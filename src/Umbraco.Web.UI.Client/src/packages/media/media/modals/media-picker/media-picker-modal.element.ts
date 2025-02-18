@@ -1,9 +1,9 @@
-import { UmbMediaItemRepository, type UmbMediaItemModel } from '../../repository/index.js';
+import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDropzoneElement } from '../../dropzone/dropzone.element.js';
-import type { UmbMediaTreeItemModel } from '../../tree/index.js';
-import { UmbMediaSearchProvider, type UmbMediaSearchItemModel } from '../../search/index.js';
+import type { UmbMediaTreeItemModel, UmbMediaSearchItemModel, UmbMediaItemModel } from '../../types.js';
+import { UmbMediaSearchProvider } from '../../search/index.js';
 import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
@@ -31,10 +31,7 @@ const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_M
 
 // TODO: investigate how we can reuse the picker-search-field element, picker context etc.
 @customElement('umb-media-picker-modal')
-export class UmbMediaPickerModalElement extends UmbModalBaseElement<
-	UmbMediaPickerModalData<unknown>,
-	UmbMediaPickerModalValue
-> {
+export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPickerModalData, UmbMediaPickerModalValue> {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this);
 	#mediaItemRepository = new UmbMediaItemRepository(this);
 	#mediaSearchProvider = new UmbMediaSearchProvider(this);
@@ -91,8 +88,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	protected override async firstUpdated(_changedProperties: PropertyValues): Promise<void> {
 		super.firstUpdated(_changedProperties);
 
-		if (this.data?.startNode) {
-			const { data } = await this.#mediaItemRepository.requestItems([this.data.startNode]);
+		const startNode = this.data?.startNode;
+
+		if (startNode) {
+			const { data } = await this.#mediaItemRepository.requestItems([startNode.unique]);
 			this._startNode = data?.[0];
 
 			if (this._startNode) {
@@ -165,7 +164,11 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 		}
 
 		const query = this._searchQuery;
-		const { data } = await this.#mediaSearchProvider.search({ query, searchFrom: this._searchFrom });
+		const { data } = await this.#mediaSearchProvider.search({
+			query,
+			searchFrom: this._searchFrom,
+			...this.data?.search?.queryParams,
+		});
 
 		if (!data) {
 			// No search results.
@@ -229,12 +232,12 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMedia')}>
+			<umb-body-layout headline=${this.localize.term('defaultdialogs_chooseMedia')}>
 				${this.#renderBody()} ${this.#renderBreadcrumb()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
-						label=${this.localize.term('general_submit')}
+						label=${this.localize.term('general_choose')}
 						look="primary"
 						color="positive"
 						@click=${this._submitModal}></uui-button>
@@ -323,6 +326,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 			<uui-card-media
 				class=${ifDefined(disabled ? 'not-allowed' : undefined)}
 				.name=${item.name}
+				data-mark="${item.entityType}:${item.unique}"
 				@open=${() => this.#onOpen(item)}
 				@selected=${() => this.#onSelected(item)}
 				@deselected=${() => this.#onDeselected(item)}

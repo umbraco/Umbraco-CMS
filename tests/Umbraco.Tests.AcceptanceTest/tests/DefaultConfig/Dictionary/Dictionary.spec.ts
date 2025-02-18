@@ -23,8 +23,8 @@ test('can create a dictionary item', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dictionary.clickSaveButton();
 
   // Assert
-  expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeTruthy();
   await umbracoUi.dictionary.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeTruthy();
   await umbracoUi.dictionary.clickLeftArrowButton();
   // Verify the dictionary item displays in the tree and in the list
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(dictionaryName);
@@ -60,9 +60,7 @@ test('can create a dictionary item in a dictionary', {tag: '@smoke'}, async ({um
 
   // Act
   await umbracoUi.dictionary.clickActionsMenuForDictionary(parentDictionaryName);
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.dictionary.clickCreateButton();
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.dictionary.enterDictionaryName(dictionaryName);
   await umbracoUi.dictionary.clickSaveButton();
 

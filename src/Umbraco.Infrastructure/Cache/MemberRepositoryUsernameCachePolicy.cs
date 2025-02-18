@@ -30,4 +30,10 @@ public class MemberRepositoryUsernameCachePolicy : DefaultRepositoryCachePolicy<
 
         return entity;
     }
+
+    public void DeleteByUserName(string key, string? username)
+    {
+        var cacheKey = GetEntityCacheKey(key + username);
+        Cache.ClearByKey(cacheKey);
+    }
 }

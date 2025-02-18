@@ -1,4 +1,4 @@
-export const UMB_DOCUMENT_TYPE_COMPOSITION_REPOSITORY_ALIAS = 'Umb.Repository.DocumentType.Composition';
+import { UMB_DOCUMENT_TYPE_COMPOSITION_REPOSITORY_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

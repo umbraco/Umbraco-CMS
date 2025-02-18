@@ -1,10 +1,10 @@
-import { css, html, nothing, repeat, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, repeat, customElement, property, classMap } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
-type UmbCheckboxListItem = { label: string; value: string; checked: boolean };
+export type UmbCheckboxListItem = { label: string; value: string; checked: boolean; invalid?: boolean };
 
 @customElement('umb-input-checkbox-list')
 export class UmbInputCheckboxListElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -74,16 +74,22 @@ export class UmbInputCheckboxListElement extends UUIFormControlMixin(UmbLitEleme
 
 	#renderCheckbox(item: (typeof this.list)[0]) {
 		return html`<uui-checkbox
+			class=${classMap({ invalid: !!item.invalid })}
 			?checked=${item.checked}
-			label=${item.label}
+			label=${item.label + (item.invalid ? ` (${this.localize.term('validation_legacyOption')})` : '')}
+			title=${item.invalid ? this.localize.term('validation_legacyOptionDescription') : ''}
 			value=${item.value}
 			?readonly=${this.readonly}></uui-checkbox>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			uui-checkbox {
 				width: 100%;
+
+				&.invalid {
+					text-decoration: line-through;
+				}
 			}
 		`,
 	];

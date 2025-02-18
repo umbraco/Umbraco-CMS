@@ -1,4 +1,4 @@
-import { UMB_MEMBER_COLLECTION_REPOSITORY_ALIAS } from './repository/index.js';
+import { UMB_MEMBER_COLLECTION_REPOSITORY_ALIAS } from './repository/constants.js';
 import { manifests as collectionRepositoryManifests } from './repository/manifests.js';
 import { manifests as collectionViewManifests } from './views/manifests.js';
 import { manifests as collectionActionManifests } from './action/manifests.js';

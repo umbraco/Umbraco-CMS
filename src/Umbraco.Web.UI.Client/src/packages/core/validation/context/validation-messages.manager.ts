@@ -11,28 +11,40 @@ export interface UmbValidationMessage {
 	body: string;
 }
 
+/**
+ * Matches a path or a descendant path.
+ * @param {string} source The path to check.
+ * @param {string} match The path to match against, the source must forfill all of the match, but the source can be further specific.
+ * @returns {boolean} True if the path matches or is a descendant path.
+ */
+function MatchPathOrDescendantPath(source: string, match: string): boolean {
+	// Find messages that starts with the given path, if the path is longer then require a dot or [ as the next character. using a more performant way than Regex:
+	return (
+		source.indexOf(match) === 0 &&
+		(source.length === match.length || source[match.length] === '.' || source[match.length] === '[')
+	);
+}
+
 export class UmbValidationMessagesManager {
 	#messages = new UmbArrayState<UmbValidationMessage>([], (x) => x.key);
 	messages = this.#messages.asObservable();
 
 	debug(logName: string) {
-		this.#messages.asObservable().subscribe((x) => console.log(logName, x));
+		this.messages.subscribe((x) => console.log(logName, x));
 	}
 
 	getHasAnyMessages(): boolean {
 		return this.#messages.getValue().length !== 0;
 	}
 
+	getMessagesOfPathAndDescendant(path: string): Array<UmbValidationMessage> {
+		//path = path.toLowerCase();
+		return this.#messages.getValue().filter((x) => MatchPathOrDescendantPath(x.path, path));
+	}
+
 	messagesOfPathAndDescendant(path: string): Observable<Array<UmbValidationMessage>> {
 		//path = path.toLowerCase();
-		// Find messages that starts with the given path, if the path is longer then require a dot or [ as the next character. using a more performant way than Regex:
-		return this.#messages.asObservablePart((msgs) =>
-			msgs.filter(
-				(x) =>
-					x.path.indexOf(path) === 0 &&
-					(x.path.length === path.length || x.path[path.length] === '.' || x.path[path.length] === '['),
-			),
-		);
+		return this.#messages.asObservablePart((msgs) => msgs.filter((x) => MatchPathOrDescendantPath(x.path, path)));
 	}
 
 	messagesOfTypeAndPath(type: UmbValidationMessageType, path: string): Observable<Array<UmbValidationMessage>> {
@@ -43,14 +55,7 @@ export class UmbValidationMessagesManager {
 
 	hasMessagesOfPathAndDescendant(path: string): Observable<boolean> {
 		//path = path.toLowerCase();
-		return this.#messages.asObservablePart((msgs) =>
-			// Find messages that starts with the given path, if the path is longer then require a dot or [ as the next character. Using a more performant way than Regex: [NL]
-			msgs.some(
-				(x) =>
-					x.path.indexOf(path) === 0 &&
-					(x.path.length === path.length || x.path[path.length] === '.' || x.path[path.length] === '['),
-			),
-		);
+		return this.#messages.asObservablePart((msgs) => msgs.some((x) => MatchPathOrDescendantPath(x.path, path)));
 	}
 	getHasMessagesOfPathAndDescendant(path: string): boolean {
 		//path = path.toLowerCase();
@@ -90,12 +95,18 @@ export class UmbValidationMessagesManager {
 	removeMessageByKeys(keys: Array<string>): void {
 		this.#messages.filter((x) => keys.indexOf(x.key) === -1);
 	}
+	removeMessagesByType(type: UmbValidationMessageType): void {
+		this.#messages.filter((x) => x.type !== type);
+	}
+	removeMessagesByPath(path: string): void {
+		this.#messages.filter((x) => x.path !== path);
+	}
+	removeMessagesAndDescendantsByPath(path: string): void {
+		this.#messages.filter((x) => MatchPathOrDescendantPath(x.path, path));
+	}
 	removeMessagesByTypeAndPath(type: UmbValidationMessageType, path: string): void {
 		//path = path.toLowerCase();
 		this.#messages.filter((x) => !(x.type === type && x.path === path));
-	}
-	removeMessagesByType(type: UmbValidationMessageType): void {
-		this.#messages.filter((x) => x.type !== type);
 	}
 
 	#translatePath(path: string): string | undefined {

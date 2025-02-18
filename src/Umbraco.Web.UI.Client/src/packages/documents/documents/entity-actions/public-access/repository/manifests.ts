@@ -1,4 +1,4 @@
-export const UMB_DOCUMENT_PUBLIC_ACCESS_REPOSITORY_ALIAS = 'Umb.Repository.Document.PublicAccess';
+import { UMB_DOCUMENT_PUBLIC_ACCESS_REPOSITORY_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

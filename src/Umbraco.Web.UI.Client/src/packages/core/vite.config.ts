@@ -16,6 +16,7 @@ export default defineConfig({
 			'auth/index': './auth/index.ts',
 			'collection/index': './collection/index.ts',
 			'components/index': './components/index.ts',
+			'const/index': './const/index.ts',
 			'content-type/index': './content-type/index.ts',
 			'content/index': './content/index.ts',
 			'culture/index': './culture/index.ts',

@@ -1,7 +1,4 @@
-import {
-	UMB_MEMBER_GROUP_DETAIL_REPOSITORY_ALIAS,
-	UMB_MEMBER_GROUP_ITEM_REPOSITORY_ALIAS,
-} from '../repository/index.js';
+import { UMB_MEMBER_GROUP_DETAIL_REPOSITORY_ALIAS, UMB_MEMBER_GROUP_ITEM_REPOSITORY_ALIAS } from '../constants.js';
 import { UMB_MEMBER_GROUP_ENTITY_TYPE, UMB_MEMBER_GROUP_ROOT_ENTITY_TYPE } from '../entity.js';
 
 export const manifests: Array<UmbExtensionManifest> = [

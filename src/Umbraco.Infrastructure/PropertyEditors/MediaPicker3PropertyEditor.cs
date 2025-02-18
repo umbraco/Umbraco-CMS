@@ -1,8 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.TemporaryFile;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
@@ -66,7 +70,8 @@ public class MediaPicker3PropertyEditor : DataEditor
             ITemporaryFileService temporaryFileService,
             IScopeProvider scopeProvider,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            IDataTypeConfigurationCache dataTypeReadCache)
+            IDataTypeConfigurationCache dataTypeReadCache,
+            ILocalizedTextService localizedTextService)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
@@ -76,6 +81,34 @@ public class MediaPicker3PropertyEditor : DataEditor
             _scopeProvider = scopeProvider;
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _dataTypeReadCache = dataTypeReadCache;
+            Validators.Add(new MinMaxValidator(jsonSerializer, localizedTextService));
+        }
+
+        [Obsolete("Use non obsoleted constructor instead. Scheduled for removal in v17")]
+        public MediaPicker3PropertyValueEditor(
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            DataEditorAttribute attribute,
+            IMediaImportService mediaImportService,
+            IMediaService mediaService,
+            ITemporaryFileService temporaryFileService,
+            IScopeProvider scopeProvider,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IDataTypeConfigurationCache dataTypeReadCache)
+            : this(
+                shortStringHelper,
+                jsonSerializer,
+                ioHelper,
+                attribute,
+                mediaImportService,
+                mediaService,
+                temporaryFileService,
+                scopeProvider,
+                backOfficeSecurityAccessor,
+                dataTypeReadCache,
+                StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>())
+        {
         }
 
         /// <remarks>
@@ -292,6 +325,62 @@ public class MediaPicker3PropertyEditor : DataEditor
                 {
                     FocalPoint = null;
                 }
+            }
+        }
+
+        private class MinMaxValidator : IValueValidator
+        {
+            private readonly IJsonSerializer _jsonSerializer;
+            private readonly ILocalizedTextService _localizedTextService;
+
+            public MinMaxValidator(IJsonSerializer jsonSerializer, ILocalizedTextService localizedTextService)
+            {
+                _jsonSerializer = jsonSerializer;
+                _localizedTextService = localizedTextService;
+            }
+
+            public IEnumerable<ValidationResult> Validate(
+                object? value,
+                string? valueType,
+                object? dataTypeConfiguration,
+                PropertyValidationContext validationContext)
+            {
+                var validationResults = new List<ValidationResult>();
+
+                if (dataTypeConfiguration is not MediaPicker3Configuration mediaPickerConfiguration)
+                {
+                    return validationResults;
+                }
+
+                if (value is null ||
+                    _jsonSerializer.TryDeserialize(value, out List<MediaWithCropsDto>? mediaWithCropsDtos) is false)
+                {
+                    return validationResults;
+                }
+
+                if (mediaPickerConfiguration.ValidationLimit.Min is not null
+                    && mediaWithCropsDtos.Count < mediaPickerConfiguration.ValidationLimit.Min)
+                {
+                    validationResults.Add(new ValidationResult(
+                        _localizedTextService.Localize(
+                            "validation",
+                            "entriesShort",
+                            new[] { mediaPickerConfiguration.ValidationLimit.Min.ToString(), (mediaPickerConfiguration.ValidationLimit.Min - mediaWithCropsDtos.Count).ToString(), }),
+                        new[] { "validationLimit" }));
+                }
+
+                if (mediaPickerConfiguration.ValidationLimit.Max is not null
+                    && mediaWithCropsDtos.Count > mediaPickerConfiguration.ValidationLimit.Max)
+                {
+                    validationResults.Add(new ValidationResult(
+                        _localizedTextService.Localize(
+                            "validation",
+                            "entriesExceed",
+                            new[] { mediaPickerConfiguration.ValidationLimit.Max.ToString(), (mediaWithCropsDtos.Count - mediaPickerConfiguration.ValidationLimit.Max).ToString(), }),
+                        new[] { "validationLimit" }));
+                }
+
+                return validationResults;
             }
         }
     }

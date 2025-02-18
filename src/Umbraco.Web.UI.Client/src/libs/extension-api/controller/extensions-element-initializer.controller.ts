@@ -5,8 +5,12 @@ import { UmbExtensionElementInitializer } from './extension-element-initializer.
 import {
 	type PermittedControllerType,
 	UmbBaseExtensionsInitializer,
+	type UmbBaseExtensionsInitializerArgs,
 } from './base-extensions-initializer.controller.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbExtensionsElementInitializerArgs extends UmbBaseExtensionsInitializerArgs {}
 
 /**
  */
@@ -46,8 +50,9 @@ export class UmbExtensionsElementInitializer<
 		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void,
 		controllerAlias?: string,
 		defaultElement?: string,
+		args?: UmbExtensionsElementInitializerArgs,
 	) {
-		super(host, extensionRegistry, type, filter, onChange, controllerAlias);
+		super(host, extensionRegistry, type, filter, onChange, controllerAlias, args);
 		this.#extensionRegistry = extensionRegistry;
 		this.#defaultElement = defaultElement;
 		this._init();

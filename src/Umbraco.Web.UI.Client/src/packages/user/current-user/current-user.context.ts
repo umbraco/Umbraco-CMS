@@ -58,10 +58,10 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
 
 		if (asObservable) {
-			this.observe(asObservable(), (currentUser) => {
+			await this.observe(asObservable(), (currentUser) => {
 				this.#currentUser?.setValue(currentUser);
 				this.#redirectToFirstAllowedSectionIfNeeded();
-			});
+			}).asPromise();
 		}
 	}
 

@@ -1,5 +1,4 @@
-export const UMB_TAG_REPOSITORY_ALIAS = 'Umb.Repository.Tags';
-export const UMB_TAG_STORE_ALIAS = 'Umb.Store.Tags';
+import { UMB_TAG_REPOSITORY_ALIAS, UMB_TAG_STORE_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

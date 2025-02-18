@@ -34,7 +34,7 @@ export class UmbWorkspaceIsNewRedirectController extends UmbControllerBase {
 							id: unique,
 						});
 						this.destroy();
-						window.history.pushState({}, '', newPath);
+						window.history.replaceState({}, '', newPath);
 					}
 				}
 			}

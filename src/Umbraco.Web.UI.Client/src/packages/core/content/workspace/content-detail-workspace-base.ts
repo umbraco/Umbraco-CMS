@@ -3,6 +3,7 @@ import { UmbContentWorkspaceDataManager } from '../manager/index.js';
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
 import type { UmbContentVariantPickerData, UmbContentVariantPickerValue } from '../variant-picker/index.js';
 import type { UmbContentPropertyDatasetContext } from '../property-dataset-context/index.js';
+import type { UmbContentValidationRepository } from '../repository/content-validation-repository.interface.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbraco-cms/backoffice/repository';
@@ -23,7 +24,7 @@ import {
 	type UmbEntityVariantModel,
 	type UmbEntityVariantOptionModel,
 } from '@umbraco-cms/backoffice/variant';
-import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
@@ -33,7 +34,7 @@ import {
 	UMB_VALIDATION_CONTEXT,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbDataPathVariantQuery,
-	UmbValidationContext,
+	UmbServerModelValidatorContext,
 	UmbVariantsValidationPathTranslator,
 	UmbVariantValuesValidationPathTranslator,
 } from '@umbraco-cms/backoffice/validation';
@@ -41,9 +42,11 @@ import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
+	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
+import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -54,10 +57,26 @@ export interface UmbContentDetailWorkspaceContextArgs<
 	VariantOptionModelType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel<VariantModelType>,
 > extends UmbEntityDetailWorkspaceContextArgs {
 	contentTypeDetailRepository: UmbDetailRepositoryConstructor<ContentTypeDetailModelType>;
+	contentValidationRepository?: ClassConstructor<UmbContentValidationRepository<DetailModelType>>;
+	skipValidationOnSubmit?: boolean;
 	contentVariantScaffold: VariantModelType;
 	saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 }
 
+/**
+ * The base class for a content detail workspace context.
+ * @exports
+ * @abstract
+ * @class UmbContentDetailWorkspaceContextBase
+ * @augments {UmbEntityDetailWorkspaceContextBase<DetailModelType, DetailRepositoryType, CreateArgsType>}
+ * @implements {UmbContentWorkspaceContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>}
+ * @template DetailModelType
+ * @template DetailRepositoryType
+ * @template ContentTypeDetailModelType
+ * @template VariantModelType
+ * @template VariantOptionModelType
+ * @template CreateArgsType
+ */
 export abstract class UmbContentDetailWorkspaceContextBase<
 		DetailModelType extends UmbContentDetailModel<VariantModelType>,
 		DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
@@ -78,8 +97,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/* Content Data */
 	protected override readonly _data = new UmbContentWorkspaceDataManager<DetailModelType, VariantModelType>(this);
+
+	public override readonly data = this._data.current;
 	public readonly values = this._data.createObservablePartOfCurrent((data) => data?.values);
 	public readonly variants = this._data.createObservablePartOfCurrent((data) => data?.variants ?? []);
+	public override readonly persistedData = this._data.persisted;
 
 	/* Content Type (Structure) Data */
 	public readonly structure;
@@ -90,11 +112,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	abstract readonly contentTypeUnique: Observable<string | undefined>;
 
 	/* Data Type */
+	// This dataTypeItemManager is used to load the data type items for this content type, so we have all data-types for this content type up front. [NL]
+	// But once we have a propert application cache this could be solved in a way where we ask the cache for the data type items. [NL]
+	// And then we do not need to store them here in a local manager, but instead just request them here up-front and then again needed(which would get them from the cache, which as well could be update while this runs) [NL]
 	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
-	/**
-	 * Data Type Schema Map is used for lookup, this should make coder simpler and give better performance. [NL]
-	 */
-	#dataTypeSchemaAliasMap = new Map<string, string>();
 
 	#varies?: boolean;
 	#variesByCulture?: boolean;
@@ -118,6 +139,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	// TODO: fix type error
 	public readonly variantOptions;
 
+	#validateOnSubmit: boolean;
+	#serverValidation = new UmbServerModelValidatorContext(this);
+	#validationRepositoryClass?: ClassConstructor<UmbContentValidationRepository<DetailModelType>>;
+	#validationRepository?: UmbContentValidationRepository<DetailModelType>;
+
 	#saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 
 	constructor(
@@ -135,6 +161,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.#saveModalToken = args.saveModalToken;
 
 		const contentTypeDetailRepository = new args.contentTypeDetailRepository(this);
+		this.#validationRepositoryClass = args.contentValidationRepository;
+		this.#validateOnSubmit = args.skipValidationOnSubmit ? !args.skipValidationOnSubmit : true;
 		this.structure = new UmbContentTypeStructureManager<ContentTypeDetailModelType>(this, contentTypeDetailRepository);
 		this.variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
 		this.variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
@@ -173,7 +201,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			},
 		);
 
-		this.addValidationContext(new UmbValidationContext(this));
 		new UmbVariantValuesValidationPathTranslator(this);
 		new UmbVariantsValidationPathTranslator(this);
 
@@ -205,18 +232,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.structure.contentTypeDataTypeUniques,
 			(dataTypeUniques: Array<string>) => {
 				this.#dataTypeItemManager.setUniques(dataTypeUniques);
-			},
-			null,
-		);
-		this.observe(
-			this.#dataTypeItemManager.items,
-			(dataTypes) => {
-				// Make a map of the data type unique and editorAlias
-				this.#dataTypeSchemaAliasMap = new Map(
-					dataTypes.map((dataType) => {
-						return [dataType.unique, dataType.propertyEditorSchemaAlias];
-					}),
-				);
 			},
 			null,
 		);
@@ -320,6 +335,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		return this._data.getCurrent()?.variants?.find((x) => variantId.compare(x));
 	}
 
+	public getVariants(): Array<VariantModelType> | undefined {
+		return this._data.getCurrent()?.variants;
+	}
+
 	/**
 	 * Observe the property type
 	 * @param {string} propertyId - The id of the property
@@ -393,7 +412,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			throw new Error(`Property alias "${alias}" not found.`);
 		}
 
-		const editorAlias = this.#dataTypeSchemaAliasMap.get(property.dataType.unique);
+		// the getItemByUnique is a async method that first resolves once the item is loaded.
+		const editorAlias = (await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique))
+			.propertyEditorSchemaAlias;
+		// This means if its not loaded this will never resolve and the error below will never happen.
 		if (!editorAlias) {
 			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
 		}
@@ -428,7 +450,19 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this._data.finishPropertyValueChange();
 	};
 
-	protected async _determineVariantOptions() {
+	/**
+	 * Gets the changed variant ids
+	 * @returns {Array<UmbVariantId>} - The changed variant ids
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
+	public getChangedVariants(): Array<UmbVariantId> {
+		return this._data.getChangedVariants();
+	}
+
+	protected async _determineVariantOptions(): Promise<{
+		options: VariantOptionModelType[];
+		selected: string[];
+	}> {
 		const options = await firstValueFrom(this.variantOptions);
 
 		const activeVariants = this.splitView.getActiveVariants();
@@ -447,14 +481,41 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		};
 	}
 
-	protected _readOnlyLanguageVariantsFilter = (option: VariantOptionModelType) => {
+	protected _saveableVariantsFilter = (option: VariantOptionModelType) => {
 		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
 		return readOnlyCultures.includes(option.culture) === false;
 	};
 
 	/* validation */
-	protected async _runMandatoryValidationForSaveData(saveData: DetailModelType) {
+	/**
+	 * Run the mandatory validation for the save data
+	 * @deprecated Use the public runMandatoryValidationForSaveData instead. Will be removed in v. 17.
+	 * @protected
+	 * @param {DetailModelType} saveData - The data to validate
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
+	protected async _runMandatoryValidationForSaveData(saveData: DetailModelType, variantIds: Array<UmbVariantId> = []) {
+		new UmbDeprecation({
+			removeInVersion: '17',
+			deprecated: '_runMandatoryValidationForSaveData',
+			solution: 'Use the public runMandatoryValidationForSaveData instead.',
+		}).warn();
+		this.runMandatoryValidationForSaveData(saveData, variantIds);
+	}
+
+	/**
+	 * Run the mandatory validation for the save data
+	 * @param {DetailModelType} saveData - The data to validate
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
+	public async runMandatoryValidationForSaveData(saveData: DetailModelType, variantIds: Array<UmbVariantId> = []) {
 		// Check that the data is valid before we save it.
+		const missingVariants = variantIds.filter((variant) => {
+			return !saveData.variants.some((y) => variant.compare(y));
+		});
+		if (missingVariants.length > 0) {
+			throw new Error('One or more selected variants have not been created');
+		}
 		// Check variants have a name:
 		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
 		if (variantsWithoutAName.length > 0) {
@@ -470,8 +531,54 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 	}
 
+	/**
+	 * Ask the server to validate the save data
+	 * @param {DetailModelType} saveData - The data to validate
+	 * @param {Array<UmbVariantId>} variantIds - The variant ids to validate
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
+	public async askServerToValidate(saveData: DetailModelType, variantIds: Array<UmbVariantId>) {
+		if (this.#validationRepositoryClass) {
+			// Create the validation repository if it does not exist. (we first create this here when we need it) [NL]
+			this.#validationRepository ??= new this.#validationRepositoryClass(this);
+
+			// We ask the server first to get a concatenated set of validation messages. So we see both front-end and back-end validation messages [NL]
+			if (this.getIsNew()) {
+				const parent = this.getParent();
+				if (!parent) throw new Error('Parent is not set');
+				await this.#serverValidation.askServerForValidation(
+					saveData,
+					this.#validationRepository.validateCreate(saveData, parent.unique),
+				);
+			} else {
+				await this.#serverValidation.askServerForValidation(
+					saveData,
+					this.#validationRepository.validateSave(saveData, variantIds),
+				);
+			}
+		}
+	}
+
+	/**
+	 * Request a submit of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be submitted.
+	 * @returns {Promise<void>} a promise which resolves once it has been completed.
+	 */
+	public override requestSubmit() {
+		return this._handleSubmit();
+	}
+
 	public override submit() {
 		return this._handleSubmit();
+	}
+
+	/**
+	 * Get the data to save
+	 * @param {Array<UmbVariantId>} variantIds - The variant ids to save
+	 * @returns {Promise<DetailModelType>}  {Promise<DetailModelType>}
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
+	public constructSaveData(variantIds: Array<UmbVariantId>): Promise<DetailModelType> {
+		return this._data.constructData(variantIds);
 	}
 
 	protected async _handleSubmit() {
@@ -497,7 +604,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				.open(this, this.#saveModalToken, {
 					data: {
 						options,
-						pickableFilter: this._readOnlyLanguageVariantsFilter,
+						pickableFilter: this._saveableVariantsFilter,
 					},
 					value: { selection: selected },
 				})
@@ -511,12 +618,42 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			throw new Error('No variant picker modal token is set. There are multiple variants to save. Cannot proceed.');
 		}
 
-		const saveData = await this._data.constructData(variantIds);
-		await this._runMandatoryValidationForSaveData(saveData);
-		await this._performCreateOrUpdate(variantIds, saveData);
+		const saveData = await this.constructSaveData(variantIds);
+		await this.runMandatoryValidationForSaveData(saveData, variantIds);
+		if (this.#validateOnSubmit) {
+			await this.askServerToValidate(saveData, variantIds);
+			return this.validateAndSubmit(
+				async () => {
+					return this.performCreateOrUpdate(variantIds, saveData);
+				},
+				async () => {
+					return this.invalidSubmit();
+				},
+			);
+		} else {
+			await this.performCreateOrUpdate(variantIds, saveData);
+		}
 	}
 
+	/**
+	 * Perform the create or update of the content
+	 * @deprecated Use the public performCreateOrUpdate instead. Will be removed in v. 17.
+	 * @protected
+	 * @param {Array<UmbVariantId>} variantIds
+	 * @param {DetailModelType} saveData
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
 	protected async _performCreateOrUpdate(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
+		await this.performCreateOrUpdate(variantIds, saveData);
+	}
+
+	/**
+	 * Perform the create or update of the content
+	 * @param {Array<UmbVariantId>} variantIds - The variant ids to save
+	 * @param {DetailModelType} saveData - The data to save
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
+	public async performCreateOrUpdate(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
 		if (this.getIsNew()) {
 			await this.#create(variantIds, saveData);
 		} else {
@@ -584,14 +721,27 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 		this._data.setCurrent(newCurrentData);
 
+		const unique = this.getUnique()!;
+		const entityType = this.getEntityType();
+
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			entityType: this.getEntityType(),
-			unique: this.getUnique()!,
+		const structureEvent = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+		eventContext.dispatchEvent(structureEvent);
+
+		const updatedEvent = new UmbEntityUpdatedEvent({
+			unique,
+			entityType,
+			eventUnique: this._workspaceEventUnique,
 		});
 
-		eventContext.dispatchEvent(event);
+		eventContext.dispatchEvent(updatedEvent);
+
 		this._closeModal();
+	}
+
+	override resetState() {
+		super.resetState();
+		this.readOnlyState.clear();
 	}
 
 	abstract getContentTypeUnique(): string | undefined;

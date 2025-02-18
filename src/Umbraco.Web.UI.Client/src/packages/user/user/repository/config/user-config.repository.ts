@@ -7,14 +7,23 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbUserConfigRepository extends UmbRepositoryBase implements UmbApi {
+	/**
+	 * Promise that resolves when the repository has been initialized, i.e. when the user configuration has been fetched from the server.
+	 * @memberof UmbUserConfigRepository
+	 */
+	initialized: Promise<void>;
+
 	#dataStore?: typeof UMB_USER_CONFIG_STORE_CONTEXT.TYPE;
 	#dataSource = new UmbUserConfigServerDataSource(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-		this.consumeContext(UMB_USER_CONFIG_STORE_CONTEXT, (store) => {
-			this.#dataStore = store;
-			this.#init();
+		this.initialized = new Promise<void>((resolve) => {
+			this.consumeContext(UMB_USER_CONFIG_STORE_CONTEXT, async (store) => {
+				this.#dataStore = store;
+				await this.#init();
+				resolve();
+			});
 		});
 	}
 

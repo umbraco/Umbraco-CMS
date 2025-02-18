@@ -423,6 +423,8 @@ export type CreateUserRequestModel = {
 
 export type CreateWebhookRequestModel = {
     enabled: boolean;
+    name?: (string) | null;
+    description?: (string) | null;
     url: string;
     contentTypeKeys: Array<(string)>;
     headers: {
@@ -443,10 +445,11 @@ export type CultureReponseModel = {
 };
 
 export type CurrentUserResponseModel = {
-    id: string;
     email: string;
     userName: string;
     name: string;
+    userGroupIds: Array<(ReferenceByIdModel)>;
+    id: string;
     languageIsoCode: (string) | null;
     documentStartNodeIds: Array<(ReferenceByIdModel)>;
     hasDocumentRootAccess: boolean;
@@ -469,6 +472,8 @@ export type CurrenUserConfigurationResponseModel = {
      */
     usernameIsEmail: boolean;
     passwordConfiguration: (PasswordConfigurationResponseModel);
+    allowChangePassword: boolean;
+    allowTwoFactor: boolean;
 };
 
 export type DatabaseInstallRequestModel = {
@@ -560,6 +565,7 @@ export type DataTypeTreeItemResponseModel = {
 };
 
 export type DefaultReferenceResponseModel = {
+    $type: string;
     id: string;
     name?: (string) | null;
     type?: (string) | null;
@@ -635,6 +641,8 @@ export type DocumentCollectionResponseModel = {
     creator?: (string) | null;
     sortOrder: number;
     documentType: (DocumentTypeCollectionReferenceResponseModel);
+    isTrashed: boolean;
+    isProtected: boolean;
     updater?: (string) | null;
 };
 
@@ -673,6 +681,7 @@ export type DocumentPermissionPresentationModel = {
 
 export type DocumentRecycleBinItemResponseModel = {
     id: string;
+    createDate: string;
     hasChildren: boolean;
     parent?: ((ItemReferenceByIdResponseModel) | null);
     documentType: (DocumentTypeReferenceResponseModel);
@@ -680,6 +689,7 @@ export type DocumentRecycleBinItemResponseModel = {
 };
 
 export type DocumentReferenceResponseModel = {
+    $type: string;
     id: string;
     name?: (string) | null;
     published?: (boolean) | null;
@@ -702,6 +712,7 @@ export type DocumentTreeItemResponseModel = {
     noAccess: boolean;
     isTrashed: boolean;
     id: string;
+    createDate: string;
     isProtected: boolean;
     documentType: (DocumentTypeReferenceResponseModel);
     variants: Array<(DocumentVariantItemResponseModel)>;
@@ -865,6 +876,8 @@ export type DocumentVariantResponseModel = {
     updateDate: string;
     state: DocumentVariantStateModel;
     publishDate?: (string) | null;
+    scheduledPublishDate?: (string) | null;
+    scheduledUnpublishDate?: (string) | null;
 };
 
 export enum DocumentVariantStateModel {
@@ -1027,7 +1040,8 @@ export type HealthCheckWithResultPresentationModel = {
 export enum HealthStatusModel {
     HEALTHY = 'Healthy',
     UNHEALTHY = 'Unhealthy',
-    REBUILDING = 'Rebuilding'
+    REBUILDING = 'Rebuilding',
+    CORRUPT = 'Corrupt'
 }
 
 export type HealthStatusResponseModel = {
@@ -1195,6 +1209,7 @@ export type MediaItemResponseModel = {
 
 export type MediaRecycleBinItemResponseModel = {
     id: string;
+    createDate: string;
     hasChildren: boolean;
     parent?: ((ItemReferenceByIdResponseModel) | null);
     mediaType: (MediaTypeReferenceResponseModel);
@@ -1202,6 +1217,7 @@ export type MediaRecycleBinItemResponseModel = {
 };
 
 export type MediaReferenceResponseModel = {
+    $type: string;
     id: string;
     name?: (string) | null;
     mediaType: (TrackedReferenceMediaTypeModel);
@@ -1222,6 +1238,7 @@ export type MediaTreeItemResponseModel = {
     noAccess: boolean;
     isTrashed: boolean;
     id: string;
+    createDate: string;
     mediaType: (MediaTypeReferenceResponseModel);
     variants: Array<(VariantItemResponseModel)>;
 };
@@ -1932,6 +1949,11 @@ export type PagedWebhookEventModel = {
     items: Array<(WebhookEventModel)>;
 };
 
+export type PagedWebhookLogResponseModel = {
+    total: number;
+    items: Array<(WebhookLogResponseModel)>;
+};
+
 export type PagedWebhookResponseModel = {
     total: number;
     items: Array<(WebhookResponseModel)>;
@@ -2028,6 +2050,7 @@ export type PublishDocumentRequestModel = {
 
 export type PublishDocumentWithDescendantsRequestModel = {
     includeUnpublishedDescendants: boolean;
+    forceRepublish: boolean;
     cultures: Array<(string)>;
 };
 
@@ -2203,6 +2226,7 @@ export type ServerConfigurationItemResponseModel = {
 export type ServerConfigurationResponseModel = {
     allowPasswordReset: boolean;
     versionCheckPeriod: number;
+    allowLocalLogin: boolean;
 };
 
 export type ServerInformationResponseModel = {
@@ -2654,6 +2678,8 @@ export type UpdateUserRequestModel = {
 
 export type UpdateWebhookRequestModel = {
     enabled: boolean;
+    name?: (string) | null;
+    description?: (string) | null;
     url: string;
     contentTypeKeys: Array<(string)>;
     headers: {
@@ -2680,6 +2706,8 @@ export type UserConfigurationResponseModel = {
     canInviteUsers: boolean;
     usernameIsEmail: boolean;
     passwordConfiguration: (PasswordConfigurationResponseModel);
+    allowChangePassword: boolean;
+    allowTwoFactor: boolean;
 };
 
 export type UserDataModel = {
@@ -2868,8 +2896,26 @@ export type WebhookItemResponseModel = {
     types: string;
 };
 
+export type WebhookLogResponseModel = {
+    key: string;
+    webhookKey: string;
+    statusCode: string;
+    isSuccessStatusCode: boolean;
+    date: string;
+    eventAlias: string;
+    url: string;
+    retryCount: number;
+    requestHeaders: string;
+    requestBody: string;
+    responseHeaders: string;
+    responseBody: string;
+    exceptionOccured: boolean;
+};
+
 export type WebhookResponseModel = {
     enabled: boolean;
+    name?: (string) | null;
+    description?: (string) | null;
     url: string;
     contentTypeKeys: Array<(string)>;
     headers: {
@@ -3303,6 +3349,7 @@ export type GetItemDocumentData = {
 export type GetItemDocumentResponse = (Array<(DocumentItemResponseModel)>);
 
 export type GetItemDocumentSearchData = {
+    allowedDocumentTypes?: Array<(string)>;
     parentId?: string;
     query?: string;
     skip?: number;
@@ -3871,6 +3918,7 @@ export type GetItemMediaData = {
 export type GetItemMediaResponse = (Array<(MediaItemResponseModel)>);
 
 export type GetItemMediaSearchData = {
+    allowedMediaTypes?: Array<(string)>;
     parentId?: string;
     query?: string;
     skip?: number;
@@ -4222,6 +4270,7 @@ export type GetItemMemberData = {
 export type GetItemMemberResponse = (Array<(MemberItemResponseModel)>);
 
 export type GetItemMemberSearchData = {
+    allowedMemberTypes?: Array<(string)>;
     query?: string;
     skip?: number;
     take?: number;
@@ -5340,9 +5389,24 @@ export type PutWebhookByIdData = {
 
 export type PutWebhookByIdResponse = (string);
 
+export type GetWebhookByIdLogsData = {
+    id: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetWebhookByIdLogsResponse = ((PagedWebhookLogResponseModel));
+
 export type GetWebhookEventsData = {
     skip?: number;
     take?: number;
 };
 
 export type GetWebhookEventsResponse = ((PagedWebhookEventModel));
+
+export type GetWebhookLogsData = {
+    skip?: number;
+    take?: number;
+};
+
+export type GetWebhookLogsResponse = ((PagedWebhookLogResponseModel));

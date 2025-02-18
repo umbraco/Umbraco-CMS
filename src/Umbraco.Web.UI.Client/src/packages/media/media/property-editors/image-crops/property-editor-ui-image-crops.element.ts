@@ -4,6 +4,7 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/propert
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 export type UmbCrop = {
 	label: string;
@@ -20,13 +21,41 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 	@query('#label')
 	private _labelInput!: HTMLInputElement;
 
-	@property({ attribute: false })
-	value: UmbCrop[] = [];
+	@state()
+	private _value: Array<UmbCrop> = [];
+
+	@property({ type: Array })
+	public set value(value: Array<UmbCrop>) {
+		this._value = value ?? [];
+		this.#sorter.setModel(this.value);
+	}
+	public get value(): Array<UmbCrop> {
+		return this._value;
+	}
 
 	@state()
 	editCropAlias = '';
 
 	#oldInputValue = '';
+
+	#sorter = new UmbSorterController(this, {
+		getUniqueOfElement: (element: HTMLElement) => {
+			const unique = element.dataset['alias'];
+			return unique;
+		},
+		getUniqueOfModel: (modelEntry: UmbCrop) => {
+			return modelEntry.alias;
+		},
+		identifier: 'Umb.SorterIdentifier.ImageCrops',
+		itemSelector: '.crop',
+		containerSelector: '.crops',
+		onChange: ({ model }) => {
+			const oldValue = this._value;
+			this._value = model;
+			this.requestUpdate('_value', oldValue);
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		},
+	});
 
 	#onRemove(alias: string) {
 		this.value = [...this.value.filter((item) => item.alias !== alias)];
@@ -163,7 +192,7 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 					this.value,
 					(item) => item.alias,
 					(item) => html`
-						<div class="crop">
+						<div class="crop" data-alias="${item.alias}">
 							<span class="crop-drag">+</span>
 							<span><strong>${item.label}</strong> <em>(${item.alias})</em></span>
 							<span class="crop-size">(${item.width} x ${item.height}px)</span>

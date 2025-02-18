@@ -99,7 +99,8 @@ public class HtmlImageSourceParserTests
             new MediaUrlProviderCollection(() => new[] { mediaUrlProvider.Object }),
             Mock.Of<IVariationContextAccessor>(),
             Mock.Of<IPublishedContentCache>(),
-            Mock.Of<IDocumentNavigationQueryService>());
+            Mock.Of<IDocumentNavigationQueryService>(),
+            Mock.Of<IPublishStatusQueryService>());
 
         using (var reference = umbracoContextFactory.EnsureUmbracoContext())
         {

@@ -1,5 +1,7 @@
-import { UMB_PROPERTY_TYPE_ENTITY_TYPE, UMB_PROPERTY_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+
+export const UMB_PROPERTY_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.PropertyType';
+export const UMB_PROPERTY_TYPE_ENTITY_TYPE = 'property-type';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

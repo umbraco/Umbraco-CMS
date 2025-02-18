@@ -1,4 +1,4 @@
-import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '../../contexts/is-trashed/index.js';
+import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '../../constants.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbConditionConfigBase,

@@ -117,7 +117,7 @@ public class NewDefaultUrlProvider : IUrlProvider
 
             // although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
             var route = GetLegacyRouteFormatById(key, culture);
-            if (route == null)
+            if (route == null || route == "#")
             {
                 continue;
             }
@@ -145,8 +145,10 @@ public class NewDefaultUrlProvider : IUrlProvider
 
     private string GetLegacyRouteFormatById(Guid key, string? culture)
     {
+        var isDraft = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
 
-        return _documentUrlService.GetLegacyRouteFormat(key, culture, _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode);
+
+        return _documentUrlService.GetLegacyRouteFormat(key, culture, isDraft);
 
 
     }
@@ -163,9 +165,22 @@ public class NewDefaultUrlProvider : IUrlProvider
             throw new ArgumentException("Current URL must be absolute.", nameof(current));
         }
 
+        // This might seem to be some code duplication, as we do the same check in GetLegacyRouteFormat
+        // but this is strictly neccesary, as if we're coming from a published notification
+        // this document will still not always be in the memory cache. And thus we have to hit the DB
+        // We have the published content now, so we can check if the culture is published, and thus avoid the DB hit.
+        string route;
+        var isDraft = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
+        if(isDraft is false && string.IsNullOrWhiteSpace(culture) is false && content.Cultures.Any() && content.IsInvariantOrHasCulture(culture) is false)
+        {
+            route = "#";
+        }
+        else
+        {
+            route = GetLegacyRouteFormatById(content.Key, culture);
+        }
 
         // will not use cache if previewing
-        var route = GetLegacyRouteFormatById(content.Key, culture);
 
         return GetUrlFromRoute(route, content.Id, current, mode, culture);
     }

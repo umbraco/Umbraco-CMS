@@ -13,7 +13,7 @@ If the answer is yes, please read on. Otherwise, make sure to head on over [to t
 
 ↖️ You can jump to any section by using the "table of contents" button ( ![Table of contents icon](img/tableofcontentsicon.svg) ) above.
 
-## Debugging source locally
+## Working with the Umbraco source code
 
 Did you read ["Are you sure"](#are-you-sure)?
 
@@ -21,75 +21,109 @@ Did you read ["Are you sure"](#are-you-sure)?
 
 If you want to run a build without debugging, see [Building from source](#building-from-source) below. This runs the build in the same way it is run on our build servers.
 
-> [!NOTE]
-> The caching for the back office has been described as 'aggressive' so we often find it's best when making back office changes to [disable caching in the browser (check "Disable cache" on the "Network" tab of developer tools)][disable browser caching] to help you to see the changes you're making.
+If you've got this far and are keen to get stuck in helping us fix a bug or implement a feature, great! Please read on...
 
-#### Debugging with VS Code
+### Prerequisites
 
-In order to build the Umbraco source code locally with Visual Studio Code, first make sure you have the following installed.
+In order to work with the Umbraco source code locally, first make sure you have the following installed.
 
--   [Visual Studio Code](https://code.visualstudio.com/)
+-   Your favourite IDE: [Visual Studio 2022 v17+ with .NET 7+](https://visualstudio.microsoft.com/vs/), [Rider](https://www.jetbrains.com/rider/) or [Visual Studio Code](https://code.visualstudio.com/)
 -   [dotnet SDK v9+](https://dotnet.microsoft.com/en-us/download)
 -   [Node.js v20+](https://nodejs.org/en/download/)
 -   npm v10+ (installed with Node.js)
 -   [Git command line](https://git-scm.com/download/)
 
-Open the root folder of the repository in Visual Studio Code.
+### Familiarizing yourself with the code
 
-To build the front end you'll need to open the command pallet (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>) and run `>Tasks: Run Task` followed by `Client Build`.
+Umbraco is a .NET application using C#. The solution is broken down into multiple projects.  There are several class libraries. The `Umbraco.Web.UI` project is the main project that hosts the back office and login screen. This is the project you will want to run to see your changes.
 
-You can also run the tasks manually on the command line:
+There are two web projects in the solution with client-side assets based on TypeScript, `Umbraco.Web.UI.Client` and `Umbraco.Web.UI.Login`.
 
-```
-cd src\Umbraco.Web.UI.Client
-npm i
-npm run build:for:cms
-```
+There are a few different ways to work locally when implementing features or fixing issues with the Umbraco CMS. Depending on whether you are working solely on the front-end, solely on the back-end, or somewhere in between, you may find different workflows work best for you.
 
-If you just want to watch the UI Client to `Umbraco.Web.UI` then instead of running `build:for:cms`, you can do: `npm run dev:mock`. This will launch the Vite dev server on http://localhost:5173 and watch for changes with mocked API responses.
+Here are some suggestions based on how we work on developing Umbraco at HQ.
 
-You can also run `npm run dev:server` to run the Vite server against a local Umbraco instance. In this case, you need to have the .NET project running and accept connections from the Vite server. Please see the Umbraco.Web.UI.Client README.md [Run against a local Umbraco instance](../src/Umbraco.Web.UI.Client/.github/README.md#run-against-a-local-umbraco-instance) for more information.
+### First checkout
 
-The login screen is a different frontend build, for that one you can run it as follows:
+When you first clone the source code, build the whole solution via your IDE. You can then start the `Umbraco.Web.UI` project via the IDE or the command line and should find everything across front and back-end is built and running.
 
 ```
-cd src\Umbraco.Web.UI.Login
-npm i
-npm run dev
+cd <solution root>\src\Umbraco.Web.UI
+dotnet run --no-build
 ```
 
-If you just want to build the Login screen to `Umbraco.Web.UI` then instead of running `dev`, you can do: `npm run build`.
+When the page loads in your web browser, you can follow the installer to set up a database for debugging. When complete, you will have an empty Umbraco installation to begin working with. You may also wish to install a [starter kit][https://marketplace.umbraco.com/category/themes-&-starter-kits] to ease your debugging.
 
-To run the C# portion of the project, either hit <kbd>F5</kbd> to begin debugging, or manually using the command line:
+### Back-end only changes
+
+If you are working on back-end only features, when switching branches or pulling down the latest from GitHub, you will find the front-end getting rebuilt periodically when you look to build the back-end changes. This can take a while and slow you down. So if for a period of time you don't care about changes in the front-end, you can disable this build step.
+
+Go to `Umbraco.Cms.StaticAssets.csproj` and comment out the following lines of MsBuild by adding a REM statement in front:
 
 ```
-dotnet watch --project .\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj
+REM npm ci --no-fund --no-audit --prefer-offline
+REM npm run build:for:cms
 ```
 
-**The initial C# build might take a _really_ long time (seriously, go and make a cup of coffee!) - but don't worry, this will be faster on subsequent runs.**
+Just be careful not to include this change in your PR.
 
-When the page eventually loads in your web browser, you can follow the installer to set up a database for debugging. You may also wish to install a [starter kit][starter kits] to ease your debugging.
+### Front-end only changes
 
-#### Debugging with Visual Studio
+Conversely, if you are working on front-end only, you want to build the back-end once and then run it. Before you do so, update the configuration in `appSettings.json` to add the following under `Umbraco:Cms:Security`:
 
-In order to build the Umbraco source code locally with Visual Studio, first make sure you have the following installed.
+```
+"BackOfficeHost": "http://localhost:5173",
+"AuthorizeCallbackPathName": "/oauth_complete",
+"AuthorizeCallbackLogoutPathName": "/logout",
+"AuthorizeCallbackErrorPathName": "/error"
+```
 
--   [Visual Studio 2022 v17+ with .NET 7+](https://visualstudio.microsoft.com/vs/) ([the community edition is free](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15) for you to use to contribute to Open Source projects)
--   [Node.js v20+](https://nodejs.org/en/download/)
--   npm v10+ (installed with Node.js)
--   [Git command line](https://git-scm.com/download/)
+Then run Umbraco from the command line.
 
-The easiest way to get started is to open `umbraco.sln` in Visual Studio.
+```
+cd <solution root>\src\Umbraco.Web.UI
+dotnet run --no-build
+```
 
-Umbraco is a C# based codebase, which is mostly ASP.NET Core MVC based. You can make changes, build them in Visual Studio, and hit <kbd>F5</kbd> to see the result. There are two web projects in the solution, `Umbraco.Web.UI.Client` and `Umbraco.Web.UI.Login`. They each have their own build process and can be run separately. The `Umbraco.Web.UI` project is the main project that hosts the back office and login screen. This is the project you will want to run to see your changes. It will automatically restore and build the client projects when you run it.
+In another terminal window, run the following to watch the front-end changes and launch Umbraco using the URL indicated from this task.
 
-If you want to watch the UI Client to `Umbraco.Web.UI` then you can open a terminal in `src/Umbraco.Web.UI.Client` where you can run `npm run dev:mock` manually. This will launch the Vite dev server on http://localhost:5173 and watch for changes with mocked API responses.
+```
+cd <solution root>\src\Umbraco.Web.UI.Client
+npm run dev:server
+```
 
-You can also run `npm run dev:server` to run the Vite server against a local Umbraco instance. In this case, you need to have the .NET project running and accept connections from the Vite server. Please see the Umbraco.Web.UI.Client README.md [Run against a local Umbraco instance](../src/Umbraco.Web.UI.Client/.github/README.md#run-against-a-local-umbraco-instance) for more information.
+You'll find as you make changes to the front-end files, the updates will be picked up and your browser refreshed automatically.
 
-**The initial C# build might take a _really_ long time (seriously, go and make a cup of coffee!) - but don't worry, this will be faster on subsequent runs.**
+> [!NOTE]
+> The caching for the back office has been described as 'aggressive' so we often find it's best when making back office changes to [disable caching in the browser (check "Disable cache" on the "Network" tab of developer tools)][disable browser caching] to help you to see the changes you're making.
 
-When the page eventually loads in your web browser, you can follow the installer to set up a database for debugging. You may also wish to install a [starter kit][starter kits] to ease your debugging.
+Whilst most of the backoffice code lives in `Umbraco.Web.UI.Client`, the login screen is in a separate project. If you do any work with that you can build with:
+
+```
+cd <solution root>\src\Umbraco.Web.UI.Login
+npm run build
+```
+
+In both front-end projects, if you've refreshed your branch from the latest on GitHub you may need to update front-end dependencies.
+
+To do that, run:
+
+```
+npm ci --no-fund --no-audit --prefer-offline
+```
+
+### Full-stack changes
+
+If working across both front and back-end, follow both methods and use `dotnet watch`, or re-run `dotnet run` (or `dotnet build` followed by `dotnet run --no-build`) whenever you need to update the back-end code.
+
+Request and response models used by the management APIs are made available client-side as generated code. If you make changes to the management API, you can re-generate the typed client code with:
+
+```
+cd <solution root>\src\Umbraco.Web.UI.Client
+npm run generate:server-api-dev
+```
+
+Please also update the `OpenApi.json` file held in the solution by copying and pasting the output from `/umbraco/swagger/management/swagger.json`.
 
 ## Building from source
 
@@ -150,5 +184,4 @@ The produced artifacts are published in a container that can be downloaded from 
 Git might have issues dealing with long file paths during build. You may want/need to enable `core.longpaths` support (see [this page](https://github.com/msysgit/msysgit/wiki/Git-cannot-create-a-file-or-directory-with-a-long-path) for details).
 
 [ contribution guidelines]: CONTRIBUTING.md "Read the guide to contributing for more details on contributing to Umbraco"
-[ starter kits ]: https://our.umbraco.com/packages/?category=Starter%20Kits&version=9 "Browse starter kits available for v9 on Our "
 [ disable browser caching ]: https://techwiser.com/disable-cache-google-chrome-firefox "Instructions on how to disable browser caching in Chrome and Firefox"

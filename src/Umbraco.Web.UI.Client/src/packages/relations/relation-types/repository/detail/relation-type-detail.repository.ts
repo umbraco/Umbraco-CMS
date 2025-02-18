@@ -1,6 +1,6 @@
 import type { UmbRelationTypeDetailModel } from '../../types.js';
 import { UmbRelationTypeDetailServerDataSource } from './relation-type-detail.server.data-source.js';
-import { UMB_RELATION_TYPE_DETAIL_STORE_CONTEXT } from './relation-type-detail.store.js';
+import { UMB_RELATION_TYPE_DETAIL_STORE_CONTEXT } from './relation-type-detail.store.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReadDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';

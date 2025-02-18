@@ -14,11 +14,11 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   if (dataTypeDefaultData !== null) {
-    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);   
-  }   
+    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);
+  }
 });
 
-test('can update initial state', async ({umbracoApi, umbracoUi}) => {
+test('can update preset value state', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedDataTypeValues = {
     "alias": "default",
@@ -26,7 +26,7 @@ test('can update initial state', async ({umbracoApi, umbracoUi}) => {
   };
 
   // Act
-  await umbracoUi.dataType.clickInitialStateSlider();
+  await umbracoUi.dataType.clickPresetValueSlider();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
@@ -63,6 +63,7 @@ test('can update label on', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
@@ -80,6 +81,7 @@ test('can update label off', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });

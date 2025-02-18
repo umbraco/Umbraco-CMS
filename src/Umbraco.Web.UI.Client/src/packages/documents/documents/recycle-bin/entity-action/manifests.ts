@@ -1,12 +1,11 @@
-import { UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS } from '../repository/index.js';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
-import { UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UMB_DOCUMENT_PICKER_MODAL } from '../../modals/index.js';
+import { UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS, UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
 import {
+	UMB_DOCUMENT_ENTITY_TYPE,
+	UMB_DOCUMENT_PICKER_MODAL,
 	UMB_USER_PERMISSION_DOCUMENT_DELETE,
 	UMB_USER_PERMISSION_DOCUMENT_MOVE,
-} from '../../user-permissions/constants.js';
+} from '../../constants.js';
+import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../item/constants.js';
 import {
 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 	UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,

@@ -1,9 +1,7 @@
-import type { UmbBlockTypeWithGroupKey, UmbInputBlockTypeElement } from '../../../block-type/index.js';
-import '../../../block-type/components/input-block-type/index.js';
-import {
-	type UmbPropertyEditorUiElement,
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
+import type { UmbBlockTypeWithGroupKey, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
+import type {
+	UmbPropertyEditorUiElement,
+	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import {
 	html,
@@ -30,6 +28,8 @@ import {
 } from '@umbraco-cms/backoffice/property';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 interface MappedGroupWithBlockTypes extends UmbBlockGridTypeGroupType {
 	blocks: Array<UmbBlockTypeWithGroupKey>;
@@ -43,7 +43,6 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	#moveData?: Array<UmbBlockTypeWithGroupKey>;
 	#sorter = new UmbSorterController<MappedGroupWithBlockTypes, HTMLElement>(this, {
 		getUniqueOfElement: (element) => element.getAttribute('data-umb-group-key'),
 		getUniqueOfModel: (modelEntry) => modelEntry.key!,
@@ -104,8 +103,14 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.#datasetContext = context;
-			//this.#observeBlocks();
-			this.#observeBlockGroups();
+			this.observe(
+				await this.#datasetContext.propertyValueByAlias('blockGroups'),
+				(value) => {
+					this.#blockGroups = (value as Array<UmbBlockGridTypeGroupType>) ?? [];
+					this.#mapValuesToBlockGroups();
+				},
+				'_observeBlockGroups',
+			);
 		});
 
 		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(
@@ -118,24 +123,6 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 				this._workspacePath = newpath;
 			});
 	}
-
-	async #observeBlockGroups() {
-		if (!this.#datasetContext) return;
-		this.observe(await this.#datasetContext.propertyValueByAlias('blockGroups'), (value) => {
-			this.#blockGroups = (value as Array<UmbBlockGridTypeGroupType>) ?? [];
-			this.#mapValuesToBlockGroups();
-		});
-	}
-	// TODO: No need for this, we just got the value via the value property.. [NL]
-	/*
-	async #observeBlocks() {
-		if (!this.#datasetContext) return;
-		this.observe(await this.#datasetContext.propertyValueByAlias('blocks'), (value) => {
-			this.value = (value as Array<UmbBlockTypeWithGroupKey>) ?? [];
-			this.#mapValuesToBlockGroups();
-		});
-	}
-	*/
 
 	#mapValuesToBlockGroups() {
 		if (!this.#blockGroups) return;
@@ -152,63 +139,60 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		this.#sorter.setModel(this._groupsWithBlockTypes);
 	}
 
-	#onDelete(e: CustomEvent, groupKey?: string) {
-		const updatedValues = (e.target as UmbInputBlockTypeElement).value.map((value) => ({ ...value, groupKey }));
-		const filteredValues = this.#value.filter((value) => value.groupKey !== groupKey);
-		this.value = [...filteredValues, ...updatedValues];
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-	}
-
-	async #onChange(e: CustomEvent) {
+	async #onChange(e: Event, groupKey?: string) {
 		e.stopPropagation();
 		const element = e.target as UmbInputBlockTypeElement;
-		const value = element.value;
+		const value = element.value.map((x) => ({ ...x, groupKey }));
 
-		if (!e.detail?.moveComplete) {
-			// Container change, store data of the new group...
-			const newGroupKey = element.getAttribute('data-umb-group-key');
-			const movedItem = e.detail?.item as UmbBlockTypeWithGroupKey;
-			// Check if item moved back to original group...
-			if (movedItem.groupKey === newGroupKey) {
-				this.#moveData = undefined;
-			} else {
-				this.#moveData = value.map((block) => ({ ...block, groupKey: newGroupKey }));
-			}
-		} else if (e.detail?.moveComplete) {
-			// Move complete, get the blocks that were in an untouched group
-			const blocks = this.#value
-				.filter((block) => !value.find((value) => value.contentElementTypeKey === block.contentElementTypeKey))
-				.filter(
-					(block) => !this.#moveData?.find((value) => value.contentElementTypeKey === block.contentElementTypeKey),
-				);
-
-			this.value = this.#moveData ? [...blocks, ...value, ...this.#moveData] : [...blocks, ...value];
-			this.dispatchEvent(new UmbPropertyValueChangeEvent());
-			this.#moveData = undefined;
+		if (groupKey) {
+			// Update the specific group:
+			this._groupsWithBlockTypes = this._groupsWithBlockTypes.map((group) => {
+				if (group.key === groupKey) {
+					return { ...group, blocks: value };
+				}
+				return group;
+			});
+		} else {
+			// Update the not grouped blocks:
+			this._notGroupedBlockTypes = value;
 		}
+
+		this.#updateValue();
+	}
+
+	#updateValue() {
+		this.value = [...this._notGroupedBlockTypes, ...this._groupsWithBlockTypes.flatMap((group) => group.blocks)];
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#updateBlockGroupsValue(groups: Array<UmbBlockGridTypeGroupType>) {
+		this.#datasetContext?.setPropertyValue('blockGroups', groups);
 	}
 
 	#onCreate(e: CustomEvent, groupKey?: string) {
 		const selectedElementType = e.detail.contentElementTypeKey;
 		if (selectedElementType) {
-			this.#blockTypeWorkspaceModalRegistration?.open({}, 'create/' + selectedElementType + '/' + (groupKey ?? null));
+			this.#blockTypeWorkspaceModalRegistration?.open({}, 'create/' + selectedElementType + '/' + (groupKey ?? 'null'));
 		}
 	}
 
 	// TODO: Implement confirm dialog [NL]
-	#deleteGroup(groupKey: string) {
-		// TODO: make one method for updating the blockGroupsDataSetValue: [NL]
-		// This one that deletes might require the ability to parse what to send as an argument to the method, then a filtering can occur before.
-		this.#datasetContext?.setPropertyValue(
-			'blockGroups',
-			this.#blockGroups?.filter((group) => group.key !== groupKey),
-		);
-
+	async #deleteGroup(groupKey: string) {
+		const groupName = this.#blockGroups?.find((group) => group.key === groupKey)?.name ?? '';
+		await umbConfirmModal(this, {
+			headline: '#blockEditor_confirmDeleteBlockGroupTitle',
+			content: this.localize.term('#blockEditor_confirmDeleteBlockGroupMessage', [groupName]),
+			color: 'danger',
+			confirmLabel: '#general_delete',
+		});
 		// If a group is deleted, Move the blocks to no group:
 		this.value = this.#value.map((block) => (block.groupKey === groupKey ? { ...block, groupKey: undefined } : block));
+		if (this.#blockGroups) {
+			this.#updateBlockGroupsValue(this.#blockGroups.filter((group) => group.key !== groupKey));
+		}
 	}
 
-	#changeGroupName(e: UUIInputEvent, groupKey: string) {
+	#onGroupNameChange(e: UUIInputEvent, groupKey: string) {
 		const groupName = e.target.value as string;
 		// TODO: make one method for updating the blockGroupsDataSetValue: [NL]
 		this.#datasetContext?.setPropertyValue(
@@ -224,9 +208,8 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 						.propertyAlias=${this._alias}
 						.value=${this._notGroupedBlockTypes}
 						.workspacePath=${this._workspacePath}
-						@change=${this.#onChange}
-						@create=${(e: CustomEvent) => this.#onCreate(e, undefined)}
-						@delete=${(e: CustomEvent) => this.#onDelete(e, undefined)}></umb-input-block-type>`
+						@change=${(e: Event) => this.#onChange(e, undefined)}
+						@create=${(e: CustomEvent) => this.#onCreate(e, undefined)}></umb-input-block-type>`
 				: ''}
 			${repeat(
 				this._groupsWithBlockTypes,
@@ -239,9 +222,8 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 							.propertyAlias=${this._alias + '_' + group.key}
 							.value=${group.blocks}
 							.workspacePath=${this._workspacePath}
-							@change=${this.#onChange}
-							@create=${(e: CustomEvent) => this.#onCreate(e, group.key)}
-							@delete=${(e: CustomEvent) => this.#onDelete(e, group.key)}></umb-input-block-type>
+							@change=${(e: Event) => this.#onChange(e, group.key)}
+							@create=${(e: CustomEvent) => this.#onCreate(e, group.key)}></umb-input-block-type>
 					</div>`,
 			)}
 		</div>`;
@@ -253,7 +235,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 				auto-width
 				label="Group"
 				.value=${groupName ?? ''}
-				@change=${(e: UUIInputEvent) => this.#changeGroupName(e, groupKey)}>
+				@change=${(e: UUIInputEvent) => this.#onGroupNameChange(e, groupKey)}>
 				<uui-button compact slot="append" label="delete" @click=${() => this.#deleteGroup(groupKey)}>
 					<uui-icon name="icon-trash"></uui-icon>
 				</uui-button>

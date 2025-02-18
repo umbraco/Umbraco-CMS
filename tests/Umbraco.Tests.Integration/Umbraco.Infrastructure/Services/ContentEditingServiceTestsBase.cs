@@ -38,6 +38,13 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
             .WithAlias("text")
             .WithName("Text")
             .WithVariations(ContentVariation.Nothing)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("label")
+            .WithName("Label")
+            .WithDataTypeId(Constants.DataTypes.LabelString)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
+            .WithVariations(ContentVariation.Nothing)
             .Done();
 
         foreach (var template in templates)
@@ -82,6 +89,13 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
             .WithAlias("invariantTitle")
             .WithName("Invariant Title")
             .WithVariations(ContentVariation.Nothing)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("variantLabel")
+            .WithName("Variant Label")
+            .WithDataTypeId(Constants.DataTypes.LabelString)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
+            .WithVariations(ContentVariation.Culture)
             .Done()
             .Build();
         contentType.AllowedAsRoot = true;

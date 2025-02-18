@@ -32,6 +32,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 
     protected bool SkipMigration { get; init; }
 
+    protected bool ParallelizeMigration { get; init; }
+
     protected enum EditorValueHandling
     {
         IgnoreConversion,
@@ -258,7 +260,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                             propertyDataDto.TextValue = stringValue;
                 }
 
-                if (DatabaseType == DatabaseType.SQLite)
+                if (ParallelizeMigration is false || DatabaseType == DatabaseType.SQLite)
                 {
                     // SQLite locks up if we run the migration in parallel, so... let's not.
                     foreach (UpdateBatch<PropertyDataDto> update in updateBatch)

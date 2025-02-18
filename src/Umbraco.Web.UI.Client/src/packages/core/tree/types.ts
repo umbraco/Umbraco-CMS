@@ -1,5 +1,9 @@
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-export type * from './extensions/index.js';
+
+export type * from './entity-actions/types.js';
+export type * from './extensions/types.js';
+export type * from './folder/types.js';
+export type * from './tree-menu-item-default/types.js';
 
 export interface UmbTreeItemModelBase extends UmbEntityModel {
 	name: string;

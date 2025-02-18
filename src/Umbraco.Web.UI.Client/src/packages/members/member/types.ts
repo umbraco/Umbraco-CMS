@@ -3,7 +3,10 @@ import type { UmbMemberKindType } from './utils/index.js';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbContentDetailModel, UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 
+export type * from './entity.js';
 export type * from './collection/types.js';
+export type * from './item/types.js';
+
 export interface UmbMemberDetailModel extends UmbContentDetailModel {
 	email: string;
 	entityType: UmbMemberEntityType;
@@ -16,7 +19,10 @@ export interface UmbMemberDetailModel extends UmbContentDetailModel {
 	lastLockoutDate: string | null;
 	lastLoginDate: string | null;
 	lastPasswordChangeDate: string | null;
-	memberType: { unique: string };
+	memberType: {
+		unique: string;
+		icon: string;
+	};
 	newPassword?: string;
 	oldPassword?: string;
 	unique: string;

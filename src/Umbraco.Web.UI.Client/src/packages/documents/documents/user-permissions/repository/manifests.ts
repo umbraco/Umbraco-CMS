@@ -1,4 +1,4 @@
-export const UMB_DOCUMENT_PERMISSION_REPOSITORY_ALIAS = 'Umb.Repository.Document.Permission';
+import { UMB_DOCUMENT_PERMISSION_REPOSITORY_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

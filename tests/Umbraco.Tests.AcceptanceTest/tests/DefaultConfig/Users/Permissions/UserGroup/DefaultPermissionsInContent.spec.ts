@@ -504,7 +504,7 @@ test('can set culture and hostnames with culture and hostnames permission enable
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickCultureAndHostnamesButton();
   await umbracoUi.content.clickAddNewDomainButton();
-  await umbracoUi.content.enterDomain('/en');
+  await umbracoUi.content.enterDomain('/domain');
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
@@ -578,13 +578,12 @@ test('can rollback content with rollback permission enabled', async ({umbracoApi
   await umbracoUi.content.goToContentWithName(rootDocumentName);
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, updatedTextStringText);
   await umbracoUi.content.clickInfoTab();
-  // Needs to wait for the rollback button to be visible
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.clickRollbackButton();
   await umbracoUi.content.clickLatestRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton();
 
   // Assert
+  await umbracoUi.content.clickContentTab();
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, documentText);
 });
 

@@ -21,8 +21,8 @@ test('can create a rich text editor with tiptap', {tag: '@smoke'}, async ({umbra
 
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
-  await umbracoUi.dataType.clickCreateButton();
-  await umbracoUi.dataType.clickNewDataTypeThreeDotsButton();
+  await umbracoUi.dataType.clickActionsMenuCreateButton();
+  await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(tipTapName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor(tipTapLocatorName);
@@ -200,8 +200,8 @@ test('can enable ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const tiptapData = await umbracoApi.dataType.getByName(tipTapName);
-  expect(tiptapData.values).toContainEqual(expectedTiptapValues);
+  const tipTapData = await umbracoApi.dataType.getByName(tipTapName);
+  expect(tipTapData.values).toContainEqual(expectedTiptapValues);
 });
 
 test('can delete toolbar group', async ({umbracoApi, umbracoUi}) => {

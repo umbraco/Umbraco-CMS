@@ -47,41 +47,56 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
     protected virtual string Url => GetManagementApiUrl(MethodSelector);
 
-    protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, bool isAdmin)
+    protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, bool isAdmin) =>
+        await AuthenticateClientAsync(client,
+            async userService =>
+            {
+                IUser user;
+                if (isAdmin)
+                {
+                    user = await userService.GetRequiredUserAsync(Constants.Security.SuperUserKey);
+                    user.Username = user.Email = username;
+                    userService.Save(user);
+                }
+                else
+                {
+                    user = (await userService.CreateAsync(
+                        Constants.Security.SuperUserKey,
+                        new UserCreateModel
+                        {
+                            Email = username,
+                            Name = username,
+                            UserName = username,
+                            UserGroupKeys = new HashSet<Guid>(new[] { Constants.Security.EditorGroupKey })
+                        },
+                        true)).Result.CreatedUser;
+                }
+
+                return (user, password);
+            });
+
+
+    protected async Task AuthenticateClientAsync(HttpClient client, Func<IUserService, Task<(IUser user, string Password)>> createUser)
     {
-        Guid userKey = Constants.Security.SuperUserKey;
+
         OpenIddictApplicationDescriptor backofficeOpenIddictApplicationDescriptor;
         var scopeProvider = GetRequiredService<ICoreScopeProvider>();
+
+        string? username;
+        string? password;
+
         using (var scope = scopeProvider.CreateCoreScope())
         {
             var userService = GetRequiredService<IUserService>();
             using var serviceScope = GetRequiredService<IServiceScopeFactory>().CreateScope();
             var userManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
 
-            IUser user;
-            if (isAdmin)
-            {
-                user = await userService.GetRequiredUserAsync(userKey);
-                user.Username = user.Email = username;
-                userService.Save(user);
-            }
-            else
-            {
-                user = (await userService.CreateAsync(
-                    Constants.Security.SuperUserKey,
-                    new UserCreateModel()
-                    {
-                        Email = username,
-                        Name = username,
-                        UserName = username,
-                        UserGroupKeys = new HashSet<Guid>(new[] { Constants.Security.EditorGroupKey })
-                    },
-                    true)).Result.CreatedUser;
-                userKey = user.Key;
-            }
+            var userCreationResult = await createUser(userService);
+            username = userCreationResult.user.Username;
+            password = userCreationResult.Password;
+            var userKey = userCreationResult.user.Key;
 
-
-            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var token = await userManager.GeneratePasswordResetTokenAsync(userCreationResult.user);
 
 
             var changePasswordAttempt = await userService.ChangePasswordAsync(userKey,
@@ -98,7 +113,8 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                 serviceScope.ServiceProvider.GetRequiredService<IBackOfficeApplicationManager>() as
                     BackOfficeApplicationManager;
             backofficeOpenIddictApplicationDescriptor =
-                backOfficeApplicationManager.BackofficeOpenIddictApplicationDescriptor(client.BaseAddress);
+                backOfficeApplicationManager.BackofficeOpenIddictApplicationDescriptor([client.BaseAddress]);
+
             scope.Complete();
         }
 

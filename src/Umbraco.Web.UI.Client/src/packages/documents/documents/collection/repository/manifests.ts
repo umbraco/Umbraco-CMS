@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_COLLECTION_REPOSITORY_ALIAS } from './index.js';
+import { UMB_DOCUMENT_COLLECTION_REPOSITORY_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

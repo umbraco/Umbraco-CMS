@@ -21,7 +21,6 @@ import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/ext
  */
 @customElement('umb-rte-block')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	//
 	@property({ type: String, attribute: 'data-content-key', reflect: true })
 	public get contentKey(): string | undefined {
 		return this._contentKey;
@@ -292,7 +291,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 					look="secondary"
 					color=${this._contentInvalid ? 'danger' : ''}
 					href=${this._workspaceEditContentPath}>
-					<uui-icon name="icon-edit"></uui-icon>
+					<uui-icon name=${this._exposed === false ? 'icon-add' : 'icon-edit'}></uui-icon>
 					${this._contentInvalid
 						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
 						: nothing}
@@ -301,9 +300,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				? html`<uui-button
 						@click=${this.#expose}
 						label=${this.localize.term('blockEditor_createThisFor', this._contentTypeName)}
-						look="secondary"
-						><uui-icon name="icon-add"></uui-icon
-					></uui-button>`
+						look="secondary">
+						<uui-icon name="icon-add"></uui-icon>
+					</uui-button>`
 				: nothing;
 	}
 

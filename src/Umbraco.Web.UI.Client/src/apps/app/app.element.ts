@@ -4,6 +4,7 @@ import { UmbAppContext } from './app.context.js';
 import { UmbServerConnection } from './server-connection.js';
 import { UmbAppAuthController } from './app-auth.controller.js';
 import { UmbApiInterceptorController } from './api-interceptor.controller.js';
+import type { UmbAppOauthElement } from './app-oauth.element.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
@@ -20,7 +21,6 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasOwnOpener, retrieveStoredPath } from '@umbraco-cms/backoffice/utils';
-import type { UmbAppOauthElement } from './app-oauth.element.js';
 
 import './app-oauth.element.js';
 
@@ -163,7 +163,11 @@ export class UmbAppElement extends UmbLitElement {
 		this.#serverConnection = await new UmbServerConnection(this.serverUrl).connect();
 
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, this.backofficePath, this.bypassAuth);
-		new UmbAppContext(this, { backofficePath: this.backofficePath, serverUrl: this.serverUrl });
+		new UmbAppContext(this, {
+			backofficePath: this.backofficePath,
+			serverUrl: this.serverUrl,
+			serverConnection: this.#serverConnection,
+		});
 
 		// Register Core extensions (this is specifically done here because we need these extensions to be registered before the application is initialized)
 		onInit(this, umbExtensionsRegistry);

@@ -3,12 +3,12 @@ import type {
 	HealthCheckGroupWithResultResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthCheckService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 
+// TODO: Check whats up with this code, this is not a context, this is a controller... [NL]
 export class UmbHealthCheckContext extends UmbControllerBase implements UmbApi {
 	#checks = new UmbBasicState<HealthCheckGroupPresentationModel | undefined>(undefined);
 	public readonly checks = this.#checks.asObservable();
@@ -42,5 +42,3 @@ export class UmbHealthCheckContext extends UmbControllerBase implements UmbApi {
 }
 
 export default UmbHealthCheckContext;
-
-export const UMB_HEALTHCHECK_CONTEXT = new UmbContextToken<UmbHealthCheckContext>('UmbHealthCheckContext');

@@ -1,12 +1,16 @@
-import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../entity.js';
-import { UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS, UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
+import {
+	UMB_MEDIA_TYPE_ENTITY_TYPE,
+	UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
+	UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS,
+} from '../constants.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
 import { manifests as duplicateManifests } from './duplicate/manifests.js';
 import { manifests as exportManifests } from './export/manifests.js';
 import { manifests as importManifests } from './import/manifests.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<UmbExtensionManifest> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'entityAction',
 		kind: 'delete',

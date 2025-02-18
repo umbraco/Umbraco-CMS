@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -16,6 +18,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     private readonly IRequestPreviewService _requestPreviewService;
     private readonly IPublishedContentCache _contentCache;
     private readonly IDocumentNavigationQueryService _navigationQueryService;
+    private readonly IPublishStatusQueryService _publishStatusQueryService;
     private RequestHandlerSettings _requestSettings;
 
     public ApiContentRouteBuilder(
@@ -25,16 +28,39 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         IRequestPreviewService requestPreviewService,
         IOptionsMonitor<RequestHandlerSettings> requestSettings,
         IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService navigationQueryService)
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishStatusQueryService publishStatusQueryService)
     {
         _apiContentPathProvider = apiContentPathProvider;
         _variationContextAccessor = variationContextAccessor;
         _requestPreviewService = requestPreviewService;
         _contentCache = contentCache;
         _navigationQueryService = navigationQueryService;
+        _publishStatusQueryService = publishStatusQueryService;
         _globalSettings = globalSettings.Value;
         _requestSettings = requestSettings.CurrentValue;
         requestSettings.OnChange(settings => _requestSettings = settings);
+    }
+
+    [Obsolete("Use constructor that takes an IPublishStatusQueryService instead, scheduled for removal in v17")]
+    public ApiContentRouteBuilder(
+        IApiContentPathProvider apiContentPathProvider,
+        IOptions<GlobalSettings> globalSettings,
+        IVariationContextAccessor variationContextAccessor,
+        IRequestPreviewService requestPreviewService,
+        IOptionsMonitor<RequestHandlerSettings> requestSettings,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
+        : this(
+        apiContentPathProvider,
+        globalSettings,
+        variationContextAccessor,
+        requestPreviewService,
+        requestSettings,
+        contentCache,
+        navigationQueryService,
+        StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>())
+    {
     }
 
     public IApiContentRoute? Build(IPublishedContent content, string? culture = null)
@@ -69,7 +95,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     {
         // entirely unpublished content does not resolve any route, but we need one i.e. for preview to work,
         // so we'll use the content key as path.
-        if (isPreview && content.IsPublished(culture) is false)
+        if (isPreview && _publishStatusQueryService.IsDocumentPublished(content.Key, culture ?? string.Empty) is false)
         {
             return ContentPreviewPath(content);
         }
@@ -105,7 +131,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     {
         if (isPreview is false)
         {
-            return content.Root(_contentCache, _navigationQueryService);
+            return content.Root(_variationContextAccessor, _contentCache, _navigationQueryService, _publishStatusQueryService);
         }
 
         _navigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
@@ -114,6 +140,6 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         // in very edge case scenarios during preview, content.Root() does not map to the root.
         // we'll code our way around it for the time being.
         return rootContent.FirstOrDefault(root => root.IsAncestorOrSelf(content))
-               ?? content.Root(_contentCache, _navigationQueryService);
+               ?? content.Root(_variationContextAccessor, _contentCache, _navigationQueryService, _publishStatusQueryService);
     }
 }

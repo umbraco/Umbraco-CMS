@@ -1,16 +1,12 @@
 import { UMB_SCRIPT_WORKSPACE_CONTEXT } from './script-workspace.context-token.js';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
-import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 import '@umbraco-cms/backoffice/code-editor';
 
 @customElement('umb-script-workspace-editor')
 export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
-	@state()
-	private _name?: string = '';
-
 	@state()
 	private _content?: string | null = '';
 
@@ -24,16 +20,9 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_SCRIPT_WORKSPACE_CONTEXT, (context) => {
 			this.#context = context;
-			this.observe(this.#context.name, (name) => (this._name = name));
 			this.observe(this.#context.content, (content) => (this._content = content));
 			this.observe(this.#context.isNew, (isNew) => (this._isNew = isNew));
 		});
-	}
-
-	#onNameInput(event: Event) {
-		const target = event.target as UUIInputElement;
-		const value = target.value as string;
-		this.#context?.setName(value);
 	}
 
 	#onCodeEditorInput(event: Event) {
@@ -45,23 +34,11 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-entity-detail-workspace-editor>
-				${this.#renderHeader()} ${this.#renderBody()}
+				<umb-workspace-header-name-editable
+					slot="header"
+					?readonly=${this._isNew === false}></umb-workspace-header-name-editable>
+				${this.#renderBody()}
 			</umb-entity-detail-workspace-editor>
-		`;
-	}
-
-	#renderHeader() {
-		return html`
-			<div id="workspace-header" slot="header">
-				<uui-input
-					placeholder=${this.localize.term('placeholders_entername')}
-					.value=${this._name}
-					@input=${this.#onNameInput}
-					label=${this.localize.term('placeholders_entername')}
-					?readonly=${this._isNew === false}
-					${umbFocus()}>
-				</uui-input>
-			</div>
 		`;
 	}
 
@@ -101,14 +78,6 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 				--uui-box-default-padding: 0;
 				/* remove header border bottom as code editor looks better in this box */
 				--uui-color-divider-standalone: transparent;
-			}
-
-			#workspace-header {
-				width: 100%;
-			}
-
-			uui-input {
-				width: 100%;
 			}
 		`,
 	];

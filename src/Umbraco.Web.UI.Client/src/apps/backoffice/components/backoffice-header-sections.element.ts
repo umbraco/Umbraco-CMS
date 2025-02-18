@@ -54,7 +54,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<uui-tab-group id="tabs">
+			<uui-tab-group id="tabs" data-mark="section-links">
 				${repeat(
 					this._sections,
 					(section) => section.alias,
@@ -66,7 +66,8 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 								section.manifest?.meta.label
 									? this.localize.string(section.manifest?.meta.label)
 									: section.manifest?.name,
-							)}"></uui-tab>
+							)}"
+							data-mark="section-link:${section.alias}"></uui-tab>
 					`,
 				)}
 			</uui-tab-group>

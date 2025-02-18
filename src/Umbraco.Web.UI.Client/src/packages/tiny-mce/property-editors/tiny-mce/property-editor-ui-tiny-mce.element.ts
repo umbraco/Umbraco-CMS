@@ -1,6 +1,6 @@
 import type { UmbInputTinyMceElement } from '../../components/input-tiny-mce/input-tiny-mce.element.js';
-import { UmbPropertyEditorUiRteElementBase, UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { UmbPropertyEditorUiRteElementBase, UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
 
 import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 
@@ -11,6 +11,13 @@ import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 export class UmbPropertyEditorUITinyMceElement extends UmbPropertyEditorUiRteElementBase {
 	#onChange(event: CustomEvent & { target: UmbInputTinyMceElement }) {
 		const value = typeof event.target.value === 'string' ? event.target.value : '';
+
+		// If we don't get any markup clear the property editor value.
+		if (value === '') {
+			this.value = undefined;
+			this._fireChangeEvent();
+			return;
+		}
 
 		// Clone the DOM, to remove the classes and attributes on the original:
 		const div = document.createElement('div');
@@ -38,10 +45,22 @@ export class UmbPropertyEditorUITinyMceElement extends UmbPropertyEditorUiRteEle
 
 		this._latestMarkup = markup;
 
-		this._value = {
-			...this._value,
-			markup: markup,
-		};
+		if (this.value) {
+			this.value = {
+				...this.value,
+				markup: this._latestMarkup,
+			};
+		} else {
+			this.value = {
+				markup: this._latestMarkup,
+				blocks: {
+					layout: {},
+					contentData: [],
+					settingsData: [],
+					expose: [],
+				},
+			};
+		}
 
 		this._fireChangeEvent();
 	}

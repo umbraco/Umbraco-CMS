@@ -175,7 +175,7 @@ test('can delete a group in a media type', {tag: '@smoke'}, async ({umbracoApi, 
 
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-  await umbracoUi.mediaType.deleteGroup(groupName, true);
+  await umbracoUi.mediaType.deleteGroup(groupName);
   await umbracoUi.mediaType.clickConfirmToDeleteButton();
   await umbracoUi.mediaType.clickSaveButton();
 
@@ -277,6 +277,7 @@ test('can create a media type with a composition', async ({umbracoApi, umbracoUi
 
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.mediaType.clickCompositionsButton();
   await umbracoUi.mediaType.clickButtonWithName(compositionMediaTypeName);
   await umbracoUi.mediaType.clickSubmitButton();
@@ -328,7 +329,6 @@ test('can reorder properties in a media type', async ({umbracoApi, umbracoUi}) =
   const dragFromLocator = umbracoUi.mediaType.getTextLocatorWithName(dataTypeNameTwo);
   const dragToLocator = umbracoUi.mediaType.getTextLocatorWithName(dataTypeName);
   await umbracoUi.mediaType.dragAndDrop(dragFromLocator, dragToLocator);
-  await umbracoUi.waitForTimeout(200);
   await umbracoUi.mediaType.clickIAmDoneReorderingButton();
   await umbracoUi.mediaType.clickSaveButton();
 

@@ -50,7 +50,7 @@ public class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegrationTestW
     {
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, true, new[] { "*" });
+            ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
 
 
@@ -70,7 +70,7 @@ public class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegrationTestW
 
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, true, new[] { "*" });
+            ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
@@ -89,8 +89,8 @@ public class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegrationTestW
 
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, true, new[] { "*" });
-            ContentService.PublishBranch(secondRoot, true, new[] { "*" });
+            ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+            ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
@@ -114,39 +114,10 @@ public class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegrationTestW
         // Publish both the main root and the second root with descendants
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, true, new[] { "*" });
-            ContentService.PublishBranch(secondRoot, true, new[] { "*" });
+            ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+            ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
-    }
-
-    [Test]
-    public async Task Two_items_in_level_1_with_same_name_will_not_have_conflicting_routes()
-    {
-        // Create a second root
-        var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
-        ContentService.Save(secondRoot, -1, contentSchedule);
-
-        // Create a child of second root
-        var childOfSecondRoot = ContentBuilder.CreateSimpleContent(ContentType, Subpage.Name, secondRoot);
-        childOfSecondRoot.Key = new Guid("FF6654FB-BC68-4A65-8C6C-135567F50BD6");
-        ContentService.Save(childOfSecondRoot, -1, contentSchedule);
-
-        // Publish both the main root and the second root with descendants
-        ContentService.PublishBranch(Textpage, true, new[] { "*" });
-        ContentService.PublishBranch(secondRoot, true, new[] { "*" });
-
-        var subPageUrls = await DocumentUrlService.ListUrlsAsync(Subpage.Key);
-        var childOfSecondRootUrls = await DocumentUrlService.ListUrlsAsync(childOfSecondRoot.Key);
-
-        Assert.AreEqual(1, subPageUrls.Count());
-        Assert.IsTrue(subPageUrls.First().IsUrl);
-        Assert.AreEqual("/textpage/text-page-1", subPageUrls.First().Text);
-
-        Assert.AreEqual(1, childOfSecondRootUrls.Count());
-        Assert.IsTrue(childOfSecondRootUrls.First().IsUrl);
-        Assert.AreEqual("/second-root/text-page-1", childOfSecondRootUrls.First().Text);
     }
 }

@@ -13,6 +13,7 @@ import './components/index.js';
 
 const CORE_PACKAGES = [
 	import('../../packages/block/umbraco-package.js'),
+	import('../../packages/clipboard/umbraco-package.js'),
 	import('../../packages/code-editor/umbraco-package.js'),
 	import('../../packages/data-type/umbraco-package.js'),
 	import('../../packages/dictionary/umbraco-package.js'),

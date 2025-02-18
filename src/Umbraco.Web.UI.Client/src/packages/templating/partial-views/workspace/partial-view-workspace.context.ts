@@ -1,7 +1,7 @@
 import type { UmbPartialViewDetailModel } from '../types.js';
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import type { UmbPartialViewDetailRepository } from '../repository/index.js';
-import { UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS } from '../constants.js';
 import { UmbPartialViewWorkspaceEditorElement } from './partial-view-workspace-editor.element.js';
 import { UMB_PARTIAL_VIEW_WORKSPACE_ALIAS } from './manifests.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -11,7 +11,7 @@ import type {
 	UmbSubmittableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEntityDetailWorkspaceContextBase,
+	UmbEntityNamedDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -25,14 +25,13 @@ export interface UmbPartialViewWorkspaceContextCreateArgs
 }
 
 export class UmbPartialViewWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<
+	extends UmbEntityNamedDetailWorkspaceContextBase<
 		UmbPartialViewDetailModel,
 		UmbPartialViewDetailRepository,
 		UmbPartialViewWorkspaceContextCreateArgs
 	>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	public readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 	public readonly content = this._data.createObservablePartOfCurrent((data) => data?.content);
 
 	constructor(host: UmbControllerHost) {
@@ -94,10 +93,6 @@ export class UmbPartialViewWorkspaceContext
 			this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
 		);
 	};
-
-	setName(value: string) {
-		this._data.updateCurrent({ name: value });
-	}
 
 	setContent(value: string) {
 		this._data.updateCurrent({ content: value });

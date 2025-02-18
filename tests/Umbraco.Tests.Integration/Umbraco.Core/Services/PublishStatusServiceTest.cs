@@ -67,7 +67,7 @@ public class PublishStatusServiceTest : UmbracoIntegrationTestWithContent
         });
 
         // Act
-        var publishResults = ContentService.PublishBranch(Textpage, true, new[] { "*" });
+        var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         await sut.InitializeAsync(CancellationToken.None);
 
         Assert.Multiple(() =>
@@ -98,12 +98,14 @@ public class PublishStatusServiceTest : UmbracoIntegrationTestWithContent
         var sut = new PublishStatusService(
             GetRequiredService<ILogger<PublishStatusService>>(),
             GetRequiredService<IPublishStatusRepository>(),
-            GetRequiredService<ICoreScopeProvider>());
+            GetRequiredService<ICoreScopeProvider>(),
+            GetRequiredService<ILanguageService>()
+            );
 
         Assert.IsFalse(sut.IsDocumentPublished(Textpage.Key, DefaultCulture));
 
         // Act
-        var publishResults = ContentService.PublishBranch(Textpage, true, new[] { "*" });
+        var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         await sut.AddOrUpdateStatusWithDescendantsAsync(Textpage.Key, CancellationToken.None);
         Assert.IsTrue(sut.IsDocumentPublished(Textpage.Key, DefaultCulture));
         Assert.IsTrue(sut.IsDocumentPublished(Subpage.Key, DefaultCulture)); // Updated due to being an descendant
@@ -118,12 +120,13 @@ public class PublishStatusServiceTest : UmbracoIntegrationTestWithContent
         var sut = new PublishStatusService(
             GetRequiredService<ILogger<PublishStatusService>>(),
             GetRequiredService<IPublishStatusRepository>(),
-            GetRequiredService<ICoreScopeProvider>());
+            GetRequiredService<ICoreScopeProvider>(),
+            GetRequiredService<ILanguageService>());
 
         Assert.IsFalse(sut.IsDocumentPublished(Textpage.Key, DefaultCulture));
 
         // Act
-        var publishResults = ContentService.PublishBranch(Textpage, true, new[] { "*" });
+        var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         await sut.AddOrUpdateStatusAsync(Textpage.Key, CancellationToken.None);
         Assert.IsTrue(sut.IsDocumentPublished(Textpage.Key, DefaultCulture));
         Assert.IsFalse(sut.IsDocumentPublished(Subpage.Key, DefaultCulture)); // Not updated
@@ -164,7 +167,7 @@ public class PublishStatusServiceTest : UmbracoIntegrationTestWithContent
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
         ContentService.Save(grandchild, -1, contentSchedule);
 
-        var publishResults = ContentService.PublishBranch(Textpage, true, new[] { "*" });
+        var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         var randomCulture = "da-DK";
 
         var subPage2FromDB = ContentService.GetById(Subpage2.Key);
@@ -187,7 +190,7 @@ public class PublishStatusServiceTest : UmbracoIntegrationTestWithContent
      [Test]
     public void When_Branch_is_publised_default_language_return_true()
     {
-        var publishResults = ContentService.PublishBranch(Textpage, true, new[] { "*" });
+        var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         var randomCulture = "da-DK";
         Assert.Multiple(() =>
         {

@@ -1,4 +1,4 @@
-export const UMB_DOCUMENT_CREATE_BLUEPRINT_REPOSITORY_ALIAS = 'Umb.Repository.Document.CreateBlueprint';
+import { UMB_DOCUMENT_CREATE_BLUEPRINT_REPOSITORY_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

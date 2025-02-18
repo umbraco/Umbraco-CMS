@@ -1,5 +1,5 @@
 import { UmbLanguageCollectionRepository } from '../../collection/index.js';
-import type { UmbLanguageItemModel } from '../../repository/index.js';
+import type { UmbLanguageItemModel } from '../../types.js';
 import type { UmbLanguagePickerModalValue, UmbLanguagePickerModalData } from './language-picker-modal.token.js';
 import { html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';

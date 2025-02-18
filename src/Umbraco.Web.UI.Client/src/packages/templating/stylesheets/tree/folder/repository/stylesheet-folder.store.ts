@@ -1,4 +1,4 @@
-import { UMB_STYLESHEET_FOLDER_STORE_CONTEXT } from './stylesheet-folder.store.context.token.js';
+import { UMB_STYLESHEET_FOLDER_STORE_CONTEXT } from './stylesheet-folder.store.context-token.js';
 import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';

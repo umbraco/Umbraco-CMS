@@ -9,7 +9,6 @@ import {
 	type UmbEntityDetailWorkspaceContextCreateArgs,
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { jsonStringComparison, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -50,8 +49,6 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		super(host, args);
 
 		this.structure = new UmbContentTypeStructureManager<DetailModelType>(this, args.detailRepositoryAlias);
-
-		this.addValidationContext(new UmbValidationContext(this));
 
 		this.name = this.structure.ownerContentTypeObservablePart((data) => data?.name);
 		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);

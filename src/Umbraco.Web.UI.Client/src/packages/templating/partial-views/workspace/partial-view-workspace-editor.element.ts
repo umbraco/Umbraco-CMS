@@ -2,20 +2,16 @@ import { getQuerySnippet } from '../../utils/index.js';
 import type { UmbTemplatingInsertMenuElement } from '../../local-components/insert-menu/index.js';
 import { UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT } from './partial-view-workspace.context-token.js';
 import { css, customElement, html, nothing, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '@umbraco-cms/backoffice/template';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
-import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 import '@umbraco-cms/backoffice/code-editor';
 import '../../local-components/insert-menu/index.js';
 
 @customElement('umb-partial-view-workspace-editor')
 export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
-	@state()
-	private _name?: string = '';
-
 	@state()
 	private _content?: string | null = '';
 
@@ -32,9 +28,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
-			this.observe(this.#workspaceContext.name, (name) => {
-				this._name = name;
-			});
 
 			this.observe(this.#workspaceContext.content, (content) => {
 				this._content = content;
@@ -44,12 +37,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 				this._isNew = isNew;
 			});
 		});
-	}
-
-	#onNameInput(event: Event) {
-		const target = event.target as UUIInputElement;
-		const value = target.value as string;
-		this.#workspaceContext?.setName(value);
 	}
 
 	#onCodeEditorInput(event: Event) {
@@ -79,15 +66,9 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-entity-detail-workspace-editor>
-				<div id="workspace-header" slot="header">
-					<uui-input
-						placeholder=${this.localize.term('placeholders_entername')}
-						.value=${this._name}
-						@input=${this.#onNameInput}
-						label=${this.localize.term('placeholders_entername')}
-						?readonly=${this._isNew === false}
-						${umbFocus()}></uui-input>
-				</div>
+				<umb-workspace-header-name-editable
+					slot="header"
+					?readonly=${this._isNew === false}></umb-workspace-header-name-editable>
 				<uui-box>
 					<div slot="header" id="code-editor-menu-container">
 						<umb-templating-insert-menu @insert=${this.#insertSnippet} hidePartialViews></umb-templating-insert-menu>
@@ -138,14 +119,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 				--uui-box-default-padding: 0;
 				/* remove header border bottom as code editor looks better in this box */
 				--uui-color-divider-standalone: transparent;
-			}
-
-			#workspace-header {
-				width: 100%;
-			}
-
-			uui-input {
-				width: 100%;
 			}
 
 			#code-editor-menu-container uui-icon:not([name='icon-delete']) {

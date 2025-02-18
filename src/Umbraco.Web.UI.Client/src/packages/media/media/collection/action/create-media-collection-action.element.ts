@@ -1,5 +1,5 @@
 import { UMB_MEDIA_COLLECTION_CONTEXT } from '../media-collection.context-token.js';
-import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../workspace/index.js';
+import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../constants.js';
 import { UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { html, customElement, property, state, map } from '@umbraco-cms/backoffice/external/lit';

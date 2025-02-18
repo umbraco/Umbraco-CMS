@@ -1,20 +1,17 @@
 import type { UmbPropertyEditorUiValueType } from '../types.js';
 import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../constants.js';
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBlockRteEntriesContext, UmbBlockRteManagerContext } from '@umbraco-cms/backoffice/block-rte';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import {
-	UmbBlockRteEntriesContext,
-	UmbBlockRteManagerContext,
-	type UmbBlockRteTypeModel,
-} from '@umbraco-cms/backoffice/block-rte';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
-// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
 export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement implements UmbPropertyEditorUiElement {
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -35,6 +32,16 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 		},
 	})
 	public set value(value: UmbPropertyEditorUiValueType | undefined) {
+		if (!value) {
+			this._value = undefined;
+			this._markup = this._latestMarkup = '';
+			this.#managerContext.setLayouts([]);
+			this.#managerContext.setContents([]);
+			this.#managerContext.setSettings([]);
+			this.#managerContext.setExposes([]);
+			return;
+		}
+
 		const buildUpValue: Partial<UmbPropertyEditorUiValueType> = value ? { ...value } : {};
 		buildUpValue.markup ??= '';
 		buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [], expose: [] };
@@ -69,10 +76,7 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 	protected _config?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	protected _value: UmbPropertyEditorUiValueType = {
-		markup: '',
-		blocks: { layout: {}, contentData: [], settingsData: [], expose: [] },
-	};
+	protected _value?: UmbPropertyEditorUiValueType | undefined;
 
 	/**
 	 * Separate state for markup, to avoid re-rendering/re-setting the value of the Tiptap editor when the value does not really change.
@@ -125,51 +129,40 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 				this.#managerContext.setLayouts(layouts);
 			});
 
-			// Observe the value of the property and update the editor value.
-			this.observe(this.#managerContext.layouts, (layouts) => {
-				this._value = {
-					...this._value,
-					blocks: { ...this._value.blocks, layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts } },
-				};
-				this._fireChangeEvent();
-			});
-			this.observe(this.#managerContext.contents, (contents) => {
-				this._value = { ...this._value, blocks: { ...this._value.blocks, contentData: contents } };
-				this._fireChangeEvent();
-			});
-			this.observe(this.#managerContext.settings, (settings) => {
-				this._value = { ...this._value, blocks: { ...this._value.blocks, settingsData: settings } };
-				this._fireChangeEvent();
-			});
-			this.observe(this.#managerContext.exposes, (exposes) => {
-				this._value = { ...this._value, blocks: { ...this._value.blocks, expose: exposes } };
-				this._fireChangeEvent();
-			});
-
-			// The above could potentially be replaced with a single observeMultiple call, but it is not done for now to avoid potential issues with the order of the updates.
-			/*this.observe(
+			this.observe(
 				observeMultiple([
 					this.#managerContext.layouts,
 					this.#managerContext.contents,
 					this.#managerContext.settings,
 					this.#managerContext.exposes,
-				]).pipe(debounceTime(20)),
+				]),
 				([layouts, contents, settings, exposes]) => {
-					this._value = {
-						...this._value,
-						blocks: {
-							layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
-							contentData: contents,
-							settingsData: settings,
-							expose: exposes,
-						},
-					};
+					if (layouts.length === 0) {
+						this._value = undefined;
+					} else {
+						this._value = {
+							markup: this._latestMarkup,
+							blocks: {
+								layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
+								contentData: contents,
+								settingsData: settings,
+								expose: exposes,
+							},
+						};
+					}
 
-					this._fireChangeEvent();
+					// If we don't have a value set from the outside or an internal value, we don't want to set the value.
+					// This is added to prevent the block list from setting an empty value on startup.
+					if (!this._latestMarkup && !this._value?.markup) {
+						return;
+					}
+
+					context.setValue(this._value);
 				},
 				'motherObserver',
-			);*/
+			);
 		});
+
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#managerContext.setVariantId(context.getVariantId());
 		});
@@ -181,14 +174,17 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 	}
 
 	protected _filterUnusedBlocks(usedContentKeys: (string | null)[]) {
-		const unusedBlockContents = this.#managerContext.getContents().filter((x) => usedContentKeys.indexOf(x.key) === -1);
-		unusedBlockContents.forEach((blockContent) => {
-			this.#managerContext.removeOneContent(blockContent.key);
-		});
-		const unusedBlocks = this.#managerContext.getLayouts().filter((x) => usedContentKeys.indexOf(x.contentKey) === -1);
-		unusedBlocks.forEach((blockLayout) => {
-			this.#managerContext.removeOneLayout(blockLayout.contentKey);
-		});
+		const unusedLayouts = this.#managerContext.getLayouts().filter((x) => usedContentKeys.indexOf(x.contentKey) === -1);
+
+		const unusedContentKeys = unusedLayouts.map((x) => x.contentKey);
+
+		const unusedSettingsKeys = unusedLayouts
+			.map((x) => x.settingsKey)
+			.filter((x) => typeof x === 'string') as Array<string>;
+
+		this.#managerContext.removeManyContent(unusedContentKeys);
+		this.#managerContext.removeManySettings(unusedSettingsKeys);
+		this.#managerContext.removeManyLayouts(unusedContentKeys);
 	}
 
 	protected _fireChangeEvent() {

@@ -1,5 +1,4 @@
-export const UMB_STATIC_FILE_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.StaticFileItem';
-export const UMB_STATIC_FILE_STORE_ALIAS = 'Umb.Store.StaticFileItem';
+import { UMB_STATIC_FILE_ITEM_REPOSITORY_ALIAS, UMB_STATIC_FILE_STORE_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

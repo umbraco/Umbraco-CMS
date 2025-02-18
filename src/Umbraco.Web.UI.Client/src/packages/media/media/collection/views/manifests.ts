@@ -1,4 +1,4 @@
-import { UMB_MEDIA_GRID_COLLECTION_VIEW_ALIAS, UMB_MEDIA_TABLE_COLLECTION_VIEW_ALIAS } from './index.js';
+import { UMB_MEDIA_GRID_COLLECTION_VIEW_ALIAS, UMB_MEDIA_TABLE_COLLECTION_VIEW_ALIAS } from './constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [

@@ -14,6 +14,9 @@ export class UmbBlockRteManagerContext<
 	removeOneLayout(contentKey: string) {
 		this._layouts.removeOne(contentKey);
 	}
+	removeManyLayouts(contentKeys: Array<string>) {
+		this._layouts.remove(contentKeys);
+	}
 
 	create(
 		contentElementTypeKey: string,

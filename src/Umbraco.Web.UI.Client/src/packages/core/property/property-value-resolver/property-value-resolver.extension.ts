@@ -3,11 +3,15 @@ import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestPropertyValueResolver extends ManifestApi<UmbPropertyValueResolver<any, any, any>> {
 	type: 'propertyValueResolver';
-	meta: MetaPropertyValueResolver;
+	meta?: MetaPropertyValueResolver;
+	forEditorAlias: string;
 }
 
 export interface MetaPropertyValueResolver {
-	editorAlias: string;
+	/**
+	 * @deprecated use `forEditorAlias` instead
+	 */
+	editorAlias?: string;
 }
 
 declare global {

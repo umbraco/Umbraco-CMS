@@ -4,7 +4,7 @@ import {
 	UmbContentTypeContainerStructureHelper,
 	UmbContentTypeMoveRootGroupsIntoFirstTabHelper,
 } from '../../../structure/index.js';
-import { UMB_COMPOSITION_PICKER_MODAL } from '../../../modals/index.js';
+import { UMB_COMPOSITION_PICKER_MODAL } from '../../../modals/constants.js';
 import type { UmbContentTypeDesignEditorTabElement } from './content-type-design-editor-tab.element.js';
 import { UmbContentTypeDesignEditorContext } from './content-type-design-editor.context.js';
 import { css, html, customElement, state, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
@@ -140,7 +140,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
 			this.#tabsStructureHelper.setStructureManager(workspaceContext.structure);
-			new UmbContentTypeMoveRootGroupsIntoFirstTabHelper(this, workspaceContext.structure);
 
 			this.#observeRootGroups();
 		});
@@ -187,21 +186,20 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			});
 		}
 
-		routes.push({
-			path: 'root',
-			component: () => import('./content-type-design-editor-tab.element.js'),
-			setup: (component) => {
-				(component as UmbContentTypeDesignEditorTabElement).containerId = null;
-			},
-		});
-
-		if (this._hasRootGroups) {
+		if (this._hasRootGroups || this._tabs.length === 0) {
+			routes.push({
+				path: 'root',
+				component: () => import('./content-type-design-editor-tab.element.js'),
+				setup: (component) => {
+					(component as UmbContentTypeDesignEditorTabElement).containerId = null;
+				},
+			});
 			routes.push({
 				path: '',
 				redirectTo: 'root',
 				guards: [() => this._activeTabId === undefined],
 			});
-		} else if (routes.length !== 0) {
+		} else {
 			routes.push({
 				path: '',
 				redirectTo: routes[0]?.path,
@@ -269,9 +267,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	#deleteTab(tabId?: string) {
 		if (!tabId) return;
 		this.#workspaceContext?.structure.removeContainer(null, tabId);
-		// TODO: We should only navigate away if it was the last tab and if it was the active one... [NL]
-		if (this.#tabsStructureHelper?.isOwnerChildContainer(tabId)) {
-			window.history.replaceState(null, '', this._routerPath + (this._routes[0]?.path ?? '/root'));
+		if (this._activeTabId === tabId) {
+			this._activeTabId = undefined;
 		}
 	}
 	async #addTab() {
@@ -283,11 +280,19 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			return;
 		}
 
+		if (!this.#workspaceContext) {
+			throw new Error('Workspace context has not been found');
+		}
+
 		if (!this._tabs) return;
 
 		const len = this._tabs.length;
 		const sortOrder = len === 0 ? 0 : this._tabs[len - 1].sortOrder + 1;
-		const tab = await this.#workspaceContext?.structure.createContainer(null, null, 'Tab', sortOrder);
+		const tab = await this.#workspaceContext.structure.createContainer(null, null, 'Tab', sortOrder);
+		// If length was 0 before, then we need to move the root groups into the first tab: [NL]
+		if (len === 0) {
+			new UmbContentTypeMoveRootGroupsIntoFirstTabHelper(this, this.#workspaceContext.structure);
+		}
 		if (tab) {
 			const path = this._routerPath + '/tab/' + encodeFolderName(tab.name && tab.name !== '' ? tab.name : '-');
 			window.history.replaceState(null, '', path);

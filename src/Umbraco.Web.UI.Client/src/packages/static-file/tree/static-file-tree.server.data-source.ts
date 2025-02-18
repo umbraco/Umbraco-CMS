@@ -2,7 +2,7 @@ import {
 	UMB_STATIC_FILE_ENTITY_TYPE,
 	UMB_STATIC_FILE_FOLDER_ENTITY_TYPE,
 	UMB_STATIC_FILE_ROOT_ENTITY_TYPE,
-} from '../entity.js';
+} from './constants.js';
 import type { UmbStaticFileTreeItemModel } from './types.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type {

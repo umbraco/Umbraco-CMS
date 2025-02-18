@@ -1,7 +1,7 @@
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document Public Access that fetches data from the server
@@ -41,7 +41,9 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentService.getDocumentByIdPublicAccess({ id: unique }));
+		// NOTE: The entity will not be present, when fetching Public Access for a descendant of a protected Document.
+		//       This is a perfectly valid scenario, which is handled in the view. In other words, just use tryExecute here.
+		return tryExecute(DocumentService.getDocumentByIdPublicAccess({ id: unique }));
 	}
 
 	/**

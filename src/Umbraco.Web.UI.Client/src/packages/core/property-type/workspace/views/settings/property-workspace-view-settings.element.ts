@@ -216,6 +216,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					<umb-form-validation-message>
 						<uui-input
 							id="name-input"
+							data-mark="input:entity-name"
 							name="name"
 							label=${this.localize.term('placeholders_entername')}
 							placeholder=${this.localize.term('placeholders_entername')}

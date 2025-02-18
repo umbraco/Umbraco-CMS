@@ -1,4 +1,4 @@
-import { UMB_DUPLICATE_DOCUMENT_MODAL_ALIAS } from './constants.js';
+import { UMB_DUPLICATE_DOCUMENT_MODAL_ALIAS } from './manifests.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 

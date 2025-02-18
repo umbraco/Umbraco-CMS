@@ -1,4 +1,4 @@
-export const UMB_MEMBER_GROUP_COLLECTION_REPOSITORY_ALIAS = 'Umb.Repository.MemberGroup.Collection';
+import { UMB_MEMBER_GROUP_COLLECTION_REPOSITORY_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

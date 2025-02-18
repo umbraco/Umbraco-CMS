@@ -7,8 +7,8 @@ test.beforeEach(async ({umbracoUi}) => {
 
 test('can click on buttons', async ({umbracoUi}) => {
   // Arrange
-  const getTheHelpYouNeedDocumentationUrl = 'https://docs.umbraco.com/umbraco-cms/umbraco-cms';
-  const goToTheForumUrl = 'https://our.umbraco.com/forum';
+  const getTheHelpYouNeedDocumentationUrl = 'https://docs.umbraco.com/umbraco-cms';
+  const goToTheForumUrl = 'https://our.umbraco.com/forum/';
   const chatWithTheCommunityUrl = 'https://discord.umbraco.com';
   const getCertifiedUrl = 'https://umbraco.com/training/';
   const getTheHelpYouNeedSupportUrl = 'https://umbraco.com/support/';

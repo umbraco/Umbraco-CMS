@@ -76,11 +76,14 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 	}
 
 	override renderIconContainer() {
+		const icon = this.item?.documentType.icon;
+		const iconWithoutColor = icon?.split(' ')[0];
+
 		return html`
 			<span id="icon-container" slot="icon" class=${classMap({ draft: this.#isDraft() })}>
-				${this.item?.documentType.icon
+				${icon && iconWithoutColor
 					? html`
-							<umb-icon id="icon" slot="icon" name="${this.item.documentType.icon}"></umb-icon>
+							<umb-icon id="icon" slot="icon" name="${this._isActive ? iconWithoutColor : icon}"></umb-icon>
 							${this.#renderStateIcon()}
 						`
 					: nothing}

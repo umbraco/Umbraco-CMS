@@ -3,8 +3,10 @@ import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbrac
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { DocumentVariantStateModel as UmbDocumentBlueprintVariantState } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
-export { UmbDocumentBlueprintVariantState };
 
+export { UmbDocumentBlueprintVariantState };
+export type * from './tree/types.js';
+export type * from './workspace/types.js';
 export interface UmbDocumentBlueprintDetailModel {
 	documentType: {
 		unique: string;

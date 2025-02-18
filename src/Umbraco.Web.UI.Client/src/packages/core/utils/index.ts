@@ -1,3 +1,4 @@
+export * from './bytes/bytes.function.js';
 export * from './debounce/debounce.function.js';
 export * from './direction/index.js';
 export * from './download/blob-download.function.js';
@@ -19,8 +20,10 @@ export * from './path/stored-path.function.js';
 export * from './path/transform-server-path-to-client-path.function.js';
 export * from './path/umbraco-path.function.js';
 export * from './path/url-pattern-to-string.function.js';
+export * from './sanitize/escape-html.function.js';
 export * from './sanitize/sanitize-html.function.js';
 export * from './selection-manager/selection.manager.js';
 export * from './state-manager/index.js';
 export * from './string/index.js';
+export * from './deprecation/index.js';
 export type * from './type/index.js';

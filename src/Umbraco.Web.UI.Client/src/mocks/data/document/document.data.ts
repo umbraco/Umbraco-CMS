@@ -17,6 +17,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		template: null,
 		id: 'the-simplest-document-id',
+		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
 		documentType: {
 			id: 'the-simplest-document-type-id',
@@ -56,6 +57,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		template: null,
 		id: 'all-property-editors-document-id',
+		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
 		documentType: {
 			id: 'all-property-editors-document-type-id',
@@ -213,6 +215,13 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				editorAlias: 'Umbraco.DropDown.Flexible',
 				alias: 'dropdown',
+				culture: null,
+				segment: null,
+				value: null,
+			},
+			{
+				editorAlias: 'Umbraco.DropDown.Flexible',
+				alias: 'dropdownMultiple',
 				culture: null,
 				segment: null,
 				value: null,
@@ -601,6 +610,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		template: null,
 		id: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
+		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
 		documentType: {
 			id: '29643452-cff9-47f2-98cd-7de4b6807681',
@@ -734,6 +744,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		urls: [],
 		template: null,
 		id: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
+		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
 		documentType: {
 			id: '29643452-cff9-47f2-98cd-7de4b6807681',
@@ -822,6 +833,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		template: null,
 		id: 'simple-document-id',
+		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
 		documentType: {
 			id: 'simple-document-type-id',
@@ -869,6 +881,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		template: null,
 		id: 'all-rtes-id',
+		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
 		documentType: {
 			id: 'all-rtes-document-type-id',
@@ -901,8 +914,26 @@ export const data: Array<UmbMockDocumentModel> = [
 						<p>
 							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
 						</p>
+						<table style="width: 100%;">
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>Alias</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Lee</td>
+									<td>lke</td>
+								</tr>
+								<tr>
+									<td>Jacob</td>
+									<td>jov</td>
+								</tr>
+							</tbody>
+						</table>
 						<p>
-							<img width="500" height="332" loading="lazy" alt="Jason" src="/umbraco/backoffice/assets/login.jpg" />
+							<img width="384" height="228" loading="lazy" alt="Installer illustration" src="/umbraco/backoffice/assets/installer-illustration.svg" />
 						</p>
 						<p>End of test content</p>
 					`,
@@ -921,7 +952,7 @@ export const data: Array<UmbMockDocumentModel> = [
 						</p>
 						<div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
 						<p>
-							<img width="500" height="332" loading="lazy" alt="Jason" src="/umbraco/backoffice/assets/login.jpg" />
+							<img width="384" height="228" loading="lazy" alt="Installer illustration" src="/umbraco/backoffice/assets/installer-illustration.svg" />
 						</p>
 						<p>End of test content</p>
 					`,
@@ -938,6 +969,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		template: null,
 		id: 'block-editors-document-id',
+		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
 		documentType: {
 			id: 'block-editors-document-type-id',

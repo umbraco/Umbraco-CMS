@@ -1,5 +1,4 @@
-export const UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS = 'Umb.Repository.Document.Detail';
-export const UMB_DOCUMENT_DETAIL_STORE_ALIAS = 'Umb.Store.Document.Detail';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UMB_DOCUMENT_DETAIL_STORE_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

@@ -4,7 +4,6 @@ import { UMB_TREE_ITEM_CONTEXT } from './tree-item-context-base.js';
 import { html, nothing, state, ifDefined, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
 export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeItemModel> extends UmbLitElement {
 	_item?: TreeItemModelType;
 	@property({ type: Object, attribute: false })
@@ -20,7 +19,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	hideActions: boolean = false;
 
 	@state()
-	private _isActive = false;
+	protected _isActive = false;
 
 	@state()
 	private _childItems?: TreeItemModelType[];
@@ -150,9 +149,10 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	#renderIcon() {
 		const icon = this._item?.icon;
 		const isFolder = this._item?.isFolder;
+		const iconWithoutColor = icon?.split(' ')[0];
 
-		if (icon) {
-			return html`<umb-icon slot="icon" name="${icon}"></umb-icon>`;
+		if (icon && iconWithoutColor) {
+			return html`<umb-icon slot="icon" name="${this._isActive ? iconWithoutColor : icon}"></umb-icon>`;
 		}
 
 		if (isFolder) {

@@ -1,4 +1,4 @@
-import { UMB_SCRIPT_ITEM_REPOSITORY_ALIAS } from '../../repository/item/index.js';
+import { UMB_SCRIPT_ITEM_REPOSITORY_ALIAS } from '../../repository/item/constants.js';
 import { UMB_SCRIPT_PICKER_MODAL } from '../../modals/script-picker-modal.token.js';
 import type { UmbScriptItemModel, UmbScriptTreeItemModel } from '../../index.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';

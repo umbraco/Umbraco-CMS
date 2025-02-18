@@ -1,7 +1,6 @@
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
+import { UMB_DICTIONARY_WORKSPACE_ALIAS } from './constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-
-export const UMB_DICTIONARY_WORKSPACE_ALIAS = 'Umb.Workspace.Dictionary';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

@@ -1,4 +1,4 @@
-export const UMB_MEDIA_VALIDATION_REPOSITORY_ALIAS = 'Umb.Repository.Document.Validation';
+import { UMB_MEDIA_VALIDATION_REPOSITORY_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

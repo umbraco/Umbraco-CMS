@@ -7,6 +7,7 @@ import { UmbEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@um
 import { UMB_DISCARD_CHANGES_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
+	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
@@ -14,6 +15,8 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 const LOADING_STATE_UNIQUE = 'umbLoadingEntityDetail';
 
@@ -38,16 +41,36 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public readonly unique = this.#entityContext.unique;
 
 	public readonly data = this._data.current;
+	public readonly persistedData = this._data.persisted;
 	public readonly loading = new UmbStateManager(this);
 
 	protected _getDataPromise?: Promise<any>;
 	protected _detailRepository?: DetailRepositoryType;
+
+	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	#parent = new UmbObjectState<{ entityType: string; unique: UmbEntityUnique } | undefined>(undefined);
 	public readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 	public readonly parentEntityType = this.#parent.asObservablePart((parent) =>
 		parent ? parent.entityType : undefined,
 	);
+
+	/**
+	 * The base validation context for the workspace. This ensures that at least one validation context is always present.
+	 * @example You can manually validate all properties on the context:
+	 * ```ts
+	 * try {
+	 *   await this.validationContext.validate();
+	 * } catch (error) {
+	 *   console.error(error);
+	 * }
+	 * ```
+	 * @example You can set the data path on the context to map to a specific part of the server validation:
+	 * ```ts
+	 * this.validationContext.setDataPath('path.to.data');
+	 * ```
+	 */
+	protected validationContext = new UmbValidationContext(this);
 
 	#initResolver?: () => void;
 	#initialized = false;
@@ -65,6 +88,20 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.#entityContext.setEntityType(args.entityType);
 		window.addEventListener('willchangestate', this.#onWillNavigate);
 		this.#observeRepository(args.detailRepositoryAlias);
+		this.addValidationContext(this.validationContext);
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
+			this.#eventContext = context;
+
+			this.#eventContext.removeEventListener(
+				UmbEntityUpdatedEvent.TYPE,
+				this.#onEntityUpdatedEvent as unknown as EventListener,
+			);
+			this.#eventContext.addEventListener(
+				UmbEntityUpdatedEvent.TYPE,
+				this.#onEntityUpdatedEvent as unknown as EventListener,
+			);
+		});
 	}
 
 	/**
@@ -83,6 +120,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 */
 	getData(): DetailModelType | undefined {
 		return this._data.getCurrent();
+	}
+
+	/**
+	 * Get the persisted data
+	 * @returns { DetailModelType | undefined } The persisted data
+	 */
+	public getPersistedData(): DetailModelType | undefined {
+		return this._data.getPersisted();
 	}
 
 	/**
@@ -122,10 +167,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		this.#entityContext.setUnique(unique);
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
 		await this.#init;
-		this.resetState();
 		this._getDataPromise = this._detailRepository!.requestByUnique(unique);
 		type GetDataType = Awaited<ReturnType<UmbDetailRepository<DetailModelType>['requestByUnique']>>;
 		const response = (await this._getDataPromise) as GetDataType;
@@ -148,6 +193,21 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	/**
+	 * Reload the workspace data
+	 * @returns { Promise<void> } The promise of the reload
+	 */
+	public async reload(): Promise<void> {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is not set');
+		const { data } = await this._detailRepository!.requestByUnique(unique);
+
+		if (data) {
+			this._data.setPersisted(data);
+			this._data.setCurrent(data);
+		}
+	}
+
+	/**
 	 * Method to check if the workspace data is loaded.
 	 * @returns { Promise<any> | undefined } true if the workspace data is loaded.
 	 * @memberof UmbEntityWorkspaceContextBase
@@ -166,9 +226,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns { Promise<any> | undefined } The data of the scaffold.
 	 */
 	public async createScaffold(args: CreateArgsType) {
+		this.resetState();
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Creating ${this.getEntityType()} scaffold` });
 		await this.#init;
-		this.resetState();
 		this.setParent(args.parent);
 
 		const request = this._detailRepository!.createScaffold(args.preset);
@@ -264,13 +324,21 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this._data.setPersisted(data);
 		this._data.setCurrent(data);
 
-		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			unique: this.getUnique()!,
-			entityType: this.getEntityType(),
+		const unique = this.getUnique()!;
+		const entityType = this.getEntityType();
+
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+
+		eventContext.dispatchEvent(event);
+
+		const updatedEvent = new UmbEntityUpdatedEvent({
+			unique,
+			entityType,
+			eventUnique: this._workspaceEventUnique,
 		});
 
-		actionEventContext.dispatchEvent(event);
+		eventContext.dispatchEvent(updatedEvent);
 	}
 
 	#allowNavigateAway = false;
@@ -339,7 +407,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			this,
 			umbExtensionsRegistry,
 			repositoryAlias,
-			[this._host],
+			[],
 			(permitted, ctrl) => {
 				this._detailRepository = permitted ? ctrl.api : undefined;
 				this.#checkIfInitialized();
@@ -353,8 +421,30 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 	}
 
+	// Discriminator to identify events from this workspace context
+	protected readonly _workspaceEventUnique = UmbId.new();
+
+	#onEntityUpdatedEvent = (event: UmbEntityUpdatedEvent) => {
+		const eventEntityUnique = event.getUnique();
+		const eventEntityType = event.getEntityType();
+		const eventDiscriminator = event.getEventUnique();
+
+		// Ignore events for other entities
+		if (eventEntityType !== this.getEntityType()) return;
+		if (eventEntityUnique !== this.getUnique()) return;
+
+		// Ignore events from this workspace so we don't reload the data twice. Ex saving this workspace
+		if (eventDiscriminator === this._workspaceEventUnique) return;
+
+		this.reload();
+	};
+
 	public override destroy(): void {
 		window.removeEventListener('willchangestate', this.#onWillNavigate);
+		this.#eventContext?.removeEventListener(
+			UmbEntityUpdatedEvent.TYPE,
+			this.#onEntityUpdatedEvent as unknown as EventListener,
+		);
 		this._detailRepository?.destroy();
 		this.#entityContext.destroy();
 		super.destroy();

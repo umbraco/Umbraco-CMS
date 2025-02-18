@@ -1,5 +1,5 @@
+import { UMB_DATA_TYPE_TREE_STORE_CONTEXT } from './data-type-tree.store.context-token.js';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -17,7 +17,4 @@ export class UmbDataTypeTreeStore extends UmbUniqueTreeStore {
 		super(host, UMB_DATA_TYPE_TREE_STORE_CONTEXT.toString());
 	}
 }
-
-export const UMB_DATA_TYPE_TREE_STORE_CONTEXT = new UmbContextToken<UmbDataTypeTreeStore>('UmbDataTypeTreeStore');
-
 export { UmbDataTypeTreeStore as api };

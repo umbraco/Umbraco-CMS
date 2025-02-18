@@ -20,7 +20,7 @@ export interface WorkspaceAliasConditionConfig extends UmbConditionConfigBase<ty
 	oneOf?: Array<string>;
 }
 
-export type WorkspaceContentTypeAliasConditionConfig =
+export type UmbWorkspaceContentTypeAliasConditionConfig =
 	UmbConditionConfigBase<'Umb.Condition.WorkspaceContentTypeAlias'> & {
 		/**
 		 * Define a content type alias in which workspace this extension should be available
@@ -35,8 +35,12 @@ export type WorkspaceContentTypeAliasConditionConfig =
 		 */
 		oneOf?: Array<string>;
 	};
+/**
+ * @deprecated Use `UmbWorkspaceContentTypeAliasConditionConfig` instead. This will be removed in Umbraco 17.
+ */
+export type WorkspaceContentTypeAliasConditionConfig = UmbWorkspaceContentTypeAliasConditionConfig;
 
-export type WorkspaceEntityTypeConditionConfig = UmbConditionConfigBase<'Umb.Condition.WorkspaceEntityType'> & {
+export type UmbWorkspaceEntityTypeConditionConfig = UmbConditionConfigBase<'Umb.Condition.WorkspaceEntityType'> & {
 	/**
 	 * Define the workspace that this extension should be available in
 	 * @example
@@ -44,21 +48,36 @@ export type WorkspaceEntityTypeConditionConfig = UmbConditionConfigBase<'Umb.Con
 	 */
 	match: string;
 };
+/**
+ * @deprecated Use `UmbWorkspaceEntityTypeConditionConfig` instead. This will be removed in Umbraco 17.
+ */
+export type WorkspaceEntityTypeConditionConfig = UmbWorkspaceEntityTypeConditionConfig;
 
-export type WorkspaceHasCollectionConditionConfig = UmbConditionConfigBase<
+export type UmbWorkspaceHasCollectionConditionConfig = UmbConditionConfigBase<
 	typeof UMB_WORKSPACE_HAS_COLLECTION_CONDITION_ALIAS
 >;
+/**
+ * @deprecated Use `UmbWorkspaceHasCollectionConditionConfig` instead. This will be removed in Umbraco 17.
+ */
+export type WorkspaceHasCollectionConditionConfig = UmbWorkspaceHasCollectionConditionConfig;
 
-export interface WorkspaceEntityIsNewConditionConfig
+export interface UmbWorkspaceEntityIsNewConditionConfig
 	extends UmbConditionConfigBase<typeof UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS> {
 	match: boolean;
 }
 
+/**
+ * @deprecated Use `UmbWorkspaceEntityIsNewConditionConfig` instead. This will be removed in Umbraco 17.
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface WorkspaceEntityIsNewConditionConfig extends UmbWorkspaceEntityIsNewConditionConfig {}
+
 declare global {
 	interface UmbExtensionConditionConfigMap {
 		umbWorkspaceAlias: WorkspaceAliasConditionConfig;
-		umbWorkspaceContentTypeAlias: WorkspaceContentTypeAliasConditionConfig;
-		umbWorkspaceEntityType: WorkspaceEntityTypeConditionConfig;
-		umbWorkspaceHasCollection: WorkspaceHasCollectionConditionConfig;
+		umbWorkspaceContentTypeAlias: UmbWorkspaceContentTypeAliasConditionConfig;
+		umbWorkspaceEntityIsNewConditionConfig: UmbWorkspaceEntityIsNewConditionConfig;
+		umbWorkspaceEntityType: UmbWorkspaceEntityTypeConditionConfig;
+		umbWorkspaceHasCollection: UmbWorkspaceHasCollectionConditionConfig;
 	}
 }

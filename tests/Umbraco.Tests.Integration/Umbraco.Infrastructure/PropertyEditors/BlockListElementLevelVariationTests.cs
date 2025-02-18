@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -10,18 +12,12 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
-public partial class BlockListElementLevelVariationTests : BlockEditorElementVariationTestBase
+internal partial class BlockListElementLevelVariationTests : BlockEditorElementVariationTestBase
 {
-    [OneTimeSetUp]
-    public void OneTimeSetUp()
+    public static new void ConfigureAllowEditInvariantFromNonDefaultTrue(IUmbracoBuilder builder)
     {
-        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Publish_Invariant_Properties_Without_Default_Culture_With_AllowEditInvariantFromNonDefault));
-        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault));
-        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_In_Nested_Blocks_Without_Access_With_AllowEditInvariantFromNonDefault));
-        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault) + "(True)");
-        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault) + "(False)");
-        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_In_Nested_Blocks_Without_Access_With_AllowEditInvariantFromNonDefault) + "(True)");
-        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_In_Nested_Blocks_Without_Access_With_AllowEditInvariantFromNonDefault) + "(False)");
+        builder.Services.Configure<ContentSettings>(config =>
+            config.AllowEditInvariantFromNonDefault = true);
     }
 
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();

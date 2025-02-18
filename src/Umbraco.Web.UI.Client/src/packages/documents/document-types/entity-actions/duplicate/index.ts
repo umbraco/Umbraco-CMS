@@ -1,4 +1,1 @@
-export {
-	UmbDuplicateDocumentTypeRepository,
-	UMB_DUPLICATE_DOCUMENT_TYPE_REPOSITORY_ALIAS,
-} from './repository/index.js';
+export { UmbDuplicateDocumentTypeRepository } from './repository/index.js';

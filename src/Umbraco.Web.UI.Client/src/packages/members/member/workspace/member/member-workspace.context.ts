@@ -1,8 +1,8 @@
 import type { UmbMemberDetailRepository } from '../../repository/index.js';
-import { UMB_MEMBER_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbMemberDetailModel, UmbMemberVariantModel } from '../../types.js';
-import { UmbMemberPropertyDatasetContext } from '../../property-dataset-context/member-property-dataset-context.js';
+import { UmbMemberPropertyDatasetContext } from '../../property-dataset-context/member-property-dataset.context.js';
 import { UMB_MEMBER_ENTITY_TYPE, UMB_MEMBER_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_MEMBER_DETAIL_REPOSITORY_ALIAS } from '../../repository/detail/manifests.js';
 import { UMB_MEMBER_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbMemberWorkspaceEditorElement } from './member-workspace-editor.element.js';
 import { UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD } from './constants.js';
@@ -38,6 +38,8 @@ export class UmbMemberWorkspaceContext
 			workspaceAlias: UMB_MEMBER_WORKSPACE_ALIAS,
 			detailRepositoryAlias: UMB_MEMBER_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbMemberTypeDetailRepository,
+			// TODO: Enable Validation Repository when we have UI for showing validation issues on other tabs. [NL]
+			//contentValidationRepository: UmbMemberValidationRepository,
 			contentVariantScaffold: UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
 		});
 
@@ -76,6 +78,7 @@ export class UmbMemberWorkspaceContext
 			preset: {
 				memberType: {
 					unique: memberTypeUnique,
+					icon: "icon-user"
 				},
 			},
 		});

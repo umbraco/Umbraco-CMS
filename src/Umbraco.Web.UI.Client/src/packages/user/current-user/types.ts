@@ -8,6 +8,8 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
+export type * from './user-profile-app.extension.js';
+export type * from './current-user-action.extension.js';
 export type * from './conditions/types.js';
 
 export interface UmbCurrentUserModel {
@@ -28,6 +30,7 @@ export interface UmbCurrentUserModel {
 	permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 	unique: string;
 	userName: string;
+	userGroupUniques: string[];
 }
 
 export type UmbCurrentUserExternalLoginProviderModel = UserExternalLoginProviderModel;

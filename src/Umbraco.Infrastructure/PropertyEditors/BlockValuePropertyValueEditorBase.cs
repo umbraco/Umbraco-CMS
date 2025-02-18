@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -257,6 +258,190 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                 blockPropertyValue.Value = newValue;
             }
         }
+    }
+
+    /// <summary>
+    /// Updates the invariant data in the source with the invariant data in the value if allowed
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="target"></param>
+    /// <param name="canUpdateInvariantData"></param>
+    /// <returns></returns>
+    internal virtual BlockEditorData<TValue, TLayout>? UpdateSourceInvariantData(BlockEditorData<TValue, TLayout>? source, BlockEditorData<TValue, TLayout>? target, bool canUpdateInvariantData)
+    {
+        if (source is null && target is null)
+        {
+            return null;
+        }
+
+        if (source is null)
+        {
+            return MergeNewInvariant(target!, canUpdateInvariantData);
+        }
+
+        if (target is null)
+        {
+            return MergeRemovalInvariant(source, canUpdateInvariantData);
+        }
+
+        return MergeInvariant(source, target, canUpdateInvariantData);
+    }
+
+    internal virtual object? MergeVariantInvariantPropertyValue(
+        object? sourceValue,
+        object? targetValue,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
+        BlockEditorData<TValue, TLayout>? source = BlockEditorValues.DeserializeAndClean(sourceValue);
+        BlockEditorData<TValue, TLayout>? target = BlockEditorValues.DeserializeAndClean(targetValue);
+
+        TValue? mergedBlockValue =
+            MergeVariantInvariantPropertyValueTyped(source, target, canUpdateInvariantData, allowedCultures);
+
+        return _jsonSerializer.Serialize(mergedBlockValue);
+    }
+
+    internal virtual TValue? MergeVariantInvariantPropertyValueTyped(
+        BlockEditorData<TValue, TLayout>? source,
+        BlockEditorData<TValue, TLayout>? target,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
+        source = UpdateSourceInvariantData(source, target, canUpdateInvariantData);
+
+        if (source is null && target is null)
+        {
+            return null;
+        }
+
+        if (source is null && target?.Layout is not null)
+        {
+            source = new BlockEditorData<TValue, TLayout>([], CreateWithLayout(target.Layout));
+        }
+        else if (target is null && source?.Layout is not null)
+        {
+            target = new BlockEditorData<TValue, TLayout>([], CreateWithLayout(source.Layout));
+        }
+
+        // at this point the layout should have been merged or fallback created
+        if (source is null || target is null)
+        {
+            throw new ArgumentException("invalid sourceValue or targetValue");
+        }
+
+        // remove all the blocks that are no longer part of the layout
+        target.BlockValue.ContentData.RemoveAll(contentBlock =>
+            target.Layout!.Any(layoutItem => layoutItem.ReferencesContent(contentBlock.Key)) is false);
+
+        target.BlockValue.SettingsData.RemoveAll(settingsBlock =>
+            target.Layout!.Any(layoutItem => layoutItem.ReferencesSetting(settingsBlock.Key)) is false);
+
+        CleanupVariantValues(source.BlockValue.ContentData, target.BlockValue.ContentData, canUpdateInvariantData, allowedCultures);
+        CleanupVariantValues(source.BlockValue.SettingsData, target.BlockValue.SettingsData, canUpdateInvariantData, allowedCultures);
+
+        return target.BlockValue;
+    }
+
+    private void CleanupVariantValues(
+        List<BlockItemData> sourceBlockItems,
+        List<BlockItemData> targetBlockItems,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
+        // merge the source values into the target values for culture
+        foreach (BlockItemData targetBlockItem in targetBlockItems)
+        {
+            BlockItemData? sourceBlockItem = sourceBlockItems.FirstOrDefault(i => i.Key == targetBlockItem.Key);
+
+            var valuesToRemove = new List<BlockPropertyValue>();
+
+            foreach (BlockPropertyValue targetBlockPropertyValue in targetBlockItem.Values)
+            {
+                BlockPropertyValue? sourceBlockPropertyValue =
+                    sourceBlockItem?.Values.FirstOrDefault(v => v.Culture == targetBlockPropertyValue.Culture);
+
+                // todo double check if this path can have an invariant value, but it shouldn't right???
+                // => it can be a null culture, but we shouldn't do anything? as the invariant section should have done it already
+                if ((targetBlockPropertyValue.Culture is null && canUpdateInvariantData == false)
+                    || (targetBlockPropertyValue.Culture is not null && allowedCultures.Contains(targetBlockPropertyValue.Culture) is false))
+                {
+                    // not allowed to update this culture, set the value back to the source
+                    if (sourceBlockPropertyValue is null)
+                    {
+                        valuesToRemove.Add(targetBlockPropertyValue);
+                    }
+                    else
+                    {
+                        targetBlockPropertyValue.Value = sourceBlockPropertyValue.Value;
+                    }
+
+                    continue;
+                }
+
+                // is this another editor that supports partial merging? i.e. blocks within blocks.
+                IDataEditor? mergingDataEditor = null;
+                var shouldPerformPartialMerge = targetBlockPropertyValue.PropertyType is not null
+                                  && _propertyEditors.TryGet(targetBlockPropertyValue.PropertyType.PropertyEditorAlias, out mergingDataEditor)
+                                  && mergingDataEditor.CanMergePartialPropertyValues(targetBlockPropertyValue.PropertyType);
+
+                if (shouldPerformPartialMerge is false)
+                {
+                    continue;
+                }
+
+                // marge subdata
+                targetBlockPropertyValue.Value = mergingDataEditor!.MergeVariantInvariantPropertyValue(
+                    sourceBlockPropertyValue?.Value,
+                    targetBlockPropertyValue.Value,
+                    canUpdateInvariantData,
+                    allowedCultures);
+            }
+
+            foreach (BlockPropertyValue value in valuesToRemove)
+            {
+                targetBlockItem.Values.Remove(value);
+            }
+        }
+    }
+
+    private BlockEditorData<TValue, TLayout>? MergeNewInvariant(BlockEditorData<TValue, TLayout> target, bool canUpdateInvariantData)
+    {
+        if (canUpdateInvariantData is false)
+        {
+            // source value was null and not allowed to update the structure which is invariant => nothing remains
+            return null;
+        }
+
+        // create a new source object based on the target value that only has the invariant data (structure)
+        return target.Layout is not null
+            ? new BlockEditorData<TValue, TLayout>([], CreateWithLayout(target.Layout))
+            : null;
+    }
+
+    private BlockEditorData<TValue, TLayout>? MergeRemovalInvariant(BlockEditorData<TValue, TLayout> source, bool canUpdateInvariantData)
+    {
+        if (canUpdateInvariantData)
+        {
+            // if the structure is removed, everything is gone anyway
+            return null;
+        }
+
+        // create a new target object based on the source value that only has the invariant data (structure)
+        return source.Layout is not null
+            ? new BlockEditorData<TValue, TLayout>([], CreateWithLayout(source.Layout))
+            : null;
+    }
+
+    private BlockEditorData<TValue, TLayout> MergeInvariant(BlockEditorData<TValue, TLayout> source, BlockEditorData<TValue, TLayout> target, bool canUpdateInvariantData)
+    {
+        if (canUpdateInvariantData)
+        {
+            source.BlockValue.Layout = target.BlockValue.Layout;
+            source.BlockValue.Expose = target.BlockValue.Expose;
+        }
+
+        return source;
     }
 
     internal virtual object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture)

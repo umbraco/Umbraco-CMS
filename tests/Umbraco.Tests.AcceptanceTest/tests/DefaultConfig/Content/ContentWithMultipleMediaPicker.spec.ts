@@ -24,13 +24,13 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(firstMediaFileName);
   await umbracoApi.media.ensureNameNotExists(secondMediaFileName);
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
 test('can create content with multiple media picker data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const expectedState = 'Draft'; 
+  const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -52,7 +52,7 @@ test('can create content with multiple media picker data type', async ({umbracoA
 
 test('can publish content with multiple media picker data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const expectedState = 'Published'; 
+  const expectedState = 'Published';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -80,9 +80,9 @@ test('can add multiple media files to the multiple media picker', async ({umbrac
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseMediaPickerButton();
-  await umbracoUi.content.clickMediaByNameInMediaPicker(firstMediaFileName);
-  await umbracoUi.content.clickMediaByNameInMediaPicker(secondMediaFileName);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.selectMediaWithName(firstMediaFileName);
+  await umbracoUi.content.selectMediaWithName(secondMediaFileName);
+  await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert

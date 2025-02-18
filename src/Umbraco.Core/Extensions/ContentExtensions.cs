@@ -237,20 +237,20 @@ public static class ContentExtensions
 
         if (!content.ContentType.VariesByCulture())
         {
-            culture = string.Empty;
+            culture = Constants.System.InvariantCulture;
         }
         else if (culture.IsNullOrWhiteSpace())
         {
             throw new ArgumentNullException($"{nameof(culture)} cannot be null or empty");
         }
 
-        IEnumerable<ContentSchedule> expires = contentSchedule.GetSchedule(culture!, ContentScheduleAction.Expire);
+        IEnumerable<ContentSchedule> expires = contentSchedule.GetSchedule(culture, ContentScheduleAction.Expire);
         if (expires != null && expires.Any(x => x.Date > DateTime.MinValue && DateTime.Now > x.Date))
         {
             return ContentStatus.Expired;
         }
 
-        IEnumerable<ContentSchedule> release = contentSchedule.GetSchedule(culture!, ContentScheduleAction.Release);
+        IEnumerable<ContentSchedule> release = contentSchedule.GetSchedule(culture, ContentScheduleAction.Release);
         if (release != null && release.Any(x => x.Date > DateTime.MinValue && x.Date > DateTime.Now))
         {
             return ContentStatus.AwaitingRelease;

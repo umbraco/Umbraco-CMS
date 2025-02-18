@@ -20,9 +20,9 @@ export class UmbHealthCheckDashboardContext {
 		this.host = host;
 	}
 
-	checkAll() {
+	async checkAll() {
 		for (const [label, api] of this.apis.entries()) {
-			api?.checkGroup?.(label);
+			await api?.checkGroup?.(label);
 		}
 	}
 

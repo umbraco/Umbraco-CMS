@@ -1,5 +1,5 @@
 import { UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../../../../paths.js';
-import { UMB_EDIT_DOCUMENT_TYPE_FOLDER_WORKSPACE_PATH_PATTERN } from '../../../folder/index.js';
+import { UMB_EDIT_DOCUMENT_TYPE_FOLDER_WORKSPACE_PATH_PATTERN } from '../../../constants.js';
 import type { UmbDocumentTypeTreeItemModel } from '../../../types.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
@@ -31,6 +31,7 @@ export class UmbDocumentTypeTreeItemTableCollectionViewElement extends UmbLitEle
 		{
 			name: '',
 			alias: 'entityActions',
+			align: 'right',
 		},
 	];
 

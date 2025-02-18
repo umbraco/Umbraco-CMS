@@ -1,4 +1,5 @@
 import { UmbDropzoneManager } from './dropzone-manager.class.js';
+import { UmbDropzoneSubmittedEvent } from './dropzone-submitted.event.js';
 import { UmbFileDropzoneItemStatus, type UmbUploadableItem } from './types.js';
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -117,10 +118,10 @@ export class UmbDropzoneElement extends UmbLitElement {
 
 		if (this.createAsTemporary) {
 			const uploadable = this.#dropzoneManager.createTemporaryFiles(event.detail.files);
-			this.dispatchEvent(new CustomEvent('submitted', { detail: await uploadable }));
+			this.dispatchEvent(new UmbDropzoneSubmittedEvent(await uploadable));
 		} else {
 			const uploadable = this.#dropzoneManager.createMediaItems(event.detail, this.parentUnique);
-			this.dispatchEvent(new CustomEvent('submitted', { detail: await uploadable }));
+			this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadable));
 		}
 	}
 

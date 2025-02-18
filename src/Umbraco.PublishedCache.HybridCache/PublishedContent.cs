@@ -42,6 +42,8 @@ internal class PublishedContent : PublishedContentBase
         _urlSegment = contentData.UrlSegment;
         _published = contentData.Published;
 
+        IsPreviewing = preview;
+
         var properties = new IPublishedProperty[_contentNode.ContentType.PropertyTypes.Count()];
         var i = 0;
         foreach (IPublishedPropertyType propertyType in _contentNode.ContentType.PropertyTypes)
@@ -127,7 +129,7 @@ internal class PublishedContent : PublishedContentBase
 
     public override DateTime UpdateDate { get; }
 
-    public bool IsPreviewing { get; } = false;
+    public bool IsPreviewing { get; }
 
     // Needed for publishedProperty
     internal IVariationContextAccessor VariationContextAccessor { get; }

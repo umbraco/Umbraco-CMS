@@ -1,7 +1,7 @@
-import { UMB_STATIC_FILE_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UMB_STATIC_FILE_ROOT_ENTITY_TYPE } from './constants.js';
 import { UmbStaticFileTreeServerDataSource } from './static-file-tree.server.data-source.js';
 import type { UmbStaticFileTreeItemModel, UmbStaticFileTreeRootModel } from './types.js';
-import { UMB_STATIC_FILE_TREE_STORE_CONTEXT } from './static-file-tree.store.js';
+import { UMB_STATIC_FILE_TREE_STORE_CONTEXT } from './static-file-tree.store.context-token.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';

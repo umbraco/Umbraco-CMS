@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
 using Microsoft.Extensions.Options;
@@ -47,11 +48,11 @@ namespace Umbraco.Cms.Core.Strings
         #region Filters
 
         // ok to be static here because it's not configurable in any way
-        private static readonly char[] InvalidFileNameChars =
+        private static readonly FrozenSet<char> InvalidFileNameChars =
             Path.GetInvalidFileNameChars()
             .Union("!*'();:@&=+$,/?%#[]-~{}\"<>\\^`| ".ToCharArray())
             .Distinct()
-            .ToArray();
+            .ToFrozenSet();
 
         public static bool IsValidFileNameChar(char c)
         {

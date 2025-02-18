@@ -1,10 +1,4 @@
-import { UMB_WRITABLE_PROPERTY_CONDITION_ALIAS } from './constants.js';
+import { manifests as hasValueManifests } from './has-value/manifests.js';
+import { manifests as writableManifests } from './writable/manifests.js';
 
-export const manifests: Array<UmbExtensionManifest> = [
-	{
-		type: 'condition',
-		name: 'Writable Property Condition',
-		alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
-		api: () => import('./writable-property.condition.js'),
-	},
-];
+export const manifests: Array<UmbExtensionManifest> = [...hasValueManifests, ...writableManifests];

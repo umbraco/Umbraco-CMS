@@ -163,6 +163,11 @@ export class UmbExtensionRegistry<
 		return !this.#exclusions.includes(ext.alias);
 	};
 
+	/**
+	 * Register an extension.
+	 * @param {(ManifestTypes | ManifestKind<ManifestTypes>)} manifest - The extension to register.
+	 * @memberof UmbExtensionRegistry
+	 */
 	register(manifest: ManifestTypes | ManifestKind<ManifestTypes>): void {
 		const isValid = this.#validateExtension(manifest);
 		if (!isValid) {
@@ -185,19 +190,39 @@ export class UmbExtensionRegistry<
 		]);
 	}
 
+	/**
+	 * Get all registered extensions.
+	 * @returns {Array<ManifestTypes>} - All registered extensions.
+	 * @memberof UmbExtensionRegistry
+	 */
 	getAllExtensions(): Array<ManifestTypes> {
 		return this._extensions.getValue();
 	}
 
+	/**
+	 * Register many extensions.
+	 * @param {(Array<ManifestTypes | ManifestKind<ManifestTypes>>)} manifests - The extensions to register.
+	 * @memberof UmbExtensionRegistry
+	 */
 	registerMany(manifests: Array<ManifestTypes | ManifestKind<ManifestTypes>>): void {
 		// we have to register extensions individually, so we ensure a manifest is valid before continuing to the next one
 		manifests.forEach((manifest) => this.register(manifest));
 	}
 
+	/**
+	 * Unregister many extensions with the given aliases.
+	 * @param {Array<string>} aliases - The aliases of the extensions to unregister.
+	 * @memberof UmbExtensionRegistry
+	 */
 	unregisterMany(aliases: Array<string>): void {
 		aliases.forEach((alias) => this.unregister(alias));
 	}
 
+	/**
+	 * Unregister an extension with the given alias.
+	 * @param {string} alias - The alias of the extension to unregister.
+	 * @memberof UmbExtensionRegistry
+	 */
 	unregister(alias: string): void {
 		const newKindsValues = this._kinds.getValue().filter((kind) => kind.alias !== alias);
 		const newExtensionsValues = this._extensions.getValue().filter((extension) => extension.alias !== alias);
@@ -206,6 +231,12 @@ export class UmbExtensionRegistry<
 		this._extensions.setValue(newExtensionsValues);
 	}
 
+	/**
+	 * Check if an extension with the given alias is registered.
+	 * @param {string} alias - The alias of the extension to check.
+	 * @returns {boolean} - true if an extension with the given alias is registered.
+	 * @memberof UmbExtensionRegistry
+	 */
 	isRegistered(alias: string): boolean {
 		if (this._extensions.getValue().find((ext) => ext.alias === alias)) {
 			return true;
@@ -216,6 +247,15 @@ export class UmbExtensionRegistry<
 		}
 
 		return false;
+	}
+
+	/**
+	 * Clears all extensions and kinds from the registry.
+	 * @memberof UmbExtensionRegistry
+	 */
+	clear(): void {
+		this._extensions.setValue([]);
+		this._kinds.setValue([]);
 	}
 
 	#validateExtension(manifest: ManifestTypes | ManifestKind<ManifestTypes>): boolean {

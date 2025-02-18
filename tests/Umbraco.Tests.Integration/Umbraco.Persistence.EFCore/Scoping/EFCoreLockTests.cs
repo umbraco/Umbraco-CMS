@@ -125,7 +125,7 @@ public class EFCoreLockTests : UmbracoIntegrationTest
         const int threadCount = 8;
         var threads = new Thread[threadCount];
         var exceptions = new Exception[threadCount];
-        var locker = new object();
+        Lock locker = new();
         var acquired = 0;
         var m2 = new ManualResetEventSlim(false);
         var m1 = new ManualResetEventSlim(false);

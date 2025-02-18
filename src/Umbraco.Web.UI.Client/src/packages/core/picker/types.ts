@@ -4,3 +4,5 @@ export interface UmbPickerContextConfig {
 		queryParams?: object;
 	};
 }
+
+export type * from './search/types.js';

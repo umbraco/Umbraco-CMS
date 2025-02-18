@@ -1,4 +1,4 @@
-import { UMB_SCRIPT_DETAIL_STORE_CONTEXT } from '../../repository/index.js';
+import { UMB_SCRIPT_DETAIL_STORE_CONTEXT } from '../../repository/constants.js';
 import type { UmbScriptDetailModel } from '../../types.js';
 import { UmbRenameScriptServerDataSource } from './rename-script.server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

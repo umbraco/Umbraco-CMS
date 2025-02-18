@@ -1,11 +1,12 @@
 import type { UmbScriptDetailModel } from '../types.js';
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
-import { UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS, type UmbScriptDetailRepository } from '../repository/index.js';
+import type { UmbScriptDetailRepository } from '../repository/index.js';
+import { UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS } from '../constants.js';
 import { UMB_SCRIPT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbScriptWorkspaceEditorElement } from './script-workspace-editor.element.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
-	UmbEntityDetailWorkspaceContextBase,
+	UmbEntityNamedDetailWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
 	type UmbSubmittableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
@@ -14,10 +15,9 @@ import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router
 import { UmbServerFileRenameWorkspaceRedirectController } from '@umbraco-cms/backoffice/server-file-system';
 
 export class UmbScriptWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<UmbScriptDetailModel, UmbScriptDetailRepository>
+	extends UmbEntityNamedDetailWorkspaceContextBase<UmbScriptDetailModel, UmbScriptDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	public readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 	public readonly content = this._data.createObservablePartOfCurrent((data) => data?.content);
 
 	constructor(host: UmbControllerHost) {
@@ -58,15 +58,6 @@ export class UmbScriptWorkspaceContext
 				},
 			},
 		]);
-	}
-
-	/**
-	 * @description Set the name of the script
-	 * @param {string} value The name of the script
-	 * @memberof UmbScriptWorkspaceContext
-	 */
-	public setName(value: string) {
-		this._data.updateCurrent({ name: value });
 	}
 
 	/**

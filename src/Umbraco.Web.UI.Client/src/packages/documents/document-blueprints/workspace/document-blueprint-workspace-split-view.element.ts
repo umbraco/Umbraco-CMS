@@ -1,5 +1,4 @@
-import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS } from './manifests.js';
-import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT } from './document-blueprint-workspace.context-token.js';
+import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS, UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT } from './constants.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';

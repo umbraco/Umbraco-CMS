@@ -43,6 +43,7 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 			userContext.allowedSections,
 			(allowedSections) => {
 				if (!allowedSections) return;
+				// TODO: Please be aware that we re-initialize this initializer based on user permissions. I suggest we should solve this specific case should be improved by the ability to change the filter [NL]
 				new UmbExtensionsManifestInitializer(
 					this,
 					umbExtensionsRegistry,
@@ -78,10 +79,10 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 		this.#activeSectionAlias.setValue(alias);
 	}
 
-	public async serverUpgradeCheck(): Promise<boolean> {
+	public async serverUpgradeCheck() {
+		const version = await this.observe(this.version).asPromise();
 		const repository = new UmbSysinfoRepository(this);
-		const check = await repository.serverUpgradeCheck();
-		return !!check;
+		return repository.serverUpgradeCheck(version);
 	}
 }
 

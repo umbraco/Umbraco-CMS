@@ -47,6 +47,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private readonly IDatabaseCacheRebuilder _databaseCacheRebuilder;
     private readonly IKeyValueService _keyValueService;
     private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly AppCaches _appCaches;
     private readonly DistributedCache _distributedCache;
     private readonly IScopeAccessor _scopeAccessor;
     private readonly ICoreScopeProvider _scopeProvider;
@@ -62,7 +63,8 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         IDatabaseCacheRebuilder databaseCacheRebuilder,
         DistributedCache distributedCache,
         IKeyValueService keyValueService,
-        IServiceScopeFactory serviceScopeFactory)
+        IServiceScopeFactory serviceScopeFactory,
+        AppCaches appCaches)
     {
         _scopeProvider = scopeProvider;
         _scopeAccessor = scopeAccessor;
@@ -72,8 +74,34 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         _databaseCacheRebuilder = databaseCacheRebuilder;
         _keyValueService = keyValueService;
         _serviceScopeFactory = serviceScopeFactory;
+        _appCaches = appCaches;
         _distributedCache = distributedCache;
         _logger = _loggerFactory.CreateLogger<MigrationPlanExecutor>();
+    }
+
+    [Obsolete("Use the non obsoleted constructor instead. Scheduled for removal in v17")]
+    public MigrationPlanExecutor(
+        ICoreScopeProvider scopeProvider,
+        IScopeAccessor scopeAccessor,
+        ILoggerFactory loggerFactory,
+        IMigrationBuilder migrationBuilder,
+        IUmbracoDatabaseFactory databaseFactory,
+        IDatabaseCacheRebuilder databaseCacheRebuilder,
+        DistributedCache distributedCache,
+        IKeyValueService keyValueService,
+        IServiceScopeFactory serviceScopeFactory)
+    : this(
+        scopeProvider,
+        scopeAccessor,
+        loggerFactory,
+        migrationBuilder,
+        databaseFactory,
+        databaseCacheRebuilder,
+        distributedCache,
+        keyValueService,
+        serviceScopeFactory,
+        StaticServiceProvider.Instance.GetRequiredService<AppCaches>())
+    {
     }
 
     public string Execute(MigrationPlan plan, string fromState) => ExecutePlan(plan, fromState).FinalState;
@@ -303,6 +331,8 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
 
     private void RebuildCache()
     {
+        _appCaches.RuntimeCache.Clear();
+        _appCaches.IsolatedCaches.ClearAllCaches();
         _databaseCacheRebuilder.Rebuild();
         _distributedCache.RefreshAllPublishedSnapshot();
     }

@@ -1,4 +1,4 @@
-import { type PropertyValueMap, css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -19,6 +19,9 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	@property({ type: Boolean, reflect: true })
 	required: boolean = false;
 
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@property({ type: Boolean, reflect: true, attribute: 'alias-readonly' })
 	aliasReadonly = false;
 
@@ -28,9 +31,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	@state()
 	private _aliasLocked = true;
 
-	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.firstUpdated(_changedProperties);
-
+	protected override firstUpdated(): void {
 		this.addValidator(
 			'valueMissing',
 			() => UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
@@ -104,34 +105,45 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 				label=${nameLabel}
 				.value=${this.value}
 				@input=${this.#onNameChange}
-				?required=${this.required}>
-				<uui-input-lock
-					name="alias"
-					slot="append"
-					label=${aliasLabel}
-					placeholder=${aliasLabel}
-					.value=${this.alias}
-					?auto-width=${!!this.value}
-					?locked=${this._aliasLocked && !this.aliasReadonly}
-					?readonly=${this.aliasReadonly}
-					?required=${this.required}
-					@input=${this.#onAliasChange}
-					@blur=${this.#onAliasBlur}
-					@lock-change=${this.#onToggleAliasLock}>
-				</uui-input-lock>
+				?required=${this.required}
+				?readonly=${this.readonly}>
+				${!this.readonly
+					? html`
+							<uui-input-lock
+								id="alias"
+								name="alias"
+								slot="append"
+								label=${aliasLabel}
+								placeholder=${aliasLabel}
+								.value=${this.alias}
+								?auto-width=${!!this.value}
+								?locked=${this._aliasLocked && !this.aliasReadonly}
+								?readonly=${this.aliasReadonly}
+								?required=${this.required}
+								@input=${this.#onAliasChange}
+								@blur=${this.#onAliasBlur}
+								@lock-change=${this.#onToggleAliasLock}>
+							</uui-input-lock>
+						`
+					: html`<span id="alias" class="muted" slot="append">${this.alias}</span>`}
 			</uui-input>
 		`;
 	}
 
-	static override styles = css`
+	static override readonly styles = css`
 		#name {
 			width: 100%;
 			flex: 1 1 auto;
 			align-items: center;
 		}
 
-		#name > uui-input {
+		#alias {
 			max-width: 50%;
+
+			&.muted {
+				opacity: 0.55;
+				padding: var(--uui-size-1, 3px) var(--uui-size-space-3, 9px);
+			}
 		}
 
 		:host(:invalid:not([pristine])) {
