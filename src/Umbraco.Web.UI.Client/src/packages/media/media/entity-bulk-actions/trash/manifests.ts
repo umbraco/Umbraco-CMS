@@ -7,10 +7,11 @@ import {
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
+import { UMB_ENTITY_BULK_ACTION_TRASH_KIND } from '@umbraco-cms/backoffice/recycle-bin';
 
 const bulkTrashAction: UmbExtensionManifest = {
 	type: 'entityBulkAction',
-	kind: 'trashWithRelation',
+	kind: UMB_ENTITY_BULK_ACTION_TRASH_KIND,
 	alias: 'Umb.EntityBulkAction.Media.Trash',
 	name: 'Trash Media Entity Bulk Action',
 	weight: 10,

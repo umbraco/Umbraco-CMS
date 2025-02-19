@@ -81,6 +81,6 @@ export { UmbBulkTrashWithRelationConfirmModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-trash-with-relation-confirm-modal': UmbBulkTrashWithRelationConfirmModalElement;
+		'umb-bulk-trash-with-relation-confirm-modal': UmbBulkTrashWithRelationConfirmModalElement;
 	}
 }

@@ -81,6 +81,6 @@ export { UmbBulkDeleteWithRelationConfirmModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-delete-with-relation-confirm-modal': UmbBulkDeleteWithRelationConfirmModalElement;
+		'umb-bulk-delete-with-relation-confirm-modal': UmbBulkDeleteWithRelationConfirmModalElement;
 	}
 }
