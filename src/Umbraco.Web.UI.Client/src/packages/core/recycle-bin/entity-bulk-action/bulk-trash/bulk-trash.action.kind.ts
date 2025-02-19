@@ -4,12 +4,12 @@ import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension
 export const UMB_ENTITY_BULK_ACTION_TRASH_KIND_MANIFEST: UmbExtensionManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.EntityBulkAction.Trash',
-	matchKind: 'trash',
+	matchKind: 'trashV2',
 	matchType: 'entityBulkAction',
 	manifest: {
 		...UMB_ENTITY_BULK_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityBulkAction',
-		kind: 'trash',
+		kind: 'trashV2',
 		api: () => import('./bulk-trash.action.js'),
 		weight: 1150,
 		meta: {
