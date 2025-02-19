@@ -1,23 +1,21 @@
-# Umbraco.Web.UI.Client
+# Guide for working with Umbraco Backoffice UI/Client
 
-This is the Umbraco Backoffice UI/Client, also known as Bellissima.
-
-This is for you as a contributor who likes to make changes to the Backoffice UI/Client project.
+This is for you as a contributor who likes to make changes to the Backoffice UI project.
 
 ## Installation
 
 1. Make sure you have [NodeJS](https://nodejs.org/en/download) installed.
 2. Run `npm install` to install the dependencies.
 
-## Ways to run a Development Server
+## Ways to run a Front-end Development Server
 
-1. If you will be working from VS Code, there is options to run both [back-end and front-end server in debug modes](#debug-via-vs-code).
+A. If you will be working from VS Code, there is a script to [run the servers in debug mode](#debug-via-vs-code).
 
-2. Or you can choose to [run each of these individually](#run-a-front-end-server-against-a-local-umbraco-instance), this can be done from the Command-line/Terminal, but requires a few lines from configuration on the back-end server.
+B. Otherwise choose to [run the servers individually](#run-a-front-end-server-against-a-local-umbraco-instance).
 
 ### Debug via VS Code
 
-If you are using VS Code, you can use the `launch.json` file to start the development server. This will also start the Umbraco instance and open the browser.
+Open the project with VS Code, then under `Run and Debug`, you can use the `launch.json` file to start the development server. This will also start the Umbraco instance and open the browser.
 
 You should run the task **Backoffice Launch (Vite + .NET Core)** in the **Run and Debug** panel, which will start the Vite server and the Umbraco instance. It automatically configures Umbraco (using environment variables) to use the Vite server as the Backoffice host. This task will also open a browser window, so you can start developing right away. The first time you run this task, it will take a little longer to start the Umbraco instance, but subsequent runs will be faster. Keep an eye on the Debug Console to see when the Umbraco instance is ready and then refresh the browser.
 
@@ -25,13 +23,13 @@ If you want to run the Vite server only, you can run the task **Backoffice Launc
 
 If you have an existing Vite server running, you can run the task **Backoffice Attach Vite** to attach the debugger to the Vite server.
 
-### Run a front-end server against a local Umbraco instance
+### Run a Front-end server against a local Umbraco instance
 
+#### 1. Configure Umbraco instance
+Enable the front-end server communicating with the Backend server(Umbraco instance) you need need to correct the `appsettings.json` of your project.
 
-To enable the client running on a different server, we need to correct the `appsettings.json` of your project.
-
-For code contributions you can use the backend project of `src/Umbraco.Web.UI`.
-Open this file in an editor: `src/Umbraco.Web.UI/appsettings.Development.json` and add these 4 fields to the `Umbraco > CMS > Security`:
+For code contributions use the backend project of `/src/Umbraco.Web.UI`.
+Open this file in an editor: `/src/Umbraco.Web.UI/appsettings.Development.json` and add these 4 fields to the `Umbraco > CMS > Security`:
 
 ```json
 "Umbraco": {
@@ -48,11 +46,11 @@ Open this file in an editor: `src/Umbraco.Web.UI/appsettings.Development.json` a
 
 This will override the backoffice host URL, enabling the Client to run from a different origin.
 
-Then start the backend server by running the command: `dotnet run` in the `Umbraco.Web.UI` folder.
+#### 2. Start Umbraco
+Then start the backend server by running the command: `dotnet run` in the `/src/Umbraco.Web.UI` folder.
 
-#### Run the front-end server
-
-Now start the Vite server by running the command: `npm run dev:server` in the `Umbraco.Web.UI.Client` folder.
+#### 3. Start Frontend server
+Now start the frontend server by running the command: `npm run dev:server` in the `/src/Umbraco.Web.UI.Client` folder.
 
 Finally open `http://localhost:5173` in your browser.
 
@@ -70,7 +68,7 @@ The documentation can be found on [Umbraco Docs](https://docs.umbraco.com/umbrac
 
 ### Storybook
 
-You can test the Storybook locally by running `npm run storybook`. This will start the Storybook server and open a browser window with the Storybook UI.
+You can test the Backoffice UI Storybook locally by running `npm run storybook`. This will start the server and open a browser window with the Storybook Web Interface.
 
 Storybook is an excellent tool to test out UI components in isolation and to document them. It is also a great way to test the responsiveness and accessibility of the components.
 
