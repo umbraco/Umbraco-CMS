@@ -1,6 +1,8 @@
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
@@ -37,6 +39,8 @@ public class ContentService : RepositoryService, IContentService
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IIdKeyMap _idKeyMap;
+    private ContentSettings _contentSettings;
+    private readonly IRelationService _relationService;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
@@ -56,7 +60,9 @@ public class ContentService : RepositoryService, IContentService
         ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
         PropertyEditorCollection propertyEditorCollection,
-        IIdKeyMap idKeyMap)
+        IIdKeyMap idKeyMap,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -71,8 +77,55 @@ public class ContentService : RepositoryService, IContentService
         _userIdKeyResolver = userIdKeyResolver;
         _propertyEditorCollection = propertyEditorCollection;
         _idKeyMap = idKeyMap;
+        _contentSettings = optionsMonitor.CurrentValue;
+        optionsMonitor.OnChange((contentSettings) =>
+        {
+            _contentSettings = contentSettings;
+        });
+        _relationService = relationService;
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
+
+    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V17.")]
+
+    public ContentService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
+        IAuditRepository auditRepository,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver,
+        PropertyEditorCollection propertyEditorCollection,
+        IIdKeyMap idKeyMap)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            documentRepository,
+            entityRepository,
+            auditRepository,
+            contentTypeRepository,
+            documentBlueprintRepository,
+            languageRepository,
+            propertyValidationService,
+            shortStringHelper,
+            cultureImpactFactory,
+            userIdKeyResolver,
+            propertyEditorCollection,
+            idKeyMap,
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>(),
+            StaticServiceProvider.Instance.GetRequiredService<IRelationService>())
+    {
+    }
+
+
 
     [Obsolete("Use non-obsolete constructor. Scheduled for removal in V17.")]
     public ContentService(
@@ -2718,6 +2771,13 @@ public class ContentService : RepositoryService, IContentService
             {
                 foreach (IContent content in contents)
                 {
+                    if (_contentSettings.DisableDeleteWhenReferenced)
+                    {
+                        if (_relationService.IsRelated(content.Id))
+                        {
+                            continue;
+                        }
+                    }
                     DeleteLocked(scope, content, eventMessages);
                     deleted.Add(content);
                 }
