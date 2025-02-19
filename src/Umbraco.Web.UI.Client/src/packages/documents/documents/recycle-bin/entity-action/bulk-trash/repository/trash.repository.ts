@@ -1,4 +1,4 @@
-import { UmbDocumentRecycleBinServerDataSource } from '../../../recycle-bin/repository/document-recycle-bin.server.data-source.js';
+import { UmbDocumentRecycleBinServerDataSource } from '../../../repository/document-recycle-bin.server.data-source.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbBulkTrashRepository, UmbBulkTrashRequestArgs } from '@umbraco-cms/backoffice/entity-bulk-action';
