@@ -1,4 +1,4 @@
-import { UmbMediaRecycleBinServerDataSource } from '../../../recycle-bin/repository/media-recycle-bin.server.data-source.js';
+import { UmbMediaRecycleBinServerDataSource } from '../../../repository/media-recycle-bin.server.data-source.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbBulkTrashRepository, UmbBulkTrashRequestArgs } from '@umbraco-cms/backoffice/entity-bulk-action';
