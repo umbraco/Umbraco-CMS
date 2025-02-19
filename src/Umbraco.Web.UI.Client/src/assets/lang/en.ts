@@ -511,6 +511,8 @@ export default {
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
 		confirmtrash: (name: string) => `Are you sure you want to move <strong>${name}</strong> to the Recycle Bin?`,
+		confirmbulktrash: (total: number) =>
+			`Are you sure you want to move <strong>${total} ${total === 1 ? 'item' : 'items'}</strong> to the Recycle Bin?`,
 		cut: 'Cut',
 		editDictionary: 'Edit dictionary item',
 		editLanguage: 'Edit language',

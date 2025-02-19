@@ -7,10 +7,13 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbTrashEntityBulkAction<
 	MetaKindType extends MetaEntityBulkActionTrashKind = MetaEntityBulkActionTrashKind,
 > extends UmbEntityBulkActionBase<MetaKindType> {
+	#localize = new UmbLocalizationController(this);
+
 	override async execute() {
 		if (this.selection?.length === 0) {
 			throw new Error('No items selected.');
@@ -23,11 +26,11 @@ export class UmbTrashEntityBulkAction<
 
 	protected async _confirmTrash() {
 		const headline = '#actions_trash';
+		const message = '#defaultdialogs_confirmbulktrash';
 
-		// TODO: handle items with variants
 		await umbConfirmModal(this._host, {
 			headline,
-			content: `Are you sure you want to move ${this.selection.length} ${this.selection.length === 1 ? 'item' : 'items'} to the recycle bin?`,
+			content: this.#localize.string(message, this.selection.length),
 			color: 'danger',
 			confirmLabel: '#actions_trash',
 		});

@@ -1,5 +1,9 @@
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../../collection/constants.js';
-import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS } from '../../constants.js';
+import {
+	UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
+	UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
+	UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
+} from '../../constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_USER_PERMISSION_DOCUMENT_DELETE } from '../../user-permissions/constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
@@ -8,7 +12,7 @@ import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collecti
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityBulkAction',
-		kind: 'trash',
+		kind: 'trashWithRelation',
 		alias: 'Umb.EntityBulkAction.Document.Trash',
 		name: 'Trash Document Entity Bulk Action',
 		weight: 10,
@@ -16,6 +20,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
 			recycleBinRepositoryAlias: UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
+			referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
