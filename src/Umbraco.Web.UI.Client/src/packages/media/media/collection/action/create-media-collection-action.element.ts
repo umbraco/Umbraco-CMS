@@ -53,11 +53,11 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	}
 
 	override async firstUpdated() {
-		this.#retrieveAllowedMediaTypesOf(this._mediaTypeUnique ?? '');
+		this.#retrieveAllowedMediaTypesOf(this._mediaTypeUnique ?? '', this._mediaUnique || null);
 	}
 
-	async #retrieveAllowedMediaTypesOf(unique: string | null) {
-		const { data } = await this.#mediaTypeStructureRepository.requestAllowedChildrenOf(unique);
+	async #retrieveAllowedMediaTypesOf(unique: string | null, parentContentUnique: string | null) {
+		const { data } = await this.#mediaTypeStructureRepository.requestAllowedChildrenOf(unique, parentContentUnique);
 		if (data && data.items) {
 			this._allowedMediaTypes = data.items;
 		}

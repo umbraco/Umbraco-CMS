@@ -2138,6 +2138,7 @@ export class DocumentTypeService {
     /**
      * @param data The data for the request.
      * @param data.id
+     * @param data.parentContentKey
      * @param data.skip
      * @param data.take
      * @returns unknown OK
@@ -2151,6 +2152,7 @@ export class DocumentTypeService {
                 id: data.id
             },
             query: {
+                parentContentKey: data.parentContentKey,
                 skip: data.skip,
                 take: data.take
             },
@@ -4258,6 +4260,7 @@ export class MediaTypeService {
     /**
      * @param data The data for the request.
      * @param data.id
+     * @param data.parentContentKey
      * @param data.skip
      * @param data.take
      * @returns unknown OK
@@ -4271,6 +4274,7 @@ export class MediaTypeService {
                 id: data.id
             },
             query: {
+                parentContentKey: data.parentContentKey,
                 skip: data.skip,
                 take: data.take
             },
