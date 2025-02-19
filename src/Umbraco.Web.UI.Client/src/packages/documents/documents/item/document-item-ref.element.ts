@@ -1,11 +1,11 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import type { UmbDocumentItemModel } from './types.js';
 import { UmbDocumentItemDataResolver } from './document-item-data-resolver.js';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-document-item-ref')
 export class UmbDocumentItemRefElement extends UmbLitElement {
@@ -16,17 +16,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		return this.#item.getData();
 	}
 	public set item(value: UmbDocumentItemModel | undefined) {
-		const oldValue = this.#item.getData();
 		this.#item.setData(value);
-
-		if (!value) {
-			this.#modalRoute?.destroy();
-			return;
-		}
-
-		if (oldValue?.unique === value.unique) {
-			return;
-		}
 	}
 
 	@property({ type: Boolean })
@@ -53,21 +43,11 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	@state()
 	_editPath = '';
 
-	@state()
-	_defaultCulture?: string;
-
-	@state()
-	_appCulture?: string;
-
-	@state()
-	_propertyDataSetCulture?: UmbVariantId;
-
-	#modalRoute?: any;
-
 	constructor() {
 		super();
 
-		this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addUniquePaths(['unique'])
 			.onSetup(() => {
 				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
 			})
@@ -83,8 +63,9 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	}
 
 	#getHref() {
-		if (!this._editPath) return;
-		return `${this._editPath}/edit/${this._unique}`;
+		if (!this._unique) return;
+		const path = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this._unique });
+		return `${this._editPath}/${path}`;
 	}
 
 	override render() {

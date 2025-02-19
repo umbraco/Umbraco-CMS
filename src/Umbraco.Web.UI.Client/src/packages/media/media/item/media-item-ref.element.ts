@@ -1,6 +1,7 @@
 import type { UmbMediaItemModel } from '../repository/types.js';
 import { UMB_MEDIA_SECTION_ALIAS } from '../../media-section/constants.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
+import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -17,16 +18,7 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 		return this.#item;
 	}
 	public set item(value: UmbMediaItemModel | undefined) {
-		const oldValue = this.#item;
 		this.#item = value;
-
-		if (!this.#item) {
-			this.#modalRoute?.destroy();
-			return;
-		}
-		if (oldValue?.unique === this.#item.unique) {
-			return;
-		}
 	}
 
 	@property({ type: Boolean })
@@ -40,8 +32,6 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 
 	@state()
 	_userHasSectionAccess = false;
-
-	#modalRoute?: any;
 
 	constructor() {
 		super();
@@ -57,7 +47,8 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 			},
 		]);
 
-		this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addUniquePaths(['unique'])
 			.onSetup(() => {
 				return { data: { entityType: UMB_MEDIA_ENTITY_TYPE, preset: {} } };
 			})
@@ -68,7 +59,8 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 
 	#getHref(item: UmbMediaItemModel) {
 		if (!this._editPath) return;
-		return `${this._editPath}/edit/${item.unique}`;
+		const path = UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
+		return `${this._editPath}/${path}`;
 	}
 
 	override render() {

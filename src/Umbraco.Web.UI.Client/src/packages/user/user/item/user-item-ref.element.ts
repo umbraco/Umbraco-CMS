@@ -1,7 +1,8 @@
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import type { UmbUserItemModel } from '../repository/index.js';
 import { UMB_USER_MANAGEMENT_SECTION_ALIAS } from '../../section/constants.js';
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_EDIT_USER_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
@@ -17,19 +18,7 @@ export class UmbUserItemRefElement extends UmbLitElement {
 		return this.#item;
 	}
 	public set item(value: UmbUserItemModel | undefined) {
-		const oldValue = this.#item;
 		this.#item = value;
-
-		if (!this.#item) {
-			this.#modalRoute?.destroy();
-			return;
-		}
-
-		if (oldValue?.unique === this.#item.unique) {
-			return;
-		}
-
-		this.#modalRoute?.setUniquePathValue('unique', this.#item.unique);
 	}
 
 	@property({ type: Boolean })
@@ -43,8 +32,6 @@ export class UmbUserItemRefElement extends UmbLitElement {
 
 	@state()
 	_userHasSectionAccess = false;
-
-	#modalRoute?: any;
 
 	constructor() {
 		super();
@@ -60,9 +47,7 @@ export class UmbUserItemRefElement extends UmbLitElement {
 			},
 		]);
 
-		this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath(UMB_USER_ENTITY_TYPE)
-			.addUniquePaths(['unique'])
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.onSetup(() => {
 				return { data: { entityType: UMB_USER_ENTITY_TYPE, preset: {} } };
 			})
@@ -72,7 +57,9 @@ export class UmbUserItemRefElement extends UmbLitElement {
 	}
 
 	#getHref(item: UmbUserItemModel) {
-		return `${this._editPath}/edit/${item.unique}`;
+		if (!this._editPath) return;
+		const path = UMB_EDIT_USER_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
+		return `${this._editPath}/${path}`;
 	}
 
 	override render() {
@@ -81,7 +68,7 @@ export class UmbUserItemRefElement extends UmbLitElement {
 		return html`
 			<uui-ref-node-user
 				name=${this.item.name}
-				href=${this.#getHref(this.item)}
+				href=${ifDefined(this.#getHref(this.item))}
 				?readonly=${this.readonly || !this._userHasSectionAccess}
 				?standalone=${this.standalone}>
 				<umb-user-avatar
