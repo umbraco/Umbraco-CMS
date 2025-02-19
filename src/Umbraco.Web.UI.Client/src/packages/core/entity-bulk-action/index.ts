@@ -8,3 +8,5 @@ export {
 	UMB_ENTITY_BULK_ACTION_DELETE_KIND_MANIFEST,
 	UMB_ENTITY_BULK_ACTION_DELETE_KIND,
 } from './common/bulk-delete/bulk-delete.action.kind.js';
+
+export { UMB_ENTITY_BULK_ACTION_TRASH_KIND } from './common/trash/constants.js';
