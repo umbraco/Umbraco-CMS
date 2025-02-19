@@ -14,17 +14,6 @@ internal sealed class PublishedMediaStatusFilteringService : IPublishedMediaStat
     public PublishedMediaStatusFilteringService(IPublishedMediaCache publishedMediaCache)
         => _publishedMediaCache = publishedMediaCache;
 
-    public IEnumerable<IPublishedContent> FilterAncestors(IEnumerable<Guid> ancestorsKeys, string? culture)
-        => GetAll(ancestorsKeys);
-
-    public IEnumerable<IPublishedContent> FilterSiblings(IEnumerable<Guid> siblingKeys, string? culture)
-        => GetAll(siblingKeys);
-
-    public IEnumerable<IPublishedContent> FilterChildren(IEnumerable<Guid> childrenKeys, string? culture)
-        => GetAll(childrenKeys);
-
-    public IEnumerable<IPublishedContent> FilterDescendants(IEnumerable<Guid> descendantKeys, string? culture)
-        => GetAll(descendantKeys);
-
-    private IEnumerable<IPublishedContent> GetAll(IEnumerable<Guid> keys) => keys.Select(_publishedMediaCache.GetById).WhereNotNull().ToArray();
+    public IEnumerable<IPublishedContent> FilterAvailable(IEnumerable<Guid> candidateKeys, string? culture)
+        => candidateKeys.Select(_publishedMediaCache.GetById).WhereNotNull().ToArray();
 }

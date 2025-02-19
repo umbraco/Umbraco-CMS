@@ -157,7 +157,7 @@ public static class PublishedContentExtensions
 
         // parent key is null if content is at root
         return parentKey.HasValue
-            ? publishedStatusFilteringService.FilterAncestors([parentKey.Value], null).FirstOrDefault()
+            ? publishedStatusFilteringService.FilterAvailable([parentKey.Value], null).FirstOrDefault()
             : null;
     }
 
@@ -3765,7 +3765,7 @@ public static class PublishedContentExtensions
         // making it a very slow operation.
 
         return publishedStatusFilteringService
-            .FilterChildren(childrenKeys, culture)
+            .FilterAvailable(childrenKeys, culture)
             .OrderBy(x => x.SortOrder);
     }
 
@@ -3795,7 +3795,7 @@ public static class PublishedContentExtensions
         }
 
         IEnumerable<IPublishedContent> descendants = publishedStatusFilteringService
-            .FilterDescendants(descendantsKeys, culture);
+            .FilterAvailable(descendantsKeys, culture);
 
         foreach (IPublishedContent descendant in descendants)
         {
@@ -3828,7 +3828,7 @@ public static class PublishedContentExtensions
             yield break;
         }
 
-        IEnumerable<IPublishedContent> ancestors = publishedStatusFilteringService.FilterAncestors(ancestorsKeys, culture);
+        IEnumerable<IPublishedContent> ancestors = publishedStatusFilteringService.FilterAvailable(ancestorsKeys, culture);
         foreach (IPublishedContent ancestor in ancestors)
         {
             yield return ancestor;
@@ -3855,7 +3855,7 @@ public static class PublishedContentExtensions
                 : navigationQueryService.TryGetChildrenKeysOfType(parentKey.Value, contentTypeAlias, out childrenKeys);
 
             return foundChildrenKeys
-                ? publishedStatusFilteringService.FilterSiblings(childrenKeys, culture)
+                ? publishedStatusFilteringService.FilterAvailable(childrenKeys, culture)
                 : [];
         }
 
@@ -3868,7 +3868,7 @@ public static class PublishedContentExtensions
         {
             IEnumerable<Guid> rootKeysArray = rootKeys as Guid[] ?? rootKeys.ToArray();
             return rootKeysArray.Contains(content.Key)
-                ? publishedStatusFilteringService.FilterSiblings(rootKeysArray, culture)
+                ? publishedStatusFilteringService.FilterAvailable(rootKeysArray, culture)
                 : [];
         }
 

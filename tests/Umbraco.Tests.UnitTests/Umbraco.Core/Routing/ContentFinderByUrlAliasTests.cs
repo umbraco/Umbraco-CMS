@@ -52,7 +52,7 @@ public class ContentFinderByUrlAliasTests
         IEnumerable<Guid> descendantKeys = [];
         Mock.Get(documentNavigationQueryService).Setup(x => x.TryGetDescendantsKeys(It.IsAny<Guid>(), out descendantKeys)).Returns(true);
 
-        Mock.Get(publishedContentStatusFilteringService).Setup(x => x.FilterDescendants(It.IsAny<IEnumerable<Guid>>(), It.IsAny<string?>())).Returns([]);
+        Mock.Get(publishedContentStatusFilteringService).Setup(x => x.FilterAvailable(It.IsAny<IEnumerable<Guid>>(), It.IsAny<string?>())).Returns([]);
         var publishedRequestBuilder = new PublishedRequestBuilder(new Uri(absoluteUrl, UriKind.Absolute), fileService);
 
         // Act
