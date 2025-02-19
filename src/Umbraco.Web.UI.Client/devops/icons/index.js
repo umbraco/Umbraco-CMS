@@ -223,6 +223,6 @@ if (errors.length > 0) {
 		console.log(`::error title=Failed to generate all icons::${msg}`);
 		process.exit(1);
 	} else {
-		console.log('Failed to generate all icons, please see the error log');
+		console.error('Failed to generate all icons, please see the error log');
 	}
 }
