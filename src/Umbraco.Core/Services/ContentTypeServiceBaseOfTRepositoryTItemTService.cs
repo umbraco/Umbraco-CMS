@@ -1186,7 +1186,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     /// <inheritdoc />
     public async Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take)
-        => await GetAllowedChildrenAsync(key, Guid.Empty, skip, take);
+        => await GetAllowedChildrenAsync(key, null, skip, take);
 
     /// <inheritdoc />
     public async Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, Guid? parentContentKey, int skip, int take)

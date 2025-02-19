@@ -4672,6 +4672,14 @@
             }
           },
           {
+            "name": "parentContentKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
             "name": "skip",
             "in": "query",
             "schema": {
@@ -13954,6 +13962,14 @@
             "name": "id",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "parentContentKey",
+            "in": "query",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -36826,6 +36842,8 @@
         "required": [
           "documentType",
           "id",
+          "isProtected",
+          "isTrashed",
           "sortOrder",
           "values",
           "variants"
@@ -36870,6 +36888,12 @@
                 "$ref": "#/components/schemas/DocumentTypeCollectionReferenceResponseModel"
               }
             ]
+          },
+          "isTrashed": {
+            "type": "boolean"
+          },
+          "isProtected": {
+            "type": "boolean"
           },
           "updater": {
             "type": "string",
