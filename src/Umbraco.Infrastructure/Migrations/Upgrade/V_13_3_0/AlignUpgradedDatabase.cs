@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using ColumnInfo = Umbraco.Cms.Infrastructure.Persistence.SqlSyntax.ColumnInfo;
@@ -153,16 +153,26 @@ SELECT obj_Constraint.NAME AS 'constraintName'
 ");
         var currentConstraintName = Database.ExecuteScalar<string>(constraintNameQuery);
 
-
-        // only rename the constraint if necessary
+        // Only rename the constraint if necessary.
         if (currentConstraintName == expectedConstraintName)
         {
             return;
         }
 
-        Sql<ISqlContext> renameConstraintQuery = Database.SqlContext.Sql(
-            $"EXEC sp_rename N'{currentConstraintName}', N'{expectedConstraintName}', N'OBJECT'");
-        Database.Execute(renameConstraintQuery);
+        if (currentConstraintName is null)
+        {
+            // Constraint does not exist, so we need to create it.
+            Sql<ISqlContext> createConstraintStatement = Database.SqlContext.Sql(@$"
+ALTER TABLE umbracoContentVersion ADD CONSTRAINT [DF_umbracoContentVersion_versionDate] DEFAULT (getdate()) FOR [versionDate]");
+            Database.Execute(createConstraintStatement);
+        }
+        else
+        {
+            // Constraint exists, and differs from the expected name, so we need to rename it.
+            Sql<ISqlContext> renameConstraintQuery = Database.SqlContext.Sql(
+                $"EXEC sp_rename N'{currentConstraintName}', N'{expectedConstraintName}', N'OBJECT'");
+            Database.Execute(renameConstraintQuery);
+        }
     }
 
     private void UpdateExternalLoginIndexes(IEnumerable<Tuple<string, string, string, bool>> indexes)

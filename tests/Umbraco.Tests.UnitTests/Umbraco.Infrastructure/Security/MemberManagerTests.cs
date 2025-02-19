@@ -268,7 +268,7 @@ public class MemberManagerTests
             .Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(fakeMember);
         _mockMemberService
-            .Setup(x => x.Save(fakeMember, Constants.Security.SuperUserId))
+            .Setup(x => x.Save(fakeMember, It.IsAny<PublishNotificationSaveOptions>(), Constants.Security.SuperUserId))
             .Returns(Attempt.Succeed<OperationResult?>(null));
 
     }
