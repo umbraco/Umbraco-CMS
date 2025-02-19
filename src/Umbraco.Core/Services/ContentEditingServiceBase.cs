@@ -150,10 +150,22 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     }
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveToRecycleBinAsync(Guid key, Guid userKey)
-        => await HandleDeletionAsync(key, userKey, ContentTrashStatusRequirement.MustNotBeTrashed, MoveToRecycleBin, _contentSettings.DisableUnpublishWhenReferenced);
+        => await HandleDeletionAsync(key,
+                userKey,
+                ContentTrashStatusRequirement.MustNotBeTrashed,
+                MoveToRecycleBin,
+                _contentSettings.DisableUnpublishWhenReferenced,
+                ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeleteAsync(Guid key, Guid userKey, bool mustBeTrashed = true)
-        => await HandleDeletionAsync(key, userKey, mustBeTrashed ? ContentTrashStatusRequirement.MustBeTrashed : ContentTrashStatusRequirement.Irrelevant, Delete, _contentSettings.DisableDeleteWhenReferenced);
+        => await HandleDeletionAsync(key,
+                userKey,
+                mustBeTrashed
+                    ? ContentTrashStatusRequirement.MustBeTrashed
+                    : ContentTrashStatusRequirement.Irrelevant,
+                Delete,
+                _contentSettings.DisableDeleteWhenReferenced,
+                ContentEditingOperationStatus.CannotDeleteWhenReferenced);
 
     // helper method to perform move-to-recycle-bin, delete-from-recycle-bin and delete for content as they are very much handled in the same way
     // IContentEditingService methods hitting this (ContentTrashStatusRequirement, calledFunction):
@@ -165,7 +177,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         Guid userKey,
         ContentTrashStatusRequirement trashStatusRequirement,
         Func<TContent, int, OperationResult?> performDelete,
-        bool disabledWhenReferenced)
+        bool disabledWhenReferenced,
+        ContentEditingOperationStatus referenceFailStatus)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
@@ -186,7 +199,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         if (disabledWhenReferenced && _relationService.IsRelated(content.Id))
         {
-            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced, content);
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(referenceFailStatus, content);
         }
 
         var userId = await GetUserIdAsync(userKey);
