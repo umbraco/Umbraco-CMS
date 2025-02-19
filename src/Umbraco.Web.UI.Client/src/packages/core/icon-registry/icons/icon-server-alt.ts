@@ -1,16 +1,1 @@
-export default `<!-- @license lucide-static v0.473.0 - ISC -->
-<svg
-  class="lucide lucide-database"
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="1.75"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <ellipse cx="12" cy="5" rx="9" ry="3" />
-  <path d="M3 5V19A9 3 0 0 0 21 19V5" />
-  <path d="M3 12A9 3 0 0 0 21 12" />
-</svg>
-`;
+export default `<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" class="lucide lucide-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>`;

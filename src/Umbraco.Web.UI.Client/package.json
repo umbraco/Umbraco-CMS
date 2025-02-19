@@ -275,6 +275,7 @@
 		"rollup-plugin-import-css": "^3.5.8",
 		"simple-icons": "^14.7.0",
 		"storybook": "^8.5.7",
+		"svgo": "^3.3.2",
 		"tiny-glob": "^0.2.9",
 		"tsc-alias": "^1.8.10",
 		"typedoc": "^0.27.7",

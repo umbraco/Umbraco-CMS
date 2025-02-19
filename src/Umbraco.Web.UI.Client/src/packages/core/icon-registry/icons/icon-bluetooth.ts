@@ -1,14 +1,1 @@
-export default `<!-- @license lucide-static v0.473.0 - ISC -->
-<svg
-  class="lucide lucide-bluetooth"
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="1.75"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m7 7 10 10-5 5V2l5 5L7 17" />
-</svg>
-`;
+export default `<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" class="lucide lucide-bluetooth" viewBox="0 0 24 24"><path d="m7 7 10 10-5 5V2l5 5L7 17"/></svg>`;

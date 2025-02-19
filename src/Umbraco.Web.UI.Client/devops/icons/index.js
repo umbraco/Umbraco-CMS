@@ -1,6 +1,7 @@
 import { readFileSync, writeFile, mkdir, rmSync } from 'fs';
 import * as globModule from 'tiny-glob';
 import * as pathModule from 'path';
+import { optimize } from 'svgo';
 
 const path = pathModule.default;
 const getDirName = path.dirname;
@@ -164,7 +165,9 @@ const collectDiskIcons = async (icons) => {
 
 const writeIconsToDisk = (icons) => {
 	icons.forEach((icon) => {
-		const content = 'export default `' + icon.svg + '`;';
+		const optimizedResult = optimize(icon.svg);
+
+		const content = 'export default `' + optimizedResult.data + '`;';
 
 		writeFileWithDir(icon.output, content, (err) => {
 			if (err) {

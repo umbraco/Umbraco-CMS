@@ -1,17 +1,1 @@
-export default `<!-- @license lucide-static v0.473.0 - ISC -->
-<svg
-  class="lucide lucide-app-window"
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="1.75"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <rect x="2" y="4" width="20" height="16" rx="2" />
-  <path d="M10 4v4" />
-  <path d="M2 8h20" />
-  <path d="M6 4v4" />
-</svg>
-`;
+export default `<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" class="lucide lucide-app-window" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="M10 4v4M2 8h20M6 4v4"/></svg>`;
