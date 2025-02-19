@@ -1,5 +1,6 @@
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -425,7 +426,7 @@ public class BackOfficeUserStore :
     }
 
     /// <inheritdoc />
-    public override Task<IdentityResult> DeleteAsync(
+    public override async Task<IdentityResult> DeleteAsync(
         BackOfficeIdentityUser user,
         CancellationToken cancellationToken = default)
     {
@@ -436,15 +437,14 @@ public class BackOfficeUserStore :
             throw new ArgumentNullException(nameof(user));
         }
 
-        IUser? found = FindUserFromString(user.Id);
-        if (found is not null)
+        if (TryFindUserFromString(user.Id, out IUser? found))
         {
-            DisableAsync(found).GetAwaiter().GetResult();
+            await DisableAsync(found);
         }
 
         _externalLoginService.DeleteUserLogins(user.Key);
 
-        return Task.FromResult(IdentityResult.Success);
+        return IdentityResult.Success;
     }
 
     /// <inheritdoc />
@@ -469,8 +469,7 @@ public class BackOfficeUserStore :
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
 
-        IUser? user = FindUserFromString(userId);
-        if (user == null)
+        if (TryFindUserFromString(userId, out IUser? user) is false)
         {
             return Task.FromResult((BackOfficeIdentityUser?)null)!;
         }
@@ -478,22 +477,28 @@ public class BackOfficeUserStore :
         return Task.FromResult(AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user)))!;
     }
 
-    private IUser? FindUserFromString(string userId)
+    private bool TryFindUserFromString(string userId, [NotNullWhen(true)] out IUser? user)
     {
         // We could use ResolveEntityIdFromIdentityId here, but that would require multiple DB calls, so let's not.
         if (TryConvertIdentityIdToInt(userId, out var id))
         {
-            return GetAsync(id).GetAwaiter().GetResult();
+            user = GetAsync(id).GetAwaiter().GetResult();
+            return user is not null;
         }
 
         // We couldn't directly convert the ID to an int, this is because the user logged in with external login.
         // So we need to look up the user by key.
         if (Guid.TryParse(userId, out Guid key))
         {
-            return GetAsync(key).GetAwaiter().GetResult();
+            user = GetAsync(key).GetAwaiter().GetResult();
+            return user is not null;
         }
 
-        throw new InvalidOperationException($"Unable to resolve user with ID {userId}");
+        // Maybe we have some other format of user Id from an external login flow, so don't throw but return null.
+        // We won't be able to find the user via this ID in a local database lookup so we'll handle the same as if they don't exist.
+
+        user = null;
+        return false;
     }
 
     protected override async Task<int> ResolveEntityIdFromIdentityId(string? identityId)
