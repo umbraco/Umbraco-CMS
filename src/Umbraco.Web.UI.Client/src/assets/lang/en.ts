@@ -510,9 +510,11 @@ export default {
 		confirmremoveusageof: 'Are you sure you want to remove the usage of <strong>%0%</strong>',
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
-		confirmtrash: (name: string) => `Are you sure you want to move <strong>${name}</strong> to the Recycle Bin?`,
-		confirmbulktrash: (total: number) =>
+		confirmTrash: (name: string) => `Are you sure you want to move <strong>${name}</strong> to the Recycle Bin?`,
+		confirmBulkTrash: (total: number) =>
 			`Are you sure you want to move <strong>${total} ${total === 1 ? 'item' : 'items'}</strong> to the Recycle Bin?`,
+		confirmBulkDelete: (total: number) =>
+			`Are you sure you want to delete <strong>${total} ${total === 1 ? 'item' : 'items'}</strong>?`,
 		cut: 'Cut',
 		editDictionary: 'Edit dictionary item',
 		editLanguage: 'Edit language',

@@ -61,7 +61,7 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 
 	override render() {
 		const headline = this.localize.string('#actions_trash');
-		const content = this.localize.string('#defaultdialogs_confirmtrash', this._name);
+		const content = this.localize.string('#defaultdialogs_confirmTrash', this._name);
 
 		return html`
 			<uui-dialog-layout class="uui-text" headline=${headline}>

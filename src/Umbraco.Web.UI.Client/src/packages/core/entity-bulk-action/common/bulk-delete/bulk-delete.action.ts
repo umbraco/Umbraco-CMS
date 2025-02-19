@@ -1,21 +1,20 @@
-import type { UmbRecycleBinRepository } from '../../recycle-bin-repository.interface.js';
-import { UmbEntityTrashedEvent } from '../../entity-action/trash/index.js';
-import type { MetaEntityBulkActionTrashKind } from './types.js';
+import type { MetaEntityBulkActionDeleteKind } from './types.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
+	UmbEntityDeletedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import { UMB_ENTITY_CONTEXT, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
-export class UmbTrashEntityBulkAction<
-	MetaKindType extends MetaEntityBulkActionTrashKind = MetaEntityBulkActionTrashKind,
+export class UmbDeleteEntityBulkAction<
+	MetaKindType extends MetaEntityBulkActionDeleteKind = MetaEntityBulkActionDeleteKind,
 > extends UmbEntityBulkActionBase<MetaKindType> {
 	#localize = new UmbLocalizationController(this);
 	_items: Array<any> = [];
@@ -27,20 +26,20 @@ export class UmbTrashEntityBulkAction<
 
 		// TODO: Move item look up to a future bulk action context
 		await this.#requestItems();
-		await this._confirmTrash(this._items);
-		await this.#requestBulkTrash(this.selection);
+		await this._confirmDelete(this._items);
+		await this.#requestBulkDelete(this.selection);
 	}
 
-	protected async _confirmTrash(items: Array<any>) {
-		const headline = '#actions_trash';
-		const message = '#defaultdialogs_confirmBulkTrash';
+	protected async _confirmDelete(items: Array<any>) {
+		const headline = '#actions_delete';
+		const message = '#defaultdialogs_confirmBulkDelete';
 
-		// TODO: consider showing more details about the items being trashed
+		// TODO: consider showing more details about the items being deleted
 		await umbConfirmModal(this._host, {
 			headline,
 			content: this.#localize.string(message, items.length),
 			color: 'danger',
-			confirmLabel: '#actions_trash',
+			confirmLabel: '#actions_delete',
 		});
 	}
 
@@ -55,10 +54,10 @@ export class UmbTrashEntityBulkAction<
 		this._items = data ?? [];
 	}
 
-	async #requestBulkTrash(uniques: Array<string>) {
-		const recycleBinRepository = await createExtensionApiByAlias<UmbRecycleBinRepository>(
+	async #requestBulkDelete(uniques: Array<string>) {
+		const detailRepository = await createExtensionApiByAlias<UmbDetailRepository<UmbEntityModel>>(
 			this,
-			this.args.meta.recycleBinRepositoryAlias,
+			this.args.meta.detailRepositoryAlias,
 		);
 
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
@@ -66,7 +65,7 @@ export class UmbTrashEntityBulkAction<
 		const succeeded: Array<string> = [];
 
 		for (const unique of uniques) {
-			const { error } = await recycleBinRepository.requestTrash({ unique });
+			const { error } = await detailRepository.delete(unique);
 
 			if (error) {
 				const notification = { data: { message: error.message } };
@@ -78,7 +77,7 @@ export class UmbTrashEntityBulkAction<
 
 		if (succeeded.length > 0) {
 			const notification = {
-				data: { message: `Trashed ${succeeded.length} ${succeeded.length === 1 ? 'item' : 'items'}` },
+				data: { message: `Deleted ${succeeded.length} ${succeeded.length === 1 ? 'item' : 'items'}` },
 			};
 			notificationContext?.peek('positive', notification);
 		}
@@ -109,14 +108,14 @@ export class UmbTrashEntityBulkAction<
 		const succeededItems = this._items.filter((item) => succeeded.includes(item.unique));
 
 		succeededItems.forEach((item) => {
-			const trashedEvent = new UmbEntityTrashedEvent({
+			const deletedEvent = new UmbEntityDeletedEvent({
 				unique: item.unique,
 				entityType: item.entityType,
 			});
 
-			eventContext.dispatchEvent(trashedEvent);
+			eventContext.dispatchEvent(deletedEvent);
 		});
 	}
 }
 
-export { UmbTrashEntityBulkAction as api };
+export { UmbDeleteEntityBulkAction as api };
