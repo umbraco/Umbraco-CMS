@@ -21,8 +21,10 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 		return this.shadowRoot?.querySelector(`#${popoverId}`) as UUIPopoverContainerElement;
 	}
 
-	#onMouseEnter(popoverId: string) {
-		const popover = this.#getPopoverById(popoverId);
+	#onMouseEnter(item: UmbCascadingMenuItem) {
+		if (!item.items?.length) return;
+
+		const popover = this.#getPopoverById(item.unique);
 		if (!popover) return;
 
 		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
@@ -31,8 +33,8 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 		popover.showPopover();
 	}
 
-	#onMouseLeave(popoverId: string) {
-		const popover = this.#getPopoverById(popoverId);
+	#onMouseLeave(item: UmbCascadingMenuItem) {
+		const popover = this.#getPopoverById(item.unique);
 		if (!popover) return;
 
 		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
@@ -45,7 +47,7 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 		item.execute?.();
 
 		setTimeout(() => {
-			this.#onMouseLeave(item.unique);
+			this.#onMouseLeave(item);
 		}, 100);
 	}
 
@@ -74,15 +76,15 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 			element.setAttribute('popovertarget', item.unique);
 		}
 		return html`
-			<div @mouseenter=${() => this.#onMouseEnter(item.unique)} @mouseleave=${() => this.#onMouseLeave(item.unique)}>
+			<div @mouseenter=${() => this.#onMouseEnter(item)} @mouseleave=${() => this.#onMouseLeave(item)}>
 				${when(
 					element,
 					() => element,
 					() => html`
 						<uui-menu-item
+							class=${item.separatorAfter ? 'separator' : ''}
 							popovertarget=${item.unique}
-							@click-label=${() => this.#onClick(item)}
-							class=${item.separatorAfter ? 'separator' : ''}>
+							@click-label=${() => this.#onClick(item)}>
 							${when(item.icon, (icon) => html`<uui-icon slot="icon" name=${icon}></uui-icon>`)}
 							<div slot="label" class="menu-item">
 								<span>${item.label}</span>

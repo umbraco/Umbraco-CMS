@@ -11,7 +11,6 @@ import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import type { Extensions } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-import './tiptap-hover-menu.element.js';
 import './tiptap-toolbar.element.js';
 
 const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
@@ -122,8 +121,12 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			editable: !this.readonly,
 			extensions: tiptapExtensions,
 			content: this.#value,
+			//enableContentCheck: true,
 			onBeforeCreate: ({ editor }) => {
 				this._extensions.forEach((ext) => ext.setEditor(editor));
+			},
+			onContentError: ({ error }) => {
+				console.error('contentError', [error.message, error.cause]);
 			},
 			onUpdate: ({ editor }) => {
 				this.#value = editor.getHTML();
