@@ -83,6 +83,7 @@ stages:
       SERILOG__WRITETO__0__NAME: Async
       SERILOG__WRITETO__0__ARGS__CONFIGURE__0__NAME: Console
       # Set unattended install settings
+#      UMBRACO__CMS__UNATTENDED__INSTALLUNATTENDED: true
 #      UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERNAME: Playwright Test
 #      UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD: UmbracoAcceptance123!
 #      UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL: playwright@umbraco.com
@@ -104,6 +105,10 @@ stages:
       - job:
         displayName: E2E Tests (SQLite)
         timeoutInMinutes: 180
+        variables:
+          # Connection string
+          CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
+          CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.Sqlite
         strategy:
           matrix:
             # Default test configurations
@@ -117,9 +122,10 @@ stages:
             #            LinuxPart3Of3:
             #              vmImage: "ubuntu-latest"
             #              testCommand: "npm run test -- --shard=3/3"
-            #            WindowsPart1Of3:
-            #              vmImage: "windows-latest"
-            #              testCommand: "npm run test -- --shard=1/3"
+            WindowsPart1Of3:
+              vmImage: "windows-latest"
+              testFolder: "DefaultConfig"
+              testCommand: "npm run test -- --shard=1/3"
             #            WindowsPart2Of3:
             #              vmImage: "windows-latest"
             #              testCommand: "npm run test -- --shard=2/3"
@@ -187,49 +193,47 @@ stages:
               dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
               dotnet restore UmbracoProject
               cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/*.cs UmbracoProject
-              cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.cs UmbracoProject
-              cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.json UmbracoProject
-              dotnet build UmbracoProject --configuration $(buildConfiguration)
-              dotnet dev-certs https
             displayName: Install Template
             workingDirectory: $(Agent.BuildDirectory)/app
 
-#          - pwsh: |
-#              $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)"
-#              $destinationPath = "UmbracoProject"
-#              $jsonFiles = Get-ChildItem -Path $sourcePath -Filter "*.json"
-#              if ($jsonFiles) {
-#                $jsonFiles | ForEach-Object {
-#                  Write-Host "Copying: $($_.FullName)"
-#                  Copy-Item -Path $_.FullName -Destination $destinationPath -Force
-#                }
-#              } else {
-#                Write-Host "No JSON files found."
-#              }
-#            displayName: Update application to use necessary app settings
-#            workingDirectory: $(Agent.BuildDirectory)/app
-#
-#          - pwsh: |
-#              $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)"
-#              $destinationPath = "UmbracoProject"
-#              $csharpFiles = Get-ChildItem -Path $sourcePath -Filter "*.cs"
-#              if ($csharpFiles) {
-#                $csharpFiles | ForEach-Object {
-#                  Write-Host "Copying: $($_.FullName)"
-#                  Copy-Item -Path $_.FullName -Destination $destinationPath -Force
-#                }
-#              } else {
-#                Write-Host "No C# files found."
-#              }
-#            displayName: Update application to use necessary classes
-#            workingDirectory: $(Agent.BuildDirectory)/app
+          # Update application to use necessary app settings
+          - pwsh: |
+              $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)"
+              $destinationPath = "UmbracoProject"
+              $jsonFiles = Get-ChildItem -Path $sourcePath -Filter "*.json"
+              if ($jsonFiles) {
+                $jsonFiles | ForEach-Object {
+                  Write-Host "Copying: $($_.FullName)"
+                  Copy-Item -Path $_.FullName -Destination $destinationPath -Force
+                }
+              } else {
+                Write-Host "No JSON files found."
+              }
+            displayName: Update application to use necessary app settings
+            workingDirectory: $(Agent.BuildDirectory)/app
+
+          # Update application to use necessary classes
+          - pwsh: |
+              $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)"
+              $destinationPath = "UmbracoProject"
+              $csharpFiles = Get-ChildItem -Path $sourcePath -Filter "*.cs"
+              if ($csharpFiles) {
+                $csharpFiles | ForEach-Object {
+                  Write-Host "Copying: $($_.FullName)"
+                  Copy-Item -Path $_.FullName -Destination $destinationPath -Force
+                }
+              } else {
+                Write-Host "No C# files found."
+              }
+            displayName: Update application to use necessary classes
+            workingDirectory: $(Agent.BuildDirectory)/app
 
           # Build application
-#          - pwsh: |
-#              dotnet build UmbracoProject --configuration $(buildConfiguration)
-#              dotnet dev-certs https
-#            displayName: Build application
-#            workingDirectory: $(Agent.BuildDirectory)/app
+          - pwsh: |
+              dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
+              dotnet dev-certs https
+            displayName: Build application
+            workingDirectory: $(Agent.BuildDirectory)/app
 
           # Run application for Linux
           - bash: |
@@ -256,9 +260,10 @@ stages:
             displayName: Wait for application
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
-              # Wait for application to start responding to requests
+            # Wait for application to start responding to requests
           - pwsh: npx wait-on -v --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)/umbraco
             displayName: Wait for application
+            condition: succeededOrFailed()
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Install Playwright and dependencies
