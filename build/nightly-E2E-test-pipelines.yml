@@ -116,7 +116,6 @@ stages:
               vmImage: "ubuntu-latest"
               testFolder: "DefaultConfig"
               testCommand: "npm run test -- --shard=1/3"
-              additionalUrl: ""
             #            LinuxPart2Of3:
             #              vmImage: "ubuntu-latest"
             #              testCommand: "npm run test -- --shard=2/3"
@@ -127,7 +126,6 @@ stages:
               vmImage: "windows-latest"
               testFolder: "DefaultConfig"
               testCommand: "npm run test -- --shard=1/3"
-              additionalUrl: ""
             #            WindowsPart2Of3:
             #              vmImage: "windows-latest"
             #              testCommand: "npm run test -- --shard=2/3"
@@ -140,12 +138,14 @@ stages:
               vmImage: "windows-latest"
               testFolder: "UnattendedInstallConfig"
               testCommand: "npx playwright test $testFolder"
-              additionalUrl: "/umbraco/install"
+              CONNECTIONSTRINGS__UMBRACODBDSN: ""
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: ""
             LinuxUnattendedInstallConfig:
               vmImage: "ubuntu-latest"
               testFolder: "UnattendedInstallConfig"
               testCommand: "npx playwright test $testFolder"
-              additionalUrl: "/umbraco/install"
+              CONNECTIONSTRINGS__UMBRACODBDSN: ""
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: ""
         pool:
           vmImage: $(vmImage)
         steps:
@@ -260,12 +260,12 @@ stages:
             displayName: Install wait-on package
 
           # Wait for application to start responding to requests
-          - pwsh: npx wait-on -v --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)$(additionalUrl)
+          - pwsh: npx wait-on -v --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)
             displayName: Wait for application
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Wait for application to start responding to requests
-          - pwsh: npx wait-on -v --httpMethod GET --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)$(additionalUrl)
+          - pwsh: npx wait-on -v --httpMethod GET --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)
             displayName: Wait for application
             condition: succeededOrFailed()
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
