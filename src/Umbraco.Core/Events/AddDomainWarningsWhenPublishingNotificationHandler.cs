@@ -8,7 +8,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Events;
 
-[Obsolete("This has been moved into Umbraco.Cms.Web.Common and is no longer used in the core project. This class will be removed in Umbraco 16.")]
 public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationHandler<ContentPublishedNotification>
 {
     private readonly IOptions<ContentSettings> _contentSettings;

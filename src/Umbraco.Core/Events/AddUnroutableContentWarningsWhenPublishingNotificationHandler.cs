@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -13,7 +13,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Events;
 
-[Obsolete("This has been moved into Umbraco.Cms.Web.Common and is no longer used in the core project. This class will be removed in Umbraco 16.")]
 public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INotificationAsyncHandler<ContentPublishedNotification>
 {
     private readonly IPublishedRouter _publishedRouter;

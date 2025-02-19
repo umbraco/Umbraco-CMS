@@ -49,7 +49,6 @@ using Umbraco.Cms.Web.Common.Blocks;
 using Umbraco.Cms.Web.Common.Configuration;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
-using Umbraco.Cms.Web.Common.Events;
 using Umbraco.Cms.Web.Common.FileProviders;
 using Umbraco.Cms.Web.Common.Helpers;
 using Umbraco.Cms.Web.Common.Localization;
@@ -170,10 +169,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
         builder.Services.AddTransient<IIpAddressUtilities, IpAddressUtilities>();
         builder.Services.AddUnique<IPreviewTokenGenerator, UserBasedPreviewTokenGenerator>();
-
-        // Handlers for publish warnings
-        builder.AddNotificationHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
-        builder.AddNotificationAsyncHandler<ContentPublishedNotification, AddUnroutableContentWarningsWhenPublishingNotificationHandler>();
 
         return builder;
     }
