@@ -14,6 +14,10 @@ const iconMapJson = `${moduleDirectory}/icon-dictionary.json`;
 const lucideSvgDirectory = 'node_modules/lucide-static/icons';
 const simpleIconsSvgDirectory = 'node_modules/simple-icons/icons';
 
+const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
+
+const errors = [];
+
 const run = async () => {
 	// Empty output directory:
 	rmSync(iconsOutputDirectory, { recursive: true });
@@ -55,6 +59,7 @@ const collectDictionaryIcons = async () => {
 
 				icons.push(icon);
 			} catch (e) {
+				errors.push(`[Lucide] Could not load file: '${path}'`);
 				console.log(`[Lucide] Could not load file: '${path}'`);
 			}
 		}
@@ -86,6 +91,7 @@ const collectDictionaryIcons = async () => {
 
 				icons.push(icon);
 			} catch (e) {
+				errors.push(`[SimpleIcons] Could not load file: '${path}'`);
 				console.log(`[SimpleIcons] Could not load file: '${path}'`);
 			}
 		}
@@ -111,6 +117,7 @@ const collectDictionaryIcons = async () => {
 
 				icons.push(icon);
 			} catch (e) {
+				errors.push(`[Umbraco] Could not load file: '${path}'`);
 				console.log(`[Umbraco] Could not load file: '${path}'`);
 			}
 		}
@@ -199,10 +206,23 @@ const generateJS = (icons) => {
 
 const writeFileWithDir = (path, contents, cb) => {
 	mkdir(getDirName(path), { recursive: true }, function (err) {
-		if (err) return cb(err);
+		if (err) {
+			errors.push(err);
+			return cb(err);
+		}
 
 		writeFile(path, contents, cb);
 	});
 };
 
-run();
+await run();
+
+if (errors.length > 0) {
+	if (IS_GITHUB_ACTIONS) {
+		const msg = errors.join('\n');
+		console.log(`::error title=Failed to generate all icons::${msg}`);
+		process.exit(1);
+	} else {
+		console.log('Failed to generate all icons, please see the error log');
+	}
+}
