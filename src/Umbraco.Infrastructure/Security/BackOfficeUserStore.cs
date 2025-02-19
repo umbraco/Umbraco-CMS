@@ -426,7 +426,7 @@ public class BackOfficeUserStore :
     }
 
     /// <inheritdoc />
-    public override async Task<IdentityResult> DeleteAsync(
+    public override Task<IdentityResult> DeleteAsync(
         BackOfficeIdentityUser user,
         CancellationToken cancellationToken = default)
     {
@@ -439,12 +439,12 @@ public class BackOfficeUserStore :
 
         if (TryFindUserFromString(user.Id, out IUser? found))
         {
-            await DisableAsync(found);
+            DisableAsync(found).GetAwaiter().GetResult();
         }
 
         _externalLoginService.DeleteUserLogins(user.Key);
 
-        return IdentityResult.Success;
+        return Task.FromResult(IdentityResult.Success);
     }
 
     /// <inheritdoc />
