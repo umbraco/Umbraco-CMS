@@ -1715,6 +1715,7 @@ export default {
 		elementDoesNotSupport: 'This is not applicable for an Element Type',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
 		displaySettingsHeadline: 'Appearance',
+		displaySettingsLabelOnLeft: 'Label to the left',
 		displaySettingsLabelOnTop: 'Label above (full-width)',
 		confirmDeleteTabMessage: 'Are you sure you want to delete the tab <strong>%0%</strong>?',
 		confirmDeleteGroupMessage: 'Are you sure you want to delete the group <strong>%0%</strong>?',
@@ -1971,6 +1972,8 @@ export default {
 		permissionsDefault: 'Default permissions',
 		permissionsGranular: 'Granular permissions',
 		permissionsGranularHelp: 'Set permissions for specific nodes',
+		granularRightsLabel: 'Documents',
+		granularRightsDescription: 'Assign permissions to specific documents',
 		permissionsEntityGroup_document: 'Content',
 		permissionsEntityGroup_media: 'Media',
 		permissionsEntityGroup_member: 'Member',
@@ -1987,6 +1990,8 @@ export default {
 		chooseUserGroup: (multiple: boolean) => {
 			return multiple ? 'Choose User Groups' : 'Choose User Group';
 		},
+		entityPermissionsLabel: 'Permissions',
+		entityPermissionsDescription: 'Assign permissions for actions',
 		noStartNode: 'No start node selected',
 		noStartNodes: 'No start nodes selected',
 		startnode: 'Content start node',
@@ -2060,6 +2065,7 @@ export default {
 	},
 	validation: {
 		validation: 'Validation',
+		validateNothing: 'No validation',
 		validateAsEmail: 'Validate as an email address',
 		validateAsNumber: 'Validate as a number',
 		validateAsUrl: 'Validate as a URL',
