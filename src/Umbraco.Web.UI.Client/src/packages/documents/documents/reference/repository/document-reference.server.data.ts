@@ -9,7 +9,7 @@ import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
 
 /**
  * @class UmbDocumentReferenceServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbEntityReferenceDataSource}
  */
 export class UmbDocumentReferenceServerDataSource extends UmbControllerBase implements UmbEntityReferenceDataSource {
 	#dataMapper = new UmbManagementApiDataMapper(this);
@@ -56,7 +56,7 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase impl
 	}
 
 	/**
-	 * Fetches items that are referenced by the given uniques from the server
+	 * Checks if the items are referenced by other items
 	 * @param {Array<string>} uniques - The unique identifiers of the items to fetch
 	 * @param {number} skip - The number of items to skip
 	 * @param {number} take - The number of items to take
