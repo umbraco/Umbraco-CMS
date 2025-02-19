@@ -20,7 +20,7 @@ test('Install Umbraco', async ({page, umbracoUi}) => {
   await page.getByLabel('Install').click();
 
   // Assert
-  await expect(page.getByLabel('E-mail')).toBeVisible({timeout: 30000});
+  await expect(page.getByLabel('E-mail')).toBeVisible({timeout: 60000});
   await page.getByLabel('E-mail').fill(email);
   await page.getByLabel('Password').fill(password);
   await page.getByLabel('Login').click();

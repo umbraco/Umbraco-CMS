@@ -272,11 +272,13 @@ stages:
 
           # Install Playwright and dependencies
           - pwsh: npx playwright install --with-deps
+            condition: succeededOrFailed()
             displayName: Install Playwright
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
           - pwsh: $(testCommand)
+            condition: succeededOrFailed()
             displayName: Run Playwright tests
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
             env:
