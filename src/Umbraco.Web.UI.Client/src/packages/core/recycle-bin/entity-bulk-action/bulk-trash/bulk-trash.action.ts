@@ -35,6 +35,7 @@ export class UmbTrashEntityBulkAction<
 		const headline = '#actions_trash';
 		const message = '#defaultdialogs_confirmbulktrash';
 
+		// TODO: consider showing more details about the items being trashed
 		await umbConfirmModal(this._host, {
 			headline,
 			content: this.#localize.string(message, items.length),
