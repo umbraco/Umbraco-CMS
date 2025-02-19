@@ -22,7 +22,7 @@ public interface IContentTypeFilter
     /// <param name="contentTypes">Retrieved collection of content types.</param>
     /// <param name="parentKey">The parent content key.</param>
     /// <returns>Filtered collection of content types.</returns>
-    [Obsolete("Please the method overload taking all parameters. This method will be removed in Umbraco 17.")]
+    [Obsolete("Please use the method overload taking all parameters. Scheduled for removal in Umbraco 17.")]
     Task<IEnumerable<ContentTypeSort>> FilterAllowedChildrenAsync(IEnumerable<ContentTypeSort> contentTypes, Guid parentKey)
         => Task.FromResult(contentTypes);
 

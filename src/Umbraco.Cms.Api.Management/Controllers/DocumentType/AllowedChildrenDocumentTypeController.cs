@@ -24,7 +24,7 @@ public class AllowedChildrenDocumentTypeController : DocumentTypeControllerBase
     }
 
     [NonAction]
-    [Obsolete("Scheduled to be removed in v16, use the non obsoleted method instead")]
+    [Obsolete("Use the non obsoleted method instead. Scheduled to be removed in v16")]
     public async Task<IActionResult> AllowedChildrenByKey(
         CancellationToken cancellationToken,
         Guid id,
