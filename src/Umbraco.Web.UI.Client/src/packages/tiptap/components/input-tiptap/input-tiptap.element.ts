@@ -66,23 +66,21 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	async #loadExtensions() {
+		const enabledExtensions = this.configuration?.getValueByAlias<string[]>('extensions') ?? [];
+
+		// Ensures that the "Rich Text Essentials" extension is always enabled. [LK]
+		if (!enabledExtensions.includes(TIPTAP_CORE_EXTENSION_ALIAS)) {
+			const { api } = await import('../../extensions/core/rich-text-essentials.tiptap-api.js');
+			this._extensions.push(new api(this));
+		}
+
 		await new Promise<void>((resolve) => {
-			this.observe(umbExtensionsRegistry.byType('tiptapExtension'), async (manifests) => {
-				let enabledExtensions = this.configuration?.getValueByAlias<string[]>('extensions') ?? [];
-
-				// Ensures that the "Rich Text Essentials" extension is always enabled. [LK]
-				if (!enabledExtensions.includes(TIPTAP_CORE_EXTENSION_ALIAS)) {
-					enabledExtensions = [TIPTAP_CORE_EXTENSION_ALIAS, ...enabledExtensions];
-				}
-
+			this.observe(umbExtensionsRegistry.byTypeAndAliases('tiptapExtension', enabledExtensions), async (manifests) => {
 				for (const manifest of manifests) {
 					if (manifest.api) {
 						const extension = await loadManifestApi(manifest.api);
 						if (extension) {
-							// Check if the extension is enabled
-							if (enabledExtensions.includes(manifest.alias)) {
-								this._extensions.push(new extension(this));
-							}
+							this._extensions.push(new extension(this));
 						}
 					}
 				}
