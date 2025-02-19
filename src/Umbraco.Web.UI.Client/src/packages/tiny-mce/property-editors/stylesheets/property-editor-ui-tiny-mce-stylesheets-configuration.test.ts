@@ -1,5 +1,3 @@
-/*
-// Disabled because TinyMCE is not included in the test runner
 import { UmbPropertyEditorUITinyMceStylesheetsConfigurationElement } from './property-editor-ui-tiny-mce-stylesheets-configuration.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
@@ -23,4 +21,3 @@ describe('UmbPropertyEditorUITinyMceStylesheetsConfigurationElement', () => {
 		});
 	}
 });
-*/
