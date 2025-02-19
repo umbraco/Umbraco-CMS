@@ -4,36 +4,54 @@ import type { MetaEntityBulkActionTrashKind } from './types.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbTrashEntityBulkAction<
 	MetaKindType extends MetaEntityBulkActionTrashKind = MetaEntityBulkActionTrashKind,
 > extends UmbEntityBulkActionBase<MetaKindType> {
 	#localize = new UmbLocalizationController(this);
+	_items: Array<any> = [];
 
 	override async execute() {
 		if (this.selection?.length === 0) {
 			throw new Error('No items selected.');
 		}
 
-		await this._confirmTrash();
+		// TODO: Move item look up to a future bulk action context
+		await this.#requestItems();
+		await this._confirmTrash(this._items);
 		await this.#requestBulkTrash(this.selection);
-		await this.#notify();
 	}
 
-	protected async _confirmTrash() {
+	protected async _confirmTrash(items: Array<any>) {
 		const headline = '#actions_trash';
 		const message = '#defaultdialogs_confirmbulktrash';
 
 		await umbConfirmModal(this._host, {
 			headline,
-			content: this.#localize.string(message, this.selection.length),
+			content: this.#localize.string(message, items.length),
 			color: 'danger',
 			confirmLabel: '#actions_trash',
 		});
+	}
+
+	async #requestItems() {
+		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(
+			this,
+			this.args.meta.itemRepositoryAlias,
+		);
+
+		const { data } = await itemRepository.requestItems(this.selection);
+
+		this._items = data ?? [];
 	}
 
 	async #requestBulkTrash(uniques: Array<string>) {
@@ -44,7 +62,7 @@ export class UmbTrashEntityBulkAction<
 
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 
-		let count = 0;
+		const succeeded: Array<string> = [];
 
 		for (const unique of uniques) {
 			const { error } = await recycleBinRepository.requestTrash({ unique });
@@ -53,34 +71,50 @@ export class UmbTrashEntityBulkAction<
 				const notification = { data: { message: error.message } };
 				notificationContext?.peek('danger', notification);
 			} else {
-				count++;
+				succeeded.push(unique);
 			}
 		}
 
-		if (count > 0) {
-			const notification = { data: { message: `Trashed ${count} ${count === 1 ? 'item' : 'items'}` } };
+		if (succeeded.length > 0) {
+			const notification = {
+				data: { message: `Trashed ${succeeded.length} ${succeeded.length === 1 ? 'item' : 'items'}` },
+			};
 			notificationContext?.peek('positive', notification);
 		}
 
-		return {};
+		await this.#notify(succeeded);
 	}
 
-	async #notify() {
-		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+	async #notify(succeeded: Array<string>) {
+		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
+		if (!entityContext) throw new Error('Entity Context is not available');
 
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			unique: this.args.unique,
-			entityType: this.args.entityType,
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) throw new Error('Event Context is not available');
+
+		const entityType = entityContext.getEntityType();
+		const unique = entityContext.getUnique();
+
+		if (entityType && unique !== undefined) {
+			const args = { entityType, unique };
+
+			const reloadChildren = new UmbRequestReloadChildrenOfEntityEvent(args);
+			eventContext.dispatchEvent(reloadChildren);
+
+			const reloadStructure = new UmbRequestReloadStructureForEntityEvent(args);
+			eventContext.dispatchEvent(reloadStructure);
+		}
+
+		const succeededItems = this._items.filter((item) => succeeded.includes(item.unique));
+
+		succeededItems.forEach((item) => {
+			const trashedEvent = new UmbEntityTrashedEvent({
+				unique: item.unique,
+				entityType: item.entityType,
+			});
+
+			eventContext.dispatchEvent(trashedEvent);
 		});
-
-		actionEventContext.dispatchEvent(event);
-
-		const trashedEvent = new UmbEntityTrashedEvent({
-			unique: this.args.unique,
-			entityType: this.args.entityType,
-		});
-
-		actionEventContext.dispatchEvent(trashedEvent);
 	}
 }
 
