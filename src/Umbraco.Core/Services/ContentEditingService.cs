@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -21,8 +20,7 @@ internal sealed class ContentEditingService
     private readonly IUserService _userService;
     private readonly ILocalizationService _localizationService;
     private readonly ILanguageService _languageService;
-    private readonly IRelationService _relationService;
-    private readonly ContentSettings _contentSettings;
+    private ContentSettings _contentSettings;
 
     public ContentEditingService(
         IContentService contentService,
@@ -38,9 +36,20 @@ internal sealed class ContentEditingService
         IUserService userService,
         ILocalizationService localizationService,
         ILanguageService languageService,
-        IOptions<ContentSettings> contentSettings,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, contentValidationService, treeEntitySortingService)
+        : base(
+            contentService,
+            contentTypeService,
+            propertyEditorCollection,
+            dataTypeService,
+            logger,
+            scopeProvider,
+            userIdKeyResolver,
+            contentValidationService,
+            treeEntitySortingService,
+            optionsMonitor,
+            relationService)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _templateService = templateService;
@@ -48,8 +57,12 @@ internal sealed class ContentEditingService
         _userService = userService;
         _localizationService = localizationService;
         _languageService = languageService;
-        _relationService = relationService;
-        _contentSettings = contentSettings.Value;
+        _contentSettings = optionsMonitor.CurrentValue;
+        optionsMonitor.OnChange((contentSettings) =>
+        {
+            _contentSettings = contentSettings;
+        });
+
     }
 
     public async Task<IContent?> GetAsync(Guid key)
@@ -244,71 +257,13 @@ internal sealed class ContentEditingService
     }
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
-    {
-        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        IContent? content = ContentService.GetById(key);
-        if (content == null)
-        {
-            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
-        }
-
-        // checking the trash status is not done when it is irrelevant
-        if (content.Trashed)
-        {
-            return await Task.FromResult(Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.InTrash, content));
-        }
-
-        if (_contentSettings.DisableUnpublishWhenReferenced && _relationService.IsRelated(content.Id))
-        {
-            return Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced, content);
-        }
-
-        var userId = await GetUserIdAsync(userKey);
-        OperationResult? deleteResult = MoveToRecycleBin(content, userId);
-
-        scope.Complete();
-
-        return OperationResultToAttempt(content, deleteResult);
-    }
+        => await HandleMoveToRecycleBinAsync(key, userKey);
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey)
-        => await HandleDeletionAsync(key, userKey, ContentTrashStatusRequirement.MustBeTrashed, Delete);
+        => await HandleDeleteAsync(key, userKey,true);
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
-        => await HandleDeletionAsync(key, userKey, ContentTrashStatusRequirement.Irrelevant, Delete);
-
-    private async Task<Attempt<IContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid key, Guid userKey, ContentTrashStatusRequirement trashStatusRequirement, Func<IContent, int, OperationResult?> performDelete)
-    {
-        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        IContent? content = ContentService.GetById(key);
-        if (content == null)
-        {
-            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
-        }
-
-        // checking the trash status is not done when it is irrelevant
-        if ((trashStatusRequirement is ContentTrashStatusRequirement.MustBeTrashed && content.Trashed is false)
-            || (trashStatusRequirement is ContentTrashStatusRequirement.MustNotBeTrashed && content.Trashed))
-        {
-            ContentEditingOperationStatus status = trashStatusRequirement is ContentTrashStatusRequirement.MustBeTrashed
-                ? ContentEditingOperationStatus.NotInTrash
-                : ContentEditingOperationStatus.InTrash;
-            return await Task.FromResult(Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(status, content));
-        }
-
-        if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id))
-        {
-            return Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.CannotDeleteWhenReferenced, content);
-        }
-
-        var userId = await GetUserIdAsync(userKey);
-        OperationResult? deleteResult = performDelete(content, userId);
-
-        scope.Complete();
-
-        return OperationResultToAttempt(content, deleteResult);
-    }
-
+        => await HandleDeleteAsync(key, userKey,false);
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);
