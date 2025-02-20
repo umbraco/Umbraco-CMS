@@ -43,7 +43,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 						margin="6"
 						placement="top-end"
 						@toggle=${this.#onPopoverToggle}>
-						<umb-popover-layout>
+						<umb-popover-layout id="workspace-action-popover-layout">
 							<uui-scroll-container>
 								${repeat(
 									this.items,
@@ -75,12 +75,17 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 
 			#workspace-action-popover {
 				min-width: 200px;
+				
 			}
 
 			#popover-trigger {
 				--uui-button-padding-top-factor: 0;
 				--uui-button-padding-bottom-factor: 0.125;
 			}
+
+			#workspace-action-popover-layout {
+      			overflow: visible;
+    		}
 		`,
 	];
 }
