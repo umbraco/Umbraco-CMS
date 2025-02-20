@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -150,13 +151,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 
                 if (trashed.HasValue)
                 {
-                    string requiredOrNotString = trashed.Value ? "+" : "!";
-                    string myPath = "-1,-20";
-                    myPath = myPath.Replace("-", "\\-").Replace(",", "\\,");
-                    sb.Append($"{requiredOrNotString}__Path:");
-                    sb.Append(myPath);
-                    sb.Append("\\,*");
-                    sb.Append(' ');
+                    AppendRequiredTrashPath(trashed.Value, sb);
                 }
 
                 break;
@@ -192,6 +187,14 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         totalFound = result.TotalItemCount;
 
         return result;
+    }
+
+    private void AppendRequiredTrashPath( bool trashed, StringBuilder sb)
+    {
+        string requiredOrNotString = trashed ? "+" : "!";
+        string trashPath = "-1,-20";
+        trashPath = trashPath.Replace("-", "\\-").Replace(",", "\\,");
+        sb.Append($"{requiredOrNotString}__Path:{trashPath}\\,* ");
     }
 
     private bool BuildQuery(StringBuilder sb, string query, string? searchFrom, List<string> fields, string type)
