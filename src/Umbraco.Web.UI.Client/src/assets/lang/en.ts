@@ -2633,6 +2633,8 @@ export default {
 		labelInlineMode: 'Display inline with text',
 		notExposedLabel: 'Draft',
 		notExposedDescription: 'This Block is not yet created for this variant',
+		areaValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in this area.',
+		rootValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in the root of this property.',
 		unsupportedBlockName: 'Unsupported',
 		unsupportedBlockDescription:
 			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',
