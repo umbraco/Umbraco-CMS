@@ -26,8 +26,8 @@ public class HealthCheckResultsTests
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action) =>
             throw new NotImplementedException();
 
-        public override Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
-                        Task.FromResult<IEnumerable<HealthCheckStatus>>(new List<HealthCheckStatus> { new(_message) { ResultType = _resultType } });
+        public override Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
+            Task.FromResult<IEnumerable<HealthCheckStatus>>(new List<HealthCheckStatus> { new(_message) { ResultType = _resultType } });
     }
 
     [HealthCheck("CFD6FC34-59C9-4402-B55F-C8BC96B628A1", "Stub check 1")]
@@ -56,7 +56,7 @@ public class HealthCheckResultsTests
         {
         }
 
-        public override Task<IEnumerable<HealthCheckStatus>> GetStatus()
+        public override Task<IEnumerable<HealthCheckStatus>> GetStatusAsync()
             => throw new Exception("Check threw exception");
     }
 

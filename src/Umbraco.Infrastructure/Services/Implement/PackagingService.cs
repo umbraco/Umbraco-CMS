@@ -1,3 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Runtime.Loader;
 using System.Xml.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -354,7 +357,15 @@ public class PackagingService : IPackagingService
 
             if (!string.IsNullOrEmpty(packageManifest.Version))
             {
+                // Always use package version from manifest
                 installedPackage.Version = packageManifest.Version;
+            }
+            else if (string.IsNullOrEmpty(installedPackage.Version) &&
+                string.IsNullOrEmpty(installedPackage.PackageId) is false &&
+                TryGetAssemblyInformationalVersion(installedPackage.PackageId, out string? version))
+            {
+                // Use version of the assembly with the same name as the package ID
+                installedPackage.Version = version;
             }
         }
 
@@ -371,16 +382,16 @@ public class PackagingService : IPackagingService
             _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
 
         InstalledPackage[] installedPackages = _packageMigrationPlans
-            .GroupBy(plan => plan.PackageName)
+            .GroupBy(plan => (plan.PackageName, plan.PackageId))
             .Select(group =>
             {
                 var package = new InstalledPackage
                 {
-                    PackageName = group.Key,
+                    PackageName = group.Key.PackageName,
                 };
 
                 var currentState = keyValues?
-                    .GetValueOrDefault(Constants.Conventions.Migrations.KeyValuePrefix + package.PackageName);
+                    .GetValueOrDefault(Constants.Conventions.Migrations.KeyValuePrefix + group.Key.PackageId);
 
                 package.PackageMigrationPlans = group
                     .Select(plan => new InstalledPackageMigrationPlans
@@ -413,5 +424,21 @@ public class PackagingService : IPackagingService
         }
 
         return packageFile.CreateReadStream();
+    }
+
+    private static bool TryGetAssemblyInformationalVersion(string name, [NotNullWhen(true)] out string? version)
+    {
+        foreach (Assembly assembly in AssemblyLoadContext.Default.Assemblies)
+        {
+            AssemblyName assemblyName = assembly.GetName();
+            if (string.Equals(assemblyName.Name, name, StringComparison.OrdinalIgnoreCase) &&
+                assembly.TryGetInformationalVersion(out version))
+            {
+                return true;
+            }
+        }
+
+        version = null;
+        return false;
     }
 }

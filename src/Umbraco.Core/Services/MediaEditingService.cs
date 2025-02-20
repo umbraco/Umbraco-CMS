@@ -55,12 +55,18 @@ internal sealed class MediaEditingService
         ContentEditingOperationStatus validationStatus = result.Status;
         ContentValidationResult validationResult = result.Result.ValidationResult;
 
+        // If we have property validation errors, don't allow saving, as media only supports "published" status.
+        if (result.Status == ContentEditingOperationStatus.PropertyValidationError)
+        {
+            return Attempt.FailWithStatus(validationStatus, new MediaCreateResult { ValidationResult = validationResult });
+        }
+
         IMedia media = result.Result.Content!;
 
         var currentUserId = await GetUserIdAsync(userKey);
         ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
         return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(validationStatus, new MediaCreateResult { Content = media, ValidationResult = validationResult })
+            ? Attempt.SucceedWithStatus(validationStatus, new MediaCreateResult { Content = media })
             : Attempt.FailWithStatus(operationStatus, new MediaCreateResult { Content = media });
     }
 

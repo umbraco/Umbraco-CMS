@@ -60,10 +60,6 @@ public class WebRoutingSettings
     [DefaultValue(StaticValidateAlternativeTemplates)]
     public bool ValidateAlternativeTemplates { get; set; } = StaticValidateAlternativeTemplates;
 
-    [Obsolete("Use DisableFindContentByIdentifierPath instead. This will be removed in Umbraco 15." )]
-    [DefaultValue(StaticDisableFindContentByIdPath)]
-    public bool DisableFindContentByIdPath { get; set; } = StaticDisableFindContentByIdPath;
-
     [DefaultValue(StaticDisableFindContentByIdentifierPath)]
     public bool DisableFindContentByIdentifierPath { get; set; } = StaticDisableFindContentByIdentifierPath;
     /// <summary>

@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
 public class PropertyValueConverterTests : DeliveryApiTests
 {
-    protected IPublishedSnapshotAccessor PublishedSnapshotAccessor { get; private set; }
+    protected ICacheManager CacheManager { get; private set; }
 
     protected IPublishedUrlProvider PublishedUrlProvider { get; private set; }
 
@@ -28,6 +28,8 @@ public class PropertyValueConverterTests : DeliveryApiTests
     protected Mock<IPublishedMediaCache> PublishedMediaCacheMock { get; private set; }
 
     protected Mock<IPublishedUrlProvider> PublishedUrlProviderMock { get; private set; }
+
+    protected VariationContext VariationContext { get; } = new();
 
     [SetUp]
     public override void Setup()
@@ -60,9 +62,10 @@ public class PropertyValueConverterTests : DeliveryApiTests
             .Setup(pcc => pcc.GetById(mediaKey))
             .Returns(publishedMedia.Object);
 
-        var publishedSnapshot = new Mock<IPublishedSnapshot>();
-        publishedSnapshot.SetupGet(ps => ps.Content).Returns(PublishedContentCacheMock.Object);
-        publishedSnapshot.SetupGet(ps => ps.Media).Returns(PublishedMediaCacheMock.Object);
+        var cacheMock = new Mock<ICacheManager>();
+        cacheMock.SetupGet(cache => cache.Content).Returns(PublishedContentCacheMock.Object);
+        cacheMock.SetupGet(cache => cache.Media).Returns(PublishedMediaCacheMock.Object);
+        CacheManager = cacheMock.Object;
 
         PublishedUrlProviderMock = new Mock<IPublishedUrlProvider>();
         PublishedUrlProviderMock
@@ -73,13 +76,6 @@ public class PropertyValueConverterTests : DeliveryApiTests
             .Returns("the-media-url");
         PublishedUrlProvider = PublishedUrlProviderMock.Object;
         ApiContentPathProvider = new ApiContentPathProvider(PublishedUrlProvider);
-
-        var publishedSnapshotAccessor = new Mock<IPublishedSnapshotAccessor>();
-        var publishedSnapshotObject = publishedSnapshot.Object;
-        publishedSnapshotAccessor
-            .Setup(psa => psa.TryGetPublishedSnapshot(out publishedSnapshotObject))
-            .Returns(true);
-        PublishedSnapshotAccessor = publishedSnapshotAccessor.Object;
     }
 
     protected Mock<IPublishedContent> SetupPublishedContent(string name, Guid key, PublishedItemType itemType, IPublishedContentType contentType)

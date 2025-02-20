@@ -38,7 +38,7 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HealthCheckResultResponseModel), StatusCodes.Status200OK)]
-    public Task<ActionResult<HealthCheckResultResponseModel>> ExecuteAction(
+    public async Task<ActionResult<HealthCheckResultResponseModel>> ExecuteAction(
         CancellationToken cancellationToken,
         HealthCheckActionRequestModel action)
     {
@@ -58,11 +58,11 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
                 Type = "Error",
             };
 
-            return Task.FromResult<ActionResult<HealthCheckResultResponseModel>>(BadRequest(invalidModelProblem));
+            return BadRequest(invalidModelProblem);
         }
 
-        HealthCheckStatus result = healthCheck.ExecuteAction(_umbracoMapper.Map<HealthCheckAction>(action)!);
+        HealthCheckStatus result = await healthCheck.ExecuteActionAsync(_umbracoMapper.Map<HealthCheckAction>(action)!);
 
-        return Task.FromResult<ActionResult<HealthCheckResultResponseModel>>(Ok(_umbracoMapper.Map<HealthCheckResultResponseModel>(result)));
+        return Ok(_umbracoMapper.Map<HealthCheckResultResponseModel>(result));
     }
 }

@@ -141,4 +141,10 @@ public class TrackedReferencesService : ITrackedReferencesService
 
         return Task.FromResult(pagedModel);
     }
+
+    public async Task<PagedModel<Guid>> GetPagedKeysWithDependentReferencesAsync(ISet<Guid> keys, Guid objectTypeId, long skip, long take)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        return await _trackedReferencesRepository.GetPagedNodeKeysWithDependantReferencesAsync(keys, objectTypeId, skip, take);
+    }
 }

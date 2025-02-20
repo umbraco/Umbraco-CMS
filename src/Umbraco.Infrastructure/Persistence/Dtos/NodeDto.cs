@@ -12,19 +12,27 @@ public class NodeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Node;
     public const int NodeIdSeed = 1060;
+
+    // Public constants to bind properties between DTOs
+    public const string IdColumnName = "id";
+    public const string KeyColumnName = "uniqueId";
+    public const string ParentIdColumnName = "parentId";
+    public const string SortOrderColumnName = "sortOrder";
+    public const string TrashedColumnName = "trashed";
+
     private int? _userId;
 
-    [Column("id")]
+    [Column(IdColumnName)]
     [PrimaryKeyColumn(IdentitySeed = NodeIdSeed)]
     public int NodeId { get; set; }
 
-    [Column("uniqueId")]
+    [Column(KeyColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_UniqueId", IncludeColumns = "parentId,level,path,sortOrder,trashed,nodeUser,text,createDate")]
     [Constraint(Default = SystemMethods.NewGuid)]
     public Guid UniqueId { get; set; }
 
-    [Column("parentId")]
+    [Column(ParentIdColumnName)]
     [ForeignKey(typeof(NodeDto))]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_parentId_nodeObjectType", ForColumns = "parentID,nodeObjectType", IncludeColumns = "trashed,nodeUser,level,path,sortOrder,uniqueID,text,createDate")]
     public int ParentId { get; set; }
@@ -39,11 +47,11 @@ public class NodeDto
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Path")]
     public string Path { get; set; } = null!;
 
-    [Column("sortOrder")]
+    [Column(SortOrderColumnName)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType_trashed_sorted", ForColumns = "nodeObjectType,trashed,sortOrder,id", IncludeColumns = "uniqueID,parentID,level,path,nodeUser,text,createDate")]
     public int SortOrder { get; set; }
 
-    [Column("trashed")]
+    [Column(TrashedColumnName)]
     [Constraint(Default = "0")]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Trashed")]
     public bool Trashed { get; set; }

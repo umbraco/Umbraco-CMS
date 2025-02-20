@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Blocks;
@@ -12,12 +10,6 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// </summary>
 public class BlockGridEditorDataConverter : BlockEditorDataConverter<BlockGridValue, BlockGridLayoutItem>
 {
-    [Obsolete("Use the constructor that takes IJsonSerializer. Will be removed in V15.")]
-    public BlockGridEditorDataConverter()
-        : this(StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
-    {
-    }
-
     public BlockGridEditorDataConverter(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)
     {
@@ -27,7 +19,7 @@ public class BlockGridEditorDataConverter : BlockEditorDataConverter<BlockGridVa
     {
         IList<ContentAndSettingsReference> ExtractContentAndSettingsReferences(BlockGridLayoutItem item)
         {
-            var references = new List<ContentAndSettingsReference> { new(item.ContentUdi, item.SettingsUdi) };
+            var references = new List<ContentAndSettingsReference> { new(item.ContentKey, item.SettingsKey) };
             references.AddRange(item.Areas.SelectMany(area => area.Items.SelectMany(ExtractContentAndSettingsReferences)));
             return references;
         }

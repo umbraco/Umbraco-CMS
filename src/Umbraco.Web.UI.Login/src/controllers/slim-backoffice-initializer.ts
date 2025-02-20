@@ -2,7 +2,10 @@ import {
   UmbBundleExtensionInitializer,
   UmbServerExtensionRegistrator
 } from "@umbraco-cms/backoffice/extension-api";
-import { umbExtensionsRegistry } from "@umbraco-cms/backoffice/extension-registry";
+import {
+  UmbAppEntryPointExtensionInitializer,
+  umbExtensionsRegistry
+} from "@umbraco-cms/backoffice/extension-registry";
 import type { UmbElement } from "@umbraco-cms/backoffice/element-api";
 import { UmbControllerBase } from "@umbraco-cms/backoffice/class-api";
 import { UUIIconRegistryEssential } from "@umbraco-cms/backoffice/external/uui";
@@ -21,6 +24,7 @@ export class UmbSlimBackofficeController extends UmbControllerBase {
   constructor(host: UmbElement) {
     super(host);
     new UmbBundleExtensionInitializer(host, umbExtensionsRegistry);
+    new UmbAppEntryPointExtensionInitializer(host, umbExtensionsRegistry);
     new UmbServerExtensionRegistrator(host, umbExtensionsRegistry).registerPublicExtensions();
 
     this.#uuiIconRegistry.attach(host);

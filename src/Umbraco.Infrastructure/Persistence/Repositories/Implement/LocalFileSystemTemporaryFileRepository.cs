@@ -71,8 +71,6 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
 
     public async Task SaveAsync(TemporaryFileModel model)
     {
-        ArgumentNullException.ThrowIfNull(nameof(model));
-
         // Ensure folder does not exist
         await DeleteAsync(model.Key);
 

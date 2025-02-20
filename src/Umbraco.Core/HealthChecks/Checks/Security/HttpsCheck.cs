@@ -46,7 +46,7 @@ public class HttpsCheck : HealthCheck
         _hostingEnvironment = hostingEnvironment;
     }
     /// <inheritdoc />
-    public override async Task<IEnumerable<HealthCheckStatus>> GetStatus()
+    public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync()
         => [
             await CheckIfCurrentSchemeIsHttps(),
             await CheckHttpsConfigurationSetting(),

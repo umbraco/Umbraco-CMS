@@ -21,6 +21,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
     private DateTime? _inviteDateUtc;
     private int[] _startContentIds;
     private int[] _startMediaIds;
+    private UserKind _kind;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="BackOfficeIdentityUser" /> class.
@@ -109,6 +110,12 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
         }
     }
 
+    public UserKind Kind
+    {
+        get => _kind;
+        set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _kind, nameof(Kind));
+    }
+
     /// <summary>
     ///     Used to construct a new instance without an identity
     /// </summary>
@@ -118,7 +125,8 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
     /// <param name="culture"></param>
     /// <param name="name"></param>
     /// <param name="id"></param>
-    public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string? username, string email, string culture, string? name = null, Guid? id = null)
+    /// <param name="kind"></param>
+    public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string? username, string email, string culture, string? name = null, Guid? id = null, UserKind kind = UserKind.Default)
     {
         if (string.IsNullOrWhiteSpace(username))
         {
@@ -144,6 +152,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
         user.HasIdentity = false;
         user._culture = culture;
         user.Name = name;
+        user.Kind = kind;
         user.EnableChangeTracking();
         return user;
     }

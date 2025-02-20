@@ -4,10 +4,18 @@
     <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
+  
   <PropertyGroup>
-    <!-- TODO: Fix all warnings and remove this override -->
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!--
+      TODO: Fix and remove overrides:
+      [SA1117] params all on same line
+      [SA1401] make fields private
+      [SA1134] own line attributes
+      [CS9042] not obsolete
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1117,SA1401,SA1134,CS9042</WarningsNotAsErrors>
   </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="CommandLineParser" VersionOverride="2.9.1" />
     <PackageReference Include="NJsonSchema" VersionOverride="11.0.2" />

@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -45,8 +45,7 @@ public class MediaBuilderTests : DeliveryApiTests
             Guid.NewGuid(),
             "The media",
             "media-url-segment",
-            new Dictionary<string, object>()
-        );
+            new Dictionary<string, object>());
 
         var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), Mock.Of<IPublishedValueFallback>(), CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(media);

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
@@ -15,7 +15,8 @@ internal class DeferredActions
     {
         IScopeContext? scopeContext = scopeProvider.Context;
 
-        return scopeContext?.Enlist("examineEvents",
+        return scopeContext?.Enlist(
+            "examineEvents",
             () => new DeferredActions(), // creator
             (completed, actions) => // action
             {

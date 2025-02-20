@@ -32,6 +32,7 @@ public interface IPublishedCache
     /// <param name="contentId">The content Udi identifier.</param>
     /// <returns>The content, or null.</returns>
     /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
+    [Obsolete] // FIXME: Remove when replacing nucache
     IPublishedContent? GetById(bool preview, Udi contentId);
 
     /// <summary>
@@ -56,24 +57,8 @@ public interface IPublishedCache
     /// <param name="contentId">The content unique identifier.</param>
     /// <returns>The content, or null.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
+    [Obsolete] // FIXME: Remove when replacing nucache
     IPublishedContent? GetById(Udi contentId);
-
-    /// <summary>
-    ///     Gets a value indicating whether the cache contains a specified content.
-    /// </summary>
-    /// <param name="preview">A value indicating whether to consider unpublished content.</param>
-    /// <param name="contentId">The content unique identifier.</param>
-    /// <returns>A value indicating whether to the cache contains the specified content.</returns>
-    /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
-    bool HasById(bool preview, int contentId);
-
-    /// <summary>
-    ///     Gets a value indicating whether the cache contains a specified content.
-    /// </summary>
-    /// <param name="contentId">The content unique identifier.</param>
-    /// <returns>A value indicating whether to the cache contains the specified content.</returns>
-    /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-    bool HasById(int contentId);
 
     /// <summary>
     ///     Gets contents at root.
@@ -82,6 +67,7 @@ public interface IPublishedCache
     /// <param name="culture">A culture.</param>
     /// <returns>The contents.</returns>
     /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
+    [Obsolete("Scheduled for removal, use IDocumentNavigationQueryService instead in v17")]
     IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null);
 
     /// <summary>
@@ -90,6 +76,7 @@ public interface IPublishedCache
     /// <param name="culture">A culture.</param>
     /// <returns>The contents.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
+    [Obsolete("Scheduled for removal, use IDocumentNavigationQueryService instead in v17")]
     IEnumerable<IPublishedContent> GetAtRoot(string? culture = null);
 
     /// <summary>
@@ -98,6 +85,7 @@ public interface IPublishedCache
     /// <param name="preview">A value indicating whether to consider unpublished content.</param>
     /// <returns>A value indicating whether the cache contains published content.</returns>
     /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
+    [Obsolete("Scheduled for removal in v17")]
     bool HasContent(bool preview);
 
     /// <summary>
@@ -105,6 +93,7 @@ public interface IPublishedCache
     /// </summary>
     /// <returns>A value indicating whether the cache contains published content.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
+    [Obsolete("Scheduled for removal in v17")]
     bool HasContent();
 
     /// <summary>
@@ -112,6 +101,7 @@ public interface IPublishedCache
     /// </summary>
     /// <param name="id">The content type unique identifier.</param>
     /// <returns>The content type, or null.</returns>
+    [Obsolete("Please use the IContentTypeCacheService instead, scheduled for removal in V16")]
     IPublishedContentType? GetContentType(int id);
 
     /// <summary>
@@ -120,6 +110,7 @@ public interface IPublishedCache
     /// <param name="alias">The content type alias.</param>
     /// <returns>The content type, or null.</returns>
     /// <remarks>The alias is case-insensitive.</remarks>
+    [Obsolete("Please use the IContentTypeCacheService instead, scheduled for removal in V16")]
     IPublishedContentType? GetContentType(string alias);
 
     /// <summary>
@@ -127,6 +118,7 @@ public interface IPublishedCache
     /// </summary>
     /// <param name="contentType">The content type.</param>
     /// <returns>The contents.</returns>
+    [Obsolete]
     IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
 
     /// <summary>
@@ -134,5 +126,6 @@ public interface IPublishedCache
     /// </summary>
     /// <param name="key">The content type key.</param>
     /// <returns>The content type, or null.</returns>
+    [Obsolete("Please use the IContentTypeCacheService instead, scheduled for removal in V16")]
     IPublishedContentType? GetContentType(Guid key);
 }

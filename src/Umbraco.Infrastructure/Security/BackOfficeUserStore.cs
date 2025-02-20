@@ -141,6 +141,7 @@ public class BackOfficeUserStore :
             StartMediaIds = user.StartMediaIds ?? new int[] { },
             IsLockedOut = user.IsLockedOut,
             Key = user.Key,
+            Kind = user.Kind
         };
 
 

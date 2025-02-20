@@ -22,7 +22,7 @@ public class ByPathScriptFolderController : ScriptFolderControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet("{path}")]
+    [HttpGet("{*path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ScriptFolderResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

@@ -89,7 +89,7 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
             if (node != null)
             {
                 Domain? d = DomainUtilities.FindWildcardDomainInPath(
-                    umbracoContext.PublishedSnapshot.Domains?.GetAll(true), node.Path, null);
+                    umbracoContext.Domains?.GetAll(true), node.Path, null);
                 if (d != null)
                 {
                     errorCulture = d.Culture;
@@ -100,7 +100,7 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
             _contentSettings.Error404Collection.ToArray(),
             _entityService,
-            new PublishedContentQuery(umbracoContext.PublishedSnapshot, _variationContextAccessor, _examineManager),
+            new PublishedContentQuery(_variationContextAccessor, _examineManager, umbracoContext.Content!, umbracoContext.Media),
             errorCulture,
             domainContentId);
 

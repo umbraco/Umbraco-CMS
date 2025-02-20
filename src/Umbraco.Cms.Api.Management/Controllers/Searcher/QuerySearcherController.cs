@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using Examine;
+using Examine.Lucene.Search;
 using Examine.Search;
 using Lucene.Net.QueryParsers.Classic;
 using Microsoft.AspNetCore.Http;
@@ -52,12 +53,13 @@ public class QuerySearcherController : SearcherControllerBase
         ISearchResults results;
 
         // NativeQuery will work for a single word/phrase too (but depends on the implementation) the lucene one will work.
+        // Due to examine changes we need to supply the skipTakeMaxResults, see https://github.com/umbraco/Umbraco-CMS/issues/17920 for more info
         try
         {
             results = searcher
                 .CreateQuery()
                 .NativeQuery(term)
-                .Execute(QueryOptions.SkipTake(skip, take));
+                .Execute(new LuceneQueryOptions(skip, take, skipTakeMaxResults: skip + take));
         }
         catch (ParseException)
         {

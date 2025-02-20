@@ -122,11 +122,10 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         var options = new RepositoryCachePolicyOptions
         {
             // allow zero to be cached
-            GetAllCacheAllowZeroCount = true,
+            GetAllCacheAllowZeroCount = true
         };
 
-        return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, int>(GlobalIsolatedCache, ScopeAccessor,
-            options);
+        return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, int>(GlobalIsolatedCache, ScopeAccessor, options);
     }
 
     private IDictionaryItem ConvertFromDto(DictionaryDto dto, IDictionary<int, ILanguage> languagesById)
@@ -217,11 +216,23 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
             var options = new RepositoryCachePolicyOptions
             {
                 // allow zero to be cached
-                GetAllCacheAllowZeroCount = true,
+                GetAllCacheAllowZeroCount = true
             };
 
-            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(GlobalIsolatedCache, ScopeAccessor,
-                options);
+            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(GlobalIsolatedCache, ScopeAccessor, options);
+        }
+
+        protected override IEnumerable<IDictionaryItem> PerformGetAll(params Guid[]? ids)
+        {
+            Sql<ISqlContext> sql = GetBaseQuery(false).Where<DictionaryDto>(x => x.PrimaryKey > 0);
+            if (ids?.Any() ?? false)
+            {
+                sql.WhereIn<DictionaryDto>(x => x.UniqueId, ids);
+            }
+
+            return Database
+                .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
+                .Select(ConvertToEntity);
         }
     }
 
@@ -259,12 +270,26 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         {
             var options = new RepositoryCachePolicyOptions
             {
+                // allow null to be cached
+                CacheNullValues = true,
                 // allow zero to be cached
-                GetAllCacheAllowZeroCount = true,
+                GetAllCacheAllowZeroCount = true
             };
 
-            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor,
-                options);
+            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor, options);
+        }
+
+        protected override IEnumerable<IDictionaryItem> PerformGetAll(params string[]? ids)
+        {
+            Sql<ISqlContext> sql = GetBaseQuery(false).Where<DictionaryDto>(x => x.PrimaryKey > 0);
+            if (ids?.Any() ?? false)
+            {
+                sql.WhereIn<DictionaryDto>(x => x.Key, ids);
+            }
+
+            return Database
+                .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
+                .Select(ConvertToEntity);
         }
     }
 

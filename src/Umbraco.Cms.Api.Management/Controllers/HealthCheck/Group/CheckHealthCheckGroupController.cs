@@ -25,7 +25,7 @@ public class CheckHealthCheckGroupController : HealthCheckGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HealthCheckGroupWithResultResponseModel), StatusCodes.Status200OK)]
-    public Task<IActionResult> ByNameWithResult(
+    public async Task<IActionResult> ByNameWithResult(
         CancellationToken cancellationToken,
         string name)
     {
@@ -36,9 +36,9 @@ public class CheckHealthCheckGroupController : HealthCheckGroupControllerBase
 
         if (group is null)
         {
-            return Task.FromResult(HealthCheckGroupNotFound());
+            return HealthCheckGroupNotFound();
         }
 
-        return Task.FromResult<IActionResult>(Ok(_healthCheckGroupPresentationFactory.CreateHealthCheckGroupWithResultViewModel(group)));
+        return Ok(await _healthCheckGroupPresentationFactory.CreateHealthCheckGroupWithResultViewModelAsync(group));
     }
 }

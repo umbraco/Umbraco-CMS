@@ -8,11 +8,10 @@ const contentPickerDocumentTypeName = 'DocumentTypeForContentPicker';
 const contentPickerName = 'TestContentPicker';
 let contentPickerDocumentTypeId = '';
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
+test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
   contentPickerDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(contentPickerDocumentTypeName);
-  await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -24,9 +23,11 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can create content with the content picker datatype', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -38,24 +39,25 @@ test('can create content with the content picker datatype', {tag: '@smoke'}, asy
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(1);
+  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].value).toEqual(contentPickerId);
 });
 
 test('can publish content with the content picker data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const expectedState = 'Published';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
-  await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.addContentPicker(contentPickerName);
   await umbracoUi.content.clickSaveAndPublishButton();
 
@@ -63,6 +65,7 @@ test('can publish content with the content picker data type', async ({umbracoApi
   await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].value).toEqual(contentPickerId);
 });
 
@@ -70,20 +73,19 @@ test('can open content picker in the content', async ({umbracoApi, umbracoUi}) =
   // Arrange
   const customDataTypeName = 'CustomContentPicker';
   const customDataTypeId = await umbracoApi.dataType.createContentPickerDataTypeWithShowOpenButton(customDataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  // Create content to pick
   await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
-  await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.addContentPicker(contentPickerName);
 
   // Assert
-  await umbracoUi.content.isOpenButtonVisibleInContentPicker(contentPickerName);
-  await umbracoUi.content.clickContentPickerOpenButton(contentPickerName);
+  await umbracoUi.content.clickReferenceNodeLinkWithName(contentPickerName);
   await umbracoUi.content.isNodeOpenForContentPicker(contentPickerName);
 
   // Clean
@@ -97,19 +99,18 @@ test('can choose start node for the content picker in the content', async ({umbr
   const childContentPickerName = 'TestChildContentPicker';
   await umbracoApi.documentType.ensureNameNotExists(childContentPickerDocumentTypeName);
   const childContentPickerDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childContentPickerDocumentTypeName);
-  const contentPickerDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(contentPickerName, childContentPickerDocumentTypeId);
+  contentPickerDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(contentPickerName, childContentPickerDocumentTypeId);
   const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
   await umbracoApi.document.createDefaultDocumentWithParent(childContentPickerName, childContentPickerDocumentTypeId, contentPickerId);
   // Create a custom content picker with start node
   const customDataTypeId = await umbracoApi.dataType.createContentPickerDataTypeWithStartNode(customDataTypeName, contentPickerId);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
-  await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseButton();
 
   // Assert
@@ -119,6 +120,7 @@ test('can choose start node for the content picker in the content', async ({umbr
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   await umbracoApi.document.ensureNameNotExists(childContentPickerName);
+  await umbracoApi.documentType.ensureNameNotExists(childContentPickerDocumentTypeName);
 });
 
 test.skip('can ignore user start node for the content picker in the content', async ({umbracoApi, umbracoUi}) => {
@@ -128,19 +130,18 @@ test.skip('can ignore user start node for the content picker in the content', as
   const childContentPickerName = 'TestChildContentPicker';
   await umbracoApi.documentType.ensureNameNotExists(childContentPickerDocumentTypeName);
   const childContentPickerDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childContentPickerDocumentTypeName);
-  const contentPickerDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(contentPickerName, childContentPickerDocumentTypeId);
+  contentPickerDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(contentPickerName, childContentPickerDocumentTypeId);
   const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
   await umbracoApi.document.createDefaultDocumentWithParent(childContentPickerName, childContentPickerDocumentTypeId, contentPickerId);
   // Create a custom content picker with the setting "ignore user start node" is enable
   const customDataTypeId = await umbracoApi.dataType.createContentPickerDataTypeWithIgnoreUserStartNodes(customDataTypeName, contentPickerId);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
-  await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseButton();
 
   // Assert
@@ -150,6 +151,7 @@ test.skip('can ignore user start node for the content picker in the content', as
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   await umbracoApi.document.ensureNameNotExists(childContentPickerName);
+  await umbracoApi.documentType.ensureNameNotExists(childContentPickerDocumentTypeName);
 });
 
 test('can remove content picker in the content', async ({umbracoApi, umbracoUi}) => {
@@ -158,6 +160,7 @@ test('can remove content picker in the content', async ({umbracoApi, umbracoUi})
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
   await umbracoApi.document.createDocumentWithContentPicker(contentName, documentTypeId, contentPickerId);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act

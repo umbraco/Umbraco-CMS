@@ -8,9 +8,21 @@ public class TreeChange<TItem>
         ChangeTypes = changeTypes;
     }
 
+    public TreeChange(TItem changedItem, TreeChangeTypes changeTypes, IEnumerable<string>? publishedCultures, IEnumerable<string>? unpublishedCultures)
+    {
+        Item = changedItem;
+        ChangeTypes = changeTypes;
+        PublishedCultures = publishedCultures;
+        UnpublishedCultures = unpublishedCultures;
+    }
+
     public TItem Item { get; }
 
     public TreeChangeTypes ChangeTypes { get; }
+
+    public IEnumerable<string>? PublishedCultures { get; }
+
+    public IEnumerable<string>? UnpublishedCultures { get; }
 
     public EventArgs ToEventArgs() => new EventArgs(this);
 

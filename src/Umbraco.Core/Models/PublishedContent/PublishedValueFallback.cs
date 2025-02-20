@@ -1,4 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
@@ -184,7 +188,7 @@ public class PublishedValueFallback : IPublishedValueFallback
         IPublishedProperty? property; // if we are here, content's property has no value
         do
         {
-            content = content?.Parent;
+            content = content?.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(), StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
 
             IPublishedPropertyType? propertyType = content?.ContentType.GetPropertyType(alias);
 

@@ -55,9 +55,9 @@ public class MemberManagerTests
             new UmbracoMapper(new MapDefinitionCollection(() => mapDefinitions), scopeProvider, NullLogger<UmbracoMapper>.Instance),
             scopeProvider,
             new IdentityErrorDescriber(),
-            Mock.Of<IPublishedSnapshotAccessor>(),
             Mock.Of<IExternalLoginWithKeyService>(),
-            Mock.Of<ITwoFactorLoginService>());
+            Mock.Of<ITwoFactorLoginService>(),
+            Mock.Of<IPublishedMemberCache>());
 
         _mockIdentityOptions = new Mock<IOptions<IdentityOptions>>();
         var idOptions = new IdentityOptions { Lockout = { AllowedForNewUsers = false } };
@@ -269,7 +269,7 @@ public class MemberManagerTests
             .Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(fakeMember);
         _mockMemberService
-            .Setup(x => x.Save(fakeMember, Constants.Security.SuperUserId))
+            .Setup(x => x.Save(fakeMember, It.IsAny<PublishNotificationSaveOptions>(), Constants.Security.SuperUserId))
             .Returns(Attempt.Succeed<OperationResult?>(null));
 
     }

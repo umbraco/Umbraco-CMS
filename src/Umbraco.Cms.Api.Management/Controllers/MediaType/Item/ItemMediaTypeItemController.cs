@@ -32,7 +32,7 @@ public class ItemMediaTypeItemController : MediaTypeItemControllerBase
             return Task.FromResult<IActionResult>(Ok(Enumerable.Empty<MediaTypeItemResponseModel>()));
         }
 
-        IEnumerable<IMediaType> mediaTypes = _mediaTypeService.GetAll(ids);
+        IEnumerable<IMediaType> mediaTypes = _mediaTypeService.GetMany(ids);
         List<MediaTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IMediaType, MediaTypeItemResponseModel>(mediaTypes);
         return Task.FromResult<IActionResult>(Ok(responseModels));
     }

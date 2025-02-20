@@ -113,7 +113,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
     protected async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidatePropertiesAsync(
         ContentEditingModelBase contentEditingModelBase,
-        Guid contentTypeKey)
+        Guid contentTypeKey,
+        IEnumerable<string?>? culturesToValidate = null)
     {
         TContentType? contentType = await ContentTypeService.GetAsync(contentTypeKey);
         if (contentType is null)
@@ -121,14 +122,15 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeNotFound, new ContentValidationResult());
         }
 
-        return await ValidatePropertiesAsync(contentEditingModelBase, contentType);
+        return await ValidatePropertiesAsync(contentEditingModelBase, contentType, culturesToValidate);
     }
 
     private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidatePropertiesAsync(
         ContentEditingModelBase contentEditingModelBase,
-        TContentType contentType)
+        TContentType contentType,
+        IEnumerable<string?>? culturesToValidate = null)
     {
-        ContentValidationResult result = await _validationService.ValidatePropertiesAsync(contentEditingModelBase, contentType);
+        ContentValidationResult result = await _validationService.ValidatePropertiesAsync(contentEditingModelBase, contentType, culturesToValidate);
         return result.ValidationErrors.Any() is false
             ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, result)
             : Attempt.FailWithStatus(ContentEditingOperationStatus.PropertyValidationError, result);
@@ -456,7 +458,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         IDataValueEditor dataValueEditor = dataEditor.GetValueEditor();
         if (dataValueEditor.IsReadOnly)
         {
-            return null;
+            // read-only property editor - get and return the current value
+            return content.GetValue(propertyType.Alias, culture, segment);
         }
 
         IDataType? dataType = await _dataTypeService.GetAsync(propertyType.DataTypeKey);

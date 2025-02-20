@@ -32,6 +32,7 @@ public static partial class Constants
             public const string Document = TableNamePrefix + "Document";
             public const string DocumentCultureVariation = TableNamePrefix + "DocumentCultureVariation";
             public const string DocumentVersion = TableNamePrefix + "DocumentVersion";
+            public const string DocumentUrl = TableNamePrefix + "DocumentUrl";
             public const string MediaVersion = TableNamePrefix + "MediaVersion";
             public const string ContentSchedule = TableNamePrefix + "ContentSchedule";
 
@@ -52,6 +53,7 @@ public static partial class Constants
             public const string UserStartNode = TableNamePrefix + "UserStartNode";
             public const string User2UserGroup = TableNamePrefix + "User2UserGroup";
             public const string User2NodeNotify = TableNamePrefix + "User2NodeNotify";
+            public const string User2ClientId = TableNamePrefix + "User2ClientId";
             public const string UserGroup2App = TableNamePrefix + "UserGroup2App";
             public const string UserData = TableNamePrefix + "UserData";
 

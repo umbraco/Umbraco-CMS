@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -105,10 +106,10 @@ public class DataValueEditor : IDataValueEditor
     public List<IValueValidator> Validators { get; private set; } = new();
 
     /// <inheritdoc />
-    public IEnumerable<ValidationResult> Validate(object? value, bool required, string? format)
+    public IEnumerable<ValidationResult> Validate(object? value, bool required, string? format, PropertyValidationContext validationContext)
     {
         List<ValidationResult>? results = null;
-        var r = Validators.SelectMany(v => v.Validate(value, ValueType, ConfigurationObject)).ToList();
+        var r = Validators.SelectMany(v => v.Validate(value, ValueType, ConfigurationObject, validationContext)).ToList();
         if (r.Any())
         {
             results = r;

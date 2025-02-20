@@ -9,6 +9,8 @@ namespace Umbraco.Cms.Core.Services;
 /// <inheritdoc />
 internal sealed class UserGroupPermissionService : IUserGroupPermissionService
 {
+    private static readonly Task<UserGroupAuthorizationStatus> _successTaskResult = Task.FromResult(UserGroupAuthorizationStatus.Success);
+    private static readonly Task<UserGroupAuthorizationStatus> _unauthorizedMissingUserGroupAccessTaskResult = Task.FromResult(UserGroupAuthorizationStatus.UnauthorizedMissingUserGroupAccess);
     private readonly IContentService _contentService;
     private readonly IMediaService _mediaService;
     private readonly IEntityService _entityService;
@@ -31,15 +33,16 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     {
         if (user.IsAdmin())
         {
-            return Task.FromResult(UserGroupAuthorizationStatus.Success);
+            return _successTaskResult;
         }
 
-        var allowedUserGroupsKeys = user.Groups.Select(x => x.Key).ToArray();
-        var missingAccess = userGroupKeys.Except(allowedUserGroupsKeys).ToArray();
+        // LINQ.Except will make a HashSet of the argument passed in, so it is OK to use IEnumerable and avoid an allocation
+        var allowedUserGroupsKeys = user.Groups.Select(x => x.Key);
+        var missingAccess = userGroupKeys.Except(allowedUserGroupsKeys);
 
-        return Task.FromResult(missingAccess.Length == 0
-            ? UserGroupAuthorizationStatus.Success
-            : UserGroupAuthorizationStatus.UnauthorizedMissingUserGroupAccess);
+        return missingAccess.Any() is false
+            ? _successTaskResult
+            : _unauthorizedMissingUserGroupAccessTaskResult;
     }
 
     /// <inheritdoc/>
@@ -100,7 +103,7 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     /// </summary>
     /// <param name="user"><see cref="IUser" /> to check for access.</param>
     /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
-    private bool HasAccessToUsersSection(IUser user)
+    private static bool HasAccessToUsersSection(IUser user)
         => user.AllowedSections.Contains(Constants.Applications.Users);
 
     /// <summary>
@@ -109,15 +112,15 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     /// <param name="user"><see cref="IUser" /> to check for access.</param>
     /// <param name="userGroup">The user group being created or updated.</param>
     /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
-    private bool HasAccessToAllUserGroupSections(IUser user, IUserGroup userGroup)
+    private static bool HasAccessToAllUserGroupSections(IUser user, IUserGroup userGroup)
     {
         if (user.IsAdmin())
         {
             return true;
         }
 
-        var sectionsMissingAccess = userGroup.AllowedSections.Except(user.AllowedSections).ToArray();
-        return sectionsMissingAccess.Length == 0;
+        var sectionsMissingAccess = userGroup.AllowedSections.Except(user.AllowedSections);
+        return sectionsMissingAccess.Any() is false;
     }
 
     /// <summary>

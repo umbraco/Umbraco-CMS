@@ -63,8 +63,7 @@ test('can set is an element type for a document type', {tag: '@smoke'}, async ({
   expect(documentTypeData.isElement).toBeTruthy();
 });
 
-// TODO: Unskip. Currently The cleanup is not updated upon save
-test.skip('can disable history cleanup for a document type', async ({umbracoApi, umbracoUi}) => {
+test('can disable history cleanup for a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -72,9 +71,8 @@ test.skip('can disable history cleanup for a document type', async ({umbracoApi,
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   // Is needed
-  await umbracoUi.waitForTimeout(200);
   await umbracoUi.documentType.clickDocumentTypeSettingsTab();
-  await umbracoUi.documentType.clickAutoCleanupButton();
+  await umbracoUi.documentType.clickPreventCleanupButton();
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert

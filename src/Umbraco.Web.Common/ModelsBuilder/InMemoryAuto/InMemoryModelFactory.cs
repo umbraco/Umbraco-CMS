@@ -5,11 +5,15 @@ using System.Runtime.Loader;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -17,6 +21,7 @@ using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 using Umbraco.Extensions;
 using File = System.IO.File;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
 {
@@ -31,7 +36,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         private readonly ILogger<InMemoryModelFactory> _logger;
         private readonly FileSystemWatcher? _watcher;
         private readonly Lazy<UmbracoServices> _umbracoServices; // TODO: this is because of circular refs :(
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IHostEnvironment _hostEnvironment;
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly ModelsGenerationError _errors;
         private readonly IPublishedValueFallback _publishedValueFallback;
@@ -48,6 +53,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         private ModelsBuilderSettings _config;
         private bool _disposedValue;
 
+        [Obsolete("Use a not obsoleted constructor instead. Scheduled for removal in v16")]
         public InMemoryModelFactory(
             Lazy<UmbracoServices> umbracoServices,
             IProfilingLogger profilingLogger,
@@ -63,12 +69,62 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             _profilingLogger = profilingLogger;
             _logger = logger;
             _config = config.CurrentValue;
-            _hostingEnvironment = hostingEnvironment;
+            _hostEnvironment = StaticServiceProvider.Instance.GetRequiredService<IHostEnvironment>();
             _hostingLifetime = hostingLifetime;
             _publishedValueFallback = publishedValueFallback;
             _loadContextManager = loadContextManager;
             _runtimeCompilationCacheBuster = runtimeCompilationCacheBuster;
-            _errors = new ModelsGenerationError(config, _hostingEnvironment);
+            _errors = new ModelsGenerationError(config, _hostEnvironment);
+            _ver = 1; // zero is for when we had no version
+            _skipver = -1; // nothing to skip
+
+            if (!hostingEnvironment.IsHosted)
+            {
+                return;
+            }
+
+            config.OnChange(x => _config = x);
+            _pureLiveDirectory = new Lazy<string>(PureLiveDirectoryAbsolute);
+
+            if (!Directory.Exists(_pureLiveDirectory.Value))
+            {
+                Directory.CreateDirectory(_pureLiveDirectory.Value);
+            }
+
+            // BEWARE! if the watcher is not properly released then for some reason the
+            // BuildManager will start confusing types - using a 'registered object' here
+            // though we should probably plug into Umbraco's MainDom - which is internal
+            _hostingLifetime.RegisterObject(this);
+            _watcher = new FileSystemWatcher(_pureLiveDirectory.Value);
+            _watcher.Changed += WatcherOnChanged;
+            _watcher.EnableRaisingEvents = true;
+
+            // get it here, this need to be fast
+            _debugLevel = _config.DebugLevel;
+        }
+
+        public InMemoryModelFactory(
+            Lazy<UmbracoServices> umbracoServices,
+            IProfilingLogger profilingLogger,
+            ILogger<InMemoryModelFactory> logger,
+            IOptionsMonitor<ModelsBuilderSettings> config,
+            IHostingEnvironment hostingEnvironment,
+            IHostEnvironment hostEnvironment,
+            IApplicationShutdownRegistry hostingLifetime,
+            IPublishedValueFallback publishedValueFallback,
+            InMemoryAssemblyLoadContextManager loadContextManager,
+            RuntimeCompilationCacheBuster runtimeCompilationCacheBuster)
+        {
+            _umbracoServices = umbracoServices;
+            _profilingLogger = profilingLogger;
+            _logger = logger;
+            _config = config.CurrentValue;
+            _hostEnvironment = hostEnvironment;
+            _hostingLifetime = hostingLifetime;
+            _publishedValueFallback = publishedValueFallback;
+            _loadContextManager = loadContextManager;
+            _runtimeCompilationCacheBuster = runtimeCompilationCacheBuster;
+            _errors = new ModelsGenerationError(config, _hostEnvironment);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
 
@@ -106,7 +162,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         public Assembly? CurrentModelsAssembly { get; private set; }
 
         /// <inheritdoc />
-        public object SyncRoot { get; } = new object();
+        public object SyncRoot { get; } = new();
 
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
@@ -359,7 +415,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             }
         }
 
-        public string PureLiveDirectoryAbsolute() => _hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.TempData + "/InMemoryAuto");
+        public string PureLiveDirectoryAbsolute() => _hostEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.TempData + "/InMemoryAuto");
 
         // This is NOT thread safe but it is only called from within a lock
         private Assembly ReloadAssembly(string pathToAssembly)

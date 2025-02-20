@@ -36,7 +36,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         sql.SelectCount();
         sql
             .From<NodeDto>();
-        sql.WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes );
+        sql.WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
 
         foreach (Tuple<string, object[]> queryClause in query.GetWhereClauses())
         {
@@ -83,7 +83,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             }
         }, objectTypes);
 
-        ordering = ordering ?? Ordering.ByDefault();
+        ordering ??= Ordering.ByDefault();
 
         var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
         sql = translator.Translate();
@@ -252,7 +252,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         var isMedia = objectType == Constants.ObjectTypes.Media;
         var isMember = objectType == Constants.ObjectTypes.Member;
 
-        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, null, new[] {objectType});
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, null, new[] { objectType });
 
         var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
         sql = translator.Translate();
@@ -316,7 +316,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
     public bool Exists(IEnumerable<Guid> keys)
     {
-        var distictKeys = keys.Distinct();
+        IEnumerable<Guid> distictKeys = keys.Distinct();
         Sql<ISqlContext> sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => distictKeys.Contains(x.UniqueId));
         return Database.ExecuteScalar<int>(sql) == distictKeys.Count();
     }
@@ -349,7 +349,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     }
 
     private DocumentEntitySlim BuildVariants(DocumentEntitySlim entity)
-        => BuildVariants(new[] {entity}).First();
+        => BuildVariants(new[] { entity }).First();
 
     private IEnumerable<DocumentEntitySlim> BuildVariants(IEnumerable<DocumentEntitySlim> entities)
     {
@@ -359,7 +359,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         {
             if (e.Variations.VariesByCulture())
             {
-                (v ?? (v = new List<DocumentEntitySlim>())).Add(e);
+                (v ??= new List<DocumentEntitySlim>()).Add(e);
             }
         }
 
@@ -369,8 +369,10 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         }
 
         // fetch all variant info dtos
-        IEnumerable<VariantInfoDto> dtos = Database.FetchByGroups<VariantInfoDto, int>(v.Select(x => x.Id),
-            Constants.Sql.MaxParameterCount, GetVariantInfos);
+        IEnumerable<VariantInfoDto> dtos = Database.FetchByGroups<VariantInfoDto, int>(
+            v.Select(x => x.Id),
+            Constants.Sql.MaxParameterCount,
+            GetVariantInfos);
 
         // group by node id (each group contains all languages)
         var xdtos = dtos.GroupBy(x => x.NodeId).ToDictionary(x => x.Key, x => x);
@@ -396,10 +398,16 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         Sql()
             .Select<NodeDto>(x => x.NodeId)
             .AndSelect<LanguageDto>(x => x.IsoCode)
-            .AndSelect<DocumentDto>("doc", x => Alias(x.Published, "DocumentPublished"),
+            .AndSelect<DocumentDto>(
+                "doc",
+                x => Alias(
+                    x.Published,
+                    "DocumentPublished"),
                 x => Alias(x.Edited, "DocumentEdited"))
-            .AndSelect<DocumentCultureVariationDto>("dcv",
-                x => Alias(x.Available, "CultureAvailable"), x => Alias(x.Published, "CulturePublished"),
+            .AndSelect<DocumentCultureVariationDto>(
+                "dcv",
+                x => Alias(x.Available, "CultureAvailable"),
+                x => Alias(x.Published, "CulturePublished"),
                 x => Alias(x.Edited, "CultureEdited"),
                 x => Alias(x.Name, "Name"))
 
@@ -440,7 +448,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType,
         Action<Sql<ISqlContext>>? filter)
     {
-        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] {objectType});
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] { objectType });
         return AddGroupBy(isContent, isMedia, isMember, sql, true);
     }
 

@@ -26,7 +26,7 @@ internal sealed class DataTypeConfigurationCache : IDataTypeConfigurationCache
         var cacheKey = GetCacheKey(key);
         if (_memoryCache.TryGetValue(cacheKey, out T? configuration) is false)
         {
-            IDataType? dataType = _dataTypeService.GetDataType(key);
+            IDataType? dataType = _dataTypeService.GetAsync(key).GetAwaiter().GetResult();
             configuration = dataType?.ConfigurationAs<T>();
 
             // Only cache if data type was found (but still cache null configurations)

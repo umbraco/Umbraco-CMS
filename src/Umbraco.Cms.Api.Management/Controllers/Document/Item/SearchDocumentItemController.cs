@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,16 +22,26 @@ public class SearchDocumentItemController : DocumentItemControllerBase
         _documentPresentationFactory = documentPresentationFactory;
     }
 
+    [NonAction]
+    [Obsolete("Scheduled to be removed in v16, use the non obsoleted method instead")]
+    public Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
+        => SearchFromParent(cancellationToken, query, skip, take);
+
+    [NonAction]
+    [Obsolete("Scheduled to be removed in v16, use the non obsoleted method instead")]
+    public async Task<IActionResult> SearchFromParent(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, Guid? parentId = null)
+        => await SearchFromParentWithAllowedTypes(cancellationToken, query, skip, take, parentId);
+
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
+    public Task<IActionResult> SearchFromParentWithAllowedTypes(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, Guid? parentId = null, [FromQuery]IEnumerable<Guid>? allowedDocumentTypes = null)
     {
-        PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Document, query, skip, take);
+        PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Document, query, parentId, allowedDocumentTypes, skip, take);
         var result = new PagedModel<DocumentItemResponseModel>
         {
             Items = searchResult.Items.OfType<IDocumentEntitySlim>().Select(_documentPresentationFactory.CreateItemResponseModel),
-            Total = searchResult.Total
+            Total = searchResult.Total,
         };
 
         return Task.FromResult<IActionResult>(Ok(result));

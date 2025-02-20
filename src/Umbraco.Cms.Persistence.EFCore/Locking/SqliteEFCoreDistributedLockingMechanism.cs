@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.Locking;
 
-internal class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingMechanism
+internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingMechanism
     where T : DbContext
 {
     private readonly ILogger<SqliteEFCoreDistributedLockingMechanism<T>> _logger;
@@ -163,7 +163,10 @@ internal class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingM
             });
         }
 
-        private static bool IsBusyOrLocked(SqliteException ex)
-            => ex.SqliteErrorCode is raw.SQLITE_BUSY or raw.SQLITE_LOCKED or raw.SQLITE_LOCKED_SHAREDCACHE;
+        private static bool IsBusyOrLocked(SqliteException ex) =>
+            ex.SqliteErrorCode
+                is raw.SQLITE_BUSY
+                or raw.SQLITE_LOCKED
+                or raw.SQLITE_LOCKED_SHAREDCACHE;
     }
 }

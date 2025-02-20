@@ -8967,6 +8967,66 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document/{id}/published": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentByIdPublished",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PublishedDocumentResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/document/{id}/referenced-by": {
       "get": {
         "tags": [
@@ -9279,6 +9339,149 @@
                 "oneOf": [
                   {
                     "$ref": "#/components/schemas/UpdateDocumentRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true,
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1.1/document/{id}/validate": {
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PutUmbracoManagementApiV1.1DocumentByIdValidate1.1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ValidateUpdateDocumentRequestModel"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ValidateUpdateDocumentRequestModel"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ValidateUpdateDocumentRequestModel"
                   }
                 ]
               }
@@ -9874,6 +10077,25 @@
               "type": "integer",
               "format": "int32",
               "default": 100
+            }
+          },
+          {
+            "name": "parentId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "allowedDocumentTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
             }
           }
         ],
@@ -15545,6 +15767,25 @@
               "format": "int32",
               "default": 100
             }
+          },
+          {
+            "name": "parentId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "allowedMediaTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
           }
         ],
         "responses": {
@@ -19419,6 +19660,17 @@
               "format": "int32",
               "default": 100
             }
+          },
+          {
+            "name": "allowedMemberTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
           }
         ],
         "responses": {
@@ -22668,8 +22920,8 @@
         ],
         "operationId": "PostPublishedCacheCollect",
         "responses": {
-          "200": {
-            "description": "OK",
+          "501": {
+            "description": "Not Implemented",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -22687,6 +22939,7 @@
             "description": "The resource is protected and requires an authentication token"
           }
         },
+        "deprecated": true,
         "security": [
           {
             "Backoffice User": [ ]
@@ -22767,20 +23020,14 @@
         ],
         "operationId": "GetPublishedCacheStatus",
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+          "501": {
+            "description": "Not Implemented"
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
           }
         },
+        "deprecated": true,
         "security": [
           {
             "Backoffice User": [ ]
@@ -25062,16 +25309,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
           }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
+        }
       }
     },
     "/umbraco/management/api/v1/server/information": {
@@ -25167,6 +25406,41 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/server/upgrade-check": {
+      "get": {
+        "tags": [
+          "Server"
+        ],
+        "operationId": "GetServerUpgradeCheck",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UpgradeCheckResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -30570,6 +30844,258 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/user/{id}/client-credentials": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "PostUserByIdClientCredentials",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateUserClientCredentialsRequestModel"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateUserClientCredentialsRequestModel"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateUserClientCredentialsRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetUserByIdClientCredentials",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/user/{id}/client-credentials/{clientId}": {
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "DeleteUserByIdClientCredentialsByClientId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "clientId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/user/{id}/reset-password": {
       "post": {
         "tags": [
@@ -32855,6 +33381,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -33056,6 +33585,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -33314,6 +33846,67 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/webhook/{id}/logs": {
+      "get": {
+        "tags": [
+          "Webhook"
+        ],
+        "operationId": "GetWebhookByIdLogs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedWebhookLogResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/webhook/events": {
       "get": {
         "tags": [
@@ -33349,6 +33942,61 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/PagedWebhookEventModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/webhook/logs": {
+      "get": {
+        "tags": [
+          "Webhook"
+        ],
+        "operationId": "GetWebhookLogs",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedWebhookLogResponseModel"
                     }
                   ]
                 }
@@ -35107,6 +35755,22 @@
         },
         "additionalProperties": false
       },
+      "CreateUserClientCredentialsRequestModel": {
+        "required": [
+          "clientId",
+          "clientSecret"
+        ],
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string"
+          },
+          "clientSecret": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateUserDataRequestModel": {
         "required": [
           "group",
@@ -35225,6 +35889,7 @@
       "CreateUserRequestModel": {
         "required": [
           "email",
+          "kind",
           "name",
           "userGroupIds",
           "userName"
@@ -35255,6 +35920,9 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
+          },
+          "kind": {
+            "$ref": "#/components/schemas/UserKindModel"
           }
         },
         "additionalProperties": false
@@ -35271,6 +35939,14 @@
         "properties": {
           "enabled": {
             "type": "boolean"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           },
           "url": {
             "minLength": 1,
@@ -35341,6 +36017,8 @@
       },
       "CurrenUserConfigurationResponseModel": {
         "required": [
+          "allowChangePassword",
+          "allowTwoFactor",
           "keepUserLoggedIn",
           "passwordConfiguration",
           "usernameIsEmail"
@@ -35360,6 +36038,12 @@
                 "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
               }
             ]
+          },
+          "allowChangePassword": {
+            "type": "boolean"
+          },
+          "allowTwoFactor": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -35382,14 +36066,11 @@
           "mediaStartNodeIds",
           "name",
           "permissions",
+          "userGroupIds",
           "userName"
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "email": {
             "type": "string"
           },
@@ -35398,6 +36079,21 @@
           },
           "name": {
             "type": "string"
+          },
+          "userGroupIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
           },
           "languageIsoCode": {
             "type": "string",
@@ -35521,6 +36217,7 @@
       },
       "DataTypeItemResponseModel": {
         "required": [
+          "editorAlias",
           "id",
           "isDeletable",
           "name"
@@ -35537,6 +36234,9 @@
           "editorUiAlias": {
             "type": "string",
             "nullable": true
+          },
+          "editorAlias": {
+            "type": "string"
           },
           "isDeletable": {
             "type": "boolean"
@@ -35817,10 +36517,14 @@
       },
       "DefaultReferenceResponseModel": {
         "required": [
+          "$type",
           "id"
         ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -35838,7 +36542,13 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DefaultReferenceResponseModel": "#/components/schemas/DefaultReferenceResponseModel"
+          }
+        }
       },
       "DeleteUserGroupsRequestModel": {
         "required": [
@@ -36042,7 +36752,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentValueModel"
+                  "$ref": "#/components/schemas/DocumentValueResponseModel"
                 }
               ]
             }
@@ -36127,7 +36837,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentValueModel"
+                  "$ref": "#/components/schemas/DocumentValueResponseModel"
                 }
               ]
             }
@@ -36204,6 +36914,7 @@
       "DocumentItemResponseModel": {
         "required": [
           "documentType",
+          "hasChildren",
           "id",
           "isProtected",
           "isTrashed",
@@ -36219,6 +36930,17 @@
             "type": "boolean"
           },
           "isProtected": {
+            "type": "boolean"
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
+          "hasChildren": {
             "type": "boolean"
           },
           "documentType": {
@@ -36244,11 +36966,15 @@
       "DocumentNotificationResponseModel": {
         "required": [
           "actionId",
+          "alias",
           "subscribed"
         ],
         "type": "object",
         "properties": {
           "actionId": {
+            "type": "string"
+          },
+          "alias": {
             "type": "string"
           },
           "subscribed": {
@@ -36293,6 +37019,7 @@
       },
       "DocumentRecycleBinItemResponseModel": {
         "required": [
+          "createDate",
           "documentType",
           "hasChildren",
           "id",
@@ -36303,6 +37030,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
           },
           "hasChildren": {
             "type": "boolean"
@@ -36337,11 +37068,15 @@
       },
       "DocumentReferenceResponseModel": {
         "required": [
+          "$type",
           "documentType",
           "id"
         ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -36362,7 +37097,13 @@
             ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentReferenceResponseModel": "#/components/schemas/DocumentReferenceResponseModel"
+          }
+        }
       },
       "DocumentResponseModel": {
         "required": [
@@ -36380,7 +37121,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentValueModel"
+                  "$ref": "#/components/schemas/DocumentValueResponseModel"
                 }
               ]
             }
@@ -36432,6 +37173,7 @@
       },
       "DocumentTreeItemResponseModel": {
         "required": [
+          "createDate",
           "documentType",
           "hasChildren",
           "id",
@@ -36462,6 +37204,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
           },
           "isProtected": {
             "type": "boolean"
@@ -37062,6 +37808,35 @@
         },
         "additionalProperties": false
       },
+      "DocumentValueResponseModel": {
+        "required": [
+          "alias",
+          "editorAlias"
+        ],
+        "type": "object",
+        "properties": {
+          "culture": {
+            "type": "string",
+            "nullable": true
+          },
+          "segment": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "value": {
+            "nullable": true
+          },
+          "editorAlias": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "DocumentVariantItemResponseModel": {
         "required": [
           "name",
@@ -37136,6 +37911,16 @@
             "$ref": "#/components/schemas/DocumentVariantStateModel"
           },
           "publishDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "scheduledPublishDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "scheduledUnpublishDate": {
             "type": "string",
             "format": "date-time",
             "nullable": true
@@ -37220,7 +38005,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentValueModel"
+                  "$ref": "#/components/schemas/DocumentValueResponseModel"
                 }
               ]
             }
@@ -37760,7 +38545,8 @@
         "enum": [
           "Healthy",
           "Unhealthy",
-          "Rebuilding"
+          "Rebuilding",
+          "Corrupt"
         ],
         "type": "string"
       },
@@ -37907,7 +38693,9 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": { },
+            "additionalProperties": {
+              "nullable": true
+            },
             "nullable": true
           }
         },
@@ -38262,7 +39050,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/MediaValueModel"
+                  "$ref": "#/components/schemas/MediaValueResponseModel"
                 }
               ]
             }
@@ -38326,6 +39114,7 @@
       },
       "MediaItemResponseModel": {
         "required": [
+          "hasChildren",
           "id",
           "isTrashed",
           "mediaType",
@@ -38338,6 +39127,17 @@
             "format": "uuid"
           },
           "isTrashed": {
+            "type": "boolean"
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
+          "hasChildren": {
             "type": "boolean"
           },
           "mediaType": {
@@ -38362,6 +39162,7 @@
       },
       "MediaRecycleBinItemResponseModel": {
         "required": [
+          "createDate",
           "hasChildren",
           "id",
           "mediaType",
@@ -38372,6 +39173,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
           },
           "hasChildren": {
             "type": "boolean"
@@ -38406,11 +39211,15 @@
       },
       "MediaReferenceResponseModel": {
         "required": [
+          "$type",
           "id",
           "mediaType"
         ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -38427,7 +39236,13 @@
             ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "MediaReferenceResponseModel": "#/components/schemas/MediaReferenceResponseModel"
+          }
+        }
       },
       "MediaResponseModel": {
         "required": [
@@ -38445,7 +39260,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/MediaValueModel"
+                  "$ref": "#/components/schemas/MediaValueResponseModel"
                 }
               ]
             }
@@ -38489,6 +39304,7 @@
       },
       "MediaTreeItemResponseModel": {
         "required": [
+          "createDate",
           "hasChildren",
           "id",
           "isTrashed",
@@ -38518,6 +39334,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
           },
           "mediaType": {
             "oneOf": [
@@ -39033,6 +39853,35 @@
         },
         "additionalProperties": false
       },
+      "MediaValueResponseModel": {
+        "required": [
+          "alias",
+          "editorAlias"
+        ],
+        "type": "object",
+        "properties": {
+          "culture": {
+            "type": "string",
+            "nullable": true
+          },
+          "segment": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "value": {
+            "nullable": true
+          },
+          "editorAlias": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "MediaVariantRequestModel": {
         "required": [
           "name"
@@ -39139,6 +39988,7 @@
       "MemberItemResponseModel": {
         "required": [
           "id",
+          "kind",
           "memberType",
           "variants"
         ],
@@ -39164,9 +40014,19 @@
                 }
               ]
             }
+          },
+          "kind": {
+            "$ref": "#/components/schemas/MemberKindModel"
           }
         },
         "additionalProperties": false
+      },
+      "MemberKindModel": {
+        "enum": [
+          "Default",
+          "Api"
+        ],
+        "type": "string"
       },
       "MemberResponseModel": {
         "required": [
@@ -39177,6 +40037,7 @@
           "isApproved",
           "isLockedOut",
           "isTwoFactorEnabled",
+          "kind",
           "memberType",
           "username",
           "values",
@@ -39189,7 +40050,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/MemberValueModel"
+                  "$ref": "#/components/schemas/MemberValueResponseModel"
                 }
               ]
             }
@@ -39255,6 +40116,9 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          "kind": {
+            "$ref": "#/components/schemas/MemberKindModel"
           }
         },
         "additionalProperties": false
@@ -39667,6 +40531,35 @@
           },
           "value": {
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MemberValueResponseModel": {
+        "required": [
+          "alias",
+          "editorAlias"
+        ],
+        "type": "object",
+        "properties": {
+          "culture": {
+            "type": "string",
+            "nullable": true
+          },
+          "segment": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "value": {
+            "nullable": true
+          },
+          "editorAlias": {
+            "minLength": 1,
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -40092,7 +40985,8 @@
             "format": "uuid"
           },
           "packagePath": {
-            "type": "string"
+            "type": "string",
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -41511,6 +42405,30 @@
         },
         "additionalProperties": false
       },
+      "PagedWebhookLogResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/WebhookLogResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedWebhookResponseModel": {
         "required": [
           "items",
@@ -41877,6 +42795,7 @@
       "PublishDocumentWithDescendantsRequestModel": {
         "required": [
           "cultures",
+          "forceRepublish",
           "includeUnpublishedDescendants"
         ],
         "type": "object",
@@ -41884,11 +42803,80 @@
           "includeUnpublishedDescendants": {
             "type": "boolean"
           },
+          "forceRepublish": {
+            "type": "boolean"
+          },
           "cultures": {
             "type": "array",
             "items": {
               "type": "string"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PublishedDocumentResponseModel": {
+        "required": [
+          "documentType",
+          "id",
+          "isTrashed",
+          "urls",
+          "values",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentValueResponseModel"
+                }
+              ]
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantResponseModel"
+                }
+              ]
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
+              }
+            ]
+          },
+          "urls": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentUrlInfoModel"
+                }
+              ]
+            }
+          },
+          "template": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
+          "isTrashed": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -42010,22 +42998,26 @@
               {
                 "$ref": "#/components/schemas/RelationReferenceModel"
               }
-            ]
+            ],
+            "readOnly": true
           },
           "child": {
             "oneOf": [
               {
                 "$ref": "#/components/schemas/RelationReferenceModel"
               }
-            ]
+            ],
+            "readOnly": true
           },
           "createDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "readOnly": true
           },
           "comment": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -42446,11 +43438,20 @@
       },
       "ServerConfigurationResponseModel": {
         "required": [
-          "allowPasswordReset"
+          "allowLocalLogin",
+          "allowPasswordReset",
+          "versionCheckPeriod"
         ],
         "type": "object",
         "properties": {
           "allowPasswordReset": {
+            "type": "boolean"
+          },
+          "versionCheckPeriod": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "allowLocalLogin": {
             "type": "boolean"
           }
         },
@@ -44202,7 +45203,8 @@
             }
           },
           "packagePath": {
-            "type": "string"
+            "type": "string",
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -44488,6 +45490,14 @@
           "enabled": {
             "type": "boolean"
           },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
           "url": {
             "minLength": 1,
             "type": "string"
@@ -44510,6 +45520,26 @@
             "items": {
               "type": "string"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpgradeCheckResponseModel": {
+        "required": [
+          "comment",
+          "type",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -44549,6 +45579,8 @@
       },
       "UserConfigurationResponseModel": {
         "required": [
+          "allowChangePassword",
+          "allowTwoFactor",
           "canInviteUsers",
           "passwordConfiguration",
           "usernameIsEmail"
@@ -44567,6 +45599,12 @@
                 "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
               }
             ]
+          },
+          "allowChangePassword": {
+            "type": "boolean"
+          },
+          "allowTwoFactor": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -44806,6 +45844,7 @@
         "required": [
           "avatarUrls",
           "id",
+          "kind",
           "name"
         ],
         "type": "object",
@@ -44822,9 +45861,19 @@
             "items": {
               "type": "string"
             }
+          },
+          "kind": {
+            "$ref": "#/components/schemas/UserKindModel"
           }
         },
         "additionalProperties": false
+      },
+      "UserKindModel": {
+        "enum": [
+          "Default",
+          "Api"
+        ],
+        "type": "string"
       },
       "UserOrderModel": {
         "enum": [
@@ -44892,6 +45941,7 @@
           "hasMediaRootAccess",
           "id",
           "isAdmin",
+          "kind",
           "mediaStartNodeIds",
           "name",
           "state",
@@ -44995,6 +46045,9 @@
           },
           "isAdmin": {
             "type": "boolean"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/UserKindModel"
           }
         },
         "additionalProperties": false
@@ -45051,6 +46104,52 @@
           },
           "isEnabledOnUser": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ValidateUpdateDocumentRequestModel": {
+        "required": [
+          "values",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentValueModel"
+                }
+              ]
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantRequestModel"
+                }
+              ]
+            }
+          },
+          "template": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
+          "cultures": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -45212,6 +46311,70 @@
         },
         "additionalProperties": false
       },
+      "WebhookLogResponseModel": {
+        "required": [
+          "date",
+          "eventAlias",
+          "exceptionOccured",
+          "isSuccessStatusCode",
+          "key",
+          "requestBody",
+          "requestHeaders",
+          "responseBody",
+          "responseHeaders",
+          "retryCount",
+          "statusCode",
+          "url",
+          "webhookKey"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "webhookKey": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "statusCode": {
+            "type": "string"
+          },
+          "isSuccessStatusCode": {
+            "type": "boolean"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "eventAlias": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "retryCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "requestHeaders": {
+            "type": "string"
+          },
+          "requestBody": {
+            "type": "string"
+          },
+          "responseHeaders": {
+            "type": "string"
+          },
+          "responseBody": {
+            "type": "string"
+          },
+          "exceptionOccured": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "WebhookResponseModel": {
         "required": [
           "contentTypeKeys",
@@ -45225,6 +46388,14 @@
         "properties": {
           "enabled": {
             "type": "boolean"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           },
           "url": {
             "minLength": 1,

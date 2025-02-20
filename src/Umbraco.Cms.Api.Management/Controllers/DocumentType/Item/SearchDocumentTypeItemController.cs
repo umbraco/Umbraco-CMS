@@ -35,7 +35,7 @@ public class SearchDocumentTypeItemController : DocumentTypeItemControllerBase
             return Task.FromResult<IActionResult>(Ok(new PagedModel<DocumentTypeItemResponseModel> { Total = searchResult.Total }));
         }
 
-        IEnumerable<IContentType> contentTypes = _contentTypeService.GetAll(searchResult.Items.Select(item => item.Key).ToArray().EmptyNull());
+        IEnumerable<IContentType> contentTypes = _contentTypeService.GetMany(searchResult.Items.Select(item => item.Key).ToArray().EmptyNull());
         var result = new PagedModel<DocumentTypeItemResponseModel>
         {
             Items = _mapper.MapEnumerable<IContentType, DocumentTypeItemResponseModel>(contentTypes),

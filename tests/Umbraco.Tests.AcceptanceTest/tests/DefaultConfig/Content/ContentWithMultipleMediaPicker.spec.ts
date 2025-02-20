@@ -1,12 +1,12 @@
-﻿import { ConstantHelper, test, AliasHelper } from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test, AliasHelper} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Multiple Media Picker';
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const firstMediaFileName = 'TestFirstMedia';
-const firstMediaTypeName = 'File';
 const secondMediaFileName = 'TestSecondMedia';
+const firstMediaTypeName = 'File';
 const secondMediaTypeName = 'Image';
 let firstMediaFileId = '';
 let secondMediaFileId = '';
@@ -30,6 +30,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can create content with multiple media picker data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -39,43 +40,53 @@ test('can create content with multiple media picker data type', async ({umbracoA
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.selectMediaByName(firstMediaFileName);
-  await umbracoUi.content.clickSubmitButton();
-  await umbracoUi.content.selectMediaByName(secondMediaFileName);
-  await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(1);
+  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value.length).toBe(2);
-  expect(contentData.values[0].value[0].mediaKey).toEqual(firstMediaFileId);
-  expect(contentData.values[0].value[0].mediaTypeAlias).toEqual(firstMediaTypeName);
-  expect(contentData.values[0].value[1].mediaKey).toEqual(secondMediaFileId);
-  expect(contentData.values[0].value[1].mediaTypeAlias).toEqual(secondMediaTypeName);
+  expect(contentData.variants[0].state).toBe(expectedState);
+  expect(contentData.values).toEqual([]);
 });
 
 test('can publish content with multiple media picker data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const expectedState = 'Published';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
-  await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.selectMediaByName(firstMediaFileName);
-  await umbracoUi.content.clickSubmitButton();
-  await umbracoUi.content.selectMediaByName(secondMediaFileName);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe(expectedState);
+  expect(contentData.values).toEqual([]);
+});
+
+test('can add multiple media files to the multiple media picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseMediaPickerButton();
+  await umbracoUi.content.selectMediaWithName(firstMediaFileName);
+  await umbracoUi.content.selectMediaWithName(secondMediaFileName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -90,7 +101,7 @@ test('can remove a media picker in the content', async ({umbracoApi, umbracoUi})
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoApi.document.createDocumentWithTwoMediaPicker(contentName, documentTypeId, firstMediaFileId, secondMediaFileId);
+  await umbracoApi.document.createDocumentWithTwoMediaPicker(contentName, documentTypeId, firstMediaFileId, secondMediaFileId, AliasHelper.toAlias(dataTypeName));
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -99,7 +110,7 @@ test('can remove a media picker in the content', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(1);
+  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -107,4 +118,5 @@ test('can remove a media picker in the content', async ({umbracoApi, umbracoUi})
   expect(contentData.values[0].value[0].mediaKey).toEqual(secondMediaFileId);
   expect(contentData.values[0].value[0].mediaTypeAlias).toEqual(secondMediaTypeName);
 });
+
 

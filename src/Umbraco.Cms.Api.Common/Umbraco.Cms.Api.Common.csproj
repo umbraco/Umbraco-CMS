@@ -3,6 +3,7 @@
     <Title>Umbraco CMS - API Common</Title>
     <Description>Contains the bits and pieces that are shared between the Umbraco CMS APIs.</Description>
   </PropertyGroup>
+
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
@@ -16,8 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Take top-level depedendency on OpenIddict.AspNetCore depends on a vulnerable version -->
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
-
   </ItemGroup>
 </Project>

@@ -232,7 +232,7 @@ public abstract class Item : IEntity, ICanBeDirty
             return true;
         }
 
-        if (ReferenceEquals(obj, null))
+        if (obj is null)
         {
             return false;
         }

@@ -7,12 +7,26 @@
     <RootNamespace>Umbraco.Cms.Tests.Integration</RootNamespace>
     <IsPackable>true</IsPackable>
     <EnablePackageValidation>$(BaseEnablePackageValidation)</EnablePackageValidation>
-    <NoWarn>NU5100</NoWarn>
+    <NoWarn>$(NoWarn),NU5100</NoWarn>
   </PropertyGroup>
+  
   <PropertyGroup>
-    <!-- TODO: Fix all warnings and remove this override -->
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!--
+      TODO: Fix and remove overrides:
+      [CS0108] hidden inherited members
+      [SYSLIB0012] and [CS0618] obsolete references
+      [SA1116] and [SA1117] parameter formatting
+      [CS0162] unreachable code
+      [CS0169] unused fields
+      [SA1134] attribute on each line of code
+      [SA1405] Debug.Assert provide message text
+      [CS4014]/[CS1998] await call
+      [CS0649] field not assigned to
+      [CS0168] unused variable
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0108,SYSLIB0012,CS0618,SA1116,SA1117,CS0162,CS0169,SA1134,SA1405,CS4014,CS1998,CS0649,CS0168</WarningsNotAsErrors>
   </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="Bogus" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
@@ -28,6 +42,7 @@
     <ProjectReference Include="..\..\src\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms\Umbraco.Cms.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
   </ItemGroup>
 
@@ -157,9 +172,86 @@
     <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.GetFolderMediaTypes.cs">
       <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
+    <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Indexing.cs">
+      <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Editing.cs">
+      <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Parsing.cs">
+      <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Publishing.cs">
+      <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Validation.cs">
+      <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Copy.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Create.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Delete.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.DeleteFromRecycleBin.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Move.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.MoveToRecycleBin.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Rebuild.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Restore.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Sort.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Update.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Create.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Delete.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.DeleteFromRecycleBin.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Move.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.MoveToRecycleBin.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Rebuild.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Sort.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Restore.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Sort.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Update.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\PublishedUrlInfoProvider_hidetoplevel_false.cs">
+      <DependentUpon>PublishedUrlInfoProviderTestsBase.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\PublishedUrlInfoProviderTests.cs">
+      <DependentUpon>PublishedUrlInfoProviderTestsBase.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

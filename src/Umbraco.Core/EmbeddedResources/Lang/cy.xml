@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="cy_gb" intName="Welsh (UK)" localName="Cymraeg (UK)" lcid="1106" culture="cy-GB">
   <creator>
     <name>Method4 Ltd</name>
@@ -82,7 +82,8 @@
   <area alias="login">
     <key alias="resetCodeExpired">Mae'r ddolen rydych wedi clicio arno naill ai yn annilys neu wedi dod i ben</key>
     <key alias="resetPasswordEmailCopySubject">Umbraco: Ailosod Cyfrinair</key>
-    <key alias="resetPasswordEmailCopyFormat"><![CDATA[
+    <key alias="resetPasswordEmailCopyFormat">
+      <![CDATA[
         <html>
 			<head>
 				<meta name='viewport' content='width=device-width'>
@@ -162,10 +163,12 @@
 				</table>
 			</body>
 		</html>
-	]]></key>
+	]]>
+    </key>
   </area>
   <area alias="notifications">
-    <key alias="mailBody"><![CDATA[
+    <key alias="mailBody">
+      <![CDATA[
         Helo %0%
 
         Mae hyn yn ebost awtomatig i'ch hysbysu fod y dasg '%1%'
@@ -177,9 +180,11 @@
         Mwynhewch eich diwrnod!
 
         Hwyl fawr oddi wrth y robot Umbraco
-        ]]></key>
+        ]]>
+    </key>
     <key alias="mailBodyVariantSummary">Mae'r ieithoedd canlynol wedi'u haddasu %0%</key>
-    <key alias="mailBodyHtml"><![CDATA[
+    <key alias="mailBodyHtml">
+      <![CDATA[
         <html>
 			<head>
 				<meta name='viewport' content='width=device-width'>
@@ -256,16 +261,20 @@
 				</table>
 			</body>
 		</html>
-	]]></key>
-    <key alias="mailBodyVariantHtmlSummary"><![CDATA[<p>Mae'r ieithoedd canlynol wedi'u haddasu:</p>
+	]]>
+    </key>
+    <key alias="mailBodyVariantHtmlSummary">
+      <![CDATA[<p>Mae'r ieithoedd canlynol wedi'u haddasu:</p>
         %0%
-    ]]></key>
+    ]]>
+    </key>
     <key alias="mailSubject">[%0%] Hysbysiad am %1% wedi perfformio am %2%</key>
   </area>
   <area alias="user">
     <key alias="passwordMismatch">Nid yw'r cyfrinair cadarnhau yn cyfateb â'r cyfrinair newydd!</key>
     <key alias="inviteEmailCopySubject">Umbraco: Gwahoddiad</key>
-    <key alias="inviteEmailCopyFormat"><![CDATA[
+    <key alias="inviteEmailCopyFormat">
+      <![CDATA[
         <html>
 			<head>
 				<meta name='viewport' content='width=device-width'>
@@ -355,7 +364,8 @@
 					</tr>
 				</table>
 			</body>
-    </html>]]></key>
+    </html>]]>
+    </key>
     <key alias="duplicateLogin">Mae defnyddiwr gyda'r mewngofnodi hwn eisoes yn bodoli</key>
     <key alias="passwordRequiresDigit">Rhaid bod gan y cyfrinair o leiaf un digid ('0'-'9')</key>
     <key alias="passwordRequiresLower">Rhaid bod gan y cyfrinair o leiaf un llythrennau bach ('a'-'z')</key>
@@ -414,6 +424,8 @@
     <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Modd casgliad dadfygio wedi'i analluogi.</key>
     <key alias="compilationDebugCheckErrorMessage">Modd casgliad dadfygio wedi'i alluogi. Argymhellwyd analluogi'r gosodiad yma cyn mynd yn fyw.</key>
+    <key alias="runtimeModeCheckSuccessMessage">Mae'r modd rhedeg wedi'i osod i gynhyrchu.</key>
+    <key alias="runtimeModeCheckErrorMessage">Nid yw'r modd rhedeg wedi'i osod i Gynhyrchu. Argymhellir gosod y Modd Rhedeg i Gynhyrchu ar gyfer amgylcheddau byw/cynhyrchu.</key>
     <!-- The following keys get these tokens passed in:
   0: Comma delimitted list of failed folder paths
 -->
@@ -426,14 +438,12 @@
     <key alias="noSniffCheckHeaderNotFound"><![CDATA[Nid yw'r peniad neu meta-tag <strong>X-Content-Type-Options</strong> sy'n cael ei ddefnyddio i amddiffyn yn erbyn gwendidau sniffio MIME wedi'i ganfod.]]></key>
     <key alias="hSTSCheckHeaderFound"><![CDATA[Mae'r peniad <strong>Strict-Transport-Security</strong>, hefyd wedi'i adnabod fel HSTS-header, wedi'i ganfod.]]></key>
     <key alias="hSTSCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>Strict-Transport-Security</strong> wedi'i ganfod.]]></key>
-    <key alias="hSTSCheckHeaderFoundOnLocalhost">
-      <![CDATA[Darganfuwyd y pennyn <strong>Strict-Transport-Security</strong>, a elwir hefyd yn HSTS-header. <strong>Ni ddylai'r pennyn hwn fod yn bresennol ar localhost.</strong>]]>
-    </key>
-    <key alias="hSTSCheckHeaderNotFoundOnLocalhost">
-      <![CDATA[Ni ddaethpwyd o hyd i'r pennyn <strong>Strict-Transport-Security</strong>. Ni ddylai'r pennyn hwn fod yn bresennol ar localhost.]]>
-    </key>
+    <key alias="hSTSCheckHeaderFoundOnLocalhost"><![CDATA[Darganfuwyd y pennyn <strong>Strict-Transport-Security</strong>, a elwir hefyd yn HSTS-header. <strong>Ni ddylai'r pennyn hwn fod yn bresennol ar localhost.</strong>]]></key>
+    <key alias="hSTSCheckHeaderNotFoundOnLocalhost"><![CDATA[Ni ddaethpwyd o hyd i'r pennyn <strong>Strict-Transport-Security</strong>. Ni ddylai'r pennyn hwn fod yn bresennol ar localhost.]]></key>
     <key alias="xssProtectionCheckHeaderFound"><![CDATA[Mae'r peniad <strong>X-XSS-Protection</strong> wedi'i ganfod.]]></key>
     <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>X-XSS-Protection</strong> wedi'i ganfod.]]></key>
+    <key alias="contentSecurityPolicyCheckHeaderFound"><![CDATA[Mae'r peniad <strong>Content-Security-Policy (CSP)</strong> wedi'i ganfod.]]></key>
+    <key alias="contentSecurityPolicyCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>Content-Security-Policy (CSP)</strong>, a ddefnyddir i atal ymosodiadau sgriptio traws-safle (XSS) a gwendidau pigiad cod eraill, wedi'i ganfod.]]></key>
     <key alias="excessiveHeadersFound"><![CDATA[Mae'r peniadau canlynol sy'n datgelu gwynodaeth am dechnoleg eich gwefan wedi'u canfod: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Dim peniadau sy'n datgelu gwynodaeth am dechnoleg eich gwefan wedi'u canfod.</key>
     <key alias="smtpMailSettingsConnectionSuccess">Gosodiadau SMTP wedi ffurfweddu'n gywir ac mae'r gwasanaeth yn gweithio fel y disgwylir.</key>
@@ -463,8 +473,17 @@
     <key alias="minimalLevelDescription">Byddwn ond yn anfon ID safle dienw i roi gwybod i ni bod y wefan yn bodoli.</key>
     <key alias="basicLevelDescription">Byddwn yn anfon ID safle dienw, fersiwn Umbraco, a phecynnau wedi'u gosod</key>
     <key alias="detailedLevelDescription">
-          Byddwn yn anfon:
-          <ul><li>ID safle dienw, fersiwn Umbraco, a phecynnau wedi'u gosod.</li><li>Nifer o: Nodau gwraidd, Nodau Cynnwys, Macros, Cyfryngau, Mathau o Ddogfen, Templedi, Ieithoedd, Parthau, Grŵp Defnyddwyr, Defnyddwyr, Aelodau, a Golygyddion Eiddo a ddefnyddir.</li><li>Gwybodaeth system: Webserver, gweinydd OS, fframwaith gweinydd, iaith gweinyddwr OS, a darparwr cronfa ddata.</li><li>Gosodiadau cyfluniad: Modd Modelsbuilder, os oes llwybr Umbraco arferol yn bodoli, amgylchedd ASP, ac os ydych chi yn y modd dadfygio.</li></ul><em>Efallai y byddwn yn newid yr hyn a anfonwn ar y lefel Fanwl yn y dyfodol. Os felly, fe'i rhestrir uchod.
-          <br />Drwy ddewis "Manwl" rydych yn cytuno i wybodaeth ddienw yn awr ac yn y dyfodol gael ei chasglu.</em></key>
+      Byddwn yn anfon:
+      <ul>
+        <li>ID safle dienw, fersiwn Umbraco, a phecynnau wedi'u gosod.</li>
+        <li>Nifer o: Nodau gwraidd, Nodau Cynnwys, Macros, Cyfryngau, Mathau o Ddogfen, Templedi, Ieithoedd, Parthau, Grŵp Defnyddwyr, Defnyddwyr, Aelodau, a Golygyddion Eiddo a ddefnyddir.</li>
+        <li>Gwybodaeth system: Webserver, gweinydd OS, fframwaith gweinydd, iaith gweinyddwr OS, a darparwr cronfa ddata.</li>
+        <li>Gosodiadau cyfluniad: Modd Modelsbuilder, os oes llwybr Umbraco arferol yn bodoli, amgylchedd ASP, ac os ydych chi yn y modd dadfygio.</li>
+      </ul>
+      <em>
+        Efallai y byddwn yn newid yr hyn a anfonwn ar y lefel Fanwl yn y dyfodol. Os felly, fe'i rhestrir uchod.
+        <br />Drwy ddewis "Manwl" rydych yn cytuno i wybodaeth ddienw yn awr ac yn y dyfodol gael ei chasglu.
+      </em>
+    </key>
   </area>
 </language>

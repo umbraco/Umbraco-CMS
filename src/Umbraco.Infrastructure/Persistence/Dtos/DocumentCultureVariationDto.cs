@@ -11,6 +11,9 @@ internal class DocumentCultureVariationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DocumentCultureVariation;
 
+    // Public constants to bind properties between DTOs
+    public const string PublishedColumnName = "published";
+
     [Column("id")]
     [PrimaryKeyColumn]
     public int Id { get; set; }
@@ -40,7 +43,7 @@ internal class DocumentCultureVariationDto
 
     // de-normalized for perfs
     // (means there is a published content version culture variation for the language)
-    [Column("published")]
+    [Column(PublishedColumnName)]
     public bool Published { get; set; }
 
     // de-normalized for perfs

@@ -51,9 +51,10 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     /// </summary>
     bool HasContentNodes(int id);
 
-    IEnumerable<TItem> GetAll(params int[] ids);
+    IEnumerable<TItem> GetAll();
+    IEnumerable<TItem> GetMany(params int[] ids);
 
-    IEnumerable<TItem> GetAll(IEnumerable<Guid>? ids);
+    IEnumerable<TItem> GetMany(IEnumerable<Guid>? ids);
 
     IEnumerable<TItem> GetDescendants(int id, bool andSelf); // parent-child axis
 

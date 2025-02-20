@@ -17,33 +17,16 @@ namespace Umbraco.Cms.Api.Delivery.Configuration;
 /// </remarks>
 public class ConfigureUmbracoMemberAuthenticationDeliveryApiSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
 {
-    private const string AuthSchemeName = "Umbraco Member";
+    private const string AuthSchemeName = "UmbracoMember";
 
     public void Configure(SwaggerGenOptions options)
     {
-        options.AddSecurityDefinition(
-            AuthSchemeName,
-            new OpenApiSecurityScheme
-            {
-                In = ParameterLocation.Header,
-                Name = AuthSchemeName,
-                Type = SecuritySchemeType.OAuth2,
-                Description = "Umbraco Member Authentication",
-                Flows = new OpenApiOAuthFlows
-                {
-                    AuthorizationCode = new OpenApiOAuthFlow
-                    {
-                        AuthorizationUrl = new Uri(Paths.MemberApi.AuthorizationEndpoint, UriKind.Relative),
-                        TokenUrl = new Uri(Paths.MemberApi.TokenEndpoint, UriKind.Relative)
-                    }
-                }
-            });
-
         // add security requirements for content API operations
+        options.DocumentFilter<DeliveryApiSecurityFilter>();
         options.OperationFilter<DeliveryApiSecurityFilter>();
     }
 
-    private class DeliveryApiSecurityFilter : SwaggerFilterBase<ContentApiControllerBase>, IOperationFilter
+    private class DeliveryApiSecurityFilter : SwaggerFilterBase<ContentApiControllerBase>, IOperationFilter, IDocumentFilter
     {
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
@@ -69,6 +52,32 @@ public class ConfigureUmbracoMemberAuthenticationDeliveryApiSwaggerGenOptions : 
                     }
                 }
             };
+        }
+
+        public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
+        {
+            if (context.DocumentName != DeliveryApiConfiguration.ApiName)
+            {
+                return;
+            }
+
+            swaggerDoc.Components.SecuritySchemes.Add(
+                AuthSchemeName,
+                new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Name = AuthSchemeName,
+                    Type = SecuritySchemeType.OAuth2,
+                    Description = "Umbraco Member Authentication",
+                    Flows = new OpenApiOAuthFlows
+                    {
+                        AuthorizationCode = new OpenApiOAuthFlow
+                        {
+                            AuthorizationUrl = new Uri(Paths.MemberApi.AuthorizationEndpoint, UriKind.Relative),
+                            TokenUrl = new Uri(Paths.MemberApi.TokenEndpoint, UriKind.Relative)
+                        }
+                    }
+                });
         }
     }
 }

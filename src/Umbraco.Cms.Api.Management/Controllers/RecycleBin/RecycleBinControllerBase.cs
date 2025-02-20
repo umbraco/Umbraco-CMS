@@ -55,6 +55,7 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
         var viewModel = new TItem
         {
             Id = entity.Key,
+            CreateDate = entity.CreateDate,
             HasChildren = entity.HasChildren,
             Parent = parentKey.HasValue
                 ? new ItemReferenceByIdResponseModel

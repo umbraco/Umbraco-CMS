@@ -109,7 +109,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
     {
         const int pageSize = 500;
 
-        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetAll(memberTypeIds);
+        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(memberTypeIds);
         foreach (IMemberType memberType in memberTypes)
         {
             var page = 0;
@@ -117,13 +117,15 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
             while (page * pageSize < total)
             {
                 IEnumerable<IMember> memberToRefresh = _memberService.GetAll(
-                    page++, pageSize, out total, "LoginName", Direction.Ascending,
+                    page * pageSize, pageSize, out total, "LoginName", Direction.Ascending,
                     memberType.Alias);
 
                 foreach (IMember c in memberToRefresh)
                 {
                     _umbracoIndexingHandler.ReIndexForMember(c);
                 }
+
+                page++;
             }
         }
     }

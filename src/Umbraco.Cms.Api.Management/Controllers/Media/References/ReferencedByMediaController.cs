@@ -37,7 +37,7 @@ public class ReferencedByMediaController : MediaControllerBase
         int skip = 0,
         int take = 20)
     {
-        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, false);
+        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, true);
 
         var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
         {

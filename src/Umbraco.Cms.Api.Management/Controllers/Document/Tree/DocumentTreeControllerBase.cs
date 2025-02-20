@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Factories;
@@ -54,6 +54,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
             responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
             responseModel.IsTrashed = entity.Trashed;
             responseModel.Id = entity.Key;
+            responseModel.CreateDate = entity.CreateDate;
 
             responseModel.Variants = _documentPresentationFactory.CreateVariantsItemResponseModels(documentEntitySlim);
             responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);

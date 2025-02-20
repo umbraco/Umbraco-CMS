@@ -56,7 +56,7 @@ public class PropertyCacheLevelTests
         // anything else is not > None, use Content
         //
         // for standalone elements, it's only None or Content
-        var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+        var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, new VariationContext());
 
         Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
         Assert.AreEqual(1, converter.SourceConverts);
@@ -71,43 +71,31 @@ public class PropertyCacheLevelTests
 
     // property is not cached, converted cached at Content, exept
     //  /None = not cached at all
-    [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Element, 1, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Elements, 1, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Snapshot, 1, 0, 0, 0, 0)]
+    [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.None, 2, 0, 0)]
+    [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Element, 1, 0, 0)]
+    [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Elements, 1, 0, 0)]
 
     // property is cached at element level, converted cached at
     //  /None = not at all
     //  /Element = in element
     //  /Snapshot = in snapshot
     //  /Elements = in elements
-    [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.Element, 1, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.Elements, 1, 1, 0, 1, 0)]
-    [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.Snapshot, 1, 0, 1, 0, 1)]
+    [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.None, 2, 0, 0)]
+    [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.Element, 1, 0, 0)]
+    [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.Elements, 1, 1, 1)]
 
     // property is cached at elements level, converted cached at Element, exept
     //  /None = not cached at all
     //  /Snapshot = cached in snapshot
-    [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.Element, 1, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.Elements, 1, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.Snapshot, 1, 0, 1, 0, 1)]
-
-    // property is cached at snapshot level, converted cached at Element, exept
-    //  /None = not cached at all
-    [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Element, 1, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Elements, 1, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Snapshot, 1, 0, 0, 0, 0)]
+    [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.None, 2, 0, 0)]
+    [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.Element, 1, 0, 0)]
+    [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.Elements, 1, 0, 0)]
     public void CachePublishedSnapshotTest(
         PropertyCacheLevel referenceCacheLevel,
         PropertyCacheLevel converterCacheLevel,
         int interConverts,
         int elementsCount1,
-        int snapshotCount1,
-        int elementsCount2,
-        int snapshotCount2)
+        int elementsCount2)
     {
         var converter = new CacheConverter1(converterCacheLevel);
 
@@ -129,15 +117,9 @@ public class PropertyCacheLevelTests
         var setType1 = publishedContentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "set1", CreatePropertyTypes);
 
         var elementsCache = new FastDictionaryAppCache();
-        var snapshotCache = new FastDictionaryAppCache();
 
-        var publishedSnapshot = new Mock<IPublishedSnapshot>();
-        publishedSnapshot.Setup(x => x.SnapshotCache).Returns(snapshotCache);
-        publishedSnapshot.Setup(x => x.ElementsCache).Returns(elementsCache);
-
-        var publishedSnapshotAccessor = new Mock<IPublishedSnapshotAccessor>();
-        var localPublishedSnapshot = publishedSnapshot.Object;
-        publishedSnapshotAccessor.Setup(x => x.TryGetPublishedSnapshot(out localPublishedSnapshot)).Returns(true);
+        var cacheManager = new Mock<ICacheManager>();
+        cacheManager.Setup(x => x.ElementsCache).Returns(elementsCache);
 
         // pretend we're creating this set as a value for a property
         // referenceCacheLevel is the cache level for this fictious property
@@ -151,33 +133,24 @@ public class PropertyCacheLevelTests
             },
             false,
             referenceCacheLevel,
-            publishedSnapshotAccessor.Object);
+            new VariationContext(),
+            cacheManager.Object);
 
         Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
         Assert.AreEqual(1, converter.SourceConverts);
         Assert.AreEqual(1, converter.InterConverts);
 
         Assert.AreEqual(elementsCount1, elementsCache.Count);
-        Assert.AreEqual(snapshotCount1, snapshotCache.Count);
-
         Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
         Assert.AreEqual(1, converter.SourceConverts);
         Assert.AreEqual(interConverts, converter.InterConverts);
 
         Assert.AreEqual(elementsCount2, elementsCache.Count);
-        Assert.AreEqual(snapshotCount2, snapshotCache.Count);
-
-        var oldSnapshotCache = snapshotCache;
-        snapshotCache.Clear();
 
         Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
         Assert.AreEqual(1, converter.SourceConverts);
 
         Assert.AreEqual(elementsCount2, elementsCache.Count);
-        Assert.AreEqual(snapshotCount2, snapshotCache.Count);
-        Assert.AreEqual(snapshotCount2, oldSnapshotCache.Count);
-
-        Assert.AreEqual((interConverts == 1 ? 1 : 3) + snapshotCache.Count, converter.InterConverts);
 
         var oldElementsCache = elementsCache;
         elementsCache.Clear();
@@ -187,9 +160,6 @@ public class PropertyCacheLevelTests
 
         Assert.AreEqual(elementsCount2, elementsCache.Count);
         Assert.AreEqual(elementsCount2, oldElementsCache.Count);
-        Assert.AreEqual(snapshotCount2, snapshotCache.Count);
-
-        Assert.AreEqual((interConverts == 1 ? 1 : 4) + snapshotCache.Count + elementsCache.Count, converter.InterConverts);
     }
 
     [Test]
@@ -216,7 +186,7 @@ public class PropertyCacheLevelTests
 
         Assert.Throws<Exception>(() =>
         {
-            var unused = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+            var unused = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, new VariationContext());
         });
     }
 

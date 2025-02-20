@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
@@ -12,11 +13,11 @@ internal sealed class RequestRoutingService : RoutingServiceBase, IRequestRoutin
     private readonly IRequestCultureService _requestCultureService;
 
     public RequestRoutingService(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IDomainCache domainCache,
         IHttpContextAccessor httpContextAccessor,
         IRequestStartItemProviderAccessor requestStartItemProviderAccessor,
         IRequestCultureService requestCultureService)
-        : base(publishedSnapshotAccessor, httpContextAccessor, requestStartItemProviderAccessor) =>
+        : base(domainCache, httpContextAccessor, requestStartItemProviderAccessor) =>
         _requestCultureService = requestCultureService;
 
     /// <inheritdoc />
