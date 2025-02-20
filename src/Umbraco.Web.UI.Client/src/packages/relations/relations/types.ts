@@ -1,10 +1,5 @@
 import type { UmbRelationEntityType } from './entity.js';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type {
-	DefaultReferenceResponseModel,
-	DocumentReferenceResponseModel,
-	MediaReferenceResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
+export type * from './reference/types.js';
 
 export interface UmbRelationDetailModel {
 	unique: string;
@@ -23,11 +18,3 @@ export interface UmbRelationDetailModel {
 	createDate: string;
 	comment: string | null;
 }
-
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbReferenceItemModel extends UmbEntityModel {}
-
-export type UmbReferenceModel =
-	| DefaultReferenceResponseModel
-	| DocumentReferenceResponseModel
-	| MediaReferenceResponseModel;
