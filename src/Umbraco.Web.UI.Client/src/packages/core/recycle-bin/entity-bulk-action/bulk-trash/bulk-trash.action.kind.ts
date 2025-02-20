@@ -1,7 +1,9 @@
 import { UMB_ENTITY_BULK_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffice/entity-bulk-action';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-// TODO: v17: rename kind to trash
+/* TODO: v17: rename kind to trash
+ this is named v2 to avoid a name clash. The original trash kind is deprecated.
+We have added a constant to try and prevent too big a breaking change when renaming. */
 export const UMB_ENTITY_BULK_ACTION_TRASH_KIND = 'trashV2';
 
 export const UMB_ENTITY_BULK_ACTION_TRASH_KIND_MANIFEST: UmbExtensionManifestKind = {
