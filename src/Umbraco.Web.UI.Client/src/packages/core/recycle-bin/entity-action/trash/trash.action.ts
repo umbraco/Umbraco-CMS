@@ -41,7 +41,7 @@ export class UmbTrashEntityAction<
 
 	protected async _confirmTrash(item: any) {
 		const headline = '#actions_trash';
-		const message = '#defaultdialogs_confirmtrash';
+		const message = '#defaultdialogs_confirmTrash';
 
 		// TODO: handle items with variants
 		await umbConfirmModal(this._host, {
