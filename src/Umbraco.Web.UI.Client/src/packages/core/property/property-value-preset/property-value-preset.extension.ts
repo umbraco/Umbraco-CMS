@@ -1,9 +1,10 @@
-import type { UmbPropertyValueResolver } from './types.js';
+import type { UmbPropertyValuePresetApi } from './types.js';
 import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestPropertyValuePreset extends ManifestApi<UmbPropertyValueResolver<any>> {
+export interface ManifestPropertyValuePreset extends ManifestApi<UmbPropertyValuePresetApi<any>> {
 	type: 'propertyValuePreset';
-	forEditorAlias: string;
+	forPropertyEditorSchemaAlias?: string;
+	forPropertyEditorUiAlias?: string;
 }
 
 declare global {
