@@ -7,6 +7,7 @@ namespace Umbraco.Extensions;
 
 public static class ThreadExtensions
 {
+    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 16.")]
     public static void SanitizeThreadCulture(this Thread thread)
     {
         // get the current culture

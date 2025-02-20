@@ -8,6 +8,7 @@ namespace Umbraco.Extensions;
 
 public static class NameValueCollectionExtensions
 {
+    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 16.")]
     public static IEnumerable<KeyValuePair<string?, string?>> AsEnumerable(this NameValueCollection nvc)
     {
         foreach (var key in nvc.AllKeys)
@@ -16,9 +17,11 @@ public static class NameValueCollectionExtensions
         }
     }
 
+    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 16.")]
     public static bool ContainsKey(this NameValueCollection collection, string key) =>
         collection.Keys.Cast<object>().Any(k => (string)k == key);
 
+    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 16.")]
     public static T? GetValue<T>(this NameValueCollection collection, string key, T defaultIfNotFound)
     {
         if (collection.ContainsKey(key) == false)

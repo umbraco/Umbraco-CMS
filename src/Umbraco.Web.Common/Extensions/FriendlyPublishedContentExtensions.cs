@@ -669,6 +669,7 @@ public static class FriendlyPublishedContentExtensions
     ///     null)
     /// </param>
     /// <returns>The children of the content.</returns>
+    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 16.")]
     public static DataTable ChildrenAsTable(this IPublishedContent content, string contentTypeAliasFilter = "", string? culture = null)
         =>
             content.ChildrenAsTable(

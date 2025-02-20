@@ -8,6 +8,7 @@ namespace Umbraco.Extensions;
 
 public static class DelegateExtensions
 {
+    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 16.")]
     public static Attempt<T?> RetryUntilSuccessOrTimeout<T>(this Func<Attempt<T?>> task, TimeSpan timeout, TimeSpan pause)
     {
         if (pause.TotalMilliseconds < 0)
@@ -31,6 +32,7 @@ public static class DelegateExtensions
         return Attempt<T?>.Fail();
     }
 
+    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 16.")]
     public static Attempt<T?> RetryUntilSuccessOrMaxAttempts<T>(this Func<int, Attempt<T?>> task, int totalAttempts, TimeSpan pause)
     {
         if (pause.TotalMilliseconds < 0)
