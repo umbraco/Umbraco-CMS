@@ -2615,4 +2615,7 @@ export default {
 		toolbar_removeItem: 'Fjern handling',
 		toolbar_emptyGroup: 'Tom',
 	},
+	collection: {
+		addCollectionConfiguration: 'Tilføj samling',
+	},
 } as UmbLocalizationDictionary;

@@ -2727,4 +2727,7 @@ export default {
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',
 	},
+	collection: {
+		addCollectionConfiguration: 'Add collection',
+	},
 } as UmbLocalizationDictionary;
