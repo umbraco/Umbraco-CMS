@@ -1,7 +1,7 @@
-import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
-import { UMB_MEMBER_MANAGEMENT_SECTION_ALIAS } from '../../section/constants.js';
-import { UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN } from '../paths.js';
-import type { UmbMemberItemModel } from './repository/types.js';
+import type { UmbMediaItemModel } from '../repository/types.js';
+import { UMB_MEDIA_SECTION_ALIAS } from '../../media-section/constants.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
+import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -9,15 +9,15 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 
-@customElement('umb-member-item-ref')
-export class UmbMemberItemRefElement extends UmbLitElement {
-	#item?: UmbMemberItemModel | undefined;
+@customElement('umb-media-item-ref')
+export class UmbMediaItemRefElement extends UmbLitElement {
+	#item?: UmbMediaItemModel | undefined;
 
 	@property({ type: Object })
-	public get item(): UmbMemberItemModel | undefined {
+	public get item(): UmbMediaItemModel | undefined {
 		return this.#item;
 	}
-	public set item(value: UmbMemberItemModel | undefined) {
+	public set item(value: UmbMediaItemModel | undefined) {
 		this.#item = value;
 	}
 
@@ -39,7 +39,7 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
 			{
 				config: {
-					match: UMB_MEMBER_MANAGEMENT_SECTION_ALIAS,
+					match: UMB_MEDIA_SECTION_ALIAS,
 				},
 				onChange: (permitted: boolean) => {
 					this._userHasSectionAccess = permitted;
@@ -48,17 +48,18 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 		]);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addUniquePaths(['unique'])
 			.onSetup(() => {
-				return { data: { entityType: UMB_MEMBER_ENTITY_TYPE, preset: {} } };
+				return { data: { entityType: UMB_MEDIA_ENTITY_TYPE, preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._editPath = routeBuilder({});
 			});
 	}
 
-	#getHref(item: UmbMemberItemModel) {
+	#getHref(item: UmbMediaItemModel) {
 		if (!this._editPath) return;
-		const path = UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
+		const path = UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
 		return `${this._editPath}/${path}`;
 	}
 
@@ -66,27 +67,27 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 		if (!this.item) return nothing;
 
 		return html`
-			<uui-ref-node-member
+			<uui-ref-node
 				name=${this.item.name}
 				href=${ifDefined(this.#getHref(this.item))}
 				?readonly=${this.readonly || !this._userHasSectionAccess}
 				?standalone=${this.standalone}>
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon(this.item)}
-			</uui-ref-node-member>
+			</uui-ref-node>
 		`;
 	}
 
-	#renderIcon(item: UmbMemberItemModel) {
-		if (!item.memberType.icon) return;
-		return html`<umb-icon slot="icon" name=${item.memberType.icon}></umb-icon>`;
+	#renderIcon(item: UmbMediaItemModel) {
+		if (!item.mediaType.icon) return;
+		return html`<umb-icon slot="icon" name=${item.mediaType.icon}></umb-icon>`;
 	}
 }
 
-export { UmbMemberItemRefElement as element };
+export { UmbMediaItemRefElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-member-item-ref': UmbMemberItemRefElement;
+		'umb-media-item-ref': UmbMediaItemRefElement;
 	}
 }

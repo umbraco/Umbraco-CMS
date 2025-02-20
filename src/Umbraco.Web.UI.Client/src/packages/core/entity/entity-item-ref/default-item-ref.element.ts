@@ -8,16 +8,13 @@ export class UmbDefaultItemRefElement extends UmbLitElement {
 	item?: UmbDefaultItemModel;
 
 	@property({ type: Boolean })
-	readonly = false;
-
-	@property({ type: Boolean })
 	standalone = false;
 
 	override render() {
 		if (!this.item) return nothing;
 
 		return html`
-			<uui-ref-node name=${this.item.name} ?readonly=${this.readonly} ?standalone=${this.standalone}>
+			<uui-ref-node name=${this.item.name} ?standalone=${this.standalone} readonly>
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon(this.item)}
 			</uui-ref-node>

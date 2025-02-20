@@ -1,30 +1,47 @@
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * @class UmbMediaReferenceServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbMediaReferenceServerDataSource {
-	#host: UmbControllerHost;
-
-	/**
-	 * Creates an instance of UmbMediaReferenceServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbMediaReferenceServerDataSource
-	 */
-	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
+export class UmbMediaReferenceServerDataSource extends UmbControllerBase {
+	#dataMapper = new UmbManagementApiDataMapper(this);
 
 	/**
 	 * Fetches the item for the given id from the server
-	 * @param {Array<string>} ids
+	 * @param {string} unique - The unique identifier of the item to fetch
 	 * @returns {*}
 	 * @memberof UmbMediaReferenceServerDataSource
 	 */
-	async getReferencedBy(id: string, skip = 0, take = 20) {
-		return await tryExecuteAndNotify(this.#host, MediaService.getMediaByIdReferencedBy({ id, skip, take }));
+	async getReferencedBy(unique: string, skip = 0, take = 20) {
+		const { data, error } = await tryExecuteAndNotify(
+			this,
+			MediaService.getMediaByIdReferencedBy({ id: unique, skip, take }),
+		);
+
+		if (data) {
+			const promises = data.items.map(async (item) => {
+				return this.#dataMapper.map({
+					forDataModel: item.$type,
+					data: item,
+					fallback: async () => {
+						return {
+							...item,
+							unique: item.id,
+							entityType: 'unknown',
+						};
+					},
+				});
+			});
+
+			const items = await Promise.all(promises);
+
+			return { data: { items, total: data.total } };
+		}
+
+		return { data, error };
 	}
 }
