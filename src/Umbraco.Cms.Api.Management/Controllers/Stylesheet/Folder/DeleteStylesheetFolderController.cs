@@ -15,7 +15,7 @@ public class DeleteStylesheetFolderController : StylesheetFolderControllerBase
     public DeleteStylesheetFolderController(IStylesheetFolderService stylesheetFolderService)
         => _stylesheetFolderService = stylesheetFolderService;
 
-    [HttpDelete("{path}")]
+    [HttpDelete("{*path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

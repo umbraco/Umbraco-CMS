@@ -1,3 +1,5 @@
+using Umbraco.Extensions;
+
 namespace Umbraco.Cms.Core.Services.Navigation;
 
 /// <summary>
@@ -11,6 +13,19 @@ public interface IRecycleBinNavigationQueryService
     bool TryGetChildrenKeysInBin(Guid parentKey, out IEnumerable<Guid> childrenKeys);
 
     bool TryGetDescendantsKeysInBin(Guid parentKey, out IEnumerable<Guid> descendantsKeys);
+
+    bool TryGetDescendantsKeysOrSelfKeysInBin(Guid childKey, out IEnumerable<Guid> descendantsOrSelfKeys)
+    {
+        if (TryGetDescendantsKeysInBin(childKey, out IEnumerable<Guid>? descendantsKeys))
+        {
+            descendantsOrSelfKeys = childKey.Yield().Concat(descendantsKeys);
+            return true;
+        }
+
+        descendantsOrSelfKeys = Array.Empty<Guid>();
+        return false;
+    }
+
 
     bool TryGetAncestorsKeysInBin(Guid childKey, out IEnumerable<Guid> ancestorsKeys);
 

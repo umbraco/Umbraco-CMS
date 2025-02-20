@@ -29,7 +29,7 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
     protected override DocumentTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
         var contentTypes = _contentTypeService
-            .GetAll(entities.Select(entity => entity.Id).ToArray())
+            .GetMany(entities.Select(entity => entity.Id).ToArray())
             .ToDictionary(contentType => contentType.Id);
 
         return entities.Select(entity =>

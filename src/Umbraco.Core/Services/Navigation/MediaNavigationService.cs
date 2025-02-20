@@ -1,12 +1,13 @@
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services.Navigation;
 
-internal sealed class MediaNavigationService : ContentNavigationServiceBase, IMediaNavigationQueryService, IMediaNavigationManagementService
+internal sealed class MediaNavigationService : ContentNavigationServiceBase<IMediaType, IMediaTypeService>, IMediaNavigationQueryService, IMediaNavigationManagementService
 {
-    public MediaNavigationService(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository)
-        : base(coreScopeProvider, navigationRepository)
+    public MediaNavigationService(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository, IMediaTypeService mediaTypeService)
+        : base(coreScopeProvider, navigationRepository, mediaTypeService)
     {
     }
 

@@ -1,4 +1,4 @@
-﻿using System.Xml;
+using System.Xml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Xml
     {
         #region Private vars
 
-        readonly IDictionary<string, IXsltContextVariable> _variables =
+        private readonly IDictionary<string, IXsltContextVariable> _variables =
             new Dictionary<string, IXsltContextVariable>();
 
         #endregion Private
@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Core.Xml
         /// Implementation equal to <see cref="XsltContext"/>.
         /// </summary>
         public override int CompareDocument(string baseUri, string nextbaseUri) =>
-            String.Compare(baseUri, nextbaseUri, false, System.Globalization.CultureInfo.InvariantCulture);
+            string.Compare(baseUri, nextbaseUri, false, System.Globalization.CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Same as <see cref="XmlNamespaceManager"/>.
@@ -211,12 +211,11 @@ namespace Umbraco.Cms.Core.Xml
         /// </summary>
         internal class DynamicVariable : IXsltContextVariable
         {
-            private readonly string _name;
             private readonly object _value;
 
             #region Public Members
 
-            public string Name { get { return _name; } }
+            public string Name { get; }
 
             /// <summary>
             /// Initializes a new instance of the class.
@@ -226,7 +225,7 @@ namespace Umbraco.Cms.Core.Xml
             public DynamicVariable(string name, object value)
             {
 
-                _name = name;
+                Name = name;
                 _value = value;
 
                 if (value is string)

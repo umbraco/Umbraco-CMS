@@ -2,6 +2,7 @@
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models;
@@ -176,6 +177,21 @@ public class Property : EntityBase, IProperty
 
     // internal - must be invoked by the content item
     // does *not* validate the value - content item must validate first
+    public void PublishPartialValues(IDataEditor dataEditor, string? culture)
+    {
+        if (PropertyType.VariesByCulture())
+        {
+            throw new NotSupportedException("Cannot publish merged culture values for culture variant properties");
+        }
+
+        culture = culture?.NullOrWhiteSpaceAsNull();
+
+        var value = dataEditor.MergePartialPropertyValueForCulture(_pvalue?.EditedValue, _pvalue?.PublishedValue, culture);
+        PublishValue(_pvalue, value);
+    }
+
+    // internal - must be invoked by the content item
+    // does *not* validate the value - content item must validate first
     public void PublishValues(string? culture = "*", string? segment = "*")
     {
         culture = culture?.NullOrWhiteSpaceAsNull();
@@ -300,13 +316,23 @@ public class Property : EntityBase, IProperty
             return;
         }
 
+        PublishValue(pvalue, ConvertAssignedValue(pvalue.EditedValue));
+    }
+
+    private void PublishValue(IPropertyValue? pvalue, object? newPublishedValue)
+    {
+        if (pvalue == null)
+        {
+            return;
+        }
+
         if (!PropertyType.SupportsPublishing)
         {
             throw new NotSupportedException("Property type does not support publishing.");
         }
 
         var origValue = pvalue.PublishedValue;
-        pvalue.PublishedValue = ConvertAssignedValue(pvalue.EditedValue);
+        pvalue.PublishedValue = newPublishedValue;
         DetectChanges(pvalue.EditedValue, origValue, nameof(Values), PropertyValueComparer, false);
     }
 

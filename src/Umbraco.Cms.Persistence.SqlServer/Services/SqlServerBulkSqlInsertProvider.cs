@@ -39,7 +39,7 @@ public class SqlServerBulkSqlInsertProvider : IBulkSqlInsertProvider
     /// <param name="pocoData">The PocoData object corresponding to the record's type.</param>
     /// <param name="records">The records.</param>
     /// <returns>The number of records that were inserted.</returns>
-    private int BulkInsertRecordsSqlServer<T>(IUmbracoDatabase database, PocoData pocoData, IEnumerable<T> records)
+    private static int BulkInsertRecordsSqlServer<T>(IUmbracoDatabase database, PocoData pocoData, IEnumerable<T> records)
     {
         // TODO: The main reason this exists is because the NPoco InsertBulk method doesn't return the number of items.
         // It is worth investigating the performance of this vs NPoco's because we use a custom BulkDataReader

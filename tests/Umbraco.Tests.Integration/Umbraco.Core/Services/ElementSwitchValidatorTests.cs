@@ -37,13 +37,29 @@ public class ElementSwitchValidatorTests : UmbracoIntegrationTest
     [TestCase(new[] { false, false }, 0, true, true, TestName = "E InValid Child")]
     [TestCase(new[] { true, true }, 1, false, false, TestName = "D InValid Parent")]
     [TestCase(new[] { true, true }, 0, false, true, TestName = "D InValid Child")]
-    [TestCase(new[] { true, false, false, true, false }, 2, true, false,
+    [TestCase(
+        new[] { true, false, false, true, false },
+        2,
+        true,
+        false,
         TestName = "D=>E InValid Child, Invalid Parent")]
-    [TestCase(new[] { false, true, false, true, false }, 2, true, false,
+    [TestCase(
+        new[] { false, true, false, true, false },
+        2,
+        true,
+        false,
         TestName = "D=>E InValid Child, Invalid Ancestor")]
-    [TestCase(new[] { true, false, false, true, true }, 2, true, false,
+    [TestCase(
+        new[] { true, false, false, true, true },
+        2,
+        true,
+        false,
         TestName = "D=>E Valid Children, Invalid Parent")]
-    [TestCase(new[] { false, true, false, true, true }, 2, true, false,
+    [TestCase(
+        new[] { false, true, false, true, true },
+        2,
+        true,
+        false,
         TestName = "D=>E Valid Children, Invalid Ancestor")]
     [TestCase(new[] { false, false, false, false, false }, 2, true, false, TestName = "D=>E mismatch")]
     [TestCase(new[] { false, false, true, false, false }, 2, false, true, TestName = "D=>E correction")]
@@ -98,13 +114,28 @@ public class ElementSwitchValidatorTests : UmbracoIntegrationTest
     [TestCase(new[] { false, false }, 0, true, false, TestName = "E InValid Child")]
     [TestCase(new[] { true, true }, 1, false, true, TestName = "D InValid Parent")]
     [TestCase(new[] { true, true }, 0, false, false, TestName = "D InValid Child")]
-    [TestCase(new[] { true, false, false, true, false }, 2, true, false,
+    [TestCase(
+        new[] { true, false, false, true, false },
+        2,
+        true,
+        false,
         TestName = "D=>E InValid Child, Invalid Parent")]
-    [TestCase(new[] { false, true, false, true, false }, 2, true, false,
+    [TestCase(
+        new[] { false, true, false, true, false },
+        2,
+        true,
+        false,
         TestName = "D=>E InValid Child, Invalid Ancestor")]
-    [TestCase(new[] { true, false, false, true, true }, 2, true, true,
+    [TestCase(
+        new[] { true, false, false, true, true },
+        2,
+        true,
+        true,
         TestName = "D=>E Valid Children, Invalid Parent")]
-    [TestCase(new[] { false, true, false, true, true }, 2, true, true,
+    [TestCase(new[] { false, true, false, true, true },
+        2,
+        true,
+        true,
         TestName = "D=>E Valid Children, Invalid Ancestor")]
     [TestCase(new[] { false, false, false, false, false }, 2, true, false, TestName = "D=>E mismatch")]
     [TestCase(new[] { false, false, true, false, false }, 2, false, true, TestName = "D=>E correction")]

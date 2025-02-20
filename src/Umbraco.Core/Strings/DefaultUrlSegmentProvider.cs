@@ -12,21 +12,25 @@ public class DefaultUrlSegmentProvider : IUrlSegmentProvider
 
     public DefaultUrlSegmentProvider(IShortStringHelper shortStringHelper) => _shortStringHelper = shortStringHelper;
 
+
+    public virtual string? GetUrlSegment(IContentBase content, bool published, string? culture = null) =>
+        GetUrlSegmentSource(content, culture, published)?.ToUrlSegment(_shortStringHelper, culture);
+
     /// <summary>
     ///     Gets the URL segment for a specified content and culture.
     /// </summary>
     /// <param name="content">The content.</param>
     /// <param name="culture">The culture.</param>
     /// <returns>The URL segment.</returns>
-    public string? GetUrlSegment(IContentBase content, string? culture = null) =>
-        GetUrlSegmentSource(content, culture)?.ToUrlSegment(_shortStringHelper, culture);
+    public virtual string? GetUrlSegment(IContentBase content, string? culture = null) =>
+        GetUrlSegmentSource(content, culture, true)?.ToUrlSegment(_shortStringHelper, culture);
 
-    private static string? GetUrlSegmentSource(IContentBase content, string? culture)
+    private static string? GetUrlSegmentSource(IContentBase content, string? culture, bool published)
     {
         string? source = null;
         if (content.HasProperty(Constants.Conventions.Content.UrlName))
         {
-            source = (content.GetValue<string>(Constants.Conventions.Content.UrlName, culture) ?? string.Empty).Trim();
+            source = (content.GetValue<string>(Constants.Conventions.Content.UrlName, culture, published: published) ?? string.Empty).Trim();
         }
 
         if (string.IsNullOrWhiteSpace(source))

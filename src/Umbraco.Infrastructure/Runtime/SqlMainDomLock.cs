@@ -23,7 +23,7 @@ public class SqlMainDomLock : IMainDomLock
     private readonly IUmbracoDatabase? _db;
     private readonly UmbracoDatabaseFactory _dbFactory;
     private readonly IOptions<GlobalSettings> _globalSettings;
-    private readonly object _locker = new();
+    private readonly Lock _locker = new();
     private readonly string _lockId;
     private readonly ILogger<SqlMainDomLock> _logger;
     private bool _acquireWhenTablesNotAvailable;
@@ -101,7 +101,8 @@ public class SqlMainDomLock : IMainDomLock
             db.BeginTransaction(IsolationLevel.Serializable);
 
             RecordPersistenceType
-                result = InsertLockRecord(tempId,
+                result = InsertLockRecord(
+                    tempId,
                     db); //we change the row to a random Id to signal other MainDom to shutdown
             if (result == RecordPersistenceType.Insert)
             {
@@ -244,39 +245,43 @@ public class SqlMainDomLock : IMainDomLock
 
         using (ExecutionContext.SuppressFlow())
         {
-            return Task.Run(() =>
-            {
-                try
+            return Task.Run(
+                () =>
                 {
-                    using IUmbracoDatabase db = _dbFactory.CreateDatabase();
-
-                    var watch = new Stopwatch();
-                    watch.Start();
-                    while (true)
+                    try
                     {
-                        // poll very often, we need to take over as fast as we can
-                        // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
-                        Thread.Sleep(1000);
+                        using IUmbracoDatabase db = _dbFactory.CreateDatabase();
 
-                        var acquired = TryAcquire(db, tempId, updatedTempId);
-                        if (acquired.HasValue)
+                        var watch = new Stopwatch();
+                        watch.Start();
+                        while (true)
                         {
-                            return acquired.Value;
-                        }
+                            // poll very often, we need to take over as fast as we can
+                            // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
+                            Thread.Sleep(1000);
 
-                        if (watch.ElapsedMilliseconds >= millisecondsTimeout)
-                        {
-                            return AcquireWhenMaxWaitTimeElapsed(db);
+                            var acquired = TryAcquire(db, tempId, updatedTempId);
+                            if (acquired.HasValue)
+                            {
+                                return acquired.Value;
+                            }
+
+                            if (watch.ElapsedMilliseconds >= millisecondsTimeout)
+                            {
+                                return AcquireWhenMaxWaitTimeElapsed(db);
+                            }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex,
-                        "An error occurred trying to acquire and waiting for existing SqlMainDomLock to shutdown");
-                    return false;
-                }
-            }, _cancellationTokenSource.Token);
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(
+                            ex,
+                            "An error occurred trying to acquire and waiting for existing SqlMainDomLock " +
+                            "to shutdown");
+                        return false;
+                    }
+                },
+                _cancellationTokenSource.Token);
         }
     }
 
@@ -292,8 +297,9 @@ public class SqlMainDomLock : IMainDomLock
             transaction = db.GetTransaction(IsolationLevel.Serializable);
 
             // the row
-            List<KeyValueDto>? mainDomRows = db.Fetch<KeyValueDto>("SELECT * FROM umbracoKeyValue WHERE [key] = @key",
-                new {key = MainDomKey});
+            List<KeyValueDto>? mainDomRows = db.Fetch<KeyValueDto>(
+                "SELECT * FROM umbracoKeyValue WHERE [key] = @key",
+                new { key = MainDomKey });
 
             if (mainDomRows.Count == 0 || mainDomRows[0].Value == updatedTempId)
             {
@@ -375,15 +381,16 @@ public class SqlMainDomLock : IMainDomLock
     ///     Inserts or updates the key/value row
     /// </summary>
     private RecordPersistenceType InsertLockRecord(string id, IUmbracoDatabase db) =>
-        db.InsertOrUpdate(new KeyValueDto {Key = MainDomKey, Value = id, UpdateDate = DateTime.Now});
+        db.InsertOrUpdate(new KeyValueDto { Key = MainDomKey, Value = id, UpdateDate = DateTime.Now });
 
     /// <summary>
     ///     Checks if the DB row value is equals the value
     /// </summary>
     /// <returns></returns>
     private bool IsMainDomValue(string val, IUmbracoDatabase db) =>
-        db.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoKeyValue WHERE [key] = @key AND [value] = @val",
-            new {key = MainDomKey, val}) == 1;
+        db.ExecuteScalar<int>(
+            "SELECT COUNT(*) FROM umbracoKeyValue WHERE [key] = @key AND [value] = @val",
+            new { key = MainDomKey, val }) == 1;
 
     #region IDisposable Support
 
@@ -423,13 +430,14 @@ public class SqlMainDomLock : IMainDomLock
                                 _logger.LogDebug("Releasing MainDom, updating row, new application is booting.");
                                 var count = db.Execute(
                                     $"UPDATE umbracoKeyValue SET [value] = [value] + '{UpdatedSuffix}' WHERE [key] = @key",
-                                    new {key = MainDomKey});
+                                    new { key = MainDomKey });
                             }
                             else
                             {
                                 _logger.LogDebug("Releasing MainDom, deleting row, application is shutting down.");
-                                var count = db.Execute("DELETE FROM umbracoKeyValue WHERE [key] = @key",
-                                    new {key = MainDomKey});
+                                var count = db.Execute(
+                                    "DELETE FROM umbracoKeyValue WHERE [key] = @key",
+                                    new { key = MainDomKey });
                             }
                         }
                         catch (Exception ex)

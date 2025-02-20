@@ -21,7 +21,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HostedServices;
-using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Persistence.EFCore.Locking;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
@@ -47,8 +46,6 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddUnique(testHelper.MainDom);
 
         builder.Services.AddUnique<IIndexRebuilder, TestBackgroundIndexRebuilder>();
-        // we don't want persisted nucache files in tests
-        builder.Services.AddTransient(factory => new PublishedSnapshotServiceOptions { IgnoreLocalDb = true });
 
 #if IS_WINDOWS
         // ensure all lucene indexes are using RAM directory (no file system)

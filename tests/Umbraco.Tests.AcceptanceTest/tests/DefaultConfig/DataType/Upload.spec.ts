@@ -35,11 +35,15 @@ for (const uploadType of uploadTypes) {
       await umbracoUi.dataType.goToDataType(uploadType);
 
       // Act
+      await umbracoUi.waitForTimeout(500);
       await umbracoUi.dataType.clickAddAcceptedFileExtensionsButton();
       await umbracoUi.dataType.enterAcceptedFileExtensions(fileExtensionValue);
+      await umbracoUi.waitForTimeout(500);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
+      await umbracoUi.dataType.isSuccessNotificationVisible();
+      await umbracoUi.waitForTimeout(500);
       dataTypeData = await umbracoApi.dataType.getByName(uploadType);
       expect(dataTypeData.values).toEqual(expectedDataTypeValues);
     });
@@ -64,6 +68,7 @@ for (const uploadType of uploadTypes) {
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
+      await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(uploadType);
       expect(dataTypeData.values).toEqual([]);
     });

@@ -113,5 +113,7 @@ public static partial class Constants
         /// The <c>DataDirectory</c> placeholder used to resolve paths in connection strings.
         /// </summary>
         public const string DataDirectoryPlaceholder = "|DataDirectory|";
+
+        public const string InvariantCulture = "*";
     }
 }

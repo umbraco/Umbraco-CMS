@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.Item;
 
@@ -9,6 +9,10 @@ public class DocumentItemResponseModel : ItemResponseModelBase
     public bool IsTrashed { get; set; }
 
     public bool IsProtected { get; set; }
+
+    public ReferenceByIdModel? Parent { get; set; }
+
+    public bool HasChildren { get; set; }
 
     public DocumentTypeReferenceResponseModel DocumentType { get; set; } = new();
 

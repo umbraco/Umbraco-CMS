@@ -125,7 +125,7 @@ public class WebProfiler : IProfiler
             return false;
         }
 
-        var miniprofilerOptions = _httpContextAccessor.HttpContext?.RequestServices?.GetService<IOptions<MiniProfilerOptions>>();
+        IOptions<MiniProfilerOptions>? miniprofilerOptions = _httpContextAccessor.HttpContext?.RequestServices?.GetService<IOptions<MiniProfilerOptions>>();
         if (miniprofilerOptions is not null && miniprofilerOptions.Value.IgnoredPaths.Contains(request.Path))
         {
             return false;

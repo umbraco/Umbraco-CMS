@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
@@ -253,14 +254,7 @@ public static class HtmlHelperRenderExtensions
         if (!metaData.AreaName.IsNullOrWhiteSpace())
         {
             // set the area to the plugin area
-            if (routeVals.ContainsKey("area"))
-            {
-                routeVals["area"] = metaData.AreaName;
-            }
-            else
-            {
-                routeVals.Add("area", metaData.AreaName);
-            }
+            routeVals["area"] = metaData.AreaName;
         }
 
         return htmlHelper.ActionLink(actionName, metaData.ControllerName, routeVals);
@@ -815,10 +809,7 @@ public static class HtmlHelperRenderExtensions
         object? additionalRouteVals = null)
     {
         // ensure that the multipart/form-data is added to the HTML attributes
-        if (htmlAttributes.ContainsKey("enctype") == false)
-        {
-            htmlAttributes.Add("enctype", "multipart/form-data");
-        }
+        htmlAttributes.TryAdd("enctype", "multipart/form-data");
 
         var tagBuilder = new TagBuilder("form");
         tagBuilder.MergeAttributes(htmlAttributes);

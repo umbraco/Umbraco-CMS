@@ -420,7 +420,13 @@ public class LocalDb
         /// </remarks>
         public bool CreateDatabase(string databaseName, string filesPath)
         {
-            GetDatabaseFiles(databaseName, filesPath, out var logName, out _, out _, out var mdfFilename,
+            GetDatabaseFiles(
+                databaseName,
+                filesPath,
+                out var logName,
+                out _,
+                out _,
+                out var mdfFilename,
                 out var ldfFilename);
 
             using (var conn = new SqlConnection(_masterCstr))
@@ -463,7 +469,9 @@ public class LocalDb
             {
                 conn.Open();
 
-                SetCommand(cmd, @"
+                SetCommand(
+                    cmd,
+                    @"
                         SELECT name, filename FROM master.dbo.sysdatabases WHERE ('[' + name + ']' = @0 OR name = @0)",
                     databaseName);
 
@@ -554,11 +562,7 @@ public class LocalDb
             {
                 conn.Open();
 
-                var mdf = GetDatabase(cmd, databaseName);
-                if (mdf == null)
-                {
-                    throw new InvalidOperationException("Database does not exist.");
-                }
+                var mdf = GetDatabase(cmd, databaseName) ?? throw new InvalidOperationException("Database does not exist.");
 
                 DetachDatabase(cmd, databaseName);
 
@@ -597,9 +601,12 @@ public class LocalDb
         /// <param name="ldfName">The LDF logical name.</param>
         /// <param name="mdfFilename">The MDF filename.</param>
         /// <param name="ldfFilename">The LDF filename.</param>
-        public void GetFilenames(string databaseName,
-            out string? mdfName, out string? ldfName,
-            out string? mdfFilename, out string? ldfFilename)
+        public void GetFilenames(
+            string databaseName,
+            out string? mdfName,
+            out string? ldfName,
+            out string? mdfFilename,
+            out string? ldfFilename)
         {
             using (var conn = new SqlConnection(_masterCstr))
             using (SqlCommand? cmd = conn.CreateCommand())
@@ -621,7 +628,9 @@ public class LocalDb
             {
                 conn.Open();
 
-                SetCommand(cmd, @"
+                SetCommand(
+                    cmd,
+                    @"
                         DECLARE @sql VARCHAR(MAX);
                         SELECT @sql = COALESCE(@sql,'') + 'kill ' + CONVERT(VARCHAR, SPId) + ';'
                             FROM master.sys.sysprocesses
@@ -640,7 +649,9 @@ public class LocalDb
         /// <returns>The full filename of the MDF file, if the database exists, otherwise null.</returns>
         private static string? GetDatabase(SqlCommand cmd, string databaseName)
         {
-            SetCommand(cmd, @"
+            SetCommand(
+                cmd,
+                @"
                     SELECT name, filename FROM master.dbo.sysdatabases WHERE ('[' + name + ']' = @0 OR name = @0)",
                 databaseName);
 
@@ -707,7 +718,7 @@ public class LocalDb
                 File.Delete(mdf);
             }
 
-            ldf = ldf ?? GetLogFilename(mdf);
+            ldf ??= GetLogFilename(mdf);
             if (File.Exists(ldf))
             {
                 File.Delete(ldf);
@@ -726,7 +737,7 @@ public class LocalDb
                 throw new ArgumentException("Not a valid MDF filename (no .mdf extension).", nameof(mdfFilename));
             }
 
-            return mdfFilename.Substring(0, mdfFilename.Length - ".mdf".Length) + "_log.ldf";
+            return mdfFilename[..^".mdf".Length] + "_log.ldf";
         }
 
         /// <summary>
@@ -743,7 +754,9 @@ public class LocalDb
 
             var unused1 = cmd.ExecuteNonQuery();
 
-            SetCommand(cmd, @"
+            SetCommand(
+                cmd,
+                @"
                     EXEC sp_detach_db @dbname=@0",
                 databaseName);
 
@@ -758,8 +771,14 @@ public class LocalDb
         /// <param name="filesPath">The directory containing database files.</param>
         private static void AttachDatabase(SqlCommand cmd, string databaseName, string filesPath)
         {
-            GetDatabaseFiles(databaseName, filesPath,
-                out var logName, out _, out _, out var mdfFilename, out var ldfFilename);
+            GetDatabaseFiles(
+                databaseName,
+                filesPath,
+                out var logName,
+                out _,
+                out _,
+                out var mdfFilename,
+                out var ldfFilename);
 
             // cannot use parameters on CREATE DATABASE
             // ie "CREATE DATABASE @0 ..." does not work
@@ -802,13 +821,19 @@ public class LocalDb
         /// <param name="ldfName">The LDF logical name.</param>
         /// <param name="mdfFilename">The MDF filename.</param>
         /// <param name="ldfFilename">The LDF filename.</param>
-        private void GetFilenames(SqlCommand cmd, string databaseName,
-            out string? mdfName, out string? ldfName,
-            out string? mdfFilename, out string? ldfFilename)
+        private static void GetFilenames(
+            SqlCommand cmd,
+            string databaseName,
+            out string? mdfName,
+            out string? ldfName,
+            out string? mdfFilename,
+            out string? ldfFilename)
         {
             mdfName = ldfName = mdfFilename = ldfFilename = null;
 
-            SetCommand(cmd, @"
+            SetCommand(
+                cmd,
+                @"
                     SELECT DB_NAME(database_id), type_desc, name, physical_name
                     FROM master.sys.master_files
                     WHERE database_id=DB_ID(@0)",
@@ -854,21 +879,32 @@ public class LocalDb
     ///     <paramref name="delete" />.
     ///     Extensions are used eg to copy MyDatabase.mdf to MyDatabase.mdf.temp.
     /// </remarks>
-    public void CopyDatabaseFiles(string databaseName, string filesPath,
-        string? targetDatabaseName = null, string? targetFilesPath = null,
-        string? sourceExtension = null, string? targetExtension = null,
-        bool overwrite = false, bool delete = false)
+    public void CopyDatabaseFiles(
+        string databaseName,
+        string filesPath,
+        string? targetDatabaseName = null,
+        string? targetFilesPath = null,
+        string? sourceExtension = null,
+        string? targetExtension = null,
+        bool overwrite = false,
+        bool delete = false)
     {
         var nop = (targetFilesPath == null || targetFilesPath == filesPath)
                   && (targetDatabaseName == null || targetDatabaseName == databaseName)
-                  && (sourceExtension == null && targetExtension == null || sourceExtension == targetExtension);
+                  && ((sourceExtension == null && targetExtension == null) || sourceExtension == targetExtension);
         if (nop && delete == false)
         {
             return;
         }
 
-        GetDatabaseFiles(databaseName, filesPath,
-            out _, out _, out _, out var mdfFilename, out var ldfFilename);
+        GetDatabaseFiles(
+            databaseName,
+            filesPath,
+            out _,
+            out _,
+            out _,
+            out var mdfFilename,
+            out var ldfFilename);
 
         if (sourceExtension != null)
         {
@@ -892,8 +928,14 @@ public class LocalDb
         else
         {
             // copy or copy+delete ie move
-            GetDatabaseFiles(targetDatabaseName ?? databaseName, targetFilesPath ?? filesPath,
-                out _, out _, out _, out var targetMdfFilename, out var targetLdfFilename);
+            GetDatabaseFiles(
+                targetDatabaseName ?? databaseName,
+                targetFilesPath ?? filesPath,
+                out _,
+                out _,
+                out _,
+                out var targetMdfFilename,
+                out var targetLdfFilename);
 
             if (targetExtension != null)
             {
@@ -936,8 +978,14 @@ public class LocalDb
     /// </remarks>
     public bool DatabaseFilesExist(string databaseName, string filesPath, string? extension = null)
     {
-        GetDatabaseFiles(databaseName, filesPath,
-            out _, out _, out _, out var mdfFilename, out var ldfFilename);
+        GetDatabaseFiles(
+            databaseName,
+            filesPath,
+            out _,
+            out _,
+            out _,
+            out var mdfFilename,
+            out var ldfFilename);
 
         if (extension != null)
         {
@@ -958,10 +1006,14 @@ public class LocalDb
     /// <param name="baseLogFilename">The base log filename (the LDF filename without the .ldf extension).</param>
     /// <param name="mdfFilename">The MDF filename.</param>
     /// <param name="ldfFilename">The LDF filename.</param>
-    private static void GetDatabaseFiles(string databaseName, string filesPath,
+    private static void GetDatabaseFiles(
+        string databaseName,
+        string filesPath,
         out string logName,
-        out string baseFilename, out string baseLogFilename,
-        out string mdfFilename, out string ldfFilename)
+        out string baseFilename,
+        out string baseLogFilename,
+        out string mdfFilename,
+        out string ldfFilename)
     {
         logName = databaseName + "_log";
         baseFilename = Path.Combine(filesPath, databaseName);

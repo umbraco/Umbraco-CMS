@@ -196,4 +196,16 @@ public class DataEditor : IDataEditor
     ///     Provides a summary of the PropertyEditor for use with the <see cref="DebuggerDisplayAttribute" />.
     /// </summary>
     protected virtual string DebuggerDisplay() => $"Alias: {Alias}";
+
+    /// <inheritdoc />
+    public virtual bool CanMergePartialPropertyValues(IPropertyType propertyType) => false;
+
+    /// <inheritdoc />
+    public virtual object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture) => sourceValue;
+
+    public virtual object? MergeVariantInvariantPropertyValue(
+        object? sourceValue,
+        object? targetValue,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures) => sourceValue;
 }

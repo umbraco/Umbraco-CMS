@@ -17,8 +17,20 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
     }
 
     public ContentUpdateModel MapUpdateModel(UpdateDocumentRequestModel requestModel)
+        => MapUpdateContentModel<ContentUpdateModel>(requestModel);
+
+    public ValidateContentUpdateModel MapValidateUpdateModel(ValidateUpdateDocumentRequestModel requestModel)
     {
-        ContentUpdateModel model = MapContentEditingModel<ContentUpdateModel>(requestModel);
+        ValidateContentUpdateModel model = MapUpdateContentModel<ValidateContentUpdateModel>(requestModel);
+        model.Cultures = requestModel.Cultures;
+
+        return model;
+    }
+
+    private TUpdateModel MapUpdateContentModel<TUpdateModel>(UpdateDocumentRequestModel requestModel)
+        where TUpdateModel : ContentUpdateModel, new()
+    {
+        TUpdateModel model = MapContentEditingModel<TUpdateModel>(requestModel);
         model.TemplateKey = requestModel.Template?.Id;
 
         return model;

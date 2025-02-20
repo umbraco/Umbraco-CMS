@@ -21,6 +21,8 @@ public partial class MediaNavigationServiceTests : MediaNavigationServiceTestsBa
         // Media Types
         FolderMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Folder);
         ImageMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Image);
+        ImageMediaType.PropertyTypes.First(x => x.Alias == "umbracoFile").Mandatory = false;
+        MediaTypeService.Save(ImageMediaType);
 
         // Media
         var albumModel = CreateMediaCreateModel("Album", new Guid("1CD97C02-8534-4B72-AE9E-AE52EC94CF31"), FolderMediaType.Key);
@@ -75,5 +77,28 @@ public partial class MediaNavigationServiceTests : MediaNavigationServiceTestsBa
 
         // Assert
         Assert.IsFalse(nodeExists);
+    }
+
+    [Test]
+    public void Can_Filter_Children_By_Type()
+    {
+        // Arrange
+        MediaNavigationQueryService.TryGetChildrenKeys(Album.Key, out IEnumerable<Guid> allChildrenKeys);
+        List<Guid> allChildrenList = allChildrenKeys.ToList();
+
+        // Act
+        MediaNavigationQueryService.TryGetChildrenKeysOfType(Album.Key, ImageMediaType.Alias, out IEnumerable<Guid> childrenKeysOfTypeImage);
+        List<Guid> imageChildrenList = childrenKeysOfTypeImage.ToList();
+
+        MediaNavigationQueryService.TryGetChildrenKeysOfType(Album.Key, FolderMediaType.Alias, out IEnumerable<Guid> childrenKeysOfTypeFolder);
+        List<Guid> folderChildrenList = childrenKeysOfTypeFolder.ToList();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, imageChildrenList.Count);
+            Assert.AreEqual(2, folderChildrenList.Count);
+            Assert.AreEqual(3, allChildrenList.Count);
+        });
     }
 }

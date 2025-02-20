@@ -58,8 +58,6 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     /// <param name="userCount"></param>
     /// <param name="alias"></param>
     /// <param name="name"></param>
-    /// <param name="permissions"></param>
-    /// <param name="granularPermissions"></param>
     /// <param name="icon"></param>
     /// <param name="shortStringHelper"></param>
     public UserGroup(

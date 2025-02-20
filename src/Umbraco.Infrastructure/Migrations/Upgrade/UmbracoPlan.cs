@@ -63,21 +63,22 @@ public class UmbracoPlan : MigrationPlan
         To<V_13_0_0.ChangeWebhookUrlColumnsToNvarcharMax>("{21C42760-5109-4C03-AB4F-7EA53577D1F5}");
         To<V_13_0_0.AddExceptionOccured>("{6158F3A3-4902-4201-835E-1ED7F810B2D8}");
         To<V_13_3_0.AlignUpgradedDatabase>("{985AF2BA-69D3-4DBA-95E0-AD3FA7459FA7}");
+        To<V_13_5_0.ChangeRedirectUrlToNvarcharMax>("{CC47C751-A81B-489A-A2BC-0240245DB687}");
 
         // To 14.0.0
-        To<V_14_0_0.AddPropertyEditorUiAliasColumn>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
-        To<V_14_0_0.AddGuidsToUserGroups>("{69E12556-D9B3-493A-8E8A-65EC89FB658D}");
-        To<V_14_0_0.AddUserGroup2PermisionTable>("{F2B16CD4-F181-4BEE-81C9-11CF384E6025}");
-        To<V_14_0_0.AddGuidsToUsers>("{A8E01644-9F2E-4988-8341-587EF5B7EA69}");
+        To<NoopMigration>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
+        To<NoopMigration>("{69E12556-D9B3-493A-8E8A-65EC89FB658D}");
+        To<NoopMigration>("{F2B16CD4-F181-4BEE-81C9-11CF384E6025}");
+        To<NoopMigration>("{A8E01644-9F2E-4988-8341-587EF5B7EA69}");
         To<V_14_0_0.UpdateDefaultGuidsOfCreatedPackages>("{E073DBC0-9E8E-4C92-8210-9CB18364F46E}");
         To<V_14_0_0.RenameTechnologyLeakingPropertyEditorAliases>("{80D282A4-5497-47FF-991F-BC0BCE603121}");
         To<V_14_0_0.MigrateSchduledPublishesToUtc>("{96525697-E9DC-4198-B136-25AD033442B8}");
-        To<V_14_0_0.AddListViewKeysToDocumentTypes>("{7FC5AC9B-6F56-415B-913E-4A900629B853}");
+        To<NoopMigration>("{7FC5AC9B-6F56-415B-913E-4A900629B853}");
         To<V_14_0_0.MigrateDataTypeConfigurations>("{1539A010-2EB5-4163-8518-4AE2AA98AFC6}");
-        To<V_14_0_0.MigrateCharPermissionsToStrings>("{C567DE81-DF92-4B99-BEA8-CD34EF99DA5D}");
+        To<NoopMigration>("{C567DE81-DF92-4B99-BEA8-CD34EF99DA5D}");
         To<V_14_0_0.DeleteMacroTables>("{0D82C836-96DD-480D-A924-7964E458BD34}");
         To<V_14_0_0.MoveDocumentBlueprintsToFolders>("{1A0FBC8A-6FC6-456C-805C-B94816B2E570}");
-        To<V_14_0_0.MigrateTours>("{302DE171-6D83-4B6B-B3C0-AC8808A16CA1}");
+        To<NoopMigration>("{302DE171-6D83-4B6B-B3C0-AC8808A16CA1}");
         To<V_14_0_0.MigrateUserGroup2PermissionPermissionColumnType>("{8184E61D-ECBA-4AAA-B61B-D7A82EB82EB7}");
         To<V_14_0_0.MigrateNotificationCharsToStrings>("{E261BF01-2C7F-4544-BAE7-49D545B21D68}");
         To<V_14_0_0.AddEditorUiToDataType>("{5A2EF07D-37B4-49D5-8E9B-3ED01877263B}");
@@ -92,8 +93,23 @@ public class UmbracoPlan : MigrationPlan
         // To 14.2.0
         To<V_14_2_0.AddMissingDateTimeConfiguration>("{20ED404C-6FF9-4F91-8AC9-2B298E0002EB}");
 
+        // To 14.3.0
+        To<V_13_5_0.ChangeRedirectUrlToNvarcharMax>("{EEF792FC-318C-4921-9859-51EBF07A53A3}"); // Execute again, to ensure all that migrated to 14.0.0 without 13.5 will have this
+
         // To 15.0.0
         To<V_15_0_0.AddUserClientId>("{7F4F31D8-DD71-4F0D-93FC-2690A924D84B}");
-        To<V_15_0_0.AddKindToUser>("{1A8835EF-F8AB-4472-B4D8-D75B7C164022}");
+        To<NoopMigration>("{1A8835EF-F8AB-4472-B4D8-D75B7C164022}");
+        To<V_15_0_0.RebuildDocumentUrls>("{3FE0FA2D-CF4F-4892-BA8D-E97D06E028DC}");
+        To<V_15_0_0.ConvertBlockListEditorProperties>("{6C04B137-0097-4938-8C6A-276DF1A0ECA8}");
+        To<V_15_0_0.ConvertBlockGridEditorProperties>("{9D3CE7D4-4884-41D4-98E8-302EB6CB0CF6}");
+        To<V_15_0_0.ConvertRichTextEditorProperties>("{37875E80-5CDD-42FF-A21A-7D4E3E23E0ED}");
+        To<V_15_0_0.ConvertLocalLinks>("{42E44F9E-7262-4269-922D-7310CB48E724}");
+
+        // To 15.1.0
+        To<V_15_1_0.RebuildCacheMigration>("{7B51B4DE-5574-4484-993E-05D12D9ED703}");
+        To<V_15_1_0.FixConvertLocalLinks>("{F3D3EF46-1B1F-47DB-B437-7D573EEDEB98}");
+
+        // To 15.3.0
+        To<V_15_3_0.AddNameAndDescriptionToWebhooks>("{7B11F01E-EE33-4B0B-81A1-F78F834CA45B}");
     }
 }

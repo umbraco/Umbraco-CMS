@@ -1,9 +1,11 @@
 @model Umbraco.Cms.Web.Website.Models.NoNodesViewModel
+@using Umbraco.Cms.Api.Management.Controllers.Security
 @using Umbraco.Cms.Core.Hosting
 @using Umbraco.Cms.Core.Routing
 @inject IHostingEnvironment HostingEnvironment
 @{
     var backOfficePath = HostingEnvironment.GetBackOfficePath();
+    var logoImage = Url.RouteUrl(BackOfficeGraphicsController.LogoRouteName, new {Version= "1"});
 }
 <!doctype html>
 <html class="no-js" lang="en">
@@ -22,7 +24,7 @@
         <article>
             <div>
                 <div class="logo" aria-hidden="true">
-                    <img alt="Umbraco" src="umbraco/backoffice/assets/umbraco_logomark_white.svg" width="91" height="91" />
+                    <img alt="logo" src="@logoImage" height="91"/>
                 </div>
 
                 <h1>Welcome to your Umbraco installation</h1>

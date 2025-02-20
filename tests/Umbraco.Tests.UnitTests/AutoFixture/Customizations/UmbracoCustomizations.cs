@@ -11,6 +11,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Install;
@@ -34,7 +35,8 @@ internal class UmbracoCustomizations : ICustomization
             .Customize(new ConstructorCustomization(typeof(DatabaseSchemaCreatorFactory), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(InstallHelper), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(DatabaseBuilder), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(ContentVersionService), new GreedyConstructorQuery()));
+            .Customize(new ConstructorCustomization(typeof(ContentVersionService), new GreedyConstructorQuery()))
+            .Customize(new ConstructorCustomization(typeof(ContentFinderByUrlAlias), new GreedyConstructorQuery()));
 
         // When requesting an IUserStore ensure we actually uses a IUserLockoutStore
         fixture.Customize<IUserStore<BackOfficeIdentityUser>>(cc =>

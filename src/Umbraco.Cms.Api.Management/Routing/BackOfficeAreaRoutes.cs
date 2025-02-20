@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Umbraco.Cms.Api.Management.Controllers.Security;
+using Umbraco.Cms.Api.Management.ServerEvents;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Routing;
@@ -29,6 +30,7 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
             MapMinimalBackOffice(endpoints);
 
             endpoints.MapHub<BackofficeHub>(Constants.System.UmbracoPathSegment + Constants.Web.BackofficeSignalRHub);
+            endpoints.MapHub<ServerEventHub>(Constants.System.UmbracoPathSegment + Constants.Web.ServerEventSignalRHub);
         }
     }
 

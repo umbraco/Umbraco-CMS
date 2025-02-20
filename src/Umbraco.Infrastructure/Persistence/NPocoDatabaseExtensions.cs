@@ -120,6 +120,7 @@ public static partial class NPocoDatabaseExtensions
     ///         once T1 and T2 have completed. Whereas here, it could contain T1's value.
     ///     </para>
     /// </remarks>
+    [Obsolete("Use InsertOrUpdateAsync instead")]
     public static RecordPersistenceType InsertOrUpdate<T>(this IUmbracoDatabase db, T poco)
         where T : class =>
         db.InsertOrUpdate(poco, null, null);
@@ -150,7 +151,7 @@ public static partial class NPocoDatabaseExtensions
     ///         once T1 and T2 have completed. Whereas here, it could contain T1's value.
     ///     </para>
     /// </remarks>
-    public static RecordPersistenceType InsertOrUpdate<T>(
+    public static async Task<RecordPersistenceType> InsertOrUpdateAsync<T>(
         this IUmbracoDatabase db,
         T poco,
         string? updateCommand,
@@ -167,7 +168,7 @@ public static partial class NPocoDatabaseExtensions
 
         // try to update
         var rowCount = updateCommand.IsNullOrWhiteSpace() || updateArgs is null
-            ? db.Update(poco)
+            ? await db.UpdateAsync(poco)
             : db.Update<T>(updateCommand!, updateArgs);
         if (rowCount > 0)
         {
@@ -182,7 +183,7 @@ public static partial class NPocoDatabaseExtensions
             try
             {
                 // try to insert
-                db.Insert(poco);
+                await db.InsertAsync(poco);
                 return RecordPersistenceType.Insert;
             }
             catch (DbException)
@@ -193,7 +194,7 @@ public static partial class NPocoDatabaseExtensions
 
                 // try to update
                 rowCount = updateCommand.IsNullOrWhiteSpace() || updateArgs is null
-                    ? db.Update(poco)
+                    ? await db.UpdateAsync(poco)
                     : db.Update<T>(updateCommand!, updateArgs);
                 if (rowCount > 0)
                 {
@@ -208,6 +209,14 @@ public static partial class NPocoDatabaseExtensions
         // this can go on forever... have to break at some point and report an error.
         throw new DataException("Record could not be inserted or updated.");
     }
+
+    public static RecordPersistenceType InsertOrUpdate<T>(
+        this IUmbracoDatabase db,
+        T poco,
+        string? updateCommand,
+        object? updateArgs)
+        where T : class =>
+        db.InsertOrUpdateAsync(poco, updateCommand, updateArgs).GetAwaiter().GetResult();
 
     /// <summary>
     ///     This will escape single @ symbols for npoco values so it doesn't think it's a parameter

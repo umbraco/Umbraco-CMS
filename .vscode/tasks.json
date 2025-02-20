@@ -27,11 +27,9 @@
             "promptOnClose": true,
             "group": "build",
             "type": "npm",
-            "script": "build",
+            "script": "build:for:cms",
             "path": "src/Umbraco.Web.UI.Client/",
-            "problemMatcher": [
-                "$gulp-tsc"
-            ]
+            "problemMatcher": []
         },
         {
             "label": "Client Watch",
@@ -41,9 +39,7 @@
             "type": "npm",
             "script": "dev",
             "path": "src/Umbraco.Web.UI.Client/",
-            "problemMatcher": [
-                "$gulp-tsc"
-            ]
+            "problemMatcher": []
         },
         {
             "label": "Dotnet build",

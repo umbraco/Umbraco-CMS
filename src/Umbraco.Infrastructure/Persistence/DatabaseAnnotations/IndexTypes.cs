@@ -8,4 +8,5 @@ public enum IndexTypes
     Clustered,
     NonClustered,
     UniqueNonClustered,
+    UniqueClustered,
 }

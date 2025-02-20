@@ -17,6 +17,7 @@ public class NodeDto
     public const string IdColumnName = "id";
     public const string KeyColumnName = "uniqueId";
     public const string ParentIdColumnName = "parentId";
+    public const string SortOrderColumnName = "sortOrder";
     public const string TrashedColumnName = "trashed";
 
     private int? _userId;
@@ -46,7 +47,7 @@ public class NodeDto
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Path")]
     public string Path { get; set; } = null!;
 
-    [Column("sortOrder")]
+    [Column(SortOrderColumnName)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType_trashed_sorted", ForColumns = "nodeObjectType,trashed,sortOrder,id", IncludeColumns = "uniqueID,parentID,level,path,nodeUser,text,createDate")]
     public int SortOrder { get; set; }
 

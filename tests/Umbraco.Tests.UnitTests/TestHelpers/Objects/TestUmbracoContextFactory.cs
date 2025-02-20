@@ -33,23 +33,21 @@ public class TestUmbracoContextFactory
 
         var contentCache = new Mock<IPublishedContentCache>();
         var mediaCache = new Mock<IPublishedMediaCache>();
-        var snapshot = new Mock<IPublishedSnapshot>();
-        snapshot.Setup(x => x.Content).Returns(contentCache.Object);
-        snapshot.Setup(x => x.Media).Returns(mediaCache.Object);
-        var snapshotService = new Mock<IPublishedSnapshotService>();
-        snapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(snapshot.Object);
+        var cacheManager = new Mock<ICacheManager>();
+        cacheManager.Setup(x => x.Content).Returns(contentCache.Object);
+        cacheManager.Setup(x => x.Media).Returns(mediaCache.Object);
 
         var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
         var umbracoContextFactory = new UmbracoContextFactory(
             umbracoContextAccessor,
-            snapshotService.Object,
             new UmbracoRequestPaths(hostingEnvironment, Options.Create(umbracoRequestPathsOptions)),
             hostingEnvironment,
             new UriUtility(hostingEnvironment),
             new AspNetCoreCookieManager(httpContextAccessor),
             httpContextAccessor,
-            Mock.Of<IWebProfilerService>());
+            Mock.Of<IWebProfilerService>(),
+            cacheManager.Object);
 
         return umbracoContextFactory;
     }
