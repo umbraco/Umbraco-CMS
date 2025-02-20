@@ -1,9 +1,7 @@
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Delivery.Controllers;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 
