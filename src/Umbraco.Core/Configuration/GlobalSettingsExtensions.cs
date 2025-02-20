@@ -12,7 +12,7 @@ public static class GlobalSettingsExtensions
     /// <param name="globalSettings"></param>
     /// <param name="hostingEnvironment"></param>
     /// <returns></returns>
-    [Obsolete("The UmbracoPath setting is removed, use IHostingEnvironment.GetBackOfficePath() instead. This method will be removed in a future version.")]
+    [Obsolete("The UmbracoPath setting is removed, use IHostingEnvironment.GetBackOfficePath() instead. Scheduled for removal in Umbraco 17.")]
     public static string GetBackOfficePath(this GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         => hostingEnvironment.GetBackOfficePath();
 
@@ -28,7 +28,7 @@ public static class GlobalSettingsExtensions
     ///     with something
     ///     like "MyVirtualDirectory-Umbraco" instead of just "Umbraco".
     /// </remarks>
-    [Obsolete("The UmbracoPath setting is removed, use Constants.System.UmbracoPathSegment as area name instead. This method will be removed in a future version.")]
+    [Obsolete("The UmbracoPath setting is removed, use Constants.System.UmbracoPathSegment as area name instead. Scheduled for removal in Umbraco 17.")]
     public static string GetUmbracoMvcArea(this GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         => Constants.System.UmbracoPathSegment;
 }

@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Nodes;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
@@ -12,8 +12,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.DeliveryApi;
 [TestFixture]
 public class OpenApiContractTest : UmbracoTestServerTestBase
 {
-    private GlobalSettings GlobalSettings => GetRequiredService<IOptions<GlobalSettings>>().Value;
-
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
@@ -26,7 +24,7 @@ public class OpenApiContractTest : UmbracoTestServerTestBase
     [Test]
     public async Task Validate_OpenApi_Contract()
     {
-        var backOfficePath = GlobalSettings.GetBackOfficePath(HostingEnvironment);
+        var backOfficePath = HostingEnvironment.GetBackOfficePath();
 
         var swaggerPath = $"{backOfficePath}/swagger/delivery/swagger.json";
 

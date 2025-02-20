@@ -14,7 +14,7 @@ public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
     public AspNetCoreBackOfficeInfo(IHostingEnvironment hostingEnviroment)
         => _hostingEnvironment = hostingEnviroment;
 
-    [Obsolete("The globalSettings parameter is not required anymore, use the other constructor instead. This constructor will be removed in a future version.")]
+    [Obsolete("The globalSettings parameter is not required anymore, use the other constructor instead. Scheduled for removal in Umbraco 17.")]
     public AspNetCoreBackOfficeInfo(IOptionsMonitor<GlobalSettings> globalSettings, IHostingEnvironment hostingEnviroment)
         : this(hostingEnviroment)
     { }
