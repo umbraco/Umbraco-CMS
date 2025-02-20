@@ -124,9 +124,6 @@ public class ContentService : RepositoryService, IContentService
             StaticServiceProvider.Instance.GetRequiredService<IRelationService>())
     {
     }
-
-
-
     [Obsolete("Use non-obsolete constructor. Scheduled for removal in V17.")]
     public ContentService(
         ICoreScopeProvider provider,
@@ -2771,13 +2768,11 @@ public class ContentService : RepositoryService, IContentService
             {
                 foreach (IContent content in contents)
                 {
-                    if (_contentSettings.DisableDeleteWhenReferenced)
+                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id))
                     {
-                        if (_relationService.IsRelated(content.Id))
-                        {
-                            continue;
-                        }
+                        continue;
                     }
+
                     DeleteLocked(scope, content, eventMessages);
                     deleted.Add(content);
                 }
