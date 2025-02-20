@@ -1,4 +1,6 @@
-# Build or run a Development Server
+# Umbraco CMS Build
+
+This guide will explain how you can build the Umbraco CMS from the source code. You will most likely want to do this if your are setting up a local development environment for contributing code updates to the project. You will need this in order to develop and test your fix or feature.
 
 ## Are you sure?
 
