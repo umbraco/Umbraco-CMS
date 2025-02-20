@@ -2,8 +2,8 @@ import { UmbDataMappingResolver } from './mapping/data-mapping-resolver.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 export interface UmbDataMapperMapArgs<fromModelType = unknown, toModelType = unknown> {
-	dataModelIdentifier: string;
-	dataSourceIdentifier: string;
+	forDataModel: string;
+	forDataSource: string;
 	data: fromModelType;
 	fallback?: (data: fromModelType) => Promise<toModelType>;
 }
@@ -12,11 +12,11 @@ export class UmbDataMapper<fromModelType = unknown, toModelType = unknown> exten
 	#dataMappingResolver = new UmbDataMappingResolver(this);
 
 	async map(args: UmbDataMapperMapArgs<fromModelType, toModelType>) {
-		if (!args.dataSourceIdentifier) {
+		if (!args.forDataSource) {
 			throw new Error('data source identifier is required');
 		}
 
-		if (!args.dataModelIdentifier) {
+		if (!args.forDataModel) {
 			throw new Error('data identifier is required');
 		}
 
@@ -24,7 +24,7 @@ export class UmbDataMapper<fromModelType = unknown, toModelType = unknown> exten
 			throw new Error('data is required');
 		}
 
-		const dataMapping = await this.#dataMappingResolver.resolve(args.dataSourceIdentifier, args.dataModelIdentifier);
+		const dataMapping = await this.#dataMappingResolver.resolve(args.forDataSource, args.forDataModel);
 
 		if (!dataMapping && !args.fallback) {
 			throw new Error('Data mapping not found and no fallback provided.');

@@ -35,7 +35,7 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase impl
 		if (data) {
 			const promises = data.items.map(async (item) => {
 				return this.#dataMapper.map({
-					dataModelIdentifier: item.$type,
+					forDataModel: item.$type,
 					data: item,
 					fallback: async () => {
 						return {
