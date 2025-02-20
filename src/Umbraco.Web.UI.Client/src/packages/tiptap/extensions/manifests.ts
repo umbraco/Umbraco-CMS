@@ -1,5 +1,6 @@
 import { manifests as blockExtensions } from './block/manifests.js';
 import { manifests as styleSelectExtensions } from './style-select/manifests.js';
+import { manifests as tableExtensions } from './table/manifests.js';
 import type { ManifestTiptapExtension } from './tiptap.extension.js';
 import type { ManifestTiptapToolbarExtension } from './tiptap-toolbar.extension.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
@@ -96,18 +97,6 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 			icon: 'icon-superscript',
 			label: 'Superscript',
 			group: '#tiptap_extGroup_formatting',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Table',
-		name: 'Table Tiptap Extension',
-		api: () => import('./core/table.tiptap-api.js'),
-		meta: {
-			icon: 'icon-table',
-			label: 'Table',
-			group: '#tiptap_extGroup_interactive',
 		},
 	},
 	{
@@ -473,21 +462,14 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 			label: '#general_embed',
 		},
 	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Table',
-		name: 'Table Tiptap Extension',
-		api: () => import('./toolbar/table.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.Table'],
-		meta: {
-			alias: 'table',
-			icon: 'icon-table',
-			label: 'Table',
-		},
-	},
 ];
 
-const extensions = [...coreExtensions, ...toolbarExtensions, ...blockExtensions, ...styleSelectExtensions];
+const extensions = [
+	...coreExtensions,
+	...toolbarExtensions,
+	...blockExtensions,
+	...styleSelectExtensions,
+	...tableExtensions,
+];
 
 export const manifests = [...kinds, ...extensions];
