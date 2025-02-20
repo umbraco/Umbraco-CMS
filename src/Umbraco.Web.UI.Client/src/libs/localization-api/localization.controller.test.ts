@@ -282,6 +282,71 @@ describe('UmbLocalizeController', () => {
 		});
 	});
 
+	describe('list format', () => {
+		it('should return a list with conjunction', () => {
+			expect(controller.list(['one', 'two', 'three'], { type: 'conjunction' })).to.equal('one, two, and three');
+		});
+
+		it('should return a list with disjunction', () => {
+			expect(controller.list(['one', 'two', 'three'], { type: 'disjunction' })).to.equal('one, two, or three');
+		});
+	});
+
+	describe('duration', () => {
+		it('should return a duration', () => {
+			const now = new Date('2020-01-01T00:00:00');
+			const inTwoDays = new Date(now.getTime());
+			inTwoDays.setDate(inTwoDays.getDate() + 2);
+			inTwoDays.setHours(11, 30, 5);
+
+			expect(controller.duration(inTwoDays, now)).to.equal('2 days, 11 hours, 30 minutes, 5 seconds');
+		});
+
+		it('should return a date in seconds if the date is less than a minute away', () => {
+			const now = new Date();
+			const inTenSeconds = new Date(now.getTime() + 10000);
+
+			expect(controller.duration(inTenSeconds, now)).to.equal('10 seconds');
+		});
+
+		it('should compare between two dates', () => {
+			const twoDaysAgo = new Date();
+			twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+			const inTwoDays = new Date();
+			inTwoDays.setDate(inTwoDays.getDate() + 2);
+
+			expect(controller.duration(inTwoDays, twoDaysAgo)).to.equal('4 days');
+		});
+
+		it('should return a negative duration', () => {
+			expect(controller.duration('2020-01-01', '2019-12-30')).to.equal('2 days');
+		});
+
+		it('should update the relative compounded time when the language changes', async () => {
+			const now = new Date();
+			const inTwoDays = new Date();
+			inTwoDays.setDate(inTwoDays.getDate() + 2);
+
+			expect(controller.duration(inTwoDays, now)).to.equal('2 days');
+
+			// Switch browser to Danish
+			document.documentElement.lang = danishRegional.$code;
+			await aTimeout(0);
+
+			expect(controller.duration(inTwoDays, now)).to.equal('2 dage');
+		});
+	});
+
+	describe('list format', () => {
+		it('should return a list with conjunction', () => {
+			expect(controller.list(['one', 'two', 'three'], { type: 'conjunction' })).to.equal('one, two, and three');
+		});
+
+		it('should return a list with disjunction', () => {
+			expect(controller.list(['one', 'two', 'three'], { type: 'disjunction' })).to.equal('one, two, or three');
+		});
+	});
+
 	describe('string', () => {
 		it('should replace words prefixed with a # with translated value', async () => {
 			const str = '#close';

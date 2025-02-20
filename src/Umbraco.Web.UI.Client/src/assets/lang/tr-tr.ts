@@ -1737,9 +1737,6 @@ export default {
 		smtpMailSettingsConnectionSuccess: 'SMTP ayarları doğru yapılandırıldı ve hizmet beklendiği gibi çalışıyor.',
 		notificationEmailsCheckSuccessMessage: 'Bildirim e-postası <strong>%0%</strong> olarak ayarlandı',
 		notificationEmailsCheckErrorMessage: 'Bildirim e-postası hâlâ varsayılan değer olan <strong>%0%</strong>.',
-		scheduledHealthCheckEmailBody:
-			'<html><body><p>%0% tarihinde %1% ile çalıştırılan planlanmış Umbraco Sağlık Kontrollerinin sonuçları aşağıdaki gibidir: </p>%2%</body></html>',
-		scheduledHealthCheckEmailSubject: 'Umbraco Sağlık Kontrolü Durumu: %0%',
 		checkGroup: 'Grubu kontrol et',
 		helpText:
 			'\n        <p> Durum denetleyicisi, sitenizin çeşitli alanlarını en iyi uygulama ayarları, yapılandırma, olası sorunlar vb. için değerlendirir. Sorunları bir düğmeye basarak kolayca düzeltebilirsiniz.\n        Kendi sağlık kontrollerinizi ekleyebilir, <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">özel durum kontrolleri hakkında daha fazla bilgi için belgeler </a>. </p>\n        ',

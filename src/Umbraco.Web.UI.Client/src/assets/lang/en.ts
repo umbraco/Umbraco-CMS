@@ -294,6 +294,7 @@ export default {
 		notmemberof: 'Not a member of group(s)',
 		childItems: 'Child items',
 		target: 'Target',
+		scheduledPendingChanges: 'This schedule has changes that will take effect when you click "%0%".',
 		scheduledPublishServerTime: 'This translates to the following time on the server:',
 		scheduledPublishDocumentation:
 			'<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">What does this mean?</a>',
@@ -438,10 +439,10 @@ export default {
 		compositionDescription:
 			"Defines a re-usable set of properties that can be included in the definition of\n      multiple other Document Types. For example, a set of 'Common Page Settings'.\n    ",
 		folder: 'Folder',
-		folderDescription:
-			'Used to organise the Document Types, Compositions and Element Types created in this\n      Document Type tree.\n    ',
+		folderDescription: 'Used to organise items and other folders. Keep items structured and easy to access.',
 		newFolder: 'New folder',
 		newDataType: 'New Data Type',
+		newDataTypeDescription: 'Used to define a configuration for a Property Type on a Content Type.',
 		newJavascriptFile: 'New JavaScript file',
 		newEmptyPartialView: 'New empty partial view',
 		newPartialViewMacro: 'New partial view macro',
@@ -965,6 +966,10 @@ export default {
 		revert: 'Revert',
 		validate: 'Validate',
 		newVersionAvailable: 'New version available',
+		duration: (duration: string, date: Date | string, now: Date | string) => {
+			if (new Date(date).getTime() < new Date(now).getTime()) return `${duration} ago`;
+			return `in ${duration}`;
+		},
 	},
 	colors: {
 		blue: 'Blue',
@@ -1407,7 +1412,7 @@ export default {
 		folderUploadNotAllowed:
 			'This file is being uploaded as part of a folder, but creating a new folder is not allowed here',
 		folderCreationNotAllowed: 'Creating a new folder is not allowed here',
-		contentPublishedFailedByEvent: 'Content could not be published, a 3rd party add-in cancelled the action',
+		contentPublishedFailedByEvent: 'Document could not be published, a 3rd party add-in cancelled the action',
 		contentTypeDublicatePropertyType: 'Property type already exists',
 		contentTypePropertyTypeCreated: 'Property type created',
 		contentTypePropertyTypeCreatedText: 'Name: %0% <br /> DataType: %1%',
@@ -1421,12 +1426,13 @@ export default {
 		cssSavedText: 'Stylesheet saved without any errors',
 		dataTypeSaved: 'Datatype saved',
 		dictionaryItemSaved: 'Dictionary item saved',
-		editContentPublishedFailedByParent: 'Content could not be published, because a parent page is not published',
-		editContentPublishedHeader: 'Content published',
-		editContentPublishedText: 'and visible on the website',
+		editContentPublishedFailedByValidation: 'Document could not be published, but we saved it for you',
+		editContentPublishedFailedByParent: 'Document could not be published, because a parent page is not published',
+		editContentPublishedHeader: 'Document published',
+		editContentPublishedText: 'and is visible on the website',
 		editBlueprintSavedHeader: 'Document Blueprint saved',
 		editBlueprintSavedText: 'Changes have been successfully saved',
-		editContentSavedHeader: 'Content saved',
+		editContentSavedHeader: 'Document saved',
 		editContentSavedText: 'Remember to publish to make changes visible',
 		editContentSendToPublish: 'Sent For Approval',
 		editContentSendToPublishText: 'Changes have been sent for approval',
@@ -1488,10 +1494,11 @@ export default {
 		cannotCopyInformation: 'Could not copy your system information to the clipboard',
 		webhookSaved: 'Webhook saved',
 		operationSavedHeaderReloadUser: 'Saved. To view the changes please reload your browser',
-		editMultiContentPublishedText: '%0% documents published and visible on the website',
-		editVariantPublishedText: '%0% published and visible on the website',
-		editMultiVariantPublishedText: '%0% documents published for languages %1% and visible on the website',
+		editMultiContentPublishedText: '%0% documents published and are visible on the website',
+		editVariantPublishedText: '%0% published and is visible on the website',
+		editMultiVariantPublishedText: '%0% documents published for languages %1% and are visible on the website',
 		editContentScheduledSavedText: 'A schedule for publishing has been updated',
+		editContentScheduledNotSavedText: 'The schedule for publishing could not be updated',
 		editVariantSavedText: '%0% saved',
 		editVariantSendToPublishText: '%0% changes have been sent for approval',
 		contentCultureUnpublished: 'Content variation %0% unpublished',
@@ -2023,6 +2030,8 @@ export default {
 		permissionsDefault: 'Default permissions',
 		permissionsGranular: 'Granular permissions',
 		permissionsGranularHelp: 'Set permissions for specific nodes',
+		granularRightsLabel: 'Documents',
+		granularRightsDescription: 'Assign permissions to specific documents',
 		permissionsEntityGroup_document: 'Content',
 		permissionsEntityGroup_media: 'Media',
 		permissionsEntityGroup_member: 'Member',
@@ -2039,6 +2048,8 @@ export default {
 		chooseUserGroup: (multiple: boolean) => {
 			return multiple ? 'Choose User Groups' : 'Choose User Group';
 		},
+		entityPermissionsLabel: 'Permissions',
+		entityPermissionsDescription: 'Assign permissions for actions',
 		noStartNode: 'No start node selected',
 		noStartNodes: 'No start nodes selected',
 		startnode: 'Content start node',
@@ -2212,9 +2223,6 @@ export default {
 		notificationEmailsCheckSuccessMessage: 'Notification email has been set to <strong>%0%</strong>.',
 		notificationEmailsCheckErrorMessage:
 			'Notification email is still set to the default value of <strong>%0%</strong>.',
-		scheduledHealthCheckEmailBody:
-			'<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>',
-		scheduledHealthCheckEmailSubject: 'Umbraco Health Check Status: %0%',
 		checkGroup: 'Check group',
 		helpText:
 			'\n        <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.\n        You can add your own health checks, have a look at <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>\n        ',
@@ -2626,6 +2634,8 @@ export default {
 		labelInlineMode: 'Display inline with text',
 		notExposedLabel: 'Draft',
 		notExposedDescription: 'This Block is not yet created for this variant',
+		areaValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in this area.',
+		rootValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in the root of this property.',
 		unsupportedBlockName: 'Unsupported',
 		unsupportedBlockDescription:
 			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',

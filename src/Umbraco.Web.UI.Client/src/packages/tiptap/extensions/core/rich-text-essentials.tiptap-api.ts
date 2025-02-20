@@ -9,7 +9,7 @@ import {
 	TextStyle,
 } from '@umbraco-cms/backoffice/external/tiptap';
 
-export default class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionApiBase {
+export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionApiBase {
 	#localize = new UmbLocalizationController(this);
 
 	getTiptapExtensions = () => [
@@ -55,3 +55,7 @@ export default class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapEx
 		Span,
 	];
 }
+
+export default UmbTiptapRichTextEssentialsExtensionApi;
+
+export { UmbTiptapRichTextEssentialsExtensionApi as api };
