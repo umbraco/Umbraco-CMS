@@ -1,20 +1,24 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-[Platform("Linux", Reason = "This uses too much memory when running both caches, should be removed when nuchache is removed")]
 public class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
 {
     private string _englishIsoCode = "en-US";
@@ -24,11 +28,11 @@ public class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
     private string _invariantTitleAlias = "invariantTitle";
     private string _invariantTitleName = "Invariant Title";
 
-    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
-
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+
+    private IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
 
     private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 
@@ -36,7 +40,11 @@ public class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
 
     private IContent VariantPage { get; set; }
 
-    protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
+        builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
+    }
 
     [SetUp]
     public async Task Setup() => await CreateTestData();
@@ -49,37 +57,33 @@ public class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
         var updatedInvariantTitle = "Updated Invariant Title";
         var updatedVariantTitle = "Updated Variant Title";
 
-
         var updateModel = new ContentUpdateModel
         {
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = _invariantTitleAlias, Value = updatedInvariantTitle }
-            },
-            Variants = new []
+            InvariantProperties =
+                new[] { new PropertyValueModel { Alias = _invariantTitleAlias, Value = updatedInvariantTitle } },
+            Variants = new[]
             {
                 new VariantModel
                 {
                     Culture = _englishIsoCode,
                     Name = "Updated English Name",
-                    Properties = new []
-                    {
-                        new PropertyValueModel { Alias = _variantTitleAlias, Value = updatedVariantTitle }
-                    }
+                    Properties =
+                        new[] { new PropertyValueModel { Alias = _variantTitleAlias, Value = updatedVariantTitle } },
                 },
                 new VariantModel
                 {
                     Culture = _danishIsoCode,
                     Name = "Updated Danish Name",
-                    Properties = new []
+                    Properties = new[]
                     {
-                        new PropertyValueModel { Alias = _variantTitleAlias, Value = updatedVariantTitle }
+                        new PropertyValueModel { Alias = _variantTitleAlias, Value = updatedVariantTitle },
                     },
                 },
             },
         };
 
-        var result = await ContentEditingService.UpdateAsync(VariantPage.Key, updateModel, Constants.Security.SuperUserKey);
+        var result =
+            await ContentEditingService.UpdateAsync(VariantPage.Key, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         // Act
@@ -87,7 +91,7 @@ public class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
 
         // Assert
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
-        Assert.AreEqual(updatedInvariantTitle, textPage.Value(_invariantTitleAlias, "", ""));
+        Assert.AreEqual(updatedInvariantTitle, textPage.Value(_invariantTitleAlias, string.Empty, string.Empty));
         Assert.AreEqual(updatedVariantTitle, textPage.Value(_variantTitleAlias, _englishIsoCode));
         Assert.AreEqual(updatedVariantTitle, textPage.Value(_variantTitleAlias, _danishIsoCode));
     }
@@ -100,28 +104,26 @@ public class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
         var updatedInvariantTitle = "Updated Invariant Title";
         var updatedVariantTitle = "Updated Invariant Title";
 
-
         var updateModel = new ContentUpdateModel
         {
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = _invariantTitleAlias, Value = updatedInvariantTitle }
-            },
-            Variants = new []
+            InvariantProperties =
+                new[] { new PropertyValueModel { Alias = _invariantTitleAlias, Value = updatedInvariantTitle } },
+            Variants = new[]
             {
                 new VariantModel
                 {
                     Culture = _englishIsoCode,
                     Name = "Updated English Name",
-                    Properties = new []
+                    Properties = new[]
                     {
-                        new PropertyValueModel { Alias = _variantTitleAlias, Value = updatedVariantTitle }
-                    }
+                        new PropertyValueModel { Alias = _variantTitleAlias, Value = updatedVariantTitle },
+                    },
                 },
             },
         };
 
-        var result = await ContentEditingService.UpdateAsync(VariantPage.Key, updateModel, Constants.Security.SuperUserKey);
+        var result =
+            await ContentEditingService.UpdateAsync(VariantPage.Key, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         // Act
@@ -129,64 +131,30 @@ public class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
 
         // Assert
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
-        Assert.AreEqual(updatedInvariantTitle, textPage.Value(_invariantTitleAlias, "", ""));
+        Assert.AreEqual(updatedInvariantTitle, textPage.Value(_invariantTitleAlias, string.Empty, string.Empty));
         Assert.AreEqual(updatedVariantTitle, textPage.Value(_variantTitleAlias, _englishIsoCode));
         Assert.AreEqual(_variantTitleName, textPage.Value(_variantTitleAlias, _danishIsoCode));
     }
 
-
     private async Task CreateTestData()
     {
-        // NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
         var language = new LanguageBuilder()
             .WithCultureInfo(_danishIsoCode)
             .Build();
-
         await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
 
-        var contentType = new ContentTypeBuilder()
-            .WithAlias("cultureVariationTest")
-            .WithName("Culture Variation Test")
-            .WithContentVariation(ContentVariation.Culture)
-            .AddPropertyType()
-            .WithAlias(_variantTitleAlias)
-            .WithName(_variantTitleName)
-            .WithVariations(ContentVariation.Culture)
-            .Done()
-            .AddPropertyType()
-            .WithAlias(_invariantTitleAlias)
-            .WithName(_invariantTitleName)
-            .WithVariations(ContentVariation.Nothing)
-            .Done()
-            .Build();
-        contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
-        var rootContentCreateModel = new ContentCreateModel
+        var contentType = ContentTypeEditingBuilder.CreateContentTypeWithTwoPropertiesOneVariantAndOneInvariant(
+            "cultureVariationTest", "Culture Variation Test", _variantTitleAlias, _variantTitleName,
+            _invariantTitleAlias, _invariantTitleName);
+        var contentTypeAttempt = await ContentTypeEditingService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        if (!contentTypeAttempt.Success)
         {
-            ContentTypeKey = contentType.Key,
-            Variants = new[]
-            {
-                new VariantModel
-                {
-                    Culture = "en-US",
-                    Name = "English Page",
-                    Properties = new []
-                    {
-                        new PropertyValueModel { Alias = _variantTitleAlias, Value = _variantTitleName }
-                    },
-                },
-                new VariantModel
-                {
-                    Culture = "da-DK",
-                    Name = "Danish Page",
-                    Properties = new []
-                    {
-                        new PropertyValueModel { Alias = _variantTitleAlias, Value = _variantTitleName }
-                    },
-                },
-            },
-        };
+            throw new Exception("Failed to create content type");
+        }
 
+        var rootContentCreateModel =
+            ContentEditingBuilder.CreateContentWithTwoVariantProperties(contentTypeAttempt.Result.Key, "en-US", "da-DK",
+                _variantTitleAlias, _variantTitleName);
         var result = await ContentEditingService.CreateAsync(rootContentCreateModel, Constants.Security.SuperUserKey);
         VariantPage = result.Result.Content;
     }

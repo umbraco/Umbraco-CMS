@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core;
 public class SimpleMainDom : IMainDom, IDisposable
 {
     private readonly List<KeyValuePair<int, Action>> _callbacks = new();
-    private readonly object _locko = new();
+    private readonly Lock _locko = new();
     private bool _disposedValue;
     private bool _isStopping;
 

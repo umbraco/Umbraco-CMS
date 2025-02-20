@@ -202,6 +202,8 @@ public class MediaListViewServiceTests : ContentListViewServiceTestsBase
     private async Task<IMedia> CreateRootMediaWithFiveChildrenAsListViewItems(Guid? listViewDataTypeKey = null)
     {
         var childImageMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Image);
+        childImageMediaType.PropertyTypes.First(x => x.Alias == "umbracoFile").Mandatory = false;
+        MediaTypeService.Save(childImageMediaType);
 
         var mediaTypeWithListView = new MediaTypeBuilder()
             .WithAlias("album")

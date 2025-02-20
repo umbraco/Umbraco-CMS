@@ -64,11 +64,5 @@ public abstract class PublishedCacheBase : IPublishedCache
 
     public abstract IPublishedContentType? GetContentType(Guid key);
 
-    public virtual IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType) =>
-
-        // this is probably not super-efficient, but works
-        // some cache implementation may want to override it, though
-        GetAtRoot()
-            .SelectMany(x => x.DescendantsOrSelf(_variationContextAccessor!))
-            .Where(x => x.ContentType.Id == contentType.Id);
+    public virtual IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType) => throw new NotImplementedException();
 }

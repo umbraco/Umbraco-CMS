@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Models;
 [DataContract(IsReference = true)]
 public class PropertyCollection : KeyedCollection<string, IProperty>, IPropertyCollection
 {
-    private readonly object _addLocker = new();
+    private readonly Lock _addLocker = new();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PropertyCollection" /> class.

@@ -54,7 +54,7 @@ public interface ITrackedReferencesService
     ///     Gets a paged result of items which are in relation with the current item.
     ///     Basically, shows the items which depend on the current item.
     /// </summary>
-    /// <param name="id">The identifier of the entity to retrieve relations for.</param>
+    /// <param name="key">The identifier of the entity to retrieve relations for.</param>
     /// <param name="skip">The amount of items to skip</param>
     /// <param name="take">The amount of items to take.</param>
     /// <param name="filterMustBeIsDependency">
@@ -97,4 +97,10 @@ public interface ITrackedReferencesService
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
     Task<PagedModel<RelationItemModel>> GetPagedItemsWithRelationsAsync(ISet<Guid> keys, long skip, long take,
         bool filterMustBeIsDependency);
+
+    Task<PagedModel<Guid>> GetPagedKeysWithDependentReferencesAsync(ISet<Guid> keys, Guid nodeObjectTypeId, long skip, long take)
+    {
+        PagedModel<RelationItemModel> pagedItems = GetPagedItemsWithRelationsAsync(keys, skip, take, true).GetAwaiter().GetResult();
+        return Task.FromResult(new PagedModel<Guid>(pagedItems.Total, pagedItems.Items.Select(i => i.NodeKey)));
+    }
 }

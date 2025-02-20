@@ -6,19 +6,30 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// <summary>
 ///     Used for deserializing the rich text block layouts
 /// </summary>
-public class RichTextBlockLayoutItem : IBlockLayoutItem
+public class RichTextBlockLayoutItem : BlockLayoutItemBase
 {
-    public Udi? ContentUdi { get; set; }
-
-    public Udi? SettingsUdi { get; set; }
-
     public RichTextBlockLayoutItem()
     { }
 
+    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
     public RichTextBlockLayoutItem(Udi contentUdi)
-        => ContentUdi = contentUdi;
+        : base(contentUdi)
+    {
+    }
 
+    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
     public RichTextBlockLayoutItem(Udi contentUdi, Udi settingsUdi)
-        : this(contentUdi)
-        => SettingsUdi = settingsUdi;
+        : base(contentUdi, settingsUdi)
+    {
+    }
+
+    public RichTextBlockLayoutItem(Guid contentKey)
+        : base(contentKey)
+    {
+    }
+
+    public RichTextBlockLayoutItem(Guid contentKey, Guid settingsKey)
+        : base(contentKey, settingsKey)
+    {
+    }
 }

@@ -185,11 +185,17 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
                         var listViewType = new List<string>();
 
                         if (dataType.Id.Equals(Constants.DataTypes.DefaultContentListView) && udi.EntityType == ObjectTypes.GetUdiType(UmbracoObjectTypes.DocumentType))
+                        {
                             listViewType.Add(Constants.Conventions.DataTypes.ListViewPrefix + "Content");
+                        }
                         else if (dataType.Id.Equals(Constants.DataTypes.DefaultMediaListView) && udi.EntityType == ObjectTypes.GetUdiType(UmbracoObjectTypes.MediaType))
+                        {
                             listViewType.Add(Constants.Conventions.DataTypes.ListViewPrefix + "Media");
+                        }
                         else if (dataType.Id.Equals(Constants.DataTypes.DefaultMembersListView) && udi.EntityType == ObjectTypes.GetUdiType(UmbracoObjectTypes.MemberType))
+                        {
                             listViewType.Add(Constants.Conventions.DataTypes.ListViewPrefix + "Members");
+                        }
 
                         if (listViewType.Any())
                         {
@@ -402,7 +408,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
         Database.Delete<User2NodeNotifyDto>("WHERE nodeId = @Id", new { entity.Id });
 
         // Remove Permissions
-        Database.Delete<UserGroup2GranularPermissionDto>("WHERE uniqueId = @Key", new { Key = entity.Key });
+        Database.Delete<UserGroup2GranularPermissionDto>("WHERE uniqueId = @Key", new { entity.Key });
 
         // Remove associated tags
         Database.Delete<TagRelationshipDto>("WHERE nodeId = @Id", new { entity.Id });

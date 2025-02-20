@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security;
@@ -13,15 +14,18 @@ public class PreviewService : IPreviewService
     private readonly ICookieManager _cookieManager;
     private readonly IPreviewTokenGenerator _previewTokenGenerator;
     private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly IRequestCache _requestCache;
 
     public PreviewService(
         ICookieManager cookieManager,
         IPreviewTokenGenerator previewTokenGenerator,
-        IServiceScopeFactory serviceScopeFactory)
+        IServiceScopeFactory serviceScopeFactory,
+        IRequestCache requestCache)
     {
         _cookieManager = cookieManager;
         _previewTokenGenerator = previewTokenGenerator;
         _serviceScopeFactory = serviceScopeFactory;
+        _requestCache = requestCache;
     }
 
     public async Task<bool> TryEnterPreviewAsync(IUser user)
@@ -41,6 +45,11 @@ public class PreviewService : IPreviewService
          _cookieManager.ExpireCookie(Constants.Web.PreviewCookieName);
          return Task.CompletedTask;
     }
+
+    public bool IsInPreview() =>
+        _requestCache.Get(
+            "IsInPreview",
+            () => TryGetPreviewClaimsIdentityAsync().GetAwaiter().GetResult().Success) as bool? ?? false;
 
     public async Task<Attempt<ClaimsIdentity>> TryGetPreviewClaimsIdentityAsync()
     {

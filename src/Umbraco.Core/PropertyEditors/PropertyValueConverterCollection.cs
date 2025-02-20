@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 
 public class PropertyValueConverterCollection : BuilderCollectionBase<IPropertyValueConverter>
 {
-    private readonly object _locker = new();
+    private readonly Lock _locker = new();
     private Dictionary<IPropertyValueConverter, Type[]>? _defaultConverters;
 
     public PropertyValueConverterCollection(Func<IEnumerable<IPropertyValueConverter>> items)

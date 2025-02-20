@@ -64,7 +64,7 @@ test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.openBlockContentModel();
+  await umbracoUi.dataType.clickReferenceNodeLinkWithName(elementTypeName);
 
   // Assert
   await umbracoUi.dataType.isElementWorkspaceOpenInBlock(elementTypeName);

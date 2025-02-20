@@ -13,7 +13,7 @@ public static class DateTypeServiceExtensions
             return false; // built in ones can never be ignoring start nodes
         }
 
-        IDataType? dataType = dataTypeService.GetDataType(key);
+        IDataType? dataType = dataTypeService.GetAsync(key).GetAwaiter().GetResult();
 
         if (dataType != null && dataType.ConfigurationObject is IIgnoreUserStartNodesConfig ignoreStartNodesConfig)
         {

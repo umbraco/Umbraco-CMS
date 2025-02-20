@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 
@@ -6,11 +7,19 @@ internal interface IDatabaseCacheRepository
 {
     Task DeleteContentItemAsync(int id);
 
-    Task<ContentCacheNode?> GetContentSourceAsync(int id, bool preview = false);
+    Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false);
 
-    Task<ContentCacheNode?> GetMediaSourceAsync(int id);
+    Task<ContentCacheNode?> GetMediaSourceAsync(Guid key);
 
-    IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys);
+
+    IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType);
+
+    /// <summary>
+    /// Gets all content keys of specific document types
+    /// </summary>
+    /// <param name="keys">The document types to find content using.</param>
+    /// <returns>The keys of all content use specific document types.</returns>
+    IEnumerable<Guid> GetDocumentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false);
 
     /// <summary>
     ///     Refreshes the nucache database row for the given cache node />
@@ -54,4 +63,6 @@ internal interface IDatabaseCacheRepository
     ///     Rebuilds the caches for content, media and/or members based on the content type ids specified
     /// </summary>
     bool VerifyMediaDbCache();
+
+    Task<IEnumerable<Guid>> GetContentKeysAsync(Guid nodeObjectType);
 }

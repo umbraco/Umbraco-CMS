@@ -48,6 +48,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
         target.EditorUiAlias = source.EditorUiAlias;
+        target.EditorAlias = source.EditorAlias;
         target.IsDeletable = source.IsDeletableDataType();
     }
 
@@ -119,7 +120,7 @@ public class ItemTypeMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private static void Map(IWebhook source, WebhookItemResponseModel target, MapperContext context)
     {
-        target.Name = string.Empty; //source.Name;
+        target.Name = source.Name ?? source.Url;
         target.Url = source.Url;
         target.Enabled = source.Enabled;
         target.Events = string.Join(",", source.Events);

@@ -13,7 +13,7 @@ public class LockingMechanism : ILockingMechanism
 {
     private readonly IDistributedLockingMechanismFactory _distributedLockingMechanismFactory;
     private readonly ILogger<LockingMechanism> _logger;
-    private readonly object _locker = new();
+    private readonly Lock _locker = new();
     private StackQueue<(DistributedLockType lockType, TimeSpan timeout, Guid instanceId, int lockId)>? _queuedLocks;
     private HashSet<int>? _readLocks;
     private Dictionary<Guid, Dictionary<int, int>>? _readLocksDictionary;

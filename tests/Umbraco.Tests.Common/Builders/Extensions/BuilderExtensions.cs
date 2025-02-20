@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Globalization;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
@@ -77,6 +76,13 @@ public static class BuilderExtensions
         where T : IWithKeyBuilder
     {
         builder.Key = key;
+        return builder;
+    }
+
+    public static T WithDataTypeKey<T>(this T builder, Guid key)
+        where T : IWithDataTypeKeyBuilder
+    {
+        builder.DataTypeKey = key;
         return builder;
     }
 
@@ -238,6 +244,104 @@ public static class BuilderExtensions
     public static T WithDate<T>(this T builder, DateTime date) where T : IWithDateBuilder
     {
         builder.Date = date;
+        return builder;
+    }
+
+    public static T WithInvariantName<T>(this T builder, string invariantName)
+        where T : IWithInvariantNameBuilder
+    {
+        builder.InvariantName = invariantName;
+        return builder;
+    }
+
+    public static T WithKey<T>(this T builder, Guid? key)
+        where T : IWithKeyBuilder
+    {
+        builder.Key = key;
+        return builder;
+    }
+
+    public static T WithContentTypeKey<T>(this T builder, Guid contentTypeKey)
+        where T : IWithContentTypeKeyBuilder
+    {
+        builder.ContentTypeKey = contentTypeKey;
+        return builder;
+    }
+
+    public static T WithParentKey<T>(this T builder, Guid? parentKey)
+        where T : IWithParentKeyBuilder
+    {
+        builder.ParentKey = parentKey;
+        return builder;
+    }
+
+    public static T WithTemplateKey<T>(this T builder, Guid? templateKey)
+        where T : IWithTemplateKeyBuilder
+    {
+        builder.TemplateKey = templateKey;
+        return builder;
+    }
+
+    public static T WithValue<T>(this T builder, object? value)
+        where T : IWithValueBuilder
+    {
+        builder.Value = value;
+        return builder;
+    }
+
+    public static T WithCulture<T>(this T builder, string culture)
+        where T : IWithCultureBuilder
+    {
+        builder.Culture = culture;
+        return builder;
+    }
+
+    public static T WithAllowAsRoot<T>(this T builder, bool allowAsRoot)
+        where T : IWithAllowAsRootBuilder
+    {
+        builder.AllowAsRoot = allowAsRoot;
+        return builder;
+    }
+
+    public static T WithSegment<T>(this T builder, string segment)
+        where T : IWithSegmentBuilder
+    {
+        builder.Segment = segment;
+        return builder;
+    }
+
+    public static T WithIsElement<T>(this T builder, bool isElement)
+        where T : IWithIsElementBuilder
+    {
+        builder.IsElement = isElement;
+        return builder;
+    }
+
+    public static T WithVariesByCulture<T>(this T builder, bool variesByCulture)
+        where T : IWithVariesByCultureBuilder
+    {
+        builder.VariesByCulture = variesByCulture;
+        return builder;
+    }
+
+    public static T WithVariesBySegement<T>(this T builder, bool variesBySegment)
+        where T : IWithVariesBySegmentBuilder
+    {
+        builder.VariesBySegment = variesBySegment;
+        return builder;
+    }
+
+    public static T WithDefaultTemplateKey<T>(this T builder, Guid? defaultTemplateKey)
+        where T : IWithDefaultTemplateKeyBuilder
+    {
+        builder.DefaultTemplateKey = defaultTemplateKey;
+        return builder;
+    }
+
+    public static T WithContainerKey<T>(this T builder, Guid? containerKey)
+        where T : IWithContainerKeyBuilder
+    {
+        builder.ContainerKey = containerKey;
         return builder;
     }
 }

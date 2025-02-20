@@ -1,189 +1,177 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Tests.Common.Builders;
-using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-[Platform("Linux", Reason = "This uses too much memory when running both caches, should be removed when nuchache is removed")]
-public class MediaHybridCacheTests : UmbracoIntegrationTest
+public class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEditing
 {
     private IPublishedMediaCache PublishedMediaHybridCache => GetRequiredService<IPublishedMediaCache>();
 
-    private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
-
-    private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
-
-    private IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
-
-    protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
-
-    // TODO: make test with MediaWithCrops
-
-    [Test]
-    public async Task Can_Get_Media_By_Key()
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
-        // Arrange
-        var newMediaType = new MediaTypeBuilder()
-            .WithAlias("album")
-            .WithName("Album")
-            .Build();
+        builder.AddNotificationHandler<MediaTreeChangeNotification, MediaTreeChangeDistributedCacheNotificationHandler>();
+        builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
+    }
 
-        newMediaType.AllowedAsRoot = true;
-        MediaTypeService.Save(newMediaType);
-
-        var createModel = new MediaCreateModel
-        {
-            ContentTypeKey = newMediaType.Key,
-            ParentKey = Constants.System.RootKey,
-            InvariantName = "Image",
-        };
-
-        var result = await MediaEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-
+    // Media with crops
+    [Test]
+    public async Task Can_Get_Root_Media_By_Id()
+    {
         // Act
-        var media = await PublishedMediaHybridCache.GetByKeyAsync(result.Result.Content.Key);
+        var media = await PublishedMediaHybridCache.GetByIdAsync(RootFolderId);
 
         // Assert
         Assert.IsNotNull(media);
-        Assert.AreEqual("Image", media.Name);
-        Assert.AreEqual(newMediaType.Key, media.ContentType.Key);
+        Assert.AreEqual("RootFolder", media.Name);
+        Assert.AreEqual(RootFolder.ContentTypeKey, media.ContentType.Key);
     }
 
     [Test]
-    public async Task Can_Get_Media_By_Id()
+    public async Task Can_Get_Root_Media_By_Key()
     {
-        // Arrange
-        var newMediaType = new MediaTypeBuilder()
-            .WithAlias("album")
-            .WithName("Album")
-            .Build();
-
-        newMediaType.AllowedAsRoot = true;
-        MediaTypeService.Save(newMediaType);
-
-        var createModel = new MediaCreateModel
-        {
-            ContentTypeKey = newMediaType.Key,
-            ParentKey = Constants.System.RootKey,
-            InvariantName = "Image",
-        };
-
-        var result = await MediaEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-
-        // Act
-        var media = await PublishedMediaHybridCache.GetByIdAsync(result.Result.Content.Id);
+        var media = await PublishedMediaHybridCache.GetByIdAsync(RootFolder.Key.Value);
 
         // Assert
         Assert.IsNotNull(media);
-        Assert.AreEqual("Image", media.Name);
-        Assert.AreEqual(newMediaType.Key, media.ContentType.Key);
+        Assert.AreEqual("RootFolder", media.Name);
+        Assert.AreEqual(RootFolder.ContentTypeKey, media.ContentType.Key);
     }
 
     [Test]
-    public async Task Cannot_Get_Non_Existing_Media_By_Key()
+    public async Task Can_Get_Child_Media_By_Id()
     {
         // Act
-        var media = await PublishedMediaHybridCache.GetByKeyAsync(Guid.NewGuid());
+        var media = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
 
         // Assert
-        Assert.IsNull(media);
+        Assert.IsNotNull(media);
+        Assert.AreEqual("SubImage", media.Name);
+        Assert.AreEqual(SubImage.ContentTypeKey, media.ContentType.Key);
+        Assert.AreEqual(SubImage.ParentKey, RootFolder.Key);
+    }
+
+
+    [Test]
+    public async Task Can_Get_Child_Media_By_Key()
+    {
+        var media = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
+
+        // Assert
+        Assert.IsNotNull(media);
+        Assert.AreEqual("SubImage", media.Name);
+        Assert.AreEqual(SubImage.ContentTypeKey, media.ContentType.Key);
+        Assert.AreEqual(SubImage.ParentKey, RootFolder.Key);
     }
 
     [Test]
     public async Task Cannot_Get_Non_Existing_Media_By_Id()
     {
         // Act
-        var media = await PublishedMediaHybridCache.GetByIdAsync(124214);
+        const int nonExistingId = 124214;
+        var media = await PublishedMediaHybridCache.GetByIdAsync(nonExistingId);
 
         // Assert
         Assert.IsNull(media);
     }
 
     [Test]
-    public async Task Can_Get_Media_Property_By_Key()
+    public async Task Cannot_Get_Non_Existing_Media_By_Key()
     {
-        // Arrange
-        var media = await CreateMedia();
-
         // Act
-        var publishedMedia = await PublishedMediaHybridCache.GetByKeyAsync(media.Key);
-
-        UmbracoContextFactory.EnsureUmbracoContext();
+        var media = await PublishedMediaHybridCache.GetByIdAsync(Guid.NewGuid());
 
         // Assert
-        Assert.IsNotNull(media);
-        Assert.AreEqual("Image", media.Name);
-        Assert.AreEqual("NewTitle", publishedMedia.Value("title"));
+        Assert.IsNull(media);
     }
 
     [Test]
     public async Task Can_Get_Media_Property_By_Id()
     {
-        // Arrange
-        var media = await CreateMedia();
-
         // Act
-        var publishedMedia = await PublishedMediaHybridCache.GetByKeyAsync(media.Key);
-
-        UmbracoContextFactory.EnsureUmbracoContext();
+        var media = await PublishedMediaHybridCache.GetByIdAsync(SubTestMediaId);
 
         // Assert
-        Assert.IsNotNull(publishedMedia);
-        Assert.AreEqual("Image", publishedMedia.Name);
-        Assert.AreEqual("NewTitle", publishedMedia.Value("title"));
+        Assert.IsNotNull(media);
+        Assert.AreEqual("SubTestMedia", media.Name);
+        Assert.AreEqual("This is a test", media.Value("testProperty"));
     }
 
     [Test]
-    public async Task Can_Get_Updated_Media()
+    public async Task Can_Get_Media_Property_By_Key()
     {
-        // Arrange
-        var media = await CreateMedia();
-        await PublishedMediaHybridCache.GetByIdAsync(media.Id);
-
         // Act
-        var updateModel = new MediaUpdateModel()
-        {
-            InvariantName = "Update name",
-            InvariantProperties = new List<PropertyValueModel>()
-            {
-                new()
-                {
-                    Alias = "title",
-                    Value = "Updated Title"
-                }
-            }
-        };
-
-        var updateAttempt = await MediaEditingService.UpdateAsync(media.Key, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(updateAttempt.Success);
-        var publishedMedia = await PublishedMediaHybridCache.GetByIdAsync(media.Id);
-        UmbracoContextFactory.EnsureUmbracoContext();
+        var media = await PublishedMediaHybridCache.GetByIdAsync(SubTestMedia.Key.Value);
 
         // Assert
-        Assert.IsNotNull(publishedMedia);
-        Assert.AreEqual("Update name", publishedMedia.Name);
-        Assert.AreEqual("Updated Title", publishedMedia.Value("title"));
+        Assert.IsNotNull(media);
+        Assert.AreEqual("SubTestMedia", media.Name);
+        Assert.AreEqual("This is a test", media.Value("testProperty"));
+    }
+
+    [Test]
+    public async Task Can_Get_Updated_Media_By_Id()
+    {
+        // Arrange
+        const string newName = "NewImageName";
+        var media = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
+        Assert.AreEqual(media.Name, "SubImage");
+
+        var mediaUpdateModel = new MediaUpdateModel
+        {
+            InvariantName = newName,
+            InvariantProperties = SubImage.InvariantProperties,
+            Variants = SubImage.Variants,
+        };
+
+        // Act
+        await MediaEditingService.UpdateAsync(SubImage.Key.Value, mediaUpdateModel, Constants.Security.SuperUserKey);
+        var updatedMedia = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
+
+        // Assert
+        Assert.IsNotNull(updatedMedia);
+        Assert.AreEqual(newName, updatedMedia.Name);
+    }
+
+    [Test]
+    public async Task Can_Get_Updated_Media_By_Key()
+    {
+        // Arrange
+        const string newName = "NewImageName";
+        var media = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
+        Assert.AreEqual(media.Name, "SubImage");
+
+        var mediaUpdateModel = new MediaUpdateModel
+        {
+            InvariantName = newName,
+            InvariantProperties = SubImage.InvariantProperties,
+            Variants = SubImage.Variants,
+        };
+
+        // Act
+        await MediaEditingService.UpdateAsync(SubImage.Key.Value, mediaUpdateModel, Constants.Security.SuperUserKey);
+        var updatedMedia = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
+
+        // Assert
+        Assert.IsNotNull(updatedMedia);
+        Assert.AreEqual(newName, updatedMedia.Name);
     }
 
     [Test]
     public async Task Cannot_Get_Deleted_Media_By_Id()
     {
         // Arrange
-        var media = await CreateMedia();
-        var publishedMedia = await PublishedMediaHybridCache.GetByIdAsync(media.Id);
-        Assert.IsNotNull(publishedMedia);
+        var media = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
+        Assert.IsNotNull(media);
 
         await MediaEditingService.DeleteAsync(media.Key, Constants.Security.SuperUserKey);
 
@@ -198,42 +186,16 @@ public class MediaHybridCacheTests : UmbracoIntegrationTest
     public async Task Cannot_Get_Deleted_Media_By_Key()
     {
         // Arrange
-        var media = await CreateMedia();
-        var publishedMedia = await PublishedMediaHybridCache.GetByKeyAsync(media.Key);
-        Assert.IsNotNull(publishedMedia);
+        var media = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
+
+        Assert.IsNotNull(media);
 
         await MediaEditingService.DeleteAsync(media.Key, Constants.Security.SuperUserKey);
 
         // Act
-        var deletedMedia = await PublishedMediaHybridCache.GetByKeyAsync(media.Key);
+        var deletedMedia = await PublishedMediaHybridCache.GetByIdAsync(media.Key);
 
         // Assert
         Assert.IsNull(deletedMedia);
-    }
-
-    private async Task<IMedia> CreateMedia()
-    {
-        IMediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("test", "Test");
-        mediaType.AllowedAsRoot = true;
-        MediaTypeService.Save(mediaType);
-
-        var createModel = new MediaCreateModel
-        {
-            ContentTypeKey = mediaType.Key,
-            ParentKey = Constants.System.RootKey,
-            InvariantName = "Image",
-            InvariantProperties = new List<PropertyValueModel>()
-            {
-                new()
-                {
-                    Alias = "title",
-                    Value = "NewTitle"
-                }
-            }
-        };
-
-        var result = await MediaEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        return result.Result.Content;
     }
 }

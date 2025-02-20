@@ -12,15 +12,15 @@ The following steps are a quick-start guide:
 1. **Fork**
 
     Create a fork of [`Umbraco-CMS` on GitHub](https://github.com/umbraco/Umbraco-CMS)
-    
+
     ![Fork the repository](img/forkrepository.png)
-    
+
 2. **Clone**
 
     When GitHub has created your fork, you can clone it in your favorite Git tool or on the command line with `git clone https://github.com/[YourUsername]/Umbraco-CMS`.
-    
-    ![Clone the fork](img/clonefork.png) 
-    
+
+    ![Clone the fork](img/clonefork.png)
+
 3. **Switch to the correct branch**
 
     Switch to the `contrib` branch
@@ -31,7 +31,11 @@ The following steps are a quick-start guide:
 
 5. **Branch**
 
-    Create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp/12345`. This means it's a temporary branch for the particular issue you're working on, in this case issue number `12345`.  Don't commit to `contrib`, create a new branch first.
+    Create a new branch now and name it after the issue you're fixing, we usually follow the format: `v{major}/{feature|bugfix|task}/{issue}-{description}`. For example: `v15/bugfix/18132-rte-tinymce-onchange-value-check`.
+
+    This means it's a temporary branch for the particular issue you're working on, in this case a bug fix for issue number `18132` that affects Umbraco 15.
+
+    Don't commit to `contrib`, create a new branch first.
 
 6. **Change**
 

@@ -27,12 +27,14 @@ public static class DictionaryExtensions
     public static TVal GetOrCreate<TKey, TVal>(this IDictionary<TKey, TVal> dict, TKey key)
         where TVal : class, new()
     {
-        if (dict.ContainsKey(key) == false)
+        if (dict.TryGetValue(key, out TVal? existing))
         {
-            dict.Add(key, new TVal());
+            return existing;
         }
 
-        return dict[key];
+        TVal value = new();
+        dict.Add(key, value);
+        return value;
     }
 
     /// <summary>
@@ -204,9 +206,9 @@ public static class DictionaryExtensions
     /// <returns></returns>
     public static TVal? GetValue<TKey, TVal>(this IDictionary<TKey, TVal> d, TKey key, TVal? defaultValue = default)
     {
-        if (d.ContainsKey(key))
+        if (d.TryGetValue(key, out TVal? value))
         {
-            return d[key];
+            return value;
         }
 
         return defaultValue;
@@ -220,7 +222,7 @@ public static class DictionaryExtensions
     /// <param name="key"></param>
     /// <returns></returns>
     public static string? GetValueAsString<TKey, TVal>(this IDictionary<TKey, TVal> d, TKey key)
-        => d.ContainsKey(key) ? d[key]!.ToString() : string.Empty;
+        => d.TryGetValue(key, out TVal? value) ? value!.ToString() : string.Empty;
 
     /// <summary>
     ///     Returns the value of the key value based on the key as it's string value, if the key is not found or is an empty
@@ -232,9 +234,9 @@ public static class DictionaryExtensions
     /// <returns></returns>
     public static string? GetValueAsString<TKey, TVal>(this IDictionary<TKey, TVal> d, TKey key, string defaultValue)
     {
-        if (d.ContainsKey(key))
+        if (d.TryGetValue(key, out TVal? dictionaryValue))
         {
-            var value = d[key]!.ToString();
+            var value = dictionaryValue!.ToString();
             if (value != string.Empty)
             {
                 return value;
@@ -268,7 +270,13 @@ public static class DictionaryExtensions
         var builder = new StringBuilder();
         foreach (KeyValuePair<string, object?> i in d)
         {
-            builder.Append(string.Format("{0}={1}&", WebUtility.UrlEncode(i.Key), i.Value == null ? string.Empty : WebUtility.UrlEncode(i.Value.ToString())));
+            builder.Append(WebUtility.UrlEncode(i.Key));
+            builder.Append('=');
+            if (i.Value != null)
+            {
+                builder.Append(WebUtility.UrlEncode(i.Value.ToString()));
+            }
+            builder.Append('&');
         }
 
         return builder.ToString().TrimEnd(Constants.CharArrays.Ampersand);

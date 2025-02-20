@@ -4,20 +4,22 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Extensions;
 
 public static class UrlProviderExtensions
 {
-    [Obsolete("Use GetContentUrlsAsync that takes ILanguageService instead of ILocalizationService. Will be removed in V15.")]
+    [Obsolete("Use GetContentUrlsAsync that takes all parameters. Will be removed in V17.")]
     public static async Task<IEnumerable<UrlInfo>> GetContentUrlsAsync(
         this IContent content,
         IPublishedRouter publishedRouter,
         IUmbracoContext umbracoContext,
-        ILocalizationService localizationService,
+        ILanguageService languageService,
         ILocalizedTextService textService,
         IContentService contentService,
         IVariationContextAccessor variationContextAccessor,
@@ -27,13 +29,15 @@ public static class UrlProviderExtensions
         => await content.GetContentUrlsAsync(
             publishedRouter,
             umbracoContext,
-            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
+            languageService,
             textService,
             contentService,
             variationContextAccessor,
             logger,
             uriUtility,
-            publishedUrlProvider);
+            publishedUrlProvider,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
 
     /// <summary>
     ///     Gets the URLs of the content item.
@@ -52,7 +56,9 @@ public static class UrlProviderExtensions
         IVariationContextAccessor variationContextAccessor,
         ILogger<IContent> logger,
         UriUtility uriUtility,
-        IPublishedUrlProvider publishedUrlProvider)
+        IPublishedUrlProvider publishedUrlProvider,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
     {
         ArgumentNullException.ThrowIfNull(content);
         ArgumentNullException.ThrowIfNull(publishedRouter);
@@ -89,7 +95,7 @@ public static class UrlProviderExtensions
 
         // get all URLs for all cultures
         // in a HashSet, so de-duplicates too
-        foreach (UrlInfo cultureUrl in await GetContentUrlsByCultureAsync(content, cultures, publishedRouter, umbracoContext, contentService, textService, variationContextAccessor, logger, uriUtility, publishedUrlProvider))
+        foreach (UrlInfo cultureUrl in await GetContentUrlsByCultureAsync(content, cultures, publishedRouter, umbracoContext, contentService, textService, variationContextAccessor, logger, uriUtility, publishedUrlProvider, contentCache, navigationQueryService))
         {
             urls.Add(cultureUrl);
         }
@@ -139,7 +145,9 @@ public static class UrlProviderExtensions
         IVariationContextAccessor variationContextAccessor,
         ILogger logger,
         UriUtility uriUtility,
-        IPublishedUrlProvider publishedUrlProvider)
+        IPublishedUrlProvider publishedUrlProvider,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
     {
         var result = new List<UrlInfo>();
 
@@ -178,7 +186,7 @@ public static class UrlProviderExtensions
                 // got a URL, deal with collisions, add URL
                 default:
                     // detect collisions, etc
-                    Attempt<UrlInfo?> hasCollision = await DetectCollisionAsync(logger, content, url, culture, umbracoContext, publishedRouter, textService, variationContextAccessor, uriUtility);
+                    Attempt<UrlInfo?> hasCollision = await DetectCollisionAsync(logger, content, url, culture, umbracoContext, publishedRouter, textService, variationContextAccessor, uriUtility, contentCache, navigationQueryService);
                     if (hasCollision.Success && hasCollision.Result is not null)
                     {
                         result.Add(hasCollision.Result);
@@ -234,7 +242,9 @@ public static class UrlProviderExtensions
         IPublishedRouter publishedRouter,
         ILocalizedTextService textService,
         IVariationContextAccessor variationContextAccessor,
-        UriUtility uriUtility)
+        UriUtility uriUtility,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
     {
         // test for collisions on the 'main' URL
         var uri = new Uri(url.TrimEnd(Constants.CharArrays.ForwardSlash), UriKind.RelativeOrAbsolute);
@@ -273,7 +283,7 @@ public static class UrlProviderExtensions
             while (o != null)
             {
                 l.Add(o.Name(variationContextAccessor)!);
-                o = o.Parent;
+                o = o.Parent<IPublishedContent>(contentCache, navigationQueryService);
             }
 
             l.Reverse();

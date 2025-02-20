@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,6 +19,7 @@ using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Infrastructure.Services.Implement;
@@ -77,6 +79,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IMediaListViewService, MediaListViewService>();
         builder.Services.AddUnique<IEntitySearchService, EntitySearchService>();
         builder.Services.AddUnique<IIndexedEntitySearchService, IndexedEntitySearchService>();
+        builder.Services.TryAddTransient<IReservedFieldNamesService, ReservedFieldNamesService>();
 
         return builder;
     }
@@ -113,7 +116,9 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IShortStringHelper>(),
             factory.GetRequiredService<IConfigurationEditorJsonSerializer>(),
             factory.GetRequiredService<IMediaService>(),
-            factory.GetRequiredService<IMediaTypeService>());
+            factory.GetRequiredService<IMediaTypeService>(),
+            factory.GetRequiredService<ITemplateContentParserService>(),
+            factory.GetRequiredService<ITemplateService>());
 
     private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(
         IServiceProvider container)

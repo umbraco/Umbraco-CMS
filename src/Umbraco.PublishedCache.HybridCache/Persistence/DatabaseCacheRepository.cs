@@ -65,8 +65,13 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
 
-        // always refresh the edited data
-        await OnRepositoryRefreshed(serializer, contentCacheNode, true);
+        // We always cache draft and published separately, so we only want to cache drafts if the node is a draft type.
+        if (contentCacheNode.IsDraft)
+        {
+            await OnRepositoryRefreshed(serializer, contentCacheNode, true);
+            // if it's a draft node we don't need to worry about the published state
+            return;
+        }
 
         switch (publishedState)
         {
@@ -82,7 +87,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     public async Task RefreshMediaAsync(ContentCacheNode contentCacheNode)
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
-        await OnRepositoryRefreshed(serializer, contentCacheNode, false);
+        await OnRepositoryRefreshed(serializer, contentCacheNode, true);
     }
 
     /// <inheritdoc/>
@@ -112,20 +117,10 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             }
         }
 
-        if (contentTypeIds != null)
-        {
-            RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
-        }
+        RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
+        RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds);
+        RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds);
 
-        if (mediaTypeIds != null)
-        {
-            RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds);
-        }
-
-        if (memberTypeIds != null)
-        {
-            RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds);
-        }
     }
 
     // assumes content tree lock
@@ -166,6 +161,16 @@ AND cmsContentNu.nodeId IS NULL
         return count == 0;
     }
 
+    public async Task<IEnumerable<Guid>> GetContentKeysAsync(Guid nodeObjectType)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .Select<NodeDto>(x => x.UniqueId)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.NodeObjectType == nodeObjectType);
+
+        return await Database.FetchAsync<Guid>(sql);
+    }
+
     // assumes member tree lock
     public bool VerifyMemberDbCache()
     {
@@ -184,11 +189,11 @@ AND cmsContentNu.nodeId IS NULL
         return count == 0;
     }
 
-    public async Task<ContentCacheNode?> GetContentSourceAsync(int id, bool preview = false)
+    public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
     {
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
-            .Append(SqlWhereNodeId(SqlContext, id))
+            .Append(SqlWhereNodeKey(SqlContext, key))
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
         ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
@@ -208,36 +213,66 @@ AND cmsContentNu.nodeId IS NULL
         return CreateContentNodeKit(dto, serializer, preview);
     }
 
-    public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys)
+    private IEnumerable<ContentSourceDto> GetContentSourceByDocumentTypeKey(IEnumerable<Guid> documentTypeKeys, Guid objectType)
     {
+        Guid[] keys = documentTypeKeys.ToArray();
         if (keys.Any() is false)
         {
-            yield break;
+            return [];
         }
 
-        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
-            .InnerJoin<NodeDto>("n")
+        Sql<ISqlContext> sql = objectType == Constants.ObjectTypes.Document
+            ? SqlContentSourcesSelect()
+            : objectType == Constants.ObjectTypes.Media
+                ? SqlMediaSourcesSelect()
+                : throw new ArgumentOutOfRangeException(nameof(objectType), objectType, null);
+
+            sql.InnerJoin<NodeDto>("n")
             .On<NodeDto, ContentDto>((n, c) => n.NodeId == c.ContentTypeId, "n", "umbracoContent")
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+            .Append(SqlObjectTypeNotTrashed(SqlContext, objectType))
             .WhereIn<NodeDto>(x => x.UniqueId, keys,"n")
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
-        IContentCacheDataSerializer serializer =
-            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+        return GetContentNodeDtos(sql);
+    }
 
-        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql);
+    public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType)
+    {
+        Guid objectType = entityType switch
+        {
+            ContentCacheDataSerializerEntityType.Document => Constants.ObjectTypes.Document,
+            ContentCacheDataSerializerEntityType.Media => Constants.ObjectTypes.Media,
+            _ => throw new ArgumentOutOfRangeException(nameof(entityType), entityType, null),
+        };
+
+        IEnumerable<ContentSourceDto> dtos = GetContentSourceByDocumentTypeKey(keys, objectType);
+
+        IContentCacheDataSerializer serializer =
+            _contentCacheDataSerializerFactory.Create(entityType);
 
         foreach (ContentSourceDto row in dtos)
         {
-            yield return CreateContentNodeKit(row, serializer, row.Published is false);
+            if (entityType == ContentCacheDataSerializerEntityType.Document)
+            {
+                yield return CreateContentNodeKit(row, serializer, row.Published is false);
+            }
+            else
+            {
+                yield return CreateMediaNodeKit(row, serializer);
+            }
+
         }
     }
 
-    public async Task<ContentCacheNode?> GetMediaSourceAsync(int id)
+    /// <inheritdoc />
+    public IEnumerable<Guid> GetDocumentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
+        => GetContentSourceByDocumentTypeKey(keys, Constants.ObjectTypes.Document).Where(x => x.Published == published).Select(x => x.Key);
+
+    public async Task<ContentCacheNode?> GetMediaSourceAsync(Guid key)
     {
         Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
-            .Append(SqlWhereNodeId(SqlContext, id))
+            .Append(SqlWhereNodeKey(SqlContext, key))
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
         ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
@@ -518,8 +553,7 @@ WHERE cmsContentNu.nodeId IN (
                     cultureData[cultureInfo.Culture] = new CultureVariation
                     {
                         Name = cultureInfo.Name,
-                        UrlSegment =
-                            content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, cultureInfo.Culture),
+                        UrlSegment = content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, cultureInfo.Culture),
                         Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue,
                         IsDraft = cultureIsDraft,
                     };
@@ -639,6 +673,19 @@ WHERE cmsContentNu.nodeId IN (
                 builder.Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("id")));
 
         Sql<ISqlContext> sql = sqlTemplate.Sql(id);
+        return sql;
+    }
+
+    private Sql<ISqlContext> SqlWhereNodeKey(ISqlContext sqlContext, Guid key)
+    {
+        ISqlSyntaxProvider syntax = sqlContext.SqlSyntax;
+
+        SqlTemplate sqlTemplate = sqlContext.Templates.Get(
+            Constants.SqlTemplates.NuCacheDatabaseDataSource.WhereNodeKey,
+            builder =>
+                builder.Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("key")));
+
+        Sql<ISqlContext> sql = sqlTemplate.Sql(key);
         return sql;
     }
 
@@ -774,7 +821,7 @@ WHERE cmsContentNu.nodeId IN (
                     serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
                 var draftContentData = new ContentData(
                     dto.EditName,
-                    null,
+                    deserializedDraftContent?.UrlSegment,
                     dto.VersionId,
                     dto.EditVersionDate,
                     dto.CreatorId,
@@ -813,11 +860,11 @@ WHERE cmsContentNu.nodeId IN (
         ContentCacheDataModel? deserializedContent = serializer.Deserialize(dto, dto.PubData, dto.PubDataRaw, true);
         var publishedContentData = new ContentData(
             dto.PubName,
-            null,
+            deserializedContent?.UrlSegment,
             dto.VersionId,
             dto.PubVersionDate,
             dto.CreatorId,
-            dto.EditTemplateId == 0 ? null : dto.EditTemplateId,
+            dto.PubTemplateId == 0 ? null : dto.PubTemplateId,
             true,
             deserializedContent?.PropertyData,
             deserializedContent?.CultureData);

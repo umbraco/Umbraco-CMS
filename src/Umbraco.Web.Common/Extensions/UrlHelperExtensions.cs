@@ -197,7 +197,7 @@ public static class UrlHelperExtensions
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
         string actionName)
         where T : UmbracoApiController =>
-        url.GetUmbracoApiService<T>(umbracoApiControllerTypeCollection, actionName)?.TrimEndExact(actionName);
+        url.GetUmbracoApiService<T>(umbracoApiControllerTypeCollection, actionName)?.TrimEnd(actionName);
 
     [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiServiceBaseUrl<T>(
@@ -213,7 +213,7 @@ public static class UrlHelperExtensions
                                              " or the result ");
         }
 
-        return url.GetUmbracoApiService<T>(umbracoApiControllerTypeCollection, method.Name)?.TrimEndExact(method.Name);
+        return url.GetUmbracoApiService<T>(umbracoApiControllerTypeCollection, method.Name)?.TrimEnd(method.Name);
     }
 
     /// <summary>

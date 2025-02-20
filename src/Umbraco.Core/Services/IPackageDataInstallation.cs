@@ -51,7 +51,8 @@ public interface IPackageDataInstallation
     /// <param name="dictionaryItemElementList">Xml to import</param>
     /// <param name="userId"></param>
     /// <returns>An enumerable list of dictionary items</returns>
-    IReadOnlyList<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList,
+    IReadOnlyList<IDictionaryItem> ImportDictionaryItems(
+        IEnumerable<XElement> dictionaryItemElementList,
         int userId);
 
     IEnumerable<IDictionaryItem> ImportDictionaryItem(XElement dictionaryItemElement, int userId, Guid? parentId);
@@ -64,7 +65,10 @@ public interface IPackageDataInstallation
     /// <returns>An enumerable list of generated languages</returns>
     IReadOnlyList<ILanguage> ImportLanguages(IEnumerable<XElement> languageElements, int userId);
 
+    [Obsolete("Use Async version instead, Scheduled to be removed in v17")]
     IEnumerable<ITemplate> ImportTemplate(XElement templateElement, int userId);
+
+    Task<IEnumerable<ITemplate>> ImportTemplateAsync(XElement templateElement, int userId) => Task.FromResult(ImportTemplate(templateElement, userId));
 
     /// <summary>
     /// Imports and saves package xml as <see cref="ITemplate"/>
@@ -72,7 +76,16 @@ public interface IPackageDataInstallation
     /// <param name="templateElements">Xml to import</param>
     /// <param name="userId">Optional user id</param>
     /// <returns>An enumerable list of generated Templates</returns>
+    [Obsolete("Use Async version instead, Scheduled to be removed in v17")]
     IReadOnlyList<ITemplate> ImportTemplates(IReadOnlyCollection<XElement> templateElements, int userId);
+
+    /// <summary>
+    /// Imports and saves package xml as <see cref="ITemplate"/>
+    /// </summary>
+    /// <param name="templateElements">Xml to import</param>
+    /// <param name="userId">Optional user id</param>
+    /// <returns>An enumerable list of generated Templates</returns>
+    Task<IReadOnlyList<ITemplate>> ImportTemplatesAsync(IReadOnlyCollection<XElement> templateElements, int userId) => Task.FromResult(ImportTemplates(templateElements, userId));
 
     Guid GetContentTypeKey(XElement contentType);
 

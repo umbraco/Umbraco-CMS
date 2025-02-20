@@ -45,13 +45,8 @@ public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
             ControllerActionDescriptor? descriptor = _controllerActionSearcher.Find<IRenderController>(
                 new DefaultHttpContext(), // this actually makes no difference for this method
                 DefaultControllerName,
-                UmbracoRouteValues.DefaultActionName);
-
-            if (descriptor == null)
-            {
-                throw new InvalidOperationException(
+                UmbracoRouteValues.DefaultActionName) ?? throw new InvalidOperationException(
                     $"No controller/action found by name {DefaultControllerName}.{UmbracoRouteValues.DefaultActionName}");
-            }
 
             return descriptor;
         });
@@ -128,11 +123,12 @@ public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
         IPublishedRequest request = def.PublishedRequest;
 
         // Here we need to check if there is no hijacked route and no template assigned but there is a content item.
-        // If this is the case we want to return a blank page.
+        // If this is the case we want to return a blank page, the only exception being if the content item has a redirect field present.
         // We also check if templates have been disabled since if they are then we're allowed to render even though there's no template,
         // for example for json rendering in headless.
         if (request.HasPublishedContent()
             && !request.HasTemplate()
+            && !request.IsRedirect()
             && !_umbracoFeatures.Disabled.DisableTemplates
             && !hasHijackedRoute)
         {
@@ -150,8 +146,8 @@ public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
                     $"The call to {nameof(IPublishedRouter.UpdateRequestAsync)} cannot return null");
             }
 
-			string? customActionName = GetTemplateName(request);
-			
+            string? customActionName = GetTemplateName(request);
+
             def = new UmbracoRouteValues(
                 request,
                 def.ControllerActionDescriptor,
@@ -166,7 +162,7 @@ public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
 
         return def;
     }
-	
+
 	private string? GetTemplateName(IPublishedRequest request)
     {
         // check that a template is defined), if it doesn't and there is a hijacked route it will just route

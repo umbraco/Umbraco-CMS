@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs
 
         private TempFileCleanupJob CreateTempFileCleanupJob()
         {
-            
+
             _mockIOHelper = new Mock<IIOHelper>();
             _mockIOHelper.Setup(x => x.GetTempFolders())
                 .Returns(new DirectoryInfo[] { new(_testPath) });

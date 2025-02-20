@@ -37,6 +37,8 @@ public class ExamineExternalIndexTests : ExamineBaseTest
         var httpContext = new DefaultHttpContext();
         httpContext.RequestServices = Services;
         Mock.Get(TestHelper.GetHttpContextAccessor()).Setup(x => x.HttpContext).Returns(httpContext);
+
+        DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
     }
 
     [TearDown]
@@ -48,9 +50,11 @@ public class ExamineExternalIndexTests : ExamineBaseTest
         (Services as IDisposable)?.Dispose();
     }
 
+
     private IExamineExternalIndexSearcherTest ExamineExternalIndexSearcher =>
         GetRequiredService<IExamineExternalIndexSearcherTest>();
 
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
@@ -66,11 +70,8 @@ public class ExamineExternalIndexTests : ExamineBaseTest
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
+        base.CustomTestSetup(builder);
         builder.Services.AddUnique<IExamineExternalIndexSearcherTest, ExamineExternalIndexSearcherTest>();
-        builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
-        builder
-            .AddNotificationHandler<ContentTreeChangeNotification,
-                ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddExamineIndexes();
         builder.Services.AddHostedService<QueuedHostedService>();

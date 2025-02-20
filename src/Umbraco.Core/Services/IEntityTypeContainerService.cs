@@ -15,6 +15,20 @@ public interface IEntityTypeContainerService<TTreeEntity>
     Task<EntityContainer?> GetAsync(Guid id);
 
     /// <summary>
+    /// Gets containers by name and level
+    /// </summary>
+    /// <param name="name">The name of the containers to get.</param>
+    /// <param name="level">The level in the tree of the containers to get.</param>
+    /// <returns></returns>
+    Task<IEnumerable<EntityContainer>> GetAsync(string name, int level);
+
+    /// <summary>
+    /// Gets all containers
+    /// </summary>
+    /// <returns></returns>
+    Task<IEnumerable<EntityContainer>> GetAllAsync();
+
+    /// <summary>
     /// Gets the parent container of a container
     /// </summary>
     /// <param name="container">The container whose parent container to get.</param>

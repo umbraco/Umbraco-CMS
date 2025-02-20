@@ -102,7 +102,7 @@ test('can update hide anchor/query string input', async ({umbracoApi, umbracoUi}
 });
 
 // TODO: Remove skip when the front-end is ready. Currently you still can update the minimum greater than the maximum.
-test.skip('cannot update the minimum number of items greater than the Maximum', async ({umbracoUi}) => {
+test.skip('cannot update the minimum number of items greater than the maximum', async ({umbracoUi}) => {
   // Arrange
   const minimumValue = 5;
   const maximumValue = 2;

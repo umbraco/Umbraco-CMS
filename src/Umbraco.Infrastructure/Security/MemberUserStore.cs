@@ -23,9 +23,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     private readonly IExternalLoginWithKeyService _externalLoginService;
     private readonly IUmbracoMapper _mapper;
     private readonly IMemberService _memberService;
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
+    private readonly IPublishedMemberCache _memberCache;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberUserStore" /> class for the members identity store
@@ -34,53 +34,26 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     /// <param name="mapper">The mapper for properties</param>
     /// <param name="scopeProvider">The scope provider</param>
     /// <param name="describer">The error describer</param>
-    /// <param name="publishedSnapshotAccessor">The published snapshot accessor</param>
     /// <param name="externalLoginService">The external login service</param>
     /// <param name="twoFactorLoginService">The two factor login service</param>
+    /// <param name="memberCache"></param>
     [ActivatorUtilitiesConstructor]
     public MemberUserStore(
         IMemberService memberService,
         IUmbracoMapper mapper,
         ICoreScopeProvider scopeProvider,
         IdentityErrorDescriber describer,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IExternalLoginWithKeyService externalLoginService,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IPublishedMemberCache memberCache)
         : base(describer)
     {
         _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _externalLoginService = externalLoginService;
         _twoFactorLoginService = twoFactorLoginService;
-    }
-
-    [Obsolete("Use ctor with IExternalLoginWithKeyService and ITwoFactorLoginService param")]
-    public MemberUserStore(
-        IMemberService memberService,
-        IUmbracoMapper mapper,
-        ICoreScopeProvider scopeProvider,
-        IdentityErrorDescriber describer,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IExternalLoginWithKeyService externalLoginService)
-        : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
-    {
-    }
-
-    [Obsolete("Use ctor with IExternalLoginWithKeyService and ITwoFactorLoginService param")]
-    public MemberUserStore(
-        IMemberService memberService,
-        IUmbracoMapper mapper,
-        ICoreScopeProvider scopeProvider,
-        IdentityErrorDescriber describer,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor)
-        : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
-    {
+        _memberCache = memberCache;
     }
 
     /// <inheritdoc />
@@ -128,12 +101,13 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             UpdateMemberProperties(memberEntity, user, out bool _);
 
             // create the member
-            Attempt<OperationResult?> saveAttempt = _memberService.Save(memberEntity);
+            Attempt<OperationResult?> saveAttempt = _memberService.Save(memberEntity, PublishNotificationSaveOptions.Saving);
             if (saveAttempt.Success is false)
             {
                 scope.Complete();
                 return Task.FromResult(IdentityResult.Failed(
-                    new IdentityError {
+                    new IdentityError
+                    {
                         Code = CancelledIdentityErrorCode,
                         Description = string.Empty
 
@@ -319,8 +293,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             return null;
         }
 
-        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-        return publishedSnapshot.Members?.Get(member);
+        return _memberCache.Get(member);
     }
 
     /// <inheritdoc />

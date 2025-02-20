@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
@@ -29,7 +30,7 @@ public class HtmlLocalLinkParserTests
 </p><p><img src='/media/234234.jpg' data-udi=""umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"" />
 <a type=""media"" href=""/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}"" title=""media"">media</a>
 </p>";
-        
+
         var parser = new HtmlLocalLinkParser(Mock.Of<IPublishedUrlProvider>());
 
         var result = parser.FindUdisFromLocalLinks(input).ToList();
@@ -116,6 +117,34 @@ public class HtmlLocalLinkParserTests
     [TestCase(
         "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\"type=\"media\">world</a>",
         "<a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+    [TestCase(
+        "<p><a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a></p><p><a href=\"/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}\" title=\"world\" type=\"media\">world</a></p>",
+        "<p><a href=\"/my-test-url\" title=\"world\">world</a></p><p><a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a></p>")]
+
+    // attributes order should not matter
+    [TestCase(
+        "<a rel=\"noopener\" title=\"world\" type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">world</a>",
+        "<a rel=\"noopener\" title=\"world\" href=\"/my-test-url\">world</a>")]
+    [TestCase(
+        "<a rel=\"noopener\" title=\"world\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" type=\"document\">world</a>",
+        "<a rel=\"noopener\" title=\"world\" href=\"/my-test-url\">world</a>")]
+    [TestCase(
+        "<a rel=\"noopener\" title=\"world\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}#anchor\" type=\"document\">world</a>",
+        "<a rel=\"noopener\" title=\"world\" href=\"/my-test-url#anchor\">world</a>")]
+
+    // anchors and query strings
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}#anchor\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url#anchor\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}?v=1\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url?v=1\" title=\"world\">world</a>")]
+
+    // custom type ignored
+    [TestCase(
+        "<a type=\"custom\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a type=\"custom\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>")]
+
     // legacy
     [TestCase(
         "hello href=\"{localLink:1234}\" world ",
@@ -127,8 +156,14 @@ public class HtmlLocalLinkParserTests
         "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}\" world ",
         "hello href=\"/my-test-url\" world ")]
     [TestCase(
+        "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}#anchor\" world ",
+        "hello href=\"/my-test-url#anchor\" world ")]
+    [TestCase(
         "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ",
         "hello href=\"/media/1001/my-image.jpg\" world ")]
+    [TestCase(
+        "hello href='{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}' world ",
+        "hello href='/media/1001/my-image.jpg' world ")]
 
     // This one has an invalid char so won't match.
     [TestCase(
@@ -136,7 +171,7 @@ public class HtmlLocalLinkParserTests
         "hello href=\"{localLink:umb^://document/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ")]
     [TestCase(
         "hello href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ",
-        "hello href=\"#\" world ")]
+        "hello href=\"\" world ")]
     public void ParseLocalLinks(string input, string result)
     {
         // setup a mock URL provider which we'll use for testing
@@ -185,12 +220,11 @@ public class HtmlLocalLinkParserTests
             umbracoContextAccessor: umbracoContextAccessor);
 
         var webRoutingSettings = new WebRoutingSettings();
-        var publishedUrlProvider = new UrlProvider(
-            umbracoContextAccessor,
-            Options.Create(webRoutingSettings),
-            new UrlProviderCollection(() => new[] { contentUrlProvider.Object }),
-            new MediaUrlProviderCollection(() => new[] { mediaUrlProvider.Object }),
-            Mock.Of<IVariationContextAccessor>());
+
+        var navigationQueryService = new Mock<IDocumentNavigationQueryService>();
+        Guid? parentKey = null;
+        navigationQueryService.Setup(x => x.TryGetParentKey(It.IsAny<Guid>(), out parentKey)).Returns(true);
+
         using (var reference = umbracoContextFactory.EnsureUmbracoContext())
         {
             var contentCache = Mock.Get(reference.UmbracoContext.Content);
@@ -200,6 +234,21 @@ public class HtmlLocalLinkParserTests
             var mediaCache = Mock.Get(reference.UmbracoContext.Media);
             mediaCache.Setup(x => x.GetById(It.IsAny<int>())).Returns(media.Object);
             mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
+
+            var publishStatusQueryService = new Mock<IPublishStatusQueryService>();
+            publishStatusQueryService
+                .Setup(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
+                .Returns(true);
+
+            var publishedUrlProvider = new UrlProvider(
+                umbracoContextAccessor,
+                Options.Create(webRoutingSettings),
+                new UrlProviderCollection(() => new[] { contentUrlProvider.Object }),
+                new MediaUrlProviderCollection(() => new[] { mediaUrlProvider.Object }),
+                Mock.Of<IVariationContextAccessor>(),
+                contentCache.Object,
+                navigationQueryService.Object,
+                publishStatusQueryService.Object);
 
             var linkParser = new HtmlLocalLinkParser(publishedUrlProvider);
 

@@ -4,7 +4,6 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -16,12 +15,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 [TestFixture]
 public class BlockEditorComponentTests
 {
-    private const string ContentGuid1 = "036ce82586a64dfba2d523a99ed80f58";
-    private const string ContentGuid2 = "48288c21a38a40ef82deb3eda90a58f6";
-    private const string SettingsGuid1 = "ffd35c4e2eea4900abfa5611b67b2492";
-    private const string SubContentGuid1 = "4c44ce6b3a5c4f5f8f15e3dc24819a9e";
-    private const string SubContentGuid2 = "a062c06d6b0b44ac892b35d90309c7f8";
-    private const string SubSettingsGuid1 = "4d998d980ffa4eee8afdc23c4abd6d29";
+    private const string ContentGuid1 = "709b857e-6f00-45c6-bf65-f7da028c361f";
+    private const string ContentGuid2 = "823dc755-28ec-4198-b050-514d91b7994e";
+    private const string SettingsGuid1 = "4d2e18fe-f030-4ea9-aed9-10e7aee265fd";
+    private const string SubContentGuid1 = "b5698cf9-bf26-4c1c-8b1c-db30a1b5c56a";
+    private const string SubContentGuid2 = "68606a64-a03a-4b78-bcb1-39daee0c590d";
+    private const string SubSettingsGuid1 = "5ce1b7da-7c9f-491e-9b95-5510fd28c50c";
 
     private readonly IJsonSerializer _jsonSerializer = new SystemTextJsonSerializer();
 
@@ -30,7 +29,7 @@ public class BlockEditorComponentTests
     {
         var component = new BlockListPropertyNotificationHandler(Mock.Of<ILogger<BlockListPropertyNotificationHandler>>());
         var json = GetBlockListJson(null, string.Empty);
-        Assert.Throws<FormatException>(() => component.ReplaceBlockEditorUdis(json));
+        Assert.Throws<FormatException>(() => component.ReplaceBlockEditorKeys(json));
     }
 
     [Test]
@@ -46,7 +45,7 @@ public class BlockEditorComponentTests
         var json = GetBlockListJson(null);
 
         var component = new BlockListPropertyNotificationHandler(Mock.Of<ILogger<BlockListPropertyNotificationHandler>>());
-        var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
+        var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
         Assert.AreEqual(3, guidMap.Count);
         var expected = ReplaceGuids(json, guidMap);
@@ -76,7 +75,7 @@ public class BlockEditorComponentTests
         var json = GetBlockListJson(innerJsonEscaped);
 
         var component = new BlockListPropertyNotificationHandler(Mock.Of<ILogger<BlockListPropertyNotificationHandler>>());
-        var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
+        var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
         // the expected result is that the subFeatures data remains escaped
         Assert.AreEqual(6, guidMap.Count);
@@ -105,7 +104,7 @@ public class BlockEditorComponentTests
         var json = GetBlockListJson(innerJson);
 
         var component = new BlockListPropertyNotificationHandler(Mock.Of<ILogger<BlockListPropertyNotificationHandler>>());
-        var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
+        var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
         Assert.AreEqual(6, guidMap.Count);
         var expected = ReplaceGuids(GetBlockListJson(innerJson), guidMap);
@@ -137,7 +136,7 @@ public class BlockEditorComponentTests
         var json = GetBlockListJson(complexEditorJsonEscaped);
 
         var component = new BlockListPropertyNotificationHandler(Mock.Of<ILogger<BlockListPropertyNotificationHandler>>());
-        var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
+        var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
         // the expected result is that the subFeatures remains escaped
         Assert.AreEqual(6, guidMap.Count);
@@ -168,7 +167,7 @@ public class BlockEditorComponentTests
         var json = GetBlockGridJson(innerJsonEscaped);
 
         var component = new BlockGridPropertyNotificationHandler(Mock.Of<ILogger<BlockGridPropertyNotificationHandler>>());
-        var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
+        var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
         // the expected result is that the subFeatures remains escaped
         Assert.AreEqual(13, guidMap.Count);
@@ -195,7 +194,7 @@ public class BlockEditorComponentTests
         var json = GetBlockGridJson(innerJson);
 
         var component = new BlockGridPropertyNotificationHandler(Mock.Of<ILogger<BlockGridPropertyNotificationHandler>>());
-        var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
+        var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
         // the expected result is that the subFeatures remains unescaped
         Assert.AreEqual(13, guidMap.Count);
@@ -228,7 +227,7 @@ public class BlockEditorComponentTests
         var json = GetBlockGridJson(innerJson);
 
         var component = new BlockGridPropertyNotificationHandler(Mock.Of<ILogger<BlockGridPropertyNotificationHandler>>());
-        var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
+        var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
         // the expected result is that the subFeatures remains unaltered - the UDIs within should still exist
         Assert.AreEqual(10, guidMap.Count);
@@ -253,39 +252,41 @@ public class BlockEditorComponentTests
     {
         ""Umbraco.BlockList"": [
             {
-                ""contentUdi"": """ + (contentGuid1.IsNullOrWhiteSpace()
-            ? string.Empty
-            : Udi.Create(Constants.UdiEntityType.Element, Guid.Parse(contentGuid1)).ToString()) + @"""
+                ""contentKey"": """ + (contentGuid1.IsNullOrWhiteSpace() ? string.Empty : contentGuid1) + @"""
             },
             {
-                ""contentUdi"": ""umb://element/" + contentGuid2 + @""",
-                ""settingsUdi"": ""umb://element/" + settingsGuid1 + @"""
+                ""contentKey"": """ + contentGuid2 + @""",
+                ""settingsKey"": """ + settingsGuid1 + @"""
             }
         ]
     },
     ""contentData"": [
         {
             ""contentTypeKey"": ""d6ce4a86-91a2-45b3-a99c-8691fc1fb020"",
-            ""udi"": """ + (contentGuid1.IsNullOrWhiteSpace()
-            ? string.Empty
-            : Udi.Create(Constants.UdiEntityType.Element, Guid.Parse(contentGuid1)).ToString()) + @""",
-            ""featureName"": ""Hello"",
-            ""featureDetails"": ""World""
+            ""key"": """ + (contentGuid1.IsNullOrWhiteSpace() ? string.Empty : contentGuid1) + @""",
+            ""values"": [
+                { ""alias"": ""featureName"", ""value"": ""Hello"" },
+                { ""alias"": ""featureDetails"", ""value"": ""World"" }
+            ]
         },
         {
             ""contentTypeKey"": ""d6ce4a86-91a2-45b3-a99c-8691fc1fb020"",
-            ""udi"": ""umb://element/" + contentGuid2 + @""",
-            ""featureName"": ""Another"",
-            ""featureDetails"": ""Feature""" +
-        (subFeatures == null ? string.Empty : @", ""subFeatures"": " + subFeatures) + @"
+            ""key"": """ + contentGuid2 + @""",
+            ""values"": [
+                { ""alias"": ""featureName"", ""value"": ""Another"" },
+                { ""alias"": ""featureDetails"", ""value"": ""Feature"" },
+                { ""alias"": ""subFeatures"", ""value"": " + subFeatures.OrIfNullOrWhiteSpace(@"""""") + @" }
+            ]
         }
     ],
     ""settingsData"": [
         {
             ""contentTypeKey"": ""d6ce4a86-91a2-45b3-a99c-8691fc1fb020"",
-            ""udi"": ""umb://element/" + settingsGuid1 + @""",
-            ""featureName"": ""Setting 1"",
-            ""featureDetails"": ""Setting 2""
+            ""key"": """ + settingsGuid1 + @""",
+            ""values"": [
+                { ""alias"": ""featureName"", ""value"": ""Setting 1"" },
+                { ""alias"": ""featureDetails"", ""value"": ""Setting 2"" }
+            ]
         }
     ]
 }";
@@ -350,7 +351,7 @@ public class BlockEditorComponentTests
         @"{
     ""layout"": {
         ""Umbraco.BlockGrid"": [{
-                ""contentUdi"": ""umb://element/d05861169d124582a7c2826e52a51b47"",
+                ""contentKey"": ""fb0595b1-26e7-493f-86c7-bf2c42326850"",
                 ""areas"": [{
                         ""key"": ""b17663f0-c1f4-4bee-97cd-290fbc7b9a2c"",
                         ""items"": []
@@ -361,13 +362,13 @@ public class BlockEditorComponentTests
                 ],
                 ""columnSpan"": 12,
                 ""rowSpan"": 1,
-                ""settingsUdi"": ""umb://element/262d5efd2eeb43ed95e95c094c45ce1c""
+                ""settingsKey"": ""0183ae81-2b62-49b5-8ac6-88d66c33068c""
             }, {
-                ""contentUdi"": ""umb://element/5abad9f1b4e24d7aa269fbd1b50033ac"",
+                ""contentKey"": ""4852d9ef-ac8d-4d44-87c9-82d282aa0e7f"",
                 ""areas"": [{
                         ""key"": ""b17663f0-c1f4-4bee-97cd-290fbc7b9a2c"",
                         ""items"": [{
-                                ""contentUdi"": ""umb://element/5fc866c590be4d01a28a979472a1ffee"",
+                                ""contentKey"": ""96a15ca9-3970-4e0a-9c66-18433bc23274"",
                                 ""areas"": [],
                                 ""columnSpan"": 3,
                                 ""rowSpan"": 1
@@ -376,25 +377,25 @@ public class BlockEditorComponentTests
                     }, {
                         ""key"": ""2bdcdadd-f609-4acc-b840-01970b9ced1d"",
                         ""items"": [{
-                                ""contentUdi"": ""umb://element/264536b65b0f4641aa43d4bfb515831d"",
+                                ""contentKey"": ""3093f7f1-c931-4325-ba71-638eb2746c8d"",
                                 ""areas"": [],
                                 ""columnSpan"": 3,
                                 ""rowSpan"": 1,
-                                ""settingsUdi"": ""umb://element/20d735c7c57b40229ed845375cf22d1f""
+                                ""settingsKey"": ""bef9eb67-56de-4fec-9fbc-1c7c02f5a5a7""
                             }
                         ]
                     }
                 ],
                 ""columnSpan"": 6,
                 ""rowSpan"": 1,
-                ""settingsUdi"": ""umb://element/4d121eaba49c4e09a7460069d1bee600""
+                ""settingsKey"": ""6eed3662-6ad1-4cba-805b-352f28599b0d""
             }, {
-                ""contentUdi"": ""umb://element/76e24aeb6eeb4370892ca521932a96df"",
+                ""contentKey"": ""1f778485-933e-40b4-91e2-9926857a5c81"",
                 ""areas"": [],
                 ""columnSpan"": 6,
                 ""rowSpan"": 1
             }, {
-                ""contentUdi"": ""umb://element/90549d94555647fdbe4d111c7178ada4"",
+                ""contentKey"": ""2d5c6555-0dd8-4db2-b0c9-2d2eba29026d"",
                 ""areas"": [{
                         ""key"": ""b17663f0-c1f4-4bee-97cd-290fbc7b9a2c"",
                         ""items"": []
@@ -405,51 +406,67 @@ public class BlockEditorComponentTests
                 ],
                 ""columnSpan"": 12,
                 ""rowSpan"": 3,
-                ""settingsUdi"": ""umb://element/3dfabc96584c4c35ac2e6bf06ffa20de""
+                ""settingsKey"": ""48a7b7da-673f-44d5-8bad-7d71d157fb3e""
             }
         ]
     },
     ""contentData"": [{
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
-            ""udi"": ""umb://element/d05861169d124582a7c2826e52a51b47"",
-            ""title"": ""Element one - 12 cols""
+            ""key"": ""fb0595b1-26e7-493f-86c7-bf2c42326850"",
+            ""values"": [
+                { ""alias"": ""title"", ""value"": ""Element one - 12 cols"" }
+            ]
         }, {
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
-            ""udi"": ""umb://element/5abad9f1b4e24d7aa269fbd1b50033ac"",
-            ""title"": ""Element one - 6 cols, left side""
+            ""key"": ""4852d9ef-ac8d-4d44-87c9-82d282aa0e7f"",
+            ""values"": [
+                { ""alias"": ""title"", ""value"": ""Element one - 6 cols, left side"" }
+            ]
         }, {
             ""contentTypeKey"": ""5cc488aa-ba24-41f2-a01e-8f2d1982f865"",
-            ""udi"": ""umb://element/76e24aeb6eeb4370892ca521932a96df"",
-            ""text"": ""Element two - 6 cols, right side""
+            ""key"": ""1f778485-933e-40b4-91e2-9926857a5c81"",
+            ""values"": [
+                { ""alias"": ""title"", ""value"": ""Element one - 6 cols, right side"" }
+            ]
         }, {
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
-            ""udi"": ""umb://element/90549d94555647fdbe4d111c7178ada4"",
-            ""title"": ""One more element one - 12 cols"",
-            ""subFeatures"": " + subFeatures.OrIfNullOrWhiteSpace(@"""""") + @"
+            ""key"": ""2d5c6555-0dd8-4db2-b0c9-2d2eba29026d"",
+            ""values"": [
+                { ""alias"": ""title"", ""value"": ""One more element one - 12 cols"" },
+                { ""alias"": ""subFeatures"", ""value"": " + subFeatures.OrIfNullOrWhiteSpace(@"""""") + @" }
+            ]
         }, {
             ""contentTypeKey"": ""5cc488aa-ba24-41f2-a01e-8f2d1982f865"",
-            ""udi"": ""umb://element/5fc866c590be4d01a28a979472a1ffee"",
-            ""text"": ""Nested element two - left side""
+            ""key"": ""96a15ca9-3970-4e0a-9c66-18433bc23274"",
+            ""values"": [
+                { ""alias"": ""title"", ""value"": ""Nested element two - left side"" }
+            ]
         }, {
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
-            ""udi"": ""umb://element/264536b65b0f4641aa43d4bfb515831d"",
-            ""title"": ""Nested element one - right side""
+            ""key"": ""3093f7f1-c931-4325-ba71-638eb2746c8d"",
+            ""values"": [
+                { ""alias"": ""title"", ""value"": ""Nested element one - right side"" }
+            ]
         }
     ],
     ""settingsData"": [{
             ""contentTypeKey"": ""ef150524-7145-469e-8d99-166aad69a7ad"",
-            ""udi"": ""umb://element/262d5efd2eeb43ed95e95c094c45ce1c"",
-            ""enabled"": 1
+            ""key"": ""0183ae81-2b62-49b5-8ac6-88d66c33068c"",
+            ""values"": [
+                { ""alias"": ""enabled"", ""value"": 1 }
+            ]
         }, {
             ""contentTypeKey"": ""ef150524-7145-469e-8d99-166aad69a7ad"",
-            ""udi"": ""umb://element/4d121eaba49c4e09a7460069d1bee600""
+            ""key"": ""6eed3662-6ad1-4cba-805b-352f28599b0d""
         }, {
             ""contentTypeKey"": ""ef150524-7145-469e-8d99-166aad69a7ad"",
-            ""udi"": ""umb://element/20d735c7c57b40229ed845375cf22d1f""
+            ""key"": ""bef9eb67-56de-4fec-9fbc-1c7c02f5a5a7""
         }, {
             ""contentTypeKey"": ""ef150524-7145-469e-8d99-166aad69a7ad"",
-            ""udi"": ""umb://element/3dfabc96584c4c35ac2e6bf06ffa20de"",
-            ""enabled"": 1
+            ""key"": ""48a7b7da-673f-44d5-8bad-7d71d157fb3e"",
+            ""values"": [
+                { ""alias"": ""enabled"", ""value"": 1 }
+            ]
         }
     ]
 }";
@@ -458,7 +475,7 @@ public class BlockEditorComponentTests
     {
         foreach ((Guid oldKey, Guid newKey) in guidMap)
         {
-            json = json.Replace(oldKey.ToString("N"), newKey.ToString("N"));
+            json = json.Replace(oldKey.ToString("D"), newKey.ToString("D"));
         }
 
         return json;

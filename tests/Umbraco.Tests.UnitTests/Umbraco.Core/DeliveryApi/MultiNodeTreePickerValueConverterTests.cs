@@ -23,11 +23,13 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var apiUrProvider = new ApiMediaUrlProvider(PublishedUrlProvider);
         routeBuilder = routeBuilder ?? CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings());
         return new MultiNodeTreePickerValueConverter(
-            PublishedSnapshotAccessor,
             Mock.Of<IUmbracoContextAccessor>(),
             Mock.Of<IMemberService>(),
             new ApiContentBuilder(contentNameProvider, routeBuilder, expansionStrategyAccessor),
-            new ApiMediaBuilder(contentNameProvider, apiUrProvider, Mock.Of<IPublishedValueFallback>(), expansionStrategyAccessor));
+            new ApiMediaBuilder(contentNameProvider, apiUrProvider, Mock.Of<IPublishedValueFallback>(), expansionStrategyAccessor),
+            CacheManager.Content,
+            CacheManager.Media,
+            CacheManager.Members);
     }
 
     private PublishedDataType MultiNodePickerPublishedDataType(bool multiSelect, string entityType) =>
@@ -99,8 +101,8 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
     {
         var content = new Mock<IPublishedContent>();
 
-        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None);
-        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None);
+        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None, new VariationContext(), CacheManager);
+        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None, new VariationContext(), CacheManager);
 
         var key = Guid.NewGuid();
         var urlSegment = "page-url-segment";

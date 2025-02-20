@@ -1,14 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Umbraco.Cms.PublishedCache.HybridCache</PackageId>
     <Title>Umbraco CMS - Published cache - HybridCache</Title>
     <Description>Contains the published cache assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Infrastructure.HybridCache</RootNamespace>
-    <!-- TODO: Enable package validation in v16 by removing this line -->
-    <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
-
+  
+  <PropertyGroup>
+    <!-- TODO: Fix all warnings and remove this override -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" />
     <PackageReference Include="MessagePack" />
@@ -20,10 +22,19 @@
       <_Parameter1>Umbraco.Tests</_Parameter1>
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Umbraco.Tests.Common</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Umbraco.Tests.Integration</_Parameter1>
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 
@@ -31,5 +42,4 @@
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
   </ItemGroup>
-
 </Project>

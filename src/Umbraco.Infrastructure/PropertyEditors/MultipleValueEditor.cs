@@ -2,8 +2,8 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -26,8 +26,11 @@ public class MultipleValueEditor : DataValueEditor
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
         DataEditorAttribute attribute)
-        : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute) =>
+        : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+    {
         _jsonSerializer = jsonSerializer;
+        Validators.Add(new MultipleValueValidator());
+    }
 
     /// <summary>
     ///     When multiple values are selected a json array will be posted back so we need to format for storage in

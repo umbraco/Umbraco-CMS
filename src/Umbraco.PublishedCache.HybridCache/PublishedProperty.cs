@@ -27,7 +27,7 @@ internal class PublishedProperty : PublishedPropertyBase
     private CacheValues? _cacheValues;
 
     // the variant source and inter values
-    private readonly object _locko = new();
+    private readonly Lock _locko = new();
     private ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>? _sourceValues;
 
     // initializes a published content property with a value
@@ -80,10 +80,10 @@ internal class PublishedProperty : PublishedPropertyBase
     {
         if (previewing)
         {
-            return "Cache.Property.CacheValues[D:" + contentUid + ":" + typeAlias + "]";
+            return CacheKeys.PreviewPropertyCacheKeyPrefix + contentUid + ":" + typeAlias + "]";
         }
 
-        return "Cache.Property.CacheValues[P:" + contentUid + ":" + typeAlias + "]";
+        return CacheKeys.PropertyCacheKeyPrefix + contentUid + ":" + typeAlias + "]";
     }
 
     // determines whether a property has value
@@ -270,7 +270,7 @@ internal class PublishedProperty : PublishedPropertyBase
 
     private class CacheValues : CacheValue
     {
-        private readonly object _locko = new();
+        private readonly Lock _locko = new();
         private ConcurrentDictionary<CompositeStringStringKey, CacheValue>? _values;
 
         public CacheValue For(string? culture, string? segment)

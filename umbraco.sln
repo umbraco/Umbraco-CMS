@@ -89,8 +89,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Infrastructure", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.TestData", "tests\Umbraco.TestData\Umbraco.TestData.csproj", "{FB5676ED-7A69-492C-B802-E7B24144C0FC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.PublishedCache.NuCache", "src\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj", "{F6DE8DA0-07CC-4EF2-8A59-2BC81DBB3830}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Examine.Lucene", "src\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj", "{0FAD7D2A-D7DD-45B1-91FD-488BB6CDACEA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.Website", "src\Umbraco.Web.Website\Umbraco.Web.Website.csproj", "{5A246D54-3109-4D2B-BE7D-FC0787D126AE}"
@@ -141,6 +139,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{20CE9C97
 		build\azure-pipelines.yml = build\azure-pipelines.yml
 		build\nightly-build-trigger.yml = build\nightly-build-trigger.yml
 		build\templates\backoffice-install.yml = build\templates\backoffice-install.yml
+		build\nightly-E2E-test-pipelines.yml = build\nightly-E2E-test-pipelines.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "csharp-docs", "csharp-docs", "{F2BF84D9-0A14-40AF-A0F3-B9BBBBC16A44}"
@@ -234,12 +233,6 @@ Global
 		{FB5676ED-7A69-492C-B802-E7B24144C0FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB5676ED-7A69-492C-B802-E7B24144C0FC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FB5676ED-7A69-492C-B802-E7B24144C0FC}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
-		{F6DE8DA0-07CC-4EF2-8A59-2BC81DBB3830}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F6DE8DA0-07CC-4EF2-8A59-2BC81DBB3830}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F6DE8DA0-07CC-4EF2-8A59-2BC81DBB3830}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F6DE8DA0-07CC-4EF2-8A59-2BC81DBB3830}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F6DE8DA0-07CC-4EF2-8A59-2BC81DBB3830}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
-		{F6DE8DA0-07CC-4EF2-8A59-2BC81DBB3830}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 		{0FAD7D2A-D7DD-45B1-91FD-488BB6CDACEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0FAD7D2A-D7DD-45B1-91FD-488BB6CDACEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FAD7D2A-D7DD-45B1-91FD-488BB6CDACEA}.Release|Any CPU.ActiveCfg = Release|Any CPU

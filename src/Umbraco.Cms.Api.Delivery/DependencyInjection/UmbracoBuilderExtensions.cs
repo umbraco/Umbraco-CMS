@@ -61,6 +61,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiMediaQueryService, ApiMediaQueryService>();
         builder.Services.AddTransient<IMemberApplicationManager, MemberApplicationManager>();
         builder.Services.AddTransient<IRequestMemberAccessService, RequestMemberAccessService>();
+        builder.Services.AddTransient<ICurrentMemberClaimsProvider, CurrentMemberClaimsProvider>();
         builder.Services.AddScoped<IMemberClientCredentialsManager, MemberClientCredentialsManager>();
 
         builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
@@ -105,7 +106,7 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddOutputCache(options =>
         {
-            options.AddBasePolicy(_ => { });
+            options.AddBasePolicy(build => build.AddPolicy<NoOutputCachePolicy>());
 
             if (outputCacheSettings.ContentDuration.TotalSeconds > 0)
             {

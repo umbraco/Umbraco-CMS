@@ -1,7 +1,12 @@
-﻿using Umbraco.Cms.Core;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Infrastructure.HybridCache.Services;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
@@ -9,56 +14,116 @@ public sealed class DocumentCache : IPublishedContentCache
 {
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
+    private readonly IDocumentUrlService _documentUrlService;
+    private readonly Lazy<IPublishedUrlProvider> _publishedUrlProvider;
 
-    public DocumentCache(IDocumentCacheService documentCacheService, IPublishedContentTypeCache publishedContentTypeCache)
+    public DocumentCache(
+        IDocumentCacheService documentCacheService,
+        IPublishedContentTypeCache publishedContentTypeCache,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IDocumentUrlService documentUrlService,
+        Lazy<IPublishedUrlProvider> publishedUrlProvider)
     {
         _documentCacheService = documentCacheService;
         _publishedContentTypeCache = publishedContentTypeCache;
+        _documentNavigationQueryService = documentNavigationQueryService;
+        _documentUrlService = documentUrlService;
+        _publishedUrlProvider = publishedUrlProvider;
     }
 
-    public async Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false) => await _documentCacheService.GetByIdAsync(id, preview);
+    public async Task<IPublishedContent?> GetByIdAsync(int id, bool? preview = null) => await _documentCacheService.GetByIdAsync(id, preview);
 
 
-    public async Task<IPublishedContent?> GetByIdAsync(Guid key, bool preview = false) => await _documentCacheService.GetByKeyAsync(key, preview);
+    public async Task<IPublishedContent?> GetByIdAsync(Guid key, bool? preview = null) => await _documentCacheService.GetByKeyAsync(key, preview);
 
     public IPublishedContent? GetById(bool preview, int contentId) => GetByIdAsync(contentId, preview).GetAwaiter().GetResult();
 
     public IPublishedContent? GetById(bool preview, Guid contentId) => GetByIdAsync(contentId, preview).GetAwaiter().GetResult();
 
 
-    public IPublishedContent? GetById(int contentId) => GetByIdAsync(contentId, false).GetAwaiter().GetResult();
+    public IPublishedContent? GetById(int contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
 
-    public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId, false).GetAwaiter().GetResult();
+    public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
 
     public IPublishedContentType? GetContentType(int id) => _publishedContentTypeCache.Get(PublishedItemType.Content, id);
 
     public IPublishedContentType? GetContentType(string alias) => _publishedContentTypeCache.Get(PublishedItemType.Content, alias);
 
-
     public IPublishedContentType? GetContentType(Guid key) => _publishedContentTypeCache.Get(PublishedItemType.Content, key);
 
-    // FIXME: These need to be refactored when removing nucache
-    // Thats the time where we can change the IPublishedContentCache interface.
+    // TODO: These are all obsolete and should be removed
 
-    public IPublishedContent? GetById(bool preview, Udi contentId) => throw new NotImplementedException();
+    [Obsolete("Scheduled for removal in v17")]
+    public IPublishedContent? GetById(bool preview, Udi contentId)
+    {
+        if(contentId is not GuidUdi guidUdi)
+        {
+            throw new NotSupportedException("Only GuidUdi is supported");
+        }
 
-    public IPublishedContent? GetById(Udi contentId) => throw new NotImplementedException();
+        return GetById(preview, guidUdi.Guid);
+    }
 
-    public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null) => throw new NotImplementedException();
+    [Obsolete("Scheduled for removal in v17")]
+    public IPublishedContent? GetById(Udi contentId)
+    {
+        if(contentId is not GuidUdi guidUdi)
+        {
+            throw new NotSupportedException("Only GuidUdi is supported");
+        }
 
-    public IEnumerable<IPublishedContent> GetAtRoot(string? culture = null) => throw new NotImplementedException();
+        return GetById(guidUdi.Guid);
+    }
 
-    public bool HasContent(bool preview) => throw new NotImplementedException();
+    public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null)
+    {
+        _documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
 
-    public bool HasContent() => throw new NotImplementedException();
+        IEnumerable<IPublishedContent> rootContent = rootKeys.Select(key => GetById(preview, key)).WhereNotNull();
+        return culture is null ? rootContent : rootContent.Where(x => x.IsInvariantOrHasCulture(culture));
+    }
 
-    public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType) => throw new NotImplementedException();
+    public IEnumerable<IPublishedContent> GetAtRoot(string? culture = null)
+    {
+        _documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
 
-    public IPublishedContent? GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null) => throw new NotImplementedException();
+        IEnumerable<IPublishedContent> rootContent = rootKeys.Select(key => GetById(key)).WhereNotNull();
+        return culture is null ? rootContent : rootContent.Where(x => x.IsInvariantOrHasCulture(culture));
+    }
 
-    public IPublishedContent? GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null) => throw new NotImplementedException();
+    [Obsolete("Scheduled for removal in v17")]
+    public bool HasContent(bool preview) => HasContent();
 
-    public string? GetRouteById(bool preview, int contentId, string? culture = null) => throw new NotImplementedException();
+    [Obsolete("Scheduled for removal in v17")]
+    public bool HasContent() => _documentUrlService.HasAny();
 
-    public string? GetRouteById(int contentId, string? culture = null) => throw new NotImplementedException();
+    [Obsolete]
+    public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
+        => _documentCacheService.GetByContentType(contentType);
+
+    [Obsolete("Use IPublishedUrlProvider.GetUrl instead, scheduled for removal in v17")]
+    public IPublishedContent? GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null)
+    {
+        Guid? key = _documentUrlService.GetDocumentKeyByRoute(route, culture, null, preview);
+        return key is not null ? GetById(preview, key.Value) : null;
+    }
+
+    [Obsolete("Use IPublishedUrlProvider.GetUrl instead, scheduled for removal in v17")]
+    public IPublishedContent? GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null)
+    {
+        Guid? key = _documentUrlService.GetDocumentKeyByRoute(route, culture, null, false);
+        return key is not null ? GetById(key.Value) : null;
+    }
+
+    [Obsolete("Use IPublishedUrlProvider.GetUrl instead, scheduled for removal in v17")]
+    public string? GetRouteById(bool preview, int contentId, string? culture = null)
+    {
+        IPublishedContent? content = GetById(preview, contentId);
+
+        return content is not null ? _publishedUrlProvider.Value.GetUrl(content, UrlMode.Relative, culture) : null;
+    }
+
+    [Obsolete("Use IPublishedUrlProvider.GetUrl instead, scheduled for removal in v17")]
+    public string? GetRouteById(int contentId, string? culture = null) => GetRouteById(false, contentId, culture);
 }

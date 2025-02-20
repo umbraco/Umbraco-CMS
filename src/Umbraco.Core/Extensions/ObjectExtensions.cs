@@ -49,6 +49,7 @@ public static class ObjectExtensions
         if (value == null)
         {
             return string.Empty;
+
         }
 
         if (type == typeof(string))

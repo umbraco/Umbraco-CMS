@@ -19,9 +19,10 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
-using Umbraco.Cms.Tests.Integration.TestServerTest;
+
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
@@ -84,7 +85,11 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     }
 
     [TearDown]
-    public void TearDownAsync() => _host.StopAsync();
+    public void TearDownAsync()
+    {
+        _host.StopAsync();
+        (Services as IDisposable)?.Dispose();
+    }
 
     /// <summary>
     ///     Create the Generic Host and execute startup ConfigureServices/Configure calls
@@ -162,6 +167,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
             .AddExamine()
             .AddUmbracoSqlServerSupport()
             .AddUmbracoSqliteSupport()
+            .AddUmbracoHybridCache()
             .AddTestServices(TestHelper);
 
         if (TestOptions.Mapper)
@@ -171,12 +177,35 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
                 .AddCoreMappingProfiles();
         }
 
+        services.RemoveAll(x=>x.ImplementationType == typeof(DocumentUrlServiceInitializerNotificationHandler));
         services.AddSignalR();
         services.AddMvc();
 
         CustomTestSetup(builder);
+        ExecuteBuilderAttributes(builder);
 
         builder.Build();
+    }
+
+    private void ExecuteBuilderAttributes(IUmbracoBuilder builder)
+    {
+        // todo better errors
+
+        // execute builder attributes defined on method
+        foreach (ConfigureBuilderAttribute builderAttribute in Type.GetType(TestContext.CurrentContext.Test.ClassName)
+                     .GetMethods().First(m => m.Name == TestContext.CurrentContext.Test.MethodName)
+                     .GetCustomAttributes(typeof(ConfigureBuilderAttribute), true))
+        {
+            builderAttribute.Execute(builder);
+        }
+
+        // execute builder attributes defined on method with param value passtrough from testcase
+        foreach (ConfigureBuilderTestCaseAttribute builderAttribute in Type.GetType(TestContext.CurrentContext.Test.ClassName)
+                     .GetMethods().First(m => m.Name == TestContext.CurrentContext.Test.MethodName)
+                     .GetCustomAttributes(typeof(ConfigureBuilderTestCaseAttribute), true))
+        {
+            builderAttribute.Execute(builder);
+        }
     }
 
     /// <summary>

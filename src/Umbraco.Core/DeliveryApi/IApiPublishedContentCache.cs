@@ -9,4 +9,8 @@ public interface IApiPublishedContentCache
     IPublishedContent? GetById(Guid contentId);
 
     IEnumerable<IPublishedContent> GetByIds(IEnumerable<Guid> contentIds);
+
+    Task<IPublishedContent?> GetByIdAsync(Guid contentId) => Task.FromResult(GetById(contentId));
+    Task<IPublishedContent?> GetByRouteAsync(string route) => Task.FromResult(GetByRoute(route));
+    Task<IEnumerable<IPublishedContent>> GetByIdsAsync(IEnumerable<Guid> contentIds) => Task.FromResult(GetByIds(contentIds));
 }
