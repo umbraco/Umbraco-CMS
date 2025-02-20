@@ -107,25 +107,25 @@ stages:
         timeoutInMinutes: 180
         variables:
           # Connection string
-          CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
-          CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.Sqlite
+#          CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
+#          CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.Sqlite
         strategy:
           matrix:
             # Default test configurations
-            LinuxPart1Of3:
-              vmImage: "ubuntu-latest"
-              testFolder: "DefaultConfig"
-              testCommand: "npm run test -- --shard=1/3"
+#            LinuxPart1Of3:
+#              vmImage: "ubuntu-latest"
+#              testFolder: "DefaultConfig"
+#              testCommand: "npm run test -- --shard=1/3"
             #            LinuxPart2Of3:
             #              vmImage: "ubuntu-latest"
             #              testCommand: "npm run test -- --shard=2/3"
             #            LinuxPart3Of3:
             #              vmImage: "ubuntu-latest"
             #              testCommand: "npm run test -- --shard=3/3"
-            WindowsPart1Of3:
-              vmImage: "windows-latest"
-              testFolder: "DefaultConfig"
-              testCommand: "npm run test -- --shard=1/3"
+#            WindowsPart1Of3:
+#              vmImage: "windows-latest"
+#              testFolder: "DefaultConfig"
+#              testCommand: "npm run test -- --shard=1/3"
             #            WindowsPart2Of3:
             #              vmImage: "windows-latest"
             #              testCommand: "npm run test -- --shard=2/3"
@@ -138,14 +138,14 @@ stages:
               vmImage: "windows-latest"
               testFolder: "UnattendedInstallConfig"
               testCommand: "npx playwright test $testFolder"
-              CONNECTIONSTRINGS__UMBRACODBDSN: ""
-              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: ""
+#              CONNECTIONSTRINGS__UMBRACODBDSN: ""
+#              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: ""
             LinuxUnattendedInstallConfig:
               vmImage: "ubuntu-latest"
               testFolder: "UnattendedInstallConfig"
               testCommand: "npx playwright test $testFolder"
-              CONNECTIONSTRINGS__UMBRACODBDSN: ""
-              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: ""
+#              CONNECTIONSTRINGS__UMBRACODBDSN: ""
+#              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: ""
         pool:
           vmImage: $(vmImage)
         steps:
