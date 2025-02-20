@@ -35,7 +35,6 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryE
 	},
 	//identifier: 'block-list-editor',
 	itemSelector: 'umb-block-list-entry',
-	disabledItemSelector: '[unsupported]',
 	//containerSelector: 'EMPTY ON PURPOSE, SO IT BECOMES THE HOST ELEMENT',
 };
 
