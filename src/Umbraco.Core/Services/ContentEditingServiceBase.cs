@@ -22,7 +22,6 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private readonly ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IContentValidationServiceBase<TContentType> _validationService;
-    private ContentSettings _contentSettings;
     private readonly IRelationService _relationService;
 
     protected ContentEditingServiceBase(
@@ -42,10 +41,10 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         _logger = logger;
         _userIdKeyResolver = userIdKeyResolver;
         _validationService = validationService;
-        _contentSettings = optionsMonitor.CurrentValue;
+        ContentSettings = optionsMonitor.CurrentValue;
         optionsMonitor.OnChange((contentSettings) =>
         {
-            _contentSettings = contentSettings;
+            ContentSettings = contentSettings;
         });
 
         _relationService = relationService;
@@ -63,6 +62,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected abstract OperationResult? MoveToRecycleBin(TContent content, int userId);
 
     protected abstract OperationResult? Delete(TContent content, int userId);
+
+    protected ContentSettings ContentSettings { get; private set; }
 
     protected ICoreScopeProvider CoreScopeProvider { get; }
 
@@ -154,7 +155,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
                 userKey,
                 ContentTrashStatusRequirement.MustNotBeTrashed,
                 MoveToRecycleBin,
-                _contentSettings.DisableUnpublishWhenReferenced,
+                ContentSettings.DisableUnpublishWhenReferenced,
                 ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeleteAsync(Guid key, Guid userKey, bool mustBeTrashed = true)
@@ -164,7 +165,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
                     ? ContentTrashStatusRequirement.MustBeTrashed
                     : ContentTrashStatusRequirement.Irrelevant,
                 Delete,
-                _contentSettings.DisableDeleteWhenReferenced,
+                ContentSettings.DisableDeleteWhenReferenced,
                 ContentEditingOperationStatus.CannotDeleteWhenReferenced);
 
     // helper method to perform move-to-recycle-bin, delete-from-recycle-bin and delete for content as they are very much handled in the same way
@@ -286,7 +287,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             : Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.CancelledByNotification, null);
     }
 
-    protected internal Attempt<TContent?, ContentEditingOperationStatus> OperationResultToAttempt(TContent? content, OperationResult? operationResult)
+    private Attempt<TContent?, ContentEditingOperationStatus> OperationResultToAttempt(TContent? content, OperationResult? operationResult)
     {
         ContentEditingOperationStatus operationStatus = OperationResultToOperationStatus(operationResult);
         return operationStatus == ContentEditingOperationStatus.Success
