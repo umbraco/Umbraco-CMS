@@ -136,7 +136,7 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 		if (total === 0) return nothing;
 
 		return html`
-			<h5 id="reference-headline">${this.localize.term(headline)}</h5>
+			<h5 class="uui-h5" id="reference-headline">${this.localize.term(headline)}</h5>
 			<uui-ref-list>
 				${items.map(
 					(item) =>
