@@ -8,7 +8,7 @@ We have a guide on [what to consider before you start](contributing-before-you-s
 
 ## Contribution guide
 
-This guide decribes each step to make your first contribution:
+This guide describes each step to make your first contribution:
 
 1. **Fork**
 
