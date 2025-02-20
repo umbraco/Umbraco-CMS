@@ -345,7 +345,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		if (this._exposed) {
 			return ext.component;
 		} else {
-			return html`<div>
+			return html`<div class="expose-button-encapsulation">
 				${ext.component}
 				<umb-block-overlay-expose-button
 					.contentTypeName=${this._contentTypeName}
@@ -556,6 +556,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			:host([drag-placeholder]) .umb-block-list__block {
 				transition: opacity 50ms 16ms;
 				opacity: 0;
+			}
+
+			.expose-button-encapsulation {
+				min-height: var(--uui-size-16);
 			}
 		`,
 	];
