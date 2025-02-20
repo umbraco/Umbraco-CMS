@@ -24,8 +24,8 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase impl
 	 */
 	async getReferencedBy(
 		unique: string,
-		skip: number = 0,
-		take: number = 20,
+		skip = 0,
+		take = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>> {
 		const { data, error } = await tryExecuteAndNotify(
 			this,

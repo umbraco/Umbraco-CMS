@@ -1,16 +1,25 @@
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-toggle')
-export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputToggleElement extends UmbFormControlMixin(UmbLitElement, '') {
+	/**
+	 * Sets the input to required, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	required?: boolean;
+
+	@property({ type: String })
+	requiredMessage?: string;
+
 	@property({ type: Boolean })
 	public set checked(toggle: boolean) {
 		this.#checked = toggle;
 		super.value = toggle.toString();
-		this.#updateLabel();
 	}
 	public get checked(): boolean {
 		return this.#checked;
@@ -32,7 +41,6 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
-	 * @attr
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
@@ -41,15 +49,8 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 	@state()
 	_currentLabel?: string;
 
-	protected override getFormElement() {
-		return undefined;
-	}
-
-	// test
-
-	override connectedCallback(): void {
-		super.connectedCallback();
-		this.#updateLabel();
+	protected override firstUpdated(): void {
+		this.addFormControlElement(this.shadowRoot!.querySelector('uui-toggle')!);
 	}
 
 	#onChange(event: UUIBooleanInputEvent) {
@@ -58,16 +59,17 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#updateLabel() {
-		this._currentLabel = this.showLabels ? (this.checked ? this.labelOn : this.labelOff) : ''; 
-	}
-
 	override render() {
+		const label = this.showLabels ? (this.checked ? this.labelOn : this.labelOff) : '';
 		return html`<uui-toggle
 			.checked=${this.#checked}
-			.label="${this.ariaLabel}"
+			.label=${this.ariaLabel}
+			?required=${this.required}
+			.requiredMessage=${this.requiredMessage}
 			@change=${this.#onChange}
-			?readonly=${this.readonly}><span>${this._currentLabel}</span> </uui-toggle>`;
+			?readonly=${this.readonly}
+			><span>${label}</span>
+		</uui-toggle>`;
 	}
 
 	static override styles = [

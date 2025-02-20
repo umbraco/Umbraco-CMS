@@ -59,6 +59,7 @@ export abstract class UmbTiptapToolbarElementApiBase extends UmbControllerBase i
 	 * @see {ManifestTiptapToolbarExtension}
 	 * @param {Editor} editor The editor instance.
 	 */
+
 	public abstract execute(editor?: Editor): void;
 
 	/**

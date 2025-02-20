@@ -275,6 +275,12 @@ internal class PublishedProperty : PublishedPropertyBase
 
         public CacheValue For(string? culture, string? segment)
         {
+            // As noted on IPropertyValue, null value means invariant
+            // But as we need an actual string value to build a CompositeStringStringKey
+            // We need to convert null to empty
+            culture ??= string.Empty;
+            segment ??= string.Empty;
+
             if (culture == string.Empty && segment == string.Empty)
             {
                 return this;

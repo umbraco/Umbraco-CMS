@@ -498,17 +498,14 @@ export abstract class UmbBlockEntryContext<
 	#gotEntries() {
 		this.#updateCreatePaths();
 		this.#observeLayout();
-		if (this._entries) {
-			this.observe(
-				this._entries.workspacePath,
-				(workspacePath) => {
-					this.#workspacePath.setValue(workspacePath);
-				},
-				'observeWorkspacePath',
-			);
-		} else {
-			this.removeUmbControllerByAlias('observeWorkspacePath');
-		}
+
+		this.observe(
+			this._entries?.workspacePath,
+			(workspacePath) => {
+				this.#workspacePath.setValue(workspacePath);
+			},
+			'observeWorkspacePath',
+		);
 	}
 
 	abstract _gotEntries(): void;
@@ -521,6 +518,7 @@ export abstract class UmbBlockEntryContext<
 			this._manager.contentOf(this.#contentKey),
 			(content) => {
 				if (this.#unsupported.getValue() !== true) {
+					// If we could not find content, then we do not know the contentTypeKey and then the content is broken. [NL]
 					this.#unsupported.setValue(!content);
 				}
 				this.#content.setValue(content);
@@ -556,7 +554,7 @@ export abstract class UmbBlockEntryContext<
 			throw new Error('No contentStructure found');
 		}
 
-		// observe blockType:
+		// observe variantId:
 		this.observe(
 			observeMultiple([
 				this._manager.variantId,
@@ -568,7 +566,7 @@ export abstract class UmbBlockEntryContext<
 				this.#variantId.setValue(variantId.toVariant(variesByCulture, variesBySegment));
 				this.#gotVariantId();
 			},
-			'observeBlockType',
+			'observeVariantId',
 		);
 	}
 
@@ -607,7 +605,10 @@ export abstract class UmbBlockEntryContext<
 		this.#contentStructure = this._manager.getStructure(contentTypeKey);
 		this.#contentStructurePromiseResolve?.();
 
-		this.#unsupported.setValue(!this.#contentStructure);
+		if (!this.#contentStructure) {
+			// If we got no content structure, then this is element type did not load and there for it is not supported any longer.
+			this.#unsupported.setValue(true);
+		}
 
 		this.observe(
 			this.#contentStructure?.ownerContentType,
@@ -649,6 +650,10 @@ export abstract class UmbBlockEntryContext<
 			this._manager.blockTypeOf(contentTypeKey),
 			(blockType) => {
 				this._blockType.setValue(blockType as BlockType);
+				if (!blockType) {
+					// If the block type is undefined, then we do not have this Block Type and the Block is then unsupported. [NL]
+					this.#unsupported.setValue(true);
+				}
 			},
 			'observeBlockType',
 		);
