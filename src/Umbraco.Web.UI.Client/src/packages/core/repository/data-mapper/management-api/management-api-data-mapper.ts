@@ -10,10 +10,10 @@ export class UmbManagementApiDataMapper extends UmbControllerBase {
 		super(host);
 	}
 
-	map(args: Omit<UmbDataMapperMapArgs, 'dataSourceIdentifier'>) {
+	map(args: Omit<UmbDataMapperMapArgs, 'forDataSource'>) {
 		return this.#dataMapper.map({
 			...args,
-			dataSourceIdentifier: UMB_MANAGEMENT_API_DATA_SOURCE_IDENTIFIER,
+			forDataSource: UMB_MANAGEMENT_API_DATA_SOURCE_IDENTIFIER,
 		});
 	}
 }

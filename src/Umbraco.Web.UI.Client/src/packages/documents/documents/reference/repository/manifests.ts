@@ -13,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.DataMapping.ManagementApi.DocumentReferenceResponse',
 		name: 'Document Reference Response Management Api Data Mapping',
 		api: () => import('./document-reference-response.management-api.mapping.js'),
-		dataSourceIdentifier: UMB_MANAGEMENT_API_DATA_SOURCE_IDENTIFIER,
-		dataModelIdentifier: 'DocumentReferenceResponseModel',
+		forDataSource: UMB_MANAGEMENT_API_DATA_SOURCE_IDENTIFIER,
+		forDataModel: 'DocumentReferenceResponseModel',
 	},
 ];
