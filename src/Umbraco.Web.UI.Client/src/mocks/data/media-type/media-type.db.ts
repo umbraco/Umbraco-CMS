@@ -3,6 +3,7 @@ import { UmbMockEntityFolderManager } from '../utils/entity/entity-folder.manage
 import { UmbMockEntityTreeManager } from '../utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
+import { umbDataTypeMockDb } from '../data-type/data-type.db.js';
 import type { UmbMockMediaTypeModel, UmbMockMediaTypeUnionModel } from './media-type.data.js';
 import { data } from './media-type.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -17,7 +18,6 @@ import type {
 	MediaTypeTreeItemResponseModel,
 	PagedAllowedMediaTypeModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { umbDataTypeMockDb } from '../data-type/data-type.db.js';
 
 class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockMediaTypeModel>(this, mediaTypeTreeItemMapper);
@@ -52,7 +52,7 @@ class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
 		const allowedTypes = this.data.filter((field) => {
 			const allProperties = field.properties.flat();
 
-			const fileUploadType = allProperties.find((prop) => prop.alias === 'umbracoFile');
+			const fileUploadType = allProperties.find((prop) => prop.alias === 'umbracoFile' || prop.alias === 'mediaPicker');
 			if (!fileUploadType) return false;
 
 			const dataType = umbDataTypeMockDb.read(fileUploadType.dataType.id);

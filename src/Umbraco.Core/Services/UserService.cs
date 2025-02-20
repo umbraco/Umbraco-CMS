@@ -1,13 +1,11 @@
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
 using System.Linq.Expressions;
-using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Editors;
@@ -40,7 +38,6 @@ internal partial class UserService : RepositoryService, IUserService
 {
     private readonly GlobalSettings _globalSettings;
     private readonly SecuritySettings _securitySettings;
-    private readonly ILogger<UserService> _logger;
     private readonly IUserGroupRepository _userGroupRepository;
     private readonly UserEditorAuthorizationHelper _userEditorAuthorizationHelper;
     private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -137,7 +134,6 @@ internal partial class UserService : RepositoryService, IUserService
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _contentSettings = contentSettings.Value;
-        _logger = loggerFactory.CreateLogger<UserService>();
     }
 
     /// <summary>
@@ -964,6 +960,15 @@ internal partial class UserService : RepositoryService, IUserService
         {
             scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MissingUser, existingUser);
+        }
+
+        // User names can only contain the configured allowed characters. This is validated by ASP.NET Identity on create
+        // as the setting is applied to the BackOfficeIdentityOptions, but we need to check ourselves for updates.
+        var allowedUserNameCharacters = _securitySettings.AllowedUserNameCharacters;
+        if (model.UserName.Any(c => allowedUserNameCharacters.Contains(c) == false))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.InvalidUserName, existingUser);
         }
 
         IEnumerable<IUserGroup> allUserGroups = _userGroupRepository.GetMany().ToArray();

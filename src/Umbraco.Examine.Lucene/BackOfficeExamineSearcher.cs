@@ -52,12 +52,24 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         _publishedUrlProvider = publishedUrlProvider;
     }
 
+    [Obsolete("Please use the method that accepts all parameters. Will be removed in V17.")]
     public IEnumerable<ISearchResult> Search(
         string query,
         UmbracoEntityTypes entityType,
         int pageSize,
         long pageIndex,
         out long totalFound,
+        string? searchFrom = null,
+        bool ignoreUserStartNodes = false)
+        => Search(query, entityType, pageSize, pageIndex, out totalFound, null, searchFrom, ignoreUserStartNodes);
+
+    public IEnumerable<ISearchResult> Search(
+        string query,
+        UmbracoEntityTypes entityType,
+        int pageSize,
+        long pageIndex,
+        out long totalFound,
+        string[]? contentTypeAliases,
         string? searchFrom = null,
         bool ignoreUserStartNodes = false)
     {
@@ -105,7 +117,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                 {
                     sb.Append("+__NodeTypeAlias:");
                     sb.Append(searchFrom);
-                    sb.Append(" ");
+                    sb.Append(' ');
                 }
 
                 break;
@@ -139,6 +151,11 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                 throw new NotSupportedException("The " + typeof(BackOfficeExamineSearcher) +
                                                 " currently does not support searching against object type " +
                                                 entityType);
+        }
+
+        if (contentTypeAliases?.Any() is true)
+        {
+            sb.Append($"+({string.Join(" ", contentTypeAliases.Select(alias => $"{ExamineFieldNames.ItemTypeFieldName}:{alias}"))}) ");
         }
 
         if (!_examineManager.TryGetIndex(indexName, out IIndex? index))
@@ -261,16 +278,16 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 
                     //additional fields normally
                     sb.Append(f);
-                    sb.Append(":");
-                    sb.Append("(");
+                    sb.Append(':');
+                    sb.Append('(');
                     foreach (var w in queryWordsReplaced)
                     {
                         sb.Append(w.ToLower());
                         sb.Append("* ");
                     }
 
-                    sb.Append(")");
-                    sb.Append(" ");
+                    sb.Append(')');
+                    sb.Append(' ');
                 }
 
                 sb.Append(") ");
@@ -284,7 +301,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         return true;
     }
 
-    private void AppendNodeNamePhraseWithBoost(StringBuilder sb, string query, IEnumerable<string> allLangs)
+    private static void AppendNodeNamePhraseWithBoost(StringBuilder sb, string query, IEnumerable<string> allLangs)
     {
         //node name exactly boost x 10
         sb.Append("nodeName: (");
@@ -301,31 +318,31 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         }
     }
 
-    private void AppendNodeNameExactWithBoost(StringBuilder sb, string query, IEnumerable<string> allLangs)
+    private static void AppendNodeNameExactWithBoost(StringBuilder sb, string query, IEnumerable<string> allLangs)
     {
         //node name exactly boost x 10
         sb.Append("nodeName:");
-        sb.Append("\"");
+        sb.Append('"');
         sb.Append(query.ToLower());
-        sb.Append("\"");
+        sb.Append('"');
         sb.Append("^10.0 ");
         //also search on all variant node names
         foreach (var lang in allLangs)
         {
             //node name exactly boost x 10
-            sb.Append($"nodeName_{lang}:");
-            sb.Append("\"");
+            sb.Append("nodeName_").Append(lang).Append(':');
+            sb.Append('"');
             sb.Append(query.ToLower());
-            sb.Append("\"");
+            sb.Append('"');
             sb.Append("^10.0 ");
         }
     }
 
-    private void AppendNodeNameWithWildcards(StringBuilder sb, string[] querywords, IEnumerable<string> allLangs)
+    private static void AppendNodeNameWithWildcards(StringBuilder sb, string[] querywords, IEnumerable<string> allLangs)
     {
         //node name normally with wildcards
         sb.Append("nodeName:");
-        sb.Append("(");
+        sb.Append('(');
         foreach (var w in querywords)
         {
             sb.Append(w.ToLower());
@@ -338,7 +355,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         {
             //node name normally with wildcards
             sb.Append($"nodeName_{lang}:");
-            sb.Append("(");
+            sb.Append('(');
             foreach (var w in querywords)
             {
                 sb.Append(w.ToLower());
@@ -349,7 +366,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         }
     }
 
-    private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[]? startNodeIds, string? searchFrom, bool ignoreUserStartNodes, IEntityService entityService)
+    private static void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[]? startNodeIds, string? searchFrom, bool ignoreUserStartNodes, IEntityService entityService)
     {
         if (sb == null)
         {
@@ -382,7 +399,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
             // find... only what's underneath
             sb.Append("+__Path:");
             AppendPath(sb, entityPath.Path, false);
-            sb.Append(" ");
+            sb.Append(' ');
         }
         else if (startNodeIds?.Length == 0)
         {
@@ -405,7 +422,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                 }
                 else
                 {
-                    sb.Append(" ");
+                    sb.Append(' ');
                 }
 
                 AppendPath(sb, ep.Path, true);
@@ -415,13 +432,13 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         }
     }
 
-    private void AppendPath(StringBuilder sb, string path, bool includeThisNode)
+    private static void AppendPath(StringBuilder sb, string path, bool includeThisNode)
     {
         path = path.Replace("-", "\\-").Replace(",", "\\,");
         if (includeThisNode)
         {
             sb.Append(path);
-            sb.Append(" ");
+            sb.Append(' ');
         }
 
         sb.Append(path);

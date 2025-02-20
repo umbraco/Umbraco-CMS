@@ -18,21 +18,18 @@ public abstract class CreateDocumentControllerBase : DocumentControllerBase
 
     protected async Task<IActionResult> HandleRequest(CreateDocumentRequestModel requestModel, Func<Task<IActionResult>> authorizedHandler)
     {
-        // TODO This have temporarily been uncommented, to support the client sends values from all cultures, even when the user do not have access to the languages.
-        // The values are ignored in the ContentEditingService
+        // We intentionally don't pass in cultures here.
+        // This is to support the client sending values for all cultures even if the user doesn't have access to the language.
+        // Values for unauthorized languages are later ignored in the ContentEditingService.
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionNew.ActionLetter, requestModel.Parent?.Id),
+            AuthorizationPolicies.ContentPermissionByResource);
 
-        // IEnumerable<string> cultures = requestModel.Variants
-        //     .Where(v => v.Culture is not null)
-        //     .Select(v => v.Culture!);
-        // AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
-        //     User,
-        //     ContentPermissionResource.WithKeys(ActionNew.ActionLetter, requestModel.Parent?.Id, cultures),
-        //     AuthorizationPolicies.ContentPermissionByResource);
-        //
-        // if (!authorizationResult.Succeeded)
-        // {
-        //     return Forbidden();
-        // }
+        if (authorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
 
         return await authorizedHandler();
     }

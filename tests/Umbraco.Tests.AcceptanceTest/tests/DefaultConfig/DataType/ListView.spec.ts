@@ -131,7 +131,6 @@ for (const listViewType of listViewTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
-      await umbracoUi.waitForTimeout(500);
       await umbracoUi.dataType.addLayouts(layoutName);
       await umbracoUi.dataType.clickSaveButton();
 

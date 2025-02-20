@@ -40,7 +40,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 
 	#parseInt(value: unknown, fallback: number): number {
 		const num = Number(value);
-		return !isNaN(num) && num > 0 ? num : fallback;
+		return !Number.isNaN(num) && num > 0 ? num : fallback;
 	}
 
 	@state()
@@ -56,6 +56,9 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 	private _max = Infinity;
 
 	@state()
+	private _label?: string;
+
+	@state()
 	private _alias?: string;
 
 	@state()
@@ -65,9 +68,19 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 		super();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this._label = context.getLabel();
 			this.observe(context.alias, (alias) => (this._alias = alias));
 			this.observe(context.variantId, (variantId) => (this._variantId = variantId?.toString() || 'invariant'));
 		});
+	}
+
+	protected override firstUpdated() {
+		if (this._min && this._max && this._min > this._max) {
+			console.warn(
+				`Property '${this._label}' (Multi URL Picker) has been misconfigured, 'min' is greater than 'max'. Please correct your data type configuration.`,
+				this,
+			);
+		}
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputMultiUrlElement }) {

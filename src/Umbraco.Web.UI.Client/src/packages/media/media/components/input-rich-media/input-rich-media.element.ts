@@ -10,11 +10,12 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-
-import '@umbraco-cms/backoffice/imaging';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice/media';
+
+import '@umbraco-cms/backoffice/imaging';
 
 type UmbRichMediaCardModel = {
 	unique: string;
@@ -109,8 +110,8 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
 
-	@property({ type: String })
-	startNode = '';
+	@property({ type: Object, attribute: false })
+	startNode?: UmbTreeStartNode;
 
 	@property({ type: Boolean })
 	multiple = false;
@@ -172,11 +173,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	@state()
 	private _routeBuilder?: UmbModalRouteBuilder;
 
-	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(
-		this,
-		UMB_MEDIA_ITEM_REPOSITORY_ALIAS,
-		(x) => x.unique,
-	);
+	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
 
 	constructor() {
 		super();
@@ -324,7 +321,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		const data = await modalHandler?.onSubmit().catch(() => null);
 		if (!data) return;
 
-		const selection = data.selection;
+		const selection = data.selection.filter((x) => x !== null) as string[];
 		this.#addItems(selection);
 	}
 

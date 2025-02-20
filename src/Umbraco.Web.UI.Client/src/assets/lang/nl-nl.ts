@@ -1850,9 +1850,6 @@ export default {
 		notificationEmailsCheckSuccessMessage: 'Notificatie e-mail is verzonden naar <strong>%0%</strong>.',
 		notificationEmailsCheckErrorMessage:
 			'Notificatie e-mail staat nog steeds op de standaard waarde van <strong>%0%</strong>.',
-		scheduledHealthCheckEmailBody:
-			'<html><body><p>Resultaten van de geplande Umbraco Health Checks uitgevoerd op %0% op %1%:</p>%2%</body></html>',
-		scheduledHealthCheckEmailSubject: 'Umbraco Health Check Status: %0%',
 		checkGroup: 'Groep controleren',
 		helpText:
 			'\n    <p>De health checker evalueert verschillende delen van de website voor best practice instellingen, configuratie, mogelijke problemen, enzovoort. U kunt problemen eenvoudig oplossen met een druk op de knop.\n    U kunt uw eigen health checks toevoegen, kijk even naar <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">de documentatie voor meer informatie</a> over aangepaste health checks.</p>\n    ',

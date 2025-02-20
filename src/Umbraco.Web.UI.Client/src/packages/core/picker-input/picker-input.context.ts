@@ -1,10 +1,12 @@
+import { UMB_PICKER_INPUT_CONTEXT } from './picker-input.context-token.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 type PickerItemBaseType = { name: string; unique: string };
 export class UmbPickerInputContext<
@@ -12,7 +14,7 @@ export class UmbPickerInputContext<
 	PickerItemType extends PickerItemBaseType = PickedItemType,
 	PickerModalConfigType extends UmbPickerModalData<PickerItemType> = UmbPickerModalData<PickerItemType>,
 	PickerModalValueType extends UmbPickerModalValue = UmbPickerModalValue,
-> extends UmbControllerBase {
+> extends UmbContextBase<UmbPickerInputContext> {
 	modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>;
 	repository?: UmbItemRepository<PickedItemType>;
 	#getUnique: (entry: PickedItemType) => string | undefined;
@@ -44,19 +46,35 @@ export class UmbPickerInputContext<
 	}
 	private _min = 0;
 
-	/* TODO: find a better way to have a getUniqueMethod. If we want to support trees/items of different types,
-	then it need to be bound to the type and can't be a generic method we pass in. */
+	/**
+	 * Creates an instance of UmbPickerInputContext.
+	 * @param {UmbControllerHost} host - The host for the controller.
+	 * @param {string} repositoryAlias - The alias of the repository to use.
+	 * @param {(string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>)} modalAlias - The alias of the modal to use.
+	 * @param {((entry: PickedItemType) => string | undefined)} [getUniqueMethod] - DEPRECATED since 15.3. Will be removed in v. 17: A method to get the unique key from the item.
+	 * @memberof UmbPickerInputContext
+	 */
 	constructor(
 		host: UmbControllerHost,
 		repositoryAlias: string,
 		modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>,
 		getUniqueMethod?: (entry: PickedItemType) => string | undefined,
 	) {
-		super(host);
+		super(host, UMB_PICKER_INPUT_CONTEXT);
 		this.modalAlias = modalAlias;
-		this.#getUnique = getUniqueMethod || ((entry) => entry.unique);
 
-		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias, this.#getUnique);
+		this.#getUnique = getUniqueMethod
+			? (entry: PickedItemType) => {
+					new UmbDeprecation({
+						deprecated: 'The getUniqueMethod parameter.',
+						removeInVersion: '17.0.0',
+						solution: 'The required unique property on the item will be used instead.',
+					}).warn();
+					return getUniqueMethod(entry);
+				}
+			: (entry) => entry.unique;
+
+		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias, getUniqueMethod);
 
 		this.selection = this.#itemManager.uniques;
 		this.selectedItems = this.#itemManager.items;

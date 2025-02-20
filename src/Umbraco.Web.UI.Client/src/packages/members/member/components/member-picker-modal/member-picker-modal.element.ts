@@ -1,6 +1,6 @@
 import { UmbMemberCollectionRepository } from '../../collection/index.js';
 import type { UmbMemberDetailModel } from '../../types.js';
-import type { UmbMemberItemModel } from '../../repository/index.js';
+import type { UmbMemberItemModel } from '../../item/types.js';
 import type { UmbMemberPickerModalValue, UmbMemberPickerModalData } from './member-picker-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
@@ -14,10 +14,13 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	UmbMemberPickerModalValue
 > {
 	@state()
-	private _members: Array<UmbMemberDetailModel> = [];
+	private _members: Array<UmbMemberItemModel | UmbMemberDetailModel> = [];
 
 	@state()
 	private _searchQuery?: string;
+
+	@state()
+	private _selectableFilter: (item: UmbMemberItemModel) => boolean = () => true;
 
 	#collectionRepository = new UmbMemberCollectionRepository(this);
 	#pickerContext = new UmbCollectionItemPickerContext(this);
@@ -46,8 +49,24 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has('data')) {
-			this.#pickerContext.search.updateConfig({ ...this.data?.search });
 			this.#pickerContext.selection.setMultiple(this.data?.multiple ?? false);
+
+			if (this.data?.pickableFilter) {
+				this._selectableFilter = this.data?.pickableFilter;
+			}
+
+			if (this.data?.search) {
+				this.#pickerContext.search.updateConfig({
+					...this.data.search,
+				});
+
+				const searchQueryParams = this.data.search.queryParams;
+				if (searchQueryParams) {
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					//@ts-ignore - TODO wire up types
+					this.#pickerContext.search.setQuery(searchQueryParams);
+				}
+			}
 		}
 
 		if (_changedProperties.has('value')) {
@@ -96,14 +115,19 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderMemberItem(item: UmbMemberItemModel | UmbMemberDetailModel) {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore - TODO: MemberDetailModel does not have a name. It should have so we ignore this for now.
+		const selectable = this._selectableFilter(item);
+
 		return html`
 			<uui-menu-item
 				label=${item.variants[0].name ?? ''}
-				selectable
+				?selectable=${selectable}
+				?disabled=${!selectable}
 				@selected=${() => this.#pickerContext.selection.select(item.unique)}
 				@deselected=${() => this.#pickerContext.selection.deselect(item.unique)}
 				?selected=${this.#pickerContext.selection.isSelected(item.unique)}>
-				<uui-icon slot="icon" name="icon-user"></uui-icon>
+				<umb-icon slot="icon" name=${item.memberType.icon}></umb-icon>
 			</uui-menu-item>
 		`;
 	}

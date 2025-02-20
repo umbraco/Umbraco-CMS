@@ -19,6 +19,7 @@ public class RuntimeSettings
     public RuntimeMode Mode { get; set; } = RuntimeMode.BackofficeDevelopment;
 
     /// <summary>
+    [Obsolete("No longer used and will be removed in Umbraco 16.")]
     ///     Gets or sets a value for the maximum request length in kb.
     /// </summary>
     public long? MaxRequestLength { get; set; }

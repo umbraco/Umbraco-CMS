@@ -3449,9 +3449,9 @@ public static class PublishedContentExtensions
             { "Url", "Url" },
         };
 
-        foreach (KeyValuePair<string, string> field in stdFields.Where(x => fields.ContainsKey(x.Key) == false))
+        foreach (KeyValuePair<string, string> field in stdFields)
         {
-            fields[field.Key] = field.Value;
+            fields.TryAdd(field.Key, field.Value);
         }
 
         return fields;

@@ -15,7 +15,7 @@ export type UmbMockMediaTypeUnionModel =
 
 export const data: Array<UmbMockMediaTypeModel> = [
 	{
-		name: 'Media Type 1',
+		name: 'Image',
 		id: 'media-type-1-id',
 		parent: null,
 		description: 'Media type 1 description',
@@ -105,7 +105,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		aliasCanBeChanged: false,
 	},
 	{
-		name: 'Media Type 2',
+		name: 'Audio',
 		id: 'media-type-2-id',
 		parent: null,
 		description: 'Media type 2 description',
@@ -118,7 +118,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 				alias: 'umbracoFile',
 				name: 'File',
 				description: '',
-				dataType: { id: 'dt-uploadField' },
+				dataType: { id: 'dt-uploadFieldFiles' },
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 0,
@@ -155,7 +155,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		aliasCanBeChanged: false,
 	},
 	{
-		name: 'Media Type 3',
+		name: 'Vector Graphics',
 		id: 'media-type-3-id',
 		parent: null,
 		description: 'Media type 3 description',
@@ -168,7 +168,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 				alias: 'umbracoFile',
 				name: 'File',
 				description: '',
-				dataType: { id: 'dt-uploadField' },
+				dataType: { id: 'dt-uploadFieldVector' },
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 0,
@@ -205,7 +205,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		aliasCanBeChanged: false,
 	},
 	{
-		name: 'Media Type 4',
+		name: 'Movie',
 		id: 'media-type-4-id',
 		parent: null,
 		description: 'Media type 4 description',
@@ -218,7 +218,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 				alias: 'umbracoFile',
 				name: 'File',
 				description: '',
-				dataType: { id: 'dt-uploadField' },
+				dataType: { id: 'dt-uploadFieldMovies' },
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 0,
@@ -268,7 +268,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 				alias: 'umbracoFile',
 				name: 'File',
 				description: '',
-				dataType: { id: 'dt-uploadField' },
+				dataType: { id: 'dt-uploadFieldFiles' },
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 0,

@@ -722,7 +722,70 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'fileExtensions',
-				value: ['jpg', 'jpeg', 'png', 'pdf'],
+				value: ['jpg', 'jpeg', 'png', 'svg'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Upload Field (Files)',
+		id: 'dt-uploadFieldFiles',
+		parent: null,
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['pdf', 'iso'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Upload Field (Movies)',
+		id: 'dt-uploadFieldMovies',
+		parent: null,
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['mp4', 'mov'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Upload Field (Vector)',
+		id: 'dt-uploadFieldVector',
+		parent: null,
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['svg'],
 			},
 			{
 				alias: 'multiple',
@@ -878,8 +941,16 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'layouts',
 				value: [
-					{ icon: 'icon-grid', isSystem: true, name: 'Grid', path: '', selected: true },
-					{ icon: 'icon-list', isSystem: true, name: 'Table', path: '', selected: true },
+					{
+						icon: 'icon-grid',
+						name: 'Document Grid Collection View',
+						collectionView: 'Umb.CollectionView.Document.Grid',
+					},
+					{
+						icon: 'icon-list',
+						name: 'Document Table Collection View',
+						collectionView: 'Umb.CollectionView.Document.Table',
+					},
 				],
 			},
 			{ alias: 'icon', value: 'icon-layers' },
@@ -912,8 +983,16 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'layouts',
 				value: [
-					{ icon: 'icon-grid', isSystem: true, name: 'Grid', path: '', selected: true },
-					{ icon: 'icon-list', isSystem: true, name: 'Table', path: '', selected: true },
+					{
+						icon: 'icon-grid',
+						name: 'Media Grid Collection View',
+						collectionView: 'Umb.CollectionView.Media.Grid',
+					},
+					{
+						icon: 'icon-list',
+						name: 'Media Table Collection View',
+						collectionView: 'Umb.CollectionView.Media.Table',
+					},
 				],
 			},
 			{ alias: 'icon', value: 'icon-layers' },
@@ -944,9 +1023,53 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		values: [
+			{
+				alias: 'extensions',
+				value: [
+					'Umb.Tiptap.RichTextEssentials',
+					'Umb.Tiptap.Embed',
+					'Umb.Tiptap.Figure',
+					'Umb.Tiptap.Image',
+					'Umb.Tiptap.Link',
+					'Umb.Tiptap.MediaUpload',
+					'Umb.Tiptap.Subscript',
+					'Umb.Tiptap.Superscript',
+					'Umb.Tiptap.Table',
+					'Umb.Tiptap.TextAlign',
+					'Umb.Tiptap.Underline',
+				],
+			},
+			{
+				alias: 'toolbar',
+				value: [
+					[
+						[
+							'Umb.Tiptap.Toolbar.SourceEditor',
+							'Umb.Tiptap.Toolbar.Undo',
+							'Umb.Tiptap.Toolbar.Redo',
+							'Umb.Tiptap.Toolbar.StyleSelect',
+							'Umb.Tiptap.Toolbar.Bold',
+							'Umb.Tiptap.Toolbar.Italic',
+							'Umb.Tiptap.Toolbar.TextAlignLeft',
+							'Umb.Tiptap.Toolbar.TextAlignCenter',
+							'Umb.Tiptap.Toolbar.TextAlignRight',
+							'Umb.Tiptap.Toolbar.BulletList',
+							'Umb.Tiptap.Toolbar.OrderedList',
+							'Umb.Tiptap.Toolbar.Blockquote',
+							'Umb.Tiptap.Toolbar.Link',
+							'Umb.Tiptap.Toolbar.Unlink',
+							'Umb.Tiptap.Toolbar.HorizontalRule',
+							'Umb.Tiptap.Toolbar.Table',
+							'Umb.Tiptap.Toolbar.MediaPicker',
+							'Umb.Tiptap.Toolbar.EmbeddedMedia',
+						],
+					],
+				],
+			},
 			{ alias: 'dimensions', value: { height: 500 } },
 			{ alias: 'maxImageSize', value: 500 },
 			{ alias: 'ignoreUserStartNodes', value: false },
+			{ alias: 'overlaySize', value: 'medium' },
 		],
 	},
 	{
