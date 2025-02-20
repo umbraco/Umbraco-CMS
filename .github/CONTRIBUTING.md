@@ -50,7 +50,7 @@ This guide describes each step to make your first contribution:
 
     Done? Yay! 🎉
 
-    Remember to commit to your branch. When its ready push the changes to your fork on GitHub.
+    Remember to commit to your branch. When it's ready push the changes to your fork on GitHub.
 
 8. **Create pull request**
 
