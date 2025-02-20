@@ -2035,6 +2035,8 @@ export default {
 		permissionsDefault: 'Default permissions',
 		permissionsGranular: 'Granular permissions',
 		permissionsGranularHelp: 'Set permissions for specific nodes',
+		granularRightsLabel: 'Documents',
+		granularRightsDescription: 'Assign permissions to specific documents',
 		permissionsEntityGroup_document: 'Content',
 		permissionsEntityGroup_media: 'Media',
 		permissionsEntityGroup_member: 'Member',
@@ -2051,6 +2053,8 @@ export default {
 		chooseUserGroup: (multiple: boolean) => {
 			return multiple ? 'Choose User Groups' : 'Choose User Group';
 		},
+		entityPermissionsLabel: 'Permissions',
+		entityPermissionsDescription: 'Assign permissions for actions',
 		noStartNode: 'No start node selected',
 		noStartNodes: 'No start nodes selected',
 		startnode: 'Content start node',
@@ -2146,6 +2150,7 @@ export default {
 		invalidEmail: 'Invalid email',
 		invalidNull: 'Value cannot be null',
 		invalidEmpty: 'Value cannot be empty',
+		invalidFalse: 'This field must be turned on',
 		invalidPattern: 'Value is invalid, it does not match the correct pattern',
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
@@ -2634,6 +2639,8 @@ export default {
 		labelInlineMode: 'Display inline with text',
 		notExposedLabel: 'Draft',
 		notExposedDescription: 'This Block is not yet created for this variant',
+		areaValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in this area.',
+		rootValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in the root of this property.',
 		unsupportedBlockName: 'Unsupported',
 		unsupportedBlockDescription:
 			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',

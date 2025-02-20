@@ -1,5 +1,6 @@
 import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEMBER_MANAGEMENT_SECTION_ALIAS } from '../../section/constants.js';
+import { UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import type { UmbMemberItemModel } from './repository/types.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -17,16 +18,7 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 		return this.#item;
 	}
 	public set item(value: UmbMemberItemModel | undefined) {
-		const oldValue = this.#item;
 		this.#item = value;
-
-		if (!this.#item) {
-			this.#modalRoute?.destroy();
-			return;
-		}
-		if (oldValue?.unique === this.#item.unique) {
-			return;
-		}
 	}
 
 	@property({ type: Boolean })
@@ -40,8 +32,6 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 
 	@state()
 	_userHasSectionAccess = false;
-
-	#modalRoute?: any;
 
 	constructor() {
 		super();
@@ -57,7 +47,7 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 			},
 		]);
 
-		this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.onSetup(() => {
 				return { data: { entityType: UMB_MEMBER_ENTITY_TYPE, preset: {} } };
 			})
@@ -68,7 +58,8 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 
 	#getHref(item: UmbMemberItemModel) {
 		if (!this._editPath) return;
-		return `${this._editPath}/edit/${item.unique}`;
+		const path = UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
+		return `${this._editPath}/${path}`;
 	}
 
 	override render() {

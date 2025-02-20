@@ -6,16 +6,16 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 export class UmbDataMappingResolver extends UmbControllerBase {
 	#apiCache = new Map<string, UmbDataMapping>();
 
-	async resolve(dataSourceIdentifier: string, dataModelIdentifier: string): Promise<UmbDataMapping | undefined> {
-		if (!dataSourceIdentifier) {
+	async resolve(forDataSource: string, forDataModel: string): Promise<UmbDataMapping | undefined> {
+		if (!forDataSource) {
 			throw new Error('data source identifier is required');
 		}
 
-		if (!dataModelIdentifier) {
+		if (!forDataModel) {
 			throw new Error('data identifier is required');
 		}
 
-		const manifest = this.#getManifestWithBestFit(dataSourceIdentifier, dataModelIdentifier);
+		const manifest = this.#getManifestWithBestFit(forDataSource, forDataModel);
 
 		if (!manifest) {
 			return undefined;
@@ -42,22 +42,21 @@ export class UmbDataMappingResolver extends UmbControllerBase {
 		return dataMapping;
 	}
 
-	#getManifestWithBestFit(dataSourceIdentifier: string, dataModelIdentifier: string) {
-		const supportedManifests = this.#getSupportedManifests(dataSourceIdentifier, dataModelIdentifier);
+	#getManifestWithBestFit(forDataSource: string, forDataModel: string) {
+		const supportedManifests = this.#getSupportedManifests(forDataSource, forDataModel);
 
 		if (!supportedManifests.length) {
 			return undefined;
 		}
 
 		// Pick the manifest with the highest priority
+		// TODO: This should have been handled in the extension registry, but until then we do it here: [NL]
 		return supportedManifests.sort((a: ManifestBase, b: ManifestBase): number => (b.weight || 0) - (a.weight || 0))[0];
 	}
 
-	#getSupportedManifests(dataSourceIdentifier: string, dataModelIdentifier: string) {
+	#getSupportedManifests(forDataSource: string, forDataModel: string) {
 		const supportedManifests = umbExtensionsRegistry.getByTypeAndFilter('dataMapping', (manifest) => {
-			return (
-				manifest.dataSourceIdentifier === dataSourceIdentifier && manifest.dataModelIdentifier === dataModelIdentifier
-			);
+			return manifest.forDataSource === forDataSource && manifest.forDataModel === forDataModel;
 		});
 
 		return supportedManifests;

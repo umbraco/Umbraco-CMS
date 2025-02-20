@@ -24,8 +24,8 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase impl
 	 */
 	async getReferencedBy(
 		unique: string,
-		skip: number = 0,
-		take: number = 20,
+		skip = 0,
+		take = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>> {
 		const { data, error } = await tryExecuteAndNotify(
 			this,
@@ -35,7 +35,7 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase impl
 		if (data) {
 			const promises = data.items.map(async (item) => {
 				return this.#dataMapper.map({
-					dataModelIdentifier: item.$type,
+					forDataModel: item.$type,
 					data: item,
 					fallback: async () => {
 						return {

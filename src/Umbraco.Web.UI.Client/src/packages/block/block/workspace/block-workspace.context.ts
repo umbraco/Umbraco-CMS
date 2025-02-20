@@ -92,89 +92,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
 			this.#blockManager = manager;
-
-			this.observe(
-				manager.liveEditingMode,
-				(liveEditingMode) => {
-					this.#liveEditingMode = liveEditingMode ?? false;
-				},
-				'observeLiveEditingMode',
-			);
-
-			this.observe(
-				observeMultiple([
-					manager.variantId,
-					this.content.structure.variesByCulture,
-					this.content.structure.variesBySegment,
-				]),
-				([variantId, variesByCulture, variesBySegment]) => {
-					if (!variantId || variesByCulture === undefined || variesBySegment === undefined) return;
-					if (!variesBySegment && !variesByCulture) {
-						variantId = UmbVariantId.CreateInvariant();
-					} else if (!variesBySegment) {
-						variantId = variantId.toSegmentInvariant();
-					} else if (!variesByCulture) {
-						variantId = variantId.toCultureInvariant();
-					}
-
-					this.#variantId.setValue(variantId);
-				},
-				'observeVariantIds',
-			);
-
-			this.removeUmbControllerByAlias('observeHasExpose');
-			this.observe(
-				observeMultiple([this.contentKey, this.variantId]),
-				([contentKey, variantId]) => {
-					if (!contentKey || !variantId) return;
-
-					this.observe(
-						manager.hasExposeOf(contentKey, variantId),
-						(exposed) => {
-							this.#exposed.setValue(exposed);
-						},
-						'observeHasExpose',
-					);
-				},
-				'observeContentKeyAndVariantId',
-			);
-
-			this.observe(
-				observeMultiple([manager.readOnlyState.isReadOnly, this.variantId]),
-				([isReadOnly, variantId]) => {
-					const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
-					if (variantId === undefined) return;
-
-					if (isReadOnly) {
-						const state = {
-							unique,
-							variantId,
-							message: '',
-						};
-
-						this.readOnlyState?.addState(state);
-					} else {
-						this.readOnlyState?.removeState(unique);
-					}
-				},
-				'observeIsReadOnly',
-			);
-
-			this.observe(
-				this.content.contentTypeId,
-				(contentTypeId) => {
-					this.observe(
-						contentTypeId ? manager.blockTypeOf(contentTypeId) : undefined,
-						(blockType) => {
-							if (blockType?.editorSize) {
-								this.setEditorSize(blockType.editorSize);
-							}
-						},
-						'observeBlockType',
-					);
-				},
-				'observeContentTypeId',
-			);
+			this.#gotManager();
 		});
 
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
@@ -214,6 +132,95 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				},
 			},
 		]);
+	}
+
+	#gotManager() {
+		if (!this.#blockManager) return;
+		const manager = this.#blockManager;
+
+		this.observe(
+			manager.liveEditingMode,
+			(liveEditingMode) => {
+				this.#liveEditingMode = liveEditingMode ?? false;
+			},
+			'observeLiveEditingMode',
+		);
+
+		this.observe(
+			observeMultiple([
+				manager.variantId,
+				this.content.structure.variesByCulture,
+				this.content.structure.variesBySegment,
+			]),
+			([variantId, variesByCulture, variesBySegment]) => {
+				if (!variantId || variesByCulture === undefined || variesBySegment === undefined) return;
+
+				if (!variesBySegment && !variesByCulture) {
+					variantId = UmbVariantId.CreateInvariant();
+				} else if (!variesBySegment) {
+					variantId = variantId.toSegmentInvariant();
+				} else if (!variesByCulture) {
+					variantId = variantId.toCultureInvariant();
+				}
+
+				this.#variantId.setValue(variantId);
+			},
+			'observeVariantIds',
+		);
+
+		this.removeUmbControllerByAlias('observeHasExpose');
+		this.observe(
+			observeMultiple([this.contentKey, this.variantId]),
+			([contentKey, variantId]) => {
+				if (!contentKey || !variantId) return;
+
+				this.observe(
+					manager.hasExposeOf(contentKey, variantId),
+					(exposed) => {
+						this.#exposed.setValue(exposed);
+					},
+					'observeHasExpose',
+				);
+			},
+			'observeContentKeyAndVariantId',
+		);
+
+		this.observe(
+			observeMultiple([manager.readOnlyState.isReadOnly, this.variantId]),
+			([isReadOnly, variantId]) => {
+				const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
+				if (variantId === undefined) return;
+
+				if (isReadOnly) {
+					const state = {
+						unique,
+						variantId,
+						message: '',
+					};
+
+					this.readOnlyState?.addState(state);
+				} else {
+					this.readOnlyState?.removeState(unique);
+				}
+			},
+			'observeIsReadOnly',
+		);
+
+		this.observe(
+			this.content.contentTypeId,
+			(contentTypeId) => {
+				this.observe(
+					contentTypeId ? manager.blockTypeOf(contentTypeId) : undefined,
+					(blockType) => {
+						if (blockType?.editorSize) {
+							this.setEditorSize(blockType.editorSize);
+						}
+					},
+					'observeBlockType',
+				);
+			},
+			'observeContentTypeId',
+		);
 	}
 
 	setEditorSize(editorSize: UUIModalSidebarSize) {
