@@ -1,6 +1,6 @@
 # Guide for working with Umbraco Backoffice UI/Client
 
-This is for you as a contributor who likes to make changes to the Backoffice UI project.
+This is for you as a contributor who would like to make changes to the Backoffice UI project.
 
 ## Installation
 
