@@ -61,7 +61,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         out long totalFound,
         string? searchFrom = null,
         bool ignoreUserStartNodes = false)
-        => Search(query, entityType, pageSize, pageIndex, out totalFound, null, searchFrom, ignoreUserStartNodes);
+        => Search(query, entityType, pageSize, pageIndex, out totalFound, null, null, searchFrom, ignoreUserStartNodes);
 
     public IEnumerable<ISearchResult> Search(
         string query,
@@ -70,6 +70,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         long pageIndex,
         out long totalFound,
         string[]? contentTypeAliases,
+        bool? trashed,
         string? searchFrom = null,
         bool ignoreUserStartNodes = false)
     {
@@ -146,6 +147,18 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                     ? currentUser.CalculateContentStartNodeIds(_entityService, _appCaches)
                     : Array.Empty<int>();
                 AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
+
+                if (trashed.HasValue)
+                {
+                    string requiredOrNotString = trashed.Value ? "+" : "!";
+                    string myPath = "-1,-20";
+                    myPath = myPath.Replace("-", "\\-").Replace(",", "\\,");
+                    sb.Append($"{requiredOrNotString}__Path:");
+                    sb.Append(myPath);
+                    sb.Append("\\,*");
+                    sb.Append(' ');
+                }
+
                 break;
             default:
                 throw new NotSupportedException("The " + typeof(BackOfficeExamineSearcher) +
@@ -394,6 +407,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
             searchFromId > 0
                 ? entityService.GetAllPaths(objectType, searchFromId).FirstOrDefault()
                 : null;
+
         if (entityPath != null)
         {
             // find... only what's underneath
