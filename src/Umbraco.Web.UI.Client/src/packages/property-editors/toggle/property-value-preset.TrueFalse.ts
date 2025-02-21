@@ -6,7 +6,7 @@ export class UmbPropertyValuePresetTrueFalseApi
 	implements UmbPropertyValuePresetApi<UmbPropertyEditorUIToggleValue, UmbPropertyEditorConfig>
 {
 	async processValue(value: undefined | UmbPropertyEditorUIToggleValue, config: UmbPropertyEditorConfig) {
-		const initialState = (config.find((x) => x.alias === 'initialState')?.value as boolean | undefined) ?? false;
+		const initialState = (config.find((x) => x.alias === 'default')?.value as boolean | undefined) ?? false;
 		return value !== undefined ? value : initialState;
 	}
 
