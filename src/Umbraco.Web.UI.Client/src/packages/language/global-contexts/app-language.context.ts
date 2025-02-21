@@ -13,18 +13,22 @@ import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 // TODO: Implement default language end-point, in progress at backend team, so we can avoid getting all languages.
 export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext> implements UmbApi {
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
-
-	#appLanguage = new UmbObjectState<UmbLanguageDetailModel | undefined>(undefined);
-	public readonly appLanguage = this.#appLanguage.asObservable();
-	public readonly appLanguageCulture = this.#appLanguage.asObservablePart((x) => x?.unique);
-
-	public readonly appLanguageReadOnlyState = new UmbReadOnlyStateManager(this);
+	public readonly languages = this.#languages.asObservable();
+	async getLanguages() {
+		return await this.observe(this.languages).asPromise();
+	}
 
 	public readonly appDefaultLanguage = this.#languages.asObservablePart((languages) =>
 		languages.find((language) => language.isDefault),
 	);
 
 	public readonly moreThanOneLanguage = this.#languages.asObservablePart((x) => x.length > 1);
+
+	#appLanguage = new UmbObjectState<UmbLanguageDetailModel | undefined>(undefined);
+	public readonly appLanguage = this.#appLanguage.asObservable();
+	public readonly appLanguageCulture = this.#appLanguage.asObservablePart((x) => x?.unique);
+
+	public readonly appLanguageReadOnlyState = new UmbReadOnlyStateManager(this);
 
 	#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
 	#currentUserAllowedLanguages: Array<string> = [];
