@@ -13,7 +13,7 @@ export const UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL = new UmbModalToken<
 	UmbEntityCreateOptionActionListModalValue
 >('Umb.Modal.Entity.CreateOptionActionList', {
 	modal: {
-		type: 'sidebar',
+		type: 'dialog',
 		size: 'small',
 	},
 });
