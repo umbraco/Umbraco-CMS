@@ -3,6 +3,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type {
+	ManifestPropertyValuePreset,
 	UmbPropertyTypePresetModel,
 	UmbPropertyTypePresetWithSchemaAliasModel,
 	UmbPropertyValuePresetApi,
@@ -36,17 +37,24 @@ export class UmbPropertyValuePresetBuilderController extends UmbControllerBase {
 			.propertyEditorSchemaAlias;
 
 		const editorUiAlias = propertyType.propertyEditorUiAlias;
+		if (!editorUiAlias) {
+			throw new Error(`propertyEditorUiAlias was not defined in ${propertyType}`);
+		}
 
 		const alias = propertyType.alias;
 		if (!alias) {
 			throw new Error(`alias not defined in ${propertyType}`);
 		}
 
+		let filter: (x: ManifestPropertyValuePreset) => boolean;
+		if (editorAlias && editorUiAlias) {
+			filter = (x) => x.forPropertyEditorSchemaAlias === editorAlias || x.forPropertyEditorUiAlias === editorUiAlias;
+		} else {
+			filter = (x) => x.forPropertyEditorUiAlias === editorUiAlias;
+		}
+
 		// Find a preset for this editor alias:
-		const manifests = umbExtensionsRegistry.getByTypeAndFilter(
-			'propertyValuePreset',
-			(x) => x.forPropertyEditorSchemaAlias === editorAlias || x.forPropertyEditorUiAlias === editorUiAlias,
-		);
+		const manifests = umbExtensionsRegistry.getByTypeAndFilter('propertyValuePreset', filter);
 
 		const apis = (await Promise.all(manifests.map((x) => createExtensionApi(this, x)))).filter(
 			(x) => x !== undefined,
