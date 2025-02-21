@@ -33,6 +33,15 @@ export class TestPropertyValuePresetSecondApi implements UmbPropertyValuePresetA
 	destroy(): void {}
 }
 
+export class TestPropertyValuePresetAsyncApi implements UmbPropertyValuePresetApi<string, UmbPropertyEditorConfig> {
+	async processValue(value: string, config: UmbPropertyEditorConfig) {
+		await new Promise((resolve) => setTimeout(resolve, 10));
+		return value ? value + '_async' : 'async';
+	}
+
+	destroy(): void {}
+}
+
 describe('UmbPropertyValuePresetBuilderController', () => {
 	describe('Create with a single preset', () => {
 		beforeEach(async () => {
@@ -160,6 +169,64 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 
 			expect(result.length).to.be.equal(1);
 			expect(result[0]?.value).to.be.equal('second_first');
+		});
+	});
+
+	describe('weigthed async presets keeps the right order', () => {
+		beforeEach(async () => {
+			const manifestFirstPreset: ManifestPropertyValuePreset = {
+				type: 'propertyValuePreset',
+				name: 'test-preset-1',
+				alias: 'Umb.Test.Preset.1',
+				weight: 3,
+				api: TestPropertyValuePresetFirstApi,
+				forPropertyEditorUiAlias: 'test-editor',
+			};
+
+			const manifestAsyncPreset: ManifestPropertyValuePreset = {
+				type: 'propertyValuePreset',
+				name: 'test-preset-3',
+				alias: 'Umb.Test.Preset.3',
+				weight: 2,
+				api: TestPropertyValuePresetAsyncApi,
+				forPropertyEditorUiAlias: 'test-editor',
+			};
+
+			const manifestSecondPreset: ManifestPropertyValuePreset = {
+				type: 'propertyValuePreset',
+				name: 'test-preset-2',
+				alias: 'Umb.Test.Preset.2',
+				weight: 1,
+				api: TestPropertyValuePresetSecondApi,
+				forPropertyEditorUiAlias: 'test-editor',
+			};
+
+			umbExtensionsRegistry.register(manifestSecondPreset);
+			umbExtensionsRegistry.register(manifestAsyncPreset);
+			umbExtensionsRegistry.register(manifestFirstPreset);
+		});
+		afterEach(async () => {
+			umbExtensionsRegistry.unregister('Umb.Test.Preset.1');
+			umbExtensionsRegistry.unregister('Umb.Test.Preset.2');
+			umbExtensionsRegistry.unregister('Umb.Test.Preset.3');
+		});
+
+		it('creates a combined value', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbPropertyValuePresetBuilderController(ctrlHost);
+
+			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
+				{
+					alias: 'test',
+					propertyEditorUiAlias: 'test-editor',
+					config: [],
+				},
+			];
+
+			const result = await ctrl.create(propertyTypes);
+
+			expect(result.length).to.be.equal(1);
+			expect(result[0]?.value).to.be.equal('first_async_second');
 		});
 	});
 });
