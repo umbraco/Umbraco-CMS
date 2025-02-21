@@ -1,11 +1,7 @@
 import { esbuildPlugin } from '@web/dev-server-esbuild';
 import { playwrightLauncher } from '@web/test-runner-playwright';
 import { importMapsPlugin } from '@web/dev-server-import-maps';
-import rollupCommonjs from '@rollup/plugin-commonjs';
-import { fromRollup } from '@web/dev-server-rollup';
 import { createImportMap } from './devops/importmap/index.js';
-
-const commonjs = fromRollup(rollupCommonjs);
 
 const mode = process.env.MODE || 'dev';
 if (!['dev', 'prod'].includes(mode)) {
@@ -45,9 +41,6 @@ export default {
 					replaceModuleExtensions: true,
 				}),
 			},
-		}),
-		commonjs({
-			include: ['node_modules/base64-js/**/*', 'node_modules/tinymce/**/*'],
 		}),
 		esbuildPlugin({ ts: true, tsconfig: './tsconfig.json', target: 'auto', json: true }),
 	],

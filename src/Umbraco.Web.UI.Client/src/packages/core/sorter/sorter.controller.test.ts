@@ -120,12 +120,12 @@ describe('UmbSorterController', () => {
 			expect(items.length).to.equal(4);
 		});
 
-		it('sets all allowed draggable items to draggable', async () => {
+		it('sets all allowed draggable items to draggable="false"', async () => {
 			const items = element.getSortableItems();
 			expect(items.length).to.equal(3);
 			await aTimeout(100);
 			items.forEach((item) => {
-				expect(item.draggable).to.be.true;
+				expect(item.draggable).to.be.false;
 			});
 		});
 
@@ -151,7 +151,7 @@ describe('UmbSorterController', () => {
 	});
 
 	describe('enable', () => {
-		it('sets all allowed items to draggable', async () => {
+		it('sets all allowed items to draggable="false"', async () => {
 			const items = element.getSortableItems();
 			expect(items.length).to.equal(3);
 
@@ -160,7 +160,7 @@ describe('UmbSorterController', () => {
 
 			// Expect all items to be draggable
 			items.forEach((item) => {
-				expect(item.draggable).to.be.true;
+				expect(item.draggable).to.be.false;
 			});
 		});
 
