@@ -50,7 +50,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 				name: 'test-preset-1',
 				alias: 'Umb.Test.Preset.1',
 				api: TestPropertyValuePresetFirstApi,
-				forPropertyEditorUiAlias: 'test-editor',
+				forPropertyEditorUiAlias: 'test-editor-ui',
 			};
 
 			umbExtensionsRegistry.register(manifestFirstPreset);
@@ -66,7 +66,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
 				{
 					alias: 'test',
-					propertyEditorUiAlias: 'test-editor',
+					propertyEditorUiAlias: 'test-editor-ui',
 					config: [],
 				},
 			];
@@ -86,7 +86,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 				alias: 'Umb.Test.Preset.1',
 				weight: 20,
 				api: TestPropertyValuePresetFirstApi,
-				forPropertyEditorUiAlias: 'test-editor',
+				forPropertyEditorUiAlias: 'test-editor-ui',
 			};
 
 			const manifestSecondPreset: ManifestPropertyValuePreset = {
@@ -95,7 +95,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 				alias: 'Umb.Test.Preset.2',
 				weight: 10,
 				api: TestPropertyValuePresetSecondApi,
-				forPropertyEditorUiAlias: 'test-editor',
+				forPropertyEditorUiAlias: 'test-editor-ui',
 			};
 
 			umbExtensionsRegistry.register(manifestSecondPreset);
@@ -113,7 +113,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
 				{
 					alias: 'test',
-					propertyEditorUiAlias: 'test-editor',
+					propertyEditorUiAlias: 'test-editor-ui',
 					config: [],
 				},
 			];
@@ -133,7 +133,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 				alias: 'Umb.Test.Preset.1',
 				weight: 20,
 				api: TestPropertyValuePresetFirstApi,
-				forPropertyEditorUiAlias: 'test-editor',
+				forPropertyEditorUiAlias: 'test-editor-ui',
 			};
 
 			const manifestSecondPreset: ManifestPropertyValuePreset = {
@@ -142,7 +142,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 				alias: 'Umb.Test.Preset.2',
 				weight: 3000,
 				api: TestPropertyValuePresetSecondApi,
-				forPropertyEditorUiAlias: 'test-editor',
+				forPropertyEditorUiAlias: 'test-editor-ui',
 			};
 
 			umbExtensionsRegistry.register(manifestSecondPreset);
@@ -160,7 +160,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
 				{
 					alias: 'test',
-					propertyEditorUiAlias: 'test-editor',
+					propertyEditorUiAlias: 'test-editor-ui',
 					config: [],
 				},
 			];
@@ -180,7 +180,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 				alias: 'Umb.Test.Preset.1',
 				weight: 3,
 				api: TestPropertyValuePresetFirstApi,
-				forPropertyEditorUiAlias: 'test-editor',
+				forPropertyEditorUiAlias: 'test-editor-ui',
 			};
 
 			const manifestAsyncPreset: ManifestPropertyValuePreset = {
@@ -189,7 +189,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 				alias: 'Umb.Test.Preset.3',
 				weight: 2,
 				api: TestPropertyValuePresetAsyncApi,
-				forPropertyEditorUiAlias: 'test-editor',
+				forPropertyEditorUiAlias: 'test-editor-ui',
 			};
 
 			const manifestSecondPreset: ManifestPropertyValuePreset = {
@@ -198,7 +198,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 				alias: 'Umb.Test.Preset.2',
 				weight: 1,
 				api: TestPropertyValuePresetSecondApi,
-				forPropertyEditorUiAlias: 'test-editor',
+				forPropertyEditorUiAlias: 'test-editor-ui',
 			};
 
 			umbExtensionsRegistry.register(manifestSecondPreset);
@@ -218,15 +218,100 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
 				{
 					alias: 'test',
-					propertyEditorUiAlias: 'test-editor',
+					propertyEditorUiAlias: 'test-editor-ui',
+					config: [],
+				},
+				{
+					alias: 'test2',
+					propertyEditorUiAlias: 'test-editor-ui',
 					config: [],
 				},
 			];
 
 			const result = await ctrl.create(propertyTypes);
 
-			expect(result.length).to.be.equal(1);
+			expect(result.length).to.be.equal(2);
+			expect(result[0]?.alias).to.be.equal('test');
 			expect(result[0]?.value).to.be.equal('first_async_second');
+			expect(result[1]?.alias).to.be.equal('test2');
+			expect(result[1]?.value).to.be.equal('first_async_second');
+		});
+	});
+
+	describe('combine use of UI and Schema Presets', () => {
+		beforeEach(async () => {
+			const manifestFirstPreset: ManifestPropertyValuePreset = {
+				type: 'propertyValuePreset',
+				name: 'test-preset-1',
+				alias: 'Umb.Test.Preset.1',
+				weight: 3,
+				api: TestPropertyValuePresetFirstApi,
+				forPropertyEditorSchemaAlias: 'test-editor-schema',
+			};
+
+			const manifestAsyncPreset: ManifestPropertyValuePreset = {
+				type: 'propertyValuePreset',
+				name: 'test-preset-3',
+				alias: 'Umb.Test.Preset.3',
+				weight: 2,
+				api: TestPropertyValuePresetAsyncApi,
+				forPropertyEditorUiAlias: 'test-editor-ui',
+				forPropertyEditorSchemaAlias: 'test-editor-schema',
+			};
+
+			const manifestSecondPreset: ManifestPropertyValuePreset = {
+				type: 'propertyValuePreset',
+				name: 'test-preset-2',
+				alias: 'Umb.Test.Preset.2',
+				weight: 1,
+				api: TestPropertyValuePresetSecondApi,
+				forPropertyEditorUiAlias: 'test-editor-ui',
+			};
+
+			umbExtensionsRegistry.register(manifestSecondPreset);
+			umbExtensionsRegistry.register(manifestAsyncPreset);
+			umbExtensionsRegistry.register(manifestFirstPreset);
+		});
+		afterEach(async () => {
+			umbExtensionsRegistry.unregister('Umb.Test.Preset.1');
+			umbExtensionsRegistry.unregister('Umb.Test.Preset.2');
+			umbExtensionsRegistry.unregister('Umb.Test.Preset.3');
+		});
+
+		it('creates only presets that fits the configuration', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbPropertyValuePresetBuilderController(ctrlHost);
+
+			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
+				{
+					alias: 'test',
+					propertyEditorUiAlias: 'test-editor-ui',
+					config: [],
+				},
+				{
+					alias: 'test2',
+					propertyEditorUiAlias: 'test-editor-ui',
+					propertyEditorSchemaAlias: 'test-editor-schema',
+					config: [],
+				},
+				{
+					alias: 'test3',
+					propertyEditorUiAlias: 'some-other-ui',
+					propertyEditorSchemaAlias: 'test-editor-schema',
+					config: [],
+				},
+			];
+
+			const result = await ctrl.create(propertyTypes);
+
+			// Test that only the right presets are used:
+			expect(result.length).to.be.equal(3);
+			expect(result[0]?.alias).to.be.equal('test');
+			expect(result[0]?.value).to.be.equal('async_second');
+			expect(result[1]?.alias).to.be.equal('test2');
+			expect(result[1]?.value).to.be.equal('first_async_second');
+			expect(result[2]?.alias).to.be.equal('test3');
+			expect(result[2]?.value).to.be.equal('first_async');
 		});
 	});
 });
