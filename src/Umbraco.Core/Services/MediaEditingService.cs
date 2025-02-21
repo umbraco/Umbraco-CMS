@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -21,8 +23,21 @@ internal sealed class MediaEditingService
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
         ITreeEntitySortingService treeEntitySortingService,
-        IMediaValidationService mediaValidationService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, mediaValidationService, treeEntitySortingService)
+        IMediaValidationService mediaValidationService,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService)
+        : base(
+            contentService,
+            contentTypeService,
+            propertyEditorCollection,
+            dataTypeService,
+            logger,
+            scopeProvider,
+            userIdKeyResolver,
+            mediaValidationService,
+            treeEntitySortingService,
+            optionsMonitor,
+            relationService)
         => _logger = logger;
 
     public Task<IMedia?> GetAsync(Guid key)
