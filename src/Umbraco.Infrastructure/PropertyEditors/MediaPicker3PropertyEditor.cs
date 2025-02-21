@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -73,7 +74,8 @@ public class MediaPicker3PropertyEditor : DataEditor
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IDataTypeConfigurationCache dataTypeReadCache,
             ILocalizedTextService localizedTextService,
-            IMediaTypeService mediaTypeService)
+            IMediaTypeService mediaTypeService,
+            IMediaNavigationQueryService mediaNavigationQueryService)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
@@ -86,7 +88,8 @@ public class MediaPicker3PropertyEditor : DataEditor
             var validators = new TypedJsonValidatorRunner<List<MediaWithCropsDto>, MediaPicker3Configuration>(
                 jsonSerializer,
                 new MinMaxValidator(localizedTextService),
-                new AllowedTypeValidator(localizedTextService, mediaTypeService));
+                new AllowedTypeValidator(localizedTextService, mediaTypeService),
+                new StartNodeValidator(localizedTextService, mediaNavigationQueryService));
 
             Validators.Add(validators);
         }
@@ -115,7 +118,8 @@ public class MediaPicker3PropertyEditor : DataEditor
                 backOfficeSecurityAccessor,
                 dataTypeReadCache,
                 StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>(),
-                StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>())
+                StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>(),
+                StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>())
         {
         }
 
@@ -336,7 +340,7 @@ public class MediaPicker3PropertyEditor : DataEditor
             }
         }
 
-        private class MinMaxValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        internal class MinMaxValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
             private readonly ILocalizedTextService _localizedTextService;
 
@@ -388,7 +392,7 @@ public class MediaPicker3PropertyEditor : DataEditor
             }
         }
 
-        private class AllowedTypeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        internal class AllowedTypeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly IMediaTypeService _mediaTypeService;
@@ -430,6 +434,52 @@ public class MediaPicker3PropertyEditor : DataEditor
                             new ValidationResult(
                                 _localizedTextService.Localize("validation", "invalidMediaType"),
                                 new[] { "invalidMediaType" })
+                        ];
+                    }
+                }
+
+                return [];
+            }
+        }
+
+        internal class StartNodeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        {
+            private readonly ILocalizedTextService _localizedTextService;
+            private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
+
+            public StartNodeValidator(
+                ILocalizedTextService localizedTextService,
+                IMediaNavigationQueryService mediaNavigationQueryService)
+            {
+                _localizedTextService = localizedTextService;
+                _mediaNavigationQueryService = mediaNavigationQueryService;
+            }
+
+            public IEnumerable<ValidationResult> Validate(
+                List<MediaWithCropsDto>? value,
+                MediaPicker3Configuration? configuration,
+                string? valueType,
+                PropertyValidationContext validationContext)
+            {
+                if (value is null || configuration?.StartNodeId is null)
+                {
+                    return [];
+                }
+
+                foreach (MediaWithCropsDto media in value)
+                {
+                    if (_mediaNavigationQueryService.TryGetAncestorsKeys(media.MediaKey, out IEnumerable<Guid> ancestorsKeys) is false)
+                    {
+                        continue;
+                    }
+
+                    if (ancestorsKeys.Contains(configuration.StartNodeId.Value) is false)
+                    {
+                        return
+                        [
+                            new ValidationResult(
+                                _localizedTextService.Localize("validation", "invalidStartNode"),
+                                new[] { "invalidStartNode" })
                         ];
                     }
                 }
