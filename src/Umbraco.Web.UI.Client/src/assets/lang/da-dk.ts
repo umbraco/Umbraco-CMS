@@ -2051,6 +2051,7 @@ export default {
 		invalidEmail: 'Ugyldig e-mail',
 		invalidNull: 'Værdien kan ikke være tom',
 		invalidEmpty: 'Værdien kan ikke være tom',
+		invalidFalse: 'Dette felt skal være slået til',
 		invalidPattern: 'Værdien er ugyldig, som ikke matcher det korrekte format',
 		customValidation: 'Selvvalgt validering',
 		entriesShort: 'Minimum %0% element(er), tilføj <strong>%1%</strong> mere.',

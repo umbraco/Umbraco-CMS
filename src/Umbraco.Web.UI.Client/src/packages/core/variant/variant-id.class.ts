@@ -1,3 +1,5 @@
+import { UmbDeprecation } from '../utils/index.js';
+
 export type UmbObjectWithVariantProperties = {
 	culture: string | null;
 	segment: string | null;
@@ -5,9 +7,16 @@ export type UmbObjectWithVariantProperties = {
 
 /**
  *
- * @param variant
+ * @param {UmbObjectWithVariantProperties} variant - An object with variant specifying properties to convert to a string.
+ * @returns {string} A string representation of the variant properties.
+ * @deprecated Use UmbVariantId to make this conversion. Will ve removed in v.17
  */
 export function variantPropertiesObjectToString(variant: UmbObjectWithVariantProperties): string {
+	new UmbDeprecation({
+		deprecated: 'Method `variantPropertiesObjectToString` is deprecated',
+		removeInVersion: '17',
+		solution: 'Use UmbVariantId to make this conversion',
+	}).warn();
 	// Currently a direct copy of the toString method of variantId.
 	return (variant.culture || UMB_INVARIANT_CULTURE) + (variant.segment ? `_${variant.segment}` : '');
 }
@@ -79,6 +88,10 @@ export class UmbVariantId {
 		return this.culture === null && this.segment === null;
 	}
 
+	public clone(): UmbVariantId {
+		return new UmbVariantId(null, this.segment);
+	}
+
 	public toObject(): UmbObjectWithVariantProperties {
 		return { culture: this.culture, segment: this.segment };
 	}
@@ -89,6 +102,14 @@ export class UmbVariantId {
 	public toCultureInvariant(): UmbVariantId {
 		return Object.freeze(new UmbVariantId(null, this.segment));
 	}
+
+	public toCulture(culture: string | null): UmbVariantId {
+		return Object.freeze(new UmbVariantId(culture, this.segment));
+	}
+	public toSegment(segment: string | null): UmbVariantId {
+		return Object.freeze(new UmbVariantId(this.culture, segment));
+	}
+
 	public toVariant(varyByCulture?: boolean, varyBySegment?: boolean): UmbVariantId {
 		return Object.freeze(new UmbVariantId(varyByCulture ? this.culture : null, varyBySegment ? this.segment : null));
 	}

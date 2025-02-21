@@ -34,7 +34,7 @@ export class UmbBlockGridBlockUnsupportedElement extends UmbLitElement {
 	}
 
 	#renderInside() {
-		return html`<div id="inside">
+		return html`<div id="inside" draggable="false">
 			${this.localize.term('blockEditor_unsupportedBlockDescription')}
 			<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
 		</div>`;
