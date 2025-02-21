@@ -13,7 +13,7 @@ export interface UmbPropertyValuePresetApi<
 export type UmbPropertyValuePresetApiValuesProcessor<
 	ValueType = unknown,
 	ConfigType extends UmbPropertyEditorConfig = UmbPropertyEditorConfig,
-> = (value: ValueType, config: ConfigType) => PromiseLike<ValueType | undefined>;
+> = (value: undefined | ValueType, config: ConfigType) => PromiseLike<ValueType>;
 
 export interface UmbPropertyTypePresetModel {
 	alias: string;

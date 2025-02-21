@@ -18,7 +18,7 @@ export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(
 
 // Test with async APIs, espcially where the first one is slower than the last one.
 export class TestPropertyValuePresetFirstApi implements UmbPropertyValuePresetApi<string, UmbPropertyEditorConfig> {
-	async processValue(value: string, config: UmbPropertyEditorConfig) {
+	async processValue(value: undefined | string, config: UmbPropertyEditorConfig) {
 		return value ? value + '_first' : 'first';
 	}
 
@@ -26,7 +26,7 @@ export class TestPropertyValuePresetFirstApi implements UmbPropertyValuePresetAp
 }
 
 export class TestPropertyValuePresetSecondApi implements UmbPropertyValuePresetApi<string, UmbPropertyEditorConfig> {
-	async processValue(value: string, config: UmbPropertyEditorConfig) {
+	async processValue(value: undefined | string, config: UmbPropertyEditorConfig) {
 		return value ? value + '_second' : 'second';
 	}
 
@@ -34,7 +34,7 @@ export class TestPropertyValuePresetSecondApi implements UmbPropertyValuePresetA
 }
 
 export class TestPropertyValuePresetAsyncApi implements UmbPropertyValuePresetApi<string, UmbPropertyEditorConfig> {
-	async processValue(value: string, config: UmbPropertyEditorConfig) {
+	async processValue(value: undefined | string, config: UmbPropertyEditorConfig) {
 		await new Promise((resolve) => setTimeout(resolve, 10));
 		return value ? value + '_async' : 'async';
 	}
