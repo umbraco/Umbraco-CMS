@@ -5,7 +5,7 @@ import type {
 	UmbDocumentPublishWithDescendantsModalValue,
 } from './document-publish-with-descendants-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { umbConfirmModal, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
@@ -82,7 +82,6 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 
 	#onIncludeUnpublishedDescendantsChange() {
 		this.#includeUnpublishedDescendants = !this.#includeUnpublishedDescendants;
-		console.log(this.#includeUnpublishedDescendants);
 	}
 
 	async #onForceRepublishChange() {
@@ -92,22 +91,12 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	async #submit() {
 
 		if (this.#forceRepublish) {
-			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-			const confirm = await modalManagerContext
-				.open(this, UMB_CONFIRM_MODAL, {
-					data: {
-						headline: this.localize.term('content_forceRepublishWarning'),
-						content: this.localize.term('content_forceRepublishAdvisory'),
-						color: 'warning',
-						confirmLabel: this.localize.term('actions_publish'),
-					},
-				})
-				.onSubmit()
-				.catch(() => false);
-			console.log(confirm);
-			if (confirm === false) {
-				return;
-			}
+			await umbConfirmModal(this, {
+				headline: this.localize.term('content_forceRepublishWarning'),
+				content: this.localize.term('content_forceRepublishAdvisory'),
+				color: 'warning',
+				confirmLabel: this.localize.term('actions_publish'),
+			});
 		}
 
 		this.value = {
