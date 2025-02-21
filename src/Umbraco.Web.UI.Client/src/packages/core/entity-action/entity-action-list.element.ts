@@ -91,6 +91,7 @@ export class UmbEntityActionListElement extends UmbLitElement {
 		css`
 			:host {
 				--uui-menu-item-flat-structure: 1;
+				--uui-menu-item-indent: 0;
 			}
 		`,
 	];
