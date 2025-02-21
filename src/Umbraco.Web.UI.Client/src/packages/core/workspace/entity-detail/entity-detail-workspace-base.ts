@@ -231,6 +231,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		await this.#init;
 		this.setParent(args.parent);
 
+		// TODO: Handle presets here [NL]
 		const request = this._detailRepository!.createScaffold(args.preset);
 		this._getDataPromise = request;
 		let { data } = await request;

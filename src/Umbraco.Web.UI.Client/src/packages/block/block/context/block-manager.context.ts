@@ -321,9 +321,9 @@ export abstract class UmbBlockManagerContext<
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
 		originData?: BlockOriginDataType,
-	): UmbBlockDataObjectModel<BlockLayoutType> | undefined;
+	): Promise<UmbBlockDataObjectModel<BlockLayoutType> | undefined>;
 
-	public createBlockSettingsData(contentElementTypeKey: string) {
+	public async createBlockSettingsData(contentElementTypeKey: string) {
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
 		if (!blockType) {
 			throw new Error(`Cannot create block settings, missing block type for ${contentElementTypeKey}`);
@@ -331,6 +331,8 @@ export abstract class UmbBlockManagerContext<
 		if (!blockType.settingsElementTypeKey) {
 			throw new Error(`Cannot create block settings, missing settings element type for ${contentElementTypeKey}`);
 		}
+
+		// TODO: Handle presets here [NL]
 
 		return {
 			key: UmbId.new(),
@@ -340,6 +342,9 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	protected _createBlockElementData(key: string, elementTypeKey: string) {
+		//
+		// TODO: Handle presets here [NL]
+
 		return {
 			key: key,
 			contentTypeKey: elementTypeKey,
@@ -347,7 +352,10 @@ export abstract class UmbBlockManagerContext<
 		};
 	}
 
-	protected _createBlockData(contentElementTypeKey: string, partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>) {
+	protected async _createBlockData(
+		contentElementTypeKey: string,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+	) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
 		if (!blockType) {
