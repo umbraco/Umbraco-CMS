@@ -92,14 +92,14 @@ export class UmbBlockGridManagerContext<
 		});
 	}
 
-	create(
+	async create(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
 		// This property is used by some implementations, but not used in this.
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		originData?: UmbBlockGridWorkspaceOriginData,
 	) {
-		return super._createBlockData(contentElementTypeKey, partialLayoutEntry);
+		return await super._createBlockData(contentElementTypeKey, partialLayoutEntry);
 	}
 
 	/**

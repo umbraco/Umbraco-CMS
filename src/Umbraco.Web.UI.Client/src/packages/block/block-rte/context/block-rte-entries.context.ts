@@ -111,7 +111,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		originData?: UmbBlockRteWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
-		return this._manager?.create(contentElementTypeKey, partialLayoutEntry, originData);
+		return await this._manager?.create(contentElementTypeKey, partialLayoutEntry, originData);
 	}
 
 	// insert Block?

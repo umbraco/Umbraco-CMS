@@ -21,14 +21,14 @@ export class UmbBlockListManagerContext<
 		return this.#inlineEditingMode.getValue();
 	}
 
-	create(
+	async create(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
 		// This property is used by some implementations, but not used in this. Do not remove. [NL]
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		_originData?: UmbBlockListWorkspaceOriginData,
 	) {
-		return super._createBlockData(contentElementTypeKey, partialLayoutEntry);
+		return await super._createBlockData(contentElementTypeKey, partialLayoutEntry);
 	}
 
 	insert(
