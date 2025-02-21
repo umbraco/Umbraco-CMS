@@ -1217,6 +1217,12 @@ export default {
 	colorpicker: {
 		noColors: 'Du har ikke konfigureret nogen godkendte farver',
 	},
+	colorPickerConfigurations: {
+		colorsTitle: 'Farver',
+		colorsDescription: 'Tilføj, fjern eller sorter farver',
+		showLabelTitle: 'Inkluder label?',
+		showLabelDescription: 'Gemmer farver som et Json-objekt, der både indeholder farvens hex streng og label, i stedet for kun at gemme hex strengen.',
+	},
 	contentPicker: {
 		allowedItemTypes: 'Du kan kun vælge følgende type(r) dokumenter: %0%',
 		defineDynamicRoot: 'Definer Dynamisk Udgangspunkt',
@@ -2444,8 +2450,8 @@ export default {
 		searchResults: 'resultater',
 	},
 	propertyEditorPicker: {
-		title: 'Select Property Editor',
-		openPropertyEditorPicker: 'Select Property Editor',
+		title: 'Vælg Property Editor',
+		openPropertyEditorPicker: 'Vælg Property Editor',
 	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",

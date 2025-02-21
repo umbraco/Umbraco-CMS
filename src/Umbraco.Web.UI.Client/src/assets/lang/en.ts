@@ -1257,6 +1257,12 @@ export default {
 	colorpicker: {
 		noColors: 'You have not configured any approved colours',
 	},
+	colorPickerConfigurations: {
+		colorsTitle: 'Colours',
+		colorsDescription: 'Add, remove or sort colours',
+		showLabelTitle: 'Include labels?',
+		showLabelDescription: 'Stores colours as a JSON object containing both the colour hex string and label, rather than just the hex string.',
+	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
 		pickedTrashedItem: 'You have picked a content item currently deleted or in the recycle bin',
