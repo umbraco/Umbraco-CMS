@@ -7,6 +7,7 @@ import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 import './default-item-ref.element.js';
+import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-entity-item-ref')
 export class UmbEntityItemRefElement extends UmbLitElement {
@@ -32,6 +33,8 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 			this._component.item = value;
 			return;
 		}
+
+		this.#pathAddendum.setAddendum('ref/' + value.entityType + '/' + value.unique);
 
 		// If the component is already created, but the entity type is different, we need to destroy the component.
 		this.#createController(value.entityType);
@@ -62,6 +65,8 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 			this._component.standalone = this.#standalone;
 		}
 	}
+
+	#pathAddendum = new UmbRoutePathAddendumContext(this);
 
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
