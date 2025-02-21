@@ -5,7 +5,7 @@ import type {
 	UmbDocumentPublishWithDescendantsModalValue,
 } from './document-publish-with-descendants-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
@@ -80,7 +80,36 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 		);
 	}
 
-	#submit() {
+	#onIncludeUnpublishedDescendantsChange() {
+		this.#includeUnpublishedDescendants = !this.#includeUnpublishedDescendants;
+		console.log(this.#includeUnpublishedDescendants);
+	}
+
+	async #onForceRepublishChange() {
+		this.#forceRepublish = !this.#forceRepublish;
+	}
+
+	async #submit() {
+
+		if (this.#forceRepublish) {
+			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+			const confirm = await modalManagerContext
+				.open(this, UMB_CONFIRM_MODAL, {
+					data: {
+						headline: this.localize.term('content_forceRepublishWarning'),
+						content: this.localize.term('content_forceRepublishAdvisory'),
+						color: 'warning',
+						confirmLabel: this.localize.term('actions_publish'),
+					},
+				})
+				.onSubmit()
+				.catch(() => false);
+			console.log(confirm);
+			if (confirm === false) {
+				return;
+			}
+		}
+
 		this.value = {
 			selection: this.#selectionManager.getSelection(),
 			includeUnpublishedDescendants: this.#includeUnpublishedDescendants,
@@ -122,7 +151,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 					id="includeUnpublishedDescendants"
 					label=${this.localize.term('content_includeUnpublished')}
 					?checked=${this.value?.includeUnpublishedDescendants}
-					@change=${() => (this.#includeUnpublishedDescendants = !this.#includeUnpublishedDescendants)}></uui-toggle>
+					@change=${this.#onIncludeUnpublishedDescendantsChange}></uui-toggle>
 			</uui-form-layout-item>
 
 			<uui-form-layout-item>
@@ -130,7 +159,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 					id="forceRepublish"
 					label=${this.localize.term('content_forceRepublish')}
 					?checked=${this.value?.forceRepublish}
-					@change=${() => (this.#forceRepublish = !this.#forceRepublish)}></uui-toggle>
+					@change=${this.#onForceRepublishChange}></uui-toggle>
 			</uui-form-layout-item>
 
 			<div slot="actions">
