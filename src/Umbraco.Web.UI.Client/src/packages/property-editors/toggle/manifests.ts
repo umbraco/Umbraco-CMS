@@ -2,6 +2,13 @@ import { manifest as trueFalseSchemaManifest } from './Umbraco.TrueFalse.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
+		type: 'propertyValuePreset',
+		forPropertyEditorSchemaAlias: 'Umbraco.TrueFalse',
+		alias: 'Umb.PropertyValuePreset.TrueFalse',
+		name: 'Property Editor Schema True/False Preset for Initial State',
+		api: () => import('./property-value-preset.TrueFalse.js'),
+	},
+	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.Toggle',
 		name: 'Toggle Property Editor UI',
@@ -19,24 +26,22 @@ export const manifests: Array<UmbExtensionManifest> = [
 						label: 'Preset value',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 						config: [
-	
 							{
-								alias: "ariaLabel",
-								value: 'toggle for the initial state of this data type'
-							}
-						]
+								alias: 'ariaLabel',
+								value: 'toggle for the initial state of this data type',
+							},
+						],
 					},
 					{
 						alias: 'showLabels',
 						label: 'Show on/off labels',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 						config: [
-	
 							{
-								alias: "ariaLabel",
-								value: 'toggle for weather if label should be displayed'
-							}
-						]
+								alias: 'ariaLabel',
+								value: 'toggle for weather if label should be displayed',
+							},
+						],
 					},
 					{
 						alias: 'labelOn',

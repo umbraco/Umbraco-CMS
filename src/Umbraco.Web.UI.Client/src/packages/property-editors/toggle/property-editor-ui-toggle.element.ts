@@ -7,10 +7,11 @@ import type {
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_VALIDATION_FALSE_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import type { UmbPropertyEditorUIToggleValue } from './types';
 
 @customElement('umb-property-editor-ui-toggle')
 export class UmbPropertyEditorUIToggleElement
-	extends UmbFormControlMixin<boolean, typeof UmbLitElement, undefined>(UmbLitElement)
+	extends UmbFormControlMixin<UmbPropertyEditorUIToggleValue, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
 	@property({ type: String })
