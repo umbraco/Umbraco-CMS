@@ -1261,7 +1261,8 @@ export default {
 		colorsTitle: 'Colours',
 		colorsDescription: 'Add, remove or sort colours',
 		showLabelTitle: 'Include labels?',
-		showLabelDescription: 'Stores colours as a JSON object containing both the colour hex string and label, rather than just the hex string.',
+		showLabelDescription:
+			'Stores colours as a JSON object containing both the colour hex string and label, rather than just the hex string.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
