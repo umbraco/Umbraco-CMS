@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Web;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using OpenIddict.Abstractions;
@@ -15,12 +16,12 @@ using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 
@@ -43,61 +44,51 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         // We do not wanna fake anything, and thereby have protection
     }
 
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        // Remove the NuCacheStartupHandler, as we do not want to rebuild the cache. Since there is no reason to build as it is not used in the tests.
+        //builder.Services.Remove(
+            //builder.Services.FirstOrDefault(x => x.ImplementationType == typeof(HybridCache)));
+    }
+
     protected abstract Expression<Func<T, object>> MethodSelector { get; }
 
     protected virtual string Url => GetManagementApiUrl(MethodSelector);
 
-    protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, bool isAdmin) =>
-        await AuthenticateClientAsync(client,
-            async userService =>
-            {
-                IUser user;
-                if (isAdmin)
-                {
-                    user = await userService.GetRequiredUserAsync(Constants.Security.SuperUserKey);
-                    user.Username = user.Email = username;
-                    userService.Save(user);
-                }
-                else
-                {
-                    user = (await userService.CreateAsync(
-                        Constants.Security.SuperUserKey,
-                        new UserCreateModel
-                        {
-                            Email = username,
-                            Name = username,
-                            UserName = username,
-                            UserGroupKeys = new HashSet<Guid>(new[] { Constants.Security.EditorGroupKey })
-                        },
-                        true)).Result.CreatedUser;
-                }
-
-                return (user, password);
-            });
-
-
-    protected async Task AuthenticateClientAsync(HttpClient client, Func<IUserService, Task<(IUser user, string Password)>> createUser)
+    protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, Guid userGroupKey)
     {
-
+        Guid userKey = Constants.Security.SuperUserKey;
         OpenIddictApplicationDescriptor backofficeOpenIddictApplicationDescriptor;
         var scopeProvider = GetRequiredService<ICoreScopeProvider>();
-
-        string? username;
-        string? password;
-
         using (var scope = scopeProvider.CreateCoreScope())
         {
             var userService = GetRequiredService<IUserService>();
             using var serviceScope = GetRequiredService<IServiceScopeFactory>().CreateScope();
             var userManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
 
-            var userCreationResult = await createUser(userService);
-            username = userCreationResult.user.Username;
-            password = userCreationResult.Password;
-            var userKey = userCreationResult.user.Key;
+            IUser user;
+            if (userGroupKey == Constants.Security.AdminGroupKey)
+            {
+                user = await userService.GetAsync(userKey) ??
+                       throw new Exception("Super user not found.");
+                user.Username = user.Email = username;
+                userService.Save(user);
+            }
+            else
+            {
+                user = (await userService.CreateAsync(Constants.Security.SuperUserKey,
+                    new UserCreateModel()
+                    {
+                        Email = username,
+                        Name = username,
+                        UserName = username,
+                        UserGroupKeys = new HashSet<Guid>(new[] { userGroupKey })
+                    },
+                    true)).Result.CreatedUser;
+                userKey = user.Key;
+            }
 
-            var token = await userManager.GeneratePasswordResetTokenAsync(userCreationResult.user);
-
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
 
             var changePasswordAttempt = await userService.ChangePasswordAsync(userKey,
                 new ChangeUserPasswordModel
@@ -113,8 +104,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                 serviceScope.ServiceProvider.GetRequiredService<IBackOfficeApplicationManager>() as
                     BackOfficeApplicationManager;
             backofficeOpenIddictApplicationDescriptor =
-                backOfficeApplicationManager.BackofficeOpenIddictApplicationDescriptor([client.BaseAddress]);
-
+                backOfficeApplicationManager.BackofficeOpenIddictApplicationDescriptor(client.BaseAddress);
             scope.Complete();
         }
 
@@ -127,12 +117,12 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         Assert.AreEqual(HttpStatusCode.OK, loginResponse.StatusCode, await loginResponse.Content.ReadAsStringAsync());
 
         var codeVerifier = "12345"; // Just a dummy value we use in tests
-        var codeChallange = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)))
+        var codeChallenge = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)))
             .TrimEnd("=");
 
-        var authorizationUrl = GetManagementApiUrl<BackOfficeController>(x => x.Authorize(CancellationToken.None)) +
-                  $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallange}";
-        var authorizeResponse = await client.GetAsync(authorizationUrl);
+        var authorizeResponse = await client.GetAsync(
+            GetManagementApiUrl<BackOfficeController>(x => x.Authorize(CancellationToken.None)) +
+            $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallenge}");
 
         Assert.AreEqual(HttpStatusCode.Found, authorizeResponse.StatusCode, await authorizeResponse.Content.ReadAsStringAsync());
 
@@ -156,5 +146,4 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     {
         [JsonPropertyName("access_token")] public string AccessToken { get; set; }
     }
-
 }

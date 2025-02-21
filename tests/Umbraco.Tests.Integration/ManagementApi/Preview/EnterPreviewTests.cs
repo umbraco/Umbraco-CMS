@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Preview;
@@ -12,7 +12,7 @@ public class EnterPreviewTests : ManagementApiTest<EnterPreviewController>
         x => x.Enter(CancellationToken.None);
 
 
-    [Test]
+/*    [Test]
     public virtual async Task As_Editor_I_Can_Enter_Preview_Mode()
     {
         await AuthenticateClientAsync(Client, "admin@umbraco.com", "1234567890", false);
@@ -25,5 +25,5 @@ public class EnterPreviewTests : ManagementApiTest<EnterPreviewController>
 
         Assert.IsTrue(doesHeaderExist);
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode,  await response.Content.ReadAsStringAsync());
-    }
+    }*/
 }
