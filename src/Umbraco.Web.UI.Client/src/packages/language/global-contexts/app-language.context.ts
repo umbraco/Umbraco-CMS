@@ -14,8 +14,9 @@ import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext> implements UmbApi {
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	public readonly languages = this.#languages.asObservable();
-	async getLanguages() {
-		return await this.observe(this.languages).asPromise();
+	public readonly cultures = this.#languages.asObservablePart((x) => x.map((y) => y.unique));
+	async getCultures() {
+		return (await this.observe(this.languages).asPromise()).map((x) => x.unique);
 	}
 
 	public readonly appDefaultLanguage = this.#languages.asObservablePart((languages) =>
