@@ -1257,10 +1257,10 @@ export default {
 		noColors: 'You have not configured any approved colours',
 	},
 	colorPickerConfigurations: {
-		colorsTitle: 'Colors',
-		colorsDescription: 'Add, remove or sort colors',
+		colorsTitle: 'Colours',
+		colorsDescription: 'Add, remove or sort colours',
 		showLabelTitle: 'Include labels?',
-		showLabelDescription: 'Stores colors as a Json object containing both the color hex string and label, rather than just the hex string.',
+		showLabelDescription: 'Stores colours as a JSON object containing both the colour hex string and label, rather than just the hex string.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
