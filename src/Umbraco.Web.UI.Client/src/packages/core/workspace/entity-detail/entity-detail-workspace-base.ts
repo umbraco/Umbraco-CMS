@@ -358,6 +358,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 		/* TODO: temp removal of discard changes in workspace modals.
 		 The modal closes before the discard changes dialog is resolved.*/
+		// TODO: I think this can go away now???
 		if (newUrl.includes('/modal/umb-modal-workspace/')) {
 			return true;
 		}

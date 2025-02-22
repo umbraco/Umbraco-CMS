@@ -731,8 +731,23 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 
 		this._data.setPersisted(data);
+		console.log('setPersisted', data);
 
-		const currentData = this._data.getCurrent();
+		let currentData = this._data.getCurrent();
+
+		// TODO: fix sorting of properties, I think its the currentData.values that needs to be sorted. [NL]
+		/*
+		if (currentData) {
+			const persistedValueOrder = data.values;
+			// Sort values of currentData in the same order as persisted data:
+			const values = currentData.values.sort((a, b) => {
+				let aIndex = persistedValueOrder.findIndex((x) => x.alias === a.alias);
+				let bIndex = persistedValueOrder.findIndex((x) => x.alias === b.alias);
+				return aIndex - bIndex;
+			});
+			currentData = { ...currentData, values };
+		}
+		*/
 
 		const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
 
@@ -744,6 +759,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			variantIdsIncludingInvariant,
 		);
 
+		console.log('setCurrent', newCurrentData);
 		this._data.setCurrent(newCurrentData);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
