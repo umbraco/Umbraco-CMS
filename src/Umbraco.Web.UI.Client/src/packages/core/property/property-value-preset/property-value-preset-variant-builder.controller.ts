@@ -49,7 +49,7 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 			}
 
 			for (const culture of this.#cultures) {
-				const value = await super._generatePropertyValue(apis, propertyType, {
+				const value = await this._generatePropertyValue(apis, propertyType, {
 					variantId: new UmbVariantId(culture),
 				});
 				value.culture = culture;
@@ -58,7 +58,7 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 			}
 		} else if (propertyType.typeArgs.varyBySegment) {
 			for (const segment of this.#segments) {
-				const value = await super._generatePropertyValue(apis, propertyType, {
+				const value = await this._generatePropertyValue(apis, propertyType, {
 					variantId: new UmbVariantId(null, segment),
 				});
 				// Be aware this maybe should have been the default culture?
@@ -67,7 +67,11 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 				values.push(value);
 			}
 		} else {
-			values.push(await this._generatePropertyValue(apis, propertyType, {}));
+			const value = await this._generatePropertyValue(apis, propertyType, {});
+			// Be aware this maybe should have been the default culture?
+			value.culture = null;
+			value.segment = null;
+			values.push(value);
 		}
 		return values;
 	}
