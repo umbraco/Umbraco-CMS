@@ -7,43 +7,41 @@ import type {
 	UmbPropertyTypePresetModel,
 	UmbPropertyTypePresetWithSchemaAliasModel,
 	UmbPropertyValuePresetApi,
+	UmbPropertyValuePresetApiCallArgs,
 } from './types.js';
 
-//type PropertyTypesType = UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel;
+const EMPTY_CALL_ARGS = Object.freeze({});
 
-export class UmbPropertyValuePresetBuilderController extends UmbControllerBase {
+export class UmbPropertyValuePresetBuilderController<
+	ReturnType = UmbPropertyValueData | UmbPropertyValueDataPotentiallyWithEditorAlias,
+> extends UmbControllerBase {
 	/**
 	 * Clones the property data.
-	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} property - The property data.
+	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} propertyTypes - Data about the properties to make a preset for.
 	 * @returns {Promise<UmbPropertyValueDataPotentiallyWithEditorAlias>} - A promise that resolves to the cloned property data.
 	 */
-	async create<
-		GivenPropertyTypesType extends UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel,
-		ReturnType = GivenPropertyTypesType extends UmbPropertyTypePresetWithSchemaAliasModel
-			? UmbPropertyValueDataPotentiallyWithEditorAlias
-			: UmbPropertyValueData,
-	>(propertyTypes: Array<GivenPropertyTypesType>): Promise<Array<ReturnType>> {
-		const result = await Promise.all(propertyTypes.map(this.#createPropertyPreset<ReturnType>));
+	async create<GivenPropertyTypesType extends UmbPropertyTypePresetModel>(
+		propertyTypes: Array<GivenPropertyTypesType>,
+	): Promise<Array<ReturnType>> {
+		const result = await Promise.all(propertyTypes.map(this.#createPropertyPreset));
+
+		//Merge all the values into a single array:
+		const values = result.flatMap((x) => x);
 
 		this.destroy();
 
-		return result;
+		return values;
 	}
 
-	#createPropertyPreset = async <ReturnType>(
+	#createPropertyPreset = async (
 		propertyType: UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel,
-	): Promise<ReturnType> => {
+	): Promise<Array<ReturnType>> => {
 		const editorAlias: string | undefined = (propertyType as UmbPropertyTypePresetWithSchemaAliasModel)
 			.propertyEditorSchemaAlias;
 
 		const editorUiAlias = propertyType.propertyEditorUiAlias;
 		if (!editorUiAlias) {
 			throw new Error(`propertyEditorUiAlias was not defined in ${propertyType}`);
-		}
-
-		const alias = propertyType.alias;
-		if (!alias) {
-			throw new Error(`alias not defined in ${propertyType}`);
 		}
 
 		let filter: (x: ManifestPropertyValuePreset) => boolean;
@@ -60,28 +58,48 @@ export class UmbPropertyValuePresetBuilderController extends UmbControllerBase {
 			(x) => x !== undefined,
 		) as Array<UmbPropertyValuePresetApi>;
 
+		const result = await this._generatePropertyValues(apis, propertyType);
+
+		for (const api of apis) {
+			api.destroy();
+		}
+
+		return result;
+	};
+
+	protected async _generatePropertyValues(
+		apis: Array<UmbPropertyValuePresetApi>,
+		propertyType: UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel,
+	): Promise<Array<ReturnType>> {
+		return [await this._generatePropertyValue(apis, propertyType, EMPTY_CALL_ARGS)];
+	}
+
+	protected async _generatePropertyValue(
+		apis: Array<UmbPropertyValuePresetApi>,
+		propertyType: UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel,
+		callArgs: UmbPropertyValuePresetApiCallArgs,
+	): Promise<ReturnType> {
 		let value: unknown = undefined;
 		// Important to use a inline for loop, to secure that each entry is processed(asynchronously) in order
 		for (const api of apis) {
 			if (!api.processValue) {
-				throw new Error(
-					`processValue method is not defined in one of the apis of these extensions: ${manifests.map((x) => x.alias).join(', ')}`,
-				);
+				throw new Error(`'processValue()' method is not defined in the api: ${api.constructor.name}`);
 			}
-			value = await api.processValue(value, propertyType.config);
+
+			value = await api.processValue(value, propertyType.config, propertyType.typeArgs, callArgs);
 		}
 
-		if (editorAlias) {
+		if ((propertyType as UmbPropertyTypePresetWithSchemaAliasModel).propertyEditorSchemaAlias) {
 			return {
-				editorAlias,
-				alias,
+				editorAlias: (propertyType as UmbPropertyTypePresetWithSchemaAliasModel).propertyEditorSchemaAlias,
+				alias: propertyType.alias,
 				value,
 			} satisfies UmbPropertyValueDataPotentiallyWithEditorAlias as ReturnType;
 		} else {
 			return {
-				alias,
+				alias: propertyType.alias,
 				value,
 			} satisfies UmbPropertyValueData as ReturnType;
 		}
-	};
+	}
 }

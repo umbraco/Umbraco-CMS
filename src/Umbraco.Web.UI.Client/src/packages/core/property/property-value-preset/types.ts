@@ -1,5 +1,6 @@
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbVariantId } from '../../variant/variant-id.class.js';
 
 export type * from './property-value-preset.extension.js';
 
@@ -13,12 +14,27 @@ export interface UmbPropertyValuePresetApi<
 export type UmbPropertyValuePresetApiValuesProcessor<
 	ValueType = unknown,
 	ConfigType extends UmbPropertyEditorConfig = UmbPropertyEditorConfig,
-> = (value: undefined | ValueType, config: ConfigType) => PromiseLike<ValueType>;
+> = (
+	value: undefined | ValueType,
+	config: ConfigType,
+	typeArgs: UmbPropertyTypePresetModelTypeModel,
+	callArgs: UmbPropertyValuePresetApiCallArgs,
+) => PromiseLike<ValueType>;
 
 export interface UmbPropertyTypePresetModel {
 	alias: string;
 	propertyEditorUiAlias: string;
 	config: UmbPropertyEditorConfig;
+	typeArgs: UmbPropertyTypePresetModelTypeModel;
+}
+
+export interface UmbPropertyTypePresetModelTypeModel {
+	isMandatory?: boolean;
+	varyByCulture?: boolean;
+	varyBySegment?: boolean;
+}
+export interface UmbPropertyValuePresetApiCallArgs {
+	variantId?: UmbVariantId;
 }
 
 export interface UmbPropertyTypePresetWithSchemaAliasModel extends UmbPropertyTypePresetModel {
