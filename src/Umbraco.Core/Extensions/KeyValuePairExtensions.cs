@@ -12,7 +12,7 @@ public static class KeyValuePairExtensions
     ///     Implements key/value pair deconstruction.
     /// </summary>
     /// <remarks>Allows for <c>foreach ((var k, var v) in ...)</c>.</remarks>
-    [Obsolete("Please replace uses of this extension method with native language features. This method will be removed in Umbraco 16.")]
+    [Obsolete("Please replace uses of this extension method with native language features. This method will be removed in Umbraco 17.")]
     public static void Deconstruct<TKey, TValue>(this KeyValuePair<TKey, TValue> kvp, out TKey key, out TValue value)
     {
         key = kvp.Key;

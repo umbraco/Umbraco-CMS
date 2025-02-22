@@ -47,7 +47,7 @@ public static class AssemblyExtensions
     /// </summary>
     /// <param name="assembly"></param>
     /// <returns></returns>
-    [Obsolete("This extension method is not longer used and will be removed in Umbraco 16.")]
+    [Obsolete("This extension method is not longer used and will be removed in Umbraco 17.")]
     public static FileInfo GetAssemblyFile(this Assembly assembly)
     {
         var codeBase = assembly.Location;
@@ -95,7 +95,7 @@ public static class AssemblyExtensions
     /// </summary>
     /// <param name="assemblyName"></param>
     /// <returns></returns>
-    [Obsolete("This extension method is not longer used and will be removed in Umbraco 16.")]
+    [Obsolete("This extension method is not longer used and will be removed in Umbraco 17.")]
     public static FileInfo? GetAssemblyFile(this AssemblyName assemblyName)
     {
         var codeBase = assemblyName.CodeBase;
