@@ -68,6 +68,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 					alias: 'test',
 					propertyEditorUiAlias: 'test-editor-ui',
 					config: [],
+					typeArgs: {},
 				},
 			];
 
@@ -115,6 +116,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 					alias: 'test',
 					propertyEditorUiAlias: 'test-editor-ui',
 					config: [],
+					typeArgs: {},
 				},
 			];
 
@@ -162,6 +164,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 					alias: 'test',
 					propertyEditorUiAlias: 'test-editor-ui',
 					config: [],
+					typeArgs: {},
 				},
 			];
 
@@ -220,11 +223,13 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 					alias: 'test',
 					propertyEditorUiAlias: 'test-editor-ui',
 					config: [],
+					typeArgs: {},
 				},
 				{
 					alias: 'test2',
 					propertyEditorUiAlias: 'test-editor-ui',
 					config: [],
+					typeArgs: {},
 				},
 			];
 
@@ -287,18 +292,21 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 					alias: 'test',
 					propertyEditorUiAlias: 'test-editor-ui',
 					config: [],
+					typeArgs: {},
 				},
 				{
 					alias: 'test2',
 					propertyEditorUiAlias: 'test-editor-ui',
 					propertyEditorSchemaAlias: 'test-editor-schema',
 					config: [],
+					typeArgs: {},
 				},
 				{
 					alias: 'test3',
 					propertyEditorUiAlias: 'some-other-ui',
 					propertyEditorSchemaAlias: 'test-editor-schema',
 					config: [],
+					typeArgs: {},
 				},
 			];
 
