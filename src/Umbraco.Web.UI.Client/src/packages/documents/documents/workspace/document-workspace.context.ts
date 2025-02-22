@@ -82,6 +82,7 @@ export class UmbDocumentWorkspaceContext
 			contentValidationRepository: UmbDocumentValidationRepository,
 			skipValidationOnSubmit: true,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
+			contentTypePropertyName: 'documentType',
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
 		});
 

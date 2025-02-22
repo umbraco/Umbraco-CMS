@@ -231,18 +231,19 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		await this.#init;
 		this.setParent(args.parent);
 
-		// TODO: Handle presets here [NL]
 		const request = this._detailRepository!.createScaffold(args.preset);
 		this._getDataPromise = request;
 		let { data } = await request;
 
 		if (data) {
-			this.#entityContext.setUnique(data.unique);
+			data = await this._scaffoldProcessData(data);
 
 			if (this.modalContext) {
+				// Notice if the preset comes with values, they will overwrite the scaffolded values... [NL]
 				data = { ...data, ...this.modalContext.data.preset };
 			}
 
+			this.#entityContext.setUnique(data.unique);
 			this.setIsNew(true);
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
@@ -250,6 +251,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 		this.loading.removeState(LOADING_STATE_UNIQUE);
 
+		return data;
+	}
+
+	protected async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
 		return data;
 	}
 

@@ -51,6 +51,7 @@ export class UmbMediaWorkspaceContext
 			contentTypeDetailRepository: UmbMediaTypeDetailRepository,
 			contentValidationRepository: UmbMediaValidationRepository,
 			contentVariantScaffold: UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
+			contentTypePropertyName: 'mediaType',
 		});
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
