@@ -28,7 +28,10 @@
                         show-labels="true">
             </umb-toggle>
         </div>
-
+        <div ng-if="vm.forceRepublish" class="umb-alert umb-alert--warning">
+            <p><localize key="content_forceRepublishWarning"></localize></p>
+            <p><localize key="content_forceRepublishAdvisory"></localize></p>
+        </div>
     </div>
 
     <div ng-if="vm.displayVariants.length > 1">
@@ -58,6 +61,10 @@
                         label-position="right"
                         show-labels="true">
             </umb-toggle>
+        </div>
+        <div ng-if="vm.forceRepublish" class="umb-alert umb-alert--warning">
+            <p><localize key="content_forceRepublishWarning"></localize></p>
+            <p><localize key="content_forceRepublishAdvisory"></localize></p>
         </div>
 
         <div class="umb-list umb-list--condensed">
