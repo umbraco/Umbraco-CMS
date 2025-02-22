@@ -26,7 +26,7 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 		apis: Array<UmbPropertyValuePresetApi>,
 		propertyType: UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel,
 	): Promise<Array<ReturnType>> {
-		let values = [];
+		let values: Array<ReturnType> = [];
 
 		if (propertyType.typeArgs.varyBySegment && propertyType.typeArgs.varyByCulture) {
 			if (this.#cultures.length === 0) {
@@ -38,9 +38,11 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 					const value = await this._generatePropertyValue(apis, propertyType, {
 						variantId: new UmbVariantId(culture, segment),
 					});
-					value.culture = culture;
-					value.segment = segment;
-					values.push(value);
+					if (value) {
+						value.culture = culture;
+						value.segment = segment;
+						values.push(value);
+					}
 				}
 			}
 		} else if (propertyType.typeArgs.varyByCulture) {
@@ -52,26 +54,32 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 				const value = await this._generatePropertyValue(apis, propertyType, {
 					variantId: new UmbVariantId(culture),
 				});
-				value.culture = culture;
-				value.segment = null;
-				values.push(value);
+				if (value) {
+					value.culture = culture;
+					value.segment = null;
+					values.push(value);
+				}
 			}
 		} else if (propertyType.typeArgs.varyBySegment) {
 			for (const segment of this.#segments) {
 				const value = await this._generatePropertyValue(apis, propertyType, {
 					variantId: new UmbVariantId(null, segment),
 				});
-				// Be aware this maybe should have been the default culture?
-				value.culture = null;
-				value.segment = segment;
-				values.push(value);
+				if (value) {
+					// Be aware this maybe should have been the default culture?
+					value.culture = null;
+					value.segment = segment;
+					values.push(value);
+				}
 			}
 		} else {
 			const value = await this._generatePropertyValue(apis, propertyType, {});
-			// Be aware this maybe should have been the default culture?
-			value.culture = null;
-			value.segment = null;
-			values.push(value);
+			if (value) {
+				// Be aware this maybe should have been the default culture?
+				value.culture = null;
+				value.segment = null;
+				values.push(value);
+			}
 		}
 		return values;
 	}

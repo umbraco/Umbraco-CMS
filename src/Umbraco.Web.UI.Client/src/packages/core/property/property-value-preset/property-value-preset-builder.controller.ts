@@ -71,14 +71,15 @@ export class UmbPropertyValuePresetBuilderController<
 		apis: Array<UmbPropertyValuePresetApi>,
 		propertyType: UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel,
 	): Promise<Array<ReturnType>> {
-		return [await this._generatePropertyValue(apis, propertyType, EMPTY_CALL_ARGS)];
+		const property = await this._generatePropertyValue(apis, propertyType, EMPTY_CALL_ARGS);
+		return property ? [property] : [];
 	}
 
 	protected async _generatePropertyValue(
 		apis: Array<UmbPropertyValuePresetApi>,
 		propertyType: UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel,
 		callArgs: UmbPropertyValuePresetApiCallArgs,
-	): Promise<ReturnType> {
+	): Promise<ReturnType | undefined> {
 		let value: unknown = undefined;
 		// Important to use a inline for loop, to secure that each entry is processed(asynchronously) in order
 		for (const api of apis) {
@@ -87,6 +88,10 @@ export class UmbPropertyValuePresetBuilderController<
 			}
 
 			value = await api.processValue(value, propertyType.config, propertyType.typeArgs, callArgs);
+		}
+
+		if (!value) {
+			return;
 		}
 
 		if ((propertyType as UmbPropertyTypePresetWithSchemaAliasModel).propertyEditorSchemaAlias) {
