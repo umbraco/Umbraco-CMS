@@ -18,6 +18,13 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import {
+	UmbPropertyValuePresetVariantBuilderController,
+	type UmbPropertyTypePresetModel,
+	type UmbPropertyTypePresetModelTypeModel,
+} from '@umbraco-cms/backoffice/property';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
@@ -353,14 +360,63 @@ export abstract class UmbBlockManagerContext<
 		};
 	}
 
-	protected _createBlockElementData(key: string, elementTypeKey: string) {
+	protected async _createBlockElementData(key: string, contentTypeKey: string) {
 		//
-		// TODO: Handle presets here [NL]
+		const appLanguage = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+
+		const contentStructure = this.getStructure(contentTypeKey);
+		if (!contentStructure) {
+			throw new Error(`Cannot create Preset for Block, missing content structure for ${contentTypeKey}`);
+		}
+
+		// Set culture and segment for all values:
+		const cutlures = contentStructure.variesByCulture ? await appLanguage.getCultures() : [];
+		if (cutlures.length === 0) {
+			throw new Error('Could not retrieve app cultures.');
+		}
+		// TODO: Receive the segments from somewhere. [NL]
+		const segments: Array<string> | undefined = contentStructure.variesBySegment ? [] : undefined;
+
+		const propertyTypes = await contentStructure.getContentTypeProperties();
+		const valueDefinitions = await Promise.all(
+			propertyTypes.map(async (property) => {
+				// the getItemByUnique is a async method that first resolves once the item is loaded.
+				const repo = new UmbDataTypeDetailRepository(this);
+				const dataType = (await repo.requestByUnique(property.dataType.unique)).data;
+				// This means if its not loaded this will never resolve and the error below will never happen.
+				if (!dataType) {
+					throw new Error(`DataType of "${property.dataType.unique}" not found.`);
+				}
+				if (!dataType.editorUiAlias) {
+					throw new Error(`DataType of "${property.dataType.unique}" did not have a editorUiAlias.`);
+				}
+
+				return {
+					alias: property.alias,
+					propertyEditorUiAlias: dataType.editorUiAlias,
+					propertyEditorSchemaAlias: dataType.editorAlias,
+					config: dataType.values,
+					typeArgs: {
+						variesByCulture: property.variesByCulture,
+						variesBySegment: property.variesBySegment,
+					} as UmbPropertyTypePresetModelTypeModel,
+				} as UmbPropertyTypePresetModel;
+			}),
+		);
+
+		const controller = new UmbPropertyValuePresetVariantBuilderController(this);
+		controller.setCultures(cutlures);
+		if (segments) {
+			controller.setSegments(segments);
+		}
+		let values = await controller.create(valueDefinitions);
+
+		// Set culture and segment for all values:
 
 		return {
-			key: key,
-			contentTypeKey: elementTypeKey,
-			values: [],
+			key,
+			contentTypeKey,
+			values,
 		};
 	}
 
@@ -380,12 +436,12 @@ export abstract class UmbBlockManagerContext<
 			...(partialLayoutEntry as Partial<BlockLayoutType>),
 		} as BlockLayoutType;
 
-		const content = this._createBlockElementData(layout.contentKey, contentElementTypeKey);
+		const content = await this._createBlockElementData(layout.contentKey, contentElementTypeKey);
 		let settings: UmbBlockDataModel | undefined = undefined;
 
 		if (blockType.settingsElementTypeKey) {
 			layout.settingsKey = UmbId.new();
-			settings = this._createBlockElementData(layout.settingsKey, blockType.settingsElementTypeKey);
+			settings = await this._createBlockElementData(layout.settingsKey, blockType.settingsElementTypeKey);
 		}
 
 		return {

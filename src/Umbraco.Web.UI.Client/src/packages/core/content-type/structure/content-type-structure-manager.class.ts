@@ -48,6 +48,14 @@ export class UmbContentTypeStructureManager<
 		}
 	});
 
+	/*
+	async whenLoaded() {
+		await this.#initRepository;
+		await this.#init;
+		return true;
+	}
+		*/
+
 	#ownerContentTypeUnique?: string;
 	#contentTypeObservers = new Array<UmbController>();
 
@@ -68,6 +76,9 @@ export class UmbContentTypeStructureManager<
 		// Notice this may need to use getValue to avoid resetting it self. [NL]
 		return contentTypes.flatMap((x) => x.properties ?? []);
 	});
+	async getContentTypeProperties() {
+		return await this.observe(this.contentTypeProperties).asPromise();
+	}
 	readonly contentTypeDataTypeUniques = this.#contentTypes.asObservablePart((contentTypes) => {
 		// Notice this may need to use getValue to avoid resetting it self. [NL]
 		return contentTypes

@@ -48,8 +48,6 @@ export class UmbPropertyEditorUIToggleElement
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
-		// TODO: Do not set value here, but use future feature of Value Presets. [NL]
-		this.value ??= config.getValueByAlias('default') ?? false;
 		this._labelOff = config.getValueByAlias('labelOff');
 		this._labelOn = config.getValueByAlias('labelOn');
 		this._showLabels = Boolean(config.getValueByAlias('showLabels'));
@@ -61,7 +59,8 @@ export class UmbPropertyEditorUIToggleElement
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputToggleElement }) {
-		this.value = event.target.checked;
+		const checked = event.target.checked;
+		this.value = this.mandatory ? (checked ?? null) : checked;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
