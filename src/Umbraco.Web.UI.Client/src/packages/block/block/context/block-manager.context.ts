@@ -377,11 +377,12 @@ export abstract class UmbBlockManagerContext<
 		// TODO: Receive the segments from somewhere. [NL]
 		const segments: Array<string> | undefined = contentStructure.variesBySegment ? [] : undefined;
 
+		const repo = new UmbDataTypeDetailRepository(this);
+
 		const propertyTypes = await contentStructure.getContentTypeProperties();
 		const valueDefinitions = await Promise.all(
 			propertyTypes.map(async (property) => {
-				// the getItemByUnique is a async method that first resolves once the item is loaded.
-				const repo = new UmbDataTypeDetailRepository(this);
+				// TODO: Implement caching for data-type requests. [NL]
 				const dataType = (await repo.requestByUnique(property.dataType.unique)).data;
 				// This means if its not loaded this will never resolve and the error below will never happen.
 				if (!dataType) {
