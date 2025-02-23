@@ -6,16 +6,17 @@ import '../../components/cascading-menu-popover/cascading-menu-popover.element.j
 
 @customElement('umb-tiptap-font-size-toolbar-element')
 export class UmbTiptapToolbarFontSizeToolbarElement extends UmbTiptapToolbarButtonElement {
-	#fontSizes = [8, 10, 12, 14, 16, 18, 24, 36, 48];
+	#fontSizes = [8, 10, 12, 14, 16, 18, 24, 36, 48].map((fontSize) => `${fontSize}pt`);
 
 	#menu: Array<UmbCascadingMenuItem> = this.#fontSizes.map((fontSize) => ({
-		unique: `font-size-${fontSize}pt`,
-		label: `${fontSize}pt`,
+		unique: `font-size-${fontSize}`,
+		label: fontSize,
+		// execute: () => this.editor?.chain().focus().setMark('textStyle', { fontSize }).run(),
 		execute: () =>
 			this.editor
 				?.chain()
 				.focus()
-				.setMark('textStyle', { style: `font-size: ${fontSize}pt;` })
+				.setMark('textStyle', { style: `font-size: ${fontSize};` })
 				.run(),
 	}));
 
