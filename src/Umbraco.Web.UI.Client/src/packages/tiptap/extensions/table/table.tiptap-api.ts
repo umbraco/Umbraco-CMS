@@ -68,7 +68,8 @@ export default class UmbTiptapTableExtensionApi extends UmbTiptapExtensionApiBas
 				}
 
 				.selectedCell {
-					background-color: var(--uui-color-current);
+					background-color: var(--uui-color-surface-emphasis);
+					border-color: var(--uui-color-selected);
 				}
 
 				.grip-column,
