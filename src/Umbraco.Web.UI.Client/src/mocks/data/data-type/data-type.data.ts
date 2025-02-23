@@ -1049,6 +1049,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 							'Umb.Tiptap.Toolbar.Redo',
 							'Umb.Tiptap.Toolbar.StyleSelect',
 							'Umb.Tiptap.Toolbar.FontFamily',
+							'Umb.Tiptap.Toolbar.FontSize',
 							'Umb.Tiptap.Toolbar.Bold',
 							'Umb.Tiptap.Toolbar.Italic',
 							'Umb.Tiptap.Toolbar.TextAlignLeft',
