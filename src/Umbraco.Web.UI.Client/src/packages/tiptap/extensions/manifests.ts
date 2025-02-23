@@ -462,6 +462,17 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 			label: '#general_embed',
 		},
 	},
+	{
+		type: 'tiptapToolbarExtension',
+		alias: 'Umb.Tiptap.Toolbar.FontFamily',
+		name: 'Font Family Tiptap Extension',
+		element: () => import('./toolbar/font-family-tiptap-toolbar.element.js'),
+		meta: {
+			alias: 'umbFontFamily',
+			icon: 'icon-palette',
+			label: 'Font family',
+		},
+	},
 ];
 
 const extensions = [
