@@ -37,6 +37,7 @@ export class UmbTiptapToolbarFontFamilyToolbarElement extends UmbTiptapToolbarBu
 	#getElement(fontFamily: string, label: string) {
 		const menuItem = document.createElement('uui-menu-item');
 		menuItem.addEventListener('click', () => {
+			//this.editor?.chain().focus().setMark('textStyle', { fontFamily }).run();
 			this.editor
 				?.chain()
 				.focus()
@@ -47,7 +48,7 @@ export class UmbTiptapToolbarFontFamilyToolbarElement extends UmbTiptapToolbarBu
 		const element = document.createElement('span');
 		element.slot = 'label';
 		element.textContent = label;
-		element.style.cssText = `font-family: ${fontFamily};`;
+		element.style.fontFamily = fontFamily;
 
 		menuItem.appendChild(element);
 
