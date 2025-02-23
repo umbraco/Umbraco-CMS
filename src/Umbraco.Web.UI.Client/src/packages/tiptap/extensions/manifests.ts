@@ -473,6 +473,17 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 			label: 'Font family',
 		},
 	},
+	{
+		type: 'tiptapToolbarExtension',
+		alias: 'Umb.Tiptap.Toolbar.FontSize',
+		name: 'Font Size Tiptap Extension',
+		element: () => import('./toolbar/font-size-tiptap-toolbar.element.js'),
+		meta: {
+			alias: 'umbFontSize',
+			icon: 'icon-palette',
+			label: 'Font size',
+		},
+	},
 ];
 
 const extensions = [
