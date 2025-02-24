@@ -1,24 +1,58 @@
-import { UmbEntityActionBase } from '../../../entity-action/entity-action-base.js';
-import { UmbRequestReloadStructureForEntityEvent } from '../../../entity-action/request-reload-structure-for-entity.event.js';
 import type { UmbRecycleBinRepository } from '../../recycle-bin-repository.interface.js';
 import type { MetaEntityActionTrashKind } from './types.js';
 import { UmbEntityTrashedEvent } from './trash.event.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 /**
  * Entity action for trashing an item.
  * @class UmbTrashEntityAction
  * @augments {UmbEntityActionBase<MetaEntityActionTrashKind>}
  */
-export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTrashKind> {
+export class UmbTrashEntityAction<
+	MetaKindType extends MetaEntityActionTrashKind = MetaEntityActionTrashKind,
+> extends UmbEntityActionBase<MetaKindType> {
+	#localize = new UmbLocalizationController(this);
+
 	/**
 	 * Executes the action.
 	 * @memberof UmbTrashEntityAction
 	 */
 	override async execute() {
+		if (!this.args.unique) throw new Error('Cannot trash an item without a unique identifier.');
+
+		const item = await this.#requestItem();
+
+		await this._confirmTrash(item);
+
+		const recycleBinRepository = await createExtensionApiByAlias<UmbRecycleBinRepository>(
+			this,
+			this.args.meta.recycleBinRepositoryAlias,
+		);
+
+		await recycleBinRepository.requestTrash({ unique: this.args.unique });
+
+		this.#notify();
+	}
+
+	protected async _confirmTrash(item: any) {
+		const headline = '#actions_trash';
+		const message = '#defaultdialogs_confirmTrash';
+
+		// TODO: handle items with variants
+		await umbConfirmModal(this._host, {
+			headline,
+			content: this.#localize.string(message, item.name),
+			color: 'danger',
+			confirmLabel: '#actions_trash',
+		});
+	}
+
+	async #requestItem() {
 		if (!this.args.unique) throw new Error('Cannot trash an item without a unique identifier.');
 
 		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(
@@ -29,22 +63,7 @@ export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTr
 		const { data } = await itemRepository.requestItems([this.args.unique]);
 		const item = data?.[0];
 		if (!item) throw new Error('Item not found.');
-
-		// TODO: handle items with variants
-		await umbConfirmModal(this._host, {
-			headline: `Trash`,
-			content: `Are you sure you want to move ${item.name} to the recycle bin?`,
-			color: 'danger',
-			confirmLabel: 'Trash',
-		});
-
-		const recycleBinRepository = await createExtensionApiByAlias<UmbRecycleBinRepository>(
-			this,
-			this.args.meta.recycleBinRepositoryAlias,
-		);
-		await recycleBinRepository.requestTrash({ unique: this.args.unique });
-
-		this.#notify();
+		return item;
 	}
 
 	async #notify() {

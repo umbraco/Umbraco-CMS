@@ -1,5 +1,4 @@
 import esbuild from 'rollup-plugin-esbuild';
-import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import css from 'rollup-plugin-import-css';
 import replace from '@rollup/plugin-replace';
@@ -82,7 +81,6 @@ const libraries = allowed.map((module) => {
 			format: 'es',
 		},
 		plugins: [
-			commonjs(),
 			nodeResolve({ preferBuiltins: false, browser: true }),
 			// Replace the vite specific inline query with nothing so that the import is valid
 			replace({
