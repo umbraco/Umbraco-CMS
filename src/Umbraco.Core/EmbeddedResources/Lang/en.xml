@@ -388,8 +388,8 @@
     <key alias="duplicateMemberGroupName">Member group name '%0%' is already taken</key>
     <key alias="duplicateUsername">Username '%0%' is already taken</key>
     <key alias="outOfRangeMinimum">The value %0% is less than the allowed minimum value of %1%</key>
-    <key alias="outOfRangeMaxmimum">The value %0% is greater than the allowed maximum value of %1%</key>
-    <key alias="invalidStep">The value %0% does not correspond with the configured step value of %1%</key>
+    <key alias="outOfRangeMaximum">The value %0% is greater than the allowed maximum value of %1%</key>
+    <key alias="invalidStep">The value %0% does not correspond with the configured step value of %1% and minimum value of %2%</key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:

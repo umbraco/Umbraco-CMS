@@ -40,10 +40,6 @@ public class IntegerPropertyEditor : DataEditor
     /// </summary>
     internal class IntegerPropertyValueEditor : DataValueEditor
     {
-        private const string ConfigurationKeyMinValue = "min";
-        private const string ConfigurationKeyMaxValue = "max";
-        private const string ConfigurationKeyStepValue = "step";
-
         /// <summary>
         /// Initializes a new instance of the <see cref="IntegerPropertyValueEditor"/> class.
         /// </summary>
@@ -76,6 +72,21 @@ public class IntegerPropertyEditor : DataEditor
         /// </summary>
         internal abstract class IntegerPropertyConfigurationValidatorBase : SimplePropertyConfigurationValidatorBase<int>
         {
+            /// <summary>
+            /// The configuration key for the minimum value.
+            /// </summary>
+            protected const string ConfigurationKeyMinValue = "min";
+
+            /// <summary>
+            /// The configuration key for the maximum value.
+            /// </summary>
+            protected const string ConfigurationKeyMaxValue = "max";
+
+            /// <summary>
+            /// The configuration key for the step value.
+            /// </summary>
+            protected const string ConfigurationKeyStepValue = "step";
+
             /// <summary>
             /// Initializes a new instance of the <see cref="IntegerPropertyConfigurationValidatorBase"/> class.
             /// </summary>
@@ -149,17 +160,12 @@ public class IntegerPropertyEditor : DataEditor
                     yield break;
                 }
 
-                if (dataTypeConfiguration is not Dictionary<string, object> configuration)
-                {
-                    yield break;
-                }
-
-                if (TryGetConfiguredValue(configuration, ConfigurationKeyMinValue, out int min) &&
-                    TryGetConfiguredValue(configuration, ConfigurationKeyStepValue, out int step) &&
+                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMinValue, out int min) &&
+                    TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out int step) &&
                     IsValidForStep(parsedIntegerValue, min, step) is false)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "invalidStep", [parsedIntegerValue.ToString(), step.ToString()]),
+                        LocalizedTextService.Localize("validation", "invalidStep", [parsedIntegerValue.ToString(), step.ToString(), min.ToString()]),
                         ["value"]);
                 }
             }

@@ -1,9 +1,11 @@
-﻿using Moq;
+using System.Globalization;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -71,6 +73,84 @@ public class DecimalValueEditorTests
         Assert.IsNull(result);
     }
 
+    [TestCase("x", false)]
+    [TestCase(1.5, true)]
+    public void Validates_Is_Decimal(object value, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor();
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual(validationResult.ErrorMessage, $"The value {value} is not a valid decimal");
+        }
+    }
+
+    [TestCase(0.9, false)]
+    [TestCase(1.1, true)]
+    [TestCase(1.3, true)]
+    public void Validates_Is_Greater_Than_Or_Equal_To_Configured_Min(object value, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor();
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMinimum");
+        }
+    }
+
+    [TestCase(1.7, true)]
+    [TestCase(1.9, true)]
+    [TestCase(2.1, false)]
+    public void Validates_Is_Less_Than_Or_Equal_To_Configured_Max(object value, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor();
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMaximum");
+        }
+    }
+
+    [TestCase(1.4, false)]
+    [TestCase(1.5, true)]
+    public void Validates_Matches_Configured_Step(object value, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor();
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual(validationResult.ErrorMessage, "validation_invalidStep");
+        }
+    }
+
     private static object? FromEditor(object? value)
         => CreateValueEditor().FromEditor(new ContentPropertyData(value, null), null);
 
@@ -86,11 +166,27 @@ public class DecimalValueEditorTests
 
     private static DecimalPropertyEditor.DecimalPropertyValueEditor CreateValueEditor()
     {
+        var localizedTextServiceMock = new Mock<ILocalizedTextService>();
+        localizedTextServiceMock.Setup(x => x.Localize(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CultureInfo>(),
+                It.IsAny<IDictionary<string, string>>()))
+            .Returns((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => $"{key}_{alias}");
         var valueEditor = new DecimalPropertyEditor.DecimalPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias"));
+            new DataEditorAttribute("alias"),
+            localizedTextServiceMock.Object)
+        {
+            ConfigurationObject = new Dictionary<string, object>
+            {
+                { "min", 1.1 },
+                { "max", 1.9 },
+                { "step", 0.2 }
+            }
+        };
         return valueEditor;
     }
 }
