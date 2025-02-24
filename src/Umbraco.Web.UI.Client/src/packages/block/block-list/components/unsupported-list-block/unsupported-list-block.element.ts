@@ -15,7 +15,7 @@ export class UmbUnsupportedListBlockElement extends UmbLitElement {
 					<slot></slot>
 					<slot name="tag"></slot>
 				</div>
-				<div id="inside">${this.localize.term('blockEditor_unsupportedBlockDescription')}</div>
+				<div id="inside" draggable="false">${this.localize.term('blockEditor_unsupportedBlockDescription')}</div>
 			</div>
 		`;
 	}

@@ -317,6 +317,8 @@ export default {
 		contentRoot: 'Content root',
 		includeUnpublished: 'Include unpublished content items.',
 		forceRepublish: 'Publish unchanged items.',
+		forceRepublishWarning: 'WARNING: Publishing all pages below this one in the content tree, whether or not they have changed, can be an expensive and long-running operation.',
+		forceRepublishAdvisory: 'This should not be necessary in normal circumstances so please only proceed with this option selected if you are certain it is required.',
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your\n      website administrator.\n    ',
 		isSensitiveValue_short: 'This value is hidden.',
@@ -510,6 +512,11 @@ export default {
 		confirmremoveusageof: 'Are you sure you want to remove the usage of <strong>%0%</strong>',
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
+		confirmTrash: (name: string) => `Are you sure you want to move <strong>${name}</strong> to the Recycle Bin?`,
+		confirmBulkTrash: (total: number) =>
+			`Are you sure you want to move <strong>${total} ${total === 1 ? 'item' : 'items'}</strong> to the Recycle Bin?`,
+		confirmBulkDelete: (total: number) =>
+			`Are you sure you want to delete <strong>${total} ${total === 1 ? 'item' : 'items'}</strong>?`,
 		cut: 'Cut',
 		editDictionary: 'Edit dictionary item',
 		editLanguage: 'Edit language',
@@ -1255,6 +1262,13 @@ export default {
 	},
 	colorpicker: {
 		noColors: 'You have not configured any approved colours',
+	},
+	colorPickerConfigurations: {
+		colorsTitle: 'Colours',
+		colorsDescription: 'Add, remove or sort colours',
+		showLabelTitle: 'Include labels?',
+		showLabelDescription:
+			'Stores colours as a JSON object containing both the colour hex string and label, rather than just the hex string.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
@@ -2145,6 +2159,7 @@ export default {
 		invalidEmail: 'Invalid email',
 		invalidNull: 'Value cannot be null',
 		invalidEmpty: 'Value cannot be empty',
+		invalidFalse: 'This field must be turned on',
 		invalidPattern: 'Value is invalid, it does not match the correct pattern',
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
@@ -2633,6 +2648,8 @@ export default {
 		labelInlineMode: 'Display inline with text',
 		notExposedLabel: 'Draft',
 		notExposedDescription: 'This Block is not yet created for this variant',
+		areaValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in this area.',
+		rootValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in the root of this property.',
 		unsupportedBlockName: 'Unsupported',
 		unsupportedBlockDescription:
 			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',

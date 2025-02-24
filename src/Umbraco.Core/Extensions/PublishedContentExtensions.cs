@@ -2850,6 +2850,7 @@ public static class PublishedContentExtensions
     ///     null)
     /// </param>
     /// <returns>The children of the content.</returns>
+    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 17.")]
     public static DataTable ChildrenAsTable(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -3141,7 +3142,7 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.Children<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
 
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
+    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 17.")]
     public static DataTable ChildrenAsTable(
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,

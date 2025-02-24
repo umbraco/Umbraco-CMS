@@ -16,19 +16,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		return this.#item.getData();
 	}
 	public set item(value: UmbDocumentItemModel | undefined) {
-		const oldValue = this.#item.getData();
 		this.#item.setData(value);
-
-		if (!value) {
-			this.#modalRoute?.destroy();
-			return;
-		}
-
-		if (oldValue?.unique === value.unique) {
-			return;
-		}
-
-		this.#modalRoute?.setUniquePathValue('unique', value.unique);
 	}
 
 	@property({ type: Boolean })
@@ -55,13 +43,10 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	@state()
 	_editPath = '';
 
-	#modalRoute?: any;
-
 	constructor() {
 		super();
 
-		this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath(UMB_DOCUMENT_ENTITY_TYPE)
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addUniquePaths(['unique'])
 			.onSetup(() => {
 				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
@@ -78,6 +63,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	}
 
 	#getHref() {
+		if (!this._unique) return;
 		const path = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this._unique });
 		return `${this._editPath}/${path}`;
 	}

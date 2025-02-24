@@ -10,15 +10,15 @@ export const manifest: ManifestPropertyEditorSchema = {
 			properties: [
 				{
 					alias: 'useLabel',
-					label: 'Include labels?',
+					label: '#colorPickerConfigurations_showLabelTitle',
 					description:
-						'Stores colors as a Json object containing both the color hex string and label, rather than just the hex string.',
+						'{umbLocalize: colorPickerConfigurations_showLabelDescription}',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'items',
-					label: 'Colors',
-					description: 'Add, remove or sort colors',
+					label: '#colorPickerConfigurations_colorsTitle',
+					description: '{umbLocalize: colorPickerConfigurations_colorsDescription}',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ColorSwatchesEditor',
 				},
 			],
