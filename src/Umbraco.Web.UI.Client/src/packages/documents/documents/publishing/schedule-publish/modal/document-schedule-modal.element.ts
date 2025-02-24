@@ -21,19 +21,19 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	#selectionManager = new UmbSelectionManager<string>(this);
 
 	@state()
-	_options: Array<UmbDocumentVariantOptionModel> = [];
+	private _options: Array<UmbDocumentVariantOptionModel> = [];
 
 	@state()
-	_hasNotSelectedMandatory?: boolean;
+	private _hasNotSelectedMandatory?: boolean;
 
 	@state()
-	_selection: Array<UmbDocumentScheduleSelectionModel> = [];
+	private readonly _selection: Array<UmbDocumentScheduleSelectionModel> = [];
 
 	@state()
-	_isAllSelected = false;
+	private _isAllSelected = false;
 
 	@state()
-	_internalValues: Array<UmbDocumentScheduleSelectionModel> = [];
+	private _internalValues: Array<UmbDocumentScheduleSelectionModel> = [];
 
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
 		if (isNotPublishedMandatory(option)) {
