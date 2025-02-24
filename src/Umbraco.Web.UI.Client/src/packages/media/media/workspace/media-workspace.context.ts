@@ -90,13 +90,14 @@ export class UmbMediaWorkspaceContext
 
 	public override resetState() {
 		super.resetState();
+		this.#isTrashedContext.setIsTrashed(false);
 		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 	}
 
 	public override async load(unique: string) {
 		const response = await super.load(unique);
 
-		if (response.data) {
+		if (response?.data) {
 			this.#isTrashedContext.setIsTrashed(response.data.isTrashed);
 		}
 
