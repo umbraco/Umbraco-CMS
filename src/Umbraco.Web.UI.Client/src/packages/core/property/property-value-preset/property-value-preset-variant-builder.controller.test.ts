@@ -59,7 +59,7 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 					alias: 'test',
 					propertyEditorUiAlias: 'test-editor-ui',
 					config: [],
-					typeArgs: { varyByCulture: true },
+					typeArgs: { variesByCulture: true },
 				},
 			];
 
@@ -81,7 +81,7 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 					alias: 'test',
 					propertyEditorUiAlias: 'test-editor-ui',
 					config: [],
-					typeArgs: { varyByCulture: true },
+					typeArgs: { variesByCulture: true },
 				},
 			];
 
@@ -101,7 +101,7 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 					alias: 'test',
 					propertyEditorUiAlias: 'test-editor-ui',
 					config: [],
-					typeArgs: { varyBySegment: true },
+					typeArgs: { variesBySegment: true },
 				},
 			];
 
@@ -128,7 +128,7 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 					alias: 'test',
 					propertyEditorUiAlias: 'test-editor-ui',
 					config: [],
-					typeArgs: { varyBySegment: true },
+					typeArgs: { variesBySegment: true },
 				},
 			];
 
@@ -151,7 +151,7 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 					alias: 'test',
 					propertyEditorUiAlias: 'test-editor-ui',
 					config: [],
-					typeArgs: { varyByCulture: true, varyBySegment: true },
+					typeArgs: { variesByCulture: true, variesBySegment: true },
 				},
 			];
 
