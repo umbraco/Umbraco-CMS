@@ -6,7 +6,9 @@ using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -49,9 +51,10 @@ public class IntegerPropertyEditor : DataEditor
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
-            DataEditorAttribute attribute)
+            DataEditorAttribute attribute,
+            ILocalizedTextService localizedTextService)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
-            => Validators.AddRange([new IntegerValidator(), new MinMaxValidator(), new StepValidator()]);
+            => Validators.AddRange([new IntegerValidator(), new MinMaxValidator(localizedTextService), new StepValidator(localizedTextService)]);
 
         /// <inheritdoc/>
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
@@ -73,6 +76,16 @@ public class IntegerPropertyEditor : DataEditor
         /// </summary>
         internal abstract class IntegerPropertyConfigurationValidatorBase : SimplePropertyConfigurationValidatorBase<int>
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="IntegerPropertyConfigurationValidatorBase"/> class.
+            /// </summary>
+            protected IntegerPropertyConfigurationValidatorBase(ILocalizedTextService localizedTextService) => LocalizedTextService = localizedTextService;
+
+            /// <summary>
+            /// Gets the <see cref="ILocalizedTextService"/>.
+            /// </summary>
+            protected ILocalizedTextService LocalizedTextService { get; }
+
             /// <inheritdoc/>
             protected override bool TryParsePropertyValue(object? value, out int parsedIntegerValue)
                 => int.TryParse(value?.ToString(), CultureInfo.InvariantCulture, out parsedIntegerValue);
@@ -83,6 +96,14 @@ public class IntegerPropertyEditor : DataEditor
         /// </summary>
         internal class MinMaxValidator : IntegerPropertyConfigurationValidatorBase, IValueValidator
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="MinMaxValidator"/> class.
+            /// </summary>
+            public MinMaxValidator(ILocalizedTextService localizedTextService)
+                : base(localizedTextService)
+            {
+            }
+
             /// <inheritdoc/>
             public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
             {
@@ -93,12 +114,16 @@ public class IntegerPropertyEditor : DataEditor
 
                 if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMinValue, out int min) && parsedIntegerValue < min)
                 {
-                    yield return new ValidationResult($"The value {value} is less than the allowed minimum value of {min}", ["value"]);
+                    yield return new ValidationResult(
+                        LocalizedTextService.Localize("validation", "outOfRangeMinimum", [parsedIntegerValue.ToString(), min.ToString()]),
+                        ["value"]);
                 }
 
                 if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMaxValue, out int max) && parsedIntegerValue > max)
                 {
-                    yield return new ValidationResult($"The value {value} is greater than the allowed maximum value of {max}", ["value"]);
+                    yield return new ValidationResult(
+                        LocalizedTextService.Localize("validation", "outOfRangeMaximum", [parsedIntegerValue.ToString(), max.ToString()]),
+                        ["value"]);
                 }
             }
         }
@@ -108,6 +133,14 @@ public class IntegerPropertyEditor : DataEditor
         /// </summary>
         internal class StepValidator : IntegerPropertyConfigurationValidatorBase, IValueValidator
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="StepValidator"/> class.
+            /// </summary>
+            public StepValidator(ILocalizedTextService localizedTextService)
+                : base(localizedTextService)
+            {
+            }
+
             /// <inheritdoc/>
             public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
             {
@@ -125,7 +158,9 @@ public class IntegerPropertyEditor : DataEditor
                     TryGetConfiguredValue(configuration, ConfigurationKeyStepValue, out int step) &&
                     IsValidForStep(parsedIntegerValue, min, step) is false)
                 {
-                    yield return new ValidationResult($"The value {value} does not correspond with the configured step value of {step}", ["value"]);
+                    yield return new ValidationResult(
+                        LocalizedTextService.Localize("validation", "invalidStep", [parsedIntegerValue.ToString(), step.ToString()]),
+                        ["value"]);
                 }
             }
 

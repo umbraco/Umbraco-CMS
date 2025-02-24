@@ -1,3 +1,4 @@
+using System.Globalization;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -7,6 +8,7 @@ using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
@@ -106,7 +108,7 @@ public class IntegerValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, $"The value {value} is less than the allowed minimum value of 10");
+            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMinimum");
         }
     }
 
@@ -126,7 +128,7 @@ public class IntegerValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, $"The value {value} is greater than the allowed maximum value of 20");
+            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMaximum");
         }
     }
 
@@ -145,7 +147,7 @@ public class IntegerValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, $"The value {value} does not correspond with the configured step value of 2");
+            Assert.AreEqual(validationResult.ErrorMessage, "validation_invalidStep");
         }
     }
 
@@ -164,16 +166,26 @@ public class IntegerValueEditorTests
 
     private static IntegerPropertyEditor.IntegerPropertyValueEditor CreateValueEditor()
     {
+        var localizedTextServiceMock = new Mock<ILocalizedTextService>();
+        localizedTextServiceMock.Setup(x => x.Localize(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CultureInfo>(),
+                It.IsAny<IDictionary<string, string>>()))
+            .Returns((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => $"{key}_{alias}");
         var valueEditor = new IntegerPropertyEditor.IntegerPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias"));
-        valueEditor.ConfigurationObject = new Dictionary<string, object>
+            new DataEditorAttribute("alias"),
+            localizedTextServiceMock.Object)
         {
-            { "min", 10 },
-            { "max", 20 },
-            { "step", 2 }
+            ConfigurationObject = new Dictionary<string, object>
+            {
+                { "min", 10 },
+                { "max", 20 },
+                { "step", 2 }
+            }
         };
         return valueEditor;
     }
