@@ -23,9 +23,9 @@ public abstract class ConfigurationValidatorBase
             return false;
         }
 
-        if (configuration.TryGetValue(key, out object? obj) && obj is TValue intValue)
+        if (configuration.TryGetValue(key, out object? obj) && obj is TValue castValue)
         {
-            value = intValue;
+            value = castValue
             return true;
         }
 
