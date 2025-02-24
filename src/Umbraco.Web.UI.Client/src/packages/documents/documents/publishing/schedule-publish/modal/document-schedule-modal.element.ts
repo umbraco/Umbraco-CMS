@@ -27,7 +27,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	_hasNotSelectedMandatory?: boolean;
 
 	@state()
-	_selection: Array<string> = [];
+	_selection: Array<UmbDocumentScheduleSelectionModel> = [];
 
 	@state()
 	_isAllSelected = false;
@@ -54,7 +54,13 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				if (!this._options && !selection) return;
 
 				// New selections are mapped to the schedule data
-				this._selection = selection;
+				this._selection.length = 0;
+				for (const unique of selection) {
+					const existing = this._internalValues.find((s) => s.unique === unique);
+					if (existing) {
+						this._selection.push(existing);
+					}
+				}
 				this._isAllSelected = this.#isAllSelected();
 
 				//Getting not published mandatory options — the options that are mandatory and not currently published.
@@ -103,7 +109,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 	#submit() {
 		this.value = {
-			selection: this._internalValues,
+			selection: this._selection,
 		};
 		this.modalContext?.submit();
 	}
@@ -113,7 +119,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#isSelected(unique: string) {
-		return this._selection.includes(unique);
+		return this._selection.some((s) => s.unique === unique);
 	}
 
 	#onSelectAllChange(event: Event) {
