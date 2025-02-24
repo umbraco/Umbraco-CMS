@@ -13,7 +13,7 @@ export class UmbLocalizeRelativeTimeElement extends UmbLitElement {
 	 * @attr
 	 * @example time=10
 	 */
-	@property()
+	@property({ type: Number })
 	time!: number;
 
 	/**
@@ -21,7 +21,7 @@ export class UmbLocalizeRelativeTimeElement extends UmbLitElement {
 	 * @attr
 	 * @example options={ dateStyle: 'full', timeStyle: 'long', timeZone: 'Australia/Sydney' }
 	 */
-	@property()
+	@property({ type: Object })
 	options?: Intl.RelativeTimeFormatOptions;
 
 	/**

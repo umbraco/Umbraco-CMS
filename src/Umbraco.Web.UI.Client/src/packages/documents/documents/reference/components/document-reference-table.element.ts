@@ -44,7 +44,8 @@ export class UmbDocumentReferenceTableElement extends UmbLitElement {
 		}
 
 		if (!data) return;
-
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		//@ts-ignore
 		this._items = data.items;
 		this._hasMoreReferences = data.total > this.#pageSize ? data.total - this.#pageSize : 0;
 	}

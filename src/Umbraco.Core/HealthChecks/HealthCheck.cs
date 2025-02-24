@@ -46,12 +46,34 @@ public abstract class HealthCheck : IDiscoverable
     ///     If there are possible actions to take to rectify this check, this method must be overridden by a sub class
     ///     in order to explicitly provide those actions.
     /// </remarks>
-    public abstract Task<IEnumerable<HealthCheckStatus>> GetStatus();
+    [Obsolete("Use GetStatusAsync instead. Will be removed in v17")]
+    public virtual Task<IEnumerable<HealthCheckStatus>> GetStatus() => Task.FromResult(Enumerable.Empty<HealthCheckStatus>());
+
+    /// <summary>
+    ///     Get the status for this health check
+    /// </summary>
+    /// <returns></returns>
+    /// <remarks>
+    ///     If there are possible actions to take to rectify this check, this method must be overridden by a sub class
+    ///     in order to explicitly provide those actions.
+    /// </remarks>
+#pragma warning disable CS0618 // Type or member is obsolete
+    public virtual Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() => GetStatus();
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Executes the action and returns it's status
     /// </summary>
     /// <param name="action"></param>
     /// <returns></returns>
-    public abstract HealthCheckStatus ExecuteAction(HealthCheckAction action);
+    public virtual HealthCheckStatus ExecuteAction(HealthCheckAction action) =>
+        new HealthCheckStatus("Not implemented");
+
+    /// <summary>
+    ///     Executes the action and returns it's status
+    /// </summary>
+    /// <param name="action"></param>
+    /// <returns></returns>
+    public virtual Task<HealthCheckStatus> ExecuteActionAsync(HealthCheckAction action) =>
+        Task.FromResult(ExecuteAction(action));
 }

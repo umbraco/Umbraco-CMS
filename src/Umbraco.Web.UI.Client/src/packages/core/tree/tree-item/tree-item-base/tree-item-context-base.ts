@@ -23,6 +23,7 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 export abstract class UmbTreeItemContextBase<
 		TreeItemType extends UmbTreeItemModel,
 		TreeRootType extends UmbTreeRootModel,
+		ManifestType extends ManifestTreeItem = ManifestTreeItem,
 	>
 	extends UmbContextBase<UmbTreeItemContext<TreeItemType>>
 	implements UmbTreeItemContext<TreeItemType>
@@ -31,7 +32,7 @@ export abstract class UmbTreeItemContextBase<
 	public entityType?: string;
 	public readonly pagination = new UmbPaginationManager();
 
-	#manifest?: ManifestTreeItem;
+	#manifest?: ManifestType;
 
 	protected readonly _treeItem = new UmbObjectState<TreeItemType | undefined>(undefined);
 	readonly treeItem = this._treeItem.asObservable();
@@ -71,7 +72,9 @@ export abstract class UmbTreeItemContextBase<
 	#foldersOnly = new UmbBooleanState(false);
 	readonly foldersOnly = this.#foldersOnly.asObservable();
 
-	treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType>;
+	public treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType>;
+	public parentTreeItemContext?: UmbTreeItemContext<TreeItemType>;
+
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 	#sectionSidebarContext?: typeof UMB_SECTION_SIDEBAR_CONTEXT.TYPE;
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
@@ -90,24 +93,6 @@ export abstract class UmbTreeItemContextBase<
 		// listen for page changes on the pagination manager
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 
-		/* TODO: revisit. This is a temp solution to notify the parent it needs to reload its children
-		there might be a better way to do this through a tree item parent context.
-		It does not look like there is a way to have a "dynamic" parent context that will stop when a
-		specific parent is reached (a tree item unique that matches the parentUnique of this item) */
-		const hostElement = this.getHostElement();
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		hostElement.addEventListener('temp-reload-tree-item-parent', (event: CustomEvent) => {
-			const treeItem = this.getTreeItem();
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			const unique = treeItem?.unique;
-			if (event.detail.unique === unique) {
-				event.stopPropagation();
-				this.loadChildren();
-			}
-		});
-
 		window.addEventListener('navigationend', this.#debouncedCheckIsActive);
 	}
 
@@ -116,7 +101,7 @@ export abstract class UmbTreeItemContextBase<
 	 * @param {ManifestCollection} manifest
 	 * @memberof UmbCollectionContext
 	 */
-	public set manifest(manifest: ManifestTreeItem | undefined) {
+	public set manifest(manifest: ManifestType | undefined) {
 		if (this.#manifest === manifest) return;
 		this.#manifest = manifest;
 	}
@@ -261,22 +246,12 @@ export abstract class UmbTreeItemContextBase<
 			this.#observeLocation();
 		});
 
+		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (instance) => {
+			this.parentTreeItemContext = instance;
+		}).skipHost();
+
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
-			this.#actionEventContext?.removeEventListener(
-				UmbRequestReloadTreeItemChildrenEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext?.removeEventListener(
-				UmbRequestReloadChildrenOfEntityEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext?.removeEventListener(
-				UmbRequestReloadStructureForEntityEvent.TYPE,
-				this.#onReloadStructureRequest as unknown as EventListener,
-			);
-
+			this.#removeEventListeners();
 			this.#actionEventContext = instance;
 
 			this.#actionEventContext.addEventListener(
@@ -398,19 +373,11 @@ export abstract class UmbTreeItemContextBase<
 		if (event.getUnique() !== this.unique) return;
 		if (event.getEntityType() !== this.entityType) return;
 
-		/* TODO: revisit. This is a temp solution to notify the parent it needs to reload its children
-		there might be a better way to do this through a tree item parent context.
-		It does not look like there is a way to have a "dynamic" parent context that will stop when a
-		specific parent is reached (a tree item unique that matches the parentUnique of this item) */
-		const treeItem = this.getTreeItem();
-		const parentUnique = treeItem?.parent.unique;
-
-		const customEvent = new CustomEvent('temp-reload-tree-item-parent', {
-			detail: { unique: parentUnique },
-			bubbles: true,
-			composed: true,
-		});
-		this.getHostElement().dispatchEvent(customEvent);
+		if (this.parentTreeItemContext) {
+			this.parentTreeItemContext.loadChildren();
+		} else {
+			this.treeContext?.loadTree();
+		}
 	};
 
 	#onPageChange = (event: UmbChangeEvent) => {
@@ -442,7 +409,7 @@ export abstract class UmbTreeItemContextBase<
 		return `section/${pathname}/workspace/${entityType}/edit/${unique}`;
 	}
 
-	override destroy(): void {
+	#removeEventListeners = () => {
 		this.#actionEventContext?.removeEventListener(
 			UmbRequestReloadTreeItemChildrenEvent.TYPE,
 			this.#onReloadRequest as EventListener,
@@ -457,6 +424,10 @@ export abstract class UmbTreeItemContextBase<
 			UmbRequestReloadStructureForEntityEvent.TYPE,
 			this.#onReloadStructureRequest as unknown as EventListener,
 		);
+	};
+
+	override destroy(): void {
+		this.#removeEventListeners();
 		window.removeEventListener('navigationend', this.#debouncedCheckIsActive);
 		super.destroy();
 	}

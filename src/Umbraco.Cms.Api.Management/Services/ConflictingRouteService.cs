@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Services;
@@ -19,7 +20,7 @@ public class ConflictingRouteService : IConflictingRouteService
     public bool HasConflictingRoutes(out string controllerName)
     {
         var controllers = _typeLoader.GetTypes<ManagementApiControllerBase>().ToList();
-        foreach (Type controller in controllers)
+        foreach (Type controller in CollectionsMarshal.AsSpan(controllers))
         {
             Type[] potentialConflicting = controllers.Where(x => x.Name == controller.Name).ToArray();
             if (potentialConflicting.Length > 1)

@@ -8,6 +8,7 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/propert
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 
 import '../block-grid-block-inline/index.js';
+import '../block-grid-block-unsupported/index.js';
 import '../block-grid-block/index.js';
 import '../block-scale-handler/index.js';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
@@ -18,6 +19,7 @@ import type {
 } from '@umbraco-cms/backoffice/block-custom-view';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+
 /**
  * @element umb-block-grid-entry
  */
@@ -91,6 +93,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	_exposed?: boolean;
 
+	// Unuspported is triggerede if the Block Type is not reconized, it can also be triggerede by the Content Element Type not existing any longer. [NL]
+	@state()
+	_unsupported?: boolean;
+
 	@state()
 	_workspaceEditContentPath?: string;
 
@@ -102,13 +108,16 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_canScale?: boolean;
-
 	@state()
 	_showInlineCreateBefore?: boolean;
 	@state()
 	_showInlineCreateAfter?: boolean;
 	@state()
 	_inlineCreateAboveWidth?: string;
+
+	// If the Block Type is disallowed in this location then it become a invalid Block Type. Notice not supported blocks are determined via the unsupported property. [NL]
+	@property({ type: Boolean, attribute: 'location-invalid', reflect: true })
+	_invalidLocation?: boolean;
 
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
@@ -134,7 +143,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	constructor() {
 		super();
-
+		this.#init();
+	}
+	#init() {
 		// Misc:
 		this.observe(
 			this.#context.showContentEdit,
@@ -156,6 +167,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.canScale,
 			(canScale) => {
 				this._canScale = canScale;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.isAllowed,
+			(isAllowed) => {
+				this._invalidLocation = !isAllowed;
 			},
 			null,
 		);
@@ -191,6 +209,17 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
+		this.observe(
+			this.#context.unsupported,
+			(unsupported) => {
+				if (unsupported === undefined) return;
+				this.#updateBlockViewProps({ unsupported: unsupported });
+				this._unsupported = unsupported;
+				this.toggleAttribute('unsupported', unsupported);
+			},
+			null,
+		);
+
 		this.observe(
 			this.#context.inlineEditingMode,
 			(mode) => {
@@ -233,18 +262,14 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.createBeforePath,
 			(createPath) => {
-				//const oldValue = this._createBeforePath;
 				this._createBeforePath = createPath;
-				//this.requestUpdate('_createPath', oldValue);
 			},
 			null,
 		);
 		this.observe(
 			this.#context.createAfterPath,
 			(createPath) => {
-				//const oldValue = this._createAfterPath;
 				this._createAfterPath = createPath;
-				//this.requestUpdate('_createPath', oldValue);
 			},
 			null,
 		);
@@ -387,6 +412,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
+		if (!this._contentTypeAlias) {
+			// accept no extensions if we don't have a content type alias
+			return false;
+		}
 		// We do have _contentTypeAlias at this stage, cause we do use the filter method in the extension slot which first gets rendered when we have the _contentTypeAlias. [NL]
 		if (
 			manifest.forContentTypeAlias &&
@@ -416,7 +445,61 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		}
 	};
 
-	#renderInlineEditBlock() {
+	override render() {
+		return this.contentKey
+			? html`
+					${this.#renderCreateBeforeInlineButton()}
+					<div class="umb-block-grid__block" part="umb-block-grid__block">
+						<umb-extension-slot
+							.filter=${this.#extensionSlotFilterMethod}
+							.renderMethod=${this.#extensionSlotRenderMethod}
+							.props=${this._blockViewProps}
+							default-element=${this._inlineEditingMode ? 'umb-block-grid-block-inline' : 'umb-block-grid-block'}
+							type="blockEditorCustomView"
+							single
+							>${this.#renderBuiltinBlockView()}</umb-extension-slot
+						>
+						${this.#renderActionBar()}
+						${!this._showContentEdit && this._contentInvalid
+							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+							: nothing}
+						${this._invalidLocation
+							? html`<uui-tag id="invalidLocation" color="danger"
+									><umb-localize key="blockEditor_invalidDropPosition" .args=${[this._label]}></umb-localize
+								></uui-tag>`
+							: nothing}
+						${this._canScale
+							? html` <umb-block-scale-handler
+									@mousedown=${(e: MouseEvent) => this.#context.scaleManager.onScaleMouseDown(e)}>
+									${this._columnSpan}x${this._rowSpan}
+								</umb-block-scale-handler>`
+							: nothing}
+					</div>
+					${this.#renderCreateAfterInlineButton()}
+				`
+			: nothing;
+	}
+
+	#renderBuiltinBlockView() {
+		if (this._unsupported) {
+			return this.#renderUnsupportedBlock();
+		}
+		if (this._inlineEditingMode) {
+			return this.renderInlineBlock();
+		}
+		return this.#renderRefBlock();
+	}
+
+	#renderUnsupportedBlock() {
+		return html`<umb-block-grid-block-unsupported
+			class="umb-block-grid__block--view"
+			.config=${this._blockViewProps.config}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}></umb-block-grid-block-unsupported>`;
+		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root
+	}
+
+	renderInlineBlock() {
 		return html`<umb-block-grid-block-inline
 			class="umb-block-grid__block--view"
 			.label=${this._label}
@@ -438,36 +521,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}></umb-block-grid-block>`;
 		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root
-	}
-
-	#renderBlock() {
-		return this.contentKey && this._contentTypeAlias
-			? html`
-					${this.#renderCreateBeforeInlineButton()}
-					<div class="umb-block-grid__block" part="umb-block-grid__block">
-						<umb-extension-slot
-							.filter=${this.#extensionSlotFilterMethod}
-							.renderMethod=${this.#extensionSlotRenderMethod}
-							.props=${this._blockViewProps}
-							default-element=${this._inlineEditingMode ? 'umb-block-grid-block-inline' : 'umb-block-grid-block'}
-							type="blockEditorCustomView"
-							single
-							>${this._inlineEditingMode ? this.#renderInlineEditBlock() : this.#renderRefBlock()}</umb-extension-slot
-						>
-						${this.#renderActionBar()}
-						${!this._showContentEdit && this._contentInvalid
-							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
-							: nothing}
-						${this._canScale
-							? html` <umb-block-scale-handler
-									@mousedown=${(e: MouseEvent) => this.#context.scaleManager.onScaleMouseDown(e)}>
-									${this._columnSpan}x${this._rowSpan}
-								</umb-block-scale-handler>`
-							: nothing}
-					</div>
-					${this.#renderCreateAfterInlineButton()}
-				`
-			: nothing;
 	}
 
 	#renderCreateBeforeInlineButton() {
@@ -559,10 +612,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		`;
 	}
 
-	override render() {
-		return this.#renderBlock();
-	}
-
 	static override styles = [
 		UUIBlinkKeyframes,
 		css`
@@ -591,9 +640,17 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				transition: border-color 240ms ease-in;
 			}
 
+			:host([location-invalid])::after,
 			:host([settings-invalid])::after,
 			:host([content-invalid])::after {
 				border-color: var(--uui-color-danger);
+			}
+
+			#invalidLocation {
+				position: absolute;
+				top: -1em;
+				left: var(--uui-size-space-2);
+				z-index: 2;
 			}
 
 			uui-action-bar {

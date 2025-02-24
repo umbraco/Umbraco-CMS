@@ -169,7 +169,8 @@ export default {
 		languagesToPublish: 'Hvilke språk vil du publisere?',
 		languagesToSchedule: 'Hvilke språk vil du planlegge?',
 		languagesToSendForApproval: 'Hvilke språk vil du sende for godkjenning?',
-		languagesToUnpublish: 'Velg språkene som skal avpubliseres. Avpublisering av et obligatorisk språk vil avpublisere alle språk.',
+		languagesToUnpublish:
+			'Velg språkene som skal avpubliseres. Avpublisering av et obligatorisk språk vil avpublisere alle språk.',
 		lastPublished: 'Sist publisert',
 		listViewNoContent: 'Ingen underordnede elementer er lagt til',
 		listViewNoItems: 'Det er ingen elementer å vise i listen.',
@@ -184,7 +185,8 @@ export default {
 		nestedContentDeleteAllItems: 'Er du sikker på at du vil slette alle elementer?',
 		nestedContentDeleteItem: 'Er du sikker på at du vil slette dette elementet?',
 		nestedContentEditorNotSupported: 'Egenskap %0% bruker editor %1% som ikke støttes av Nested Content.',
-		nestedContentGroupHelpText: 'Velg gruppen hvis egenskaper skal vises. Hvis den står tom, vil første gruppe på elementtypen bli brukt.',
+		nestedContentGroupHelpText:
+			'Velg gruppen hvis egenskaper skal vises. Hvis den står tom, vil første gruppe på elementtypen bli brukt.',
 		nestedContentNoContentTypes: 'Ingen innholdstyper er konfigurert for denne egenskapen.',
 		nestedContentNoGroups: 'Den valgte elementtypen inneholder ingen støttede grupper.',
 		nestedContentSelectElementTypeModalTitle: 'Velg elementtype',
@@ -207,7 +209,8 @@ export default {
 		parentNotPublishedAnomaly: 'Intern feil: dokumentet er publisert men finnes ikke i hurtigbuffer',
 		publish: 'Publisert',
 		publishDescendantsHelp: 'Publiser <strong>%0%</strong> og alle undersider, slik at innhold blir tilgjengelig.',
-		publishDescendantsWithVariantsHelp: 'Publiser varianter og undervarianter av samme type, slik at innhold blir tilgjengelig.',
+		publishDescendantsWithVariantsHelp:
+			'Publiser varianter og undervarianter av samme type, slik at innhold blir tilgjengelig.',
 		publishRequiresVariants: 'Følgende varianter er nødvendig for at publisering skal kunne gjennomføres:',
 		publishStatus: 'Publiseringsstatus',
 		published: 'Publisert',
@@ -1174,28 +1177,37 @@ export default {
 		allowanceMaximum: 'Sett et maksimumskrav',
 		allowanceMinimum: 'Sett et minimumskrav',
 		allowBlockInAreas: 'Tillat i områder',
-		allowBlockInAreasHelp: 'Gjør denne blokken tilgjengelig som standard innenfor områdene til andre blokker (med mindre eksplisitte tillatelser er satt for disse områdene).',
+		allowBlockInAreasHelp:
+			'Gjør denne blokken tilgjengelig som standard innenfor områdene til andre blokker (med mindre eksplisitte tillatelser er satt for disse områdene).',
 		allowBlockInRoot: 'Tillat på rot-nivå',
-		allowBlockInRootHelp: 'Gjør denne blokken tilgjengelig på rot-nivå av oppsettet. Hvis dette ikke er valgt, kan denne blokken bare brukes innenfor andre blokkers definerte områder',
+		allowBlockInRootHelp:
+			'Gjør denne blokken tilgjengelig på rot-nivå av oppsettet. Hvis dette ikke er valgt, kan denne blokken bare brukes innenfor andre blokkers definerte områder',
 		allowedBlockColumns: 'Tilgjengelige kolonnestørrelser',
-		allowedBlockColumnsHelp: 'Definer de forskjellige antall kolonner denne blokken kan strekke seg over. Dette hindrer ikke blokker i å plasseres i et mindre område.',
+		allowedBlockColumnsHelp:
+			'Definer de forskjellige antall kolonner denne blokken kan strekke seg over. Dette hindrer ikke blokker i å plasseres i et mindre område.',
 		allowedBlockRows: 'Tilgjengelige radbredder',
 		allowedBlockRowsHelp: 'Definer rekkevidden av layout-rader denne blokken kan strekke seg over.',
-		areaAliasHelp: 'Dette aliaset skrives ut via GetBlockGridHTML(), bruk aliaset til å fange det elementet som representerer dette området. F.eks.. .umb-block-grid__area[data-area-alias="MittOmraadeAlias"] { ... }',
+		areaAliasHelp:
+			'Dette aliaset skrives ut via GetBlockGridHTML(), bruk aliaset til å fange det elementet som representerer dette området. F.eks.. .umb-block-grid__area[data-area-alias="MittOmraadeAlias"] { ... }',
 		areaAliasIsNotUnique: 'Aliaset til dette området må være unikt sammenlignet med de andre områdene i denne blokken.',
 		areaAllowedBlocks: 'Tillatte blokktyper',
-		areaAllowedBlocksEmpty: 'Som standard er alle blokktyper tillatt i et område. Bruk dette alternativet for kun å tillate utvalgte typer.',
-		areaAllowedBlocksHelp: 'Definer typene blokker som er tillatt i dette området, og eventuelt hvor mange av hver type som skal være til stede.',
-		areaCreateLabelHelp: "Overstyr etiketteksten for å legge til en ny blokk i dette området. Eksempel: 'Legg til widget'",
+		areaAllowedBlocksEmpty:
+			'Som standard er alle blokktyper tillatt i et område. Bruk dette alternativet for kun å tillate utvalgte typer.',
+		areaAllowedBlocksHelp:
+			'Definer typene blokker som er tillatt i dette området, og eventuelt hvor mange av hver type som skal være til stede.',
+		areaCreateLabelHelp:
+			"Overstyr etiketteksten for å legge til en ny blokk i dette området. Eksempel: 'Legg til widget'",
 		areaCreateLabelTitle: 'Opprett knappetikett',
 		areaDisallowAllBlocks: 'Tillat kun spesifikke blokktyper',
 		areaIdentification: 'Identifikasjon',
 		areaNumberOfBlocks: 'Antall blokker',
 		areas: 'Områder',
 		areasConfigurations: 'Områder',
-		areasConfigurationsHelp: 'Hvis det skal være mulig å sette nye blokker inni denne blokken, må det oprettes ett eller flere områder for å plassere den nye blokken i.',
+		areasConfigurationsHelp:
+			'Hvis det skal være mulig å sette nye blokker inni denne blokken, må det oprettes ett eller flere områder for å plassere den nye blokken i.',
 		areasLayoutColumns: 'Grid-kolonner for områder',
-		areasLayoutColumnsHelp: 'Definer hvor mange kolonner som skal være tilgjengelige for blokkens områder. Hvis ikke definert, vil antall kolonner definert for hele oppsettet bli brukt.',
+		areasLayoutColumnsHelp:
+			'Definer hvor mange kolonner som skal være tilgjengelige for blokkens områder. Hvis ikke definert, vil antall kolonner definert for hele oppsettet bli brukt.',
 		areaValidation: 'Validering',
 		areaValidationEntriesExceed: '<strong>%0%</strong> må maksimalt være tilstede <strong>%3%</strong> ganger.',
 		areaValidationEntriesShort: '<strong>%0%</strong> må være tilstede minst <strong>%2%</strong> ganger.',
@@ -1207,13 +1219,17 @@ export default {
 		confirmCancelBlockCreationMessage: 'Er du sikker på at du vil avbryte opprettelsen?',
 		confirmDeleteBlockAreaMessage: 'Er du sikker på at du vil slette dette området?',
 		confirmDeleteBlockAreaNotice: 'Alle blokker som for øyeblikket er opprettet i dette området, vil bli slettet.',
-		confirmDeleteBlockGroupMessage: 'Er du sikker på at du vil slette gruppen <strong>%0%</strong> og alle blokk-konfigurasjonene for denne?',
-		confirmDeleteBlockGroupNotice: 'Innholdet i disse blokkene vil fortsatt være tilstede, men redigering av dette innholdet\n      vil ikke lenger være tilgjengelig og vil bli vist som ikke støttet innhold.\n    ',
+		confirmDeleteBlockGroupMessage:
+			'Er du sikker på at du vil slette gruppen <strong>%0%</strong> og alle blokk-konfigurasjonene for denne?',
+		confirmDeleteBlockGroupNotice:
+			'Innholdet i disse blokkene vil fortsatt være tilstede, men redigering av dette innholdet\n      vil ikke lenger være tilgjengelig og vil bli vist som ikke støttet innhold.\n    ',
 		confirmDeleteBlockMessage: 'Er du sikker på at du vil slette innholdet <strong>%0%</strong>?',
 		confirmDeleteBlockTypeMessage: 'Er du sikker på at du vil slette blokk-konfigurasjonen <strong>%0%</strong>?',
-		confirmDeleteBlockTypeNotice: 'Innholdet i denne blokken vil fortsatt være tilstede, men redigering av dette innholdet\n      vil ikke lenger være tilgjengelig og vil bli vist som ikke støttet innhold.\n    ',
+		confirmDeleteBlockTypeNotice:
+			'Innholdet i denne blokken vil fortsatt være tilstede, men redigering av dette innholdet\n      vil ikke lenger være tilgjengelig og vil bli vist som ikke støttet innhold.\n    ',
 		confirmPasteDisallowedNestedBlockHeadline: 'Ikke tillatt innhold ble avvist',
-		confirmPasteDisallowedNestedBlockMessage: 'Det innsatte innholdet inneholdt ikke tillatt innhold, som ikke har blitt opprettet. Vil du beholde resten av dette innholdet likevel?',
+		confirmPasteDisallowedNestedBlockMessage:
+			'Det innsatte innholdet inneholdt ikke tillatt innhold, som ikke har blitt opprettet. Vil du beholde resten av dette innholdet likevel?',
 		defaultLayoutStylesheet: 'Standard oppsett-stilark',
 		deleteArea: 'Slett område',
 		elementTypeDoesNotExist: 'Kan ikke redigeres fordi ElementType ikke eksisterer.',
@@ -1221,12 +1237,15 @@ export default {
 		elementTypeDoesNotExistHeadline: 'Feil!',
 		focusParentBlock: 'Sett fokus på container-blokken',
 		forceHideContentEditor: 'Skjul innholdsredigerer',
-		forceHideContentEditorHelp: 'Skjul innholdsredigeringsknappen og innholdsredigereren fra blokkredigeringsoverlegget',
+		forceHideContentEditorHelp:
+			'Skjul innholdsredigeringsknappen og innholdsredigereren fra blokkredigeringsoverlegget',
 		getSampleButton: 'Installer',
-		getSampleDescription: 'Dette vil legge til grunnleggende blokker og hjelpe deg å komme i gang med Block Grid Editor.<br/> Du får blokker for overskrift, rik tekst, bilde, samt et oppsett for to kolonner.',
+		getSampleDescription:
+			'Dette vil legge til grunnleggende blokker og hjelpe deg å komme i gang med Block Grid Editor.<br/> Du får blokker for overskrift, rik tekst, bilde, samt et oppsett for to kolonner.',
 		getSampleHeadline: 'Installer eksempelkonfigurasjon',
 		gridInlineEditing: 'Inline-redigering',
-		gridInlineEditingHelp: 'Aktiverer inline-redigering for den første egenskapen. Ytterligere egenskaper kan redigeres i overlegget.',
+		gridInlineEditingHelp:
+			'Aktiverer inline-redigering for den første egenskapen. Ytterligere egenskaper kan redigeres i overlegget.',
 		headlineAddCustomStylesheet: 'Velg stilark',
 		headlineAddCustomView: 'Velg visning',
 		headlineAddSettingsElementType: 'Legg til en innstillings-elementtype',
@@ -1244,7 +1263,8 @@ export default {
 		labelcreateNewElementType: 'Opprett ny ElementType',
 		labelCustomStylesheet: 'Tilpasset stilark',
 		labelCustomView: 'Tilpasset visning',
-		labelCustomViewDescription: 'Overskriv hvordan denne blokken vises i backoffice-grensesnittet. Velg en .html-fil\n      som inneholder presentasjonen din.\n    ',
+		labelCustomViewDescription:
+			'Overskriv hvordan denne blokken vises i backoffice-grensesnittet. Velg en .html-fil\n      som inneholder presentasjonen din.\n    ',
 		labelCustomViewInfoTitle: 'Vis beskrivelse av tilpasset visning',
 		labelEditorSize: 'Overlegg-redigerer størrelse',
 		labelIconColor: 'Ikonfarge',
@@ -1265,6 +1285,6 @@ export default {
 		tabBlockTypeSettings: 'Innstillinger',
 		tabClipboard: 'Utklippstavle',
 		tabCreateEmpty: 'Opprett tomt',
-		thumbnail: 'Miniatyrbilde'
+		thumbnail: 'Miniatyrbilde',
 	},
 } as UmbLocalizationDictionary;

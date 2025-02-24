@@ -213,6 +213,7 @@ test('can create a document type with a composition', {tag: '@smoke'}, async ({u
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickButtonWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
@@ -240,6 +241,7 @@ test('can remove a composition from a document type', async ({umbracoApi, umbrac
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickButtonWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
@@ -291,7 +293,6 @@ test.skip('can reorder properties in a document type', async ({umbracoApi, umbra
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickReorderButton();
   // Drag and Drop
-  await umbracoUi.waitForTimeout(5000);
   const dragFromLocator = umbracoUi.documentType.getTextLocatorWithName(dataTypeNameTwo);
   const dragToLocator = umbracoUi.documentType.getTextLocatorWithName(dataTypeName);
   await umbracoUi.documentType.dragAndDrop(dragFromLocator, dragToLocator, 0, 0, 5);

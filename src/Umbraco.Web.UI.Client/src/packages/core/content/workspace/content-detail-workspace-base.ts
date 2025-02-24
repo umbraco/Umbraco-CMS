@@ -24,7 +24,7 @@ import {
 	type UmbEntityVariantModel,
 	type UmbEntityVariantOptionModel,
 } from '@umbraco-cms/backoffice/variant';
-import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
@@ -42,6 +42,7 @@ import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
+	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
@@ -480,7 +481,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		};
 	}
 
-	protected _readOnlyLanguageVariantsFilter = (option: VariantOptionModelType) => {
+	protected _saveableVariantsFilter = (option: VariantOptionModelType) => {
 		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
 		return readOnlyCultures.includes(option.culture) === false;
 	};
@@ -493,8 +494,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @param {DetailModelType} saveData - The data to validate
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
-	protected async _runMandatoryValidationForSaveData(saveData: DetailModelType) {
-		this.runMandatoryValidationForSaveData(saveData);
+	protected async _runMandatoryValidationForSaveData(saveData: DetailModelType, variantIds: Array<UmbVariantId> = []) {
+		new UmbDeprecation({
+			removeInVersion: '17',
+			deprecated: '_runMandatoryValidationForSaveData',
+			solution: 'Use the public runMandatoryValidationForSaveData instead.',
+		}).warn();
+		this.runMandatoryValidationForSaveData(saveData, variantIds);
 	}
 
 	/**
@@ -502,8 +508,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @param {DetailModelType} saveData - The data to validate
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
-	public async runMandatoryValidationForSaveData(saveData: DetailModelType) {
+	public async runMandatoryValidationForSaveData(saveData: DetailModelType, variantIds: Array<UmbVariantId> = []) {
 		// Check that the data is valid before we save it.
+		const missingVariants = variantIds.filter((variant) => {
+			return !saveData.variants.some((y) => variant.compare(y));
+		});
+		if (missingVariants.length > 0) {
+			throw new Error('One or more selected variants have not been created');
+		}
 		// Check variants have a name:
 		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
 		if (variantsWithoutAName.length > 0) {
@@ -592,7 +604,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				.open(this, this.#saveModalToken, {
 					data: {
 						options,
-						pickableFilter: this._readOnlyLanguageVariantsFilter,
+						pickableFilter: this._saveableVariantsFilter,
 					},
 					value: { selection: selected },
 				})
@@ -607,7 +619,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 
 		const saveData = await this.constructSaveData(variantIds);
-		await this.runMandatoryValidationForSaveData(saveData);
+		await this.runMandatoryValidationForSaveData(saveData, variantIds);
 		if (this.#validateOnSubmit) {
 			await this.askServerToValidate(saveData, variantIds);
 			return this.validateAndSubmit(
@@ -709,13 +721,21 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 		this._data.setCurrent(newCurrentData);
 
+		const unique = this.getUnique()!;
+		const entityType = this.getEntityType();
+
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			entityType: this.getEntityType(),
-			unique: this.getUnique()!,
+		const structureEvent = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+		eventContext.dispatchEvent(structureEvent);
+
+		const updatedEvent = new UmbEntityUpdatedEvent({
+			unique,
+			entityType,
+			eventUnique: this._workspaceEventUnique,
 		});
 
-		eventContext.dispatchEvent(event);
+		eventContext.dispatchEvent(updatedEvent);
+
 		this._closeModal();
 	}
 

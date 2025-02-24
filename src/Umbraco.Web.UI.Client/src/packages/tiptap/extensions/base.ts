@@ -6,6 +6,7 @@ import type {
 	UmbTiptapToolbarElementApi,
 } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import type { Editor, Extension, Mark, Node } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
@@ -25,6 +26,13 @@ export abstract class UmbTiptapExtensionApiBase extends UmbControllerBase implem
 	 */
 	setEditor(editor: Editor): void {
 		this._editor = editor;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	getStyles(): CSSResultGroup | null | undefined {
+		return null;
 	}
 
 	/**
@@ -51,6 +59,7 @@ export abstract class UmbTiptapToolbarElementApiBase extends UmbControllerBase i
 	 * @see {ManifestTiptapToolbarExtension}
 	 * @param {Editor} editor The editor instance.
 	 */
+
 	public abstract execute(editor?: Editor): void;
 
 	/**

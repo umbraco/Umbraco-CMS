@@ -33846,6 +33846,67 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/webhook/{id}/logs": {
+      "get": {
+        "tags": [
+          "Webhook"
+        ],
+        "operationId": "GetWebhookByIdLogs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedWebhookLogResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/webhook/events": {
       "get": {
         "tags": [
@@ -33935,21 +33996,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/WebhookResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ProblemDetails"
+                      "$ref": "#/components/schemas/PagedWebhookLogResponseModel"
                     }
                   ]
                 }
@@ -35893,6 +35940,14 @@
           "enabled": {
             "type": "boolean"
           },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
           "url": {
             "minLength": 1,
             "type": "string"
@@ -36462,10 +36517,14 @@
       },
       "DefaultReferenceResponseModel": {
         "required": [
+          "$type",
           "id"
         ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -36483,7 +36542,13 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DefaultReferenceResponseModel": "#/components/schemas/DefaultReferenceResponseModel"
+          }
+        }
       },
       "DeleteUserGroupsRequestModel": {
         "required": [
@@ -37003,11 +37068,15 @@
       },
       "DocumentReferenceResponseModel": {
         "required": [
+          "$type",
           "documentType",
           "id"
         ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -37028,7 +37097,13 @@
             ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentReferenceResponseModel": "#/components/schemas/DocumentReferenceResponseModel"
+          }
+        }
       },
       "DocumentResponseModel": {
         "required": [
@@ -39136,11 +39211,15 @@
       },
       "MediaReferenceResponseModel": {
         "required": [
+          "$type",
           "id",
           "mediaType"
         ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -39157,7 +39236,13 @@
             ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "MediaReferenceResponseModel": "#/components/schemas/MediaReferenceResponseModel"
+          }
+        }
       },
       "MediaResponseModel": {
         "required": [
@@ -42320,6 +42405,30 @@
         },
         "additionalProperties": false
       },
+      "PagedWebhookLogResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/WebhookLogResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedWebhookResponseModel": {
         "required": [
           "items",
@@ -42686,11 +42795,15 @@
       "PublishDocumentWithDescendantsRequestModel": {
         "required": [
           "cultures",
+          "forceRepublish",
           "includeUnpublishedDescendants"
         ],
         "type": "object",
         "properties": {
           "includeUnpublishedDescendants": {
+            "type": "boolean"
+          },
+          "forceRepublish": {
             "type": "boolean"
           },
           "cultures": {
@@ -45377,6 +45490,14 @@
           "enabled": {
             "type": "boolean"
           },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
           "url": {
             "minLength": 1,
             "type": "string"
@@ -46190,6 +46311,70 @@
         },
         "additionalProperties": false
       },
+      "WebhookLogResponseModel": {
+        "required": [
+          "date",
+          "eventAlias",
+          "exceptionOccured",
+          "isSuccessStatusCode",
+          "key",
+          "requestBody",
+          "requestHeaders",
+          "responseBody",
+          "responseHeaders",
+          "retryCount",
+          "statusCode",
+          "url",
+          "webhookKey"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "webhookKey": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "statusCode": {
+            "type": "string"
+          },
+          "isSuccessStatusCode": {
+            "type": "boolean"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "eventAlias": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "retryCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "requestHeaders": {
+            "type": "string"
+          },
+          "requestBody": {
+            "type": "string"
+          },
+          "responseHeaders": {
+            "type": "string"
+          },
+          "responseBody": {
+            "type": "string"
+          },
+          "exceptionOccured": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "WebhookResponseModel": {
         "required": [
           "contentTypeKeys",
@@ -46203,6 +46388,14 @@
         "properties": {
           "enabled": {
             "type": "boolean"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           },
           "url": {
             "minLength": 1,

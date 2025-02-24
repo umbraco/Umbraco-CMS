@@ -65,12 +65,12 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 	}
 
 	// Prevent valid events from bubbling outside the message element
-	#onValid(event: any) {
+	#onValid(event: Event) {
 		event.stopPropagation();
 	}
 
 	// Prevent invalid events from bubbling outside the message element
-	#onInvalid(event: any) {
+	#onInvalid(event: Event) {
 		event.stopPropagation();
 	}
 

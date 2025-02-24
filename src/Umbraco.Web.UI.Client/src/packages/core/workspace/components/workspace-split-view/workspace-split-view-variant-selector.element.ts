@@ -206,6 +206,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	/**
 	 * Focuses the input element after a short delay to ensure it is rendered.
 	 * This works better than the {umbFocus()} directive, which does not work in this context.
+	 * @param element
 	 */
 	#focusInput(element?: Element) {
 		if (!element) return;

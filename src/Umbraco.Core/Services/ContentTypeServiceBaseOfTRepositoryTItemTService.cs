@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -157,7 +158,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         // eg maybe a property has been added, with an alias that's OK (no conflict with ancestors)
         // but that cannot be used (conflict with descendants)
 
-        IContentTypeComposition[] allContentTypes = Repository.GetMany(new int[0]).Cast<IContentTypeComposition>().ToArray();
+        IContentTypeComposition[] allContentTypes = Repository.GetMany(Array.Empty<int>()).Cast<IContentTypeComposition>().ToArray();
 
         IEnumerable<string> compositionAliases = compositionContentType.CompositionAliases();
         IEnumerable<IContentTypeComposition> compositions = allContentTypes.Where(x => compositionAliases.Any(y => x.Alias.Equals(y)));
@@ -928,7 +929,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
         //remove all composition that is not it's current alias
         var compositionAliases = clone.CompositionAliases().Except(new[] { alias }).ToList();
-        foreach (var a in compositionAliases)
+        foreach (var a in CollectionsMarshal.AsSpan(compositionAliases))
         {
             clone.RemoveContentType(a);
         }

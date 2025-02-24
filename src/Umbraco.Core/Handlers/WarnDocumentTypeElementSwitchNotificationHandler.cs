@@ -56,12 +56,11 @@ public class WarnDocumentTypeElementSwitchNotificationHandler :
 
         foreach (IContentType savedDocumentType in notification.SavedEntities)
         {
-            if (stateInformation.ContainsKey(savedDocumentType.Key) is false)
+            if (stateInformation.TryGetValue(savedDocumentType.Key, out DocumentTypeElementSwitchInformation? state) is false)
             {
                 continue;
             }
 
-            DocumentTypeElementSwitchInformation state = stateInformation[savedDocumentType.Key];
             if (state.WasElement == savedDocumentType.IsElement)
             {
                 // no change

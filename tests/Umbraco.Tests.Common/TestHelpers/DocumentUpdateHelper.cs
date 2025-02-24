@@ -28,4 +28,32 @@ public static class DocumentUpdateHelper
 
         return updateRequestModel;
     }
+
+    public static CreateDocumentRequestModel CreateDocumentRequestModel(ContentCreateModel createModel)
+    {
+        var createDocumentRequestModel = new CreateDocumentRequestModel
+        {
+            Template = ReferenceByIdModel.ReferenceOrNull(createModel.TemplateKey),
+            DocumentType = new ReferenceByIdModel(createModel.ContentTypeKey),
+            Parent = ReferenceByIdModel.ReferenceOrNull(createModel.ParentKey),
+        };
+
+        createDocumentRequestModel.Variants =
+        [
+            new DocumentVariantRequestModel
+            {
+                Segment = null,
+                Culture = null,
+                Name = createModel.InvariantName!,
+            }
+        ];
+        createDocumentRequestModel.Values = createModel.InvariantProperties.Select(x => new DocumentValueModel
+        {
+            Alias = x.Alias,
+            Value = x.Value,
+        });
+
+
+        return createDocumentRequestModel;
+    }
 }
