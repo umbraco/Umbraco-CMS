@@ -8,6 +8,7 @@ export const items: Array<
 	DefaultReferenceResponseModel | DocumentReferenceResponseModel | MediaReferenceResponseModel
 > = [
 	{
+		$type: 'DocumentReferenceResponseModel',
 		id: 'simple-document-id',
 		name: 'Simple Document',
 		published: true,
@@ -18,6 +19,7 @@ export const items: Array<
 		},
 	} satisfies DocumentReferenceResponseModel,
 	{
+		$type: 'DocumentReferenceResponseModel',
 		id: '1234',
 		name: 'Image Block',
 		published: true,
@@ -28,6 +30,7 @@ export const items: Array<
 		},
 	} satisfies DocumentReferenceResponseModel,
 	{
+		$type: 'MediaReferenceResponseModel',
 		id: 'media-id',
 		name: 'Simple Media',
 		mediaType: {
@@ -37,6 +40,7 @@ export const items: Array<
 		},
 	} satisfies MediaReferenceResponseModel,
 	{
+		$type: 'DefaultReferenceResponseModel',
 		id: 'default-id',
 		name: 'Some other reference',
 		type: 'Default',

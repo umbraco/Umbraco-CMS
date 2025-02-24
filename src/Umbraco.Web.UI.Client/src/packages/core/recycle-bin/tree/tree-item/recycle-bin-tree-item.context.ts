@@ -4,6 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityTrashedEvent } from '@umbraco-cms/backoffice/recycle-bin';
+import { debounce } from '@umbraco-cms/backoffice/utils';
 
 export class UmbRecycleBinTreeItemContext<
 	RecycleBinTreeItemModelType extends UmbTreeItemModel,
@@ -25,6 +26,8 @@ export class UmbRecycleBinTreeItemContext<
 		});
 	}
 
+	#debounceLoadChildren = debounce(() => this.loadChildren(), 100);
+
 	#onEntityTrashed = (event: UmbEntityTrashedEvent) => {
 		const entityType = event.getEntityType();
 		if (!entityType) throw new Error('Entity type is required');
@@ -32,11 +35,11 @@ export class UmbRecycleBinTreeItemContext<
 		const supportedEntityTypes = this.getManifest()?.meta.supportedEntityTypes;
 
 		if (!supportedEntityTypes) {
-			throw new Error('Entity types are missing from the manifest.');
+			throw new Error('Entity types are missing from the manifest (manifest.meta.supportedEntityTypes).');
 		}
 
 		if (supportedEntityTypes.includes(entityType)) {
-			this.loadChildren();
+			this.#debounceLoadChildren();
 		}
 	};
 

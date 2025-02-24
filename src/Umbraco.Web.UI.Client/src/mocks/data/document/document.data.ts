@@ -914,6 +914,24 @@ export const data: Array<UmbMockDocumentModel> = [
 						<p>
 							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
 						</p>
+						<table style="width: 100%;">
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>Alias</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Lee</td>
+									<td>lke</td>
+								</tr>
+								<tr>
+									<td>Jacob</td>
+									<td>jov</td>
+								</tr>
+							</tbody>
+						</table>
 						<p>
 							<img width="384" height="228" loading="lazy" alt="Installer illustration" src="/umbraco/backoffice/assets/installer-illustration.svg" />
 						</p>

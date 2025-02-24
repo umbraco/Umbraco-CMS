@@ -7,6 +7,7 @@ export * from './entity-action-list.element.js';
 export * from './entity-action.event.js';
 export * from './has-children/index.js';
 export * from './entity-updated.event.js';
+export * from './entity-deleted.event.js';
 
 export type * from './types.js';
 

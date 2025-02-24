@@ -6,7 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-import '../toolbar/tiptap-toolbar-dropdown-base.element.js';
+import '../cascading-menu-popover/cascading-menu-popover.element.js';
 
 @customElement('umb-tiptap-toolbar')
 export class UmbTiptapToolbarElement extends UmbLitElement {
@@ -53,6 +53,9 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			(extensionControllers) => {
 				this._lookup = new Map(extensionControllers.map((ext) => [ext.alias, ext.component]));
 			},
+			undefined,
+			undefined,
+			() => import('../toolbar/default-tiptap-toolbar-element.api.js'),
 		);
 
 		this.#extensionsController.apiProperties = { configuration: this.configuration };

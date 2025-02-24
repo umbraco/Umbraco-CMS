@@ -40,7 +40,6 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 	#itemsManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
 		this,
 		UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-		(x) => x.unique,
 	);
 
 	constructor() {
@@ -124,6 +123,9 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 	}
 
 	override render() {
+		if (this._blockTypesWithElementName.length === 0) {
+			return nothing;
+		}
 		return html`<div id="permissions">
 				${repeat(
 					this._value,

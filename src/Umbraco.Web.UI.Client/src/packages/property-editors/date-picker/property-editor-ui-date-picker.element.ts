@@ -147,6 +147,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 	override render() {
 		return html`
 			<umb-input-date
+				label=${this.localize.term('placeholders_enterdate')}
 				.value=${this._inputValue}
 				.min=${this._min}
 				.max=${this._max}
