@@ -38,11 +38,7 @@ export class UmbTiptapToolbarFontFamilyToolbarElement extends UmbTiptapToolbarBu
 		const menuItem = document.createElement('uui-menu-item');
 		menuItem.addEventListener('click', () => {
 			//this.editor?.chain().focus().setMark('textStyle', { fontFamily }).run();
-			this.editor
-				?.chain()
-				.focus()
-				.setMark('textStyle', { style: `font-family: ${fontFamily};` })
-				.run();
+			this.editor?.chain().focus().setSpanStyle(`font-family: ${fontFamily};`).run();
 		});
 
 		const element = document.createElement('span');

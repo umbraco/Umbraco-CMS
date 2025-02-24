@@ -469,7 +469,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		element: () => import('./toolbar/font-family-tiptap-toolbar.element.js'),
 		meta: {
 			alias: 'umbFontFamily',
-			icon: 'icon-palette',
+			icon: 'icon-ruler-alt',
 			label: 'Font family',
 		},
 	},
@@ -480,7 +480,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		element: () => import('./toolbar/font-size-tiptap-toolbar.element.js'),
 		meta: {
 			alias: 'umbFontSize',
-			icon: 'icon-palette',
+			icon: 'icon-ruler',
 			label: 'Font size',
 		},
 	},

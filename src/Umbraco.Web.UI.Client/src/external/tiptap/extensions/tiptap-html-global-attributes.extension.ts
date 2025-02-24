@@ -45,14 +45,9 @@ export const HtmlGlobalAttributes = Extension.create<HtmlGlobalAttributesOptions
 						},
 					},
 					id: {},
-					style: {},
-					// style: {
-					// 	parseHTML: (element) => (element.style?.length ? element.style : null),
-					// 	renderHTML: (attributes) => {
-					// 		if (!attributes.style?.length) return null;
-					// 		return { style: attributes.style.cssText };
-					// 	},
-					// },
+					style: {
+						parseHTML: (element) => (element.style.length ? element.style.cssText : null),
+					},
 				} as Attributes,
 			},
 		];
