@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
-/// Represents an integer property and parameter editor.
+///  Represents a decimal property editor.
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.Integer,

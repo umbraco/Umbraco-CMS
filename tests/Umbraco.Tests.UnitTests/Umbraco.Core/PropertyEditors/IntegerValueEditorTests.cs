@@ -173,7 +173,7 @@ public class IntegerValueEditorTests
                 It.IsAny<CultureInfo>(),
                 It.IsAny<IDictionary<string, string>>()))
             .Returns((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => $"{key}_{alias}");
-        var valueEditor = new IntegerPropertyEditor.IntegerPropertyValueEditor(
+        return new IntegerPropertyEditor.IntegerPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
@@ -187,6 +187,5 @@ public class IntegerValueEditorTests
                 { "step", 2 }
             }
         };
-        return valueEditor;
     }
 }

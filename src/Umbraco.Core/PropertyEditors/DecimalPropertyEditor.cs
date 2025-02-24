@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
-///     Represents a decimal property and parameter editor.
+///  Represents a decimal property editor.
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.Decimal,
@@ -96,7 +96,7 @@ public class DecimalPropertyEditor : DataEditor
         }
 
         /// <summary>
-        /// Validates the min/max configuration for the integer property editor.
+        /// Validates the min/max configuration for the decimal property editor.
         /// </summary>
         internal class MinMaxValidator : DecimalPropertyConfigurationValidatorBase, IValueValidator
         {
@@ -133,7 +133,7 @@ public class DecimalPropertyEditor : DataEditor
         }
 
         /// <summary>
-        /// Validates the step configuration for the integer property editor.
+        /// Validates the step configuration for the decimal property editor.
         /// </summary>
         internal class StepValidator : DecimalPropertyConfigurationValidatorBase, IValueValidator
         {

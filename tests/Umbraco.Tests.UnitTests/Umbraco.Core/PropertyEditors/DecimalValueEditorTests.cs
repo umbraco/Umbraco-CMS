@@ -173,7 +173,7 @@ public class DecimalValueEditorTests
                 It.IsAny<CultureInfo>(),
                 It.IsAny<IDictionary<string, string>>()))
             .Returns((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => $"{key}_{alias}");
-        var valueEditor = new DecimalPropertyEditor.DecimalPropertyValueEditor(
+        return new DecimalPropertyEditor.DecimalPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
@@ -187,6 +187,5 @@ public class DecimalValueEditorTests
                 { "step", 0.2 }
             }
         };
-        return valueEditor;
     }
 }
