@@ -1,7 +1,11 @@
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
 import type { UmbElementDetailModel } from '../types.js';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbVariantObjectCompare } from '@umbraco-cms/backoffice/variant';
 import { UmbEntityWorkspaceDataManager, type UmbWorkspaceDataManager } from '@umbraco-cms/backoffice/workspace';
+
+function valueObjectCompare(a: any, b: any) {
+	return a.alias === b.alias && umbVariantObjectCompare(a, b);
+}
 
 export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailModel>
 	extends UmbEntityWorkspaceDataManager<ModelType>
@@ -22,7 +26,10 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 			return {
 				...currentData,
 				values: [...currentData.values].sort(function (a, b) {
-					return persistedValues.indexOf(a) - persistedValues.indexOf(b);
+					return (
+						persistedValues.findIndex((x) => valueObjectCompare(x, a)) -
+						persistedValues.findIndex((x) => valueObjectCompare(x, b))
+					);
 				}),
 			};
 		}
