@@ -19,6 +19,27 @@ export class UmbContentWorkspaceDataManager<
 		this.#variantScaffold = variantScaffold;
 	}
 
+	override setCurrent(data: ModelType | undefined): void {
+		if (data) {
+			const persistedData = this.getPersisted();
+			if (persistedData) {
+				// Sort the values in the same order as the persisted data:
+				const persistedValues = persistedData.values;
+				data.values.sort(function (a, b) {
+					return persistedValues.indexOf(a) - persistedValues.indexOf(b);
+				});
+
+				// Sort the variants in the same order as the persisted data:
+				const persistedVariants = persistedData.variants;
+				data.variants.sort(function (a, b) {
+					return persistedVariants.indexOf(a) - persistedVariants.indexOf(b);
+				});
+			}
+		}
+
+		super.setCurrent(data);
+	}
+
 	/**
 	 * Sets the variant scaffold data
 	 * @param {ModelVariantType} variantScaffold The variant scaffold data
