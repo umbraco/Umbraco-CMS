@@ -7,8 +7,7 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-
-export type UmbSliderValue = { from: number; to: number } | undefined;
+import type { UmbPropertyEditorUISliderValue } from './types.js';
 
 /**
  * @element umb-property-editor-ui-slider
@@ -16,7 +15,7 @@ export type UmbSliderValue = { from: number; to: number } | undefined;
 @customElement('umb-property-editor-ui-slider')
 export class UmbPropertyEditorUISliderElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Object })
-	value: UmbSliderValue | undefined;
+	value: UmbPropertyEditorUISliderValue | undefined;
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
