@@ -730,13 +730,20 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			throw new Error('Error creating content');
 		}
 
-		this._data.setPersisted(data);
-
-		let currentData = this._data.getCurrent();
-
 		const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
 
-		// Retrieve a data set which only contains updates from the selected variants + invariant. [NL]
+		// Only update the variants that was chosen to be saved:
+		const persistedData = this._data.getCurrent();
+		const newPersistedData = await new UmbMergeContentVariantDataController(this).process(
+			persistedData,
+			data,
+			variantIds,
+			variantIdsIncludingInvariant,
+		);
+		this._data.setPersisted(newPersistedData);
+
+		// Only update the variants that was chosen to be saved:
+		let currentData = this._data.getCurrent();
 		const newCurrentData = await new UmbMergeContentVariantDataController(this).process(
 			currentData,
 			data,
@@ -764,12 +771,20 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			throw new Error('Error saving content');
 		}
 
-		this._data.setPersisted(data);
-		// TODO: Only update the variants that was chosen to be saved:
-		const currentData = this._data.getCurrent();
-
 		const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
 
+		// Only update the variants that was chosen to be saved:
+		const persistedData = this._data.getCurrent();
+		const newPersistedData = await new UmbMergeContentVariantDataController(this).process(
+			persistedData,
+			data,
+			variantIds,
+			variantIdsIncludingInvariant,
+		);
+		this._data.setPersisted(newPersistedData);
+
+		// Only update the variants that was chosen to be saved:
+		const currentData = this._data.getCurrent();
 		const newCurrentData = await new UmbMergeContentVariantDataController(this).process(
 			currentData,
 			data,
