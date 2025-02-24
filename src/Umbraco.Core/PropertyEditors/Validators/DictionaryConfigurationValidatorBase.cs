@@ -1,15 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 
 /// <summary>
 /// Provides common functionality to validators that rely on data type configuration.
 /// </summary>
-public abstract class ConfigurationValidatorBase
+public abstract class DictionaryConfigurationValidatorBase
 {
     /// <summary>
-    /// Retrieves a typed value from data type configuration for the provided key.
+    /// Retrieves a typed value from data type dictionary configuration for the provided key.
     /// </summary>
     /// <param name="dataTypeConfiguration">The data type configuration.</param>
     /// <param name="key">The configuration key.</param>
@@ -25,7 +23,7 @@ public abstract class ConfigurationValidatorBase
 
         if (configuration.TryGetValue(key, out object? obj) && obj is TValue castValue)
         {
-            value = castValue
+            value = castValue;
             return true;
         }
 

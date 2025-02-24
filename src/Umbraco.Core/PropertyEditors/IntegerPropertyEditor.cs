@@ -11,7 +11,7 @@ using Umbraco.Cms.Core.Strings;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
-///     Represents an integer property and parameter editor.
+/// Represents an integer property and parameter editor.
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.Integer,
@@ -19,6 +19,9 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueEditorIsReusable = true)]
 public class IntegerPropertyEditor : DataEditor
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IntegerPropertyEditor"/> class.
+    /// </summary>
     public IntegerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
         => SupportsReadOnly = true;
@@ -30,8 +33,18 @@ public class IntegerPropertyEditor : DataEditor
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() => new IntegerConfigurationEditor();
 
+    /// <summary>
+    /// Defines the value editor for the integer property editor.
+    /// </summary>
     internal class IntegerPropertyValueEditor : DataValueEditor
     {
+        private const string ConfigurationKeyMinValue = "min";
+        private const string ConfigurationKeyMaxValue = "max";
+        private const string ConfigurationKeyStepValue = "step";
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IntegerPropertyValueEditor"/> class.
+        /// </summary>
         public IntegerPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
@@ -40,9 +53,11 @@ public class IntegerPropertyEditor : DataEditor
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
             => Validators.AddRange([new IntegerValidator(), new MinMaxValidator(), new StepValidator()]);
 
+        /// <inheritdoc/>
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
             => TryParsePropertyValue(property.GetValue(culture, segment));
 
+        /// <inheritdoc/>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             => TryParsePropertyValue(editorValue.Value);
 
@@ -53,14 +68,22 @@ public class IntegerPropertyEditor : DataEditor
                     ? parsedIntegerValue
                     : null;
 
-        internal abstract class IntegerPropertyConfigurationValidatorBase : ConfigurationValidatorBase
+        /// <summary>
+        /// Base validator for configuration specific integer property editor validation.
+        /// </summary>
+        internal abstract class IntegerPropertyConfigurationValidatorBase : SimplePropertyConfigurationValidatorBase<int>
         {
-            protected static bool TryParsePropertyValue(object? value, out int parsedIntegerValue)
+            /// <inheritdoc/>
+            protected override bool TryParsePropertyValue(object? value, out int parsedIntegerValue)
                 => int.TryParse(value?.ToString(), CultureInfo.InvariantCulture, out parsedIntegerValue);
         }
 
+        /// <summary>
+        /// Validates the min/max configuration for the integer property editor.
+        /// </summary>
         internal class MinMaxValidator : IntegerPropertyConfigurationValidatorBase, IValueValidator
         {
+            /// <inheritdoc/>
             public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
             {
                 if (TryParsePropertyValue(value, out var parsedIntegerValue) is false)
@@ -68,20 +91,24 @@ public class IntegerPropertyEditor : DataEditor
                     yield break;
                 }
 
-                if (TryGetConfiguredValue(dataTypeConfiguration, "min", out int min) && parsedIntegerValue < min)
+                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMinValue, out int min) && parsedIntegerValue < min)
                 {
                     yield return new ValidationResult($"The value {value} is less than the allowed minimum value of {min}", ["value"]);
                 }
 
-                if (TryGetConfiguredValue(dataTypeConfiguration, "max", out int max) && parsedIntegerValue > max)
+                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMaxValue, out int max) && parsedIntegerValue > max)
                 {
                     yield return new ValidationResult($"The value {value} is greater than the allowed maximum value of {max}", ["value"]);
                 }
             }
         }
 
+        /// <summary>
+        /// Validates the step configuration for the integer property editor.
+        /// </summary>
         internal class StepValidator : IntegerPropertyConfigurationValidatorBase, IValueValidator
         {
+            /// <inheritdoc/>
             public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
             {
                 if (TryParsePropertyValue(value, out var parsedIntegerValue) is false)
@@ -94,8 +121,8 @@ public class IntegerPropertyEditor : DataEditor
                     yield break;
                 }
 
-                if (TryGetConfiguredValue(configuration, "min", out int min) &&
-                    TryGetConfiguredValue(configuration, "step", out int step) &&
+                if (TryGetConfiguredValue(configuration, ConfigurationKeyMinValue, out int min) &&
+                    TryGetConfiguredValue(configuration, ConfigurationKeyStepValue, out int step) &&
                     IsValidForStep(parsedIntegerValue, min, step) is false)
                 {
                     yield return new ValidationResult($"The value {value} does not correspond with the configured step value of {step}", ["value"]);
