@@ -9,8 +9,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./media-reference.repository.js'),
 	},
 	{
-		type: 'dataMapping',
-		alias: 'Umb.DataMapping.ManagementApi.MediaReferenceResponse',
+		type: 'dataSourceDataMapping',
+		alias: 'Umb.DataSourceDataMapping.ManagementApi.MediaReferenceResponse',
 		name: 'Media Reference Response Management Api Data Mapping',
 		api: () => import('./media-reference-response.management-api.mapping.js'),
 		forDataSource: UMB_MANAGEMENT_API_DATA_SOURCE_ALIAS,
