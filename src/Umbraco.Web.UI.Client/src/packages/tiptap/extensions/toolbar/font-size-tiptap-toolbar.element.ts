@@ -12,12 +12,7 @@ export class UmbTiptapToolbarFontSizeToolbarElement extends UmbTiptapToolbarButt
 		unique: `font-size-${fontSize}`,
 		label: fontSize,
 		// execute: () => this.editor?.chain().focus().setMark('textStyle', { fontSize }).run(),
-		execute: () =>
-			this.editor
-				?.chain()
-				.focus()
-				.setMark('textStyle', { style: `font-size: ${fontSize};` })
-				.run(),
+		execute: () => this.editor?.chain().focus().setSpanStyle(`font-size: ${fontSize};`).run(),
 	}));
 
 	override render() {
