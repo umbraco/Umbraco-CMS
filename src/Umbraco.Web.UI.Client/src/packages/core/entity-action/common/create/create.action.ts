@@ -18,13 +18,17 @@ import type {
 
 export class UmbCreateEntityAction extends UmbEntityActionBase<MetaEntityActionCreateKind> {
 	#hasSingleOption = true;
-	#promise?: Promise<void>;
+	#optionsInit?: Promise<void>;
 	#singleOptionApi?: UmbEntityCreateOptionAction;
 
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<MetaEntityActionCreateKind>) {
 		super(host, args);
 
-		this.#promise = new Promise((resolve) => {
+		/* This is wrapped in a promise to confirm whether only one option exists and to ensure 
+		that the API for this option has been created. We both need to wait for any options to 
+		be returned from the registry and for the API to be created. This is a custom promise implementation, 
+		because using .asPromise() on the initializer does not wait for the async API creation in the callback.*/
+		this.#optionsInit = new Promise((resolve) => {
 			new UmbExtensionsManifestInitializer(
 				this,
 				umbExtensionsRegistry,
@@ -45,13 +49,13 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<MetaEntityActionC
 	}
 
 	override async getHref() {
-		await this.#promise;
+		await this.#optionsInit;
 		const href = await this.#singleOptionApi?.getHref();
 		return this.#hasSingleOption && href ? href : undefined;
 	}
 
 	override async execute() {
-		await this.#promise;
+		await this.#optionsInit;
 		if (this.#hasSingleOption) {
 			await this.#singleOptionApi?.execute();
 			return;
