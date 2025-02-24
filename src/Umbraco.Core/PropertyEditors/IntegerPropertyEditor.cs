@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -68,7 +69,7 @@ public class IntegerPropertyEditor : DataEditor
                     : null;
 
         /// <summary>
-        /// Base validator for configuration specific integer property editor validation.
+        /// /// Base validator for the integer property editor validation against data type configured values.
         /// </summary>
         internal abstract class IntegerPropertyConfigurationValidatorBase : SimplePropertyConfigurationValidatorBase<int>
         {
@@ -162,22 +163,12 @@ public class IntegerPropertyEditor : DataEditor
 
                 if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMinValue, out int min) &&
                     TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out int step) &&
-                    IsValidForStep(parsedIntegerValue, min, step) is false)
+                    ValidationHelper.IsValueValidForStep(parsedIntegerValue, min, step) is false)
                 {
                     yield return new ValidationResult(
                         LocalizedTextService.Localize("validation", "invalidStep", [parsedIntegerValue.ToString(), step.ToString(), min.ToString()]),
                         ["value"]);
                 }
-            }
-
-            private static bool IsValidForStep(int value, int min, int step)
-            {
-                if (value < min)
-                {
-                    return true; // Outside of the range, so we expect another validator will have picked this up.
-                }
-
-                return (value - min) % step == 0;
             }
         }
     }

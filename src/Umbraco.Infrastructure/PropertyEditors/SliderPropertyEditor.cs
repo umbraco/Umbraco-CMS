@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -97,7 +98,7 @@ public class SliderPropertyEditor : DataEditor
                 : null;
 
         /// <summary>
-        /// Represents a slide value.
+        /// Represents a slider value.
         /// </summary>
         internal class SliderRange
         {
@@ -119,7 +120,7 @@ public class SliderPropertyEditor : DataEditor
         }
 
         /// <summary>
-        /// Base validator for configuration specific integer property editor validation.
+        /// Base validator for the slider property editor validation against data type configured values.
         /// </summary>
         internal abstract class SliderPropertyConfigurationValidatorBase
         {
@@ -295,23 +296,13 @@ public class SliderPropertyEditor : DataEditor
                     yield break;
                 }
 
-                if (IsValidForStep(sliderRange.From, sliderConfiguration.MinimumValue, sliderConfiguration.Step) is false ||
-                    IsValidForStep(sliderRange.To, sliderConfiguration.MinimumValue, sliderConfiguration.Step) is false)
+                if (ValidationHelper.IsValueValidForStep(sliderRange.From, sliderConfiguration.MinimumValue, sliderConfiguration.Step) is false ||
+                    ValidationHelper.IsValueValidForStep(sliderRange.To, sliderConfiguration.MinimumValue, sliderConfiguration.Step) is false)
                 {
                     yield return new ValidationResult(
                         LocalizedTextService.Localize("validation", "invalidStep", [sliderRange.ToString(), sliderConfiguration.Step.ToString(), sliderConfiguration.MinimumValue.ToString()]),
                         ["value"]);
                 }
-            }
-
-            private static bool IsValidForStep(decimal value, decimal min, decimal step)
-            {
-                if (value < min)
-                {
-                    return true; // Outside of the range, so we expect another validator will have picked this up.
-                }
-
-                return (value - min) % step == 0;
             }
         }
     }

@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -36,8 +37,15 @@ public class DecimalPropertyEditor : DataEditor
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() => new DecimalConfigurationEditor();
 
+
+    /// <summary>
+    /// Defines the value editor for the decimal property editor.
+    /// </summary>
     internal class DecimalPropertyValueEditor : DataValueEditor
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DecimalPropertyValueEditor"/> class.
+        /// </summary>
         public DecimalPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
@@ -47,9 +55,11 @@ public class DecimalPropertyEditor : DataEditor
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
             => Validators.AddRange([new DecimalValidator(), new MinMaxValidator(localizedTextService), new StepValidator(localizedTextService)]);
 
+        /// <inheritdoc/>
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
             => TryParsePropertyValue(property.GetValue(culture, segment));
 
+        /// <inheritdoc/>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             => TryParsePropertyValue(editorValue.Value);
 
@@ -61,7 +71,7 @@ public class DecimalPropertyEditor : DataEditor
                     : null;
 
         /// <summary>
-        /// Base validator for configuration specific integer property editor validation.
+        /// Base validator for the decimal property editor validation against data type configured values.
         /// </summary>
         internal abstract class DecimalPropertyConfigurationValidatorBase : SimplePropertyConfigurationValidatorBase<double>
         {
@@ -155,22 +165,12 @@ public class DecimalPropertyEditor : DataEditor
 
                 if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMinValue, out double min) &&
                     TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out double step) &&
-                    IsValidForStep(parsedDecimalValue, min, step) is false)
+                    ValidationHelper.IsValueValidForStep((decimal)parsedDecimalValue, (decimal)min, (decimal)step) is false)
                 {
                     yield return new ValidationResult(
                         LocalizedTextService.Localize("validation", "invalidStep", [parsedDecimalValue.ToString(), step.ToString(), min.ToString()]),
                         ["value"]);
                 }
-            }
-
-            private static bool IsValidForStep(double value, double min, double step)
-            {
-                if (value < min)
-                {
-                    return true; // Outside of the range, so we expect another validator will have picked this up.
-                }
-
-                return (decimal)(value - min) % (decimal)step == 0;
             }
         }
     }
