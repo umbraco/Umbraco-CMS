@@ -157,6 +157,7 @@ export class UmbContentTypeStructureManager<
 
 		// Add the new content type to the list of content types, this holds our draft state of this scaffold.
 		this.#contentTypes.appendOne(data);
+		this.#initResolver?.();
 		return { data };
 	}
 
