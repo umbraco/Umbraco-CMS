@@ -2,7 +2,6 @@ using System.Data;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -322,9 +321,15 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             throw new ArgumentNullException(nameof(userId));
         }
 
-        IMember? user = Guid.TryParse(userId, out Guid key)
-            ? _memberService.GetByKey(key)
-            : _memberService.GetById(ResolveEntityIdFromIdentityId(userId).GetAwaiter().GetResult());
+        IMember? user = null;
+        if (Guid.TryParse(userId, out Guid key))
+        {
+            user = _memberService.GetByKey(key);
+        }
+        else if (TryResolveEntityIdFromIdentityId(userId, out int id))
+        {
+            user = _memberService.GetById(id);
+        }
 
         if (user == null)
         {
@@ -334,11 +339,11 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         return Task.FromResult(AssignLoginsCallback(_mapper.Map<MemberIdentityUser>(user)))!;
     }
 
-    protected override Task<int> ResolveEntityIdFromIdentityId(string? identityId)
+    private bool TryResolveEntityIdFromIdentityId(string? identityId, out int entityId)
     {
-        if (TryConvertIdentityIdToInt(identityId, out var id))
+        if (TryConvertIdentityIdToInt(identityId, out entityId))
         {
-            return Task.FromResult(id);
+            return true;
         }
 
         if (Guid.TryParse(identityId, out Guid key))
@@ -346,8 +351,19 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             IMember? member = _memberService.GetByKey(key);
             if (member is not null)
             {
-                return Task.FromResult(member.Id);
+                entityId = member.Id;
+                return true;
             }
+        }
+
+        return false;
+    }
+
+    protected override Task<int> ResolveEntityIdFromIdentityId(string? identityId)
+    {
+        if (TryResolveEntityIdFromIdentityId(identityId, out var entityId))
+        {
+            return Task.FromResult(entityId);
         }
 
         throw new InvalidOperationException($"Unable to resolve user with ID {identityId}");
