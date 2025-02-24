@@ -148,7 +148,7 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 
 					// If we don't have a value set from the outside or an internal value, we don't want to set the value.
 					// This is added to prevent the block list from setting an empty value on startup.
-					if (!this._latestMarkup && !this._value?.markup) {
+					if (this._value?.markup === undefined) {
 						return;
 					}
 
