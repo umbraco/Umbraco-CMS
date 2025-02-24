@@ -37,18 +37,40 @@ export class UmbGridBlockToBlockGridClipboardPastePropertyValueTranslator
 	 * Checks if the clipboard entry value is compatible with the config.
 	 * @param {UmbGridBlockClipboardEntryValueModel} value - The grid block clipboard entry value.
 	 * @param {*} config - The Property Editor config.
+	 * @param {() => Promise<boolean>} filter - The filter function.
 	 * @returns {Promise<boolean>} {Promise<boolean>}
 	 * @memberof UmbGridBlockToBlockGridClipboardPastePropertyValueTranslator
 	 */
 	async isCompatibleValue(
 		value: UmbGridBlockClipboardEntryValueModel,
 		// TODO: Replace any with the correct type.
-		config: Array<{ alias: string; value: [{ contentElementTypeKey: string }] }>,
+		config: Array<{ alias: string; value: [{ allowAtRoot: boolean; contentElementTypeKey: string }] }>,
+		filter?: () => Promise<boolean>,
 	): Promise<boolean> {
-		const allowedBlockContentTypes =
-			config.find((c) => c.alias === 'blocks')?.value.map((b) => b.contentElementTypeKey) ?? [];
+		const blocksConfig = config.find((c) => c.alias === 'blocks');
+		const allowedBlockContentTypes = blocksConfig?.value.map((b) => b.contentElementTypeKey) ?? [];
 		const blockContentTypes = value.contentData.map((c) => c.contentTypeKey);
-		return blockContentTypes?.every((b) => allowedBlockContentTypes.includes(b)) ?? false;
+		const allContentTypesAllowed = blockContentTypes?.every((b) => allowedBlockContentTypes.includes(b)) ?? false;
+
+		console.log(blocksConfig);
+		console.log(blockContentTypes);
+
+		const allowedRootContentTypeKeys =
+			blocksConfig?.value
+				.map((blockConfig) => {
+					if (blockConfig.allowAtRoot) {
+						return blockConfig.contentElementTypeKey;
+					} else {
+						return null;
+					}
+				})
+				.filter((contentTypeKey) => contentTypeKey !== null) ?? [];
+
+		const allAllowedAtRoot = value.contentData.every((block) =>
+			allowedRootContentTypeKeys.includes(block.contentTypeKey),
+		);
+
+		return allContentTypesAllowed && allAllowedAtRoot;
 	}
 }
 
