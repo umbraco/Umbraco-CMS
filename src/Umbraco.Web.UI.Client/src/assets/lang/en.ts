@@ -9,6 +9,7 @@
  * Language Culture: en-GB
  */
 import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localization-api';
+
 export default {
 	actions: {
 		assigndomain: 'Culture and Hostnames',
@@ -2724,12 +2725,17 @@ export default {
 	},
 	rte: {
 		config_blocks: 'Available Blocks',
+		config_blocks_description: 'Define the available blocks.',
 		config_ignoreUserStartNodes: 'Ignore User Start Nodes',
 		config_maxImageSize: 'Maximum size for inserted images',
+		config_maxImageSize_description: 'Maximum width or height - enter 0 to disable resizing.',
 		config_mediaParentId: 'Image Upload Folder',
+		config_mediaParentId_description: 'Choose the upload location of pasted images.',
 		config_overlaySize: 'Overlay size',
+		config_overlaySize_description: 'Select the width of the overlay (link picker).',
 	},
 	tiptap: {
+		config_dimensions_description: 'Set the maximum width and height of the editor. This excludes the toolbar height.',
 		config_extensions: 'Capabilities',
 		config_toolbar: 'Toolbar',
 		extGroup_formatting: 'Text formatting',

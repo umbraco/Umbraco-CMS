@@ -11,14 +11,14 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'blocks',
 					label: '#rte_config_blocks',
-					description: 'Define the available blocks.',
+					description: '{#rte_config_blocks_description}',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockRteTypeConfiguration',
 					weight: 80,
 				},
 				{
 					alias: 'mediaParentId',
 					label: '#rte_config_mediaParentId',
-					description: 'Choose the upload location of pasted images',
+					description: '{#rte_config_mediaParentId_description}',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaEntityPicker',
 					config: [{ alias: 'validationLimit', value: { min: 0, max: 1 } }],
 					weight: 90,
