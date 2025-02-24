@@ -34,7 +34,7 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 	public set value(value: UmbPropertyEditorUiValueType | undefined) {
 		if (!value) {
 			this._value = undefined;
-			this._markup = this._latestMarkup = '';
+			this._markup = '';
 			this.#managerContext.setLayouts([]);
 			this.#managerContext.setContents([]);
 			this.#managerContext.setSettings([]);
@@ -52,7 +52,7 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 		this._value = buildUpValue as UmbPropertyEditorUiValueType;
 
 		// Only update the actual editor markup if it is not the same as the value.
-		if (this._latestMarkup !== this._value.markup) {
+		if (this._markup !== this._value.markup) {
 			this._markup = this._value.markup;
 		}
 
@@ -83,11 +83,6 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 	 */
 	@state()
 	protected _markup = '';
-
-	/**
-	 * The latest value gotten from the RTE editor.
-	 */
-	protected _latestMarkup = '';
 
 	readonly #managerContext = new UmbBlockRteManagerContext(this);
 	readonly #entriesContext = new UmbBlockRteEntriesContext(this);
@@ -141,7 +136,7 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 						this._value = undefined;
 					} else {
 						this._value = {
-							markup: this._latestMarkup,
+							markup: this._markup,
 							blocks: {
 								layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
 								contentData: contents,
