@@ -19,15 +19,22 @@ export class UmbContentWorkspaceDataManager<
 		this.#variantScaffold = variantScaffold;
 	}
 
-	protected override _sortCurrentData(persistedData: Partial<ModelType>, currentData: Partial<ModelType>) {
-		super._sortCurrentData(persistedData, currentData);
+	protected override _sortCurrentData<GivenType extends Partial<ModelType> = Partial<ModelType>>(
+		persistedData: Partial<ModelType>,
+		currentData: GivenType,
+	): GivenType {
+		currentData = super._sortCurrentData(persistedData, currentData);
 		// Sort the variants in the same order as the persisted data:
 		const persistedVariants = persistedData.variants;
-		if (persistedVariants) {
-			currentData.variants?.sort(function (a, b) {
-				return persistedVariants.indexOf(a) - persistedVariants.indexOf(b);
-			});
+		if (persistedVariants && currentData.variants) {
+			return {
+				...currentData,
+				variants: [...currentData.variants].sort(function (a, b) {
+					return persistedVariants.indexOf(a) - persistedVariants.indexOf(b);
+				}),
+			};
 		}
+		return currentData;
 	}
 
 	/**

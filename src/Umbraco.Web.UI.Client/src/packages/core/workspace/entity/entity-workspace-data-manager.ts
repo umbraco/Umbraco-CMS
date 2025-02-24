@@ -28,8 +28,12 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 */
 	public readonly current = this._current.asObservable();
 
-	protected _sortCurrentData(persistedData: Partial<ModelType>, currentData: Partial<ModelType>) {
+	protected _sortCurrentData<GivenType extends Partial<ModelType> = Partial<ModelType>>(
+		persistedData: Partial<ModelType>,
+		currentData: GivenType,
+	): GivenType {
 		// do nothing.
+		return currentData;
 	}
 
 	/**
@@ -88,7 +92,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 		if (data) {
 			const persistedData = this._persisted.getValue();
 			if (persistedData) {
-				this._sortCurrentData(persistedData, data);
+				data = this._sortCurrentData(persistedData, data);
 			}
 		}
 		this._current.setValue(data);
@@ -103,7 +107,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 		if (partialData) {
 			const persistedData = this._persisted.getValue();
 			if (persistedData) {
-				this._sortCurrentData(persistedData, partialData);
+				partialData = this._sortCurrentData(persistedData, partialData);
 			}
 		}
 		this._current.update(partialData);
