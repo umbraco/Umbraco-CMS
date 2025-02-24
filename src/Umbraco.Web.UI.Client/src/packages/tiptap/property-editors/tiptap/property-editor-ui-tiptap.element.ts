@@ -4,12 +4,10 @@ import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
 import '../../components/input-tiptap/input-tiptap.element.js';
 
-const elementName = 'umb-property-editor-ui-tiptap';
-
 /**
  * @element umb-property-editor-ui-tiptap
  */
-@customElement(elementName)
+@customElement('umb-property-editor-ui-tiptap')
 export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElementBase {
 	#onChange(event: CustomEvent & { target: UmbInputTiptapElement }) {
 		const tipTapElement = event.target;
@@ -38,16 +36,16 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 
 		this._filterUnusedBlocks(usedContentKeys);
 
-		this._latestMarkup = value;
+		this._markup = value;
 
 		if (this.value) {
 			this.value = {
 				...this.value,
-				markup: this._latestMarkup,
+				markup: this._markup,
 			};
 		} else {
 			this.value = {
-				markup: this._latestMarkup,
+				markup: this._markup,
 				blocks: {
 					layout: {},
 					contentData: [],
@@ -75,6 +73,6 @@ export { UmbPropertyEditorUiTiptapElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPropertyEditorUiTiptapElement;
+		'umb-property-editor-ui-tiptap': UmbPropertyEditorUiTiptapElement;
 	}
 }

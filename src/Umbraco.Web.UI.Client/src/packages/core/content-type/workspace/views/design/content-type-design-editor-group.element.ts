@@ -4,7 +4,7 @@ import { css, customElement, html, nothing, property, repeat, state, when } from
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UUIBlinkAnimationValue, UUIBlinkKeyframes, type UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import './content-type-design-editor-properties.element.js';
 
@@ -158,7 +158,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	// TODO: impl UMB_EDIT_DOCUMENT_TYPE_PATH_PATTERN, but we need either a generic type or a way to get the path pattern.... [NL]
 	#renderContainerHeader() {
 		return html`
-			<div slot="header">
+			<div slot="header" class="drag-handle">
 				<div>
 					${when(
 						this.sortModeActive && this._hasOwnerContainer,
@@ -221,13 +221,61 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 
 	static override styles = [
 		UmbTextStyles,
+		UUIBlinkKeyframes,
 		css`
+			:host {
+				position: relative;
+			}
+
 			:host([drag-placeholder]) {
 				opacity: 0.5;
 			}
 
-			:host([drag-placeholder]) > uui-box > * {
+			:host::before,
+			:host::after {
+				content: '';
+				position: absolute;
+				pointer-events: none;
+				inset: 0;
+				border-radius: var(--uui-border-radius);
+				opacity: 0;
+				transition:
+					opacity 60ms linear 1ms,
+					border-color,
+					10ms;
+			}
+
+			:host::after {
+				display: block;
+				z-index: 1;
+				border: 2px solid transparent;
+			}
+
+			:host([drag-placeholder])::after {
+				opacity: 1;
+				border-color: var(--uui-color-interactive-emphasis);
+				animation: ${UUIBlinkAnimationValue};
+			}
+			:host([drag-placeholder])::before {
+				background-color: var(--uui-color-interactive-emphasis);
+				opacity: 0.12;
+			}
+
+			:host([drag-placeholder]) uui-box {
+				--uui-box-default-padding: 0;
+			}
+			:host([drag-placeholder]) div[slot='header'],
+			:host([drag-placeholder]) div[slot='header-actions'] {
+				transition: opacity 60ms linear 1ms;
+				opacity: 0;
+			}
+			:host([drag-placeholder]) umb-content-type-design-editor-properties {
 				visibility: hidden;
+				display: none;
+			}
+
+			uui-box {
+				--uui-box-header-padding: 0;
 			}
 
 			div[slot='header'] {
@@ -235,6 +283,8 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
+				cursor: grab;
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 			}
 
 			div[slot='header'] > div {
@@ -257,8 +307,8 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				vertical-align: sub;
 			}
 
-			:host([sort-mode-active]) div[slot='header'] {
-				cursor: grab;
+			div[slot='header-actions'] {
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 			}
 		`,
 	];

@@ -7,6 +7,7 @@ import { UmbEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@um
 import { UMB_DISCARD_CHANGES_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
+	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
@@ -15,6 +16,7 @@ import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/bac
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 const LOADING_STATE_UNIQUE = 'umbLoadingEntityDetail';
 
@@ -44,6 +46,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	protected _getDataPromise?: Promise<any>;
 	protected _detailRepository?: DetailRepositoryType;
+
+	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	#parent = new UmbObjectState<{ entityType: string; unique: UmbEntityUnique } | undefined>(undefined);
 	public readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
@@ -85,6 +89,19 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		window.addEventListener('willchangestate', this.#onWillNavigate);
 		this.#observeRepository(args.detailRepositoryAlias);
 		this.addValidationContext(this.validationContext);
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
+			this.#eventContext = context;
+
+			this.#eventContext.removeEventListener(
+				UmbEntityUpdatedEvent.TYPE,
+				this.#onEntityUpdatedEvent as unknown as EventListener,
+			);
+			this.#eventContext.addEventListener(
+				UmbEntityUpdatedEvent.TYPE,
+				this.#onEntityUpdatedEvent as unknown as EventListener,
+			);
+		});
 	}
 
 	/**
@@ -150,6 +167,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	async load(unique: string) {
+		if (unique === this.getUnique() && this._getDataPromise) {
+			return (await this._getDataPromise) as GetDataType;
+		}
 		this.resetState();
 		this.#entityContext.setUnique(unique);
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
@@ -307,13 +327,21 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this._data.setPersisted(data);
 		this._data.setCurrent(data);
 
-		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			unique: this.getUnique()!,
-			entityType: this.getEntityType(),
+		const unique = this.getUnique()!;
+		const entityType = this.getEntityType();
+
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+
+		eventContext.dispatchEvent(event);
+
+		const updatedEvent = new UmbEntityUpdatedEvent({
+			unique,
+			entityType,
+			eventUnique: this._workspaceEventUnique,
 		});
 
-		actionEventContext.dispatchEvent(event);
+		eventContext.dispatchEvent(updatedEvent);
 	}
 
 	#allowNavigateAway = false;
@@ -364,8 +392,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	override resetState() {
 		super.resetState();
+		this.loading.clear();
 		this._data.clear();
 		this.#allowNavigateAway = false;
+		this._getDataPromise = undefined;
 	}
 
 	#checkIfInitialized() {
@@ -382,7 +412,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			this,
 			umbExtensionsRegistry,
 			repositoryAlias,
-			[this._host],
+			[],
 			(permitted, ctrl) => {
 				this._detailRepository = permitted ? ctrl.api : undefined;
 				this.#checkIfInitialized();
@@ -396,10 +426,33 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 	}
 
+	// Discriminator to identify events from this workspace context
+	protected readonly _workspaceEventUnique = UmbId.new();
+
+	#onEntityUpdatedEvent = (event: UmbEntityUpdatedEvent) => {
+		const eventEntityUnique = event.getUnique();
+		const eventEntityType = event.getEntityType();
+		const eventDiscriminator = event.getEventUnique();
+
+		// Ignore events for other entities
+		if (eventEntityType !== this.getEntityType()) return;
+		if (eventEntityUnique !== this.getUnique()) return;
+
+		// Ignore events from this workspace so we don't reload the data twice. Ex saving this workspace
+		if (eventDiscriminator === this._workspaceEventUnique) return;
+
+		this.reload();
+	};
+
 	public override destroy(): void {
 		window.removeEventListener('willchangestate', this.#onWillNavigate);
+		this.#eventContext?.removeEventListener(
+			UmbEntityUpdatedEvent.TYPE,
+			this.#onEntityUpdatedEvent as unknown as EventListener,
+		);
 		this._detailRepository?.destroy();
 		this.#entityContext.destroy();
+		this._getDataPromise = undefined;
 		super.destroy();
 	}
 }

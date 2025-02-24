@@ -19,7 +19,8 @@ import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-t
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 /**
  * Manages the dropzone and uploads folders and files to the server.
@@ -49,9 +50,16 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	readonly #progressItems = new UmbArrayState<UmbUploadableItem>([], (x) => x.unique);
 	public readonly progressItems = this.#progressItems.asObservable();
 
+	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+	#localization = new UmbLocalizationController(this);
+
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.#host = host;
+
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
+			this.#notificationContext = context;
+		});
 	}
 
 	public setIsFoldersAllowed(isAllowed: boolean) {
@@ -70,10 +78,13 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	 * Allows the user to pick a media type option if multiple types are allowed.
 	 * @param {UmbFileDropzoneDroppedItems} items - The files and folders to upload.
 	 * @param {string | null} parentUnique - Where the items should be uploaded.
-	 * @returns {Promise<Array<UmbUploadableItem>>} - The items about to be uploaded.
+	 * @returns {Array<UmbUploadableItem>} - The items about to be uploaded.
 	 */
-	public async createMediaItems(items: UmbFileDropzoneDroppedItems, parentUnique: string | null = null) {
-		const uploadableItems = await this.#setupProgress(items, parentUnique);
+	public createMediaItems(items: UmbFileDropzoneDroppedItems, parentUnique: string | null = null) {
+		const uploadableItems = this.#setupProgress(items, parentUnique);
+
+		if (!uploadableItems.length) return [];
+
 		if (uploadableItems.length === 1) {
 			// When there is only one item being uploaded, allow the user to pick the media type, if more than one is allowed.
 			this.#createOneMediaItem(uploadableItems[0]);
@@ -81,6 +92,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			// When there are multiple items being uploaded, automatically pick the media types for each item. We probably want to allow the user to pick the media type in the future.
 			this.#createMediaItems(uploadableItems);
 		}
+
 		return uploadableItems;
 	}
 
@@ -90,32 +102,30 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	/**
 	 * Uploads the files as temporary files and returns the data.
 	 * @param { File[] } files - The files to upload.
-	 * @returns {Promise<Array<UmbUploadableFileModel>>} - Files as temporary files.
+	 * @returns {Promise<Array<UmbUploadableItem>>} - Files as temporary files.
 	 */
-	public async createTemporaryFiles(files: Array<File>) {
-		const uploadableItems = (await this.#setupProgress({ files, folders: [] }, null)) as Array<UmbUploadableFile>;
+	public async createTemporaryFiles(files: Array<File>): Promise<Array<UmbUploadableItem>> {
+		const uploadableItems = this.#setupProgress({ files, folders: [] }, null) as Array<UmbUploadableFile>;
 
-		const uploadedItems: Array<UmbTemporaryFileModel> = [];
+		const uploadedItems: Array<UmbUploadableItem> = [];
 
 		for (const item of uploadableItems) {
 			// Upload as temp file
 			const uploaded = await this.#tempFileManager.uploadOne({
 				temporaryUnique: item.temporaryFile.temporaryUnique,
 				file: item.temporaryFile.file,
+				onProgress: (progress) => this.#updateProgress(item, progress),
 			});
 
 			// Update progress
-			const progress = this.#progress.getValue();
-			this.#progress.update({ completed: progress.completed + 1 });
-
 			if (uploaded.status === TemporaryFileStatus.SUCCESS) {
-				this.#progressItems.updateOne(item.unique, { status: UmbFileDropzoneItemStatus.COMPLETE });
+				this.#updateStatus(item, UmbFileDropzoneItemStatus.COMPLETE);
 			} else {
-				this.#progressItems.updateOne(item.unique, { status: UmbFileDropzoneItemStatus.ERROR });
+				this.#updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
 			}
 
 			// Add to return value
-			uploadedItems.push(uploaded);
+			uploadedItems.push(item);
 		}
 
 		return uploadedItems;
@@ -131,13 +141,18 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	async #createOneMediaItem(item: UmbUploadableItem) {
 		const options = await this.#getMediaTypeOptions(item);
 		if (!options.length) {
-			return this.#updateProgress(item, UmbFileDropzoneItemStatus.NOT_ALLOWED);
+			this.#notificationContext?.peek('warning', {
+				data: {
+					message: `${this.#localization.term('media_disallowedFileType')}: ${item.temporaryFile?.file.name}.`,
+				},
+			});
+			return this.#updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED);
 		}
 
 		const mediaTypeUnique = options.length > 1 ? await this.#showDialogMediaTypePicker(options) : options[0].unique;
 
 		if (!mediaTypeUnique) {
-			return this.#updateProgress(item, UmbFileDropzoneItemStatus.CANCELLED);
+			return this.#updateStatus(item, UmbFileDropzoneItemStatus.CANCELLED);
 		}
 
 		if (item.temporaryFile) {
@@ -151,7 +166,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		for (const item of uploadableItems) {
 			const options = await this.#getMediaTypeOptions(item);
 			if (!options.length) {
-				this.#updateProgress(item, UmbFileDropzoneItemStatus.NOT_ALLOWED);
+				this.#updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED);
 				continue;
 			}
 
@@ -163,9 +178,9 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 			// Handle files and folders differently: a file is uploaded as temp then created as a media item, and a folder is created as a media item directly
 			if (item.temporaryFile) {
-				await this.#handleFile(item as UmbUploadableFile, mediaTypeUnique);
+				this.#handleFile(item as UmbUploadableFile, mediaTypeUnique);
 			} else if (item.folder) {
-				await this.#handleFolder(item as UmbUploadableFolder, mediaTypeUnique);
+				this.#handleFolder(item as UmbUploadableFolder, mediaTypeUnique);
 			}
 		}
 	}
@@ -174,7 +189,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		// Upload the file as a temporary file and update progress.
 		const temporaryFile = await this.#uploadAsTemporaryFile(item);
 		if (temporaryFile.status !== TemporaryFileStatus.SUCCESS) {
-			this.#updateProgress(item, UmbFileDropzoneItemStatus.ERROR);
+			this.#updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
 			return;
 		}
 
@@ -183,9 +198,9 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		const { data } = await this.#mediaDetailRepository.create(scaffold, item.parentUnique);
 
 		if (data) {
-			this.#updateProgress(item, UmbFileDropzoneItemStatus.COMPLETE);
+			this.#updateStatus(item, UmbFileDropzoneItemStatus.COMPLETE);
 		} else {
-			this.#updateProgress(item, UmbFileDropzoneItemStatus.ERROR);
+			this.#updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
 		}
 	}
 
@@ -193,16 +208,17 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		const scaffold = await this.#getItemScaffold(item, mediaTypeUnique);
 		const { data } = await this.#mediaDetailRepository.create(scaffold, item.parentUnique);
 		if (data) {
-			this.#updateProgress(item, UmbFileDropzoneItemStatus.COMPLETE);
+			this.#updateStatus(item, UmbFileDropzoneItemStatus.COMPLETE);
 		} else {
-			this.#updateProgress(item, UmbFileDropzoneItemStatus.ERROR);
+			this.#updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
 		}
 	}
 
-	async #uploadAsTemporaryFile(item: UmbUploadableFile) {
-		return await this.#tempFileManager.uploadOne({
+	#uploadAsTemporaryFile(item: UmbUploadableFile) {
+		return this.#tempFileManager.uploadOne({
 			temporaryUnique: item.temporaryFile.temporaryUnique,
 			file: item.temporaryFile.file,
+			onProgress: (progress) => this.#updateProgress(item, progress),
 		});
 	}
 
@@ -259,7 +275,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		// TODO: Use a scaffolding feature to ensure consistency. [NL]
 		const name = item.temporaryFile ? item.temporaryFile.file.name : (item.folder?.name ?? '');
 		const umbracoFile: UmbMediaValueModel = {
-			editorAlias: null as any,
+			editorAlias: '',
 			alias: 'umbracoFile',
 			value: { temporaryFileId: item.temporaryFile?.temporaryUnique },
 			culture: null,
@@ -277,7 +293,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	}
 
 	// Progress handling
-	async #setupProgress(items: UmbFileDropzoneDroppedItems, parent: string | null) {
+	#setupProgress(items: UmbFileDropzoneDroppedItems, parent: string | null) {
 		const current = this.#progress.getValue();
 		const currentItems = this.#progressItems.getValue();
 
@@ -289,10 +305,14 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		return uploadableItems;
 	}
 
-	#updateProgress(item: UmbUploadableItem, status: UmbFileDropzoneItemStatus) {
+	#updateStatus(item: UmbUploadableItem, status: UmbFileDropzoneItemStatus) {
 		this.#progressItems.updateOne(item.unique, { status });
 		const progress = this.#progress.getValue();
 		this.#progress.update({ completed: progress.completed + 1 });
+	}
+
+	#updateProgress(item: UmbUploadableItem, progress: number) {
+		this.#progressItems.updateOne(item.unique, { progress });
 	}
 
 	readonly #prepareItemsAsUploadable = (
@@ -302,15 +322,13 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		const items: Array<UmbUploadableItem> = [];
 
 		for (const file of files) {
-			const unique = UmbId.new();
-			if (file.type) {
-				items.push({
-					unique,
-					parentUnique,
-					status: UmbFileDropzoneItemStatus.WAITING,
-					temporaryFile: { file, temporaryUnique: UmbId.new() },
-				});
-			}
+			items.push({
+				unique: UmbId.new(),
+				parentUnique,
+				status: UmbFileDropzoneItemStatus.WAITING,
+				progress: 0,
+				temporaryFile: { file, temporaryUnique: UmbId.new() },
+			});
 		}
 
 		for (const subfolder of folders) {
@@ -319,6 +337,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 				unique,
 				parentUnique,
 				status: UmbFileDropzoneItemStatus.WAITING,
+				progress: 100, // Folders are created instantly.
 				folder: { name: subfolder.folderName },
 			});
 

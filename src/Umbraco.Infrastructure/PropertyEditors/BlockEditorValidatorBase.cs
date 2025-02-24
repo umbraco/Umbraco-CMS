@@ -27,6 +27,7 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
 
         if (validationContextCulture is null)
         {
+            // make sure we extend validation to variant block value (element level variation)
             IEnumerable<string> validationContextCulturesBeingValidated = isWildcardCulture
                 ? blockEditorData.BlockValue.Expose.Select(e => e.Culture).WhereNotNull().Distinct()
                 : validationContext.CulturesBeingValidated;
@@ -36,6 +37,14 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
                 {
                     elementTypeValidation.AddRange(GetBlockEditorDataValidation(blockEditorData, culture, segment));
                 }
+            }
+        }
+        else
+        {
+            // make sure we extend validation to invariant block values (no element level variation)
+            foreach (var segment in validationContext.SegmentsBeingValidated.DefaultIfEmpty(null))
+            {
+                elementTypeValidation.AddRange(GetBlockEditorDataValidation(blockEditorData, null, segment));
             }
         }
 

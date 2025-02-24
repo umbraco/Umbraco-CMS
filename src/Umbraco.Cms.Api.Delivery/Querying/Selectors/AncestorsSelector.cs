@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Navigation;
 
@@ -20,10 +21,9 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
         IRequestPreviewService requestPreviewService)
         : this(
             requestRoutingService,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
-            StaticServiceProvider.Instance.GetRequiredService<IRequestPreviewService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IRequestCultureService>(),
+            requestPreviewService,
             StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(),
             navigationQueryService)
     {
     }
@@ -35,10 +35,9 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
         IDocumentNavigationQueryService navigationQueryService)
         : this(
             requestRoutingService,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
             StaticServiceProvider.Instance.GetRequiredService<IRequestPreviewService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IRequestCultureService>(),
             StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(),
             navigationQueryService)
     {
     }
@@ -47,10 +46,9 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
     public AncestorsSelector(IPublishedContentCache publishedContentCache, IRequestRoutingService requestRoutingService)
         : this(
             requestRoutingService,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
             StaticServiceProvider.Instance.GetRequiredService<IRequestPreviewService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IRequestCultureService>(),
             StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(),
             StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
     {
     }
@@ -58,10 +56,10 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
     public AncestorsSelector(
         IRequestRoutingService requestRoutingService,
         IRequestPreviewService requestPreviewService,
-        IRequestCultureService requestCultureService,
         IApiDocumentUrlService apiDocumentUrlService,
+        IVariationContextAccessor variationContextAccessor,
         IDocumentNavigationQueryService navigationQueryService)
-        : base(requestRoutingService, requestPreviewService, requestCultureService, apiDocumentUrlService)
+        : base(requestRoutingService, requestPreviewService, apiDocumentUrlService, variationContextAccessor)
         => _navigationQueryService = navigationQueryService;
 
     [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17.")]
@@ -69,10 +67,10 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
         IRequestRoutingService requestRoutingService,
         IPublishedContentCache publishedContentCache,
         IRequestPreviewService requestPreviewService,
-        IRequestCultureService requestCultureService,
         IApiDocumentUrlService apiDocumentUrlService,
+        IVariationContextAccessor variationContextAccessor,
         IDocumentNavigationQueryService navigationQueryService)
-        : this(requestRoutingService, requestPreviewService, requestCultureService, apiDocumentUrlService, navigationQueryService)
+        : this(requestRoutingService, requestPreviewService, apiDocumentUrlService, variationContextAccessor, navigationQueryService)
     {
     }
 

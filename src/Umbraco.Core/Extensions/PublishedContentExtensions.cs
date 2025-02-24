@@ -3298,6 +3298,7 @@ public static class PublishedContentExtensions
     /// </param>
     /// <param name="publishedCache"></param>
     /// <returns>The children of the content.</returns>
+    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 17.")]
     public static DataTable ChildrenAsTable(
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,
@@ -3449,9 +3450,9 @@ public static class PublishedContentExtensions
             { "Url", "Url" },
         };
 
-        foreach (KeyValuePair<string, string> field in stdFields.Where(x => fields.ContainsKey(x.Key) == false))
+        foreach (KeyValuePair<string, string> field in stdFields)
         {
-            fields[field.Key] = field.Value;
+            fields.TryAdd(field.Key, field.Value);
         }
 
         return fields;
@@ -3640,6 +3641,7 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent =>
         Children<T>(content, variationContextAccessor, StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(), culture);
 
+    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 17.")]
     public static DataTable ChildrenAsTable(
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,

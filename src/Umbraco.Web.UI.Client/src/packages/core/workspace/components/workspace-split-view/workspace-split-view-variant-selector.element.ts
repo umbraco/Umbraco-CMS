@@ -48,7 +48,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	private _variantSelectorOpen = false;
 
 	@state()
-	private _readOnlyCultures: string[] = [];
+	private _readOnlyCultures: Array<string | null> = [];
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected _variantSorter = (a: VariantOptionModelType, b: VariantOptionModelType) => {
@@ -181,8 +181,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	#setReadOnlyCultures() {
 		this._readOnlyCultures = this._variantOptions
 			.filter((variant) => this._readOnlyStates.some((state) => state.variantId.compare(variant)))
-			.map((variant) => variant.culture)
-			.filter((item) => item !== null) as string[];
+			.map((variant) => variant.culture);
 	}
 
 	#onPopoverToggle(event: ToggleEvent) {
@@ -207,6 +206,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	/**
 	 * Focuses the input element after a short delay to ensure it is rendered.
 	 * This works better than the {umbFocus()} directive, which does not work in this context.
+	 * @param element
 	 */
 	#focusInput(element?: Element) {
 		if (!element) return;
@@ -252,7 +252,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 									`
 								: ''}
 						`
-					: nothing}
+					: html`<span id="read-only-tag" slot="append"> ${this.#renderReadOnlyTag(null)} </span>`}
 			</uui-input>
 
 			${this.#hasVariants()
@@ -310,12 +310,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	}
 
 	#isReadOnly(culture: string | null) {
-		if (!culture) return false;
 		return this._readOnlyCultures.includes(culture);
 	}
 
 	#renderReadOnlyTag(culture?: string | null) {
-		if (!culture) return nothing;
+		if (culture === undefined) return nothing;
 		return this.#isReadOnly(culture)
 			? html`<uui-tag look="secondary">${this.localize.term('general_readOnly')}</uui-tag>`
 			: nothing;
@@ -366,6 +365,13 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 			#variant-close {
 				white-space: nowrap;
+			}
+
+			#read-only-tag {
+				white-space: nowrap;
+				display: flex;
+				align-items: center;
+				justify-content: center;
 			}
 
 			uui-scroll-container {

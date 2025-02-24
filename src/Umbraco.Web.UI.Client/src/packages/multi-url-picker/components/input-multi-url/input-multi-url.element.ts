@@ -200,6 +200,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 					},
 					data: {
 						index: index,
+						isNew: index === null,
 						config: {
 							hideAnchor: this.hideAnchor,
 						},

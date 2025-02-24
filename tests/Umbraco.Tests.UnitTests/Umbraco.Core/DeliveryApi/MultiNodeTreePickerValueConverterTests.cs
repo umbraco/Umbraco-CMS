@@ -101,8 +101,8 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
     {
         var content = new Mock<IPublishedContent>();
 
-        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None, CacheManager);
-        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None, CacheManager);
+        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None, new VariationContext(), CacheManager);
+        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None, new VariationContext(), CacheManager);
 
         var key = Guid.NewGuid();
         var urlSegment = "page-url-segment";

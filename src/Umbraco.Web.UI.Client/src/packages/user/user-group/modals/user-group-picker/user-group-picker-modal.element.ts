@@ -1,11 +1,12 @@
 import { UmbUserGroupCollectionRepository } from '../../collection/repository/index.js';
 import type { UmbUserGroupDetailModel } from '../../types.js';
-import { customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { debounce, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UMB_USER_GROUP_PICKER_MODAL } from '@umbraco-cms/backoffice/user-group';
-import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputEvent, UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import '../../components/user-group-ref/user-group-ref.element.js';
 
@@ -15,9 +16,22 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 	typeof UMB_USER_GROUP_PICKER_MODAL.VALUE
 > {
 	@state()
+	private _filteredItems: Array<UmbUserGroupDetailModel> = [];
+
+	@state()
 	private _userGroups: Array<UmbUserGroupDetailModel> = [];
 
+	#debouncedFilter = debounce((filter: string) => {
+		this._filteredItems = filter
+			? this._userGroups.filter(
+					(userGroup) =>
+						userGroup.alias.toLowerCase().includes(filter) || userGroup.name.toLowerCase().includes(filter),
+				)
+			: this._userGroups;
+	}, 500);
+
 	#selectionManager = new UmbSelectionManager(this);
+
 	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
 
 	constructor() {
@@ -40,7 +54,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 		const { error, asObservable } = await this.#userGroupCollectionRepository.requestCollection();
 		if (error) return;
 
-		this.observe(asObservable(), (items) => (this._userGroups = items), 'umbUserGroupsObserver');
+		this.observe(asObservable(), (items) => (this._userGroups = this._filteredItems = items), 'umbUserGroupsObserver');
 	}
 
 	#onSelected(event: UUIMenuItemEvent, item: UmbUserGroupDetailModel) {
@@ -63,6 +77,11 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(item.unique));
 	}
 
+	#onFilterInput(event: UUIInputEvent) {
+		const query = (event.target.value as string) || '';
+		this.#debouncedFilter(query.toLowerCase());
+	}
+
 	#onSubmit() {
 		this.updateValue({ selection: this.#selectionManager.getSelection() });
 		this._submitModal();
@@ -72,8 +91,17 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline=${this.localize.term('user_chooseUserGroup', true)}>
 				<uui-box>
+					<uui-input
+						type="search"
+						id="filter"
+						label=${this.localize.term('placeholders_filter')}
+						placeholder=${this.localize.term('placeholders_filter')}
+						@input=${this.#onFilterInput}
+						${umbFocus()}>
+						<uui-icon name="search" slot="prepend" id="filter-icon"></uui-icon>
+					</uui-input>
 					${repeat(
-						this._userGroups,
+						this._filteredItems,
 						(userGroup) => userGroup.alias,
 						(userGroup) => html`
 							<umb-user-group-ref
@@ -104,6 +132,22 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 			</umb-body-layout>
 		`;
 	}
+
+	static override styles = [
+		css`
+			#filter {
+				width: 100%;
+				margin-bottom: var(--uui-size-space-4);
+			}
+
+			#filter-icon {
+				display: flex;
+				color: var(--uui-color-border);
+				height: 100%;
+				padding-left: var(--uui-size-space-2);
+			}
+		`,
+	];
 }
 
 export default UmbUserGroupPickerModalElement;

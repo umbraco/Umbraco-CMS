@@ -89,8 +89,6 @@ public class NewDefaultUrlProvider : IUrlProvider
             yield break;
         }
 
-
-
         // look for domains, walking up the tree
         IPublishedContent? n = node;
         IEnumerable<DomainAndUri>? domainUris =
@@ -117,7 +115,7 @@ public class NewDefaultUrlProvider : IUrlProvider
 
             // although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
             var route = GetLegacyRouteFormatById(key, culture);
-            if (route == null)
+            if (route == null || route == "#")
             {
                 continue;
             }

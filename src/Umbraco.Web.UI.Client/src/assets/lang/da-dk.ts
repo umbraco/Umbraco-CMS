@@ -298,6 +298,9 @@ export default {
 		removeTextBox: 'Fjern denne tekstboks',
 		contentRoot: 'Indholdsrod',
 		includeUnpublished: 'Inkluder ikke-udgivet indhold.',
+		forceRepublish: 'Udgiv uændrede elementer.',
+		forceRepublishWarning: 'ADVARSEL: Udgivelse af alle sider under denne i indholdstræet, uanset om de er ændret eller ej, kan være en ressourcekrævende og langvarig proces.',
+		forceRepublishAdvisory: 'Dette bør ikke være nødvendigt under normale omstændigheder, så fortsæt kun med denne handling, hvis du er sikker på, at det er nødvendigt.',
 		isSensitiveValue:
 			'Denne værdi er skjult.Hvis du har brug for adgang til at se denne værdi, bedes du\n      kontakte din web-administrator.\n    ',
 		isSensitiveValue_short: 'Denne værdi er skjult.',
@@ -345,6 +348,9 @@ export default {
 		clickToUpload: 'Klik for at uploade',
 		orClickHereToUpload: 'eller klik her for at vælge filer',
 		disallowedFileType: 'Kan ikke uploade denne fil, den har ikke en godkendt filtype',
+		disallowedMediaType: "Kan ikke uploade denne fil, mediatypen med alias '%0%' er ikke tilladt her",
+		invalidFileName: 'Kan ikke uploade denne fil, den har et ugyldigt filnavn',
+		invalidFileSize: 'Kan ikke uploade denne fil, den er for stor',
 		maxFileSize: 'Maks filstørrelse er',
 		mediaRoot: 'Medie rod',
 		moveToSameFolderFailed: 'Overordnet og destinations mappe kan ikke være den samme',
@@ -353,8 +359,6 @@ export default {
 		dragAndDropYourFilesIntoTheArea:
 			'Træk dine filer ind i dropzonen for, at uploade dem til\n      mediebiblioteket.\n    ',
 		uploadNotAllowed: 'Upload er ikke tiladt på denne lokation',
-		disallowedMediaType: "Cannot upload this file, the media type with alias '%0%' is not allowed here",
-		invalidFileName: 'Cannot upload this file, it does not have a valid file name',
 	},
 	member: {
 		createNewMember: 'Opret et nyt medlem',
@@ -478,7 +482,7 @@ export default {
 		anchorLinkPicker: 'Lokalt link / querystreng',
 		anchorInsert: 'Navn på lokalt link',
 		closeThisWindow: 'Luk denne dialog',
-		confirmdelete: 'Er du sikker på at du vil slette',
+		confirmdelete: (name: string) => `Er du sikker på at du vil slette${name ? ` <strong>${name}</strong>` : ''}?`,
 		confirmdisable: 'Er du sikker på du vil deaktivere',
 		confirmremove: 'Er du sikker på at du vil fjerne',
 		confirmremoveusageof: 'Er du sikker på du vil fjerne brugen af <strong>%0%</strong>',
@@ -542,6 +546,8 @@ export default {
 		selectIcon: 'Vælg ikon',
 		selectItem: 'Vælg item',
 		selectLink: 'Vælg link',
+		addLink: 'Tilføj Link',
+		updateLink: 'Opdater Link',
 		selectMacro: 'Vælg makro',
 		selectContent: 'Vælg indhold',
 		selectContentType: 'Vælg indholdstype',
@@ -581,6 +587,8 @@ export default {
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
+		seeErrorAction: 'Se fejlen',
+		seeErrorDialogHeadline: 'Fejl detaljer',
 	},
 	dictionary: {
 		noItems: 'Der er ingen ordbogselementer.',
@@ -870,6 +878,7 @@ export default {
 		unknown: 'Ukendt',
 		unknownUser: 'Ukendt bruger',
 		under: 'under',
+		unnamed: 'Unavngivet',
 		up: 'Op',
 		update: 'Opdatér',
 		upgrade: 'Opdatér',
@@ -905,22 +914,27 @@ export default {
 		videos: 'Videoer',
 		avatar: 'Avatar til',
 		header: 'Overskrift',
+		selectAll: 'Vælg alle',
 		systemField: 'system felt',
 		readOnly: 'Skrivebeskyttet',
 		restore: 'Genskab',
-		generic: 'Generic',
+		generic: 'Generisk',
 		media: 'Media',
-		nodeName: 'Node Name',
-		revert: 'Revert',
+		nodeName: 'Node navn',
+		revert: 'Fortryd',
 		umbracoInfo: 'Umbraco info',
-		shared: 'Shared',
-		success: 'Success',
-		typeName: 'Type Name',
-		validate: 'Validate',
-		lastUpdated: 'Last Updated',
-		skipToMenu: 'Skip to menu',
-		skipToContent: 'Skip to content',
+		shared: 'Delt',
+		success: 'Succes',
+		typeName: 'Type navn',
+		validate: 'Valider',
+		lastUpdated: 'Sidst opdateret',
+		skipToMenu: 'Spring til menu',
+		skipToContent: 'Spring til indhold',
 		newVersionAvailable: 'Ny version tilgængelig',
+		duration: (duration: string, date: Date | string, now: Date | string) => {
+			if (new Date(date).getTime() < new Date(now).getTime()) return `for ${duration} siden`;
+			return `om ${duration}`;
+		},
 	},
 	colors: {
 		blue: 'Blå',
@@ -1205,6 +1219,12 @@ export default {
 	},
 	colorpicker: {
 		noColors: 'Du har ikke konfigureret nogen godkendte farver',
+	},
+	colorPickerConfigurations: {
+		colorsTitle: 'Farver',
+		colorsDescription: 'Tilføj, fjern eller sorter farver',
+		showLabelTitle: 'Inkluder label?',
+		showLabelDescription: 'Gemmer farver som et Json-objekt, der både indeholder farvens hex streng og label, i stedet for kun at gemme hex strengen.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'Du kan kun vælge følgende type(r) dokumenter: %0%',
@@ -1670,6 +1690,7 @@ export default {
 		elementDoesNotSupport: 'Dette benyttes ikke for en Element-type',
 		propertyHasChanges: 'Du har lavet ændringer til denne egenskab. Er du sikker på at du vil kassere dem?\n    ',
 		displaySettingsHeadline: 'Visning',
+		displaySettingsLabelOnLeft: 'Label på venstre side',
 		displaySettingsLabelOnTop: 'Label hen over (fuld bredde)',
 		removeChildNode: 'Du fjerner noden',
 		removeChildNodeWarning:
@@ -1685,14 +1706,14 @@ export default {
 		convertToTab: 'Convert to tab',
 		tabDirectPropertiesDropZone: 'Drag properties here to place directly on the tab',
 		usingEditor: 'using this editor will get updated with the new settings.',
-		historyCleanupHeading: 'History cleanup',
-		historyCleanupDescription: 'Allow overriding the global history cleanup settings.',
-		historyCleanupKeepAllVersionsNewerThanDays: 'Keep all versions newer than days',
-		historyCleanupKeepLatestVersionPerDayForDays: 'Keep latest version per day for days',
-		historyCleanupPreventCleanup: 'Prevent cleanup',
-		historyCleanupEnableCleanup: 'Enable cleanup',
+		historyCleanupHeading: 'Historikoprydning',
+		historyCleanupDescription: 'Tillad tilsidesættelse af de globale indstillinger for historikoprydning.',
+		historyCleanupKeepAllVersionsNewerThanDays: 'Behold alle versioner nyere end antal dage',
+		historyCleanupKeepLatestVersionPerDayForDays: 'Behold den seneste version pr. dag i antal dage',
+		historyCleanupPreventCleanup: 'Forhindre oprydning',
+		historyCleanupEnableCleanup: 'Aktivér oprydning',
 		historyCleanupGloballyDisabled:
-			'<strong>NOTE!</strong> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.',
+			'<strong>NOTE!</strong> Oprydning af historiske indholdsversioner er deaktiveret globalt. Disse indstillinger træder først i kraft, når den aktiveres.',
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collection: 'Samling',
@@ -1911,6 +1932,8 @@ export default {
 		permissionsDefault: 'Standardrettigheder',
 		permissionsGranular: 'Granulære rettigheder',
 		permissionsGranularHelp: 'Sæt rettigheder for specifikke noder',
+		granularRightsLabel: 'Dokumenter',
+		granularRightsDescription: 'Tillad adgang til specifikke dokumenter',
 		permissionsEntityGroup_document: 'Indhold',
 		permissionsEntityGroup_media: 'Medie',
 		permissionsEntityGroup_member: 'Medlemmer',
@@ -1927,6 +1950,8 @@ export default {
 		chooseUserGroup: (multiple: boolean) => {
 			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';
 		},
+		entityPermissionsLabel: 'Handlingsrettigheder',
+		entityPermissionsDescription: 'Tildel tilladelser til handlinger',
 		noStartNode: 'Ingen startnode valgt',
 		noStartNodes: 'Ingen startnoder valgt',
 		startnode: 'Indhold startnode',
@@ -2013,6 +2038,7 @@ export default {
 	},
 	validation: {
 		validation: 'Validering',
+		validateNothing: 'Ingen validering',
 		validateAsEmail: 'Valider som e-mail',
 		validateAsNumber: 'Valider som tal',
 		validateAsUrl: 'Valider som URL',
@@ -2034,6 +2060,7 @@ export default {
 		invalidEmail: 'Ugyldig e-mail',
 		invalidNull: 'Værdien kan ikke være tom',
 		invalidEmpty: 'Værdien kan ikke være tom',
+		invalidFalse: 'Dette felt skal være slået til',
 		invalidPattern: 'Værdien er ugyldig, som ikke matcher det korrekte format',
 		customValidation: 'Selvvalgt validering',
 		entriesShort: 'Minimum %0% element(er), tilføj <strong>%1%</strong> mere.',
@@ -2251,6 +2278,8 @@ export default {
 		labelForRemoveAllEntries: 'Fjern alle elementer',
 		labelForClearClipboard: 'Ryd udklipsholder',
 		labelForCopyToClipboard: 'Kopier til udklipsholder',
+		confirmDeleteHeadline: 'Slet fra udklipsholderen',
+		confirmDeleteDescription: 'Er du sikker på at du vil slette <strong>{0}</strong> fra udklipsholderen?',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Åben egenskabshandlinger',
@@ -2382,6 +2411,9 @@ export default {
 		labelInlineMode: 'Indsæt på linje med tekst',
 		notExposedLabel: 'ikke oprettet',
 		notExposedDescription: 'Denne Block er endnu ikke oprettet for denne variant',
+		unsupportedBlockName: 'Ugyldigt indhold',
+		unsupportedBlockDescription:
+			'Dette indhold er ikke længere understøttet. Hvis du mangler dette indhold bør du kontakte din administrator. Ellers bør du slette dette indhold.',
 	},
 	contentTemplatesDashboard: {
 		whatHeadline: 'Hvad er Indholdsskabeloner?',
@@ -2421,8 +2453,8 @@ export default {
 		searchResults: 'resultater',
 	},
 	propertyEditorPicker: {
-		title: 'Select Property Editor',
-		openPropertyEditorPicker: 'Select Property Editor',
+		title: 'Vælg Property Editor',
+		openPropertyEditorPicker: 'Vælg Property Editor',
 	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",

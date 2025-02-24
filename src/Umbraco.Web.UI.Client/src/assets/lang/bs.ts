@@ -1910,9 +1910,6 @@ export default {
 		notificationEmailsCheckSuccessMessage: 'E-mail za obavještenje je postavljen na <strong>%0%</strong>.',
 		notificationEmailsCheckErrorMessage:
 			'E-pošta za obavještenje je i dalje postavljena na zadanu vrijednost od <strong>%0%</strong>.',
-		scheduledHealthCheckEmailBody:
-			'<html><body><p>Rezultati zakazanih Umbraco provjera zdravlja koji se pokreću na %0% na %1% su sljedeći:</p>%2%</body></html>',
-		scheduledHealthCheckEmailSubject: 'Status provjere zdravlja Umbraco: %0%',
 		checkGroup: 'Provjerite grupu',
 		helpText:
 			'\n        <p>Provjera zdravlja procjenjuje različita područja vaše web lokacije u pogledu postavki najbolje prakse, konfiguracije, potencijalnih problema itd. Možete jednostavno riješiti probleme pritiskom na dugme.\n        Možete dodati svoje zdravstvene preglede, pogledajte <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">dokumentaciju za više informacija</a> o prilagođenim zdravstvenim pregledima.</p>\n        ',

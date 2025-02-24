@@ -338,6 +338,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			this.#typeLimitValidator = undefined;
 		}
 		if (hasTypeLimits) {
+			// If we have specific block type limits, we should use those for validation (not the Block Type Configurations)
 			this.#typeLimitValidator = this.addValidator(
 				'customError',
 				() => {
@@ -358,6 +359,28 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				},
 				() => {
 					return !this.#context.checkBlockTypeLimitsValidity();
+				},
+			);
+		} else {
+			// Limit based on Block Type Configurations (Allow in Areas / allow in root)
+			this.#typeLimitValidator = this.addValidator(
+				'customError',
+				() => {
+					const invalids = this.#context
+						.getInvalidBlockTypeConfigurations()
+						// make invalids unique:
+						.filter((v, i, a) => a.indexOf(v) === i)
+						// join them together to become a string:
+						.join(', ');
+					return this.localize.term(
+						this._areaKey
+							? 'blockEditor_areaValidationEntriesNotAllowed'
+							: 'blockEditor_rootValidationEntriesNotAllowed',
+						invalids,
+					);
+				},
+				() => {
+					return !this.#context.checkBlockTypeConfigurationValidity();
 				},
 			);
 		}

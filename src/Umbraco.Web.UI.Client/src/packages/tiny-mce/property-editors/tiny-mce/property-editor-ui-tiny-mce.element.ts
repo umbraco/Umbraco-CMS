@@ -1,6 +1,6 @@
 import type { UmbInputTinyMceElement } from '../../components/input-tiny-mce/input-tiny-mce.element.js';
-import { UmbPropertyEditorUiRteElementBase, UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { UmbPropertyEditorUiRteElementBase, UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
 
 import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 
@@ -43,16 +43,16 @@ export class UmbPropertyEditorUITinyMceElement extends UmbPropertyEditorUiRteEle
 		// Then get the content of the editor and update the value.
 		// maybe in this way doc.body.innerHTML;
 
-		this._latestMarkup = markup;
+		this._markup = markup;
 
 		if (this.value) {
 			this.value = {
 				...this.value,
-				markup: this._latestMarkup,
+				markup: this._markup,
 			};
 		} else {
 			this.value = {
-				markup: this._latestMarkup,
+				markup: this._markup,
 				blocks: {
 					layout: {},
 					contentData: [],
