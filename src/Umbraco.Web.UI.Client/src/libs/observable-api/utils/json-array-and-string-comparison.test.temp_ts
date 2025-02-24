@@ -1,0 +1,29 @@
+import { expect } from '@open-wc/testing';
+import { umbJsonDeepComparison } from './json-array-and-string-comparison.function.js';
+
+describe('umbJsonDeepComparison', () => {
+	beforeEach(() => {});
+
+	it('gives a result', (done) => {
+		const a = {
+			property: 'hello',
+			arr: [1, 2, 3],
+			obj: {
+				deep: 'value',
+				deep2: 'value2',
+			},
+		};
+
+		const b = {
+			property: 'hello',
+			arr: [1, 2, 3],
+			obj: {
+				deep2: 'value2',
+				deep: 'value',
+			},
+		};
+
+		const result = umbJsonDeepComparison(a, b);
+		expect(result).to.be.false;
+	});
+});
