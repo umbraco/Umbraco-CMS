@@ -7,6 +7,7 @@ import {
 	Span,
 	StarterKit,
 	TextStyle,
+	TrailingNode,
 } from '@umbraco-cms/backoffice/external/tiptap';
 
 export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionApiBase {
@@ -53,6 +54,7 @@ export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionA
 		}),
 		Div,
 		Span,
+		TrailingNode,
 	];
 }
 
