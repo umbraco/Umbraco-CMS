@@ -2,7 +2,7 @@ import type { UmbContentDetailModel } from '../types.js';
 import { UmbElementWorkspaceDataManager } from './element-data-manager.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { appendToFrozenArray, jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
-import { UmbVariantId, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbVariantObjectCompare, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
 export class UmbContentWorkspaceDataManager<
 	ModelType extends UmbContentDetailModel,
@@ -30,7 +30,10 @@ export class UmbContentWorkspaceDataManager<
 			return {
 				...currentData,
 				variants: [...currentData.variants].sort(function (a, b) {
-					return persistedVariants.indexOf(a) - persistedVariants.indexOf(b);
+					return (
+						persistedVariants.findIndex((x) => umbVariantObjectCompare(x, a)) -
+						persistedVariants.findIndex((x) => umbVariantObjectCompare(x, b))
+					);
 				}),
 			};
 		}
