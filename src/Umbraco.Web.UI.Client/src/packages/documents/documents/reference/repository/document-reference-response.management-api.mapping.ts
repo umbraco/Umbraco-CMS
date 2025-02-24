@@ -5,11 +5,11 @@ import {
 	type DocumentReferenceResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbDataMapping } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceDataMapping } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDocumentReferenceResponseManagementApiDataMapping
 	extends UmbControllerBase
-	implements UmbDataMapping<DocumentReferenceResponseModel, UmbDocumentReferenceModel>
+	implements UmbDataSourceDataMapping<DocumentReferenceResponseModel, UmbDocumentReferenceModel>
 {
 	async map(data: DocumentReferenceResponseModel): Promise<UmbDocumentReferenceModel> {
 		return {
