@@ -719,22 +719,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 	}
 
-	#setCurrentData(persistedData: DetailModelType, newCurrentData: DetailModelType) {
-		// Sort the values in the same order as the persisted data:
-		const persistedValues = persistedData.values;
-		newCurrentData.values.sort(function (a, b) {
-			return persistedValues.indexOf(a) - persistedValues.indexOf(b);
-		});
-
-		// Sort the variants in the same order as the persisted data:
-		const persistedVariants = persistedData.variants;
-		newCurrentData.variants.sort(function (a, b) {
-			return persistedVariants.indexOf(a) - persistedVariants.indexOf(b);
-		});
-
-		this._data.setCurrent(newCurrentData);
-	}
-
 	async #create(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
 		if (!this._detailRepository) throw new Error('Detail repository is not set');
 
@@ -759,7 +743,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			variantIds,
 			variantIdsIncludingInvariant,
 		);
-		this.#setCurrentData(data, newCurrentData);
+		this._data.setCurrent(newCurrentData);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		const event = new UmbRequestReloadChildrenOfEntityEvent({
@@ -792,7 +776,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			variantIds,
 			variantIdsIncludingInvariant,
 		);
-		this.#setCurrentData(data, newCurrentData);
+		this._data.setCurrent(newCurrentData);
 
 		const unique = this.getUnique()!;
 		const entityType = this.getEntityType();
