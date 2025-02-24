@@ -78,7 +78,7 @@ export class UmbMemberWorkspaceContext
 			preset: {
 				memberType: {
 					unique: memberTypeUnique,
-					icon: "icon-user"
+					icon: 'icon-user',
 				},
 			},
 		});
