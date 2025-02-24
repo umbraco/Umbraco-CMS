@@ -1,16 +1,26 @@
-import { UmbMediaRecycleBinServerDataSource } from '../../../recycle-bin/repository/media-recycle-bin.server.data-source.js';
+import { UmbDocumentRecycleBinServerDataSource } from '../../../repository/document-recycle-bin.server.data-source.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbBulkTrashRepository, UmbBulkTrashRequestArgs } from '@umbraco-cms/backoffice/entity-bulk-action';
 import type { UmbRepositoryErrorResponse } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
-export class UmbBulkTrashMediaRepository extends UmbRepositoryBase implements UmbBulkTrashRepository {
+/**
+ * @deprecated since 15.3.0. Will be removed in 17.0.0. Call trash method on UmbDocumentRecycleBinRepository instead.
+ */
+export class UmbBulkTrashDocumentRepository extends UmbRepositoryBase implements UmbBulkTrashRepository {
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
-	#recycleBinSource = new UmbMediaRecycleBinServerDataSource(this);
+	#recycleBinSource = new UmbDocumentRecycleBinServerDataSource(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host);
+
+		new UmbDeprecation({
+			removeInVersion: '17.0.0',
+			deprecated: 'UmbBulkTrashDocumentRepository',
+			solution: 'Call trash method on UmbDocumentRecycleBinRepository instead.',
+		}).warn();
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (notificationContext) => {
 			this.#notificationContext = notificationContext;
@@ -32,7 +42,7 @@ export class UmbBulkTrashMediaRepository extends UmbRepositoryBase implements Um
 		}
 
 		if (count > 0) {
-			const notification = { data: { message: `Trashed ${count} media ${count === 1 ? 'item' : 'items'}` } };
+			const notification = { data: { message: `Trashed ${count} ${count === 1 ? 'document' : 'documents'}` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 
@@ -40,4 +50,4 @@ export class UmbBulkTrashMediaRepository extends UmbRepositoryBase implements Um
 	}
 }
 
-export { UmbBulkTrashMediaRepository as api };
+export { UmbBulkTrashDocumentRepository as api };

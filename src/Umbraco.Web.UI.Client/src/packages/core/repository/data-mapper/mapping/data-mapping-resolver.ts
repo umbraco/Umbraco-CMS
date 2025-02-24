@@ -1,12 +1,12 @@
-import type { UmbDataMapping } from './types.js';
+import type { UmbDataSourceDataMapping } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi, type ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbDataMappingResolver extends UmbControllerBase {
-	#apiCache = new Map<string, UmbDataMapping>();
+export class UmbDataSourceDataMappingResolver extends UmbControllerBase {
+	#apiCache = new Map<string, UmbDataSourceDataMapping>();
 
-	async resolve(forDataSource: string, forDataModel: string): Promise<UmbDataMapping | undefined> {
+	async resolve(forDataSource: string, forDataModel: string): Promise<UmbDataSourceDataMapping | undefined> {
 		if (!forDataSource) {
 			throw new Error('data source identifier is required');
 		}
@@ -26,7 +26,7 @@ export class UmbDataMappingResolver extends UmbControllerBase {
 			return this.#apiCache.get(manifest.alias)!;
 		}
 
-		const dataMapping = await createExtensionApi<UmbDataMapping>(this, manifest);
+		const dataMapping = await createExtensionApi<UmbDataSourceDataMapping>(this, manifest);
 
 		if (!dataMapping) {
 			return undefined;
@@ -55,7 +55,7 @@ export class UmbDataMappingResolver extends UmbControllerBase {
 	}
 
 	#getSupportedManifests(forDataSource: string, forDataModel: string) {
-		const supportedManifests = umbExtensionsRegistry.getByTypeAndFilter('dataMapping', (manifest) => {
+		const supportedManifests = umbExtensionsRegistry.getByTypeAndFilter('dataSourceDataMapping', (manifest) => {
 			return manifest.forDataSource === forDataSource && manifest.forDataModel === forDataModel;
 		});
 

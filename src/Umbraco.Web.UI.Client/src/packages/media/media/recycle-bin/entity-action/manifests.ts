@@ -5,6 +5,7 @@ import {
 } from '../../constants.js';
 import { UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE, UMB_MEDIA_RECYCLE_BIN_REPOSITORY_ALIAS } from '../constants.js';
 import { UMB_MEDIA_REFERENCE_REPOSITORY_ALIAS } from '../../reference/constants.js';
+import { manifests as bulkTrashManifests } from './bulk-trash/manifests.js';
 import {
 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 	UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
@@ -55,4 +56,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 			recycleBinRepositoryAlias: UMB_MEDIA_RECYCLE_BIN_REPOSITORY_ALIAS,
 		},
 	},
+	...bulkTrashManifests,
 ];
