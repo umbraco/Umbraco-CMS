@@ -28,7 +28,7 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 	): Promise<Array<ReturnType>> {
 		const values: Array<ReturnType> = [];
 
-		if (propertyType.typeArgs.varyBySegment && propertyType.typeArgs.varyByCulture) {
+		if (propertyType.typeArgs.variesBySegment && propertyType.typeArgs.variesByCulture) {
 			if (this.#cultures.length === 0) {
 				throw new Error('Cultures must be set when varying by culture.');
 			}
@@ -45,7 +45,7 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 					}
 				}
 			}
-		} else if (propertyType.typeArgs.varyByCulture) {
+		} else if (propertyType.typeArgs.variesByCulture) {
 			if (this.#cultures.length === 0) {
 				throw new Error('Cultures must be set when varying by culture.');
 			}
@@ -60,7 +60,7 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 					values.push(value);
 				}
 			}
-		} else if (propertyType.typeArgs.varyBySegment) {
+		} else if (propertyType.typeArgs.variesBySegment) {
 			for (const segment of this.#segments) {
 				const value = await this._generatePropertyValue(apis, propertyType, {
 					variantId: new UmbVariantId(null, segment),

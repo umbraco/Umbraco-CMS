@@ -2,6 +2,13 @@ import { manifest as schemaManifest } from './Umbraco.MarkdownEditor.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
+		type: 'propertyValuePreset',
+		forPropertyEditorSchemaAlias: 'Umbraco.MarkdownEditor',
+		alias: 'Umbraco.MarkdownEditor',
+		name: 'Markdown Editor Property Value Preset',
+		api: () => import('./property-value-preset.MarkdownEditor.js'),
+	},
+	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.MarkdownEditor',
 		name: 'Markdown Editor Property Editor UI',

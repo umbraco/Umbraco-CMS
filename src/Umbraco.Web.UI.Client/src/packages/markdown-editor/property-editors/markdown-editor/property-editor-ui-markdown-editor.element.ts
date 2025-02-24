@@ -38,12 +38,6 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 
 		this._preview = config.getValueByAlias('preview');
 		this._overlaySize = config.getValueByAlias('overlaySize') ?? 'small';
-
-		// TODO: To be removed once the "Property Value Presets" feature has been implemented.
-		const defaultValue = config.getValueByAlias<string>('defaultValue');
-		if (defaultValue && this.value === undefined) {
-			this.value = defaultValue;
-		}
 	}
 
 	#onChange(event: Event & { target: UmbInputMarkdownElement }) {

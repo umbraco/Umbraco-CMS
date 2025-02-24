@@ -30,8 +30,8 @@ export interface UmbPropertyTypePresetModel {
 
 export interface UmbPropertyTypePresetModelTypeModel {
 	isMandatory?: boolean;
-	varyByCulture?: boolean;
-	varyBySegment?: boolean;
+	variesByCulture?: boolean;
+	variesBySegment?: boolean;
 }
 export interface UmbPropertyValuePresetApiCallArgs {
 	variantId?: UmbVariantId;
