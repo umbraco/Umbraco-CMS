@@ -11,13 +11,15 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 	//#variesByCulture?: boolean;
 	//#variesBySegment?: boolean;
 
-	protected override _sortCurrentData(persistedData: ModelType, currentData: Partial<ModelType>) {
+	protected override _sortCurrentData(persistedData: Partial<ModelType>, currentData: Partial<ModelType>) {
 		super._sortCurrentData(persistedData, currentData);
 		// Sort the values in the same order as the persisted data:
 		const persistedValues = persistedData.values;
-		currentData.values?.sort(function (a, b) {
-			return persistedValues.indexOf(a) - persistedValues.indexOf(b);
-		});
+		if (persistedValues) {
+			currentData.values?.sort(function (a, b) {
+				return persistedValues.indexOf(a) - persistedValues.indexOf(b);
+			});
+		}
 	}
 
 	#updateLock = 0;

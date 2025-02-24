@@ -28,7 +28,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 */
 	public readonly current = this._current.asObservable();
 
-	protected _sortCurrentData(persistedData: ModelType, currentData: Partial<ModelType>) {
+	protected _sortCurrentData(persistedData: Partial<ModelType>, currentData: Partial<ModelType>) {
 		// do nothing.
 	}
 
