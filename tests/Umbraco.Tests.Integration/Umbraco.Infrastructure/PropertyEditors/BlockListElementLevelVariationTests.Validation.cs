@@ -512,4 +512,126 @@ internal partial class BlockListElementLevelVariationTests
 
         Assert.IsEmpty(result.ValidationErrors);
     }
+
+    [Test]
+    public async Task Can_Validate_Properties_Variant_Blocks()
+    {
+        var elementType = CreateElementTypeWithValidation(ContentVariation.Nothing);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    // blocks property values use null culture for culture variant block editor properties
+                    new() { Alias = "invariantText", Value = "Valid invariantText content value", Culture = null },
+                    new() { Alias = "variantText", Value = "Invalid variantText content value", Culture = null },
+                },
+                new List<BlockPropertyValue>
+                {
+                    // blocks property values use null culture for culture variant block editor properties
+                    new() { Alias = "invariantText", Value = "Invalid invariantText settings value", Culture = null },
+                    new() { Alias = "variantText", Value = "Valid variantText settings value", Culture = null },
+                },
+                "en-US",
+                null));
+
+        // make sure all blocks are exposed as they would be for culture variant properties
+        blockListValue.Expose =
+        [
+            new() { ContentKey = blockListValue.ContentData[0].Key, Culture = null }
+        ];
+
+        var result = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Variants =
+                [
+                    new VariantModel
+                    {
+                        Name = "Name en-US",
+                        Culture = "en-US",
+                        Segment = null,
+                        Properties = [
+                            new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
+                        ]
+                    }
+                ],
+                InvariantProperties = []
+            },
+            contentType);
+
+        var errors = result.ValidationErrors.ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, errors.Length);
+            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == "en-US" && error.Segment == null));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[1].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value"));
+        });
+    }
+
+    [Test]
+    public async Task Can_Validate_Missing_Properties_Variant_Blocks()
+    {
+        var elementType = CreateElementTypeWithValidation(ContentVariation.Nothing);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    // missing the mandatory "invariantText"
+                    new() { Alias = "variantText", Value = "Valid variantText content value", Culture = null },
+                },
+                new List<BlockPropertyValue>
+                {
+                    // missing the mandatory "variantText" (which, to add to the confusion, is invariant at block level in this test case)
+                    new() { Alias = "invariantText", Value = "Valid invariantText settings value", Culture = null },
+                },
+                "en-US",
+                null));
+
+        // make sure all blocks are exposed as they would be for culture variant properties
+        blockListValue.Expose =
+        [
+            new() { ContentKey = blockListValue.ContentData[0].Key, Culture = null }
+        ];
+
+        var result = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Variants =
+                [
+                    new VariantModel
+                    {
+                        Name = "Name en-US",
+                        Culture = "en-US",
+                        Segment = null,
+                        Properties = [
+                            new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
+                        ]
+                    }
+                ],
+                InvariantProperties = []
+            },
+            contentType);
+
+        var errors = result.ValidationErrors.ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, errors.Length);
+            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == "en-US" && error.Segment == null));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'variantText' && @.culture == null && @.segment == null)].value"));
+        });
+    }
 }
