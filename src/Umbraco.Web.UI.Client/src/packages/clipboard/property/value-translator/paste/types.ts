@@ -8,5 +8,9 @@ export interface UmbClipboardPastePropertyValueTranslator<
 	ConfigType = any,
 > extends UmbApi {
 	translate: (value: ClipboardEntryValueType) => Promise<PropertyValueModelType>;
-	isCompatibleValue?: (value: ClipboardEntryValueType, config: ConfigType) => Promise<boolean>;
+	isCompatibleValue?: (
+		value: ClipboardEntryValueType,
+		config: ConfigType,
+		filter: () => Promise<boolean>,
+	) => Promise<boolean>;
 }
