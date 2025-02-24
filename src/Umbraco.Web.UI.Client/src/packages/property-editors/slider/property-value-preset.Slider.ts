@@ -1,6 +1,6 @@
+import type { UmbPropertyEditorUISliderValue } from './types.js';
 import type { UmbPropertyValuePresetApi } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUISliderValue } from './types.js';
 
 export class UmbPropertyValuePresetSliderApi
 	implements UmbPropertyValuePresetApi<UmbPropertyEditorUISliderValue, UmbPropertyEditorConfig>

@@ -1,3 +1,4 @@
+import type { UmbPropertyEditorUIToggleValue } from './types.js';
 import type { UmbInputToggleElement } from '@umbraco-cms/backoffice/components';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -7,7 +8,6 @@ import type {
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_VALIDATION_FALSE_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import type { UmbPropertyEditorUIToggleValue } from './types';
 
 @customElement('umb-property-editor-ui-toggle')
 export class UmbPropertyEditorUIToggleElement

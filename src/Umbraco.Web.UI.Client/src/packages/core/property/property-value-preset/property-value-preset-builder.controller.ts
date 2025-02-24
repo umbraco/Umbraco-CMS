@@ -1,7 +1,4 @@
 import type { UmbPropertyValueData, UmbPropertyValueDataPotentiallyWithEditorAlias } from '../index.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	ManifestPropertyValuePreset,
 	UmbPropertyTypePresetModel,
@@ -9,6 +6,9 @@ import type {
 	UmbPropertyValuePresetApi,
 	UmbPropertyValuePresetApiCallArgs,
 } from './types.js';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 const EMPTY_CALL_ARGS = Object.freeze({});
 

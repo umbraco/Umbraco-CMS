@@ -1,6 +1,6 @@
+import type { UmbVariantId } from '../../variant/variant-id.class.js';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbVariantId } from '../../variant/variant-id.class.js';
 
 export type * from './property-value-preset.extension.js';
 

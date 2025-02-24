@@ -1,11 +1,11 @@
-import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
+import { UmbVariantId } from '../../variant/variant-id.class.js';
 import { UmbPropertyValuePresetBuilderController } from './property-value-preset-builder.controller.js';
 import type {
 	UmbPropertyTypePresetModel,
 	UmbPropertyTypePresetWithSchemaAliasModel,
 	UmbPropertyValuePresetApi,
 } from './types.js';
-import { UmbVariantId } from '../../variant/variant-id.class.js';
+import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 
 type ReturnType = UmbElementValueModel;
 
@@ -26,7 +26,7 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 		apis: Array<UmbPropertyValuePresetApi>,
 		propertyType: UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel,
 	): Promise<Array<ReturnType>> {
-		let values: Array<ReturnType> = [];
+		const values: Array<ReturnType> = [];
 
 		if (propertyType.typeArgs.varyBySegment && propertyType.typeArgs.varyByCulture) {
 			if (this.#cultures.length === 0) {

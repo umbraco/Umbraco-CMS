@@ -1,3 +1,4 @@
+import type { UmbPropertyEditorUISliderValue } from './types.js';
 import type { UmbInputSliderElement } from '@umbraco-cms/backoffice/components';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -7,7 +8,6 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUISliderValue } from './types.js';
 
 /**
  * @element umb-property-editor-ui-slider
