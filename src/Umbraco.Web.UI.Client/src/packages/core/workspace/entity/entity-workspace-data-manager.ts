@@ -28,6 +28,10 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 */
 	public readonly current = this._current.asObservable();
 
+	protected _sortCurrentData(persistedData: ModelType, currentData: Partial<ModelType>) {
+		// do nothing.
+	}
+
 	/**
 	 * Gets persisted data
 	 * @returns {(ModelType | undefined)}
@@ -81,6 +85,12 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	setCurrent(data: ModelType | undefined) {
+		if (data) {
+			const persistedData = this._persisted.getValue();
+			if (persistedData) {
+				this._sortCurrentData(persistedData, data);
+			}
+		}
 		this._current.setValue(data);
 	}
 
@@ -90,6 +100,12 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	updateCurrent(partialData: Partial<ModelType>) {
+		if (partialData) {
+			const persistedData = this._persisted.getValue();
+			if (persistedData) {
+				this._sortCurrentData(persistedData, partialData);
+			}
+		}
 		this._current.update(partialData);
 	}
 

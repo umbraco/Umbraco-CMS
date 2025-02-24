@@ -11,6 +11,15 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 	//#variesByCulture?: boolean;
 	//#variesBySegment?: boolean;
 
+	protected override _sortCurrentData(persistedData: ModelType, currentData: Partial<ModelType>) {
+		super._sortCurrentData(persistedData, currentData);
+		// Sort the values in the same order as the persisted data:
+		const persistedValues = persistedData.values;
+		currentData.values?.sort(function (a, b) {
+			return persistedValues.indexOf(a) - persistedValues.indexOf(b);
+		});
+	}
+
 	#updateLock = 0;
 	initiatePropertyValueChange() {
 		this.#updateLock++;
@@ -54,7 +63,7 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 			variantsToStore = [...selectedVariants, invariantVariantId];
 		}
 
-		const data = this._current.getValue();
+		const data = this.getCurrent();
 		if (!data) throw new Error('Current data is missing');
 		//if (!data.unique) throw new Error('Unique of current data is missing');
 

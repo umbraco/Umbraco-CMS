@@ -19,25 +19,13 @@ export class UmbContentWorkspaceDataManager<
 		this.#variantScaffold = variantScaffold;
 	}
 
-	override setCurrent(data: ModelType | undefined): void {
-		if (data) {
-			const persistedData = this.getPersisted();
-			if (persistedData) {
-				// Sort the values in the same order as the persisted data:
-				const persistedValues = persistedData.values;
-				data.values.sort(function (a, b) {
-					return persistedValues.indexOf(a) - persistedValues.indexOf(b);
-				});
-
-				// Sort the variants in the same order as the persisted data:
-				const persistedVariants = persistedData.variants;
-				data.variants.sort(function (a, b) {
-					return persistedVariants.indexOf(a) - persistedVariants.indexOf(b);
-				});
-			}
-		}
-
-		super.setCurrent(data);
+	protected override _sortCurrentData(persistedData: ModelType, currentData: Partial<ModelType>) {
+		super._sortCurrentData(persistedData, currentData);
+		// Sort the variants in the same order as the persisted data:
+		const persistedVariants = persistedData.variants;
+		currentData.variants?.sort(function (a, b) {
+			return persistedVariants.indexOf(a) - persistedVariants.indexOf(b);
+		});
 	}
 
 	/**
@@ -71,8 +59,7 @@ export class UmbContentWorkspaceDataManager<
 				} as ModelVariantType,
 				(x) => variantId.compare(x),
 			) as Array<ModelVariantType>;
-			// TODO: I have some trouble with TypeScript here, I does not look like me, but i had to give up. [NL]
-			this._current.update({ variants: newVariants } as any);
+			this.updateCurrent({ variants: newVariants } as unknown as ModelType);
 		} else if (this._varies === false) {
 			// TODO: Beware about segments, in this case we need to also consider segments, if its allowed to vary by segments.
 			const invariantVariantId = UmbVariantId.CreateInvariant();
@@ -86,8 +73,7 @@ export class UmbContentWorkspaceDataManager<
 					...update,
 				} as ModelVariantType,
 			];
-			// TODO: I have some trouble with TypeScript here, I does not look like me, but i had to give up. [NL]
-			this._current.update({ variants: newVariants } as any);
+			this.updateCurrent({ variants: newVariants } as unknown as ModelType);
 		} else {
 			throw new Error('Varies by culture is missing');
 		}
