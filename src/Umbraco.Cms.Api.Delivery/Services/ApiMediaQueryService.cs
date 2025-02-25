@@ -16,12 +16,18 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
     private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly ILogger<ApiMediaQueryService> _logger;
     private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
+    private readonly IPublishedMediaStatusFilteringService _publishedMediaStatusFilteringService;
 
-    public ApiMediaQueryService(IPublishedMediaCache publishedMediaCache, ILogger<ApiMediaQueryService> logger, IMediaNavigationQueryService mediaNavigationQueryService)
+    public ApiMediaQueryService(
+        IPublishedMediaCache publishedMediaCache,
+        ILogger<ApiMediaQueryService> logger,
+        IMediaNavigationQueryService mediaNavigationQueryService,
+        IPublishedMediaStatusFilteringService publishedMediaStatusFilteringService)
     {
         _publishedMediaCache = publishedMediaCache;
         _logger = logger;
         _mediaNavigationQueryService = mediaNavigationQueryService;
+        _publishedMediaStatusFilteringService = publishedMediaStatusFilteringService;
     }
 
     /// <inheritdoc/>
@@ -71,7 +77,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
                 break;
             }
 
-            currentChildren = resolvedMedia.Children(null, _publishedMediaCache, _mediaNavigationQueryService);
+            currentChildren = resolvedMedia.Children(_mediaNavigationQueryService, _publishedMediaStatusFilteringService);
         }
 
         return resolvedMedia;
@@ -104,7 +110,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             ? mediaCache.GetById(parentKey)
             : TryGetByPath(childrenOf, mediaCache);
 
-        return parent?.Children(null, _publishedMediaCache, _mediaNavigationQueryService) ?? Array.Empty<IPublishedContent>();
+        return parent?.Children(_mediaNavigationQueryService, _publishedMediaStatusFilteringService) ?? Array.Empty<IPublishedContent>();
     }
 
     private IEnumerable<IPublishedContent>? ApplyFilters(IEnumerable<IPublishedContent> source, IEnumerable<string> filters)
