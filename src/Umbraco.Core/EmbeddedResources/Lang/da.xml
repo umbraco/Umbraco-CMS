@@ -113,6 +113,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="entriesShort"><![CDATA[Minimum %0% element(er), tilføj <strong>%1%</strong> mere.]]></key>
     <key alias="entriesExceed"><![CDATA[Maksimum %0% element(er), <strong>%1%</strong> for mange.]]></key>
     <key alias="entriesAreasMismatch">Ét eller flere områder lever ikke op til kravene for antal indholdselementer.</key>
+    <key alias="invalidMediaType">Den valgte medie type er ugyldig.</key>
+    <key alias="multipleMediaNotAllowed">Det er kun tilladt at vælge ét medie.</key>
+    <key alias="invalidStartNode">Valgt medie kommer fra en ugyldig mappe.</key>
   </area>
   <area alias="recycleBin">
     <key alias="contentTrashed">Slettet indhold med Id: {0} Relateret til original "parent" med id: {1}</key>
