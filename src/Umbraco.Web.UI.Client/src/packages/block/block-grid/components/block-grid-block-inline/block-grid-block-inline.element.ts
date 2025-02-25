@@ -204,12 +204,12 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 					.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize
 			></uui-button>`;
 		} else {
-			return html`<div id="inside">
+			return html`<div id="inside" draggable="false">
 				<umb-property-type-based-property
 					.property=${this._inlineProperty}
 					.dataPath=${this._inlinePropertyDataPath ?? ''}
 					slot="areas"></umb-property-type-based-property>
-				<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
+				<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
 			</div>`;
 		}
 	}

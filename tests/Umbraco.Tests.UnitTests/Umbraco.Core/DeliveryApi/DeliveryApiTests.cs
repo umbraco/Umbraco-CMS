@@ -113,13 +113,14 @@ public class DeliveryApiTests
         content.SetupGet(c => c.ContentType).Returns(contentType);
         content.SetupGet(c => c.Properties).Returns(properties);
         content.SetupGet(c => c.ItemType).Returns(contentType.ItemType);
+        content.SetupGet(c => c.Level).Returns(1);
         content.Setup(c => c.IsPublished(It.IsAny<string?>())).Returns(true);
     }
 
     protected string DefaultUrlSegment(string name, string? culture = null)
         => $"{name.ToLowerInvariant().Replace(" ", "-")}{(culture.IsNullOrWhiteSpace() ? string.Empty : $"-{culture}")}";
 
-    protected ApiContentRouteBuilder CreateContentRouteBuilder(
+    protected virtual ApiContentRouteBuilder CreateContentRouteBuilder(
         IApiContentPathProvider contentPathProvider,
         IOptions<GlobalSettings> globalSettings,
         IVariationContextAccessor? variationContextAccessor = null,

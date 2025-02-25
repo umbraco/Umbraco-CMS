@@ -912,8 +912,34 @@ export const data: Array<UmbMockDocumentModel> = [
 					blocks: undefined,
 					markup: `
 						<p>
-							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
+							<span id="foo">Some</span> value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a>.
 						</p>
+						<div data-foo-bar="123">
+							<span>This is a plain old span tag.</span>
+							<span style="color:red;">Hello <span style="color:blue;">world</span>.</span>
+						</div>
+						<table style="width: 100%;">
+							<thead>
+								<tr>
+									<th>Version</th>
+									<th>Date</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>15.3</td>
+									<td>2025-03-20</td>
+								</tr>
+								<tr>
+									<td>16.0</td>
+									<td>2025-06-12</td>
+								</tr>
+								<tr>
+									<td>17.0</td>
+									<td>2025-11-27</td>
+								</tr>
+							</tbody>
+						</table>
 						<p>
 							<img width="384" height="228" loading="lazy" alt="Installer illustration" src="/umbraco/backoffice/assets/installer-illustration.svg" />
 						</p>

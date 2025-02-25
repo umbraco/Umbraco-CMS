@@ -10,6 +10,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
@@ -18,6 +20,9 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 
 	override async execute() {
 		if (!this.args.unique) throw new Error('The document unique identifier is missing');
+
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		const localize = new UmbLocalizationController(this);
 
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);
 		const { data: languageData } = await languageRepository.requestCollection({});
@@ -65,7 +70,15 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 		if (options.length === 1) {
 			const variantId = UmbVariantId.Create(documentData.variants[0]);
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
-			await publishingRepository.publish(this.args.unique, [{ variantId }]);
+			const { error } = await publishingRepository.publish(this.args.unique, [{ variantId }]);
+			if (!error) {
+				notificationContext.peek('positive', {
+					data: {
+						headline: localize.term('speechBubbles_editContentPublishedHeader'),
+						message: localize.term('speechBubbles_editContentPublishedText'),
+					},
+				});
+			}
 			actionEventContext.dispatchEvent(event);
 			return;
 		}
@@ -103,10 +116,24 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 
 		if (variantIds.length) {
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
-			await publishingRepository.publish(
+			const { error } = await publishingRepository.publish(
 				this.args.unique,
 				variantIds.map((variantId) => ({ variantId })),
 			);
+
+			if (!error) {
+				const documentVariants = documentData.variants.filter((variant) => result.selection.includes(variant.culture!));
+				notificationContext.peek('positive', {
+					data: {
+						headline: localize.term('speechBubbles_editContentPublishedHeader'),
+						message: localize.term(
+							'speechBubbles_editVariantPublishedText',
+							localize.list(documentVariants.map((v) => v.culture ?? v.name)),
+						),
+					},
+				});
+			}
+
 			actionEventContext.dispatchEvent(event);
 		}
 	}

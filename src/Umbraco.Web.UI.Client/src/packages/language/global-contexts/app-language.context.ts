@@ -17,6 +17,17 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 		this.#languagesResolve = resolve;
 	});
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
+	public readonly languages = this.#languages.asObservable();
+	public readonly cultures = this.#languages.asObservablePart((x) => x.map((y) => y.unique));
+	async getCultures() {
+		return (await this.observe(this.languages).asPromise()).map((x) => x.unique);
+	}
+
+	public readonly appDefaultLanguage = this.#languages.asObservablePart((languages) =>
+		languages.find((language) => language.isDefault),
+	);
+
+	public readonly moreThanOneLanguage = this.#languages.asObservablePart((x) => x.length > 1);
 
 	#appLanguage = new UmbObjectState<UmbLanguageDetailModel | undefined>(undefined);
 	public readonly appLanguage = this.#appLanguage.asObservable();
@@ -24,9 +35,6 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 
 	public readonly appLanguageReadOnlyState = new UmbReadOnlyStateManager(this);
 
-	public readonly appDefaultLanguage = this.#languages.asObservablePart((languages) =>
-		languages.find((language) => language.isDefault),
-	);
 	public readonly appMandatoryLanguages = this.#languages.asObservablePart((languages) =>
 		languages.filter((language) => language.isMandatory),
 	);
@@ -35,11 +43,7 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 		return this.#languages.getValue().filter((language) => language.isMandatory);
 	}
 
-	public readonly moreThanOneLanguage = this.#languages.asObservablePart((x) => x.length > 1);
-
 	#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
-	#currentUserAllowedLanguages: Array<string> = [];
-	#currentUserHasAccessToAllLanguages = false;
 
 	#readOnlyStateIdentifier = 'UMB_LANGUAGE_PERMISSION_';
 	#localStorageKey = 'umb:appLanguage';

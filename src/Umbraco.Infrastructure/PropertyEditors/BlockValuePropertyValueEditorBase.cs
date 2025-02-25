@@ -296,6 +296,18 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         BlockEditorData<TValue, TLayout>? source = BlockEditorValues.DeserializeAndClean(sourceValue);
         BlockEditorData<TValue, TLayout>? target = BlockEditorValues.DeserializeAndClean(targetValue);
 
+        TValue? mergedBlockValue =
+            MergeVariantInvariantPropertyValueTyped(source, target, canUpdateInvariantData, allowedCultures);
+
+        return _jsonSerializer.Serialize(mergedBlockValue);
+    }
+
+    internal virtual TValue? MergeVariantInvariantPropertyValueTyped(
+        BlockEditorData<TValue, TLayout>? source,
+        BlockEditorData<TValue, TLayout>? target,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
         source = UpdateSourceInvariantData(source, target, canUpdateInvariantData);
 
         if (source is null && target is null)
@@ -328,7 +340,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         CleanupVariantValues(source.BlockValue.ContentData, target.BlockValue.ContentData, canUpdateInvariantData, allowedCultures);
         CleanupVariantValues(source.BlockValue.SettingsData, target.BlockValue.SettingsData, canUpdateInvariantData, allowedCultures);
 
-        return _jsonSerializer.Serialize(target.BlockValue);
+        return target.BlockValue;
     }
 
     private void CleanupVariantValues(

@@ -43,16 +43,16 @@ export class UmbPropertyEditorUITinyMceElement extends UmbPropertyEditorUiRteEle
 		// Then get the content of the editor and update the value.
 		// maybe in this way doc.body.innerHTML;
 
-		this._latestMarkup = markup;
+		this._markup = markup;
 
 		if (this.value) {
 			this.value = {
 				...this.value,
-				markup: this._latestMarkup,
+				markup: this._markup,
 			};
 		} else {
 			this.value = {
-				markup: this._latestMarkup,
+				markup: this._markup,
 				blocks: {
 					layout: {},
 					contentData: [],
