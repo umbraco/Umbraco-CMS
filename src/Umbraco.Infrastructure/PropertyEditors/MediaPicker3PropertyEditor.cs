@@ -393,9 +393,11 @@ public class MediaPicker3PropertyEditor : DataEditor
                     return [];
                 }
 
-                foreach (MediaWithCropsDto media in value)
+                IEnumerable<string> distinctTypeAliases = value.DistinctBy(x => x.MediaTypeAlias).Select(x => x.MediaTypeAlias);
+
+                foreach (var typeAlias in distinctTypeAliases)
                 {
-                    IMediaType? type = _mediaTypeService.Get(media.MediaTypeAlias);
+                    IMediaType? type = _mediaTypeService.Get(typeAlias);
 
                     if (type is null || allowedTypes.Contains(type.Key.ToString()) is false)
                     {
