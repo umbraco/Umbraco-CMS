@@ -157,7 +157,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'bold',
 			icon: 'icon-bold',
-			label: 'Bold',
+			label: '#buttons_bold',
 		},
 	},
 	{
@@ -169,7 +169,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'italic',
 			icon: 'icon-italic',
-			label: 'Italic',
+			label: '#buttons_italic',
 		},
 	},
 	{
@@ -306,7 +306,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'bulletList',
 			icon: 'icon-bulleted-list',
-			label: 'Bullet List',
+			label: '#buttons_listBullet',
 		},
 	},
 	{
@@ -420,7 +420,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'undo',
 			icon: 'icon-undo',
-			label: 'Undo',
+			label: '#buttons_undo',
 		},
 	},
 	{
@@ -433,7 +433,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'redo',
 			icon: 'icon-redo',
-			label: 'Redo',
+			label: '#buttons_redo',
 		},
 	},
 	{
@@ -446,7 +446,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'umbMedia',
 			icon: 'icon-picture',
-			label: 'Media picker',
+			label: '#general_mediaPicker',
 		},
 	},
 	{
