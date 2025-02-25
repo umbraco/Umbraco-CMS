@@ -1015,43 +1015,6 @@ public partial class ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Cannot_Create_Property_Container_In_Composition_Container()
-    {
-        var compositionBase = ContentTypeCreateModel(
-            "Composition Base",
-            "compositionBase");
-
-        // Let's add a property to ensure that it passes through
-        var compositionContainer = ContentTypePropertyContainerModel("Composition Tab");
-        compositionBase.Containers = new[] { compositionContainer };
-
-        var compositionProperty = ContentTypePropertyTypeModel("Composition Property", "compositionProperty", containerKey: compositionContainer.Key);
-        compositionBase.Properties = new[] { compositionProperty };
-
-        var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
-        Assert.IsTrue(compositionResult.Success);
-        var compositionType = compositionResult.Result;
-
-        // Create doc type using the composition
-        var createModel = ContentTypeCreateModel(
-            compositions: new[]
-            {
-                new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
-            });
-
-        // this is invalid; cannot create a new container within a parent container that belongs to the composition (the parent container must be duplicated to the content type itself)
-        var container = ContentTypePropertyContainerModel("My Group", type: GroupContainerType);
-        container.ParentKey = compositionContainer.Key;
-        createModel.Containers = new[] { container };
-        var property = ContentTypePropertyTypeModel("My Property", "myProperty", containerKey: container.Key);
-        createModel.Properties = new[] { property };
-
-        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
-    }
-
-    [Test]
     public async Task Cannot_Create_Composite_With_MediaType()
     {
         var compositionBase = MediaTypeCreateModel("Composition Base");

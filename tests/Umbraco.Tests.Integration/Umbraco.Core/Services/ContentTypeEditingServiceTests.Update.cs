@@ -834,7 +834,7 @@ public partial class ContentTypeEditingServiceTests
 
         // Prepare composition with a tab and content type that uses the composition.
         var compositionTab = ContentTypePropertyContainerModel(name: "Tab 1");
-        var compositionGroup = ContentTypePropertyContainerModel(name: "Group 1", type: "Group");
+        var compositionGroup = ContentTypePropertyContainerModel(name: "Group 1", type: GroupContainerType);
         compositionGroup.ParentKey = compositionTab.Key;
         var compositionProperty = ContentTypePropertyTypeModel("Test Property", "testProperty", containerKey: compositionGroup.Key);
         var compositionCreateModel = ContentTypeCreateModel("Composition", "composition");
@@ -850,7 +850,7 @@ public partial class ContentTypeEditingServiceTests
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
         // Add a new group and property.
-        var propertyGroup = ContentTypePropertyContainerModel(name: "Group 2", type: "Group");
+        var propertyGroup = ContentTypePropertyContainerModel(name: "Group 2", type: GroupContainerType);
         propertyGroup.ParentKey = compositionTab.Key;
         var property = ContentTypePropertyTypeModel("Test Property 2", "testProperty2");
         property.ContainerKey = propertyGroup.Key;
