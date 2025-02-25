@@ -1,17 +1,17 @@
-import { UmbDataMappingResolver } from './mapping/data-mapping-resolver.js';
+import { UmbDataSourceDataMappingResolver } from './mapping/data-mapping-resolver.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export interface UmbDataMapperMapArgs<fromModelType = unknown, toModelType = unknown> {
+export interface UmbDataSourceDataMapperMapArgs<fromModelType = unknown, toModelType = unknown> {
 	forDataModel: string;
 	forDataSource: string;
 	data: fromModelType;
 	fallback?: (data: fromModelType) => Promise<toModelType>;
 }
 
-export class UmbDataMapper<fromModelType = unknown, toModelType = unknown> extends UmbControllerBase {
-	#dataMappingResolver = new UmbDataMappingResolver(this);
+export class UmbDataSourceDataMapper<fromModelType = unknown, toModelType = unknown> extends UmbControllerBase {
+	#dataMappingResolver = new UmbDataSourceDataMappingResolver(this);
 
-	async map(args: UmbDataMapperMapArgs<fromModelType, toModelType>) {
+	async map(args: UmbDataSourceDataMapperMapArgs<fromModelType, toModelType>) {
 		if (!args.forDataSource) {
 			throw new Error('data source identifier is required');
 		}

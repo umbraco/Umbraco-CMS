@@ -61,6 +61,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	}
 
 	override set value(newValue: FormDataEntryValue | FormData) {
+		if (newValue === this.value) return;
 		super.value = newValue;
 		const newContent = typeof newValue === 'string' ? newValue : '';
 
