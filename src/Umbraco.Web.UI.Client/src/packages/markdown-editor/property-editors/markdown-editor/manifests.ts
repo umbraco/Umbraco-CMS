@@ -4,7 +4,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyValuePreset',
 		forPropertyEditorSchemaAlias: 'Umbraco.MarkdownEditor',
-		alias: 'Umbraco.MarkdownEditor',
+		alias: 'Umb.PropertyValuePreset.MarkdownEditor',
 		name: 'Markdown Editor Property Value Preset',
 		api: () => import('./markdown-editor-property-value-preset.js'),
 	},
