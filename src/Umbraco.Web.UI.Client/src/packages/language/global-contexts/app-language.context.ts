@@ -44,6 +44,8 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 	}
 
 	#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
+	#currentUserAllowedLanguages: Array<string> = [];
+	#currentUserHasAccessToAllLanguages = false;
 
 	#readOnlyStateIdentifier = 'UMB_LANGUAGE_PERMISSION_';
 	#localStorageKey = 'umb:appLanguage';
