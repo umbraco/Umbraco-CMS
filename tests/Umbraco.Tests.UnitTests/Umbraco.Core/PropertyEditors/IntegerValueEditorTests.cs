@@ -14,7 +14,7 @@ using Umbraco.Cms.Core.Strings;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
 [TestFixture]
-public class DecimalValueEditorTests
+public class IntegerValueEditorTests
 {
     // annoyingly we can't use decimals etc. in attributes, so we can't turn these into test cases :(
     private Dictionary<object?,object?> _valuesAndExpectedResults = new();
@@ -22,13 +22,13 @@ public class DecimalValueEditorTests
     [SetUp]
     public void SetUp() => _valuesAndExpectedResults = new Dictionary<object?, object?>
     {
-        { 123m, 123m },
-        { 123, 123m },
-        { -123, -123m },
-        { 123.45d, 123.45m },
-        { "123.45", 123.45m },
-        { "1234.56", 1234.56m },
-        { "123,45", 12345m },
+        { 123m, 123 },
+        { 123, 123 },
+        { -123, -123 },
+        { 123.45d, null },
+        { "123.45", null },
+        { "1234.56", null },
+        { "123,45", null },
         { "1.234,56", null },
         { "123 45", null },
         { "something", null },
@@ -74,8 +74,8 @@ public class DecimalValueEditorTests
     }
 
     [TestCase("x", false)]
-    [TestCase(1.5, true)]
-    public void Validates_Is_Decimal(object value, bool expectedSuccess)
+    [TestCase(10, true)]
+    public void Validates_Is_Integer(object value, bool expectedSuccess)
     {
         var editor = CreateValueEditor();
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
@@ -88,13 +88,13 @@ public class DecimalValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, $"The value {value} is not a valid decimal");
+            Assert.AreEqual($"The value {value} is not a valid integer", validationResult.ErrorMessage);
         }
     }
 
-    [TestCase(0.9, false)]
-    [TestCase(1.1, true)]
-    [TestCase(1.3, true)]
+    [TestCase(8, false)]
+    [TestCase(10, true)]
+    [TestCase(12, true)]
     public void Validates_Is_Greater_Than_Or_Equal_To_Configured_Min(object value, bool expectedSuccess)
     {
         var editor = CreateValueEditor();
@@ -108,13 +108,13 @@ public class DecimalValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMinimum");
+            Assert.AreEqual("validation_outOfRangeMinimum", validationResult.ErrorMessage);
         }
     }
 
-    [TestCase(1.7, true)]
-    [TestCase(1.9, true)]
-    [TestCase(2.1, false)]
+    [TestCase(18, true)]
+    [TestCase(20, true)]
+    [TestCase(22, false)]
     public void Validates_Is_Less_Than_Or_Equal_To_Configured_Max(object value, bool expectedSuccess)
     {
         var editor = CreateValueEditor();
@@ -128,12 +128,12 @@ public class DecimalValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMaximum");
+            Assert.AreEqual("validation_outOfRangeMaximum", validationResult.ErrorMessage);
         }
     }
 
-    [TestCase(1.4, false)]
-    [TestCase(1.5, true)]
+    [TestCase(17, false)]
+    [TestCase(18, true)]
     public void Validates_Matches_Configured_Step(object value, bool expectedSuccess)
     {
         var editor = CreateValueEditor();
@@ -147,7 +147,7 @@ public class DecimalValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, "validation_invalidStep");
+            Assert.AreEqual("validation_invalidStep", validationResult.ErrorMessage);
         }
     }
 
@@ -164,7 +164,7 @@ public class DecimalValueEditorTests
         return CreateValueEditor().ToEditor(property.Object);
     }
 
-    private static DecimalPropertyEditor.DecimalPropertyValueEditor CreateValueEditor()
+    private static IntegerPropertyEditor.IntegerPropertyValueEditor CreateValueEditor()
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
         localizedTextServiceMock.Setup(x => x.Localize(
@@ -173,7 +173,7 @@ public class DecimalValueEditorTests
                 It.IsAny<CultureInfo>(),
                 It.IsAny<IDictionary<string, string>>()))
             .Returns((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => $"{key}_{alias}");
-        return new DecimalPropertyEditor.DecimalPropertyValueEditor(
+        return new IntegerPropertyEditor.IntegerPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
@@ -182,9 +182,9 @@ public class DecimalValueEditorTests
         {
             ConfigurationObject = new Dictionary<string, object>
             {
-                { "min", 1.1 },
-                { "max", 1.9 },
-                { "step", 0.2 }
+                { "min", 10 },
+                { "max", 20 },
+                { "step", 2 }
             }
         };
     }
