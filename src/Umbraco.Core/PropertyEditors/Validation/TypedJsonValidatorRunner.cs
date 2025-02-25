@@ -4,6 +4,16 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validation;
 
+/// <summary>
+/// <para>
+/// An aggregate validator for JSON based value editors, to avoid doing multiple deserialization.
+/// </para>
+/// <para>
+/// Will deserialize once, and cast the configuration once, and pass those values to each <see cref="ITypedJsonValidator{TValue,TConfiguration}"/>, aggregating the results.
+/// </para>
+/// </summary>
+/// <typeparam name="TValue">The type of the expected value.</typeparam>
+/// <typeparam name="TConfiguration">The type of the expected configuration</typeparam>
 public class TypedJsonValidatorRunner<TValue, TConfiguration> : IValueValidator
     where TValue : class
 {
