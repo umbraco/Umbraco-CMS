@@ -334,7 +334,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                 {
                     validationResults.Add(new ValidationResult(
                         _localizedTextService.Localize("validation", "multipleMediaNotAllowed"),
-                        new[] { "validationLimit" }));
+                        new[] { "value" }));
                 }
 
                 if (mediaPickerConfiguration.ValidationLimit.Min is not null
@@ -345,7 +345,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                             "validation",
                             "entriesShort",
                             new[] { mediaPickerConfiguration.ValidationLimit.Min.ToString(), (mediaPickerConfiguration.ValidationLimit.Min - mediaWithCropsDtos.Count).ToString(), }),
-                        new[] { "validationLimit" }));
+                        new[] { "value" }));
                 }
 
                 if (mediaPickerConfiguration.ValidationLimit.Max is not null
@@ -356,7 +356,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                             "validation",
                             "entriesExceed",
                             new[] { mediaPickerConfiguration.ValidationLimit.Max.ToString(), (mediaWithCropsDtos.Count - mediaPickerConfiguration.ValidationLimit.Max).ToString(), }),
-                        new[] { "validationLimit" }));
+                        new[] { "value" }));
                 }
 
                 return validationResults;
@@ -405,7 +405,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                         [
                             new ValidationResult(
                                 _localizedTextService.Localize("validation", "invalidMediaType"),
-                                new[] { "invalidMediaType" })
+                                new[] { "value" })
                         ];
                     }
                 }
@@ -451,7 +451,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                         [
                             new ValidationResult(
                                 _localizedTextService.Localize("validation", "invalidStartNode"),
-                                new[] { "invalidStartNode" })
+                                new[] { "value" })
                         ];
                     }
                 }

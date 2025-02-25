@@ -42,7 +42,7 @@ internal class MediaPicker3ValueEditorValidationTests
 
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
 
-        ValidateResult(succeed, result, "invalidStartNode");
+        ValidateResult(succeed, result);
     }
 
     [Test]
@@ -80,7 +80,7 @@ internal class MediaPicker3ValueEditorValidationTests
         var value = "[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"" + mediaKey + "\",\n  \"mediaTypeAlias\" : \"" + mediaTypeAlias + "\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]";
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
 
-        ValidateResult(succeed, result, "invalidMediaType");
+        ValidateResult(succeed, result);
     }
 
     [Test]
@@ -96,7 +96,7 @@ internal class MediaPicker3ValueEditorValidationTests
         valueEditor.ConfigurationObject = new MediaPicker3Configuration() { Multiple = multiple };
 
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
-        ValidateResult(succeed, result, "validationLimit");
+        ValidateResult(succeed, result);
     }
 
     [Test]
@@ -114,7 +114,7 @@ internal class MediaPicker3ValueEditorValidationTests
 
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
 
-        ValidateResult(succeed, result, "validationLimit");
+        ValidateResult(succeed, result);
     }
 
     [Test]
@@ -132,10 +132,10 @@ internal class MediaPicker3ValueEditorValidationTests
         valueEditor.ConfigurationObject = new MediaPicker3Configuration() { Multiple = true, ValidationLimit = new MediaPicker3Configuration.NumberRange { Max = max } };
 
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
-        ValidateResult(succeed, result, "validationLimit");
+        ValidateResult(succeed, result);
     }
 
-    private static void ValidateResult(bool succeed, IEnumerable<ValidationResult> result, string memberName)
+    private static void ValidateResult(bool succeed, IEnumerable<ValidationResult> result)
     {
         if (succeed)
         {
@@ -144,7 +144,6 @@ internal class MediaPicker3ValueEditorValidationTests
         else
         {
             Assert.That(result.Count(), Is.EqualTo(1));
-            Assert.That(result.First().MemberNames.First(), Is.EqualTo(memberName));
         }
     }
 
