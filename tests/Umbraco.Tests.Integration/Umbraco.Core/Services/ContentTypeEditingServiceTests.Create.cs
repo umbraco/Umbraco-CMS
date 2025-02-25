@@ -1014,6 +1014,12 @@ public partial class ContentTypeEditingServiceTests
         Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
     }
 
+    [Obsolete("This test is no longer valid (see https://github.com/umbraco/Umbraco-CMS/pull/18458/). " +
+        "It's kept only to avoid a breaking change in the integration tests public interface. It will be removed in Umbraco 16")]
+    public async Task Cannot_Create_Property_Container_In_Composition_Container()
+    {
+    }
+
     [Test]
     public async Task Cannot_Create_Composite_With_MediaType()
     {
