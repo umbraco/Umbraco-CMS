@@ -602,6 +602,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         var parts = containerName.Split(Constants.CharArrays.Space);
         return $"{parts.First().ToFirstLowerInvariant()}{string.Join(string.Empty, parts.Skip(1).Select(part => part.ToFirstUpperInvariant()))}";
     }
+
     private static bool IsRequiredTabMissingFromPropertyGroups(
         IEnumerable<TPropertyTypeContainer> modelContainers,
         IEnumerable<PropertyGroup> propertyGroups,
