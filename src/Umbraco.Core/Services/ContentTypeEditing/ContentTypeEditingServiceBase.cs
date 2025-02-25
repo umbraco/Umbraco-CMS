@@ -507,53 +507,45 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
 
         // build a dictionary of parent container IDs and their names (we need it when mapping property groups)
         IEnumerable<PropertyGroup> compositionPropertyGroups = GetCompositionPropertyGroups(model, allContentTypeCompositions);
-        var parentContainerNamesById = model
-            .Containers
-            .Where(container => container.ParentKey is not null)
-            .DistinctBy(container => container.ParentKey)
-            .ToDictionary(
-                container => container.ParentKey!.Value,
-                // NOTE: this look-up appears to be a little dangerous, but at this point we should have validated
-                //       the containers and their parent relationships is either in the model or originate from a
-                //       composition, so it's ok
-                container => GetParentContainerName(model.Containers, compositionPropertyGroups, container));
+        Dictionary<Guid, string> parentContainerNamesById = BuildParentContainerNamesById(model, compositionPropertyGroups);
 
         // handle properties in groups
-        var propertyGroups = model.Containers.Select(container =>
-        {
-            PropertyGroup propertyGroup = contentType.PropertyGroups.FirstOrDefault(group => group.Key == container.Key) ??
-                                          new PropertyGroup(SupportsPublishing) { Key = container.Key };
-            // NOTE: eventually group.Type should be a string to make the client more flexible; for now we'll have to parse the string value back to its expected enum
-            propertyGroup.Type = Enum.Parse<PropertyGroupType>(container.Type);
-            propertyGroup.Name = container.Name;
-            // this is not pretty, but this is how the data structure is at the moment; we just have to live with it for the time being.
-            var alias = PropertyGroupAlias(container.Name);
-            if (container.ParentKey is not null)
+        var propertyGroups = model.Containers
+            .Select(container =>
             {
-                alias = $"{PropertyGroupAlias(parentContainerNamesById[container.ParentKey.Value])}/{alias}";
-            }
-            propertyGroup.Alias = alias;
-            propertyGroup.SortOrder = container.SortOrder;
+                PropertyGroup propertyGroup = contentType.PropertyGroups.FirstOrDefault(group => group.Key == container.Key) ??
+                                              new PropertyGroup(SupportsPublishing) { Key = container.Key };
+                // NOTE: eventually group.Type should be a string to make the client more flexible; for now we'll have to parse the string value back to its expected enum
+                propertyGroup.Type = Enum.Parse<PropertyGroupType>(container.Type);
+                propertyGroup.Name = container.Name;
+                // this is not pretty, but this is how the data structure is at the moment; we just have to live with it for the time being.
+                var alias = PropertyGroupAlias(container.Name);
+                if (container.ParentKey is not null)
+                {
+                    alias = $"{PropertyGroupAlias(parentContainerNamesById[container.ParentKey.Value])}/{alias}";
+                }
+                propertyGroup.Alias = alias;
+                propertyGroup.SortOrder = container.SortOrder;
 
-            IPropertyType[] properties = model
-                .Properties
-                .Where(property => property.ContainerKey == container.Key)
-                .Select(property => MapProperty(contentType, property, propertyGroup, dataTypesByKey))
-                .ToArray();
+                IPropertyType[] properties = model
+                    .Properties
+                    .Where(property => property.ContainerKey == container.Key)
+                    .Select(property => MapProperty(contentType, property, propertyGroup, dataTypesByKey))
+                    .ToArray();
 
-            if (properties.Any() is false && parentContainerNamesById.ContainsKey(container.Key) is false)
-            {
-                // FIXME: if at all possible, retain empty containers (bad DX to remove stuff that's been attempted saved)
-                return null;
-            }
+                if (properties.Any() is false && parentContainerNamesById.ContainsKey(container.Key) is false)
+                {
+                    // FIXME: if at all possible, retain empty containers (bad DX to remove stuff that's been attempted saved)
+                    return null;
+                }
 
-            if (propertyGroup.PropertyTypes == null || propertyGroup.PropertyTypes.SequenceEqual(properties) is false)
-            {
-                propertyGroup.PropertyTypes = new PropertyTypeCollection(SupportsPublishing, properties);
-            }
+                if (propertyGroup.PropertyTypes == null || propertyGroup.PropertyTypes.SequenceEqual(properties) is false)
+                {
+                    propertyGroup.PropertyTypes = new PropertyTypeCollection(SupportsPublishing, properties);
+                }
 
-            return propertyGroup;
-        })
+                return propertyGroup;
+            })
             .WhereNotNull()
             .ToList();
 
@@ -586,6 +578,18 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             contentType.NoGroupPropertyTypes = new PropertyTypeCollection(SupportsPublishing, orphanedPropertyTypes);
         }
     }
+
+    private static Dictionary<Guid, string> BuildParentContainerNamesById(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, IEnumerable<PropertyGroup> compositionPropertyGroups)
+        => model
+            .Containers
+            .Where(container => container.ParentKey is not null)
+            .DistinctBy(container => container.ParentKey)
+            .ToDictionary(
+                container => container.ParentKey!.Value,
+                // NOTE: this look-up appears to be a little dangerous, but at this point we should have validated
+                //       the containers and their parent relationships is either in the model or originate from a
+                //       composition, so it's ok
+                container => GetParentContainerName(model.Containers, compositionPropertyGroups, container));
 
     private static string GetParentContainerName(IEnumerable<TPropertyTypeContainer> modelContainers, IEnumerable<PropertyGroup> compositionPropertyGroups, TPropertyTypeContainer container)
         => modelContainers.FirstOrDefault(c => c.Key == container.ParentKey)?.Name
