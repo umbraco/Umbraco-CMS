@@ -387,6 +387,9 @@
     <key alias="duplicateUserGroupName">User group name '%0%' is already taken</key>
     <key alias="duplicateMemberGroupName">Member group name '%0%' is already taken</key>
     <key alias="duplicateUsername">Username '%0%' is already taken</key>
+    <key alias="invalidMediaType">The chosen media type is invalid.</key>
+    <key alias="multipleMediaNotAllowed">Multiple selected media is not allowed.</key>
+    <key alias="invalidStartNode">The selected media is from the wrong folder.</key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:
