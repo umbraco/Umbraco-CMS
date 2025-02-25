@@ -7,6 +7,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbReadOnlyStateManager } from '@umbraco-cms/backoffice/utils';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 
 // TODO: Make a store for the App Languages.
 // TODO: Implement default language end-point, in progress at backend team, so we can avoid getting all languages.
@@ -52,7 +53,13 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_APP_LANGUAGE_CONTEXT);
 
-		this.#requestLanguages();
+		// TODO: We need to ensure this request is called every time the user logs in, but this should be done somewhere across the app and not here [JOV]
+		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+			this.observe(authContext.isAuthorized, (isAuthorized) => {
+				if (!isAuthorized) return;
+				this.#requestLanguages();
+			});
+		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
 			this.observe(context.languages, (languages) => {
