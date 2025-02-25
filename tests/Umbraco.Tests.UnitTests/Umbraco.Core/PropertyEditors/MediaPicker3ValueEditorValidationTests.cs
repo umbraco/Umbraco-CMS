@@ -90,10 +90,10 @@ internal class MediaPicker3ValueEditorValidationTests
         ValidateResult(shouldSucceed, result);
     }
 
-    [TestCase(true, true)]
-    [TestCase(false, true)]
-    [TestCase(false, false)]
-    public void Validates_Allowed_Type(bool succeed, bool findsMediaType)
+    [TestCase(true, true, true)]
+    [TestCase(false, true, false)]
+    [TestCase(false, false, true)]
+    public void Validates_Allowed_Type(bool shouldSucceed, bool hasAllowedType, bool findsMediaType)
     {
         var (valueEditor, mediaTypeServiceMock, mediaNavigationQueryServiceMock) = CreateValueEditor();
 
@@ -103,7 +103,7 @@ internal class MediaPicker3ValueEditorValidationTests
         valueEditor.ConfigurationObject = new MediaPicker3Configuration() { Filter = $"{mediaTypeKey}" };
         var mediaTypeMock = new Mock<IMediaType>();
 
-        if (succeed)
+        if (hasAllowedType)
         {
             mediaTypeMock.Setup(x => x.Key).Returns(mediaTypeKey);
         }
@@ -124,7 +124,7 @@ internal class MediaPicker3ValueEditorValidationTests
         var value = "[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"" + mediaKey + "\",\n  \"mediaTypeAlias\" : \"" + mediaTypeAlias + "\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]";
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
 
-        ValidateResult(succeed, result);
+        ValidateResult(shouldSucceed, result);
     }
 
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", false, true)]
