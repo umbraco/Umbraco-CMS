@@ -14,13 +14,7 @@ export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionA
 
 	getTiptapExtensions = () => [
 		StarterKit,
-		Placeholder.configure({
-			placeholder: ({ node }) => {
-				return this.#localize.term(
-					node.type.name === 'heading' ? 'placeholders_rteHeading' : 'placeholders_rteParagraph',
-				);
-			},
-		}),
+		Placeholder.configure({ placeholder: this.#localize.term('placeholders_rteParagraph') }),
 		Div,
 		Span,
 		HtmlGlobalAttributes.configure({

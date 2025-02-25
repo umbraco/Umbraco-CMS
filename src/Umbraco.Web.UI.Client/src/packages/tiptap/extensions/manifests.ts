@@ -8,7 +8,7 @@ import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension
 const kinds: Array<UmbExtensionManifestKind> = [
 	{
 		type: 'kind',
-		alias: 'Umb.Kind.Button',
+		alias: 'Umb.Kind.TiptapToolbar.Button',
 		matchKind: 'button',
 		matchType: 'tiptapToolbarExtension',
 		manifest: {
