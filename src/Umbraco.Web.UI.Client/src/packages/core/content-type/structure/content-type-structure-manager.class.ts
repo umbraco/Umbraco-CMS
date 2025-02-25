@@ -4,7 +4,7 @@ import type {
 	UmbPropertyTypeContainerModel,
 	UmbPropertyTypeModel,
 } from '../types.js';
-import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbDetailRepository, UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
 import type { MappingFunction } from '@umbraco-cms/backoffice/observable-api';
@@ -35,7 +35,10 @@ const UmbFilterDuplicateStrings = (value: string, index: number, array: Array<st
 export class UmbContentTypeStructureManager<
 	T extends UmbContentTypeModel = UmbContentTypeModel,
 > extends UmbControllerBase {
-	#init!: Promise<unknown>;
+	#initResolver?: (respoonse: UmbRepositoryResponse<T>) => void;
+	#init = new Promise<UmbRepositoryResponse<T>>((resolve) => {
+		this.#initResolver = resolve;
+	});
 
 	#repository?: UmbDetailRepository<T>;
 	#initRepositoryResolver?: () => void;
@@ -47,6 +50,11 @@ export class UmbContentTypeStructureManager<
 			this.#initRepositoryResolver = resolve;
 		}
 	});
+
+	async whenLoaded() {
+		await this.#init;
+		return true;
+	}
 
 	#ownerContentTypeUnique?: string;
 	#contentTypeObservers = new Array<UmbController>();
@@ -68,6 +76,9 @@ export class UmbContentTypeStructureManager<
 		// Notice this may need to use getValue to avoid resetting it self. [NL]
 		return contentTypes.flatMap((x) => x.properties ?? []);
 	});
+	async getContentTypeProperties() {
+		return await this.observe(this.contentTypeProperties).asPromise();
+	}
 	readonly contentTypeDataTypeUniques = this.#contentTypes.asObservablePart((contentTypes) => {
 		// Notice this may need to use getValue to avoid resetting it self. [NL]
 		return contentTypes
@@ -122,30 +133,32 @@ export class UmbContentTypeStructureManager<
 	 * @returns {Promise} - Promise resolved
 	 */
 	public async loadType(unique?: string) {
-		//if (!unique) return;
-		//if (this.#ownerContentTypeUnique === unique) return;
+		if (this.#ownerContentTypeUnique === unique) {
+			// Its the same, but we do not know if its done loading jet, so we will wait for the load promise to finish. [NL]
+			await this.#init;
+			return;
+		}
 		this.#clear();
-
 		this.#ownerContentTypeUnique = unique;
-
-		const promise = this.#loadType(unique);
-		this.#init = promise;
-		await this.#init;
-		return promise;
+		if (!unique) return;
+		const result = await this.#loadType(unique);
+		this.#initResolver?.(result);
+		return result;
 	}
 
 	public async createScaffold(preset?: Partial<T>) {
 		await this.#initRepository;
 		this.#clear();
 
-		const { data } = await this.#repository!.createScaffold(preset);
-		if (!data) return {};
+		const repsonse = await this.#repository!.createScaffold(preset);
+		if (!repsonse.data) return {};
 
-		this.#ownerContentTypeUnique = data.unique;
+		this.#ownerContentTypeUnique = repsonse.data.unique;
 
 		// Add the new content type to the list of content types, this holds our draft state of this scaffold.
-		this.#contentTypes.appendOne(data);
-		return { data };
+		this.#contentTypes.appendOne(repsonse.data);
+		this.#initResolver?.(repsonse);
+		return repsonse;
 	}
 
 	/**
@@ -394,7 +407,7 @@ export class UmbContentTypeStructureManager<
 		parentId: string | null = null,
 		type: UmbPropertyContainerTypes = 'Group',
 		sortOrder?: number,
-	) {
+	): Promise<UmbPropertyTypeContainerModel> {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
@@ -449,7 +462,7 @@ export class UmbContentTypeStructureManager<
 		containerId: string,
 		containerType: UmbPropertyContainerTypes,
 		parentId: string | null = null,
-	) {
+	): string {
 		return (
 			this.makeContainerNameUniqueForOwnerContentType(containerId, 'Unnamed', containerType, parentId) ?? 'Unnamed'
 		);
@@ -776,6 +789,9 @@ export class UmbContentTypeStructureManager<
 	}
 
 	#clear() {
+		this.#init = new Promise((resolve) => {
+			this.#initResolver = resolve;
+		});
 		this.#contentTypes.setValue([]);
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];

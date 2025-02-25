@@ -467,7 +467,9 @@ export class UmbExtensionRegistry<
 			return [];
 		}
 		const kinds = this._kinds.getValue();
-		return exts.map((ext) => (ext?.kind ? (this.#mergeExtensionWithKinds([ext, kinds]) ?? ext) : ext));
+		return exts
+			.map((ext) => (ext?.kind ? (this.#mergeExtensionWithKinds([ext, kinds]) ?? ext) : ext))
+			.sort(sortExtensions);
 	}
 
 	/**

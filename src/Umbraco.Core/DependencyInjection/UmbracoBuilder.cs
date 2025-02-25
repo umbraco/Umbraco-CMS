@@ -387,6 +387,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IPublishStatusManagementService>(x => x.GetRequiredService<PublishStatusService>());
             Services.AddUnique<IPublishStatusQueryService>(x => x.GetRequiredService<PublishStatusService>());
 
+            Services.AddUnique<IPublishedContentStatusFilteringService, PublishedContentStatusFilteringService>();
+            Services.AddUnique<IPublishedMediaStatusFilteringService, PublishedMediaStatusFilteringService>();
+
             // Register a noop IHtmlSanitizer & IMarkdownSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
             Services.AddUnique<IMarkdownSanitizer, NoopMarkdownSanitizer>();
