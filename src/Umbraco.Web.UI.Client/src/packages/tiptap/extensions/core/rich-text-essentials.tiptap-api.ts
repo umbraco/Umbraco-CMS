@@ -1,6 +1,13 @@
 import { UmbTiptapExtensionApiBase } from '../base.js';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-import { Div, HtmlGlobalAttributes, Placeholder, Span, StarterKit } from '@umbraco-cms/backoffice/external/tiptap';
+import {
+	Div,
+	HtmlGlobalAttributes,
+	Placeholder,
+	Span,
+	StarterKit,
+	TrailingNode,
+} from '@umbraco-cms/backoffice/external/tiptap';
 
 export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionApiBase {
 	#localize = new UmbLocalizationController(this);
@@ -44,6 +51,7 @@ export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionA
 				'umbLink',
 			],
 		}),
+		TrailingNode,
 	];
 }
 
