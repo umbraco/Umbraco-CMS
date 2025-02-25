@@ -1,1 +1,1 @@
-export type UmbPropertyEditorUIMarkdownValue = string | undefined;
+export type UmbMarkdownPropertyEditorUiValue = string | undefined;

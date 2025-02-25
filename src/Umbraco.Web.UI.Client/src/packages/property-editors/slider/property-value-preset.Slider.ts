@@ -1,11 +1,11 @@
-import type { UmbPropertyEditorUISliderValue } from './types.js';
+import type { UmbSliderPropertyEditorUiValue } from './types.js';
 import type { UmbPropertyValuePreset } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbSliderPropertyValuePreset
-	implements UmbPropertyValuePreset<UmbPropertyEditorUISliderValue, UmbPropertyEditorConfig>
+	implements UmbPropertyValuePreset<UmbSliderPropertyEditorUiValue, UmbPropertyEditorConfig>
 {
-	async processValue(value: undefined | UmbPropertyEditorUISliderValue, config: UmbPropertyEditorConfig) {
+	async processValue(value: undefined | UmbSliderPropertyEditorUiValue, config: UmbPropertyEditorConfig) {
 		const enableRange = Boolean(config.find((x) => x.alias === 'enableRange') ?? false);
 
 		/*
