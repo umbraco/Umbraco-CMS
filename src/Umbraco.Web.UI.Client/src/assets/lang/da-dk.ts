@@ -2616,6 +2616,7 @@ export default {
 		toolbar_emptyGroup: 'Tom',
 	},
 	collection: {
+		noItemsTitle: 'Intet indhold',
 		addCollectionConfiguration: 'Tilføj samling',
 	},
 } as UmbLocalizationDictionary;
