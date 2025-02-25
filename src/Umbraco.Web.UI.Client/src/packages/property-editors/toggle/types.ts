@@ -1,1 +1,1 @@
-export type UmbPropertyEditorUIToggleValue = boolean;
+export type UmbTogglePropertyEditorUiValue = boolean;
