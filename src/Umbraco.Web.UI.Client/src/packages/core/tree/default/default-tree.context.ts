@@ -1,4 +1,10 @@
-import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
+import type {
+	UmbTreeExpansionEntry,
+	UmbTreeExpansionModel,
+	UmbTreeItemModel,
+	UmbTreeRootModel,
+	UmbTreeStartNode,
+} from '../types.js';
 import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { UmbTreeContext } from '../tree-context.interface.js';
 import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
@@ -35,8 +41,8 @@ export class UmbDefaultTreeContext<
 	#rootItems = new UmbArrayState<TreeItemType>([], (x) => x.unique);
 	rootItems = this.#rootItems.asObservable();
 
-	#location = new UmbArrayState<UmbEntityUnique>([], (x) => x);
-	location = this.#location.asObservable();
+	#expansion = new UmbObjectState<UmbTreeExpansionModel | undefined>(undefined);
+	expansion = this.#expansion.asObservable();
 
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 	public filter?: (item: TreeItemType) => boolean = () => true;
@@ -281,12 +287,12 @@ export class UmbDefaultTreeContext<
 		return this.#additionalRequestArgs.getValue();
 	}
 
-	setLocation(path: Array<UmbEntityUnique>): void {
-		this.#location.setValue(path);
+	setExpansion(model: UmbTreeExpansionModel | undefined): void {
+		this.#expansion.setValue(model);
 	}
 
-	getLocation(): Array<UmbEntityUnique> {
-		return this.#location.getValue();
+	getExpansion(): UmbTreeExpansionModel | undefined {
+		return this.#expansion.getValue();
 	}
 
 	#resetTree() {

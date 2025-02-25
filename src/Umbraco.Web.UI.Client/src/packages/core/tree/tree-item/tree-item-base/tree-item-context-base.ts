@@ -1,9 +1,9 @@
 import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
 import { UMB_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/index.js';
-import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
+import type { UmbTreeExpansionEntry, UmbTreeExpansionModel, UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
 import { UmbRequestReloadTreeItemChildrenEvent } from '../../entity-actions/reload-tree-item-children/index.js';
 import type { ManifestTreeItem } from '../../extensions/types.js';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
+import { map, Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbArrayState, UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -68,6 +68,9 @@ export abstract class UmbTreeItemContextBase<
 
 	#isOpen = new UmbBooleanState(false);
 	isOpen = this.#isOpen.asObservable();
+
+	#expansion = new UmbObjectState<UmbTreeExpansionModel | undefined>(undefined);
+	expansion = this.#expansion.asObservable();
 
 	#foldersOnly = new UmbBooleanState(false);
 	readonly foldersOnly = this.#foldersOnly.asObservable();
@@ -140,7 +143,6 @@ export abstract class UmbTreeItemContextBase<
 		this.#observeIsSelectable();
 		this.#observeIsSelected();
 		this.#observeSectionPath();
-		this.#observeLocation();
 	}
 
 	/**
@@ -243,11 +245,12 @@ export abstract class UmbTreeItemContextBase<
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
 			this.#observeFoldersOnly();
-			this.#observeLocation();
+			this.#observeExpansion(this.treeContext?.expansion);
 		});
 
 		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (instance) => {
 			this.parentTreeItemContext = instance;
+			this.#observeExpansion(this.parentTreeItemContext.expansion);
 		}).skipHost();
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
@@ -344,18 +347,21 @@ export abstract class UmbTreeItemContextBase<
 		);
 	}
 
-	#observeLocation() {
-		if (!this.treeContext) return;
+	#observeExpansion(expansion: Observable<UmbTreeExpansionModel | undefined> | undefined) {
+		if (!expansion) return;
 
 		this.observe(
-			this.treeContext.location,
-			(location) => {
+			expansion,
+			(expansion) => {
 				if (this.unique === undefined) return;
-				if (location.includes(this.unique)) {
-					if (this.#hasChildren.getValue()) {
-						this.loadChildren();
-						this.showChildren();
-					}
+
+				const isSelf = expansion?.find((entry) => entry.entityType === this.entityType && entry.unique === this.unique);
+
+				if (isSelf && this.#hasChildren.getValue()) {
+					this.#expansion.setValue(isSelf.expand);
+					this.loadChildren();
+					this.showChildren();
+					return;
 				}
 			},
 			'observeLocation',

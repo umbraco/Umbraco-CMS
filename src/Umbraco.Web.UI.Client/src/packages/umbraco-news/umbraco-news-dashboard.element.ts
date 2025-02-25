@@ -44,11 +44,27 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 					<umb-tree
 						alias="Umb.Tree.DataType"
 						.props=${{
-							location: [
-								null,
-								'5f485f78-19f2-4841-89b3-2bb668f103eb',
-								'950174a0-c84f-444b-bd66-a25a0ee4c848',
-								'20df0d05-186c-4ec5-bbe0-8df08abc257e',
+							expand: [
+								{
+									entityType: 'data-type-root',
+									unique: null,
+									expand: [
+										{
+											entityType: 'data-type-folder',
+											unique: 'ed422666-d767-4281-a763-b114323e33a5',
+										},
+										{
+											entityType: 'data-type-folder',
+											unique: '883dd906-591d-421c-b055-22d625f5601b',
+											expand: [
+												{
+													entityType: 'data-type-folder',
+													unique: 'bbd6750a-bea9-4fcf-8ae3-26aca07e9f8d',
+												},
+											],
+										},
+									],
+								},
 							],
 						}}></umb-tree>
 				</uui-box>
