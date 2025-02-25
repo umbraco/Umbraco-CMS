@@ -113,6 +113,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="entriesShort"><![CDATA[Minimum %0% element(er), tilføj <strong>%1%</strong> mere.]]></key>
     <key alias="entriesExceed"><![CDATA[Maksimum %0% element(er), <strong>%1%</strong> for mange.]]></key>
     <key alias="entriesAreasMismatch">Ét eller flere områder lever ikke op til kravene for antal indholdselementer.</key>
+    <key alias="invalidMediaType">Den valgte medie type er ugyldig.</key>
+    <key alias="multipleMediaNotAllowed">Det er kun tilladt at vælge ét medie.</key>
+    <key alias="invalidStartNode">Valgt medie kommer fra en ugyldig mappe.</key>
     <key alias="outOfRangeMinimum">Værdien %0% er mindre end det tilladte minimum af %1%.</key>
     <key alias="outOfRangeMaximum">Værdien %0% er større end det tilladte maksimum af %1%.</key>
     <key alias="invalidStep">Værdien %0% passer ikke med den konfigureret trin værdi af %1% og mindste værdi af %2%.</key>

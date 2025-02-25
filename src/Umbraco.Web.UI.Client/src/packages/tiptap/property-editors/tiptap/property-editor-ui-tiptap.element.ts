@@ -36,16 +36,16 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 
 		this._filterUnusedBlocks(usedContentKeys);
 
-		this._latestMarkup = value;
+		this._markup = value;
 
 		if (this.value) {
 			this.value = {
 				...this.value,
-				markup: this._latestMarkup,
+				markup: this._markup,
 			};
 		} else {
 			this.value = {
-				markup: this._latestMarkup,
+				markup: this._markup,
 				blocks: {
 					layout: {},
 					contentData: [],

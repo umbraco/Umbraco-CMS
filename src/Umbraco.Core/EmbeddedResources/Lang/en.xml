@@ -392,6 +392,9 @@
     <key alias="invalidStep">The value %0% does not correspond with the configured step value of %1% and minimum value of %2%</key>
     <key alias="unexpectedRange">The value %0% is not expected to contain a range</key>
     <key alias="invalidRange">The value %0% is not expected to have a to value less than the from value</key>
+    <key alias="invalidMediaType">The chosen media type is invalid.</key>
+    <key alias="multipleMediaNotAllowed">Multiple selected media is not allowed.</key>
+    <key alias="invalidStartNode">The selected media is from the wrong folder.</key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:
