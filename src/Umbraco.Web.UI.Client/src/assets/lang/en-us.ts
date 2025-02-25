@@ -222,6 +222,7 @@ export default {
 	},
 	collection: {
 		noItemsTitle: 'No items',
+		addCollectionConfiguration: 'Add collection',
 	},
 	content: {
 		isPublished: 'Is Published',
@@ -320,6 +321,8 @@ export default {
 		contentRoot: 'Content root',
 		includeUnpublished: 'Include unpublished content items.',
 		forceRepublish: 'Publish unchanged items.',
+		forceRepublishWarning: 'WARNING: Publishing all pages below this one in the content tree, whether or not they have changed, can be an expensive and long-running operation.',
+		forceRepublishAdvisory: 'This should not be necessary in normal circumstances so please only proceed with this option selected if you are certain it is required.',
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your\n      website administrator.\n    ',
 		isSensitiveValue_short: 'This value is hidden.',
@@ -1241,6 +1244,12 @@ export default {
 	colorpicker: {
 		noColors: 'You have not configured any approved colors',
 	},
+	colorPickerConfigurations: {
+		colorsTitle: 'Colors',
+		colorsDescription: 'Add, remove or sort colors',
+		showLabelTitle: 'Include labels?',
+		showLabelDescription: 'Stores colors as a JSON object containing both the color hex string and label, rather than just the hex string.',
+	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
 		defineDynamicRoot: 'Specify root node',
@@ -1715,6 +1724,7 @@ export default {
 		elementDoesNotSupport: 'This is not applicable for an Element Type',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
 		displaySettingsHeadline: 'Appearance',
+		displaySettingsLabelOnLeft: 'Label to the left',
 		displaySettingsLabelOnTop: 'Label above (full-width)',
 		confirmDeleteTabMessage: 'Are you sure you want to delete the tab <strong>%0%</strong>?',
 		confirmDeleteGroupMessage: 'Are you sure you want to delete the group <strong>%0%</strong>?',
@@ -1971,6 +1981,8 @@ export default {
 		permissionsDefault: 'Default permissions',
 		permissionsGranular: 'Granular permissions',
 		permissionsGranularHelp: 'Set permissions for specific nodes',
+		granularRightsLabel: 'Documents',
+		granularRightsDescription: 'Assign permissions to specific documents',
 		permissionsEntityGroup_document: 'Content',
 		permissionsEntityGroup_media: 'Media',
 		permissionsEntityGroup_member: 'Member',
@@ -1987,6 +1999,8 @@ export default {
 		chooseUserGroup: (multiple: boolean) => {
 			return multiple ? 'Choose User Groups' : 'Choose User Group';
 		},
+		entityPermissionsLabel: 'Permissions',
+		entityPermissionsDescription: 'Assign permissions for actions',
 		noStartNode: 'No start node selected',
 		noStartNodes: 'No start nodes selected',
 		startnode: 'Content start node',
@@ -2060,6 +2074,7 @@ export default {
 	},
 	validation: {
 		validation: 'Validation',
+		validateNothing: 'No validation',
 		validateAsEmail: 'Validate as an email address',
 		validateAsNumber: 'Validate as a number',
 		validateAsUrl: 'Validate as a URL',

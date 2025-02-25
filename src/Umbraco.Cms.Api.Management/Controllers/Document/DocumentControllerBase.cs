@@ -121,6 +121,11 @@ public abstract class DocumentControllerBase : ContentControllerBase
                 .WithDetail(
                     "Cannot handle an unpublish time that is not after the current server time.")
                 .Build()),
+            ContentPublishingOperationStatus.CannotUnpublishWhenReferenced => BadRequest(problemDetailsBuilder
+                .WithTitle("Cannot unpublish document when it's referenced somewhere else.")
+                .WithDetail(
+                    "Cannot unpublish a referenced document, while the setting ContentSettings.DisableUnpublishWhenReferenced is enabled.")
+                .Build()),
             ContentPublishingOperationStatus.FailedBranch => BadRequest(problemDetailsBuilder
                 .WithTitle("Failed branch operation")
                 .WithDetail("One or more items in the branch could not complete the operation.")

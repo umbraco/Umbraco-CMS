@@ -177,10 +177,15 @@ export class UmbDocumentWorkspaceContext
 		]);
 	}
 
+	override resetState(): void {
+		super.resetState();
+		this.#isTrashedContext.setIsTrashed(false);
+	}
+
 	override async load(unique: string) {
 		const response = await super.load(unique);
 
-		if (response.data) {
+		if (response?.data) {
 			this.#isTrashedContext.setIsTrashed(response.data.isTrashed);
 		}
 

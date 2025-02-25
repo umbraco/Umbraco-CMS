@@ -167,6 +167,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	async load(unique: string) {
+		if (unique === this.getUnique() && this._getDataPromise) {
+			return (await this._getDataPromise) as GetDataType;
+		}
 		this.resetState();
 		this.#entityContext.setUnique(unique);
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
@@ -389,8 +392,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	override resetState() {
 		super.resetState();
+		this.loading.clear();
 		this._data.clear();
 		this.#allowNavigateAway = false;
+		this._getDataPromise = undefined;
 	}
 
 	#checkIfInitialized() {
@@ -447,6 +452,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		);
 		this._detailRepository?.destroy();
 		this.#entityContext.destroy();
+		this._getDataPromise = undefined;
 		super.destroy();
 	}
 }
