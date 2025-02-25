@@ -2728,6 +2728,7 @@ export default {
 		resetUrlLabel: 'Reset',
 	},
 	collection: {
+		noItemsTitle: 'No items',
 		addCollectionConfiguration: 'Add collection',
 	},
 } as UmbLocalizationDictionary;
