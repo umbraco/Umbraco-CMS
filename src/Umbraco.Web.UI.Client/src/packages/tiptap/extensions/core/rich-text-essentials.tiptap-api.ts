@@ -6,7 +6,6 @@ import {
 	Placeholder,
 	Span,
 	StarterKit,
-	TextStyle,
 	TrailingNode,
 } from '@umbraco-cms/backoffice/external/tiptap';
 
@@ -22,7 +21,8 @@ export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionA
 				);
 			},
 		}),
-		TextStyle,
+		Div,
+		Span,
 		HtmlGlobalAttributes.configure({
 			types: [
 				'bold',
@@ -47,13 +47,10 @@ export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionA
 				'tableHeader',
 				'tableRow',
 				'tableCell',
-				'textStyle',
 				'underline',
 				'umbLink',
 			],
 		}),
-		Div,
-		Span,
 		TrailingNode,
 	];
 }
