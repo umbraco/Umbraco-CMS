@@ -743,7 +743,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this._data.setPersisted(newPersistedData);
 
 		// Only update the variants that was chosen to be saved:
-		let currentData = this._data.getCurrent();
+		const currentData = this._data.getCurrent();
 		const newCurrentData = await new UmbMergeContentVariantDataController(this).process(
 			currentData,
 			data,

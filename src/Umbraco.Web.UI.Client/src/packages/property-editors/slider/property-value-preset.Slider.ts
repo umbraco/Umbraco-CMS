@@ -18,10 +18,10 @@ export class UmbSliderPropertyValuePreset
 		const step = (config.find((x) => x.alias === 'step') as number | undefined) ?? 0;
 		const stepVerified = step > 0 ? step : 1;
 
-		const initValueMin = Number(config.find((x) => x.alias === 'initVal1')?.value) ?? 0;
+		const initValueMin = Number(config.find((x) => x.alias === 'initVal1')?.value) || 0;
 		const initValueMinVerified = isNaN(initValueMin) ? 0 : initValueMin;
 
-		const initValueMax = Number(config.find((x) => x.alias === 'initVal2')?.value) ?? 0;
+		const initValueMax = Number(config.find((x) => x.alias === 'initVal2')?.value) || 0;
 		const initValueMaxVerified = isNaN(initValueMax) ? initValueMinVerified + stepVerified : initValueMax;
 
 		const initialState = enableRange

@@ -410,7 +410,7 @@ export abstract class UmbBlockManagerContext<
 		if (segments) {
 			controller.setSegments(segments);
 		}
-		let values = await controller.create(valueDefinitions);
+		const values = await controller.create(valueDefinitions);
 
 		// Set culture and segment for all values:
 
