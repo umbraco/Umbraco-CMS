@@ -3,7 +3,7 @@ import type {
 	ManifestPropertyValuePreset,
 	UmbPropertyTypePresetModel,
 	UmbPropertyTypePresetWithSchemaAliasModel,
-	UmbPropertyValuePresetApi,
+	UmbPropertyValuePreset,
 	UmbPropertyValuePresetApiCallArgs,
 } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -56,7 +56,7 @@ export class UmbPropertyValuePresetBuilderController<
 
 		const apis = (await Promise.all(manifests.map((x) => createExtensionApi(this, x)))).filter(
 			(x) => x !== undefined,
-		) as Array<UmbPropertyValuePresetApi>;
+		) as Array<UmbPropertyValuePreset>;
 
 		const result = await this._generatePropertyValues(apis, propertyType);
 
@@ -68,7 +68,7 @@ export class UmbPropertyValuePresetBuilderController<
 	};
 
 	protected async _generatePropertyValues(
-		apis: Array<UmbPropertyValuePresetApi>,
+		apis: Array<UmbPropertyValuePreset>,
 		propertyType: UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel,
 	): Promise<Array<ReturnType>> {
 		const property = await this._generatePropertyValue(apis, propertyType, EMPTY_CALL_ARGS);
@@ -76,7 +76,7 @@ export class UmbPropertyValuePresetBuilderController<
 	}
 
 	protected async _generatePropertyValue(
-		apis: Array<UmbPropertyValuePresetApi>,
+		apis: Array<UmbPropertyValuePreset>,
 		propertyType: UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel,
 		callArgs: UmbPropertyValuePresetApiCallArgs,
 	): Promise<ReturnType | undefined> {

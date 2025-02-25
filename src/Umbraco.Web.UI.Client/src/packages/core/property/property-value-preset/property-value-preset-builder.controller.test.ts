@@ -6,7 +6,7 @@ import type {
 	ManifestPropertyValuePreset,
 	UmbPropertyTypePresetModel,
 	UmbPropertyTypePresetWithSchemaAliasModel,
-	UmbPropertyValuePresetApi,
+	UmbPropertyValuePreset,
 } from './types.js';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyValuePresetBuilderController } from './property-value-preset-builder.controller.js';
@@ -17,7 +17,7 @@ export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(
 // TODO: Write test with config, investigate oppertunity to retrieve Config Object, for an simpler DX. [NL]
 
 // Test with async APIs, espcially where the first one is slower than the last one.
-export class TestPropertyValuePresetFirstApi implements UmbPropertyValuePresetApi<string, UmbPropertyEditorConfig> {
+export class TestPropertyValuePresetFirstApi implements UmbPropertyValuePreset<string, UmbPropertyEditorConfig> {
 	async processValue(value: undefined | string, config: UmbPropertyEditorConfig) {
 		return value ? value + '_first' : 'first';
 	}
@@ -25,7 +25,7 @@ export class TestPropertyValuePresetFirstApi implements UmbPropertyValuePresetAp
 	destroy(): void {}
 }
 
-export class TestPropertyValuePresetSecondApi implements UmbPropertyValuePresetApi<string, UmbPropertyEditorConfig> {
+export class TestPropertyValuePresetSecondApi implements UmbPropertyValuePreset<string, UmbPropertyEditorConfig> {
 	async processValue(value: undefined | string, config: UmbPropertyEditorConfig) {
 		return value ? value + '_second' : 'second';
 	}
@@ -33,7 +33,7 @@ export class TestPropertyValuePresetSecondApi implements UmbPropertyValuePresetA
 	destroy(): void {}
 }
 
-export class TestPropertyValuePresetAsyncApi implements UmbPropertyValuePresetApi<string, UmbPropertyEditorConfig> {
+export class TestPropertyValuePresetAsyncApi implements UmbPropertyValuePreset<string, UmbPropertyEditorConfig> {
 	async processValue(value: undefined | string, config: UmbPropertyEditorConfig) {
 		await new Promise((resolve) => setTimeout(resolve, 10));
 		return value ? value + '_async' : 'async';

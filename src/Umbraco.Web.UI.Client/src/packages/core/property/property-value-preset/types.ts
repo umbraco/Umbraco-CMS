@@ -4,14 +4,14 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export type * from './property-value-preset.extension.js';
 
-export interface UmbPropertyValuePresetApi<
+export interface UmbPropertyValuePreset<
 	ValueType = unknown,
 	ConfigType extends UmbPropertyEditorConfig = UmbPropertyEditorConfig,
 > extends UmbApi {
-	processValue: UmbPropertyValuePresetApiValuesProcessor<ValueType, ConfigType>;
+	processValue: UmbPropertyValuePresetValuesProcessor<ValueType, ConfigType>;
 }
 
-export type UmbPropertyValuePresetApiValuesProcessor<
+export type UmbPropertyValuePresetValuesProcessor<
 	ValueType = unknown,
 	ConfigType extends UmbPropertyEditorConfig = UmbPropertyEditorConfig,
 > = (

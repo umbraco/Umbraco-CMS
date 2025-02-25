@@ -7,7 +7,7 @@ import type {
 	UmbPropertyTypePresetModel,
 	UmbPropertyTypePresetModelTypeModel,
 	UmbPropertyTypePresetWithSchemaAliasModel,
-	UmbPropertyValuePresetApi,
+	UmbPropertyValuePreset,
 	UmbPropertyValuePresetApiCallArgs,
 } from './types.js';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
@@ -17,7 +17,7 @@ import { UmbPropertyValuePresetVariantBuilderController } from './property-value
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 // Test with async APIs, espcially where the first one is slower than the last one.
-export class TestPropertyValuePresetFirstApi implements UmbPropertyValuePresetApi<string, UmbPropertyEditorConfig> {
+export class TestPropertyValuePresetFirstApi implements UmbPropertyValuePreset<string, UmbPropertyEditorConfig> {
 	async processValue(
 		value: undefined | string,
 		config: UmbPropertyEditorConfig,

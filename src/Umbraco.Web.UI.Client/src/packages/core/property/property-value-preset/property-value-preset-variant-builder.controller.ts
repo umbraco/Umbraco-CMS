@@ -3,7 +3,7 @@ import { UmbPropertyValuePresetBuilderController } from './property-value-preset
 import type {
 	UmbPropertyTypePresetModel,
 	UmbPropertyTypePresetWithSchemaAliasModel,
-	UmbPropertyValuePresetApi,
+	UmbPropertyValuePreset,
 } from './types.js';
 import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 
@@ -23,7 +23,7 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 	}
 
 	protected override async _generatePropertyValues(
-		apis: Array<UmbPropertyValuePresetApi>,
+		apis: Array<UmbPropertyValuePreset>,
 		propertyType: UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel,
 	): Promise<Array<ReturnType>> {
 		const values: Array<ReturnType> = [];
