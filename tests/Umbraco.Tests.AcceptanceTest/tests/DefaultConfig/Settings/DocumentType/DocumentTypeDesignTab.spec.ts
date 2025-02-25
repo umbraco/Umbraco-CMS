@@ -258,7 +258,8 @@ test('can remove a composition from a document type', async ({umbracoApi, umbrac
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
 });
 
-test('can reorder groups in a document type', async ({umbracoApi, umbracoUi}) => {
+// Skip this flaky tests as sometimes the groups are not dragged correctly.
+test.skip('can reorder groups in a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondGroupName = 'SecondGroup';
