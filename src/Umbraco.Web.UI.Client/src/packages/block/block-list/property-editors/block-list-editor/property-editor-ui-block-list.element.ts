@@ -22,7 +22,12 @@ import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 
 import '../../components/block-list-entry/index.js';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { ExtractJsonQueryProps, UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import {
+	ExtractJsonQueryProps,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbFormControlMixin,
+	UmbValidationContext,
+} from '@umbraco-cms/backoffice/validation';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -134,6 +139,12 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 	#readonly = false;
 
+	@property({ type: Boolean })
+	mandatory?: boolean;
+
+	@property({ type: String })
+	mandatoryMessage?: string | undefined;
+
 	@state()
 	private _limitMin?: number;
 	@state()
@@ -207,6 +218,12 @@ export class UmbPropertyEditorUIBlockListElement
 					this.#entriesContext.getLength() - (this._limitMax || 0),
 				),
 			() => !!this._limitMax && this.#entriesContext.getLength() > this._limitMax,
+		);
+
+		this.addValidator(
+			'valueMissing',
+			() => this.mandatoryMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !!this.mandatory && this.#entriesContext.getLength() === 0,
 		);
 
 		this.observe(
