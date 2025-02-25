@@ -57,7 +57,6 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	}
 
 	protected resetState() {
-		//this.validation.reset();
 		this.#validationContexts.forEach((context) => context.reset());
 		this.#isNew.setValue(undefined);
 	}
