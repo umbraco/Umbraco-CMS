@@ -15,7 +15,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 				properties: [
 					{
 						alias: 'extensions',
-						label: 'Capabilities',
+						label: '#tiptap_config_extensions',
 						description: `Choose which Tiptap extensions to enable
 
 _Once enabled, the related actions will be available for the toolbar._`,
@@ -24,7 +24,7 @@ _Once enabled, the related actions will be available for the toolbar._`,
 					},
 					{
 						alias: 'toolbar',
-						label: 'Toolbar',
+						label: '#tiptap_config_toolbar',
 						description: `Design the available actions
 
 _Drag and drop the available actions onto the toolbar._`,
@@ -33,22 +33,22 @@ _Drag and drop the available actions onto the toolbar._`,
 					},
 					{
 						alias: 'dimensions',
-						label: 'Dimensions',
-						description: 'Set the maximum width and height of the editor',
+						label: '#general_dimensions',
+						description: '{#tiptap_config_dimensions_description}',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.DimensionsConfiguration',
 						weight: 20,
 					},
 					{
 						alias: 'maxImageSize',
-						label: 'Maximum size for inserted images',
-						description: 'Maximum width or height - enter 0 to disable resizing',
+						label: '#rte_config_maxImageSize',
+						description: '{#rte_config_maxImageSize_description}',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.MaxImageSizeConfiguration',
 						weight: 40,
 					},
 					{
 						alias: 'overlaySize',
-						label: 'Overlay Size',
-						description: 'Select the width of the overlay (link picker)',
+						label: '#rte_config_overlaySize',
+						description: '{#rte_config_overlaySize_description}',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
 						weight: 50,
 					},

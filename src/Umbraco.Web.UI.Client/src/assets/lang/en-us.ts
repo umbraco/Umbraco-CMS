@@ -222,6 +222,7 @@ export default {
 	},
 	collection: {
 		noItemsTitle: 'No items',
+		addCollectionConfiguration: 'Add collection',
 	},
 	content: {
 		isPublished: 'Is Published',

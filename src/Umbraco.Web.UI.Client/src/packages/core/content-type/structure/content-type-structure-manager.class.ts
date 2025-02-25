@@ -35,7 +35,10 @@ const UmbFilterDuplicateStrings = (value: string, index: number, array: Array<st
 export class UmbContentTypeStructureManager<
 	T extends UmbContentTypeModel = UmbContentTypeModel,
 > extends UmbControllerBase {
-	#init!: Promise<unknown>;
+	#initResolver?: () => void;
+	#init = new Promise<void>((resolve) => {
+		this.#initResolver = resolve;
+	});
 
 	#repository?: UmbDetailRepository<T>;
 	#initRepositoryResolver?: () => void;
@@ -47,6 +50,11 @@ export class UmbContentTypeStructureManager<
 			this.#initRepositoryResolver = resolve;
 		}
 	});
+
+	async whenLoaded() {
+		await this.#init;
+		return true;
+	}
 
 	#ownerContentTypeUnique?: string;
 	#contentTypeObservers = new Array<UmbController>();
@@ -68,6 +76,9 @@ export class UmbContentTypeStructureManager<
 		// Notice this may need to use getValue to avoid resetting it self. [NL]
 		return contentTypes.flatMap((x) => x.properties ?? []);
 	});
+	async getContentTypeProperties() {
+		return await this.observe(this.contentTypeProperties).asPromise();
+	}
 	readonly contentTypeDataTypeUniques = this.#contentTypes.asObservablePart((contentTypes) => {
 		// Notice this may need to use getValue to avoid resetting it self. [NL]
 		return contentTypes
@@ -122,16 +133,17 @@ export class UmbContentTypeStructureManager<
 	 * @returns {Promise} - Promise resolved
 	 */
 	public async loadType(unique?: string) {
-		//if (!unique) return;
-		//if (this.#ownerContentTypeUnique === unique) return;
+		if (this.#ownerContentTypeUnique === unique) {
+			// Its the same, but we do not know if its done loading jet, so we will wait for the load promise to finish. [NL]
+			await this.#init;
+			return;
+		}
 		this.#clear();
-
 		this.#ownerContentTypeUnique = unique;
-
-		const promise = this.#loadType(unique);
-		this.#init = promise;
-		await this.#init;
-		return promise;
+		if (!unique) return;
+		const result = await this.#loadType(unique);
+		this.#initResolver?.();
+		return result;
 	}
 
 	public async createScaffold(preset?: Partial<T>) {
@@ -145,6 +157,7 @@ export class UmbContentTypeStructureManager<
 
 		// Add the new content type to the list of content types, this holds our draft state of this scaffold.
 		this.#contentTypes.appendOne(data);
+		this.#initResolver?.();
 		return { data };
 	}
 
@@ -776,6 +789,9 @@ export class UmbContentTypeStructureManager<
 	}
 
 	#clear() {
+		this.#init = new Promise<void>((resolve) => {
+			this.#initResolver = resolve;
+		});
 		this.#contentTypes.setValue([]);
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];

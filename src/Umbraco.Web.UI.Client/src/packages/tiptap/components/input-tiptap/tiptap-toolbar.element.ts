@@ -116,6 +116,7 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 
 			.group {
 				display: inline-flex;
+				flex-wrap: wrap;
 				align-items: stretch;
 
 				&:not(:last-child)::after {
