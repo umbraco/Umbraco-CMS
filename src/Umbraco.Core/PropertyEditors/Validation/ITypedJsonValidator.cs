@@ -5,7 +5,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validation;
 
 public interface ITypedJsonValidator<TValue, TConfiguration>
 {
-
     public abstract IEnumerable<ValidationResult> Validate(
         TValue? value,
         TConfiguration? configuration,

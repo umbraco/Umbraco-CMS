@@ -359,7 +359,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                     return validationResults;
                 }
 
-                if(mediaPickerConfiguration.Multiple is false && mediaWithCropsDtos.Count > 1)
+                if (mediaPickerConfiguration.Multiple is false && mediaWithCropsDtos.Count > 1)
                 {
                     validationResults.Add(new ValidationResult(
                         _localizedTextService.Localize("validation", "multipleMediaNotAllowed"),
@@ -402,7 +402,6 @@ public class MediaPicker3PropertyEditor : DataEditor
                 _localizedTextService = localizedTextService;
                 _mediaTypeService = mediaTypeService;
             }
-
 
             public IEnumerable<ValidationResult> Validate(
                 List<MediaWithCropsDto>? value,

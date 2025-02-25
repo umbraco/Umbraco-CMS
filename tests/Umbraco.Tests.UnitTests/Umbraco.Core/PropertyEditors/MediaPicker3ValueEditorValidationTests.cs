@@ -51,7 +51,6 @@ internal class MediaPicker3ValueEditorValidationTests
     [TestCase(false, false)]
     public void Validates_Allowed_Type(bool succeed, bool findsMediaType)
     {
-
         var (valueEditor, mediaTypeServiceMock, mediaNavigationQueryServiceMock) = CreateValueEditor();
 
         var mediaKey = Guid.NewGuid();
