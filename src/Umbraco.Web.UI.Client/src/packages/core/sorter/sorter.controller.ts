@@ -49,7 +49,9 @@ function getParentScrollElement(el: Element, includeSelf: boolean) {
  * @param ignorerSelectors
  */
 function setupIgnorerElements(element: HTMLElement, ignorerSelectors: string) {
-	ignorerSelectors.split(',').forEach(function (criteria) {
+	const selectors = ignorerSelectors.split(',');
+	selectors.push('[draggable="false"]');
+	selectors.forEach(function (criteria) {
 		element.querySelectorAll(criteria.trim()).forEach(setupPreventEvent);
 	});
 }
@@ -59,7 +61,9 @@ function setupIgnorerElements(element: HTMLElement, ignorerSelectors: string) {
  * @param ignorerSelectors
  */
 function destroyIgnorerElements(element: HTMLElement, ignorerSelectors: string) {
-	ignorerSelectors.split(',').forEach(function (criteria: string) {
+	const selectors = ignorerSelectors.split(',');
+	selectors.push('[draggable="false"]');
+	selectors.forEach(function (criteria: string) {
 		element.querySelectorAll(criteria.trim()).forEach(destroyPreventEvent);
 	});
 }
@@ -68,6 +72,7 @@ function destroyIgnorerElements(element: HTMLElement, ignorerSelectors: string) 
  * @param element
  */
 function setupPreventEvent(element: Element) {
+	console.log('prevent on', element);
 	(element as HTMLElement).draggable = false;
 	//(element as HTMLElement).setAttribute('draggable', 'false');
 }
@@ -153,6 +158,10 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	 * The selector to find the draggable element within the item.
 	 */
 	draggableSelector?: string;
+	/**
+	 * The selector to define the interactive element within the item, this element will then become the only interactive part, the item can only be dragged by mouse when interacting with this element.
+	 */
+	handleSelector?: string;
 
 	//boundarySelector?: string;
 	dataTransferResolver?: (dataTransfer: DataTransfer | null, currentItem: T) => void;
@@ -221,7 +230,7 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
 	Partial<Pick<INTERNAL_UmbSorterConfig<T, ElementType>, 'ignorerSelector' | 'containerSelector' | 'identifier'>>;
 
 /**
- 
+
  * @class UmbSorterController
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
@@ -258,7 +267,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	static activeIndex?: number;
 	static activeItem?: any;
 	static activeElement?: HTMLElement;
-	static activeDragElement?: Element;
+	static activeDragElement?: HTMLElement;
 
 	#host;
 	#isConnected = false;
@@ -296,7 +305,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		// Set defaults:
 		config.identifier ??= Symbol();
-		config.ignorerSelector ??= 'a, img, iframe';
+		config.ignorerSelector ??= 'a,img,iframe,input,textarea,select,option';
 		if (!config.placeholderClass && !config.placeholderAttr) {
 			config.placeholderAttr = 'drag-placeholder';
 		}
@@ -450,7 +459,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		} else {
 			// Indication if drop is good:
 			if (this.updateAllowIndication(UmbSorterController.activeItem) === false) {
-				console.log('Dropping here was not allowed');
 				return;
 			}
 
@@ -465,8 +473,38 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	#getDraggableElement(element: HTMLElement) {
 		if (this.#config.draggableSelector) {
 			// Concept for enabling getting element within ShadowRoot: (But it might need to be configurable, so its still possible to get light dom element(slotted), despite the host is a web-component with shadow-dom.) [NL]
-			//const queryFromEl = element.shadowRoot ?? element;
-			return (element.querySelector(this.#config.draggableSelector) as HTMLElement | undefined) ?? element;
+			const queryFromEl = element.shadowRoot ?? element;
+			return (queryFromEl.querySelector(this.#config.draggableSelector) as HTMLElement | undefined) ?? element;
+		}
+		return element;
+	}
+
+	#getHandleElement(element: HTMLElement) {
+		if (this.#config.handleSelector) {
+			// Concept for enabling getting element within ShadowRoot: (But it might need to be configurable, so its still possible to get light dom element(slotted), despite the host is a web-component with shadow-dom.) [NL]
+			const queryFromEl = element.shadowRoot ?? element;
+			return (queryFromEl.querySelector(this.#config.handleSelector) as HTMLElement | undefined) ?? element;
+		}
+		return element;
+	}
+
+	#getElement(innerElement: HTMLElement): HTMLElement | null {
+		let source = innerElement;
+		let element: HTMLElement | null = null;
+		while (!element) {
+			element = source.closest(this.#config.itemSelector);
+			if (!element) {
+				const containingElement = (source.getRootNode() as ShadowRoot).host;
+				const newSource =
+					source === containingElement
+						? ((source.parentElement?.getRootNode() as ShadowRoot | undefined)?.host as HTMLElement | undefined)
+						: (containingElement as HTMLElement);
+				if (newSource) {
+					source = newSource;
+				} else {
+					return null;
+				}
+			}
 		}
 		return element;
 	}
@@ -479,7 +517,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		if (!this.#config.disabledItemSelector || !element.matches(this.#config.disabledItemSelector)) {
 			// Idea: to make sure on does not get initialized twice: if ((element as HTMLElement).draggable === true) return;
 			const draggableElement = this.#getDraggableElement(element);
-			(draggableElement as HTMLElement).draggable = true;
+			const handleElement = this.#getHandleElement(element);
+			handleElement.addEventListener('mousedown', this.#handleHandleMouseDown);
+			// Will be set to true by the 'mousedown' event if approved:
+			(draggableElement as HTMLElement).draggable = false;
 			draggableElement.addEventListener('dragstart', this.#handleDragStart);
 			draggableElement.addEventListener('dragend', this.#handleDragEnd);
 		}
@@ -507,6 +548,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		const draggableElement = this.#getDraggableElement(element);
 		draggableElement.removeEventListener('dragstart', this.#handleDragStart);
 		draggableElement.removeEventListener('dragend', this.#handleDragEnd);
+
+		const handleElement = this.#getHandleElement(element);
+		handleElement.removeEventListener('mousedown', this.#handleHandleMouseDown);
 
 		(draggableElement as HTMLElement).draggable = false;
 
@@ -546,6 +590,48 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		this.#setupPlaceholderStyle();
 	}
 
+	#handleHandleMouseDown = (event: MouseEvent) => {
+		const target = event.target as HTMLElement;
+		const composedPath = event.composedPath();
+
+		// Test for a match with the ignore selectors:
+		if (this.#config.ignorerSelector) {
+			if (target.matches(this.#config.ignorerSelector)) {
+				return;
+			}
+			// filter composedPath for only elements descending from the event.target:
+			const index = composedPath.indexOf(target);
+			const composedPathBelowTarget = index !== -1 ? composedPath.slice(0, index) : undefined;
+
+			if (composedPathBelowTarget) {
+				const ignoreThis = composedPathBelowTarget.some((x) =>
+					(x as HTMLElement).matches?.('[draggable="false"],' + this.#config.ignorerSelector),
+				);
+				if (ignoreThis) {
+					return;
+				}
+			}
+		}
+
+		if (event.target && event.button === 0) {
+			const element = this.#getElement(event.target as HTMLElement);
+			if (!element) return;
+			const dragElement = this.#getDraggableElement(element);
+			if (!dragElement) return;
+
+			dragElement.addEventListener('mouseup', this.#handleDragElementMouseUp);
+			dragElement.draggable = true;
+		}
+	};
+
+	#handleDragElementMouseUp = (event: MouseEvent) => {
+		const target = event.target as HTMLElement | null;
+		if (target) {
+			target.removeEventListener('mouseup', this.#handleDragElementMouseUp);
+			target.draggable = false;
+		}
+	};
+
 	#handleDragStart = (event: DragEvent) => {
 		const element = (event.target as HTMLElement).closest(this.#config.itemSelector) as HTMLElement | null;
 		if (!element) return;
@@ -558,6 +644,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		event.stopPropagation();
 		if (event.dataTransfer) {
+			const dragElement = UmbSorterController.activeDragElement ?? element;
+			const activeDragRect = dragElement.getBoundingClientRect();
+			event.dataTransfer.setDragImage(dragElement, event.clientX - activeDragRect.x, event.clientY - activeDragRect.y);
+			event.dataTransfer.dropEffect = 'move';
 			event.dataTransfer.effectAllowed = 'all'; // copyMove when we enhance the drag with clipboard data.// defaults to 'all'
 		}
 
@@ -567,7 +657,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		this.#setCurrentElement(element as ElementType);
 
-		element.addEventListener('dragend', this.#handleDragEnd);
+		UmbSorterController.activeDragElement?.addEventListener('dragend', this.#handleDragEnd);
 		window.addEventListener('mouseup', this.#handleMouseUp);
 		window.addEventListener('mouseout', this.#handleMouseUp);
 		window.addEventListener('mouseleave', this.#handleMouseUp);
@@ -586,8 +676,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		// Get the current index of the item:
 		UmbSorterController.activeIndex = UmbSorterController.originalIndex;
-
-		UmbSorterController.activeElement!.style.transform = 'translateZ(0)'; // Solves problem with FireFox and ShadowDom in the drag-image.
+		UmbSorterController.activeDragElement!.style.transform = 'translateZ(0)'; // Solves problem with FireFox and ShadowDom in the drag-image.
 
 		if (this.#config.dataTransferResolver) {
 			this.#config.dataTransferResolver(event.dataTransfer, UmbSorterController.activeItem as T);
@@ -608,8 +697,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		UmbSorterController.rqaId = requestAnimationFrame(() => {
 			// It should be okay to use the same rqaId, as the move does not, or is okay not, to happen on first frame/drag-move.
 			UmbSorterController.rqaId = undefined;
-			if (UmbSorterController.activeElement) {
-				UmbSorterController.activeElement.style.transform = '';
+			if (UmbSorterController.activeDragElement) {
+				UmbSorterController.activeDragElement.style.transform = '';
 			}
 		});
 
@@ -651,13 +740,19 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			return;
 		}
 
-		UmbSorterController.activeElement.removeEventListener('dragend', this.#handleDragEnd);
+		const element = UmbSorterController.activeElement;
+
+		if (UmbSorterController.activeDragElement) {
+			UmbSorterController.activeDragElement.style.transform = '';
+			UmbSorterController.activeDragElement.draggable = false;
+			UmbSorterController.activeDragElement.removeEventListener('dragend', this.#handleDragEnd);
+		}
+
 		window.removeEventListener('mouseup', this.#handleMouseUp);
 		window.removeEventListener('mouseout', this.#handleMouseUp);
 		window.removeEventListener('mouseleave', this.#handleMouseUp);
 		window.removeEventListener('mousemove', this.#handleMouseMove);
 
-		UmbSorterController.activeElement.style.transform = '';
 		this.#removePlaceholderStyle();
 		this.#stopAutoScroll();
 		this.removeAllowIndication();
@@ -665,7 +760,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		if (this.#config.onEnd) {
 			this.#config.onEnd({
 				item: UmbSorterController.activeItem,
-				element: UmbSorterController.activeElement as ElementType,
+				element: element as ElementType,
 			});
 		}
 

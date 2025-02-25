@@ -35,7 +35,6 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryE
 	},
 	//identifier: 'block-list-editor',
 	itemSelector: 'umb-block-list-entry',
-	disabledItemSelector: '[unsupported]',
 	//containerSelector: 'EMPTY ON PURPOSE, SO IT BECOMES THE HOST ELEMENT',
 };
 
@@ -273,7 +272,7 @@ export class UmbPropertyEditorUIBlockListElement
 
 		this.addValidator(
 			'rangeOverflow',
-			() => this.localize.term('validation_entriesExceed', this._limitMax, this.#entriesContext.getLength()),
+			() => this.localize.term('validation_entriesExceed', this._limitMax, this.#entriesContext.getLength() - (this._limitMax || 0)),
 			() => !!this._limitMax && this.#entriesContext.getLength() > this._limitMax,
 		);
 

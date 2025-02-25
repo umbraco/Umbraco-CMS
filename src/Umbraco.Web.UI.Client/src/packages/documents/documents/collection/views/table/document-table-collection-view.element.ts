@@ -3,6 +3,7 @@ import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbDocumentCollectionItemModel } from '../../types.js';
 import type { UmbDocumentCollectionContext } from '../../document-collection.context.js';
 import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../document-collection.context-token.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -166,8 +167,8 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 
 			return {
 				id: item.unique,
-				icon: item.icon,
-				entityType: 'document',
+				icon: item.documentType.icon,
+				entityType: UMB_DOCUMENT_ENTITY_TYPE,
 				data: data,
 			};
 		});

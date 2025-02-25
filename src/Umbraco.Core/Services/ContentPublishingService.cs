@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -16,6 +18,8 @@ internal sealed class ContentPublishingService : IContentPublishingService
     private readonly IContentValidationService _contentValidationService;
     private readonly IContentTypeService _contentTypeService;
     private readonly ILanguageService _languageService;
+    private ContentSettings _contentSettings;
+    private readonly IRelationService _relationService;
 
     public ContentPublishingService(
         ICoreScopeProvider coreScopeProvider,
@@ -23,7 +27,9 @@ internal sealed class ContentPublishingService : IContentPublishingService
         IUserIdKeyResolver userIdKeyResolver,
         IContentValidationService contentValidationService,
         IContentTypeService contentTypeService,
-        ILanguageService languageService)
+        ILanguageService languageService,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService)
     {
         _coreScopeProvider = coreScopeProvider;
         _contentService = contentService;
@@ -31,6 +37,12 @@ internal sealed class ContentPublishingService : IContentPublishingService
         _contentValidationService = contentValidationService;
         _contentTypeService = contentTypeService;
         _languageService = languageService;
+        _relationService = relationService;
+        _contentSettings = optionsMonitor.CurrentValue;
+        optionsMonitor.OnChange((contentSettings) =>
+        {
+            _contentSettings = contentSettings;
+        });
     }
 
     /// <inheritdoc />
@@ -239,7 +251,12 @@ internal sealed class ContentPublishingService : IContentPublishingService
     }
 
     /// <inheritdoc />
+    [Obsolete("This method is not longer used as the 'force' parameter has been split into publishing unpublished and force re-published. Please use the overload containing parameters for those options instead. Will be removed in V17.")]
     public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, bool force, Guid userKey)
+        => await PublishBranchAsync(key, cultures, force ? PublishBranchFilter.IncludeUnpublished : PublishBranchFilter.Default, userKey);
+
+    /// <inheritdoc />
+    public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, PublishBranchFilter publishBranchFilter, Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         IContent? content = _contentService.GetById(key);
@@ -260,7 +277,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         }
 
         var userId = await _userIdKeyResolver.GetAsync(userKey);
-        IEnumerable<PublishResult> result = _contentService.PublishBranch(content, force, cultures.ToArray(), userId);
+        IEnumerable<PublishResult> result = _contentService.PublishBranch(content, publishBranchFilter, cultures.ToArray(), userId);
         scope.Complete();
 
         var itemResults = result.ToDictionary(r => r.Content.Key, ToContentPublishingOperationStatus);
@@ -292,6 +309,12 @@ internal sealed class ContentPublishingService : IContentPublishingService
         {
             scope.Complete();
             return Attempt.Fail(ContentPublishingOperationStatus.ContentNotFound);
+        }
+
+        if (_contentSettings.DisableUnpublishWhenReferenced && _relationService.IsRelated(content.Id))
+        {
+            scope.Complete();
+            return Attempt<ContentPublishingOperationStatus>.Fail(ContentPublishingOperationStatus.CannotUnpublishWhenReferenced);
         }
 
         var userId = await _userIdKeyResolver.GetAsync(userKey);

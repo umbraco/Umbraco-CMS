@@ -36,3 +36,4 @@ export * from './extensions/tiptap-html-global-attributes.extension.js';
 export * from './extensions/tiptap-umb-embedded-media.extension.js';
 export * from './extensions/tiptap-umb-image.extension.js';
 export * from './extensions/tiptap-umb-link.extension.js';
+export * from './extensions/tiptap-umb-table.extension.js';
