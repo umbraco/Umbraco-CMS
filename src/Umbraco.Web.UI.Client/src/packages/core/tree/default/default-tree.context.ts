@@ -1,5 +1,5 @@
 import type {
-	UmbTreeExpansionEntry,
+	UmbTreeExpansionEntryModel,
 	UmbTreeExpansionModel,
 	UmbTreeItemModel,
 	UmbTreeRootModel,
