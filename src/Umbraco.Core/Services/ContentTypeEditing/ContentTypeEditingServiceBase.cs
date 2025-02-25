@@ -506,7 +506,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         var dataTypesByKey = (await GetDataTypesAsync(model)).ToDictionary(d => d.Key);
 
         // build a dictionary of parent container IDs and their names (we need it when mapping property groups)
-        var compositionPropertyGroups = GetCompositionPropertyGroups(model, allContentTypeCompositions);
+        IEnumerable<PropertyGroup> compositionPropertyGroups = GetCompositionPropertyGroups(model, allContentTypeCompositions);
         var parentContainerNamesById = model
             .Containers
             .Where(container => container.ParentKey is not null)
@@ -587,15 +587,6 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         }
     }
 
-    private static bool IsRequiredTabMissingFromPropertyGroups(
-        IEnumerable<TPropertyTypeContainer> modelContainers,
-        IEnumerable<PropertyGroup> propertyGroups,
-        PropertyGroup compositionPropertyGroup)
-        => // If we have the tab as a parent of a property group in the model, but it's not in the property groups collection
-           // for the content type, indicate that it should be added.
-           modelContainers.Any(x => x.ParentKey == compositionPropertyGroup.Key) &&
-           propertyGroups.Any(x => x.Alias == compositionPropertyGroup.Alias) is false;
-
     private static string GetParentContainerName(IEnumerable<TPropertyTypeContainer> modelContainers, IEnumerable<PropertyGroup> compositionPropertyGroups, TPropertyTypeContainer container)
         => modelContainers.FirstOrDefault(c => c.Key == container.ParentKey)?.Name
             ?? compositionPropertyGroups.FirstOrDefault(c => c.Key == container.ParentKey)?.Name
@@ -611,6 +602,14 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         var parts = containerName.Split(Constants.CharArrays.Space);
         return $"{parts.First().ToFirstLowerInvariant()}{string.Join(string.Empty, parts.Skip(1).Select(part => part.ToFirstUpperInvariant()))}";
     }
+    private static bool IsRequiredTabMissingFromPropertyGroups(
+        IEnumerable<TPropertyTypeContainer> modelContainers,
+        IEnumerable<PropertyGroup> propertyGroups,
+        PropertyGroup compositionPropertyGroup)
+        => // If we have the tab as a parent of a property group in the model, but it's not in the property groups collection
+           // for the content type, indicate that it should be added.
+           modelContainers.Any(x => x.ParentKey == compositionPropertyGroup.Key) &&
+           propertyGroups.Any(x => x.Alias == compositionPropertyGroup.Alias) is false;
 
     private IPropertyType MapProperty(
         TContentType contentType,
