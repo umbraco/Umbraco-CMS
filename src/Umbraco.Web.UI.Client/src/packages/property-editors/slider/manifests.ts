@@ -6,7 +6,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		forPropertyEditorSchemaAlias: 'Umbraco.Slider',
 		alias: 'Umb.PropertyValuePreset.Slider',
 		name: 'Property Editor Schema Slider Preset for Initial Values',
-		api: () => import('./property-value-preset.Slider.js'),
+		api: () => import('./slider-property-value-preset.js'),
 	},
 	{
 		type: 'propertyEditorUi',

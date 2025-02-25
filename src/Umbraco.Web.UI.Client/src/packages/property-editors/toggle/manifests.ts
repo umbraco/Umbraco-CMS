@@ -6,7 +6,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		forPropertyEditorSchemaAlias: 'Umbraco.TrueFalse',
 		alias: 'Umb.PropertyValuePreset.TrueFalse',
 		name: 'Property Editor Schema True/False Preset for Initial State',
-		api: () => import('./property-value-preset.TrueFalse.js'),
+		api: () => import('./true-false-property-value-preset.js'),
 	},
 	{
 		type: 'propertyEditorUi',
