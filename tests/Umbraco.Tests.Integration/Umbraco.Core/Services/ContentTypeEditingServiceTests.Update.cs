@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
@@ -825,5 +825,53 @@ public partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidContainerType, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Add_Group_And_Property_To_Composed_Tab()
+    {
+        // Verifies fix and mitigates regression of: https://github.com/umbraco/Umbraco-CMS/issues/18402
+
+        // Prepare composition with a tab and content type that uses the composition.
+        var compositionTab = ContentTypePropertyContainerModel(name: "Tab 1");
+        var compositionGroup = ContentTypePropertyContainerModel(name: "Group 1", type: "Group");
+        compositionGroup.ParentKey = compositionTab.Key;
+        var compositionProperty = ContentTypePropertyTypeModel("Test Property", "testProperty", containerKey: compositionGroup.Key);
+        var compositionCreateModel = ContentTypeCreateModel("Composition", "composition");
+        compositionCreateModel.Containers = [compositionTab, compositionGroup];
+        compositionCreateModel.Properties = [compositionProperty];
+        var compositionContentType = (await ContentTypeEditingService.CreateAsync(compositionCreateModel, Constants.Security.SuperUserKey)).Result!;
+
+        var createModel = ContentTypeCreateModel("Test", "test");
+        createModel.Compositions =
+        [
+            new Composition { Key = compositionContentType.Key, CompositionType = CompositionType.Composition }
+        ];
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        // Add a new group and property.
+        var propertyGroup = ContentTypePropertyContainerModel(name: "Group 2", type: "Group");
+        propertyGroup.ParentKey = compositionTab.Key;
+        var property = ContentTypePropertyTypeModel("Test Property 2", "testProperty2");
+        property.ContainerKey = propertyGroup.Key;
+
+        var updateModel = ContentTypeUpdateModel("Test", "test");
+        updateModel.Containers = [propertyGroup];
+        updateModel.Properties = [property];
+        updateModel.Compositions = createModel.Compositions;
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        // Retrieve and assert the composition and content type that uses the composition.
+        compositionContentType = await ContentTypeService.GetAsync(compositionContentType.Key);
+        Assert.AreEqual("Tab 1, Group 1", string.Join(", ", compositionContentType.PropertyGroups.Select(x => x.Name)));
+        Assert.AreEqual("tab1, tab1/group1", string.Join(", ", compositionContentType.PropertyGroups.Select(x => x.Alias)));
+        Assert.IsNotNull(compositionContentType.PropertyGroups.Single(x => x.Key == compositionGroup.Key).PropertyTypes.SingleOrDefault(x => x.Alias == "testProperty"));
+
+        contentType = await ContentTypeService.GetAsync(contentType.Key);
+        Assert.AreEqual("Group 2, Tab 1", string.Join(", ", contentType.PropertyGroups.Select(x => x.Name)));
+        Assert.AreEqual("tab1/group2, tab1", string.Join(", ", contentType.PropertyGroups.Select(x => x.Alias)));
+        Assert.IsNotNull(contentType.PropertyGroups.Single(x => x.Key == propertyGroup.Key).PropertyTypes.SingleOrDefault(x => x.Alias == "testProperty2"));
     }
 }
