@@ -18,7 +18,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 [TestFixture]
 internal class MediaPicker3ValueEditorValidationTests
 {
-    [Test]
     [TestCase(true, true)]
     [TestCase(false, true)]
     [TestCase(false, false)]
@@ -45,7 +44,6 @@ internal class MediaPicker3ValueEditorValidationTests
         ValidateResult(succeed, result);
     }
 
-    [Test]
     [TestCase(true, true)]
     [TestCase(false, true)]
     [TestCase(false, false)]
@@ -83,7 +81,6 @@ internal class MediaPicker3ValueEditorValidationTests
         ValidateResult(succeed, result);
     }
 
-    [Test]
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", false, true)]
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n}, {\n  \" key\" : \"1C70519E-C3AE-4D45-8E48-30B3D02E455E\",\n  \"mediaKey\" : \"E243A7E2-8D2E-4DC9-88FB-822350A40142\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", false, false)]
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n}, {\n  \" key\" : \"1C70519E-C3AE-4D45-8E48-30B3D02E455E\",\n  \"mediaKey\" : \"E243A7E2-8D2E-4DC9-88FB-822350A40142\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", true, true)]
@@ -99,7 +96,6 @@ internal class MediaPicker3ValueEditorValidationTests
         ValidateResult(succeed, result);
     }
 
-    [Test]
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", 2, false)]
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n}, {\n  \" key\" : \"1C70519E-C3AE-4D45-8E48-30B3D02E455E\",\n  \"mediaKey\" : \"E243A7E2-8D2E-4DC9-88FB-822350A40142\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", 1, true)]
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n}, {\n  \" key\" : \"1C70519E-C3AE-4D45-8E48-30B3D02E455E\",\n  \"mediaKey\" : \"E243A7E2-8D2E-4DC9-88FB-822350A40142\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", 2, true)]
@@ -117,7 +113,6 @@ internal class MediaPicker3ValueEditorValidationTests
         ValidateResult(succeed, result);
     }
 
-    [Test]
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", 1, true)]
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", 0, false)]
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n}, {\n  \" key\" : \"1C70519E-C3AE-4D45-8E48-30B3D02E455E\",\n  \"mediaKey\" : \"E243A7E2-8D2E-4DC9-88FB-822350A40142\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", 1, false)]
