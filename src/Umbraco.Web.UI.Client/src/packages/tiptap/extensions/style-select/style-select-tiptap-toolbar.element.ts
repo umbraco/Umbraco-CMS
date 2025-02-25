@@ -75,6 +75,8 @@ export class UmbTiptapToolbarStyleSelectToolbarElement extends UmbLitElement {
 		css`
 			:host {
 				--uui-button-font-weight: normal;
+
+				margin-inline-start: var(--uui-size-space-1);
 			}
 
 			uui-button > uui-symbol-expand {

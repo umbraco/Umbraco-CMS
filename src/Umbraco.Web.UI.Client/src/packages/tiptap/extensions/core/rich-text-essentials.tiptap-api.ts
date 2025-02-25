@@ -1,13 +1,6 @@
 import { UmbTiptapExtensionApiBase } from '../base.js';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-import {
-	Div,
-	HtmlGlobalAttributes,
-	Placeholder,
-	Span,
-	StarterKit,
-	TextStyle,
-} from '@umbraco-cms/backoffice/external/tiptap';
+import { Div, HtmlGlobalAttributes, Placeholder, Span, StarterKit } from '@umbraco-cms/backoffice/external/tiptap';
 
 export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionApiBase {
 	#localize = new UmbLocalizationController(this);
@@ -21,7 +14,8 @@ export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionA
 				);
 			},
 		}),
-		TextStyle,
+		Div,
+		Span,
 		HtmlGlobalAttributes.configure({
 			types: [
 				'bold',
@@ -46,13 +40,10 @@ export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionA
 				'tableHeader',
 				'tableRow',
 				'tableCell',
-				'textStyle',
 				'underline',
 				'umbLink',
 			],
 		}),
-		Div,
-		Span,
 	];
 }
 
