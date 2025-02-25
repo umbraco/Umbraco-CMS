@@ -19,29 +19,75 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 internal class MediaPicker3ValueEditorValidationTests
 {
     [TestCase(true, true)]
-    [TestCase(false, true)]
     [TestCase(false, false)]
-    public void Validates_Start_Node(bool succeed, bool hasAncestorKey)
+    public void Validates_Start_Node_Immediate_Parent(bool shouldSucceed, bool hasValidParentKey)
     {
         var (valueEditor, mediaTypeServiceMock, mediaNavigationQueryServiceMock) = CreateValueEditor();
 
-        var parentKey = Guid.NewGuid();
-        IEnumerable<Guid> ancestorKeys = hasAncestorKey ? [Guid.NewGuid()] : [];
+        Guid? validParentKey = Guid.NewGuid();
         var mediaKey = Guid.NewGuid();
 
-        if (succeed)
+        if (hasValidParentKey)
         {
-            ancestorKeys = [parentKey];
+            mediaNavigationQueryServiceMock.Setup(x => x.TryGetParentKey(mediaKey, out validParentKey)).Returns(true);
+        }
+        else
+        {
+            Guid? invalidParentKey = Guid.NewGuid();
+            mediaNavigationQueryServiceMock.Setup(x => x.TryGetParentKey(mediaKey, out invalidParentKey)).Returns(true);
         }
 
-        mediaNavigationQueryServiceMock.Setup(x => x.TryGetAncestorsKeys(mediaKey, out ancestorKeys)).Returns(true);
-        valueEditor.ConfigurationObject = new MediaPicker3Configuration { StartNodeId = parentKey };
+        valueEditor.ConfigurationObject = new MediaPicker3Configuration { StartNodeId = validParentKey };
 
         var value = "[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"" + mediaKey + "\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]";
 
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
 
-        ValidateResult(succeed, result);
+        ValidateResult(shouldSucceed, result);
+    }
+
+    [Test]
+    public void Validates_Start_Node_Parent_Not_Found()
+    {
+        var (valueEditor, mediaTypeServiceMock, mediaNavigationQueryServiceMock) = CreateValueEditor();
+
+        Guid? parentKey = null;
+        var mediaKey = Guid.NewGuid();
+
+        mediaNavigationQueryServiceMock.Setup(x => x.TryGetParentKey(mediaKey, out parentKey)).Returns(true);
+
+        valueEditor.ConfigurationObject = new MediaPicker3Configuration { StartNodeId = Guid.NewGuid() };
+
+        var value = "[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"" + mediaKey + "\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]";
+
+        var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
+
+        ValidateResult(false, result);
+    }
+
+    [Test]
+    [TestCase(true, true, true)]
+    [TestCase(false, false, true)]
+    [TestCase(false, true, false)]
+    public void Validates_Start_Node_Ancestor(bool shouldSucceed, bool findsAncestor, bool hasValidAncestorKey)
+    {
+        var (valueEditor, mediaTypeServiceMock, mediaNavigationQueryServiceMock) = CreateValueEditor();
+
+        Guid ancestorKey = Guid.NewGuid();
+        Guid? parentKey = Guid.NewGuid();
+        var mediaKey = Guid.NewGuid();
+        IEnumerable<Guid> ancestorKeys = findsAncestor is false ? [] : hasValidAncestorKey ? [ancestorKey] : [Guid.NewGuid()];
+
+        mediaNavigationQueryServiceMock.Setup(x => x.TryGetParentKey(mediaKey, out parentKey)).Returns(true);
+        mediaNavigationQueryServiceMock.Setup(x => x.TryGetAncestorsKeys(parentKey.Value, out ancestorKeys)).Returns(true);
+
+        valueEditor.ConfigurationObject = new MediaPicker3Configuration { StartNodeId = ancestorKey };
+
+        var value = "[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"" + mediaKey + "\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]";
+
+        var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
+
+        ValidateResult(shouldSucceed, result);
     }
 
     [TestCase(true, true)]

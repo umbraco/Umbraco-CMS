@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -334,7 +332,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                 {
                     validationResults.Add(new ValidationResult(
                         _localizedTextService.Localize("validation", "multipleMediaNotAllowed"),
-                        new[] { "value" }));
+                        ["value"]));
                 }
 
                 if (mediaPickerConfiguration.ValidationLimit.Min is not null
@@ -344,8 +342,9 @@ public class MediaPicker3PropertyEditor : DataEditor
                         _localizedTextService.Localize(
                             "validation",
                             "entriesShort",
-                            new[] { mediaPickerConfiguration.ValidationLimit.Min.ToString(), (mediaPickerConfiguration.ValidationLimit.Min - mediaWithCropsDtos.Count).ToString(), }),
-                        new[] { "value" }));
+                            [mediaPickerConfiguration.ValidationLimit.Min.ToString(), (mediaPickerConfiguration.ValidationLimit.Min - mediaWithCropsDtos.Count).ToString()
+                            ]),
+                        ["value"]));
                 }
 
                 if (mediaPickerConfiguration.ValidationLimit.Max is not null
@@ -355,8 +354,9 @@ public class MediaPicker3PropertyEditor : DataEditor
                         _localizedTextService.Localize(
                             "validation",
                             "entriesExceed",
-                            new[] { mediaPickerConfiguration.ValidationLimit.Max.ToString(), (mediaWithCropsDtos.Count - mediaPickerConfiguration.ValidationLimit.Max).ToString(), }),
-                        new[] { "value" }));
+                            [mediaPickerConfiguration.ValidationLimit.Max.ToString(), (mediaWithCropsDtos.Count - mediaPickerConfiguration.ValidationLimit.Max).ToString()
+                            ]),
+                        ["value"]));
                 }
 
                 return validationResults;
@@ -405,7 +405,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                         [
                             new ValidationResult(
                                 _localizedTextService.Localize("validation", "invalidMediaType"),
-                                new[] { "value" })
+                                ["value"])
                         ];
                     }
                 }
@@ -438,20 +438,51 @@ public class MediaPicker3PropertyEditor : DataEditor
                     return [];
                 }
 
-                foreach (MediaWithCropsDto media in value)
+
+                List<Guid> uniqueParentKeys = [];
+                foreach (Guid distinctMediaKey in value.DistinctBy(x => x.MediaKey).Select(x => x.MediaKey))
                 {
-                    if (_mediaNavigationQueryService.TryGetAncestorsKeys(media.MediaKey, out IEnumerable<Guid> ancestorsKeys) is false)
+                    if (_mediaNavigationQueryService.TryGetParentKey(distinctMediaKey, out Guid? parentKey) is false)
                     {
                         continue;
                     }
 
-                    if (ancestorsKeys.Contains(configuration.StartNodeId.Value) is false)
+                    // If there is a start node, the media must have a parent.
+                    if (parentKey is null)
                     {
                         return
                         [
                             new ValidationResult(
                                 _localizedTextService.Localize("validation", "invalidStartNode"),
-                                new[] { "value" })
+                                ["value"])
+                        ];
+                    }
+
+                    uniqueParentKeys.Add(parentKey.Value);
+                }
+
+                IEnumerable<Guid> parentKeysNotInStartNode = uniqueParentKeys.Where(x => x != configuration.StartNodeId.Value);
+                foreach (Guid parentKey in parentKeysNotInStartNode)
+                {
+                    if (_mediaNavigationQueryService.TryGetAncestorsKeys(parentKey, out IEnumerable<Guid> foundAncestorKeys) is false)
+                    {
+                        // We couldn't find the parent node, so we fail.
+                        return
+                        [
+                            new ValidationResult(
+                                _localizedTextService.Localize("validation", "invalidStartNode"),
+                                ["value"])
+                        ];
+                    }
+
+                    Guid[] ancestorKeys = foundAncestorKeys.ToArray();
+                    if (ancestorKeys.Length == 0 || ancestorKeys.Contains(configuration.StartNodeId.Value) is false)
+                    {
+                        return
+                        [
+                            new ValidationResult(
+                                _localizedTextService.Localize("validation", "invalidStartNode"),
+                                ["value"])
                         ];
                     }
                 }
