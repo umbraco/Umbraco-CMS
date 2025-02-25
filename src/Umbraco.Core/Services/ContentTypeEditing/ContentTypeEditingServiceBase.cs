@@ -557,12 +557,11 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             .WhereNotNull()
             .ToList();
 
-        // Properties groups created in tabs from a composition need their parent tab saved as a group on the content type too.
-        // Ensure that they exist.
+        // Property groups (of type = group) created in tabs from a composition need their parent tab saved as a property group (of type = tab)
+        // on the current content type too. Ensure that they exist.
         foreach (PropertyGroup compositionPropertyGroup in compositionPropertyGroups.Where(x => x.Type == PropertyGroupType.Tab))
         {
-            // If we have the tab as a parent of a property group in the model, but it's not in the property groups collection for the content type, add it.
-            if (model.Containers.Any(x => x.ParentKey == compositionPropertyGroup.Key) && propertyGroups.Any(x => x.Alias == compositionPropertyGroup.Alias) is false)
+            if (IsRequiredTabMissingFromPropertyGroups(model.Containers, propertyGroups, compositionPropertyGroup))
             {
                 propertyGroups.Add(new PropertyGroup(SupportsPublishing)
                 {
@@ -587,6 +586,15 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             contentType.NoGroupPropertyTypes = new PropertyTypeCollection(SupportsPublishing, orphanedPropertyTypes);
         }
     }
+
+    private static bool IsRequiredTabMissingFromPropertyGroups(
+        IEnumerable<TPropertyTypeContainer> modelContainers,
+        IEnumerable<PropertyGroup> propertyGroups,
+        PropertyGroup compositionPropertyGroup)
+        => // If we have the tab as a parent of a property group in the model, but it's not in the property groups collection
+           // for the content type, indicate that it should be added.
+           modelContainers.Any(x => x.ParentKey == compositionPropertyGroup.Key) &&
+           propertyGroups.Any(x => x.Alias == compositionPropertyGroup.Alias) is false;
 
     private static string GetParentContainerName(IEnumerable<TPropertyTypeContainer> modelContainers, IEnumerable<PropertyGroup> compositionPropertyGroups, TPropertyTypeContainer container)
         => modelContainers.FirstOrDefault(c => c.Key == container.ParentKey)?.Name
