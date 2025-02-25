@@ -40,8 +40,6 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 			}
 		}
 
-		//this._markup = markup;
-
 		if (this.value) {
 			this.value = {
 				...this.value,
