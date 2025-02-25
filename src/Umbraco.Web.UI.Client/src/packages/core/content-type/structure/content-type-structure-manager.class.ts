@@ -4,7 +4,7 @@ import type {
 	UmbPropertyTypeContainerModel,
 	UmbPropertyTypeModel,
 } from '../types.js';
-import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbDetailRepository, UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
 import type { MappingFunction } from '@umbraco-cms/backoffice/observable-api';
@@ -35,8 +35,8 @@ const UmbFilterDuplicateStrings = (value: string, index: number, array: Array<st
 export class UmbContentTypeStructureManager<
 	T extends UmbContentTypeModel = UmbContentTypeModel,
 > extends UmbControllerBase {
-	#initResolver?: () => void;
-	#init = new Promise<void>((resolve) => {
+	#initResolver?: (respoonse: UmbRepositoryResponse<T>) => void;
+	#init = new Promise<UmbRepositoryResponse<T>>((resolve) => {
 		this.#initResolver = resolve;
 	});
 
@@ -142,7 +142,7 @@ export class UmbContentTypeStructureManager<
 		this.#ownerContentTypeUnique = unique;
 		if (!unique) return;
 		const result = await this.#loadType(unique);
-		this.#initResolver?.();
+		this.#initResolver?.(result);
 		return result;
 	}
 
@@ -150,15 +150,15 @@ export class UmbContentTypeStructureManager<
 		await this.#initRepository;
 		this.#clear();
 
-		const { data } = await this.#repository!.createScaffold(preset);
-		if (!data) return {};
+		const repsonse = await this.#repository!.createScaffold(preset);
+		if (!repsonse.data) return {};
 
-		this.#ownerContentTypeUnique = data.unique;
+		this.#ownerContentTypeUnique = repsonse.data.unique;
 
 		// Add the new content type to the list of content types, this holds our draft state of this scaffold.
-		this.#contentTypes.appendOne(data);
-		this.#initResolver?.();
-		return { data };
+		this.#contentTypes.appendOne(repsonse.data);
+		this.#initResolver?.(repsonse);
+		return repsonse;
 	}
 
 	/**
@@ -407,7 +407,7 @@ export class UmbContentTypeStructureManager<
 		parentId: string | null = null,
 		type: UmbPropertyContainerTypes = 'Group',
 		sortOrder?: number,
-	) {
+	): Promise<UmbPropertyTypeContainerModel> {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
@@ -462,7 +462,7 @@ export class UmbContentTypeStructureManager<
 		containerId: string,
 		containerType: UmbPropertyContainerTypes,
 		parentId: string | null = null,
-	) {
+	): string {
 		return (
 			this.makeContainerNameUniqueForOwnerContentType(containerId, 'Unnamed', containerType, parentId) ?? 'Unnamed'
 		);
@@ -789,7 +789,7 @@ export class UmbContentTypeStructureManager<
 	}
 
 	#clear() {
-		this.#init = new Promise<void>((resolve) => {
+		this.#init = new Promise((resolve) => {
 			this.#initResolver = resolve;
 		});
 		this.#contentTypes.setValue([]);
