@@ -94,35 +94,6 @@ public class MediaPicker3PropertyEditor : DataEditor
             Validators.Add(validators);
         }
 
-        [Obsolete("Use non obsoleted constructor instead. Scheduled for removal in v17")]
-        public MediaPicker3PropertyValueEditor(
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer,
-            IIOHelper ioHelper,
-            DataEditorAttribute attribute,
-            IMediaImportService mediaImportService,
-            IMediaService mediaService,
-            ITemporaryFileService temporaryFileService,
-            IScopeProvider scopeProvider,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            IDataTypeConfigurationCache dataTypeReadCache)
-            : this(
-                shortStringHelper,
-                jsonSerializer,
-                ioHelper,
-                attribute,
-                mediaImportService,
-                mediaService,
-                temporaryFileService,
-                scopeProvider,
-                backOfficeSecurityAccessor,
-                dataTypeReadCache,
-                StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>(),
-                StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>(),
-                StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>())
-        {
-        }
-
         /// <remarks>
         ///     Note: no FromEditor() and ToEditor() methods
         ///     We do not want to transform the way the data is stored in the DB and would like to keep a raw JSON string
