@@ -5,13 +5,17 @@ import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observabl
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbReadOnlyStateManager } from '@umbraco-cms/backoffice/utils';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 
 // TODO: Make a store for the App Languages.
 // TODO: Implement default language end-point, in progress at backend team, so we can avoid getting all languages.
 export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext> implements UmbApi {
+	#languagesResolve!: () => void;
+	#languagesPromise = new Promise<void>((resolve) => {
+		this.#languagesResolve = resolve;
+	});
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	public readonly languages = this.#languages.asObservable();
 	public readonly cultures = this.#languages.asObservablePart((x) => x.map((y) => y.unique));
@@ -31,6 +35,14 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 
 	public readonly appLanguageReadOnlyState = new UmbReadOnlyStateManager(this);
 
+	public readonly appMandatoryLanguages = this.#languages.asObservablePart((languages) =>
+		languages.filter((language) => language.isMandatory),
+	);
+	async getMandatoryLanguages() {
+		await this.#languagesPromise;
+		return this.#languages.getValue().filter((language) => language.isMandatory);
+	}
+
 	#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
 	#currentUserAllowedLanguages: Array<string> = [];
 	#currentUserHasAccessToAllLanguages = false;
@@ -45,7 +57,7 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
 			this.observe(authContext.isAuthorized, (isAuthorized) => {
 				if (!isAuthorized) return;
-				this.#observeLanguages();
+				this.#requestLanguages();
 			});
 		});
 
@@ -90,12 +102,13 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 		this.#setIsReadOnly();
 	}
 
-	async #observeLanguages() {
+	async #requestLanguages() {
 		const { data } = await this.#languageCollectionRepository.requestCollection({});
 
 		// TODO: make this observable / update when languages are added/removed/updated
 		if (data) {
 			this.#languages.setValue(data.items);
+			this.#languagesResolve();
 
 			// If the app language is not set, set it to the default language
 			if (!this.#appLanguage.getValue()) {
