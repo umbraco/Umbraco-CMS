@@ -1,11 +1,17 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -46,10 +52,21 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
-            DataEditorAttribute attribute)
+            DataEditorAttribute attribute,
+            ILocalizedTextService localizedTextService)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
+            Validators.Add(new TypedJsonValidatorRunner<EditorEntityReference[], MultiNodePickerConfiguration>(jsonSerializer, new AmountValidator(localizedTextService)));
+        }
+
+        public MultiNodeTreePickerPropertyValueEditor(
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            DataEditorAttribute attribute)
+            : this(shortStringHelper, jsonSerializer, ioHelper, attribute, StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>())
+        {
         }
 
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
@@ -101,6 +118,54 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             public required string Type { get; set; }
 
             public required Guid Unique { get; set; }
+        }
+
+        internal class AmountValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
+        {
+            private readonly ILocalizedTextService _localizedTextService;
+
+            public AmountValidator(ILocalizedTextService localizedTextService)
+            {
+                _localizedTextService = localizedTextService;
+            }
+
+            public IEnumerable<ValidationResult> Validate(
+                EditorEntityReference[]? entityReferences,
+                MultiNodePickerConfiguration? configuration,
+                string? valueType,
+                PropertyValidationContext validationContext)
+            {
+                var validationResults = new List<ValidationResult>();
+
+                if (entityReferences is null || configuration is null)
+                {
+                    return validationResults;
+                }
+
+                if (configuration.MinNumber > 0 && entityReferences.Length < configuration.MinNumber)
+                {
+                    validationResults.Add(new ValidationResult(
+                        _localizedTextService.Localize(
+                            "validation",
+                            "entriesShort",
+                            [configuration.MinNumber.ToString(), (configuration.MinNumber - entityReferences.Length).ToString()
+                            ]),
+                        ["value"]));
+                }
+
+                if (configuration.MaxNumber > 0 && entityReferences.Length > configuration.MaxNumber)
+                {
+                    validationResults.Add(new ValidationResult(
+                        _localizedTextService.Localize(
+                            "validation",
+                            "entriesExceed",
+                            [configuration.MaxNumber.ToString(), (entityReferences.Length - configuration.MaxNumber).ToString()
+                            ]),
+                        ["value"]));
+                }
+
+                return validationResults;
+            }
         }
     }
 }
