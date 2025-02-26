@@ -36,13 +36,13 @@ export class UmbBlockGridPasteFromClipboardPropertyAction extends UmbPasteFromCl
 				})
 				.filter((contentTypeKey) => contentTypeKey !== undefined) ?? [];
 
-		// ensure all content types in the paste value are allowed in the grid root
 		const rootContentKeys = propertyValue.layout['Umbraco.BlockGrid']?.map((block) => block.contentKey) ?? [];
-		const rootContentTypesKeys = propertyValue.contentData
+		const rootContentTypeKeys = propertyValue.contentData
 			.filter((content) => rootContentKeys.includes(content.key))
 			.map((content) => content.contentTypeKey);
 
-		const allContentTypesAllowedAtRoot = rootContentTypesKeys.every((contentKey) =>
+		// ensure all content types in the paste value are allowed in the grid root
+		const allContentTypesAllowedAtRoot = rootContentTypeKeys.every((contentKey) =>
 			allowedRootContentTypeKeys.includes(contentKey),
 		);
 
