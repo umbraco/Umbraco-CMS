@@ -6,12 +6,13 @@ import type {
 	UmbDocumentScheduleModalValue,
 	UmbDocumentScheduleSelectionModel,
 } from './document-schedule-modal.token.js';
-import { css, customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ref, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { umbBindToValidation, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
-import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIBooleanInputElement, UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-schedule-modal')
 export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
@@ -21,19 +22,24 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	#selectionManager = new UmbSelectionManager<string>(this);
 
 	@state()
-	_options: Array<UmbDocumentVariantOptionModel> = [];
+	private _options: Array<UmbDocumentVariantOptionModel> = [];
 
 	@state()
-	_hasNotSelectedMandatory?: boolean;
+	private _hasNotSelectedMandatory?: boolean;
 
 	@state()
-	_selection: Array<string> = [];
+	private readonly _selection: Array<UmbDocumentScheduleSelectionModel> = [];
 
 	@state()
-	_isAllSelected = false;
+	private _isAllSelected = false;
 
 	@state()
-	_internalValues: Array<UmbDocumentScheduleSelectionModel> = [];
+	private _internalValues: Array<UmbDocumentScheduleSelectionModel> = [];
+
+	@state()
+	private _submitButtonState?: UUIButtonState;
+
+	#validation = new UmbValidationContext(this);
 
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
 		if (isNotPublishedMandatory(option)) {
@@ -54,7 +60,13 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				if (!this._options && !selection) return;
 
 				// New selections are mapped to the schedule data
-				this._selection = selection;
+				this._selection.length = 0;
+				for (const unique of selection) {
+					const existing = this._internalValues.find((s) => s.unique === unique);
+					if (existing) {
+						this._selection.push(existing);
+					}
+				}
 				this._isAllSelected = this.#isAllSelected();
 
 				//Getting not published mandatory options — the options that are mandatory and not currently published.
@@ -81,21 +93,40 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
 		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
-		this._options = this.data?.options.filter((option) => this.#pickableFilter(option)) ?? [];
+		this._options =
+			this.data?.options.filter(
+				(option) =>
+					(option.variant && option.variant.state === null) ||
+					isNotPublishedMandatory(option) ||
+					option.variant?.state !== UmbDocumentVariantState.NOT_CREATED,
+			) ?? [];
 
 		let selected = this.data?.activeVariants ?? [];
 
+		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
+		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
+		const validOptions = this._options.filter((option) => this.#pickableFilter(option));
+
 		// Filter selection based on options:
-		selected = selected.filter((unique) => this._options.some((o) => o.unique === unique));
+		selected = selected.filter((unique) => validOptions.some((o) => o.unique === unique));
 
 		this.#selectionManager.setSelection(selected);
 	}
 
-	#submit() {
-		this.value = {
-			selection: this._internalValues,
-		};
-		this.modalContext?.submit();
+	async #submit() {
+		this._submitButtonState = 'waiting';
+		try {
+			await this.#validation.validate();
+			this._submitButtonState = 'success';
+			this.value = {
+				selection: this._selection,
+			};
+			this.modalContext?.submit();
+		} catch {
+			this._submitButtonState = 'failed';
+		} finally {
+			this._submitButtonState = undefined;
+		}
 	}
 
 	#close() {
@@ -103,7 +134,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#isSelected(unique: string) {
-		return this._selection.includes(unique);
+		return this._selection.some((s) => s.unique === unique);
 	}
 
 	#onSelectAllChange(event: Event) {
@@ -146,6 +177,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
+					.state=${this._submitButtonState}
 					label="${this.localize.term('buttons_schedulePublish')}"
 					look="primary"
 					color="positive"
@@ -203,59 +235,115 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		`;
 	}
 
+	#attachValidatorsToPublish(element: UmbInputDateElement | null) {
+		if (!element) return;
+
+		element.addValidator(
+			'badInput',
+			() => this.localize.term('speechBubbles_scheduleErrReleaseDate1'),
+			() => {
+				const value = element.value.toString();
+				if (!value) return false;
+				const date = new Date(value);
+				return date < new Date();
+			},
+		);
+	}
+
+	#attachValidatorsToUnpublish(element: UmbInputDateElement | null, unique: string) {
+		if (!element) return;
+
+		element.addValidator(
+			'badInput',
+			() => this.localize.term('speechBubbles_scheduleErrExpireDate1'),
+			() => {
+				const value = element.value.toString();
+				if (!value) return false;
+				const date = new Date(value);
+				return date < new Date();
+			},
+		);
+
+		element.addValidator(
+			'customError',
+			() => this.localize.term('speechBubbles_scheduleErrExpireDate2'),
+			() => {
+				const value = element.value.toString();
+				if (!value) return false;
+
+				// Check if the unpublish date is before the publish date
+				const variant = this._internalValues.find((s) => s.unique === unique);
+				if (!variant) return false;
+				const publishTime = variant.schedule?.publishTime;
+				if (!publishTime) return false;
+
+				const date = new Date(value);
+				const publishDate = new Date(publishTime);
+				return date < publishDate;
+			},
+		);
+	}
+
 	#renderPublishDateInput(option: UmbDocumentVariantOptionModel, fromDate: string | null, toDate: string | null) {
-		return html`<div class="publish-date">
-			<uui-form-layout-item>
-				<uui-label slot="label"><umb-localize key="content_releaseDate">Publish at</umb-localize></uui-label>
-				<div>
-					<umb-input-date
-						type="datetime-local"
-						.value=${this.#formatDate(fromDate)}
-						@change=${(e: Event) => this.#onFromDateChange(e, option.unique)}
-						label=${this.localize.term('general_publishDate')}>
-						<div slot="append">
-							${when(
-								fromDate,
-								() => html`
-									<uui-button
-										compact
-										label=${this.localize.term('general_clear')}
-										title=${this.localize.term('general_clear')}
-										@click=${() => this.#removeFromDate(option.unique)}>
-										<uui-icon name="remove"></uui-icon>
-									</uui-button>
-								`,
-							)}
-						</div>
-					</umb-input-date>
-				</div>
-			</uui-form-layout-item>
-			<uui-form-layout-item>
-				<uui-label slot="label"><umb-localize key="content_unpublishDate">Unpublish at</umb-localize></uui-label>
-				<div>
-					<umb-input-date
-						type="datetime-local"
-						.value=${this.#formatDate(toDate)}
-						@change=${(e: Event) => this.#onToDateChange(e, option.unique)}
-						label=${this.localize.term('general_publishDate')}>
-						<div slot="append">
-							${when(
-								toDate,
-								() => html`
-									<uui-button
-										compact
-										label=${this.localize.term('general_clear')}
-										title=${this.localize.term('general_clear')}
-										@click=${() => this.#removeToDate(option.unique)}>
-										<uui-icon name="remove"></uui-icon>
-									</uui-button>
-								`,
-							)}
-						</div>
-					</umb-input-date>
-				</div>
-			</uui-form-layout-item>
-		</div>`;
+		return html`
+			<div class="publish-date">
+				<uui-form-layout-item>
+					<uui-label slot="label"><umb-localize key="content_releaseDate">Publish at</umb-localize></uui-label>
+					<div>
+						<umb-input-date
+							${ref((e) => this.#attachValidatorsToPublish(e as UmbInputDateElement))}
+							${umbBindToValidation(this)}
+							type="datetime-local"
+							.value=${this.#formatDate(fromDate)}
+							@change=${(e: Event) => this.#onFromDateChange(e, option.unique)}
+							label=${this.localize.term('general_publishDate')}>
+							<div slot="append">
+								${when(
+									fromDate,
+									() => html`
+										<uui-button
+											compact
+											label=${this.localize.term('general_clear')}
+											title=${this.localize.term('general_clear')}
+											@click=${() => this.#removeFromDate(option.unique)}>
+											<uui-icon name="remove"></uui-icon>
+										</uui-button>
+									`,
+								)}
+							</div>
+						</umb-input-date>
+					</div>
+				</uui-form-layout-item>
+
+				<uui-form-layout-item>
+					<uui-label slot="label"><umb-localize key="content_unpublishDate">Unpublish at</umb-localize></uui-label>
+					<div>
+						<umb-input-date
+							${ref((e) => this.#attachValidatorsToUnpublish(e as UmbInputDateElement, option.unique))}
+							${umbBindToValidation(this)}
+							type="datetime-local"
+							.value=${this.#formatDate(toDate)}
+							@change=${(e: Event) => this.#onToDateChange(e, option.unique)}
+							label=${this.localize.term('general_publishDate')}>
+							<div slot="append">
+								${when(
+									toDate,
+									() => html`
+										<uui-button
+											compact
+											label=${this.localize.term('general_clear')}
+											title=${this.localize.term('general_clear')}
+											@click=${() => this.#removeToDate(option.unique)}>
+											<uui-icon name="remove"></uui-icon>
+										</uui-button>
+									`,
+								)}
+							</div>
+						</umb-input-date>
+					</div>
+				</uui-form-layout-item>
+			</div>
+		`;
 	}
 
 	#fromDate(unique: string): string | null {
@@ -275,6 +363,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			...variant.schedule,
 			publishTime: null,
 		};
+		this.#validation.validate();
 		this.requestUpdate('_internalValues');
 	}
 
@@ -285,6 +374,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			...variant.schedule,
 			unpublishTime: null,
 		};
+		this.#validation.validate();
 		this.requestUpdate('_internalValues');
 	}
 
@@ -325,6 +415,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			...variant.schedule,
 			publishTime: this.#getDateValue(e),
 		};
+		this.#validation.validate();
 		this.requestUpdate('_internalValues');
 	}
 
@@ -335,6 +426,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			...variant.schedule,
 			unpublishTime: this.#getDateValue(e),
 		};
+		this.#validation.validate();
 		this.requestUpdate('_internalValues');
 	}
 

@@ -8,7 +8,7 @@ import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension
 const kinds: Array<UmbExtensionManifestKind> = [
 	{
 		type: 'kind',
-		alias: 'Umb.Kind.Button',
+		alias: 'Umb.Kind.TiptapToolbar.Button',
 		matchKind: 'button',
 		matchType: 'tiptapToolbarExtension',
 		manifest: {
@@ -124,6 +124,17 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 	},
 	{
 		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.TextDirection',
+		name: 'Text Direction Tiptap Extension',
+		api: () => import('./core/text-direction.tiptap-api.js'),
+		meta: {
+			icon: 'icon-text-direction-ltr',
+			label: 'Text Direction',
+			group: '#tiptap_extGroup_formatting',
+		},
+	},
+	{
+		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.MediaUpload',
 		name: 'Media Upload Tiptap Extension',
 		api: () => import('./core/media-upload.tiptap-api.js'),
@@ -157,7 +168,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'bold',
 			icon: 'icon-bold',
-			label: 'Bold',
+			label: '#buttons_bold',
 		},
 	},
 	{
@@ -169,7 +180,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'italic',
 			icon: 'icon-italic',
-			label: 'Italic',
+			label: '#buttons_italic',
 		},
 	},
 	{
@@ -264,6 +275,32 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.TextDirectionRtl',
+		name: 'Text Direction RTL Tiptap Extension',
+		api: () => import('./toolbar/text-direction-rtl.tiptap-toolbar-api.js'),
+		forExtensions: ['Umb.Tiptap.TextAlign'],
+		meta: {
+			alias: 'text-direction-rtl',
+			icon: 'icon-text-direction-rtl',
+			label: 'Right to left',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.TextDirectionLtr',
+		name: 'Text Direction LTR Tiptap Extension',
+		api: () => import('./toolbar/text-direction-ltr.tiptap-toolbar-api.js'),
+		forExtensions: ['Umb.Tiptap.TextAlign'],
+		meta: {
+			alias: 'text-direction-ltr',
+			icon: 'icon-text-direction-ltr',
+			label: 'Left to right',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Heading1',
 		name: 'Heading 1 Tiptap Extension',
 		api: () => import('./toolbar/heading1.tiptap-toolbar-api.js'),
@@ -306,7 +343,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'bulletList',
 			icon: 'icon-bulleted-list',
-			label: 'Bullet List',
+			label: '#buttons_listBullet',
 		},
 	},
 	{
@@ -420,7 +457,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'undo',
 			icon: 'icon-undo',
-			label: 'Undo',
+			label: '#buttons_undo',
 		},
 	},
 	{
@@ -433,7 +470,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'redo',
 			icon: 'icon-redo',
-			label: 'Redo',
+			label: '#buttons_redo',
 		},
 	},
 	{
@@ -446,7 +483,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'umbMedia',
 			icon: 'icon-picture',
-			label: 'Media picker',
+			label: '#general_mediaPicker',
 		},
 	},
 	{

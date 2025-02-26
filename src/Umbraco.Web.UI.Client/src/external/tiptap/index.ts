@@ -33,6 +33,8 @@ export * from './extensions/tiptap-figcaption.extension.js';
 export * from './extensions/tiptap-figure.extension.js';
 export * from './extensions/tiptap-span.extension.js';
 export * from './extensions/tiptap-html-global-attributes.extension.js';
+export * from './extensions/tiptap-text-direction-extension.js';
+export * from './extensions/tiptap-trailing-node.extension.js';
 export * from './extensions/tiptap-umb-embedded-media.extension.js';
 export * from './extensions/tiptap-umb-image.extension.js';
 export * from './extensions/tiptap-umb-link.extension.js';
