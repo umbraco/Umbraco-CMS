@@ -1,5 +1,6 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridValueModel } from '../../../types.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../../constants.js';
+import type { UmbBlockGridPropertyEditorConfig } from '../../../property-editors/block-grid-editor/types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbClipboardPastePropertyValueTranslator } from '@umbraco-cms/backoffice/clipboard';
 import type { UmbBlockClipboardEntryValueModel, UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
@@ -51,8 +52,7 @@ export class UmbBlockToBlockGridClipboardPastePropertyValueTranslator
 	 */
 	async isCompatibleValue(
 		value: UmbBlockClipboardEntryValueModel,
-		// TODO: Replace any with the correct type.
-		config: Array<{ alias: string; value: [{ contentElementTypeKey: string }] }>,
+		config: UmbBlockGridPropertyEditorConfig,
 	): Promise<boolean> {
 		const allowedBlockContentTypes =
 			config.find((c) => c.alias === 'blocks')?.value.map((b) => b.contentElementTypeKey) ?? [];
