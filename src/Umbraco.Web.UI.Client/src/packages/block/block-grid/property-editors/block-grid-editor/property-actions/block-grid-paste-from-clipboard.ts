@@ -31,13 +31,22 @@ export class UmbBlockGridPasteFromClipboardPropertyAction extends UmbPasteFromCl
 					if (blockConfig.allowAtRoot) {
 						return blockConfig.contentElementTypeKey;
 					} else {
-						return null;
+						return undefined;
 					}
 				})
-				.filter((contentTypeKey) => contentTypeKey !== null) ?? [];
+				.filter((contentTypeKey) => contentTypeKey !== undefined) ?? [];
 
 		// ensure all content types in the paste value are allowed in the grid root
-		return propertyValue.contentData.every((block) => allowedRootContentTypeKeys.includes(block.contentTypeKey));
+		const rootContentKeys = propertyValue.layout['Umbraco.BlockGrid']?.map((block) => block.contentKey) ?? [];
+		const rootContentTypesKeys = propertyValue.contentData
+			.filter((content) => rootContentKeys.includes(content.key))
+			.map((content) => content.contentTypeKey);
+
+		const allContentTypesAllowedAtRoot = rootContentTypesKeys.every((contentKey) =>
+			allowedRootContentTypeKeys.includes(contentKey),
+		);
+
+		return allContentTypesAllowedAtRoot;
 	}
 }
 export { UmbBlockGridPasteFromClipboardPropertyAction as api };
