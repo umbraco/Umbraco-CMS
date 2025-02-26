@@ -33,6 +33,10 @@ export class UmbValidationMessagesManager {
 		this.messages.subscribe((x) => console.log(logName, x));
 	}
 
+	getMessages(): Array<UmbValidationMessage> {
+		return this.#messages.getValue();
+	}
+
 	getHasAnyMessages(): boolean {
 		return this.#messages.getValue().length !== 0;
 	}
