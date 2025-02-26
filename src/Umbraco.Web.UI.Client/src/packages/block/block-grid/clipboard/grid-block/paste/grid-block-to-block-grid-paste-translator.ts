@@ -1,3 +1,4 @@
+import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../../constants.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../../property-editors/constants.js';
 import type { UmbBlockGridValueModel } from '../../../types.js';
 import type { UmbGridBlockClipboardEntryValueModel } from '../../types.js';
@@ -45,32 +46,13 @@ export class UmbGridBlockToBlockGridClipboardPastePropertyValueTranslator
 		value: UmbGridBlockClipboardEntryValueModel,
 		// TODO: Replace any with the correct type.
 		config: Array<{ alias: string; value: [{ allowAtRoot: boolean; contentElementTypeKey: string }] }>,
-		filter?: () => Promise<boolean>,
+		filter?: (value: UmbGridBlockClipboardEntryValueModel, config: any) => Promise<boolean>,
 	): Promise<boolean> {
 		const blocksConfig = config.find((c) => c.alias === 'blocks');
 		const allowedBlockContentTypes = blocksConfig?.value.map((b) => b.contentElementTypeKey) ?? [];
 		const blockContentTypes = value.contentData.map((c) => c.contentTypeKey);
 		const allContentTypesAllowed = blockContentTypes?.every((b) => allowedBlockContentTypes.includes(b)) ?? false;
-
-		console.log(blocksConfig);
-		console.log(blockContentTypes);
-
-		const allowedRootContentTypeKeys =
-			blocksConfig?.value
-				.map((blockConfig) => {
-					if (blockConfig.allowAtRoot) {
-						return blockConfig.contentElementTypeKey;
-					} else {
-						return null;
-					}
-				})
-				.filter((contentTypeKey) => contentTypeKey !== null) ?? [];
-
-		const allAllowedAtRoot = value.contentData.every((block) =>
-			allowedRootContentTypeKeys.includes(block.contentTypeKey),
-		);
-
-		return allContentTypesAllowed && allAllowedAtRoot;
+		return allContentTypesAllowed && (!filter || (await filter(value, config)));
 	}
 }
 
