@@ -36,25 +36,22 @@ export class UmbGridBlockToBlockGridClipboardPastePropertyValueTranslator
 
 	/**
 	 * Checks if the clipboard entry value is compatible with the config.
-	 * @param {UmbGridBlockClipboardEntryValueModel} value - The grid block clipboard entry value.
+	 * @param {UmbGridBlockClipboardEntryValueModel} propertyValue - The grid block clipboard entry value.
 	 * @param {*} config - The Property Editor config.
 	 * @param {(value, config) => Promise<boolean>} filter - The filter function.
 	 * @returns {Promise<boolean>} {Promise<boolean>}
 	 * @memberof UmbGridBlockToBlockGridClipboardPastePropertyValueTranslator
 	 */
 	async isCompatibleValue(
-		value: UmbGridBlockClipboardEntryValueModel,
+		propertyValue: UmbBlockGridValueModel,
 		config: UmbBlockGridPropertyEditorConfig,
-		filter?: (
-			value: UmbGridBlockClipboardEntryValueModel,
-			config: UmbBlockGridPropertyEditorConfig,
-		) => Promise<boolean>,
+		filter?: (propertyValue: UmbBlockGridValueModel, config: UmbBlockGridPropertyEditorConfig) => Promise<boolean>,
 	): Promise<boolean> {
 		const blocksConfig = config.find((c) => c.alias === 'blocks');
 		const allowedBlockContentTypes = blocksConfig?.value.map((b) => b.contentElementTypeKey) ?? [];
-		const blockContentTypes = value.contentData.map((c) => c.contentTypeKey);
+		const blockContentTypes = propertyValue.contentData.map((c) => c.contentTypeKey);
 		const allContentTypesAllowed = blockContentTypes?.every((b) => allowedBlockContentTypes.includes(b)) ?? false;
-		return allContentTypesAllowed && (!filter || (await filter(value, config)));
+		return allContentTypesAllowed && (!filter || (await filter(propertyValue, config)));
 	}
 }
 

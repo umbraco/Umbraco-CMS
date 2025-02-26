@@ -124,7 +124,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 	async pick(args: {
 		multiple: boolean;
 		propertyEditorUiAlias: string;
-		filter?: (value: UmbClipboardEntryValueModel, config: any) => Promise<boolean>;
+		filter?: (value: any, config: any) => Promise<boolean>;
 	}): Promise<{ selection: Array<UmbEntityUnique>; propertyValues: Array<any> }> {
 		await this.#init;
 
@@ -152,8 +152,12 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 					);
 
 					if (pasteTranslator.isCompatibleValue) {
-						const value = await valueResolver.resolve(clipboardEntryDetail.values, propertyEditorUiManifest.alias);
-						return pasteTranslator.isCompatibleValue(value, config, args.filter);
+						const propertyValue = await valueResolver.resolve(
+							clipboardEntryDetail.values,
+							propertyEditorUiManifest.alias,
+						);
+
+						return pasteTranslator.isCompatibleValue(propertyValue, config, args.filter);
 					}
 
 					return true;

@@ -45,18 +45,18 @@ export class UmbBlockToBlockGridClipboardPastePropertyValueTranslator
 
 	/**
 	 * Determines if a block clipboard entry value is compatible with the Block Grid property editor.
-	 * @param {UmbBlockClipboardEntryValueModel} value The block clipboard entry value.
-	 * @param {*} config The Block Grid property editor configuration.
+	 * @param {UmbBlockClipboardEntryValueModel} propertyValue The block clipboard entry value.
+	 * @param {UmbBlockGridPropertyEditorConfig} config The Block Grid property editor configuration.
 	 * @returns {Promise<boolean>} A promise that resolves with a boolean indicating if the value is compatible.
 	 * @memberof UmbBlockToBlockGridClipboardPastePropertyValueTranslator
 	 */
 	async isCompatibleValue(
-		value: UmbBlockClipboardEntryValueModel,
+		propertyValue: UmbBlockGridValueModel,
 		config: UmbBlockGridPropertyEditorConfig,
 	): Promise<boolean> {
 		const allowedBlockContentTypes =
 			config.find((c) => c.alias === 'blocks')?.value.map((b) => b.contentElementTypeKey) ?? [];
-		const blockContentTypes = value.contentData.map((c) => c.contentTypeKey);
+		const blockContentTypes = propertyValue.contentData.map((c) => c.contentTypeKey);
 		return blockContentTypes?.every((b) => allowedBlockContentTypes.includes(b)) ?? false;
 	}
 }
