@@ -182,7 +182,7 @@ export abstract class UmbPropertyEditorUiRteElementBase
 						super.value = {
 							...super.value,
 							blocks: {
-								layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: [] },
+								layout: {},
 								contentData: [],
 								settingsData: [],
 								expose: [],
