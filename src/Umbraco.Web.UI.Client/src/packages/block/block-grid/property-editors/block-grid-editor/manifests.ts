@@ -1,5 +1,6 @@
 import { manifest as blockGridSchemaManifest } from './Umbraco.BlockGrid.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS, UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS } from './constants.js';
+import { manifests as propertyActionManifests } from './property-actions/manifests.js';
 import { UmbStandardBlockValueResolver } from '@umbraco-cms/backoffice/block';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -66,7 +67,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		},
 	},
-	blockGridSchemaManifest,
 	{
 		type: 'propertyValueResolver',
 		alias: 'Umb.PropertyValueResolver.BlockGrid',
@@ -76,4 +76,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			editorAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		},
 	},
+	blockGridSchemaManifest,
+	...propertyActionManifests,
 ];

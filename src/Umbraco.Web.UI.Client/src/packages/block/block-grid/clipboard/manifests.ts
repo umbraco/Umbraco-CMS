@@ -1,7 +1,6 @@
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS } from '../property-editors/constants.js';
 import { manifests as blockManifests } from './block/manifests.js';
 import { manifests as gridBlockManifests } from './grid-block/manifests.js';
-import { manifests as pasteManifests } from './paste/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UMB_PROPERTY_HAS_VALUE_CONDITION_ALIAS,
@@ -33,7 +32,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			},
 		],
 	},
-	...pasteManifests,
 	...blockManifests,
 	...gridBlockManifests,
 ];
