@@ -1,4 +1,4 @@
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 let documentTypeId = '';
@@ -52,32 +52,89 @@ test('can create content with a block grid with an empty block in a area', {tag:
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
-
   // Act
   await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
-
-  await umbracoUi.content.clickLinkWithName(areaCreateLabel)
+  await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(firstElementTypeName);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await page.pause()
-
+  await umbracoUi.reloadPage();
   await umbracoUi.content.doesBlockContainBlockInAreaWithName(firstElementTypeName, firstAreaName, firstElementTypeName);
-
-
-
+  await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 1);
 });
 
-test('can create content with block grid area alias', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test('can create content with a block grid with two empty blocks in a area', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
+  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithAllowInAreas(blockGridDataTypeName, firstElementTypeId, firstAreaName, toAllowInAreas, areaCreateLabel);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickLinkWithName(areaCreateLabel);
+  await umbracoUi.content.clickSelectBlockElementInAreaWithName(firstElementTypeName);
+  await umbracoUi.content.addBlockToAreasWithExistingBlock(firstElementTypeName, firstAreaName, 0, 0);
+  await umbracoUi.content.clickSelectBlockElementInAreaWithName(firstElementTypeName);
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.reloadPage();
+  await umbracoUi.content.doesBlockContainCountOfBlockInArea(firstElementTypeName, firstAreaName, firstElementTypeName, 2);
+
+  // Checks if the block grid contains the blocks through the API
+  const parentBlockKey = await umbracoUi.content.getBlockAtRootDataElementKey(firstElementTypeName, 0);
+  const areaKey = await umbracoUi.content.getBlockAreaKeyFromParentBlockDataElementKey(parentBlockKey, 0);
+  const firstBlockInAreaKey = await umbracoUi.content.getBlockDataElementKeyInArea(firstElementTypeName, firstAreaName, firstElementTypeName, 0, 0);
+  const secondBlockInAreaKey = await umbracoUi.content.getBlockDataElementKeyInArea(firstElementTypeName, firstAreaName, firstElementTypeName, 0, 1);
+  expect(await umbracoApi.document.doesBlockGridContainBlocksWithDataElementKeyInAreaWithKey(contentName, AliasHelper.toAlias(blockGridDataTypeName),parentBlockKey, areaKey, [firstBlockInAreaKey, secondBlockInAreaKey])).toBeTruthy();
 });
 
 test('can create content with block grid area with a create label', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
+  const createLabel = 'ThisIsACreateLabel';
+  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithACreateLabel(blockGridDataTypeName, firstElementTypeId, createLabel);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
+
+  // Assert
+  await umbracoUi.content.doesBlockGridBlockWithAreaContainCreateLabel(firstElementTypeName, createLabel);
 });
 
+
 test('can create content with block grid area with column span', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
+  const columnSpan = 2;
+  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithColumnSpanAndRowSpan(blockGridDataTypeName, firstElementTypeId, columnSpan, 1, areaCreateLabel);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await page.pause();
+  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
+
+  // Assert
 });
 
 test('can create content with block grid area with row span', async ({page, umbracoApi, umbracoUi}) => {
