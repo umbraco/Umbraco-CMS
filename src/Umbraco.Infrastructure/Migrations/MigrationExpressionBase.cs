@@ -71,6 +71,7 @@ public abstract class MigrationExpressionBase : IMigrationExpression
                     else
                     {
                         stmtBuilder.Append(line);
+                        stmtBuilder.Append(Environment.NewLine);
                     }
                 }
 
