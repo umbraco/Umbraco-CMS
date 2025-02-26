@@ -1,19 +1,20 @@
 import { UmbTiptapExtensionApiBase } from '../base.js';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-import { Div, HtmlGlobalAttributes, Placeholder, Span, StarterKit } from '@umbraco-cms/backoffice/external/tiptap';
+import {
+	Div,
+	HtmlGlobalAttributes,
+	Placeholder,
+	Span,
+	StarterKit,
+	TrailingNode,
+} from '@umbraco-cms/backoffice/external/tiptap';
 
 export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionApiBase {
 	#localize = new UmbLocalizationController(this);
 
 	getTiptapExtensions = () => [
 		StarterKit,
-		Placeholder.configure({
-			placeholder: ({ node }) => {
-				return this.#localize.term(
-					node.type.name === 'heading' ? 'placeholders_rteHeading' : 'placeholders_rteParagraph',
-				);
-			},
-		}),
+		Placeholder.configure({ placeholder: this.#localize.term('placeholders_rteParagraph') }),
 		Div,
 		Span,
 		HtmlGlobalAttributes.configure({
@@ -44,6 +45,7 @@ export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionA
 				'umbLink',
 			],
 		}),
+		TrailingNode,
 	];
 }
 

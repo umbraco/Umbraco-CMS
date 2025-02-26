@@ -2078,6 +2078,14 @@
 			"file": "align-right.svg"
 		},
 		{
+			"name": "icon-text-direction-ltr",
+			"file": "pilcrow-right.svg"
+		},
+		{
+			"name": "icon-text-direction-rtl",
+			"file": "pilcrow-left.svg"
+		},
+		{
 			"name": "icon-theater",
 			"file": "drama.svg"
 		},

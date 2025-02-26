@@ -36,6 +36,16 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	configuration?: UmbPropertyEditorConfigCollection;
 
 	/**
+	 * Sets the input to required, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	required?: boolean;
+
+	@property({ type: String })
+	requiredMessage?: string;
+
+	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 */
 	@property({ type: Boolean, reflect: true })
@@ -52,6 +62,16 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 	@state()
 	_toolbar: UmbTiptapToolbarValue = [[[]]];
+
+	constructor() {
+		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? 'Value is required',
+			() => !!this.required && this.isEmpty(),
+		);
+	}
 
 	protected override async firstUpdated() {
 		await Promise.all([await this.#loadExtensions(), await this.#loadEditor()]);
@@ -131,6 +151,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			},
 			onUpdate: ({ editor }) => {
 				this.#value = editor.getHTML();
+				this._runValidators();
 				this.dispatchEvent(new UmbChangeEvent());
 			},
 		});
@@ -147,7 +168,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 						.toolbar=${this._toolbar}
 						.editor=${this._editor}
 						.configuration=${this.configuration}
-						?readonly=${this.readonly}></umb-tiptap-toolbar>
+						?readonly=${this.readonly}>
+					</umb-tiptap-toolbar>
 				`,
 			)}
 			<div id="editor"></div>
@@ -183,6 +205,15 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				display: flex;
 				align-items: center;
 				justify-content: center;
+			}
+
+			:host(:not([pristine]):invalid),
+			/* polyfill support */
+			:host(:not([pristine])[internals-invalid]) {
+				--umb-tiptap-edge-border-color: var(--uui-color-danger);
+				#editor {
+					border-color: var(--uui-color-danger);
+				}
 			}
 
 			#editor {
@@ -247,6 +278,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 					margin-top: 0;
 					margin-bottom: 0.5em;
 				}
+
+					max-width: 100%;
 
 				li {
 					> p {

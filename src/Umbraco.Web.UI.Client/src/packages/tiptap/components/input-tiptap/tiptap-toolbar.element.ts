@@ -90,6 +90,10 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			border-bottom-left-radius: 0;
 			border-bottom-right-radius: 0;
 
+			border-top-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+			border-left-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+			border-right-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+
 			background-color: var(--uui-color-surface);
 			color: var(--color-text);
 			font-size: var(--uui-type-default-size);
@@ -99,8 +103,8 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 
 			position: sticky;
 			top: -25px;
-			left: 0px;
-			right: 0px;
+			left: 0;
+			right: 0;
 			padding: var(--uui-size-3);
 			z-index: 9999999;
 
