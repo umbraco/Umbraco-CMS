@@ -12,7 +12,6 @@ import type {
 	UmbBlockGridTypeAreaType,
 	UmbBlockGridTypeModel,
 	UmbBlockGridValueModel,
-	UmbGridBlockClipboardEntryValueModel,
 } from '../types.js';
 import { forEachBlockLayoutEntryOf } from '../utils/index.js';
 import type { UmbBlockGridPropertyEditorConfig } from '../property-editors/block-grid-editor/types.js';

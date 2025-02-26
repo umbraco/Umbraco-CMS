@@ -25,6 +25,7 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 		]);
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected async _pickerFilter(value: any, config: any) {
 		return true;
 	}
