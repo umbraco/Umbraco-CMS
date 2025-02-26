@@ -31,7 +31,8 @@ export class UmbInstallerLayoutElement extends LitElement {
 				height: 100%;
 
 				background-color: hsla(240, 68%, 11%, 1);
-				background-image: radial-gradient(at 99% 2%, hsla(212, 40%, 12%, 1) 0px, transparent 50%),
+				background-image:
+					radial-gradient(at 99% 2%, hsla(212, 40%, 12%, 1) 0px, transparent 50%),
 					radial-gradient(at 98% 95%, hsla(255, 40%, 12%, 1) 0px, transparent 50%),
 					radial-gradient(at 1% 2%, hsla(249, 40%, 12%, 1) 0px, transparent 50%),
 					radial-gradient(at 2% 97%, hsla(228, 40%, 12%, 1) 0px, transparent 50%),

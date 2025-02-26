@@ -3,11 +3,11 @@ import type { UmbValidationMessageTranslator } from '../translators/index.js';
 import { GetValueByJsonPath } from '../utils/json-path.function.js';
 import { UMB_VALIDATION_CONTEXT } from '../context/validation.context-token.js';
 import { type UmbValidationMessage, UmbValidationMessagesManager } from '../context/validation-messages.manager.js';
+import { ReplaceStartOfPath } from '../utils/replace-start-of-path.function.js';
 import type { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { ReplaceStartOfPath } from '../utils/replace-start-of-path.function.js';
 
 /**
  * Validation Context is the core of Validation.

@@ -89,7 +89,6 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	}
 
 	async #submit() {
-
 		if (this.#forceRepublish) {
 			await umbConfirmModal(this, {
 				headline: this.localize.term('content_forceRepublishWarning'),

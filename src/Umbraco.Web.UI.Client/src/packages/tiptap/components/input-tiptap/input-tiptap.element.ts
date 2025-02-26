@@ -249,7 +249,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 					margin-bottom: 0.5em;
 				}
 
-					max-width: 100%;
+				max-width: 100%;
 
 				li {
 					> p {

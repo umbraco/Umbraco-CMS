@@ -299,8 +299,10 @@ export default {
 		contentRoot: 'Indholdsrod',
 		includeUnpublished: 'Inkluder ikke-udgivet indhold.',
 		forceRepublish: 'Udgiv uændrede elementer.',
-		forceRepublishWarning: 'ADVARSEL: Udgivelse af alle sider under denne i indholdstræet, uanset om de er ændret eller ej, kan være en ressourcekrævende og langvarig proces.',
-		forceRepublishAdvisory: 'Dette bør ikke være nødvendigt under normale omstændigheder, så fortsæt kun med denne handling, hvis du er sikker på, at det er nødvendigt.',
+		forceRepublishWarning:
+			'ADVARSEL: Udgivelse af alle sider under denne i indholdstræet, uanset om de er ændret eller ej, kan være en ressourcekrævende og langvarig proces.',
+		forceRepublishAdvisory:
+			'Dette bør ikke være nødvendigt under normale omstændigheder, så fortsæt kun med denne handling, hvis du er sikker på, at det er nødvendigt.',
 		isSensitiveValue:
 			'Denne værdi er skjult.Hvis du har brug for adgang til at se denne værdi, bedes du\n      kontakte din web-administrator.\n    ',
 		isSensitiveValue_short: 'Denne værdi er skjult.',
@@ -1224,7 +1226,8 @@ export default {
 		colorsTitle: 'Farver',
 		colorsDescription: 'Tilføj, fjern eller sorter farver',
 		showLabelTitle: 'Inkluder label?',
-		showLabelDescription: 'Gemmer farver som et Json-objekt, der både indeholder farvens hex streng og label, i stedet for kun at gemme hex strengen.',
+		showLabelDescription:
+			'Gemmer farver som et Json-objekt, der både indeholder farvens hex streng og label, i stedet for kun at gemme hex strengen.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'Du kan kun vælge følgende type(r) dokumenter: %0%',
