@@ -1,7 +1,7 @@
-import { UMB_BLOCK_RTE_MANAGER_CONTEXT, UMB_BLOCK_RTE_ENTRIES_CONTEXT } from '@umbraco-cms/backoffice/block-rte';
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import { UmbTiptapToolbarElementApiBase } from '@umbraco-cms/backoffice/tiptap';
+import { UMB_BLOCK_RTE_MANAGER_CONTEXT, UMB_BLOCK_RTE_ENTRIES_CONTEXT } from '@umbraco-cms/backoffice/block-rte';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export default class UmbTiptapBlockPickerToolbarExtension extends UmbTiptapToolbarElementApiBase {
@@ -25,8 +25,8 @@ export default class UmbTiptapBlockPickerToolbarExtension extends UmbTiptapToolb
 		});
 	}
 
-	override isActive(editor: Editor) {
-		return editor.isActive('umbRteBlock') || editor.isActive('umbRteBlockInline');
+	override isActive(editor?: Editor) {
+		return editor?.isActive('umbRteBlock') === true || editor?.isActive('umbRteBlockInline') === true;
 	}
 
 	override async execute() {

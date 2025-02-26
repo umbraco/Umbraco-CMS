@@ -99,8 +99,8 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 
 			position: sticky;
 			top: -25px;
-			left: 0px;
-			right: 0px;
+			left: 0;
+			right: 0;
 			padding: var(--uui-size-3);
 			z-index: 9999999;
 
@@ -116,6 +116,7 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 
 			.group {
 				display: inline-flex;
+				flex-wrap: wrap;
 				align-items: stretch;
 
 				&:not(:last-child)::after {

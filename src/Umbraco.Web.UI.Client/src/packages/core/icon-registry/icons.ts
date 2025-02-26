@@ -1693,6 +1693,12 @@ path: () => import("./icons/icon-text-align-left.js"),
 name: "icon-text-align-right",
 path: () => import("./icons/icon-text-align-right.js"),
 },{
+name: "icon-text-direction-ltr",
+path: () => import("./icons/icon-text-direction-ltr.js"),
+},{
+name: "icon-text-direction-rtl",
+path: () => import("./icons/icon-text-direction-rtl.js"),
+},{
 name: "icon-theater",
 path: () => import("./icons/icon-theater.js"),
 },{

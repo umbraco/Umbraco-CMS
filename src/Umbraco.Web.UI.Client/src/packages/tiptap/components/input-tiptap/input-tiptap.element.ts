@@ -19,6 +19,7 @@ const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
 	@property({ type: String })
 	override set value(value: string) {
+		if (value === this.#value) return;
 		this.#value = value;
 
 		// Try to set the value to the editor if it is ready.
@@ -146,7 +147,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 						.toolbar=${this._toolbar}
 						.editor=${this._editor}
 						.configuration=${this.configuration}
-						?readonly=${this.readonly}></umb-tiptap-toolbar>
+						?readonly=${this.readonly}>
+					</umb-tiptap-toolbar>
 				`,
 			)}
 			<div id="editor"></div>
@@ -246,6 +248,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 					margin-top: 0;
 					margin-bottom: 0.5em;
 				}
+
+					max-width: 100%;
 
 				li {
 					> p {

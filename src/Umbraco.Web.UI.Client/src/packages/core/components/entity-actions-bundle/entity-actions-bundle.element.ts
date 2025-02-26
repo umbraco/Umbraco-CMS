@@ -29,6 +29,9 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	private _firstActionApi?: UmbEntityAction<unknown>;
 
 	@state()
+	private _firstActionHref?: string;
+
+	@state()
 	_dropdownIsOpen = false;
 
 	#sectionSidebarContext?: UmbSectionSidebarContext;
@@ -73,6 +76,8 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		this._firstActionApi = await createExtensionApi(this, this._firstActionManifest, [
 			{ unique: this.unique, entityType: this.entityType, meta: this._firstActionManifest.meta },
 		]);
+
+		this._firstActionHref = await this._firstActionApi?.getHref();
 	}
 
 	#openContextMenu() {
@@ -91,8 +96,14 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	}
 
 	async #onFirstActionClick(event: PointerEvent) {
-		event.stopPropagation();
 		this.#sectionSidebarContext?.closeContextMenu();
+
+		// skip if href is defined
+		if (this._firstActionHref) {
+			return;
+		}
+
+		event.stopPropagation();
 		await this._firstActionApi?.execute();
 	}
 
@@ -133,7 +144,8 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		if (!this._firstActionApi) return nothing;
 		return html`<uui-button
 			label=${ifDefined(this._firstActionManifest?.meta.label)}
-			@click=${this.#onFirstActionClick}>
+			@click=${this.#onFirstActionClick}
+			href="${ifDefined(this._firstActionHref)}">
 			<uui-icon name=${ifDefined(this._firstActionManifest?.meta.icon)}></uui-icon>
 		</uui-button>`;
 	}

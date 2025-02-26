@@ -82,6 +82,7 @@ export class UmbDocumentWorkspaceContext
 			contentValidationRepository: UmbDocumentValidationRepository,
 			skipValidationOnSubmit: true,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
+			contentTypePropertyName: 'documentType',
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
 		});
 
@@ -177,10 +178,15 @@ export class UmbDocumentWorkspaceContext
 		]);
 	}
 
+	override resetState(): void {
+		super.resetState();
+		this.#isTrashedContext.setIsTrashed(false);
+	}
+
 	override async load(unique: string) {
 		const response = await super.load(unique);
 
-		if (response.data) {
+		if (response?.data) {
 			this.#isTrashedContext.setIsTrashed(response.data.isTrashed);
 		}
 
