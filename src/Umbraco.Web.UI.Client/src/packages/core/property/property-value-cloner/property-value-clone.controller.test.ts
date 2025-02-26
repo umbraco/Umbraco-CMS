@@ -8,12 +8,8 @@ import type {
 	UmbPropertyValueCloner,
 } from '../types.js';
 import type { UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbPropertyValueCloneController } from './property-value-clone.controller.js';
-
-@customElement('umb-test-controller-host')
-export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+import { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
 
 type TestPropertyValueWithId = {
 	id: string;
@@ -85,7 +81,7 @@ describe('UmbPropertyValueCloneController', () => {
 		});
 
 		it('clones value', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValueCloneController(ctrlHost);
 
 			const value = {
@@ -143,7 +139,7 @@ describe('UmbPropertyValueCloneController', () => {
 		});
 
 		it('clones value and inner values', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValueCloneController(ctrlHost);
 
 			const value = {
@@ -162,7 +158,7 @@ describe('UmbPropertyValueCloneController', () => {
 		});
 
 		it('clones only inner values', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValueCloneController(ctrlHost);
 
 			const value = {
@@ -193,7 +189,7 @@ describe('UmbPropertyValueCloneController', () => {
 		});
 
 		it('clones value and inner values', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValueCloneController(ctrlHost);
 
 			const value = {
@@ -224,7 +220,7 @@ describe('UmbPropertyValueCloneController', () => {
 		});
 
 		it('clones value and inner values for two levels', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValueCloneController(ctrlHost);
 
 			const value = {

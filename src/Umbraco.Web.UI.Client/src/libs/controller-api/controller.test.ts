@@ -1,13 +1,9 @@
 import type { UmbControllerHostElement } from './controller-host-element.interface.js';
-import { UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
 import { UmbControllerHostMixin } from './controller-host.mixin.js';
 import type { UmbControllerAlias } from './controller-alias.type.js';
 import type { UmbControllerHost } from './controller-host.interface.js';
 import { expect } from '@open-wc/testing';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-
-@customElement('test-my-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+import { UmbControllerHostElementElement } from './controller-host-element.element.js';
 
 class UmbTestControllerImplementation extends UmbControllerHostMixin(class {}) {
 	testIsConnected = false;
@@ -51,7 +47,7 @@ describe('UmbController', () => {
 	let hostElement: UmbControllerHostElement;
 
 	beforeEach(() => {
-		hostElement = new UmbTestControllerHostElement();
+		hostElement = new UmbControllerHostElementElement();
 	});
 
 	describe('Controller Host Public API', () => {

@@ -1,11 +1,7 @@
 import { UmbStateManager } from './state.manager.js';
 import { expect } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-
-@customElement('test-my-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+import { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
 
 describe('UmbSelectionManager', () => {
 	let manager: UmbStateManager;
@@ -13,7 +9,7 @@ describe('UmbSelectionManager', () => {
 	const state2 = { unique: '2', message: 'State 2' };
 
 	beforeEach(() => {
-		const hostElement = new UmbTestControllerHostElement();
+		const hostElement = new UmbControllerHostElementElement();
 		manager = new UmbStateManager(hostElement);
 	});
 

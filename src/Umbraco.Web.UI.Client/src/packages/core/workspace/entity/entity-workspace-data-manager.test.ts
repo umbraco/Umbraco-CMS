@@ -1,22 +1,17 @@
 import { expect } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbEntityWorkspaceDataManager } from './entity-workspace-data-manager.js';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
 
 interface TestDataModel {
 	name: string;
 }
 
-@customElement('test-my-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
-
 describe('UmbEntityWorkspaceDataManager', () => {
 	let manager: UmbEntityWorkspaceDataManager<TestDataModel>;
 
 	beforeEach(() => {
-		const hostElement = new UmbTestControllerHostElement();
+		const hostElement = new UmbControllerHostElementElement();
 		manager = new UmbEntityWorkspaceDataManager(hostElement);
 	});
 

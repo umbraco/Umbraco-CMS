@@ -1,6 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { customElement } from 'lit/decorators.js';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbClipboardCopyPropertyValueTranslatorValueResolver } from './clipboard-copy-translator-value-resolver.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbClipboardCopyPropertyValueTranslator } from './types.js';
@@ -49,18 +48,15 @@ const copyTranslatorManifest2 = {
 	toClipboardEntryValueType: TEST_CLIPBOARD_ENTRY_VALUE_TYPE_2,
 };
 
-@customElement('test-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
-
 describe('UmbClipboardCopyPropertyValueTranslatorValueResolver', () => {
-	let hostElement: UmbTestControllerHostElement;
+	let hostElement: UmbControllerHostElementElement;
 	let resolver: UmbClipboardCopyPropertyValueTranslatorValueResolver;
 
 	const propertyValue = 'testValue';
 
 	beforeEach(async () => {
 		umbExtensionsRegistry.registerMany([copyTranslatorManifest1, copyTranslatorManifest2]);
-		hostElement = new UmbTestControllerHostElement();
+		hostElement = new UmbControllerHostElementElement();
 		resolver = new UmbClipboardCopyPropertyValueTranslatorValueResolver(hostElement);
 		document.body.appendChild(hostElement);
 	});

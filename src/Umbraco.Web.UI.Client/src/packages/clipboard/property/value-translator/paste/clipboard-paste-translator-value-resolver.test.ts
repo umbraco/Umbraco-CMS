@@ -1,6 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { customElement } from 'lit/decorators.js';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbClipboardPastePropertyValueTranslatorValueResolver } from './clipboard-paste-translator-value-resolver.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbClipboardPastePropertyValueTranslator } from './types.js';
@@ -51,11 +50,8 @@ const pasteTranslatorManifest2 = {
 	toPropertyEditorUi: TEST_PROPERTY_EDITOR_UI_ALIAS,
 };
 
-@customElement('test-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
-
 describe('UmbClipboardCopyPropertyValueTranslatorValueResolver', () => {
-	let hostElement: UmbTestControllerHostElement;
+	let hostElement: UmbControllerHostElementElement;
 	let resolver: UmbClipboardPastePropertyValueTranslatorValueResolver<string>;
 
 	const clipboardEntryValues: UmbClipboardEntryValuesType = [
@@ -71,7 +67,7 @@ describe('UmbClipboardCopyPropertyValueTranslatorValueResolver', () => {
 
 	beforeEach(async () => {
 		umbExtensionsRegistry.registerMany([pasteTranslatorManifest1, pasteTranslatorManifest2]);
-		hostElement = new UmbTestControllerHostElement();
+		hostElement = new UmbControllerHostElementElement();
 		resolver = new UmbClipboardPastePropertyValueTranslatorValueResolver<string>(hostElement);
 		document.body.appendChild(hostElement);
 	});

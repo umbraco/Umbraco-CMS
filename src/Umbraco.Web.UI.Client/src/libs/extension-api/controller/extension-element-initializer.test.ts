@@ -1,22 +1,19 @@
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { UmbExtensionElementInitializer } from './index.js';
 import { expect, fixture } from '@open-wc/testing';
-import { UmbControllerHostElementMixin, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestSection } from '@umbraco-cms/backoffice/section';
 
-@customElement('umb-test-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
-
 describe('UmbExtensionElementController', () => {
 	describe('Manifest without conditions', () => {
-		let hostElement: UmbControllerHostElement;
+		let hostElement: UmbControllerHostElementElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestSection>;
 		let manifest: ManifestSection;
 
 		beforeEach(async () => {
-			hostElement = new UmbTestControllerHostElement();
+			hostElement = new UmbControllerHostElementElement();
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
 				type: 'section',
@@ -82,12 +79,12 @@ describe('UmbExtensionElementController', () => {
 	});
 
 	describe('Manifest with multiple conditions that changes over time', () => {
-		let hostElement: UmbControllerHostElement;
+		let hostElement: UmbControllerHostElementElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestSection>;
 		let manifest: ManifestSection;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = await fixture(html`<umb-controller-host></umb-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 
 			manifest = {

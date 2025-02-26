@@ -1,16 +1,12 @@
 import { expect } from '@open-wc/testing';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/property';
 import { manifests } from './manifests';
 import {
 	UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS,
 	type UmbPropertyEditorUiValueType,
 } from '@umbraco-cms/backoffice/rte';
-
-@customElement('umb-test-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+import { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
 
 describe('UmbBlockRtePropertyValueCloner', () => {
 	describe('Cloner', () => {
@@ -22,7 +18,7 @@ describe('UmbBlockRtePropertyValueCloner', () => {
 		});
 
 		it('clones value', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValueCloneController(ctrlHost);
 
 			const value = {

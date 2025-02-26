@@ -3,16 +3,10 @@ import type { ManifestApi, ManifestWithDynamicConditions } from '../types/index.
 import { UmbExtensionApiInitializer } from './index.js';
 import { expect, fixture } from '@open-wc/testing';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbControllerHostElement, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestSection } from '@umbraco-cms/backoffice/section';
-
-@customElement('umb-test-controller-host')
-// Element is used in tests
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 class UmbTestApiController extends UmbControllerBase {
 	public i_am_test_api_controller = true;
@@ -33,7 +27,7 @@ describe('UmbExtensionApiController', () => {
 		let manifest: TestManifest;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = await fixture(html`<umb-controller-host></umb-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
 				type: 'test-type',
@@ -95,7 +89,7 @@ describe('UmbExtensionApiController', () => {
 		let manifest: ManifestSection;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = await fixture(html`<umb-controller-host></umb-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 
 			manifest = {

@@ -3,13 +3,10 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions, UmbApi } fro
 import { UmbExtensionElementAndApiInitializer } from './extension-element-and-api-initializer.controller.js';
 import { expect } from '@open-wc/testing';
 import type { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElementElement, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-
-@customElement('umb-test-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 @customElement('umb-test-extension-element')
 // Ignoring eslint rule. Element name is used for testing.
@@ -37,7 +34,7 @@ describe('UmbExtensionElementAndApiController', () => {
 		let manifest: TestManifest;
 
 		beforeEach(async () => {
-			hostElement = new UmbTestControllerHostElement();
+			hostElement = new UmbControllerHostElementElement();
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
 				type: 'test-type',
@@ -107,7 +104,7 @@ describe('UmbExtensionElementAndApiController', () => {
 		let manifest: TestManifest;
 
 		beforeEach(async () => {
-			hostElement = new UmbTestControllerHostElement();
+			hostElement = new UmbControllerHostElementElement();
 			extensionRegistry = new UmbExtensionRegistry();
 
 			manifest = {
@@ -177,7 +174,7 @@ describe('UmbExtensionElementAndApiController', () => {
 		let manifest: TestManifest;
 
 		beforeEach(async () => {
-			hostElement = new UmbTestControllerHostElement();
+			hostElement = new UmbControllerHostElementElement();
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
 				type: 'test-type',
@@ -240,7 +237,7 @@ describe('UmbExtensionElementAndApiController', () => {
 		let manifest: TestManifest;
 
 		beforeEach(async () => {
-			hostElement = new UmbTestControllerHostElement();
+			hostElement = new UmbControllerHostElementElement();
 			extensionRegistry = new UmbExtensionRegistry();
 
 			manifest = {

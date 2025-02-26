@@ -2,11 +2,8 @@ import type { ManifestApi } from '../types/index.js';
 import type { UmbApi } from '../models/api.interface.js';
 import { createExtensionApi } from './create-extension-api.function.js';
 import { expect, fixture } from '@open-wc/testing';
-import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-
-@customElement('umb-test-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 class UmbExtensionApiTrueTestClass implements UmbApi {
 	isValidClassInstance() {
@@ -36,10 +33,10 @@ const jsModuleWithDefaultAndApiExport = {
 };
 
 describe('Create Extension Api Method', () => {
-	let hostElement: UmbTestControllerHostElement;
+	let hostElement: UmbControllerHostElement;
 
 	beforeEach(async () => {
-		hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+		hostElement = await fixture(html`<umb-controller-host></umb-controller-host>`);
 	});
 
 	it('Returns `undefined` when manifest does not have any correct properties', async () => {
