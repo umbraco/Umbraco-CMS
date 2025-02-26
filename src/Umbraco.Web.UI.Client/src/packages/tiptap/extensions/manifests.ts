@@ -286,7 +286,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		alias: 'Umb.Tiptap.Toolbar.TextDirectionRtl',
 		name: 'Text Direction RTL Tiptap Extension',
 		api: () => import('./toolbar/text-direction-rtl.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.TextAlign'],
+		forExtensions: ['Umb.Tiptap.TextDirection'],
 		meta: {
 			alias: 'text-direction-rtl',
 			icon: 'icon-text-direction-rtl',
@@ -299,7 +299,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		alias: 'Umb.Tiptap.Toolbar.TextDirectionLtr',
 		name: 'Text Direction LTR Tiptap Extension',
 		api: () => import('./toolbar/text-direction-ltr.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.TextAlign'],
+		forExtensions: ['Umb.Tiptap.TextDirection'],
 		meta: {
 			alias: 'text-direction-ltr',
 			icon: 'icon-text-direction-ltr',
