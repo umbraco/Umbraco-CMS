@@ -1278,6 +1278,11 @@ public class ContentController : ContentControllerBase
         SimpleNotificationModel globalNotifications,
         string[]? successfulCultures)
     {
+        if (_contentSettings.ShowUnroutableContentWarnings is false)
+        {
+            return;
+        }
+
         IContent? content = publishStatus.FirstOrDefault()?.Content;
         if (content is null)
         {
