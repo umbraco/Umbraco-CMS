@@ -31,14 +31,14 @@ public sealed class EmailValidator : IValueValidator
     /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
     {
-        var asString = value?.ToString()?.Trim() ?? string.Empty;
+        var valueAsString = value?.ToString() ?? string.Empty;
 
-        var emailVal = new EmailAddressAttribute();
+        var emailAddressAttribute = new EmailAddressAttribute();
 
-        if (asString != string.Empty && emailVal.IsValid(asString) == false)
+        if (valueAsString != string.Empty && emailAddressAttribute.IsValid(valueAsString) == false)
         {
             yield return new ValidationResult(
-                _localizedTextService.Localize("validation", "invalidEmail", [asString]),
+                _localizedTextService.Localize("validation", "invalidEmail", [valueAsString]),
                 ["value"]);
         }
     }

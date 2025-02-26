@@ -16,6 +16,7 @@ public class EmailValidatorTests
 {
     [TestCase(null, true)]
     [TestCase("", true)]
+    [TestCase(" ", false)]
     [TestCase("test@test.com", true)]
     [TestCase("invalid", false)]
     public void Validates_Email_Address(object? email, bool expectedSuccess)
