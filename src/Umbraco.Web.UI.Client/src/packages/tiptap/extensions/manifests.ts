@@ -154,7 +154,7 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 	},
 ];
 
-const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
+const toolbarExtensions: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'button',
