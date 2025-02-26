@@ -272,11 +272,19 @@ export class UmbBlockGridEntriesContext
 			});
 	}
 
-	async #clipboardEntriesFilter(value: UmbGridBlockClipboardEntryValueModel) {
-		const allowedElementTypes = this.#retrieveAllowedElementTypes();
-		return value.contentData.every((block) =>
-			allowedElementTypes.map((elementType) => elementType.contentElementTypeKey).includes(block.contentTypeKey),
+	async #clipboardEntriesFilter(propertyValue: UmbBlockGridValueModel) {
+		const allowedElementTypeKeys = this.#retrieveAllowedElementTypes().map((x) => x.contentElementTypeKey);
+
+		const rootContentKeys = propertyValue.layout['Umbraco.BlockGrid']?.map((block) => block.contentKey) ?? [];
+		const rootContentTypeKeys = propertyValue.contentData
+			.filter((content) => rootContentKeys.includes(content.key))
+			.map((content) => content.contentTypeKey);
+
+		const allContentTypesAllowed = rootContentTypeKeys.every((contentKey) =>
+			allowedElementTypeKeys.includes(contentKey),
 		);
+
+		return allContentTypesAllowed;
 	}
 
 	protected _gotBlockManager() {
