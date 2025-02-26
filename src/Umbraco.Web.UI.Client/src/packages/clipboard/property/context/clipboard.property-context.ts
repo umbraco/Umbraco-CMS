@@ -2,6 +2,7 @@ import { UMB_CLIPBOARD_CONTEXT } from '../../context/index.js';
 import {
 	UMB_CLIPBOARD_ENTRY_PICKER_MODAL,
 	type UmbClipboardEntryDetailModel,
+	type UmbClipboardEntryValueModel,
 	type UmbClipboardEntryValuesType,
 } from '../../clipboard-entry/index.js';
 import type { ManifestClipboardPastePropertyValueTranslator } from '../value-translator/types.js';
@@ -123,7 +124,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 	async pick(args: {
 		multiple: boolean;
 		propertyEditorUiAlias: string;
-		filter?: () => Promise<boolean>;
+		filter?: (value: UmbClipboardEntryValueModel, config: any) => Promise<boolean>;
 	}): Promise<{ selection: Array<UmbEntityUnique>; propertyValues: Array<any> }> {
 		await this.#init;
 

@@ -1,4 +1,5 @@
-import type { UmbBlockGridPropertyEditorConfig, UmbBlockGridPropertyEditorUiValue } from '../types.js';
+import type { UmbGridBlockClipboardEntryValueModel } from '../../../types.js';
+import type { UmbBlockGridPropertyEditorConfig } from '../types.js';
 import { UmbPasteFromClipboardPropertyAction } from '@umbraco-cms/backoffice/clipboard';
 
 /**
@@ -17,7 +18,7 @@ export class UmbBlockGridPasteFromClipboardPropertyAction extends UmbPasteFromCl
 	 * @memberof UmbBlockGridPasteFromClipboardPropertyAction
 	 */
 	protected override async _pickerFilter(
-		value: UmbBlockGridPropertyEditorUiValue,
+		value: UmbGridBlockClipboardEntryValueModel,
 		config: UmbBlockGridPropertyEditorConfig,
 	) {
 		// The property action always paste in the root of the grid so
@@ -35,11 +36,8 @@ export class UmbBlockGridPasteFromClipboardPropertyAction extends UmbPasteFromCl
 				})
 				.filter((contentTypeKey) => contentTypeKey !== null) ?? [];
 
-		const areAllTypesAllowedAtRoot = value.contentData.every((block) =>
-			allowedRootContentTypeKeys.includes(block.contentTypeKey),
-		);
-
-		return areAllTypesAllowedAtRoot;
+		// ensure all content types in the paste value are allowed in the grid root
+		return value.contentData.every((block) => allowedRootContentTypeKeys.includes(block.contentTypeKey));
 	}
 }
 export { UmbBlockGridPasteFromClipboardPropertyAction as api };
