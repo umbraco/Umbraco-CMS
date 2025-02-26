@@ -1,4 +1,4 @@
-import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../../constants.js';
+import type { UmbBlockGridPropertyEditorConfig } from '../../../property-editors/block-grid-editor/types.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../../property-editors/constants.js';
 import type { UmbBlockGridValueModel } from '../../../types.js';
 import type { UmbGridBlockClipboardEntryValueModel } from '../../types.js';
@@ -38,15 +38,17 @@ export class UmbGridBlockToBlockGridClipboardPastePropertyValueTranslator
 	 * Checks if the clipboard entry value is compatible with the config.
 	 * @param {UmbGridBlockClipboardEntryValueModel} value - The grid block clipboard entry value.
 	 * @param {*} config - The Property Editor config.
-	 * @param {() => Promise<boolean>} filter - The filter function.
+	 * @param {(value, config) => Promise<boolean>} filter - The filter function.
 	 * @returns {Promise<boolean>} {Promise<boolean>}
 	 * @memberof UmbGridBlockToBlockGridClipboardPastePropertyValueTranslator
 	 */
 	async isCompatibleValue(
 		value: UmbGridBlockClipboardEntryValueModel,
-		// TODO: Replace any with the correct type.
-		config: Array<{ alias: string; value: [{ allowAtRoot: boolean; contentElementTypeKey: string }] }>,
-		filter?: (value: UmbGridBlockClipboardEntryValueModel, config: any) => Promise<boolean>,
+		config: UmbBlockGridPropertyEditorConfig,
+		filter?: (
+			value: UmbGridBlockClipboardEntryValueModel,
+			config: UmbBlockGridPropertyEditorConfig,
+		) => Promise<boolean>,
 	): Promise<boolean> {
 		const blocksConfig = config.find((c) => c.alias === 'blocks');
 		const allowedBlockContentTypes = blocksConfig?.value.map((b) => b.contentElementTypeKey) ?? [];
