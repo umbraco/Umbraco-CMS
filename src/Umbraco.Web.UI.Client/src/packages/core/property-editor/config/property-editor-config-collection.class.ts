@@ -1,4 +1,4 @@
-import type { UmbPropertyEditorConfigProperty, UmbPropertyEditorConfig } from '../index.js';
+import type { UmbPropertyEditorConfigProperty, UmbPropertyEditorConfig } from '../types.js';
 import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**

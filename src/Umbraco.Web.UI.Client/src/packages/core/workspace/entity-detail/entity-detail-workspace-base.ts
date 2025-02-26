@@ -239,12 +239,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		let { data } = await request;
 
 		if (data) {
-			this.#entityContext.setUnique(data.unique);
+			data = await this._scaffoldProcessData(data);
 
 			if (this.modalContext) {
+				// Notice if the preset comes with values, they will overwrite the scaffolded values... [NL]
 				data = { ...data, ...this.modalContext.data.preset };
 			}
 
+			this.#entityContext.setUnique(data.unique);
 			this.setIsNew(true);
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
@@ -252,6 +254,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 		this.loading.removeState(LOADING_STATE_UNIQUE);
 
+		return data;
+	}
+
+	protected async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
 		return data;
 	}
 
@@ -355,6 +361,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 		/* TODO: temp removal of discard changes in workspace modals.
 		 The modal closes before the discard changes dialog is resolved.*/
+		// TODO: I think this can go away now???
 		if (newUrl.includes('/modal/umb-modal-workspace/')) {
 			return true;
 		}
