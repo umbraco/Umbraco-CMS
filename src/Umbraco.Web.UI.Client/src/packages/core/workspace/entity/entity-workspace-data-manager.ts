@@ -132,7 +132,12 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	getHasUnpersistedChanges() {
 		const persisted = this._persisted.getValue();
 		const current = this._current.getValue();
-		return jsonStringComparison(persisted, current) === false;
+		const result = jsonStringComparison(persisted, current) === false;
+		// TODO: Implement developer-mode
+		if (result) {
+			console.warn('Changes detected based on JSON comparison between', persisted, 'and', current);
+		}
+		return result;
 	}
 
 	/**

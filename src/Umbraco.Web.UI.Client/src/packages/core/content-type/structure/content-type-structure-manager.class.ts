@@ -375,7 +375,6 @@ export class UmbContentTypeStructureManager<
 			...(this.#contentTypes.getValue().find((x) => x.unique === toContentTypeUnique)?.containers ?? []),
 		];
 
-		//.filter((x) => x.name !== clonedContainer.name && x.type === clonedContainer.type);
 		containers.push(clonedContainer);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -410,6 +409,14 @@ export class UmbContentTypeStructureManager<
 	): Promise<UmbPropertyTypeContainerModel> {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
+
+		if (parentId) {
+			const duplicatedParentContainer = await this.ensureContainerOf(parentId, contentTypeUnique);
+			if (!duplicatedParentContainer) {
+				throw new Error('Parent container for creating a new container could not be found or created');
+			}
+			parentId = duplicatedParentContainer.id;
+		}
 
 		const container: UmbPropertyTypeContainerModel = {
 			id: UmbId.new(),
