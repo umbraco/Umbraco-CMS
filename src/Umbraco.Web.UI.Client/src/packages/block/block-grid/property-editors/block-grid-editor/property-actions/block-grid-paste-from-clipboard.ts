@@ -1,7 +1,21 @@
 import type { UmbBlockGridPropertyEditorConfig, UmbBlockGridPropertyEditorUiValue } from '../types.js';
 import { UmbPasteFromClipboardPropertyAction } from '@umbraco-cms/backoffice/clipboard';
 
+/**
+ * The Block Grid Paste From Clipboard Property Action.
+ * @exports
+ * @class UmbBlockGridPasteFromClipboardPropertyAction
+ * @augments UmbPasteFromClipboardPropertyAction
+ */
 export class UmbBlockGridPasteFromClipboardPropertyAction extends UmbPasteFromClipboardPropertyAction {
+	/**
+	 * Filters the picker based on the block grid property editor config.
+	 * @param {UmbBlockGridPropertyEditorUiValue} value The property editor value.
+	 * @param {UmbBlockGridPropertyEditorConfig} config The property editor config.
+	 * @override
+	 * @protected
+	 * @memberof UmbBlockGridPasteFromClipboardPropertyAction
+	 */
 	protected override async _pickerFilter(
 		value: UmbBlockGridPropertyEditorUiValue,
 		config: UmbBlockGridPropertyEditorConfig,
