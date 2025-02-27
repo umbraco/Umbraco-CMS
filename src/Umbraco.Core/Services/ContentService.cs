@@ -3373,7 +3373,7 @@ public class ContentService : RepositoryService, IContentService
                             content.Name,
                             content.Id,
                             culture,
-                            "document is culture awaiting release");
+                            "document has culture awaiting release");
                     }
 
                     return new PublishResult(

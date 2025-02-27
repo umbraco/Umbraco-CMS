@@ -288,11 +288,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 {
                     using (ExecutionContext.SuppressFlow())
                     {
-                        Task.Run(async () =>
-                        {
-                            Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus> result = await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey, taskId);
-                            SetPublishingBranchResult(taskId, result);
-                        });
+                        Task.Run(async () => await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey, taskId) );
                         return Task.CompletedTask;
                     }
                 });
@@ -351,9 +347,15 @@ internal sealed class ContentPublishingService : IContentPublishingService
                     .ToArray()
             };
 
-            return branchResult.FailedItems.Any() is false
+            Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus> attempt = branchResult.FailedItems.Any() is false
                 ? Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, branchResult)
                 : Attempt.FailWithStatus(ContentPublishingOperationStatus.FailedBranch, branchResult);
+            if (taskId.HasValue)
+            {
+                SetPublishingBranchResult(taskId.Value, attempt);
+            }
+
+            return attempt;
         }
         finally
         {
@@ -370,16 +372,13 @@ internal sealed class ContentPublishingService : IContentPublishingService
     /// <inheritdoc/>
     public Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> GetPublishBranchResultAsync(Guid taskId)
     {
-        var cacheKey = GetPublishingBranchResultCacheKey(taskId);
-        var taskResult = _runtimeCache.Get(cacheKey) as Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>?;
+        var taskResult = _runtimeCache.Get(GetPublishingBranchResultCacheKey(taskId)) as Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>?;
         if (taskResult is null)
         {
             return Task.FromResult(Attempt.FailWithStatus(ContentPublishingOperationStatus.TaskResultNotFound, new ContentPublishingBranchResult()));
         }
 
-        // Now we've retrieved it, clear the cache.
-        _runtimeCache.Clear(cacheKey);
-
+        // We won't clear the cache here just in case we remove references to the returned object. It expires after 60 seconds anyway.
         return Task.FromResult(taskResult.Value);
     }
 
