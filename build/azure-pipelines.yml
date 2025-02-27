@@ -635,8 +635,8 @@ stages:
             inputs:
               testResultsFormat: 'JUnit'
               testResultsFiles: '*.xml'
-              searchFolder: "${{ params.testDir }}/test-results"
-              testRunTitle: "Playwright Tests ${{ params.shardIndex }}/${{ params.totalShards }}"  
+              searchFolder: "$(System.DefaultWorkingDirectory)/test-results"
+              testRunTitle: "Playwright Tests"  
             condition: always()
       - job:
         displayName: E2E Tests (SQL Server)
@@ -808,8 +808,8 @@ stages:
             inputs:
               testResultsFormat: 'JUnit'
               testResultsFiles: '*.xml'
-              searchFolder: "${{ params.testDir }}/test-results"
-              testRunTitle: "Playwright Tests ${{ params.shardIndex }}/${{ params.totalShards }}"  
+              searchFolder: "$(System.DefaultWorkingDirectory)/test-results"
+              testRunTitle: "Playwright Tests"   
             condition: always()
   ###############################################
   ## Release
