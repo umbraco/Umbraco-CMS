@@ -5,6 +5,7 @@
  * @returns {unknown} - the found value.
  */
 export function GetValueByJsonPath(data: unknown, path: string): unknown {
+	if (path === '$') return data;
 	// strip $ from the path:
 	const strippedPath = path.startsWith('$.') ? path.slice(2) : path;
 	// get value from the path:

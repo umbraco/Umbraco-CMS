@@ -2,6 +2,14 @@ import { expect } from '@open-wc/testing';
 import { GetValueByJsonPath } from './json-path.function.js';
 
 describe('UmbJsonPathFunctions', () => {
+	it('retrieves root when path is root', () => {
+		const data = { value: 'test' };
+		const result = GetValueByJsonPath(data, '$') as any;
+
+		expect(result).to.eq(data);
+		expect(result.value).to.eq('test');
+	});
+
 	it('retrieve property value', () => {
 		const result = GetValueByJsonPath({ value: 'test' }, '$.value');
 

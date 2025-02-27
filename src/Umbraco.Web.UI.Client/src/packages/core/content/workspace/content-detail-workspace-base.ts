@@ -35,6 +35,7 @@ import {
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbDataPathVariantQuery,
 	UmbServerModelValidatorContext,
+	UmbValidationController,
 	UmbVariantsValidationPathTranslator,
 	UmbVariantValuesValidationPathTranslator,
 } from '@umbraco-cms/backoffice/validation';
@@ -145,6 +146,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	// TODO: fix type error
 	public readonly variantOptions;
 
+	#variantValidationContexts: Array<UmbValidationController> = [];
+	getVariantValidationContext(variantId: UmbVariantId): UmbValidationController | undefined {
+		return this.#variantValidationContexts.find((x) => x.getVariantId()?.compare(variantId));
+	}
+
 	#validateOnSubmit: boolean;
 	#serverValidation = new UmbServerModelValidatorContext(this);
 	#validationRepositoryClass?: ClassConstructor<UmbContentValidationRepository<DetailModelType>>;
@@ -211,6 +217,27 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		new UmbVariantValuesValidationPathTranslator(this);
 		new UmbVariantsValidationPathTranslator(this);
+
+		this.observe(
+			this.variantOptions,
+			(variantOptions) => {
+				variantOptions.forEach((variantOption) => {
+					const missingThis = this.#variantValidationContexts.filter((x) => {
+						const variantId = x.getVariantId();
+						if (!variantId) return;
+						return variantId.culture === variantOption.culture && variantId.segment === variantOption.segment;
+					});
+					if (missingThis) {
+						const context = new UmbValidationController(this);
+						context.inheritFrom(this.validationContext, '$');
+						context.messages.debugFiltered('' + variantOption.unique);
+						context.setVariantId(UmbVariantId.Create(variantOption));
+						this.#variantValidationContexts.push(context);
+					}
+				});
+			},
+			null,
+		);
 
 		this.observe(
 			this.varies,
