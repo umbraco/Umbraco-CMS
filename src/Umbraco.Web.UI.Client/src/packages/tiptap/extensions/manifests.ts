@@ -2,7 +2,6 @@ import { manifests as blockExtensions } from './block/manifests.js';
 import { manifests as styleSelectExtensions } from './style-select/manifests.js';
 import { manifests as tableExtensions } from './table/manifests.js';
 import type { ManifestTiptapExtension } from './tiptap.extension.js';
-import type { ManifestTiptapToolbarExtension } from './tiptap-toolbar.extension.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 const kinds: Array<UmbExtensionManifestKind> = [
@@ -13,6 +12,15 @@ const kinds: Array<UmbExtensionManifestKind> = [
 		matchType: 'tiptapToolbarExtension',
 		manifest: {
 			element: () => import('../components/toolbar/tiptap-toolbar-button.element.js'),
+		},
+	},
+	{
+		type: 'kind',
+		alias: 'Umb.Kind.TiptapToolbar.ColorPickerButton',
+		matchKind: 'colorPickerButton',
+		matchType: 'tiptapToolbarExtension',
+		manifest: {
+			element: () => import('../components/toolbar/tiptap-toolbar-color-picker-button.element.js'),
 		},
 	},
 ];
@@ -146,7 +154,7 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 	},
 ];
 
-const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
+const toolbarExtensions: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'button',
@@ -270,6 +278,30 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 			alias: 'text-align-justify',
 			icon: 'icon-text-align-justify',
 			label: 'Text Align Justify',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'colorPickerButton',
+		alias: 'Umb.Tiptap.Toolbar.TextColorBackground',
+		name: 'Text Color Background Tiptap Extension',
+		api: () => import('./toolbar/text-color-background.tiptap-toolbar-api.js'),
+		meta: {
+			alias: 'text-color-background',
+			icon: 'icon-color-bucket',
+			label: 'Background color',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'colorPickerButton',
+		alias: 'Umb.Tiptap.Toolbar.TextColorForeground',
+		name: 'Text Color Foreground Tiptap Extension',
+		api: () => import('./toolbar/text-color-foreground.tiptap-toolbar-api.js'),
+		meta: {
+			alias: 'text-color-foreground',
+			icon: 'icon-colorpicker',
+			label: 'Color',
 		},
 	},
 	{
