@@ -438,53 +438,14 @@ public class MediaPicker3PropertyEditor : DataEditor
                     return [];
                 }
 
-
-                List<Guid> uniqueParentKeys = [];
-                foreach (Guid distinctMediaKey in value.DistinctBy(x => x.MediaKey).Select(x => x.MediaKey))
+                if (ValidationHelper.HasValidStartNode(value.Select(x => x.MediaKey), configuration.StartNodeId.Value, _mediaNavigationQueryService) is false)
                 {
-                    if (_mediaNavigationQueryService.TryGetParentKey(distinctMediaKey, out Guid? parentKey) is false)
-                    {
-                        continue;
-                    }
-
-                    // If there is a start node, the media must have a parent.
-                    if (parentKey is null)
-                    {
-                        return
-                        [
-                            new ValidationResult(
-                                _localizedTextService.Localize("validation", "invalidStartNode"),
-                                ["value"])
-                        ];
-                    }
-
-                    uniqueParentKeys.Add(parentKey.Value);
-                }
-
-                IEnumerable<Guid> parentKeysNotInStartNode = uniqueParentKeys.Where(x => x != configuration.StartNodeId.Value);
-                foreach (Guid parentKey in parentKeysNotInStartNode)
-                {
-                    if (_mediaNavigationQueryService.TryGetAncestorsKeys(parentKey, out IEnumerable<Guid> foundAncestorKeys) is false)
-                    {
-                        // We couldn't find the parent node, so we fail.
-                        return
-                        [
-                            new ValidationResult(
-                                _localizedTextService.Localize("validation", "invalidStartNode"),
-                                ["value"])
-                        ];
-                    }
-
-                    Guid[] ancestorKeys = foundAncestorKeys.ToArray();
-                    if (ancestorKeys.Length == 0 || ancestorKeys.Contains(configuration.StartNodeId.Value) is false)
-                    {
-                        return
-                        [
-                            new ValidationResult(
-                                _localizedTextService.Localize("validation", "invalidStartNode"),
-                                ["value"])
-                        ];
-                    }
+                    return
+                    [
+                        new ValidationResult(
+                            _localizedTextService.Localize("validation", "invalidStartNode"),
+                            ["value"])
+                    ];
                 }
 
                 return [];
