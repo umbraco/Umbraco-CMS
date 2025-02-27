@@ -15,7 +15,8 @@ namespace Umbraco.Cms.Core.Services;
 
 internal sealed class ContentPublishingService : IContentPublishingService
 {
-    private const string IsPublishingBranchCacheRuntimeCacheKeyFormat = "temp_publish_branch_op_{0}_{1}";
+    private const string IsPublishingBranchRuntimeCacheKeyPrefix = "temp_indexing_op_";
+    private const string PublishingBranchResultCacheKeyPrefix = "temp_indexing_result_";
 
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IContentService _contentService;
@@ -279,19 +280,24 @@ internal sealed class ContentPublishingService : IContentPublishingService
     {
         if (useBackgroundThread)
         {
-            _logger.LogInformation("Starting async background thread for rebuilding database cache.");
+            _logger.LogInformation("Starting async background thread for publishing branch.");
 
+            var taskId = Guid.NewGuid();
             _backgroundTaskQueue.QueueBackgroundWorkItem(
                 cancellationToken =>
                 {
                     using (ExecutionContext.SuppressFlow())
                     {
-                        Task.Run(async () => await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey));
+                        Task.Run(async () =>
+                        {
+                            Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus> result = await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey, taskId);
+                            SetPublishingBranchResult(taskId, result);
+                        });
                         return Task.CompletedTask;
                     }
                 });
 
-            return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Accepted, new ContentPublishingBranchResult());
+            return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Accepted, new ContentPublishingBranchResult { AcceptedTaskId = taskId});
         }
         else
         {
@@ -299,11 +305,14 @@ internal sealed class ContentPublishingService : IContentPublishingService
         }
     }
 
-    private async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PerformPublishBranchAsync(Guid key, IEnumerable<string> cultures, PublishBranchFilter publishBranchFilter, Guid userKey)
+    private async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PerformPublishBranchAsync(Guid key, IEnumerable<string> cultures, PublishBranchFilter publishBranchFilter, Guid userKey, Guid? taskId = null)
     {
         try
         {
-            SetIsPublishingBranch(key, userKey);
+            if (taskId.HasValue)
+            {
+                SetIsPublishingBranch(taskId.Value);
+            }
 
             using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
             IContent? content = _contentService.GetById(key);
@@ -315,10 +324,11 @@ internal sealed class ContentPublishingService : IContentPublishingService
                     {
                         FailedItems = new[]
                         {
-                        new ContentPublishingBranchItemResult
-                        {
-                            Key = key, OperationStatus = ContentPublishingOperationStatus.ContentNotFound
-                        }
+                            new ContentPublishingBranchItemResult
+                            {
+                                Key = key,
+                                OperationStatus = ContentPublishingOperationStatus.ContentNotFound,
+                            }
                         }
                     });
             }
@@ -347,15 +357,42 @@ internal sealed class ContentPublishingService : IContentPublishingService
         }
         finally
         {
-            ClearIsPublishingBranch(key, userKey);
+            if (taskId.HasValue)
+            {
+                ClearIsPublishingBranch(taskId.Value);
+            }
         }
     }
 
-    private void SetIsPublishingBranch(Guid key, Guid userKey) => _runtimeCache.Insert(GetIsPublishingBranchCacheKey(key, userKey), () => "tempValue", TimeSpan.FromMinutes(10));
+    /// <inheritdoc/>
+    public Task<bool> IsPublishingBranchAsync(Guid taskId) => Task.FromResult(_runtimeCache.Get(GetIsPublishingBranchCacheKey(taskId)) is not null);
 
-    private void ClearIsPublishingBranch(Guid key, Guid userKey) => _runtimeCache.Clear(GetIsPublishingBranchCacheKey(key, userKey));
+    /// <inheritdoc/>
+    public Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> GetPublishBranchResultAsync(Guid taskId)
+    {
+        var cacheKey = GetPublishingBranchResultCacheKey(taskId);
+        var taskResult = _runtimeCache.Get(cacheKey) as Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>?;
+        if (taskResult is null)
+        {
+            return Task.FromResult(Attempt.FailWithStatus(ContentPublishingOperationStatus.TaskResultNotFound, new ContentPublishingBranchResult()));
+        }
 
-    private static string GetIsPublishingBranchCacheKey(Guid key, Guid userKey) => string.Format(IsPublishingBranchCacheRuntimeCacheKeyFormat, key, userKey);
+        // Now we've retrieved it, clear the cache.
+        _runtimeCache.Clear(cacheKey);
+
+        return Task.FromResult(taskResult.Value);
+    }
+
+    private void SetIsPublishingBranch(Guid taskId) => _runtimeCache.Insert(GetIsPublishingBranchCacheKey(taskId), () => "tempValue", TimeSpan.FromMinutes(10));
+
+    private void ClearIsPublishingBranch(Guid taskId) => _runtimeCache.Clear(GetIsPublishingBranchCacheKey(taskId));
+
+    private static string GetIsPublishingBranchCacheKey(Guid taskId) => IsPublishingBranchRuntimeCacheKeyPrefix + taskId;
+
+    private void SetPublishingBranchResult(Guid taskId, Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus> result)
+        => _runtimeCache.Insert(GetPublishingBranchResultCacheKey(taskId), () => result, TimeSpan.FromMinutes(1));
+
+    private static string GetPublishingBranchResultCacheKey(Guid taskId) => PublishingBranchResultCacheKeyPrefix + taskId;
 
     /// <inheritdoc/>
     public async Task<Attempt<ContentPublishingOperationStatus>> UnpublishAsync(Guid key, ISet<string>? cultures, Guid userKey)

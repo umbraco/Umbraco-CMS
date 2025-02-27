@@ -28,4 +28,5 @@ public enum ContentPublishingOperationStatus
     Failed, // unspecified failure (can happen on unpublish at the time of writing)
     Unknown,
     CannotUnpublishWhenReferenced,
+    TaskResultNotFound,
 }
