@@ -1,12 +1,12 @@
-import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group/constants.js';
-import type { ManifestUserPermission, UmbContextualUserPermissionModel } from './types.js';
-import type { UmbUserPermissionVerbElement } from './components/index.js';
+import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../../user-group/constants.js';
+import type { ManifestUserPermission, UmbContextualUserPermissionModel } from '../types.js';
+import type { UmbUserPermissionVerbElement } from './index.js';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-@customElement('umb-hello')
-export class UmbHelloElement extends UmbLitElement {
+@customElement('umb-input-user-permission')
+export class UmbInputUserPermissionElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	private _manifest?: ManifestUserPermission | undefined;
 	public get manifest(): ManifestUserPermission | undefined {
@@ -88,7 +88,6 @@ export class UmbHelloElement extends UmbLitElement {
 	}
 
 	#isAllowed() {
-		console.log(this._userGroupPermissions);
 		const contextualPermissions = this._userGroupPermissions.filter(
 			(permission) =>
 				permission.$type === 'UnknownTypePermissionPresentationModel' &&
@@ -116,10 +115,10 @@ export class UmbHelloElement extends UmbLitElement {
 	}
 }
 
-export { UmbHelloElement as element };
+export { UmbInputUserPermissionElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-hello': UmbHelloElement;
+		'umb-input-user-permission': UmbInputUserPermissionElement;
 	}
 }
