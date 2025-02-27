@@ -65,13 +65,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 			<uui-popover-container id="logo-popover" placement="bottom-start">
 				<umb-popover-layout>
 					<div id="modal">
-						<img
-							aria-hidden="true"
-							src="${this._serverUrl}/umbraco/management/api/v1/security/back-office/graphics/login-logo-alternative"
-							alt="logo"
-							width="300"
-							height="82"
-							loading="lazy" />
+						<umb-app-logo id="logo" logo-type="logo" alternative></umb-app-logo>
 						<span>${this._version}</span>
 
 						${this._serverUpgradeCheck

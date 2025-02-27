@@ -1,17 +1,41 @@
 import { UMB_APP_CONTEXT } from './app.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-app-logo')
 export class UmbAppLogoElement extends UmbLitElement {
+	/**
+	 * The loading attribute of the image.
+	 * @type {'lazy' | 'eager'}
+	 * @default 'eager'
+	 */
+	@property()
+	loading: 'lazy' | 'eager' = 'lazy';
+
+	/**
+	 * The type of logo to display.
+	 * @type {'mark' | 'logo'}
+	 * @default 'mark'
+	 */
+	@property({ type: String, attribute: 'logo-type' })
+	logoType: 'mark' | 'logo' = 'mark';
+
+	/**
+	 * Whether to use the alternative logo.
+	 * @type {boolean}
+	 * @default false
+	 */
+	@property({ type: Boolean })
+	alternative: boolean = false;
+
 	@state()
-	private _logoUrl?: string;
+	private _serverUrl?: string;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
-			this._logoUrl = `${instance.getServerUrl()}/umbraco/management/api/v1/security/back-office/graphics/logo`;
+			this._serverUrl = instance.getServerUrl();
 		});
 	}
 
@@ -24,11 +48,19 @@ export class UmbAppLogoElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (!this._logoUrl) {
+		if (!this._serverUrl) {
 			return nothing;
 		}
 
-		return html`<img .src=${this._logoUrl} aria-hidden="true" loading="eager" alt="logo" style="height: 100%" />`;
+		let logoFile = this.alternative ? 'logo-alternative' : 'logo';
+
+		if (this.logoType === 'logo') {
+			logoFile = `login-${logoFile}`;
+		}
+
+		const logoUrl = `${this._serverUrl}/umbraco/management/api/v1/security/back-office/graphics/${logoFile}`;
+
+		return html`<img src=${logoUrl} aria-hidden="true" loading=${this.loading} alt="logo" />`;
 	}
 }
 
