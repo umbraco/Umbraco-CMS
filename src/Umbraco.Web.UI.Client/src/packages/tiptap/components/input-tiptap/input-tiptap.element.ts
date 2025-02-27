@@ -1,6 +1,6 @@
 import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
 import type { UmbTiptapToolbarValue } from '../types.js';
-import { css, customElement, html, property, state, unsafeCSS, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, map, property, state, unsafeCSS, when } from '@umbraco-cms/backoffice/external/lit';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { Editor } from '@umbraco-cms/backoffice/external/tiptap';
@@ -17,6 +17,8 @@ const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
 
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
+	#stylesheets = new Set(['/umbraco/backoffice/css/rte-content.css']);
+
 	@property({ type: String })
 	override set value(value: string) {
 		if (value === this.#value) return;
@@ -121,6 +123,11 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			element.setAttribute('style', `height: ${dimensions.height}px;`);
 		}
 
+		const stylesheets = this.configuration?.getValueByAlias<Array<string>>('stylesheets');
+		if (stylesheets?.length) {
+			stylesheets.forEach((x) => this.#stylesheets.add(x));
+		}
+
 		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
 
 		const tiptapExtensions: Extensions = [];
@@ -179,6 +186,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	#renderStyles() {
 		if (!this._styles?.length) return;
 		return html`
+			${map(this.#stylesheets, (stylesheet) => html`<link rel="stylesheet" href=${stylesheet} />`)}
 			<style>
 				${this._styles.map((style) => unsafeCSS(style))}
 			</style>
