@@ -1,8 +1,9 @@
-﻿namespace Umbraco.Cms.Core.Services.OperationStatus;
+namespace Umbraco.Cms.Core.Services.OperationStatus;
 
 public enum ContentPublishingOperationStatus
 {
     Success,
+    Accepted,
     ContentNotFound,
     CancelledByEvent,
     ContentInvalid,
@@ -27,5 +28,4 @@ public enum ContentPublishingOperationStatus
     Failed, // unspecified failure (can happen on unpublish at the time of writing)
     Unknown,
     CannotUnpublishWhenReferenced,
-
 }

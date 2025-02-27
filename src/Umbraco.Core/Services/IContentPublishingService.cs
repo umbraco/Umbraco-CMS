@@ -27,7 +27,7 @@ public interface IContentPublishingService
     /// <param name="force">A value indicating whether to force-publish content that is not already published.</param>
     /// <param name="userKey">The identifier of the user performing the operation.</param>
     /// <returns>Result of the publish operation.</returns>
-    [Obsolete("This method is not longer used as the 'force' parameter has been extended into options for publishing unpublished and re-publishing changed content. Please use the overload containing the parameter for those options instead. Will be removed in V17.")]
+    [Obsolete("This method is not longer used as the 'force' parameter has been extended into options for publishing unpublished and re-publishing changed content. Please use the overload containing the parameter for those options instead. Scheduled for removal in Umbraco 17.")]
     Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, bool force, Guid userKey);
 
     /// <summary>
@@ -38,9 +38,24 @@ public interface IContentPublishingService
     /// <param name="publishBranchFilter">A value indicating options for force publishing unpublished or re-publishing unchanged content.</param>
     /// <param name="userKey">The identifier of the user performing the operation.</param>
     /// <returns>Result of the publish operation.</returns>
+    [Obsolete("Please use the overload containing all parameters. Scheduled for removal in Umbraco 17.")]
     Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, PublishBranchFilter publishBranchFilter, Guid userKey)
 #pragma warning disable CS0618 // Type or member is obsolete
         => PublishBranchAsync(key, cultures, publishBranchFilter.HasFlag(PublishBranchFilter.IncludeUnpublished), userKey);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <summary>
+    ///     Publishes a content branch.
+    /// </summary>
+    /// <param name="key">The key of the root content.</param>
+    /// <param name="cultures">The cultures to publish.</param>
+    /// <param name="publishBranchFilter">A value indicating options for force publishing unpublished or re-publishing unchanged content.</param>
+    /// <param name="userKey">The identifier of the user performing the operation.</param>
+    /// <param name="useBackgroundThread">Flag indicating whether to use a background thread for the operation and immediately return to the caller.</param>
+    /// <returns>Result of the publish operation.</returns>
+    Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, PublishBranchFilter publishBranchFilter, Guid userKey, bool useBackgroundThread)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => PublishBranchAsync(key, cultures, publishBranchFilter, userKey);
 #pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
