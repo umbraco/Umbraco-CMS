@@ -635,7 +635,7 @@ stages:
             inputs:
               testResultsFormat: 'JUnit'
               testResultsFiles: '*.xml'
-              searchFolder: "$(System.DefaultWorkingDirectory)/test-results"
+              searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
               testRunTitle: "Playwright Tests"  
             condition: always()
       - job:
@@ -808,7 +808,7 @@ stages:
             inputs:
               testResultsFormat: 'JUnit'
               testResultsFiles: '*.xml'
-              searchFolder: "$(System.DefaultWorkingDirectory)/test-results"
+              searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
               testRunTitle: "Playwright Tests"   
             condition: always()
   ###############################################
