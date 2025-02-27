@@ -17,7 +17,7 @@ export class UmbUserGroupUserPermissionListElement extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry.byType('userPermission'),
 			(manifests) => {
-				this._groups = [...new Set(manifests.flatMap((manifest) => manifest.meta.group))];
+				this._groups = [...new Set(manifests.flatMap((manifest) => manifest.meta.permission.context))];
 			},
 			'umbUserPermissionObserver',
 		);
@@ -27,13 +27,14 @@ export class UmbUserGroupUserPermissionListElement extends UmbLitElement {
 		return html` ${this._groups.map((group) => this.#renderPermissionsByGroup(group))} `;
 	}
 
-	#renderPermissionsByGroup(group: string) {
+	#renderPermissionsByGroup(context: string) {
 		return html`
-			<h4>${group}</h4>
+			<h4>${context}</h4>
 			<umb-extension-slot
 				slot="editor"
 				type="userPermission"
-				default-element="umb-input-user-permission"></umb-extension-slot>
+				default-element="umb-input-user-permission"
+				.filter=${(manifest) => manifest.meta.permission.context === context}></umb-extension-slot>
 		`;
 	}
 

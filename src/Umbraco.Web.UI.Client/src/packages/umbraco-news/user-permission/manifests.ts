@@ -1,7 +1,4 @@
-import {
-	UMB_USER_PERMISSION_CONTEXT_UMBRACO_NEWS_DASHBOARD,
-	UMB_USER_PERMISSION_UMBRACO_NEWS_DASHBOARD_BROWSE,
-} from './constants.js';
+import { UMB_USER_PERMISSION_CONTEXT_UMBRACO_NEWS, UMB_USER_PERMISSION_UMBRACO_NEWS_BROWSE } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -13,8 +10,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 			description: 'Allow access to browse the Umbraco News Dashboard',
 			group: 'Umbraco News',
 			permission: {
-				context: UMB_USER_PERMISSION_CONTEXT_UMBRACO_NEWS_DASHBOARD,
-				verbs: [UMB_USER_PERMISSION_UMBRACO_NEWS_DASHBOARD_BROWSE],
+				context: UMB_USER_PERMISSION_CONTEXT_UMBRACO_NEWS,
+				verbs: [UMB_USER_PERMISSION_UMBRACO_NEWS_BROWSE],
 			},
 		},
 	},
