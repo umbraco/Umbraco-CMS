@@ -3,11 +3,20 @@ import { isCurrentUserAnAdmin } from '@umbraco-cms/backoffice/current-user';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_NEWVERSION_MODAL, UMB_SYSINFO_MODAL } from '@umbraco-cms/backoffice/sysinfo';
 import type { UmbServerUpgradeCheck } from '@umbraco-cms/backoffice/sysinfo';
 
+/**
+ * The backoffice header logo element.
+ * @cssprop --umb-header-logo-display - The display property of the header logo.
+ * @cssprop --umb-header-logo-margin - The margin of the header logo.
+ * @cssprop --umb-header-logo-width - The width of the header logo.
+ * @cssprop --umb-header-logo-height - The height of the header logo.
+ * @cssprop --umb-logo-display - The display property of the logo.
+ * @cssprop --umb-logo-width - The width of the logo.
+ * @cssprop --umb-logo-height - The height of the logo.
+ */
 @customElement('umb-backoffice-header-logo')
 export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 	@state()
@@ -18,9 +27,6 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 
 	@state()
 	private _serverUpgradeCheck: UmbServerUpgradeCheck | null = null;
-
-	@state()
-	private _serverUrl = '';
 
 	#backofficeContext?: typeof UMB_BACKOFFICE_CONTEXT.TYPE;
 
@@ -39,10 +45,6 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 
 			this.#backofficeContext = context;
 		});
-
-		this.consumeContext(UMB_APP_CONTEXT, (context) => {
-			this._serverUrl = context.getServerUrl();
-		});
 	}
 
 	protected override async firstUpdated() {
@@ -59,8 +61,8 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<uui-button id="logo" look="primary" label="Logo" compact popovertarget="logo-popover">
-				<umb-app-logo id="logo-img"></umb-app-logo>
+			<uui-button id="header-logo-button" look="primary" label="Logo" compact popovertarget="logo-popover">
+				<umb-app-logo id="header-logo" loading="eager"></umb-app-logo>
 			</uui-button>
 			<uui-popover-container id="logo-popover" placement="bottom-start">
 				<umb-popover-layout>
@@ -109,17 +111,25 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
-			#logo {
-				display: var(--umb-header-logo-display, inline);
+			#header-logo-button {
 				--uui-button-padding-top-factor: 1;
 				--uui-button-padding-bottom-factor: 0.5;
-				margin-right: var(--uui-size-space-2);
 				--uui-button-background-color: transparent;
+				display: var(--umb-header-logo-display, inline);
+				margin: var(--umb-header-logo-margin, 0 var(--uui-size-space-2) 0 0);
 			}
 
-			#logo-img {
-				display: block;
-				height: var(--uui-size-10);
+			#header-logo > img {
+				width: var(--umb-header-logo-width, auto);
+				height: var(--umb-header-logo-height, 30px);
+			}
+
+			#logo {
+				display: var(--umb-logo-display, block);
+				> img {
+					width: var(--umb-logo-width, auto);
+					height: var(--umb-logo-height, 50px);
+				}
 			}
 
 			#modal {
