@@ -1,4 +1,5 @@
 import { Extension } from '@tiptap/core';
+import type { Attributes } from '@tiptap/core';
 
 /**
  * Converts camelCase to kebab-case.
@@ -44,8 +45,10 @@ export const HtmlGlobalAttributes = Extension.create<HtmlGlobalAttributesOptions
 						},
 					},
 					id: {},
-					style: {},
-				},
+					style: {
+						parseHTML: (element) => (element.style.length ? element.style.cssText : null),
+					},
+				} as Attributes,
 			},
 		];
 	},

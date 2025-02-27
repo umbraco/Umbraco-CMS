@@ -80,8 +80,8 @@ export class UmbTiptapTableInsertElement extends UmbLitElement {
 
 					&:hover,
 					&.selected {
-						background-color: var(--uui-color-current);
-						border-color: var(--uui-color-border-emphasis);
+						background-color: var(--uui-color-background);
+						border-color: var(--uui-color-selected);
 					}
 				}
 			}

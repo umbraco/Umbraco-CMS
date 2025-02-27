@@ -42,7 +42,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         requestSettings.OnChange(settings => _requestSettings = settings);
     }
 
-    [Obsolete("Use constructor that takes an IPublishStatusQueryService instead, scheduled for removal in v17")]
+    [Obsolete("Use the non-obsolete constructor, scheduled for removal in v17")]
     public ApiContentRouteBuilder(
         IApiContentPathProvider apiContentPathProvider,
         IOptions<GlobalSettings> globalSettings,
@@ -80,7 +80,12 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 
         contentPath = contentPath.EnsureStartsWith("/");
 
-        IPublishedContent root = GetRoot(content, isPreview);
+        IPublishedContent? root = GetRoot(content, isPreview);
+        if (root is null)
+        {
+            return null;
+        }
+
         var rootPath = root.UrlSegment(_variationContextAccessor, culture) ?? string.Empty;
 
         if (_globalSettings.HideTopLevelNodeFromPath == false)
@@ -127,19 +132,21 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 
     private static bool IsInvalidContentPath(string? path) => path.IsNullOrWhiteSpace() || "#".Equals(path);
 
-    private IPublishedContent GetRoot(IPublishedContent content, bool isPreview)
+    private IPublishedContent? GetRoot(IPublishedContent content, bool isPreview)
     {
-        if (isPreview is false)
+        if (content.Level == 1)
         {
-            return content.Root(_variationContextAccessor, _contentCache, _navigationQueryService, _publishStatusQueryService);
+            return content;
         }
 
-        _navigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
-        IEnumerable<IPublishedContent> rootContent = rootKeys.Select(x => _contentCache.GetById(true, x)).WhereNotNull();
+        if (_navigationQueryService.TryGetAncestorsKeys(content.Key, out IEnumerable<Guid> ancestorKeys) is false)
+        {
+            return null;
+        }
 
-        // in very edge case scenarios during preview, content.Root() does not map to the root.
-        // we'll code our way around it for the time being.
-        return rootContent.FirstOrDefault(root => root.IsAncestorOrSelf(content))
-               ?? content.Root(_variationContextAccessor, _contentCache, _navigationQueryService, _publishStatusQueryService);
+        Guid[] ancestorKeysAsArray = ancestorKeys as Guid[] ?? ancestorKeys.ToArray();
+        return ancestorKeysAsArray.Length > 0
+            ? _contentCache.GetById(isPreview, ancestorKeysAsArray.Last())
+            : content;
     }
 }
