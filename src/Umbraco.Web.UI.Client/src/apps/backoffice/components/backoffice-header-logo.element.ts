@@ -128,7 +128,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 				display: var(--umb-logo-display, block);
 				> img {
 					width: var(--umb-logo-width, auto);
-					height: var(--umb-logo-height, 50px);
+					height: var(--umb-logo-height, 55px);
 				}
 			}
 
