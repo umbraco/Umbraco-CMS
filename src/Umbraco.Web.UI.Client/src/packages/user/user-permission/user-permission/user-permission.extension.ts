@@ -11,7 +11,7 @@ export interface MetaUserPermission {
 	description?: string;
 	permission: {
 		context: string;
-		permission: string;
+		verbs: Array<string>;
 	};
 }
 

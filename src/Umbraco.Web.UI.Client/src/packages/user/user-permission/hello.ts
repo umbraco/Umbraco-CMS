@@ -1,33 +1,54 @@
+import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group/constants.js';
+import type { ManifestUserPermission, UmbContextualUserPermissionModel } from './types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, type PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-hello')
 export class UmbHelloElement extends UmbLitElement {
-	@property({ type: String, attribute: true })
-	label: string = '';
-
-	@property({ type: String, attribute: true })
-	description?: string = '';
-
-	@property({ type: Boolean, attribute: true })
-	allowed: boolean = false;
+	@property({ type: Object, attribute: false })
+	manifest?: ManifestUserPermission;
 
 	#onChange(event: UUIBooleanInputEvent) {
 		event.stopPropagation();
-		this.allowed = event.target.checked;
-		this.dispatchEvent(new UmbChangeEvent());
+
+		if (this.manifest === undefined) {
+			throw new Error('Manifest is undefined');
+		}
+
+		const permissions = this.#context?.getPermissions();
+		const permission: UmbContextualUserPermissionModel = {
+			$type: 'UnknownTypePermissionPresentationModel',
+			context: this.manifest.meta.permission.context,
+			verbs: this.manifest.meta.permission.verbs,
+		};
+
+		this.#context?.setPermissions([...permissions, permission]);
+	}
+
+	#context?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (context) => {
+			this.#context = context;
+		});
+	}
+
+	protected override firstUpdated(_changedProperties: PropertyValues): void {
+		super.firstUpdated(_changedProperties);
 	}
 
 	override render() {
-		return html`Hello world`;
+		const label = this.manifest?.meta.label ?? this.manifest?.name ?? '';
+		const description = this.manifest?.meta.description ?? '';
 		return html`<div id="setting">
-			<uui-toggle label=${this.label} ?checked=${this.allowed} @change=${this.#onChange}>
+			<uui-toggle label=${label} @change=${this.#onChange}>
 				<div id="meta">
-					<div id="name">${this.label}</div>
-					<small>${this.description}</small>
+					<div id="name">${label}</div>
+					<small>${description}</small>
 				</div>
 			</uui-toggle>
 		</div>`;

@@ -3,7 +3,7 @@ import { UMB_USER_GROUP_DETAIL_REPOSITORY_ALIAS, type UmbUserGroupDetailReposito
 import { UMB_USER_GROUP_ENTITY_TYPE, UMB_USER_GROUP_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UmbUserGroupWorkspaceEditorElement } from './user-group-workspace-editor.element.js';
 import { UMB_USER_GROUP_WORKSPACE_ALIAS } from './constants.js';
-import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
+import type { UmbContextualUserPermissionModel, UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
 import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbEntityDetailWorkspaceContextBase,
@@ -70,6 +70,7 @@ export class UmbUserGroupWorkspaceContext
 	/**
 	 * Gets the user group user permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
+	 * @returns {Array<UmbUserPermissionModel | UmbContextualUserPermissionModel>} The user group user permissions.
 	 */
 	getPermissions() {
 		return this._data.getCurrent()?.permissions ?? [];
@@ -80,13 +81,14 @@ export class UmbUserGroupWorkspaceContext
 	 * @param {Array<UmbUserPermissionModel>} permissions
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
-	setPermissions(permissions: Array<UmbUserPermissionModel>) {
+	setPermissions(permissions: Array<UmbUserPermissionModel | UmbContextualUserPermissionModel>) {
 		this._data.updateCurrent({ permissions: permissions });
 	}
 
 	/**
 	 * Gets the user group fallback permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
+	 * @returns {Array<string>} The user group fallback permissions.
 	 */
 	getFallbackPermissions() {
 		return this._data.getCurrent()?.fallbackPermissions ?? [];
