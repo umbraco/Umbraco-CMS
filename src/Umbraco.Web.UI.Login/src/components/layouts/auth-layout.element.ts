@@ -8,7 +8,6 @@ import {
 	customElement,
 	property,
 	when,
-	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
 
 /**
@@ -87,7 +86,7 @@ export class UmbAuthLayoutElement extends UmbLitElement {
 
 					${when(
 						this.logoImage,
-						() => html`<img id="logo-on-image" src=${ifDefined(this.logoImage)} alt="logo" aria-hidden="true" />`
+						(logoImage) => html`<img id="logo-on-image" src=${logoImage} alt="logo" aria-hidden="true" />`
 					)}
 				</div>
 			</div>
