@@ -4,13 +4,15 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...userPermissionModalManifests,
 	{
 		type: 'userPermission',
-		alias: 'Umb.UserPermission.Developer',
-		name: 'Developer User Permission',
-		weight: 1000,
+		alias: 'Umb.UserPermission.HealthCheck.Browse',
+		name: 'Browse Health Check User Permission',
 		meta: {
-			label: 'Developer User Permission',
-			description: 'Enables access to developer hints and tools.',
-			verbs: ['Umb.Developer'],
+			label: 'Browse Health Check User Permission',
+			description: 'Something Something Health Check',
+			permission: {
+				context: 'Umbraco.HealthCheck',
+				permission: 'browse',
+			},
 		},
 	},
 ];

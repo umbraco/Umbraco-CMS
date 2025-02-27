@@ -8,7 +8,11 @@ export interface ManifestUserPermission<MetaType extends MetaUserPermission = Me
 export interface MetaUserPermission {
 	label: string;
 	description?: string;
-	verbs: Array<string>;
+	permission: {
+		context: string;
+		key?: string;
+		permission: string;
+	};
 }
 
 declare global {
