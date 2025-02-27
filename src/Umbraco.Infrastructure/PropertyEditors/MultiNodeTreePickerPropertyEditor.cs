@@ -8,8 +8,10 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors.Validation;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -53,11 +55,16 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute,
-            ILocalizedTextService localizedTextService)
+            ILocalizedTextService localizedTextService,
+            IEntityService entityService,
+            ICoreScopeProvider coreScopeProvider)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
-            Validators.Add(new TypedJsonValidatorRunner<EditorEntityReference[], MultiNodePickerConfiguration>(jsonSerializer, new AmountValidator(localizedTextService)));
+            Validators.Add(new TypedJsonValidatorRunner<EditorEntityReference[], MultiNodePickerConfiguration>(
+                jsonSerializer,
+                new AmountValidator(localizedTextService),
+                new ObjectTypeValidator(localizedTextService, coreScopeProvider, entityService)));
         }
 
         public MultiNodeTreePickerPropertyValueEditor(
@@ -65,7 +72,14 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute)
-            : this(shortStringHelper, jsonSerializer, ioHelper, attribute, StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>())
+            : this(
+                shortStringHelper,
+                jsonSerializer,
+                ioHelper,
+                attribute,
+                StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>(),
+                StaticServiceProvider.Instance.GetRequiredService<IEntityService>(),
+                StaticServiceProvider.Instance.GetRequiredService<ICoreScopeProvider>())
         {
         }
 
@@ -166,6 +180,85 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
 
                 return validationResults;
             }
+        }
+
+        internal class ObjectTypeValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
+        {
+            private readonly ILocalizedTextService _localizedTextService;
+            private readonly ICoreScopeProvider _coreScopeProvider;
+            private readonly IEntityService _entityService;
+
+            public ObjectTypeValidator(
+                ILocalizedTextService localizedTextService,
+                ICoreScopeProvider coreScopeProvider,
+                IEntityService entityService)
+            {
+                _localizedTextService = localizedTextService;
+                _coreScopeProvider = coreScopeProvider;
+                _entityService = entityService;
+            }
+
+            public IEnumerable<ValidationResult> Validate(
+                EditorEntityReference[]? entityReferences,
+                MultiNodePickerConfiguration? configuration,
+                string? valueType,
+                PropertyValidationContext validationContext)
+            {
+                var validationResults = new List<ValidationResult>();
+
+                if (entityReferences is null || configuration?.TreeSource?.ObjectType is null)
+                {
+                    return validationResults;
+                }
+
+                Guid[] uniqueKeys = entityReferences.DistinctBy(x => x.Unique).Select(x => x.Unique).ToArray();
+
+                if (uniqueKeys.Length == 0)
+                {
+                    return validationResults;
+                }
+
+                Guid? allowedObjectType = GetObjectType(configuration.TreeSource.ObjectType);
+                if (allowedObjectType is null)
+                {
+                    return
+                    [
+                        // Some invalid object type was sent.
+                        new ValidationResult(
+                            _localizedTextService.Localize(
+                                "validation",
+                                "invalidObjectType"),
+                            ["value"])
+                    ];
+                }
+
+                using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+                foreach (Guid key in uniqueKeys)
+                {
+                    IEntitySlim? entity = _entityService.Get(key);
+                    if (entity is not null && entity.NodeObjectType != allowedObjectType)
+                    {
+                        validationResults.Add(new ValidationResult(
+                            _localizedTextService.Localize(
+                                "validation",
+                                "invalidObjectType"),
+                            ["value"]));
+                    }
+                }
+
+                scope.Complete();
+
+                return validationResults;
+            }
+
+            private Guid? GetObjectType(string objectType) =>
+                objectType switch
+                {
+                    "content" => Constants.ObjectTypes.Document,
+                    "media" => Constants.ObjectTypes.Media,
+                    "member" => Constants.ObjectTypes.Member,
+                    _ => null,
+                };
         }
     }
 }

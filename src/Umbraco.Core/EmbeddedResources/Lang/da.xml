@@ -121,6 +121,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="invalidStep">Værdien %0% passer ikke med den konfigureret trin værdi af %1% og mindste værdi af %2%.</key>
     <key alias="unexpectedRange">Værdien %0% forventes ikke at indeholde et spænd.</key>
     <key alias="invalidRange">Værdien %0% forventes at have en værdi der er større end fra værdien.</key>
+    <key alias="invalidObjectType">Det valgte indhold er af den forkerte type.</key>
   </area>
   <area alias="recycleBin">
     <key alias="contentTrashed">Slettet indhold med Id: {0} Relateret til original "parent" med id: {1}</key>
