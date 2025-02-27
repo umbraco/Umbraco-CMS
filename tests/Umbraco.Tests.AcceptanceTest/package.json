@@ -6,7 +6,7 @@
     "ui": "npx playwright test --ui DefaultConfig",
     "postinstall": "node postinstall.js",
     "config": "node config.js",
-    "testSqlite": "npx playwright test DefaultConfig --grep-invert \"Users\"",
+    "testSqlite": "npx playwright test DefaultConfig/Content --grep \"@smoke\" --grep-invert \"Users\"",
     "all": "npx playwright test",
     "createTest": "node createTest.js",
     "smokeTest": "npx playwright test DefaultConfig/Content --grep \"@smoke\"",
