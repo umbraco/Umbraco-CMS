@@ -23,6 +23,13 @@ export interface ManifestTiptapToolbarExtensionButtonKind<
 	kind: 'button';
 }
 
+export interface ManifestTiptapToolbarExtensionColorPickerButtonKind<
+	MetaType extends MetaTiptapToolbarExtension = MetaTiptapToolbarExtension,
+> extends ManifestTiptapToolbarExtension<MetaType> {
+	type: 'tiptapToolbarExtension';
+	kind: 'colorPickerButton';
+}
+
 export interface MetaTiptapToolbarMenuItem {
 	data?: unknown;
 	element?: ElementLoaderProperty<HTMLElement>;
@@ -51,6 +58,7 @@ declare global {
 		umbTiptapToolbarExtension:
 			| ManifestTiptapToolbarExtension
 			| ManifestTiptapToolbarExtensionButtonKind
+			| ManifestTiptapToolbarExtensionColorPickerButtonKind
 			| ManifestTiptapToolbarExtensionMenuKind;
 	}
 }
