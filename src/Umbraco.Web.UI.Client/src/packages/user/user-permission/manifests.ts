@@ -6,6 +6,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'userPermission',
 		alias: 'Umb.UserPermission.HealthCheck.Browse',
 		name: 'Browse Health Check User Permission',
+		element: () => import('./hello.js'),
 		meta: {
 			label: 'Browse Health Check User Permission',
 			description: 'Something Something Health Check',

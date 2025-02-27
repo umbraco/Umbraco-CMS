@@ -1,6 +1,7 @@
-import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestUserPermission<MetaType extends MetaUserPermission = MetaUserPermission> extends ManifestBase {
+export interface ManifestUserPermission<MetaType extends MetaUserPermission = MetaUserPermission>
+	extends ManifestElement {
 	type: 'userPermission';
 	meta: MetaType;
 }
@@ -10,7 +11,6 @@ export interface MetaUserPermission {
 	description?: string;
 	permission: {
 		context: string;
-		key?: string;
 		permission: string;
 	};
 }

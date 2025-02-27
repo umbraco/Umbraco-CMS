@@ -17,7 +17,6 @@ import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/component
 // import of local components
 import './components/user-group-entity-user-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
-import './components/user-group-user-permission-list.element.js';
 
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
@@ -242,6 +241,8 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 						${this.#renderLanguageAccess()} ${this.#renderDocumentAccess()} ${this.#renderMediaAccess()}
 					</uui-box>
+
+					<uui-box headline="Permissions"><umb-extension-slot type="userPermission"></umb-extension-slot></uui-box>
 
 					<uui-box>
 						<div slot="headline"><umb-localize key="user_permissionsDefault"></umb-localize></div>
