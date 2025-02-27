@@ -261,9 +261,14 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	}
 
 	protected override _getHasUnpersistedChanges(): boolean {
-		const currentData = this.structure.getOwnerContentType();
 		const persistedData = this._data.getPersisted();
-		return jsonStringComparison(persistedData, currentData) === false;
+		const currentData = this.structure.getOwnerContentType();
+		const result = jsonStringComparison(persistedData, currentData) === false;
+		// TODO: Implement developer-mode
+		if (result) {
+			console.warn('Changes detected based on JSON comparison between', persistedData, 'and', currentData);
+		}
+		return result;
 	}
 
 	public override destroy(): void {
