@@ -109,9 +109,40 @@ export class UmbDocumentPublishingServerDataSource {
 			forceRepublish,
 		};
 
-		return tryExecuteAndNotify(
+		// Initiate the publish descendants task and get back a task Id.
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			DocumentService.putDocumentByIdPublishWithDescendants({ id: unique, requestBody }),
+		);
+
+		if (error || !data) {
+			return { error };
+		}
+
+		const taskId = data.taskId;
+
+		// Poll until we know publishing is finished.
+		let isPolling = true;
+		let isFirstPoll = true;
+		while (isPolling) {
+			await new Promise((resolve) => setTimeout(resolve, isFirstPoll ? 1000 : 5000));
+			isFirstPoll = false;
+			const { data, error } = await tryExecuteAndNotify(
+				this.#host,
+				DocumentService.getDocumentByIdPublishWithDescendantsStatusByTaskId({ id: unique, taskId }));
+			if (error || !data) {
+				return { error };
+			}
+
+			if (!data.isPublishing) {
+				isPolling = false;
+			}
+		}
+
+		// Get and return the result.
+		return await tryExecuteAndNotify(
+			this.#host,
+			DocumentService.getDocumentByIdPublishWithDescendantsResultByTaskId({ id: unique, taskId }),
 		);
 	}
 

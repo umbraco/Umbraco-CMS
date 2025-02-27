@@ -84,6 +84,10 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 		if (!variantIds) throw new Error('variant IDs are missing');
 		await this.#init;
 
+		const notification = { data: { message: `Document and descendants submitted for publishing...` } };
+		// TODO: Move this to the calling workspace context [JOV]
+		this.#notificationContext?.peek('positive', notification);
+
 		const { error } = await this.#publishingDataSource.publishWithDescendants(
 			id,
 			variantIds,
