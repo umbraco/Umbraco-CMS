@@ -10,8 +10,3 @@ export interface UmbContextualUserPermissionModel extends UmbUserPermissionModel
 	$type: 'UnknownTypePermissionPresentationModel';
 	context: string;
 }
-
-export interface UmbGranularUserPermissionModel extends UmbUserPermissionModel {
-	context: string;
-	unique: string;
-}
