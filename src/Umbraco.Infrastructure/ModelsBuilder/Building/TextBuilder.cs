@@ -51,7 +51,15 @@ public class TextBuilder : Builder
     ///     Outputs an "auto-generated" header to a string builder.
     /// </summary>
     /// <param name="sb">The string builder.</param>
-    public static void WriteHeader(StringBuilder sb) => TextHeaderWriter.WriteHeader(sb);
+    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 17.")]
+    public static void WriteHeader(StringBuilder sb) => WriteHeader(sb, true);
+
+    /// <summary>
+    ///     Outputs an "auto-generated" header to a string builder.
+    /// </summary>
+    /// <param name="sb">The string builder.</param>
+    /// <param name="includeVersion">Flag indicating whether the tool version number should be included in the output.</param>
+    public static void WriteHeader(StringBuilder sb, bool includeVersion) => TextHeaderWriter.WriteHeader(sb, includeVersion);
 
     /// <summary>
     ///     Outputs a generated model to a string builder.
@@ -60,7 +68,7 @@ public class TextBuilder : Builder
     /// <param name="typeModel">The model to generate.</param>
     public void Generate(StringBuilder sb, TypeModel typeModel)
     {
-        WriteHeader(sb);
+        WriteHeader(sb, Config.IncludeVersionNumberInGeneratedModels);
 
         foreach (var t in TypesUsing)
         {
@@ -83,7 +91,7 @@ public class TextBuilder : Builder
     /// <param name="typeModels">The models to generate.</param>
     public void Generate(StringBuilder sb, IEnumerable<TypeModel> typeModels)
     {
-        WriteHeader(sb);
+        WriteHeader(sb, Config.IncludeVersionNumberInGeneratedModels);
 
         foreach (var t in TypesUsing)
         {
