@@ -246,7 +246,7 @@ describe('UmbExtensionRegistry', () => {
 		it('should get all extensions of the given type', async () => {
 			const extensions = extensionRegistry.getByType('section');
 
-			expect(extensions).to.have.lengthOf(4);
+			expect(extensions).to.have.lengthOf(3);
 			expect(extensions?.[0]?.type).to.eq('section');
 			expect(extensions?.[1]?.type).to.eq('section');
 			expect(extensions?.[2]?.type).to.eq('section');
@@ -255,7 +255,7 @@ describe('UmbExtensionRegistry', () => {
 		it('should return extensions ordered by weight', () => {
 			const extensions = extensionRegistry.getByType('section');
 
-			expect(extensions).to.have.lengthOf(4);
+			expect(extensions).to.have.lengthOf(3);
 			expect(extensions[0]?.weight).to.eq(200);
 			expect(extensions[1]?.weight).to.eq(25);
 			expect(extensions[2]?.weight).to.eq(1);
