@@ -4,64 +4,99 @@
     <Description>Contains the static assets needed to run Umbraco CMS.</Description>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+    <!-- Disable compression for static files, because MapStaticAssets() is not used anyway (yet) -->
+    <CompressionEnabled>false</CompressionEnabled>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--
+      TODO: Fix and remove overrides:
+      [NU5123] Rename files so path is shorter
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),NU5123</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
 
+  <!-- Restore and build backoffice project -->
   <PropertyGroup>
-    <BasePath>$(ProjectDir)wwwroot\umbraco</BasePath>
-    <BellePath>$(BasePath)\lib</BellePath>
-    <LoginPath>$(BasePath)\login</LoginPath>
+    <BackofficeProjectDirectory Condition="'$(BackofficeProjectDirectory)' == ''">..\Umbraco.Web.UI.Client\</BackofficeProjectDirectory>
+    <BackofficeAssetsPath>wwwroot\umbraco\backoffice</BackofficeAssetsPath>
   </PropertyGroup>
 
-  <Target Name="BuildStaticAssetsPreconditions" BeforeTargets="Build">
-    <Message Text="Skip BuildBelle target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
-    <Message Text="Skip BuildBelle target because '$(BellePath)' already exists" Importance="high" Condition="Exists('$(BellePath)')" />
-    <Message Text="Call BuildBelle target because UmbracoBuild is empty (this is Visual Studio) and '$(BellePath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellePath)')" />
-    <CallTarget Targets="BuildBelle" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellePath)')" />
+  <ItemGroup>
+    <BackofficeAssetsInputs Include="$(BackofficeProjectDirectory)package.json;$(BackofficeProjectDirectory)package-lock.json;$(BackofficeProjectDirectory)src\**" Exclude="$(DefaultItemExcludes)" />
+    <Content Remove="$(BackofficeAssetsPath)\**" />
+  </ItemGroup>
 
-    <Message Text="Skip BuildLogin target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
-    <Message Text="Skip BuildLogin target because '$(LoginPath)' already exists" Importance="high" Condition="Exists('$(LoginPath)')" />
-    <Message Text="Call BuildLogin target because UmbracoBuild is empty (this is Visual Studio) and '$(LoginPath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginPath)')" />
-    <CallTarget Targets="BuildLogin" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginPath)')" />
+  <Target Name="RestoreBackoffice" Inputs="$(BackofficeProjectDirectory)package-lock.json" Outputs="$(BackofficeProjectDirectory)node_modules\.package-lock.json">
+    <Message Importance="high" Text="Restoring Backoffice NPM packages..." />
+    <Exec Command="npm ci --no-fund --no-audit --prefer-offline" WorkingDirectory="$(BackofficeProjectDirectory)" />
   </Target>
 
-  <Target Name="BuildBelle">
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm ci --no-fund --no-audit --prefer-offline" />
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm run build:skip-tests" />
-  </Target>
-
-  <Target Name="BuildLogin">
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm ci --no-fund --no-audit --prefer-offline" />
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm run build" />
-  </Target>
-
-  <Target Name="CleanStaticAssetsPreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
-    <Message Text="Skip CleanBelle target because '$(BellePath)' doesn't exist" Importance="high" Condition="!Exists('$(BellePath)')" />
-    <Message Text="Skip CleanBelle target because preserve.belle marker file exists" Importance="high" Condition="Exists('$(BellePath)') and Exists('$(SolutionDir)preserve.belle')" />
-    <Message Text="Call CleanBelle target because '$(BellePath)' exists and preserve.belle marker file doesn't exist" Importance="high" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
-    <CallTarget Targets="CleanBelle" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
-
-    <Message Text="Skip CleanLogin target because '$(LoginPath)' doesn't exist" Importance="high" Condition="!Exists('$(LoginPath)')" />
-    <Message Text="Skip CleanLogin target because preserve.login marker file exists" Importance="high" Condition="Exists('$(LoginPath)') and Exists('$(SolutionDir)preserve.login')" />
-    <Message Text="Call CleanLogin target because '$(LoginPath)' exists and preserve.login marker file doesn't exist" Importance="high" Condition="Exists('$(LoginPath)') and !Exists('$(SolutionDir)preserve.login')" />
-    <CallTarget Targets="CleanLogin" Condition="Exists('$(LoginPath)') and !Exists('$(SolutionDir)preserve.login')" />
-  </Target>
-
-  <Target Name="CleanBelle">
+  <Target Name="BuildBackoffice" DependsOnTargets="RestoreBackoffice" BeforeTargets="AssignTargetPaths" Inputs="@(BackofficeAssetsInputs)" Outputs="$(IntermediateOutputPath)backoffice.complete.txt">
+    <Message Importance="high" Text="Executing Backoffice NPM build script..." />
+    <Exec Command="npm run build:for:cms" WorkingDirectory="$(BackofficeProjectDirectory)" />
     <ItemGroup>
-      <BelleDirectories Include="$(BasePath)/js;$(BasePath)/lib;$(BasePath)/assets;$(BasePath)/views;" />
+      <_BackofficeAssetsBuildOutput Include="$(BackofficeAssetsPath)\**" />
     </ItemGroup>
-    <RemoveDir Directories="@(BelleDirectories)" />
+    <WriteLinesToFile File="$(IntermediateOutputPath)backoffice.complete.txt" Lines="@(_BackofficeAssetsBuildOutput)" Overwrite="true" />
   </Target>
 
-  <Target Name="CleanLogin">
+  <Target Name="DefineBackofficeAssets" AfterTargets="BuildBackoffice" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
     <ItemGroup>
-      <LoginDirectories Include="$(LoginPath)" />
+      <FileWrites Include="@(_BackofficeAssetsBuildOutput)" />
+      <FileWrites Include="$(IntermediateOutputPath)backoffice.complete.txt" />
     </ItemGroup>
-    <RemoveDir Directories="@(LoginDirectories)" />
+    <DefineStaticWebAssets CandidateAssets="@(_BackofficeAssetsBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(ProjectDir)wwwroot" BasePath="$(StaticWebAssetBasePath)">
+      <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
+    </DefineStaticWebAssets>
+  </Target>
+
+  <!-- Restore and build login project -->
+  <PropertyGroup>
+    <LoginProjectDirectory Condition="'$(LoginProjectDirectory)' == ''">..\Umbraco.Web.UI.Login\</LoginProjectDirectory>
+    <LoginAssetsPath>wwwroot\umbraco\login</LoginAssetsPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <LoginAssetsInputs Include="$(LoginProjectDirectory)**" Exclude="$(DefaultItemExcludes)" />
+    <Content Remove="$(LoginAssetsPath)\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\umbraco\assets\README.md" />
+  </ItemGroup>
+
+  <Target Name="RestoreLogin" Inputs="$(LoginProjectDirectory)package-lock.json" Outputs="$(LoginProjectDirectory)node_modules/.package-lock.json">
+    <Message Importance="high" Text="Restoring Login NPM packages..." />
+    <Exec Command="npm ci --no-fund --no-audit --prefer-offline" WorkingDirectory="$(LoginProjectDirectory)" />
+  </Target>
+
+  <Target Name="BuildLogin" DependsOnTargets="RestoreLogin" BeforeTargets="AssignTargetPaths" Inputs="@(LoginAssetsInputs)" Outputs="$(IntermediateOutputPath)login.complete.txt">
+    <Message Importance="high" Text="Executing Login NPM build script..." />
+    <Exec Command="npm run build" WorkingDirectory="$(LoginProjectDirectory)" />
+    <ItemGroup>
+      <_LoginAssetsBuildOutput Include="$(LoginAssetsPath)\**" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)login.complete.txt" Lines="@(_LoginAssetsBuildOutput)" Overwrite="true" />
+  </Target>
+
+  <Target Name="DefineLoginAssets" AfterTargets="BuildLogin" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
+    <ItemGroup>
+      <FileWrites Include="@(_LoginAssetsBuildOutput)" />
+      <FileWrites Include="$(IntermediateOutputPath)login.complete.txt" />
+    </ItemGroup>
+    <DefineStaticWebAssets CandidateAssets="@(_LoginAssetsBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(ProjectDir)wwwroot" BasePath="$(StaticWebAssetBasePath)">
+      <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
+    </DefineStaticWebAssets>
   </Target>
 </Project>

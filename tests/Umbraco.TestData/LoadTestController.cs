@@ -28,7 +28,7 @@ public class LoadTestController : Controller
 </html>";
 
     private static readonly Random s_random = new();
-    private static readonly object s_locko = new();
+    private static readonly Lock s_locko = new();
 
     private static volatile int s_containerId = -1;
 
@@ -214,18 +214,19 @@ public class LoadTestController : Controller
             Description = "Container for LoadTest content",
             Icon = "icon-document",
             AllowedAsRoot = true,
-            IsContainer = true
+            ListView = Constants.DataTypes.Guids.ListViewContentGuid,
         };
         containerType.AllowedContentTypes = containerType.AllowedContentTypes.Union(new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias)
+            new ContentTypeSort(contentType.Key, 0, contentType.Alias)
         });
         containerType.AllowedTemplates = containerType.AllowedTemplates.Union(new[] { containerTemplate });
         containerType.SetDefaultTemplate(containerTemplate);
         _contentTypeService.Save(containerType);
 
         var content = _contentService.Create("LoadTestContainer", -1, ContainerAlias);
-        _contentService.SaveAndPublish(content);
+        _contentService.Save(content);
+        _contentService.Publish(content, content.AvailableCultures.ToArray());
 
         return ContentHtml("Installed.");
     }
@@ -277,7 +278,8 @@ public class LoadTestController : Controller
             var name = Guid.NewGuid().ToString("N").ToUpper() + "-" + (restart ? "R" : "X") + "-" + o;
             var content = _contentService.Create(name, s_containerId, ContentAlias);
             content.SetValue("origin", o);
-            _contentService.SaveAndPublish(content);
+            _contentService.Save(content);
+            _contentService.Publish(content, content.AvailableCultures.ToArray());
         }
 
         if (restart)

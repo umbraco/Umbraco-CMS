@@ -14,17 +14,29 @@ public static class UserGroupExtensions
         }
 
         // otherwise create one
-        return new ReadOnlyUserGroup(group.Id, group.Key, group.Name, group.Icon, group.StartContentId, group.StartMediaId, group.Alias, group.AllowedLanguages, group.AllowedSections, group.Permissions, group.HasAccessToAllLanguages);
+        return new ReadOnlyUserGroup(
+            group.Id,
+            group.Key,
+            group.Name,
+            group.Icon,
+            group.StartContentId,
+            group.StartMediaId,
+            group.Alias,
+            group.AllowedLanguages,
+            group.AllowedSections,
+            group.Permissions,
+            group.GranularPermissions,
+            group.HasAccessToAllLanguages);
     }
 
     public static bool IsSystemUserGroup(this IUserGroup group) =>
-        IsSystemUserGroup(group.Alias);
+        IsSystemUserGroup(group.Key);
 
     public static bool IsSystemUserGroup(this IReadOnlyUserGroup group) =>
-        IsSystemUserGroup(group.Alias);
+        IsSystemUserGroup(group.Key);
 
-    private static bool IsSystemUserGroup(this string? groupAlias) =>
-        groupAlias == Constants.Security.AdminGroupAlias
-        || groupAlias == Constants.Security.SensitiveDataGroupAlias
-        || groupAlias == Constants.Security.TranslatorGroupAlias;
+    private static bool IsSystemUserGroup(this Guid? groupKey) =>
+        groupKey == Constants.Security.AdminGroupKey
+        || groupKey == Constants.Security.SensitiveDataGroupKey
+        || groupKey == Constants.Security.TranslatorGroupKey;
 }

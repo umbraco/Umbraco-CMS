@@ -5,12 +5,22 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Security.Claims;
 using System.Security.Principal;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Extensions;
 
 public static class ClaimsIdentityExtensions
 {
+    private static string? _authenticationType;
+    private static string AuthenticationType =>
+        _authenticationType ??= StaticServiceProvider.Instance?.GetService<IOptions<BackOfficeAuthenticationTypeSettings>>()?
+            .Value?
+            .AuthenticationType ?? Constants.Security.BackOfficeAuthenticationType;
+
     /// <summary>
     ///     Returns the required claim types for a back office identity
     /// </summary>
@@ -24,8 +34,6 @@ public static class ClaimsIdentityExtensions
         ClaimTypes.Name, // username
         ClaimTypes.GivenName,
 
-        // Constants.Security.StartContentNodeIdClaimType, These seem to be able to be null...
-        // Constants.Security.StartMediaNodeIdClaimType,
         ClaimTypes.Locality, Constants.Security.SecurityStampClaimType,
     };
 
@@ -55,10 +63,35 @@ public static class ClaimsIdentityExtensions
         if (identity is ClaimsIdentity claimsIdentity)
         {
             userId = claimsIdentity.FindFirstValue(ClaimTypes.NameIdentifier)
-                     ?? claimsIdentity.FindFirstValue("sub");
+                     ?? claimsIdentity.FindFirstValue(Constants.Security.OpenIdDictSubClaimType);
         }
 
         return userId;
+    }
+
+    /// <summary>
+    ///     Returns the user key from the <see cref="IIdentity" /> of the claim type "sub".
+    /// </summary>
+    /// <param name="identity"></param>
+    /// <returns>
+    ///     The string value of the user id if found otherwise null.
+    /// </returns>
+    public static Guid? GetUserKey(this IIdentity identity)
+    {
+        if (identity is null)
+        {
+            throw new ArgumentNullException(nameof(identity));
+        }
+
+        string? userKey = null;
+        if (identity is ClaimsIdentity claimsIdentity)
+        {
+            userKey = claimsIdentity.FindFirstValue(Constants.Security.OpenIdDictSubClaimType);
+        }
+
+        return Guid.TryParse(userKey, out Guid result)
+            ? result
+            : null;
     }
 
     /// <summary>
@@ -147,9 +180,9 @@ public static class ClaimsIdentityExtensions
             }
         }
 
-        verifiedIdentity = identity.AuthenticationType == Constants.Security.BackOfficeAuthenticationType
+        verifiedIdentity = identity.AuthenticationType == AuthenticationType
             ? identity
-            : new ClaimsIdentity(identity.Claims, Constants.Security.BackOfficeAuthenticationType);
+            : new ClaimsIdentity(identity.Claims, AuthenticationType);
         return true;
     }
 
@@ -158,6 +191,7 @@ public static class ClaimsIdentityExtensions
     /// </summary>
     /// <param name="identity">this</param>
     /// <param name="userId">The users Id</param>
+    /// <param name="userKey">The users key</param>
     /// <param name="username">Username</param>
     /// <param name="realName">Real name</param>
     /// <param name="startContentNodes">Start content nodes</param>
@@ -166,7 +200,7 @@ public static class ClaimsIdentityExtensions
     /// <param name="securityStamp">Security stamp</param>
     /// <param name="allowedApps">Allowed apps</param>
     /// <param name="roles">Roles</param>
-    public static void AddRequiredClaims(this ClaimsIdentity identity, string userId, string username, string realName, IEnumerable<int>? startContentNodes, IEnumerable<int>? startMediaNodes, string culture, string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
+    public static void AddRequiredClaims(this ClaimsIdentity identity, string userId, Guid userKey, string username, string realName, IEnumerable<int>? startContentNodes, IEnumerable<int>? startMediaNodes, string culture, string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
     {
         // This is the id that 'identity' uses to check for the user id
         if (identity.HasClaim(x => x.Type == ClaimTypes.NameIdentifier) == false)
@@ -175,8 +209,20 @@ public static class ClaimsIdentityExtensions
                 ClaimTypes.NameIdentifier,
                 userId,
                 ClaimValueTypes.String,
-                Constants.Security.BackOfficeAuthenticationType,
-                Constants.Security.BackOfficeAuthenticationType,
+                AuthenticationType,
+                AuthenticationType,
+                identity));
+        }
+
+        // This is the id that 'identity' uses to check for the user id
+        if (identity.HasClaim(x => x.Type == Constants.Security.OpenIdDictSubClaimType) == false)
+        {
+            identity.AddClaim(new Claim(
+                Constants.Security.OpenIdDictSubClaimType,
+                userKey.ToString(),
+                ClaimValueTypes.String,
+                AuthenticationType,
+                AuthenticationType,
                 identity));
         }
 
@@ -186,8 +232,8 @@ public static class ClaimsIdentityExtensions
                 ClaimTypes.Name,
                 username,
                 ClaimValueTypes.String,
-                Constants.Security.BackOfficeAuthenticationType,
-                Constants.Security.BackOfficeAuthenticationType,
+                AuthenticationType,
+                AuthenticationType,
                 identity));
         }
 
@@ -197,11 +243,12 @@ public static class ClaimsIdentityExtensions
                 ClaimTypes.GivenName,
                 realName,
                 ClaimValueTypes.String,
-                Constants.Security.BackOfficeAuthenticationType,
-                Constants.Security.BackOfficeAuthenticationType,
+                AuthenticationType,
+                AuthenticationType,
                 identity));
         }
 
+        // NOTE: this can be removed when the obsolete claim type has been deleted
         if (identity.HasClaim(x => x.Type == Constants.Security.StartContentNodeIdClaimType) == false &&
             startContentNodes != null)
         {
@@ -211,12 +258,13 @@ public static class ClaimsIdentityExtensions
                     Constants.Security.StartContentNodeIdClaimType,
                     startContentNode.ToInvariantString(),
                     ClaimValueTypes.Integer32,
-                    Constants.Security.BackOfficeAuthenticationType,
-                    Constants.Security.BackOfficeAuthenticationType,
+                    AuthenticationType,
+                    AuthenticationType,
                     identity));
             }
         }
 
+        // NOTE: this can be removed when the obsolete claim type has been deleted
         if (identity.HasClaim(x => x.Type == Constants.Security.StartMediaNodeIdClaimType) == false &&
             startMediaNodes != null)
         {
@@ -226,8 +274,8 @@ public static class ClaimsIdentityExtensions
                     Constants.Security.StartMediaNodeIdClaimType,
                     startMediaNode.ToInvariantString(),
                     ClaimValueTypes.Integer32,
-                    Constants.Security.BackOfficeAuthenticationType,
-                    Constants.Security.BackOfficeAuthenticationType,
+                    AuthenticationType,
+                    AuthenticationType,
                     identity));
             }
         }
@@ -238,8 +286,8 @@ public static class ClaimsIdentityExtensions
                 ClaimTypes.Locality,
                 culture,
                 ClaimValueTypes.String,
-                Constants.Security.BackOfficeAuthenticationType,
-                Constants.Security.BackOfficeAuthenticationType,
+                AuthenticationType,
+                AuthenticationType,
                 identity));
         }
 
@@ -250,12 +298,13 @@ public static class ClaimsIdentityExtensions
                 Constants.Security.SecurityStampClaimType,
                 securityStamp,
                 ClaimValueTypes.String,
-                Constants.Security.BackOfficeAuthenticationType,
-                Constants.Security.BackOfficeAuthenticationType,
+                AuthenticationType,
+                AuthenticationType,
                 identity));
         }
 
         // Add each app as a separate claim
+        // NOTE: this can be removed when the obsolete claim type has been deleted
         if (identity.HasClaim(x => x.Type == Constants.Security.AllowedApplicationsClaimType) == false && allowedApps != null)
         {
             foreach (var application in allowedApps)
@@ -264,8 +313,8 @@ public static class ClaimsIdentityExtensions
                     Constants.Security.AllowedApplicationsClaimType,
                     application,
                     ClaimValueTypes.String,
-                    Constants.Security.BackOfficeAuthenticationType,
-                    Constants.Security.BackOfficeAuthenticationType,
+                    AuthenticationType,
+                    AuthenticationType,
                     identity));
             }
         }
@@ -281,18 +330,21 @@ public static class ClaimsIdentityExtensions
                     identity.RoleClaimType,
                     roleName,
                     ClaimValueTypes.String,
-                    Constants.Security.BackOfficeAuthenticationType,
-                    Constants.Security.BackOfficeAuthenticationType,
+                    AuthenticationType,
+                    AuthenticationType,
                     identity));
             }
         }
     }
+
+
 
     /// <summary>
     ///     Get the start content nodes from a ClaimsIdentity
     /// </summary>
     /// <param name="identity"></param>
     /// <returns>Array of start content nodes</returns>
+    [Obsolete("Please use the UserExtensions class to access user start node info. Will be removed in V15.")]
     public static int[] GetStartContentNodes(this ClaimsIdentity identity) =>
         identity.FindAll(x => x.Type == Constants.Security.StartContentNodeIdClaimType)
             .Select(node => int.TryParse(node.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
@@ -305,6 +357,7 @@ public static class ClaimsIdentityExtensions
     /// </summary>
     /// <param name="identity"></param>
     /// <returns>Array of start media nodes</returns>
+    [Obsolete("Please use the UserExtensions class to access user start node info. Will be removed in V15.")]
     public static int[] GetStartMediaNodes(this ClaimsIdentity identity) =>
         identity.FindAll(x => x.Type == Constants.Security.StartMediaNodeIdClaimType)
             .Select(node => int.TryParse(node.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
@@ -317,6 +370,7 @@ public static class ClaimsIdentityExtensions
     /// </summary>
     /// <param name="identity"></param>
     /// <returns></returns>
+    [Obsolete("Please use IUser.AllowedSections instead. Will be removed in V15.")]
     public static string[] GetAllowedApplications(this ClaimsIdentity identity) => identity
         .FindAll(x => x.Type == Constants.Security.AllowedApplicationsClaimType).Select(app => app.Value).ToArray();
 
@@ -330,7 +384,10 @@ public static class ClaimsIdentityExtensions
         var firstValue = identity.FindFirstValue(ClaimTypes.NameIdentifier);
         if (firstValue is not null)
         {
-            return int.Parse(firstValue, CultureInfo.InvariantCulture);
+            if (int.TryParse(firstValue, CultureInfo.InvariantCulture, out var id))
+            {
+                return id;
+            }
         }
 
         return null;

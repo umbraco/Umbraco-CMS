@@ -1,16 +1,17 @@
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 
 internal class UmbracoCmsSchema
 {
-    public UmbracoDefinition Umbraco { get; set; } = null!;
+    public required UmbracoDefinition Umbraco { get; set; }
 
     /// <summary>
     /// Configuration container for all Umbraco products.
     /// </summary>
     public class UmbracoDefinition
     {
-        public UmbracoCmsDefinition CMS { get; set; } = null!;
+        public required UmbracoCmsDefinition CMS { get; set; }
     }
 
     /// <summary>
@@ -18,69 +19,79 @@ internal class UmbracoCmsSchema
     /// </summary>
     public class UmbracoCmsDefinition
     {
-        public ContentSettings Content { get; set; } = null!;
+        public required ContentSettings Content { get; set; }
 
-        public DeliveryApiSettings DeliveryApi { get; set; } = null!;
+        public required DeliveryApiSettings DeliveryApi { get; set; }
 
-        public CoreDebugSettings Debug { get; set; } = null!;
+        public required CoreDebugSettings Debug { get; set; }
 
-        public ExceptionFilterSettings ExceptionFilter { get; set; } = null!;
+        public required ExceptionFilterSettings ExceptionFilter { get; set; }
 
-        public ModelsBuilderSettings ModelsBuilder { get; set; } = null!;
+        public required ModelsBuilderSettings ModelsBuilder { get; set; }
 
-        public GlobalSettings Global { get; set; } = null!;
+        public required GlobalSettings Global { get; set; }
 
-        public HealthChecksSettings HealthChecks { get; set; } = null!;
+        public required HealthChecksSettings HealthChecks { get; set; }
 
-        public HostingSettings Hosting { get; set; } = null!;
+        public required HostingSettings Hosting { get; set; }
 
-        public ImagingSettings Imaging { get; set; } = null!;
+        public required ImagingSettings Imaging { get; set; }
 
-        public IndexCreatorSettings Examine { get; set; } = null!;
-        public IndexingSettings Indexing { get; set; } = null!;
+        public required IndexCreatorSettings Examine { get; set; }
 
-        public KeepAliveSettings KeepAlive { get; set; } = null!;
+        public required IndexingSettings Indexing { get; set; }
 
-        public LoggingSettings Logging { get; set; } = null!;
+        public required LoggingSettings Logging { get; set; }
 
-        public NuCacheSettings NuCache { get; set; } = null!;
+        public required NuCacheSettings NuCache { get; set; }
 
-        public RequestHandlerSettings RequestHandler { get; set; } = null!;
+        public required RequestHandlerSettings RequestHandler { get; set; }
 
-        public RuntimeSettings Runtime { get; set; } = null!;
+        public required RuntimeSettings Runtime { get; set; }
 
-        public SecuritySettings Security { get; set; } = null!;
+        public required SecuritySettings Security { get; set; }
 
-        public TourSettings Tours { get; set; } = null!;
+        public required TypeFinderSettings TypeFinder { get; set; }
 
-        public TypeFinderSettings TypeFinder { get; set; } = null!;
+        public required WebRoutingSettings WebRouting { get; set; }
 
-        public WebRoutingSettings WebRouting { get; set; } = null!;
+        public required UmbracoPluginSettings Plugins { get; set; }
 
-        public UmbracoPluginSettings Plugins { get; set; } = null!;
+        public required UnattendedSettings Unattended { get; set; }
 
-        public UnattendedSettings Unattended { get; set; } = null!;
+        [Obsolete("Runtime minification is no longer supported. Will be removed entirely in V16.")]
+        public required RuntimeMinificationSettings RuntimeMinification { get; set; }
 
-        public RichTextEditorSettings RichTextEditor { get; set; } = null!;
+        public required BasicAuthSettings BasicAuth { get; set; }
 
-        public RuntimeMinificationSettings RuntimeMinification { get; set; } = null!;
+        public required PackageMigrationSettings PackageMigration { get; set; }
 
-        public BasicAuthSettings BasicAuth { get; set; } = null!;
+        public required LegacyPasswordMigrationSettings LegacyPasswordMigration { get; set; }
 
-        public PackageMigrationSettings PackageMigration { get; set; } = null!;
+        [Obsolete("Scheduled for removal in v16, dashboard manipulation is now done trough frontend extensions.")]
+        public required ContentDashboardSettings ContentDashboard { get; set; }
 
-        public LegacyPasswordMigrationSettings LegacyPasswordMigration { get; set; } = null!;
+        public required HelpPageSettings HelpPage { get; set; }
 
-        public ContentDashboardSettings ContentDashboard { get; set; } = null!;
+        public required InstallDefaultDataNamedOptions InstallDefaultData { get; set; }
 
-        public HelpPageSettings HelpPage { get; set; } = null!;
+        public required DataTypesSettings DataTypes { get; set; }
 
-        public InstallDefaultDataSettings DefaultDataCreation { get; set; } = null!;
+        public required MarketplaceSettings Marketplace { get; set; }
 
-        public DataTypesSettings DataTypes { get; set; } = null!;
+        public required WebhookSettings Webhook { get; set; }
 
-        public MarketplaceSettings Marketplace { get; set; } = null!;
+        public required CacheSettings Cache { get; set; }
+    }
 
-        public WebhookSettings Webhook { get; set; } = null!;
+    public class InstallDefaultDataNamedOptions
+    {
+        public required InstallDefaultDataSettings Languages { get; set; }
+
+        public required InstallDefaultDataSettings DataTypes { get; set; }
+
+        public required InstallDefaultDataSettings MediaTypes { get; set; }
+
+        public required InstallDefaultDataSettings MemberTypes { get; set; }
     }
 }

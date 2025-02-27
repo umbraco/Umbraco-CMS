@@ -36,7 +36,7 @@ public interface IDocumentRepository : IContentRepository<int, IContent>, IReadR
     ///     Gets <see cref="IContent" /> objects having an expiration date before (lower than, or equal to) a specified date.
     /// </summary>
     /// <remarks>
-    ///     The content returned from this method may be culture variant, in which case you can use 
+    ///     The content returned from this method may be culture variant, in which case you can use
     ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
     IEnumerable<IContent> GetContentForExpiration(DateTime date);
@@ -45,7 +45,7 @@ public interface IDocumentRepository : IContentRepository<int, IContent>, IReadR
     ///     Gets <see cref="IContent" /> objects having a release date before (lower than, or equal to) a specified date.
     /// </summary>
     /// <remarks>
-    ///     The content returned from this method may be culture variant, in which case you can use 
+    ///     The content returned from this method may be culture variant, in which case you can use
     ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
     IEnumerable<IContent> GetContentForRelease(DateTime date);
@@ -74,7 +74,7 @@ public interface IDocumentRepository : IContentRepository<int, IContent>, IReadR
     /// <param name="entity"></param>
     /// <param name="permission"></param>
     /// <param name="groupIds"></param>
-    void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> groupIds);
+    void AssignEntityPermission(IContent entity, string permission, IEnumerable<int> groupIds);
 
     /// <summary>
     ///     Gets the explicit list of permissions for the content item

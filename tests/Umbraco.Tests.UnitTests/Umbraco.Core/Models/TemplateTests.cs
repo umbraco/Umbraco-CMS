@@ -2,9 +2,8 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -60,7 +59,7 @@ public class TemplateTests
     {
         var template = BuildTemplate();
 
-        var json = JsonConvert.SerializeObject(template);
+        var json = JsonSerializer.Serialize(template);
         Debug.Print(json);
     }
 

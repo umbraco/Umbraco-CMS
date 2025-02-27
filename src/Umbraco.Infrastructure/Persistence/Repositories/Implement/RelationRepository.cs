@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
@@ -37,6 +38,27 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
 
     public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
         => GetPagedChildEntitiesByParentId(parentId, pageIndex, pageSize, out totalRecords, new int[0], entityTypes);
+
+    public Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(Guid childKey, int skip, int take, string? relationTypeAlias)
+    {
+        Sql<ISqlContext> sql = GetBaseQuery(false);
+
+        if (string.IsNullOrEmpty(relationTypeAlias) is false)
+        {
+
+            sql = sql.InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(umbracoRelation => umbracoRelation.RelationType, rt => rt.Id)
+                .Where<RelationTypeDto>(rt => rt.Alias == relationTypeAlias);
+        }
+        sql = sql.Where<NodeDto>(n => n.UniqueId == childKey, "uchild"); // "uchild" comes from the base query
+
+
+        RelationDto[] pagedResult =
+            Database.SkipTake<RelationDto>(skip, take, sql).ToArray();
+        var totalRecords = Database.Count(sql);
+
+        return Task.FromResult(new PagedModel<IRelation>(totalRecords, DtosToEntities(pagedResult)));
+
+    }
 
     public void Save(IEnumerable<IRelation> relations)
     {

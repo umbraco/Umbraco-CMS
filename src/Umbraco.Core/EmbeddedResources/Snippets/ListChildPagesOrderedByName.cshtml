@@ -1,8 +1,11 @@
-@using Umbraco.Cms.Core
 @using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Cms.Core.PublishedCache
 @using Umbraco.Cms.Core.Routing
-@using Umbraco.Extensions
-@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
+@using Umbraco.Cms.Core.Services.Navigation
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@inject IVariationContextAccessor VariationContextAccessor
+@inject IPublishedContentCache PublishedContentCache
+@inject IDocumentNavigationQueryService DocumentNavigationQueryService
 @inject IPublishedValueFallback PublishedValueFallback
 @inject IPublishedUrlProvider PublishedUrlProvider
 @*
@@ -14,14 +17,14 @@
     - It then generates links so the visitor can go to each page
 *@
 
-@{ var selection = Model?.Content.Children.Where(x => x.IsVisible(PublishedValueFallback)).OrderBy(x => x.Name).ToArray(); }
+@{ var selection = Model?.Content.Children(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService).Where(x => x.IsVisible(PublishedValueFallback)).OrderBy(x => x.Name).ToArray(); }
 
 @if (selection?.Length > 0)
 {
     <ul>
         @foreach (var item in selection)
         {
-            <li><a href="@item.Url(PublishedUrlProvider))">@item.Name</a></li>
+            <li><a href="@item.Url(PublishedUrlProvider)">@item.Name</a></li>
         }
     </ul>
 }

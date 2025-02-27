@@ -55,20 +55,9 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
         IEnumerable<string>? allowGroups = null,
         IEnumerable<int>? allowMembers = null)
     {
-        if (allowTypes == null)
-        {
-            allowTypes = Enumerable.Empty<string>();
-        }
-
-        if (allowGroups == null)
-        {
-            allowGroups = Enumerable.Empty<string>();
-        }
-
-        if (allowMembers == null)
-        {
-            allowMembers = Enumerable.Empty<int>();
-        }
+        allowTypes ??= Enumerable.Empty<string>();
+        allowGroups ??= Enumerable.Empty<string>();
+        allowMembers ??= Enumerable.Empty<int>();
 
         // Allow by default
         var allowAction = true;

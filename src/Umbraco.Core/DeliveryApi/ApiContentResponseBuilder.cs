@@ -1,11 +1,10 @@
 ﻿using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public sealed class ApiContentResponseBuilder : ApiContentBuilderBase<IApiContentResponse>, IApiContentResponseBuilder
+public class ApiContentResponseBuilder : ApiContentBuilderBase<IApiContentResponse>, IApiContentResponseBuilder
 {
     private readonly IApiContentRouteBuilder _apiContentRouteBuilder;
 
@@ -14,6 +13,12 @@ public sealed class ApiContentResponseBuilder : ApiContentBuilderBase<IApiConten
         => _apiContentRouteBuilder = apiContentRouteBuilder;
 
     protected override IApiContentResponse Create(IPublishedContent content, string name, IApiContentRoute route, IDictionary<string, object?> properties)
+    {
+        IDictionary<string, IApiContentRoute> cultures = GetCultures(content);
+        return new ApiContentResponse(content.Key, name, content.ContentType.Alias, content.CreateDate, content.UpdateDate, route, properties, cultures);
+    }
+
+    protected virtual IDictionary<string, IApiContentRoute> GetCultures(IPublishedContent content)
     {
         var routesByCulture = new Dictionary<string, IApiContentRoute>();
 
@@ -35,6 +40,6 @@ public sealed class ApiContentResponseBuilder : ApiContentBuilderBase<IApiConten
             routesByCulture[publishedCultureInfo.Culture] = cultureRoute;
         }
 
-        return new ApiContentResponse(content.Key, name, content.ContentType.Alias, content.CreateDate, content.UpdateDate, route, properties, routesByCulture);
+        return routesByCulture;
     }
 }

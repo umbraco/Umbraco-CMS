@@ -1,10 +1,15 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Filters;
+using Umbraco.Cms.Core.Services.Locking;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -19,13 +24,76 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
         IAuditRepository auditRepository,
         IMediaTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
+        : base(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            mediaTypeRepository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilters) => MediaService = mediaService;
+
+    [Obsolete("Use the constructor with all dependencies instead")]
+    public MediaTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMediaService mediaService,
+        IMediaTypeRepository mediaTypeRepository,
+        IAuditRepository auditRepository,
+        IMediaTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
         IEventAggregator eventAggregator)
-        : base(provider, loggerFactory, eventMessagesFactory, mediaTypeRepository, auditRepository, entityContainerRepository, entityRepository, eventAggregator) => MediaService = mediaService;
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            mediaService,
+            mediaTypeRepository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+    {
+    }
 
-    // beware! order is important to avoid deadlocks
-    protected override int[] ReadLockIds { get; } = { Constants.Locks.MediaTypes };
+    [Obsolete("Use the constructor with all dependencies instead")]
+    public MediaTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMediaService mediaService,
+        IMediaTypeRepository mediaTypeRepository,
+        IAuditRepository auditRepository,
+        IMediaTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            mediaService,
+            mediaTypeRepository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            StaticServiceProvider.Instance.GetRequiredService<ContentTypeFilterCollection>())
+    {
+    }
 
-    protected override int[] WriteLockIds { get; } = { Constants.Locks.MediaTree, Constants.Locks.MediaTypes };
+    protected override int[] ReadLockIds => MediaTypeLocks.ReadLockIds;
+
+    protected override int[] WriteLockIds => MediaTypeLocks.WriteLockIds;
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.MediaType;
 
@@ -38,6 +106,9 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
             MediaService.DeleteMediaOfType(typeId);
         }
     }
+
+    protected override bool CanDelete(IMediaType item)
+        => item.IsSystemMediaType() is false;
 
     #region Notifications
 

@@ -35,7 +35,7 @@ public class ExcessiveHeadersCheck : HealthCheck
     /// <summary>
     ///     Get the status for this health check
     /// </summary>
-    public override async Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
+    public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
         await Task.WhenAll(CheckForHeaders());
 
     /// <summary>
@@ -51,7 +51,7 @@ public class ExcessiveHeadersCheck : HealthCheck
         var url = _hostingEnvironment.ApplicationMainUrl?.GetLeftPart(UriPartial.Authority);
 
         // Access the site home page and check for the headers
-        var request = new HttpRequestMessage(HttpMethod.Head, url);
+        using var request = new HttpRequestMessage(HttpMethod.Head, url);
         try
         {
             using HttpResponseMessage response = await HttpClient.SendAsync(request);

@@ -293,58 +293,6 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Add_On_ContentTypeRepository_After_Model_Mapping()
-    {
-        // Arrange
-        var provider = ScopeProvider;
-        using (var scope = provider.CreateScope())
-        {
-            var repository = ContentTypeRepository;
-
-            // Act
-            var contentType = (IContentType)ContentTypeBuilder.CreateSimpleContentType2("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
-
-            Assert.AreEqual(4, contentType.PropertyTypes.Count());
-
-            // remove all templates - since they are not saved, they would break the (!) mapping code
-            contentType.AllowedTemplates = new ITemplate[0];
-
-            // there is NO mapping from display to contentType, but only from save
-            // to contentType, so if we want to test, let's to it properly!
-            var display = Mapper.Map<DocumentTypeDisplay>(contentType);
-            var save = MapToContentTypeSave(display);
-            var mapped = Mapper.Map<IContentType>(save);
-
-            Assert.AreEqual(4, mapped.PropertyTypes.Count());
-
-            repository.Save(mapped);
-
-            Assert.AreEqual(4, mapped.PropertyTypes.Count());
-
-            // re-get
-            contentType = repository.Get(mapped.Id);
-
-            Assert.AreEqual(4, contentType.PropertyTypes.Count());
-
-            // Assert
-            Assert.That(contentType.HasIdentity, Is.True);
-            Assert.That(contentType.PropertyGroups.All(x => x.HasIdentity), Is.True);
-            Assert.That(contentType.PropertyTypes.All(x => x.HasIdentity), Is.True);
-            Assert.That(contentType.Path.Contains(","), Is.True);
-            Assert.That(contentType.SortOrder, Is.GreaterThan(0));
-
-            Assert.That(contentType.PropertyGroups.ElementAt(0).Name == "testGroup", Is.True);
-            var groupId = contentType.PropertyGroups.ElementAt(0).Id;
-
-            var propertyTypes = contentType.PropertyTypes.ToArray();
-            Assert.AreEqual("gen", propertyTypes[0].Alias); // just to be sure
-            Assert.IsNull(propertyTypes[0].PropertyGroupId);
-            Assert.IsTrue(propertyTypes.Skip(1).All(x => x.PropertyGroupId.Value == groupId));
-            Assert.That(propertyTypes.Single(x => x.Alias == "title").LabelOnTop, Is.True);
-        }
-    }
-
-    [Test]
     public void Can_Perform_Update_On_ContentTypeRepository()
     {
         // Arrange
@@ -377,113 +325,6 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
             Assert.That(contentType.Thumbnail, Is.EqualTo("Doc2.png"));
             Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "subtitle"), Is.True);
             Assert.That(contentType.PropertyTypes.Single(x => x.Alias == "subtitle").LabelOnTop, Is.True);
-        }
-    }
-
-    // this is for tests only because it makes no sense at all to have such a
-    // mapping defined, we only need it for the weird tests that use it
-    private DocumentTypeSave MapToContentTypeSave(DocumentTypeDisplay display) =>
-        new()
-        {
-            // EntityBasic
-            Name = display.Name,
-            Icon = display.Icon,
-            Trashed = display.Trashed,
-            Key = display.Key,
-            ParentId = display.ParentId,
-            //// Alias = display.Alias,
-            Path = display.Path,
-            //// AdditionalData = display.AdditionalData,
-            HistoryCleanup = display.HistoryCleanup,
-
-            // ContentTypeBasic
-            Alias = display.Alias,
-            UpdateDate = display.UpdateDate,
-            CreateDate = display.CreateDate,
-            Description = display.Description,
-            Thumbnail = display.Thumbnail,
-
-            // ContentTypeSave
-            CompositeContentTypes = display.CompositeContentTypes,
-            IsContainer = display.IsContainer,
-            AllowAsRoot = display.AllowAsRoot,
-            AllowedTemplates = display.AllowedTemplates.Select(x => x.Alias),
-            AllowedContentTypes = display.AllowedContentTypes,
-            DefaultTemplate = display.DefaultTemplate?.Alias,
-            Groups = display.Groups.Select(x => new PropertyGroupBasic<PropertyTypeBasic>
-            {
-                Inherited = x.Inherited,
-                Id = x.Id,
-                Key = x.Key,
-                Type = x.Type,
-                Name = x.Name,
-                Alias = x.Alias,
-                SortOrder = x.SortOrder,
-                Properties = x.Properties
-            }).ToArray()
-        };
-
-    [Test]
-    public void Can_Perform_Update_On_ContentTypeRepository_After_Model_Mapping()
-    {
-        // Arrange
-        var provider = ScopeProvider;
-        using (var scope = provider.CreateScope())
-        {
-            var repository = ContentTypeRepository;
-
-            // Act
-            var contentType = repository.Get(_textpageContentType.Id);
-
-            // there is NO mapping from display to contentType, but only from save
-            // to contentType, so if we want to test, let's to it properly!
-            var display = Mapper.Map<DocumentTypeDisplay>(contentType);
-            var save = MapToContentTypeSave(display);
-
-            // modify...
-            save.Thumbnail = "Doc2.png";
-            var contentGroup = save.Groups.Single(x => x.Name == "Content");
-            contentGroup.Properties = contentGroup.Properties.Concat(new[]
-            {
-                new PropertyTypeBasic
-                {
-                    Alias = "subtitle",
-                    Label = "Subtitle",
-                    Description = "Optional Subtitle",
-                    Validation = new PropertyTypeValidation {Mandatory = false, Pattern = string.Empty},
-                    SortOrder = 1,
-                    DataTypeId = -88,
-                    LabelOnTop = true
-                }
-            });
-
-            var mapped = Mapper.Map(save, contentType);
-
-            // just making sure
-            Assert.AreEqual(mapped.Thumbnail, "Doc2.png");
-            Assert.IsTrue(mapped.PropertyTypes.Any(x => x.Alias == "subtitle"));
-            Assert.IsTrue(mapped.PropertyTypes.Single(x => x.Alias == "subtitle").LabelOnTop);
-
-            repository.Save(mapped);
-
-            var dirty = mapped.IsDirty();
-
-            // re-get
-            contentType = repository.Get(_textpageContentType.Id);
-
-            // Assert
-            Assert.That(contentType.HasIdentity, Is.True);
-            Assert.That(dirty, Is.False);
-            Assert.That(contentType.Thumbnail, Is.EqualTo("Doc2.png"));
-            Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "subtitle"), Is.True);
-
-            Assert.That(contentType.PropertyTypes.Single(x => x.Alias == "subtitle").LabelOnTop, Is.True);
-
-            foreach (var propertyType in contentType.PropertyTypes)
-            {
-                Assert.IsTrue(propertyType.HasIdentity);
-                Assert.Greater(propertyType.Id, 0);
-            }
         }
     }
 
@@ -563,7 +404,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             // Act
-            var contentTypes = repository.Get(provider.CreateQuery<IContentType>().Where(x => x.ParentId == contentType.Id)).ToArray();;
+            var contentTypes = repository.Get(provider.CreateQuery<IContentType>().Where(x => x.ParentId == contentType.Id)).ToArray();
 
             // Assert
             Assert.That(contentTypes.Count(), Is.EqualTo(3));
@@ -809,8 +650,8 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var contentType = repository.Get(_simpleContentType.Id);
             contentType.AllowedContentTypes = new List<ContentTypeSort>
             {
-                new(new Lazy<int>(() => subpageContentType.Id), 0, subpageContentType.Alias),
-                new(new Lazy<int>(() => simpleSubpageContentType.Id), 1, simpleSubpageContentType.Alias)
+                new(subpageContentType.Key, 0, subpageContentType.Alias),
+                new(simpleSubpageContentType.Key, 1, simpleSubpageContentType.Alias)
             };
             repository.Save(contentType);
 

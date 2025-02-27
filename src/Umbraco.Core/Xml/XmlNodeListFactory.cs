@@ -11,27 +11,6 @@ public class XmlNodeListFactory
     {
     }
 
-    #region Public members
-
-    /// <summary>
-    ///     Creates an instance of a <see cref="XmlNodeList" /> that allows
-    ///     enumerating <see cref="XmlNode" /> elements in the iterator.
-    /// </summary>
-    /// <param name="iterator">
-    ///     The result of a previous node selection
-    ///     through an <see cref="XPathNavigator" /> query.
-    /// </param>
-    /// <returns>An initialized list ready to be enumerated.</returns>
-    /// <remarks>
-    ///     The underlying XML store used to issue the query must be
-    ///     an object inheriting <see cref="XmlNode" />, such as
-    ///     <see cref="XmlDocument" />.
-    /// </remarks>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public static XmlNodeList CreateNodeList(XPathNodeIterator? iterator) => new XmlNodeListIterator(iterator);
-
-    #endregion Public members
-
     #region XmlNodeListIterator
 
     private class XmlNodeListIterator : XmlNodeList

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Globalization;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Membership;
@@ -65,7 +66,7 @@ public static class UserServiceExtensions
     /// <param name="groupId"></param>
     /// <param name="entityIds"></param>
     public static void RemoveUserGroupPermissions(this IUserService userService, int groupId, params int[] entityIds) =>
-        userService.ReplaceUserGroupPermissions(groupId, null, entityIds);
+        userService.ReplaceUserGroupPermissions(groupId, new HashSet<string>(), entityIds);
 
     /// <summary>
     ///     Remove all permissions for this user group for all nodes
@@ -73,7 +74,7 @@ public static class UserServiceExtensions
     /// <param name="userService"></param>
     /// <param name="groupId"></param>
     public static void RemoveUserGroupPermissions(this IUserService userService, int groupId) =>
-        userService.ReplaceUserGroupPermissions(groupId, null);
+        userService.ReplaceUserGroupPermissions(groupId, new HashSet<string>());
 
     public static IEnumerable<IProfile> GetProfilesById(this IUserService userService, params int[] ids)
     {
@@ -86,9 +87,6 @@ public static class UserServiceExtensions
         });
     }
 
-    public static IUser? GetByKey(this IUserService userService, Guid key)
-    {
-        var id = BitConverter.ToInt32(key.ToByteArray(), 0);
-        return userService.GetUserById(id);
-    }
+    [Obsolete("Use IUserService.Get that takes a Guid instead. Scheduled for removal in V15.")]
+    public static IUser? GetByKey(this IUserService userService, Guid key) => userService.GetAsync(key).GetAwaiter().GetResult();
 }

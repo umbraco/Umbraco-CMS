@@ -16,28 +16,7 @@ public interface IDataEditor : IDiscoverable
 
     bool SupportsReadOnly => false;
 
-    /// <summary>
-    ///     Gets the type of the editor.
-    /// </summary>
-    /// <remarks>An editor can be a property value editor, or a parameter editor.</remarks>
-    EditorType Type { get; }
-
-    /// <summary>
-    ///     Gets the name of the editor.
-    /// </summary>
-    string Name { get; }
-
-    /// <summary>
-    ///     Gets the icon of the editor.
-    /// </summary>
-    /// <remarks>Can be used to display editors when presenting them.</remarks>
-    string Icon { get; }
-
-    /// <summary>
-    ///     Gets the group of the editor.
-    /// </summary>
-    /// <remarks>Can be used to organize editors when presenting them.</remarks>
-    string Group { get; }
+    bool SupportsConfigurableElements => false;
 
     /// <summary>
     ///     Gets a value indicating whether the editor is deprecated.
@@ -63,7 +42,7 @@ public interface IDataEditor : IDiscoverable
     /// <summary>
     ///     Gets a configured value editor.
     /// </summary>
-    IDataValueEditor GetValueEditor(object? configuration);
+    IDataValueEditor GetValueEditor(object? configurationObject);
 
     /// <summary>
     ///     Gets an editor to edit the value editor configuration.
@@ -72,4 +51,21 @@ public interface IDataEditor : IDiscoverable
     ///     <para>Is expected to throw if the editor does not support being configured, e.g. for most parameter editors.</para>
     /// </remarks>
     IConfigurationEditor GetConfigurationEditor();
+
+    /// <summary>
+    ///     Determines if the value editor needs to perform <see cref="MergePartialPropertyValueForCulture"/> for a given property type.
+    /// </summary>
+    bool CanMergePartialPropertyValues(IPropertyType propertyType) => false;
+
+    /// <summary>
+    ///     Partially merges a source property value into a target property value for a given culture.
+    /// </summary>
+    /// <param name="sourceValue">The source property value.</param>
+    /// <param name="targetValue">The target property value.</param>
+    /// <param name="culture">The culture (or null for invariant).</param>
+    /// <returns>The result of the merge operation.</returns>
+    object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture) => sourceValue;
+
+    object? MergeVariantInvariantPropertyValue(object? sourceValue, object? targetValue,
+        bool canUpdateInvariantData, HashSet<string> allowedCultures) => sourceValue;
 }

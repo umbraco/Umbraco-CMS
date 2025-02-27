@@ -60,12 +60,14 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
 
     private FileSystems FileSystems => GetRequiredService<FileSystems>();
 
+    private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
+
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer =>
         GetRequiredService<IConfigurationEditorJsonSerializer>();
 
     public void CreateTestData()
     {
-        var template = TemplateBuilder.CreateTextPageTemplate();
+        var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
         FileService.SaveTemplate(template);
 
         // Create and Save ContentType "umbTextpage" -> (_contentType.Id)
@@ -224,7 +226,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
 
             // publish = new edit version
             content1.SetValue("title", "title");
-            content1.PublishCulture(CultureImpact.Invariant);
+            content1.PublishCulture(CultureImpact.Invariant, DateTime.Now, PropertyEditorCollection);
             content1.PublishedState = PublishedState.Publishing;
             repository.Save(content1);
 
@@ -300,7 +302,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
                     new { id = content1.Id }));
 
             // publish = version
-            content1.PublishCulture(CultureImpact.Invariant);
+            content1.PublishCulture(CultureImpact.Invariant, DateTime.Now, PropertyEditorCollection);
             content1.PublishedState = PublishedState.Publishing;
             repository.Save(content1);
 
@@ -344,7 +346,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             // publish = new version
             content1.Name = "name-4";
             content1.SetValue("title", "title-4");
-            content1.PublishCulture(CultureImpact.Invariant);
+            content1.PublishCulture(CultureImpact.Invariant, DateTime.Now, PropertyEditorCollection);
             content1.PublishedState = PublishedState.Publishing;
             repository.Save(content1);
 
@@ -764,7 +766,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             // publish them all
             foreach (var content in result)
             {
-                content.PublishCulture(CultureImpact.Invariant);
+                content.PublishCulture(CultureImpact.Invariant, DateTime.Now, PropertyEditorCollection);
                 repository.Save(content);
             }
 
@@ -824,7 +826,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
         ContentTypeService.Save(variantCt);
 
         invariantCt.AllowedContentTypes =
-            new[] { new ContentTypeSort(invariantCt.Id, 0), new ContentTypeSort(variantCt.Id, 1) };
+            new[] { new ContentTypeSort(invariantCt.Key, 0, invariantCt.Alias), new ContentTypeSort(variantCt.Key, 1, variantCt.Alias) };
         ContentTypeService.Save(invariantCt);
 
         // Create content

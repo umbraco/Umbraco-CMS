@@ -25,16 +25,6 @@ public static partial class Constants
         public const string CsrfValidationCookieName = "UMB-XSRF-V";
 
         /// <summary>
-        ///     The cookie name that is set for angular to use to pass in to the header value for "X-UMB-XSRF-TOKEN"
-        /// </summary>
-        public const string AngularCookieName = "UMB-XSRF-TOKEN";
-
-        /// <summary>
-        ///     The header name that angular uses to pass in the token to validate the cookie
-        /// </summary>
-        public const string AngularHeadername = "X-UMB-XSRF-TOKEN";
-
-        /// <summary>
         ///     The route name of the page shown when Umbraco has no published content.
         /// </summary>
         public const string NoContentRouteName = "umbraco-no-content";
@@ -43,6 +33,11 @@ public static partial class Constants
         ///     The default authentication type used for remembering that 2FA is not needed on next login
         /// </summary>
         public const string TwoFactorRememberBrowserCookie = "TwoFactorRememberBrowser";
+
+        /// <summary>
+        ///     The token used to replace the cache buster hash in web assets.
+        /// </summary>
+        public const string CacheBusterToken = "%CACHE_BUSTER%";
 
         public static class Mvc
         {
@@ -57,17 +52,28 @@ public static partial class Constants
             public const string BackOfficeLoginArea = "UmbracoLogin"; // Used for area routes of non-api controllers for login
         }
 
+        /// <summary>
+        ///     The "base" path to the Management API
+        /// </summary>
+        public const string ManagementApiPath = "/management/api/";
+        public const string BackofficeSignalRHub = "/backofficeHub";
+        public const string ServerEventSignalRHub = "/serverEventHub";
+
         public static class Routing
         {
             public const string ControllerToken = "controller";
             public const string ActionToken = "action";
             public const string AreaToken = "area";
+            public const string DynamicRoutePattern = "/{**umbracoSlug}";
         }
 
         public static class RoutePath
         {
             public const string Tree = "tree";
             public const string RecycleBin = "recycle-bin";
+            public const string Item = "item";
+            public const string Collection = "collection";
+            public const string Filter = "filter";
         }
 
         public static class AttributeRouting

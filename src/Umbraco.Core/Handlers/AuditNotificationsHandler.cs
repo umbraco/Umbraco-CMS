@@ -1,6 +1,8 @@
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -30,6 +32,7 @@ public sealed class AuditNotificationsHandler :
     private readonly GlobalSettings _globalSettings;
     private readonly IIpResolver _ipResolver;
     private readonly IMemberService _memberService;
+    private readonly IUserGroupService _userGroupService;
     private readonly IUserService _userService;
 
     public AuditNotificationsHandler(
@@ -39,7 +42,8 @@ public sealed class AuditNotificationsHandler :
         IIpResolver ipResolver,
         IOptionsMonitor<GlobalSettings> globalSettings,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IMemberService memberService)
+        IMemberService memberService,
+        IUserGroupService userGroupService)
     {
         _auditService = auditService;
         _userService = userService;
@@ -47,7 +51,30 @@ public sealed class AuditNotificationsHandler :
         _ipResolver = ipResolver;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _memberService = memberService;
+        _userGroupService = userGroupService;
         _globalSettings = globalSettings.CurrentValue;
+    }
+
+    [Obsolete("Use constructor that takes IUserGroupService, scheduled for removal in V15.")]
+    public AuditNotificationsHandler(
+        IAuditService auditService,
+        IUserService userService,
+        IEntityService entityService,
+        IIpResolver ipResolver,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IMemberService memberService)
+        : this(
+            auditService,
+            userService,
+            entityService,
+            ipResolver,
+            globalSettings,
+            backOfficeSecurityAccessor,
+            memberService,
+            StaticServiceProvider.Instance.GetRequiredService<IUserGroupService>()
+        )
+    {
     }
 
     private IUser CurrentPerformingUser
@@ -55,7 +82,7 @@ public sealed class AuditNotificationsHandler :
         get
         {
             IUser? identity = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-            IUser? user = identity == null ? null : _userService.GetUserById(Convert.ToInt32(identity.Id));
+            IUser? user = identity == null ? null : _userService.GetAsync(identity.Key).GetAwaiter().GetResult();
             return user ?? UnknownUser(_globalSettings);
         }
     }
@@ -95,8 +122,8 @@ public sealed class AuditNotificationsHandler :
         IEnumerable<EntityPermission> perms = notification.EntityPermissions;
         foreach (EntityPermission perm in perms)
         {
-            IUserGroup? group = _userService.GetUserGroupById(perm.UserGroupId);
-            var assigned = string.Join(", ", perm.AssignedPermissions ?? Array.Empty<string>());
+            IUserGroup? group = _userGroupService.GetAsync(perm.UserGroupId).Result;
+            var assigned = string.Join(", ", perm.AssignedPermissions);
             IEntitySlim? entity = _entityService.Get(perm.EntityId);
 
             _auditService.Write(
@@ -211,10 +238,10 @@ public sealed class AuditNotificationsHandler :
             IUserGroup group = groupWithUser.UserGroup;
 
             var dp = string.Join(", ", ((UserGroup)group).GetWereDirtyProperties());
-            var sections = ((UserGroup)group).WasPropertyDirty("AllowedSections")
+            var sections = ((UserGroup)group).WasPropertyDirty(nameof(group.AllowedSections))
                 ? string.Join(", ", group.AllowedSections)
                 : null;
-            var perms = ((UserGroup)group).WasPropertyDirty("Permissions") && group.Permissions is not null
+            var perms = ((UserGroup)group).WasPropertyDirty(nameof(group.Permissions))
                 ? string.Join(", ", group.Permissions)
                 : null;
 

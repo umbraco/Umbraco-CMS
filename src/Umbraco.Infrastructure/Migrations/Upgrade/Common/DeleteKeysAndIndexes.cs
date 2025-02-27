@@ -24,8 +24,6 @@ public class DeleteKeysAndIndexes : MigrationBase
             "cmsDocument",
             "cmsDocumentType",
             "cmsLanguageText",
-            "cmsMacro",
-            "cmsMacroProperty",
             "cmsMedia",
             "cmsMember",
             "cmsMember2MemberGroup",

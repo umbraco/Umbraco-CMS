@@ -16,11 +16,6 @@ public enum UmbracoEntityTypes
     User,
 
     /// <summary>
-    ///     Macro
-    /// </summary>
-    Macro,
-
-    /// <summary>
     ///     Document
     /// </summary>
     Document,

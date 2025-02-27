@@ -9,6 +9,11 @@ public class ContentEntitySlim : EntitySlim, IContentEntitySlim
     public string ContentTypeAlias { get; set; } = string.Empty;
 
     /// <inheritdoc />
+    public Guid ContentTypeKey { get; set; }
+
+    public Guid? ListViewKey { get; set; }
+
+    /// <inheritdoc />
     public string? ContentTypeIcon { get; set; }
 
     /// <inheritdoc />

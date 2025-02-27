@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
-using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
 using NUnit.Framework;

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-
 namespace Umbraco.Extensions
 {
     /// <summary>

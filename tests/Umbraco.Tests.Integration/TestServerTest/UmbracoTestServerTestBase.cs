@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,16 +13,22 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Common.Attributes;
+using Umbraco.Cms.Api.Delivery.Controllers.Content;
+using Umbraco.Cms.Api.Management.Controllers;
+using Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
+using Umbraco.Cms.Api.Management.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Website.Controllers;
 
@@ -33,7 +40,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
     {
         protected HttpClient Client { get; private set; }
 
-        protected LinkGenerator LinkGenerator { get; private set; }
+        protected LinkGenerator LinkGenerator => Factory.Services.GetRequiredService<LinkGenerator>();
 
         protected WebApplicationFactory<UmbracoTestServerTestBase> Factory { get; private set; }
 
@@ -45,6 +52,14 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         /// </remarks>
         protected virtual void CustomTestSetup(IUmbracoBuilder builder)
         {
+        }
+
+        protected virtual void CustomTestAuthSetup(IServiceCollection services)
+        {
+            // Add a test auth scheme with a test auth handler to authn and assign the user
+            services.AddAuthentication(TestAuthHandler.TestAuthenticationScheme)
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                    TestAuthHandler.TestAuthenticationScheme, options => { });
         }
 
         [SetUp]
@@ -67,6 +82,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
              */
             var factory = new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder);
 
+
             // additional host configuration for web server integration tests
             Factory = factory.WithWebHostBuilder(builder =>
             {
@@ -75,18 +91,18 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
                 // Executes after the standard ConfigureServices method
                 builder.ConfigureTestServices(services =>
+                {
+                    services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
 
-                    // Add a test auth scheme with a test auth handler to authn and assign the user
-                    services.AddAuthentication(TestAuthHandler.TestAuthenticationScheme)
-                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.TestAuthenticationScheme, options => { }));
+                    CustomTestAuthSetup(services);
+                });
             });
 
             Client = Factory.CreateClient(new WebApplicationFactoryClientOptions
             {
-                AllowAutoRedirect = false
+                AllowAutoRedirect = false,
+                BaseAddress = new Uri("https://localhost/", UriKind.Absolute)
             });
-
-            LinkGenerator = Factory.Services.GetRequiredService<LinkGenerator>();
         }
 
         /// <summary>
@@ -99,6 +115,33 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         {
             var url = LinkGenerator.GetUmbracoApiService(methodSelector);
             return PrepareUrl(url);
+        }
+
+        protected string GetManagementApiUrl<T>(Expression<Func<T, object>> methodSelector)
+            where T : ManagementApiControllerBase
+        {
+            MethodInfo? method = ExpressionHelper.GetMethodInfo(methodSelector);
+            IDictionary<string, object?> methodParams = ExpressionHelper.GetMethodParams(methodSelector) ?? new Dictionary<string, object?>();
+
+            // Remove the CancellationToken from the method params, this is automatically added by the framework
+            // So we do not want to add this to the query string
+            var cancellationTokenKey = methodParams.FirstOrDefault(x => x.Value is CancellationToken).Key;
+            if (cancellationTokenKey is not null)
+            {
+                methodParams.Remove(cancellationTokenKey);
+            }
+
+
+            methodParams["version"] = method?.GetCustomAttribute<MapToApiVersionAttribute>()?.Versions?.First().MajorVersion.ToString();
+            if (method == null)
+            {
+                throw new MissingMethodException(
+                    $"Could not find the method {methodSelector} on type {typeof(T)} or the result ");
+            }
+
+            var controllerName = ControllerExtensions.GetControllerName(typeof(T));
+
+            return LinkGenerator.GetUmbracoControllerUrl(method.Name, controllerName, null, methodParams);
         }
 
         /// <summary>
@@ -207,44 +250,55 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             services.AddLogger(TestHelper.GetWebHostEnvironment(), Configuration);
 
             var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache, hostingEnvironment);
+            builder.Services.AddTransient<IHostedService>(sp => new TestDatabaseHostedLifecycleService(() => UseTestDatabase(sp)));
 
             builder
                 .AddConfiguration()
                 .AddUmbracoCore()
                 .AddWebComponents()
-                .AddNuCache()
-                .AddRuntimeMinifier()
+                .AddUmbracoHybridCache()
                 .AddBackOfficeCore()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
                 .AddMembersIdentity()
-                .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
-                .AddPreviewSupport()
+                // .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
                 .AddMvcAndRazor(mvcBuilding: mvcBuilder =>
                 {
-                    // Adds Umbraco.Web.BackOffice
-                    mvcBuilder.AddApplicationPart(typeof(ContentController).Assembly);
-
                     // Adds Umbraco.Web.Common
                     mvcBuilder.AddApplicationPart(typeof(RenderController).Assembly);
 
                     // Adds Umbraco.Web.Website
                     mvcBuilder.AddApplicationPart(typeof(SurfaceController).Assembly);
 
+                    // Adds Umbraco.Cms.Api.ManagementApi
+                    mvcBuilder.AddApplicationPart(typeof(ModelsBuilderControllerBase).Assembly);
+
+                    // Adds Umbraco.Cms.Api.DeliveryApi
+                    mvcBuilder.AddApplicationPart(typeof(ContentApiItemControllerBase).Assembly);
+
                     // Adds Umbraco.Tests.Integration
                     mvcBuilder.AddApplicationPart(typeof(UmbracoTestServerTestBase).Assembly);
+
+                    CustomMvcSetup(mvcBuilder);
                 })
                 .AddWebServer()
                 .AddWebsite()
                 .AddUmbracoSqlServerSupport()
                 .AddUmbracoSqliteSupport()
                 .AddDeliveryApi()
+                .AddUmbracoManagementApi()
                 .AddComposers()
                 .AddTestServices(TestHelper); // This is the important one!
 
             CustomTestSetup(builder);
 
+
             builder.Build();
+        }
+
+        protected virtual void CustomMvcSetup(IMvcBuilder mvcBuilder)
+        {
+
         }
 
         /// <summary>
@@ -257,8 +311,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         protected void Configure(IApplicationBuilder app)
         {
-            UseTestDatabase(app);
-
             app.UseUmbraco()
                 .WithMiddleware(u =>
                 {
@@ -272,4 +324,30 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 });
         }
     }
+}
+
+public class TestDatabaseHostedLifecycleService : IHostedLifecycleService
+{
+    private readonly Action _action;
+
+    public TestDatabaseHostedLifecycleService(Action action)
+    {
+        _action = action;
+    }
+
+    public Task StartAsync(CancellationToken cancellationToken)=> Task.CompletedTask;
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StartedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StartingAsync(CancellationToken cancellationToken)
+    {
+        _action();
+        return Task.CompletedTask;
+
+    }
+    public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

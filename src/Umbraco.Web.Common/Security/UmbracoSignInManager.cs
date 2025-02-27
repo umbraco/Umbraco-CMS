@@ -29,27 +29,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
     protected const string UmbracoSignInMgrXsrfKey = "XsrfId";
 
-    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V14.")]
-    public UmbracoSignInManager(
-        UserManager<TUser> userManager,
-        IHttpContextAccessor contextAccessor,
-        IUserClaimsPrincipalFactory<TUser> claimsFactory,
-        IOptions<IdentityOptions> optionsAccessor,
-        ILogger<SignInManager<TUser>> logger,
-        IAuthenticationSchemeProvider schemes,
-        IUserConfirmation<TUser> confirmation)
-        : this(
-            userManager,
-            contextAccessor,
-            claimsFactory,
-            optionsAccessor,
-            logger,
-            schemes,
-            confirmation,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>(),
-            StaticServiceProvider.Instance.GetRequiredService<IRequestCache>())
-    {
-    }
 
     [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V15.")]
     public UmbracoSignInManager(
@@ -104,6 +83,14 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         // override to handle logging/events
         SignInResult result = await base.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
         return result;
+    }
+
+    public virtual async Task<ClaimsPrincipal?> CreateUserPrincipalAsync(Guid userKey)
+    {
+        TUser? user = await UserManager.FindByIdAsync(userKey.ToString());
+        return user is null
+                ? null
+                : await this.ClaimsFactory.CreateAsync(user);
     }
 
     /// <inheritdoc />
@@ -178,7 +165,8 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     public override async Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure)
     {
         // override to handle logging/events
-        TUser? user = await UserManager.FindByNameAsync(userName);
+        string strippedUsername = userName.Trim();
+        TUser? user = await UserManager.FindByNameAsync(strippedUsername);
         if (user == null)
         {
             return await HandleSignIn(null, userName, SignInResult.Failed);

@@ -1,42 +1,57 @@
+using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Snippets
+namespace Umbraco.Cms.Core.Snippets;
+
+/// <summary>
+/// The partial view snippet collection builder.
+/// </summary>
+public partial class PartialViewSnippetCollectionBuilder : LazyCollectionBuilderBase<PartialViewSnippetCollectionBuilder, PartialViewSnippetCollection, PartialViewSnippet>
 {
-    /// <summary>
-    /// The partial view snippet collection builder.
-    /// </summary>
-    public class PartialViewSnippetCollectionBuilder : LazyCollectionBuilderBase<PartialViewSnippetCollectionBuilder, PartialViewSnippetCollection, ISnippet>
+    protected override PartialViewSnippetCollectionBuilder This => this;
+
+    protected override IEnumerable<PartialViewSnippet> CreateItems(IServiceProvider factory)
     {
-        protected override PartialViewSnippetCollectionBuilder This => this;
+        var embeddedSnippets = new List<PartialViewSnippet>(base.CreateItems(factory));
 
-        protected override IEnumerable<ISnippet> CreateItems(IServiceProvider factory)
+        var snippetProvider = new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Snippets");
+        IEnumerable<IFileInfo> embeddedFiles = snippetProvider.GetDirectoryContents(string.Empty)
+            .Where(x => !x.IsDirectory && x.Name.EndsWith(".cshtml"));
+
+        IShortStringHelper shortStringHelper = factory.GetRequiredService<IShortStringHelper>();
+        foreach (IFileInfo file in embeddedFiles)
         {
-            var embeddedSnippets = new List<ISnippet>(base.CreateItems(factory));
-
-            // Ignore these
-            var filterNames = new List<string>
-            {
-                "Gallery",
-                "ListChildPagesFromChangeableSource",
-                "ListChildPagesOrderedByProperty",
-                "ListImagesFromMediaFolder"
-            };
-
-            var snippetProvider = new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Snippets");
-            var embeddedFiles = snippetProvider.GetDirectoryContents(string.Empty)
-                                    .Where(x => !x.IsDirectory && x.Name.EndsWith(".cshtml"));
-
-            foreach (var file in embeddedFiles)
-            {
-                if (!filterNames.Contains(Path.GetFileNameWithoutExtension(file.Name)))
-                {
-                    using var stream = new StreamReader(file.CreateReadStream());
-                    embeddedSnippets.Add(new Snippet(file.Name, stream.ReadToEnd().Trim()));
-                }
-            }
-
-            return embeddedSnippets;
+            var id = Path.GetFileNameWithoutExtension(file.Name);
+            var name = id.SplitPascalCasing(shortStringHelper).ToFirstUpperInvariant();
+            using var stream = new StreamReader(file.CreateReadStream());
+            var content = CleanUpSnippetContent(stream.ReadToEnd().Trim());
+            embeddedSnippets.Add(new PartialViewSnippet(id, name, content));
         }
+
+        return embeddedSnippets;
     }
+
+    private string CleanUpSnippetContent(string content)
+    {
+        const string partialViewHeader = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage";
+        content = content.EnsureNativeLineEndings();
+
+        // Strip the @inherits if it's there
+        Regex headerMatch = HeaderRegex();
+        var newContent = headerMatch.Replace(content, string.Empty)
+            .Replace("Model.Content.", "Model.")
+            .Replace("(Model.Content)", "(Model)")
+            .Replace("Model?.Content.", "Model.")
+            .Replace("(Model?.Content)", "(Model)");
+
+        return $"{partialViewHeader}{Environment.NewLine}{newContent}";
+    }
+
+    [GeneratedRegex("^@inherits\\s+?.*$", RegexOptions.Multiline)]
+    private static partial Regex HeaderRegex();
 }

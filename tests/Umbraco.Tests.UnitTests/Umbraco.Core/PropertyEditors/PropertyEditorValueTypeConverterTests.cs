@@ -1,8 +1,7 @@
-﻿using System.Xml.Linq;
+﻿using System.Text.Json;
+using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -197,11 +196,11 @@ public class PropertyEditorValueTypeConverterTests
 
         Assert.IsTrue(converter.IsConverter(propertyType));
 
-        var result = converter.ConvertSourceToIntermediate(null, propertyType, source, false) as JToken;
+        var result = converter.ConvertSourceToIntermediate(null, propertyType, source, false) as JsonDocument;
         if (expectsSuccess)
         {
             Assert.IsNotNull(result);
-            Assert.AreEqual(source, result.ToString(Formatting.None));
+            Assert.AreEqual(source, result.RootElement.ToString());
         }
         else
         {
@@ -212,7 +211,7 @@ public class PropertyEditorValueTypeConverterTests
     private static PropertyEditorCollection ValueTypePropertyEditorCollection(string valueType)
     {
         var valueEditor = Mock.Of<IDataValueEditor>(x => x.ValueType == valueType);
-        var dataEditor = Mock.Of<IDataEditor>(x => x.GetValueEditor() == valueEditor && x.Alias == "My.Custom.Alias" && x.Type == EditorType.PropertyValue);
+        var dataEditor = Mock.Of<IDataEditor>(x => x.GetValueEditor() == valueEditor && x.Alias == "My.Custom.Alias");
         var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => new[] { dataEditor }));
         return propertyEditors;
     }

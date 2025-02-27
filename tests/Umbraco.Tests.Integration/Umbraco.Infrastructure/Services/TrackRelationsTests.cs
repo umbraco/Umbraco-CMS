@@ -25,11 +25,11 @@ public class TrackRelationsTests : UmbracoIntegrationTestWithContent
 
     private IRelationService RelationService => GetRequiredService<IRelationService>();
 
-    protected override void CustomTestSetup(IUmbracoBuilder builder)
-    {
-        base.CustomTestSetup(builder);
-        builder.AddNuCache();
-    }
+    // protected override void CustomTestSetup(IUmbracoBuilder builder)
+    // {
+    //     base.CustomTestSetup(builder);
+    //     builder.AddNuCache();
+    // }
 
     [Test]
     [LongRunning]

@@ -2,15 +2,17 @@
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using BlockGridAreaConfiguration = Umbraco.Cms.Core.PropertyEditors.BlockGridConfiguration.BlockGridAreaConfiguration;
 
@@ -22,13 +24,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public abstract class BlockGridPropertyEditorBase : DataEditor
 {
     private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
-
-    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
-    protected BlockGridPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory)
-        : this(dataValueEditorFactory, StaticServiceProvider.Instance.GetRequiredService<IBlockValuePropertyIndexValueFactory>())
-    {
-
-    }
 
     protected BlockGridPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
         : base(dataValueEditorFactory)
@@ -45,43 +40,47 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<BlockGridEditorPropertyValueEditor>(Attribute!);
 
-    private class BlockGridEditorPropertyValueEditor : BlockEditorPropertyValueEditor
+    internal class BlockGridEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockGridValue, BlockGridLayoutItem>
     {
         public BlockGridEditorPropertyValueEditor(
             DataEditorAttribute attribute,
             PropertyEditorCollection propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
-            IDataTypeService dataTypeService,
+            IDataTypeConfigurationCache dataTypeConfigurationCache,
             ILocalizedTextService textService,
-            ILogger<BlockEditorPropertyValueEditor> logger,
+            ILogger<BlockGridEditorPropertyValueEditor> logger,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
-            IIOHelper ioHelper,
-            IContentTypeService contentTypeService,
-            IPropertyValidationService propertyValidationService)
-            : base(attribute, propertyEditors, dataValueReferenceFactories, dataTypeService, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
+            IBlockEditorElementTypeCache elementTypeCache,
+            IPropertyValidationService propertyValidationService,
+            BlockEditorVarianceHandler blockEditorVarianceHandler,
+            ILanguageService languageService,
+            IIOHelper ioHelper)
+            : base(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, blockEditorVarianceHandler, languageService, ioHelper, attribute)
         {
-            BlockEditorValues = new BlockEditorValues(new BlockGridEditorDataConverter(jsonSerializer), contentTypeService, logger);
-            Validators.Add(new BlockEditorValidator(propertyValidationService, BlockEditorValues, contentTypeService));
+            BlockEditorValues = new BlockEditorValues<BlockGridValue, BlockGridLayoutItem>(new BlockGridEditorDataConverter(jsonSerializer), elementTypeCache, logger);
+            Validators.Add(new BlockEditorValidator<BlockGridValue, BlockGridLayoutItem>(propertyValidationService, BlockEditorValues, elementTypeCache));
             Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
         }
 
-        private class MinMaxValidator : BlockEditorMinMaxValidatorBase
-        {
-            private readonly BlockEditorValues _blockEditorValues;
+        protected override BlockGridValue CreateWithLayout(IEnumerable<BlockGridLayoutItem> layout) => new(layout);
 
-            public MinMaxValidator(BlockEditorValues blockEditorValues, ILocalizedTextService textService)
+        private class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockGridValue, BlockGridLayoutItem>
+        {
+            private readonly BlockEditorValues<BlockGridValue, BlockGridLayoutItem> _blockEditorValues;
+
+            public MinMaxValidator(BlockEditorValues<BlockGridValue, BlockGridLayoutItem> blockEditorValues, ILocalizedTextService textService)
                 : base(textService) =>
                 _blockEditorValues = blockEditorValues;
 
-            public override IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+            public override IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
             {
                 if (dataTypeConfiguration is not BlockGridConfiguration blockConfig)
                 {
                     return Array.Empty<ValidationResult>();
                 }
 
-                BlockEditorData? blockEditorData = _blockEditorValues.DeserializeAndClean(value);
+                BlockEditorData<BlockGridValue, BlockGridLayoutItem>? blockEditorData = _blockEditorValues.DeserializeAndClean(value);
 
                 var validationResults = new List<ValidationResult>();
                 validationResults.AddRange(ValidateNumberOfBlocks(blockEditorData, blockConfig.ValidationLimit.Min, blockConfig.ValidationLimit.Max));
@@ -95,7 +94,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
                     return areas;
                 }
 
-                BlockGridLayoutAreaItem[]? areas = blockEditorData?.Layout?.ToObject<IEnumerable<BlockGridLayoutItem>>()?.SelectMany(ExtractLayoutAreaItems).ToArray();
+                BlockGridLayoutAreaItem[]? areas = blockEditorData?.Layout?.SelectMany(ExtractLayoutAreaItems).ToArray();
 
                 if (areas?.Any() != true)
                 {
@@ -117,6 +116,12 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
 
                 return validationResults;
             }
+        }
+
+        public override IEnumerable<Guid> ConfiguredElementTypeKeys()
+        {
+            var configuration = ConfigurationObject as BlockGridConfiguration;
+            return configuration?.Blocks.SelectMany(ConfiguredElementTypeKeys) ?? Enumerable.Empty<Guid>();
         }
     }
 

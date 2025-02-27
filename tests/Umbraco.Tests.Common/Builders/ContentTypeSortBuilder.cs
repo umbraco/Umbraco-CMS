@@ -8,22 +8,17 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class ContentTypeSortBuilder
-    : ChildBuilderBase<ContentTypeBuilder, ContentTypeSort>,
-        IWithIdBuilder,
+public class ContentTypeSortBuilder<TBuilder>
+    : ChildBuilderBase<TBuilder, ContentTypeSort>,
+        IWithKeyBuilder,
         IWithAliasBuilder,
         IWithSortOrderBuilder
 {
+    private Guid? _key;
     private string _alias;
-    private int? _id;
     private int? _sortOrder;
 
-    public ContentTypeSortBuilder()
-        : base(null)
-    {
-    }
-
-    public ContentTypeSortBuilder(ContentTypeBuilder parentBuilder)
+    public ContentTypeSortBuilder(TBuilder parentBuilder)
         : base(parentBuilder)
     {
     }
@@ -34,10 +29,10 @@ public class ContentTypeSortBuilder
         set => _alias = value;
     }
 
-    int? IWithIdBuilder.Id
+    Guid? IWithKeyBuilder.Key
     {
-        get => _id;
-        set => _id = value;
+        get => _key;
+        set => _key = value;
     }
 
     int? IWithSortOrderBuilder.SortOrder
@@ -48,10 +43,10 @@ public class ContentTypeSortBuilder
 
     public override ContentTypeSort Build()
     {
-        var id = _id ?? 1;
         var alias = _alias ?? Guid.NewGuid().ToString().ToCamelCase();
         var sortOrder = _sortOrder ?? 0;
+        var key = _key ?? Guid.NewGuid();
 
-        return new ContentTypeSort(new Lazy<int>(() => id), sortOrder, alias);
+        return new ContentTypeSort(key, sortOrder, alias);
     }
 }

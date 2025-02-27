@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -5,16 +6,13 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -28,124 +26,57 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IDataTypeContainerRepository _dataTypeContainerRepository;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IAuditRepository _auditRepository;
-        private readonly IEntityRepository _entityRepository;
         private readonly IIOHelper _ioHelper;
-        private readonly ILocalizedTextService _localizedTextService;
-        private readonly ILocalizationService _localizationService;
-        private readonly IShortStringHelper _shortStringHelper;
-        private readonly IJsonSerializer _jsonSerializer;
-        private readonly IEditorConfigurationParser _editorConfigurationParser;
+        private readonly IDataTypeContainerService _dataTypeContainerService;
+        private readonly IUserIdKeyResolver _userIdKeyResolver;
+        private readonly Lazy<IIdKeyMap> _idKeyMap;
 
-        [Obsolete("Please use constructor that takes an IEditorConfigurationParser. Will be removed in V13.")]
         public DataTypeService(
-            IDataValueEditorFactory dataValueEditorFactory,
             ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
             IEventMessagesFactory eventMessagesFactory,
             IDataTypeRepository dataTypeRepository,
-            IDataTypeContainerRepository dataTypeContainerRepository,
-            IAuditRepository auditRepository,
-            IEntityRepository entityRepository,
-            IContentTypeRepository contentTypeRepository,
-            IIOHelper ioHelper,
-            ILocalizedTextService localizedTextService,
-            ILocalizationService localizationService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer)
-            : this(
-                dataValueEditorFactory,
-                provider,
-                loggerFactory,
-                eventMessagesFactory,
-                dataTypeRepository,
-                dataTypeContainerRepository,
-                auditRepository,
-                entityRepository,
-                contentTypeRepository,
-                ioHelper,
-                localizedTextService,
-                localizationService,
-                shortStringHelper,
-                jsonSerializer,
-                StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-        {
-            _dataValueEditorFactory = dataValueEditorFactory;
-            _dataTypeRepository = dataTypeRepository;
-            _dataTypeContainerRepository = dataTypeContainerRepository;
-            _auditRepository = auditRepository;
-            _entityRepository = entityRepository;
-            _contentTypeRepository = contentTypeRepository;
-            _ioHelper = ioHelper;
-            _localizedTextService = localizedTextService;
-            _localizationService = localizationService;
-            _shortStringHelper = shortStringHelper;
-            _jsonSerializer = jsonSerializer;
-        }
-
-        public DataTypeService(
             IDataValueEditorFactory dataValueEditorFactory,
-            ICoreScopeProvider provider,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IDataTypeRepository dataTypeRepository,
-            IDataTypeContainerRepository dataTypeContainerRepository,
             IAuditRepository auditRepository,
-            IEntityRepository entityRepository,
             IContentTypeRepository contentTypeRepository,
             IIOHelper ioHelper,
-            ILocalizedTextService localizedTextService,
-            ILocalizationService localizationService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer,
-            IEditorConfigurationParser editorConfigurationParser)
+            Lazy<IIdKeyMap> idKeyMap)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _dataTypeRepository = dataTypeRepository;
-            _dataTypeContainerRepository = dataTypeContainerRepository;
             _auditRepository = auditRepository;
-            _entityRepository = entityRepository;
             _contentTypeRepository = contentTypeRepository;
             _ioHelper = ioHelper;
-            _localizedTextService = localizedTextService;
-            _localizationService = localizationService;
-            _shortStringHelper = shortStringHelper;
-            _jsonSerializer = jsonSerializer;
-            _editorConfigurationParser = editorConfigurationParser;
+            _idKeyMap = idKeyMap;
+
+            // resolve dependencies for obsolete methods through the static service provider, so they don't pollute the constructor signature
+            _dataTypeContainerService = StaticServiceProvider.Instance.GetRequiredService<IDataTypeContainerService>();
+            _dataTypeContainerRepository = StaticServiceProvider.Instance.GetRequiredService<IDataTypeContainerRepository>();
+            _userIdKeyResolver = StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>();
         }
 
         #region Containers
 
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V15.")]
         public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+            using (ScopeProvider.CreateCoreScope(autoComplete:true))
             {
                 try
                 {
-                    var container = new EntityContainer(Constants.ObjectTypes.DataType)
+                    Guid? parentKey = parentId > 0 ? _dataTypeContainerRepository.Get(parentId)?.Key : null;
+                    Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+                    Attempt<EntityContainer?, EntityContainerOperationStatus> result = _dataTypeContainerService.CreateAsync(key, name, parentKey, currentUserKey).GetAwaiter().GetResult();
+
+                    // mimic old service behavior
+                    return result.Status switch
                     {
-                        Name = name,
-                        ParentId = parentId,
-                        CreatorId = userId,
-                        Key = key
+                        EntityContainerOperationStatus.CancelledByNotification => OperationResult.Attempt.Cancel(evtMsgs, new EntityContainer(Constants.ObjectTypes.DataType)),
+                        EntityContainerOperationStatus.Success => OperationResult.Attempt.Succeed(evtMsgs, result.Result ?? throw new NullReferenceException("Container creation operation succeeded but the result was null")),
+                        _ => throw new InvalidOperationException($"Invalid operation status: {result.Status}")
                     };
-
-                    var savingEntityContainerNotification = new EntityContainerSavingNotification(container, evtMsgs);
-                    if (scope.Notifications.PublishCancelable(savingEntityContainerNotification))
-                    {
-                        scope.Complete();
-                        return OperationResult.Attempt.Cancel(evtMsgs, container);
-                    }
-
-                    _dataTypeContainerRepository.Save(container);
-                    scope.Complete();
-
-                    scope.Notifications.Publish(new EntityContainerSavedNotification(container, evtMsgs).WithStateFrom(savingEntityContainerNotification));
-
-                    // TODO: Audit trail ?
-
-                    return OperationResult.Attempt.Succeed(evtMsgs, container);
                 }
                 catch (Exception ex)
                 {
@@ -154,24 +85,25 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public EntityContainer? GetContainer(int containerId)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             return _dataTypeContainerRepository.Get(containerId);
         }
 
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public EntityContainer? GetContainer(Guid containerId)
-        {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            return _dataTypeContainerRepository.Get(containerId);
-        }
+            => _dataTypeContainerService.GetAsync(containerId).GetAwaiter().GetResult();
 
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public IEnumerable<EntityContainer> GetContainers(string name, int level)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             return _dataTypeContainerRepository.Get(name, level);
         }
 
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public IEnumerable<EntityContainer> GetContainers(IDataType dataType)
         {
             var ancestorIds = dataType.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
@@ -186,51 +118,44 @@ namespace Umbraco.Cms.Core.Services.Implement
             return GetContainers(ancestorIds);
         }
 
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             return _dataTypeContainerRepository.GetMany(containerIds);
         }
 
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
-
-            if (container.ContainedObjectType != Constants.ObjectTypes.DataType)
+            using (ScopeProvider.CreateCoreScope(autoComplete:true))
             {
-                var ex = new InvalidOperationException("Not a " + Constants.ObjectTypes.DataType + " container.");
-                return OperationResult.Attempt.Fail(evtMsgs, ex);
-            }
+                var isNew = container.Id == 0;
+                Guid? parentKey = isNew && container.ParentId > 0 ? _dataTypeContainerRepository.Get(container.ParentId)?.Key : null;
+                Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
 
-            if (container.HasIdentity && container.IsPropertyDirty("ParentId"))
-            {
-                var ex = new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.");
-                return OperationResult.Attempt.Fail(evtMsgs, ex);
-            }
+                Attempt<EntityContainer?, EntityContainerOperationStatus> result = isNew
+                    ? _dataTypeContainerService.CreateAsync(container.Key, container.Name.IfNullOrWhiteSpace(string.Empty), parentKey, currentUserKey).GetAwaiter().GetResult()
+                    : _dataTypeContainerService.UpdateAsync(container.Key, container.Name.IfNullOrWhiteSpace(string.Empty), currentUserKey).GetAwaiter().GetResult();
 
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-            {
-                var savingEntityContainerNotification = new EntityContainerSavingNotification(container, evtMsgs);
-                if (scope.Notifications.PublishCancelable(savingEntityContainerNotification))
+                // mimic old service behavior
+                return result.Status switch
                 {
-                    scope.Complete();
-                    return OperationResult.Attempt.Cancel(evtMsgs);
-                }
-
-                _dataTypeContainerRepository.Save(container);
-
-                scope.Notifications.Publish(new EntityContainerSavedNotification(container, evtMsgs).WithStateFrom(savingEntityContainerNotification));
-                scope.Complete();
+                    EntityContainerOperationStatus.Success => OperationResult.Attempt.Succeed(evtMsgs),
+                    EntityContainerOperationStatus.CancelledByNotification => OperationResult.Attempt.Cancel(evtMsgs),
+                    EntityContainerOperationStatus.ParentNotFound => OperationResult.Attempt.Fail(evtMsgs, new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.")),
+                    EntityContainerOperationStatus.InvalidObjectType => OperationResult.Attempt.Fail(evtMsgs, new InvalidOperationException("Not a " + Constants.ObjectTypes.DataType + " container.")),
+                    _ => OperationResult.Attempt.Fail(evtMsgs, new InvalidOperationException($"Invalid operation status: {result.Status}"))
+                };
             }
-
-            // TODO: Audit trail ?
-            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+            using (ScopeProvider.CreateCoreScope(autoComplete:true))
             {
                 EntityContainer? container = _dataTypeContainerRepository.Get(containerId);
                 if (container == null)
@@ -238,36 +163,24 @@ namespace Umbraco.Cms.Core.Services.Implement
                     return OperationResult.Attempt.NoOperation(evtMsgs);
                 }
 
-                // 'container' here does not know about its children, so we need
-                // to get it again from the entity repository, as a light entity
-                IEntitySlim? entity = _entityRepository.Get(container.Id);
-                if (entity?.HasChildren ?? false)
+                Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+                Attempt<EntityContainer?, EntityContainerOperationStatus> result = _dataTypeContainerService.DeleteAsync(container.Key, currentUserKey).GetAwaiter().GetResult();
+                // mimic old service behavior
+                return result.Status switch
                 {
-                    scope.Complete();
-                    return Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, evtMsgs));
-                }
-
-                var deletingEntityContainerNotification = new EntityContainerDeletingNotification(container, evtMsgs);
-                if (scope.Notifications.PublishCancelable(deletingEntityContainerNotification))
-                {
-                    scope.Complete();
-                    return Attempt.Fail(new OperationResult(OperationResultType.FailedCancelledByEvent, evtMsgs));
-                }
-
-                _dataTypeContainerRepository.Delete(container);
-
-                scope.Notifications.Publish(new EntityContainerDeletedNotification(container, evtMsgs).WithStateFrom(deletingEntityContainerNotification));
-                scope.Complete();
+                    EntityContainerOperationStatus.Success => OperationResult.Attempt.Succeed(evtMsgs),
+                    EntityContainerOperationStatus.NotEmpty => Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, evtMsgs)),
+                    EntityContainerOperationStatus.CancelledByNotification => Attempt.Fail(new OperationResult(OperationResultType.FailedCancelledByEvent, evtMsgs)),
+                    _ => OperationResult.Attempt.Fail(evtMsgs, new InvalidOperationException($"Invalid operation status: {result.Status}"))
+                };
             }
-
-            // TODO: Audit trail ?
-            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+            using (ScopeProvider.CreateCoreScope(autoComplete:true))
             {
                 try
                 {
@@ -280,20 +193,15 @@ namespace Umbraco.Cms.Core.Services.Implement
                     }
 
                     container.Name = name;
-
-                    var renamingEntityContainerNotification = new EntityContainerRenamingNotification(container, evtMsgs);
-                    if (scope.Notifications.PublishCancelable(renamingEntityContainerNotification))
+                    Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+                    Attempt<EntityContainer?, EntityContainerOperationStatus> result = _dataTypeContainerService.UpdateAsync(container.Key, container.Name, currentUserKey).GetAwaiter().GetResult();
+                    // mimic old service behavior
+                    return result.Status switch
                     {
-                        scope.Complete();
-                        return OperationResult.Attempt.Cancel(evtMsgs, container);
-                    }
-
-                    _dataTypeContainerRepository.Save(container);
-                    scope.Complete();
-
-                    scope.Notifications.Publish(new EntityContainerRenamedNotification(container, evtMsgs).WithStateFrom(renamingEntityContainerNotification));
-
-                    return OperationResult.Attempt.Succeed(OperationResultType.Success, evtMsgs, container);
+                        EntityContainerOperationStatus.Success => OperationResult.Attempt.Succeed(OperationResultType.Success, evtMsgs, result.Result ?? throw new NullReferenceException("Container update operation succeeded but the result was null")),
+                        EntityContainerOperationStatus.CancelledByNotification => OperationResult.Attempt.Cancel(evtMsgs, container),
+                        _ => OperationResult.Attempt.Fail<EntityContainer>(evtMsgs, new InvalidOperationException($"Invalid operation status: {result.Status}"))
+                    };
                 }
                 catch (Exception ex)
                 {
@@ -309,12 +217,64 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="name">Name of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
+        [Obsolete("Please use GetAsync. Will be removed in V15.")]
         public IDataType? GetDataType(string name)
+            => GetAsync(name).GetAwaiter().GetResult();
+
+        /// <inheritdoc />
+        public Task<IDataType?> GetAsync(string name)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IDataType? dataType = _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name))?.FirstOrDefault();
             ConvertMissingEditorOfDataTypeToLabel(dataType);
-            return dataType;
+
+            return Task.FromResult(dataType);
+        }
+
+        /// <inheritdoc />
+        public Task<IEnumerable<IDataType>> GetAllAsync(params Guid[] keys)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+            IQuery<IDataType> query = Query<IDataType>();
+            if (keys.Length > 0)
+            {
+                query = query.Where(x => keys.Contains(x.Key));
+            }
+
+            IDataType[] dataTypes = _dataTypeRepository.Get(query).ToArray();
+            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
+
+            return Task.FromResult<IEnumerable<IDataType>>(dataTypes);
+        }
+
+        /// <inheritdoc />
+        public Task<PagedModel<IDataType>> FilterAsync(string? name = null, string? editorUiAlias = null, string? editorAlias = null, int skip = 0, int take = 100)
+        {
+            IEnumerable<IDataType> query = GetAll();
+
+            if (name is not null)
+            {
+                query = query.Where(datatype => datatype.Name?.InvariantContains(name) ?? false);
+            }
+
+            if (editorUiAlias != null)
+            {
+                query = query.Where(datatype => datatype.EditorUiAlias?.InvariantContains(editorUiAlias) ?? false);
+            }
+
+            if (editorAlias != null)
+            {
+                query = query.Where(datatype => datatype.EditorAlias.InvariantContains(editorAlias));
+            }
+
+            IDataType[] result = query.ToArray();
+
+            return Task.FromResult(new PagedModel<IDataType>
+            {
+                Total = result.Length,
+                Items = result.Skip(skip).Take(take),
+            });
         }
 
         /// <summary>
@@ -322,26 +282,24 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="id">Id of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
+        [Obsolete("Please use GetAsync. Will be removed in V15.")]
         public IDataType? GetDataType(int id)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IDataType? dataType = _dataTypeRepository.Get(id);
             ConvertMissingEditorOfDataTypeToLabel(dataType);
+
             return dataType;
         }
 
-        /// <summary>
-        /// Gets a <see cref="IDataType"/> by its unique guid Id
-        /// </summary>
-        /// <param name="id">Unique guid Id of the DataType</param>
-        /// <returns><see cref="IDataType"/></returns>
-        public IDataType? GetDataType(Guid id)
+        /// <inheritdoc />
+        public Task<IDataType?> GetAsync(Guid id)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IQuery<IDataType> query = Query<IDataType>().Where(x => x.Key == id);
-            IDataType? dataType = _dataTypeRepository.Get(query).FirstOrDefault();
+            IDataType? dataType = GetDataTypeFromRepository(id);
             ConvertMissingEditorOfDataTypeToLabel(dataType);
-            return dataType;
+
+            return Task.FromResult(dataType);
         }
 
         /// <summary>
@@ -349,13 +307,40 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="propertyEditorAlias">Alias of the property editor</param>
         /// <returns>Collection of <see cref="IDataType"/> objects with a matching control id</returns>
+        [Obsolete("Please use GetByEditorAliasAsync. Will be removed in V15.")]
         public IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias)
+            => GetByEditorAliasAsync(propertyEditorAlias).GetAwaiter().GetResult();
+
+        /// <inheritdoc />
+        public Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string propertyEditorAlias)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IQuery<IDataType> query = Query<IDataType>().Where(x => x.EditorAlias == propertyEditorAlias);
-            IEnumerable<IDataType> dataType = _dataTypeRepository.Get(query).ToArray();
-            ConvertMissingEditorsOfDataTypesToLabels(dataType);
-            return dataType;
+            IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
+            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
+
+            return Task.FromResult(dataTypes);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            IQuery<IDataType> query = Query<IDataType>().Where(x => propertyEditorAlias.Contains(x.EditorAlias));
+            IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
+            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
+            return await Task.FromResult(dataTypes);
+        }
+
+        /// <inheritdoc />
+        public Task<IEnumerable<IDataType>> GetByEditorUiAlias(string editorUiAlias)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            IQuery<IDataType> query = Query<IDataType>().Where(x => x.EditorUiAlias == editorUiAlias);
+            IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
+            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
+
+            return Task.FromResult(dataTypes);
         }
 
         /// <summary>
@@ -367,8 +352,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.GetMany(ids).ToArray();
-
             ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
+
             return dataTypes;
         }
 
@@ -386,96 +371,136 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             // Any data types that don't have an associated editor are created of a specific type.
             // We convert them to labels to make clear to the user why the data type cannot be used.
-            IEnumerable<IDataType> dataTypesWithMissingEditors = dataTypes
-                .Where(x => x.Editor is MissingPropertyEditor);
+            IEnumerable<IDataType> dataTypesWithMissingEditors = dataTypes.Where(x => x.Editor is MissingPropertyEditor);
             foreach (IDataType dataType in dataTypesWithMissingEditors)
             {
-                dataType.Editor = new LabelPropertyEditor(_dataValueEditorFactory, _ioHelper, _editorConfigurationParser);
+                dataType.Editor = new LabelPropertyEditor(_dataValueEditorFactory, _ioHelper);
             }
         }
 
         public Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId)
         {
-            EventMessages evtMsgs = EventMessagesFactory.Get();
-            if (toMove.ParentId == parentId)
+            Guid? containerKey = null;
+            if (parentId > 0)
             {
-                return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs);
+                // mimic obsolete Copy method behavior
+                EntityContainer? container = GetContainer(parentId);
+                if (container is null)
+                {
+                    throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
+                }
+
+                containerKey = container.Key;
             }
 
-            var moveInfo = new List<MoveEventInfo<IDataType>>();
+            Attempt<IDataType, DataTypeOperationStatus> result = MoveAsync(toMove, containerKey, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
+
+            // mimic old service behavior
+            EventMessages evtMsgs = EventMessagesFactory.Get();
+            return result.Status switch
+            {
+                DataTypeOperationStatus.Success => OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs),
+                DataTypeOperationStatus.CancelledByNotification => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs),
+                DataTypeOperationStatus.ParentNotFound => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedParentNotFound, evtMsgs),
+                _ => OperationResult.Attempt.Fail<MoveOperationStatusType>(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs, new InvalidOperationException($"Invalid operation status: {result.Status}")),
+            };
+        }
+
+        public async Task<Attempt<IDataType, DataTypeOperationStatus>> MoveAsync(IDataType toMove, Guid? containerKey, Guid userKey)
+        {
+            EventMessages eventMessages = EventMessagesFactory.Get();
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
-                var moveEventInfo = new MoveEventInfo<IDataType>(toMove, toMove.Path, parentId);
+                EntityContainer? container = null;
+                var parentId = Constants.System.Root;
+                if (containerKey.HasValue && containerKey.Value != Guid.Empty)
+                {
+                    container = await _dataTypeContainerService.GetAsync(containerKey.Value);
+                    if (container is null)
+                    {
+                        return Attempt.FailWithStatus(DataTypeOperationStatus.ParentNotFound, toMove);
+                    }
 
-                var movingDataTypeNotification = new DataTypeMovingNotification(moveEventInfo, evtMsgs);
+                    parentId = container.Id;
+                }
+
+                if (toMove.ParentId == parentId)
+                {
+                    return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, toMove);
+                }
+
+                var moveEventInfo = new MoveEventInfo<IDataType>(toMove, toMove.Path, parentId, containerKey);
+                var movingDataTypeNotification = new DataTypeMovingNotification(moveEventInfo, eventMessages);
                 if (scope.Notifications.PublishCancelable(movingDataTypeNotification))
                 {
                     scope.Complete();
-                    return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs);
+                    return Attempt.FailWithStatus(DataTypeOperationStatus.CancelledByNotification, toMove);
                 }
 
-                try
-                {
-                    EntityContainer? container = null;
-                    if (parentId > 0)
-                    {
-                        container = _dataTypeContainerRepository.Get(parentId);
-                        if (container == null)
-                        {
-                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
-                        }
-                    }
-                    moveInfo.AddRange(_dataTypeRepository.Move(toMove, container));
+                _dataTypeRepository.Move(toMove, container);
 
-                    scope.Notifications.Publish(new DataTypeMovedNotification(moveEventInfo, evtMsgs).WithStateFrom(movingDataTypeNotification));
+                scope.Notifications.Publish(new DataTypeMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingDataTypeNotification));
 
-                    scope.Complete();
-                }
-                catch (DataOperationException<MoveOperationStatusType> ex)
-                {
-                    scope.Complete(); // TODO: what are we doing here exactly?
-                    return OperationResult.Attempt.Fail(ex.Operation, evtMsgs);
-                }
+                var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
+                Audit(AuditType.Move, currentUserId, toMove.Id);
+                scope.Complete();
             }
 
-            return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
+            return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, toMove);
         }
 
         [Obsolete("Use the method which specifies the userId parameter")]
         public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId)
-        {
-            return Copy(copying, containerId, Constants.Security.SuperUserId);
-        }
+            => Copy(copying, containerId, Constants.Security.SuperUserId);
 
         public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId, int userId = Constants.Security.SuperUserId)
         {
-            var evtMsgs = EventMessagesFactory.Get();
-
-            IDataType copy;
-            try
+            Guid? containerKey = null;
+            if (containerId > 0)
             {
-                if (containerId > 0)
+                // mimic obsolete Copy method behavior
+                EntityContainer? container = GetContainer(containerId);
+                if (container is null)
                 {
-                    var container = GetContainer(containerId);
-                    if (container is null)
-                    {
-                        throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
-                    }
+                    throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
                 }
-                copy = copying.DeepCloneWithResetIdentities();
 
-                copy.Name += " (copy)"; // might not be unique
-                copy.ParentId = containerId;
-
-                Save(copy, userId);
+                containerKey = container.Key;
             }
-            catch (DataOperationException<MoveOperationStatusType> ex)
+
+            Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+            Attempt<IDataType, DataTypeOperationStatus> result = CopyAsync(copying, containerKey, currentUserKey).GetAwaiter().GetResult();
+
+            // mimic old service behavior
+            EventMessages evtMsgs = EventMessagesFactory.Get();
+            return result.Status switch
             {
-                return OperationResult.Attempt.Fail<MoveOperationStatusType, IDataType>(ex.Operation, evtMsgs); // causes rollback
+                DataTypeOperationStatus.Success => OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs, result.Result),
+                DataTypeOperationStatus.CancelledByNotification => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs, result.Result),
+                DataTypeOperationStatus.ParentNotFound => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedParentNotFound, evtMsgs, result.Result),
+                _ =>  OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs, result.Result, new InvalidOperationException($"Invalid operation status: {result.Status}")),
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task<Attempt<IDataType, DataTypeOperationStatus>> CopyAsync(IDataType toCopy, Guid? containerKey, Guid userKey)
+        {
+            EntityContainer? container = null;
+            if (containerKey.HasValue && containerKey.Value != Guid.Empty)
+            {
+                container = await _dataTypeContainerService.GetAsync(containerKey.Value);
+                if (container is null)
+                {
+                    return Attempt.FailWithStatus(DataTypeOperationStatus.ParentNotFound, toCopy);
+                }
             }
 
-            return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs, copy);
+            IDataType copy = toCopy.DeepCloneWithResetIdentities();
+            copy.Name += " (copy)"; // might not be unique
+            copy.ParentId = container?.Id ?? Constants.System.Root;
+
+            return await SaveAsync(copy, () => DataTypeOperationStatus.Success, userKey, AuditType.Copy);
         }
 
         /// <summary>
@@ -483,21 +508,10 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="dataType"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issuing the save</param>
+        [Obsolete("Please use CreateAsync or UpdateAsync. Will be removed in V15.")]
         public void Save(IDataType dataType, int userId = Constants.Security.SuperUserId)
         {
-            EventMessages evtMsgs = EventMessagesFactory.Get();
-            dataType.CreatorId = userId;
-
-            using ICoreScope scope = ScopeProvider.CreateCoreScope();
-            var saveEventArgs = new SaveEventArgs<IDataType>(dataType);
-
-            var savingDataTypeNotification = new DataTypeSavingNotification(dataType, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingDataTypeNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
+            // mimic old service behavior
             if (string.IsNullOrWhiteSpace(dataType.Name))
             {
                 throw new ArgumentException("Cannot save datatype with empty name.");
@@ -508,19 +522,57 @@ namespace Umbraco.Cms.Core.Services.Implement
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
 
-            _dataTypeRepository.Save(dataType);
+            Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
 
-            scope.Notifications.Publish(new DataTypeSavedNotification(dataType, evtMsgs).WithStateFrom(savingDataTypeNotification));
-
-            Audit(AuditType.Save, userId, dataType.Id);
-            scope.Complete();
+            SaveAsync(
+                dataType,
+                () => DataTypeOperationStatus.Success,
+                currentUserKey,
+                AuditType.Sort).GetAwaiter().GetResult();
         }
+
+        /// <inheritdoc />
+        public async Task<Attempt<IDataType, DataTypeOperationStatus>> CreateAsync(IDataType dataType, Guid userKey)
+        {
+            if (dataType.Id != 0)
+            {
+                return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidId, dataType);
+            }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+            if (_dataTypeRepository.Get(dataType.Key) is not null)
+            {
+                return Attempt.FailWithStatus(DataTypeOperationStatus.DuplicateKey, dataType);
+            }
+
+            Attempt<IDataType, DataTypeOperationStatus> result = await SaveAsync(dataType, () => DataTypeOperationStatus.Success, userKey, AuditType.New);
+
+            scope.Complete();
+
+            return result;
+        }
+
+        /// <inheritdoc />
+        public async Task<Attempt<IDataType, DataTypeOperationStatus>> UpdateAsync(IDataType dataType, Guid userKey)
+            => await SaveAsync(
+                dataType,
+                () =>
+                {
+                    IDataType? current = _dataTypeRepository.Get(dataType.Id);
+                    return current == null
+                        ? DataTypeOperationStatus.NotFound
+                        : DataTypeOperationStatus.Success;
+                },
+                userKey,
+                AuditType.New);
 
         /// <summary>
         /// Saves a collection of <see cref="IDataType"/>
         /// </summary>
         /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issuing the save</param>
+        [Obsolete("Please use CreateAsync or UpdateAsync. Will be removed in V15.")]
         public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -558,13 +610,33 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="userId">Optional Id of the user issuing the deletion</param>
         public void Delete(IDataType dataType, int userId = Constants.Security.SuperUserId)
         {
-            EventMessages evtMsgs = EventMessagesFactory.Get();
+            Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+            DeleteAsync(dataType.Key, currentUserKey).GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc />
+        public async Task<Attempt<IDataType?, DataTypeOperationStatus>> DeleteAsync(Guid id, Guid userKey)
+        {
+            EventMessages eventMessages = EventMessagesFactory.Get();
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
-            var deletingDataTypeNotification = new DataTypeDeletingNotification(dataType, evtMsgs);
-            if (scope.Notifications.PublishCancelable(deletingDataTypeNotification))
+
+            IDataType? dataType = GetDataTypeFromRepository(id);
+            if (dataType == null)
+            {
+                return Attempt.FailWithStatus(DataTypeOperationStatus.NotFound, dataType);
+            }
+
+            if (dataType.IsDeletableDataType() is false)
             {
                 scope.Complete();
-                return;
+                return Attempt.FailWithStatus<IDataType?, DataTypeOperationStatus>(DataTypeOperationStatus.NonDeletable, dataType);
+            }
+
+            var deletingDataTypeNotification = new DataTypeDeletingNotification(dataType, eventMessages);
+            if (await scope.Notifications.PublishCancelableAsync(deletingDataTypeNotification))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus<IDataType?, DataTypeOperationStatus>(DataTypeOperationStatus.CancelledByNotification, dataType);
             }
 
             // find ContentTypes using this IDataTypeDefinition on a PropertyType, and delete
@@ -599,17 +671,36 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             _dataTypeRepository.Delete(dataType);
 
-            scope.Notifications.Publish(new DataTypeDeletedNotification(dataType, evtMsgs).WithStateFrom(deletingDataTypeNotification));
+            scope.Notifications.Publish(new DataTypeDeletedNotification(dataType, eventMessages).WithStateFrom(deletingDataTypeNotification));
 
-            Audit(AuditType.Delete, userId, dataType.Id);
+            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
+            Audit(AuditType.Delete, currentUserId, dataType.Id);
 
             scope.Complete();
+
+            return Attempt.SucceedWithStatus<IDataType?, DataTypeOperationStatus>(DataTypeOperationStatus.Success, dataType);
         }
 
+        /// <inheritdoc />
+        [Obsolete("Please use GetReferencesAsync. Will be deleted in V15.")]
         public IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             return _dataTypeRepository.FindUsages(id);
+        }
+
+        /// <inheritdoc />
+        public async Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
+            IDataType? dataType = GetDataTypeFromRepository(id);
+            if (dataType == null)
+            {
+                return Attempt.FailWithStatus<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>(DataTypeOperationStatus.NotFound, new Dictionary<Udi, IEnumerable<string>>());
+            }
+
+            IReadOnlyDictionary<Udi, IEnumerable<string>> usages = _dataTypeRepository.FindUsages(dataType.Id);
+            return await Task.FromResult(Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, usages));
         }
 
         public IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id)
@@ -618,10 +709,82 @@ namespace Umbraco.Cms.Core.Services.Implement
             return _dataTypeRepository.FindListViewUsages(id);
         }
 
-        private void Audit(AuditType type, int userId, int objectId)
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> ValidateConfigurationData(IDataType dataType)
         {
-            _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.DataType)));
+            IConfigurationEditor? configurationEditor = dataType.Editor?.GetConfigurationEditor();
+            return configurationEditor == null
+                ? new[]
+                {
+                    new ValidationResult($"Data type with editor alias {dataType.EditorAlias} does not have a configuration editor")
+                }
+                : configurationEditor.Validate(dataType.ConfigurationData);
         }
 
+        private async Task<Attempt<IDataType, DataTypeOperationStatus>> SaveAsync(
+            IDataType dataType,
+            Func<DataTypeOperationStatus> operationValidation,
+            Guid userKey,
+            AuditType auditType)
+        {
+            IEnumerable<ValidationResult> validationResults = ValidateConfigurationData(dataType);
+            if (validationResults.Any())
+            {
+                LoggerFactory
+                    .CreateLogger<DataTypeService>()
+                    .LogError($"Invalid data type configuration for data type: {dataType.Name} - validation error messages: {string.Join(Environment.NewLine, validationResults.Select(r => r.ErrorMessage))}");
+                return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidConfiguration, dataType);
+            }
+
+            EventMessages eventMessages = EventMessagesFactory.Get();
+
+            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
+            dataType.CreatorId = currentUserId;
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+            DataTypeOperationStatus status = operationValidation();
+            if (status != DataTypeOperationStatus.Success)
+            {
+                return Attempt.FailWithStatus(status, dataType);
+            }
+
+            var savingDataTypeNotification = new DataTypeSavingNotification(dataType, eventMessages);
+            if (await scope.Notifications.PublishCancelableAsync(savingDataTypeNotification))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus(DataTypeOperationStatus.CancelledByNotification, dataType);
+            }
+
+            if (string.IsNullOrWhiteSpace(dataType.Name))
+            {
+                return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidName, dataType);
+            }
+
+            if (dataType.Name is { Length: > 255 })
+            {
+                return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidName, dataType);
+            }
+
+
+            _dataTypeRepository.Save(dataType);
+
+            scope.Notifications.Publish(new DataTypeSavedNotification(dataType, eventMessages).WithStateFrom(savingDataTypeNotification));
+
+            Audit(auditType, currentUserId, dataType.Id);
+            scope.Complete();
+
+            return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, dataType);
+        }
+
+        private IDataType? GetDataTypeFromRepository(Guid id)
+        => _idKeyMap.Value.GetIdForKey(id, UmbracoObjectTypes.DataType) switch
+        {
+            { Success: false } => null,
+            { Result: var intId } => _dataTypeRepository.Get(intId),
+        };
+
+        private void Audit(AuditType type, int userId, int objectId)
+            => _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.DataType)));
     }
 }

@@ -21,6 +21,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
@@ -60,6 +61,8 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiMediaQueryService, ApiMediaQueryService>();
         builder.Services.AddTransient<IMemberApplicationManager, MemberApplicationManager>();
         builder.Services.AddTransient<IRequestMemberAccessService, RequestMemberAccessService>();
+        builder.Services.AddTransient<ICurrentMemberClaimsProvider, CurrentMemberClaimsProvider>();
+        builder.Services.AddScoped<IMemberClientCredentialsManager, MemberClientCredentialsManager>();
 
         builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
         builder.AddUmbracoApiOpenApiUI();
@@ -103,7 +106,7 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddOutputCache(options =>
         {
-            options.AddBasePolicy(_ => { });
+            options.AddBasePolicy(build => build.AddPolicy<NoOutputCachePolicy>());
 
             if (outputCacheSettings.ContentDuration.TotalSeconds > 0)
             {

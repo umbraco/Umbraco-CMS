@@ -13,11 +13,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.Locking;
 
-internal class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingMechanism
+internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingMechanism
     where T : DbContext
 {
-    private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
-    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+    private ConnectionStrings _connectionStrings;
+    private GlobalSettings _globalSettings;
     private readonly ILogger<SqliteEFCoreDistributedLockingMechanism<T>> _logger;
     private readonly Lazy<IEFCoreScopeAccessor<T>> _efCoreScopeAccessor;
 
@@ -29,31 +29,33 @@ internal class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingM
     {
         _logger = logger;
         _efCoreScopeAccessor = efCoreScopeAccessor;
-        _connectionStrings = connectionStrings;
-        _globalSettings = globalSettings;
+        _globalSettings = globalSettings.CurrentValue;
+        _connectionStrings = connectionStrings.CurrentValue;
+        globalSettings.OnChange(x=>_globalSettings = x);
+        connectionStrings.OnChange(x=>_connectionStrings = x);
     }
 
     public bool HasActiveRelatedScope => _efCoreScopeAccessor.Value.AmbientScope is not null;
 
     /// <inheritdoc />
-    public bool Enabled => _connectionStrings.CurrentValue.IsConnectionStringConfigured() &&
-                           string.Equals(_connectionStrings.CurrentValue.ProviderName, "Microsoft.Data.Sqlite", StringComparison.InvariantCultureIgnoreCase) && _efCoreScopeAccessor.Value.AmbientScope is not null;
+    public bool Enabled => _connectionStrings.IsConnectionStringConfigured() &&
+                           string.Equals(_connectionStrings.ProviderName, "Microsoft.Data.Sqlite", StringComparison.InvariantCultureIgnoreCase) && _efCoreScopeAccessor.Value.AmbientScope is not null;
 
     // With journal_mode=wal we can always read a snapshot.
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)
     {
-        obtainLockTimeout ??= _globalSettings.CurrentValue.DistributedLockingReadLockDefaultTimeout;
+        obtainLockTimeout ??= _globalSettings.DistributedLockingReadLockDefaultTimeout;
         return new SqliteDistributedLock(this, lockId, DistributedLockType.ReadLock, obtainLockTimeout.Value);
     }
 
     // With journal_mode=wal only a single write transaction can exist at a time.
     public IDistributedLock WriteLock(int lockId, TimeSpan? obtainLockTimeout = null)
     {
-        obtainLockTimeout ??= _globalSettings.CurrentValue.DistributedLockingWriteLockDefaultTimeout;
+        obtainLockTimeout ??= _globalSettings.DistributedLockingWriteLockDefaultTimeout;
         return new SqliteDistributedLock(this, lockId, DistributedLockType.WriteLock, obtainLockTimeout.Value);
     }
 
-    private class SqliteDistributedLock : IDistributedLock
+    private sealed class SqliteDistributedLock : IDistributedLock
     {
         private readonly SqliteEFCoreDistributedLockingMechanism<T> _parent;
         private readonly TimeSpan _timeout;
@@ -113,12 +115,7 @@ internal class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingM
         // Mostly no-op just check that we didn't end up ReadUncommitted for real.
         private void ObtainReadLock()
         {
-            IEfCoreScope<T>? efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope;
-
-            if (efCoreScope is null)
-            {
-                throw new PanicException("No current ambient scope");
-            }
+            IEfCoreScope<T>? efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope ?? throw new PanicException("No current ambient scope");
 
             efCoreScope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -134,12 +131,7 @@ internal class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingM
         // lock occurs for entire database as opposed to row/table.
         private void ObtainWriteLock()
         {
-            IEfCoreScope<T>? efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope;
-
-            if (efCoreScope is null)
-            {
-                throw new PanicException("No ambient scope");
-            }
+            IEfCoreScope<T>? efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope ?? throw new PanicException("No ambient scope");
 
             efCoreScope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -172,7 +164,7 @@ internal class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingM
             });
         }
 
-        private bool IsBusyOrLocked(SqliteException ex) =>
+        private static bool IsBusyOrLocked(SqliteException ex) =>
             ex.SqliteErrorCode
                 is raw.SQLITE_BUSY
                 or raw.SQLITE_LOCKED

@@ -1,6 +1,5 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_7_0;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -53,48 +52,6 @@ public class UmbracoPlan : MigrationPlan
 
         From(InitialState);
 
-        // To 10.0.0
-        To<V_10_0_0.AddMemberPropertiesAsColumns>("{B7E0D53C-2B0E-418B-AB07-2DDE486E225F}");
-
-        // To 10.2.0
-        To<V_10_2_0.AddUserGroup2LanguageTable>("{D0B3D29D-F4D5-43E3-BA67-9D49256F3266}");
-        To<V_10_2_0.AddHasAccessToAllLanguagesColumn>("{79D8217B-5920-4C0E-8E9A-3CF8FA021882}");
-
-        // To 10.3.0
-        To<V_10_3_0.AddBlockGridPartialViews>("{56833770-3B7E-4FD5-A3B6-3416A26A7A3F}");
-
-        // To 10.4.0
-        To<V_10_4_0.AddBlockGridPartialViews>("{3F5D492A-A3DB-43F9-A73E-9FEE3B180E6C}");
-
-        // To 10.5.0 / 11.2.0
-        To<V_10_5_0.AddPrimaryKeyConstrainToContentVersionCleanupDtos>("{83AF7945-DADE-4A02-9041-F3F6EBFAC319}");
-
-        // to 10.7.0
-        To<MigrateTagsFromNVarcharToNText>("{EF93F398-1385-4F07-808A-D3C518984442}");
-
-        // To 11.3.0
-        To<V_11_3_0.AddDomainSortOrder>("{BB3889ED-E2DE-49F2-8F71-5FD8616A2661}");
-
-        // To 11.4.0
-        To<V_11_4_0.AlterKeyValueDataType>("{FFB6B9B0-F1A8-45E9-9CD7-25700577D1CA}");
-
-        // to 11.4.3
-        // This is here twice since it was added in 10, so if you had already upgraded you wouldn't get it
-        // But we still need the first once, since if you upgraded to 10.7.0 then the "From" state would be unknown otherwise.
-        // This has it's own key, we essentially consider it a separate migration.
-        To<MigrateTagsFromNVarcharToNText>("{2CA0C5BB-170B-45E5-8179-E73DA4B41A46}");
-
-        // To 12.0.0
-        To<V_12_0_0.UseNvarcharInsteadOfNText>("{888A0D5D-51E4-4C7E-AA0A-01306523C7FB}");
-        To<V_12_0_0.ResetCache>("{539F2F83-FBA7-4C48-81A3-75081A56BB9D}");
-
-        // To 12.1.0
-        To<V_12_1_0.TablesIndexesImprovement>("{1187192D-EDB5-4619-955D-91D48D738871}");
-        To<V_12_1_0.AddOpenIddict>("{47DE85CE-1E16-42A0-8AF6-3EC3BCEF5471}");
-
-        // And once more for 12
-        To<MigrateTagsFromNVarcharToNText>("{2D4C9FBD-08B3-472D-A76C-6ED467A0CD20}");
-
         // To 13.0.0
         To<V_13_0_0.AddWebhooks>("{C76D9C9A-635B-4D2C-A301-05642A523E9D}");
         To<V_13_0_0.RenameEventNameColumn>("{D5139400-E507-4259-A542-C67358F7E329}");
@@ -105,5 +62,49 @@ public class UmbracoPlan : MigrationPlan
         To<V_13_0_0.ChangeWebhookRequestObjectColumnToNvarcharMax>("{F74CDA0C-7AAA-48C8-94C6-C6EC3C06F599}");
         To<V_13_0_0.ChangeWebhookUrlColumnsToNvarcharMax>("{21C42760-5109-4C03-AB4F-7EA53577D1F5}");
         To<V_13_0_0.AddExceptionOccured>("{6158F3A3-4902-4201-835E-1ED7F810B2D8}");
+        To<V_13_3_0.AlignUpgradedDatabase>("{985AF2BA-69D3-4DBA-95E0-AD3FA7459FA7}");
+        To<V_13_5_0.ChangeRedirectUrlToNvarcharMax>("{CC47C751-A81B-489A-A2BC-0240245DB687}");
+
+        // To 14.0.0
+        To<NoopMigration>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
+        To<NoopMigration>("{69E12556-D9B3-493A-8E8A-65EC89FB658D}");
+        To<NoopMigration>("{F2B16CD4-F181-4BEE-81C9-11CF384E6025}");
+        To<NoopMigration>("{A8E01644-9F2E-4988-8341-587EF5B7EA69}");
+        To<V_14_0_0.UpdateDefaultGuidsOfCreatedPackages>("{E073DBC0-9E8E-4C92-8210-9CB18364F46E}");
+        To<V_14_0_0.RenameTechnologyLeakingPropertyEditorAliases>("{80D282A4-5497-47FF-991F-BC0BCE603121}");
+        To<V_14_0_0.MigrateSchduledPublishesToUtc>("{96525697-E9DC-4198-B136-25AD033442B8}");
+        To<NoopMigration>("{7FC5AC9B-6F56-415B-913E-4A900629B853}");
+        To<V_14_0_0.MigrateDataTypeConfigurations>("{1539A010-2EB5-4163-8518-4AE2AA98AFC6}");
+        To<NoopMigration>("{C567DE81-DF92-4B99-BEA8-CD34EF99DA5D}");
+        To<V_14_0_0.DeleteMacroTables>("{0D82C836-96DD-480D-A924-7964E458BD34}");
+        To<V_14_0_0.MoveDocumentBlueprintsToFolders>("{1A0FBC8A-6FC6-456C-805C-B94816B2E570}");
+        To<NoopMigration>("{302DE171-6D83-4B6B-B3C0-AC8808A16CA1}");
+        To<V_14_0_0.MigrateUserGroup2PermissionPermissionColumnType>("{8184E61D-ECBA-4AAA-B61B-D7A82EB82EB7}");
+        To<V_14_0_0.MigrateNotificationCharsToStrings>("{E261BF01-2C7F-4544-BAE7-49D545B21D68}");
+        To<V_14_0_0.AddEditorUiToDataType>("{5A2EF07D-37B4-49D5-8E9B-3ED01877263B}");
+        // we need to re-run this migration, as it was flawed for V14 RC3 (the migration can run twice without any issues)
+        To<V_14_0_0.AddEditorUiToDataType>("{6FB5CA9E-C823-473B-A14C-FE760D75943C}");
+        To<V_14_0_0.CleanUpDataTypeConfigurations>("{827360CA-0855-42A5-8F86-A51F168CB559}");
+
+        // To 14.1.0
+        To<V_14_1_0.MigrateRichTextConfiguration>("{FEF2DAF4-5408-4636-BB0E-B8798DF8F095}");
+        To<V_14_1_0.MigrateOldRichTextSeedConfiguration>("{A385C5DF-48DC-46B4-A742-D5BB846483BC}");
+
+        // To 14.2.0
+        To<V_14_2_0.AddMissingDateTimeConfiguration>("{20ED404C-6FF9-4F91-8AC9-2B298E0002EB}");
+
+        // To 14.3.0
+        To<V_13_5_0.ChangeRedirectUrlToNvarcharMax>("{EEF792FC-318C-4921-9859-51EBF07A53A3}"); // Execute again, to ensure all that migrated to 14.0.0 without 13.5 will have this
+
+        // To 15.0.0
+        To<V_15_0_0.AddUserClientId>("{7F4F31D8-DD71-4F0D-93FC-2690A924D84B}");
+        To<NoopMigration>("{1A8835EF-F8AB-4472-B4D8-D75B7C164022}");
+        To<V_15_0_0.RebuildDocumentUrls>("{3FE0FA2D-CF4F-4892-BA8D-E97D06E028DC}");
+        To<V_15_0_0.ConvertBlockListEditorProperties>("{6C04B137-0097-4938-8C6A-276DF1A0ECA8}");
+        To<V_15_0_0.ConvertBlockGridEditorProperties>("{9D3CE7D4-4884-41D4-98E8-302EB6CB0CF6}");
+        To<V_15_0_0.ConvertRichTextEditorProperties>("{37875E80-5CDD-42FF-A21A-7D4E3E23E0ED}");
+        To<V_15_0_0.ConvertLocalLinks>("{42E44F9E-7262-4269-922D-7310CB48E724}");
+        To<V_15_1_0.RebuildCacheMigration>("{7B51B4DE-5574-4484-993E-05D12D9ED703}");
+        To<V_15_1_0.FixConvertLocalLinks>("{F3D3EF46-1B1F-47DB-B437-7D573EEDEB98}");
     }
 }

@@ -5,10 +5,21 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
-
+  
+  <PropertyGroup>
+    <!--
+      TODO: Fix and remove overrides:
+      [IDE0270] Simplify null checks
+      [CS0108] resolve hiding inherited members
+      [CS1998] remove async or make method synchronous
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),IDE0270,CS0108,CS1998</WarningsNotAsErrors>
+  </PropertyGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Api.Delivery\Umbraco.Cms.Api.Delivery.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.StaticAssets\Umbraco.Cms.StaticAssets.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,12 +29,14 @@
   <!-- Add JSON schema references (and include MSBuild task) -->
   <PropertyGroup>
     <_UmbracoCmsJsonSchemaReference>appsettings-schema.Umbraco.Cms.json</_UmbracoCmsJsonSchemaReference>
-    <NoWarn>NU5100;NU5128</NoWarn>
+    <_UmbracoCmsPackageSchemaReference>umbraco-package-schema.json</_UmbracoCmsPackageSchemaReference>
+    <NoWarn>$(NoWarn),NU5100,NU5128</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" GeneratePathProperty="true" />
     <None Include="$(PkgUmbraco_JsonSchema_Extensions)\tasks\netstandard2.0\**" Pack="true" PackagePath="tasks\netstandard2.0" Visible="false" />
     <Content Include="$(_UmbracoCmsJsonSchemaReference)" PackagePath="" Visible="false" />
+    <Content Include="$(_UmbracoCmsPackageSchemaReference)" PackagePath="" Visible="false" />
   </ItemGroup>
 
   <!-- We also need physical copies in the right location relative to the Umbraco.Cms.Targets.targets file, as that's directly referenced in projects -->
@@ -40,7 +53,7 @@
   <!-- Generate JSON schema on build (and before copying to project) -->
   <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build;CopyUmbracoJsonSchemaFiles" Condition="!Exists('$(_UmbracoCmsJsonSchemaReference)')">
     <Message Text="Generating $(_UmbracoCmsJsonSchemaReference) because it doesn't exist" Importance="high" />
-    <Exec WorkingDirectory="$(MSBuildThisFileDirectory)..\..\tools\Umbraco.JsonSchema" Command="dotnet run --configuration $(Configuration) -- --outputFile &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsJsonSchemaReference)&quot;" />
+    <Exec WorkingDirectory="$(MSBuildThisFileDirectory)..\..\tools\Umbraco.JsonSchema" Command="dotnet run --configuration $(Configuration) -- --outputFile &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsJsonSchemaReference)&quot;" Timeout="600000" />
   </Target>
 
   <!-- Remove generated JSON schema on clean -->
@@ -54,5 +67,16 @@
     <ItemGroup>
       <_PackageFiles Include="$(IntermediateOutputPath)_._" PackagePath="lib\$(TargetFramework)" />
     </ItemGroup>
+  </Target>
+
+  <!-- Generate JSON package schema on build (and before copying to project) -->
+  <Target Name="GenerateUmbracoPackageSchema" BeforeTargets="Build;CopyUmbracoJsonSchemaFiles" Condition="!Exists('$(_UmbracoCmsPackageSchemaReference)')">
+    <Message Text="Generating $(_UmbracoCmsPackageSchemaReference) because it doesn't exist" Importance="high" />
+    <Exec WorkingDirectory="$(MsBuildThisFileDirectory)..\Umbraco.Web.UI.Client" Command="npm run generate:jsonschema -- --out &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsPackageSchemaReference)&quot; tsconfig.json UmbracoPackage" />
+  </Target>
+
+  <!-- Remove generated JSON package schema on clean -->
+  <Target Name="RemovePackageSchema" AfterTargets="Clean" Condition="Exists('$(_UmbracoCmsPackageSchemaReference)')">
+    <Delete Files="$(_UmbracoCmsPackageSchemaReference)" />
   </Target>
 </Project>

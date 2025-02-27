@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
@@ -11,6 +12,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -19,12 +21,13 @@ using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 /// Represents the UserRepository for doing CRUD operations for <see cref="IUser"/>
 /// </summary>
-internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepository
+internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserRepository
 {
     private readonly IMapperCollection _mapperCollection;
     private readonly GlobalSettings _globalSettings;
@@ -33,7 +36,10 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     private readonly IRuntimeState _runtimeState;
     private string? _passwordConfigJson;
     private bool _passwordConfigInitialized;
-    private readonly object _sqliteValidateSessionLock = new();
+    private readonly Lock _sqliteValidateSessionLock = new();
+    private readonly IDictionary<string, IPermissionMapper> _permissionMappers;
+    private readonly IAppPolicyCache _globalCache;
+    private readonly IScopeAccessor _scopeAccessor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserRepository" /> class.
@@ -49,6 +55,8 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     /// <param name="passwordConfiguration">The password configuration.</param>
     /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <param name="runtimeState">State of the runtime.</param>
+    /// <param name="permissionMappers">The permission mappers.</param>
+    /// <param name="globalCache">The app policy cache.</param>
     /// <exception cref="System.ArgumentNullException">
     ///     mapperCollection
     ///     or
@@ -64,15 +72,20 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
         IOptions<GlobalSettings> globalSettings,
         IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IJsonSerializer jsonSerializer,
-        IRuntimeState runtimeState)
+        IRuntimeState runtimeState,
+        IEnumerable<IPermissionMapper> permissionMappers,
+        IAppPolicyCache globalCache)
         : base(scopeAccessor, appCaches, logger)
     {
+        _scopeAccessor = scopeAccessor;
         _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
         _passwordConfiguration =
             passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         _jsonSerializer = jsonSerializer;
         _runtimeState = runtimeState;
+        _globalCache = globalCache;
+        _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
     }
 
     /// <summary>
@@ -99,36 +112,16 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     }
 
     private IEnumerable<IUser> ConvertFromDtos(IEnumerable<UserDto> dtos) =>
-        dtos.Select(x => UserFactory.BuildEntity(_globalSettings, x));
+        dtos.Select(x => UserFactory.BuildEntity(_globalSettings, x, _permissionMappers));
 
-    #region Overrides of RepositoryBase<int,IUser>
+    #region Overrides of RepositoryBase<Guid,IUser>
 
-    protected override IUser? PerformGet(int id)
+    protected override IUser? PerformGet(Guid key)
     {
-        // This will never resolve to a user, yet this is asked
-        // for all of the time (especially in cases of members).
-        // Don't issue a SQL call for this, we know it will not exist.
-        if (_runtimeState.Level == RuntimeLevel.Upgrade)
-        {
-            // when upgrading people might come from version 7 where user 0 was the default,
-            // only in upgrade mode do we want to fetch the user of Id 0
-            if (id < -1)
-            {
-                return null;
-            }
-        }
-        else
-        {
-            if (id == default || id < -1)
-            {
-                return null;
-            }
-        }
-
         Sql<ISqlContext> sql = SqlContext.Sql()
             .Select<UserDto>()
             .From<UserDto>()
-            .Where<UserDto>(x => x.Id == id);
+            .Where<UserDto>(x => x.Key == key);
 
         List<UserDto>? dtos = Database.Fetch<UserDto>(sql);
         if (dtos.Count == 0)
@@ -137,8 +130,10 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
         }
 
         PerformGetReferencedDtos(dtos);
-        return UserFactory.BuildEntity(_globalSettings, dtos[0]);
+        return UserFactory.BuildEntity(_globalSettings, dtos[0], _permissionMappers);
     }
+
+    protected override Guid GetEntityId(IUser entity) => entity.Key;
 
     /// <summary>
     ///     Returns a user by username
@@ -153,6 +148,49 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     /// </returns>
     public IUser? GetByUsername(string username, bool includeSecurityData) =>
         GetWith(sql => sql.Where<UserDto>(x => x.Login == username), includeSecurityData);
+
+    public IUser? GetForUpgradeByUsername(string username) => GetUpgradeUserWith(sql => sql.Where<UserDto>(x => x.Login == username));
+
+    public IUser? GetForUpgradeByEmail(string email) => GetUpgradeUserWith(sql => sql.Where<UserDto>(x => x.Email == email));
+
+    public IUser? GetForUpgrade(int id) => GetUpgradeUserWith(sql => sql.Where<UserDto>(x => x.Id == id));
+
+    private IUser? GetUpgradeUserWith(Action<Sql<ISqlContext>> with)
+    {
+        if (_runtimeState.Level != RuntimeLevel.Upgrade)
+        {
+            return null;
+        }
+
+        // We'll only return a user if we're in upgrade mode.
+        Sql<ISqlContext> sql = SqlContext.Sql()
+            .Select<UserDto>(
+                dto => dto.Id,
+                dto => dto.UserName,
+                dto => dto.Email,
+                dto => dto.Login,
+                dto => dto.Password,
+                dto => dto.PasswordConfig,
+                dto => dto.SecurityStampToken,
+                dto => dto.UserLanguage,
+                dto => dto.LastLockoutDate,
+                dto => dto.Disabled,
+                dto => dto.NoConsole)
+            .From<UserDto>();
+
+        with(sql);
+
+        UserDto? userDto = Database.Fetch<UserDto>(sql).FirstOrDefault();
+
+        if (userDto is null)
+        {
+            return null;
+        }
+
+        PerformGetReferencedDtos(new List<UserDto> { userDto });
+
+        return UserFactory.BuildEntity(_globalSettings, userDto, _permissionMappers);
+    }
 
     /// <summary>
     ///     Returns a user by id
@@ -225,23 +263,23 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
     public bool ValidateLoginSession(int userId, Guid sessionId)
     {
         // HACK: Avoid a deadlock - BackOfficeCookieOptions OnValidatePrincipal
-            // After existing session times out and user logs in again ~ 4 requests come in at once that hit the
-            // "update the validate date" code path, check up the call stack there are a few variables that can make this not occur.
-            // TODO: more generic fix, do something with ForUpdate? wait on a mutex? add a distributed lock? etc.
-            if (Database.DatabaseType.IsSqlite())
+        // After existing session times out and user logs in again ~ 4 requests come in at once that hit the
+        // "update the validate date" code path, check up the call stack there are a few variables that can make this not occur.
+        // TODO: more generic fix, do something with ForUpdate? wait on a mutex? add a distributed lock? etc.
+        if (Database.DatabaseType.IsSqlite())
+        {
+            lock (_sqliteValidateSessionLock)
             {
-                lock (_sqliteValidateSessionLock)
-                {
-                    return ValidateLoginSessionInternal(userId, sessionId);
-                }
+                return ValidateLoginSessionInternal(userId, sessionId);
             }
-
-            return ValidateLoginSessionInternal(userId, sessionId);
         }
 
-        private bool ValidateLoginSessionInternal(int userId, Guid sessionId)
-        {
-            // with RepeatableRead transaction mode, read-then-update operations can
+        return ValidateLoginSessionInternal(userId, sessionId);
+    }
+
+    private bool ValidateLoginSessionInternal(int userId, Guid sessionId)
+    {
+        // with RepeatableRead transaction mode, read-then-update operations can
         // cause deadlocks, and the ForUpdate() hint is required to tell the database
         // to acquire an exclusive lock when reading
 
@@ -298,16 +336,17 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow))
             .Where<UserLoginDto>(x => x.SessionId == sessionId));
 
-    protected override IEnumerable<IUser> PerformGetAll(params int[]? ids)
+
+    protected override IEnumerable<IUser> PerformGetAll(params Guid[]? ids)
     {
         List<UserDto> dtos = ids?.Length == 0
             ? GetDtosWith(null, true)
-            : GetDtosWith(sql => sql.WhereIn<UserDto>(x => x.Id, ids), true);
+            : GetDtosWith(sql => sql.WhereIn<UserDto>(x => x.Key, ids), true);
         var users = new IUser[dtos.Count];
         var i = 0;
         foreach (UserDto dto in dtos)
         {
-            users[i++] = UserFactory.BuildEntity(_globalSettings, dto);
+            users[i++] = UserFactory.BuildEntity(_globalSettings, dto, _permissionMappers);
         }
 
         return users;
@@ -323,7 +362,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         var i = 0;
         foreach (UserDto dto in dtos)
         {
-            users[i++] = UserFactory.BuildEntity(_globalSettings, dto);
+            users[i++] = UserFactory.BuildEntity(_globalSettings, dto, _permissionMappers);
         }
 
         return users;
@@ -332,7 +371,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
     private IUser? GetWith(Action<Sql<ISqlContext>> with, bool includeReferences)
     {
         UserDto? dto = GetDtoWith(with, includeReferences);
-        return dto == null ? null : UserFactory.BuildEntity(_globalSettings, dto);
+        return dto == null ? null : UserFactory.BuildEntity(_globalSettings, dto, _permissionMappers);
     }
 
     private UserDto? GetDtoWith(Action<Sql<ISqlContext>> with, bool includeReferences)
@@ -370,18 +409,51 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             return;
         }
 
-        List<int> userIds = dtos.Count == 1 ? new List<int> {dtos[0].Id} : dtos.Select(x => x.Id).ToList();
+        List<int> userIds = dtos.Count == 1 ? new List<int> { dtos[0].Id } : dtos.Select(x => x.Id).ToList();
         Dictionary<int, UserDto>? xUsers = dtos.Count == 1 ? null : dtos.ToDictionary(x => x.Id, x => x);
 
-        // get users2groups
+        var groupIds = new List<int>();
+        var groupKeys = new List<Guid>();
+        Sql<ISqlContext> sql;
+        try
+        {
+            sql = SqlContext.Sql()
+                .Select<UserGroupDto>(x => x.Id, x => x.Key)
+                .From<UserGroupDto>()
+                .InnerJoin<User2UserGroupDto>().On<UserGroupDto, User2UserGroupDto>((left, right) => left.Id == right.UserGroupId)
+                .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
 
-        Sql<ISqlContext> sql = SqlContext.Sql()
+            List<UserGroupDto>? userGroups = Database.Fetch<UserGroupDto>(sql);
+
+
+            groupKeys = userGroups.Select(x => x.Key).ToList();
+
+        }
+        catch (DbException)
+        {
+            // ignore doing upgrade, as we know the Key potentially do not exists
+            if (_runtimeState.Level != RuntimeLevel.Upgrade)
+            {
+                throw;
+            }
+
+        }
+
+
+        // get users2groups
+        sql = SqlContext.Sql()
             .Select<User2UserGroupDto>()
             .From<User2UserGroupDto>()
             .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
 
         List<User2UserGroupDto>? user2Groups = Database.Fetch<User2UserGroupDto>(sql);
-        var groupIds = user2Groups.Select(x => x.UserGroupId).ToList();
+
+        if (groupIds.Any() is false)
+        {
+            //this can happen if we are upgrading, so we try do read from this table, as we counn't because of the key earlier
+            groupIds = user2Groups.Select(x => x.UserGroupId).Distinct().ToList();
+        }
+
 
         // get groups
         // We wrap this in a try-catch, as this might throw errors when you try to login before having migrated your database
@@ -396,12 +468,12 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             groups = Database.Fetch<UserGroupDto>(sql)
                 .ToDictionary(x => x.Id, x => x);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Logger.LogDebug(e, "Couldn't get user groups. This should only happens doing the migration that add new columns to user groups");
 
             sql = SqlContext.Sql()
-                .Select<UserGroupDto>(x=>x.Id, x=>x.Alias, x=>x.StartContentId, x=>x.StartMediaId)
+                .Select<UserGroupDto>(x => x.Id, x => x.Alias, x => x.StartContentId, x => x.StartMediaId)
                 .From<UserGroupDto>()
                 .WhereIn<UserGroupDto>(x => x.Id, groupIds);
 
@@ -449,6 +521,47 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             groups2languages = new Dictionary<int, IGrouping<int, UserGroup2LanguageDto>>();
         }
 
+        // get groups2permissions
+        sql = SqlContext.Sql()
+            .Select<UserGroup2PermissionDto>()
+            .From<UserGroup2PermissionDto>()
+            .WhereIn<UserGroup2PermissionDto>(x => x.UserGroupKey, groupKeys);
+
+        Dictionary<Guid, IGrouping<Guid, UserGroup2PermissionDto>> groups2permissions;
+        try
+        {
+            groups2permissions = Database.Fetch<UserGroup2PermissionDto>(sql)
+                .GroupBy(x => x.UserGroupKey)
+                .ToDictionary(x => x.Key, x => x);
+        }
+        catch
+        {
+            // If we get an error, the table has not been made in the database yet, set the list to an empty one
+            groups2permissions = new Dictionary<Guid, IGrouping<Guid, UserGroup2PermissionDto>>();
+        }
+
+        // get groups2granularPermissions
+
+        sql = SqlContext.Sql()
+            .Select<UserGroup2GranularPermissionDto>()
+            .From<UserGroup2GranularPermissionDto>()
+            .WhereIn<UserGroup2GranularPermissionDto>(x => x.UserGroupKey, groupKeys);
+
+
+        Dictionary<Guid, IGrouping<Guid, UserGroup2GranularPermissionDto>> groups2GranularPermissions;
+        try
+        {
+            groups2GranularPermissions = Database.Fetch<UserGroup2GranularPermissionDto>(sql)
+               .GroupBy(x => x.UserGroupKey)
+               .ToDictionary(x => x.Key, x => x);
+        }
+        catch
+        {
+            // If we get an error, the table has not been made in the database yet, set the list to an empty one
+            groups2GranularPermissions = new Dictionary<Guid, IGrouping<Guid, UserGroup2GranularPermissionDto>>();
+        }
+
+
         // map groups
 
         foreach (User2UserGroupDto? user2Group in user2Groups)
@@ -479,15 +592,37 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         }
 
+
+
         // map languages
 
-        foreach (var group in groups.Values)
+        foreach (UserGroupDto group in groups.Values)
         {
-            if (groups2languages.TryGetValue(group.Id, out var list))
+            if (groups2languages.TryGetValue(group.Id, out IGrouping<int, UserGroup2LanguageDto>? list))
             {
                 group.UserGroup2LanguageDtos = list.ToList(); // groups2apps is distinct
             }
         }
+
+        // map group permissions
+        foreach (UserGroupDto? group in groups.Values)
+        {
+            if (groups2permissions.TryGetValue(group.Key, out IGrouping<Guid, UserGroup2PermissionDto>? list))
+            {
+                group.UserGroup2PermissionDtos = list.ToList(); // groups2apps is distinct
+            }
+        }
+
+        // map granular permissions
+
+        foreach (UserGroupDto? group in groups.Values)
+        {
+            if (groups2GranularPermissions.TryGetValue(group.Key, out IGrouping<Guid, UserGroup2GranularPermissionDto>? list))
+            {
+                group.UserGroup2GranularPermissionDtos = list.ToList(); // groups2apps is distinct
+            }
+        }
+
     }
 
     #endregion
@@ -533,6 +668,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             $"DELETE FROM {Constants.DatabaseSchema.Tables.UserLogin} WHERE userId = @id",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.User2UserGroup} WHERE userId = @id",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.User2NodeNotify} WHERE userId = @id",
+            $"DELETE FROM {Constants.DatabaseSchema.Tables.User2ClientId} WHERE userId = @id",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.UserStartNode} WHERE userId = @id",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLoginToken} WHERE externalLoginId = (SELECT id FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = @key)",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = @key",
@@ -540,12 +676,13 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         };
         return list;
     }
+
     protected override void PersistDeletedItem(IUser entity)
     {
         IEnumerable<string> deletes = GetDeleteClauses();
         foreach (var delete in deletes)
         {
-            Database.Execute(delete, new { id = GetEntityId(entity), key = entity.Key });
+            Database.Execute(delete, new { id = entity.Id, key = GetEntityId(entity) });
         }
 
         entity.DeleteDate = DateTime.Now;
@@ -586,12 +723,13 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             // lookup all assigned
             List<UserGroupDto>? assigned = entity.Groups == null || entity.Groups.Any() == false
                 ? new List<UserGroupDto>()
-                : Database.Fetch<UserGroupDto>("SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)",
-                    new {aliases = entity.Groups.Select(x => x.Alias)});
+                : Database.Fetch<UserGroupDto>(
+                    "SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)",
+                    new { aliases = entity.Groups.Select(x => x.Alias) });
 
             foreach (UserGroupDto? groupDto in assigned)
             {
-                var dto = new User2UserGroupDto {UserGroupId = groupDto.Id, UserId = entity.Id};
+                var dto = new User2UserGroupDto { UserGroupId = groupDto.Id, UserId = entity.Id };
                 Database.Insert(dto);
             }
         }
@@ -634,8 +772,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             {"updateDate", "UpdateDate"},
             {"avatar", "Avatar"},
             {"emailConfirmedDate", "EmailConfirmedDate"},
-            {"invitedDate", "InvitedDate"},
-            {"tourData", "TourData"}
+            {"invitedDate", "InvitedDate"}
         };
 
         // create list of properties that have changed
@@ -689,8 +826,9 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         if (entity.IsPropertyDirty("StartContentIds") || entity.IsPropertyDirty("StartMediaIds"))
         {
             List<UserStartNodeDto>? assignedStartNodes =
-                Database.Fetch<UserStartNodeDto>("SELECT * FROM umbracoUserStartNode WHERE userId = @userId",
-                    new {userId = entity.Id});
+                Database.Fetch<UserStartNodeDto>(
+                    "SELECT * FROM umbracoUserStartNode WHERE userId = @userId",
+                    new { userId = entity.Id });
             if (entity.IsPropertyDirty("StartContentIds"))
             {
                 AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Content,
@@ -709,16 +847,17 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             //lookup all assigned
             List<UserGroupDto>? assigned = entity.Groups == null || entity.Groups.Any() == false
                 ? new List<UserGroupDto>()
-                : Database.Fetch<UserGroupDto>("SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)",
-                    new {aliases = entity.Groups.Select(x => x.Alias)});
+                : Database.Fetch<UserGroupDto>(
+                    "SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)",
+                    new { aliases = entity.Groups.Select(x => x.Alias) });
 
             //first delete all
             // TODO: We could do this a nicer way instead of "Nuke and Pave"
-            Database.Delete<User2UserGroupDto>("WHERE UserId = @UserId", new {UserId = entity.Id});
+            Database.Delete<User2UserGroupDto>("WHERE UserId = @UserId", new { UserId = entity.Id });
 
             foreach (UserGroupDto? groupDto in assigned)
             {
-                var dto = new User2UserGroupDto {UserGroupId = groupDto.Id, UserId = entity.Id};
+                var dto = new User2UserGroupDto { UserGroupId = groupDto.Id, UserId = entity.Id };
                 Database.Insert(dto);
             }
         }
@@ -740,15 +879,16 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         var toDelete = assignedIds.Except(entityStartIds).ToArray();
         if (toDelete.Length > 0)
         {
-            Database.Delete<UserStartNodeDto>("WHERE UserId = @UserId AND startNode IN (@startNodes)",
-                new {UserId = entity.Id, startNodes = toDelete});
+            Database.Delete<UserStartNodeDto>(
+                "WHERE UserId = @UserId AND startNode IN (@startNodes)",
+                new { UserId = entity.Id, startNodes = toDelete });
         }
 
         //add the ones not currently in the db
         var toAdd = entityStartIds.Except(assignedIds).ToArray();
         foreach (var i in toAdd)
         {
-            var dto = new UserStartNodeDto {StartNode = i, StartNodeType = (int)startNodeType, UserId = entity.Id};
+            var dto = new UserStartNodeDto { StartNode = i, StartNodeType = (int)startNodeType, UserId = entity.Id };
             Database.Insert(dto);
         }
     }
@@ -769,6 +909,16 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return Database.ExecuteScalar<int>(sql);
     }
 
+    protected override bool PerformExists(Guid key)
+    {
+        Sql<ISqlContext> sql = SqlContext.Sql()
+            .SelectCount()
+            .From<UserDto>()
+            .Where<UserDto>(x => x.Key == key);
+
+        return Database.ExecuteScalar<int>(sql) > 0;
+    }
+
     public bool Exists(string username) => ExistsByUserName(username);
 
     public bool ExistsByUserName(string username)
@@ -779,6 +929,39 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .Where<UserDto>(x => x.UserName == username);
 
         return Database.ExecuteScalar<int>(sql) > 0;
+    }
+
+    // This is a bit hacky, as we're stealing some of the cache implementation, so we also can cache user by id
+    // We do however need this, as all content have creatorId (as int) and thus when we index content
+    // this gets called for each content item, and we need to cache the user to avoid a lot of db calls
+    // TODO: Remove this once CreatorId gets migrated to a key.
+    public IUser? Get(int id)
+    {
+        string cacheKey = RepositoryCacheKeys.GetKey<IUser, int>(id);
+        IUser? cachedUser = IsolatedCache.GetCacheItem<IUser>(cacheKey);
+        if (cachedUser is not null)
+        {
+            return cachedUser;
+        }
+
+        Sql<ISqlContext> sql = SqlContext.Sql()
+            .Select<UserDto>()
+            .From<UserDto>()
+            .Where<UserDto>(x => x.Id == id);
+
+        List<UserDto>? dtos = Database.Fetch<UserDto>(sql);
+
+        if (dtos.Count == 0)
+        {
+            return null;
+        }
+
+        PerformGetReferencedDtos(dtos);
+
+        IUser user = UserFactory.BuildEntity(_globalSettings, dtos[0], _permissionMappers);
+        IsolatedCache.Insert(cacheKey, () => user, TimeSpan.FromMinutes(5), true);
+
+        return user;
     }
 
     public bool ExistsByLogin(string login)
@@ -891,7 +1074,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
                     INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
                     INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
                     WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
-            filterSql?.Append(subQuery, new {userGroups = includeUserGroups});
+            filterSql?.Append(subQuery, new { userGroups = includeUserGroups });
         }
 
         if (excludeUserGroups != null && excludeUserGroups.Length > 0)
@@ -901,7 +1084,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
                     INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
                     INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
                     WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
-            filterSql?.Append(subQuery, new {userGroups = excludeUserGroups});
+            filterSql?.Append(subQuery, new { userGroups = excludeUserGroups });
         }
 
         if (userState != null && userState.Length > 0)
@@ -988,7 +1171,40 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         // map references
         PerformGetReferencedDtos(pagedResult.Items);
-        return pagedResult.Items.Select(x => UserFactory.BuildEntity(_globalSettings, x));
+        return pagedResult.Items.Select(x => UserFactory.BuildEntity(_globalSettings, x, _permissionMappers));
+    }
+
+    public IEnumerable<string> GetAllClientIds()
+        => Database.Fetch<string>(SqlContext.Sql()
+            .Select<User2ClientIdDto>(d => d.ClientId)
+            .From<User2ClientIdDto>());
+
+    public IEnumerable<string> GetClientIds(int id)
+        => Database.Fetch<string>(SqlContext.Sql()
+            .Select<User2ClientIdDto>(d => d.ClientId)
+            .From<User2ClientIdDto>()
+            .Where<User2ClientIdDto>(d => d.UserId == id));
+
+    public void AddClientId(int id, string clientId)
+        => Database.Insert(new User2ClientIdDto { UserId = id, ClientId = clientId });
+
+    public bool RemoveClientId(int id, string clientId)
+        => Database.Delete<User2ClientIdDto>(SqlContext.Sql()
+            .Where<User2ClientIdDto>(d => d.UserId == id && d.ClientId == clientId)) > 0;
+
+    public IUser? GetByClientId(string clientId)
+    {
+        var userId = Database.ExecuteScalar<int>(
+            SqlContext.Sql()
+                .Select<User2ClientIdDto>(d => d.UserId)
+                .From<User2ClientIdDto>()
+                .Where<User2ClientIdDto>(d => d.ClientId == clientId));
+        if (userId == 0)
+        {
+            return null;
+        }
+
+        return Get(userId);
     }
 
     private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext>? filterSql, bool hasWhereClause)
@@ -1052,23 +1268,5 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         return sql;
     }
-
-    public IEnumerable<IUser> GetNextUsers(int id, int count)
-    {
-        Sql<ISqlContext> idsQuery = SqlContext.Sql()
-            .Select<UserDto>(x => x.Id)
-            .From<UserDto>()
-            .Where<UserDto>(x => x.Id >= id)
-            .OrderBy<UserDto>(x => x.Id);
-
-        // first page is index 1, not zero
-        var ids = Database.Page<int>(1, count, idsQuery).Items.ToArray();
-
-        // now get the actual users and ensure they are ordered properly (same clause)
-        return ids.Length == 0
-            ? Enumerable.Empty<IUser>()
-            : GetMany(ids).OrderBy(x => x.Id) ?? Enumerable.Empty<IUser>();
-    }
-
     #endregion
 }

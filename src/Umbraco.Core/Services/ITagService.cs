@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -57,6 +58,19 @@ public interface ITagService : IService
     ///     Gets all tags.
     /// </summary>
     IEnumerable<ITag> GetAllTags(string? group = null, string? culture = null);
+
+    Task<IEnumerable<ITag>> GetAllAsync(string? group = null, string? culture = null)
+    {
+        if (culture == string.Empty)
+        {
+            culture = null;
+        }
+
+        return Task.FromResult(GetAllTags(group, culture));
+    }
+
+    Task<IEnumerable<ITag>> GetByQueryAsync(string query, string? group = null, string? culture = null)
+        => Task.FromResult(GetAllAsync(group, culture).GetAwaiter().GetResult().Where(x => x.Text.InvariantContains(query)));
 
     /// <summary>
     ///     Gets all document tags.

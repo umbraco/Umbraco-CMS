@@ -1,16 +1,20 @@
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.Filters;
 using Umbraco.Cms.Api.Delivery.Configuration;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
 [ApiController]
 [JsonOptionsName(Constants.JsonOptionsNames.DeliveryApi)]
 [MapToApi(DeliveryApiConfiguration.ApiName)]
-public abstract class DeliveryApiControllerBase : Controller
+[Authorize(Policy = AuthorizationPolicies.UmbracoFeatureEnabled)]
+public abstract class DeliveryApiControllerBase : Controller, IUmbracoFeature
 {
     protected string DecodePath(string path)
     {

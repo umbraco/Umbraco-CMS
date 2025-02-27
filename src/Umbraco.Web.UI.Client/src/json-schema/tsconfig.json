@@ -1,0 +1,6 @@
+{
+	"extends": "../../tsconfig.json",
+	"include": ["./*.ts", "./**/*.ts", "./**/*.json", "./**/*.js"],
+	"exclude": ["./**/*.test.ts", "./**/*.stories.ts", "tsconfig.json", "rollup.config.js"]
+
+}

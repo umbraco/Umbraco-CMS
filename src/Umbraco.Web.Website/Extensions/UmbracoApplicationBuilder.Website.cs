@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Website.Routing;
@@ -39,7 +40,7 @@ public static class UmbracoApplicationBuilderExtensions
 
         FrontEndRoutes surfaceRoutes = builder.ApplicationServices.GetRequiredService<FrontEndRoutes>();
         surfaceRoutes.CreateRoutes(builder.EndpointRouteBuilder);
-        builder.EndpointRouteBuilder.MapDynamicControllerRoute<UmbracoRouteValueTransformer>("/{**slug}");
+        builder.EndpointRouteBuilder.MapDynamicControllerRoute<UmbracoRouteValueTransformer>(Constants.Web.Routing.DynamicRoutePattern);
 
         return builder;
     }

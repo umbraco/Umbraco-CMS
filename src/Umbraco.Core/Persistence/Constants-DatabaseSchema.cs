@@ -32,6 +32,7 @@ public static partial class Constants
             public const string Document = TableNamePrefix + "Document";
             public const string DocumentCultureVariation = TableNamePrefix + "DocumentCultureVariation";
             public const string DocumentVersion = TableNamePrefix + "DocumentVersion";
+            public const string DocumentUrl = TableNamePrefix + "DocumentUrl";
             public const string MediaVersion = TableNamePrefix + "MediaVersion";
             public const string ContentSchedule = TableNamePrefix + "ContentSchedule";
 
@@ -52,16 +53,21 @@ public static partial class Constants
             public const string UserStartNode = TableNamePrefix + "UserStartNode";
             public const string User2UserGroup = TableNamePrefix + "User2UserGroup";
             public const string User2NodeNotify = TableNamePrefix + "User2NodeNotify";
+            public const string User2ClientId = TableNamePrefix + "User2ClientId";
             public const string UserGroup2App = TableNamePrefix + "UserGroup2App";
+            public const string UserData = TableNamePrefix + "UserData";
+
+            [Obsolete("Will be removed in Umbraco 18 as this table haven't existed since Umbraco 14.")]
             public const string UserGroup2Node = TableNamePrefix + "UserGroup2Node";
+            [Obsolete("Will be removed in Umbraco 18 as this table haven't existed since Umbraco 14.")]
             public const string UserGroup2NodePermission = TableNamePrefix + "UserGroup2NodePermission";
+
+            public const string UserGroup2Permission = TableNamePrefix + "UserGroup2Permission";
+            public const string UserGroup2GranularPermission = TableNamePrefix + "UserGroup2GranularPermission";
             public const string UserGroup2Language = TableNamePrefix + "UserGroup2Language";
             public const string ExternalLogin = TableNamePrefix + "ExternalLogin";
             public const string TwoFactorLogin = TableNamePrefix + "TwoFactorLogin";
             public const string ExternalLoginToken = TableNamePrefix + "ExternalLoginToken";
-
-            public const string Macro = /*TableNamePrefix*/ "cms" + "Macro";
-            public const string MacroProperty = /*TableNamePrefix*/ "cms" + "MacroProperty";
 
             public const string Member = /*TableNamePrefix*/ "cms" + "Member";
             public const string MemberPropertyType = /*TableNamePrefix*/ "cms" + "MemberType";

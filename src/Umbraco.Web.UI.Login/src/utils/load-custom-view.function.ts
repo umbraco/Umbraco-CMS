@@ -1,5 +1,4 @@
-import { html } from 'lit';
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { html, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  * Try to load a custom view.
@@ -13,7 +12,7 @@ export async function loadCustomView<T extends HTMLElement>(view: string): Promi
 		return fetch(view).then((response) => response.text());
 	}
 
-	const module = await import(view /* @vite-ignore */);
+	const module = await import(/* @vite-ignore */ view);
 
 	if (!module.default) throw new Error('No default export found');
 

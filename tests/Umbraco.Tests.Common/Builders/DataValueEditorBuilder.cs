@@ -50,18 +50,13 @@ public class DataValueEditorBuilder<TParent> : ChildBuilderBase<TParent, IDataVa
     public override IDataValueEditor Build()
     {
         var configuration = _configuration;
-        var view = _view;
-        var hideLabel = _hideLabel ?? false;
         var valueType = _valueType ?? Guid.NewGuid().ToString();
 
         return new DataValueEditor(
-            Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>())
         {
-            Configuration = configuration,
-            View = view,
-            HideLabel = hideLabel,
+            ConfigurationObject = configuration,
             ValueType = valueType
         };
     }

@@ -4,9 +4,7 @@
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
-using System.Xml.XPath;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Xml;
 
 namespace Umbraco.Extensions;
 
@@ -17,208 +15,6 @@ public static class XmlExtensions
 {
     public static bool HasAttribute(this XmlAttributeCollection attributes, string attributeName) =>
         attributes.Cast<XmlAttribute>().Any(x => x.Name == attributeName);
-
-    /// <summary>
-    ///     Selects a list of XmlNode matching an XPath expression.
-    /// </summary>
-    /// <param name="source">A source XmlNode.</param>
-    /// <param name="expression">An XPath expression.</param>
-    /// <param name="variables">A set of XPathVariables.</param>
-    /// <returns>The list of XmlNode matching the XPath expression.</returns>
-    /// <remarks>
-    ///     <para>
-    ///         If
-    ///         <paramref name="variables" />
-    ///         is <c>null</c>, or is empty, or contains only one single
-    ///         value which itself is <c>null</c>, then variables are ignored.
-    ///     </para>
-    ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
-    /// </remarks>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public static XmlNodeList? SelectNodes(this XmlNode source, string expression, IEnumerable<XPathVariable>? variables)
-    {
-        XPathVariable[]? av = variables?.ToArray();
-        return SelectNodes(source, expression, av);
-    }
-
-    /// <summary>
-    ///     Selects a list of XmlNode matching an XPath expression.
-    /// </summary>
-    /// <param name="source">A source XmlNode.</param>
-    /// <param name="expression">An XPath expression.</param>
-    /// <param name="variables">A set of XPathVariables.</param>
-    /// <returns>The list of XmlNode matching the XPath expression.</returns>
-    /// <remarks>
-    ///     <para>
-    ///         If
-    ///         <paramref name="variables" />
-    ///         is <c>null</c>, or is empty, or contains only one single
-    ///         value which itself is <c>null</c>, then variables are ignored.
-    ///     </para>
-    ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
-    /// </remarks>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public static XmlNodeList? SelectNodes(this XmlNode source, XPathExpression expression, IEnumerable<XPathVariable>? variables)
-    {
-        XPathVariable[]? av = variables?.ToArray();
-        return SelectNodes(source, expression, av);
-    }
-
-    /// <summary>
-    ///     Selects a list of XmlNode matching an XPath expression.
-    /// </summary>
-    /// <param name="source">A source XmlNode.</param>
-    /// <param name="expression">An XPath expression.</param>
-    /// <param name="variables">A set of XPathVariables.</param>
-    /// <returns>The list of XmlNode matching the XPath expression.</returns>
-    /// <remarks>
-    ///     <para>
-    ///         If
-    ///         <paramref name="variables" />
-    ///         is <c>null</c>, or is empty, or contains only one single
-    ///         value which itself is <c>null</c>, then variables are ignored.
-    ///     </para>
-    ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
-    /// </remarks>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public static XmlNodeList? SelectNodes(this XmlNode source, string? expression, params XPathVariable[]? variables)
-    {
-        if (variables == null || variables.Length == 0 || variables[0] == null)
-        {
-            return source.SelectNodes(expression ?? string.Empty);
-        }
-
-        XPathNodeIterator? iterator = source.CreateNavigator()?.Select(expression ?? string.Empty, variables);
-        return XmlNodeListFactory.CreateNodeList(iterator);
-    }
-
-    /// <summary>
-    ///     Selects a list of XmlNode matching an XPath expression.
-    /// </summary>
-    /// <param name="source">A source XmlNode.</param>
-    /// <param name="expression">An XPath expression.</param>
-    /// <param name="variables">A set of XPathVariables.</param>
-    /// <returns>The list of XmlNode matching the XPath expression.</returns>
-    /// <remarks>
-    ///     <para>
-    ///         If
-    ///         <paramref name="variables" />
-    ///         is <c>null</c>, or is empty, or contains only one single
-    ///         value which itself is <c>null</c>, then variables are ignored.
-    ///     </para>
-    ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
-    /// </remarks>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public static XmlNodeList SelectNodes(this XmlNode source, XPathExpression expression, params XPathVariable[]? variables)
-    {
-        if (variables == null || variables.Length == 0 || variables[0] == null)
-        {
-            return source.SelectNodes(expression);
-        }
-
-        XPathNodeIterator? iterator = source.CreateNavigator()?.Select(expression, variables);
-        return XmlNodeListFactory.CreateNodeList(iterator);
-    }
-
-    /// <summary>
-    ///     Selects the first XmlNode that matches an XPath expression.
-    /// </summary>
-    /// <param name="source">A source XmlNode.</param>
-    /// <param name="expression">An XPath expression.</param>
-    /// <param name="variables">A set of XPathVariables.</param>
-    /// <returns>The first XmlNode that matches the XPath expression.</returns>
-    /// <remarks>
-    ///     <para>
-    ///         If
-    ///         <paramref name="variables" />
-    ///         is <c>null</c>, or is empty, or contains only one single
-    ///         value which itself is <c>null</c>, then variables are ignored.
-    ///     </para>
-    ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
-    /// </remarks>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public static XmlNode? SelectSingleNode(this XmlNode source, string expression, IEnumerable<XPathVariable>? variables)
-    {
-        XPathVariable[]? av = variables?.ToArray();
-        return SelectSingleNode(source, expression, av);
-    }
-
-    /// <summary>
-    ///     Selects the first XmlNode that matches an XPath expression.
-    /// </summary>
-    /// <param name="source">A source XmlNode.</param>
-    /// <param name="expression">An XPath expression.</param>
-    /// <param name="variables">A set of XPathVariables.</param>
-    /// <returns>The first XmlNode that matches the XPath expression.</returns>
-    /// <remarks>
-    ///     <para>
-    ///         If
-    ///         <paramref name="variables" />
-    ///         is <c>null</c>, or is empty, or contains only one single
-    ///         value which itself is <c>null</c>, then variables are ignored.
-    ///     </para>
-    ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
-    /// </remarks>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public static XmlNode? SelectSingleNode(this XmlNode source, XPathExpression expression, IEnumerable<XPathVariable>? variables)
-    {
-        XPathVariable[]? av = variables?.ToArray();
-        return SelectSingleNode(source, expression, av);
-    }
-
-    /// <summary>
-    ///     Selects the first XmlNode that matches an XPath expression.
-    /// </summary>
-    /// <param name="source">A source XmlNode.</param>
-    /// <param name="expression">An XPath expression.</param>
-    /// <param name="variables">A set of XPathVariables.</param>
-    /// <returns>The first XmlNode that matches the XPath expression.</returns>
-    /// <remarks>
-    ///     <para>
-    ///         If
-    ///         <paramref name="variables" />
-    ///         is <c>null</c>, or is empty, or contains only one single
-    ///         value which itself is <c>null</c>, then variables are ignored.
-    ///     </para>
-    ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
-    /// </remarks>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public static XmlNode? SelectSingleNode(this XmlNode source, string expression, params XPathVariable[]? variables)
-    {
-        if (variables == null || variables.Length == 0 || variables[0] == null)
-        {
-            return source.SelectSingleNode(expression);
-        }
-
-        return SelectNodes(source, expression, variables)?.Cast<XmlNode>().FirstOrDefault();
-    }
-
-    /// <summary>
-    ///     Selects the first XmlNode that matches an XPath expression.
-    /// </summary>
-    /// <param name="source">A source XmlNode.</param>
-    /// <param name="expression">An XPath expression.</param>
-    /// <param name="variables">A set of XPathVariables.</param>
-    /// <returns>The first XmlNode that matches the XPath expression.</returns>
-    /// <remarks>
-    ///     <para>
-    ///         If
-    ///         <paramref name="variables" />
-    ///         is <c>null</c>, or is empty, or contains only one single
-    ///         value which itself is <c>null</c>, then variables are ignored.
-    ///     </para>
-    ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
-    /// </remarks>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public static XmlNode? SelectSingleNode(this XmlNode source, XPathExpression expression, params XPathVariable[]? variables)
-    {
-        if (variables == null || variables.Length == 0 || variables[0] == null)
-        {
-            return source.SelectSingleNode(expression);
-        }
-
-        return SelectNodes(source, expression, variables).Cast<XmlNode>().FirstOrDefault();
-    }
 
     /// <summary>
     ///     Converts from an XDocument to an XmlDocument
@@ -314,18 +110,13 @@ public static class XmlExtensions
             throw new ArgumentNullException("xml");
         }
 
-        if (xml.HasAttributes == false)
+        XAttribute? xmlAttribute = xml.Attribute(attributeName);
+        if (xmlAttribute == null)
         {
             return default;
         }
 
-        if (xml.Attribute(attributeName) == null)
-        {
-            return default;
-        }
-
-        var val = xml.Attribute(attributeName)?.Value;
-        Attempt<T> result = val.TryConvertTo<T>();
+        Attempt<T> result = xmlAttribute.Value.TryConvertTo<T>();
         if (result.Success)
         {
             return result.Result;
@@ -346,13 +137,13 @@ public static class XmlExtensions
             return default;
         }
 
-        if (xml.Attributes[attributeName] == null)
+        XmlAttribute? xmlAttribute = xml.Attributes[attributeName];
+        if (xmlAttribute == null)
         {
             return default;
         }
 
-        var val = xml.Attributes[attributeName]?.Value;
-        Attempt<T> result = val.TryConvertTo<T>();
+        Attempt<T> result = xmlAttribute.Value.TryConvertTo<T>();
         if (result.Success)
         {
             return result.Result;

@@ -80,6 +80,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer? container)
     {
         var parentId = Constants.System.Root;
+        Guid? parentKey = Constants.System.RootKey;
         if (container != null)
         {
             // check path
@@ -92,10 +93,11 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             }
 
             parentId = container.Id;
+            parentKey = container.Key;
         }
 
         // track moved entities
-        var moveInfo = new List<MoveEventInfo<TEntity>> { new(moving, moving.Path, parentId) };
+        var moveInfo = new List<MoveEventInfo<TEntity>> { new(moving, moving.Path, parentId, parentKey) };
 
         // get the level delta (old pos to new pos)
         var levelDelta = container == null
@@ -118,6 +120,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 
         foreach (TEntity descendant in descendants.OrderBy(x => x.Level))
         {
+            //FIXME: Use MoveEventInfo constructor that takes a parentKey when this method is refactored
             moveInfo.Add(new MoveEventInfo<TEntity>(descendant, descendant.Path, descendant.ParentId));
 
             descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
@@ -243,16 +246,17 @@ AND umbracoNode.nodeObjectType = @objectType",
             }
         }
 
-        if (entity.AllowedContentTypes is not null)
+        (TEntity Entity, int SortOrder)[] allowedContentTypes = GetAllowedContentTypes(entity);
+        if (allowedContentTypes.Any())
         {
             // Insert collection of allowed content types
-            foreach (ContentTypeSort allowedContentType in entity.AllowedContentTypes)
+            foreach ((TEntity entity1, int sortOrder1) in allowedContentTypes)
             {
                 Database.Insert(new ContentTypeAllowedContentTypeDto
                 {
                     Id = entity.Id,
-                    AllowedId = allowedContentType.Id.Value,
-                    SortOrder = allowedContentType.SortOrder,
+                    AllowedId = entity1.Id,
+                    SortOrder = sortOrder1,
                 });
             }
         }
@@ -398,15 +402,17 @@ AND umbracoNode.id <> @id",
 
         // delete the allowed content type entries before re-inserting the collection of allowed content types
         Database.Delete<ContentTypeAllowedContentTypeDto>("WHERE Id = @Id", new { entity.Id });
-        if (entity.AllowedContentTypes is not null)
+
+        (TEntity Entity, int SortOrder)[] allowedContentTypes = GetAllowedContentTypes(entity);
+        if (allowedContentTypes.Any())
         {
-            foreach (ContentTypeSort allowedContentType in entity.AllowedContentTypes)
+            foreach ((TEntity entity1, int sortOrder) in allowedContentTypes)
             {
                 Database.Insert(new ContentTypeAllowedContentTypeDto
                 {
                     Id = entity.Id,
-                    AllowedId = allowedContentType.Id.Value,
-                    SortOrder = allowedContentType.SortOrder,
+                    AllowedId = entity1.Id,
+                    SortOrder = sortOrder,
                 });
             }
         }
@@ -533,11 +539,7 @@ AND umbracoNode.id <> @id",
             if (propertyType.IsPropertyDirty("Variations"))
             {
                 // allocate the list only when needed
-                if (propertyTypeVariationDirty == null)
-                {
-                    propertyTypeVariationDirty = new List<IPropertyType>();
-                }
-
+                propertyTypeVariationDirty ??= new List<IPropertyType>();
                 propertyTypeVariationDirty.Add(propertyType);
             }
         }
@@ -791,11 +793,7 @@ AND umbracoNode.id <> @id",
             }
 
             // allocate the dictionary only when needed
-            if (changes == null)
-            {
-                changes = new Dictionary<int, (ContentVariation, ContentVariation)>();
-            }
-
+            changes ??= new Dictionary<int, (ContentVariation, ContentVariation)>();
             changes[propertyType.Id] = (oldVariation, newVariation);
         }
 
@@ -858,10 +856,10 @@ AND umbracoNode.id <> @id",
                  propertyTypeChanges.GroupBy(x => x.Value))
         {
             var propertyTypeIds = grouping.Select(x => x.Key).ToList();
-            (ContentVariation FromVariation, ContentVariation ToVariation) = grouping.Key;
+            (ContentVariation fromVariation, ContentVariation toVariation) = grouping.Key;
 
-            var fromCultureEnabled = FromVariation.HasFlag(ContentVariation.Culture);
-            var toCultureEnabled = ToVariation.HasFlag(ContentVariation.Culture);
+            var fromCultureEnabled = fromVariation.HasFlag(ContentVariation.Culture);
+            var toCultureEnabled = toVariation.HasFlag(ContentVariation.Culture);
 
             if (!fromCultureEnabled && toCultureEnabled)
             {
@@ -883,7 +881,9 @@ AND umbracoNode.id <> @id",
     /// <summary>
     ///     Moves variant data for a content type variation change.
     /// </summary>
-    private void MoveContentTypeVariantData(IContentTypeComposition contentType, ContentVariation fromVariation,
+    private void MoveContentTypeVariantData(
+        IContentTypeComposition contentType,
+        ContentVariation fromVariation,
         ContentVariation toVariation)
     {
         var defaultLanguageId = GetDefaultLanguageId();
@@ -1504,8 +1504,7 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         var sql = new Sql(
             $@"SELECT COUNT(*) FROM cmsContentType
 INNER JOIN {Constants.DatabaseSchema.Tables.Content} ON cmsContentType.nodeId={Constants.DatabaseSchema.Tables.Content}.contentTypeId
-WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer",
-            new { ids, isContainer = true });
+WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.listView IS NULL", new { ids });
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
@@ -1528,8 +1527,8 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
         var list = new List<string>
         {
             "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
-            "DELETE FROM umbracoUserGroup2Node WHERE nodeId = @id",
-            "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
+            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
+            "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
             "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
             "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @id",
             "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @id",
@@ -1543,6 +1542,26 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
             " WHERE contenttypeNodeId = @id",
         };
         return list;
+    }
+
+    private (TEntity Entity, int SortOrder)[] GetAllowedContentTypes(IContentTypeBase contentTypeBase)
+    {
+        if (contentTypeBase.AllowedContentTypes?.Any() is not true)
+        {
+            return Array.Empty<(TEntity, int)>();
+        }
+
+        Guid[] allowedContentTypeKeys = contentTypeBase
+            .AllowedContentTypes
+            .OrderBy(c => c.SortOrder)
+            .Select(c => c.Key)
+            .ToArray();
+
+        // NOTE: we're efficiently discarding the input sort order here in favor of a "0 to n" sorting (which is the correct sort order).
+        //       i.e. if the input sort orders are [5, 3, 17] they will be come [1, 0, 2] (in effect though they will also be sorted by
+        //       the 0 based sort order, so they will be returned as [0, 1, 2]).
+        return PerformGetAll(allowedContentTypeKeys)?.Select(c => (c, allowedContentTypeKeys.IndexOf(c.Key))).ToArray()
+            ?? Array.Empty<(TEntity, int)>();
     }
 
     private class NameCompareDto

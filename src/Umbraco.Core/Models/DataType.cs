@@ -13,11 +13,11 @@ namespace Umbraco.Cms.Core.Models;
 public class DataType : TreeEntityBase, IDataType
 {
     private readonly IConfigurationEditorJsonSerializer _serializer;
-    private object? _configuration;
-    private string? _configurationJson;
+    private object? _configurationObject;
+    private IDictionary<string, object> _configurationData;
     private ValueStorageType _databaseType;
     private IDataEditor? _editor;
-    private bool _hasConfiguration;
+    private bool _hasConfigurationObject;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DataType" /> class.
@@ -29,7 +29,7 @@ public class DataType : TreeEntityBase, IDataType
         ParentId = parentId;
 
         // set a default configuration
-        Configuration = _editor.GetConfigurationEditor().DefaultConfigurationObject;
+        _configurationData = _editor.GetConfigurationEditor().DefaultConfiguration;
     }
 
     /// <inheritdoc />
@@ -45,31 +45,22 @@ public class DataType : TreeEntityBase, IDataType
                 return;
             }
 
-            OnPropertyChanged(nameof(Editor));
-
-            // try to map the existing configuration to the new configuration
-            // simulate saving to db and reloading (ie go via json)
-            var configuration = Configuration;
-            var json = _serializer.Serialize(configuration);
+            // reset the configuration (force reload on next access using the new editor)
+            _configurationObject = null;
+            _hasConfigurationObject = false;
             _editor = value;
 
-            try
-            {
-                Configuration = _editor?.GetConfigurationEditor().FromDatabase(json, _serializer);
-            }
-            catch (Exception e)
-            {
-                throw new InvalidOperationException(
-                    $"The configuration for data type {Id} : {EditorAlias} is invalid (see inner exception)."
-                    + " Please fix the configuration and ensure it is valid. The site may fail to start and / or load data types and run.",
-                    e);
-            }
+            OnPropertyChanged(nameof(Editor));
         }
     }
 
     /// <inheritdoc />
     [DataMember]
     public string EditorAlias => _editor?.Alias ?? string.Empty;
+
+    /// <inheritdoc />
+    [DataMember]
+    public string? EditorUiAlias { get; set; }
 
     /// <inheritdoc />
     [DataMember]
@@ -80,22 +71,37 @@ public class DataType : TreeEntityBase, IDataType
     }
 
     /// <inheritdoc />
+    public IDictionary<string, object> ConfigurationData
+    {
+        get => _configurationData;
+        set
+        {
+            _configurationObject = null;
+            _hasConfigurationObject = false;
+            _configurationData = value;
+
+            OnPropertyChanged(nameof(ConfigurationObject));
+            OnPropertyChanged(nameof(ConfigurationData));
+        }
+    }
+
+    /// <inheritdoc />
     [DataMember]
-    public object? Configuration
+    public object? ConfigurationObject
     {
         get
         {
             // if we know we have a configuration (which may be null), return it
             // if we don't have an editor, then we have no configuration, return null
             // else, use the editor to get the configuration object
-            if (_hasConfiguration)
+            if (_hasConfigurationObject)
             {
-                return _configuration;
+                return _configurationObject;
             }
 
             try
             {
-                _configuration = _editor?.GetConfigurationEditor().FromDatabase(_configurationJson, _serializer);
+                _configurationObject = _editor?.GetConfigurationEditor().ToConfigurationObject(_configurationData, _serializer);
             }
             catch (Exception e)
             {
@@ -105,68 +111,16 @@ public class DataType : TreeEntityBase, IDataType
                     e);
             }
 
-            _hasConfiguration = true;
-            _configurationJson = null;
+            _hasConfigurationObject = true;
 
-            return _configuration;
-        }
-
-        set
-        {
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-
-            // we don't support re-assigning the same object
-            // configurations are kinda non-mutable, mainly because detecting changes would be a pain
-            // reference comparison
-            if (_configuration == value)
-            {
-                throw new ArgumentException(
-                    "Configurations are kinda non-mutable. Do not reassign the same object.",
-                    nameof(value));
-            }
-
-            // validate configuration type
-            if (!_editor?.GetConfigurationEditor().IsConfiguration(value) ?? true)
-            {
-                throw new ArgumentException(
-                    $"Value of type {value.GetType().Name} cannot be a configuration for editor {_editor?.Alias}, expecting.",
-                    nameof(value));
-            }
-
-            // extract database type from configuration object, if appropriate
-            if (value is IConfigureValueType valueTypeConfiguration)
-            {
-                DatabaseType = ValueTypes.ToStorageType(valueTypeConfiguration.ValueType);
-            }
-
-            // extract database type from dictionary, if appropriate
-            if (value is IDictionary<string, object> dictionaryConfiguration
-                && dictionaryConfiguration.TryGetValue(
-                    Constants.PropertyEditors.ConfigurationKeys.DataValueType,
-                    out var valueTypeObject)
-                && valueTypeObject is string valueTypeString
-                && ValueTypes.IsValue(valueTypeString))
-            {
-                DatabaseType = ValueTypes.ToStorageType(valueTypeString);
-            }
-
-            _configuration = value;
-            _hasConfiguration = true;
-            _configurationJson = null;
-
-            // it's always a change
-            OnPropertyChanged(nameof(Configuration));
+            return _configurationObject;
         }
     }
 
     /// <summary>
-    ///     Lazily set the configuration as a serialized json string.
+    ///     Sets the configuration without invoking property changed events.
     /// </summary>
     /// <remarks>
-    ///     <para>Will be de-serialized on-demand.</para>
     ///     <para>
     ///         This method is meant to be used when building entities from database, exclusively.
     ///         It does NOT register a property change to dirty. It ignores the fact that the configuration
@@ -175,11 +129,11 @@ public class DataType : TreeEntityBase, IDataType
     ///     </para>
     ///     <para>Think before using!</para>
     /// </remarks>
-    public void SetLazyConfiguration(string? configurationJson)
+    public void SetConfigurationData(IDictionary<string, object> configurationData)
     {
-        _hasConfiguration = false;
-        _configuration = null;
-        _configurationJson = configurationJson;
+        _hasConfigurationObject = false;
+        _configurationObject = null;
+        _configurationData = configurationData;
     }
 
     /// <summary>
@@ -190,26 +144,26 @@ public class DataType : TreeEntityBase, IDataType
     ///     <para>This method is meant to be used when creating published datatypes, exclusively.</para>
     ///     <para>Think before using!</para>
     /// </remarks>
-    internal Lazy<object?> GetLazyConfiguration()
+    internal Lazy<object?> GetLazyConfigurationObject()
     {
         // note: in both cases, make sure we capture what we need - we don't want
         // to capture a reference to this full, potentially heavy, DataType instance.
-        if (_hasConfiguration)
+        if (_hasConfigurationObject)
         {
             // if configuration has already been de-serialized, return
-            var capturedConfiguration = _configuration;
+            var capturedConfiguration = _configurationObject;
             return new Lazy<object?>(() => capturedConfiguration);
         }
         else
         {
             // else, create a Lazy de-serializer
-            var capturedConfiguration = _configurationJson;
+            IDictionary<string, object> capturedConfiguration = _configurationData;
             IDataEditor? capturedEditor = _editor;
             return new Lazy<object?>(() =>
             {
                 try
                 {
-                    return capturedEditor?.GetConfigurationEditor().FromDatabase(capturedConfiguration, _serializer);
+                    return capturedEditor?.GetConfigurationEditor().ToConfigurationObject(capturedConfiguration, _serializer);
                 }
                 catch (Exception e)
                 {

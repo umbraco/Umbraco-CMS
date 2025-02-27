@@ -27,28 +27,20 @@ public class DataEditor : IDataEditor
     /// <summary>
     ///     Initializes a new instance of the <see cref="DataEditor" /> class.
     /// </summary>
-    public DataEditor(IDataValueEditorFactory dataValueEditorFactory, EditorType type = EditorType.PropertyValue)
+    public DataEditor(IDataValueEditorFactory dataValueEditorFactory)
     {
         // defaults
         DataValueEditorFactory = dataValueEditorFactory;
-        Type = type;
-        Icon = Constants.Icons.PropertyEditor;
-        Group = Constants.PropertyEditors.Groups.Common;
 
         // assign properties based on the attribute, if it is found
         Attribute = GetType().GetCustomAttribute<DataEditorAttribute>(false);
         if (Attribute == null)
         {
             Alias = string.Empty;
-            Name = string.Empty;
             return;
         }
 
         Alias = Attribute.Alias;
-        Type = Attribute.Type;
-        Name = Attribute.Name;
-        Icon = Attribute.Icon;
-        Group = Attribute.Group;
         IsDeprecated = Attribute.IsDeprecated;
 
         _canReuseValueEditor = Attribute.ValueEditorIsReusable;
@@ -83,21 +75,9 @@ public class DataEditor : IDataEditor
     [DataMember(Name = "supportsReadOnly", IsRequired = true)]
     public bool SupportsReadOnly { get; set; }
 
-    /// <inheritdoc />
-    [IgnoreDataMember]
-    public EditorType Type { get; }
-
-    /// <inheritdoc />
-    [DataMember(Name = "name", IsRequired = true)]
-    public string Name { get; internal set; }
-
-    /// <inheritdoc />
-    [DataMember(Name = "icon")]
-    public string Icon { get; internal set; }
-
-    /// <inheritdoc />
-    [DataMember(Name = "group")]
-    public string Group { get; internal set; }
+    // Adding a virtual method that wraps the default implementation allows derived classes
+    // to override the default implementation without having to explicitly inherit the interface.
+    public virtual bool SupportsConfigurableElements => false;
 
     /// <inheritdoc />
     [IgnoreDataMember]
@@ -107,11 +87,7 @@ public class DataEditor : IDataEditor
     [DataMember(Name = "defaultConfig")]
     public IDictionary<string, object> DefaultConfiguration
     {
-        // for property value editors, get the ConfigurationEditor.DefaultConfiguration
-        // else fallback to a default, empty dictionary
-        get => _defaultConfiguration ?? ((Type & EditorType.PropertyValue) > 0
-            ? GetConfigurationEditor().DefaultConfiguration
-            : _defaultConfiguration = new Dictionary<string, object>());
+        get => _defaultConfiguration ?? GetConfigurationEditor().DefaultConfiguration;
         set => _defaultConfiguration = value;
     }
 
@@ -149,7 +125,7 @@ public class DataEditor : IDataEditor
     ///         simple enough for now.
     ///     </para>
     /// </remarks>
-    public virtual IDataValueEditor GetValueEditor(object? configuration)
+    public virtual IDataValueEditor GetValueEditor(object? configurationObject)
     {
         // if an explicit value editor has been set (by the manifest parser)
         // then return it, and ignore the configuration, which is going to be
@@ -160,9 +136,9 @@ public class DataEditor : IDataEditor
         }
 
         IDataValueEditor editor = CreateValueEditor();
-        if (configuration is not null)
+        if (configurationObject is not null)
         {
-            ((DataValueEditor)editor).Configuration = configuration; // TODO: casting is bad
+            ((DataValueEditor)editor).ConfigurationObject = configurationObject; // TODO: casting is bad
         }
 
         return editor;
@@ -208,7 +184,7 @@ public class DataEditor : IDataEditor
         var editor = new ConfigurationEditor();
 
         // pass the default configuration if this is not a property value editor
-        if ((Type & EditorType.PropertyValue) == 0 && _defaultConfiguration is not null)
+        if (_defaultConfiguration is not null)
         {
             editor.DefaultConfiguration = _defaultConfiguration;
         }
@@ -219,5 +195,17 @@ public class DataEditor : IDataEditor
     /// <summary>
     ///     Provides a summary of the PropertyEditor for use with the <see cref="DebuggerDisplayAttribute" />.
     /// </summary>
-    protected virtual string DebuggerDisplay() => $"Name: {Name}, Alias: {Alias}";
+    protected virtual string DebuggerDisplay() => $"Alias: {Alias}";
+
+    /// <inheritdoc />
+    public virtual bool CanMergePartialPropertyValues(IPropertyType propertyType) => false;
+
+    /// <inheritdoc />
+    public virtual object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture) => sourceValue;
+
+    public virtual object? MergeVariantInvariantPropertyValue(
+        object? sourceValue,
+        object? targetValue,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures) => sourceValue;
 }

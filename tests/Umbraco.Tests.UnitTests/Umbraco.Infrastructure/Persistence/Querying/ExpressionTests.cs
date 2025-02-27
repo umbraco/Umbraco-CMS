@@ -26,7 +26,7 @@ public class ExpressionTests : BaseUsingSqlSyntax
     {
         var dataType = new DataType(
                 new VoidEditor(Mock.Of<IDataValueEditorFactory>()),
-                new ConfigurationEditorJsonSerializer())
+                new SystemTextConfigurationEditorJsonSerializer())
         { Id = 12345 };
         Expression<Func<PropertyType, bool>> predicate = p => p.DataTypeId == dataType.Id;
         var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<PropertyType>(SqlContext.SqlSyntax, Mappers);

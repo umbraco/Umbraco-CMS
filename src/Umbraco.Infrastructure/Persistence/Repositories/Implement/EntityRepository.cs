@@ -30,10 +30,35 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
     #region Repository
 
-    public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType,
+    public int CountByQuery(IQuery<IUmbracoEntity> query, IEnumerable<Guid> objectTypes, IQuery<IUmbracoEntity>? filter)
+    {
+        Sql<ISqlContext> sql = Sql();
+        sql.SelectCount();
+        sql
+            .From<NodeDto>();
+        sql.WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
+
+        foreach (Tuple<string, object[]> queryClause in query.GetWhereClauses())
+        {
+            sql.Where(queryClause.Item1, queryClause.Item2);
+        }
+
+        if (filter is not null)
+        {
+            foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
+            {
+                sql.Where(filterClause.Item1, filterClause.Item2);
+            }
+        }
+
+        return Database.ExecuteScalar<int>(sql);
+    }
+
+    public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, ISet<Guid> objectTypes,
         long pageIndex, int pageSize, out long totalRecords,
         IQuery<IUmbracoEntity>? filter, Ordering? ordering) =>
-        GetPagedResultsByQuery(query, new[] {objectType}, pageIndex, pageSize, out totalRecords, filter, ordering);
+        GetPagedResultsByQuery(query, objectTypes.ToArray(), pageIndex, pageSize, out totalRecords, filter, ordering);
+
 
     // get a page of entities
     public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid[] objectTypes,
@@ -58,7 +83,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             }
         }, objectTypes);
 
-        ordering = ordering ?? Ordering.ByDefault();
+        ordering ??= Ordering.ByDefault();
 
         var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
         sql = translator.Translate();
@@ -227,7 +252,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         var isMedia = objectType == Constants.ObjectTypes.Media;
         var isMember = objectType == Constants.ObjectTypes.Member;
 
-        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, null, new[] {objectType});
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, null, new[] { objectType });
 
         var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
         sql = translator.Translate();
@@ -289,6 +314,34 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
+    public bool Exists(IEnumerable<Guid> keys)
+    {
+        IEnumerable<Guid> distictKeys = keys.Distinct();
+        Sql<ISqlContext> sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => distictKeys.Contains(x.UniqueId));
+        return Database.ExecuteScalar<int>(sql) == distictKeys.Count();
+    }
+
+    /// <inheritdoc />
+    public bool Exists(Guid key, Guid objectType)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .SelectCount()
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == objectType);
+
+        return Database.ExecuteScalar<int>(sql) > 0;
+    }
+
+    public bool Exists(int id, Guid objectType)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .SelectCount()
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.NodeId == id && x.NodeObjectType == objectType);
+
+        return Database.ExecuteScalar<int>(sql) > 0;
+    }
+
     public bool Exists(int id)
     {
         Sql<ISqlContext> sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
@@ -296,7 +349,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     }
 
     private DocumentEntitySlim BuildVariants(DocumentEntitySlim entity)
-        => BuildVariants(new[] {entity}).First();
+        => BuildVariants(new[] { entity }).First();
 
     private IEnumerable<DocumentEntitySlim> BuildVariants(IEnumerable<DocumentEntitySlim> entities)
     {
@@ -306,7 +359,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         {
             if (e.Variations.VariesByCulture())
             {
-                (v ?? (v = new List<DocumentEntitySlim>())).Add(e);
+                (v ??= new List<DocumentEntitySlim>()).Add(e);
             }
         }
 
@@ -316,8 +369,10 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         }
 
         // fetch all variant info dtos
-        IEnumerable<VariantInfoDto> dtos = Database.FetchByGroups<VariantInfoDto, int>(v.Select(x => x.Id),
-            Constants.Sql.MaxParameterCount, GetVariantInfos);
+        IEnumerable<VariantInfoDto> dtos = Database.FetchByGroups<VariantInfoDto, int>(
+            v.Select(x => x.Id),
+            Constants.Sql.MaxParameterCount,
+            GetVariantInfos);
 
         // group by node id (each group contains all languages)
         var xdtos = dtos.GroupBy(x => x.NodeId).ToDictionary(x => x.Key, x => x);
@@ -343,10 +398,16 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         Sql()
             .Select<NodeDto>(x => x.NodeId)
             .AndSelect<LanguageDto>(x => x.IsoCode)
-            .AndSelect<DocumentDto>("doc", x => Alias(x.Published, "DocumentPublished"),
+            .AndSelect<DocumentDto>(
+                "doc",
+                x => Alias(
+                    x.Published,
+                    "DocumentPublished"),
                 x => Alias(x.Edited, "DocumentEdited"))
-            .AndSelect<DocumentCultureVariationDto>("dcv",
-                x => Alias(x.Available, "CultureAvailable"), x => Alias(x.Published, "CulturePublished"),
+            .AndSelect<DocumentCultureVariationDto>(
+                "dcv",
+                x => Alias(x.Available, "CultureAvailable"),
+                x => Alias(x.Published, "CulturePublished"),
                 x => Alias(x.Edited, "CultureEdited"),
                 x => Alias(x.Name, "Name"))
 
@@ -387,7 +448,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType,
         Action<Sql<ISqlContext>>? filter)
     {
-        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] {objectType});
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] { objectType });
         return AddGroupBy(isContent, isMedia, isMember, sql, true);
     }
 
@@ -415,8 +476,13 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             {
                 sql
                     .AndSelect<ContentVersionDto>(x => Alias(x.Id, "versionId"), x => x.VersionDate)
-                    .AndSelect<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.Thumbnail, x => x.IsContainer,
-                        x => x.Variations);
+                    .AndSelect<ContentTypeDto>(
+                        x => x.Alias,
+                        x => x.Icon,
+                        x => x.Thumbnail,
+                        x => x.ListView,
+                        x => x.Variations)
+                    .AndSelect<NodeDto>("ContentTypeNode", x => Alias(x.UniqueId, "ContentTypeKey"));
             }
 
             if (isContent)
@@ -442,7 +508,9 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
                 .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
                 .LeftJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
                 .LeftJoin<ContentTypeDto>()
-                .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId);
+                .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId)
+                .LeftJoin<NodeDto>("ContentTypeNode")
+                .On<NodeDto, ContentTypeDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "ContentTypeNode");
         }
 
         if (isContent)
@@ -544,8 +612,13 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         {
             sql
                 .AndBy<ContentVersionDto>(x => x.Id, x => x.VersionDate)
-                .AndBy<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.Thumbnail, x => x.IsContainer,
-                    x => x.Variations);
+                .AndBy<ContentTypeDto>(
+                    x => x.Alias,
+                    x => x.Icon,
+                    x => x.Thumbnail,
+                    x => x.ListView,
+                    x => x.Variations)
+                .AndBy<NodeDto>("ContentTypeNode", x => x.UniqueId);
         }
 
         if (defaultSort)
@@ -571,25 +644,40 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         // TODO: although the default ordering string works for name, it wont work for others without a table or an alias of some sort
         // As more things are attempted to be sorted we'll prob have to add more expressions here
         string orderBy;
-        switch (ordering.OrderBy?.ToUpperInvariant())
-        {
-            case "PATH":
-                orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "path");
-                break;
 
-            default:
-                orderBy = ordering.OrderBy ?? string.Empty;
-                break;
-        }
+        Ordering? runner = ordering;
 
-        if (ordering.Direction == Direction.Ascending)
+        do
         {
-            sql.OrderBy(orderBy);
+
+            switch (runner.OrderBy?.ToUpperInvariant())
+            {
+                case "NODEOBJECTTYPE":
+                    orderBy = $"UPPER({SqlSyntax.GetQuotedColumn(NodeDto.TableName, "nodeObjectType")})";
+                    break;
+                case "PATH":
+                    orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "path");
+                    break;
+
+                default:
+                    orderBy = runner.OrderBy ?? string.Empty;
+                    break;
+            }
+
+            if (runner.Direction == Direction.Ascending)
+            {
+                sql.OrderBy(orderBy);
+            }
+            else
+            {
+                sql.OrderByDescending(orderBy);
+            }
+
+            runner = runner.Next;
         }
-        else
-        {
-            sql.OrderByDescending(orderBy);
-        }
+        while (runner is not null);
+
+
     }
 
     #endregion
@@ -670,6 +758,10 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         public string? Thumbnail { get; set; }
         public bool IsContainer { get; set; }
 
+        public Guid ContentTypeKey { get; set; }
+
+        public Guid? ListView { get; set; }
+
         // ReSharper restore UnusedAutoPropertyAccessor.Local
         // ReSharper restore UnusedMember.Local
     }
@@ -726,6 +818,8 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         entity.ContentTypeAlias = dto.Alias;
         entity.ContentTypeIcon = dto.Icon;
         entity.ContentTypeThumbnail = dto.Thumbnail;
+        entity.ContentTypeKey = dto.ContentTypeKey;
+        entity.ListViewKey = dto.ListView;
     }
 
     private MediaEntitySlim BuildMediaEntity(BaseDto dto)

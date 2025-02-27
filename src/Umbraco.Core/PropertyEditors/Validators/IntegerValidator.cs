@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
@@ -6,13 +7,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 /// <summary>
 ///     A validator that validates that the value is a valid integer
 /// </summary>
-public sealed class IntegerValidator : IManifestValueValidator
+public sealed class IntegerValidator : IValueValidator
 {
     /// <inheritdoc />
-    public string ValidationName => "Integer";
-
-    /// <inheritdoc />
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
     {
         if (value != null && value.ToString() != string.Empty)
         {

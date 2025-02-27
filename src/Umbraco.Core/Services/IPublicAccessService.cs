@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -62,8 +63,48 @@ public interface IPublicAccessService : IService
     Attempt<OperationResult?> Save(PublicAccessEntry entry);
 
     /// <summary>
+    ///     Saves the entry asynchronously and returns a status result whether the operation succeeded or not
+    /// </summary>
+    /// <param name="entry"></param>
+    Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> CreateAsync(PublicAccessEntrySlim entry);
+
+    /// <summary>
+    ///     Updates the entry asynchronously and returns a status result whether the operation succeeded or not
+    /// </summary>
+    /// <param name="entry"></param>
+    Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> UpdateAsync(PublicAccessEntrySlim entry);
+
+    /// <summary>
     ///     Deletes the entry and all associated rules
     /// </summary>
     /// <param name="entry"></param>
     Attempt<OperationResult?> Delete(PublicAccessEntry entry);
+
+    /// <summary>
+    ///     Gets the entry defined for the content item based on a content key
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns>Returns null if no entry is found</returns>
+    /// <remarks>
+    /// This method supports inheritance by considering ancestor entries (if any),
+    /// if no entry is found for the specified content key.
+    /// </remarks>
+    Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKeyAsync(Guid key);
+
+    /// <summary>
+    ///     Gets the entry defined for the content item based on a content key, without taking ancestor entries into account.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns>Returns null if no entry is found</returns>
+    /// <remarks>
+    /// This method does not support inheritance. Use <see cref="GetEntryByContentKeyAsync"/> to include ancestor entries (if any).
+    /// </remarks>
+    Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKeyWithoutAncestorsAsync(Guid key)
+        => Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.EntryNotFound, null));
+
+    /// <summary>
+    ///     Deletes the entry and all associated rules for a given key.
+    /// </summary>
+    /// <param name="key"></param>
+    Task<Attempt<PublicAccessOperationStatus>> DeleteAsync(Guid key);
 }

@@ -10,7 +10,6 @@ public class PartialViewBuilder
 {
     private string _path;
     private string _content;
-    private PartialViewType _viewType = PartialViewType.Unknown;
 
     public PartialViewBuilder WithPath(string path)
     {
@@ -24,18 +23,11 @@ public class PartialViewBuilder
         return this;
     }
 
-    public PartialViewBuilder WithViewType(PartialViewType viewType)
-    {
-        _viewType = viewType;
-        return this;
-    }
-
     public override IPartialView Build()
     {
         var path = _path ?? string.Empty;
         var content = _content ?? string.Empty;
-        var viewType = _viewType;
 
-        return new PartialView(viewType, path) { Content = content };
+        return new PartialView(path) { Content = content };
     }
 }

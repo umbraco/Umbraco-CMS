@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Collections;
@@ -27,7 +26,7 @@ public class DeepCloneAppCacheTests : RuntimeAppCacheTests
     private DeepCloneAppCache _provider;
     private ObjectCacheAppCache _memberCache;
 
-    protected override int GetTotalItemCount => _memberCache.MemoryCache.Count();
+    protected override int GetTotalItemCount => _memberCache.MemoryCache.Count;
 
     internal override IAppCache AppCache => _provider;
 

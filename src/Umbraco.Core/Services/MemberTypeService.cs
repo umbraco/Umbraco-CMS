@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -14,29 +15,6 @@ namespace Umbraco.Cms.Core.Services;
 public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, IMemberType>, IMemberTypeService
 {
     private readonly IMemberTypeRepository _memberTypeRepository;
-
-    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V12.")]
-    public MemberTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IMemberService memberService,
-        IMemberTypeRepository memberTypeRepository,
-        IAuditRepository auditRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            memberService,
-            memberTypeRepository,
-            auditRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberTypeContainerRepository>(),
-            entityRepository,
-            eventAggregator)
-    {
-    }
 
     public MemberTypeService(
         ICoreScopeProvider provider,
@@ -47,7 +25,9 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
         IAuditRepository auditRepository,
         IMemberTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
         : base(
             provider,
             loggerFactory,
@@ -56,10 +36,64 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
             auditRepository,
             entityContainerRepository,
             entityRepository,
-            eventAggregator)
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilters)
     {
         MemberService = memberService;
         _memberTypeRepository = memberTypeRepository;
+    }
+
+    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V16.")]
+    public MemberTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMemberService memberService,
+        IMemberTypeRepository memberTypeRepository,
+        IAuditRepository auditRepository,
+        IMemberTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            memberService,
+            memberTypeRepository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+    {
+    }
+
+    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V16.")]
+    public MemberTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMemberService memberService,
+        IMemberTypeRepository memberTypeRepository,
+        IAuditRepository auditRepository,
+        IMemberTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            memberService,
+            memberTypeRepository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            StaticServiceProvider.Instance.GetRequiredService<ContentTypeFilterCollection>())
+    {
     }
 
     // beware! order is important to avoid deadlocks
@@ -77,7 +111,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
         {
             scope.ReadLock(ReadLockIds);
 
-            using (IEnumerator<IMemberType> e = _memberTypeRepository.GetMany(new int[0]).GetEnumerator())
+            using (IEnumerator<IMemberType> e = _memberTypeRepository.GetMany(Array.Empty<int>()).GetEnumerator())
             {
                 if (e.MoveNext() == false)
                 {

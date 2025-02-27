@@ -146,6 +146,7 @@ public class NotificationsRepositoryTest : UmbracoIntegrationTest
             {
                 var userDto = new UserDto
                 {
+                    Key = Guid.NewGuid(),
                     Email = "test" + i,
                     Login = "test" + i,
                     Password = "test",
@@ -208,6 +209,7 @@ public class NotificationsRepositoryTest : UmbracoIntegrationTest
             {
                 var userDto = new UserDto
                 {
+                    Key = Guid.NewGuid(),
                     Email = "test" + i,
                     Login = "test" + i,
                     Password = "test",

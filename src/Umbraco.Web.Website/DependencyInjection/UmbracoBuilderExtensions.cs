@@ -57,13 +57,13 @@ public static partial class UmbracoBuilderExtensions
             x.GetRequiredService<IControllerActionSearcher>(),
             x.GetRequiredService<IPublicAccessRequestHandler>(),
             x.GetRequiredService<IUmbracoVirtualPageRoute>(),
-            x.GetRequiredService<IOptionsMonitor<GlobalSettings>>()
-            ));
+            x.GetRequiredService<IOptionsMonitor<GlobalSettings>>()));
         builder.Services.AddSingleton<IControllerActionSearcher, ControllerActionSearcher>();
         builder.Services.TryAddEnumerable(Singleton<MatcherPolicy, NotFoundSelectorPolicy>());
         builder.Services.AddSingleton<IUmbracoVirtualPageRoute, UmbracoVirtualPageRoute>();
         builder.Services.AddSingleton<IUmbracoRouteValuesFactory, UmbracoRouteValuesFactory>();
         builder.Services.AddSingleton<IRoutableDocumentFilter, RoutableDocumentFilter>();
+        builder.Services.AddSingleton<MatcherPolicy, EagerMatcherPolicy>();
         builder.Services.AddSingleton<MatcherPolicy, SurfaceControllerMatcherPolicy>();
 
         builder.Services.AddSingleton<FrontEndRoutes>();

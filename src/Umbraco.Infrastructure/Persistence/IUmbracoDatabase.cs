@@ -1,3 +1,4 @@
+using System.Data.Common;
 using NPoco;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 
@@ -33,4 +34,7 @@ public interface IUmbracoDatabase : IDatabase
     bool IsUmbracoInstalled();
 
     DatabaseSchemaResult ValidateSchema();
+
+    /// <returns>The number of rows affected.</returns>
+    int ExecuteNonQuery(DbCommand command) => command.ExecuteNonQuery();
 }

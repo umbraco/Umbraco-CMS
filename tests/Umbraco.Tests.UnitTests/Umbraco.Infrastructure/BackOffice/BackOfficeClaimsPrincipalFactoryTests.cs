@@ -56,18 +56,19 @@ public class BackOfficeClaimsPrincipalFactoryTests
     public void Ctor_When_UserManager_Is_Null_Expect_ArgumentNullException()
         => Assert.Throws<ArgumentNullException>(() => new BackOfficeClaimsPrincipalFactory(
             null,
-            new OptionsWrapper<BackOfficeIdentityOptions>(new BackOfficeIdentityOptions())));
+            new OptionsWrapper<BackOfficeIdentityOptions>(new BackOfficeIdentityOptions()),
+            new OptionsWrapper<BackOfficeAuthenticationTypeSettings>(new BackOfficeAuthenticationTypeSettings())));
 
     [Test]
     public void Ctor_When_Options_Are_Null_Expect_ArgumentNullException()
         => Assert.Throws<ArgumentNullException>(() =>
-            new BackOfficeClaimsPrincipalFactory(GetMockedUserManager().Object, null));
+            new BackOfficeClaimsPrincipalFactory(GetMockedUserManager().Object, null, new OptionsWrapper<BackOfficeAuthenticationTypeSettings>(new BackOfficeAuthenticationTypeSettings())));
 
     [Test]
     public void Ctor_When_Options_Value_Is_Null_Expect_ArgumentException()
         => Assert.Throws<ArgumentException>(() => new BackOfficeClaimsPrincipalFactory(
             GetMockedUserManager().Object,
-            new OptionsWrapper<BackOfficeIdentityOptions>(null)));
+            new OptionsWrapper<BackOfficeIdentityOptions>(null), new OptionsWrapper<BackOfficeAuthenticationTypeSettings>(new BackOfficeAuthenticationTypeSettings())));
 
     [Test]
     public void CreateAsync_When_User_Is_Null_Expect_ArgumentNullException()
@@ -158,5 +159,5 @@ public class BackOfficeClaimsPrincipalFactoryTests
 
     private BackOfficeClaimsPrincipalFactory CreateSut() => new(
         _mockUserManager.Object,
-        new OptionsWrapper<BackOfficeIdentityOptions>(new BackOfficeIdentityOptions()));
+        new OptionsWrapper<BackOfficeIdentityOptions>(new BackOfficeIdentityOptions()), new OptionsWrapper<BackOfficeAuthenticationTypeSettings>(new BackOfficeAuthenticationTypeSettings()));
 }

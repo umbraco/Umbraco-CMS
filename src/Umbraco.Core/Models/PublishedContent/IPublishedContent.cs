@@ -87,7 +87,7 @@ public interface IPublishedContent : IPublishedElement
     ///         have a non-empty content name.
     ///     </para>
     ///     <para>Does not contain the invariant culture.</para>
-    ///     // fixme?
+    ///     // TODO?
     /// </remarks>
     IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }
 
@@ -100,6 +100,7 @@ public interface IPublishedContent : IPublishedElement
     ///     Gets the parent of the content item.
     /// </summary>
     /// <remarks>The parent of root content is <c>null</c>.</remarks>
+    [Obsolete("Please use either the IPublishedContent.Parent<>() extension method in the Umbraco.Extensions namespace, or IDocumentNavigationQueryService if you only need keys. Scheduled for removal in V16.")]
     IPublishedContent? Parent { get; }
 
     /// <summary>
@@ -141,10 +142,6 @@ public interface IPublishedContent : IPublishedElement
     /// <summary>
     ///     Gets the children of the content item that are available for the current culture.
     /// </summary>
+    [Obsolete("Please use either the IPublishedContent.Children() extension method in the Umbraco.Extensions namespace, or IDocumentNavigationQueryService if you only need keys. Scheduled for removal in V16.")]
     IEnumerable<IPublishedContent> Children { get; }
-
-    /// <summary>
-    ///     Gets all the children of the content item, regardless of whether they are available for the current culture.
-    /// </summary>
-    IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }
 }

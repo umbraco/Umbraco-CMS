@@ -23,7 +23,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     private readonly Lazy<SyncBootState?> _initialized;
     private readonly LastSyncedFileManager _lastSyncedFileManager;
 
-    private readonly object _locko = new();
+    private readonly Lock _locko = new();
     /*
      * this messenger writes ALL instructions to the database,
      * but only processes instructions coming from remote servers,
@@ -54,7 +54,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         IJsonSerializer jsonSerializer,
         LastSyncedFileManager lastSyncedFileManager,
         IOptionsMonitor<GlobalSettings> globalSettings)
-        : base(distributedEnabled)
+        : base(distributedEnabled, jsonSerializer)
     {
         _cancellationToken = _cancellationTokenSource.Token;
         _mainDom = mainDom;

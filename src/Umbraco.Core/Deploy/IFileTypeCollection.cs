@@ -27,18 +27,7 @@ public interface IFileTypeCollection
     /// <returns>
     ///   <c>true</c> if the file type associated with the specified entity type was found; otherwise, <c>false</c>.
     /// </returns>
-    bool TryGetValue(string entityType, [NotNullWhen(true)] out IFileType? fileType)
-    {
-        // TODO (V14): Remove default implementation
-        if (Contains(entityType))
-        {
-            fileType = this[entityType];
-            return true;
-        }
-
-        fileType = null;
-        return false;
-    }
+    bool TryGetValue(string entityType, [NotNullWhen(true)] out IFileType? fileType);
 
     /// <summary>
     /// Determines whether this collection contains a file type for the specified entity type.
@@ -55,5 +44,5 @@ public interface IFileTypeCollection
     /// <returns>
     /// The entity types.
     /// </returns>
-    ICollection<string> GetEntityTypes() => Array.Empty<string>(); // TODO (V14): Remove default implementation
+    ICollection<string> GetEntityTypes();
 }

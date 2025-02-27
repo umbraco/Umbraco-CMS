@@ -37,7 +37,6 @@ public class ScopedNuCacheTests : UmbracoIntegrationTest
         builder.AddNotificationHandler<ContentPublishedNotification, NotificationHandler>();
         builder.Services.AddUnique<IUmbracoContextAccessor, TestUmbracoContextAccessor>();
         builder.Services.AddUnique(MockHttpContextAccessor.Object);
-        builder.AddNuCache();
     }
 
     public class NotificationHandler : INotificationHandler<ContentPublishedNotification>
@@ -71,7 +70,8 @@ public class ScopedNuCacheTests : UmbracoIntegrationTest
 
         using (var scope = ScopeProvider.CreateScope())
         {
-            ContentService.SaveAndPublish(item);
+            ContentService.Save(item);
+            ContentService.Publish(item, item.AvailableCultures.ToArray());
             scope.Complete();
         }
 
@@ -96,7 +96,8 @@ public class ScopedNuCacheTests : UmbracoIntegrationTest
         using (var scope = ScopeProvider.CreateScope())
         {
             item.Name = "changed";
-            ContentService.SaveAndPublish(item);
+            ContentService.Save(item);
+            ContentService.Publish(item, item.AvailableCultures.ToArray());
 
             if (complete)
             {

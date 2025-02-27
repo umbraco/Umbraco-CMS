@@ -6,26 +6,24 @@
     "config": "node config.js",
     "ui": "npx playwright test --headed DefaultConfig",
     "test": "npx playwright test DefaultConfig",
+    "testSqlite": "npx playwright test DefaultConfig --grep-invert \"Users\"",
     "all": "npx playwright test",
-    "createTest": "node createTest.js"
+    "createTest": "node createTest.js",
+    "smokeTest": "npx playwright test DefaultConfig --grep \"@smoke\"",
+    "smokeTestSqlite": "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\""
   },
   "devDependencies": {
-    "@playwright/test": "^1.38",
-    "typescript": "^4.8.3",
-    "tslib": "^2.4.0",
-    "del": "^6.0.0",
-    "ncp": "^2.0.0",
+    "@playwright/test": "^1.50",
+    "@types/node": "^20.9.0",
     "prompt": "^1.2.0",
-    "wait-on": "^7.2.0"
+    "tslib": "^2.4.0",
+    "typescript": "^4.8.3"
   },
   "dependencies": {
-    "@umbraco/json-models-builders": "^1.0.6",
-    "@umbraco/playwright-testhelpers": "^1.0.25",
+    "@umbraco/json-models-builders": "^2.0.27",
+    "@umbraco/playwright-testhelpers": "^15.0.13",
     "camelize": "^1.0.0",
-    "faker": "^4.1.0",
-    "form-data": "^4.0.0",
-    "node-fetch": "^2.6.7",
-    "xhr2": "^0.2.1",
-    "dotenv": "^16.0.2"
+    "dotenv": "^16.3.1",
+    "node-fetch": "^2.6.7"
   }
 }

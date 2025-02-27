@@ -4,7 +4,6 @@
 using Moq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Serialization;
 
@@ -17,10 +16,9 @@ public class MockedValueEditors
         var valueType = ValueTypes.IsValue(name) ? name : ValueTypes.String;
 
         return new DataValueEditor(
-            Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
-            new JsonNetSerializer(),
+            new SystemTextJsonSerializer(),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute(name, name, name) { ValueType = valueType });
+            new DataEditorAttribute(name) { ValueType = valueType });
     }
 }

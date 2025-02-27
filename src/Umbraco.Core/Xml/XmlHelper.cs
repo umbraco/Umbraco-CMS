@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.Xml;
 /// <summary>
 ///     The XmlHelper class contains general helper methods for working with xml in umbraco.
 /// </summary>
+[Obsolete("The current implementation is not used anymore and will be removed entirely in a future version. Scheduled for removal in v15")]
 public class XmlHelper
 {
     /// <summary>
@@ -76,7 +77,6 @@ public class XmlHelper
     /// </summary>
     /// <param name="xml">The xml string.</param>
     /// <returns>An <c>XPathDocument</c> created from the xml string.</returns>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public static XPathDocument CreateXPathDocument(string xml) =>
         new XPathDocument(new XmlTextReader(new StringReader(xml)));
 
@@ -86,7 +86,6 @@ public class XmlHelper
     /// <param name="xml">The xml string.</param>
     /// <param name="doc">The XPath document.</param>
     /// <returns>A value indicating whether it has been possible to create the document.</returns>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public static bool TryCreateXPathDocument(string xml, out XPathDocument? doc)
     {
         try
@@ -108,7 +107,6 @@ public class XmlHelper
     /// <param name="doc">The XPath document.</param>
     /// <returns>A value indicating whether it has been possible to create the document.</returns>
     /// <remarks>The value can be anything... Performance-wise, this is bad.</remarks>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public static bool TryCreateXPathDocumentFromPropertyValue(object value, out XPathDocument? doc)
     {
         // DynamicNode.ConvertPropertyValueByDataType first cleans the value by calling
@@ -158,7 +156,6 @@ public class XmlHelper
     /// <param name="parentNode">The parent node.</param>
     /// <param name="childNodesXPath">An XPath expression to select children of <paramref name="parentNode" /> to sort.</param>
     /// <param name="orderBy">A function returning the value to order the nodes by.</param>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public static void SortNodes(
         XmlNode parentNode,
         string childNodesXPath,
@@ -191,7 +188,6 @@ public class XmlHelper
     ///     Assuming all nodes but <paramref name="node" /> are sorted, this will move the node to
     ///     the right position without moving all the nodes (as SortNodes would do) - should improve perfs.
     /// </remarks>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public static bool SortNode(
         XmlNode parentNode,
         string childNodesXPath,
@@ -510,7 +506,7 @@ public class XmlHelper
         }
 
         xml = xml.Trim();
-        return xml.StartsWith("<") && xml.EndsWith(">") && xml.Contains('/');
+        return xml.StartsWith('<') && xml.EndsWith('>') && xml.Contains('/');
     }
 
     /// <summary>

@@ -311,7 +311,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue; // not implementing IDataValueTags, continue
                 }
 
-                object? configuration = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.Configuration;
+                object? configurationObject = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.ConfigurationObject;
 
                 if (property.PropertyType.VariesByCulture())
                 {
@@ -319,14 +319,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     foreach (IPropertyValue pvalue in property.Values)
                     {
                         var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
-                        tags.AddRange(tagsProvider.GetTags(pvalue.EditedValue, configuration, languageId));
+                        tags.AddRange(tagsProvider.GetTags(pvalue.EditedValue, configurationObject, languageId));
                     }
 
                     tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
                 }
                 else
                 {
-                    IEnumerable<ITag> tags = tagsProvider.GetTags(property.GetValue(), configuration, null);
+                    IEnumerable<ITag> tags = tagsProvider.GetTags(property.GetValue(), configurationObject, null);
                     tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
                 }
             }

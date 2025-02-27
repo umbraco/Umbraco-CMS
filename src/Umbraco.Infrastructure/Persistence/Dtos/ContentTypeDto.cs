@@ -12,6 +12,9 @@ internal class ContentTypeDto
     public const string TableName = Constants.DatabaseSchema.Tables.ContentType;
     private string? _alias;
 
+    // Public constants to bind properties between DTOs
+    public const string VariationsColumnName = "variations";
+
     [Column("pk")]
     [PrimaryKeyColumn(IdentitySeed = 700)]
     public int PrimaryKey { get; set; }
@@ -40,9 +43,9 @@ internal class ContentTypeDto
     [Length(1500)]
     public string? Description { get; set; }
 
-    [Column("isContainer")]
-    [Constraint(Default = "0")]
-    public bool IsContainer { get; set; }
+    [Column("listView")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public Guid? ListView { get; set; }
 
     [Column("isElement")]
     [Constraint(Default = "0")]
@@ -52,7 +55,7 @@ internal class ContentTypeDto
     [Constraint(Default = "0")]
     public bool AllowAtRoot { get; set; }
 
-    [Column("variations")]
+    [Column(VariationsColumnName)]
     [Constraint(Default = "1" /*ContentVariation.InvariantNeutral*/)]
     public byte Variations { get; set; }
 

@@ -7,15 +7,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 ///     <para>This is for tests etc - does not implement fallback at all.</para>
 /// </remarks>
 public class NoopPublishedValueFallback : IPublishedValueFallback
-
 {
-    /// <inheritdoc />
-    public IVariationContextAccessor VariationContextAccessor
-    {
-        get => new ThreadCultureVariationContextAccessor();
-        set { }
-    }
-
     /// <inheritdoc />
     public bool TryGetValue(IPublishedProperty property, string? culture, string? segment, Fallback fallback, object? defaultValue, out object? value)
     {

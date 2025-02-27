@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class RichTextPropertyEditorTests : UmbracoIntegrationTest
+internal class RichTextPropertyEditorTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -88,25 +88,27 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
 
         var dataType = DataTypeService.GetDataType(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId)!;
         var editor = dataType.Editor!;
-        var valueEditor = (BlockValuePropertyValueEditorBase)editor.GetValueEditor();
+        var valueEditor = (BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>)editor.GetValueEditor();
 
         var elementId = Guid.NewGuid();
         var propertyValue = RichTextPropertyEditorHelper.SerializeRichTextEditorValue(
             new RichTextEditorValue
             {
-                Markup = @$"<p>This is some markup</p><umb-rte-block data-content-udi=""umb://element/{elementId:N}""><!--Umbraco-Block--></umb-rte-block>",
-                Blocks = JsonSerializer.Deserialize<BlockValue>($$"""
+                Markup = @$"<p>This is some markup</p><umb-rte-block data-content-key=""{elementId:D}""><!--Umbraco-Block--></umb-rte-block>",
+                Blocks = JsonSerializer.Deserialize<RichTextBlockValue>($$"""
                                                                   {
                                                                   	"layout": {
                                                                   		"Umbraco.TinyMCE": [{
-                                                                  				"contentUdi": "umb://element/{{elementId:N}}"
+                                                                  				"contentKey": "{{elementId:D}}"
                                                                   			}
                                                                   		]
                                                                   	},
                                                                   	"contentData": [{
-                                                                  			"contentTypeKey": "{{elementType.Key:B}}",
-                                                                  			"udi": "umb://element/{{elementId:N}}",
-                                                                  			"contentPicker": "umb://document/{{pickedContent.Key:N}}"
+                                                                  			"contentTypeKey": "{{elementType.Key:D}}",
+                                                                  			"key": "{{elementId:D}}",
+                                                                  			"values": [
+                                                                                { "alias": "contentPicker", "value": "umb://document/{{pickedContent.Key:N}}" }
+                                                                  			]
                                                                   		}
                                                                   	],
                                                                   	"settingsData": []
@@ -139,25 +141,27 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
 
         var dataType = DataTypeService.GetDataType(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId)!;
         var editor = dataType.Editor!;
-        var valueEditor = (BlockValuePropertyValueEditorBase)editor.GetValueEditor();
+        var valueEditor = (BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>)editor.GetValueEditor();
 
         var elementId = Guid.NewGuid();
         var propertyValue = RichTextPropertyEditorHelper.SerializeRichTextEditorValue(
             new RichTextEditorValue
             {
-                Markup = @$"<p>This is some markup</p><umb-rte-block data-content-udi=""umb://element/{elementId:N}""><!--Umbraco-Block--></umb-rte-block>",
-                Blocks = JsonSerializer.Deserialize<BlockValue>($$"""
+                Markup = @$"<p>This is some markup</p><umb-rte-block data-content-key=""{elementId:D}""><!--Umbraco-Block--></umb-rte-block>",
+                Blocks = JsonSerializer.Deserialize<RichTextBlockValue>($$"""
                                                                   {
                                                                   	"layout": {
                                                                   		"Umbraco.TinyMCE": [{
-                                                                  				"contentUdi": "umb://element/{{elementId:N}}"
+                                                                  				"contentKey": "{{elementId:D}}"
                                                                   			}
                                                                   		]
                                                                   	},
                                                                   	"contentData": [{
-                                                                  			"contentTypeKey": "{{elementType.Key:B}}",
-                                                                  			"udi": "umb://element/{{elementId:N}}",
-                                                                  			"tags": "['Tag One', 'Tag Two', 'Tag Three']"
+                                                                  			"contentTypeKey": "{{elementType.Key:D}}",
+                                                                  			"key": "{{elementId:D}}",
+                                                                  			"values": [
+                                                                                { "alias": "tags", "value": "[\"Tag One\", \"Tag Two\", \"Tag Three\"]" }
+                                                                  			]
                                                                   		}
                                                                   	],
                                                                   	"settingsData": []

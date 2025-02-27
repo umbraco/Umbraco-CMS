@@ -5,6 +5,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class LabelConfiguration : IConfigureValueType
 {
-    [ConfigurationField(Constants.PropertyEditors.ConfigurationKeys.DataValueType, "Value type", "valuetype")]
+    [ConfigurationField(Constants.PropertyEditors.ConfigurationKeys.DataValueType)]
     public string ValueType { get; set; } = ValueTypes.String;
 }

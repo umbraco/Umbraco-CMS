@@ -16,8 +16,8 @@ namespace Umbraco.Cms.Persistence.Sqlite.Services;
 
 public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
 {
-    private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
-    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+    private ConnectionStrings _connectionStrings;
+    private GlobalSettings _globalSettings;
     private readonly ILogger<SqliteDistributedLockingMechanism> _logger;
     private readonly Lazy<IScopeAccessor> _scopeAccessor;
 
@@ -29,29 +29,31 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
     {
         _logger = logger;
         _scopeAccessor = scopeAccessor;
-        _connectionStrings = connectionStrings;
-        _globalSettings = globalSettings;
+        _connectionStrings = connectionStrings.CurrentValue;
+        _globalSettings = globalSettings.CurrentValue;
+         globalSettings.OnChange(x=>_globalSettings = x);
+         connectionStrings.OnChange(x=>_connectionStrings = x);
     }
 
     /// <inheritdoc />
-    public bool Enabled => _connectionStrings.CurrentValue.IsConnectionStringConfigured() &&
-                           string.Equals(_connectionStrings.CurrentValue.ProviderName, Constants.ProviderName, StringComparison.InvariantCultureIgnoreCase);
+    public bool Enabled => _connectionStrings.IsConnectionStringConfigured() &&
+                           string.Equals(_connectionStrings.ProviderName, Constants.ProviderName, StringComparison.InvariantCultureIgnoreCase);
 
     // With journal_mode=wal we can always read a snapshot.
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)
     {
-        obtainLockTimeout ??= _globalSettings.CurrentValue.DistributedLockingReadLockDefaultTimeout;
+        obtainLockTimeout ??= _globalSettings.DistributedLockingReadLockDefaultTimeout;
         return new SqliteDistributedLock(this, lockId, DistributedLockType.ReadLock, obtainLockTimeout.Value);
     }
 
     // With journal_mode=wal only a single write transaction can exist at a time.
     public IDistributedLock WriteLock(int lockId, TimeSpan? obtainLockTimeout = null)
     {
-        obtainLockTimeout ??= _globalSettings.CurrentValue.DistributedLockingWriteLockDefaultTimeout;
+        obtainLockTimeout ??= _globalSettings.DistributedLockingWriteLockDefaultTimeout;
         return new SqliteDistributedLock(this, lockId, DistributedLockType.WriteLock, obtainLockTimeout.Value);
     }
 
-    private class SqliteDistributedLock : IDistributedLock
+    private sealed class SqliteDistributedLock : IDistributedLock
     {
         private readonly SqliteDistributedLockingMechanism _parent;
         private readonly TimeSpan _timeout;
@@ -162,7 +164,7 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
 
             try
             {
-                var i = command.ExecuteNonQuery();
+                var i = db.ExecuteNonQuery(command);
 
                 if (i == 0)
                 {

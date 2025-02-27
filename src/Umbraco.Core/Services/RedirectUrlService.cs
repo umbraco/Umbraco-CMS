@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -84,7 +84,7 @@ internal class RedirectUrlService : RepositoryService, IRedirectUrlService
 
     public async Task<IRedirectUrl?> GetMostRecentRedirectUrlAsync(string url)
     {
-        using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return await _redirectUrlRepository.GetMostRecentUrlAsync(url);
         }
@@ -142,9 +142,9 @@ internal class RedirectUrlService : RepositoryService, IRedirectUrlService
             return await GetMostRecentRedirectUrlAsync(url);
         }
 
-        using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return await _redirectUrlRepository.GetMostRecentUrlAsync(url, culture);
         }
-    }	
+    }
 }

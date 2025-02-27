@@ -2,19 +2,20 @@ using System.Xml.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Packaging;
 
 public class PackageInstallation : IPackageInstallation
 {
-    private readonly PackageDataInstallation _packageDataInstallation;
+    private readonly IPackageDataInstallation _packageDataInstallation;
     private readonly CompiledPackageXmlParser _parser;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PackageInstallation" /> class.
     /// </summary>
-    public PackageInstallation(PackageDataInstallation packageDataInstallation, CompiledPackageXmlParser parser)
+    public PackageInstallation(IPackageDataInstallation packageDataInstallation, CompiledPackageXmlParser parser)
     {
         _packageDataInstallation =
             packageDataInstallation ?? throw new ArgumentNullException(nameof(packageDataInstallation));
@@ -38,7 +39,7 @@ public class PackageInstallation : IPackageInstallation
 
         InstallationSummary installationSummary = _packageDataInstallation.InstallPackageData(compiledPackage, userId);
 
-        // Make sure the definition is up to date with everything (note: macro partial views are embedded in macros)
+        // Make sure the definition is up to date with everything
         foreach (IDataType x in installationSummary.DataTypesInstalled)
         {
             packageDefinition.DataTypes.Add(x.Id.ToInvariantString());
@@ -52,11 +53,6 @@ public class PackageInstallation : IPackageInstallation
         foreach (IDictionaryItem x in installationSummary.DictionaryItemsInstalled)
         {
             packageDefinition.DictionaryItems.Add(x.Id.ToInvariantString());
-        }
-
-        foreach (IMacro x in installationSummary.MacrosInstalled)
-        {
-            packageDefinition.Macros.Add(x.Id.ToInvariantString());
         }
 
         foreach (ITemplate x in installationSummary.TemplatesInstalled)

@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
@@ -30,6 +31,7 @@ public class ContentFinderByUrlAliasTests
         [Frozen] IUmbracoContextAccessor umbracoContextAccessor,
         [Frozen] IUmbracoContext umbracoContext,
         [Frozen] IVariationContextAccessor variationContextAccessor,
+        [Frozen] IPublishStatusQueryService publishStatusQueryService,
         IFileService fileService,
         ContentFinderByUrlAlias sut,
         IPublishedContent[] rootContents,
@@ -48,6 +50,7 @@ public class ContentFinderByUrlAliasTests
         Mock.Get(urlProperty).Setup(x => x.GetValue(null, null)).Returns(relativeUrl);
 
         Mock.Get(variationContextAccessor).Setup(x => x.VariationContext).Returns(variationContext);
+        Mock.Get(publishStatusQueryService).Setup(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>())).Returns(true);
         var publishedRequestBuilder = new PublishedRequestBuilder(new Uri(absoluteUrl, UriKind.Absolute), fileService);
 
         // Act

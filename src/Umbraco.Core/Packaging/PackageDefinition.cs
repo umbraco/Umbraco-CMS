@@ -36,9 +36,6 @@ public class PackageDefinition
     [DataMember(Name = "contentNodeId")]
     public string? ContentNodeId { get; set; }
 
-    [DataMember(Name = "macros")]
-    public IList<string> Macros { get; set; } = new List<string>();
-
     [DataMember(Name = "languages")]
     public IList<string> Languages { get; set; } = new List<string>();
 

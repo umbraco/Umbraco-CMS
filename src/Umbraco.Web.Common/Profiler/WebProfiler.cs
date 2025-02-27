@@ -1,12 +1,16 @@
 using System.Net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using StackExchange.Profiling;
 using StackExchange.Profiling.Internal;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -14,6 +18,14 @@ namespace Umbraco.Cms.Web.Common.Profiler;
 
 public class WebProfiler : IProfiler
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public WebProfiler(IHttpContextAccessor httpContextAccessor)
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+
     public static readonly AsyncLocal<MiniProfiler> MiniProfilerContext = new(x =>
     {
         _ = x;
@@ -24,11 +36,16 @@ public class WebProfiler : IProfiler
     private int _first;
     private MiniProfiler? _startupProfiler;
 
-    public IDisposable? Step(string name) => MiniProfiler.Current?.Step(name);
+    public IDisposable? Step(string name) =>
+        MiniProfiler.Current?.Step(name);
+    bool IsEnabled => true;
 
     public void Start()
     {
-        MiniProfiler.StartNew();
+        var name = $"{_httpContextAccessor.HttpContext?.Request.Method} {_httpContextAccessor.HttpContext?.Request.GetDisplayUrl()}";
+
+        MiniProfiler.StartNew(name);
+
         MiniProfilerContext.Value = MiniProfiler.Current!;
     }
 
@@ -75,7 +92,6 @@ public class WebProfiler : IProfiler
                     {
                         AddSubProfiler(_startupProfiler);
                     }
-
                     _startupProfiler = null;
                 }
 
@@ -93,7 +109,7 @@ public class WebProfiler : IProfiler
                     && !location.Contains("://"))
                 {
                     MiniProfilerContext.Value.Root.Name = "Before Redirect";
-                    cookieManager.SetCookieValue(WebProfileCookieKey, MiniProfilerContext.Value.ToJson());
+                    cookieManager.SetCookieValue(WebProfileCookieKey, MiniProfilerContext.Value.ToJson(), false);
                 }
             }
         }
@@ -102,26 +118,29 @@ public class WebProfiler : IProfiler
     private static ICookieManager GetCookieManager(HttpContext context) =>
         context.RequestServices.GetRequiredService<ICookieManager>();
 
-    private static bool ShouldProfile(HttpRequest request)
+    private bool ShouldProfile(HttpRequest request)
     {
         if (request.IsClientSideRequest())
         {
             return false;
         }
 
-        if (bool.TryParse(request.Query["umbDebug"], out var umbDebug))
+        IOptions<MiniProfilerOptions>? miniprofilerOptions = _httpContextAccessor.HttpContext?.RequestServices?.GetService<IOptions<MiniProfilerOptions>>();
+        if (miniprofilerOptions is not null && miniprofilerOptions.Value.IgnoredPaths.Contains(request.Path))
         {
-            return umbDebug;
+            return false;
         }
 
-        if (bool.TryParse(request.Headers["X-UMB-DEBUG"], out var xUmbDebug))
-        {
-            return xUmbDebug;
-        }
+        IWebProfilerService? webProfilerService = _httpContextAccessor.HttpContext?.RequestServices?.GetService<IWebProfilerService>();
 
-        if (bool.TryParse(request.Cookies["UMB-DEBUG"], out var cUmbDebug))
+        if (webProfilerService is not null)
         {
-            return cUmbDebug;
+            Attempt<bool, WebProfilerOperationStatus> shouldProfile = webProfilerService.GetStatus().GetAwaiter().GetResult();
+
+            if (shouldProfile.Success)
+            {
+                return shouldProfile.Result;
+            }
         }
 
         return false;

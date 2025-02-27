@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -16,12 +16,6 @@ public class CultureImpactFactory : ICultureImpactFactory
         _contentSettings = contentSettings.CurrentValue;
 
         contentSettings.OnChange(x => _contentSettings = x);
-    }
-
-    [Obsolete("Use constructor that takes IOptionsMonitor<SecuritySettings> instead. Scheduled for removal in V12")]
-    public CultureImpactFactory(IOptionsMonitor<SecuritySettings> securitySettings)
-        : this(StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>())
-    {
     }
 
     /// <inheritdoc/>
@@ -141,7 +135,10 @@ public class CultureImpactFactory : ICultureImpactFactory
             if (isDefault)
             {
                 if (throwOnFail)
+                {
                     throw new InvalidOperationException("The 'all' culture can not be the default culture.");
+                }
+
                 return false;
             }
 

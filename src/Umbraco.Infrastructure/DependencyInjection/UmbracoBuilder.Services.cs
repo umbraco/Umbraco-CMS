@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,14 +19,13 @@ using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Cms.Infrastructure.Telemetry.Providers;
-using Umbraco.Cms.Infrastructure.Templates;
 using Umbraco.Cms.Infrastructure.Templates.PartialViews;
 using Umbraco.Extensions;
-using CacheInstructionService = Umbraco.Cms.Core.Services.Implement.CacheInstructionService;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 
@@ -41,25 +41,45 @@ public static partial class UmbracoBuilderExtensions
 
         // register the special idk map
         builder.Services.AddUnique<IIdKeyMap, IdKeyMap>();
+        builder.Services.AddUnique<IUserIdKeyResolver, UserIdKeyResolver>();
 
         builder.Services.AddUnique<IAuditService, AuditService>();
         builder.Services.AddUnique<ICacheInstructionService, CacheInstructionService>();
         builder.Services.AddUnique<IBasicAuthService, BasicAuthService>();
         builder.Services.AddUnique<IDataTypeService, DataTypeService>();
         builder.Services.AddUnique<IPackagingService, PackagingService>();
+        builder.Services.AddUnique<IServerInformationService, ServerInformationService>();
         builder.Services.AddUnique<IServerRegistrationService, ServerRegistrationService>();
-        builder.Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
         builder.Services.AddTransient(CreateLocalizedTextServiceFileSourcesFactory);
         builder.Services.AddUnique(factory => CreatePackageRepository(factory, "createdPackages.config"));
-        builder.Services.AddUnique<ICreatedPackagesRepository, CreatedPackageSchemaRepository>();
+        builder.Services.AddUnique<ICreatedPackagesRepository>(factory
+            => new CreatedPackageSchemaRepository(
+                factory.GetRequiredService<IHostingEnvironment>(),
+                factory.GetRequiredService<FileSystems>(),
+                factory.GetRequiredService<IEntityXmlSerializer>(),
+                factory.GetRequiredService<IDataTypeService>(),
+                factory.GetRequiredService<IFileService>(),
+                factory.GetRequiredService<IMediaService>(),
+                factory.GetRequiredService<IMediaTypeService>(),
+                factory.GetRequiredService<IContentService>(),
+                factory.GetRequiredService<MediaFileManager>(),
+                factory.GetRequiredService<IContentTypeService>(),
+                factory.GetRequiredService<IScopeAccessor>(),
+                factory.GetRequiredService<ITemplateService>(),
+                factory.GetRequiredService<IDictionaryItemService>(),
+                factory.GetRequiredService<ILanguageService>()));
         builder.Services.AddSingleton(CreatePackageDataInstallation);
         builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
-        builder.Services.AddUnique<IHtmlMacroParameterParser, HtmlMacroParameterParser>();
         builder.Services.AddTransient<IExamineIndexCountService, ExamineIndexCountService>();
-        builder.Services.AddUnique<IUserDataService, SystemInformationTelemetryProvider>();
+        builder.Services.AddUnique<IUserDataService, UserDataService>();
+        builder.Services.AddUnique<ISystemTroubleshootingInformationService, SystemTroubleshootingInformationTelemetryProvider>();
         builder.Services.AddTransient<IUsageInformationService, UsageInformationService>();
-        builder.Services.AddSingleton<IEditorConfigurationParser, EditorConfigurationParser>();
         builder.Services.AddTransient<IPartialViewPopulator, PartialViewPopulator>();
+        builder.Services.AddUnique<IContentListViewService, ContentListViewService>();
+        builder.Services.AddUnique<IMediaListViewService, MediaListViewService>();
+        builder.Services.AddUnique<IEntitySearchService, EntitySearchService>();
+        builder.Services.AddUnique<IIndexedEntitySearchService, IndexedEntitySearchService>();
+        builder.Services.TryAddTransient<IReservedFieldNamesService, ReservedFieldNamesService>();
 
         return builder;
     }
@@ -70,7 +90,6 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IContentTypeService>(),
             factory.GetRequiredService<IDataTypeService>(),
             factory.GetRequiredService<IFileService>(),
-            factory.GetRequiredService<IMacroService>(),
             factory.GetRequiredService<ILocalizationService>(),
             factory.GetRequiredService<IHostingEnvironment>(),
             factory.GetRequiredService<IEntityXmlSerializer>(),
@@ -82,12 +101,11 @@ public static partial class UmbracoBuilderExtensions
             packageRepoFileName);
 
     // Factory registration is only required because of ambiguous constructor
-    private static PackageDataInstallation CreatePackageDataInstallation(IServiceProvider factory)
-        => new(
+    private static IPackageDataInstallation CreatePackageDataInstallation(IServiceProvider factory)
+        => new PackageDataInstallation(
             factory.GetRequiredService<IDataValueEditorFactory>(),
             factory.GetRequiredService<ILogger<PackageDataInstallation>>(),
             factory.GetRequiredService<IFileService>(),
-            factory.GetRequiredService<IMacroService>(),
             factory.GetRequiredService<ILocalizationService>(),
             factory.GetRequiredService<IDataTypeService>(),
             factory.GetRequiredService<IEntityService>(),
@@ -98,7 +116,9 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IShortStringHelper>(),
             factory.GetRequiredService<IConfigurationEditorJsonSerializer>(),
             factory.GetRequiredService<IMediaService>(),
-            factory.GetRequiredService<IMediaTypeService>());
+            factory.GetRequiredService<IMediaTypeService>(),
+            factory.GetRequiredService<ITemplateContentParserService>(),
+            factory.GetRequiredService<ITemplateService>());
 
     private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(
         IServiceProvider container)

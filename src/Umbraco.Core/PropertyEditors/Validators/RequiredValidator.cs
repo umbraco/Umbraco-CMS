@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -7,29 +8,28 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 /// <summary>
 ///     A validator that validates that the value is not null or empty (if it is a string)
 /// </summary>
-public sealed class RequiredValidator : IValueRequiredValidator, IManifestValueValidator
+public class RequiredValidator : IValueRequiredValidator, IValueValidator
 {
-    private const string ValueCannotBeNull = "Value cannot be null";
-    private const string ValueCannotBeEmpty = "Value cannot be empty";
-    private readonly ILocalizedTextService _textService;
+    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
+    public RequiredValidator(ILocalizedTextService textService)
+        : this()
+    {
+    }
 
-    public RequiredValidator(ILocalizedTextService textService) => _textService = textService;
-
-    /// <inheritdoc cref="IManifestValueValidator.ValidationName" />
-    public string ValidationName => "Required";
+    public RequiredValidator()
+    {
+    }
 
     /// <inheritdoc cref="IValueValidator.Validate" />
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration) =>
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext) =>
         ValidateRequired(value, valueType);
 
     /// <inheritdoc cref="IValueRequiredValidator.ValidateRequired" />
-    public IEnumerable<ValidationResult> ValidateRequired(object? value, string? valueType)
+    public virtual IEnumerable<ValidationResult> ValidateRequired(object? value, string? valueType)
     {
         if (value == null)
         {
-            yield return new ValidationResult(
-                _textService?.Localize("validation", "invalidNull") ?? ValueCannotBeNull,
-                new[] { "value" });
+            yield return new ValidationResult(Constants.Validation.ErrorMessages.Properties.Missing, new[] { "value" });
             yield break;
         }
 
@@ -37,8 +37,7 @@ public sealed class RequiredValidator : IValueRequiredValidator, IManifestValueV
         {
             if (value.ToString()?.DetectIsEmptyJson() ?? false)
             {
-                yield return new ValidationResult(
-                    _textService?.Localize("validation", "invalidEmpty") ?? ValueCannotBeEmpty, new[] { "value" });
+                yield return new ValidationResult(Constants.Validation.ErrorMessages.Properties.Empty, new[] { "value" });
             }
 
             yield break;
@@ -46,8 +45,7 @@ public sealed class RequiredValidator : IValueRequiredValidator, IManifestValueV
 
         if (value.ToString().IsNullOrWhiteSpace())
         {
-            yield return new ValidationResult(
-                _textService?.Localize("validation", "invalidEmpty") ?? ValueCannotBeEmpty, new[] { "value" });
+            yield return new ValidationResult(Constants.Validation.ErrorMessages.Properties.Empty, new[] { "value" });
         }
     }
 }

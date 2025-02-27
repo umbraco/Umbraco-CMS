@@ -1,10 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -13,41 +12,21 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.RadioButtonList,
-    "Radio button list",
-    "radiobuttons",
     ValueType = ValueTypes.String,
-    Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-target",
     ValueEditorIsReusable = true)]
 public class RadioButtonsPropertyEditor : DataEditor
 {
-    private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IIOHelper _ioHelper;
-    private readonly ILocalizedTextService _localizedTextService;
-
-    // Scheduled for removal in v12
-    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-    public RadioButtonsPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        ILocalizedTextService localizedTextService)
-        : this(dataValueEditorFactory, ioHelper, localizedTextService, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-    {
-    }
+    private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
 
     /// <summary>
     ///     The constructor will setup the property editor based on the attribute if one is found
     /// </summary>
-    public RadioButtonsPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        ILocalizedTextService localizedTextService,
-        IEditorConfigurationParser editorConfigurationParser)
+    public RadioButtonsPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
-        _localizedTextService = localizedTextService;
-        _editorConfigurationParser = editorConfigurationParser;
+        _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
         SupportsReadOnly = true;
     }
 
@@ -56,5 +35,8 @@ public class RadioButtonsPropertyEditor : DataEditor
     /// </summary>
     /// <returns></returns>
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new ValueListConfigurationEditor(_localizedTextService, _ioHelper, _editorConfigurationParser);
+        new ValueListConfigurationEditor(_ioHelper, _configurationEditorJsonSerializer);
+
+    protected override IDataValueEditor CreateValueEditor() =>
+        DataValueEditorFactory.Create<RadioValueEditor>(Attribute!);
 }

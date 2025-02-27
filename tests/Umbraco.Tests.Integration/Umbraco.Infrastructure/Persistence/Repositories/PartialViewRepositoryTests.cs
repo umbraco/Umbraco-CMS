@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.IO;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
@@ -51,7 +50,6 @@ public class PartialViewRepositoryTests : UmbracoIntegrationTest
             IOHelper,
             GetRequiredService<IOptions<GlobalSettings>>(),
             HostingEnvironment,
-            null,
             _fileSystem,
             null,
             null,
@@ -63,14 +61,14 @@ public class PartialViewRepositoryTests : UmbracoIntegrationTest
             var repository = new PartialViewRepository(fileSystems);
 
             IPartialView partialView =
-                new PartialView(PartialViewType.PartialView, "test-path-1.cshtml") { Content = "// partialView" };
+                new PartialView("test-path-1.cshtml") { Content = "// partialView" };
             repository.Save(partialView);
             Assert.IsTrue(_fileSystem.FileExists("test-path-1.cshtml"));
             Assert.AreEqual("test-path-1.cshtml", partialView.Path);
             Assert.AreEqual("/Views/Partials/test-path-1.cshtml", partialView.VirtualPath);
 
             partialView =
-                new PartialView(PartialViewType.PartialView, "path-2/test-path-2.cshtml") { Content = "// partialView" };
+                new PartialView("path-2/test-path-2.cshtml") { Content = "// partialView" };
             repository.Save(partialView);
             Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.cshtml"));
             Assert.AreEqual("path-2\\test-path-2.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
@@ -82,7 +80,7 @@ public class PartialViewRepositoryTests : UmbracoIntegrationTest
             Assert.AreEqual("/Views/Partials/path-2/test-path-2.cshtml", partialView.VirtualPath);
 
             partialView =
-                new PartialView(PartialViewType.PartialView, "path-2\\test-path-3.cshtml") { Content = "// partialView" };
+                new PartialView("path-2\\test-path-3.cshtml") { Content = "// partialView" };
             repository.Save(partialView);
             Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.cshtml"));
             Assert.AreEqual("path-2\\test-path-3.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
@@ -99,12 +97,12 @@ public class PartialViewRepositoryTests : UmbracoIntegrationTest
             Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
 
             partialView =
-                new PartialView(PartialViewType.PartialView, "..\\test-path-4.cshtml") { Content = "// partialView" };
+                new PartialView("..\\test-path-4.cshtml") { Content = "// partialView" };
             Assert.Throws<UnauthorizedAccessException>(() =>
                 repository.Save(partialView));
 
             partialView =
-                new PartialView(PartialViewType.PartialView, "\\test-path-5.cshtml") { Content = "// partialView" };
+                new PartialView("\\test-path-5.cshtml") { Content = "// partialView" };
             repository.Save(partialView);
 
             partialView = repository.Get("\\test-path-5.cshtml");

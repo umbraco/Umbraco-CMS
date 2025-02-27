@@ -1,8 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -12,7 +11,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -63,23 +61,27 @@ public class TagServiceTests : UmbracoIntegrationTest
         IContent content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1");
         content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
             new[] { "cow", "pig", "goat" });
-        ContentService.SaveAndPublish(content1);
+        ContentService.Save(content1);
+        ContentService.Publish(content1, Array.Empty<string>());
 
         // change
         content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "elephant" }, true);
         content1.RemoveTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "cow" });
-        ContentService.SaveAndPublish(content1);
+        ContentService.Save(content1);
+        ContentService.Publish(content1, Array.Empty<string>());
 
         // more changes
         content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "mouse" }, true);
-        ContentService.SaveAndPublish(content1);
+        ContentService.Save(content1);
+        ContentService.Publish(content1, Array.Empty<string>());
         content1.RemoveTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "mouse" });
-        ContentService.SaveAndPublish(content1);
+        ContentService.Save(content1);
+        ContentService.Publish(content1, Array.Empty<string>());
 
         // get it back
         content1 = ContentService.GetById(content1.Id);
         var tagsValue = content1.GetValue("tags").ToString();
-        var tagsValues = JsonConvert.DeserializeObject<string[]>(tagsValue);
+        var tagsValues = JsonSerializer.Deserialize<string[]>(tagsValue);
         Assert.AreEqual(3, tagsValues.Length);
         Assert.Contains("pig", tagsValues);
         Assert.Contains("goat", tagsValues);
@@ -101,15 +103,18 @@ public class TagServiceTests : UmbracoIntegrationTest
         var content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1");
         content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
             new[] { "cow", "pig", "goat" });
-        ContentService.SaveAndPublish(content1);
+        ContentService.Save(content1);
+        ContentService.Publish(content1, Array.Empty<string>());
 
         var content2 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 2");
         content2.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "cow", "pig" });
-        ContentService.SaveAndPublish(content2);
+        ContentService.Save(content2);
+        ContentService.Publish(content2, Array.Empty<string>());
 
         var content3 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 3");
         content3.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "cow" });
-        ContentService.SaveAndPublish(content3);
+        ContentService.Save(content3);
+        ContentService.Publish(content3, Array.Empty<string>());
 
         // Act
         var tags = TagService.GetAllContentTags()

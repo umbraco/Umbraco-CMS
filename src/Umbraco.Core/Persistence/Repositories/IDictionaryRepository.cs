@@ -12,7 +12,7 @@ public interface IDictionaryRepository : IReadWriteQueryRepository<int, IDiction
 
     IDictionaryItem? Get(string key);
 
-    IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId);
+    IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId, string? filter = null);
 
     Dictionary<string, Guid> GetDictionaryItemKeyMap();
 }

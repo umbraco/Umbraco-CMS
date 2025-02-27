@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -56,6 +56,22 @@ public class WebhookRepository : IWebhookRepository
         WebhookDto? webhookDto = await _scopeAccessor.AmbientScope?.Database.FirstOrDefaultAsync<WebhookDto>(sql)!;
 
         return webhookDto is null ? null : await DtoToEntity(webhookDto);
+    }
+
+    public async Task<PagedModel<IWebhook>> GetByIdsAsync(IEnumerable<Guid> keys)
+    {
+        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+            .Select<WebhookDto>()
+            .From<WebhookDto>()
+            .WhereIn<WebhookDto>(x => x.Key, keys);
+
+        List<WebhookDto>? webhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<WebhookDto>(sql)!;
+
+        return new PagedModel<IWebhook>
+        {
+            Items = await DtosToEntities(webhookDtos),
+            Total = webhookDtos.Count,
+        };
     }
 
     public async Task<PagedModel<IWebhook>> GetByAliasAsync(string alias)

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -41,7 +42,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
             Assert.That(language.HasIdentity, Is.True);
             Assert.That(language.CultureName, Is.EqualTo("English (United States)"));
             Assert.That(language.IsoCode, Is.EqualTo("en-US"));
-            Assert.That(language.FallbackLanguageId, Is.Null);
+            Assert.That(language.FallbackIsoCode, Is.Null);
         }
     }
 
@@ -54,7 +55,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             var au = CultureInfo.GetCultureInfo("en-AU");
-            ILanguage language = new Language(au.Name, au.EnglishName) { FallbackLanguageId = 1 };
+            ILanguage language = new Language(au.Name, au.EnglishName) { FallbackIsoCode = "en-US" };
             repository.Save(language);
 
             // re-get
@@ -65,7 +66,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
             Assert.That(language.HasIdentity, Is.True);
             Assert.That(language.CultureName, Is.EqualTo(au.EnglishName));
             Assert.That(language.IsoCode, Is.EqualTo(au.Name));
-            Assert.That(language.FallbackLanguageId, Is.EqualTo(1));
+            Assert.That(language.FallbackIsoCode, Is.EqualTo("en-US"));
         }
     }
 
@@ -182,7 +183,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
             Assert.That(languageBR.Id, Is.EqualTo(6)); // With 5 existing entries the Id should be 6
             Assert.IsFalse(languageBR.IsDefault);
             Assert.IsFalse(languageBR.IsMandatory);
-            Assert.IsNull(languageBR.FallbackLanguageId);
+            Assert.IsNull(languageBR.FallbackIsoCode);
         }
     }
 
@@ -204,7 +205,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
             Assert.That(languageBR.Id, Is.EqualTo(6)); // With 5 existing entries the Id should be 6
             Assert.IsTrue(languageBR.IsDefault);
             Assert.IsTrue(languageBR.IsMandatory);
-            Assert.IsNull(languageBR.FallbackLanguageId);
+            Assert.IsNull(languageBR.FallbackIsoCode);
         }
     }
 
@@ -218,13 +219,13 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var languageBR = new Language("pt-BR", "Portuguese (Brazil)") { FallbackLanguageId = 1 };
+            var languageBR = new Language("pt-BR", "Portuguese (Brazil)") { FallbackIsoCode = "en-US" };
             repository.Save(languageBR);
 
             // Assert
             Assert.That(languageBR.HasIdentity, Is.True);
             Assert.That(languageBR.Id, Is.EqualTo(6)); // With 5 existing entries the Id should be 6
-            Assert.That(languageBR.FallbackLanguageId, Is.EqualTo(1));
+            Assert.That(languageBR.FallbackIsoCode, Is.EqualTo("en-US"));
         }
     }
 
@@ -269,7 +270,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
             var language = repository.Get(5);
             language.IsoCode = "pt-BR";
             language.CultureName = "Portuguese (Brazil)";
-            language.FallbackLanguageId = 1;
+            language.FallbackIsoCode = "en-US";
 
             repository.Save(language);
 
@@ -279,7 +280,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
             Assert.That(languageUpdated, Is.Not.Null);
             Assert.That(languageUpdated.IsoCode, Is.EqualTo("pt-BR"));
             Assert.That(languageUpdated.CultureName, Is.EqualTo("Portuguese (Brazil)"));
-            Assert.That(languageUpdated.FallbackLanguageId, Is.EqualTo(1));
+            Assert.That(languageUpdated.FallbackIsoCode, Is.EqualTo("en-US"));
         }
     }
 
@@ -331,7 +332,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
             // Add language to delete as a fall-back language to another one
             var repository = CreateRepository(provider);
             var languageToFallbackFrom = repository.Get(5);
-            languageToFallbackFrom.FallbackLanguageId = 2; // fall back to #2 (something we can delete)
+            languageToFallbackFrom.FallbackIsoCode = "da-DK"; // fall back to "da-DK" (something we can delete)
             repository.Save(languageToFallbackFrom);
 
             // delete #2
@@ -366,22 +367,22 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
 
     private LanguageRepository CreateRepository(IScopeProvider provider) => new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>());
 
-    private void CreateTestData()
+    private async Task CreateTestData()
     {
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
 
         //Id 1 is en-US - when Umbraco is installed
 
         var languageDK = new Language("da-DK", "Danish (Denmark)");
-        localizationService.Save(languageDK); //Id 2
+        await languageService.CreateAsync(languageDK, Constants.Security.SuperUserKey); //Id 2
 
         var languageSE = new Language("sv-SE", "Swedish (Sweden)");
-        localizationService.Save(languageSE); //Id 3
+        await languageService.CreateAsync(languageSE, Constants.Security.SuperUserKey); //Id 3
 
         var languageDE = new Language("de-DE", "German (Germany)");
-        localizationService.Save(languageDE); //Id 4
+        await languageService.CreateAsync(languageDE, Constants.Security.SuperUserKey); //Id 4
 
         var languagePT = new Language("pt-PT", "Portuguese (Portugal)");
-        localizationService.Save(languagePT); //Id 5
+        await languageService.CreateAsync(languagePT, Constants.Security.SuperUserKey); //Id 5
     }
 }

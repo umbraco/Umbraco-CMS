@@ -1,5 +1,6 @@
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -11,6 +12,7 @@ namespace Umbraco.Cms.Core.Models;
 public class MediaType : ContentTypeCompositionBase, IMediaType
 {
     public const bool SupportsPublishingConst = false;
+    private bool _isCloning;
 
     /// <summary>
     ///     Constuctor for creating a MediaType with the parent's id.
@@ -46,6 +48,31 @@ public class MediaType : ContentTypeCompositionBase, IMediaType
     public override ISimpleContentType ToSimple() => new SimpleContentType(this);
 
     /// <inheritdoc />
-    IMediaType IMediaType.DeepCloneWithResetIdentities(string newAlias) =>
-        (IMediaType)DeepCloneWithResetIdentities(newAlias);
+    public override string Alias
+    {
+        get => base.Alias;
+        set
+        {
+            if (this.IsSystemMediaType() && value != Alias && _isCloning is false)
+            {
+                throw new InvalidOperationException("Cannot change the alias of a system media type");
+            }
+
+            base.Alias = value;
+        }
+    }
+
+    /// <inheritdoc />
+    // This is very hacky, but we cannot override the base DeepCloneWithResetIdentities as it would be breaking.
+    // We have to be able to set a new alias when cloning system types.
+    // TODO: Make ContentTypeBase.DeepCloneWithResetIdentities overrideable.
+
+    IMediaType IMediaType.DeepCloneWithResetIdentities(string newAlias)
+    {
+        _isCloning = true;
+        var clone = (IMediaType)DeepCloneWithResetIdentities(newAlias);
+        _isCloning = false;
+        return clone;
+    }
+
 }

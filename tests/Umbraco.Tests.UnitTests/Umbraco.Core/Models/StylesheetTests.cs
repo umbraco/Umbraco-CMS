@@ -2,8 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
-using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -133,7 +132,7 @@ public class StylesheetTests
             .Build();
 
         // Act
-        var json = JsonConvert.SerializeObject(stylesheet);
+        var json = JsonSerializer.Serialize(stylesheet);
         Debug.Print(json);
     }
 }

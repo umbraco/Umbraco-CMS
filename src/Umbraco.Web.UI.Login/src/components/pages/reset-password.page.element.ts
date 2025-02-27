@@ -1,13 +1,11 @@
-import type {UUIButtonState} from '@umbraco-ui/uui';
-import {CSSResultGroup, LitElement, css, html, nothing} from 'lit';
-import {customElement, state} from 'lit/decorators.js';
-import {until} from 'lit/directives/until.js';
+import type {UUIButtonState} from '@umbraco-cms/backoffice/external/uui';
+import {type CSSResultGroup, css, html, nothing, customElement, state} from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 
-import {umbAuthContext} from '../../context/auth.context.js';
-import {umbLocalizationContext} from '../../external/localization/localization-context.js';
+import { UMB_AUTH_CONTEXT } from '../../contexts';
 
 @customElement('umb-reset-password-page')
-export default class UmbResetPasswordPageElement extends LitElement {
+export default class UmbResetPasswordPageElement extends UmbLitElement {
   @state()
   resetCallState: UUIButtonState = undefined;
 
@@ -25,8 +23,9 @@ export default class UmbResetPasswordPageElement extends LitElement {
     const username = formData.get('email') as string;
 
     this.resetCallState = 'waiting';
-    const response = await umbAuthContext.resetPassword(username);
-    this.resetCallState = response.status === 200 ? 'success' : 'failed';
+    const authContext = await this.getContext(UMB_AUTH_CONTEXT);
+    const response = await authContext.resetPassword(username);
+    this.resetCallState = response.error ? 'failed' : 'success';
     this.error = response.error || '';
   };
 
@@ -36,35 +35,34 @@ export default class UmbResetPasswordPageElement extends LitElement {
         <form id="LoginForm" name="login" @submit="${this.#handleResetSubmit}">
           <header id="header">
             <h1>
-              <umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
+              <umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
             </h1>
             <span>
-							<umb-localize key="login_forgottenPasswordInstruction"
-              >An email will be sent to the address specified with a link to reset your password</umb-localize
-              >
+							<umb-localize key="auth_forgottenPasswordInstruction">
+                An email will be sent to the address specified with a link to reset your password
+              </umb-localize>
 						</span>
           </header>
 
           <uui-form-layout-item>
             <uui-label for="email" slot="label" required>
-              <umb-localize key="general_email">Email</umb-localize>
+              <umb-localize key="auth_email">Email</umb-localize>
             </uui-label>
             <uui-input
               type="email"
               id="email"
               name="email"
-              .label=${until(umbLocalizationContext.localize('general_email', undefined, 'Email'))}
+              .label=${this.localize.term('auth_email')}
               required
-              required-message=${until(
-                umbLocalizationContext.localize('general_required', undefined, 'Required')
-              )}></uui-input>
+              required-message=${this.localize.term('auth_required')}>
+            </uui-input>
           </uui-form-layout-item>
 
           ${this.#renderErrorMessage()}
 
           <uui-button
             type="submit"
-            .label=${until(umbLocalizationContext.localize('general_submit', undefined, 'Submit'))}
+            .label=${this.localize.term('auth_submit')}
             look="primary"
             color="default"
             .state=${this.resetCallState}></uui-button>
@@ -84,14 +82,8 @@ export default class UmbResetPasswordPageElement extends LitElement {
   #renderConfirmationPage() {
     return html`
       <umb-confirmation-layout
-        header=${until(umbLocalizationContext.localize('login_forgottenPassword', undefined, 'Forgotten password?'))}
-        message=${until(
-          umbLocalizationContext.localize(
-            'login_requestPasswordResetConfirmation',
-            undefined,
-            'An email with password reset instructions will be sent to the specified address if it matched our records'
-          )
-        )}>
+        header=${this.localize.term('auth_forgottenPassword')}
+        message=${this.localize.term('auth_requestPasswordResetConfirmation')}>
       </umb-confirmation-layout>
     `;
   }

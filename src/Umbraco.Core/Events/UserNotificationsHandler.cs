@@ -25,7 +25,6 @@ public sealed class UserNotificationsHandler :
     INotificationHandler<ContentMovedToRecycleBinNotification>,
     INotificationHandler<ContentCopiedNotification>,
     INotificationHandler<ContentRolledBackNotification>,
-    INotificationHandler<ContentSentToPublishNotification>,
     INotificationHandler<ContentUnpublishedNotification>,
     INotificationHandler<AssignedUserGroupPermissionsNotification>,
     INotificationHandler<PublicAccessEntrySavedNotification>
@@ -106,10 +105,6 @@ public sealed class UserNotificationsHandler :
         _notifier.Notify(_actions.GetAction<ActionNew>(), newEntities.ToArray());
         _notifier.Notify(_actions.GetAction<ActionUpdate>(), updatedEntities.ToArray());
     }
-
-    [Obsolete("Scheduled for removal in v13")]
-    public void Handle(ContentSentToPublishNotification notification) =>
-        _notifier.Notify(_actions.GetAction<ActionToPublish>(), notification.Entity);
 
     public void Handle(ContentSortedNotification notification)
     {
@@ -197,7 +192,7 @@ public sealed class UserNotificationsHandler :
                     _logger.LogDebug(
                     "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
                 }
-                user = _userService.GetUserById(Constants.Security.SuperUserId);
+                user = _userService.GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
                 if (user == null)
                 {
                     _logger.LogWarning(

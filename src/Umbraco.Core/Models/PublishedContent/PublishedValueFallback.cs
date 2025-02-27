@@ -1,4 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
@@ -19,9 +23,6 @@ public class PublishedValueFallback : IPublishedValueFallback
         _localizationService = serviceContext.LocalizationService;
         _variationContextAccessor = variationContextAccessor;
     }
-
-    [Obsolete("Scheduled for removal in v14")]
-    public IVariationContextAccessor VariationContextAccessor { get { return _variationContextAccessor; } }
 
     /// <inheritdoc />
     public bool TryGetValue(IPublishedProperty property, string? culture, string? segment, Fallback fallback, object? defaultValue, out object? value) =>
@@ -187,7 +188,7 @@ public class PublishedValueFallback : IPublishedValueFallback
         IPublishedProperty? property; // if we are here, content's property has no value
         do
         {
-            content = content?.Parent;
+            content = content?.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(), StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
 
             IPublishedPropertyType? propertyType = content?.ContentType.GetPropertyType(alias);
 
@@ -219,57 +220,27 @@ public class PublishedValueFallback : IPublishedValueFallback
 
     // tries to get a value, falling back onto other languages
     private bool TryGetValueWithLanguageFallback<T>(IPublishedProperty property, string? culture, string? segment, out T? value)
-    {
-        value = default;
+        => TryGetValueWithLanguageFallback(
+            (actualCulture, actualSegment)
+                => property.HasValue(actualCulture, actualSegment)
+                    ? property.Value<T>(this, actualCulture, actualSegment)
+                    : default,
+            culture,
+            segment,
+            out value);
 
-        if (culture.IsNullOrWhiteSpace())
-        {
-            return false;
-        }
-
-        var visited = new HashSet<int>();
-
-        ILanguage? language = culture is not null ? _localizationService?.GetLanguageByIsoCode(culture) : null;
-        if (language == null)
-        {
-            return false;
-        }
-
-        while (true)
-        {
-            if (language.FallbackLanguageId == null)
-            {
-                return false;
-            }
-
-            var language2Id = language.FallbackLanguageId.Value;
-            if (visited.Contains(language2Id))
-            {
-                return false;
-            }
-
-            visited.Add(language2Id);
-
-            ILanguage? language2 = _localizationService?.GetLanguageById(language2Id);
-            if (language2 == null)
-            {
-                return false;
-            }
-
-            var culture2 = language2.IsoCode;
-
-            if (property.HasValue(culture2, segment))
-            {
-                value = property.Value<T>(this, culture2, segment);
-                return true;
-            }
-
-            language = language2;
-        }
-    }
-
-    // tries to get a value, falling back onto other languages
+    // tries to get a value, falling back onto other language
     private bool TryGetValueWithLanguageFallback<T>(IPublishedElement content, string alias, string? culture, string? segment, out T? value)
+        => TryGetValueWithLanguageFallback(
+            (actualCulture, actualSegment)
+                => content.HasValue(alias, actualCulture, actualSegment)
+                    ? content.Value<T>(this, alias, actualCulture, actualSegment)
+                    : default,
+            culture,
+            segment,
+            out value);
+
+    private bool TryGetValueWithLanguageFallback<T>(TryGetValueForCultureAndSegment<T> getValue, string? culture, string? segment, out T? value)
     {
         value = default;
 
@@ -278,7 +249,7 @@ public class PublishedValueFallback : IPublishedValueFallback
             return false;
         }
 
-        var visited = new HashSet<int>();
+        var visited = new HashSet<string>();
 
         ILanguage? language = culture is not null ? _localizationService?.GetLanguageByIsoCode(culture) : null;
         if (language == null)
@@ -288,83 +259,30 @@ public class PublishedValueFallback : IPublishedValueFallback
 
         while (true)
         {
-            if (language.FallbackLanguageId == null)
+            if (language.FallbackIsoCode == null)
             {
                 return false;
             }
 
-            var language2Id = language.FallbackLanguageId.Value;
-            if (visited.Contains(language2Id))
+            var language2IsoCode = language.FallbackIsoCode;
+            if (visited.Contains(language2IsoCode))
             {
                 return false;
             }
 
-            visited.Add(language2Id);
+            visited.Add(language2IsoCode);
 
-            ILanguage? language2 = _localizationService?.GetLanguageById(language2Id);
+            ILanguage? language2 = _localizationService?.GetLanguageByIsoCode(language2IsoCode);
             if (language2 == null)
             {
                 return false;
             }
 
             var culture2 = language2.IsoCode;
-
-            if (content.HasValue(alias, culture2, segment))
+            T? culture2Value = getValue(culture2, segment);
+            if (culture2Value != null)
             {
-                value = content.Value<T>(this, alias, culture2, segment);
-                return true;
-            }
-
-            language = language2;
-        }
-    }
-
-    // tries to get a value, falling back onto other languages
-    private bool TryGetValueWithLanguageFallback<T>(IPublishedContent content, string alias, string? culture, string? segment, out T? value)
-    {
-        value = default;
-
-        if (culture.IsNullOrWhiteSpace())
-        {
-            return false;
-        }
-
-        var visited = new HashSet<int>();
-
-        // TODO: _localizationService.GetXxx() is expensive, it deep clones objects
-        // we want _localizationService.GetReadOnlyXxx() returning IReadOnlyLanguage which cannot be saved back = no need to clone
-        ILanguage? language = culture is not null ? _localizationService?.GetLanguageByIsoCode(culture) : null;
-        if (language == null)
-        {
-            return false;
-        }
-
-        while (true)
-        {
-            if (language.FallbackLanguageId == null)
-            {
-                return false;
-            }
-
-            var language2Id = language.FallbackLanguageId.Value;
-            if (visited.Contains(language2Id))
-            {
-                return false;
-            }
-
-            visited.Add(language2Id);
-
-            ILanguage? language2 = _localizationService?.GetLanguageById(language2Id);
-            if (language2 == null)
-            {
-                return false;
-            }
-
-            var culture2 = language2.IsoCode;
-
-            if (content.HasValue(alias, culture2, segment))
-            {
-                value = content.Value<T>(this, alias, culture2, segment);
+                value = culture2Value;
                 return true;
             }
 
@@ -409,4 +327,6 @@ public class PublishedValueFallback : IPublishedValueFallback
 
         return false;
     }
+
+    private delegate T? TryGetValueForCultureAndSegment<out T>(string actualCulture, string? actualSegment);
 }

@@ -23,7 +23,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         Guid[] allowedContainers =
         {
             Constants.ObjectTypes.DocumentTypeContainer, Constants.ObjectTypes.MediaTypeContainer,
-            Constants.ObjectTypes.DataTypeContainer,
+            Constants.ObjectTypes.DataTypeContainer, Constants.ObjectTypes.DocumentBlueprintContainer,
         };
         NodeObjectTypeId = containerObjectType;
         if (allowedContainers.Contains(NodeObjectTypeId) == false)
@@ -49,7 +49,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
             .Where(
                 "text=@name AND level=@level AND nodeObjectType=@umbracoObjectTypeId",
                 new { name, level, umbracoObjectTypeId = NodeObjectTypeId });
-        return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
+        return Database.Fetch<NodeDto>(sql).Select(CreateEntity).WhereNotNull();
     }
 
     // never cache
@@ -73,7 +73,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
                     GetBaseQuery(false)
                         .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
                         .WhereIn<NodeDto>(x => x.NodeId, batch))
-                .Select(CreateEntity);
+                .Select(CreateEntity).WhereNotNull();
         }
 
         // else
@@ -81,7 +81,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
             .Where("nodeObjectType=@umbracoObjectTypeId", new { umbracoObjectTypeId = NodeObjectTypeId })
             .OrderBy<NodeDto>(x => x.Level);
 
-        return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
+        return Database.Fetch<NodeDto>(sql).Select(CreateEntity).WhereNotNull();
     }
 
     protected override IEnumerable<EntityContainer> PerformGetByQuery(IQuery<EntityContainer> query) =>
@@ -103,15 +103,19 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         return sql;
     }
 
-    private static EntityContainer CreateEntity(NodeDto nodeDto)
+    private static EntityContainer? CreateEntity(NodeDto nodeDto)
     {
         if (nodeDto.NodeObjectType.HasValue == false)
         {
             throw new InvalidOperationException("Node with id " + nodeDto.NodeId + " has no object type.");
         }
 
-        // throws if node is not a container
         Guid containedObjectType = EntityContainer.GetContainedObjectType(nodeDto.NodeObjectType.Value);
+
+        if (containedObjectType == Guid.Empty)
+        {
+            return null;
+        }
 
         var entity = new EntityContainer(nodeDto.NodeId, nodeDto.UniqueId,
             nodeDto.ParentId, nodeDto.Path, nodeDto.Level, nodeDto.SortOrder,
@@ -127,6 +131,28 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
     protected override string GetBaseWhereClause() => "umbracoNode.id = @id and nodeObjectType = @NodeObjectType";
 
     protected override IEnumerable<string> GetDeleteClauses() => throw new NotImplementedException();
+
+    public bool HasDuplicateName(Guid parentKey, string name)
+    {
+        NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+            .From<NodeDto>()
+            .InnerJoin<NodeDto>("parent")
+            .On<NodeDto, NodeDto>(
+                (node, parent) => node.ParentId == parent.NodeId, aliasRight: "parent")
+            .Where<NodeDto>(dto => dto.Text == name &&  dto.NodeObjectType == NodeObjectTypeId)
+            .Where<NodeDto>(parent => parent.UniqueId == parentKey, alias: "parent"));
+
+        return nodeDto is not null;
+    }
+
+    public bool HasDuplicateName(int parentId, string name)
+    {
+        NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+            .From<NodeDto>()
+            .Where<NodeDto>(dto => dto.Text == name &&  dto.NodeObjectType == NodeObjectTypeId && dto.ParentId == parentId));
+
+        return nodeDto is not null;
+    }
 
     protected override void PersistDeletedItem(EntityContainer entity)
     {
@@ -211,12 +237,8 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
             NodeDto parentDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
                 .From<NodeDto>()
                 .Where<NodeDto>(dto =>
-                    dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
-
-            if (parentDto == null)
-            {
-                throw new InvalidOperationException("Could not find parent container with id " + entity.ParentId);
-            }
+                    dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType))
+                ?? throw new InvalidOperationException("Could not find parent container with id " + entity.ParentId);
 
             level = parentDto.Level;
             path = parentDto.Path;
@@ -276,11 +298,8 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         // find container to update
         NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
             .From<NodeDto>()
-            .Where<NodeDto>(dto => dto.NodeId == entity.Id && dto.NodeObjectType == entity.ContainerObjectType));
-        if (nodeDto == null)
-        {
-            throw new InvalidOperationException("Could not find container with id " + entity.Id);
-        }
+            .Where<NodeDto>(dto => dto.NodeId == entity.Id && dto.NodeObjectType == entity.ContainerObjectType))
+            ?? throw new InvalidOperationException("Could not find container with id " + entity.Id);
 
         // guard against duplicates
         NodeDto dupNodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
@@ -304,13 +323,9 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
                 NodeDto parent = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
                     .From<NodeDto>()
                     .Where<NodeDto>(dto =>
-                        dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
-
-                if (parent == null)
-                {
-                    throw new InvalidOperationException(
+                        dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType))
+                    ?? throw new InvalidOperationException(
                         "Could not find parent container with id " + entity.ParentId);
-                }
 
                 nodeDto.Level = Convert.ToInt16(parent.Level + 1);
                 nodeDto.Path = parent.Path + "," + nodeDto.NodeId;

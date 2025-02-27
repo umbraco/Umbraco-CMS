@@ -36,7 +36,6 @@ public class StylesheetRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<IOptions<GlobalSettings>>(),
             HostingEnvironment,
             null,
-            null,
             _fileSystem,
             null,
             null);

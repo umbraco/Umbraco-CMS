@@ -20,7 +20,7 @@ public class NotificationService : INotificationService
 {
     // manage notifications
     // ideally, would need to use IBackgroundTasks - but they are not part of Core!
-    private static readonly object Locker = new();
+    private static readonly Lock Locker = new();
 
     private readonly IContentService _contentService;
     private readonly ContentSettings _contentSettings;
@@ -94,52 +94,41 @@ public class NotificationService : INotificationService
         // lazily get versions
         var prevVersionDictionary = new Dictionary<int, IContentBase?>();
 
-        // see notes above
-        var id = Constants.Security.SuperUserId;
-        const int pagesz = 400; // load batches of 400 users
-        do
+        var notifications = GetUsersNotifications(new List<int>(), action, Enumerable.Empty<int>(), Constants.ObjectTypes.Document)?.ToList();
+        if (notifications is null || notifications.Count == 0)
         {
-            var notifications = GetUsersNotifications(new List<int>(), action, Enumerable.Empty<int>(), Constants.ObjectTypes.Document)?.ToList();
-            if (notifications is null || notifications.Count == 0)
+            return;
+        }
+
+        IUser[] users = _userService.GetAll(0, int.MaxValue, out _).ToArray();
+        foreach (IUser user in users)
+        {
+            Notification[] userNotifications = notifications.Where(n => n.UserId == user.Id).ToArray();
+            foreach (Notification notification in userNotifications)
             {
+                // notifications are inherited down the tree - find the topmost entity
+                // relevant to this notification (entity list is sorted by path)
+                IContent? entityForNotification = entitiesL
+                    .FirstOrDefault(entity =>
+                        pathsByEntityId.TryGetValue(entity.Id, out var path) &&
+                        path.Contains(notification.EntityId));
+
+                if (entityForNotification == null)
+                {
+                    continue;
+                }
+
+                if (prevVersionDictionary.ContainsKey(entityForNotification.Id) == false)
+                {
+                    prevVersionDictionary[entityForNotification.Id] = GetPreviousVersion(entityForNotification.Id);
+                }
+
+                // queue notification
+                NotificationRequest req = CreateNotificationRequest(operatingUser, user, entityForNotification, prevVersionDictionary[entityForNotification.Id], actionName, siteUri, createSubject, createBody);
+                Enqueue(req);
                 break;
             }
-
-            // users are returned ordered by id, notifications are returned ordered by user id
-            var users = _userService.GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-            foreach (IUser user in users)
-            {
-                Notification[] userNotifications = notifications.Where(n => n.UserId == user.Id).ToArray();
-                foreach (Notification notification in userNotifications)
-                {
-                    // notifications are inherited down the tree - find the topmost entity
-                    // relevant to this notification (entity list is sorted by path)
-                    IContent? entityForNotification = entitiesL
-                        .FirstOrDefault(entity =>
-                            pathsByEntityId.TryGetValue(entity.Id, out var path) &&
-                            path.Contains(notification.EntityId));
-
-                    if (entityForNotification == null)
-                    {
-                        continue;
-                    }
-
-                    if (prevVersionDictionary.ContainsKey(entityForNotification.Id) == false)
-                    {
-                        prevVersionDictionary[entityForNotification.Id] = GetPreviousVersion(entityForNotification.Id);
-                    }
-
-                    // queue notification
-                    NotificationRequest req = CreateNotificationRequest(operatingUser, user, entityForNotification, prevVersionDictionary[entityForNotification.Id], actionName, siteUri, createSubject, createBody);
-                    Enqueue(req);
-                    break;
-                }
-            }
-
-            // load more users if any
-            id = users.Count == pagesz ? users.Last().Id + 1 : -1;
         }
-        while (id > 0);
     }
 
     /// <summary>
@@ -472,7 +461,7 @@ public class NotificationService : INotificationService
         var protocol = _globalSettings.UseHttps ? "https" : "http";
 
         var subjectVars = new NotificationEmailSubjectParams(
-            string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(_globalSettings.UmbracoPath)),
+            string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(Constants.System.DefaultUmbracoPath)),
             actionName,
             content.Name);
 
@@ -490,7 +479,7 @@ public class NotificationService : INotificationService
                 string.Concat(content.Id, ".aspx"),
                 protocol),
             performingUser.Name,
-            string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(_globalSettings.UmbracoPath)),
+            string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(Constants.System.DefaultUmbracoPath)),
             summary.ToString());
 
         var fromMail = _contentSettings.Notifications.Email ?? _globalSettings.Smtp?.From;

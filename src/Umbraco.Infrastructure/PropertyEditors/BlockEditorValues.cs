@@ -2,30 +2,32 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
-/// Used to deserialize json values and clean up any values based on the existence of element types and layout structure
+/// Used to deserialize json values and clean up any values based on the existence of element types and layout structure.
 /// </summary>
-internal class BlockEditorValues
+public class BlockEditorValues<TValue, TLayout>
+    where TValue : BlockValue<TLayout>, new()
+    where TLayout : class, IBlockLayoutItem, new()
 {
-    private readonly BlockEditorDataConverter _dataConverter;
-    private readonly IContentTypeService _contentTypeService;
+    private readonly BlockEditorDataConverter<TValue, TLayout> _dataConverter;
+    private readonly IBlockEditorElementTypeCache _elementTypeCache;
     private readonly ILogger _logger;
 
-    public BlockEditorValues(BlockEditorDataConverter dataConverter, IContentTypeService contentTypeService, ILogger logger)
+    public BlockEditorValues(BlockEditorDataConverter<TValue, TLayout> dataConverter, IBlockEditorElementTypeCache elementTypeCache, ILogger logger)
     {
         _dataConverter = dataConverter;
-        _contentTypeService = contentTypeService;
+        _elementTypeCache = elementTypeCache;
         _logger = logger;
     }
 
-    public BlockEditorData? DeserializeAndClean(object? propertyValue)
+    public BlockEditorData<TValue, TLayout>? DeserializeAndClean(object? propertyValue)
     {
         var propertyValueAsString = propertyValue?.ToString();
         if (string.IsNullOrWhiteSpace(propertyValueAsString))
@@ -33,17 +35,17 @@ internal class BlockEditorValues
             return null;
         }
 
-        BlockEditorData blockEditorData = _dataConverter.Deserialize(propertyValueAsString);
+        BlockEditorData<TValue, TLayout> blockEditorData = _dataConverter.Deserialize(propertyValueAsString);
         return Clean(blockEditorData);
     }
 
-    public BlockEditorData? ConvertAndClean(BlockValue blockValue)
+    public BlockEditorData<TValue, TLayout>? ConvertAndClean(TValue blockValue)
     {
-        BlockEditorData blockEditorData = _dataConverter.Convert(blockValue);
+        BlockEditorData<TValue, TLayout> blockEditorData = _dataConverter.Convert(blockValue);
         return Clean(blockEditorData);
     }
 
-    private BlockEditorData? Clean(BlockEditorData blockEditorData)
+    private BlockEditorData<TValue, TLayout>? Clean(BlockEditorData<TValue, TLayout> blockEditorData)
     {
         if (blockEditorData.BlockValue.ContentData.Count == 0)
         {
@@ -55,18 +57,22 @@ internal class BlockEditorValues
         var contentTypePropertyTypes = new Dictionary<string, Dictionary<string, IPropertyType>>();
 
         // filter out any content that isn't referenced in the layout references
+        IEnumerable<Guid> contentTypeKeys = blockEditorData.BlockValue.ContentData.Select(x => x.ContentTypeKey)
+            .Union(blockEditorData.BlockValue.SettingsData.Select(x => x.ContentTypeKey)).Distinct();
+        IDictionary<Guid, IContentType> contentTypesDictionary = _elementTypeCache.GetMany(contentTypeKeys).ToDictionary(x=>x.Key);
+
         foreach (BlockItemData block in blockEditorData.BlockValue.ContentData.Where(x =>
-                     blockEditorData.References.Any(r => x.Udi is not null && r.ContentUdi == x.Udi)))
+                     blockEditorData.References.Any(r => r.ContentKey == x.Key)))
         {
-            ResolveBlockItemData(block, contentTypePropertyTypes);
+            ResolveBlockItemData(block, contentTypePropertyTypes, contentTypesDictionary);
         }
 
         // filter out any settings that isn't referenced in the layout references
         foreach (BlockItemData block in blockEditorData.BlockValue.SettingsData.Where(x =>
                      blockEditorData.References.Any(r =>
-                         r.SettingsUdi is not null && x.Udi is not null && r.SettingsUdi == x.Udi)))
+                         r.SettingsKey.HasValue && r.SettingsKey.Value == x.Key)))
         {
-            ResolveBlockItemData(block, contentTypePropertyTypes);
+            ResolveBlockItemData(block, contentTypePropertyTypes, contentTypesDictionary);
         }
 
         // remove blocks that couldn't be resolved
@@ -76,12 +82,9 @@ internal class BlockEditorValues
         return blockEditorData;
     }
 
-    private IContentType? GetElementType(BlockItemData item) => _contentTypeService.Get(item.ContentTypeKey);
-
-    private bool ResolveBlockItemData(BlockItemData block, Dictionary<string, Dictionary<string, IPropertyType>> contentTypePropertyTypes)
+    private bool ResolveBlockItemData(BlockItemData block, Dictionary<string, Dictionary<string, IPropertyType>> contentTypePropertyTypes, IDictionary<Guid, IContentType> contentTypesDictionary)
     {
-        IContentType? contentType = GetElementType(block);
-        if (contentType == null)
+        if (contentTypesDictionary.TryGetValue(block.ContentTypeKey, out IContentType? contentType) is false)
         {
             return false;
         }
@@ -93,31 +96,26 @@ internal class BlockEditorValues
             propertyTypes = contentTypePropertyTypes[contentType.Alias] = contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x);
         }
 
-        var propValues = new Dictionary<string, BlockItemData.BlockPropertyValue>();
-
-        // find any keys that are not real property types and remove them
-        foreach (KeyValuePair<string, object?> prop in block.RawPropertyValues.ToList())
+        // resolve the actual property types for all block properties
+        foreach (BlockPropertyValue property in block.Values)
         {
-            // doesn't exist so remove it
-            if (!propertyTypes.TryGetValue(prop.Key, out IPropertyType? propType))
+            if (!propertyTypes.TryGetValue(property.Alias, out IPropertyType? propertyType))
             {
-                block.RawPropertyValues.Remove(prop.Key);
                 _logger.LogWarning(
-                    "The property {PropertyKey} for block {BlockKey} was removed because the property type {PropertyTypeAlias} was not found on {ContentTypeAlias}",
-                    prop.Key,
+                    "The property {PropertyAlias} for block {BlockKey} was removed because the property type was not found on {ContentTypeAlias}",
+                    property.Alias,
                     block.Key,
-                    prop.Key,
                     contentType.Alias);
+                continue;
             }
-            else
-            {
-                // set the value to include the resolved property type
-                propValues[prop.Key] = new BlockItemData.BlockPropertyValue(prop.Value, propType);
-            }
+
+            property.PropertyType = propertyType;
         }
 
+        // remove all block properties that did not resolve a property type
+        block.Values.RemoveAll(blockProperty => blockProperty.PropertyType is null);
+
         block.ContentTypeAlias = contentType.Alias;
-        block.PropertyValues = propValues;
 
         return true;
     }

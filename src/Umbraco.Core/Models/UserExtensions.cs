@@ -1,5 +1,4 @@
-using System.Net;
-using System.Security.Cryptography;
+using System.Runtime.InteropServices;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -25,53 +24,9 @@ public static class UserExtensions
     /// </returns>
     public static string[] GetUserAvatarUrls(this IUser user, IAppCache cache, MediaFileManager mediaFileManager, IImageUrlGenerator imageUrlGenerator)
     {
-        // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.
-        // Unfortunately, if the FIPS setting is enabled on Windows, using MD5 will throw an exception
-        // and the website will not run.
-        // Also, check if the user has explicitly removed all avatars including a Gravatar, this will be possible and the value will be "none"
-        if (user.Avatar == "none" || CryptoConfig.AllowOnlyFipsAlgorithms)
+        if (user.Avatar.IsNullOrWhiteSpace() || user.Avatar == "none")
         {
-            return new string[0];
-        }
-
-        if (user.Avatar.IsNullOrWhiteSpace())
-        {
-            var gravatarHash = user.Email?.GenerateHash<MD5>();
-            var gravatarUrl = "https://www.gravatar.com/avatar/" + gravatarHash + "?d=404";
-
-            // try Gravatar
-            var gravatarAccess = cache.GetCacheItem("UserAvatar" + user.Id, () =>
-            {
-                // Test if we can reach this URL, will fail when there's network or firewall errors
-                var request = (HttpWebRequest)WebRequest.Create(gravatarUrl);
-
-                // Require response within 10 seconds
-                request.Timeout = 10000;
-                try
-                {
-                    using ((HttpWebResponse)request.GetResponse())
-                    {
-                    }
-                }
-                catch (Exception)
-                {
-                    // There was an HTTP or other error, return an null instead
-                    return false;
-                }
-
-                return true;
-            });
-
-            if (gravatarAccess)
-            {
-                return new[]
-                {
-                    gravatarUrl + "&s=30", gravatarUrl + "&s=60", gravatarUrl + "&s=90", gravatarUrl + "&s=150",
-                    gravatarUrl + "&s=300",
-                };
-            }
-
-            return new string[0];
+            return [];
         }
 
         // use the custom avatar
@@ -199,8 +154,8 @@ public static class UserExtensions
 
     public static int[]? CalculateContentStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
-        var cacheKey = CacheKeys.UserAllContentStartNodesPrefix + user.Id;
-        IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
+        var cacheKey = user.UserCacheKey(CacheKeys.UserAllContentStartNodesPrefix);
+        IAppPolicyCache runtimeCache = GetUserCache(appCaches);
         var result = runtimeCache.GetCacheItem(
             cacheKey,
             () =>
@@ -233,8 +188,8 @@ public static class UserExtensions
     /// <returns></returns>
     public static int[]? CalculateMediaStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
-        var cacheKey = CacheKeys.UserAllMediaStartNodesPrefix + user.Id;
-        IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
+        var cacheKey = user.UserCacheKey(CacheKeys.UserAllMediaStartNodesPrefix);
+        IAppPolicyCache runtimeCache = GetUserCache(appCaches);
         var result = runtimeCache.GetCacheItem(
             cacheKey,
             () =>
@@ -258,8 +213,8 @@ public static class UserExtensions
 
     public static string[]? GetMediaStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
-        var cacheKey = CacheKeys.UserMediaStartNodePathsPrefix + user.Id;
-        IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
+        var cacheKey = user.UserCacheKey(CacheKeys.UserMediaStartNodePathsPrefix);
+        IAppPolicyCache runtimeCache = GetUserCache(appCaches);
         var result = runtimeCache.GetCacheItem(
             cacheKey,
             () =>
@@ -276,8 +231,8 @@ public static class UserExtensions
 
     public static string[]? GetContentStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
-        var cacheKey = CacheKeys.UserContentStartNodePathsPrefix + user.Id;
-        IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
+        var cacheKey = user.UserCacheKey(CacheKeys.UserContentStartNodePathsPrefix);
+        IAppPolicyCache runtimeCache = GetUserCache(appCaches);
         var result = runtimeCache.GetCacheItem(
             cacheKey,
             () =>
@@ -349,7 +304,7 @@ public static class UserExtensions
             usn.Add(sn);
         }
 
-        foreach (var sn in usn)
+        foreach (var sn in CollectionsMarshal.AsSpan(usn))
         {
             var snp = paths[sn]; // has to be here now
             lsn.RemoveAll(x =>
@@ -360,6 +315,12 @@ public static class UserExtensions
 
         return lsn.ToArray();
     }
+
+    private static IAppPolicyCache GetUserCache(AppCaches appCaches)
+        => appCaches.IsolatedCaches.GetOrCreate<IUser>();
+
+    private static string UserCacheKey(this IUser user, string cacheKey)
+        => $"{cacheKey}{user.Key}";
 
     private static bool StartsWithPath(string test, string path) =>
         test.StartsWith(path) && test.Length > path.Length && test[path.Length] == ',';

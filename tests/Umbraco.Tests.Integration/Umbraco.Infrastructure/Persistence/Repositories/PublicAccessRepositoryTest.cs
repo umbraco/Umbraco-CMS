@@ -192,7 +192,7 @@ public class PublicAccessRepositoryTest : UmbracoIntegrationTest
 
             // now remove a few rules from a few of the items and then add some more, this will put things 'out of order' which
             // we need to verify our sort order is working for the relator
-            // FIXME: no "relator" in v8?!
+            // TODO: no "relator" in v8?!
             for (var i = 0; i < allEntries.Count; i++)
             {
                 // all the even ones

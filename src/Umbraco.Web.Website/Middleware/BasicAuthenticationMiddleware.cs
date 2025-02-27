@@ -7,10 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Middleware;
@@ -35,19 +34,6 @@ public class BasicAuthenticationMiddleware : IMiddleware
         _basicAuthService = basicAuthService;
 
         _backOfficePath = globalSettings.CurrentValue.GetBackOfficePath(hostingEnvironment);
-    }
-
-    [Obsolete("Use Ctor with all methods. This will be removed in Umbraco 12")]
-    public BasicAuthenticationMiddleware(
-        IRuntimeState runtimeState,
-        IBasicAuthService basicAuthService) : this(
-        runtimeState,
-        basicAuthService,
-        StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
-        StaticServiceProvider.Instance.GetRequiredService<IHostingEnvironment>()
-    )
-    {
-
     }
 
     /// <inheritdoc />
@@ -117,7 +103,7 @@ public class BasicAuthenticationMiddleware : IMiddleware
     {
         if (_basicAuthService.IsRedirectToLoginPageEnabled())
         {
-            context.Response.Redirect($"{_backOfficePath}/login/?status=false&returnPath={WebUtility.UrlEncode(context.Request.GetEncodedPathAndQuery())}", false);
+            context.Response.Redirect($"{_backOfficePath}/?status=false&returnPath={WebUtility.UrlEncode(context.Request.GetEncodedPathAndQuery())}", false);
         }
         else
         {

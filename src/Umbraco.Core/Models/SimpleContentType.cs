@@ -42,7 +42,7 @@ public class SimpleContentType : ISimpleContentType
         Alias = contentType.Alias;
         Variations = contentType.Variations;
         Icon = contentType.Icon;
-        IsContainer = contentType.IsContainer;
+        ListView = contentType.ListView;
         Name = contentType.Name;
         AllowedAsRoot = contentType.AllowedAsRoot;
         IsElement = contentType.IsElement;
@@ -61,7 +61,7 @@ public class SimpleContentType : ISimpleContentType
 
     public string? Icon { get; }
 
-    public bool IsContainer { get; }
+    public Guid? ListView { get; }
 
     public string? Name { get; }
 

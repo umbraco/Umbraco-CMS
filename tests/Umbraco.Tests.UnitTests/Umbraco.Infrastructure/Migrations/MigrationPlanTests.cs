@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -70,7 +71,17 @@ public class MigrationPlanTests
             Mock.Of<IServerMessenger>(),
             new CacheRefresherCollection(() => Enumerable.Empty<ICacheRefresher>()));
 
-        var executor = new MigrationPlanExecutor(scopeProvider, scopeProvider, loggerFactory, migrationBuilder, databaseFactory, Mock.Of<IPublishedSnapshotService>(), distributedCache);
+        var isolatedCaches = new IsolatedCaches(type => NoAppCache.Instance);
+
+        var appCaches = new AppCaches(Mock.Of<IAppPolicyCache>(), Mock.Of<IRequestCache>(), isolatedCaches);
+
+        var executor = new MigrationPlanExecutor(
+            scopeProvider,
+            scopeProvider,
+            loggerFactory,
+            migrationBuilder,
+            databaseFactory,
+            Mock.Of<IDatabaseCacheRebuilder>(), distributedCache, Mock.Of<IKeyValueService>(), Mock.Of<IServiceScopeFactory>(), appCaches);
 
         var plan = new MigrationPlan("default")
             .From(string.Empty)

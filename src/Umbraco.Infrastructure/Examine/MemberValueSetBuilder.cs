@@ -1,9 +1,7 @@
 using Examine;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
@@ -16,12 +14,6 @@ public class MemberValueSetBuilder : BaseValueSetBuilder<IMember>
         : base(propertyEditors, false)
     {
         _contentTypeService = contentTypeService;
-    }
-
-    [Obsolete("Use non-obsolete ctor, scheduled for removal in v14")]
-    public MemberValueSetBuilder(PropertyEditorCollection propertyEditors)
-        : this(propertyEditors, StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
-    {
     }
 
     /// <inheritdoc />

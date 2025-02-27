@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -101,6 +102,18 @@ public class TagService : RepositoryService, ITagService
             return _tagRepository.GetTagsForEntityType(TaggableObjectTypes.All, group, culture);
         }
     }
+
+    public Task<IEnumerable<ITag>> GetAllAsync(string? group = null, string? culture = null)
+    {
+        if (culture == string.Empty)
+        {
+            culture = null;
+        }
+
+        return Task.FromResult(GetAllTags(group, culture));
+    }
+
+    public async Task<IEnumerable<ITag>> GetByQueryAsync(string query, string? group = null, string? culture = null) => (await GetAllAsync(group, culture)).Where(x => x.Text.InvariantContains(query));
 
     /// <inheritdoc />
     public IEnumerable<ITag> GetAllContentTags(string? group = null, string? culture = null)

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Models;
@@ -11,11 +12,6 @@ namespace Umbraco.Cms.Core.Models;
 /// <remarks>This is the base interface for parameter and property value editors.</remarks>
 public interface IDataValueEditor
 {
-    /// <summary>
-    ///     Gets the editor view.
-    /// </summary>
-    string? View { get; }
-
     /// <summary>
     ///     Gets the type of the value.
     /// </summary>
@@ -28,15 +24,9 @@ public interface IDataValueEditor
     bool IsReadOnly { get; }
 
     /// <summary>
-    ///     Gets a value indicating whether to display the associated label.
-    /// </summary>
-    bool HideLabel { get; }
-
-    /// <summary>
     /// Gets a value indicating whether the IDataValueEditor supports readonly mode
     /// </summary>
     bool SupportsReadOnly => false;
-
 
     /// <summary>
     ///     Gets the validators to use to validate the edited value.
@@ -53,7 +43,8 @@ public interface IDataValueEditor
     /// <param name="value">The property value.</param>
     /// <param name="required">A value indicating whether the property value is required.</param>
     /// <param name="format">A specific format (regex) that the property value must respect.</param>
-    IEnumerable<ValidationResult> Validate(object? value, bool required, string? format);
+    /// <param name="validationContext">The context in which the property value is being validated.</param>
+    IEnumerable<ValidationResult> Validate(object? value, bool required, string? format, PropertyValidationContext validationContext);
 
     /// <summary>
     ///     Converts a value posted by the editor to a property value.
@@ -85,4 +76,6 @@ public interface IDataValueEditor
     XNode ConvertDbToXml(IPropertyType propertyType, object value);
 
     string ConvertDbToString(IPropertyType propertyType, object? value);
+
+    IEnumerable<Guid> ConfiguredElementTypeKeys() => Enumerable.Empty<Guid>();
 }

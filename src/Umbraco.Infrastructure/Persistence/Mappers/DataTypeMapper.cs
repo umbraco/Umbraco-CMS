@@ -30,5 +30,6 @@ public sealed class DataTypeMapper : BaseMapper
         DefineMap<DataType, NodeDto>(nameof(DataType.CreatorId), nameof(NodeDto.UserId));
         DefineMap<DataType, DataTypeDto>(nameof(DataType.EditorAlias), nameof(DataTypeDto.EditorAlias));
         DefineMap<DataType, DataTypeDto>(nameof(DataType.DatabaseType), nameof(DataTypeDto.DbType));
+        DefineMap<DataType, DataTypeDto>(nameof(DataType.EditorUiAlias), nameof(DataTypeDto.EditorUiAlias));
     }
 }

@@ -17,7 +17,8 @@ public class TypeLoaderBenchmarks
     {
         var typeFinder1 = new TypeFinder(
             new NullLogger<TypeFinder>(),
-            new DefaultUmbracoAssemblyProvider(GetType().Assembly, NullLoggerFactory.Instance));
+            new DefaultUmbracoAssemblyProvider(GetType().Assembly, NullLoggerFactory.Instance),
+            null);
 
         _typeLoader1 = new TypeLoader(typeFinder1, NullLogger<TypeLoader>.Instance);
         _typeLoader2 = new TypeLoader(typeFinder1, NullLogger<TypeLoader>.Instance);

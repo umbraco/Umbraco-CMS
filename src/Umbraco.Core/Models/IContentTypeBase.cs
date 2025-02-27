@@ -38,12 +38,12 @@ public interface IContentTypeBase : IUmbracoEntity, IRememberBeingDirty
     bool AllowedAsRoot { get; set; }
 
     /// <summary>
-    ///     Gets or Sets a boolean indicating whether this ContentType is a Container
+    ///     Gets or Sets a Guid, which is the key of the listview.
     /// </summary>
     /// <remarks>
     ///     ContentType Containers doesn't show children in the tree, but rather in grid-type view.
     /// </remarks>
-    bool IsContainer { get; set; }
+    Guid? ListView { get; set; }
 
     /// <summary>
     ///     Gets or sets a value indicating whether this content type is for an element.

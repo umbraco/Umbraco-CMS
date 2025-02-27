@@ -1,16 +1,22 @@
 using System.Data;
+using System.Data.Common;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security;
@@ -18,8 +24,10 @@ namespace Umbraco.Cms.Core.Security;
 /// <summary>
 ///     The user store for back office users
 /// </summary>
-public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, IdentityRole<string>>,
-    IUserSessionStore<BackOfficeIdentityUser>
+public class BackOfficeUserStore :
+    UmbracoUserStore<BackOfficeIdentityUser, IdentityRole<string>>,
+    IUserSessionStore<BackOfficeIdentityUser>,
+    IBackOfficeUserStore
 {
     private readonly AppCaches _appCaches;
     private readonly IEntityService _entityService;
@@ -28,7 +36,11 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     private readonly IUmbracoMapper _mapper;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
-    private readonly IUserService _userService;
+    private readonly IUserGroupService _userGroupService;
+    private readonly IUserRepository _userRepository;
+    private readonly IRuntimeState _runtimeState;
+    private readonly IEventMessagesFactory _eventMessagesFactory;
+    private readonly ILogger<BackOfficeUserStore> _logger;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="BackOfficeUserStore" /> class.
@@ -36,60 +48,52 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     [ActivatorUtilitiesConstructor]
     public BackOfficeUserStore(
         ICoreScopeProvider scopeProvider,
-        IUserService userService,
         IEntityService entityService,
         IExternalLoginWithKeyService externalLoginService,
         IOptionsSnapshot<GlobalSettings> globalSettings,
         IUmbracoMapper mapper,
         BackOfficeErrorDescriber describer,
         AppCaches appCaches,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IUserGroupService userGroupService,
+        IUserRepository userRepository,
+        IRuntimeState runtimeState,
+        IEventMessagesFactory eventMessagesFactory,
+        ILogger<BackOfficeUserStore> logger)
         : base(describer)
     {
         _scopeProvider = scopeProvider;
-        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _entityService = entityService;
         _externalLoginService = externalLoginService ?? throw new ArgumentNullException(nameof(externalLoginService));
         _globalSettings = globalSettings.Value;
         _mapper = mapper;
         _appCaches = appCaches;
         _twoFactorLoginService = twoFactorLoginService;
-        _userService = userService;
+        _userGroupService = userGroupService;
+        _userRepository = userRepository;
+        _runtimeState = runtimeState;
+        _eventMessagesFactory = eventMessagesFactory;
+        _logger = logger;
         _externalLoginService = externalLoginService;
     }
 
-    [Obsolete("Use non obsolete ctor")]
-    public BackOfficeUserStore(
-        ICoreScopeProvider scopeProvider,
-        IUserService userService,
-        IEntityService entityService,
-        IExternalLoginWithKeyService externalLoginService,
-        IOptions<GlobalSettings> globalSettings,
-        IUmbracoMapper mapper,
-        BackOfficeErrorDescriber describer,
-        AppCaches appCaches)
-        : this(
-            scopeProvider,
-            userService,
-            entityService,
-            externalLoginService,
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<GlobalSettings>>(),
-            mapper,
-            describer,
-            appCaches,
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
-    {
-    }
-
     /// <inheritdoc />
-    public Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId)
+    public async Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId)
     {
-        if (Guid.TryParse(sessionId, out Guid guidSessionId))
+        if (!Guid.TryParse(sessionId, out Guid guidSessionId))
         {
-            return Task.FromResult(_userService.ValidateLoginSession(UserIdToInt(userId), guidSessionId));
+            return false;
         }
 
-        return Task.FromResult(false);
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        // We need to resolve the id from the key here...
+        var id = await ResolveEntityIdFromIdentityId(userId);
+
+        var sessionIsValid = _userRepository.ValidateLoginSession(id, guidSessionId);
+        scope.Complete();
+
+        return sessionIsValid;
     }
 
     /// <inheritdoc />
@@ -118,16 +122,16 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         }
 
         if (user.Email is null || user.UserName is null)
-            {
-                throw new InvalidOperationException("Email and UserName is required.");
-            }
+        {
+            throw new InvalidOperationException("Email and UserName is required.");
+        }
 
-            // the password must be 'something' it could be empty if authenticating
-            // with an external provider so we'll just generate one and prefix it, the
-            // prefix will help us determine if the password hasn't actually been specified yet.
-            // this will hash the guid with a salt so should be nicely random
-            var aspHasher = new PasswordHasher<BackOfficeIdentityUser>();
-            var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
+        // the password must be 'something' it could be empty if authenticating
+        // with an external provider so we'll just generate one and prefix it, the
+        // prefix will help us determine if the password hasn't actually been specified yet.
+        // this will hash the guid with a salt so should be nicely random
+        var aspHasher = new PasswordHasher<BackOfficeIdentityUser>();
+        var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
                                  aspHasher.HashPassword(user, Guid.NewGuid().ToString("N"));
 
         var userEntity = new User(_globalSettings, user.Name, user.Email, user.UserName, emptyPasswordValue)
@@ -136,7 +140,10 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             StartContentIds = user.StartContentIds ?? new int[] { },
             StartMediaIds = user.StartMediaIds ?? new int[] { },
             IsLockedOut = user.IsLockedOut,
+            Key = user.Key,
+            Kind = user.Kind
         };
+
 
         // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
         var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(BackOfficeIdentityUser.Logins));
@@ -144,15 +151,16 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
 
         UpdateMemberProperties(userEntity, user);
 
-        _userService.Save(userEntity);
+        SaveAsync(userEntity).GetAwaiter().GetResult();
 
         if (!userEntity.HasIdentity)
         {
             throw new DataException("Could not create the user, check logs for details");
         }
 
-        // re-assign id
+        // re-assign id and key
         user.Id = UserIdToString(userEntity.Id);
+        user.Key = userEntity.Key;
 
         if (isLoginsPropertyDirty)
         {
@@ -178,6 +186,187 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     }
 
     /// <inheritdoc />
+    public Task<UserOperationStatus> SaveAsync(IUser user)
+    {
+        EventMessages eventMessages = _eventMessagesFactory.Get();
+
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        var savingNotification = new UserSavingNotification(user, eventMessages);
+        if (scope.Notifications.PublishCancelable(savingNotification))
+        {
+            scope.Complete();
+            return Task.FromResult(UserOperationStatus.CancelledByNotification);
+        }
+
+        if (string.IsNullOrWhiteSpace(user.Username))
+        {
+            throw new ArgumentException("Empty username.", nameof(user));
+        }
+
+        if (string.IsNullOrWhiteSpace(user.Name))
+        {
+            throw new ArgumentException("Empty name.", nameof(user));
+        }
+
+        try
+        {
+            _userRepository.Save(user);
+            scope.Notifications.Publish(
+                new UserSavedNotification(user, eventMessages).WithStateFrom(savingNotification));
+
+            scope.Complete();
+        }
+        catch (DbException ex)
+        {
+            // if we are upgrading and an exception occurs, log and swallow it
+            if (IsUpgrading == false)
+            {
+                throw;
+            }
+
+            _logger.LogWarning(
+                ex,
+                "An error occurred attempting to save a user instance during upgrade, normally this warning can be ignored");
+
+            // we don't want the uow to rollback its scope!
+            scope.Complete();
+        }
+
+        return Task.FromResult(UserOperationStatus.Success);
+    }
+
+    /// <inheritdoc />
+    public Task<UserOperationStatus> DisableAsync(IUser user)
+    {
+        // disable
+        user.IsApproved = false;
+
+        return SaveAsync(user);
+    }
+
+    public Task<IUser?> GetAsync(int id)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+
+        try
+        {
+            return Task.FromResult(_userRepository.Get(id));
+        }
+        catch (DbException)
+        {
+            // TODO: refactor users/upgrade
+            // currently kinda accepting anything on upgrade, but that won't deal with all cases
+            // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
+            // be better BUT requires that the app restarts after the upgrade!
+            if (IsUpgrading)
+            {
+                // NOTE: this will not be cached
+                return Task.FromResult(_userRepository.GetForUpgrade(id));
+            }
+
+            throw;
+        }
+    }
+
+    public Task<IEnumerable<IUser>> GetUsersAsync(params int[]? ids)
+    {
+        if (ids is null || ids.Length <= 0)
+        {
+            return Task.FromResult(Enumerable.Empty<IUser>());
+        }
+
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => ids.Contains(x.Id));
+        IEnumerable<IUser> users = _userRepository.Get(query);
+
+        return Task.FromResult(users);
+    }
+
+    public Task<IEnumerable<IUser>> GetUsersAsync(params Guid[]? keys)
+    {
+        if (keys is null || keys.Length <= 0)
+        {
+            return Task.FromResult(Enumerable.Empty<IUser>());
+        }
+
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        IEnumerable<IUser> users = _userRepository.GetMany(keys);
+
+        return Task.FromResult(users);
+    }
+
+    /// <inheritdoc />
+    public Task<IUser?> GetAsync(Guid key)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        return Task.FromResult(_userRepository.Get(key));
+    }
+
+    /// <inheritdoc />
+    public Task<IUser?> GetByUserNameAsync(string username)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+
+        try
+        {
+            IUser? user = _userRepository.GetByUsername(username, true);
+            return Task.FromResult(user);
+        }
+        catch (DbException)
+        {
+            // TODO: refactor users/upgrade
+            // currently kinda accepting anything on upgrade, but that won't deal with all cases
+            // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
+            // be better BUT requires that the app restarts after the upgrade!
+            if (IsUpgrading)
+            {
+                // NOTE: this will not be cached
+                IUser? upgradeUser =  _userRepository.GetForUpgradeByUsername(username);
+                return Task.FromResult(upgradeUser);
+            }
+
+            throw;
+        }
+
+    }
+
+    /// <inheritdoc />
+    public Task<IUser?> GetByEmailAsync(string email)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+
+        try
+        {
+            IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => x.Email.Equals(email));
+            IUser? user = _userRepository.Get(query).FirstOrDefault();
+            return Task.FromResult(user);
+        }
+        catch(DbException)
+        {
+            // We also need to catch upgrade state here, because the framework will try to call this to validate the email.
+            if (IsUpgrading)
+            {
+                IUser? upgradeUser = _userRepository.GetForUpgradeByEmail(email);
+                return Task.FromResult(upgradeUser);
+            }
+
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public Task<IEnumerable<IUser>> GetAllInGroupAsync(int groupId)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        IEnumerable<IUser> usersInGroup = _userRepository.GetAllInGroup(groupId);
+        return Task.FromResult(usersInGroup);
+    }
+
+    private bool IsUpgrading =>
+        _runtimeState.Level == RuntimeLevel.Install || _runtimeState.Level == RuntimeLevel.Upgrade;
+
+    /// <inheritdoc />
     public override Task<IdentityResult> UpdateAsync(
         BackOfficeIdentityUser user,
         CancellationToken cancellationToken = default)
@@ -196,7 +385,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
 
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            IUser? found = _userService.GetUserById(asInt);
+            IUser? found = GetAsync(asInt).GetAwaiter().GetResult();
             if (found != null)
             {
                 // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
@@ -205,7 +394,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
 
                 if (UpdateMemberProperties(found, user))
                 {
-                    _userService.Save(found);
+                    SaveAsync(found).GetAwaiter().GetResult();
                 }
 
                 if (isLoginsPropertyDirty)
@@ -247,32 +436,31 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             throw new ArgumentNullException(nameof(user));
         }
 
-        var userId = UserIdToInt(user.Id);
-        IUser? found = _userService.GetUserById(userId);
-        if (found != null)
+        IUser? found = FindUserFromString(user.Id);
+        if (found is not null)
         {
-            _userService.Delete(found);
+            DisableAsync(found).GetAwaiter().GetResult();
         }
 
-        _externalLoginService.DeleteUserLogins(userId.ToGuid());
+        _externalLoginService.DeleteUserLogins(user.Key);
 
         return Task.FromResult(IdentityResult.Success);
     }
 
     /// <inheritdoc />
-    public override Task<BackOfficeIdentityUser?> FindByNameAsync(string userName, CancellationToken cancellationToken = default)
+    public override async Task<BackOfficeIdentityUser?> FindByNameAsync(string userName, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
-        IUser? user = _userService.GetByUsername(userName);
+        IUser? user = await GetByUserNameAsync(userName);
         if (user == null)
         {
-            return Task.FromResult<BackOfficeIdentityUser?>(null);
+            return null;
         }
 
         BackOfficeIdentityUser? result = AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user));
 
-        return Task.FromResult(result)!;
+        return result;
     }
 
     /// <inheritdoc />
@@ -281,7 +469,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
 
-        IUser? user = _userService.GetUserById(UserIdToInt(userId));
+        IUser? user = FindUserFromString(userId);
         if (user == null)
         {
             return Task.FromResult((BackOfficeIdentityUser?)null)!;
@@ -290,19 +478,58 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         return Task.FromResult(AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user)))!;
     }
 
+    private IUser? FindUserFromString(string userId)
+    {
+        // We could use ResolveEntityIdFromIdentityId here, but that would require multiple DB calls, so let's not.
+        if (TryConvertIdentityIdToInt(userId, out var id))
+        {
+            return GetAsync(id).GetAwaiter().GetResult();
+        }
+
+        // We couldn't directly convert the ID to an int, this is because the user logged in with external login.
+        // So we need to look up the user by key.
+        if (Guid.TryParse(userId, out Guid key))
+        {
+            return GetAsync(key).GetAwaiter().GetResult();
+        }
+
+        throw new InvalidOperationException($"Unable to resolve user with ID {userId}");
+    }
+
+    protected override async Task<int> ResolveEntityIdFromIdentityId(string? identityId)
+    {
+        if (TryConvertIdentityIdToInt(identityId, out var result))
+        {
+            return result;
+        }
+
+        // We couldn't directly convert the ID to an int, this is because the user logged in with external login.
+        // So we need to look up the user by key, and then get the ID.
+        if (Guid.TryParse(identityId, out Guid key))
+        {
+            IUser? user = await GetAsync(key);
+            if (user is not null)
+            {
+                return user.Id;
+            }
+        }
+
+        throw new InvalidOperationException($"Unable to resolve a user id from {identityId}");
+    }
+
     /// <inheritdoc />
-    public override Task<BackOfficeIdentityUser?> FindByEmailAsync(
+    public override async Task<BackOfficeIdentityUser?> FindByEmailAsync(
         string email,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
-        IUser? user = _userService.GetByEmail(email);
+        IUser? user = await GetByEmailAsync(email);
         BackOfficeIdentityUser? result = user == null
             ? null
             : _mapper.Map<BackOfficeIdentityUser>(user);
 
-        return Task.FromResult(AssignLoginsCallback(result));
+        return AssignLoginsCallback(result);
     }
 
     /// <inheritdoc />
@@ -379,7 +606,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     /// <remarks>
     ///     Identity Role names are equal to Umbraco UserGroup alias.
     /// </remarks>
-    public override Task<IList<BackOfficeIdentityUser>> GetUsersInRoleAsync(
+    public override async Task<IList<BackOfficeIdentityUser>> GetUsersInRoleAsync(
         string normalizedRoleName,
         CancellationToken cancellationToken = default)
     {
@@ -390,13 +617,18 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             throw new ArgumentNullException(nameof(normalizedRoleName));
         }
 
-        IUserGroup? userGroup = _userService.GetUserGroupByAlias(normalizedRoleName);
+        IUserGroup? userGroup = _userGroupService.GetAsync(normalizedRoleName).GetAwaiter().GetResult();
 
-        IEnumerable<IUser> users = _userService.GetAllInGroup(userGroup?.Id);
+        if (userGroup is null)
+        {
+            return new List<BackOfficeIdentityUser>();
+        }
+
+        IEnumerable<IUser> users = await GetAllInGroupAsync(userGroup.Id);
         IList<BackOfficeIdentityUser> backOfficeIdentityUsers =
             users.Select(x => _mapper.Map<BackOfficeIdentityUser>(x)).Where(x => x != null).ToList()!;
 
-        return Task.FromResult(backOfficeIdentityUsers);
+        return backOfficeIdentityUsers;
     }
 
     /// <summary>
@@ -495,7 +727,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         string normalizedRoleName,
         CancellationToken cancellationToken)
     {
-        IUserGroup? group = _userService.GetUserGroupByAlias(normalizedRoleName);
+        IUserGroup? group = _userGroupService.GetAsync(normalizedRoleName).GetAwaiter().GetResult();
         if (group?.Name is null)
         {
             return Task.FromResult<IdentityRole<string>?>(null);
@@ -524,11 +756,10 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     {
         if (user != null)
         {
-            var userId = UserIdToInt(user.Id).ToGuid();
             user.SetLoginsCallback(
-                new Lazy<IEnumerable<IIdentityUserLogin>?>(() => _externalLoginService.GetExternalLogins(userId)));
+                new Lazy<IEnumerable<IIdentityUserLogin>?>(() => _externalLoginService.GetExternalLogins(user.Key)));
             user.SetTokensCallback(
-                new Lazy<IEnumerable<IIdentityUserToken>?>(() => _externalLoginService.GetExternalLoginTokens(userId)));
+                new Lazy<IEnumerable<IIdentityUserToken>?>(() => _externalLoginService.GetExternalLoginTokens(user.Key)));
         }
 
         return user;
@@ -670,7 +901,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             user.ClearGroups();
 
             // go lookup all these groups
-            IReadOnlyUserGroup[] groups = _userService.GetUserGroupsByAlias(identityUserRoles)
+            IReadOnlyUserGroup[] groups = _userGroupService.GetAsync(identityUserRoles).GetAwaiter().GetResult()
                 .Select(x => x.ToReadOnlyGroup()).ToArray();
 
             // use all of the ones assigned and add them

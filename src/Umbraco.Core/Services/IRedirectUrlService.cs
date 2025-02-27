@@ -79,6 +79,20 @@ public interface IRedirectUrlService : IService
     IEnumerable<IRedirectUrl> GetAllRedirectUrls(long pageIndex, int pageSize, out long total);
 
     /// <summary>
+    ///     Gets all redirect URLs.
+    /// </summary>
+    /// <param name="skip">Amount to skip.</param>
+    /// <param name="take">Amount to take.</param>
+    /// <param name="total">The total count of redirect URLs.</param>
+    /// <returns>The redirect URLs.</returns>
+    IEnumerable<IRedirectUrl> GetAllRedirectUrls(int skip, int take, out long total)
+    {
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        return GetAllRedirectUrls(pageNumber, pageSize, out total);
+    }
+
+    /// <summary>
     ///     Gets all redirect URLs below a given content item.
     /// </summary>
     /// <param name="rootContentId">The content unique identifier.</param>
@@ -97,4 +111,19 @@ public interface IRedirectUrlService : IService
     /// <param name="total">The total count of redirect URLs.</param>
     /// <returns>The redirect URLs.</returns>
     IEnumerable<IRedirectUrl> SearchRedirectUrls(string searchTerm, long pageIndex, int pageSize, out long total);
+
+    /// <summary>
+    ///     Searches for all redirect URLs that contain a given search term in their URL property.
+    /// </summary>
+    /// <param name="searchTerm">The term to search for.</param>
+    /// <param name="skip">Amount to skip.</param>
+    /// <param name="take">Amount to take.</param>
+    /// <param name="total">The total count of redirect URLs.</param>
+    /// <returns>The redirect URLs.</returns>
+    IEnumerable<IRedirectUrl> SearchRedirectUrls(string searchTerm, int skip, int take, out long total)
+    {
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        return SearchRedirectUrls(searchTerm, pageNumber, pageSize, out total);
+    }
 }

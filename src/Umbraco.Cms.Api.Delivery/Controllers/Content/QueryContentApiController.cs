@@ -1,11 +1,9 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -21,20 +19,6 @@ public class QueryContentApiController : ContentApiControllerBase
     private readonly IRequestMemberAccessService _requestMemberAccessService;
     private readonly IApiContentQueryService _apiContentQueryService;
 
-    [Obsolete($"Please use the constructor that accepts {nameof(IRequestMemberAccessService)}. Will be removed in V14.")]
-    public QueryContentApiController(
-        IApiPublishedContentCache apiPublishedContentCache,
-        IApiContentResponseBuilder apiContentResponseBuilderBuilder,
-        IApiContentQueryService apiContentQueryService)
-        : this(
-            apiPublishedContentCache,
-            apiContentResponseBuilderBuilder,
-            apiContentQueryService,
-            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberAccessService>())
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public QueryContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilderBuilder,

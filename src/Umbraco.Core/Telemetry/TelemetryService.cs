@@ -36,36 +36,36 @@ internal class TelemetryService : ITelemetryService
         _metricsConsentService = metricsConsentService;
     }
 
-    /// <inheritdoc />
+    [Obsolete("Please use GetTelemetryReportDataAsync. Will be removed in V15.")]
     public bool TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData)
     {
-        if (_siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid telemetryId) is false)
-        {
-            telemetryReportData = null;
-            return false;
-        }
+        telemetryReportData = GetTelemetryReportDataAsync().GetAwaiter().GetResult();
 
-        telemetryReportData = new TelemetryReportData
-        {
-            Id = telemetryId,
-            Version = GetVersion(),
-            Packages = GetPackageTelemetry(),
-            Detailed = _usageInformationService.GetDetailed(),
-        };
-        return true;
+        return telemetryReportData != null;
     }
 
-    private string? GetVersion()
+    /// <inheritdoc />
+    public async Task<TelemetryReportData?> GetTelemetryReportDataAsync()
     {
-        if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
+        if (_siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid telemetryId) is false)
         {
             return null;
         }
 
-        return _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
+        return new TelemetryReportData
+        {
+            Id = telemetryId,
+            Version = GetVersion(),
+            Packages = await GetPackageTelemetryAsync().ConfigureAwait(false),
+            Detailed = _usageInformationService.GetDetailed(),
+        };
     }
 
-    private IEnumerable<PackageTelemetry>? GetPackageTelemetry()
+    private string? GetVersion() => _metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal
+        ? null
+        : _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
+
+    private async Task<IEnumerable<PackageTelemetry>?> GetPackageTelemetryAsync()
     {
         if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
         {
@@ -73,7 +73,7 @@ internal class TelemetryService : ITelemetryService
         }
 
         List<PackageTelemetry> packages = new();
-        IEnumerable<InstalledPackage> installedPackages = _packagingService.GetAllInstalledPackages();
+        IEnumerable<InstalledPackage> installedPackages = await _packagingService.GetAllInstalledPackagesAsync().ConfigureAwait(false);
 
         foreach (InstalledPackage installedPackage in installedPackages)
         {

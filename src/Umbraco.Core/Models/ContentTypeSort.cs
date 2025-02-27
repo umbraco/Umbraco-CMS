@@ -15,23 +15,12 @@ public class ContentTypeSort : IValueObject, IDeepCloneable
     /// <summary>
     ///     Initializes a new instance of the <see cref="T:System.Object" /> class.
     /// </summary>
-    public ContentTypeSort(int id, int sortOrder)
+    public ContentTypeSort(Guid key, int sortOrder, string alias)
     {
-        Id = new Lazy<int>(() => id);
-        SortOrder = sortOrder;
-    }
-
-    public ContentTypeSort(Lazy<int> id, int sortOrder, string alias)
-    {
-        Id = id;
         SortOrder = sortOrder;
         Alias = alias;
+        Key = key;
     }
-
-    /// <summary>
-    ///     Gets or sets the Id of the ContentType
-    /// </summary>
-    public Lazy<int> Id { get; set; } = new(() => 0);
 
     /// <summary>
     ///     Gets or sets the Sort Order of the ContentType
@@ -43,11 +32,14 @@ public class ContentTypeSort : IValueObject, IDeepCloneable
     /// </summary>
     public string Alias { get; set; } = string.Empty;
 
+    /// <summary>
+    ///     Gets or sets the unique Key of the ContentType
+    /// </summary>
+    public Guid Key { get; set; }
+
     public object DeepClone()
     {
         var clone = (ContentTypeSort)MemberwiseClone();
-        var id = Id.Value;
-        clone.Id = new Lazy<int>(() => id);
         return clone;
     }
 
@@ -72,7 +64,7 @@ public class ContentTypeSort : IValueObject, IDeepCloneable
     }
 
     protected bool Equals(ContentTypeSort other) =>
-        Id.Value.Equals(other.Id.Value) && string.Equals(Alias, other.Alias);
+        Key.Equals(other.Key) && string.Equals(Alias, other.Alias);
 
     public override int GetHashCode()
     {
@@ -80,7 +72,7 @@ public class ContentTypeSort : IValueObject, IDeepCloneable
         {
             // The hash code will just be the alias if one is assigned, otherwise it will be the hash code of the Id.
             // In some cases the alias can be null of the non lazy ctor is used, in that case, the lazy Id will already have a value created.
-            return Alias != null ? Alias.GetHashCode() : Id.Value.GetHashCode() * 397;
+            return Alias != null ? Alias.GetHashCode() : Key.GetHashCode() * 397;
         }
     }
 }

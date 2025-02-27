@@ -2,6 +2,7 @@
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models;
@@ -176,6 +177,21 @@ public class Property : EntityBase, IProperty
 
     // internal - must be invoked by the content item
     // does *not* validate the value - content item must validate first
+    public void PublishPartialValues(IDataEditor dataEditor, string? culture)
+    {
+        if (PropertyType.VariesByCulture())
+        {
+            throw new NotSupportedException("Cannot publish merged culture values for culture variant properties");
+        }
+
+        culture = culture?.NullOrWhiteSpaceAsNull();
+
+        var value = dataEditor.MergePartialPropertyValueForCulture(_pvalue?.EditedValue, _pvalue?.PublishedValue, culture);
+        PublishValue(_pvalue, value);
+    }
+
+    // internal - must be invoked by the content item
+    // does *not* validate the value - content item must validate first
     public void PublishValues(string? culture = "*", string? segment = "*")
     {
         culture = culture?.NullOrWhiteSpaceAsNull();
@@ -300,13 +316,23 @@ public class Property : EntityBase, IProperty
             return;
         }
 
+        PublishValue(pvalue, ConvertAssignedValue(pvalue.EditedValue));
+    }
+
+    private void PublishValue(IPropertyValue? pvalue, object? newPublishedValue)
+    {
+        if (pvalue == null)
+        {
+            return;
+        }
+
         if (!PropertyType.SupportsPublishing)
         {
             throw new NotSupportedException("Property type does not support publishing.");
         }
 
         var origValue = pvalue.PublishedValue;
-        pvalue.PublishedValue = ConvertAssignedValue(pvalue.EditedValue);
+        pvalue.PublishedValue = newPublishedValue;
         DetectChanges(pvalue.EditedValue, origValue, nameof(Values), PropertyValueComparer, false);
     }
 
@@ -567,8 +593,6 @@ public class Property : EntityBase, IProperty
     {
         // TODO: Either we allow change tracking at this class level, or we add some special change tracking collections to the Property
         // class to deal with change tracking which variants have changed
-        private string? _culture;
-        private string? _segment;
 
         /// <summary>
         ///     Gets or sets the culture of the property.
@@ -577,18 +601,14 @@ public class Property : EntityBase, IProperty
         ///     The culture is either null (invariant) or a non-empty string. If the property is
         ///     set with an empty or whitespace value, its value is converted to null.
         /// </remarks>
-        public string? Culture
-        {
-            get => _culture;
-            set => _culture = value.IsNullOrWhiteSpace() ? null : value!.ToLowerInvariant();
-        }
+        public string? Culture { get; set; }
 
         public object DeepClone() => Clone();
 
         public bool Equals(PropertyValue? other) =>
             other != null &&
-            _culture == other._culture &&
-            _segment == other._segment &&
+            Culture == other.Culture &&
+            Segment == other.Segment &&
             EqualityComparer<object>.Default.Equals(EditedValue, other.EditedValue) &&
             EqualityComparer<object>.Default.Equals(PublishedValue, other.PublishedValue);
 
@@ -599,11 +619,7 @@ public class Property : EntityBase, IProperty
         ///     The segment is either null (neutral) or a non-empty string. If the property is
         ///     set with an empty or whitespace value, its value is converted to null.
         /// </remarks>
-        public string? Segment
-        {
-            get => _segment;
-            set => _segment = value?.ToLowerInvariant();
-        }
+        public string? Segment { get; set; }
 
         /// <summary>
         ///     Gets or sets the edited value of the property.
@@ -621,8 +637,8 @@ public class Property : EntityBase, IProperty
         public IPropertyValue Clone()
             => new PropertyValue
             {
-                _culture = _culture,
-                _segment = _segment,
+                Culture = Culture,
+                Segment = Segment,
                 PublishedValue = PublishedValue,
                 EditedValue = EditedValue,
             };
@@ -632,14 +648,14 @@ public class Property : EntityBase, IProperty
         public override int GetHashCode()
         {
             var hashCode = 1885328050;
-            if (_culture is not null)
+            if (Culture is not null)
             {
-                hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(_culture);
+                hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Culture);
             }
 
-            if (_segment is not null)
+            if (Segment is not null)
             {
-                hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(_segment);
+                hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Segment);
             }
 
             if (EditedValue is not null)

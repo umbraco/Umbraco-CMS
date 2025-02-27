@@ -1,10 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -52,7 +50,7 @@ public class UserGroupTests
     {
         var item = Build();
 
-        var json = JsonConvert.SerializeObject(item);
+        var json = JsonSerializer.Serialize(item);
         Debug.Print(json);
     }
 

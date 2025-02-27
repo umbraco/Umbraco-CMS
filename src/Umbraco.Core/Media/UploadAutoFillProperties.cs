@@ -26,16 +26,6 @@ public class UploadAutoFillProperties
         _imageDimensionExtractor = imageDimensionExtractor ?? throw new ArgumentNullException(nameof(imageDimensionExtractor));
     }
 
-    [Obsolete("Use non-obsolete ctor. This will be removed in Umbraco 13.")]
-    public UploadAutoFillProperties(
-        MediaFileManager mediaFileManager,
-        ILogger<UploadAutoFillProperties> logger,
-        IImageUrlGenerator imageUrlGenerator,
-        IImageDimensionExtractor imageDimensionExtractor) : this(mediaFileManager, logger, imageDimensionExtractor)
-    {
-
-    }
-
     /// <summary>
     /// Resets the auto-fill properties of a content item, for a specified auto-fill configuration.
     /// </summary>

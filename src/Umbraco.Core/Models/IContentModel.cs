@@ -8,8 +8,7 @@ namespace Umbraco.Cms.Core.Models;
 /// <remarks>
 ///     <para>
 ///         <see cref="IContentModel" /> exists in order to unify all view models in Umbraco, whether it's a normal
-///         template view or a partial view macro, or
-///         a user's custom model that they have created when doing route hijacking or custom routes.
+///         template view or a user's custom model that they have created when doing route hijacking or custom routes.
 ///     </para>
 ///     <para>
 ///         By default all front-end template views inherit from UmbracoViewPage which has a model of

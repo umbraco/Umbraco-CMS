@@ -1,10 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Extensions;
@@ -46,8 +45,9 @@ public class JsonValueConverter : PropertyValueConverterBase, IDeliveryApiProper
         && editor.GetValueEditor().ValueType.InvariantEquals(ValueTypes.Json)
         && _excludedPropertyEditors.Contains(propertyType.EditorAlias) == false;
 
+    // We return a JsonDocument here because it's readonly and faster than JsonNode.
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-        => typeof(JToken);
+        => typeof(JsonDocument);
 
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
@@ -65,8 +65,7 @@ public class JsonValueConverter : PropertyValueConverterBase, IDeliveryApiProper
         {
             try
             {
-                var obj = JsonConvert.DeserializeObject(sourceString);
-                return obj;
+                return JsonDocument.Parse(sourceString);
             }
             catch (Exception ex)
             {
@@ -85,7 +84,7 @@ public class JsonValueConverter : PropertyValueConverterBase, IDeliveryApiProper
         => typeof(JsonNode);
 
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
-        => inter is JObject jObject
-            ? JsonNode.Parse(jObject.ToString())
-            : null;
+        => inter is not JsonDocument jsonDocument
+            ? null
+            : JsonNode.Parse(jsonDocument.RootElement.ToString());
 }

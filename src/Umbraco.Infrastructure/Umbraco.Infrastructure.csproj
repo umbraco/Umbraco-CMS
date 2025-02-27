@@ -6,6 +6,31 @@
     <RootNamespace>Umbraco.Cms.Infrastructure</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!--
+      TODO: Fix and remove overrides:
+      [CS0618] handle member obsolete appropriately
+      [CA1416] validate platform compatibility
+      [SA1117] params all on same line
+      [SA1401] make fields private
+      [SA1134] own line attributes
+      [CA2017] match parameters number
+      [CS0108] hidden inherited member
+      [SYSLIB0051] formatter-based serialization
+      [SA1649] filename match type name
+      [CS1998] remove async or make method synchronous
+      [CS0169] unused field
+      [CS0114] hidden inherited member
+      [IDE0060] remove unused parameter
+      [SA1130] use lamda syntax
+      [IDE1006] naming violation
+      [CS1066] default value
+      [CS0612] obsolete
+      [CS1574] resolve cref
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0618,CA1416,SA1117,SA1401,SA1134,CA2017,CS0108,SYSLIB0051,SA1649,CS1998,CS0169,CS0114,IDE0060,SA1130,IDE1006,CS1066,CS0612,CS1574</WarningsNotAsErrors>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DefineConstants>$(DefineConstants);TRACE_SCOPES</DefineConstants>
   </PropertyGroup>
@@ -23,7 +48,6 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" />
     <PackageReference Include="MiniProfiler.Shared" />
     <PackageReference Include="ncrontab" />
-    <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="NPoco" />
     <PackageReference Include="OpenIddict.Abstractions" />
     <PackageReference Include="Serilog" />
@@ -37,6 +61,11 @@
     <PackageReference Include="Serilog.Sinks.Async" />
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Serilog.Sinks.Map" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Take top-level depedendency on System.Text.RegularExpressions, because Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc depends on a vulnerable version -->
+    <PackageReference Include="System.Text.RegularExpressions" />
   </ItemGroup>
 
   <ItemGroup>
@@ -63,20 +92,7 @@
       <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-      <_Parameter1>Umbraco.New.Cms.Infrastructure</_Parameter1>
+      <_Parameter1>Umbraco.Cms.Infrastructure</_Parameter1>
     </AssemblyAttribute>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="WebAssets\*.js" />
-    <EmbeddedResource Update="WebAssets\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <Compile Update="WebAssets\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
   </ItemGroup>
 </Project>

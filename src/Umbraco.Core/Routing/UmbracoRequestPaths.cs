@@ -1,8 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
@@ -16,18 +14,13 @@ public class UmbracoRequestPaths
     private readonly string _appPath;
     private readonly string _backOfficeMvcPath;
     private readonly string _backOfficePath;
+    private readonly string _managementApiPath;
     private readonly string _defaultUmbPath;
     private readonly string _defaultUmbPathWithSlash;
     private readonly string _installPath;
     private readonly string _previewMvcPath;
     private readonly string _surfaceMvcPath;
     private readonly IOptions<UmbracoRequestPathsOptions> _umbracoRequestPathsOptions;
-
-    [Obsolete("Use constructor that takes IOptions<UmbracoRequestPathsOptions> - Will be removed in Umbraco 13")]
-    public UmbracoRequestPaths(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
-        : this(globalSettings, hostingEnvironment, StaticServiceProvider.Instance.GetRequiredService<IOptions<UmbracoRequestPathsOptions>>())
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoRequestPaths" /> class.
@@ -47,6 +40,7 @@ public class UmbracoRequestPaths
         _previewMvcPath = "/" + mvcArea + "/Preview/";
         _surfaceMvcPath = "/" + mvcArea + "/Surface/";
         _apiMvcPath = "/" + mvcArea + "/Api/";
+        _managementApiPath = "/" + mvcArea + Constants.Web.ManagementApiPath;
         _installPath = hostingEnvironment.ToAbsolute(Constants.SystemDirectories.Install);
         _umbracoRequestPathsOptions = umbracoRequestPathsOptions;
     }
@@ -94,7 +88,8 @@ public class UmbracoRequestPaths
         }
 
         // check for special back office paths
-        if (urlPath.InvariantStartsWith(_backOfficeMvcPath) || urlPath.InvariantStartsWith(_previewMvcPath))
+        if (urlPath.InvariantStartsWith(_backOfficeMvcPath) || urlPath.InvariantStartsWith(_previewMvcPath)
+            || urlPath.InvariantStartsWith(_managementApiPath))
         {
             return true;
         }
@@ -148,7 +143,7 @@ public class UmbracoRequestPaths
     /// <summary>
     ///     Checks if the current uri is an install request
     /// </summary>
-    public bool IsInstallerRequest(string absPath) => absPath.InvariantStartsWith(_installPath);
+    public bool IsInstallerRequest(string absPath) => absPath.InvariantStartsWith(_managementApiPath);
 
     /// <summary>
     ///     Rudimentary check to see if it's not a server side request

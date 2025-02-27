@@ -1,4 +1,4 @@
-﻿using OpenIddict.Abstractions;
+using OpenIddict.Abstractions;
 
 namespace Umbraco.Cms.Infrastructure.Security;
 

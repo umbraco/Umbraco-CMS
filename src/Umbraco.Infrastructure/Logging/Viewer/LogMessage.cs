@@ -1,10 +1,9 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Serilog.Events;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
+[Obsolete("Use ILogEntry instead. Scheduled for removal in Umbraco 15.")]
 public class LogMessage
 {
     /// <summary>
@@ -15,7 +14,6 @@ public class LogMessage
     /// <summary>
     ///     The level of the event.
     /// </summary>
-    [JsonConverter(typeof(StringEnumConverter))]
     public LogEventLevel Level { get; set; }
 
     /// <summary>

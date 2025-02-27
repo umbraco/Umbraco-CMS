@@ -1,6 +1,7 @@
 using System.Data;
 using System.Globalization;
-using System.Xml.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -11,15 +12,14 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
-using static Umbraco.Cms.Core.Constants.SqlTemplates;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -49,6 +49,8 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
     protected Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
 
+    public IDataType? Get(Guid key) => GetMany().FirstOrDefault(x=>x.Key == key);
+
     public IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer? container)
     {
         var parentId = -1;
@@ -66,6 +68,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
         }
 
         // used to track all the moved entities to be given to the event
+        // FIXME: Use constructor that takes parent key when this method is refactored
         var moveInfo = new List<MoveEventInfo<IDataType>> { new(toMove, toMove.Path, parentId) };
 
         var origPath = toMove.Path;
@@ -88,6 +91,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
         {
             foreach (IDataType descendant in descendants.OrderBy(x => x.Level))
             {
+                // FIXME: Use constructor that takes parent key when this method is refactored
                 moveInfo.Add(new MoveEventInfo<IDataType>(descendant, descendant.Path, descendant.ParentId));
 
                 descendant.ParentId = lastParent.Id;
@@ -145,7 +149,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
            .Select<ContentTypeDto>(ct => ct.Select(node => node.NodeDto))
            .From<ContentTypeDto>()
            .InnerJoin<NodeDto>().On<NodeDto, ContentTypeDto>(n => n.NodeId, ct => ct.NodeId)
-           .Where<ContentTypeDto>(ct => ct.IsContainer == true);
+           .Where<ContentTypeDto>(ct => ct.ListView != null);
 
             List<ContentTypeDto> ctds = Database.Fetch<ContentTypeDto>(sql);
 
@@ -181,11 +185,17 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
                         var listViewType = new List<string>();
 
                         if (dataType.Id.Equals(Constants.DataTypes.DefaultContentListView) && udi.EntityType == ObjectTypes.GetUdiType(UmbracoObjectTypes.DocumentType))
+                        {
                             listViewType.Add(Constants.Conventions.DataTypes.ListViewPrefix + "Content");
+                        }
                         else if (dataType.Id.Equals(Constants.DataTypes.DefaultMediaListView) && udi.EntityType == ObjectTypes.GetUdiType(UmbracoObjectTypes.MediaType))
+                        {
                             listViewType.Add(Constants.Conventions.DataTypes.ListViewPrefix + "Media");
+                        }
                         else if (dataType.Id.Equals(Constants.DataTypes.DefaultMembersListView) && udi.EntityType == ObjectTypes.GetUdiType(UmbracoObjectTypes.MemberType))
+                        {
                             listViewType.Add(Constants.Conventions.DataTypes.ListViewPrefix + "Members");
+                        }
 
                         if (listViewType.Any())
                         {
@@ -203,7 +213,6 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
         return usages;
     }
-
 
     #region Overrides of RepositoryBase<int,DataTypeDefinition>
 
@@ -399,7 +408,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
         Database.Delete<User2NodeNotifyDto>("WHERE nodeId = @Id", new { entity.Id });
 
         // Remove Permissions
-        Database.Delete<UserGroup2NodePermissionDto>("WHERE nodeId = @Id", new { entity.Id });
+        Database.Delete<UserGroup2GranularPermissionDto>("WHERE uniqueId = @Key", new { entity.Key });
 
         // Remove associated tags
         Database.Delete<TagRelationshipDto>("WHERE nodeId = @Id", new { entity.Id });

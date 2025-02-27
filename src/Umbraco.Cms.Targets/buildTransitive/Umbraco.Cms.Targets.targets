@@ -8,11 +8,14 @@
       <DependentUpon>appsettings-schema.json</DependentUpon>
     </Content>
   </ItemGroup>
-  
+
   <!-- Copy JSON schema files into the project directory -->
   <Target Name="CopyUmbracoJsonSchemaFiles" BeforeTargets="Build">
     <Message Text="Copying JSON schema files into project directory: @(UmbracoJsonSchemaFiles->'%(Filename)%(Extension)')" Importance="high" />
     <Copy SourceFiles="@(UmbracoJsonSchemaFiles)" DestinationFolder="$(MSBuildProjectDirectory)" SkipUnchangedFiles="true" />
+
+    <Message Text="Copying JSON schema files into project directory: @(UmbracoPackageSchemaFiles->'%(Filename)%(Extension)')" Importance="high" />
+    <Copy SourceFiles="@(UmbracoPackageSchemaFiles)" DestinationFolder="$(MSBuildProjectDirectory)" SkipUnchangedFiles="true" />
   </Target>
 
   <!-- Add references to the JSON schema in the project directory -->
@@ -29,7 +32,7 @@
   <!-- Include App_Plugins content in output/publish directories -->
   <Target Name="IncludeAppPluginsContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems">
     <ItemGroup>
-      <_AppPluginsFiles Include="App_Plugins\**" />
+      <_AppPluginsFiles Include="App_Plugins\**" Exclude="App_Plugins\**\node_modules\**" />
       <ContentWithTargetPath Include="@(_AppPluginsFiles)" Exclude="@(ContentWithTargetPath)" TargetPath="%(Identity)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>

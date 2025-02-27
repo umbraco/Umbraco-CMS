@@ -5,6 +5,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class TextboxConfiguration
 {
-    [ConfigurationField("maxChars", "Maximum allowed characters", "textstringlimited", Description = "If empty, 512 character limit")]
+    [ConfigurationField("maxChars")]
     public int? MaxChars { get; set; }
 }

@@ -114,25 +114,25 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         ContentTypeStages =
             ContentTypeBuilder.CreateSimpleContentType("stages", "Stages", defaultTemplateId: template.Id);
         ContentTypeStages.Key = new Guid("BFC4C6C1-51D0-4538-B818-042BEEA0461E");
-        ContentTypeStages.AllowedContentTypes = new[] { new ContentTypeSort(ContentTypeStage.Id, 0) };
+        ContentTypeStages.AllowedContentTypes = new[] { CreateContentTypeSort(ContentTypeStage, 0) };
         ContentTypeService.Save(ContentTypeStages);
 
         ContentTypeActs = ContentTypeBuilder.CreateSimpleContentType("acts", "Acts", defaultTemplateId: template.Id);
         ContentTypeActs.Key = new Guid("110B6BC7-59E0-427D-B350-E488786788E7");
-        ContentTypeActs.AllowedContentTypes = new[] { new ContentTypeSort(ContentTypeAct.Id, 0) };
+        ContentTypeActs.AllowedContentTypes = new[] { CreateContentTypeSort(ContentTypeAct, 0) };
         ContentTypeService.Save(ContentTypeActs);
 
         ContentTypeYear = ContentTypeBuilder.CreateSimpleContentType("year", "Year", defaultTemplateId: template.Id);
         ContentTypeYear.Key = new Guid("001E9029-6BF9-4A68-B11E-7730109E4E28");
         ContentTypeYear.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(ContentTypeStages.Id, 0), new ContentTypeSort(ContentTypeActs.Id, 1),
+            CreateContentTypeSort(ContentTypeStages, 0), CreateContentTypeSort(ContentTypeActs, 1),
         };
         ContentTypeService.Save(ContentTypeYear);
 
         ContentTypeYears = ContentTypeBuilder.CreateSimpleContentType("years", "Years", defaultTemplateId: template.Id);
         ContentTypeYears.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
-        ContentTypeActs.AllowedContentTypes = new[] { new ContentTypeSort(ContentTypeYear.Id, 0) };
+        ContentTypeActs.AllowedContentTypes = new[] { CreateContentTypeSort(ContentTypeYear, 0) };
         ContentTypeService.Save(ContentTypeYears);
 
         ContentYears = ContentBuilder.CreateSimpleContent(ContentTypeYears, "Years");
@@ -282,7 +282,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         ContentTypeAct.AllowedContentTypes =
             ContentTypeAct.AllowedContentTypes!.Union(new ContentTypeSort[]
             {
-                new ContentTypeSort(ContentTypeActs.Id, 0),
+                CreateContentTypeSort(ContentTypeActs, 0),
             });
         ContentTypeService.Save(ContentTypeAct);
 
@@ -329,7 +329,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
 
         // Allow act to add acts
         ContentTypeAct.AllowedContentTypes =
-            ContentTypeAct.AllowedContentTypes!.Union(new[] { new ContentTypeSort(ContentTypeActs.Id, 0) });
+            ContentTypeAct.AllowedContentTypes!.Union(new[] { CreateContentTypeSort(ContentTypeActs, 0) });
         ContentTypeService.Save(ContentTypeAct);
 
         var contentNewActs = ContentBuilder.CreateSimpleContent(ContentTypeActs, "new Acts", ContentAct2022RanD.Id);
@@ -716,4 +716,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.AreEqual(0, result.Count());
     }
+
+    private static ContentTypeSort CreateContentTypeSort(ContentType contentType, int sortOrder)
+        => new(contentType.Key, sortOrder, contentType.Alias);
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -13,10 +14,11 @@ public sealed class AuditService : RepositoryService, IAuditService
 {
     private readonly IAuditEntryRepository _auditEntryRepository;
     private readonly IUserService _userService;
-    private readonly IEntityRepository _entityRepository;
     private readonly IAuditRepository _auditRepository;
+    private readonly IEntityService _entityService;
     private readonly Lazy<bool> _isAvailable;
 
+    [Obsolete("Use the non-obsolete constructor. Will be removed in V15.")]
     public AuditService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -25,31 +27,55 @@ public sealed class AuditService : RepositoryService, IAuditService
         IAuditEntryRepository auditEntryRepository,
         IUserService userService,
         IEntityRepository entityRepository)
-        : base(provider, loggerFactory, eventMessagesFactory)
-    {
-        _auditRepository = auditRepository;
-        _auditEntryRepository = auditEntryRepository;
-        _userService = userService;
-        _entityRepository = entityRepository;
-        _isAvailable = new Lazy<bool>(DetermineIsAvailable);
-    }
-
-    [Obsolete("Use constructor that also takes IUserService & IEntityRepository instead, scheduled for removal in v13")]
-    public AuditService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IAuditRepository auditRepository,
-        IAuditEntryRepository auditEntryRepository)
         : this(
             provider,
             loggerFactory,
             eventMessagesFactory,
             auditRepository,
             auditEntryRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IUserService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IEntityRepository>())
+            userService,
+            StaticServiceProvider.Instance.GetRequiredService<IEntityService>()
+        )
     {
+    }
+
+    [Obsolete("Use the non-obsolete constructor. Will be removed in V15.")]
+    public AuditService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IAuditRepository auditRepository,
+        IAuditEntryRepository auditEntryRepository,
+        IUserService userService,
+        IEntityRepository entityRepository,
+        IEntityService entityService)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            auditRepository,
+            auditEntryRepository,
+            userService,
+            entityService
+        )
+    {
+    }
+
+    public AuditService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IAuditRepository auditRepository,
+        IAuditEntryRepository auditEntryRepository,
+        IUserService userService,
+        IEntityService entityService)
+        : base(provider, loggerFactory, eventMessagesFactory)
+    {
+        _auditRepository = auditRepository;
+        _auditEntryRepository = auditEntryRepository;
+        _userService = userService;
+        _entityService = entityService;
+        _isAvailable = new Lazy<bool>(DetermineIsAvailable);
     }
 
     public void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null)
@@ -207,6 +233,78 @@ public sealed class AuditService : RepositoryService, IAuditService
             IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == userId);
 
             return _auditRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderDirection, auditTypeFilter, customFilter);
+        }
+    }
+
+    public async Task<PagedModel<IAuditItem>> GetItemsByKeyAsync(
+        Guid entityKey,
+        UmbracoObjectTypes entityType,
+        int skip,
+        int take,
+        Direction orderDirection = Direction.Descending,
+        DateTimeOffset? sinceDate = null,
+        AuditType[]? auditTypeFilter = null)
+        {
+            if (skip < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(skip));
+            }
+
+            if (take <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(take));
+            }
+
+            Attempt<int> keyToIdAttempt = _entityService.GetId(entityKey, entityType);
+            if (keyToIdAttempt.Success is false)
+            {
+                return await Task.FromResult(new PagedModel<IAuditItem> { Items = Enumerable.Empty<IAuditItem>(), Total = 0 });
+            }
+
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == keyToIdAttempt.Result);
+                IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate.Value.LocalDateTime) : null;
+                PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+                IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out var totalRecords, orderDirection, auditTypeFilter, customFilter);
+                return new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords };
+            }
+        }
+
+    public async Task<PagedModel<IAuditItem>> GetPagedItemsByUserAsync(
+        Guid userKey,
+        int skip,
+        int take,
+        Direction orderDirection = Direction.Descending,
+        AuditType[]? auditTypeFilter = null,
+        DateTime? sinceDate = null)
+    {
+        if (skip < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(skip));
+        }
+
+        if (take <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(take));
+        }
+
+        IUser? user = await _userService.GetAsync(userKey);
+
+        if (user is null)
+        {
+            return await Task.FromResult(new PagedModel<IAuditItem>());
+        }
+
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == user.Id);
+            IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
+            PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+            IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out var totalRecords, orderDirection, auditTypeFilter, customFilter);
+            return await Task.FromResult(new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords });
         }
     }
 

@@ -1,0 +1,8 @@
+{
+	"name": "@umbraco-backoffice/tiny-mce",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	}
+}

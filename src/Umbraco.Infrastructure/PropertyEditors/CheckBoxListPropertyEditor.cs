@@ -1,11 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -14,46 +12,26 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.CheckBoxList,
-    "Checkbox list",
-    "checkboxlist",
-    Icon = "icon-bulleted-list",
-    Group = Constants.PropertyEditors.Groups.Lists,
     ValueEditorIsReusable = true)]
 public class CheckBoxListPropertyEditor : DataEditor
 {
-    private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IIOHelper _ioHelper;
-    private readonly ILocalizedTextService _textService;
-
-    // Scheduled for removal in v12
-    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-    public CheckBoxListPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        ILocalizedTextService textService,
-        IIOHelper ioHelper)
-        : this(dataValueEditorFactory, textService, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-    {
-    }
+    private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
 
     /// <summary>
     ///     The constructor will setup the property editor based on the attribute if one is found
     /// </summary>
-    public CheckBoxListPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        ILocalizedTextService textService,
-        IIOHelper ioHelper,
-        IEditorConfigurationParser editorConfigurationParser)
+    public CheckBoxListPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         : base(dataValueEditorFactory)
     {
-        _textService = textService;
         _ioHelper = ioHelper;
-        _editorConfigurationParser = editorConfigurationParser;
+        _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
         SupportsReadOnly = true;
     }
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new ValueListConfigurationEditor(_textService, _ioHelper, _editorConfigurationParser);
+        new ValueListConfigurationEditor(_ioHelper, _configurationEditorJsonSerializer);
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>

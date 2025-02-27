@@ -1,4 +1,4 @@
-﻿using System.Xml;
+using System.Xml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 
@@ -15,11 +15,12 @@ namespace Umbraco.Cms.Core.Xml
     /// <para>Discussed in http://weblogs.asp.net/cazzu/archive/2003/10/07/30888.aspx</para>
     /// <para>Author: Daniel Cazzulino, <a href="http://clariusconsulting.net/kzu">blog</a></para>
     /// </remarks>
+    [Obsolete("The current implementation is not used anymore and will be removed entirely in a future version. Scheduled for removal in v15")]
     public class DynamicContext : XsltContext
     {
         #region Private vars
 
-        readonly IDictionary<string, IXsltContextVariable> _variables =
+        private readonly IDictionary<string, IXsltContextVariable> _variables =
             new Dictionary<string, IXsltContextVariable>();
 
         #endregion Private
@@ -95,7 +96,7 @@ namespace Umbraco.Cms.Core.Xml
         /// Implementation equal to <see cref="XsltContext"/>.
         /// </summary>
         public override int CompareDocument(string baseUri, string nextbaseUri) =>
-            String.Compare(baseUri, nextbaseUri, false, System.Globalization.CultureInfo.InvariantCulture);
+            string.Compare(baseUri, nextbaseUri, false, System.Globalization.CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Same as <see cref="XmlNamespaceManager"/>.
@@ -118,7 +119,6 @@ namespace Umbraco.Cms.Core.Xml
         /// <summary>
         /// Same as <see cref="XsltContext"/>.
         /// </summary>
-        [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
         public override bool PreserveWhitespace(XPathNavigator node)
         {
             return true;
@@ -133,21 +133,6 @@ namespace Umbraco.Cms.Core.Xml
         }
 
         #endregion Common Overrides
-
-        #region Public Members
-
-        /// <summary>
-        /// Shortcut method that compiles an expression using an empty navigator.
-        /// </summary>
-        /// <param name="xpath">The expression to compile</param>
-        /// <returns>A compiled <see cref="XPathExpression"/>.</returns>
-        [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-        public static XPathExpression? Compile(string xpath)
-        {
-            return new XmlDocument().CreateNavigator()?.Compile(xpath);
-        }
-
-        #endregion Public Members
 
         #region Variable Handling Code
 
@@ -205,7 +190,6 @@ namespace Umbraco.Cms.Core.Xml
         /// <summary>
         /// See <see cref="XsltContext"/>. Not used in our implementation.
         /// </summary>
-        [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
         public override IXsltContextFunction ResolveFunction(string prefix, string name, XPathResultType[] argTypes) => throw new NotImplementedException();
 
         /// <summary>
@@ -227,12 +211,11 @@ namespace Umbraco.Cms.Core.Xml
         /// </summary>
         internal class DynamicVariable : IXsltContextVariable
         {
-            private readonly string _name;
             private readonly object _value;
 
             #region Public Members
 
-            public string Name { get { return _name; } }
+            public string Name { get; }
 
             /// <summary>
             /// Initializes a new instance of the class.
@@ -242,7 +225,7 @@ namespace Umbraco.Cms.Core.Xml
             public DynamicVariable(string name, object value)
             {
 
-                _name = name;
+                Name = name;
                 _value = value;
 
                 if (value is string)

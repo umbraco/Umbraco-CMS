@@ -25,7 +25,6 @@ public class HttpsCheck : HealthCheck
     private const int NumberOfDaysForExpiryWarning = 14;
     private const string HttpPropertyKeyCertificateDaysToExpiry = "CertificateDaysToExpiry";
 
-    private static HttpClient? _httpClient;
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -46,14 +45,8 @@ public class HttpsCheck : HealthCheck
         _globalSettings = globalSettings;
         _hostingEnvironment = hostingEnvironment;
     }
-
-    private static HttpClient _httpClientEnsureInitialized => _httpClient ??= new HttpClient(new HttpClientHandler
-    {
-        ServerCertificateCustomValidationCallback = ServerCertificateCustomValidation,
-    });
-
     /// <inheritdoc />
-    public override async Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
+    public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
         await Task.WhenAll(
             CheckIfCurrentSchemeIsHttps(),
             CheckHttpsConfigurationSetting(),
@@ -72,8 +65,7 @@ public class HttpsCheck : HealthCheck
     {
         if (certificate is not null)
         {
-            requestMessage.Properties[HttpPropertyKeyCertificateDaysToExpiry] =
-                (int)Math.Floor((certificate.NotAfter - DateTime.Now).TotalDays);
+            requestMessage.Options.Set(new HttpRequestOptionsKey<int?>(HttpPropertyKeyCertificateDaysToExpiry), (int?)Math.Floor((certificate.NotAfter - DateTime.Now).TotalDays));
         }
 
         return sslErrors == SslPolicyErrors.None;
@@ -88,21 +80,26 @@ public class HttpsCheck : HealthCheck
         var urlBuilder = new UriBuilder(_hostingEnvironment.ApplicationMainUrl) { Scheme = Uri.UriSchemeHttps };
         Uri url = urlBuilder.Uri;
 
-        var request = new HttpRequestMessage(HttpMethod.Head, url);
+        using var request = new HttpRequestMessage(HttpMethod.Head, url);
 
         try
         {
-            using HttpResponseMessage response = await _httpClientEnsureInitialized.SendAsync(request);
+            using var httpClient = new HttpClient(new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = ServerCertificateCustomValidation,
+            });
+
+            using HttpResponseMessage response = await httpClient.SendAsync(request);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 // Got a valid response, check now if the certificate is expiring within the specified amount of days
                 int? daysToExpiry = 0;
-                if (request.Properties.TryGetValue(
-                    HttpPropertyKeyCertificateDaysToExpiry,
-                    out var certificateDaysToExpiry))
+                if (response.RequestMessage != null && response.RequestMessage.Options.TryGetValue(
+                        new HttpRequestOptionsKey<int?>(HttpPropertyKeyCertificateDaysToExpiry),
+                        out var certificateDaysToExpiry))
                 {
-                    daysToExpiry = (int?)certificateDaysToExpiry;
+                    daysToExpiry = certificateDaysToExpiry;
                 }
 
                 if (daysToExpiry <= 0)

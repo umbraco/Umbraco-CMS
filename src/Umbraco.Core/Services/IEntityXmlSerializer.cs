@@ -8,6 +8,9 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IEntityXmlSerializer
 {
+    internal const string DocumentTypeElementName = "DocumentType";
+    internal const string MediaTypeElementName = "MediaType";
+
     /// <summary>
     ///     Exports an IContent item as an XElement.
     /// </summary>
@@ -76,15 +79,6 @@ public interface IEntityXmlSerializer
     XElement Serialize(IEnumerable<ITemplate> templates);
 
     XElement Serialize(IMediaType mediaType);
-
-    /// <summary>
-    ///     Exports a list of <see cref="IMacro" /> items to xml as an <see cref="XElement" />
-    /// </summary>
-    /// <param name="macros">Macros to export</param>
-    /// <returns><see cref="XElement" /> containing the xml representation of the IMacro objects</returns>
-    XElement Serialize(IEnumerable<IMacro> macros);
-
-    XElement Serialize(IMacro macro);
 
     XElement Serialize(IContentType contentType);
 }

@@ -41,8 +41,9 @@ internal static class DataTypeFactory
             dataType.SortOrder = dto.NodeDto.SortOrder;
             dataType.Trashed = dto.NodeDto.Trashed;
             dataType.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
+            dataType.EditorUiAlias = dto.EditorUiAlias;
 
-            dataType.SetLazyConfiguration(dto.Configuration);
+            dataType.SetConfigurationData(editor.GetConfigurationEditor().FromDatabase(dto.Configuration, serializer));
 
             // reset dirty initial properties (U4-1946)
             dataType.ResetDirtyProperties(false);
@@ -59,9 +60,10 @@ internal static class DataTypeFactory
         var dataTypeDto = new DataTypeDto
         {
             EditorAlias = entity.EditorAlias,
+            EditorUiAlias = entity.EditorUiAlias,
             NodeId = entity.Id,
             DbType = entity.DatabaseType.ToString(),
-            Configuration = ConfigurationEditor.ToDatabase(entity.Configuration, serializer),
+            Configuration = entity.Editor?.GetConfigurationEditor().ToDatabase(entity.ConfigurationData, serializer),
             NodeDto = BuildNodeDto(entity),
         };
 

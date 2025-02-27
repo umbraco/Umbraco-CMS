@@ -8,16 +8,6 @@ namespace Umbraco.Cms.Core.DeliveryApi;
 /// </summary>
 public interface IApiContentQueryProvider
 {
-    [Obsolete($"Use the {nameof(ExecuteQuery)} method that accepts {nameof(ProtectedAccess)}. Will be removed in V14.")]
-    PagedModel<Guid> ExecuteQuery(
-        SelectorOption selectorOption,
-        IList<FilterOption> filterOptions,
-        IList<SortOption> sortOptions,
-        string culture,
-        bool preview,
-        int skip,
-        int take);
-
     /// <summary>
     ///     Returns a page of item ids that passed the search criteria.
     /// </summary>
@@ -38,7 +28,7 @@ public interface IApiContentQueryProvider
         ProtectedAccess protectedAccess,
         bool preview,
         int skip,
-        int take) => new();
+        int take);
 
     /// <summary>
     ///     Returns a selector option that can be applied to fetch "all content" (i.e. if a selector option is not present when performing a search).

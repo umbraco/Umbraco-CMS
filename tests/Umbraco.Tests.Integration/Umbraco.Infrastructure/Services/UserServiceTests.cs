@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -58,9 +59,9 @@ public class UserServiceTests : UmbracoIntegrationTest
 
         // Assert
         Assert.AreEqual(3, permissions.Length);
-        Assert.AreEqual(17, permissions[0].AssignedPermissions.Length);
-        Assert.AreEqual(17, permissions[1].AssignedPermissions.Length);
-        Assert.AreEqual(17, permissions[2].AssignedPermissions.Length);
+        Assert.AreEqual(17, permissions[0].AssignedPermissions.Count);
+        Assert.AreEqual(17, permissions[1].AssignedPermissions.Count);
+        Assert.AreEqual(17, permissions[2].AssignedPermissions.Count);
     }
 
     [Test]
@@ -88,13 +89,13 @@ public class UserServiceTests : UmbracoIntegrationTest
         ContentService.SetPermission(content[2], ActionBrowse.ActionLetter, new[] { userGroup.Id });
 
         // Act
-        var permissions = UserService.GetPermissions(user, content[0].Id, content[1].Id, content[2].Id).ToArray();
+        var permissions = UserService.GetPermissions(user, content[0].Id, content[1].Id, content[2].Id).OrderBy(x=>x.EntityId).ToArray();
 
         // Assert
         Assert.AreEqual(3, permissions.Length);
-        Assert.AreEqual(3, permissions[0].AssignedPermissions.Length);
-        Assert.AreEqual(2, permissions[1].AssignedPermissions.Length);
-        Assert.AreEqual(1, permissions[2].AssignedPermissions.Length);
+        Assert.AreEqual(3, permissions[0].AssignedPermissions.Count);
+        Assert.AreEqual(2, permissions[1].AssignedPermissions.Count);
+        Assert.AreEqual(1, permissions[2].AssignedPermissions.Count);
     }
 
     [Test]
@@ -127,9 +128,9 @@ public class UserServiceTests : UmbracoIntegrationTest
 
         // Assert
         Assert.AreEqual(3, permissions.Length);
-        Assert.AreEqual(3, permissions[0].AssignedPermissions.Length);
-        Assert.AreEqual(2, permissions[1].AssignedPermissions.Length);
-        Assert.AreEqual(1, permissions[2].AssignedPermissions.Length);
+        Assert.AreEqual(3, permissions[0].AssignedPermissions.Count);
+        Assert.AreEqual(2, permissions[1].AssignedPermissions.Count);
+        Assert.AreEqual(1, permissions[2].AssignedPermissions.Count);
     }
 
     [Test]
@@ -161,9 +162,9 @@ public class UserServiceTests : UmbracoIntegrationTest
 
         // Assert
         Assert.AreEqual(3, permissions.Length);
-        Assert.AreEqual(3, permissions[0].AssignedPermissions.Length);
-        Assert.AreEqual(2, permissions[1].AssignedPermissions.Length);
-        Assert.AreEqual(17, permissions[2].AssignedPermissions.Length);
+        Assert.AreEqual(3, permissions[0].AssignedPermissions.Count);
+        Assert.AreEqual(2, permissions[1].AssignedPermissions.Count);
+        Assert.AreEqual(17, permissions[2].AssignedPermissions.Count);
     }
 
     [Test]
@@ -310,19 +311,19 @@ public class UserServiceTests : UmbracoIntegrationTest
         const int groupB = 8;
         const int groupC = 9;
 
-        var userGroups = new Dictionary<int, string[]>
+        var userGroups = new Dictionary<int, ISet<string>>
         {
-            {groupA, new[] {"S", "D", "F"}}, {groupB, new[] {"S", "D", "G", "K"}}, {groupC, new[] {"F", "G"}}
+            {groupA, new[] {"S", "D", "F"}.ToHashSet()}, {groupB, new[] {"S", "D", "G", "K"}.ToHashSet()}, {groupC, new[] {"F", "G"}.ToHashSet()}
         };
 
         EntityPermission[] permissions =
         {
             new(groupA, 1, userGroups[groupA], true), new(groupA, 2, userGroups[groupA], true),
             new(groupA, 3, userGroups[groupA], true), new(groupA, 4, userGroups[groupA], true),
-            new(groupB, 1, userGroups[groupB], true), new(groupB, 2, new[] {"F", "R"}, false),
+            new(groupB, 1, userGroups[groupB], true), new(groupB, 2, new[] {"F", "R"}.ToHashSet(), false),
             new(groupB, 3, userGroups[groupB], true), new(groupB, 4, userGroups[groupB], true),
             new(groupC, 1, userGroups[groupC], true), new(groupC, 2, userGroups[groupC], true),
-            new(groupC, 3, new[] {"Q", "Z"}, false), new(groupC, 4, userGroups[groupC], true)
+            new(groupC, 3, new[] {"Q", "Z"}.ToHashSet(), false), new(groupC, 4, userGroups[groupC], true)
         };
 
         // Permissions for Id 4
@@ -359,13 +360,13 @@ public class UserServiceTests : UmbracoIntegrationTest
     {
         var path = "-1,1,2,3";
         var pathIds = path.GetIdsFromPathReversed();
-        string[] defaults = { "A", "B" };
+        ISet<string> defaults = new []{ "A", "B" }.ToHashSet();
         var permissions = new List<EntityPermission>
         {
-            new(9876, 1, defaults, true), new(9876, 2, new[] {"B", "C", "D"}, false), new(9876, 3, defaults, true)
+            new(9876, 1, defaults, true), new(9876, 2, new[] {"B", "C", "D"}.ToHashSet(), false), new(9876, 3, defaults, true)
         };
         var result = UserService.GetPermissionsForPathForGroup(permissions, pathIds, true);
-        Assert.AreEqual(3, result.AssignedPermissions.Length);
+        Assert.AreEqual(3, result.AssignedPermissions.Count);
         Assert.IsFalse(result.IsDefaultPermissions);
         Assert.IsTrue(result.AssignedPermissions.ContainsAll(new[] { "B", "C", "D" }));
         Assert.AreEqual(2, result.EntityId);
@@ -377,7 +378,7 @@ public class UserServiceTests : UmbracoIntegrationTest
     {
         var path = "-1,1,2,3";
         var pathIds = path.GetIdsFromPathReversed();
-        string[] defaults = { "A", "B", "C" };
+        ISet<string> defaults = new []{ "A", "B", "C" }.ToHashSet();
         var permissions = new List<EntityPermission>
         {
             new(9876, 1, defaults, true), new(9876, 2, defaults, true), new(9876, 3, defaults, true)
@@ -391,13 +392,13 @@ public class UserServiceTests : UmbracoIntegrationTest
     {
         var path = "-1,1,2,3";
         var pathIds = path.GetIdsFromPathReversed();
-        string[] defaults = { "A", "B" };
+        ISet<string> defaults = new []{ "A", "B" }.ToHashSet();
         var permissions = new List<EntityPermission>
         {
             new(9876, 1, defaults, true), new(9876, 2, defaults, true), new(9876, 3, defaults, true)
         };
         var result = UserService.GetPermissionsForPathForGroup(permissions, pathIds, true);
-        Assert.AreEqual(2, result.AssignedPermissions.Length);
+        Assert.AreEqual(2, result.AssignedPermissions.Count);
         Assert.IsTrue(result.IsDefaultPermissions);
         Assert.IsTrue(result.AssignedPermissions.ContainsAll(defaults));
         Assert.AreEqual(3, result.EntityId);
@@ -967,6 +968,55 @@ public class UserServiceTests : UmbracoIntegrationTest
         }
     }
 
+    [TestCase(UserKind.Default, UserClientCredentialsOperationStatus.InvalidUser)]
+    [TestCase(UserKind.Api, UserClientCredentialsOperationStatus.Success)]
+    public async Task Can_Assign_ClientId_To_Api_User(UserKind userKind, UserClientCredentialsOperationStatus expectedResult)
+    {
+        // Arrange
+        var user = await CreateTestUser(userKind);
+
+        // Act
+        var result = await UserService.AddClientIdAsync(user.Key, "client-one");
+
+        // Assert
+        Assert.AreEqual(expectedResult, result);
+    }
+
+    [TestCase("abcdefghijklmnopqrstuvwxyz", UserClientCredentialsOperationStatus.Success)]
+    [TestCase("ABCDEFGHIJKLMNOPQRSTUVWXYZ", UserClientCredentialsOperationStatus.Success)]
+    [TestCase("1234567890", UserClientCredentialsOperationStatus.Success)]
+    [TestCase(".-_~", UserClientCredentialsOperationStatus.Success)]
+    [TestCase("!", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("#", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("$", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("&", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("'", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("(", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase(")", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("*", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("+", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase(",", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("/", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase(":", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase(";", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("=", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("?", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("@", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("[", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("]", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("More_Than_255_characters_012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789", UserClientCredentialsOperationStatus.InvalidClientId)]
+    public async Task Can_Use_Only_Unreserved_Characters_For_ClientId(string clientId, UserClientCredentialsOperationStatus expectedResult)
+    {
+        // Arrange
+        var user = await CreateTestUser(UserKind.Api);
+
+        // Act
+        var result = await UserService.AddClientIdAsync(user.Key, clientId);
+
+        // Assert
+        Assert.AreEqual(expectedResult, result);
+    }
+
     private Content[] BuildContentItems(int numberToCreate)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
@@ -999,6 +1049,25 @@ public class UserServiceTests : UmbracoIntegrationTest
         return user;
     }
 
+    private async Task<IUser> CreateTestUser(UserKind userKind)
+    {
+        var userGroup = CreateTestUserGroup();
+
+        var result = await UserService.CreateAsync(
+            Constants.Security.SuperUserKey,
+            new UserCreateModel
+            {
+                Email = "test1@test.com",
+                Id = Guid.NewGuid(),
+                Kind = userKind,
+                Name = "test1@test.com",
+                UserName = "test1@test.com",
+                UserGroupKeys = new HashSet<Guid> { userGroup.Key }
+            });
+        Assert.IsTrue(result.Success);
+        return result.Result.CreatedUser!;
+    }
+
     private List<IUser> CreateTestUsers(int[] startContentIds, IUserGroup userGroup, int numberToCreate)
     {
         var users = new List<IUser>();
@@ -1021,7 +1090,7 @@ public class UserServiceTests : UmbracoIntegrationTest
 
     private UserGroup CreateTestUserGroup(string alias = "testGroup", string name = "Test Group")
     {
-        var permissions = "ABCDEFGHIJ1234567".ToCharArray().Select(x => x.ToString()).ToArray();
+        var permissions = "ABCDEFGHIJ1234567".ToCharArray().Select(x => x.ToString()).ToHashSet();
         var userGroup = UserGroupBuilder.CreateUserGroup(alias, name, permissions: permissions);
 
         UserService.Save(userGroup);

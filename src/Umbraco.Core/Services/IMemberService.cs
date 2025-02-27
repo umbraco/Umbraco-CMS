@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Services;
@@ -6,7 +7,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Defines the MemberService, which is an easy access to operations involving (umbraco) members.
 /// </summary>
-public interface IMemberService : IMembershipMemberService
+public interface IMemberService : IMembershipMemberService, IContentServiceBase<IMember>
 {
     /// <summary>
     ///     Gets a list of paged <see cref="IMember" /> objects
@@ -22,6 +23,7 @@ public interface IMemberService : IMembershipMemberService
     /// <returns>
     ///     <see cref="IEnumerable{T}" />
     /// </returns>
+    [Obsolete("Please use the skip & take instead of pageIndex & pageSize, scheduled for removal in v17")]
     IEnumerable<IMember> GetAll(
         long pageIndex,
         int pageSize,
@@ -30,6 +32,41 @@ public interface IMemberService : IMembershipMemberService
         Direction orderDirection,
         string? memberTypeAlias = null,
         string filter = "");
+
+    /// <summary>
+    ///     Gets a list of paged <see cref="IMember" /> objects
+    /// </summary>
+    /// <remarks>An <see cref="IMember" /> can be of type <see cref="IMember" /> </remarks>
+    /// <param name="skip">Amount to skip.</param>
+    /// <param name="take">Amount to take.</param>
+    /// <param name="totalRecords">Total number of records found (out)</param>
+    /// <param name="orderBy">Field to order by</param>
+    /// <param name="orderDirection">Direction to order by</param>
+    /// <param name="memberTypeAlias"></param>
+    /// <param name="filter">Search text filter</param>
+    /// <returns>
+    ///     <see cref="IEnumerable{T}" />
+    /// </returns>
+    IEnumerable<IMember> GetAll(
+        int skip,
+        int take,
+        out long totalRecords,
+        string orderBy,
+        Direction orderDirection,
+        string? memberTypeAlias = null,
+        string filter = "")
+    {
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        return GetAll(
+            pageNumber,
+            pageSize,
+            out totalRecords,
+            orderBy,
+            orderDirection,
+            memberTypeAlias,
+            filter);
+    }
 
     /// <summary>
     ///     Gets a list of paged <see cref="IMember" /> objects
@@ -55,6 +92,13 @@ public interface IMemberService : IMembershipMemberService
         bool orderBySystemField,
         string? memberTypeAlias,
         string filter);
+
+    public Task<PagedModel<IMember>> FilterAsync(
+        MemberFilter memberFilter,
+        string orderBy = "username",
+        Direction orderDirection = Direction.Ascending,
+        int skip = 0,
+        int take = 100);
 
     /// <summary>
     ///     Creates an <see cref="IMember" /> object without persisting it
@@ -174,6 +218,20 @@ public interface IMemberService : IMembershipMemberService
     IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType);
 
     /// <summary>
+    ///     Saves a single <see cref="IMember" /> object
+    /// </summary>
+    /// <param name="media">The <see cref="IMember" /> to save</param>
+    /// <param name="userId">Id of the User saving the Member</param>
+    Attempt<OperationResult?> Save(IMember media, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Saves a list of <see cref="IMember" /> objects
+    /// </summary>
+    /// <param name="members">Collection of <see cref="IMember" /> to save</param>
+    /// <param name="userId">Id of the User saving the Members</param>
+    Attempt<OperationResult?> Save(IEnumerable<IMember> members, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
     ///     Gets the count of Members by an optional MemberType alias
     /// </summary>
     /// <remarks>If no alias is supplied then the count for all Member will be returned</remarks>
@@ -246,6 +304,22 @@ public interface IMemberService : IMembershipMemberService
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
     IEnumerable<IMember> GetAllMembers(params int[] ids);
+
+    /// <summary>
+    ///     Gets <see cref="IMember" /> objects by Ids
+    /// </summary>
+    /// <param name="ids">Ids of the Member to retrieve</param>
+    /// <returns>
+    ///     <see cref="IMember" />
+    /// </returns>
+    Task<IEnumerable<IMember>> GetByKeysAsync(params Guid[] ids);
+
+    /// <summary>
+    ///     Permanently deletes an <see cref="IMember" /> object
+    /// </summary>
+    /// <param name="member">The <see cref="IMember" /> to delete</param>
+    /// <param name="userId">Id of the User deleting the Member</param>
+    Attempt<OperationResult?> Delete(IMember member, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Delete Members of the specified MemberType id

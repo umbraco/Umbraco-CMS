@@ -224,7 +224,7 @@ public class MediaBuilder
         CreateMediaImage(mediaType, parentId, "/media/test-image.png");
 
     public static Media CreateMediaImageWithCrop(IMediaType mediaType, int parentId) =>
-        CreateMediaImage(mediaType, parentId, "{src: '/media/test-image.png', crops: []}");
+        CreateMediaImage(mediaType, parentId, "{\"src\": \"/media/test-image.png\", \"crops\": []}");
 
     private static Media CreateMediaImage(IMediaType mediaType, int parentId, string fileValue) => new MediaBuilder()
         .WithMediaType(mediaType)

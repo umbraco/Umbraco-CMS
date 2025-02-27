@@ -12,6 +12,8 @@ public static class UdiEntityTypeHelper
                 return Constants.UdiEntityType.Document;
             case UmbracoObjectTypes.DocumentBlueprint:
                 return Constants.UdiEntityType.DocumentBlueprint;
+            case UmbracoObjectTypes.DocumentBlueprintContainer:
+                return Constants.UdiEntityType.DocumentBlueprintContainer;
             case UmbracoObjectTypes.Media:
                 return Constants.UdiEntityType.Media;
             case UmbracoObjectTypes.Member:

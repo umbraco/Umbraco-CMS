@@ -41,5 +41,5 @@ public class TestDbMeta
         new(name, isEmpty, null, Constants.ProviderName, null);
 
     public ConnectionStrings ToStronglyTypedConnectionString() =>
-        new() { Name = Name, ConnectionString = ConnectionString, ProviderName = Provider };
+        new() { ConnectionString = ConnectionString, ProviderName = Provider };
 }

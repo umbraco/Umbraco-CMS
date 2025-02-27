@@ -38,7 +38,13 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
     }
 
     public Attempt<string?> IsHealthy() => _diagnostics.IsHealthy();
+
     public virtual IReadOnlyDictionary<string, object?> Metadata => _diagnostics.Metadata;
+
+    /// <summary>
+    ///     Performs special __Path and __Icon value transformations to all deriving indexes when set to true.
+    /// </summary>
+    protected virtual bool ApplySpecialValueTransformations => true;
 
     /// <summary>
     ///     When set to true Umbraco will keep the index in sync with Umbraco data automatically
@@ -115,16 +121,27 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
     {
         base.OnTransformingIndexValues(e);
 
+        if (ApplySpecialValueTransformations)
+        {
+            ApplySpecialIndexValueTransformations(e);
+        }
+    }
+
+    /// <summary>
+    ///     Updates the index ValueSet with a special __Path and __Icon fields.
+    /// </summary>
+    private static void ApplySpecialIndexValueTransformations(IndexingItemEventArgs e)
+    {
         var updatedValues = e.ValueSet.Values.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value);
 
-        //ensure special __Path field
+        // Ensure special __Path field
         var path = e.ValueSet.GetValue("path");
         if (path != null)
         {
             updatedValues[UmbracoExamineFieldNames.IndexPathFieldName] = path.Yield();
         }
 
-        //icon
+        // Ensure special __Icon field
         if (e.ValueSet.Values.TryGetValue("icon", out IReadOnlyList<object>? icon) &&
             e.ValueSet.Values.ContainsKey(UmbracoExamineFieldNames.IconFieldName) == false)
         {
