@@ -3,7 +3,6 @@ import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_TREE_REPOSITORY_ALIAS } from
 import { UMB_SORT_CHILDREN_OF_MEDIA_REPOSITORY_ALIAS } from './repository/constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
-import { UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS } from '@umbraco-cms/backoffice/entity-action';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...repositoryManifests,
@@ -21,9 +20,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
-			},
-			{
-				alias: UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS,
 			},
 		],
 	},
