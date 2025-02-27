@@ -63,6 +63,9 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		this.allowedContentTypes = this.structure.ownerContentTypeObservablePart((data) => data?.allowedContentTypes);
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
 		this.collection = this.structure.ownerContentTypeObservablePart((data) => data?.collection);
+
+		// Keep current data in sync with the owner content type - This is used for the discard changes feature
+		this.observe(this.structure.ownerContentType, (data) => this._data.setCurrent(data));
 	}
 
 	/**
@@ -258,17 +261,6 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 
 	public override getData() {
 		return this.structure.getOwnerContentType();
-	}
-
-	protected override _getHasUnpersistedChanges(): boolean {
-		const persistedData = this._data.getPersisted();
-		const currentData = this.structure.getOwnerContentType();
-		const result = jsonStringComparison(persistedData, currentData) === false;
-		// TODO: Implement developer-mode
-		if (result) {
-			console.warn('Changes detected based on JSON comparison between', persistedData, 'and', currentData);
-		}
-		return result;
 	}
 
 	public override destroy(): void {
