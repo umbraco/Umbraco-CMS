@@ -176,7 +176,7 @@ export class UmbValidationMessagesManager {
 			// If not undefined or false, then it was a valid translation: [NL]
 			if (newPath) {
 				// Lets try to translate it again, this will recursively translate the path until no more translations are possible (and then fallback to '?? newpath') [NL]
-				return this.#translatePath(newPath);
+				return this.#translatePath(newPath) ?? newPath;
 			}
 		}
 		return;
