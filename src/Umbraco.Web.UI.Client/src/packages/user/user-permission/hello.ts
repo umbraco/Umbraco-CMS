@@ -1,31 +1,50 @@
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group/constants.js';
 import type { ManifestUserPermission, UmbContextualUserPermissionModel } from './types.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, property, type PropertyValues } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbUserPermissionVerbElement } from './components/index.js';
+import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-hello')
 export class UmbHelloElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
-	manifest?: ManifestUserPermission;
+	private _manifest?: ManifestUserPermission | undefined;
+	public get manifest(): ManifestUserPermission | undefined {
+		return this._manifest;
+	}
+	public set manifest(value: ManifestUserPermission | undefined) {
+		this._manifest = value;
 
-	#onChange(event: UUIBooleanInputEvent) {
-		event.stopPropagation();
-
-		if (this.manifest === undefined) {
-			throw new Error('Manifest is undefined');
+		if (!this._manifest) {
+			this._label = undefined;
+			this._description = undefined;
+			this._permission = undefined;
+			return;
 		}
 
-		const permissions = this.#context?.getPermissions();
-		const permission: UmbContextualUserPermissionModel = {
-			$type: 'UnknownTypePermissionPresentationModel',
-			context: this.manifest.meta.permission.context,
-			verbs: this.manifest.meta.permission.verbs,
-		};
+		this._label = this._manifest.meta.label ? this.localize.string(this._manifest.meta.label) : this._manifest.name;
+		this._description = this.manifest?.meta.description
+			? this.localize.string(this.manifest.meta.description)
+			: undefined;
 
-		this.#context?.setPermissions([...permissions, permission]);
+		this._permission = {
+			$type: 'UnknownTypePermissionPresentationModel',
+			context: this._manifest.meta.permission.context,
+			verbs: this._manifest.meta.permission.verbs,
+		};
 	}
+
+	@state()
+	_label?: string;
+
+	@state()
+	_description?: string;
+
+	@state()
+	_userGroupPermissions: Array<UmbContextualUserPermissionModel> = [];
+
+	@state()
+	_permission?: UmbContextualUserPermissionModel;
 
 	#context?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
@@ -34,46 +53,67 @@ export class UmbHelloElement extends UmbLitElement {
 
 		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (context) => {
 			this.#context = context;
+			this.observe(
+				this.#context.permissions,
+				(permissions) => (this._userGroupPermissions = permissions),
+				'umbPermissionsObserver',
+			);
 		});
 	}
 
-	protected override firstUpdated(_changedProperties: PropertyValues): void {
-		super.firstUpdated(_changedProperties);
+	#onChangeUserPermission(event: UmbChangeEvent) {
+		event.stopPropagation();
+		const target = event.target as UmbUserPermissionVerbElement;
+		if (target.allowed) {
+			this.#addUserPermission();
+		} else {
+			this.#removeUserPermission();
+		}
+	}
+
+	#addUserPermission() {
+		if (!this._permission) {
+			throw new Error('Permission is not set');
+		}
+
+		this.#context?.addContextualPermission(this._permission);
+	}
+
+	#removeUserPermission() {
+		if (!this._permission) {
+			throw new Error('Permission is not set');
+		}
+
+		this.#context?.removeContextualPermission(this._permission);
+	}
+
+	#isAllowed() {
+		console.log(this._userGroupPermissions);
+		const contextualPermissions = this._userGroupPermissions.filter(
+			(permission) =>
+				permission.$type === 'UnknownTypePermissionPresentationModel' &&
+				permission.context === this._permission?.context,
+		);
+
+		let isAllowed = false;
+
+		contextualPermissions.forEach((permission) => {
+			// ensure that all verbs in this permission is stored on the user group
+			if (this._permission?.verbs.every((verb) => permission?.verbs.includes(verb))) {
+				isAllowed = true;
+			}
+		});
+
+		return isAllowed;
 	}
 
 	override render() {
-		const label = this.manifest?.meta.label ?? this.manifest?.name ?? '';
-		const description = this.manifest?.meta.description ?? '';
-		return html`<div id="setting">
-			<uui-toggle label=${label} @change=${this.#onChange}>
-				<div id="meta">
-					<div id="name">${label}</div>
-					<small>${description}</small>
-				</div>
-			</uui-toggle>
-		</div>`;
+		return html` <umb-input-user-permission-verb
+			label=${ifDefined(this._label)}
+			description=${ifDefined(this._description)}
+			?allowed=${this.#isAllowed()}
+			@change=${(event: UmbChangeEvent) => this.#onChangeUserPermission(event)}></umb-input-user-permission-verb>`;
 	}
-
-	static override styles = [
-		UmbTextStyles,
-		css`
-			#setting {
-				display: flex;
-				align-items: center;
-				border-bottom: 1px solid var(--uui-color-divider);
-				padding: var(--uui-size-space-3) 0 var(--uui-size-space-4) 0;
-			}
-
-			#meta {
-				margin-left: var(--uui-size-space-4);
-				line-height: 1.2em;
-			}
-
-			#name {
-				font-weight: bold;
-			}
-		`,
-	];
 }
 
 export { UmbHelloElement as element };

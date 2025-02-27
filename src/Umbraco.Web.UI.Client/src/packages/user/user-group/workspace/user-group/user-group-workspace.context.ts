@@ -85,6 +85,73 @@ export class UmbUserGroupWorkspaceContext
 		this._data.updateCurrent({ permissions: permissions });
 	}
 
+	addContextualPermission(permission: UmbContextualUserPermissionModel) {
+		const currentPermissions = this.getPermissions();
+		// get the permission if it already exists
+		const existingPermission = currentPermissions.find(
+			(currentPermissions) =>
+				currentPermissions.$type === 'UnknownTypePermissionPresentationModel' &&
+				currentPermissions.context === permission.context,
+		);
+
+		let updatedPermissions: Array<UmbContextualUserPermissionModel> = [];
+
+		if (existingPermission) {
+			// add the new verbs to the existing permission
+			const updatedVerbs = [...existingPermission.verbs, ...permission.verbs];
+			const uniqueVerbs = [...new Set(updatedVerbs)];
+
+			// replace the existing permission with the updated one
+			updatedPermissions = currentPermissions.map((currentPermission) =>
+				currentPermission.context === permission.context
+					? { ...existingPermission, verbs: uniqueVerbs }
+					: currentPermission,
+			);
+		} else {
+			updatedPermissions = [...currentPermissions, permission];
+		}
+
+		this.setPermissions(updatedPermissions);
+	}
+
+	removeContextualPermission(permission: UmbContextualUserPermissionModel) {
+		const currentPermissions = this.getPermissions();
+
+		const existingPermission = currentPermissions.find(
+			(currentPermission) =>
+				currentPermission.$type === 'UnknownTypePermissionPresentationModel' &&
+				currentPermission.context === permission.context,
+		);
+
+		if (!existingPermission) {
+			return;
+		}
+
+		// remove the verbs from the existing permission
+		const updatedVerbs = existingPermission.verbs.filter((verb) => !permission.verbs.includes(verb));
+		const uniqueVerbs = [...new Set(updatedVerbs)];
+		let updatedPermissions: Array<UmbContextualUserPermissionModel> = [];
+
+		if (uniqueVerbs.length === 0) {
+			// remove the permission if there are no verbs left
+			updatedPermissions = currentPermissions.filter(
+				(currentPermission) =>
+					currentPermission.$type !== 'UnknownTypePermissionPresentationModel' &&
+					currentPermission.context !== permission.context,
+			);
+		} else {
+			// replace the existing permission with the updated one
+			updatedPermissions = currentPermissions.map((currentPermission) =>
+				currentPermission.$type === 'UnknownTypePermissionPresentationModel' &&
+				currentPermission.context === permission.context
+					? { ...existingPermission, verbs: uniqueVerbs }
+					: currentPermission,
+			);
+		}
+
+		this.setPermissions(updatedPermissions);
+	}
+
 	/**
 	 * Gets the user group fallback permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
