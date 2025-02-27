@@ -247,7 +247,7 @@ stages:
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
-              
+
           # Publish test results
           - task: PublishTestResults@2
             displayName: "Publish test results"
@@ -256,7 +256,7 @@ stages:
               testResultsFormat: 'JUnit'
               testResultsFiles: '*.xml'
               searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
-              testRunTitle: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
+              testRunTitle: "$(Agent.JobName)"
 
       - job:
         displayName: E2E Tests (SQL Server)
@@ -437,4 +437,4 @@ stages:
               testResultsFormat: 'JUnit'
               testResultsFiles: '*.xml'
               searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
-              testRunTitle: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
+              testRunTitle: "$(Agent.JobName)"
