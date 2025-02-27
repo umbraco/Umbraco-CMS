@@ -31,6 +31,7 @@ export class UmbTemporaryFileServerDataSource {
 		id: string,
 		file: File,
 		onProgress?: (progress: ProgressEvent) => void,
+		abortSignal?: AbortSignal,
 	): Promise<UmbDataSourceResponse<PostTemporaryFileResponse>> {
 		const body = new FormData();
 		body.append('Id', id);
@@ -41,6 +42,7 @@ export class UmbTemporaryFileServerDataSource {
 			responseHeader: 'Umb-Generated-Resource',
 			body,
 			onProgress,
+			abortSignal,
 		});
 		return tryExecuteAndNotify(this.#host, xhrRequest);
 	}

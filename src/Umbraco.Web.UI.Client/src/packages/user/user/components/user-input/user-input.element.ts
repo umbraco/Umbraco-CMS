@@ -18,7 +18,7 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			return modelEntry;
 		},
 		identifier: 'Umb.SorterIdentifier.InputUser',
-		itemSelector: 'uui-ref-node-user',
+		itemSelector: 'umb-entity-item-ref',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
@@ -156,16 +156,11 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	#renderItem(item: UmbUserItemModel) {
 		if (!item.unique) return nothing;
 		return html`
-			<uui-ref-node-user name=${item.name} id=${item.unique}>
-				<umb-user-avatar
-					slot="icon"
-					.name=${item.name}
-					.kind=${item.kind}
-					.imgUrls=${item.avatarUrls}></umb-user-avatar>
+			<umb-entity-item-ref .item=${item} id=${item.unique} ?standalone=${this.max === 1}>
 				<uui-action-bar slot="actions">
 					<uui-button label=${this.localize.term('general_remove')} @click=${() => this.#removeItem(item)}></uui-button>
 				</uui-action-bar>
-			</uui-ref-node-user>
+			</umb-entity-item-ref>
 		`;
 	}
 
@@ -173,10 +168,6 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		css`
 			#btn-add {
 				width: 100%;
-			}
-
-			umb-user-avatar {
-				font-size: var(--uui-size-4);
 			}
 		`,
 	];

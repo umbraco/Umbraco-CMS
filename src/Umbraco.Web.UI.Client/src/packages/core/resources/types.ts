@@ -7,4 +7,5 @@ export interface XhrRequestOptions {
 	headers?: Record<string, string>;
 	responseHeader?: string;
 	onProgress?: (event: ProgressEvent) => void;
+	abortSignal?: AbortSignal;
 }

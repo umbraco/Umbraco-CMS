@@ -1,12 +1,13 @@
 ﻿using System.Diagnostics;
 using System.Linq.Expressions;
-using System.Runtime.Versioning;
 using System.Text;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Query;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.TemplateQuery;
 using Umbraco.Cms.Core.PublishedCache;
@@ -20,14 +21,46 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template.Query;
 public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 {
     private readonly IPublishedContentQuery _publishedContentQuery;
-    private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly IContentTypeService _contentTypeService;
-    private readonly IPublishedContentCache _contentCache;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
+    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
 
     private static readonly string _indent = $"{Environment.NewLine}    ";
 
+    public ExecuteTemplateQueryController(
+        IPublishedContentQuery publishedContentQuery,
+        IPublishedValueFallback publishedValueFallback,
+        IContentTypeService contentTypeService,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
+    {
+        _publishedContentQuery = publishedContentQuery;
+        _publishedValueFallback = publishedValueFallback;
+        _contentTypeService = contentTypeService;
+        _documentNavigationQueryService = documentNavigationQueryService;
+        _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
+    public ExecuteTemplateQueryController(
+        IPublishedContentQuery publishedContentQuery,
+        IVariationContextAccessor variationContextAccessor,
+        IPublishedValueFallback publishedValueFallback,
+        IContentTypeService contentTypeService,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
+        : this(
+            publishedContentQuery,
+            publishedValueFallback,
+            contentTypeService,
+            documentNavigationQueryService,
+            publishedContentStatusFilteringService)
+    {
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
     public ExecuteTemplateQueryController(
         IPublishedContentQuery publishedContentQuery,
         IVariationContextAccessor variationContextAccessor,
@@ -35,13 +68,13 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
         IContentTypeService contentTypeService,
         IPublishedContentCache contentCache,
         IDocumentNavigationQueryService documentNavigationQueryService)
+        : this(
+            publishedContentQuery,
+            publishedValueFallback,
+            contentTypeService,
+            documentNavigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
     {
-        _publishedContentQuery = publishedContentQuery;
-        _variationContextAccessor = variationContextAccessor;
-        _publishedValueFallback = publishedValueFallback;
-        _contentTypeService = contentTypeService;
-        _contentCache = contentCache;
-        _documentNavigationQueryService = documentNavigationQueryService;
     }
 
     [HttpPost("execute")]
@@ -118,13 +151,13 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
             queryExpression.Append(".ChildrenOfType(\"").Append(model.DocumentTypeAlias).Append("\")");
             return rootContent == null
                 ? Enumerable.Empty<IPublishedContent>()
-                : rootContent.ChildrenOfType(_variationContextAccessor, _contentCache, _documentNavigationQueryService, model.DocumentTypeAlias);
+                : rootContent.ChildrenOfType(_documentNavigationQueryService, _publishedContentStatusFilteringService, model.DocumentTypeAlias);
         }
 
         queryExpression.Append(".Children()");
         return rootContent == null
             ? Enumerable.Empty<IPublishedContent>()
-            : rootContent.Children(_variationContextAccessor, _contentCache, _documentNavigationQueryService);
+            : rootContent.Children(_documentNavigationQueryService, _publishedContentStatusFilteringService);
     }
 
     private IEnumerable<IPublishedContent> ApplyFiltering(IEnumerable<TemplateQueryExecuteFilterPresentationModel>? filters, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)

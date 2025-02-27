@@ -6,22 +6,17 @@ import {
 	Placeholder,
 	Span,
 	StarterKit,
-	TextStyle,
+	TrailingNode,
 } from '@umbraco-cms/backoffice/external/tiptap';
 
-export default class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionApiBase {
+export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionApiBase {
 	#localize = new UmbLocalizationController(this);
 
 	getTiptapExtensions = () => [
 		StarterKit,
-		Placeholder.configure({
-			placeholder: ({ node }) => {
-				return this.#localize.term(
-					node.type.name === 'heading' ? 'placeholders_rteHeading' : 'placeholders_rteParagraph',
-				);
-			},
-		}),
-		TextStyle,
+		Placeholder.configure({ placeholder: this.#localize.term('placeholders_rteParagraph') }),
+		Div,
+		Span,
 		HtmlGlobalAttributes.configure({
 			types: [
 				'bold',
@@ -46,12 +41,14 @@ export default class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapEx
 				'tableHeader',
 				'tableRow',
 				'tableCell',
-				'textStyle',
 				'underline',
 				'umbLink',
 			],
 		}),
-		Div,
-		Span,
+		TrailingNode,
 	];
 }
+
+export default UmbTiptapRichTextEssentialsExtensionApi;
+
+export { UmbTiptapRichTextEssentialsExtensionApi as api };

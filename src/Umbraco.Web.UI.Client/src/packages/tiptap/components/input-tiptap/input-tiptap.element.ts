@@ -11,7 +11,6 @@ import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import type { Extensions } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-import './tiptap-hover-menu.element.js';
 import './tiptap-toolbar.element.js';
 
 const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
@@ -20,6 +19,7 @@ const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
 	@property({ type: String })
 	override set value(value: string) {
+		if (value === this.#value) return;
 		this.#value = value;
 
 		// Try to set the value to the editor if it is ready.
@@ -34,6 +34,16 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 	@property({ attribute: false })
 	configuration?: UmbPropertyEditorConfigCollection;
+
+	/**
+	 * Sets the input to required, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	required?: boolean;
+
+	@property({ type: String })
+	requiredMessage?: string;
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -53,6 +63,16 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	@state()
 	_toolbar: UmbTiptapToolbarValue = [[[]]];
 
+	constructor() {
+		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? 'Value is required',
+			() => !!this.required && this.isEmpty(),
+		);
+	}
+
 	protected override async firstUpdated() {
 		await Promise.all([await this.#loadExtensions(), await this.#loadEditor()]);
 	}
@@ -66,23 +86,21 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	async #loadExtensions() {
+		const enabledExtensions = this.configuration?.getValueByAlias<string[]>('extensions') ?? [];
+
+		// Ensures that the "Rich Text Essentials" extension is always enabled. [LK]
+		if (!enabledExtensions.includes(TIPTAP_CORE_EXTENSION_ALIAS)) {
+			const { api } = await import('../../extensions/core/rich-text-essentials.tiptap-api.js');
+			this._extensions.push(new api(this));
+		}
+
 		await new Promise<void>((resolve) => {
-			this.observe(umbExtensionsRegistry.byType('tiptapExtension'), async (manifests) => {
-				let enabledExtensions = this.configuration?.getValueByAlias<string[]>('extensions') ?? [];
-
-				// Ensures that the "Rich Text Essentials" extension is always enabled. [LK]
-				if (!enabledExtensions.includes(TIPTAP_CORE_EXTENSION_ALIAS)) {
-					enabledExtensions = [TIPTAP_CORE_EXTENSION_ALIAS, ...enabledExtensions];
-				}
-
+			this.observe(umbExtensionsRegistry.byTypeAndAliases('tiptapExtension', enabledExtensions), async (manifests) => {
 				for (const manifest of manifests) {
 					if (manifest.api) {
 						const extension = await loadManifestApi(manifest.api);
 						if (extension) {
-							// Check if the extension is enabled
-							if (enabledExtensions.includes(manifest.alias)) {
-								this._extensions.push(new extension(this));
-							}
+							this._extensions.push(new extension(this));
 						}
 					}
 				}
@@ -124,11 +142,16 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			editable: !this.readonly,
 			extensions: tiptapExtensions,
 			content: this.#value,
+			//enableContentCheck: true,
 			onBeforeCreate: ({ editor }) => {
 				this._extensions.forEach((ext) => ext.setEditor(editor));
 			},
+			onContentError: ({ error }) => {
+				console.error('contentError', [error.message, error.cause]);
+			},
 			onUpdate: ({ editor }) => {
 				this.#value = editor.getHTML();
+				this._runValidators();
 				this.dispatchEvent(new UmbChangeEvent());
 			},
 		});
@@ -145,7 +168,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 						.toolbar=${this._toolbar}
 						.editor=${this._editor}
 						.configuration=${this.configuration}
-						?readonly=${this.readonly}></umb-tiptap-toolbar>
+						?readonly=${this.readonly}>
+					</umb-tiptap-toolbar>
 				`,
 			)}
 			<div id="editor"></div>
@@ -181,6 +205,15 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				display: flex;
 				align-items: center;
 				justify-content: center;
+			}
+
+			:host(:not([pristine]):invalid),
+			/* polyfill support */
+			:host(:not([pristine])[internals-invalid]) {
+				--umb-tiptap-edge-border-color: var(--uui-color-danger);
+				#editor {
+					border-color: var(--uui-color-danger);
+				}
 			}
 
 			#editor {
@@ -245,6 +278,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 					margin-top: 0;
 					margin-bottom: 0.5em;
 				}
+
+					max-width: 100%;
 
 				li {
 					> p {

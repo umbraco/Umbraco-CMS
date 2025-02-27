@@ -1,4 +1,5 @@
 const { rest } = window.MockServiceWorker;
+import { createProblemDetails } from '../../data/utils.js';
 import { umbDocumentMockDb } from '../../data/document/document.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
@@ -14,8 +15,16 @@ export const publishingHandlers = [
 		if (!id) return res(ctx.status(400));
 		const requestBody = (await req.json()) as PublishDocumentRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		umbDocumentMockDb.publishing.publish(id, requestBody);
-		return res(ctx.status(200));
+
+		try {
+			umbDocumentMockDb.publishing.publish(id, requestBody);
+			return res(ctx.status(200));
+		} catch (error) {
+			if (error instanceof Error) {
+				return res(ctx.status(400), ctx.json(createProblemDetails({ title: 'Schedule', detail: error.message })));
+			}
+			throw new Error('An error occurred while publishing the document');
+		}
 	}),
 
 	rest.put(umbracoPath(`${UMB_SLUG}/:id/unpublish`), async (req, res, ctx) => {

@@ -222,6 +222,7 @@ export default {
 	},
 	collection: {
 		noItemsTitle: 'No items',
+		addCollectionConfiguration: 'Add collection',
 	},
 	content: {
 		isPublished: 'Is Published',
@@ -319,6 +320,9 @@ export default {
 		removeTextBox: 'Remove this text box',
 		contentRoot: 'Content root',
 		includeUnpublished: 'Include unpublished content items.',
+		forceRepublish: 'Publish unchanged items.',
+		forceRepublishWarning: 'WARNING: Publishing all pages below this one in the content tree, whether or not they have changed, can be an expensive and long-running operation.',
+		forceRepublishAdvisory: 'This should not be necessary in normal circumstances so please only proceed with this option selected if you are certain it is required.',
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your\n      website administrator.\n    ',
 		isSensitiveValue_short: 'This value is hidden.',
@@ -509,7 +513,6 @@ export default {
 		anchorLinkPicker: 'Anchor or querystring',
 		anchorInsert: 'Name',
 		closeThisWindow: 'Close this window',
-		confirmdelete: 'Are you sure you want to delete',
 		confirmdeleteNumberOfItems: 'Are you sure you want to delete <strong>%0%</strong> of <strong>%1%</strong> items',
 		confirmdisable: 'Are you sure you want to disable',
 		confirmremove: 'Are you sure you want to remove',
@@ -615,6 +618,8 @@ export default {
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
+		seeErrorAction: 'See error',
+		seeErrorDialogHeadline: 'Error details',
 	},
 	dictionary: {
 		importDictionaryItemHelp:
@@ -822,6 +827,7 @@ export default {
 		error: 'Error',
 		field: 'Field',
 		fieldFor: 'Field for %0%',
+		toggleFor: 'Toggle for %0%',
 		findDocument: 'Find',
 		first: 'First',
 		focalPoint: 'Focal point',
@@ -865,6 +871,7 @@ export default {
 		next: 'Next',
 		no: 'No',
 		nodeName: 'Node Name',
+		notFound: 'Not found',
 		of: 'of',
 		off: 'Off',
 		ok: 'OK',
@@ -1237,6 +1244,12 @@ export default {
 	colorpicker: {
 		noColors: 'You have not configured any approved colors',
 	},
+	colorPickerConfigurations: {
+		colorsTitle: 'Colors',
+		colorsDescription: 'Add, remove or sort colors',
+		showLabelTitle: 'Include labels?',
+		showLabelDescription: 'Stores colors as a JSON object containing both the color hex string and label, rather than just the hex string.',
+	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
 		defineDynamicRoot: 'Specify root node',
@@ -1408,14 +1421,14 @@ export default {
 		cssSavedText: 'Stylesheet saved without any errors',
 		dataTypeSaved: 'Datatype saved',
 		dictionaryItemSaved: 'Dictionary item saved',
-		editContentPublishedHeader: 'Content published',
+		editContentPublishedHeader: 'Document published',
 		editContentPublishedText: 'and is visible on the website',
-		editMultiContentPublishedText: '%0% documents published and visible on the website',
-		editVariantPublishedText: '%0% published and visible on the website',
-		editMultiVariantPublishedText: '%0% documents published for languages %1% and visible on the website',
+		editMultiContentPublishedText: '%0% documents published and are visible on the website',
+		editVariantPublishedText: '%0% published and is visible on the website',
+		editMultiVariantPublishedText: '%0% documents published for languages %1% and are visible on the website',
 		editBlueprintSavedHeader: 'Document Blueprint saved',
 		editBlueprintSavedText: 'Changes have been successfully saved',
-		editContentSavedHeader: 'Content saved',
+		editContentSavedHeader: 'Document saved',
 		editContentSavedText: 'Remember to publish to make changes visible',
 		editContentScheduledSavedText: 'A schedule for publishing has been updated',
 		editVariantSavedText: '%0% saved',
@@ -1711,6 +1724,7 @@ export default {
 		elementDoesNotSupport: 'This is not applicable for an Element Type',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
 		displaySettingsHeadline: 'Appearance',
+		displaySettingsLabelOnLeft: 'Label to the left',
 		displaySettingsLabelOnTop: 'Label above (full-width)',
 		confirmDeleteTabMessage: 'Are you sure you want to delete the tab <strong>%0%</strong>?',
 		confirmDeleteGroupMessage: 'Are you sure you want to delete the group <strong>%0%</strong>?',
@@ -1967,6 +1981,8 @@ export default {
 		permissionsDefault: 'Default permissions',
 		permissionsGranular: 'Granular permissions',
 		permissionsGranularHelp: 'Set permissions for specific nodes',
+		granularRightsLabel: 'Documents',
+		granularRightsDescription: 'Assign permissions to specific documents',
 		permissionsEntityGroup_document: 'Content',
 		permissionsEntityGroup_media: 'Media',
 		permissionsEntityGroup_member: 'Member',
@@ -1983,6 +1999,8 @@ export default {
 		chooseUserGroup: (multiple: boolean) => {
 			return multiple ? 'Choose User Groups' : 'Choose User Group';
 		},
+		entityPermissionsLabel: 'Permissions',
+		entityPermissionsDescription: 'Assign permissions for actions',
 		noStartNode: 'No start node selected',
 		noStartNodes: 'No start nodes selected',
 		startnode: 'Content start node',
@@ -2056,6 +2074,7 @@ export default {
 	},
 	validation: {
 		validation: 'Validation',
+		validateNothing: 'No validation',
 		validateAsEmail: 'Validate as an email address',
 		validateAsNumber: 'Validate as a number',
 		validateAsUrl: 'Validate as a URL',
@@ -2445,7 +2464,8 @@ export default {
 		labelEditorSize: 'Overlay editor size',
 		addCustomView: 'Add custom view',
 		addSettingsElementType: 'Add settings',
-		confirmDeleteBlockMessage: 'Are you sure you want to delete the content <strong>%0%</strong>?',
+		confirmDeleteBlockTitle: 'Delete %0%?',
+		confirmDeleteBlockMessage: 'Are you sure you want to delete this %0%?',
 		confirmDeleteBlockTypeMessage: 'Are you sure you want to delete the block configuration <strong>%0%</strong>?',
 		confirmDeleteBlockTypeNotice:
 			'The content of this block will still be present, editing of this content\n      will no longer be available and will be shown as unsupported content.\n    ',
@@ -2548,6 +2568,9 @@ export default {
 		labelInlineMode: 'Display inline with text',
 		notExposedLabel: 'Draft',
 		notExposedDescription: 'This Block is not yet created for this variant',
+		unsupportedBlockName: 'Unsupported',
+		unsupportedBlockDescription:
+			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',
 	},
 	contentTemplatesDashboard: {
 		whatHeadline: 'What are Document Blueprints?',

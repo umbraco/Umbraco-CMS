@@ -48,33 +48,39 @@ export class UmbLocalizationRegistry {
 		combineLatest([this.currentLanguage, extensionRegistry.byType('localization')]).subscribe(
 			async ([currentLanguage, extensions]) => {
 				const locale = new Intl.Locale(currentLanguage);
-				const filteredExt = extensions.filter(
+				const currentLanguageExtensions = extensions.filter(
 					(ext) =>
 						ext.meta.culture.toLowerCase() === locale.baseName.toLowerCase() ||
 						ext.meta.culture.toLowerCase() === locale.language.toLowerCase(),
 				);
 
-				// Only get the extensions that are not already loading/loaded:
-				const diff = filteredExt.filter((ext) => !this.#loadedExtAliases.includes(ext.alias));
-				if (diff.length !== 0) {
-					// got new localizations to load:
-					const translations = await Promise.all(diff.map(this.#loadExtension));
+				// If there are no extensions for the current language, return early
+				if (!currentLanguageExtensions.length) return;
 
-					if (translations.length) {
-						umbLocalizationManager.registerManyLocalizations(translations);
+				// Register the new translations only if they have not been registered before
+				const diff = currentLanguageExtensions.filter((ext) => !this.#loadedExtAliases.includes(ext.alias));
 
-						// Set the document language
-						const newLang = locale.baseName.toLowerCase();
-						if (document.documentElement.lang.toLowerCase() !== newLang) {
-							document.documentElement.lang = newLang;
-						}
+				// Load all localizations
+				const translations = await Promise.all(currentLanguageExtensions.map(this.#loadExtension));
 
-						// Set the document direction to the direction of the primary language
-						const newDir = translations[0].$dir ?? 'ltr';
-						if (document.documentElement.dir !== newDir) {
-							document.documentElement.dir = newDir;
-						}
-					}
+				// If there are no translations, return early
+				if (!translations.length) return;
+
+				if (diff.length) {
+					const filteredTranslations = translations.filter((t) => diff.some((ext) => ext.meta.culture === t.$code));
+					umbLocalizationManager.registerManyLocalizations(filteredTranslations);
+				}
+
+				// Set the document language
+				const newLang = locale.baseName.toLowerCase();
+				if (document.documentElement.lang.toLowerCase() !== newLang) {
+					document.documentElement.lang = newLang;
+				}
+
+				// Set the document direction to the direction of the primary language
+				const newDir = translations[0].$dir ?? 'ltr';
+				if (document.documentElement.dir !== newDir) {
+					document.documentElement.dir = newDir;
 				}
 			},
 		);
