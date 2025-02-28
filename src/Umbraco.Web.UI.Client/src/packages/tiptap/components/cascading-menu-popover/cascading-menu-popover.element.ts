@@ -1,15 +1,14 @@
-import { css, customElement, html, property, repeat, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, property, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
 export type UmbCascadingMenuItem = {
-	unique: string;
 	label: string;
 	icon?: string;
 	items?: Array<UmbCascadingMenuItem>;
 	element?: HTMLElement;
 	separatorAfter?: boolean;
+	style?: string;
 	execute?: () => void;
-	isActive?: () => boolean;
 };
 
 @customElement('umb-cascading-menu-popover')
@@ -21,10 +20,10 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 		return this.shadowRoot?.querySelector(`#${popoverId}`) as UUIPopoverContainerElement;
 	}
 
-	#onMouseEnter(item: UmbCascadingMenuItem) {
+	#onMouseEnter(item: UmbCascadingMenuItem, popoverId: string) {
 		if (!item.items?.length) return;
 
-		const popover = this.#getPopoverById(item.unique);
+		const popover = this.#getPopoverById(popoverId);
 		if (!popover) return;
 
 		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
@@ -33,8 +32,8 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 		popover.showPopover();
 	}
 
-	#onMouseLeave(item: UmbCascadingMenuItem) {
-		const popover = this.#getPopoverById(item.unique);
+	#onMouseLeave(item: UmbCascadingMenuItem, popoverId: string) {
+		const popover = this.#getPopoverById(popoverId);
 		if (!popover) return;
 
 		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
@@ -43,11 +42,11 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 		popover.hidePopover();
 	}
 
-	#onClick(item: UmbCascadingMenuItem) {
+	#onClick(item: UmbCascadingMenuItem, popoverId: string) {
 		item.execute?.();
 
 		setTimeout(() => {
-			this.#onMouseLeave(item);
+			this.#onMouseLeave(item, popoverId);
 		}, 100);
 	}
 
@@ -56,44 +55,40 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 			<uui-scroll-container>
 				${when(
 					this.items?.length,
-					() => html`
-						${repeat(
-							this.items!,
-							(item) => item.unique,
-							(item) => this.#renderItem(item),
-						)}
-						${super.render()}
-					`,
+					() => html` ${repeat(this.items!, (item, index) => this.#renderItem(item, index))} ${super.render()} `,
 					() => super.render(),
 				)}
 			</uui-scroll-container>
 		`;
 	}
 
-	#renderItem(item: UmbCascadingMenuItem) {
+	#renderItem(item: UmbCascadingMenuItem, index: number) {
 		const element = item.element;
+		const popoverId = `item-${index}`;
 		if (element) {
-			element.setAttribute('popovertarget', item.unique);
+			element.setAttribute('popovertarget', popoverId);
 		}
 		return html`
-			<div @mouseenter=${() => this.#onMouseEnter(item)} @mouseleave=${() => this.#onMouseLeave(item)}>
+			<div
+				@mouseenter=${() => this.#onMouseEnter(item, popoverId)}
+				@mouseleave=${() => this.#onMouseLeave(item, popoverId)}>
 				${when(
 					element,
 					() => element,
 					() => html`
 						<uui-menu-item
 							class=${item.separatorAfter ? 'separator' : ''}
-							popovertarget=${item.unique}
-							@click-label=${() => this.#onClick(item)}>
+							popovertarget=${popoverId}
+							@click-label=${() => this.#onClick(item, popoverId)}>
 							${when(item.icon, (icon) => html`<uui-icon slot="icon" name=${icon}></uui-icon>`)}
 							<div slot="label" class="menu-item">
-								<span>${item.label}</span>
+								<span style=${ifDefined(item.style)}>${item.label}</span>
 								${when(item.items, () => html`<uui-symbol-expand></uui-symbol-expand>`)}
 							</div>
 						</uui-menu-item>
 					`,
 				)}
-				<umb-cascading-menu-popover id=${item.unique} placement="right-start" .items=${item.items}>
+				<umb-cascading-menu-popover id=${popoverId} placement="right-start" .items=${item.items}>
 				</umb-cascading-menu-popover>
 			</div>
 		`;
