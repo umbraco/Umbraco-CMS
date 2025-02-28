@@ -711,13 +711,13 @@ stages:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
           
-          # Merge test reports from multiple shards
-          - pwsh: npx playwright merge-reports --reporter junit tests/Umbraco.Tests.AcceptanceTest/results
-            displayName: Merge test reports
-            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+          # # Merge test reports from multiple shards
+          # - pwsh: npx playwright merge-reports --reporter junit tests/Umbraco.Tests.AcceptanceTest/results
+          #   displayName: Merge test reports
+          #   workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Publish test results
-          - task: PublishTestResults@2
+          - task: PublishTestResults@1
             displayName: "Publish test results"
             condition: succeededOrFailed()
             inputs:
@@ -725,6 +725,7 @@ stages:
               testResultsFiles: '*.xml'
               searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
               testRunTitle: "$(Agent.JobName)"
+              mergeTestResults: true
 
   ###############################################
   ## Release
