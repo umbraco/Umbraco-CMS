@@ -162,7 +162,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				<div>
 					${when(
 						this.sortModeActive && this._hasOwnerContainer,
-						() => html`<uui-icon name="icon-navigation"></uui-icon>`,
+						() => html`<uui-icon name="icon-drag-vertical"></uui-icon>`,
 					)}
 					<uui-input
 						id="group-name"

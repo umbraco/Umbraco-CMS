@@ -433,7 +433,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 						`
 					: ''}
 				<uui-button look="outline" label=${sortButtonText} compact @click=${this.#toggleSortMode}>
-					<uui-icon name="icon-navigation"></uui-icon>
+					<uui-icon name="icon-height"></uui-icon>
 					${sortButtonText}
 				</uui-button>
 			</div>
@@ -498,7 +498,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (this._sortModeActive) {
 			return html`<div class="tab">
 				${ownedTab
-					? html`<uui-icon name="icon-navigation" class="drag-${tab.id}"> </uui-icon>${tabName}
+					? html`<uui-icon name="icon-drag-vertical" class="drag-${tab.id}"> </uui-icon>${tabName}
 							<uui-input
 								label="sort order"
 								type="number"
