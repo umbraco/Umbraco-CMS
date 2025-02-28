@@ -702,14 +702,6 @@ name: "icon-drag",
 hidden: true,
 path: () => import("./icons/icon-drag.js"),
 },{
-name: "icon-drag-horizontal",
-hidden: true,
-path: () => import("./icons/icon-drag-horizontal.js"),
-},{
-name: "icon-drag-vertical",
-hidden: true,
-path: () => import("./icons/icon-drag-vertical.js"),
-},{
 name: "icon-hammer",
 path: () => import("./icons/icon-hammer.js"),
 },{

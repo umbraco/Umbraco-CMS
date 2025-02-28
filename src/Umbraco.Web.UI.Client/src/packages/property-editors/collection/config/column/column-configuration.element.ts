@@ -132,7 +132,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 	#renderColumn(column: UmbCollectionColumnConfiguration) {
 		return html`
 			<div class="layout-item" id=${column.alias}>
-				<uui-icon class="drag-handle" name="icon-drag-vertical"></uui-icon>
+				<uui-icon class="drag-handle" name="icon-drag"></uui-icon>
 
 				<uui-input
 					required
