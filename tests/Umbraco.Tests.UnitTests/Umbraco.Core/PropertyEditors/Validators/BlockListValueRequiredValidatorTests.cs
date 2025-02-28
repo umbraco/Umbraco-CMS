@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 public class BlockListValueRequiredValidatorTests
 {
     [Test]
-    public void Validates_Empty_Block_List_As_Empty()
+    public void Validates_Empty_Block_List_As_Not_Provided()
     {
         var validator = new BlockListValueRequiredValidator(new SystemTextJsonSerializer());
 
@@ -24,7 +24,7 @@ public class BlockListValueRequiredValidatorTests
     }
 
     [Test]
-    public void Validates_Populated_Block_List_As_Completed()
+    public void Validates_Populated_Block_List_As_Provided()
     {
         var validator = new BlockListValueRequiredValidator(new SystemTextJsonSerializer());
 
