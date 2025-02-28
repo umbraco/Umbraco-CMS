@@ -1,14 +1,15 @@
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '@umbraco-cms/backoffice/property';
 
 export type * from './property-validation-path-translator.extension.js';
 
-export interface UmbPropertyValidationPathTranslator extends UmbApi {
+export interface UmbPropertyValidationPathTranslator<PropertyValueType> extends UmbApi {
 	/**
 	 * Clones a property value.
 	 * @param value The value to clone.
 	 * @returns A promise that resolves with the clonal(cloned value).
 	 */
-	translate: UmbPropertyValidationPathTranslatorMethod;
+	translate: UmbPropertyValidationPathTranslatorMethod<PropertyValueType>;
 }
 
 /**
@@ -16,18 +17,18 @@ export interface UmbPropertyValidationPathTranslator extends UmbApi {
  * @param value The value to clone.
  * @returns A promise that resolves with the translated path.
  */
-export type UmbPropertyValidationPathTranslatorMethod = <PropertyValueType>(
+export type UmbPropertyValidationPathTranslatorMethod<PropertyValueType> = (
 	paths: Array<string>,
-	propertyData: PropertyValueType,
+	propertyData: UmbPropertyValueDataPotentiallyWithEditorAlias<PropertyValueType>,
 ) => PromiseLike<Array<string>>;
 
-export interface UmbValidationPathTranslator extends UmbApi {
+export interface UmbValidationPathTranslator<T> extends UmbApi {
 	/**
 	 * Clones a property value.
 	 * @param value The value to clone.
 	 * @returns A promise that resolves with the clonal(cloned value).
 	 */
-	translate: UmbPropertyValidationPathTranslatorMethod;
+	translate: UmbValidationPathTranslatorMethod<T>;
 }
 
 /**
@@ -35,7 +36,7 @@ export interface UmbValidationPathTranslator extends UmbApi {
  * @param value The value to clone.
  * @returns A promise that resolves with the translated path.
  */
-export type UmbValidationPathTranslatorMethod = (
+export type UmbValidationPathTranslatorMethod<T> = (
 	paths: Array<string>,
-	propertyData: unknown,
+	propertyData: T,
 ) => PromiseLike<Array<string>>;
