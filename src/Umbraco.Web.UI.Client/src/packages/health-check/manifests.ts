@@ -1,4 +1,3 @@
-import { manifests as userPermissionManifests } from './user-permission/manifests.js';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -20,5 +19,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
-	...userPermissionManifests,
 ];

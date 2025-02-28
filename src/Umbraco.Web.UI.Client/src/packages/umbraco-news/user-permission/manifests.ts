@@ -7,8 +7,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Browse Umbraco News Dashboard User Permission',
 		meta: {
 			label: 'Browse',
-			description: 'Allow access to browse the Umbraco News Dashboard',
-			group: 'Umbraco News',
+			description: 'Allow access to browse the Getting Started Dashboard',
+			group: 'Getting Started',
 			permission: {
 				context: UMB_USER_PERMISSION_CONTEXT_UMBRACO_NEWS,
 				verbs: [UMB_USER_PERMISSION_UMBRACO_NEWS_BROWSE],
