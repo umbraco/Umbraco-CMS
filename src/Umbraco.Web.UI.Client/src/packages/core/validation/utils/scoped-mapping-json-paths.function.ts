@@ -1,8 +1,8 @@
 /**
  * Helper method to map paths matching a certain scope.
- * @param {Array<string>} path - the JSON paths to map.
+ * @param {Array<string>} paths - the JSON paths to map.
  * @param {string} scopePath - the JSON path to scope the mapping to.
- * @param {(Array<string>)} scopedMapper - Map function which recieves the paths in the scope and returns the resolved paths.
+ * @param {(Array<string>)} scopedMapper - Map function which receives the paths in the scope and returns the resolved paths.
  * @returns {string} - the paths, including the once mapped by the scoped mapper. Notice the order is kept.
  */
 export async function umbScopedMappingOfJsonPaths(
