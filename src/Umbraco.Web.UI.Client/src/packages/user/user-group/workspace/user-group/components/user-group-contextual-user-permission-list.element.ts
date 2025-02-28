@@ -4,23 +4,23 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestContextualUserPermission } from '@umbraco-cms/backoffice/user-permission';
 
-@customElement('umb-user-group-user-permission-list')
-export class UmbUserGroupUserPermissionListElement extends UmbLitElement {
+@customElement('umb-user-group-contextual-user-permission-list')
+export class UmbUserGroupContextualUserPermissionListElement extends UmbLitElement {
 	@state()
 	private _groups: Array<string> = [];
 
 	constructor() {
 		super();
-		this.#observeUserPermissionGroups();
+		this.#observeContextualUserPermissionGroups();
 	}
 
-	#observeUserPermissionGroups() {
+	#observeContextualUserPermissionGroups() {
 		this.observe(
 			umbExtensionsRegistry.byType('contextualUserPermission'),
 			(manifests) => {
 				this._groups = [...new Set(manifests.flatMap((manifest) => manifest.meta.group))];
 			},
-			'umbUserPermissionObserver',
+			'umbContextualUserPermissionObserver',
 		);
 	}
 
@@ -33,8 +33,8 @@ export class UmbUserGroupUserPermissionListElement extends UmbLitElement {
 			<h4>${group}</h4>
 			<umb-extension-slot
 				slot="editor"
-				type="userPermission"
-				default-element="umb-input-user-permission"
+				type="contextualUserPermission"
+				default-element="umb-input-contextual-user-permission"
 				.filter=${(manifest: ManifestContextualUserPermission) => manifest.meta.group === group}></umb-extension-slot>
 		`;
 	}
@@ -42,10 +42,8 @@ export class UmbUserGroupUserPermissionListElement extends UmbLitElement {
 	static override styles = [UmbTextStyles];
 }
 
-export default UmbUserGroupUserPermissionListElement;
-
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-group-user-permission-list': UmbUserGroupUserPermissionListElement;
+		'umb-user-group-contextual-user-permission-list': UmbUserGroupContextualUserPermissionListElement;
 	}
 }
