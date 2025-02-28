@@ -6,7 +6,7 @@ import {
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		type: 'userPermission',
+		type: 'contextualUserPermission',
 		alias: 'Umb.UserPermission.HealthCheck.Browse',
 		name: 'Browse Health Check User Permission',
 		meta: {
@@ -20,7 +20,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'contextualUserPermission',
 		alias: 'Umb.UserPermission.HealthCheck.Execute',
 		name: 'Execute Health Check User Permission',
 		meta: {

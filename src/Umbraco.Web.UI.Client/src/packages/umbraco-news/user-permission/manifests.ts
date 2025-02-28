@@ -2,7 +2,7 @@ import { UMB_USER_PERMISSION_CONTEXT_UMBRACO_NEWS, UMB_USER_PERMISSION_UMBRACO_N
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		type: 'userPermission',
+		type: 'contextualUserPermission',
 		alias: 'Umb.UserPermission.UmbracoNews.Dashboard.Browse',
 		name: 'Browse Umbraco News Dashboard User Permission',
 		meta: {
