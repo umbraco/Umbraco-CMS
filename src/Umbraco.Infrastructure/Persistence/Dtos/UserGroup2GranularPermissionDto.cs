@@ -17,11 +17,22 @@ public class UserGroup2GranularPermissionDto
     [ForeignKey(typeof(UserGroupDto), Column = "key")]
     public Guid UserGroupKey { get; set; }
 
+    /// <summary>
+    /// Unique Umbraco Id
+    /// </summary>
     [Column("uniqueId")]
     [ForeignKey(typeof(NodeDto), Column = "uniqueId")]
     [NullSetting(NullSetting = NullSettings.Null)]
     [Index(IndexTypes.NonClustered, Name = "IX_umbracoUserGroup2GranularPermissionDto_UniqueId")]
     public Guid? UniqueId { get; set; }
+
+    /// <summary>
+    /// A Unique Id within the <see cref="Context"/> that is not an Umbraco node
+    /// </summary>
+    [Column("externalUniqueId")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    [Index(IndexTypes.NonClustered, Name = "IX_umbracoUserGroup2GranularPermissionDto_ExternalUniqueId")]
+    public Guid? ExternalUniqueId { get; set; }
 
     [Column("permission")]
     [NullSetting(NullSetting = NullSettings.NotNull)]

@@ -539,11 +539,18 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
             {
                 var dto = new UserGroup2GranularPermissionDto
                 {
-                    UserGroupKey = userGroup.Key, Permission = permission.Permission, Context = permission.Context
+                    UserGroupKey = userGroup.Key,
+                    Permission = permission.Permission,
+                    Context = permission.Context,
                 };
-                if (permission is INodeGranularPermission nodeGranularPermission)
+                switch (permission)
                 {
-                    dto.UniqueId = nodeGranularPermission.Key;
+                    case INodeGranularPermission nodeGranularPermission:
+                        dto.UniqueId = nodeGranularPermission.Key;
+                        break;
+                    case IExternalGranularPermission externalGranularPermission:
+                        dto.ExternalUniqueId = externalGranularPermission.Key;
+                        break;
                 }
 
                 return dto;
