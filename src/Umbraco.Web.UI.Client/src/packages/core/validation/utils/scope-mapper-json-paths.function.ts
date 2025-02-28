@@ -5,7 +5,7 @@
  * @param {(Array<string>)} scopedMapper - Map function which receives the paths in the scope and returns the resolved paths.
  * @returns {string} - the paths, including the once mapped by the scoped mapper. Notice the order is kept.
  */
-export async function umbScopedMappingOfJsonPaths(
+export async function umbScopeMapperForJsonPaths(
 	paths: Array<string>,
 	scopePath: string,
 	scopedMapper: (scopedPaths: Array<string>) => Promise<Array<string>>,
