@@ -39,7 +39,7 @@ public abstract class DictionaryConfigurationValidatorBase
             return true;
         }
 
-        // Special case for floating point numbers - when deserilizaed these will be integers if whole numbers rather
+        // Special case for floating point numbers - when deserialized these will be integers if whole numbers rather
         // than double.
         if (typeof(TValue) == typeof(double) && value is int valueAsInt)
         {
