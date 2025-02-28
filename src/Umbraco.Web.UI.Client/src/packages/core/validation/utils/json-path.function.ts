@@ -7,6 +7,10 @@
 export function GetValueByJsonPath(data: unknown, path: string): unknown {
 	if (path === '$') return data;
 	// strip $ from the path:
+	if (path.startsWith('$[')) {
+		return _GetNextArrayEntryFromPath(data as Array<unknown>, path.slice(2));
+	}
+
 	const strippedPath = path.startsWith('$.') ? path.slice(2) : path;
 	// get value from the path:
 	return GetNextPropertyValueFromPath(data, strippedPath);
@@ -34,46 +38,59 @@ function GetNextPropertyValueFromPath(data: any, path: string): any {
 	const value = data[key];
 	// if there is no rest of the path, return the value:
 	if (rest === undefined) return value;
+
 	// if the value is an array, get the value at the index:
 	if (Array.isArray(value)) {
-		// get the value until the next ']', the value can be anything in between the brackets:
-		const lookupEnd = rest.match(/\]/);
-		if (!lookupEnd) return undefined;
-		// get everything before the match:
-		const entryPointer = rest.slice(0, lookupEnd.index);
-
-		// check if the entryPointer is a JSON Path Filter ( starting with ?( and ending with ) ):
-		if (entryPointer.startsWith('?(') && entryPointer.endsWith(')')) {
-			// get the filter from the entryPointer:
-			// get the filter as a function:
-			const jsFilter = JsFilterFromJsonPathFilter(entryPointer);
-			// find the index of the value that matches the filter:
-			const index = value.findIndex(jsFilter[0]);
-			// if the index is -1, return undefined:
-			if (index === -1) return undefined;
-			// get the value at the index:
-			const data = value[index];
-			// Check for safety:
-			if (lookupEnd.index === undefined || lookupEnd.index + 1 >= rest.length) {
-				return data;
-			}
-			// continue with the rest of the path:
-			return GetNextPropertyValueFromPath(data, rest.slice(lookupEnd.index + 2)) ?? data;
-		} else {
-			// get the value at the index:
-			const indexAsNumber = parseInt(entryPointer);
-			if (isNaN(indexAsNumber)) return undefined;
-			const data = value[indexAsNumber];
-			// Check for safety:
-			if (lookupEnd.index === undefined || lookupEnd.index + 1 >= rest.length) {
-				return data;
-			}
-			// continue with the rest of the path:
-			return GetNextPropertyValueFromPath(data, rest.slice(lookupEnd.index + 2)) ?? data;
-		}
+		return _GetNextArrayEntryFromPath(value, rest);
 	} else {
 		// continue with the rest of the path:
 		return GetNextPropertyValueFromPath(value, rest);
+	}
+}
+
+/**
+ * @private
+ * @param {object} array - object to traverse for the value.
+ * @param {string} path - the JSON path to the value that should be found, notice without the starting '['
+ * @returns {unknown} - the found value.
+ */
+function _GetNextArrayEntryFromPath(array: Array<any>, path: string): any {
+	if (!array) return undefined;
+
+	// get the value until the next ']', the value can be anything in between the brackets:
+	const lookupEnd = path.match(/\]/);
+	if (!lookupEnd) return undefined;
+	// get everything before the match:
+	const entryPointer = path.slice(0, lookupEnd.index);
+
+	// check if the entryPointer is a JSON Path Filter ( starting with ?( and ending with ) ):
+	if (entryPointer.startsWith('?(') && entryPointer.endsWith(')')) {
+		// get the filter from the entryPointer:
+		// get the filter as a function:
+		const jsFilter = JsFilterFromJsonPathFilter(entryPointer);
+		// find the index of the value that matches the filter:
+		const index = array.findIndex(jsFilter[0]);
+		// if the index is -1, return undefined:
+		if (index === -1) return undefined;
+		// get the value at the index:
+		const entryData = array[index];
+		// Check for safety:
+		if (lookupEnd.index === undefined || lookupEnd.index + 1 >= path.length) {
+			return entryData;
+		}
+		// continue with the rest of the path:
+		return GetNextPropertyValueFromPath(entryData, path.slice(lookupEnd.index + 2)) ?? entryData;
+	} else {
+		// get the value at the index:
+		const indexAsNumber = parseInt(entryPointer);
+		if (isNaN(indexAsNumber)) return undefined;
+		const entryData = array[indexAsNumber];
+		// Check for safety:
+		if (lookupEnd.index === undefined || lookupEnd.index + 1 >= path.length) {
+			return entryData;
+		}
+		// continue with the rest of the path:
+		return GetNextPropertyValueFromPath(entryData, path.slice(lookupEnd.index + 2)) ?? entryData;
 	}
 }
 

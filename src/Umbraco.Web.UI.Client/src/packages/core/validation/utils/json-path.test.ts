@@ -42,4 +42,10 @@ describe('UmbJsonPathFunctions', () => {
 
 		expect(result).to.eq('test');
 	});
+
+	it('query of array in root', () => {
+		const result = GetValueByJsonPath([{ id: '123', value: 'test' }], "$[?(@.id == '123')].value");
+
+		expect(result).to.eq('test');
+	});
 });
