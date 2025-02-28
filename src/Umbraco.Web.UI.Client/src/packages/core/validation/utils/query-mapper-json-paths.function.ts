@@ -2,7 +2,7 @@ import { GetValueByJsonPath } from './json-path.function.js';
 import { umbScopeMapperForJsonPaths } from './scope-mapper-json-paths.function.js';
 
 /**
- * Helper method to map paths matching a certain scope.
+ * Helper method to replace paths index with queries and additionally map the paths.
  * @param {Array<string>} paths - the JSON paths to map.
  * @param {string} scopePath - the JSON path to scope the mapping to.
  * @param {(Array<string>)} scopedMapper - Map function which receives the paths in the scope and returns the resolved paths.
@@ -41,7 +41,7 @@ export async function umbQueryMapperForJsonPaths<T>(
 	);
 
 	if (mapper) {
-		// Translate each property:
+		// map each property:
 		for (const uniquePath of uniquePointers) {
 			const propertyData = GetValueByJsonPath(scopeData, `$[${uniquePath}]`) as T;
 
