@@ -36,17 +36,17 @@ export class UmbDocumentTableColumnStateElement extends UmbLitElement implements
 	override render() {
 		switch (this._state) {
 			case 'Published':
-				return html`<uui-tag color="positive" look="secondary">${this.localize.term('content_published')}</uui-tag>`;
+				return html`<uui-tag color="positive" look="primary">${this.localize.term('content_published')}</uui-tag>`;
 			case 'PublishedPendingChanges':
-				return html`<uui-tag color="warning" look="secondary"
+				return html`<uui-tag color="positive" look="primary"
 					>${this.localize.term('content_publishedPendingChanges')}</uui-tag
 				>`;
 			case 'Draft':
 				return html`<uui-tag color="default" look="secondary">${this.localize.term('content_unpublished')}</uui-tag>`;
 			case 'NotCreated':
-				return html`<uui-tag color="danger" look="secondary">${this.localize.term('content_notCreated')}</uui-tag>`;
+				return html`<uui-tag color="default" look="secondary">${this.localize.term('content_notCreated')}</uui-tag>`;
 			default:
-				return html`<uui-tag color="danger" look="secondary">${fromCamelCase(this.value.item.state)}</uui-tag>`;
+				return html`<uui-tag color="default" look="secondary">${fromCamelCase(this._state)}</uui-tag>`;
 		}
 	}
 }
