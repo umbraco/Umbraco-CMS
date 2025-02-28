@@ -95,7 +95,6 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 			this.setUnique(data.unique);
 			this.setIsNew(true);
 			this._data.setPersisted(data);
-			this._data.setCurrent(data);
 		}
 
 		this.loading.removeState(LOADING_STATE_UNIQUE);
@@ -122,7 +121,6 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 
 		if (data) {
 			this._data.setPersisted(data);
-			this._data.setCurrent(data);
 			this.setIsNew(false);
 
 			this.observe(
