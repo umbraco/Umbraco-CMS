@@ -152,7 +152,7 @@ test('can unpublish content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  //await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickUnpublishButton();
   await umbracoUi.content.clickConfirmToUnpublishButton();
 

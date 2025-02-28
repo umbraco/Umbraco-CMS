@@ -18,7 +18,7 @@ test('can create a template', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
   // Act
-  await umbracoUi.template.clickActionsMenuAtRoot();
+  //await umbracoUi.template.clickActionsMenuAtRoot();
   await umbracoUi.template.clickCreateButton();
   await umbracoUi.template.enterTemplateName(templateName);
   await umbracoUi.template.clickSaveButton();
