@@ -1,4 +1,4 @@
-import type { ManifestEntityUserPermission } from '../../entity-user-permission.extension.js';
+import type { ManifestEntityUserPermission } from '../../entity-user-permission/entity-user-permission.extension.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
