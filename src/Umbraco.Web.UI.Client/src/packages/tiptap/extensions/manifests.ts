@@ -23,6 +23,15 @@ const kinds: Array<UmbExtensionManifestKind> = [
 			element: () => import('../components/toolbar/tiptap-toolbar-color-picker-button.element.js'),
 		},
 	},
+	{
+		type: 'kind',
+		alias: 'Umb.Kind.TiptapToolbar.Menu',
+		matchKind: 'menu',
+		matchType: 'tiptapToolbarExtension',
+		manifest: {
+			element: () => import('../components/toolbar/tiptap-toolbar-menu.element.js'),
+		},
+	},
 ];
 
 const coreExtensions: Array<ManifestTiptapExtension> = [
@@ -310,7 +319,7 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 		alias: 'Umb.Tiptap.Toolbar.TextDirectionRtl',
 		name: 'Text Direction RTL Tiptap Extension',
 		api: () => import('./toolbar/text-direction-rtl.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.TextAlign'],
+		forExtensions: ['Umb.Tiptap.TextDirection'],
 		meta: {
 			alias: 'text-direction-rtl',
 			icon: 'icon-text-direction-rtl',
@@ -323,7 +332,7 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 		alias: 'Umb.Tiptap.Toolbar.TextDirectionLtr',
 		name: 'Text Direction LTR Tiptap Extension',
 		api: () => import('./toolbar/text-direction-ltr.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.TextAlign'],
+		forExtensions: ['Umb.Tiptap.TextDirection'],
 		meta: {
 			alias: 'text-direction-ltr',
 			icon: 'icon-text-direction-ltr',
@@ -533,24 +542,44 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'tiptapToolbarExtension',
+		kind: 'menu',
 		alias: 'Umb.Tiptap.Toolbar.FontFamily',
 		name: 'Font Family Tiptap Extension',
-		element: () => import('./toolbar/font-family-tiptap-toolbar.element.js'),
+		api: () => import('./toolbar/font-family.tiptap-toolbar-api.js'),
 		meta: {
 			alias: 'umbFontFamily',
 			icon: 'icon-ruler-alt',
 			label: 'Font family',
+			items: [
+				{ label: 'Sans serif', style: 'font-family: sans-serif;', data: 'sans-serif' },
+				{ label: 'Serif', style: 'font-family: serif;', data: 'serif' },
+				{ label: 'Monospace', style: 'font-family: monospace;', data: 'monospace' },
+				{ label: 'Cursive', style: 'font-family: cursive;', data: 'cursive' },
+				{ label: 'Fantasy', style: 'font-family: fantasy;', data: 'fantasy' },
+			],
 		},
 	},
 	{
 		type: 'tiptapToolbarExtension',
+		kind: 'menu',
 		alias: 'Umb.Tiptap.Toolbar.FontSize',
 		name: 'Font Size Tiptap Extension',
-		element: () => import('./toolbar/font-size-tiptap-toolbar.element.js'),
+		api: () => import('./toolbar/font-size.tiptap-toolbar-api.js'),
 		meta: {
 			alias: 'umbFontSize',
 			icon: 'icon-ruler',
 			label: 'Font size',
+			items: [
+				{ label: '8pt', data: '8pt;' },
+				{ label: '10pt', data: '10pt;' },
+				{ label: '12pt', data: '12pt;' },
+				{ label: '14pt', data: '14pt;' },
+				{ label: '16pt', data: '16pt;' },
+				{ label: '18pt', data: '18pt;' },
+				{ label: '24pt', data: '24pt;' },
+				{ label: '26pt', data: '26pt;' },
+				{ label: '48pt', data: '48pt;' },
+			],
 		},
 	},
 ];
