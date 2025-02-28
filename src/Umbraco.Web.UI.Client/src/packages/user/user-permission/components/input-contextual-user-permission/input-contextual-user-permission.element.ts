@@ -1,18 +1,18 @@
-import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../../user-group/constants.js';
-import type { ManifestUserPermission, UmbContextualUserPermissionModel } from '../types.js';
-import type { UmbUserPermissionVerbElement } from './index.js';
+import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../../../user-group/constants.js';
+import type { ManifestContextualUserPermission, UmbContextualUserPermissionModel } from '../../types.js';
+import type { UmbUserPermissionVerbElement } from '../index.js';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-@customElement('umb-input-user-permission')
-export class UmbInputUserPermissionElement extends UmbLitElement {
+@customElement('umb-input-contextual-user-permission')
+export class UmbInputContextualUserPermissionElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
-	private _manifest?: ManifestUserPermission | undefined;
-	public get manifest(): ManifestUserPermission | undefined {
+	private _manifest?: ManifestContextualUserPermission | undefined;
+	public get manifest(): ManifestContextualUserPermission | undefined {
 		return this._manifest;
 	}
-	public set manifest(value: ManifestUserPermission | undefined) {
+	public set manifest(value: ManifestContextualUserPermission | undefined) {
 		this._manifest = value;
 
 		if (!this._manifest) {
@@ -65,13 +65,13 @@ export class UmbInputUserPermissionElement extends UmbLitElement {
 		event.stopPropagation();
 		const target = event.target as UmbUserPermissionVerbElement;
 		if (target.allowed) {
-			this.#addUserPermission();
+			this.#add();
 		} else {
-			this.#removeUserPermission();
+			this.#remove();
 		}
 	}
 
-	#addUserPermission() {
+	#add() {
 		if (!this._permission) {
 			throw new Error('Permission is not set');
 		}
@@ -79,7 +79,7 @@ export class UmbInputUserPermissionElement extends UmbLitElement {
 		this.#context?.addContextualPermission(this._permission);
 	}
 
-	#removeUserPermission() {
+	#remove() {
 		if (!this._permission) {
 			throw new Error('Permission is not set');
 		}
@@ -115,10 +115,10 @@ export class UmbInputUserPermissionElement extends UmbLitElement {
 	}
 }
 
-export { UmbInputUserPermissionElement as element };
+export { UmbInputContextualUserPermissionElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-user-permission': UmbInputUserPermissionElement;
+		'umb-input-contextual-user-permission': UmbInputContextualUserPermissionElement;
 	}
 }
