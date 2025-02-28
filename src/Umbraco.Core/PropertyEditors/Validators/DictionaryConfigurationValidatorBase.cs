@@ -21,13 +21,33 @@ public abstract class DictionaryConfigurationValidatorBase
             return false;
         }
 
-        if (configuration.TryGetValue(key, out object? obj) && obj is TValue castValue)
+        if (configuration.TryGetValue(key, out object? obj) && TryCastValue(obj, out TValue? castValue))
         {
             value = castValue;
             return true;
         }
 
         value = default;
+        return false;
+    }
+
+    private static bool TryCastValue<TValue>(object? value, [NotNullWhen(true)] out TValue? castValue)
+    {
+        if (value is TValue valueAsType)
+        {
+            castValue = valueAsType;
+            return true;
+        }
+
+        // Special case for floating point numbers - when deserilizaed these will be integers if whole numbers rather
+        // than double.
+        if (typeof(TValue) == typeof(double) && value is int valueAsInt)
+        {
+            castValue = (TValue)(object)Convert.ToDouble(valueAsInt);
+            return true;
+        }
+
+        castValue = default;
         return false;
     }
 }

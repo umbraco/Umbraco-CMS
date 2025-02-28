@@ -132,6 +132,25 @@ public class DecimalValueEditorTests
         }
     }
 
+    [TestCase(1.8, true)]
+    [TestCase(2.2, false)]
+    public void Validates_Is_Less_Than_Or_Equal_To_Configured_Max_With_Configured_Whole_Numbers(object value, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor(min: 1, max: 2);
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMaximum");
+        }
+    }
+
     [TestCase(1.4, false)]
     [TestCase(1.5, true)]
     public void Validates_Matches_Configured_Step(object value, bool expectedSuccess)
@@ -164,7 +183,7 @@ public class DecimalValueEditorTests
         return CreateValueEditor().ToEditor(property.Object);
     }
 
-    private static DecimalPropertyEditor.DecimalPropertyValueEditor CreateValueEditor()
+    private static DecimalPropertyEditor.DecimalPropertyValueEditor CreateValueEditor(double min = 1.1, double max = 1.9, double step = 0.2)
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
         localizedTextServiceMock.Setup(x => x.Localize(
@@ -173,6 +192,37 @@ public class DecimalValueEditorTests
                 It.IsAny<CultureInfo>(),
                 It.IsAny<IDictionary<string, string>>()))
             .Returns((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => $"{key}_{alias}");
+
+        // When configuration is populated from the deserialized JSON, whole number values are deserialized as integers.
+        // So we want to replicate that in our tests.
+        var configuration = new Dictionary<string, object>();
+        if (min % 1 == 0)
+        {
+            configuration.Add("min", (int)min);
+        }
+        else
+        {
+            configuration.Add("min", min);
+        }
+
+        if (max % 1 == 0)
+        {
+            configuration.Add("max", (int)max);
+        }
+        else
+        {
+            configuration.Add("max", max);
+        }
+
+        if (step % 1 == 0)
+        {
+            configuration.Add("step", (int)step);
+        }
+        else
+        {
+            configuration.Add("step", step);
+        }
+
         return new DecimalPropertyEditor.DecimalPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
@@ -180,12 +230,7 @@ public class DecimalValueEditorTests
             new DataEditorAttribute("alias"),
             localizedTextServiceMock.Object)
         {
-            ConfigurationObject = new Dictionary<string, object>
-            {
-                { "min", 1.1 },
-                { "max", 1.9 },
-                { "step", 0.2 }
-            }
+            ConfigurationObject = configuration
         };
     }
 }
