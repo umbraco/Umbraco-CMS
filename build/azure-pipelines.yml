@@ -808,7 +808,7 @@ stages:
               artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
           
           # Merge test reports from multiple shards
-          - pwsh: npx playwright merge-reports --reporter junit ./all-reports
+          - pwsh: npx playwright merge-reports --reporter junit ./results
             displayName: Merge test reports
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
@@ -819,7 +819,7 @@ stages:
             inputs:
               testResultsFormat: 'JUnit'
               testResultsFiles: '*.xml'
-              searchFolder: "tests/Umbraco.Tests.AcceptanceTest/all-reports"
+              searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
               testRunTitle: "$(Agent.JobName)"
 
   ###############################################
