@@ -50,17 +50,17 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
         return await GetListViewResultAsync(user, media, dataTypeKey, orderBy, null, orderDirection, filter, skip, take);
     }
 
-    protected override async Task<PagedModel<IMedia>> GetPagedChildrenAsync(int id, IQuery<IMedia>? filter, Ordering? ordering, int skip, int take)
+    protected override Task<PagedModel<IMedia>> GetPagedChildrenAsync(int id, IQuery<IMedia>? filter, Ordering? ordering, int skip, int take)
     {
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
-        IEnumerable<IMedia> items = await Task.FromResult(_mediaService.GetPagedChildren(
+        IEnumerable<IMedia> items = _mediaService.GetPagedChildren(
             id,
             pageNumber,
             pageSize,
             out var total,
             filter,
-            ordering));
+            ordering);
 
         var pagedResult = new PagedModel<IMedia>
         {
@@ -68,7 +68,7 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
             Total = total,
         };
 
-        return pagedResult;
+        return Task.FromResult(pagedResult);
     }
 
     // We can use an authorizer here, as it already handles all the necessary checks for this filtering.

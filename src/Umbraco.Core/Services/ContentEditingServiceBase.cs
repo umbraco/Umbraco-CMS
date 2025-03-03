@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
@@ -20,6 +22,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private readonly ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IContentValidationServiceBase<TContentType> _validationService;
+    private readonly IRelationService _relationService;
 
     protected ContentEditingServiceBase(
         TContentService contentService,
@@ -29,13 +32,22 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
-        IContentValidationServiceBase<TContentType> validationService)
+        IContentValidationServiceBase<TContentType> validationService,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _dataTypeService = dataTypeService;
         _logger = logger;
         _userIdKeyResolver = userIdKeyResolver;
         _validationService = validationService;
+        ContentSettings = optionsMonitor.CurrentValue;
+        optionsMonitor.OnChange((contentSettings) =>
+        {
+            ContentSettings = contentSettings;
+        });
+
+        _relationService = relationService;
         CoreScopeProvider = scopeProvider;
         ContentService = contentService;
         ContentTypeService = contentTypeService;
@@ -50,6 +62,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected abstract OperationResult? MoveToRecycleBin(TContent content, int userId);
 
     protected abstract OperationResult? Delete(TContent content, int userId);
+
+    protected ContentSettings ContentSettings { get; private set; }
 
     protected ICoreScopeProvider CoreScopeProvider { get; }
 
@@ -137,23 +151,41 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     }
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveToRecycleBinAsync(Guid key, Guid userKey)
-        => await HandleDeletionAsync(key, userKey, ContentTrashStatusRequirement.MustNotBeTrashed, MoveToRecycleBin);
+        => await HandleDeletionAsync(key,
+                userKey,
+                ContentTrashStatusRequirement.MustNotBeTrashed,
+                MoveToRecycleBin,
+                ContentSettings.DisableUnpublishWhenReferenced,
+                ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeleteAsync(Guid key, Guid userKey, bool mustBeTrashed = true)
-        => await HandleDeletionAsync(key, userKey, mustBeTrashed ? ContentTrashStatusRequirement.MustBeTrashed : ContentTrashStatusRequirement.Irrelevant, Delete);
+        => await HandleDeletionAsync(key,
+                userKey,
+                mustBeTrashed
+                    ? ContentTrashStatusRequirement.MustBeTrashed
+                    : ContentTrashStatusRequirement.Irrelevant,
+                Delete,
+                ContentSettings.DisableDeleteWhenReferenced,
+                ContentEditingOperationStatus.CannotDeleteWhenReferenced);
 
     // helper method to perform move-to-recycle-bin, delete-from-recycle-bin and delete for content as they are very much handled in the same way
     // IContentEditingService methods hitting this (ContentTrashStatusRequirement, calledFunction):
     // DeleteAsync (irrelevant, Delete)
     // MoveToRecycleBinAsync (MustNotBeTrashed, MoveToRecycleBin)
     // DeleteFromRecycleBinAsync (MustBeTrashed, Delete)
-    private async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid key, Guid userKey, ContentTrashStatusRequirement trashStatusRequirement, Func<TContent, int, OperationResult?> performDelete)
+    private async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(
+        Guid key,
+        Guid userKey,
+        ContentTrashStatusRequirement trashStatusRequirement,
+        Func<TContent, int, OperationResult?> performDelete,
+        bool disabledWhenReferenced,
+        ContentEditingOperationStatus referenceFailStatus)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
         if (content == null)
         {
-            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
         }
 
         // checking the trash status is not done when it is irrelevant
@@ -163,7 +195,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             ContentEditingOperationStatus status = trashStatusRequirement is ContentTrashStatusRequirement.MustBeTrashed
                 ? ContentEditingOperationStatus.NotInTrash
                 : ContentEditingOperationStatus.InTrash;
-            return await Task.FromResult(Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(status, content));
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(status, content);
+        }
+
+        if (disabledWhenReferenced && _relationService.IsRelated(content.Id))
+        {
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(referenceFailStatus, content);
         }
 
         var userId = await GetUserIdAsync(userKey);
@@ -180,12 +217,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         TContent? content = ContentService.GetById(key);
         if (content is null)
         {
-            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
         }
 
         if (mustBeInRecycleBin && content.Trashed is false)
         {
-            return await Task.FromResult(Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotInTrash, content));
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotInTrash, content);
         }
 
         TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
@@ -228,7 +265,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         TContent? content = ContentService.GetById(key);
         if (content is null)
         {
-            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
         }
 
         TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
@@ -264,6 +301,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             // these are the only result states currently expected from the invoked IContentService operations
             OperationResultType.Success => ContentEditingOperationStatus.Success,
             OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
+            OperationResultType.FailedCannot => ContentEditingOperationStatus.CannotDeleteWhenReferenced,
 
             // for any other state we'll return "unknown" so we know that we need to amend this switch statement
             _ => ContentEditingOperationStatus.Unknown
@@ -332,7 +370,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return contentType;
     }
 
-    protected virtual async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, TContentType contentType)
+    protected virtual Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, TContentType contentType)
     {
         TContent? parent = parentKey.HasValue
             ? ContentService.GetById(parentKey.Value)
@@ -340,19 +378,19 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         if (parentKey.HasValue && parent == null)
         {
-            return await Task.FromResult<(int? ParentId, ContentEditingOperationStatus OperationStatus)>((null, ContentEditingOperationStatus.ParentNotFound));
+            return Task.FromResult<(int?, ContentEditingOperationStatus)>((null, ContentEditingOperationStatus.ParentNotFound));
         }
 
         if (parent == null && contentType.AllowedAsRoot == false)
         {
-            return (null, ContentEditingOperationStatus.NotAllowed);
+            return Task.FromResult<(int?, ContentEditingOperationStatus)>((null, ContentEditingOperationStatus.NotAllowed));
         }
 
         if (parent != null)
         {
             if (parent.Trashed)
             {
-                return (null, ContentEditingOperationStatus.InTrash);
+                return Task.FromResult<(int?, ContentEditingOperationStatus)>((null, ContentEditingOperationStatus.InTrash));
             }
 
             TContentType? parentContentType = ContentTypeService.Get(parent.ContentType.Key);
@@ -361,11 +399,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
             if (allowedContentTypeKeys.Contains(contentType.Key) == false)
             {
-                return (null, ContentEditingOperationStatus.NotAllowed);
+                return Task.FromResult<(int?, ContentEditingOperationStatus)>((null, ContentEditingOperationStatus.NotAllowed));
             }
         }
 
-        return (parent?.Id ?? Constants.System.Root, ContentEditingOperationStatus.Success);
+        return Task.FromResult<(int?, ContentEditingOperationStatus)>((parent?.Id ?? Constants.System.Root, ContentEditingOperationStatus.Success));
     }
 
     private void UpdateNames(ContentEditingModelBase contentEditingModelBase, TContent content, TContentType contentType)
@@ -479,7 +517,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <summary>
     /// Should never be made public, serves the purpose of a nullable bool but more readable.
     /// </summary>
-    private enum ContentTrashStatusRequirement
+    protected internal enum ContentTrashStatusRequirement
     {
         Irrelevant,
         MustBeTrashed,

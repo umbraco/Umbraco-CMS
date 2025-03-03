@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
@@ -34,6 +34,6 @@ public class ByKeyMediaTypeController : MediaTypeControllerBase
         }
 
         MediaTypeResponseModel model = _umbracoMapper.Map<MediaTypeResponseModel>(mediaType)!;
-        return await Task.FromResult(Ok(model));
+        return Ok(model);
     }
 }

@@ -351,6 +351,7 @@ public static class ObjectExtensions
         return Attempt<object?>.Fail();
     }
 
+    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 17.")]
     /// <summary>
     /// Attempts to convert the input string to the output type.
     /// </summary>

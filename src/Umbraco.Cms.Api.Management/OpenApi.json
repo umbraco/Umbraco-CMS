@@ -44037,7 +44037,7 @@
           },
           "maxFileSize": {
             "type": "integer",
-            "format": "int32",
+            "format": "int64",
             "nullable": true
           }
         },

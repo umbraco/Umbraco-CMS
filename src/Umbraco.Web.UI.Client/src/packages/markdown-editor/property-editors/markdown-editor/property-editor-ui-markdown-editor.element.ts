@@ -10,14 +10,13 @@ import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 import '../../components/input-markdown-editor/index.js';
 
-const elementName = 'umb-property-editor-ui-markdown-editor';
 /**
  * @element umb-property-editor-ui-markdown-editor
  */
-@customElement(elementName)
+@customElement('umb-property-editor-ui-markdown-editor')
 export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property()
-	value = '';
+	value?: string;
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -39,12 +38,6 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 
 		this._preview = config.getValueByAlias('preview');
 		this._overlaySize = config.getValueByAlias('overlaySize') ?? 'small';
-
-		// TODO: To be removed once the "Property Value Presets" feature has been implemented.
-		const defaultValue = config.getValueByAlias<string>('defaultValue');
-		if (defaultValue && this.value === undefined) {
-			this.value = defaultValue;
-		}
 	}
 
 	#onChange(event: Event & { target: UmbInputMarkdownElement }) {
@@ -55,7 +48,7 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 	override render() {
 		return html`
 			<umb-input-markdown
-				value=${this.value}
+				.value=${this.value}
 				.overlaySize=${this._overlaySize}
 				?preview=${this._preview}
 				@change=${this.#onChange}
@@ -68,6 +61,6 @@ export { UmbPropertyEditorUIMarkdownEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPropertyEditorUIMarkdownEditorElement;
+		'umb-property-editor-ui-markdown-editor': UmbPropertyEditorUIMarkdownEditorElement;
 	}
 }

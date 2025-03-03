@@ -43,6 +43,7 @@ public static class AssemblyExtensions
     }
 
     /// <summary>
+    [Obsolete("This extension method is no longer used and will be removed in Umbraco 17.")]
     ///     Returns true if the assembly is the App_Code assembly
     /// </summary>
     /// <param name="assembly"></param>
@@ -77,6 +78,7 @@ public static class AssemblyExtensions
         assembly.FullName!.StartsWith("App_global.asax");
 
     /// <summary>
+    [Obsolete("This extension method is no longer used and will be removed in Umbraco 17.")]
     /// Gets the assembly informational version for the specified <paramref name="assembly" />.
     /// </summary>
     /// <param name="assembly">The assembly.</param>

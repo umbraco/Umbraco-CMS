@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,8 +11,6 @@ public class StatusPublishedCacheController : PublishedCacheControllerBase
     [HttpGet("status")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status501NotImplemented)]
-    public async Task<ActionResult<string>> Status(CancellationToken cancellationToken)
-    {
-        return StatusCode(StatusCodes.Status501NotImplemented);
-    }
+    public Task<ActionResult<string>> Status(CancellationToken cancellationToken)
+        => Task.FromResult<ActionResult<string>>(StatusCode(StatusCodes.Status501NotImplemented));
 }

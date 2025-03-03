@@ -1,5 +1,7 @@
 # Umbraco CMS Build
 
+This guide will explain how you can build the Umbraco CMS from the source code. You will most likely want to do this if your are setting up a local development environment for contributing code updates to the project. You will need this in order to develop and test your fix or feature.
+
 ## Are you sure?
 
 In order to use Umbraco as a CMS and build your website with it, you should not build it yourself. If you're reading this then you're trying to contribute to Umbraco or you're debugging a complex issue.

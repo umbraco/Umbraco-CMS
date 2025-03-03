@@ -61,7 +61,8 @@ internal class TelemetryService : ITelemetryService
         };
     }
 
-    private string? GetVersion() => _metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal
+    private string? GetVersion()
+        => _metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal
         ? null
         : _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
 

@@ -1,16 +1,16 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -71,7 +71,9 @@ public class MediaPicker3PropertyEditor : DataEditor
             IScopeProvider scopeProvider,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IDataTypeConfigurationCache dataTypeReadCache,
-            ILocalizedTextService localizedTextService)
+            ILocalizedTextService localizedTextService,
+            IMediaTypeService mediaTypeService,
+            IMediaNavigationQueryService mediaNavigationQueryService)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
@@ -81,34 +83,13 @@ public class MediaPicker3PropertyEditor : DataEditor
             _scopeProvider = scopeProvider;
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _dataTypeReadCache = dataTypeReadCache;
-            Validators.Add(new MinMaxValidator(jsonSerializer, localizedTextService));
-        }
-
-        [Obsolete("Use non obsoleted constructor instead. Scheduled for removal in v17")]
-        public MediaPicker3PropertyValueEditor(
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer,
-            IIOHelper ioHelper,
-            DataEditorAttribute attribute,
-            IMediaImportService mediaImportService,
-            IMediaService mediaService,
-            ITemporaryFileService temporaryFileService,
-            IScopeProvider scopeProvider,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            IDataTypeConfigurationCache dataTypeReadCache)
-            : this(
-                shortStringHelper,
+            var validators = new TypedJsonValidatorRunner<List<MediaWithCropsDto>, MediaPicker3Configuration>(
                 jsonSerializer,
-                ioHelper,
-                attribute,
-                mediaImportService,
-                mediaService,
-                temporaryFileService,
-                scopeProvider,
-                backOfficeSecurityAccessor,
-                dataTypeReadCache,
-                StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>())
-        {
+                new MinMaxValidator(localizedTextService),
+                new AllowedTypeValidator(localizedTextService, mediaTypeService),
+                new StartNodeValidator(localizedTextService, mediaNavigationQueryService));
+
+            Validators.Add(validators);
         }
 
         /// <remarks>
@@ -328,34 +309,30 @@ public class MediaPicker3PropertyEditor : DataEditor
             }
         }
 
-        private class MinMaxValidator : IValueValidator
+        internal class MinMaxValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
-            private readonly IJsonSerializer _jsonSerializer;
             private readonly ILocalizedTextService _localizedTextService;
 
-            public MinMaxValidator(IJsonSerializer jsonSerializer, ILocalizedTextService localizedTextService)
-            {
-                _jsonSerializer = jsonSerializer;
-                _localizedTextService = localizedTextService;
-            }
+            public MinMaxValidator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
 
             public IEnumerable<ValidationResult> Validate(
-                object? value,
+                List<MediaWithCropsDto>? mediaWithCropsDtos,
+                MediaPicker3Configuration? mediaPickerConfiguration,
                 string? valueType,
-                object? dataTypeConfiguration,
                 PropertyValidationContext validationContext)
             {
                 var validationResults = new List<ValidationResult>();
 
-                if (dataTypeConfiguration is not MediaPicker3Configuration mediaPickerConfiguration)
+                if (mediaWithCropsDtos is null || mediaPickerConfiguration is null)
                 {
                     return validationResults;
                 }
 
-                if (value is null ||
-                    _jsonSerializer.TryDeserialize(value, out List<MediaWithCropsDto>? mediaWithCropsDtos) is false)
+                if (mediaPickerConfiguration.Multiple is false && mediaWithCropsDtos.Count > 1)
                 {
-                    return validationResults;
+                    validationResults.Add(new ValidationResult(
+                        _localizedTextService.Localize("validation", "multipleMediaNotAllowed"),
+                        ["value"]));
                 }
 
                 if (mediaPickerConfiguration.ValidationLimit.Min is not null
@@ -365,8 +342,9 @@ public class MediaPicker3PropertyEditor : DataEditor
                         _localizedTextService.Localize(
                             "validation",
                             "entriesShort",
-                            new[] { mediaPickerConfiguration.ValidationLimit.Min.ToString(), (mediaPickerConfiguration.ValidationLimit.Min - mediaWithCropsDtos.Count).ToString(), }),
-                        new[] { "validationLimit" }));
+                            [mediaPickerConfiguration.ValidationLimit.Min.ToString(), (mediaPickerConfiguration.ValidationLimit.Min - mediaWithCropsDtos.Count).ToString()
+                            ]),
+                        ["value"]));
                 }
 
                 if (mediaPickerConfiguration.ValidationLimit.Max is not null
@@ -376,11 +354,140 @@ public class MediaPicker3PropertyEditor : DataEditor
                         _localizedTextService.Localize(
                             "validation",
                             "entriesExceed",
-                            new[] { mediaPickerConfiguration.ValidationLimit.Max.ToString(), (mediaWithCropsDtos.Count - mediaPickerConfiguration.ValidationLimit.Max).ToString(), }),
-                        new[] { "validationLimit" }));
+                            [mediaPickerConfiguration.ValidationLimit.Max.ToString(), (mediaWithCropsDtos.Count - mediaPickerConfiguration.ValidationLimit.Max).ToString()
+                            ]),
+                        ["value"]));
                 }
 
                 return validationResults;
+            }
+        }
+
+        internal class AllowedTypeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        {
+            private readonly ILocalizedTextService _localizedTextService;
+            private readonly IMediaTypeService _mediaTypeService;
+
+            public AllowedTypeValidator(ILocalizedTextService localizedTextService, IMediaTypeService mediaTypeService)
+            {
+                _localizedTextService = localizedTextService;
+                _mediaTypeService = mediaTypeService;
+            }
+
+            public IEnumerable<ValidationResult> Validate(
+                List<MediaWithCropsDto>? value,
+                MediaPicker3Configuration? configuration,
+                string? valueType,
+                PropertyValidationContext validationContext)
+            {
+                if (value is null || configuration is null)
+                {
+                    return [];
+                }
+
+                var allowedTypes = configuration.Filter?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
+
+                // No allowed types = all types are allowed
+                if (allowedTypes is null || allowedTypes.Length == 0)
+                {
+                    return [];
+                }
+
+                IEnumerable<string> distinctTypeAliases = value.DistinctBy(x => x.MediaTypeAlias).Select(x => x.MediaTypeAlias);
+
+                foreach (var typeAlias in distinctTypeAliases)
+                {
+                    IMediaType? type = _mediaTypeService.Get(typeAlias);
+
+                    if (type is null || allowedTypes.Contains(type.Key.ToString()) is false)
+                    {
+                        return
+                        [
+                            new ValidationResult(
+                                _localizedTextService.Localize("validation", "invalidMediaType"),
+                                ["value"])
+                        ];
+                    }
+                }
+
+                return [];
+            }
+        }
+
+        internal class StartNodeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        {
+            private readonly ILocalizedTextService _localizedTextService;
+            private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
+
+            public StartNodeValidator(
+                ILocalizedTextService localizedTextService,
+                IMediaNavigationQueryService mediaNavigationQueryService)
+            {
+                _localizedTextService = localizedTextService;
+                _mediaNavigationQueryService = mediaNavigationQueryService;
+            }
+
+            public IEnumerable<ValidationResult> Validate(
+                List<MediaWithCropsDto>? value,
+                MediaPicker3Configuration? configuration,
+                string? valueType,
+                PropertyValidationContext validationContext)
+            {
+                if (value is null || configuration?.StartNodeId is null)
+                {
+                    return [];
+                }
+
+
+                List<Guid> uniqueParentKeys = [];
+                foreach (Guid distinctMediaKey in value.DistinctBy(x => x.MediaKey).Select(x => x.MediaKey))
+                {
+                    if (_mediaNavigationQueryService.TryGetParentKey(distinctMediaKey, out Guid? parentKey) is false)
+                    {
+                        continue;
+                    }
+
+                    // If there is a start node, the media must have a parent.
+                    if (parentKey is null)
+                    {
+                        return
+                        [
+                            new ValidationResult(
+                                _localizedTextService.Localize("validation", "invalidStartNode"),
+                                ["value"])
+                        ];
+                    }
+
+                    uniqueParentKeys.Add(parentKey.Value);
+                }
+
+                IEnumerable<Guid> parentKeysNotInStartNode = uniqueParentKeys.Where(x => x != configuration.StartNodeId.Value);
+                foreach (Guid parentKey in parentKeysNotInStartNode)
+                {
+                    if (_mediaNavigationQueryService.TryGetAncestorsKeys(parentKey, out IEnumerable<Guid> foundAncestorKeys) is false)
+                    {
+                        // We couldn't find the parent node, so we fail.
+                        return
+                        [
+                            new ValidationResult(
+                                _localizedTextService.Localize("validation", "invalidStartNode"),
+                                ["value"])
+                        ];
+                    }
+
+                    Guid[] ancestorKeys = foundAncestorKeys.ToArray();
+                    if (ancestorKeys.Length == 0 || ancestorKeys.Contains(configuration.StartNodeId.Value) is false)
+                    {
+                        return
+                        [
+                            new ValidationResult(
+                                _localizedTextService.Localize("validation", "invalidStartNode"),
+                                ["value"])
+                        ];
+                    }
+                }
+
+                return [];
             }
         }
     }

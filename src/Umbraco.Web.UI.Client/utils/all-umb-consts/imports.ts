@@ -38,71 +38,72 @@ import * as import35 from '@umbraco-cms/backoffice/entity-action';
 import * as import36 from '@umbraco-cms/backoffice/entity-bulk-action';
 import * as import37 from '@umbraco-cms/backoffice/entity-create-option-action';
 import * as import38 from '@umbraco-cms/backoffice/entity';
-import * as import39 from '@umbraco-cms/backoffice/event';
-import * as import40 from '@umbraco-cms/backoffice/extension-registry';
-import * as import41 from '@umbraco-cms/backoffice/health-check';
-import * as import42 from '@umbraco-cms/backoffice/help';
-import * as import43 from '@umbraco-cms/backoffice/icon';
-import * as import44 from '@umbraco-cms/backoffice/id';
-import * as import45 from '@umbraco-cms/backoffice/imaging';
-import * as import46 from '@umbraco-cms/backoffice/language';
-import * as import47 from '@umbraco-cms/backoffice/lit-element';
-import * as import48 from '@umbraco-cms/backoffice/localization';
-import * as import49 from '@umbraco-cms/backoffice/log-viewer';
-import * as import50 from '@umbraco-cms/backoffice/media-type';
-import * as import51 from '@umbraco-cms/backoffice/media';
-import * as import52 from '@umbraco-cms/backoffice/member-group';
-import * as import53 from '@umbraco-cms/backoffice/member-type';
-import * as import54 from '@umbraco-cms/backoffice/member';
-import * as import55 from '@umbraco-cms/backoffice/menu';
-import * as import56 from '@umbraco-cms/backoffice/modal';
-import * as import57 from '@umbraco-cms/backoffice/multi-url-picker';
-import * as import58 from '@umbraco-cms/backoffice/notification';
-import * as import59 from '@umbraco-cms/backoffice/object-type';
-import * as import60 from '@umbraco-cms/backoffice/package';
-import * as import61 from '@umbraco-cms/backoffice/partial-view';
-import * as import62 from '@umbraco-cms/backoffice/picker-input';
-import * as import63 from '@umbraco-cms/backoffice/picker';
-import * as import64 from '@umbraco-cms/backoffice/property-action';
-import * as import65 from '@umbraco-cms/backoffice/property-editor';
-import * as import66 from '@umbraco-cms/backoffice/property-type';
-import * as import67 from '@umbraco-cms/backoffice/property';
-import * as import68 from '@umbraco-cms/backoffice/recycle-bin';
-import * as import69 from '@umbraco-cms/backoffice/relation-type';
-import * as import70 from '@umbraco-cms/backoffice/relations';
-import * as import71 from '@umbraco-cms/backoffice/repository';
-import * as import72 from '@umbraco-cms/backoffice/resources';
-import * as import73 from '@umbraco-cms/backoffice/router';
-import * as import74 from '@umbraco-cms/backoffice/rte';
-import * as import75 from '@umbraco-cms/backoffice/script';
-import * as import76 from '@umbraco-cms/backoffice/search';
-import * as import77 from '@umbraco-cms/backoffice/section';
-import * as import78 from '@umbraco-cms/backoffice/server-file-system';
-import * as import79 from '@umbraco-cms/backoffice/settings';
-import * as import80 from '@umbraco-cms/backoffice/sorter';
-import * as import81 from '@umbraco-cms/backoffice/static-file';
-import * as import82 from '@umbraco-cms/backoffice/store';
-import * as import83 from '@umbraco-cms/backoffice/style';
-import * as import84 from '@umbraco-cms/backoffice/stylesheet';
-import * as import85 from '@umbraco-cms/backoffice/sysinfo';
-import * as import86 from '@umbraco-cms/backoffice/tags';
-import * as import87 from '@umbraco-cms/backoffice/template';
-import * as import88 from '@umbraco-cms/backoffice/temporary-file';
-import * as import89 from '@umbraco-cms/backoffice/themes';
-import * as import90 from '@umbraco-cms/backoffice/tiny-mce';
-import * as import91 from '@umbraco-cms/backoffice/tiptap';
-import * as import92 from '@umbraco-cms/backoffice/translation';
-import * as import93 from '@umbraco-cms/backoffice/tree';
-import * as import94 from '@umbraco-cms/backoffice/ufm';
-import * as import95 from '@umbraco-cms/backoffice/user-change-password';
-import * as import96 from '@umbraco-cms/backoffice/user-group';
-import * as import97 from '@umbraco-cms/backoffice/user-permission';
-import * as import98 from '@umbraco-cms/backoffice/user';
-import * as import99 from '@umbraco-cms/backoffice/utils';
-import * as import100 from '@umbraco-cms/backoffice/validation';
-import * as import101 from '@umbraco-cms/backoffice/variant';
-import * as import102 from '@umbraco-cms/backoffice/webhook';
-import * as import103 from '@umbraco-cms/backoffice/workspace';
+import * as import39 from '@umbraco-cms/backoffice/entity-item';
+import * as import40 from '@umbraco-cms/backoffice/event';
+import * as import41 from '@umbraco-cms/backoffice/extension-registry';
+import * as import42 from '@umbraco-cms/backoffice/health-check';
+import * as import43 from '@umbraco-cms/backoffice/help';
+import * as import44 from '@umbraco-cms/backoffice/icon';
+import * as import45 from '@umbraco-cms/backoffice/id';
+import * as import46 from '@umbraco-cms/backoffice/imaging';
+import * as import47 from '@umbraco-cms/backoffice/language';
+import * as import48 from '@umbraco-cms/backoffice/lit-element';
+import * as import49 from '@umbraco-cms/backoffice/localization';
+import * as import50 from '@umbraco-cms/backoffice/log-viewer';
+import * as import51 from '@umbraco-cms/backoffice/media-type';
+import * as import52 from '@umbraco-cms/backoffice/media';
+import * as import53 from '@umbraco-cms/backoffice/member-group';
+import * as import54 from '@umbraco-cms/backoffice/member-type';
+import * as import55 from '@umbraco-cms/backoffice/member';
+import * as import56 from '@umbraco-cms/backoffice/menu';
+import * as import57 from '@umbraco-cms/backoffice/modal';
+import * as import58 from '@umbraco-cms/backoffice/multi-url-picker';
+import * as import59 from '@umbraco-cms/backoffice/notification';
+import * as import60 from '@umbraco-cms/backoffice/object-type';
+import * as import61 from '@umbraco-cms/backoffice/package';
+import * as import62 from '@umbraco-cms/backoffice/partial-view';
+import * as import63 from '@umbraco-cms/backoffice/picker-input';
+import * as import64 from '@umbraco-cms/backoffice/picker';
+import * as import65 from '@umbraco-cms/backoffice/property-action';
+import * as import66 from '@umbraco-cms/backoffice/property-editor';
+import * as import67 from '@umbraco-cms/backoffice/property-type';
+import * as import68 from '@umbraco-cms/backoffice/property';
+import * as import69 from '@umbraco-cms/backoffice/recycle-bin';
+import * as import70 from '@umbraco-cms/backoffice/relation-type';
+import * as import71 from '@umbraco-cms/backoffice/relations';
+import * as import72 from '@umbraco-cms/backoffice/repository';
+import * as import73 from '@umbraco-cms/backoffice/resources';
+import * as import74 from '@umbraco-cms/backoffice/router';
+import * as import75 from '@umbraco-cms/backoffice/rte';
+import * as import76 from '@umbraco-cms/backoffice/script';
+import * as import77 from '@umbraco-cms/backoffice/search';
+import * as import78 from '@umbraco-cms/backoffice/section';
+import * as import79 from '@umbraco-cms/backoffice/server-file-system';
+import * as import80 from '@umbraco-cms/backoffice/settings';
+import * as import81 from '@umbraco-cms/backoffice/sorter';
+import * as import82 from '@umbraco-cms/backoffice/static-file';
+import * as import83 from '@umbraco-cms/backoffice/store';
+import * as import84 from '@umbraco-cms/backoffice/style';
+import * as import85 from '@umbraco-cms/backoffice/stylesheet';
+import * as import86 from '@umbraco-cms/backoffice/sysinfo';
+import * as import87 from '@umbraco-cms/backoffice/tags';
+import * as import88 from '@umbraco-cms/backoffice/template';
+import * as import89 from '@umbraco-cms/backoffice/temporary-file';
+import * as import90 from '@umbraco-cms/backoffice/themes';
+import * as import91 from '@umbraco-cms/backoffice/tiny-mce';
+import * as import92 from '@umbraco-cms/backoffice/tiptap';
+import * as import93 from '@umbraco-cms/backoffice/translation';
+import * as import94 from '@umbraco-cms/backoffice/tree';
+import * as import95 from '@umbraco-cms/backoffice/ufm';
+import * as import96 from '@umbraco-cms/backoffice/user-change-password';
+import * as import97 from '@umbraco-cms/backoffice/user-group';
+import * as import98 from '@umbraco-cms/backoffice/user-permission';
+import * as import99 from '@umbraco-cms/backoffice/user';
+import * as import100 from '@umbraco-cms/backoffice/utils';
+import * as import101 from '@umbraco-cms/backoffice/validation';
+import * as import102 from '@umbraco-cms/backoffice/variant';
+import * as import103 from '@umbraco-cms/backoffice/webhook';
+import * as import104 from '@umbraco-cms/backoffice/workspace';
 
 		export const imports = [
 			{
@@ -262,264 +263,268 @@ import * as import103 from '@umbraco-cms/backoffice/workspace';
 			package: import38
 		},
 {
-			path: '@umbraco-cms/backoffice/event',
+			path: '@umbraco-cms/backoffice/entity-item',
 			package: import39
 		},
 {
-			path: '@umbraco-cms/backoffice/extension-registry',
+			path: '@umbraco-cms/backoffice/event',
 			package: import40
 		},
 {
-			path: '@umbraco-cms/backoffice/health-check',
+			path: '@umbraco-cms/backoffice/extension-registry',
 			package: import41
 		},
 {
-			path: '@umbraco-cms/backoffice/help',
+			path: '@umbraco-cms/backoffice/health-check',
 			package: import42
 		},
 {
-			path: '@umbraco-cms/backoffice/icon',
+			path: '@umbraco-cms/backoffice/help',
 			package: import43
 		},
 {
-			path: '@umbraco-cms/backoffice/id',
+			path: '@umbraco-cms/backoffice/icon',
 			package: import44
 		},
 {
-			path: '@umbraco-cms/backoffice/imaging',
+			path: '@umbraco-cms/backoffice/id',
 			package: import45
 		},
 {
-			path: '@umbraco-cms/backoffice/language',
+			path: '@umbraco-cms/backoffice/imaging',
 			package: import46
 		},
 {
-			path: '@umbraco-cms/backoffice/lit-element',
+			path: '@umbraco-cms/backoffice/language',
 			package: import47
 		},
 {
-			path: '@umbraco-cms/backoffice/localization',
+			path: '@umbraco-cms/backoffice/lit-element',
 			package: import48
 		},
 {
-			path: '@umbraco-cms/backoffice/log-viewer',
+			path: '@umbraco-cms/backoffice/localization',
 			package: import49
 		},
 {
-			path: '@umbraco-cms/backoffice/media-type',
+			path: '@umbraco-cms/backoffice/log-viewer',
 			package: import50
 		},
 {
-			path: '@umbraco-cms/backoffice/media',
+			path: '@umbraco-cms/backoffice/media-type',
 			package: import51
 		},
 {
-			path: '@umbraco-cms/backoffice/member-group',
+			path: '@umbraco-cms/backoffice/media',
 			package: import52
 		},
 {
-			path: '@umbraco-cms/backoffice/member-type',
+			path: '@umbraco-cms/backoffice/member-group',
 			package: import53
 		},
 {
-			path: '@umbraco-cms/backoffice/member',
+			path: '@umbraco-cms/backoffice/member-type',
 			package: import54
 		},
 {
-			path: '@umbraco-cms/backoffice/menu',
+			path: '@umbraco-cms/backoffice/member',
 			package: import55
 		},
 {
-			path: '@umbraco-cms/backoffice/modal',
+			path: '@umbraco-cms/backoffice/menu',
 			package: import56
 		},
 {
-			path: '@umbraco-cms/backoffice/multi-url-picker',
+			path: '@umbraco-cms/backoffice/modal',
 			package: import57
 		},
 {
-			path: '@umbraco-cms/backoffice/notification',
+			path: '@umbraco-cms/backoffice/multi-url-picker',
 			package: import58
 		},
 {
-			path: '@umbraco-cms/backoffice/object-type',
+			path: '@umbraco-cms/backoffice/notification',
 			package: import59
 		},
 {
-			path: '@umbraco-cms/backoffice/package',
+			path: '@umbraco-cms/backoffice/object-type',
 			package: import60
 		},
 {
-			path: '@umbraco-cms/backoffice/partial-view',
+			path: '@umbraco-cms/backoffice/package',
 			package: import61
 		},
 {
-			path: '@umbraco-cms/backoffice/picker-input',
+			path: '@umbraco-cms/backoffice/partial-view',
 			package: import62
 		},
 {
-			path: '@umbraco-cms/backoffice/picker',
+			path: '@umbraco-cms/backoffice/picker-input',
 			package: import63
 		},
 {
-			path: '@umbraco-cms/backoffice/property-action',
+			path: '@umbraco-cms/backoffice/picker',
 			package: import64
 		},
 {
-			path: '@umbraco-cms/backoffice/property-editor',
+			path: '@umbraco-cms/backoffice/property-action',
 			package: import65
 		},
 {
-			path: '@umbraco-cms/backoffice/property-type',
+			path: '@umbraco-cms/backoffice/property-editor',
 			package: import66
 		},
 {
-			path: '@umbraco-cms/backoffice/property',
+			path: '@umbraco-cms/backoffice/property-type',
 			package: import67
 		},
 {
-			path: '@umbraco-cms/backoffice/recycle-bin',
+			path: '@umbraco-cms/backoffice/property',
 			package: import68
 		},
 {
-			path: '@umbraco-cms/backoffice/relation-type',
+			path: '@umbraco-cms/backoffice/recycle-bin',
 			package: import69
 		},
 {
-			path: '@umbraco-cms/backoffice/relations',
+			path: '@umbraco-cms/backoffice/relation-type',
 			package: import70
 		},
 {
-			path: '@umbraco-cms/backoffice/repository',
+			path: '@umbraco-cms/backoffice/relations',
 			package: import71
 		},
 {
-			path: '@umbraco-cms/backoffice/resources',
+			path: '@umbraco-cms/backoffice/repository',
 			package: import72
 		},
 {
-			path: '@umbraco-cms/backoffice/router',
+			path: '@umbraco-cms/backoffice/resources',
 			package: import73
 		},
 {
-			path: '@umbraco-cms/backoffice/rte',
+			path: '@umbraco-cms/backoffice/router',
 			package: import74
 		},
 {
-			path: '@umbraco-cms/backoffice/script',
+			path: '@umbraco-cms/backoffice/rte',
 			package: import75
 		},
 {
-			path: '@umbraco-cms/backoffice/search',
+			path: '@umbraco-cms/backoffice/script',
 			package: import76
 		},
 {
-			path: '@umbraco-cms/backoffice/section',
+			path: '@umbraco-cms/backoffice/search',
 			package: import77
 		},
 {
-			path: '@umbraco-cms/backoffice/server-file-system',
+			path: '@umbraco-cms/backoffice/section',
 			package: import78
 		},
 {
-			path: '@umbraco-cms/backoffice/settings',
+			path: '@umbraco-cms/backoffice/server-file-system',
 			package: import79
 		},
 {
-			path: '@umbraco-cms/backoffice/sorter',
+			path: '@umbraco-cms/backoffice/settings',
 			package: import80
 		},
 {
-			path: '@umbraco-cms/backoffice/static-file',
+			path: '@umbraco-cms/backoffice/sorter',
 			package: import81
 		},
 {
-			path: '@umbraco-cms/backoffice/store',
+			path: '@umbraco-cms/backoffice/static-file',
 			package: import82
 		},
 {
-			path: '@umbraco-cms/backoffice/style',
+			path: '@umbraco-cms/backoffice/store',
 			package: import83
 		},
 {
-			path: '@umbraco-cms/backoffice/stylesheet',
+			path: '@umbraco-cms/backoffice/style',
 			package: import84
 		},
 {
-			path: '@umbraco-cms/backoffice/sysinfo',
+			path: '@umbraco-cms/backoffice/stylesheet',
 			package: import85
 		},
 {
-			path: '@umbraco-cms/backoffice/tags',
+			path: '@umbraco-cms/backoffice/sysinfo',
 			package: import86
 		},
 {
-			path: '@umbraco-cms/backoffice/template',
+			path: '@umbraco-cms/backoffice/tags',
 			package: import87
 		},
 {
-			path: '@umbraco-cms/backoffice/temporary-file',
+			path: '@umbraco-cms/backoffice/template',
 			package: import88
 		},
 {
-			path: '@umbraco-cms/backoffice/themes',
+			path: '@umbraco-cms/backoffice/temporary-file',
 			package: import89
 		},
 {
-			path: '@umbraco-cms/backoffice/tiny-mce',
+			path: '@umbraco-cms/backoffice/themes',
 			package: import90
 		},
 {
-			path: '@umbraco-cms/backoffice/tiptap',
+			path: '@umbraco-cms/backoffice/tiny-mce',
 			package: import91
 		},
 {
-			path: '@umbraco-cms/backoffice/translation',
+			path: '@umbraco-cms/backoffice/tiptap',
 			package: import92
 		},
 {
-			path: '@umbraco-cms/backoffice/tree',
+			path: '@umbraco-cms/backoffice/translation',
 			package: import93
 		},
 {
-			path: '@umbraco-cms/backoffice/ufm',
+			path: '@umbraco-cms/backoffice/tree',
 			package: import94
 		},
 {
-			path: '@umbraco-cms/backoffice/user-change-password',
+			path: '@umbraco-cms/backoffice/ufm',
 			package: import95
 		},
 {
-			path: '@umbraco-cms/backoffice/user-group',
+			path: '@umbraco-cms/backoffice/user-change-password',
 			package: import96
 		},
 {
-			path: '@umbraco-cms/backoffice/user-permission',
+			path: '@umbraco-cms/backoffice/user-group',
 			package: import97
 		},
 {
-			path: '@umbraco-cms/backoffice/user',
+			path: '@umbraco-cms/backoffice/user-permission',
 			package: import98
 		},
 {
-			path: '@umbraco-cms/backoffice/utils',
+			path: '@umbraco-cms/backoffice/user',
 			package: import99
 		},
 {
-			path: '@umbraco-cms/backoffice/validation',
+			path: '@umbraco-cms/backoffice/utils',
 			package: import100
 		},
 {
-			path: '@umbraco-cms/backoffice/variant',
+			path: '@umbraco-cms/backoffice/validation',
 			package: import101
 		},
 {
-			path: '@umbraco-cms/backoffice/webhook',
+			path: '@umbraco-cms/backoffice/variant',
 			package: import102
 		},
 {
-			path: '@umbraco-cms/backoffice/workspace',
+			path: '@umbraco-cms/backoffice/webhook',
 			package: import103
+		},
+{
+			path: '@umbraco-cms/backoffice/workspace',
+			package: import104
 		}
 		];
 	
