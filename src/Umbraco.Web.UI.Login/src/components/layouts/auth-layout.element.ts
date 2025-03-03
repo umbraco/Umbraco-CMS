@@ -102,7 +102,8 @@ export class UmbAuthLayoutElement extends UmbLitElement {
 			</div>
 			${when(
 				this.logoImageAlternative,
-				() => html`<img id="logo-on-background" src=${this.logoImageAlternative!} alt="logo" aria-hidden="true" />`
+				(logoImageAlternative) =>
+					html`<img id="logo-on-background" src=${logoImageAlternative} alt="logo" aria-hidden="true" />`
 			)}
 		`;
 	}
