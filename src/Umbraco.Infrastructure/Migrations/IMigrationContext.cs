@@ -38,13 +38,6 @@ public interface IMigrationContext
     /// </summary>
     bool BuildingExpression { get; set; }
 
-    /// <summary>
-    ///     Adds a post-migration.
-    /// </summary>
-    [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase")]
-    void AddPostMigration<TMigration>()
-        where TMigration : AsyncMigrationBase;
-
     bool IsCompleted { get; }
 
     void Complete();

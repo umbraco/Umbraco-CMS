@@ -118,8 +118,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
 
         ExecutedMigrationPlan result = await RunMigrationPlanAsync(plan, fromState).ConfigureAwait(false);
 
-        await HandlePostMigrationsAsync(result).ConfigureAwait(false);
-
         // If any completed migration requires us to rebuild cache we'll do that.
         if (_rebuildCache)
         {
@@ -134,33 +132,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         }
 
         return result;
-    }
-
-    [Obsolete]
-    private async Task HandlePostMigrationsAsync(ExecutedMigrationPlan result)
-    {
-        // prepare and de-duplicate post-migrations, only keeping the 1st occurence
-        var executedTypes = new HashSet<Type>();
-
-        foreach (IMigrationContext executedMigrationContext in result.ExecutedMigrationContexts)
-        {
-            if (executedMigrationContext is MigrationContext migrationContext)
-            {
-                foreach (Type migrationContextPostMigration in migrationContext.PostMigrations)
-                {
-                    if (executedTypes.Contains(migrationContextPostMigration))
-                    {
-                        continue;
-                    }
-
-                    _logger.LogInformation("PostMigration: {migrationContextFullName}.", migrationContextPostMigration.FullName);
-                    AsyncMigrationBase postMigration = _migrationBuilder.Build(migrationContextPostMigration, executedMigrationContext);
-                    await postMigration.RunAsync().ConfigureAwait(false);
-
-                    executedTypes.Add(migrationContextPostMigration);
-                }
-            }
-        }
     }
 
     private async Task<ExecutedMigrationPlan> RunMigrationPlanAsync(MigrationPlan plan, string fromState)
