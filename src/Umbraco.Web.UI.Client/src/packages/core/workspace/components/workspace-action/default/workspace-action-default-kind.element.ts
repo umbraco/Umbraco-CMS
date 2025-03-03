@@ -13,6 +13,7 @@ import {
 	type UmbExtensionElementAndApiInitializer,
 	UmbExtensionsElementAndApiInitializer,
 } from '@umbraco-cms/backoffice/extension-api';
+import { stringOrStringArrayIntersects } from '@umbraco-cms/backoffice/utils';
 
 import '../../workspace-action-menu/index.js';
 
@@ -148,11 +149,7 @@ export class UmbWorkspaceActionElement<
 			umbExtensionsRegistry,
 			'workspaceActionMenuItem',
 			ExtensionApiArgsMethod,
-			(action) => {
-				return Array.isArray(action.forWorkspaceActions)
-					? action.forWorkspaceActions.some((alias) => aliases.includes(alias))
-					: aliases.includes(action.forWorkspaceActions);
-			},
+			(action) => stringOrStringArrayIntersects(action.forWorkspaceActions, aliases),
 			(extensionControllers) => {
 				this._items = extensionControllers;
 			},
