@@ -1,14 +1,6 @@
+import { css, customElement, html, nothing, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	css,
-	CSSResultGroup,
-	html,
-	nothing,
-	PropertyValueMap,
-	customElement,
-	property,
-	when,
-} from '@umbraco-cms/backoffice/external/lit';
+import type { CSSResultGroup, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  * The auth layout component.

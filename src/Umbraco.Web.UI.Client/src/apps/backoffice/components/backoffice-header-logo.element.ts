@@ -1,6 +1,6 @@
 import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
-import { isCurrentUserAnAdmin } from '@umbraco-cms/backoffice/current-user';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { isCurrentUserAnAdmin } from '@umbraco-cms/backoffice/current-user';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
