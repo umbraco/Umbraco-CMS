@@ -50,6 +50,10 @@ public class PackageMigrationRunner
         _packageMigrationPlans = packageMigrationPlans.ToDictionary(x => x.Name);
     }
 
+    [Obsolete("Please use RunPackageMigrationsIfPendingAsync instead. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<ExecutedMigrationPlan> RunPackageMigrationsIfPending(string packageName)
+        => RunPackageMigrationsIfPendingAsync(packageName).GetAwaiter().GetResult();
+
     /// <summary>
     ///     Runs all migration plans for a package name if any are pending.
     /// </summary>
@@ -89,6 +93,10 @@ public class PackageMigrationRunner
 
         return Attempt.SucceedWithStatus(PackageMigrationOperationStatus.Success, true);
     }
+
+    [Obsolete("Please use RunPackageMigrationsIfPendingAsync instead. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<ExecutedMigrationPlan> RunPackagePlans(IEnumerable<string> plansToRun)
+        => RunPackagePlansAsync(plansToRun).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Runs the all specified package migration plans and publishes a <see cref="MigrationPlansExecutedNotification" />
