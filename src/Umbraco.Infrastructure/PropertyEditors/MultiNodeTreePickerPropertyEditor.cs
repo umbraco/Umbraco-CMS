@@ -19,6 +19,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+/// Represents a multi-node tree picker property editor.
+/// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.MultiNodeTreePicker,
     ValueType = ValueTypes.Text,
@@ -27,6 +30,9 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
 {
     private readonly IIOHelper _ioHelper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MultiNodeTreePickerPropertyEditor"/> class.
+    /// </summary>
     public MultiNodeTreePickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
@@ -34,22 +40,30 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
         SupportsReadOnly = true;
     }
 
+    /// <inheritdoc/>
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new MultiNodePickerConfigurationEditor(_ioHelper);
 
+    /// <inheritdoc/>
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<MultiNodeTreePickerPropertyValueEditor>(Attribute!);
 
+    /// <summary>
+    /// Defines the value editor for the media picker property editor.
+    /// </summary>
     /// <remarks>
-    /// At first glance, the fromEditor and toEditor methods might seem strange.
-    /// This is because we wanted to stop the leaking of UDI's to the frontend while not having to do database migrations
-    /// so we opted to, for now, translate the udi string in the database into a structured format unique to the client
+    /// At first glance, the FromEditor and ToEditor methods might seem strange.
+    /// This is because we wanted to stop the leaking of UDIs to the frontend while not having to do database migrations
+    /// so we opted to, for now, translate the UDI string in the database into a structured format unique to the client.
     /// This way, for now, no migration is needed and no changes outside of the editor logic needs to be touched to stop the leaking.
     /// </remarks>
     public class MultiNodeTreePickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IJsonSerializer _jsonSerializer;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MultiNodeTreePickerPropertyValueEditor"/> class.
+        /// </summary>
         public MultiNodeTreePickerPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
@@ -66,11 +80,15 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             _jsonSerializer = jsonSerializer;
             Validators.Add(new TypedJsonValidatorRunner<EditorEntityReference[], MultiNodePickerConfiguration>(
                 jsonSerializer,
-                new AmountValidator(localizedTextService),
+                new MinMaxValidator(localizedTextService),
                 new ObjectTypeValidator(localizedTextService, coreScopeProvider, entityService),
                 new ContentTypeValidator(localizedTextService, coreScopeProvider, contentService, mediaService, memberService)));
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MultiNodeTreePickerPropertyValueEditor"/> class.
+        /// </summary>
+        [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
         public MultiNodeTreePickerPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
@@ -90,6 +108,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
         {
         }
 
+        /// <inheritdoc/>
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {
             var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
@@ -104,12 +123,13 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             }
         }
 
-
+        /// <inheritdoc/>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             => editorValue.Value is JsonArray jsonArray
                 ? EntityReferencesToUdis(_jsonSerializer.Deserialize<IEnumerable<EditorEntityReference>>(jsonArray.ToJsonString()) ?? Enumerable.Empty<EditorEntityReference>())
                 : null;
 
+        /// <inheritdoc/>
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var value = property.GetValue(culture, segment);
@@ -118,7 +138,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             : null;
         }
 
-        private IEnumerable<EditorEntityReference> UdisToEntityReferences(IEnumerable<string> stringUdis)
+        private static IEnumerable<EditorEntityReference> UdisToEntityReferences(IEnumerable<string> stringUdis)
         {
             foreach (var stringUdi in stringUdis)
             {
@@ -131,29 +151,52 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             }
         }
 
-        private string EntityReferencesToUdis(IEnumerable<EditorEntityReference> nodeReferences)
+        private static string EntityReferencesToUdis(IEnumerable<EditorEntityReference> nodeReferences)
             => string.Join(",", nodeReferences.Select(entityReference => Udi.Create(entityReference.Type, entityReference.Unique).ToString()));
 
+        /// <summary>
+        /// Describes and editor entity reference.
+        /// </summary>
         public class EditorEntityReference
         {
+            /// <summary>
+            /// Gets or sets the entity object type.
+            /// </summary>
             public required string Type { get; set; }
 
+            /// <summary>
+            /// Gets or sets the entity unique identifier.
+            /// </summary>
             public required Guid Unique { get; set; }
         }
 
+        /// <summary>
+        /// Gets the name of the configured object type for documents.
+        /// </summary>
         internal const string DocumentObjectType = "content";
+
+        /// <summary>
+        /// Gets the name of the configured object type for media.
+        /// </summary>
         internal const string MediaObjectType = "media";
+
+        /// <summary>
+        /// Gets the name of the configured object type for members.
+        /// </summary>
         internal const string MemberObjectType = "member";
 
         /// <inheritdoc/>
-        internal class AmountValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
+        /// <summary>
+        /// Validates the min/max configuration for the multi-node tree picker property editor.
+        /// </summary>
+        internal class MinMaxValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
 
-            public AmountValidator(ILocalizedTextService localizedTextService)
-            {
-                _localizedTextService = localizedTextService;
-            }
+            /// <summary>
+            /// Initializes a new instance of the <see cref="MinMaxValidator"/> class.
+            /// </summary>
+            public MinMaxValidator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
 
             /// <inheritdoc/>
             public IEnumerable<ValidationResult> Validate(
@@ -196,12 +239,18 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
         }
 
         /// <inheritdoc/>
+        /// <summary>
+        /// Validates the selected object type for the multi-node tree picker property editor.
+        /// </summary>
         internal class ObjectTypeValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly ICoreScopeProvider _coreScopeProvider;
             private readonly IEntityService _entityService;
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ObjectTypeValidator"/> class.
+            /// </summary>
             public ObjectTypeValidator(
                 ILocalizedTextService localizedTextService,
                 ICoreScopeProvider coreScopeProvider,
@@ -267,7 +316,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
                 return validationResults;
             }
 
-            private Guid? GetObjectType(string objectType) =>
+            private static Guid? GetObjectType(string objectType) =>
                 objectType switch
                 {
                     DocumentObjectType => Constants.ObjectTypes.Document,
@@ -278,6 +327,9 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
         }
 
         /// <inheritdoc/>
+        /// <summary>
+        /// Validates the selected content type for the multi-node tree picker property editor.
+        /// </summary>
         internal class ContentTypeValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
@@ -286,6 +338,9 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             private readonly IMediaService _mediaService;
             private readonly IMemberService _memberService;
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ContentTypeValidator"/> class.
+            /// </summary>
             public ContentTypeValidator(
                 ILocalizedTextService localizedTextService,
                 ICoreScopeProvider coreScopeProvider,

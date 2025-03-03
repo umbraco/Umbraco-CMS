@@ -63,7 +63,7 @@ public class MultiNodeTreePickerValidationTests
         TestShouldSucceed(shouldSucceed, result);
     }
 
-    private Dictionary<Guid, Guid> EntityTypeMap = new()
+    private readonly Dictionary<Guid, Guid> _entityTypeMap = new()
     {
         { Constants.ObjectTypes.Document, Guid.Parse("08035A7E-AE9C-4D36-BA2E-63F639005758") },
         { Constants.ObjectTypes.Media, Guid.Parse("AAF97C7D-A586-45CC-AC7F-CE0A80BCFEE3") },
@@ -79,14 +79,16 @@ public class MultiNodeTreePickerValidationTests
             Value = value;
         }
 
-        public string ExpectedObjectType;
-        public bool ShouldSucceed;
-        public string Value;
+        public string ExpectedObjectType { get; }
+
+        public bool ShouldSucceed { get; }
+
+        public string Value { get; }
     }
 
     private void SetupEntityServiceForObjectTypeTest(Mock<IEntityService> entityServiceMock)
     {
-        foreach (var objectTypeEntity in EntityTypeMap)
+        foreach (var objectTypeEntity in _entityTypeMap)
         {
             var entity = new Mock<IEntitySlim>();
             entity.Setup(x => x.NodeObjectType).Returns(objectTypeEntity.Key);
@@ -97,16 +99,16 @@ public class MultiNodeTreePickerValidationTests
     private IEnumerable<ObjectTypeTestSetup> GetObjectTypeTestSetup() =>
     [
         new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.DocumentObjectType, true, "[]"),
-        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.DocumentObjectType, true, $"[{{\"type\":\"document\",\"unique\":\"{EntityTypeMap[Constants.ObjectTypes.Document]}\"}}]"),
-        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.DocumentObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{EntityTypeMap[Constants.ObjectTypes.Media]}\"}}]"),
-        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.DocumentObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{EntityTypeMap[Constants.ObjectTypes.Member]}\"}}]"),
-        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MediaObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{EntityTypeMap[Constants.ObjectTypes.Document]}\"}}]"),
-        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MemberObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{EntityTypeMap[Constants.ObjectTypes.Document]}\"}}]"),
-        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.DocumentObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{EntityTypeMap[Constants.ObjectTypes.Document]}\"}}, {{\"type\":\"document\",\"unique\":\"{EntityTypeMap[Constants.ObjectTypes.Media]}\"}}]"),
-        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MediaObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{EntityTypeMap[Constants.ObjectTypes.Document]}\"}}]"),
-        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MediaObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{EntityTypeMap[Constants.ObjectTypes.Member]}\"}}]"),
-        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MemberObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{EntityTypeMap[Constants.ObjectTypes.Document]}\"}}]"),
-        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MemberObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{EntityTypeMap[Constants.ObjectTypes.Media]}\"}}]"),
+        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.DocumentObjectType, true, $"[{{\"type\":\"document\",\"unique\":\"{_entityTypeMap[Constants.ObjectTypes.Document]}\"}}]"),
+        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.DocumentObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{_entityTypeMap[Constants.ObjectTypes.Media]}\"}}]"),
+        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.DocumentObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{_entityTypeMap[Constants.ObjectTypes.Member]}\"}}]"),
+        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MediaObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{_entityTypeMap[Constants.ObjectTypes.Document]}\"}}]"),
+        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MemberObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{_entityTypeMap[Constants.ObjectTypes.Document]}\"}}]"),
+        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.DocumentObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{_entityTypeMap[Constants.ObjectTypes.Document]}\"}}, {{\"type\":\"document\",\"unique\":\"{_entityTypeMap[Constants.ObjectTypes.Media]}\"}}]"),
+        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MediaObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{_entityTypeMap[Constants.ObjectTypes.Document]}\"}}]"),
+        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MediaObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{_entityTypeMap[Constants.ObjectTypes.Member]}\"}}]"),
+        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MemberObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{_entityTypeMap[Constants.ObjectTypes.Document]}\"}}]"),
+        new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MemberObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{_entityTypeMap[Constants.ObjectTypes.Media]}\"}}]"),
     ];
 
     [Test]
@@ -180,7 +182,7 @@ public class MultiNodeTreePickerValidationTests
         var mediaServiceMock = new Mock<IMediaService>();
         var memberServiceMock = new Mock<IMemberService>();
 
-        var mockScope = new Mock<IScope>();
+        var mockScope = new Mock<ICoreScope>();
         var mockScopeProvider = new Mock<ICoreScopeProvider>();
         mockScopeProvider
             .Setup(x => x.CreateCoreScope(
