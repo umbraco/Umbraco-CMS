@@ -39,7 +39,6 @@ export class UmbWorkspaceActionElement<
 			this._href = value?.meta.href;
 			this._additionalOptions = value?.meta.additionalOptions;
 			this.#createAliases();
-			this.requestUpdate('manifest', oldValue);
 		}
 	}
 	public get manifest() {
