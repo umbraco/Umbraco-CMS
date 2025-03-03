@@ -676,8 +676,6 @@ public static class FriendlyPublishedContentExtensions
         => content.Url(PublishedUrlProvider, culture, mode);
 
     /// <summary>
-
-
     ///     Gets the url for a media.
     /// </summary>
     /// <param name="content">The content item.</param>
