@@ -230,7 +230,7 @@ export class UmbDataTypeWorkspaceContext
 		// We are going to transfer the default data from the schema and the UI (the UI can override the schema data).
 		// Let us figure out which editors are alike from the inherited data, so we can keep that data around and only transfer the data that is not
 		// inherited from the previous data type.
-		const defaultData = [
+		this.#settingsDefaultData = [
 			...this.#propertyEditorSchemaSettingsDefaultData,
 			...this.#propertyEditorUISettingsDefaultData,
 		] satisfies Array<UmbDataTypePropertyValueModel>;
@@ -248,9 +248,9 @@ export class UmbDataTypeWorkspaceContext
 			}
 
 			// If the data is not in the existing data, then we want to add the default data if it exists.
-			const existingDefaultData = defaultData.find((x) => x.alias === defaultDataItem.alias);
+			const existingDefaultData = this.getPropertyDefaultValue(defaultDataItem.alias);
 			if (existingDefaultData) {
-				values.push(existingDefaultData);
+				values.push(existingDefaultData as UmbDataTypePropertyValueModel);
 			}
 		}
 
