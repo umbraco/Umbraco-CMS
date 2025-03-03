@@ -21,6 +21,13 @@ export interface UmbEntityReferenceRepository extends UmbApi {
 		skip?: number,
 		take?: number,
 	): Promise<UmbRepositoryResponse<UmbPagedModel<UmbReferenceItemModel>>>;
+
+	requestAreReferenced(
+		uniques: Array<string>,
+		skip?: number,
+		take?: number,
+	): Promise<UmbRepositoryResponse<UmbPagedModel<UmbEntityModel>>>;
+
 	requestDescendantsWithReferences?(
 		unique: string,
 		skip?: number,
@@ -34,6 +41,13 @@ export interface UmbEntityReferenceDataSource {
 		skip?: number,
 		take?: number,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>>;
+
+	getAreReferenced(
+		uniques: Array<string>,
+		skip?: number,
+		take?: number,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>>;
+
 	getReferencedDescendants?(
 		unique: string,
 		skip?: number,

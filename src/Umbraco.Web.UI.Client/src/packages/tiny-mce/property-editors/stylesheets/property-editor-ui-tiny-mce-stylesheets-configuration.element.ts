@@ -1,4 +1,5 @@
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
@@ -36,6 +37,16 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
 		const target = event.target as UmbStylesheetInputElement;
 		this.#value = target.selection ?? [];
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	}
+
+	constructor() {
+		super();
+		new UmbDeprecation({
+			deprecated: 'umb-property-editor-ui-tiny-mce-stylesheets-configuration',
+			removeInVersion: '16.0.0',
+			solution:
+				"Use `<umb-property-editor-ui-stylesheet-picker>` instead, or the 'Umb.PropertyEditorUi.StylesheetPicker' manifest.",
+		}).warn();
 	}
 
 	override render() {

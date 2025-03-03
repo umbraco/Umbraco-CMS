@@ -33,7 +33,9 @@ interface UmbMarkdownEditorAction extends monaco.editor.IActionDescriptor {
  * @fires change - when the value of the input changes
  */
 @customElement('umb-input-markdown')
-export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, '') {
+export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
+	UmbLitElement,
+) {
 	protected override getFormElement() {
 		return this._codeEditor;
 	}

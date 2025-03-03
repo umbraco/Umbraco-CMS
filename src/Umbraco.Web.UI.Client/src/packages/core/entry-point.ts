@@ -9,6 +9,7 @@ import { UmbExtensionsApiInitializer, type UmbEntryPointOnInit } from '@umbraco-
 import './property-action/components/index.js';
 import './menu/components/index.js';
 import './extension-registry/components/index.js';
+import './entity-item/global-components.js';
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'globalContext', [host]);
