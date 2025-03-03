@@ -58,6 +58,6 @@ public class ByIdsContentApiController : ContentApiItemControllerBase
             .WhereNotNull()
             .ToArray();
 
-        return await Task.FromResult(Ok(apiContentItems));
+        return Ok(apiContentItems);
     }
 }

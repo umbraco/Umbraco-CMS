@@ -22,6 +22,7 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
     public BackOfficeAreaRoutes(IRuntimeState runtimeState)
         => _runtimeState = runtimeState;
 
+
     /// <inheritdoc />
     public void CreateRoutes(IEndpointRouteBuilder endpoints)
     {

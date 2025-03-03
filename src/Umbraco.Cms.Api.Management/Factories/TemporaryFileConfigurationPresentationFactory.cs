@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.TemporaryFile;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Media;
@@ -22,8 +22,8 @@ public class TemporaryFileConfigurationPresentationFactory : ITemporaryFileConfi
         new()
         {
             ImageFileTypes = _imageUrlGenerator.SupportedImageFileTypes.ToArray(),
-            DisallowedUploadedFilesExtensions = _contentSettings.DisallowedUploadedFileExtensions,
-            AllowedUploadedFileExtensions = _contentSettings.AllowedUploadedFileExtensions,
+            DisallowedUploadedFilesExtensions = _contentSettings.DisallowedUploadedFileExtensions.ToArray(),
+            AllowedUploadedFileExtensions = _contentSettings.AllowedUploadedFileExtensions.ToArray(),
             MaxFileSize = _runtimeSettings.MaxRequestLength,
         };
 }

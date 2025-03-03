@@ -65,6 +65,7 @@ public class WebhookFiring : IRecurringBackgroundJob
             scope.Complete();
         }
 
+        // Send webhook requests in parallel on a suppressed ExecutionContext to avoid deadlocks (each task will create its own root IScope)
         await Task.WhenAll(requests.Select(request =>
         {
             using (ExecutionContext.SuppressFlow())

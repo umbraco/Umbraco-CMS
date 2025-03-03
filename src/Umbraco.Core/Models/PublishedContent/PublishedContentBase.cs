@@ -90,23 +90,23 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         private IEnumerable<IPublishedContent> GetChildren()
         {
             INavigationQueryService? navigationQueryService;
-            IPublishedCache? publishedCache;
+            IPublishedStatusFilteringService? publishedStatusFilteringService;
 
             switch (ContentType.ItemType)
             {
                 case PublishedItemType.Content:
-                    publishedCache = StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>();
                     navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+                    publishedStatusFilteringService = StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>();
                     break;
                 case PublishedItemType.Media:
-                    publishedCache = StaticServiceProvider.Instance.GetRequiredService<IPublishedMediaCache>();
                     navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
+                    publishedStatusFilteringService = StaticServiceProvider.Instance.GetRequiredService<IPublishedMediaStatusFilteringService>();
                     break;
                 default:
                     throw new NotImplementedException("Level is not implemented for " + ContentType.ItemType);
             }
 
-            return this.Children(_variationContextAccessor, publishedCache, navigationQueryService);
+            return this.Children(navigationQueryService, publishedStatusFilteringService);
         }
     }
 }

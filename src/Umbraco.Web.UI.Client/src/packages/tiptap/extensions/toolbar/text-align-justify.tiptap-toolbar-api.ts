@@ -7,6 +7,10 @@ export default class UmbTiptapToolbarTextAlignJustifyExtensionApi extends UmbTip
 	}
 
 	override execute(editor?: Editor) {
-		editor?.chain().focus().setTextAlign('justify').run();
+		if (!this.isActive(editor)) {
+			editor?.chain().focus().setTextAlign('justify').run();
+		} else {
+			editor?.chain().focus().unsetTextAlign().run();
+		}
 	}
 }

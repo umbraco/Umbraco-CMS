@@ -10,9 +10,9 @@ export default class UmbTiptapTableExtensionApi extends UmbTiptapExtensionApiBas
 			margin: 1.5rem 0;
 
 			table {
-				border-collapse: collapse;
-				border-radius: 0.25rem;
 				border-color: rgba(0, 0, 0, 0.1);
+				border-radius: 0.25rem;
+				border-spacing: 0;
 				box-sizing: border-box;
 				width: 100%;
 				max-width: 100%;
@@ -68,7 +68,8 @@ export default class UmbTiptapTableExtensionApi extends UmbTiptapExtensionApiBas
 				}
 
 				.selectedCell {
-					background-color: var(--uui-color-current);
+					background-color: var(--uui-color-surface-emphasis);
+					border-color: var(--uui-color-selected);
 				}
 
 				.grip-column,

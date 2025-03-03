@@ -40,6 +40,7 @@ interface UmbBlockGridAreaTypeInvalidRuleType {
 	minRequirement: number;
 	maxRequirement: number;
 }
+
 export class UmbBlockGridEntriesContext
 	extends UmbBlockEntriesContext<
 		typeof UMB_BLOCK_GRID_MANAGER_CONTEXT,
@@ -409,6 +410,12 @@ export class UmbBlockGridEntriesContext
 		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard', index: index });
 	}
 
+	isBlockTypeAllowed(contentTypeKey: string) {
+		return this.#allowedBlockTypes.asObservablePart((types) =>
+			types.some((x) => x.contentElementTypeKey === contentTypeKey),
+		);
+	}
+
 	/*
 	async setLayouts(layouts: Array<UmbBlockGridLayoutModel>) {
 		await this._retrieveManager;
@@ -429,7 +436,7 @@ export class UmbBlockGridEntriesContext
 		originData?: UmbBlockGridWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
-		return this._manager?.create(contentElementTypeKey, partialLayoutEntry, originData);
+		return await this._manager?.createWithPresets(contentElementTypeKey, partialLayoutEntry, originData);
 	}
 
 	// insert Block?
@@ -559,6 +566,7 @@ export class UmbBlockGridEntriesContext
 		}
 	}
 
+	// Property to hold the result of the check, used to make a meaningful Validation Message
 	#invalidBlockTypeLimits?: Array<UmbBlockGridAreaTypeInvalidRuleType>;
 
 	getInvalidBlockTypeLimits() {
@@ -625,8 +633,48 @@ export class UmbBlockGridEntriesContext
 				return undefined;
 			})
 			.filter((x) => x !== undefined) as Array<UmbBlockGridAreaTypeInvalidRuleType>;
-		const hasInvalidRules = this.#invalidBlockTypeLimits.length > 0;
-		return hasInvalidRules === false;
+		return this.#invalidBlockTypeLimits.length === 0;
+	}
+
+	#invalidBlockTypeConfigurations?: Array<string>;
+
+	getInvalidBlockTypeConfigurations() {
+		return this.#invalidBlockTypeConfigurations ?? [];
+	}
+	/**
+	 * @internal
+	 * @returns {boolean} - True if the block type limits are valid, otherwise false.
+	 */
+	checkBlockTypeConfigurationValidity(): boolean {
+		this.#invalidBlockTypeConfigurations = [];
+
+		const layoutEntries = this._layoutEntries.getValue();
+		if (layoutEntries.length === 0) return true;
+
+		// Check all layout entries if they are allowed.
+		const allowedBlocks = this.#allowedBlockTypes.getValue();
+		if (allowedBlocks.length === 0) return false;
+
+		const allowedKeys = allowedBlocks.map((x) => x.contentElementTypeKey);
+		// get content for each layout entry:
+		const invalidEntries = layoutEntries.filter((entry) => {
+			const contentTypeKey = this._manager!.getContentTypeKeyOfContentKey(entry.contentKey);
+			if (!contentTypeKey) {
+				// We could not find the content type key, so we cant determin if this is valid or not when the content is missing.
+				// This should be captured elsewhere as the Block then becomes invalid. So the unsupported Block should capture this.
+				return false;
+			}
+			const isBad = allowedKeys.indexOf(contentTypeKey) === -1;
+			if (contentTypeKey && isBad) {
+				// if bad, then add the ContentTypeName to the list of invalids (if we could not find the name add the key)
+				this.#invalidBlockTypeConfigurations?.push(
+					this._manager?.getContentTypeNameOf(contentTypeKey) ?? contentTypeKey,
+				);
+			}
+			return isBad;
+		});
+
+		return invalidEntries.length === 0;
 	}
 
 	/**

@@ -23,7 +23,6 @@ public class ContentSettings
     internal const string StaticLoginLogoImage = "assets/logo_light.svg";
     internal const string StaticLoginLogoImageAlternative = "assets/logo_dark.svg";
     internal const string StaticBackOfficeLogo = "assets/logo.svg";
-    internal const bool StaticHideBackOfficeLogo = false;
     internal const bool StaticDisableDeleteWhenReferenced = false;
     internal const bool StaticDisableUnpublishWhenReferenced = false;
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
@@ -49,7 +48,7 @@ public class ContentSettings
     /// <summary>
     ///     Gets or sets a value for the collection of error pages.
     /// </summary>
-    public ContentErrorPage[] Error404Collection { get; set; } = Array.Empty<ContentErrorPage>();
+    public ISet<ContentErrorPage> Error404Collection { get; set; } = new HashSet<ContentErrorPage>();
 
     /// <summary>
     ///     Gets or sets a value for the preview badge mark-up.
@@ -92,13 +91,6 @@ public class ContentSettings
     public string BackOfficeLogo { get; set; } = StaticBackOfficeLogo;
 
     /// <summary>
-    ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.
-    /// </summary>
-    [DefaultValue(StaticHideBackOfficeLogo)]
-    [Obsolete("This setting is no longer used and will be removed in future versions. An alternative BackOffice logo can be set using the BackOfficeLogo setting.")]
-    public bool HideBackOfficeLogo { get; set; } = StaticHideBackOfficeLogo;
-
-    /// <summary>
     ///     Gets or sets a value indicating whether to disable the deletion of items referenced by other items.
     /// </summary>
     [DefaultValue(StaticDisableDeleteWhenReferenced)]
@@ -124,18 +116,18 @@ public class ContentSettings
     /// <summary>
     ///     Gets or sets a value for the collection of file extensions that are allowed for upload.
     /// </summary>
-    public string[] AllowedUploadedFileExtensions { get; set; } = Array.Empty<string>();
+    public ISet<string> AllowedUploadedFileExtensions { get; set; } = new HashSet<string>();
 
     /// <summary>
     ///     Gets or sets a value for the collection of file extensions that are disallowed for upload.
     /// </summary>
     [DefaultValue(StaticDisallowedUploadFiles)]
-    public string[] DisallowedUploadedFileExtensions { get; set; } = StaticDisallowedUploadFiles.Split(',');
+    public ISet<string> DisallowedUploadedFileExtensions { get; set; } = new HashSet<string>(StaticDisallowedUploadFiles.Split(Constants.CharArrays.Comma));
 
     /// <summary>
     /// Gets or sets the allowed external host for media. If empty only relative paths are allowed.
     /// </summary>
-    public string[] AllowedMediaHosts { get; set; } = Array.Empty<string>();
+    public ISet<string> AllowedMediaHosts { get; set; } = new HashSet<string>();
 
     /// <summary>
     /// Gets or sets a value indicating whether to show domain warnings.

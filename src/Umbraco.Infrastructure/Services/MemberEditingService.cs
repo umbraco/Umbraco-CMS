@@ -70,8 +70,8 @@ internal sealed class MemberEditingService : IMemberEditingService
         _securitySettings = securitySettings.Value;
     }
 
-    public async Task<IMember?> GetAsync(Guid key)
-        => await Task.FromResult(_memberService.GetByKey(key));
+    public Task<IMember?> GetAsync(Guid key)
+        => Task.FromResult(_memberService.GetByKey(key));
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MemberCreateModel createModel)
         => await _memberContentEditingService.ValidateAsync(createModel, createModel.ContentTypeKey);

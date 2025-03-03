@@ -9,6 +9,7 @@
  * Language Culture: en-GB
  */
 import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localization-api';
+
 export default {
 	actions: {
 		assigndomain: 'Culture and Hostnames',
@@ -234,7 +235,7 @@ export default {
 		createDateDesc: 'Date/time this document was created',
 		documentType: 'Document Type',
 		editing: 'Editing',
-		expireDate: 'Remove At',
+		expireDate: 'Remove at',
 		itemChanged: 'This item has been changed after publication',
 		itemNotPublished: 'This item is not published',
 		lastPublished: 'Last published',
@@ -269,11 +270,11 @@ export default {
 		publishDescendantsWithVariantsHelp:
 			'Publish variants and variants of same type underneath and thereby making their content publicly available.',
 		noVariantsToProcess: 'There are no available variants',
-		releaseDate: 'Publish At',
-		unpublishDate: 'Unpublish At',
-		removeDate: 'Clear Date',
+		releaseDate: 'Publish at',
+		unpublishDate: 'Unpublish at',
+		removeDate: 'Clear date',
 		setDate: 'Set date',
-		sortDone: 'Sortorder is updated',
+		sortDone: 'Sort order is updated',
 		sortHelp:
 			'To sort the nodes, simply drag the nodes or click one of the column headers. You can select\n      multiple nodes by holding the "shift" or "control" key while selecting\n    ',
 		statistics: 'Statistics',
@@ -317,6 +318,8 @@ export default {
 		contentRoot: 'Content root',
 		includeUnpublished: 'Include unpublished content items.',
 		forceRepublish: 'Publish unchanged items.',
+		forceRepublishWarning: 'WARNING: Publishing all pages below this one in the content tree, whether or not they have changed, can be an expensive and long-running operation.',
+		forceRepublishAdvisory: 'This should not be necessary in normal circumstances so please only proceed with this option selected if you are certain it is required.',
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your\n      website administrator.\n    ',
 		isSensitiveValue_short: 'This value is hidden.',
@@ -510,6 +513,11 @@ export default {
 		confirmremoveusageof: 'Are you sure you want to remove the usage of <strong>%0%</strong>',
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
+		confirmTrash: (name: string) => `Are you sure you want to move <strong>${name}</strong> to the Recycle Bin?`,
+		confirmBulkTrash: (total: number) =>
+			`Are you sure you want to move <strong>${total} ${total === 1 ? 'item' : 'items'}</strong> to the Recycle Bin?`,
+		confirmBulkDelete: (total: number) =>
+			`Are you sure you want to delete <strong>${total} ${total === 1 ? 'item' : 'items'}</strong>?`,
 		cut: 'Cut',
 		editDictionary: 'Edit dictionary item',
 		editLanguage: 'Edit language',
@@ -525,7 +533,7 @@ export default {
 		languagedeletewarning: 'This will delete the language and all content related to the language',
 		languageChangeWarning:
 			'Changing the culture for a language may be an expensive operation and will result\n      in the content cache and indexes being rebuilt\n    ',
-		lastEdited: 'Last Edited',
+		lastEdited: 'Last edited',
 		link: 'Link',
 		linkinternal: 'Internal link',
 		linklocaltip: 'When using local links, insert "#" in front of link',
@@ -952,7 +960,7 @@ export default {
 		avatar: 'Avatar for',
 		header: 'Header',
 		systemField: 'system field',
-		lastUpdated: 'Last Updated',
+		lastUpdated: 'Last updated',
 		selectAll: 'Select all',
 		skipToMenu: 'Skip to menu',
 		skipToContent: 'Skip to content',
@@ -1255,6 +1263,13 @@ export default {
 	},
 	colorpicker: {
 		noColors: 'You have not configured any approved colours',
+	},
+	colorPickerConfigurations: {
+		colorsTitle: 'Colours',
+		colorsDescription: 'Add, remove or sort colours',
+		showLabelTitle: 'Include labels?',
+		showLabelDescription:
+			'Stores colours as a JSON object containing both the colour hex string and label, rather than just the hex string.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
@@ -2145,6 +2160,7 @@ export default {
 		invalidEmail: 'Invalid email',
 		invalidNull: 'Value cannot be null',
 		invalidEmpty: 'Value cannot be empty',
+		invalidFalse: 'This field must be turned on',
 		invalidPattern: 'Value is invalid, it does not match the correct pattern',
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
@@ -2633,6 +2649,8 @@ export default {
 		labelInlineMode: 'Display inline with text',
 		notExposedLabel: 'Draft',
 		notExposedDescription: 'This Block is not yet created for this variant',
+		areaValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in this area.',
+		rootValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in the root of this property.',
 		unsupportedBlockName: 'Unsupported',
 		unsupportedBlockDescription:
 			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',
@@ -2705,7 +2723,21 @@ export default {
 		wordWrapConfigLabel: 'Word wrap',
 		wordWrapConfigDescription: 'Enable word wrapping in the code editor.',
 	},
+	rte: {
+		config_blocks: 'Available Blocks',
+		config_blocks_description: 'Define the available blocks.',
+		config_ignoreUserStartNodes: 'Ignore User Start Nodes',
+		config_maxImageSize: 'Maximum size for inserted images',
+		config_maxImageSize_description: 'Maximum width or height - enter 0 to disable resizing.',
+		config_mediaParentId: 'Image Upload Folder',
+		config_mediaParentId_description: 'Choose the upload location of pasted images.',
+		config_overlaySize: 'Overlay size',
+		config_overlaySize_description: 'Select the width of the overlay (link picker).',
+	},
 	tiptap: {
+		config_dimensions_description: 'Set the maximum width and height of the editor. This excludes the toolbar height.',
+		config_extensions: 'Capabilities',
+		config_toolbar: 'Toolbar',
 		extGroup_formatting: 'Text formatting',
 		extGroup_interactive: 'Interactive elements',
 		extGroup_media: 'Embeds and media',
@@ -2721,6 +2753,7 @@ export default {
 		toolbar_removeGroup: 'Remove group',
 		toolbar_removeItem: 'Remove action',
 		toolbar_emptyGroup: 'Empty',
+		sourceCodeEdit: 'Edit source code',
 	},
 	linkPicker: {
 		modalSource: 'Source',
@@ -2730,5 +2763,9 @@ export default {
 		resetUrlHeadline: 'Reset URL?',
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',
+	},
+	collection: {
+		noItemsTitle: 'No items',
+		addCollectionConfiguration: 'Add collection',
 	},
 } as UmbLocalizationDictionary;

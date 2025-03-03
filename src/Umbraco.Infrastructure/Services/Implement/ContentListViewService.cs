@@ -49,7 +49,7 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
         return await GetListViewResultAsync(user, content, dataTypeKey, orderBy, orderCulture, orderDirection, filter, skip, take);
     }
 
-    protected override async Task<PagedModel<IContent>> GetPagedChildrenAsync(
+    protected override Task<PagedModel<IContent>> GetPagedChildrenAsync(
         int id,
         IQuery<IContent>? filter,
         Ordering? ordering,
@@ -58,13 +58,13 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
     {
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
-        IEnumerable<IContent> items = await Task.FromResult(_contentService.GetPagedChildren(
+        IEnumerable<IContent> items = _contentService.GetPagedChildren(
             id,
             pageNumber,
             pageSize,
             out var total,
             filter,
-            ordering));
+            ordering);
 
         var pagedResult = new PagedModel<IContent>
         {
@@ -72,7 +72,7 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
             Total = total,
         };
 
-        return pagedResult;
+        return Task.FromResult(pagedResult);
     }
 
     // We can use an authorizer here, as it already handles all the necessary checks for this filtering.

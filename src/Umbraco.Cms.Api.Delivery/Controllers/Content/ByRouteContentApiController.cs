@@ -117,7 +117,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
                 return deniedAccessResult;
             }
 
-            return await Task.FromResult(Ok(ApiContentResponseBuilder.Build(contentItem)));
+            return Ok(ApiContentResponseBuilder.Build(contentItem));
         }
 
         IApiContentRoute? redirectRoute = _requestRedirectService.GetRedirectRoute(path);

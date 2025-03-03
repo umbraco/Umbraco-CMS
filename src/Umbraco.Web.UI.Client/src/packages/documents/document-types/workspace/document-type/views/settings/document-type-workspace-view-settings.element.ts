@@ -100,7 +100,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setVariesByCulture((e.target as UUIToggleElement).checked);
 							}}
-							label="Vary by culture"></uui-toggle>
+							label=${this.localize.term('contentTypeEditor_cultureVariantLabel')}></uui-toggle>
 					</div>
 				</umb-property-layout>
 				<umb-property-layout
@@ -117,7 +117,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setVariesBySegment((e.target as UUIToggleElement).checked);
 							}}
-							label="Vary by segments"></uui-toggle>
+							label=${this.localize.term('contentTypeEditor_segmentVariantLabel')}></uui-toggle>
 					</div>
 				</umb-property-layout>
 				<umb-property-layout alias="ElementType" label=${this.localize.term('contentTypeEditor_elementHeading')}>
