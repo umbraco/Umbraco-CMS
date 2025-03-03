@@ -31,7 +31,7 @@ public static class ValidationHelper
     /// <param name="startNode">The configured start node.</param>
     /// <param name="navigationQueryService">The navigation query service to use for the checks.</param>
     /// <returns>True if the startnode key is in the ancestry tree.</returns>
-    public static bool HasValidStartNode(IEnumerable<Guid> entityKeys, Guid startNode,  INavigationQueryService navigationQueryService)
+    public static bool HasValidStartNode(IEnumerable<Guid> entityKeys, Guid startNode, INavigationQueryService navigationQueryService)
     {
         List<Guid> uniqueParentKeys = [];
         foreach (Guid distinctMediaKey in entityKeys.Distinct())

@@ -20,13 +20,22 @@ public class TypedJsonValidatorRunner<TValue, TConfiguration> : IValueValidator
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ITypedJsonValidator<TValue, TConfiguration>[] _validators;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TypedJsonValidatorRunner{TValue, TConfiguration}"/> class.
+    /// </summary>
+    /// <param name="jsonSerializer">The JSON serializer.</param>
+    /// <param name="validators">The collection of validators to run.</param>
     public TypedJsonValidatorRunner(IJsonSerializer jsonSerializer, params ITypedJsonValidator<TValue, TConfiguration>[] validators)
     {
         _jsonSerializer = jsonSerializer;
         _validators = validators;
     }
 
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration,
+    /// <inheritdoc/>
+    public IEnumerable<ValidationResult> Validate(
+        object? value,
+        string? valueType,
+        object? dataTypeConfiguration,
         PropertyValidationContext validationContext)
     {
         var validationResults = new List<ValidationResult>();
