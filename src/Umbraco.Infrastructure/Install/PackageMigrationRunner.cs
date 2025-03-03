@@ -75,12 +75,12 @@ public class PackageMigrationRunner
     /// <summary>
     ///     Checks if all executed package migrations succeeded for a package.
     /// </summary>
-    public async Task<Attempt<bool, PackageMigrationOperationStatus>> RunPendingPackageMigrations(string packageName)
+    public Task<Attempt<bool, PackageMigrationOperationStatus>> RunPendingPackageMigrations(string packageName)
     {
         // Check if there are any migrations
         if (_packageMigrationPlans.ContainsKey(packageName) == false)
         {
-            return Attempt.FailWithStatus(PackageMigrationOperationStatus.NotFound, false);
+            return Task.FromResult(Attempt.FailWithStatus(PackageMigrationOperationStatus.NotFound, false));
         }
 
         // Run the migrations
@@ -88,10 +88,10 @@ public class PackageMigrationRunner
 
         if (executedMigrationPlans.Any(plan => plan.Successful == false))
         {
-            return Attempt.FailWithStatus(PackageMigrationOperationStatus.CancelledByFailedMigration, false);
+            return Task.FromResult(Attempt.FailWithStatus(PackageMigrationOperationStatus.CancelledByFailedMigration, false));
         }
 
-        return Attempt.SucceedWithStatus(PackageMigrationOperationStatus.Success, true);
+        return Task.FromResult(Attempt.SucceedWithStatus(PackageMigrationOperationStatus.Success, true));
     }
 
     [Obsolete("Please use RunPackageMigrationsIfPendingAsync instead. Scheduled for removal in Umbraco 18.")]

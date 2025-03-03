@@ -56,7 +56,7 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> BuildModels(CancellationToken cancellationToken)
+    public Task<IActionResult> BuildModels(CancellationToken cancellationToken)
     {
         try
         {
@@ -70,7 +70,7 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
                     Type = "Error",
                 };
 
-                return new ObjectResult(problemDetailsModel) { StatusCode = StatusCodes.Status428PreconditionRequired };
+                return Task.FromResult<IActionResult>(new ObjectResult(problemDetailsModel) { StatusCode = StatusCodes.Status428PreconditionRequired });
             }
 
             _modelGenerator.GenerateModels();
@@ -81,6 +81,6 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
             _mbErrors.Report("Failed to build models.", e);
         }
 
-        return Ok();
+        return Task.FromResult<IActionResult>(Ok());
     }
 }

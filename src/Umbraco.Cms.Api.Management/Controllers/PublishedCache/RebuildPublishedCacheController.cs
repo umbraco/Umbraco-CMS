@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.PublishedCache;
@@ -15,9 +15,9 @@ public class RebuildPublishedCacheController : PublishedCacheControllerBase
     [HttpPost("rebuild")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Rebuild(CancellationToken cancellationToken)
+    public Task<IActionResult> Rebuild(CancellationToken cancellationToken)
     {
         _databaseCacheRebuilder.Rebuild();
-        return await Task.FromResult(Ok());
+        return Task.FromResult<IActionResult>(Ok());
     }
 }

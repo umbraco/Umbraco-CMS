@@ -33,14 +33,14 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
         _umbracoPathSegment = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
     }
 
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
+    [Obsolete("Use non-obsolete constructor. Scheduled for removal in Umbraco 16.")]
     public BackOfficeAreaRoutes(
         IOptions<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment,
         IRuntimeState runtimeState,
-        UmbracoApiControllerTypeCollection apiControllers) : this(globalSettings, hostingEnvironment, runtimeState)
+        UmbracoApiControllerTypeCollection apiControllers)
+        : this(globalSettings, hostingEnvironment, runtimeState)
     {
-
     }
 
     /// <inheritdoc />
