@@ -394,6 +394,8 @@
     <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
     <key alias="entriesAreasMismatch">The content amount requirements are not met for one or more areas.</key>
     <key alias="invalidMediaType">The chosen media type is invalid.</key>
+    <key alias="invalidContentType">The chosen content is of invalid type.</key>
+    <key alias="missingContent">The chosen content does not exist.</key>
     <key alias="multipleMediaNotAllowed">Multiple selected media is not allowed.</key>
     <key alias="invalidStartNode">The selected item is from the wrong folder.</key>
     <key alias="invalidObjectType">The selected item is of the wrong type.</key>

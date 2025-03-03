@@ -57,14 +57,18 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             DataEditorAttribute attribute,
             ILocalizedTextService localizedTextService,
             IEntityService entityService,
-            ICoreScopeProvider coreScopeProvider)
+            ICoreScopeProvider coreScopeProvider,
+            IContentService contentService,
+            IMediaService mediaService,
+            IMemberService memberService)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
             Validators.Add(new TypedJsonValidatorRunner<EditorEntityReference[], MultiNodePickerConfiguration>(
                 jsonSerializer,
                 new AmountValidator(localizedTextService),
-                new ObjectTypeValidator(localizedTextService, coreScopeProvider, entityService)));
+                new ObjectTypeValidator(localizedTextService, coreScopeProvider, entityService),
+                new ContentTypeValidator(localizedTextService, coreScopeProvider, contentService, mediaService, memberService)));
         }
 
         public MultiNodeTreePickerPropertyValueEditor(
@@ -79,7 +83,10 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
                 attribute,
                 StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>(),
                 StaticServiceProvider.Instance.GetRequiredService<IEntityService>(),
-                StaticServiceProvider.Instance.GetRequiredService<ICoreScopeProvider>())
+                StaticServiceProvider.Instance.GetRequiredService<ICoreScopeProvider>(),
+                StaticServiceProvider.Instance.GetRequiredService<IContentService>(),
+                StaticServiceProvider.Instance.GetRequiredService<IMediaService>(),
+                StaticServiceProvider.Instance.GetRequiredService<IMemberService>())
         {
         }
 
@@ -134,6 +141,11 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             public required Guid Unique { get; set; }
         }
 
+        internal const string DocumentObjectType = "content";
+        internal const string MediaObjectType = "media";
+        internal const string MemberObjectType = "member";
+
+        /// <inheritdoc/>
         internal class AmountValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
@@ -143,6 +155,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
                 _localizedTextService = localizedTextService;
             }
 
+            /// <inheritdoc/>
             public IEnumerable<ValidationResult> Validate(
                 EditorEntityReference[]? entityReferences,
                 MultiNodePickerConfiguration? configuration,
@@ -182,6 +195,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             }
         }
 
+        /// <inheritdoc/>
         internal class ObjectTypeValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
@@ -198,6 +212,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
                 _entityService = entityService;
             }
 
+            /// <inheritdoc/>
             public IEnumerable<ValidationResult> Validate(
                 EditorEntityReference[]? entityReferences,
                 MultiNodePickerConfiguration? configuration,
@@ -223,6 +238,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
                 {
                     return
                     [
+
                         // Some invalid object type was sent.
                         new ValidationResult(
                             _localizedTextService.Localize(
@@ -254,9 +270,96 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             private Guid? GetObjectType(string objectType) =>
                 objectType switch
                 {
-                    "content" => Constants.ObjectTypes.Document,
-                    "media" => Constants.ObjectTypes.Media,
-                    "member" => Constants.ObjectTypes.Member,
+                    DocumentObjectType => Constants.ObjectTypes.Document,
+                    MediaObjectType => Constants.ObjectTypes.Media,
+                    MemberObjectType => Constants.ObjectTypes.Member,
+                    _ => null,
+                };
+        }
+
+        /// <inheritdoc/>
+        internal class ContentTypeValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
+        {
+            private readonly ILocalizedTextService _localizedTextService;
+            private readonly ICoreScopeProvider _coreScopeProvider;
+            private readonly IContentService _contentService;
+            private readonly IMediaService _mediaService;
+            private readonly IMemberService _memberService;
+
+            public ContentTypeValidator(
+                ILocalizedTextService localizedTextService,
+                ICoreScopeProvider coreScopeProvider,
+                IContentService contentService,
+                IMediaService mediaService,
+                IMemberService memberService)
+            {
+                _localizedTextService = localizedTextService;
+                _coreScopeProvider = coreScopeProvider;
+                _contentService = contentService;
+                _mediaService = mediaService;
+                _memberService = memberService;
+            }
+
+            /// <inheritdoc/>
+            public IEnumerable<ValidationResult> Validate(
+                EditorEntityReference[]? entityReferences,
+                MultiNodePickerConfiguration? configuration,
+                string? valueType,
+                PropertyValidationContext validationContext)
+            {
+                var validationResults = new List<ValidationResult>();
+
+                Guid[] allowedTypes = configuration?.Filter?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(Guid.Parse).ToArray() ?? [];
+
+                // We can't validate if there is no object type, and we don't need to if there's no filter.
+                if (entityReferences is null || allowedTypes.Length == 0 || configuration?.TreeSource?.ObjectType is null)
+                {
+                    return validationResults;
+                }
+
+                using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
+                Guid?[] uniqueContentTypeKeys = entityReferences
+                    .Select(x => x.Unique)
+                    .Distinct()
+                    .Select(x => GetContent(configuration.TreeSource.ObjectType, x))
+                    .Select(x => x?.ContentType.Key)
+                    .Distinct()
+                    .ToArray();
+
+                scope.Complete();
+
+                foreach (Guid? key in uniqueContentTypeKeys)
+                {
+                    if (key is null)
+                    {
+                        validationResults.Add(new ValidationResult(
+                            _localizedTextService.Localize(
+                                "validation",
+                                "missingContent"),
+                            ["value"]));
+                        continue;
+                    }
+
+                    if (allowedTypes.Contains(key.Value) is false)
+                    {
+                        validationResults.Add(new ValidationResult(
+                            _localizedTextService.Localize(
+                                "validation",
+                                "invalidObjectType"),
+                            ["value"]));
+                    }
+                }
+
+                return validationResults;
+            }
+
+            private IContentBase? GetContent(string objectType, Guid key) =>
+                objectType switch
+                {
+                    DocumentObjectType => _contentService.GetById(key),
+                    MediaObjectType => _mediaService.GetById(key),
+                    MemberObjectType => _memberService.GetById(key),
                     _ => null,
                 };
         }
