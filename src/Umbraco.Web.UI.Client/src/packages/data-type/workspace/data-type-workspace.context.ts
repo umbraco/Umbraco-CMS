@@ -248,9 +248,9 @@ export class UmbDataTypeWorkspaceContext
 			}
 
 			// If the data is not in the existing data, then we want to add the default data if it exists.
-			const existingDefaultData = this.getPropertyDefaultValue(defaultDataItem.alias);
+			const existingDefaultData = this.#settingsDefaultData.find((x) => x.alias === defaultDataItem.alias);
 			if (existingDefaultData) {
-				values.push(existingDefaultData as UmbDataTypePropertyValueModel);
+				values.push(existingDefaultData);
 			}
 		}
 
