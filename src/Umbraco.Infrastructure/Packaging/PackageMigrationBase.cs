@@ -9,7 +9,7 @@ using Umbraco.Cms.Infrastructure.Migrations;
 namespace Umbraco.Cms.Infrastructure.Packaging;
 
 /// <inheritdoc />
-[Obsolete("Use AsyncPackageMigrationBase instead. This class will be removed in a future version.")]
+[Obsolete("Use AsyncPackageMigrationBase instead. Scheduled for removal in Umbraco 18.")]
 public abstract class PackageMigrationBase : AsyncPackageMigrationBase
 {
     protected PackageMigrationBase(
