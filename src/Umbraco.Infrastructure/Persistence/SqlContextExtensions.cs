@@ -62,6 +62,26 @@ public static class SqlContextExtensions
     /// </summary>
     /// <typeparam name="TDto1">The type of the first DTO.</typeparam>
     /// <typeparam name="TDto2">The type of the second DTO.</typeparam>
+    /// <typeparam name="TDto3">The type of the third DTO.</typeparam>
+    /// <typeparam name="TOut">The type returned by the expression.</typeparam>
+    /// <param name="sqlContext">An <see cref="ISqlContext" />.</param>
+    /// <param name="expression">An expression to visit.</param>
+    /// <param name="alias1">An optional table alias for the first DTO.</param>
+    /// <param name="alias2">An optional table alias for the second DTO.</param>
+    /// <param name="alias3">An optional table alias for the third DTO.</param>
+    /// <returns>A SQL statement, and arguments, corresponding to the expression.</returns>
+    public static (string Sql, object[] Args) VisitDto<TDto1, TDto2, TDto3, TOut>(this ISqlContext sqlContext, Expression<Func<TDto1, TDto2, TDto3, TOut>> expression, string? alias1 = null, string? alias2 = null, string? alias3 = null)
+    {
+        var visitor = new PocoToSqlExpressionVisitor<TDto1, TDto2, TDto3>(sqlContext, alias1, alias2, alias3);
+        var visited = visitor.Visit(expression);
+        return (visited, visitor.GetSqlParameters());
+    }
+
+    /// <summary>
+    ///     Visit an expression.
+    /// </summary>
+    /// <typeparam name="TDto1">The type of the first DTO.</typeparam>
+    /// <typeparam name="TDto2">The type of the second DTO.</typeparam>
     /// <typeparam name="TOut">The type returned by the expression.</typeparam>
     /// <param name="sqlContext">An <see cref="ISqlContext" />.</param>
     /// <param name="expression">An expression to visit.</param>

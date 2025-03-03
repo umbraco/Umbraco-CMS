@@ -28,7 +28,7 @@ public class GlobalSettingsTests
     {
         hostingSettings.CurrentValue.ApplicationVirtualPath = rootPath;
 
-        var globalSettings = new GlobalSettings { UmbracoPath = path };
+        var globalSettings = new GlobalSettings();
 
         Assert.AreEqual(outcome, globalSettings.GetUmbracoMvcAreaNoCache(hostingEnvironment));
     }

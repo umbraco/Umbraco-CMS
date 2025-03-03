@@ -1,5 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.MediaType;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;

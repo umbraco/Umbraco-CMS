@@ -4,11 +4,15 @@ using System.Text;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Query;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.TemplateQuery;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Query;
@@ -17,22 +21,60 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template.Query;
 public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 {
     private readonly IPublishedContentQuery _publishedContentQuery;
-    private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly IContentTypeService _contentTypeService;
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
+    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
 
     private static readonly string _indent = $"{Environment.NewLine}    ";
 
     public ExecuteTemplateQueryController(
         IPublishedContentQuery publishedContentQuery,
-        IVariationContextAccessor variationContextAccessor,
         IPublishedValueFallback publishedValueFallback,
-        IContentTypeService contentTypeService)
+        IContentTypeService contentTypeService,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
     {
         _publishedContentQuery = publishedContentQuery;
-        _variationContextAccessor = variationContextAccessor;
         _publishedValueFallback = publishedValueFallback;
         _contentTypeService = contentTypeService;
+        _documentNavigationQueryService = documentNavigationQueryService;
+        _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
+    public ExecuteTemplateQueryController(
+        IPublishedContentQuery publishedContentQuery,
+        IVariationContextAccessor variationContextAccessor,
+        IPublishedValueFallback publishedValueFallback,
+        IContentTypeService contentTypeService,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
+        : this(
+            publishedContentQuery,
+            publishedValueFallback,
+            contentTypeService,
+            documentNavigationQueryService,
+            publishedContentStatusFilteringService)
+    {
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
+    public ExecuteTemplateQueryController(
+        IPublishedContentQuery publishedContentQuery,
+        IVariationContextAccessor variationContextAccessor,
+        IPublishedValueFallback publishedValueFallback,
+        IContentTypeService contentTypeService,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService documentNavigationQueryService)
+        : this(
+            publishedContentQuery,
+            publishedValueFallback,
+            contentTypeService,
+            documentNavigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
+    {
     }
 
     [HttpPost("execute")]
@@ -51,7 +93,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
         timer.Stop();
 
         var contentTypeIconsByKey = _contentTypeService
-            .GetAll(results.Select(content => content.ContentType.Key).Distinct())
+            .GetMany(results.Select(content => content.ContentType.Key).Distinct())
             .ToDictionary(contentType => contentType.Key, contentType => contentType.Icon);
 
         return await Task.FromResult(Ok(new TemplateQueryResultResponseModel
@@ -89,7 +131,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
         if (model.RootDocument?.Id is not null)
         {
             rootContent = _publishedContentQuery.Content(model.RootDocument.Id);
-            queryExpression.Append($"Umbraco.Content(Guid.Parse(\"{model.RootDocument.Id}\"))");
+            queryExpression.Append("Umbraco.Content(Guid.Parse(\"").Append(model.RootDocument.Id).Append("\"))");
         }
         else
         {
@@ -106,16 +148,16 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 
         if (model.DocumentTypeAlias.IsNullOrWhiteSpace() == false)
         {
-            queryExpression.Append($".ChildrenOfType(\"{model.DocumentTypeAlias}\")");
+            queryExpression.Append(".ChildrenOfType(\"").Append(model.DocumentTypeAlias).Append("\")");
             return rootContent == null
                 ? Enumerable.Empty<IPublishedContent>()
-                : rootContent.ChildrenOfType(_variationContextAccessor, model.DocumentTypeAlias);
+                : rootContent.ChildrenOfType(_documentNavigationQueryService, _publishedContentStatusFilteringService, model.DocumentTypeAlias);
         }
 
         queryExpression.Append(".Children()");
         return rootContent == null
             ? Enumerable.Empty<IPublishedContent>()
-            : rootContent.Children(_variationContextAccessor);
+            : rootContent.Children(_documentNavigationQueryService, _publishedContentStatusFilteringService);
     }
 
     private IEnumerable<IPublishedContent> ApplyFiltering(IEnumerable<TemplateQueryExecuteFilterPresentationModel>? filters, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
@@ -167,7 +209,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
             //for review - this uses a tonized query rather then the normal linq query.
             contentQuery = contentQuery.Where(operation.Compile());
             queryExpression.Append(_indent);
-            queryExpression.Append($".Where({operation})");
+            queryExpression.Append(".Where(").Append(operation).Append(')');
         }
 
         return contentQuery;
@@ -211,7 +253,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
         return contentQuery;
     }
 
-    private IEnumerable<IPublishedContent> ApplyPaging(int take, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
+    private static IEnumerable<IPublishedContent> ApplyPaging(int take, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
     {
         if (take <= 0)
         {
@@ -220,7 +262,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 
         contentQuery = contentQuery.Take(take);
         queryExpression.Append(_indent);
-        queryExpression.Append($".Take({take})");
+        queryExpression.Append(".Take(").Append(take).Append(')');
 
         return contentQuery;
     }

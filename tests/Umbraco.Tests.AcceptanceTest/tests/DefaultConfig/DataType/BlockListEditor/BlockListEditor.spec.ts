@@ -24,8 +24,8 @@ test('can create a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbr
 
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
-  await umbracoUi.dataType.clickCreateButton();
-  await umbracoUi.dataType.clickNewDataTypeThreeDotsButton();
+  await umbracoUi.dataType.clickActionsMenuCreateButton();
+  await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(blockListEditorName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor(blockListLocatorName);
@@ -62,7 +62,7 @@ test('can delete a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbr
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(blockListEditorName);
-  await umbracoUi.dataType.clickDeleteExactButton();
+  await umbracoUi.dataType.clickDeleteButton();
   await umbracoUi.dataType.clickConfirmToDeleteButton();
 
   // Assert

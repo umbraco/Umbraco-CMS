@@ -6,19 +6,30 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// <summary>
 ///     Used for deserializing the block list layout
 /// </summary>
-public class BlockListLayoutItem : IBlockLayoutItem
+public class BlockListLayoutItem : BlockLayoutItemBase
 {
-    public Udi? ContentUdi { get; set; }
-
-    public Udi? SettingsUdi { get; set; }
-
     public BlockListLayoutItem()
     { }
 
+    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
     public BlockListLayoutItem(Udi contentUdi)
-        => ContentUdi = contentUdi;
+        : base(contentUdi)
+    {
+    }
 
+    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
     public BlockListLayoutItem(Udi contentUdi, Udi settingsUdi)
-        : this(contentUdi)
-        => SettingsUdi = settingsUdi;
+        : base(contentUdi, settingsUdi)
+    {
+    }
+
+    public BlockListLayoutItem(Guid contentKey)
+        : base(contentKey)
+    {
+    }
+
+    public BlockListLayoutItem(Guid contentKey, Guid settingsKey)
+        : base(contentKey, settingsKey)
+    {
+    }
 }

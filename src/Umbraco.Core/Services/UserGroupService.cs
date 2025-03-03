@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -307,8 +307,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         }
 
         Guid[] checkedGroupMembersKeys =
-            EnsureNonAdminUserIsInSavedUserGroup(performingUser, groupMembersKeys ?? Enumerable.Empty<Guid>())
-                .ToArray();
+            EnsureNonAdminUserIsInSavedUserGroup(performingUser, groupMembersKeys ?? []);
         IUser[] usersToAdd = (await _userService.GetAsync(checkedGroupMembersKeys)).ToArray();
 
         // Since this is a brand new creation we don't have to be worried about what users were added and removed
@@ -422,13 +421,10 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.Fail(resolveAttempt.Status);
         }
 
-        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result;
+        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result ??
 
-        // This should never happen, but we need to check it to avoid null reference exceptions
-        if (resolvedModel is null)
-        {
+            // This should never happen, but we need to check it to avoid null reference exceptions
             throw new InvalidOperationException("The resolved model should not be null.");
-        }
 
         IReadOnlyUserGroup readOnlyGroup = resolvedModel.UserGroup.ToReadOnlyGroup();
 
@@ -455,13 +451,10 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.Fail(resolveAttempt.Status);
         }
 
-        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result;
+        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result
 
         // This should never happen, but we need to check it to avoid null reference exceptions
-        if (resolvedModel is null)
-        {
-            throw new InvalidOperationException("The resolved model should not be null.");
-        }
+            ?? throw new InvalidOperationException("The resolved model should not be null.");
 
         foreach (IUser user in resolvedModel.Users)
         {
@@ -642,17 +635,16 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     /// <remarks>
     /// This is to ensure that the user can access the group they themselves created at a later point and modify it.
     /// </remarks>
-    private IEnumerable<Guid> EnsureNonAdminUserIsInSavedUserGroup(IUser performingUser,
-        IEnumerable<Guid> groupMembersUserKeys)
+    private static Guid[] EnsureNonAdminUserIsInSavedUserGroup(
+        IUser performingUser,
+        Guid[] groupMembersUserKeys)
     {
-        var userKeys = groupMembersUserKeys.ToList();
-
         // If the performing user is an admin we don't care, they can access the group later regardless
-        if (performingUser.IsAdmin() is false && userKeys.Contains(performingUser.Key) is false)
+        if (performingUser.IsAdmin() is false && groupMembersUserKeys.Contains(performingUser.Key) is false)
         {
-            userKeys.Add(performingUser.Key);
+            return [..groupMembersUserKeys, performingUser.Key];
         }
 
-        return userKeys;
+        return groupMembersUserKeys;
     }
 }

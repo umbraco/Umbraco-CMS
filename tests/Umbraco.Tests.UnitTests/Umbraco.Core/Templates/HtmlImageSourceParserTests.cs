@@ -10,7 +10,9 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
@@ -95,7 +97,10 @@ public class HtmlImageSourceParserTests
             Options.Create(webRoutingSettings),
             new UrlProviderCollection(() => Enumerable.Empty<IUrlProvider>()),
             new MediaUrlProviderCollection(() => new[] { mediaUrlProvider.Object }),
-            Mock.Of<IVariationContextAccessor>());
+            Mock.Of<IVariationContextAccessor>(),
+            Mock.Of<IDocumentNavigationQueryService>(),
+            Mock.Of<IPublishedContentStatusFilteringService>());
+
         using (var reference = umbracoContextFactory.EnsureUmbracoContext())
         {
             var mediaCache = Mock.Get(reference.UmbracoContext.Media);

@@ -11,8 +11,6 @@
   <Stylesheets />
   <Scripts />
   <PartialViews />
-  <Macros />
-  <MacroPartialViews />
   <DictionaryItems />
   <Languages />
   <DataTypes />

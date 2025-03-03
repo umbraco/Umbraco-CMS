@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
@@ -17,8 +17,8 @@ public class ContentBuilderTests : DeliveryApiTests
     {
         var content = new Mock<IPublishedContent>();
 
-        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None);
-        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None);
+        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None, new VariationContext(), Mock.Of<ICacheManager>());
+        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None, new VariationContext(), Mock.Of<ICacheManager>());
 
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Alias).Returns("thePageType");
@@ -36,7 +36,11 @@ public class ContentBuilderTests : DeliveryApiTests
             .Setup(p => p.GetContentPath(It.IsAny<IPublishedContent>(), It.IsAny<string?>()))
             .Returns((IPublishedContent c, string? culture) => $"url:{c.UrlSegment}");
 
-        var routeBuilder = CreateContentRouteBuilder(apiContentRouteProvider.Object, CreateGlobalSettings());
+        var navigationQueryServiceMock = new Mock<IDocumentNavigationQueryService>();
+        IEnumerable<Guid> ancestorsKeys = [];
+        navigationQueryServiceMock.Setup(x => x.TryGetAncestorsKeys(key, out ancestorsKeys)).Returns(true);
+
+        var routeBuilder = CreateContentRouteBuilder(apiContentRouteProvider.Object, CreateGlobalSettings(), navigationQueryService: navigationQueryServiceMock.Object);
 
         var builder = new ApiContentBuilder(new ApiContentNameProvider(), routeBuilder, CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(content.Object);

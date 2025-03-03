@@ -7,16 +7,19 @@ namespace Umbraco.Tests.Benchmarks;
 [QuickRunWithMemoryDiagnoserConfig]
 public class LoggerAllocationBenchmark
 {
-    private readonly string rawQuery = "";
-    private readonly int totalItemCount;
+    private readonly string _rawQuery = string.Empty;
+    private readonly int _totalItemCount;
 
     [Benchmark(Baseline = true)]
     public void Baseline()
     {
         for (var i = 0; i < 1000; i++)
         {
-            OriginalDebugSignature(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)",
-                rawQuery, totalItemCount);
+            OriginalDebugSignature(
+                GetType(),
+                "DeleteFromIndex with query: {Query} (found {TotalItems} results)",
+                _rawQuery,
+                _totalItemCount);
         }
     }
 
@@ -25,8 +28,11 @@ public class LoggerAllocationBenchmark
     {
         for (var i = 0; i < 1000; i++)
         {
-            NewDebugSignature(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery,
-                totalItemCount);
+            NewDebugSignature(
+                GetType(),
+                "DeleteFromIndex with query: {Query} (found {TotalItems} results)",
+                _rawQuery,
+                _totalItemCount);
         }
     }
 

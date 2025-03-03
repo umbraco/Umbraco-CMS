@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Security.Cryptography;
@@ -56,16 +57,17 @@ public static class StringExtensions
     /// <returns></returns>
     public static int[] GetIdsFromPathReversed(this string path)
     {
-        var nodeIds = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
-            .Select(x =>
-                int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var output)
-                    ? Attempt<int>.Succeed(output)
-                    : Attempt<int>.Fail())
-            .Where(x => x.Success)
-            .Select(x => x.Result)
-            .Reverse()
-            .ToArray();
-        return nodeIds;
+        string[] pathSegments = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
+        List<int> nodeIds = new(pathSegments.Length);
+        for (int i = pathSegments.Length - 1; i >= 0; i--)
+        {
+            if (int.TryParse(pathSegments[i], NumberStyles.Integer, CultureInfo.InvariantCulture, out int pathSegment))
+            {
+                nodeIds.Add(pathSegment);
+            }
+        }
+
+        return nodeIds.ToArray();
     }
 
     /// <summary>
@@ -78,16 +80,16 @@ public static class StringExtensions
     public static string StripFileExtension(this string fileName)
     {
         // filenames cannot contain line breaks
-        if (fileName.Contains(Environment.NewLine) || fileName.Contains("\r") || fileName.Contains("\n"))
+        if (fileName.Contains('\n') || fileName.Contains('\r'))
         {
             return fileName;
         }
 
-        var spanFileName = fileName.AsSpan();
+        ReadOnlySpan<char> spanFileName = fileName.AsSpan();
         var lastIndex = spanFileName.LastIndexOf('.');
         if (lastIndex > 0)
         {
-            var ext = spanFileName[lastIndex..];
+            ReadOnlySpan<char> ext = spanFileName[lastIndex..];
 
             // file extensions cannot contain whitespace
             if (ext.Contains(' '))
@@ -287,14 +289,14 @@ public static class StringExtensions
     /// <param name="value">The value.</param>
     /// <param name="forRemoving">For removing.</param>
     /// <returns></returns>
-    public static string TrimExact(this string value, string forRemoving)
+    public static string Trim(this string value, string forRemoving)
     {
         if (string.IsNullOrEmpty(value))
         {
             return value;
         }
 
-        return value.TrimEndExact(forRemoving).TrimStartExact(forRemoving);
+        return value.TrimEnd(forRemoving).TrimStart(forRemoving);
     }
 
     public static string EncodeJsString(this string s)
@@ -343,7 +345,7 @@ public static class StringExtensions
         return sb.ToString();
     }
 
-    public static string TrimEndExact(this string value, string forRemoving)
+    public static string TrimEnd(this string value, string forRemoving)
     {
         if (string.IsNullOrEmpty(value))
         {
@@ -363,7 +365,7 @@ public static class StringExtensions
         return value;
     }
 
-    public static string TrimStartExact(this string value, string forRemoving)
+    public static string TrimStart(this string value, string forRemoving)
     {
         if (string.IsNullOrEmpty(value))
         {
@@ -377,7 +379,7 @@ public static class StringExtensions
 
         while (value.StartsWith(forRemoving, StringComparison.InvariantCultureIgnoreCase))
         {
-            value = value.Substring(forRemoving.Length);
+            value = value[forRemoving.Length..];
         }
 
         return value;
@@ -390,7 +392,7 @@ public static class StringExtensions
             return input;
         }
 
-        return toStartWith + input.TrimStartExact(toStartWith);
+        return toStartWith + input.TrimStart(toStartWith);
     }
 
     public static string EnsureStartsWith(this string input, char value) =>
@@ -433,8 +435,7 @@ public static class StringExtensions
     {
         var delimiters = new[] { delimiter };
         return !list.IsNullOrWhiteSpace()
-            ? list.Split(delimiters, StringSplitOptions.RemoveEmptyEntries)
-                .Select(i => i.Trim())
+            ? list.Split(delimiters, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .ToList()
             : new List<string>();
     }
@@ -497,7 +498,7 @@ public static class StringExtensions
 
         var convertToHex = input.ConvertToHex();
         var hexLength = convertToHex.Length < 32 ? convertToHex.Length : 32;
-        var hex = convertToHex.Substring(0, hexLength).PadLeft(32, '0');
+        var hex = convertToHex[..hexLength].PadLeft(32, '0');
         Guid output = Guid.Empty;
         return Guid.TryParse(hex, out output) ? output : Guid.Empty;
     }
@@ -528,8 +529,8 @@ public static class StringExtensions
         var strValue = string.Empty;
         while (hexValue.Length > 0)
         {
-            strValue += Convert.ToChar(Convert.ToUInt32(hexValue.Substring(0, 2), 16)).ToString();
-            hexValue = hexValue.Substring(2, hexValue.Length - 2);
+            strValue += Convert.ToChar(Convert.ToUInt32(hexValue[..2], 16)).ToString();
+            hexValue = hexValue[2..];
         }
 
         return strValue;
@@ -616,7 +617,7 @@ public static class StringExtensions
         compare.EndsWith(compareTo, StringComparison.InvariantCultureIgnoreCase);
 
     public static bool InvariantContains(this string compare, string compareTo) =>
-        compare.IndexOf(compareTo, StringComparison.OrdinalIgnoreCase) >= 0;
+        compare.Contains(compareTo, StringComparison.OrdinalIgnoreCase);
 
     public static bool InvariantContains(this IEnumerable<string> compare, string compareTo) =>
         compare.Contains(compareTo, StringComparer.InvariantCultureIgnoreCase);
@@ -871,7 +872,7 @@ public static class StringExtensions
             return truncatedString;
         }
 
-        truncatedString = text.Substring(0, strLength);
+        truncatedString = text[..strLength];
         truncatedString = truncatedString.TrimEnd();
         truncatedString += suffix;
 
@@ -914,7 +915,7 @@ public static class StringExtensions
     public static string ToFirstUpper(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToUpper() + input.Substring(1);
+            : input[..1].ToUpper() + input[1..];
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to lowercase.
@@ -924,7 +925,7 @@ public static class StringExtensions
     public static string ToFirstLower(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToLower() + input.Substring(1);
+            : input[..1].ToLower() + input[1..];
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to uppercase using the casing rules of the
@@ -936,7 +937,7 @@ public static class StringExtensions
     public static string ToFirstUpper(this string input, CultureInfo culture) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToUpper(culture) + input.Substring(1);
+            : input[..1].ToUpper(culture) + input[1..];
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to lowercase using the casing rules of the
@@ -948,7 +949,7 @@ public static class StringExtensions
     public static string ToFirstLower(this string input, CultureInfo culture) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToLower(culture) + input.Substring(1);
+            : input[..1].ToLower(culture) + input[1..];
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to uppercase using the casing rules of the
@@ -959,7 +960,7 @@ public static class StringExtensions
     public static string ToFirstUpperInvariant(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToUpperInvariant() + input.Substring(1);
+            : input[..1].ToUpperInvariant() + input[1..];
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to lowercase using the casing rules of the
@@ -970,7 +971,7 @@ public static class StringExtensions
     public static string ToFirstLowerInvariant(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToLowerInvariant() + input.Substring(1);
+            : input[..1].ToLowerInvariant() + input[1..];
 
     /// <summary>
     ///     Returns a new string in which all occurrences of specified strings are replaced by other specified strings.
@@ -1355,7 +1356,7 @@ public static class StringExtensions
             return a;
         }
 
-        return char.ToLowerInvariant(a[0]) + a.Substring(1);
+        return char.ToLowerInvariant(a[0]) + a[1..];
     }
 
     /// <summary>
@@ -1557,6 +1558,14 @@ public static class StringExtensions
 
         yield return sb.ToString();
     }
+
+    /// <summary>
+    ///     Checks whether a string is a valid email address.
+    /// </summary>
+    /// <param name="email">The string check</param>
+    /// <returns>Returns a bool indicating whether the string is an email address.</returns>
+    public static bool IsEmail(this string? email) =>
+        string.IsNullOrWhiteSpace(email) is false && new EmailAddressAttribute().IsValid(email);
 
     // having benchmarked various solutions (incl. for/foreach, split and LINQ based ones),
     // this is by far the fastest way to find string needles in a string haystack

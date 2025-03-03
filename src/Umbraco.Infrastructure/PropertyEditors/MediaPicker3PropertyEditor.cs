@@ -1,12 +1,16 @@
+using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.TemporaryFile;
+using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -66,7 +70,10 @@ public class MediaPicker3PropertyEditor : DataEditor
             ITemporaryFileService temporaryFileService,
             IScopeProvider scopeProvider,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            IDataTypeConfigurationCache dataTypeReadCache)
+            IDataTypeConfigurationCache dataTypeReadCache,
+            ILocalizedTextService localizedTextService,
+            IMediaTypeService mediaTypeService,
+            IMediaNavigationQueryService mediaNavigationQueryService)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
@@ -76,6 +83,13 @@ public class MediaPicker3PropertyEditor : DataEditor
             _scopeProvider = scopeProvider;
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _dataTypeReadCache = dataTypeReadCache;
+            var validators = new TypedJsonValidatorRunner<List<MediaWithCropsDto>, MediaPicker3Configuration>(
+                jsonSerializer,
+                new MinMaxValidator(localizedTextService),
+                new AllowedTypeValidator(localizedTextService, mediaTypeService),
+                new StartNodeValidator(localizedTextService, mediaNavigationQueryService));
+
+            Validators.Add(validators);
         }
 
         /// <remarks>
@@ -186,9 +200,6 @@ public class MediaPicker3PropertyEditor : DataEditor
 
         private List<MediaWithCropsDto> HandleTemporaryMediaUploads(List<MediaWithCropsDto> mediaWithCropsDtos, MediaPicker3Configuration configuration)
         {
-            Guid userKey = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key
-                         ?? throw new InvalidOperationException("Could not obtain the current backoffice user");
-
             var invalidDtos = new List<MediaWithCropsDto>();
 
             foreach (MediaWithCropsDto mediaWithCropsDto in mediaWithCropsDtos)
@@ -218,7 +229,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                 // there are multiple allowed media types matching the file extension
                 using Stream fileStream = temporaryFile.OpenReadStream();
                 IMedia mediaFile = _mediaImportService
-                    .ImportAsync(temporaryFile.FileName, fileStream, startNodeGuid, mediaWithCropsDto.MediaTypeAlias, userKey)
+                    .ImportAsync(temporaryFile.FileName, fileStream, startNodeGuid, mediaWithCropsDto.MediaTypeAlias, CurrentUserKey())
                     .GetAwaiter()
                     .GetResult();
 
@@ -228,6 +239,9 @@ public class MediaPicker3PropertyEditor : DataEditor
 
             return mediaWithCropsDtos.Except(invalidDtos).ToList();
         }
+
+        private Guid CurrentUserKey() => _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key
+                                         ?? throw new InvalidOperationException("Could not obtain the current backoffice user");
 
         /// <summary>
         ///     Model/DTO that represents the JSON that the MediaPicker3 stores.
@@ -292,6 +306,188 @@ public class MediaPicker3PropertyEditor : DataEditor
                 {
                     FocalPoint = null;
                 }
+            }
+        }
+
+        internal class MinMaxValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        {
+            private readonly ILocalizedTextService _localizedTextService;
+
+            public MinMaxValidator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
+
+            public IEnumerable<ValidationResult> Validate(
+                List<MediaWithCropsDto>? mediaWithCropsDtos,
+                MediaPicker3Configuration? mediaPickerConfiguration,
+                string? valueType,
+                PropertyValidationContext validationContext)
+            {
+                var validationResults = new List<ValidationResult>();
+
+                if (mediaWithCropsDtos is null || mediaPickerConfiguration is null)
+                {
+                    return validationResults;
+                }
+
+                if (mediaPickerConfiguration.Multiple is false && mediaWithCropsDtos.Count > 1)
+                {
+                    validationResults.Add(new ValidationResult(
+                        _localizedTextService.Localize("validation", "multipleMediaNotAllowed"),
+                        ["value"]));
+                }
+
+                if (mediaPickerConfiguration.ValidationLimit.Min is not null
+                    && mediaWithCropsDtos.Count < mediaPickerConfiguration.ValidationLimit.Min)
+                {
+                    validationResults.Add(new ValidationResult(
+                        _localizedTextService.Localize(
+                            "validation",
+                            "entriesShort",
+                            [mediaPickerConfiguration.ValidationLimit.Min.ToString(), (mediaPickerConfiguration.ValidationLimit.Min - mediaWithCropsDtos.Count).ToString()
+                            ]),
+                        ["value"]));
+                }
+
+                if (mediaPickerConfiguration.ValidationLimit.Max is not null
+                    && mediaWithCropsDtos.Count > mediaPickerConfiguration.ValidationLimit.Max)
+                {
+                    validationResults.Add(new ValidationResult(
+                        _localizedTextService.Localize(
+                            "validation",
+                            "entriesExceed",
+                            [mediaPickerConfiguration.ValidationLimit.Max.ToString(), (mediaWithCropsDtos.Count - mediaPickerConfiguration.ValidationLimit.Max).ToString()
+                            ]),
+                        ["value"]));
+                }
+
+                return validationResults;
+            }
+        }
+
+        internal class AllowedTypeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        {
+            private readonly ILocalizedTextService _localizedTextService;
+            private readonly IMediaTypeService _mediaTypeService;
+
+            public AllowedTypeValidator(ILocalizedTextService localizedTextService, IMediaTypeService mediaTypeService)
+            {
+                _localizedTextService = localizedTextService;
+                _mediaTypeService = mediaTypeService;
+            }
+
+            public IEnumerable<ValidationResult> Validate(
+                List<MediaWithCropsDto>? value,
+                MediaPicker3Configuration? configuration,
+                string? valueType,
+                PropertyValidationContext validationContext)
+            {
+                if (value is null || configuration is null)
+                {
+                    return [];
+                }
+
+                var allowedTypes = configuration.Filter?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
+
+                // No allowed types = all types are allowed
+                if (allowedTypes is null || allowedTypes.Length == 0)
+                {
+                    return [];
+                }
+
+                IEnumerable<string> distinctTypeAliases = value.DistinctBy(x => x.MediaTypeAlias).Select(x => x.MediaTypeAlias);
+
+                foreach (var typeAlias in distinctTypeAliases)
+                {
+                    IMediaType? type = _mediaTypeService.Get(typeAlias);
+
+                    if (type is null || allowedTypes.Contains(type.Key.ToString()) is false)
+                    {
+                        return
+                        [
+                            new ValidationResult(
+                                _localizedTextService.Localize("validation", "invalidMediaType"),
+                                ["value"])
+                        ];
+                    }
+                }
+
+                return [];
+            }
+        }
+
+        internal class StartNodeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        {
+            private readonly ILocalizedTextService _localizedTextService;
+            private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
+
+            public StartNodeValidator(
+                ILocalizedTextService localizedTextService,
+                IMediaNavigationQueryService mediaNavigationQueryService)
+            {
+                _localizedTextService = localizedTextService;
+                _mediaNavigationQueryService = mediaNavigationQueryService;
+            }
+
+            public IEnumerable<ValidationResult> Validate(
+                List<MediaWithCropsDto>? value,
+                MediaPicker3Configuration? configuration,
+                string? valueType,
+                PropertyValidationContext validationContext)
+            {
+                if (value is null || configuration?.StartNodeId is null)
+                {
+                    return [];
+                }
+
+
+                List<Guid> uniqueParentKeys = [];
+                foreach (Guid distinctMediaKey in value.DistinctBy(x => x.MediaKey).Select(x => x.MediaKey))
+                {
+                    if (_mediaNavigationQueryService.TryGetParentKey(distinctMediaKey, out Guid? parentKey) is false)
+                    {
+                        continue;
+                    }
+
+                    // If there is a start node, the media must have a parent.
+                    if (parentKey is null)
+                    {
+                        return
+                        [
+                            new ValidationResult(
+                                _localizedTextService.Localize("validation", "invalidStartNode"),
+                                ["value"])
+                        ];
+                    }
+
+                    uniqueParentKeys.Add(parentKey.Value);
+                }
+
+                IEnumerable<Guid> parentKeysNotInStartNode = uniqueParentKeys.Where(x => x != configuration.StartNodeId.Value);
+                foreach (Guid parentKey in parentKeysNotInStartNode)
+                {
+                    if (_mediaNavigationQueryService.TryGetAncestorsKeys(parentKey, out IEnumerable<Guid> foundAncestorKeys) is false)
+                    {
+                        // We couldn't find the parent node, so we fail.
+                        return
+                        [
+                            new ValidationResult(
+                                _localizedTextService.Localize("validation", "invalidStartNode"),
+                                ["value"])
+                        ];
+                    }
+
+                    Guid[] ancestorKeys = foundAncestorKeys.ToArray();
+                    if (ancestorKeys.Length == 0 || ancestorKeys.Contains(configuration.StartNodeId.Value) is false)
+                    {
+                        return
+                        [
+                            new ValidationResult(
+                                _localizedTextService.Localize("validation", "invalidStartNode"),
+                                ["value"])
+                        ];
+                    }
+                }
+
+                return [];
             }
         }
     }

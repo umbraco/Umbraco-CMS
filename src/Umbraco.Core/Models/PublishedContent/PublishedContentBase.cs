@@ -1,4 +1,8 @@
 ﻿using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
@@ -27,15 +31,18 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public virtual string Name => this.Name(_variationContextAccessor);
 
         /// <inheritdoc />
+        [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in V16.")]
         public virtual string? UrlSegment => this.UrlSegment(_variationContextAccessor);
 
         /// <inheritdoc />
         public abstract int SortOrder { get; }
 
         /// <inheritdoc />
+        [Obsolete("Not supported for members, scheduled for removal in v17")]
         public abstract int Level { get; }
 
         /// <inheritdoc />
+        [Obsolete("Not supported for members, scheduled for removal in v17")]
         public abstract string Path { get; }
 
         /// <inheritdoc />
@@ -66,18 +73,40 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract bool IsPublished(string? culture = null);
 
         /// <inheritdoc />
+        [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
         public abstract IPublishedContent? Parent { get; }
 
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent> Children => this.Children(_variationContextAccessor);
+        [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+        public virtual IEnumerable<IPublishedContent> Children => GetChildren();
 
-        /// <inheritdoc />
-        public abstract IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }
 
         /// <inheritdoc cref="IPublishedElement.Properties"/>
         public abstract IEnumerable<IPublishedProperty> Properties { get; }
 
         /// <inheritdoc cref="IPublishedElement.GetProperty(string)"/>
         public abstract IPublishedProperty? GetProperty(string alias);
+
+        private IEnumerable<IPublishedContent> GetChildren()
+        {
+            INavigationQueryService? navigationQueryService;
+            IPublishedStatusFilteringService? publishedStatusFilteringService;
+
+            switch (ContentType.ItemType)
+            {
+                case PublishedItemType.Content:
+                    navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+                    publishedStatusFilteringService = StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>();
+                    break;
+                case PublishedItemType.Media:
+                    navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
+                    publishedStatusFilteringService = StaticServiceProvider.Instance.GetRequiredService<IPublishedMediaStatusFilteringService>();
+                    break;
+                default:
+                    throw new NotImplementedException("Level is not implemented for " + ContentType.ItemType);
+            }
+
+            return this.Children(navigationQueryService, publishedStatusFilteringService);
+        }
     }
 }

@@ -52,14 +52,14 @@ public class MigrationTests
 
         public ISqlContext SqlContext { get; set; }
 
-#if DEBUG_SCOPES
-            public ScopeInfo GetScopeInfo(IScope scope)
-            {
-                throw new NotImplementedException();
-            }
-            public IEnumerable<ScopeInfo> ScopeInfos => throw new NotImplementedException();
-#endif
         public IScope AmbientScope { get; }
+
+#if DEBUG_SCOPES
+        public IEnumerable<ScopeInfo> ScopeInfos => throw new NotImplementedException();
+
+        public ScopeInfo GetScopeInfo(IScope scope) => throw new NotImplementedException();
+#endif
+
     }
 
     private class TestPlan : MigrationPlan

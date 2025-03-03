@@ -1,0 +1,157 @@
+import { Canvas, Meta } from '@storybook/addon-docs';
+
+import * as LocalizeStories from './localize.element.stories';
+
+<Meta title="API/Localization/Intro" />
+
+# Localization
+
+Localization is the process of adapting an application to a specific language, culture, or region. Localization
+requires that you provide translated text for the user interface and localized data for the application to consume.
+
+## Registering a language
+
+To register a language, you need to add a new manifest to the Extension API.
+
+The manifest can be added through the `umbraco-package.json` file like this:
+
+```json
+{
+	"name": "MyPackage",
+	"extensions": [
+		{
+			"type": "localization",
+			"alias": "MyPackage.Lang.EnUS",
+			"name": "English (United States)",
+			"meta": {
+				"culture": "en-us"
+			},
+			"js": "/App_Plugins/MyPackage/lang/en-us.js"
+		}
+	]
+}
+```
+
+If you do not have many translations, you can also choose to include them directly in the meta object like so:
+
+```json
+"meta": {
+	"culture": "en-us",
+	"translations": {
+		"section": {
+			"key1": "value1",
+			"key2": "value2"
+		}
+	}
+}
+```
+
+### Layout of the language file
+
+The language file is a simple JS module with a default export containing a key-value structure organised in sections.
+
+```js
+export default {
+	section: {
+		key1: 'value1',
+		key2: 'value2',
+	},
+};
+```
+
+The sections and keys will be formatted into a map in Umbraco
+with the format `section_key1` and `section_key2` which forms the unique key
+of which they are requested by.
+
+The values can be either a string or a function that returns a string:
+
+```js
+export default {
+	section: {
+		key1: 'value1',
+		key2: (count) => {
+			count = parseInt(count, 10);
+			if (count === 0) return 'Nothing';
+			if (count === 1) return 'One thing';
+			return 'Many things';
+		},
+	},
+};
+```
+
+## Using the translations
+
+### umb-localize
+
+The `umb-localize` component is used to translate text in the UI. It is used like this:
+
+<Canvas of={LocalizeStories.Default} />
+
+Experiment with the component here: [Localize](/story/api-localization-umblocalizeelement--default)
+
+### UmbLocalizeController
+
+The `UmbLocalizeController` is used to translate text in the UI. It is used like this:
+
+**UmbElementMixin**
+
+The controller is already initialised if you use the `UmbElementMixin` in your element:
+
+```ts
+export class MyElement extends UmbElementMixin(LitElement) {
+	override render() {
+		return html` <uui-button .label=${this.localize.term('general_close')}></uui-button> `;
+	}
+}
+```
+
+**Reactive controller**
+
+If you do not use the `UmbElementMixin` in your element, you can use the reactive controller like this:
+
+```ts
+import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
+
+export class MyElement extends LitElement {
+	// Create a new instance of the controller and attach it to the element
+	private localize = new UmbLocalizeController(this);
+
+	override render() {
+		return html` <uui-button .label=${this.localize.localize('general_close')}></uui-button> `;
+	}
+}
+```
+
+### Fallback
+
+If a key is not found in the current language, the fallback language will be used. The fallback language is **English (United States)**.
+
+## Localization in Umbraco
+
+Out of the box, Umbraco ships with the following languages denoted by their ISO codes:
+
+- `bs-BS` - Bosnian (Bosnia and Herzegovina)
+- `cs-CZ` - Czech (Czech Republic)
+- `cy-GB` - Welsh (United Kingdom)
+- `da-DK` - Danish (Denmark)
+- `de-DE` - German (Germany)
+- `en-GB` - English (United Kingdom)
+- `en-US` - **English (United States)** (fallback language)
+- `es-ES` - Spanish (Spain)
+- `fr-FR` - French (France)
+- `he-IL` - Hebrew (Israel)
+- `hr-HR` - Croatian (Croatia)
+- `it-IT` - Italian (Italy)
+- `ja-JP` - Japanese (Japan)
+- `ko-KR` - Korean (Korea)
+- `nb-NO` - Norwegian Bokmål (Norway)
+- `nl-NL` - Dutch (Netherlands)
+- `pl-PL` - Polish (Poland)
+- `pt-BR` - Portuguese (Brazil)
+- `ro-RO` - Romanian (Romania)
+- `ru-RU` - Russian (Russia)
+- `sv-SE` - Swedish (Sweden)
+- `tr-TR` - Turkish (Turkey)
+- `ua-UA` - Ukrainian (Ukraine)
+- `zh-CN` - Chinese (China)
+- `zh-TW` - Chinese (Taiwan)

@@ -2,7 +2,6 @@ using System.Data;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -23,9 +22,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     private readonly IExternalLoginWithKeyService _externalLoginService;
     private readonly IUmbracoMapper _mapper;
     private readonly IMemberService _memberService;
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
+    private readonly IPublishedMemberCache _memberCache;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberUserStore" /> class for the members identity store
@@ -34,53 +33,26 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     /// <param name="mapper">The mapper for properties</param>
     /// <param name="scopeProvider">The scope provider</param>
     /// <param name="describer">The error describer</param>
-    /// <param name="publishedSnapshotAccessor">The published snapshot accessor</param>
     /// <param name="externalLoginService">The external login service</param>
     /// <param name="twoFactorLoginService">The two factor login service</param>
+    /// <param name="memberCache"></param>
     [ActivatorUtilitiesConstructor]
     public MemberUserStore(
         IMemberService memberService,
         IUmbracoMapper mapper,
         ICoreScopeProvider scopeProvider,
         IdentityErrorDescriber describer,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IExternalLoginWithKeyService externalLoginService,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IPublishedMemberCache memberCache)
         : base(describer)
     {
         _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _externalLoginService = externalLoginService;
         _twoFactorLoginService = twoFactorLoginService;
-    }
-
-    [Obsolete("Use ctor with IExternalLoginWithKeyService and ITwoFactorLoginService param")]
-    public MemberUserStore(
-        IMemberService memberService,
-        IUmbracoMapper mapper,
-        ICoreScopeProvider scopeProvider,
-        IdentityErrorDescriber describer,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IExternalLoginWithKeyService externalLoginService)
-        : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
-    {
-    }
-
-    [Obsolete("Use ctor with IExternalLoginWithKeyService and ITwoFactorLoginService param")]
-    public MemberUserStore(
-        IMemberService memberService,
-        IUmbracoMapper mapper,
-        ICoreScopeProvider scopeProvider,
-        IdentityErrorDescriber describer,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor)
-        : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
-    {
+        _memberCache = memberCache;
     }
 
     /// <inheritdoc />
@@ -128,12 +100,13 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             UpdateMemberProperties(memberEntity, user, out bool _);
 
             // create the member
-            Attempt<OperationResult?> saveAttempt = _memberService.Save(memberEntity);
+            Attempt<OperationResult?> saveAttempt = _memberService.Save(memberEntity, PublishNotificationSaveOptions.Saving);
             if (saveAttempt.Success is false)
             {
                 scope.Complete();
                 return Task.FromResult(IdentityResult.Failed(
-                    new IdentityError {
+                    new IdentityError
+                    {
                         Code = CancelledIdentityErrorCode,
                         Description = string.Empty
 
@@ -319,8 +292,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             return null;
         }
 
-        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-        return publishedSnapshot.Members?.Get(member);
+        return _memberCache.Get(member);
     }
 
     /// <inheritdoc />
@@ -349,9 +321,15 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             throw new ArgumentNullException(nameof(userId));
         }
 
-        IMember? user = Guid.TryParse(userId, out Guid key)
-            ? _memberService.GetByKey(key)
-            : _memberService.GetById(ResolveEntityIdFromIdentityId(userId).GetAwaiter().GetResult());
+        IMember? user = null;
+        if (Guid.TryParse(userId, out Guid key))
+        {
+            user = _memberService.GetByKey(key);
+        }
+        else if (TryResolveEntityIdFromIdentityId(userId, out int id))
+        {
+            user = _memberService.GetById(id);
+        }
 
         if (user == null)
         {
@@ -361,11 +339,11 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         return Task.FromResult(AssignLoginsCallback(_mapper.Map<MemberIdentityUser>(user)))!;
     }
 
-    protected override Task<int> ResolveEntityIdFromIdentityId(string? identityId)
+    private bool TryResolveEntityIdFromIdentityId(string? identityId, out int entityId)
     {
-        if (TryConvertIdentityIdToInt(identityId, out var id))
+        if (TryConvertIdentityIdToInt(identityId, out entityId))
         {
-            return Task.FromResult(id);
+            return true;
         }
 
         if (Guid.TryParse(identityId, out Guid key))
@@ -373,8 +351,19 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             IMember? member = _memberService.GetByKey(key);
             if (member is not null)
             {
-                return Task.FromResult(member.Id);
+                entityId = member.Id;
+                return true;
             }
+        }
+
+        return false;
+    }
+
+    protected override Task<int> ResolveEntityIdFromIdentityId(string? identityId)
+    {
+        if (TryResolveEntityIdFromIdentityId(identityId, out var entityId))
+        {
+            return Task.FromResult(entityId);
         }
 
         throw new InvalidOperationException($"Unable to resolve user with ID {identityId}");

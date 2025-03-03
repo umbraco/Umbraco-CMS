@@ -41,13 +41,22 @@ public static class ObjectExtensions
     public static IEnumerable<T> AsEnumerableOfOne<T>(this T input) => Enumerable.Repeat(input, 1);
 
     /// <summary>
+    /// Disposes the object if it implements <see cref="IDisposable" />.
     /// </summary>
-    /// <param name="input"></param>
+    /// <param name="input">The object.</param>
+    [Obsolete("Please replace uses of this extension method with (input as IDisposable)?.Dispose(). This extension method will be removed in Umbraco 17.")]
     public static void DisposeIfDisposable(this object input)
     {
         if (input is IDisposable disposable)
         {
-            disposable.Dispose();
+            try
+            {
+                disposable.Dispose();
+            }
+            catch (ObjectDisposedException)
+            {
+                // ignore if it is already disposed
+            }
         }
     }
 
@@ -58,6 +67,7 @@ public static class ObjectExtensions
     /// <typeparam name="T"></typeparam>
     /// <param name="input">The input.</param>
     /// <returns></returns>
+    [Obsolete("This extension method is not longer used and will be removed in Umbraco 17.")]
     public static T? SafeCast<T>(this object input)
     {
         if (ReferenceEquals(null, input) || ReferenceEquals(default(T), input))
@@ -345,6 +355,7 @@ public static class ObjectExtensions
     /// <param name="o"></param>
     /// <param name="ignoreProperties"></param>
     /// <returns></returns>
+    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 17.")]
     public static IDictionary<string, TVal>? ToDictionary<T, TProperty, TVal>(
         this T o,
         params Expression<Func<T, TProperty>>[] ignoreProperties) => o?.ToDictionary<TVal>(ignoreProperties
@@ -524,6 +535,7 @@ public static class ObjectExtensions
     /// <param name="o"></param>
     /// <param name="ignoreProperties">Properties to ignore</param>
     /// <returns></returns>
+    [Obsolete("Use of this can be replaced with RouteValueDictionary or HtmlHelper.AnonymousObjectToHtmlAttributes(). The method will be removed in Umbraco 17.")]
     public static IDictionary<string, TVal> ToDictionary<TVal>(this object o, params string[] ignoreProperties)
     {
         if (o != null)

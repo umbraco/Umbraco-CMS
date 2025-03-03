@@ -1,0 +1,67 @@
+name: Test Backoffice
+
+on:
+  push:
+    branches:
+      - contrib
+      - release/*
+      - v*/dev
+    paths:
+      - src/Umbraco.Web.UI.Client/**
+  pull_request:
+    branches:
+      - contrib
+      - release/*
+      - v*/dev
+    paths:
+      - src/Umbraco.Web.UI.Client/**
+
+  # Allows GitHub to use this workflow to validate the merge queue
+  merge_group:
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  NODE_OPTIONS: --max_old_space_size=16384
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/Umbraco.Web.UI.Client
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: src/Umbraco.Web.UI.Client/.nvmrc
+          cache: npm
+          cache-dependency-path: ./src/Umbraco.Web.UI.Client/package-lock.json
+      - run: npm ci --no-audit --no-fund --prefer-offline
+      - name: Check for circular dependencies
+        run: node devops/circular/index.js src
+      - run: npm run lint:errors
+      - run: npm run generate:tsconfig
+      - run: npm run generate:icons
+      - run: npm run build:for:cms
+      - run: npm run check:paths
+      - run: npm run generate:jsonschema:dist
+
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/Umbraco.Web.UI.Client
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: src/Umbraco.Web.UI.Client/.nvmrc
+          cache: npm
+          cache-dependency-path: ./src/Umbraco.Web.UI.Client/package-lock.json
+      - run: npm ci --no-audit --no-fund --prefer-offline
+      - run: npx playwright install --with-deps
+      - run: npm test

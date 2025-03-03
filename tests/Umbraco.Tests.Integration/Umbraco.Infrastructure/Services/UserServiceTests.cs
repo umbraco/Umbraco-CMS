@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -967,6 +968,55 @@ public class UserServiceTests : UmbracoIntegrationTest
         }
     }
 
+    [TestCase(UserKind.Default, UserClientCredentialsOperationStatus.InvalidUser)]
+    [TestCase(UserKind.Api, UserClientCredentialsOperationStatus.Success)]
+    public async Task Can_Assign_ClientId_To_Api_User(UserKind userKind, UserClientCredentialsOperationStatus expectedResult)
+    {
+        // Arrange
+        var user = await CreateTestUser(userKind);
+
+        // Act
+        var result = await UserService.AddClientIdAsync(user.Key, "client-one");
+
+        // Assert
+        Assert.AreEqual(expectedResult, result);
+    }
+
+    [TestCase("abcdefghijklmnopqrstuvwxyz", UserClientCredentialsOperationStatus.Success)]
+    [TestCase("ABCDEFGHIJKLMNOPQRSTUVWXYZ", UserClientCredentialsOperationStatus.Success)]
+    [TestCase("1234567890", UserClientCredentialsOperationStatus.Success)]
+    [TestCase(".-_~", UserClientCredentialsOperationStatus.Success)]
+    [TestCase("!", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("#", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("$", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("&", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("'", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("(", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase(")", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("*", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("+", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase(",", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("/", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase(":", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase(";", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("=", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("?", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("@", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("[", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("]", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("More_Than_255_characters_012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789", UserClientCredentialsOperationStatus.InvalidClientId)]
+    public async Task Can_Use_Only_Unreserved_Characters_For_ClientId(string clientId, UserClientCredentialsOperationStatus expectedResult)
+    {
+        // Arrange
+        var user = await CreateTestUser(UserKind.Api);
+
+        // Act
+        var result = await UserService.AddClientIdAsync(user.Key, clientId);
+
+        // Assert
+        Assert.AreEqual(expectedResult, result);
+    }
+
     private Content[] BuildContentItems(int numberToCreate)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
@@ -997,6 +1047,25 @@ public class UserServiceTests : UmbracoIntegrationTest
         UserService.Save(user);
 
         return user;
+    }
+
+    private async Task<IUser> CreateTestUser(UserKind userKind)
+    {
+        var userGroup = CreateTestUserGroup();
+
+        var result = await UserService.CreateAsync(
+            Constants.Security.SuperUserKey,
+            new UserCreateModel
+            {
+                Email = "test1@test.com",
+                Id = Guid.NewGuid(),
+                Kind = userKind,
+                Name = "test1@test.com",
+                UserName = "test1@test.com",
+                UserGroupKeys = new HashSet<Guid> { userGroup.Key }
+            });
+        Assert.IsTrue(result.Success);
+        return result.Result.CreatedUser!;
     }
 
     private List<IUser> CreateTestUsers(int[] startContentIds, IUserGroup userGroup, int numberToCreate)

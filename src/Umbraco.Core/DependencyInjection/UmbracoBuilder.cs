@@ -26,8 +26,6 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
@@ -36,16 +34,21 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Preview;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Security.Authorization;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Services.ImportExport;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Core.Services.Querying;
 using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
+using Umbraco.Cms.Core.Services.Filters;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {
@@ -63,6 +66,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public ILoggerFactory BuilderLoggerFactory { get; }
 
         /// <inheritdoc />
+        [Obsolete("Only here to comply with obsolete implementation. Scheduled for removal in v16")]
         public IHostingEnvironment? BuilderHostingEnvironment { get; }
 
         public IProfiler Profiler { get; }
@@ -79,6 +83,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class.
         /// </summary>
+        [Obsolete("Use a non obsolete constructor instead. Scheduled for removal in v16")]
         public UmbracoBuilder(
             IServiceCollection services,
             IConfiguration config,
@@ -92,6 +97,27 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Config = config;
             BuilderLoggerFactory = loggerFactory;
             BuilderHostingEnvironment = hostingEnvironment;
+            Profiler = profiler;
+            AppCaches = appCaches;
+            TypeLoader = typeLoader;
+
+            AddCoreServices();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class.
+        /// </summary>
+        public UmbracoBuilder(
+            IServiceCollection services,
+            IConfiguration config,
+            TypeLoader typeLoader,
+            ILoggerFactory loggerFactory,
+            IProfiler profiler,
+            AppCaches appCaches)
+        {
+            Services = services;
+            Config = config;
+            BuilderLoggerFactory = loggerFactory;
             Profiler = profiler;
             AppCaches = appCaches;
             TypeLoader = typeLoader;
@@ -215,6 +241,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // register published router
             Services.AddUnique<IPublishedRouter, PublishedRouter>();
+            Services.AddUnique<IPublishedUrlInfoProvider, PublishedUrlInfoProvider>();
 
             Services.AddUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
             Services.AddUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
@@ -263,9 +290,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .AddNotificationHandler<MemberGroupDeletedNotification, PublicAccessHandler>();
 
             Services.AddSingleton<ISyncBootStateAccessor, NonRuntimeLevelBootStateAccessor>();
-
-            // register a basic/noop published snapshot service to be replaced
-            Services.AddSingleton<IPublishedSnapshotService, InternalPublishedSnapshotService>();
 
             // Register ValueEditorCache used for validation
             Services.AddSingleton<IValueEditorCache, ValueEditorCache>();
@@ -359,6 +383,13 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IMediaNavigationQueryService>(x => x.GetRequiredService<MediaNavigationService>());
             Services.AddUnique<IMediaNavigationManagementService>(x => x.GetRequiredService<MediaNavigationService>());
 
+            Services.AddUnique<PublishStatusService, PublishStatusService>();
+            Services.AddUnique<IPublishStatusManagementService>(x => x.GetRequiredService<PublishStatusService>());
+            Services.AddUnique<IPublishStatusQueryService>(x => x.GetRequiredService<PublishStatusService>());
+
+            Services.AddUnique<IPublishedContentStatusFilteringService, PublishedContentStatusFilteringService>();
+            Services.AddUnique<IPublishedMediaStatusFilteringService, PublishedMediaStatusFilteringService>();
+
             // Register a noop IHtmlSanitizer & IMarkdownSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
             Services.AddUnique<IMarkdownSanitizer, NoopMarkdownSanitizer>();
@@ -379,7 +410,10 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IWebhookService, WebhookService>();
             Services.AddUnique<IWebhookLogService, WebhookLogService>();
             Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
-            Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
+            Services.AddUnique<IWebhookRequestService>(factory => new WebhookRequestService(
+                factory.GetRequiredService<ICoreScopeProvider>(),
+                factory.GetRequiredService<IWebhookRequestRepository>(),
+                factory.GetRequiredService<IWebhookJsonSerializer>()));
 
             // Data type configuration cache
             Services.AddUnique<IDataTypeConfigurationCache, DataTypeConfigurationCache>();
@@ -392,6 +426,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Add Query services
             Services.AddUnique<IDocumentRecycleBinQueryService, DocumentRecycleBinQueryService>();
             Services.AddUnique<IMediaRecycleBinQueryService, MediaRecycleBinQueryService>();
+            Services.AddUnique<IContentQueryService, ContentQueryService>();
 
             // Authorizers
             Services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
@@ -412,6 +447,10 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // add validation services
             Services.AddUnique<IElementSwitchValidator, ElementSwitchValidator>();
+
+            // Routing
+            Services.AddUnique<IDocumentUrlService, DocumentUrlService>();
+            Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
         }
     }
 }

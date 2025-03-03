@@ -2,8 +2,30 @@
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Umbraco.Cms.Tests.UnitTests</RootNamespace>
-    <IsPackable>false</IsPackable>
-    <EnablePackageValidation>false</EnablePackageValidation>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--
+      TODO: Fix and remove overrides:
+      [SYSLIB0013] and [CS0618] obsolete
+      [CS1998] async
+      [SA1117] params same line
+      [CS0067] unused event
+      [CA1822] mark members as static
+      [CA1416] validate platform compatibility
+      [IDE0028] collection initializers
+      [SA1401] fields must be private
+      [SA1405] debug message text
+      [IDE0060] remove parameter
+      [ASP0019] header append
+      [CS0114] inherited member
+      [CS0661]/[CS0659] adjust overrides
+      [CS0414] unassigned field
+      [CS0252] confirm reference comparison
+      [CS0612] obsolete
+      [IDE1006] fix naming rule violation
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),SYSLIB0013,CS0618,CS1998,SA1117,CS0067,CA1822,CA1416,IDE0028,SA1401,SA1405,IDE0060,ASP0019,CS0114,CS0661,CS0659,CS0414,CS0252,CS0612,IDE1006</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,44 +40,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Umbraco.Core\DeliveryApi\NestedContentValueConverterTests.cs" />
-    <Compile Remove="Umbraco.Core\PropertyEditors\NestedContentPropertyComponentTests.cs" />
     <Compile Update="Umbraco.Cms.Api.Management\Services\BackOfficeExternalLoginServiceTests.ExternalLoginStatusForUserAsync.cs">
       <DependentUpon>BackOfficeExternalLoginServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Cms.Api.Management\Services\BackOfficeExternalLoginServiceTests.UnLinkLoginAsync.cs">
       <DependentUpon>BackOfficeExternalLoginServiceTests.cs</DependentUpon>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Umbraco.Core\DeliveryApi\MediaPickerValueConverterTests.cs" />
-    <Compile Remove="Umbraco.Core\DeliveryApi\NestedContentValueConverterTests.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Umbraco.Core\DeliveryApi\MediaPickerValueConverterTests.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Umbraco.Core\DeliveryApi\MediaPickerValueConverterTests.cs" />
-    <Compile Remove="Umbraco.Core\DeliveryApi\NestedContentValueConverterTests.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Umbraco.Core\DeliveryApi\MediaPickerValueConverterTests.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Umbraco.Core\DeliveryApi\MediaPickerValueConverterTests.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Umbraco.Core\DeliveryApi\MediaPickerValueConverterTests.cs" />
-    <Compile Remove="Umbraco.Core\DeliveryApi\NestedContentValueConverterTests.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Umbraco.Core\DeliveryApi\MediaPickerValueConverterTests.cs" />
   </ItemGroup>
 </Project>

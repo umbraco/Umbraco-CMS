@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
-internal class EFCoreScopeAccessor<TDbContext> : IEFCoreScopeAccessor<TDbContext> where TDbContext : DbContext
+internal sealed class EFCoreScopeAccessor<TDbContext> : IEFCoreScopeAccessor<TDbContext> where TDbContext : DbContext
 {
     private readonly IAmbientEFCoreScopeStack<TDbContext> _ambientEfCoreScopeStack;
 

@@ -1,5 +1,8 @@
 using System.ComponentModel;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PublishedCache.Internal;
@@ -66,13 +69,17 @@ public sealed class InternalPublishedContent : IPublishedContent
 
     public PublishedItemType ItemType => PublishedItemType.Content;
 
-    public IPublishedContent? Parent { get; set; }
+    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+    public IPublishedContent? Parent => this.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(), StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
 
     public bool IsDraft(string? culture = null) => false;
 
     public bool IsPublished(string? culture = null) => true;
 
-    public IEnumerable<IPublishedContent> Children { get; set; } = Enumerable.Empty<IPublishedContent>();
+    [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+    public IEnumerable<IPublishedContent> Children => this.Children(
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
+        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
 
     public IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
 
@@ -94,7 +101,7 @@ public sealed class InternalPublishedContent : IPublishedContent
         IPublishedContent? content = this;
         while (content != null && (property == null || property.HasValue() == false))
         {
-            content = content.Parent;
+            content = content.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(), StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
             property = content?.GetProperty(alias);
         }
 

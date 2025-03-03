@@ -1,0 +1,58 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-cms
+dist-ssr
+/types
+*.tsbuildinfo
+*.local
+*.tgz
+
+## testing
+coverage/
+utils/all-umb-consts/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+!.vscode/settings.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# eslint
+.eslintcache
+test-results/
+playwright-report/
+playwright/.cache/
+
+# storybook
+storybook-static/
+
+# API Docs
+ui-api/
+
+custom-elements.json
+
+# JSON for HTML Custom Data
+# https://github.com/runem/web-component-analyzer#vscode
+# https://github.com/microsoft/vscode-custom-data
+vscode-html-custom-data.json
+public/tinymce/*
+
+# Vite runtime files
+vite.config.ts.timestamp-*.mjs
+.vite/

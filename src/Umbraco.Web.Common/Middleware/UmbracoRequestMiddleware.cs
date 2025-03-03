@@ -188,7 +188,11 @@ internal class UmbracoRequestMiddleware : IMiddleware
     }
 
 #pragma warning disable IDE0044 // Add readonly modifier
+#pragma warning disable IDE1006 // Naming Styles
+#pragma warning disable CS0169 // Unused fields
     private static bool s_firstBackOfficeRequest;
     private static bool s_firstBackOfficeReqestFlag;
+#pragma warning restore IDE1006 // Naming Styles
 #pragma warning restore IDE0044 // Add readonly modifier
+#pragma warning restore CS0169 // Unused fields
 }

@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -36,7 +37,10 @@ public class DataValueReferenceFactoryCollectionTests
                  Mock.Of<ITemporaryFileService>(),
                  Mock.Of<IScopeProvider>(),
                  Mock.Of<IBackOfficeSecurityAccessor>(),
-                 Mock.Of<IDataTypeConfigurationCache>()));
+                 Mock.Of<IDataTypeConfigurationCache>(),
+                 Mock.Of<ILocalizedTextService>(),
+                 Mock.Of<IMediaTypeService>(),
+                 Mock.Of<IMediaNavigationQueryService>()));
 
     private IIOHelper IOHelper { get; } = Mock.Of<IIOHelper>();
 

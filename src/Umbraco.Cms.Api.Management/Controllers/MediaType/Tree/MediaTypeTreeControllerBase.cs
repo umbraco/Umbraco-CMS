@@ -30,7 +30,7 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTre
     protected override MediaTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
         var mediaTypes = _mediaTypeService
-            .GetAll(entities.Select(entity => entity.Id).ToArray())
+            .GetMany(entities.Select(entity => entity.Id).ToArray())
             .ToDictionary(contentType => contentType.Id);
 
         return entities.Select(entity =>

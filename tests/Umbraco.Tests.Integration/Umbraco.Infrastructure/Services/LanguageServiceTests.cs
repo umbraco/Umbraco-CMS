@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -262,7 +262,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidFallbackIsoCode, result.Status);
     }
-    
+
     [Test]
     public async Task Cannot_Create_Language_With_NonExisting_Fallback_Language()
     {
@@ -332,7 +332,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidFallbackIsoCode, result.Status);
     }
-    
+
     [Test]
     public async Task Cannot_Create_Direct_Cyclic_Fallback_Language()
     {

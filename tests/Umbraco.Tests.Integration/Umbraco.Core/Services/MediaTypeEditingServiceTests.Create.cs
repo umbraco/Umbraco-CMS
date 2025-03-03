@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -137,8 +137,7 @@ public partial class MediaTypeEditingServiceTests
             compositions: new[]
             {
                 new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
-            }
-        );
+            });
 
         var result = await MediaTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
@@ -176,8 +175,7 @@ public partial class MediaTypeEditingServiceTests
             compositions: new[]
             {
                 new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
-            }
-        );
+            });
 
         var result = await MediaTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);

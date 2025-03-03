@@ -1,15 +1,18 @@
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
 public class PropertyValueConverterTests : DeliveryApiTests
 {
-    protected IPublishedSnapshotAccessor PublishedSnapshotAccessor { get; private set; }
+    protected ICacheManager CacheManager { get; private set; }
 
     protected IPublishedUrlProvider PublishedUrlProvider { get; private set; }
 
@@ -28,6 +31,10 @@ public class PropertyValueConverterTests : DeliveryApiTests
     protected Mock<IPublishedMediaCache> PublishedMediaCacheMock { get; private set; }
 
     protected Mock<IPublishedUrlProvider> PublishedUrlProviderMock { get; private set; }
+
+    protected VariationContext VariationContext { get; } = new();
+
+    protected Mock<IDocumentNavigationQueryService> DocumentNavigationQueryServiceMock { get; private set; }
 
     [SetUp]
     public override void Setup()
@@ -60,9 +67,10 @@ public class PropertyValueConverterTests : DeliveryApiTests
             .Setup(pcc => pcc.GetById(mediaKey))
             .Returns(publishedMedia.Object);
 
-        var publishedSnapshot = new Mock<IPublishedSnapshot>();
-        publishedSnapshot.SetupGet(ps => ps.Content).Returns(PublishedContentCacheMock.Object);
-        publishedSnapshot.SetupGet(ps => ps.Media).Returns(PublishedMediaCacheMock.Object);
+        var cacheMock = new Mock<ICacheManager>();
+        cacheMock.SetupGet(cache => cache.Content).Returns(PublishedContentCacheMock.Object);
+        cacheMock.SetupGet(cache => cache.Media).Returns(PublishedMediaCacheMock.Object);
+        CacheManager = cacheMock.Object;
 
         PublishedUrlProviderMock = new Mock<IPublishedUrlProvider>();
         PublishedUrlProviderMock
@@ -74,12 +82,9 @@ public class PropertyValueConverterTests : DeliveryApiTests
         PublishedUrlProvider = PublishedUrlProviderMock.Object;
         ApiContentPathProvider = new ApiContentPathProvider(PublishedUrlProvider);
 
-        var publishedSnapshotAccessor = new Mock<IPublishedSnapshotAccessor>();
-        var publishedSnapshotObject = publishedSnapshot.Object;
-        publishedSnapshotAccessor
-            .Setup(psa => psa.TryGetPublishedSnapshot(out publishedSnapshotObject))
-            .Returns(true);
-        PublishedSnapshotAccessor = publishedSnapshotAccessor.Object;
+        DocumentNavigationQueryServiceMock = new Mock<IDocumentNavigationQueryService>();
+        IEnumerable<Guid> ancestorsKeys = [];
+        DocumentNavigationQueryServiceMock.Setup(x => x.TryGetAncestorsKeys(contentKey, out ancestorsKeys)).Returns(true);
     }
 
     protected Mock<IPublishedContent> SetupPublishedContent(string name, Guid key, PublishedItemType itemType, IPublishedContentType contentType)
@@ -112,5 +117,29 @@ public class PropertyValueConverterTests : DeliveryApiTests
         PublishedMediaCacheMock
             .Setup(pcc => pcc.GetById(It.IsAny<bool>(), media.Key))
             .Returns(media);
+    }
+
+    protected override ApiContentRouteBuilder CreateContentRouteBuilder(
+        IApiContentPathProvider contentPathProvider,
+        IOptions<GlobalSettings> globalSettings,
+        IVariationContextAccessor? variationContextAccessor = null,
+        IRequestPreviewService? requestPreviewService = null,
+        IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null,
+        IPublishedContentCache? contentCache = null,
+        IDocumentNavigationQueryService? navigationQueryService = null,
+        IPublishStatusQueryService? publishStatusQueryService = null)
+    {
+        contentCache ??= PublishedContentCacheMock.Object;
+        navigationQueryService ??= DocumentNavigationQueryServiceMock.Object;
+
+        return base.CreateContentRouteBuilder(
+            contentPathProvider,
+            globalSettings,
+            variationContextAccessor,
+            requestPreviewService,
+            requestHandlerSettingsMonitor,
+            contentCache,
+            navigationQueryService,
+            publishStatusQueryService);
     }
 }

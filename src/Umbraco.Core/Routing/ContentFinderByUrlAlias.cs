@@ -1,6 +1,9 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -21,7 +24,8 @@ public class ContentFinderByUrlAlias : IContentFinder
     private readonly ILogger<ContentFinderByUrlAlias> _logger;
     private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-    private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
+    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrlAlias" /> class.
@@ -29,13 +33,70 @@ public class ContentFinderByUrlAlias : IContentFinder
     public ContentFinderByUrlAlias(
         ILogger<ContentFinderByUrlAlias> logger,
         IPublishedValueFallback publishedValueFallback,
-        IVariationContextAccessor variationContextAccessor,
-        IUmbracoContextAccessor umbracoContextAccessor)
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
     {
         _publishedValueFallback = publishedValueFallback;
-        _variationContextAccessor = variationContextAccessor;
         _umbracoContextAccessor = umbracoContextAccessor;
+        _documentNavigationQueryService = documentNavigationQueryService;
+        _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
         _logger = logger;
+    }
+
+    [Obsolete("Please use tne non-obsolete constructor instead. Scheduled removal in v17")]
+    public ContentFinderByUrlAlias(
+        ILogger<ContentFinderByUrlAlias> logger,
+        IPublishedValueFallback publishedValueFallback,
+        IVariationContextAccessor variationContextAccessor,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IPublishStatusQueryService publishStatusQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
+        : this(
+            logger,
+            publishedValueFallback,
+            umbracoContextAccessor,
+            documentNavigationQueryService,
+            publishedContentStatusFilteringService)
+    {
+    }
+
+    [Obsolete("Please use tne non-obsolete constructor instead. Scheduled removal in v17")]
+    public ContentFinderByUrlAlias(
+        ILogger<ContentFinderByUrlAlias> logger,
+        IPublishedValueFallback publishedValueFallback,
+        IVariationContextAccessor variationContextAccessor,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IPublishStatusQueryService publishStatusQueryService)
+        : this(
+            logger,
+            publishedValueFallback,
+            umbracoContextAccessor,
+            documentNavigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
+    {
+    }
+
+
+    [Obsolete("Please use tne non-obsolete constructor instead. Scheduled removal in v17")]
+    public ContentFinderByUrlAlias(
+        ILogger<ContentFinderByUrlAlias> logger,
+        IPublishedValueFallback publishedValueFallback,
+        IVariationContextAccessor variationContextAccessor,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService documentNavigationQueryService)
+        : this(
+            logger,
+            publishedValueFallback,
+            umbracoContextAccessor,
+            documentNavigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
+    {
     }
 
     /// <summary>
@@ -138,14 +199,14 @@ public class ContentFinderByUrlAlias : IContentFinder
         if (rootNodeId > 0)
         {
             IPublishedContent? rootNode = cache?.GetById(rootNodeId);
-            return rootNode?.Descendants(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2));
+            return rootNode?.Descendants(_documentNavigationQueryService, _publishedContentStatusFilteringService).FirstOrDefault(x => IsMatch(x, test1, test2));
         }
 
         if (cache is not null)
         {
             foreach (IPublishedContent rootContent in cache.GetAtRoot())
             {
-                IPublishedContent? c = rootContent.DescendantsOrSelf(_variationContextAccessor)
+                IPublishedContent? c = rootContent.DescendantsOrSelf(_documentNavigationQueryService, _publishedContentStatusFilteringService)
                     .FirstOrDefault(x => IsMatch(x, test1, test2));
                 if (c != null)
                 {

@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +38,7 @@ public class RebuildIndexerController : IndexerControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Rebuild(CancellationToken cancellationToken, string indexName)
     {
-        if (!_examineManager.TryGetIndex(indexName, out var index))
+        if (!_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
             var invalidModelProblem = new ProblemDetails
             {

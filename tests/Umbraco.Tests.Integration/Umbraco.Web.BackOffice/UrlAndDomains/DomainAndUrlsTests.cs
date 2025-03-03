@@ -1,17 +1,23 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.UrlAndDomains;
 
@@ -66,7 +72,13 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.Services.AddUnique<IVariationContextAccessor>(_variationContextAccessor);
-        builder.AddNuCache();
+        builder.AddUmbracoHybridCache();
+
+        // Ensure cache refreshers runs
+        builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
+        builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
+        builder.AddNotificationHandler<DomainSavedNotification, DomainSavedDistributedCacheNotificationHandler>();
+
     }
 
     private readonly TestVariationContextAccessor _variationContextAccessor = new();
@@ -400,5 +412,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
             GetRequiredService<IVariationContextAccessor>(),
             GetRequiredService<ILogger<IContent>>(),
             GetRequiredService<UriUtility>(),
-            GetRequiredService<IPublishedUrlProvider>()).GetAwaiter().GetResult();
+            GetRequiredService<IPublishedUrlProvider>(),
+            GetRequiredService<IDocumentNavigationQueryService>(),
+            GetRequiredService<IPublishedContentStatusFilteringService>()).GetAwaiter().GetResult();
 }

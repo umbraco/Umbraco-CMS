@@ -31,7 +31,7 @@ public class ElementSwitchValidator : IElementSwitchValidator
         }
 
         // if there are any ancestors where IsElement is different from the contentType, the validation fails
-        return await Task.FromResult(_contentTypeService.GetAll(ancestorIds)
+        return await Task.FromResult(_contentTypeService.GetMany(ancestorIds)
             .Any(ancestor => ancestor.IsElement != contentType.IsElement) is false);
     }
 

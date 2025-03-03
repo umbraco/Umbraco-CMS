@@ -10,7 +10,7 @@ public interface IPublishedMemberCache
     /// </summary>
     /// <param name="member"></param>
     /// <returns></returns>
-    IPublishedContent? Get(IMember member);
+    IPublishedMember? Get(IMember member);
 
     /// <summary>
     ///     Gets a content type identified by its unique identifier.
@@ -26,4 +26,10 @@ public interface IPublishedMemberCache
     /// <returns>The content type, or null.</returns>
     /// <remarks>The alias is case-insensitive.</remarks>
     IPublishedContentType GetContentType(string alias);
+
+    /// <summary>
+    ///     Get an <see cref="IPublishedContent" /> from an <see cref="IMember" />
+    /// </summary>
+    /// <returns></returns>
+    Task<IPublishedMember?> GetAsync(IMember member);
 }

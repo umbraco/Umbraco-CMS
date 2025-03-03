@@ -60,6 +60,8 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
 
     private FileSystems FileSystems => GetRequiredService<FileSystems>();
 
+    private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
+
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer =>
         GetRequiredService<IConfigurationEditorJsonSerializer>();
 
@@ -224,7 +226,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
 
             // publish = new edit version
             content1.SetValue("title", "title");
-            content1.PublishCulture(CultureImpact.Invariant);
+            content1.PublishCulture(CultureImpact.Invariant, DateTime.Now, PropertyEditorCollection);
             content1.PublishedState = PublishedState.Publishing;
             repository.Save(content1);
 
@@ -300,7 +302,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
                     new { id = content1.Id }));
 
             // publish = version
-            content1.PublishCulture(CultureImpact.Invariant);
+            content1.PublishCulture(CultureImpact.Invariant, DateTime.Now, PropertyEditorCollection);
             content1.PublishedState = PublishedState.Publishing;
             repository.Save(content1);
 
@@ -344,7 +346,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             // publish = new version
             content1.Name = "name-4";
             content1.SetValue("title", "title-4");
-            content1.PublishCulture(CultureImpact.Invariant);
+            content1.PublishCulture(CultureImpact.Invariant, DateTime.Now, PropertyEditorCollection);
             content1.PublishedState = PublishedState.Publishing;
             repository.Save(content1);
 
@@ -764,7 +766,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             // publish them all
             foreach (var content in result)
             {
-                content.PublishCulture(CultureImpact.Invariant);
+                content.PublishCulture(CultureImpact.Invariant, DateTime.Now, PropertyEditorCollection);
                 repository.Save(content);
             }
 

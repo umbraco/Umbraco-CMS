@@ -14,13 +14,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Content;
 public abstract class ContentCollectionControllerBase<TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel> : ManagementApiControllerBase
     where TContent : class, IContentBase
     where TCollectionResponseModel : ContentResponseModelBase<TValueResponseModelBase, TVariantResponseModel>
-    where TValueResponseModelBase : ValueModelBase
+    where TValueResponseModelBase : ValueResponseModelBase
     where TVariantResponseModel : VariantResponseModelBase
 {
     private readonly IUmbracoMapper _mapper;
 
     protected ContentCollectionControllerBase(IUmbracoMapper mapper) => _mapper = mapper;
 
+    [Obsolete("This method is no longer used and will be removed in Umbraco 17.")]
     protected IActionResult CollectionResult(ListViewPagedModel<TContent> result)
     {
         PagedModel<TContent> collectionItemsResult = result.Items;
@@ -42,6 +43,17 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
         {
             Items = collectionResponseModels,
             Total = collectionItemsResult.Total,
+        };
+
+        return Ok(pageViewModel);
+    }
+
+    protected IActionResult CollectionResult(List<TCollectionResponseModel> collectionResponseModels, long totalNumberOfItems)
+    {
+        var pageViewModel = new PagedViewModel<TCollectionResponseModel>
+        {
+            Items = collectionResponseModels,
+            Total = totalNumberOfItems,
         };
 
         return Ok(pageViewModel);

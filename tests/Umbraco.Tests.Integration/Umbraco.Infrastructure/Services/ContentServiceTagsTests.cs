@@ -686,7 +686,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Save(child2);
 
         // Act
-        ContentService.PublishBranch(content, true, content.AvailableCultures.ToArray());
+        ContentService.PublishBranch(content, PublishBranchFilter.IncludeUnpublished, content.AvailableCultures.ToArray());
 
         // Assert
         var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
@@ -934,7 +934,8 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         Assert.AreEqual(2, savedTags.Length);
     }
 
-    private PropertyType CreateAndAddTagsPropertyType(ContentType contentType,
+    private PropertyType CreateAndAddTagsPropertyType(
+        ContentType contentType,
         ContentVariation variations = ContentVariation.Nothing)
     {
         var propertyType = new PropertyTypeBuilder()

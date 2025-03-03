@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Asp.Versioning;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -34,6 +34,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Security;
 [ApiExplorerSettings(IgnoreApi = true)]
 public class BackOfficeController : SecurityControllerBase
 {
+    private static long? _loginDurationAverage;
+
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IBackOfficeSignInManager _backOfficeSignInManager;
     private readonly IBackOfficeUserManager _backOfficeUserManager;
@@ -75,45 +77,65 @@ public class BackOfficeController : SecurityControllerBase
     [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
     public async Task<IActionResult> Login(CancellationToken cancellationToken, LoginRequestModel model)
     {
-        IdentitySignInResult result = await _backOfficeSignInManager.PasswordSignInAsync(
-            model.Username, model.Password, true, true);
+        // Start a timed scope to ensure failed responses return is a consistent time
+        var loginDuration = Math.Max(_loginDurationAverage ?? _securitySettings.Value.UserDefaultFailedLoginDurationInMilliseconds, _securitySettings.Value.UserMinimumFailedLoginDurationInMilliseconds);
+        await using var timedScope = new TimedScope(loginDuration, cancellationToken);
 
-        if (result.IsNotAllowed)
+        IdentitySignInResult result = await _backOfficeSignInManager.PasswordSignInAsync(model.Username, model.Password, true, true);
+        if (result.Succeeded is false)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
-                .WithTitle("User is not allowed")
-                .WithDetail("The operation is not allowed on the user")
-                .Build());
-        }
-
-        if (result.IsLockedOut)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
-                .WithTitle("User is locked")
-                .WithDetail("The user is locked, and need to be unlocked before more login attempts can be executed.")
-                .Build());
-        }
-
-        if(result.RequiresTwoFactor)
-        {
-            string? twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(model.Username);
-            BackOfficeIdentityUser? attemptingUser = await _backOfficeUserManager.FindByNameAsync(model.Username);
-            IEnumerable<string> enabledProviders = (await _userTwoFactorLoginService.GetProviderNamesAsync(attemptingUser!.Key)).Result.Where(x=>x.IsEnabledOnUser).Select(x=>x.ProviderName);
-            return StatusCode(StatusCodes.Status402PaymentRequired, new RequiresTwoFactorResponseModel()
+            // TODO: The result should include the user and whether the credentials were valid to avoid these additional checks
+            BackOfficeIdentityUser? user = await _backOfficeUserManager.FindByNameAsync(model.Username.Trim()); // Align with UmbracoSignInManager and trim username!
+            if (user is not null &&
+                await _backOfficeUserManager.CheckPasswordAsync(user, model.Password))
             {
-                TwoFactorLoginView = twofactorView,
-                EnabledTwoFactorProviderNames = enabledProviders
-            });
+                // The credentials were correct, so cancel timed scope and provide a more detailed failure response
+                await timedScope.CancelAsync();
+
+                if (result.IsNotAllowed)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                        .WithTitle("User is not allowed")
+                        .WithDetail("The operation is not allowed on the user")
+                        .Build());
+                }
+
+                if (result.IsLockedOut)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                        .WithTitle("User is locked")
+                        .WithDetail("The user is locked, and need to be unlocked before more login attempts can be executed.")
+                        .Build());
+                }
+
+                if (result.RequiresTwoFactor)
+                {
+                    string? twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(model.Username);
+                    IEnumerable<string> enabledProviders = (await _userTwoFactorLoginService.GetProviderNamesAsync(user.Key)).Result.Where(x => x.IsEnabledOnUser).Select(x => x.ProviderName);
+
+                    return StatusCode(StatusCodes.Status402PaymentRequired, new RequiresTwoFactorResponseModel()
+                    {
+                        TwoFactorLoginView = twofactorView,
+                        EnabledTwoFactorProviderNames = enabledProviders
+                    });
+                }
+            }
+
+            return StatusCode(StatusCodes.Status401Unauthorized, new ProblemDetailsBuilder()
+                .WithTitle("Invalid credentials")
+                .WithDetail("The provided credentials are invalid. User has not been signed in.")
+                .Build());
         }
 
-        if (result.Succeeded)
-        {
-            return Ok();
-        }
-        return StatusCode(StatusCodes.Status401Unauthorized, new ProblemDetailsBuilder()
-            .WithTitle("Invalid credentials")
-            .WithDetail("The provided credentials are invalid. User has not been signed in.")
-            .Build());
+        // Set initial or update average (successful) login duration
+        _loginDurationAverage = _loginDurationAverage is long average
+            ? (average + (long)timedScope.Elapsed.TotalMilliseconds) / 2
+            : (long)timedScope.Elapsed.TotalMilliseconds;
+
+        // Cancel the timed scope (we don't want to unnecessarily wait on a successful response)
+        await timedScope.CancelAsync();
+
+        return Ok();
     }
 
     [AllowAnonymous]
@@ -171,7 +193,8 @@ public class BackOfficeController : SecurityControllerBase
         {
             return BadRequest(new OpenIddictResponse
             {
-                Error = "No context found", ErrorDescription = "Unable to obtain context from the current request."
+                Error = "No context found",
+                ErrorDescription = "Unable to obtain context from the current request."
             });
         }
 
@@ -180,7 +203,8 @@ public class BackOfficeController : SecurityControllerBase
         {
             return BadRequest(new OpenIddictResponse
             {
-                Error = "Invalid 'client ID'", ErrorDescription = "The specified 'client_id' is not valid."
+                Error = "Invalid 'client ID'",
+                ErrorDescription = "The specified 'client_id' is not valid."
             });
         }
 
@@ -200,7 +224,8 @@ public class BackOfficeController : SecurityControllerBase
         {
             return BadRequest(new OpenIddictResponse
             {
-                Error = "No context found", ErrorDescription = "Unable to obtain context from the current request."
+                Error = "No context found",
+                ErrorDescription = "Unable to obtain context from the current request."
             });
         }
 
@@ -213,35 +238,36 @@ public class BackOfficeController : SecurityControllerBase
                 ? new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, authenticateResult.Principal)
                 : BadRequest(new OpenIddictResponse
                 {
-                    Error = "Authorization failed", ErrorDescription = "The supplied authorization could not be verified."
+                    Error = "Authorization failed",
+                    ErrorDescription = "The supplied authorization could not be verified."
                 });
         }
 
-        if (request.IsClientCredentialsGrantType())
+        // ensure the client ID and secret are valid (verified by OpenIddict)
+        if (!request.IsClientCredentialsGrantType())
         {
-            // if we get here, the client ID and secret are valid (verified by OpenIddict)
-
-            // grab the user associated with the client ID
-            BackOfficeIdentityUser? associatedUser = await _backOfficeUserClientCredentialsManager.FindUserAsync(request.ClientId!);
-
-            if (associatedUser is not null)
-            {
-                // log current datetime as last login (this also ensures that the user is not flagged as inactive)
-                associatedUser.LastLoginDateUtc = DateTime.UtcNow;
-                await _backOfficeUserManager.UpdateAsync(associatedUser);
-
-                return await SignInBackOfficeUser(associatedUser, request);
-            }
-
-            // if this happens, the OpenIddict applications have somehow gone out of sync with the Umbraco users
-            _logger.LogError("The user associated with the client ID ({clientId}) could not be found", request.ClientId);
-            return BadRequest(new OpenIddictResponse
-            {
-                Error = "Authorization failed", ErrorDescription = "The user associated with the supplied 'client_id' could not be found."
-            });
+            throw new InvalidOperationException("The requested grant type is not supported.");
         }
 
-        throw new InvalidOperationException("The requested grant type is not supported.");
+        // grab the user associated with the client ID
+        BackOfficeIdentityUser? associatedUser = await _backOfficeUserClientCredentialsManager.FindUserAsync(request.ClientId!);
+        if (associatedUser is not null)
+        {
+            // log current datetime as last login (this also ensures that the user is not flagged as inactive)
+            associatedUser.LastLoginDateUtc = DateTime.UtcNow;
+            await _backOfficeUserManager.UpdateAsync(associatedUser);
+
+            return await SignInBackOfficeUser(associatedUser, request);
+        }
+
+        // if this happens, the OpenIddict applications have somehow gone out of sync with the Umbraco users
+        _logger.LogError("The user associated with the client ID ({clientId}) could not be found", request.ClientId);
+
+        return BadRequest(new OpenIddictResponse
+        {
+            Error = "Authorization failed",
+            ErrorDescription = "The user associated with the supplied 'client_id' could not be found."
+        });
     }
 
     [AllowAnonymous]
@@ -249,12 +275,17 @@ public class BackOfficeController : SecurityControllerBase
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Signout(CancellationToken cancellationToken)
     {
-        var userName = await GetUserNameFromAuthCookie();
+        AuthenticateResult cookieAuthResult = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+        var userName = cookieAuthResult.Principal?.Identity?.Name;
+        var userId = cookieAuthResult.Principal?.Identity?.GetUserId();
 
         await _backOfficeSignInManager.SignOutAsync();
+        _backOfficeUserManager.NotifyLogoutSuccess(cookieAuthResult.Principal ?? User, userId);
 
-        _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out",
-            userName ?? "UNKNOWN", HttpContext.Connection.RemoteIpAddress);
+        _logger.LogInformation(
+            "User {UserName} from IP address {RemoteIpAddress} has logged out",
+            userName ?? "UNKNOWN",
+            HttpContext.Connection.RemoteIpAddress);
 
         // Returning a SignOutResult will ask OpenIddict to redirect the user agent
         // to the post_logout_redirect_uri specified by the client application.
@@ -281,7 +312,7 @@ public class BackOfficeController : SecurityControllerBase
     /// <summary>
     ///     Called when a user links an external login provider in the back office
     /// </summary>
-    /// <param name="provider"></param>
+    /// <param name="requestModel"></param>
     /// <returns></returns>
     // This method is marked as AllowAnonymous and protected with a secret (linkKey) inside the model for the following reasons
     // - when a js client uses the fetch api (or old ajax requests) they can send a bearer token
@@ -487,7 +518,7 @@ public class BackOfficeController : SecurityControllerBase
 
     private static IActionResult DefaultChallengeResult() => new ChallengeResult(Constants.Security.BackOfficeAuthenticationType);
 
-    private RedirectResult CallbackErrorRedirectWithStatus( string flowType, string status, IEnumerable<IdentityError> identityErrors)
+    private RedirectResult CallbackErrorRedirectWithStatus(string flowType, string status, IEnumerable<IdentityError> identityErrors)
     {
         var redirectUrl = _securitySettings.Value.BackOfficeHost + "/" +
                           _securitySettings.Value.AuthorizeCallbackErrorPathName.TrimStart('/').AppendQueryStringToUrl(
