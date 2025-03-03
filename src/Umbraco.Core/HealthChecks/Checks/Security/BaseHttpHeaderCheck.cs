@@ -62,15 +62,14 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
     /// <summary>
     ///     Get the status for this health check
     /// </summary>
-    public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
-        await Task.WhenAll(CheckForHeader());
+    public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync()
+        => [await CheckForHeader()];
 
     /// <summary>
     ///     Executes the action and returns it's status
     /// </summary>
     public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
-        => throw new InvalidOperationException(
-            "HTTP Header action requested is either not executable or does not exist");
+        => throw new InvalidOperationException("HTTP Header action requested is either not executable or does not exist");
 
     /// <summary>
     ///     The actual health check method.

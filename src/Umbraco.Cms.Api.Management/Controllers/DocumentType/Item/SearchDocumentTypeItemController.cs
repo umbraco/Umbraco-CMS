@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
@@ -27,12 +27,12 @@ public class SearchDocumentTypeItemController : DocumentTypeItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
+    public Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
     {
         PagedModel<IEntitySlim> searchResult = _entitySearchService.Search(UmbracoObjectTypes.DocumentType, query, skip, take);
         if (searchResult.Items.Any() is false)
         {
-            return await Task.FromResult(Ok(new PagedModel<DocumentTypeItemResponseModel> { Total = searchResult.Total }));
+            return Task.FromResult<IActionResult>(Ok(new PagedModel<DocumentTypeItemResponseModel> { Total = searchResult.Total }));
         }
 
         IEnumerable<IContentType> contentTypes = _contentTypeService.GetMany(searchResult.Items.Select(item => item.Key).ToArray().EmptyNull());
@@ -42,6 +42,6 @@ public class SearchDocumentTypeItemController : DocumentTypeItemControllerBase
             Total = searchResult.Total
         };
 
-        return Ok(result);
+        return Task.FromResult<IActionResult>(Ok(result));
     }
 }

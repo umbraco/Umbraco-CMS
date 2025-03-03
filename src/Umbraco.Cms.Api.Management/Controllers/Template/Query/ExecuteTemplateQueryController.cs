@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Text;
 using Asp.Versioning;
@@ -80,7 +80,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
     [HttpPost("execute")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateQueryResultResponseModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<TemplateQueryResultResponseModel>> Execute(
+    public Task<ActionResult<TemplateQueryResultResponseModel>> Execute(
         CancellationToken cancellationToken,
         TemplateQueryExecuteModel query)
     {
@@ -96,7 +96,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
             .GetMany(results.Select(content => content.ContentType.Key).Distinct())
             .ToDictionary(contentType => contentType.Key, contentType => contentType.Icon);
 
-        return await Task.FromResult(Ok(new TemplateQueryResultResponseModel
+        return Task.FromResult<ActionResult<TemplateQueryResultResponseModel>>(Ok(new TemplateQueryResultResponseModel
         {
             QueryExpression = queryExpression.ToString(),
             ResultCount = results.Count,
