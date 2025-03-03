@@ -62,12 +62,12 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-button id="header-logo-button" look="primary" label="Logo" compact popovertarget="logo-popover">
-				<umb-app-logo id="header-logo" loading="eager"></umb-app-logo>
+				<umb-app-logo id="header-logo" loading="eager" override-theme="umb-dark-theme"></umb-app-logo>
 			</uui-button>
 			<uui-popover-container id="logo-popover" placement="bottom-start">
 				<umb-popover-layout>
 					<div id="modal">
-						<umb-app-logo id="logo" logo-type="logo" alternative></umb-app-logo>
+						<umb-app-logo id="logo" logo-type="logo"></umb-app-logo>
 						<span>${this._version}</span>
 
 						${this._serverUpgradeCheck
