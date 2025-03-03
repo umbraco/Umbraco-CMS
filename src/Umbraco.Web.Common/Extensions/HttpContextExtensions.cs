@@ -68,7 +68,13 @@ public static class HttpContextExtensions
             // Otherwise we can't log in as both a member and a backoffice user
             // For instance if you've enabled basic auth.
             ClaimsPrincipal? authenticatedPrincipal = result.Principal;
-            IEnumerable<ClaimsIdentity> existingIdentities = httpContext.User.Identities.Where(x => x.IsAuthenticated && x.AuthenticationType != authenticatedPrincipal.Identity.AuthenticationType);
+
+            // Make sure to copy into a list before attempting to update the authenticated principal, so we don't attempt to modify
+            // the collection while iterating it.
+            // See: https://github.com/umbraco/Umbraco-CMS/issues/18509
+            var existingIdentities = httpContext.User.Identities
+                .Where(x => x.IsAuthenticated && x.AuthenticationType != authenticatedPrincipal.Identity.AuthenticationType)
+                .ToList();
             authenticatedPrincipal.AddIdentities(existingIdentities);
 
             httpContext.User = authenticatedPrincipal;
