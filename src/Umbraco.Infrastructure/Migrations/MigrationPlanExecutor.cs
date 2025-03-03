@@ -104,16 +104,11 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     {
     }
 
-    /// <summary>
-    ///     Executes the plan.
-    /// </summary>
-    /// <param name="plan">The migration plan to be executes.</param>
-    /// <param name="fromState">The state to start execution at.</param>
-    /// <returns>ExecutedMigrationPlan containing information about the plan execution, such as completion state and the steps that ran.</returns>
-    /// <remarks>
-    /// <para>Each migration in the plan, may or may not run in a scope depending on the type of plan.</para>
-    /// <para>A plan can complete partially, the changes of each completed migration will be saved.</para>
-    /// </remarks>
+    /// <inheritdoc/>
+    [Obsolete("Use ExecutePlanAsync instead. Scheduled for removal in Umbraco 18.")]
+    public ExecutedMigrationPlan ExecutePlan(MigrationPlan plan, string fromState) => ExecutePlanAsync(plan, fromState).GetAwaiter().GetResult();
+
+    /// <inheritdoc/>
     public async Task<ExecutedMigrationPlan> ExecutePlanAsync(MigrationPlan plan, string fromState)
     {
         plan.Validate();
