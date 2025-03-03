@@ -90,7 +90,10 @@ export class UmbWorkspaceActionElement<
 			// TODO: This works on one level for now, which will be enough for the current use case. However, you can overwrite the overwrites, so we need to make this recursive. Perhaps we could move this to the extensions initializer.
 			// Add overwrites so that we can show any previously registered actions on the original workspace action
 			if (this.#manifest.overwrites) {
-				for (const alias of this.#manifest.overwrites) {
+				const overwrites = Array.isArray(this.#manifest.overwrites)
+					? this.#manifest.overwrites
+					: [this.#manifest.overwrites];
+				for (const alias of overwrites) {
 					aliases.add(alias);
 				}
 			}
