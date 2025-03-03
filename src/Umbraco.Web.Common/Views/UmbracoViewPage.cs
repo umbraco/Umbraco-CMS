@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -141,7 +142,7 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
                     markupToInject =
                         string.Format(
                             ContentSettings.PreviewBadge,
-                            HostingEnvironment.ToAbsolute(Core.Constants.System.DefaultUmbracoPath),
+                            HostingEnvironment.GetBackOfficePath(),
                             System.Web.HttpUtility.HtmlEncode(Context.Request.GetEncodedUrl()), // Belt and braces - via a browser at least it doesn't seem possible to have anything other than
                                                                                                 // a valid culture code provided in the querystring of this URL.
                                                                                                 // But just to be sure of prevention of an XSS vulnterablity we'll HTML encode here too.

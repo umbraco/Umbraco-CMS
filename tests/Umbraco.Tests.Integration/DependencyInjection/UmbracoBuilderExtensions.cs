@@ -105,7 +105,6 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     private static ILocalizedTextService GetLocalizedTextService(IServiceProvider factory)
     {
-        var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
         var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
         var appCaches = factory.GetRequiredService<AppCaches>();
 
@@ -130,7 +129,7 @@ public static class UmbracoBuilderExtensions
                     uiProject.Create();
                 }
 
-                var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, Constants.System.DefaultUmbracoPath.TrimStart("~/"), "config", "lang"));
+                var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, Constants.System.DefaultUmbracoPath.TrimStart(Constants.CharArrays.TildeForwardSlash), "config", "lang"));
 
                 return new LocalizedTextServiceFileSources(
                     loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),
