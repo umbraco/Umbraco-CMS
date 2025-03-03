@@ -97,7 +97,7 @@ public class RadioButtonsPropertyEditor : DataEditor
             if (valueListConfiguration.Items.Contains(valueAsString) is false)
             {
                 yield return new ValidationResult(
-                    _localizedTextService.Localize("validation", "notOneOfOptions", [valueAsString.ToString()]),
+                    _localizedTextService.Localize("validation", "notOneOfOptions", [valueAsString]),
                     ["value"]);
             }
         }
