@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Installer;
@@ -35,21 +35,21 @@ public class DatabaseUpgradeStep : StepBase, IInstallStep, IUpgradeStep
 
     public Task<Attempt<InstallationResult>> ExecuteAsync() => ExecuteInternalAsync();
 
-    private Task<Attempt<InstallationResult>> ExecuteInternalAsync()
+    private async Task<Attempt<InstallationResult>> ExecuteInternalAsync()
     {
         _logger.LogInformation("Running 'Upgrade' service");
 
         var plan = new UmbracoPlan(_umbracoVersion);
         // TODO: Clear CSRF cookies with notification.
 
-        DatabaseBuilder.Result? result = _databaseBuilder.UpgradeSchemaAndData(plan);
+        DatabaseBuilder.Result? result = await _databaseBuilder.UpgradeSchemaAndDataAsync(plan).ConfigureAwait(false);
 
         if (result?.Success == false)
         {
-            return Task.FromResult(FailWithMessage("The database failed to upgrade. ERROR: " + result.Message));
+            return FailWithMessage("The database failed to upgrade. ERROR: " + result.Message);
         }
 
-        return Task.FromResult(Success());
+        return Success();
     }
 
     public Task<bool> RequiresExecutionAsync(InstallData model) => ShouldExecute();

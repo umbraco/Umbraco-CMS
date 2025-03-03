@@ -50,15 +50,18 @@ public class PackageMigrationRunner
         _packageMigrationPlans = packageMigrationPlans.ToDictionary(x => x.Name);
     }
 
+    [Obsolete("Please use RunPackageMigrationsIfPendingAsync instead. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<ExecutedMigrationPlan> RunPackageMigrationsIfPending(string packageName)
+        => RunPackageMigrationsIfPendingAsync(packageName).GetAwaiter().GetResult();
+
     /// <summary>
     ///     Runs all migration plans for a package name if any are pending.
     /// </summary>
     /// <param name="packageName"></param>
     /// <returns></returns>
-    public IEnumerable<ExecutedMigrationPlan> RunPackageMigrationsIfPending(string packageName)
+    public async Task<IEnumerable<ExecutedMigrationPlan>> RunPackageMigrationsIfPendingAsync(string packageName)
     {
-        IReadOnlyDictionary<string, string?>? keyValues =
-            _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+        IReadOnlyDictionary<string, string?>? keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
         IReadOnlyList<string> pendingMigrations = _pendingPackageMigrations.GetPendingPackageMigrations(keyValues);
 
         IEnumerable<string> packagePlans = _packageMigrationPlans.Values
@@ -66,30 +69,34 @@ public class PackageMigrationRunner
             .Where(x => pendingMigrations.Contains(x.Name))
             .Select(x => x.Name);
 
-        return RunPackagePlans(packagePlans);
+        return await RunPackagePlansAsync(packagePlans).ConfigureAwait(false);
     }
 
     /// <summary>
     ///     Checks if all executed package migrations succeeded for a package.
     /// </summary>
-    public Task<Attempt<bool, PackageMigrationOperationStatus>> RunPendingPackageMigrations(string packageName)
+    public async Task<Attempt<bool, PackageMigrationOperationStatus>> RunPendingPackageMigrations(string packageName)
     {
         // Check if there are any migrations
         if (_packageMigrationPlans.ContainsKey(packageName) == false)
         {
-            return Task.FromResult(Attempt.FailWithStatus(PackageMigrationOperationStatus.NotFound, false));
+            return Attempt.FailWithStatus(PackageMigrationOperationStatus.NotFound, false);
         }
 
         // Run the migrations
-        IEnumerable<ExecutedMigrationPlan> executedMigrationPlans = RunPackageMigrationsIfPending(packageName);
+        IEnumerable<ExecutedMigrationPlan> executedMigrationPlans = await RunPackageMigrationsIfPendingAsync(packageName).ConfigureAwait(false);
 
         if (executedMigrationPlans.Any(plan => plan.Successful == false))
         {
-            return Task.FromResult(Attempt.FailWithStatus(PackageMigrationOperationStatus.CancelledByFailedMigration, false));
+            return Attempt.FailWithStatus(PackageMigrationOperationStatus.CancelledByFailedMigration, false);
         }
 
-        return Task.FromResult(Attempt.SucceedWithStatus(PackageMigrationOperationStatus.Success, true));
+        return Attempt.SucceedWithStatus(PackageMigrationOperationStatus.Success, true);
     }
+
+    [Obsolete("Please use RunPackageMigrationsIfPendingAsync instead. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<ExecutedMigrationPlan> RunPackagePlans(IEnumerable<string> plansToRun)
+        => RunPackagePlansAsync(plansToRun).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Runs the all specified package migration plans and publishes a <see cref="MigrationPlansExecutedNotification" />
@@ -98,7 +105,7 @@ public class PackageMigrationRunner
     /// <param name="plansToRun"></param>
     /// <returns></returns>
     /// <exception cref="Exception">If any plan fails it will throw an exception.</exception>
-    public IEnumerable<ExecutedMigrationPlan> RunPackagePlans(IEnumerable<string> plansToRun)
+    public async Task<IEnumerable<ExecutedMigrationPlan>> RunPackagePlansAsync(IEnumerable<string> plansToRun)
     {
         List<ExecutedMigrationPlan> results = new();
 
@@ -120,7 +127,7 @@ public class PackageMigrationRunner
                 Upgrader upgrader = new(plan);
 
                 // This may throw, if so the transaction will be rolled back
-                results.Add(upgrader.Execute(_migrationPlanExecutor, _scopeProvider, _keyValueService));
+                results.Add(await upgrader.ExecuteAsync(_migrationPlanExecutor, _scopeProvider, _keyValueService).ConfigureAwait(false));
             }
         }
 
