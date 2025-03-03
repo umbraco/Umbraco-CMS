@@ -10,7 +10,7 @@ import {
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import { jsonStringComparison, type Observable } from '@umbraco-cms/backoffice/observable-api';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -20,6 +20,8 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbContentTypeWorkspaceContextArgs extends UmbEntityDetailWorkspaceContextArgs {}
+
+const LOADING_STATE_UNIQUE = 'umbLoadingContentTypeDetail';
 
 export abstract class UmbContentTypeWorkspaceContextBase<
 		DetailModelType extends UmbContentTypeDetailModel = UmbContentTypeDetailModel,
@@ -61,6 +63,9 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		this.allowedContentTypes = this.structure.ownerContentTypeObservablePart((data) => data?.allowedContentTypes);
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
 		this.collection = this.structure.ownerContentTypeObservablePart((data) => data?.collection);
+
+		// Keep current data in sync with the owner content type - This is used for the discard changes feature
+		this.observe(this.structure.ownerContentType, (data) => this._data.setCurrent(data));
 	}
 
 	/**
@@ -72,21 +77,27 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		args: UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
 	): Promise<DetailModelType | undefined> {
 		this.resetState();
+		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Creating ${this.getEntityType()} scaffold` });
 		this.setParent(args.parent);
 
 		const request = this.structure.createScaffold(args.preset);
 		this._getDataPromise = request;
 		let { data } = await request;
-		if (!data) return undefined;
 
-		this.setUnique(data.unique);
+		if (data) {
+			data = await this._scaffoldProcessData(data);
 
-		if (this.modalContext) {
-			data = { ...data, ...this.modalContext.data.preset };
+			if (this.modalContext) {
+				// Notice if the preset comes with values, they will overwrite the scaffolded values... [NL]
+				data = { ...data, ...this.modalContext.data.preset };
+			}
+
+			this.setUnique(data.unique);
+			this.setIsNew(true);
+			this._data.setPersisted(data);
 		}
 
-		this.setIsNew(true);
-		this._data.setPersisted(data);
+		this.loading.removeState(LOADING_STATE_UNIQUE);
 
 		return data;
 	}
@@ -97,8 +108,13 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	 * @returns { Promise<DetailModelType> } The loaded data
 	 */
 	override async load(unique: string) {
+		if (unique === this.getUnique() && this._getDataPromise) {
+			return (await this._getDataPromise) as any;
+		}
+
 		this.resetState();
 		this.setUnique(unique);
+		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
 		this._getDataPromise = this.structure.loadType(unique);
 		const response = await this._getDataPromise;
 		const data = response.data;
@@ -106,9 +122,22 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		if (data) {
 			this._data.setPersisted(data);
 			this.setIsNew(false);
+
+			this.observe(
+				response.asObservable(),
+				(entity: any) => this.#onDetailStoreChange(entity),
+				'umbContentTypeDetailStoreObserver',
+			);
 		}
 
+		this.loading.removeState(LOADING_STATE_UNIQUE);
 		return response;
+	}
+
+	#onDetailStoreChange(entity: DetailModelType | undefined) {
+		if (!entity) {
+			this._data.clear();
+		}
 	}
 
 	/**
@@ -230,12 +259,6 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 
 	public override getData() {
 		return this.structure.getOwnerContentType();
-	}
-
-	protected override _getHasUnpersistedChanges(): boolean {
-		const currentData = this.structure.getOwnerContentType();
-		const persistedData = this._data.getPersisted();
-		return jsonStringComparison(persistedData, currentData) === false;
 	}
 
 	public override destroy(): void {

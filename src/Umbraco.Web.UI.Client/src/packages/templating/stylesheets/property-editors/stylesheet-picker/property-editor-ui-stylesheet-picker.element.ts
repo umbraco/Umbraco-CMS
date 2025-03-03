@@ -1,5 +1,4 @@
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
@@ -9,14 +8,8 @@ import type {
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbStylesheetInputElement } from '@umbraco-cms/backoffice/stylesheet';
 
-/**
- * @element umb-property-editor-ui-tiny-mce-stylesheets-configuration
- */
-@customElement('umb-property-editor-ui-tiny-mce-stylesheets-configuration')
-export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
-	extends UmbLitElement
-	implements UmbPropertyEditorUiElement
-{
+@customElement('umb-property-editor-ui-stylesheet-picker')
+export class UmbPropertyEditorUIStylesheetPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	readonly #serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
 
 	@property({ type: Array })
@@ -39,25 +32,15 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	constructor() {
-		super();
-		new UmbDeprecation({
-			deprecated: 'umb-property-editor-ui-tiny-mce-stylesheets-configuration',
-			removeInVersion: '16.0.0',
-			solution:
-				"Use `<umb-property-editor-ui-stylesheet-picker>` instead, or the 'Umb.PropertyEditorUi.StylesheetPicker' manifest.",
-		}).warn();
-	}
-
 	override render() {
 		return html`<umb-stylesheet-input @change=${this.#onChange} .selection=${this.#value}></umb-stylesheet-input>`;
 	}
 }
 
-export default UmbPropertyEditorUITinyMceStylesheetsConfigurationElement;
+export default UmbPropertyEditorUIStylesheetPickerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-tiny-mce-stylesheets-configuration': UmbPropertyEditorUITinyMceStylesheetsConfigurationElement;
+		'umb-property-editor-ui-stylesheet-picker': UmbPropertyEditorUIStylesheetPickerElement;
 	}
 }
