@@ -104,6 +104,9 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     {
     }
 
+    [Obsolete("Use ExecutePlan instead. Scheduled for removal in Umbraco 17.")]
+    public string Execute(MigrationPlan plan, string fromState) => ExecutePlan(plan, fromState).FinalState;
+
     /// <inheritdoc/>
     [Obsolete("Use ExecutePlanAsync instead. Scheduled for removal in Umbraco 18.")]
     public ExecutedMigrationPlan ExecutePlan(MigrationPlan plan, string fromState) => ExecutePlanAsync(plan, fromState).GetAwaiter().GetResult();
