@@ -13,9 +13,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 				{
 					label: 'Headers',
 					items: [
-						{ label: 'Page heading', data: 'h2', style: 'font-size: x-large;font-weight: bold;' },
-						{ label: 'Section heading', data: 'h3', style: 'font-size: large;font-weight: bold;' },
-						{ label: 'Paragraph heading', data: 'h4', style: 'font-weight: bold;' },
+						{ label: 'Page header', data: 'h2', style: 'font-size: x-large;font-weight: bold;' },
+						{ label: 'Section header', data: 'h3', style: 'font-size: large;font-weight: bold;' },
+						{ label: 'Paragraph header', data: 'h4', style: 'font-weight: bold;' },
 					],
 				},
 				{
