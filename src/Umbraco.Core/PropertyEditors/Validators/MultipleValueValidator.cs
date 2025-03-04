@@ -8,7 +8,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 
 /// <summary>
-/// A value validator editor validating property editors that handle multiple values from a configured list of options.
+/// A value validator for property editors that handle multiple values from a configured list of options.
 /// </summary>
 public class MultipleValueValidator : IValueValidator
 {
