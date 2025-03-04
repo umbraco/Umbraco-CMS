@@ -19,31 +19,22 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 ///     multiple values such as the drop down list, check box list, color picker, etc....
 /// </summary>
 /// <remarks>
-///     Mostly this used to test the we'd store INT Ids in the Db but publish STRING values or sometimes the INT values
+///     Some of these tests are to verify that the we'd store INT Ids in the Db but publish STRING values or sometimes the INT values
 ///     to cache. Now we always just deal with strings and we'll keep the tests that show that.
 /// </remarks>
 [TestFixture]
 public class MultiValuePropertyEditorTests
 {
     [Test]
-    public void DropDownMultipleValueEditor_Format_Data_For_Cache()
+    public void MultipleValueEditor_WithMultipleValues_Format_Data_For_Cache()
     {
         var dataValueEditorFactoryMock = new Mock<IDataValueEditorFactory>();
         var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(
             dataValueEditorFactoryMock.Object,
-            Mock.Of<IIOHelper>(), serializer);
-        var dataType = new DataType(checkBoxListPropertyEditor, serializer)
-        {
-            Id = 1,
-        };
-        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
-            .FromConfigurationObject(
-                new ValueListConfiguration
-                {
-                    Items = ["Value 1", "Value 2", "Value 3"]
-                },
-                serializer);
+            Mock.Of<IIOHelper>(),
+            serializer);
+        var dataType = CreateAndConfigureDataType(serializer, checkBoxListPropertyEditor);
 
         var configuration = dataType.ConfigurationObject as ValueListConfiguration;
         Assert.NotNull(configuration);
@@ -54,13 +45,7 @@ public class MultiValuePropertyEditorTests
             .Setup(x => x.GetDataType(It.IsAny<int>()))
             .Returns(dataType);
 
-        // TODO use builders instead of this mess
-        var multipleValueEditor = new MultipleValueEditor(
-            Mock.Of<ILocalizedTextService>(),
-            Mock.Of<IShortStringHelper>(),
-            Mock.Of<IJsonSerializer>(),
-            Mock.Of<IIOHelper>(),
-            new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox));
+        var multipleValueEditor = CreateValueEditor();
         dataValueEditorFactoryMock
             .Setup(x => x.Create<MultipleValueEditor>(It.IsAny<DataEditorAttribute>()))
             .Returns(multipleValueEditor);
@@ -76,25 +61,15 @@ public class MultiValuePropertyEditorTests
     }
 
     [Test]
-    public void DropDownValueEditor_Format_Data_For_Cache()
+    public void MultipleValueEditor_WithSingleValue_Format_Data_For_Cache()
     {
         var dataValueEditorFactoryMock = new Mock<IDataValueEditorFactory>();
-
         var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(
             dataValueEditorFactoryMock.Object,
-            Mock.Of<IIOHelper>(), serializer);
-        var dataType = new DataType(checkBoxListPropertyEditor, serializer)
-        {
-            Id = 1,
-        };
-        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
-            .FromConfigurationObject(
-                new ValueListConfiguration
-                {
-                    Items = ["Value 1", "Value 2", "Value 3"]
-                },
-                serializer);
+            Mock.Of<IIOHelper>(),
+            serializer);
+        var dataType = CreateAndConfigureDataType(serializer, checkBoxListPropertyEditor);
 
         var configuration = dataType.ConfigurationObject as ValueListConfiguration;
         Assert.NotNull(configuration);
@@ -105,13 +80,7 @@ public class MultiValuePropertyEditorTests
             .Setup(x => x.GetDataType(It.IsAny<int>()))
             .Returns(dataType);
 
-        // TODO use builders instead of this mess
-        var multipleValueEditor = new MultipleValueEditor(
-            Mock.Of<ILocalizedTextService>(),
-            Mock.Of<IShortStringHelper>(),
-            Mock.Of<IJsonSerializer>(),
-            Mock.Of<IIOHelper>(),
-            new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox));
+        var multipleValueEditor = CreateValueEditor();
         dataValueEditorFactoryMock
             .Setup(x => x.Create<MultipleValueEditor>(It.IsAny<DataEditorAttribute>()))
             .Returns(multipleValueEditor);
@@ -125,14 +94,15 @@ public class MultiValuePropertyEditorTests
     }
 
     [Test]
-    public void DropDownPreValueEditor_Format_Data_For_Editor()
+    public void MultipleValueEditor_Format_Data_For_Editor()
     {
         var dataValueEditorFactoryMock = new Mock<IDataValueEditorFactory>();
 
         var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(
             dataValueEditorFactoryMock.Object,
-            Mock.Of<IIOHelper>(), serializer);
+            Mock.Of<IIOHelper>(),
+            serializer);
         var dataType = new DataType(checkBoxListPropertyEditor, serializer)
         {
             Id = 1,
@@ -154,5 +124,29 @@ public class MultiValuePropertyEditorTests
         Assert.AreEqual("Item 1", result.Items[0]);
         Assert.AreEqual("Item 2", result.Items[1]);
         Assert.AreEqual("Item 3", result.Items[2]);
+    }
+
+    private static MultipleValueEditor CreateValueEditor() =>
+        new(
+            Mock.Of<ILocalizedTextService>(),
+            Mock.Of<IShortStringHelper>(),
+            Mock.Of<IJsonSerializer>(),
+            Mock.Of<IIOHelper>(),
+            new DataEditorAttribute(Constants.PropertyEditors.Aliases.CheckBoxList));
+
+    private static DataType CreateAndConfigureDataType(SystemTextConfigurationEditorJsonSerializer serializer, CheckBoxListPropertyEditor checkBoxListPropertyEditor)
+    {
+        var dataType = new DataType(checkBoxListPropertyEditor, serializer)
+        {
+            Id = 1,
+        };
+        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new ValueListConfiguration
+                {
+                    Items = ["Value 1", "Value 2", "Value 3"]
+                },
+                serializer);
+        return dataType;
     }
 }
