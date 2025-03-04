@@ -21,9 +21,10 @@ export async function umbQueryMapperForJsonPaths<T>(
 	let pathsWithQueries = scopePaths.map(
 		(path) => {
 			// This could already be translated, meaning it can both be an index or a JSON-Path query.
-			const pathSplit = path.split(']', 2);
-			// grab left side of ] and get rid of `$[`
-			let pointer = pathSplit[0].substring(2);
+			const index = path.indexOf(']');
+			// grab everything between `$[` and `]`
+			let pointer = path.substring(2, index);
+			const afterQuery = path.substring(index + 1);
 			const numberPointer = Number(pointer);
 
 			// If a number index, then create JSON-Path Query:
@@ -35,7 +36,7 @@ export async function umbQueryMapperForJsonPaths<T>(
 				uniquePointers.push(pointer);
 			}
 
-			return `$[${pointer}]${pathSplit[1]}`;
+			return `$[${pointer}]${afterQuery}`;
 		},
 		{} as Record<string, Array<string>>,
 	);

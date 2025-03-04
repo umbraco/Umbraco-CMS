@@ -20,6 +20,23 @@ describe('umbQueryMapperForJsonPaths', () => {
 		expect(result[1]).to.eq(`$[?(@.key == '1')].value`);
 	});
 
+	it('only handles the first index based pointers', async () => {
+		const data = [
+			{ key: '0', value: 'one' },
+			{ key: '1', value: 'two' },
+			{ key: '2', value: 'three' },
+		];
+		const paths = [`$[?(@.key == '0')].value`, `$[1].value.inner[1234].hello`];
+
+		const result = await umbQueryMapperForJsonPaths(paths, data, (entry: (typeof data)[0]) => {
+			return `?(@.key == '${entry.key}')`;
+		});
+
+		expect(result.length).to.eq(2);
+		expect(result[0]).to.eq(`$[?(@.key == '0')].value`);
+		expect(result[1]).to.eq(`$[?(@.key == '1')].value.inner[1234].hello`);
+	});
+
 	it('runs the mapper for both index and query based pointers', async () => {
 		const data = [
 			{ key: '0', value: 'one' },
