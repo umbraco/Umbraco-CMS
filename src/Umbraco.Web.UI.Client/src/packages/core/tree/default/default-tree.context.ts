@@ -21,6 +21,7 @@ import {
 	UmbObjectState,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbDefaultTreeContext<
 		TreeItemType extends UmbTreeItemModel,
