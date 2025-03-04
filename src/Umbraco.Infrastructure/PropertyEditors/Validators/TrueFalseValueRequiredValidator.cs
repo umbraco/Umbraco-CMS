@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
@@ -8,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
 /// <summary>
 /// Custom validator for true/false (toggle) required validation.
 /// </summary>
-internal class TrueFalseValueRequiredValidator : RequiredValidator, IValueRequiredValidator
+internal class TrueFalseValueRequiredValidator : RequiredValidator
 {
     /// <inheritdoc/>
     public override IEnumerable<ValidationResult> ValidateRequired(object? value, string? valueType)
