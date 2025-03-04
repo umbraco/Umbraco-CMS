@@ -132,11 +132,12 @@ public class DecimalValueEditorTests
         }
     }
 
-    [TestCase(1.4, false)]
-    [TestCase(1.5, true)]
-    public void Validates_Matches_Configured_Step(object value, bool expectedSuccess)
+    [TestCase(0.2, 1.4, false)]
+    [TestCase(0.2, 1.5, true)]
+    [TestCase(0.0, 1.4, true)] // A step of zero would trigger a divide by zero error in evaluating. So we always pass validation for zero, as effectively any step value is valid.
+    public void Validates_Matches_Configured_Step(double step, object value, bool expectedSuccess)
     {
-        var editor = CreateValueEditor();
+        var editor = CreateValueEditor(step: step);
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
@@ -164,7 +165,7 @@ public class DecimalValueEditorTests
         return CreateValueEditor().ToEditor(property.Object);
     }
 
-    private static DecimalPropertyEditor.DecimalPropertyValueEditor CreateValueEditor()
+    private static DecimalPropertyEditor.DecimalPropertyValueEditor CreateValueEditor(double step = 0.2)
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
         localizedTextServiceMock.Setup(x => x.Localize(
@@ -184,7 +185,7 @@ public class DecimalValueEditorTests
             {
                 { "min", 1.1 },
                 { "max", 1.9 },
-                { "step", 0.2 }
+                { "step", step }
             }
         };
     }

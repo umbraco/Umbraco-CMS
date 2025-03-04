@@ -66,7 +66,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 						alias: 'stylesheets',
 						label: '#treeHeaders_stylesheets',
 						description: 'Pick the stylesheets whose editor styles should be available when editing',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.StylesheetsConfiguration',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.StylesheetPicker',
 						weight: 20,
 					},
 					{
