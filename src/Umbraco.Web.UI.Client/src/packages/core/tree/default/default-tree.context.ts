@@ -1,10 +1,4 @@
-import type {
-	UmbTreeExpansionEntryModel,
-	UmbTreeExpansionModel,
-	UmbTreeItemModel,
-	UmbTreeRootModel,
-	UmbTreeStartNode,
-} from '../types.js';
+import type { UmbTreeExpansionModel, UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
 import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { UmbTreeContext } from '../tree-context.interface.js';
 import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
@@ -22,7 +16,6 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 export class UmbDefaultTreeContext<
 		TreeItemType extends UmbTreeItemModel,
