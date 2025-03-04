@@ -79,7 +79,6 @@ test('can not browse content node with permission disabled', async ({umbracoApi,
   await umbracoUi.content.isErrorNotificationVisible();
   // TODO: Uncomment this when this issue is fixed https://github.com/umbraco/Umbraco-CMS/issues/18533
   //await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource);
-  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource);
 });
 
 test('can create document blueprint with permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -616,6 +615,6 @@ test('can not see delete button in content for userGroup with delete permission 
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
 
   // Assert
-  await umbracoUi.content.isPermissionInActionsMenuVisible('Delete...', false);
-  await umbracoUi.content.isPermissionInActionsMenuVisible('Create...', true);
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Delete…', false);
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Create…', true);
 });
