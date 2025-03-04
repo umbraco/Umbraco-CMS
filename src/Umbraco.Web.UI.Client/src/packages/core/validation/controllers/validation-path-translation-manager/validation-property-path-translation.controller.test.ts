@@ -1,17 +1,17 @@
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { UmbValidationPropertyPathTranslatorController } from './validation-property-path-translation.manager.js';
+import { UmbValidationPropertyPathTranslationController } from './validation-property-path-translation.controller.js';
 import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '@umbraco-cms/backoffice/property';
 import { UmbDataPathPropertyValueQuery } from '../../utils/data-path-property-value-query.function.js';
 
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-describe('UmbValidationPropertyPathTranslatorController', () => {
+describe('UmbValidationPropertyPathTranslationController', () => {
 	describe('Without translators', () => {
 		let host: UmbTestControllerHostElement;
-		let ctrl!: UmbValidationPropertyPathTranslatorController;
+		let ctrl!: UmbValidationPropertyPathTranslationController;
 		let propertiesData: Array<UmbPropertyValueDataPotentiallyWithEditorAlias> = [
 			{
 				alias: 'test-alias',
@@ -22,7 +22,7 @@ describe('UmbValidationPropertyPathTranslatorController', () => {
 
 		beforeEach(async () => {
 			host = new UmbTestControllerHostElement();
-			ctrl = new UmbValidationPropertyPathTranslatorController(host);
+			ctrl = new UmbValidationPropertyPathTranslationController(host);
 		});
 		afterEach(async () => {
 			host.destroy();

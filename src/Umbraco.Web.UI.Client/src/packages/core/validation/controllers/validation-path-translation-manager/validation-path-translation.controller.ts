@@ -4,18 +4,18 @@ import type { UmbValidationMessage } from '../../context/validation-messages.man
 import type { UmbValidationPathTranslator } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export type UmbValidationTranslatorControllerArgs = {
-	pathTranslators: Array<ClassConstructor<UmbValidationPathTranslator>>;
+export type UmbValidationTranslationControllerArgs = {
+	pathTranslators: Array<ClassConstructor<UmbValidationPathTranslator<any>>>;
 	translationData: unknown;
 };
 
-// Write interface that can be handed to the API for the Host, so each path Translator can communicate back to the host here. For translating inner values.
-export class UmbValidationTranslatorController extends UmbControllerBase {
+// Write interface that can be handed to the API for the Host, so each Path Translator can communicate back to the host here. For translating inner values.
+export class UmbValidationTranslationController extends UmbControllerBase {
 	//
-	#pathTranslators: Array<ClassConstructor<UmbValidationPathTranslator>> = [];
+	#pathTranslators: Array<ClassConstructor<UmbValidationPathTranslator<any>>> = [];
 	#data: unknown;
 
-	constructor(host: UmbControllerHost, args: UmbValidationTranslatorControllerArgs) {
+	constructor(host: UmbControllerHost, args: UmbValidationTranslationControllerArgs) {
 		super(host);
 
 		this.#pathTranslators = args.pathTranslators;

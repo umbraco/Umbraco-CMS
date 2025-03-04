@@ -6,7 +6,7 @@ import { umbQueryMapperForJsonPaths } from '../../utils/query-mapper-json-paths.
 import { UmbDataPathPropertyValueQuery } from '../../utils/data-path-property-value-query.function.js';
 
 // Write interface that can be handed to the API for the Host, so each path Translator can communicate back to the host here. For translating inner values.
-export class UmbValidationPropertyPathTranslatorController extends UmbControllerBase {
+export class UmbValidationPropertyPathTranslationController extends UmbControllerBase {
 	/**
 	 * translates the property data.
 	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} property - The property data.

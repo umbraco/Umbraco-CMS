@@ -3,7 +3,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import type { UmbValidationPathTranslator } from '../types.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { UmbValidationTranslatorController } from './validation-path-translation.manager.js';
+import { UmbValidationTranslationController } from './validation-path-translation.controller.js';
 import type { UmbValidationMessage } from '../../context/validation-messages.manager.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { umbScopeMapperForJsonPaths } from '../../utils/scope-mapper-json-paths.function.js';
@@ -12,10 +12,10 @@ import { umbQueryMapperForJsonPaths } from '../../utils/query-mapper-json-paths.
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-describe('UmbValidationTranslatorController', () => {
+describe('UmbValidationTranslationController', () => {
 	describe('Without translators', () => {
 		let host: UmbTestControllerHostElement;
-		let ctrl!: UmbValidationTranslatorController;
+		let ctrl!: UmbValidationTranslationController;
 		let translationData = {
 			propertyStr: 'value',
 			propertyArray: [0, 1, 2, 3],
@@ -26,7 +26,7 @@ describe('UmbValidationTranslatorController', () => {
 
 		beforeEach(async () => {
 			host = new UmbTestControllerHostElement();
-			ctrl = new UmbValidationTranslatorController(host, { translationData, pathTranslators: [] });
+			ctrl = new UmbValidationTranslationController(host, { translationData, pathTranslators: [] });
 		});
 		afterEach(async () => {
 			host.destroy();
@@ -51,7 +51,7 @@ describe('UmbValidationTranslatorController', () => {
 
 	describe('Using a translator', () => {
 		let host: UmbTestControllerHostElement;
-		let ctrl!: UmbValidationTranslatorController;
+		let ctrl!: UmbValidationTranslationController;
 		let translationData = {
 			propArray: [
 				{
@@ -102,7 +102,7 @@ describe('UmbValidationTranslatorController', () => {
 
 		beforeEach(async () => {
 			host = new UmbTestControllerHostElement();
-			ctrl = new UmbValidationTranslatorController(host, { translationData, pathTranslators: [Translator] });
+			ctrl = new UmbValidationTranslationController(host, { translationData, pathTranslators: [Translator] });
 		});
 		afterEach(async () => {
 			host.destroy();
