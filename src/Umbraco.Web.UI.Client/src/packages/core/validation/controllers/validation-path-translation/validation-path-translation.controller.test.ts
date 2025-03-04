@@ -1,5 +1,4 @@
 import { expect } from '@open-wc/testing';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbValidationPathTranslator } from '../types.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
