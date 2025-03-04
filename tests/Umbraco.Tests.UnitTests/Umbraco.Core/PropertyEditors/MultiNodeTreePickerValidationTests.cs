@@ -25,7 +25,9 @@ public class MultiNodeTreePickerValidationTests
     [TestCase(2, true, "[{\"type\":\"document\",\"unique\":\"86eb02a7-793f-4406-9152-9736b6b64bee\"},{\"type\":\"document\",\"unique\":\"25ef6fd2-db48-450a-8c48-df3ad75adf4b\"}]")]
     [TestCase(3, false, "[{\"type\":\"document\",\"unique\":\"86eb02a7-793f-4406-9152-9736b6b64bee\"},{\"type\":\"document\",\"unique\":\"86eb02a7-793f-4406-9152-9736b6b64bee\"}]")]
     [TestCase(2, false, "[{\"type\":\"document\",\"unique\":\"86eb02a7-793f-4406-9152-9736b6b64bee\"}]")]
-    public void Validates_Minimum_Entries(int min, bool shouldSucceed, string value)
+    [TestCase(1, false, null)]
+    [TestCase(0, true, null)]
+    public void Validates_Minimum_Entries(int min, bool shouldSucceed, string? value)
     {
         var (valueEditor, _, _, _, _) = CreateValueEditor();
         valueEditor.ConfigurationObject = new MultiNodePickerConfiguration { MinNumber = min};

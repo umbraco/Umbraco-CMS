@@ -45,7 +45,8 @@ public class TypedJsonValidatorRunner<TValue, TConfiguration> : IValueValidator
             return validationResults;
         }
 
-        if (value is null || _jsonSerializer.TryDeserialize(value, out TValue? deserializedValue) is false)
+        TValue? deserializedValue = null;
+        if (value is not null && _jsonSerializer.TryDeserialize(value, out deserializedValue) is false)
         {
             return validationResults;
         }

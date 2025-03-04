@@ -207,20 +207,25 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             {
                 var validationResults = new List<ValidationResult>();
 
-                if (entityReferences is null || configuration is null)
+                if (configuration is null)
                 {
                     return validationResults;
                 }
 
-                if (configuration.MinNumber > 0 && entityReferences.Length < configuration.MinNumber)
+                if (configuration.MinNumber > 0 && (entityReferences is null || entityReferences.Length < configuration.MinNumber))
                 {
                     validationResults.Add(new ValidationResult(
                         _localizedTextService.Localize(
                             "validation",
                             "entriesShort",
-                            [configuration.MinNumber.ToString(), (configuration.MinNumber - entityReferences.Length).ToString()
+                            [configuration.MinNumber.ToString(), (configuration.MinNumber - (entityReferences?.Length ?? 0)).ToString()
                             ]),
                         ["value"]));
+                }
+
+                if (entityReferences is null)
+                {
+                    return validationResults;
                 }
 
                 if (configuration.MaxNumber > 0 && entityReferences.Length > configuration.MaxNumber)
