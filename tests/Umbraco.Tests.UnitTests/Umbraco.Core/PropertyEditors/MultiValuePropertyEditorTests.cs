@@ -1,11 +1,13 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Globalization;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -126,13 +128,47 @@ public class MultiValuePropertyEditorTests
         Assert.AreEqual("Item 3", result.Items[2]);
     }
 
-    private static MultipleValueEditor CreateValueEditor() =>
-        new(
-            Mock.Of<ILocalizedTextService>(),
+    [TestCase("Red", true, "")]
+    [TestCase("Yellow", false, "notOneOfOptions")]
+    [TestCase("Red,Green", true, "")]
+    [TestCase("Red,Yellow,Purple", false, "multipleNotOneOfOptions")]
+    public void MultipleValueEditor_Validates_Single_Value(string values, bool expectedSuccess, string expectedValidationMessageKey)
+    {
+        var editor = CreateValueEditor();
+        editor.ConfigurationObject = new ValueListConfiguration
+        {
+            Items = ["Red", "Green", "Blue"],
+        };
+        var result = editor.Validate(values.Split(','), false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual($"validation_{expectedValidationMessageKey}", validationResult.ErrorMessage);
+        }
+    }
+
+    private static MultipleValueEditor CreateValueEditor()
+    {
+        var localizedTextServiceMock = new Mock<ILocalizedTextService>();
+        localizedTextServiceMock.Setup(x => x.Localize(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CultureInfo>(),
+                It.IsAny<IDictionary<string, string>>()))
+            .Returns((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => $"{key}_{alias}");
+        return new(
+            localizedTextServiceMock.Object,
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
             new DataEditorAttribute(Constants.PropertyEditors.Aliases.CheckBoxList));
+    }
 
     private static DataType CreateAndConfigureDataType(SystemTextConfigurationEditorJsonSerializer serializer, CheckBoxListPropertyEditor checkBoxListPropertyEditor)
     {
