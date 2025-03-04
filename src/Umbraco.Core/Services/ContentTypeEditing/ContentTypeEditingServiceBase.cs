@@ -91,7 +91,12 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
         }
 
-        await AdditionalCreateValidationAsync(model);
+        // perform additional, content type specific validation
+        operationStatus = await AdditionalCreateValidationAsync(model);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
+        }
 
         // get the ID of the parent to create the content type under (we already validated that it exists)
         var parentId = GetParentId(model, containerKey) ?? throw new ArgumentException("Parent ID could not be found", nameof(model));
