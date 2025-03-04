@@ -122,6 +122,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="unexpectedRange">Værdien %0% forventes ikke at indeholde et spænd.</key>
     <key alias="invalidRange">Værdien %0% forventes at have en værdi der er større end fra værdien.</key>
     <key alias="notOneOfOptions">"Værdien '%0%' er ikke en af de tilgængelige valgmuligheder.</key>
+    <key alias="invalidColor">"Den valgte farve '%0%' er ikke en af de tilgængelige valgmuligheder.</key>
   </area>
   <area alias="recycleBin">
     <key alias="contentTrashed">Slettet indhold med Id: {0} Relateret til original "parent" med id: {1}</key>
