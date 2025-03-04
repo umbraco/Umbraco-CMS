@@ -413,6 +413,6 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
             GetRequiredService<ILogger<IContent>>(),
             GetRequiredService<UriUtility>(),
             GetRequiredService<IPublishedUrlProvider>(),
-            GetRequiredService<IPublishedContentCache>(),
-            GetRequiredService<IDocumentNavigationQueryService>()).GetAwaiter().GetResult();
+            GetRequiredService<IDocumentNavigationQueryService>(),
+            GetRequiredService<IPublishedContentStatusFilteringService>()).GetAwaiter().GetResult();
 }

@@ -9,6 +9,7 @@
  * Language Culture: en-GB
  */
 import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localization-api';
+
 export default {
 	actions: {
 		assigndomain: 'Culture and Hostnames',
@@ -34,8 +35,8 @@ export default {
 		export: 'Export',
 		exportDocumentType: 'Export Document Type',
 		folderCreate: 'Create folder',
-		folderDelete: 'Delete folder',
-		folderRename: 'Rename folder',
+		folderDelete: 'Delete',
+		folderRename: 'Rename',
 		import: 'Import',
 		importdocumenttype: 'Import Document Type',
 		importPackage: 'Import Package',
@@ -234,7 +235,7 @@ export default {
 		createDateDesc: 'Date/time this document was created',
 		documentType: 'Document Type',
 		editing: 'Editing',
-		expireDate: 'Remove At',
+		expireDate: 'Remove at',
 		itemChanged: 'This item has been changed after publication',
 		itemNotPublished: 'This item is not published',
 		lastPublished: 'Last published',
@@ -269,11 +270,11 @@ export default {
 		publishDescendantsWithVariantsHelp:
 			'Publish variants and variants of same type underneath and thereby making their content publicly available.',
 		noVariantsToProcess: 'There are no available variants',
-		releaseDate: 'Publish At',
-		unpublishDate: 'Unpublish At',
-		removeDate: 'Clear Date',
+		releaseDate: 'Publish at',
+		unpublishDate: 'Unpublish at',
+		removeDate: 'Clear date',
 		setDate: 'Set date',
-		sortDone: 'Sortorder is updated',
+		sortDone: 'Sort order is updated',
 		sortHelp:
 			'To sort the nodes, simply drag the nodes or click one of the column headers. You can select\n      multiple nodes by holding the "shift" or "control" key while selecting\n    ',
 		statistics: 'Statistics',
@@ -513,6 +514,10 @@ export default {
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
 		confirmTrash: (name: string) => `Are you sure you want to move <strong>${name}</strong> to the Recycle Bin?`,
+		confirmBulkTrash: (total: number) =>
+			`Are you sure you want to move <strong>${total} ${total === 1 ? 'item' : 'items'}</strong> to the Recycle Bin?`,
+		confirmBulkDelete: (total: number) =>
+			`Are you sure you want to delete <strong>${total} ${total === 1 ? 'item' : 'items'}</strong>?`,
 		cut: 'Cut',
 		editDictionary: 'Edit dictionary item',
 		editLanguage: 'Edit language',
@@ -528,7 +533,7 @@ export default {
 		languagedeletewarning: 'This will delete the language and all content related to the language',
 		languageChangeWarning:
 			'Changing the culture for a language may be an expensive operation and will result\n      in the content cache and indexes being rebuilt\n    ',
-		lastEdited: 'Last Edited',
+		lastEdited: 'Last edited',
 		link: 'Link',
 		linkinternal: 'Internal link',
 		linklocaltip: 'When using local links, insert "#" in front of link',
@@ -955,7 +960,7 @@ export default {
 		avatar: 'Avatar for',
 		header: 'Header',
 		systemField: 'system field',
-		lastUpdated: 'Last Updated',
+		lastUpdated: 'Last updated',
 		selectAll: 'Select all',
 		skipToMenu: 'Skip to menu',
 		skipToContent: 'Skip to content',
@@ -2718,7 +2723,21 @@ export default {
 		wordWrapConfigLabel: 'Word wrap',
 		wordWrapConfigDescription: 'Enable word wrapping in the code editor.',
 	},
+	rte: {
+		config_blocks: 'Available Blocks',
+		config_blocks_description: 'Define the available blocks.',
+		config_ignoreUserStartNodes: 'Ignore User Start Nodes',
+		config_maxImageSize: 'Maximum size for inserted images',
+		config_maxImageSize_description: 'Maximum width or height - enter 0 to disable resizing.',
+		config_mediaParentId: 'Image Upload Folder',
+		config_mediaParentId_description: 'Choose the upload location of pasted images.',
+		config_overlaySize: 'Overlay size',
+		config_overlaySize_description: 'Select the width of the overlay (link picker).',
+	},
 	tiptap: {
+		config_dimensions_description: 'Set the maximum width and height of the editor. This excludes the toolbar height.',
+		config_extensions: 'Capabilities',
+		config_toolbar: 'Toolbar',
 		extGroup_formatting: 'Text formatting',
 		extGroup_interactive: 'Interactive elements',
 		extGroup_media: 'Embeds and media',
@@ -2734,6 +2753,7 @@ export default {
 		toolbar_removeGroup: 'Remove group',
 		toolbar_removeItem: 'Remove action',
 		toolbar_emptyGroup: 'Empty',
+		sourceCodeEdit: 'Edit source code',
 	},
 	linkPicker: {
 		modalSource: 'Source',
@@ -2743,5 +2763,9 @@ export default {
 		resetUrlHeadline: 'Reset URL?',
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',
+	},
+	collection: {
+		noItemsTitle: 'No items',
+		addCollectionConfiguration: 'Add collection',
 	},
 } as UmbLocalizationDictionary;

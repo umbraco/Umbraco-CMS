@@ -226,7 +226,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	async #getMediaTypeOptions(item: UmbUploadableItem): Promise<Array<UmbAllowedMediaTypeModel>> {
 		// Check the parent which children media types are allowed
 		const parent = item.parentUnique ? await this.#mediaDetailRepository.requestByUnique(item.parentUnique) : null;
-		const allowedChildren = await this.#getAllowedChildrenOf(parent?.data?.mediaType.unique ?? null);
+		const allowedChildren = await this.#getAllowedChildrenOf(parent?.data?.mediaType.unique ?? null, item.parentUnique);
 
 		const extension = item.temporaryFile?.file.name.split('.').pop() ?? null;
 
@@ -255,7 +255,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		return availableMediaTypes;
 	}
 
-	async #getAllowedChildrenOf(mediaTypeUnique: string | null) {
+	async #getAllowedChildrenOf(mediaTypeUnique: string | null, parentUnique: string | null) {
 		//Check if we already got information on this media type.
 		const allowed = this.#allowedChildrenOf
 			.getValue()
@@ -263,7 +263,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		if (allowed) return allowed;
 
 		// Request information on this media type.
-		const { data } = await this.#mediaTypeStructure.requestAllowedChildrenOf(mediaTypeUnique);
+		const { data } = await this.#mediaTypeStructure.requestAllowedChildrenOf(mediaTypeUnique, parentUnique);
 		if (!data) throw new Error('Parent media type does not exists');
 
 		this.#allowedChildrenOf.appendOne({ mediaTypeUnique, allowedChildren: data.items });

@@ -36,7 +36,7 @@ export class UmbMediaPickerCreateItemElement extends UmbLitElement {
 	async #getAllowedMediaTypes() {
 		const mediaType = await this.#getNodeMediaType();
 
-		const { data: allowedMediaTypes } = await this.#mediaTypeStructure.requestAllowedChildrenOf(mediaType);
+		const { data: allowedMediaTypes } = await this.#mediaTypeStructure.requestAllowedChildrenOf(mediaType, this._node);
 		this._allowedMediaTypes = allowedMediaTypes?.items ?? [];
 	}
 

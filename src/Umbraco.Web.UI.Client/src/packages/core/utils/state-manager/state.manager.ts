@@ -92,4 +92,9 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	clear() {
 		this._states.setValue([]);
 	}
+
+	override destroy() {
+		super.destroy();
+		this._states.destroy();
+	}
 }

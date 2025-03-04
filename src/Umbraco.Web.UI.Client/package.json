@@ -45,6 +45,7 @@
 		"./entity-bulk-action": "./dist-cms/packages/core/entity-bulk-action/index.js",
 		"./entity-create-option-action": "./dist-cms/packages/core/entity-create-option-action/index.js",
 		"./entity": "./dist-cms/packages/core/entity/index.js",
+		"./entity-item": "./dist-cms/packages/core/entity-item/index.js",
 		"./event": "./dist-cms/packages/core/event/index.js",
 		"./extension-registry": "./dist-cms/packages/core/extension-registry/index.js",
 		"./health-check": "./dist-cms/packages/health-check/index.js",

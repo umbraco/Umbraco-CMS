@@ -1,11 +1,14 @@
-﻿using System.Text.Json.Nodes;
+using System.Globalization;
+using System.Text.Json.Nodes;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Serialization;
 
@@ -14,7 +17,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 [TestFixture]
 public class SliderValueEditorTests
 {
+#pragma warning disable IDE1006 // Naming Styles
     public static object[] InvalidCaseData = new object[]
+#pragma warning restore IDE1006 // Naming Styles
     {
         123m,
         123,
@@ -99,6 +104,133 @@ public class SliderValueEditorTests
         Assert.IsNull(result);
     }
 
+    [TestCase(true, 1.1, 1.1, true)]
+    [TestCase(true, 1.1, 1.3, true)]
+    [TestCase(false, 1.1, 1.1, true)]
+    [TestCase(false, 1.1, 1.3, false)]
+    public void Validates_Contains_Range_Only_When_Enabled(bool enableRange, decimal from, decimal to, bool expectedSuccess)
+    {
+        var value = new JsonObject
+        {
+            { "from", from },
+            { "to", to },
+        };
+        var editor = CreateValueEditor(enableRange: enableRange);
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual(validationResult.ErrorMessage, "validation_unexpectedRange");
+        }
+    }
+
+    [TestCase(1.1, 1.1, true)]
+    [TestCase(1.1, 1.3, true)]
+    [TestCase(1.3, 1.1, false)]
+    public void Validates_Contains_Valid_Range_Only_When_Enabled(decimal from, decimal to, bool expectedSuccess)
+    {
+        var value = new JsonObject
+        {
+            { "from", from },
+            { "to", to },
+        };
+        var editor = CreateValueEditor();
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual(validationResult.ErrorMessage, "validation_invalidRange");
+        }
+    }
+
+    [TestCase(0.9, 1.1, false)]
+    [TestCase(1.1, 1.1, true)]
+    [TestCase(1.3, 1.7, true)]
+    public void Validates_Is_Greater_Than_Or_Equal_To_Configured_Min(decimal from, decimal to, bool expectedSuccess)
+    {
+        var value = new JsonObject
+        {
+            { "from", from },
+            { "to", to },
+        };
+        var editor = CreateValueEditor();
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMinimum");
+        }
+    }
+
+    [TestCase(1.3, 1.7, true)]
+    [TestCase(1.9, 1.9, true)]
+    [TestCase(1.9, 2.1, false)]
+    public void Validates_Is_Less_Than_Or_Equal_To_Configured_Max(decimal from, decimal to, bool expectedSuccess)
+    {
+        var value = new JsonObject
+        {
+            { "from", from },
+            { "to", to },
+        };
+        var editor = CreateValueEditor();
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMaximum");
+        }
+    }
+
+    [TestCase(0.2, 1.3, 1.7, true)]
+    [TestCase(0.2, 1.4, 1.7, false)]
+    [TestCase(0.2, 1.3, 1.6, false)]
+    [TestCase(0.0, 1.4, 1.7, true)] // A step of zero would trigger a divide by zero error in evaluating. So we always pass validation for zero, as effectively any step value is valid.
+    public void Validates_Matches_Configured_Step(decimal step, decimal from, decimal to, bool expectedSuccess)
+    {
+        var value = new JsonObject
+        {
+            { "from", from },
+            { "to", to },
+        };
+        var editor = CreateValueEditor(step: step);
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual(validationResult.ErrorMessage, "validation_invalidStep");
+        }
+    }
+
     private static object? FromEditor(object? value)
         => CreateValueEditor().FromEditor(new ContentPropertyData(value, null), null);
 
@@ -112,13 +244,29 @@ public class SliderValueEditorTests
         return CreateValueEditor().ToEditor(property.Object);
     }
 
-    private static SliderPropertyEditor.SliderPropertyValueEditor CreateValueEditor()
+    private static SliderPropertyEditor.SliderPropertyValueEditor CreateValueEditor(bool enableRange = true, decimal step = 0.2m)
     {
-        var valueEditor = new SliderPropertyEditor.SliderPropertyValueEditor(
+        var localizedTextServiceMock = new Mock<ILocalizedTextService>();
+        localizedTextServiceMock.Setup(x => x.Localize(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CultureInfo>(),
+                It.IsAny<IDictionary<string, string>>()))
+            .Returns((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => $"{key}_{alias}");
+        return new SliderPropertyEditor.SliderPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
             new SystemTextJsonSerializer(),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias"));
-        return valueEditor;
+            new DataEditorAttribute("alias"),
+            localizedTextServiceMock.Object)
+        {
+            ConfigurationObject = new SliderConfiguration
+            {
+                EnableRange = enableRange,
+                MinimumValue = 1.1m,
+                MaximumValue = 1.9m,
+                Step = step
+            },
+        };
     }
 }
