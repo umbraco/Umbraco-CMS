@@ -18,7 +18,6 @@ using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.SyntaxProvider;
 
@@ -137,7 +136,7 @@ public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
             .Do();
 
         Assert.AreEqual(1, db.Operations.Count);
-        Assert.AreEqual("CREATE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql);
+        Assert.AreEqual("CREATE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql.Trim());
     }
 
     [Test]
@@ -152,7 +151,7 @@ public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
             .Do();
 
         Assert.AreEqual(1, db.Operations.Count);
-        Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql);
+        Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql.Trim());
     }
 
     [Test]
@@ -167,7 +166,7 @@ public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
             .Do();
 
         Assert.AreEqual(1, db.Operations.Count);
-        Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_AB] ON [TheTable] ([A],[B])", db.Operations[0].Sql);
+        Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_AB] ON [TheTable] ([A],[B])", db.Operations[0].Sql.Trim());
     }
 
     [Test]
@@ -182,7 +181,7 @@ public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
             .Do();
 
         Assert.AreEqual(1, db.Operations.Count);
-        Assert.AreEqual("CREATE CLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql);
+        Assert.AreEqual("CREATE CLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql.Trim());
     }
 
     private static IndexDefinition CreateIndexDefinition() =>
