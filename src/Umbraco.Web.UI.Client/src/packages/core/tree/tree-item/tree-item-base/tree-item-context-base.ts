@@ -425,12 +425,16 @@ export abstract class UmbTreeItemContextBase<
 			(expansion) => {
 				if (this.unique === undefined) return;
 
-				const isSelf = expansion?.find((entry) => entry.entityType === this.entityType && entry.unique === this.unique);
-				if (isSelf && this.#hasChildren.getValue()) {
-					this.#expansion.setValue(isSelf.expand);
+				// Check if this item is in the expansion
+				const isSelfExpanded = expansion?.find(
+					(entry) => entry.entityType === this.entityType && entry.unique === this.unique,
+				);
+
+				// If this item has children, load them
+				if (isSelfExpanded && this.#hasChildren.getValue()) {
+					this.#expansion.setValue(isSelfExpanded.expand);
 					this.loadChildren();
 					this.#checkIsOpen(expansion);
-					return;
 				}
 			},
 			'observeLocation',
