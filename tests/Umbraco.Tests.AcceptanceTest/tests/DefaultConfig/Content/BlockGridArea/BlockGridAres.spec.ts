@@ -83,7 +83,7 @@ test('can create content with a block grid with two empty blocks in a area', {ta
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(firstElementTypeName);
   await umbracoUi.content.addBlockToAreasWithExistingBlock(firstElementTypeName, firstAreaName, 0, 0);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(firstElementTypeName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
@@ -102,7 +102,7 @@ test('can create content with block grid area with a create label', async ({page
   // Arrange
   firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const createLabel = 'ThisIsACreateLabel';
-  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithACreateLabel(blockGridDataTypeName, firstElementTypeId, createLabel);
+  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithACreateLabel(blockGridDataTypeName, firstElementTypeId, firstAreaName, createLabel);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
@@ -122,7 +122,7 @@ test('can create content with block grid area with column span', async ({page, u
   // Arrange
   firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const columnSpan = 2;
-  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithColumnSpanAndRowSpan(blockGridDataTypeName, firstElementTypeId, columnSpan, 1, areaCreateLabel);
+  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithColumnSpanAndRowSpan(blockGridDataTypeName, firstElementTypeId, columnSpan, 1, firstAreaName,areaCreateLabel);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
@@ -130,17 +130,66 @@ test('can create content with block grid area with column span', async ({page, u
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
-  await page.pause();
   await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
 
   // Assert
+  await umbracoUi.content.doesBlockAreaContainColumnSpan(firstElementTypeName, firstAreaName, columnSpan, 0);
 });
 
 test('can create content with block grid area with row span', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
+  const rowSpan = 4;
+  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithColumnSpanAndRowSpan(blockGridDataTypeName, firstElementTypeId, 12, rowSpan, firstAreaName,areaCreateLabel);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
+
+  // Assert
+  await umbracoUi.content.doesBlockAreaContainRowSpan(firstElementTypeName, firstAreaName, rowSpan, 0);
 });
 
 test('can create content with block grid area with min allowed', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
+  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
+  const minAllowed = 2;
+  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithMinAndMaxAllowed(blockGridDataTypeName, firstElementTypeId, secondElementTypeId, minAllowed , 10, firstAreaName,areaCreateLabel);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickLinkWithName(areaCreateLabel);
+  await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
+  await umbracoUi.content.isTextWithExactNameVisible('Minimum 2 entries, requires 1 more.');
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  await umbracoUi.content.clickTesttt(firstElementTypeName, firstAreaName, 0, 1);
+  await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
+  await page.pause();
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await page.pause();
+
+
+  // Act
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
 });
 
 test('can create content with block grid area with max allowed', async ({page, umbracoApi, umbracoUi}) => {
