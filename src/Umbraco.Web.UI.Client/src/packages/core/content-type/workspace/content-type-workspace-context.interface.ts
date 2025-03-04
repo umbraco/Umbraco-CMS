@@ -21,9 +21,18 @@ export interface UmbContentTypeWorkspaceContext<ContentTypeType extends UmbConte
 
 	readonly structure: UmbContentTypeStructureManager<ContentTypeType>;
 
+	getAlias(): string | undefined;
 	setAlias(alias: string): void;
+
+	getCompositions(): Array<UmbContentTypeCompositionModel> | undefined;
 	setCompositions(compositions: Array<UmbContentTypeCompositionModel>): void;
+
+	getDescription(): string | undefined;
 	setDescription(description: string): void;
+
+	getIcon(): string | undefined;
 	setIcon(icon: string): void;
+
+	getName(): string | undefined;
 	setName(name: string): void;
 }
