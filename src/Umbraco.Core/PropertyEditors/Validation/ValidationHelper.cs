@@ -21,6 +21,11 @@ public static class ValidationHelper
             return true; // Outside of the range, so we expect another validator will have picked this up.
         }
 
+        if (step == 0)
+        {
+            return true; // A step of zero would trigger a divide by zero error in evaluating. So we always pass validation for zero, as effectively any step value is valid.
+        }
+
         return (value - min) % step == 0;
     }
 

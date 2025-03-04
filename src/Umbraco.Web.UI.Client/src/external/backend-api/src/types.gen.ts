@@ -3536,6 +3536,7 @@ export type PutDocumentTypeByIdResponse = (string);
 
 export type GetDocumentTypeByIdAllowedChildrenData = {
     id: string;
+    parentContentKey?: string;
     skip?: number;
     take?: number;
 };
@@ -4141,6 +4142,7 @@ export type PutMediaTypeByIdResponse = (string);
 
 export type GetMediaTypeByIdAllowedChildrenData = {
     id: string;
+    parentContentKey?: string;
     skip?: number;
     take?: number;
 };

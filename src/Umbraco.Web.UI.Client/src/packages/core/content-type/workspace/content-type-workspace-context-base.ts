@@ -252,6 +252,14 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		this.structure.updateOwnerContentType({ compositions } as Partial<DetailModelType>);
 	}
 
+	/**
+	 * Gets the icon of the content type
+	 * @returns { string | undefined } The icon of the content type
+	 */
+	public getIcon(): string | undefined {
+		return this.structure.getOwnerContentType()?.icon;
+	}
+
 	// TODO: manage setting icon color alias?
 	public setIcon(icon: string) {
 		this.structure.updateOwnerContentType({ icon } as Partial<DetailModelType>);

@@ -95,7 +95,7 @@ public class MediaPicker3PropertyEditor : DataEditor
             var validators = new TypedJsonValidatorRunner<List<MediaWithCropsDto>, MediaPicker3Configuration>(
                 jsonSerializer,
                 new MinMaxValidator(localizedTextService),
-                new AllowedTypeValidator(localizedTextService, mediaTypeService),
+                new AllowedTypeValidator(localizedTextService, mediaTypeService, _mediaService),
                 new StartNodeValidator(localizedTextService, mediaNavigationQueryService));
 
             Validators.Add(validators);
@@ -403,14 +403,16 @@ public class MediaPicker3PropertyEditor : DataEditor
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly IMediaTypeService _mediaTypeService;
+            private readonly IMediaService _mediaService;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="AllowedTypeValidator"/> class.
             /// </summary>
-            public AllowedTypeValidator(ILocalizedTextService localizedTextService, IMediaTypeService mediaTypeService)
+            public AllowedTypeValidator(ILocalizedTextService localizedTextService, IMediaTypeService mediaTypeService, IMediaService mediaService)
             {
                 _localizedTextService = localizedTextService;
                 _mediaTypeService = mediaTypeService;
+                _mediaService = mediaService;
             }
 
             /// <inheritdoc/>
@@ -433,7 +435,20 @@ public class MediaPicker3PropertyEditor : DataEditor
                     return [];
                 }
 
-                IEnumerable<string> distinctTypeAliases = value.DistinctBy(x => x.MediaTypeAlias).Select(x => x.MediaTypeAlias);
+                // We may or may not have explicit MediaTypeAlias values provided, depending on whether the operation is an update or a
+                // create. So let's make sure we have them all.
+                IEnumerable<string> providedTypeAliases = value
+                    .Where(x => x.MediaTypeAlias.IsNullOrWhiteSpace() is false)
+                    .Select(x => x.MediaTypeAlias);
+
+                IEnumerable<Guid> retrievedMediaKeys = value
+                    .Where(x => x.MediaTypeAlias.IsNullOrWhiteSpace())
+                    .Select(x => x.MediaKey);
+                IEnumerable<IMedia> retrievedMedia = _mediaService.GetByIds(retrievedMediaKeys);
+                IEnumerable<string> retrievedTypeAliases = retrievedMedia
+                    .Select(x => x.ContentType.Alias);
+
+                IEnumerable<string> distinctTypeAliases = providedTypeAliases.Union(retrievedTypeAliases).Distinct();
 
                 foreach (var typeAlias in distinctTypeAliases)
                 {
