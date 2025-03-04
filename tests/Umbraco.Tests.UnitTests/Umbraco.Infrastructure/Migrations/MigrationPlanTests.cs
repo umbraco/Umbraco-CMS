@@ -99,7 +99,7 @@ public class MigrationPlanTests
 
         Assert.AreEqual("VERSION.33", state);
         Assert.AreEqual(1, database.Operations.Count);
-        Assert.AreEqual("DROP TABLE [umbracoRedirectUrl]", database.Operations[0].Sql);
+        Assert.AreEqual("DROP TABLE [umbracoRedirectUrl]", database.Operations[0].Sql.Trim());
     }
 
     [Test]
