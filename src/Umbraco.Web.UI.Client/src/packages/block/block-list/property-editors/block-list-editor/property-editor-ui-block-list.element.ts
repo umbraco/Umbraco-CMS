@@ -14,10 +14,7 @@ import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import {
-	UmbBlockElementDataValidationPathTranslator,
-	type UmbBlockLayoutBaseModel,
-} from '@umbraco-cms/backoffice/block';
+import { type UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 
 import '../../components/block-list-entry/index.js';
@@ -56,8 +53,6 @@ export class UmbPropertyEditorUIBlockListElement
 	});
 
 	readonly #validationContext = new UmbValidationContext(this);
-	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
-	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 
 	#lastValue: UmbBlockListValueModel | undefined = undefined;
 
@@ -259,15 +254,9 @@ export class UmbPropertyEditorUIBlockListElement
 		this.observe(
 			context.dataPath,
 			(dataPath) => {
-				// Translate paths for content/settings:
-				this.#contentDataPathTranslator?.destroy();
-				this.#settingsDataPathTranslator?.destroy();
 				if (dataPath) {
 					// Set the data path for the local validation context:
 					this.#validationContext.setDataPath(dataPath);
-
-					this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
-					this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
 				}
 			},
 			'observeDataPath',

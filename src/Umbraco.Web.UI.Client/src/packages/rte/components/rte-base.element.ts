@@ -111,8 +111,6 @@ export abstract class UmbPropertyEditorUiRteElementBase
 	readonly #entriesContext = new UmbBlockRteEntriesContext(this);
 
 	readonly #validationContext = new UmbValidationContext(this);
-	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
-	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 
 	constructor() {
 		super();
@@ -145,15 +143,9 @@ export abstract class UmbPropertyEditorUiRteElementBase
 		this.observe(
 			context.dataPath,
 			(dataPath) => {
-				// Translate paths for content/settings:
-				this.#contentDataPathTranslator?.destroy();
-				this.#settingsDataPathTranslator?.destroy();
 				if (dataPath) {
 					// Set the data path for the local validation context:
 					this.#validationContext.setDataPath(dataPath + '.blocks');
-
-					this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
-					this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
 				}
 			},
 			'observeDataPath',

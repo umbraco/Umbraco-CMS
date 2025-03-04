@@ -20,6 +20,9 @@ export async function umbQueryMapperForJsonPaths<T>(
 	// propertyPaths is like ['$[0].value', '$[0].value.something', '$[1].value', '$[?.(@.prop == 'value')].value'] group them by the first index or query.:
 	let pathsWithQueries = scopePaths.map(
 		(path) => {
+			if (!path.startsWith('$[')) {
+				throw new Error('Invalid JSON-Path query `' + path + '`. Expected to start with `$[`.');
+			}
 			// This could already be translated, meaning it can both be an index or a JSON-Path query.
 			const index = path.indexOf(']');
 			// grab everything between `$[` and `]`
