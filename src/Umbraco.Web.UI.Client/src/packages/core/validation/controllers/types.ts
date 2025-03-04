@@ -1,1 +1,1 @@
-export type * from './validation-path-translation-manager/types.js';
+export type * from './validation-path-translation/types.js';
