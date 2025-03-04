@@ -10,9 +10,7 @@ export interface UmbPreviewDevice {
 	dimensions: { height: string; width: string };
 }
 
-const elementName = 'umb-preview-device';
-
-@customElement(elementName)
+@customElement('umb-preview-device')
 export class UmbPreviewDeviceElement extends UmbLitElement {
 	#devices: Array<UmbPreviewDevice> = [
 		{
@@ -144,6 +142,6 @@ export { UmbPreviewDeviceElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPreviewDeviceElement;
+		'umb-preview-device': UmbPreviewDeviceElement;
 	}
 }
