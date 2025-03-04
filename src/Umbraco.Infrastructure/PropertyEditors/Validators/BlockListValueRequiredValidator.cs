@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
 
@@ -10,15 +9,14 @@ namespace Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
 /// <summary>
 /// Custom validator for block value required validation.
 /// </summary>
-internal class BlockListValueRequiredValidator : RequiredValidator, IValueRequiredValidator
+internal class BlockListValueRequiredValidator : RequiredValidator
 {
     private readonly IJsonSerializer _jsonSerializer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BlockListValueRequiredValidator"/> class.
     /// </summary>
-    public BlockListValueRequiredValidator(IJsonSerializer jsonSerializer)
-        : base() => _jsonSerializer = jsonSerializer;
+    public BlockListValueRequiredValidator(IJsonSerializer jsonSerializer) => _jsonSerializer = jsonSerializer;
 
     /// <inheritdoc/>
     public override IEnumerable<ValidationResult> ValidateRequired(object? value, string? valueType)
