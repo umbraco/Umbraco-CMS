@@ -277,8 +277,9 @@ export abstract class UmbTreeItemContextBase<
 			throw new Error('Could not show children, unique is missing');
 		}
 
-		// It is the parent tree item that keeps track of the open children. We tell the parent to open this child
-		this.parentTreeItemContext?.openChild({ entityType, unique });
+		// It is the parent that keeps track of the open children. We tell the parent to open this child
+		const parentContext = this.parentTreeItemContext ?? this.treeContext;
+		parentContext?.openChild({ entityType, unique });
 	}
 
 	public hideChildren() {
@@ -293,8 +294,8 @@ export abstract class UmbTreeItemContextBase<
 			throw new Error('Could not show children, unique is missing');
 		}
 
-		// It is the parent tree item that keeps track of the open children. We tell the parent to close this child
-		this.parentTreeItemContext?.closeChild({ entityType, unique });
+		const parentContext = this.parentTreeItemContext ?? this.treeContext;
+		parentContext?.closeChild({ entityType, unique });
 	}
 
 	async #consumeContexts() {
