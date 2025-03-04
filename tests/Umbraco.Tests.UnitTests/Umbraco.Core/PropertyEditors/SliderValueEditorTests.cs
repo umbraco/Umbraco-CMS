@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -206,17 +205,18 @@ public class SliderValueEditorTests
         }
     }
 
-    [TestCase(1.3, 1.7, true)]
-    [TestCase(1.4, 1.7, false)]
-    [TestCase(1.3, 1.6, false)]
-    public void Validates_Matches_Configured_Step(decimal from, decimal to, bool expectedSuccess)
+    [TestCase(0.2, 1.3, 1.7, true)]
+    [TestCase(0.2, 1.4, 1.7, false)]
+    [TestCase(0.2, 1.3, 1.6, false)]
+    [TestCase(0.0, 1.4, 1.7, true)] // A step of zero would trigger a divide by zero error in evaluating. So we always pass validation for zero, as effectively any step value is valid.
+    public void Validates_Matches_Configured_Step(decimal step, decimal from, decimal to, bool expectedSuccess)
     {
         var value = new JsonObject
         {
             { "from", from },
             { "to", to },
         };
-        var editor = CreateValueEditor();
+        var editor = CreateValueEditor(step: step);
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
@@ -244,7 +244,7 @@ public class SliderValueEditorTests
         return CreateValueEditor().ToEditor(property.Object);
     }
 
-    private static SliderPropertyEditor.SliderPropertyValueEditor CreateValueEditor(bool enableRange = true)
+    private static SliderPropertyEditor.SliderPropertyValueEditor CreateValueEditor(bool enableRange = true, decimal step = 0.2m)
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
         localizedTextServiceMock.Setup(x => x.Localize(
@@ -265,7 +265,7 @@ public class SliderValueEditorTests
                 EnableRange = enableRange,
                 MinimumValue = 1.1m,
                 MaximumValue = 1.9m,
-                Step = 0.2m
+                Step = step
             },
         };
     }
