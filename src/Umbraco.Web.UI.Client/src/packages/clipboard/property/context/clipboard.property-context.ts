@@ -2,7 +2,6 @@ import { UMB_CLIPBOARD_CONTEXT } from '../../context/index.js';
 import {
 	UMB_CLIPBOARD_ENTRY_PICKER_MODAL,
 	type UmbClipboardEntryDetailModel,
-	type UmbClipboardEntryValueModel,
 	type UmbClipboardEntryValuesType,
 } from '../../clipboard-entry/index.js';
 import type { ManifestClipboardPastePropertyValueTranslator } from '../value-translator/types.js';
