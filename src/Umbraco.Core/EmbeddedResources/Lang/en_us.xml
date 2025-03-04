@@ -397,7 +397,7 @@
     <key alias="multipleMediaNotAllowed">Multiple selected media is not allowed.</key>
     <key alias="invalidStartNode">The selected media is from the wrong folder.</key>
     <key alias="notOneOfOptions">The value '%0%' is not one of the available options.</key>
-    <key alias="multipleNotOneOfOptions">"The values '%0%' are not found in the the available options.</key>
+    <key alias="multipleNotOneOfOptions">The values '%0%' are not found in the the available options.</key>
     <key alias="invalidColor">The selected color '%0%' is not one of the available options.</key>
   </area>
   <area alias="healthcheck">
