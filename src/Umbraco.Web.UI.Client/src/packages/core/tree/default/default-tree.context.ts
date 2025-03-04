@@ -14,7 +14,12 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	type UmbEntityActionEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	appendToFrozenArray,
+	UmbArrayState,
+	UmbBooleanState,
+	UmbObjectState,
+} from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export class UmbDefaultTreeContext<
