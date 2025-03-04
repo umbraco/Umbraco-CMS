@@ -76,6 +76,9 @@ test('can not browse content node with permission disabled', async ({umbracoApi,
   await umbracoUi.content.goToContentWithName(rootDocumentName);
 
   // Assert
+  await umbracoUi.content.isErrorNotificationVisible();
+  // TODO: Uncomment this when this issue is fixed https://github.com/umbraco/Umbraco-CMS/issues/18533
+  //await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource);
 });
 
