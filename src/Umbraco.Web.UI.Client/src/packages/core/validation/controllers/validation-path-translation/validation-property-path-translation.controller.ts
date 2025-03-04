@@ -15,7 +15,6 @@ export class UmbValidationPropertyPathTranslationController extends UmbControlle
 	async translateProperties(
 		paths: Array<string>,
 		data: Array<UmbPropertyValueDataPotentiallyWithEditorAlias>,
-		queryConstructor: (entry: UmbPropertyValueDataPotentiallyWithEditorAlias) => string,
 	): Promise<Array<string>> {
 		return await umbQueryMapperForJsonPaths(
 			paths,
@@ -29,7 +28,8 @@ export class UmbValidationPropertyPathTranslationController extends UmbControlle
 
 	/**
 	 * translates the property data.
-	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} property - The property data.
+	 * @param {Array<string>} propertyPaths - The paths to be translated.
+	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} propertyData - The property data.
 	 * @returns {Promise<UmbPropertyValueDataPotentiallyWithEditorAlias>} - A promise that resolves to the cloned property data.
 	 */
 	async translateProperty(
