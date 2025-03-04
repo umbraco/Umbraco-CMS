@@ -39,6 +39,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			username: '',
 			memberType: {
 				unique: '',
+				icon: '',
 			},
 			isApproved: false,
 			isLockedOut: false,
@@ -88,6 +89,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			username: data.username,
 			memberType: {
 				unique: data.memberType.id,
+				icon: data.memberType.icon,
 			},
 			isApproved: data.isApproved,
 			isLockedOut: data.isLockedOut,

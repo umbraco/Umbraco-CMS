@@ -67,8 +67,8 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 
 		if (newRoutes.length > 0) {
 			newRoutes.push({
+				...newRoutes[0],
 				path: ``,
-				redirectTo: newRoutes[0].path,
 			});
 
 			newRoutes.push({

@@ -6,7 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-import '../toolbar/tiptap-toolbar-dropdown-base.element.js';
+import '../cascading-menu-popover/cascading-menu-popover.element.js';
 
 @customElement('umb-tiptap-toolbar')
 export class UmbTiptapToolbarElement extends UmbLitElement {
@@ -53,6 +53,9 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			(extensionControllers) => {
 				this._lookup = new Map(extensionControllers.map((ext) => [ext.alias, ext.component]));
 			},
+			undefined,
+			undefined,
+			() => import('../toolbar/default-tiptap-toolbar-element.api.js'),
 		);
 
 		this.#extensionsController.apiProperties = { configuration: this.configuration };
@@ -87,6 +90,10 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			border-bottom-left-radius: 0;
 			border-bottom-right-radius: 0;
 
+			border-top-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+			border-left-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+			border-right-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+
 			background-color: var(--uui-color-surface);
 			color: var(--color-text);
 			font-size: var(--uui-type-default-size);
@@ -96,8 +103,8 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 
 			position: sticky;
 			top: -25px;
-			left: 0px;
-			right: 0px;
+			left: 0;
+			right: 0;
 			padding: var(--uui-size-3);
 			z-index: 9999999;
 
@@ -113,6 +120,7 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 
 			.group {
 				display: inline-flex;
+				flex-wrap: wrap;
 				align-items: stretch;
 
 				&:not(:last-child)::after {

@@ -76,6 +76,18 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
         return false;
     }
 
+    /// <inheritdoc />
+    public bool IsDocumentPublishedInAnyCulture(Guid documentKey)
+    {
+        if (_publishedCultures.TryGetValue(documentKey, out ISet<string>? publishedCultures))
+        {
+            return publishedCultures.Count > 0;
+        }
+
+        _logger.LogDebug("Document {DocumentKey} not found in the publish status cache", documentKey);
+        return false;
+    }
+
     public async Task AddOrUpdateStatusAsync(Guid documentKey, CancellationToken cancellationToken)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();

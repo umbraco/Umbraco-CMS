@@ -133,10 +133,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 	}
 
 	#createPropertyVariantId(property: UmbPropertyTypeModel, variantId: UmbVariantId) {
-		return UmbVariantId.Create({
-			culture: property.variesByCulture ? variantId.culture : null,
-			segment: property.variesBySegment ? variantId.segment : null,
-		});
+		return variantId.toVariant(property.variesByCulture, property.variesBySegment);
 	}
 
 	// We will implement propertyAlias in the future, when implementing Varying Blocks. [NL]
@@ -192,6 +189,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 			throw new Error(`Property alias "${alias}" not found.`);
 		}
 
+		// TODO: I think we should await this in the same way as we do for Content Detail Workspace Context. [NL]
 		const editorAlias = this.#dataTypeSchemaAliasMap.get(property.dataType.unique);
 		if (!editorAlias) {
 			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);

@@ -423,6 +423,8 @@ export type CreateUserRequestModel = {
 
 export type CreateWebhookRequestModel = {
     enabled: boolean;
+    name?: (string) | null;
+    description?: (string) | null;
     url: string;
     contentTypeKeys: Array<(string)>;
     headers: {
@@ -563,6 +565,7 @@ export type DataTypeTreeItemResponseModel = {
 };
 
 export type DefaultReferenceResponseModel = {
+    $type: string;
     id: string;
     name?: (string) | null;
     type?: (string) | null;
@@ -638,6 +641,8 @@ export type DocumentCollectionResponseModel = {
     creator?: (string) | null;
     sortOrder: number;
     documentType: (DocumentTypeCollectionReferenceResponseModel);
+    isTrashed: boolean;
+    isProtected: boolean;
     updater?: (string) | null;
 };
 
@@ -684,6 +689,7 @@ export type DocumentRecycleBinItemResponseModel = {
 };
 
 export type DocumentReferenceResponseModel = {
+    $type: string;
     id: string;
     name?: (string) | null;
     published?: (boolean) | null;
@@ -1211,6 +1217,7 @@ export type MediaRecycleBinItemResponseModel = {
 };
 
 export type MediaReferenceResponseModel = {
+    $type: string;
     id: string;
     name?: (string) | null;
     mediaType: (TrackedReferenceMediaTypeModel);
@@ -1942,6 +1949,11 @@ export type PagedWebhookEventModel = {
     items: Array<(WebhookEventModel)>;
 };
 
+export type PagedWebhookLogResponseModel = {
+    total: number;
+    items: Array<(WebhookLogResponseModel)>;
+};
+
 export type PagedWebhookResponseModel = {
     total: number;
     items: Array<(WebhookResponseModel)>;
@@ -2038,6 +2050,7 @@ export type PublishDocumentRequestModel = {
 
 export type PublishDocumentWithDescendantsRequestModel = {
     includeUnpublishedDescendants: boolean;
+    forceRepublish: boolean;
     cultures: Array<(string)>;
 };
 
@@ -2665,6 +2678,8 @@ export type UpdateUserRequestModel = {
 
 export type UpdateWebhookRequestModel = {
     enabled: boolean;
+    name?: (string) | null;
+    description?: (string) | null;
     url: string;
     contentTypeKeys: Array<(string)>;
     headers: {
@@ -2881,8 +2896,26 @@ export type WebhookItemResponseModel = {
     types: string;
 };
 
+export type WebhookLogResponseModel = {
+    key: string;
+    webhookKey: string;
+    statusCode: string;
+    isSuccessStatusCode: boolean;
+    date: string;
+    eventAlias: string;
+    url: string;
+    retryCount: number;
+    requestHeaders: string;
+    requestBody: string;
+    responseHeaders: string;
+    responseBody: string;
+    exceptionOccured: boolean;
+};
+
 export type WebhookResponseModel = {
     enabled: boolean;
+    name?: (string) | null;
+    description?: (string) | null;
     url: string;
     contentTypeKeys: Array<(string)>;
     headers: {
@@ -5356,6 +5389,14 @@ export type PutWebhookByIdData = {
 
 export type PutWebhookByIdResponse = (string);
 
+export type GetWebhookByIdLogsData = {
+    id: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetWebhookByIdLogsResponse = ((PagedWebhookLogResponseModel));
+
 export type GetWebhookEventsData = {
     skip?: number;
     take?: number;
@@ -5368,4 +5409,4 @@ export type GetWebhookLogsData = {
     take?: number;
 };
 
-export type GetWebhookLogsResponse = ((WebhookResponseModel));
+export type GetWebhookLogsResponse = ((PagedWebhookLogResponseModel));

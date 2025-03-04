@@ -50,6 +50,13 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	@state()
 	_isInvariant = false;
 
+	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
+		if (!option.variant) {
+			return false;
+		}
+		return this.data?.pickableFilter ? this.data.pickableFilter(option) : true;
+	};
+
 	override firstUpdated() {
 		this.#getReferences();
 
@@ -75,8 +82,10 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 
 		let selected = this.value?.selection ?? [];
 
+		const validOptions = this._options.filter((o) => this.#pickableFilter(o));
+
 		// Filter selection based on options:
-		selected = selected.filter((s) => this._options.some((o) => o.unique === s));
+		selected = selected.filter((s) => validOptions.some((o) => o.unique === s));
 
 		this._selectionManager.setSelection(selected);
 
@@ -147,7 +156,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 							.selectionManager=${this._selectionManager}
 							.variantLanguageOptions=${this._options}
 							.requiredFilter=${this._hasInvalidSelection ? this._requiredFilter : undefined}
-							.pickableFilter=${this.data?.pickableFilter}></umb-document-variant-language-picker>
+							.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>
 					`
 				: nothing}
 
@@ -192,7 +201,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		css`
 			:host {
 				display: block;
-				width: 600px;
+				min-width: 600px;
 				max-width: 90vw;
 			}
 
