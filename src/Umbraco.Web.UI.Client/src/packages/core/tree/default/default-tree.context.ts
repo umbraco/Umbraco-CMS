@@ -288,6 +288,34 @@ export class UmbDefaultTreeContext<
 		return this.#expansion.getValue();
 	}
 
+	/**
+	 * Opens a child tree item
+	 * @param {UmbEntityModel} entity The entity to open
+	 * @param {string} entity.entityType The entity type
+	 * @param {string} entity.unique The unique key
+	 * @memberof UmbDefaultTreeContext
+	 * @returns {void}
+	 */
+	public openChild(entity: UmbEntityModel): void {
+		const currentValue = this.#expansion.getValue() ?? [];
+		const newValue = appendToFrozenArray(currentValue, { ...entity, expand: [] }, (x) => x?.unique);
+		this.#expansion.setValue(newValue);
+	}
+
+	/**
+	 * Closes a child tree item
+	 * @param {UmbEntityModel} entity The entity to close
+	 * @param {string} entity.entityType The entity type
+	 * @param {string} entity.unique The unique key
+	 * @memberof UmbDefaultTreeContext
+	 * @returns {void}
+	 */
+	public closeChild(entity: UmbEntityModel): void {
+		const currentValue = this.#expansion.getValue() ?? [];
+		const newValue = currentValue.filter((x) => x.entityType !== entity.entityType && x.unique !== entity.unique);
+		this.#expansion.setValue(newValue);
+	}
+
 	#resetTree() {
 		this.#treeRoot.setValue(undefined);
 		this.#rootItems.setValue([]);
