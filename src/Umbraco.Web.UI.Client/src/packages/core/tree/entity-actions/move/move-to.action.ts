@@ -5,8 +5,13 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/tree';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionMoveToKind> {
+
+	readonly #localization = new UmbLocalizationController(this._host);
+
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
@@ -22,6 +27,12 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		const value = await modalContext.onSubmit();
 		const destinationUnique = value.selection[0];
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
+
+		if (destinationUnique === this.args.unique) {
+			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+			notificationContext!.peek('danger', { data: { message: this.#localization.term("defaultdialogs_cannotMoveToSelf") } });
+			return;
+		}
 
 		const moveRepository = await createExtensionApiByAlias<UmbMoveRepository>(this, this.args.meta.moveRepositoryAlias);
 		if (!moveRepository) throw new Error('Move Repository is not available');
