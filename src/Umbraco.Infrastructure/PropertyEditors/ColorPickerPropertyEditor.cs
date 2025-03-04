@@ -96,8 +96,8 @@ public class ColorPickerPropertyEditor : DataEditor
                     yield break;
                 }
 
-                IEnumerable<string> validColors = colorPickerConfiguration.Items.Select(x => EnsureStandardColorRepresentation(x.Value));
-                if (validColors.Contains(EnsureStandardColorRepresentation(selectedColor)) is false)
+                IEnumerable<string> validColors = colorPickerConfiguration.Items.Select(x => EnsureConsistentColorRepresentation(x.Value));
+                if (validColors.Contains(EnsureConsistentColorRepresentation(selectedColor)) is false)
                 {
                     yield return new ValidationResult(
                         _localizedTextService.Localize("validation", "invalidColor", [selectedColor]),
@@ -105,8 +105,8 @@ public class ColorPickerPropertyEditor : DataEditor
                 }
             }
 
-            private static string EnsureStandardColorRepresentation(string color)
-                => (color.StartsWith("#") ? color : $"#{color}").ToLowerInvariant();
+            private static string EnsureConsistentColorRepresentation(string color)
+                => (color.StartsWith('#') ? color : $"#{color}").ToLowerInvariant();
         }
     }
 }
