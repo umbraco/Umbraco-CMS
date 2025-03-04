@@ -136,7 +136,7 @@ public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
             .Do();
 
         Assert.AreEqual(1, db.Operations.Count);
-        Assert.AreEqual("CREATE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql.Trim());
+        Assert.AreEqual("CREATE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql);
     }
 
     [Test]
@@ -151,7 +151,7 @@ public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
             .Do();
 
         Assert.AreEqual(1, db.Operations.Count);
-        Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql.Trim());
+        Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql);
     }
 
     [Test]
@@ -166,7 +166,7 @@ public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
             .Do();
 
         Assert.AreEqual(1, db.Operations.Count);
-        Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_AB] ON [TheTable] ([A],[B])", db.Operations[0].Sql.Trim());
+        Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_AB] ON [TheTable] ([A],[B])", db.Operations[0].Sql);
     }
 
     [Test]
@@ -181,7 +181,7 @@ public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
             .Do();
 
         Assert.AreEqual(1, db.Operations.Count);
-        Assert.AreEqual("CREATE CLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql.Trim());
+        Assert.AreEqual("CREATE CLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql);
     }
 
     private static IndexDefinition CreateIndexDefinition() =>

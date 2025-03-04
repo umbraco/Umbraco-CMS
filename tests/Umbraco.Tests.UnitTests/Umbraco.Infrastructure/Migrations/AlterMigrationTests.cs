@@ -49,7 +49,7 @@ public class AlterMigrationTests
         // Assert
         Assert.That(database.Operations.Count, Is.EqualTo(1));
         Assert.That(
-            database.Operations[0].Sql.Trim(),
+            database.Operations[0].Sql,
             Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
     }
 
@@ -68,7 +68,7 @@ public class AlterMigrationTests
 
         Assert.That(database.Operations.Count, Is.EqualTo(1));
         Assert.That(
-            database.Operations[0].Sql.Trim(),
+            database.Operations[0].Sql,
             Is.EqualTo("ALTER TABLE [bar] ADD [foo] UniqueIdentifier NOT NULL"));
     }
 
@@ -97,7 +97,7 @@ public class AlterMigrationTests
 
         Assert.That(database.Operations.Count, Is.EqualTo(1));
         Assert.That(
-            database.Operations[0].Sql.Trim(),
+            database.Operations[0].Sql,
             Is.EqualTo("ALTER TABLE [bar] ALTER COLUMN [foo] UniqueIdentifier NOT NULL"));
     }
 
