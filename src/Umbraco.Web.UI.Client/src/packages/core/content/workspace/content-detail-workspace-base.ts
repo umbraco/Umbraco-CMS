@@ -53,6 +53,7 @@ import {
 	type UmbPropertyTypePresetModel,
 	type UmbPropertyTypePresetModelTypeModel,
 } from '@umbraco-cms/backoffice/property';
+import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -169,6 +170,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		>,
 	) {
 		super(host, args);
+
+		this.#serverValidation.addPathTranslator(UmbContentDetailValidationPathTranslator);
 
 		this._data.setVariantScaffold(args.contentVariantScaffold);
 		this.#saveModalToken = args.saveModalToken;
