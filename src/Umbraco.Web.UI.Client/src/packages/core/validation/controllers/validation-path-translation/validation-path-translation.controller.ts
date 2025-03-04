@@ -10,7 +10,7 @@ export type UmbValidationTranslationControllerArgs = {
 };
 
 // Write interface that can be handed to the API for the Host, so each Path Translator can communicate back to the host here. For translating inner values.
-export class UmbValidationTranslationController extends UmbControllerBase {
+export class UmbValidationPathTranslationController extends UmbControllerBase {
 	//
 	#pathTranslators: Array<ClassConstructor<UmbValidationPathTranslator<any>>> = [];
 	#data: unknown;
