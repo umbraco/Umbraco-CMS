@@ -39,7 +39,7 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Arrange
-  await umbracoUi.media.clickLabelWithName(wrongMediaFileName, true);
+  await umbracoUi.media.goToMediaWithName(wrongMediaFileName);
   await umbracoUi.media.enterMediaItemName(mediaFileName);
   await umbracoUi.media.clickSaveButton();
 
