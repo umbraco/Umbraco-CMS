@@ -1095,4 +1095,32 @@ public partial class ContentTypeEditingServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidContainerType, result.Status);
     }
+
+    [TestCase(false, true)]
+    [TestCase(true, false)]
+    public async Task Cannot_Have_Element_Type_Mismatched_Inheritance(bool parentIsElement, bool childIsElement)
+    {
+        var parentModel = ContentTypeCreateModel("Parent1", isElement: parentIsElement);
+
+        var parentKey = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result?.Key;
+        Assert.IsTrue(parentKey.HasValue);
+
+        Composition[] composition =
+        {
+            new()
+            {
+                CompositionType = CompositionType.Inheritance, Key = parentKey.Value,
+            }
+        };
+
+        var childModel = ContentTypeCreateModel(
+            "Child",
+            compositions: composition,
+            isElement: childIsElement);
+
+        var result = await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidElementFlagComparedToParent, result.Status);
+    }
 }

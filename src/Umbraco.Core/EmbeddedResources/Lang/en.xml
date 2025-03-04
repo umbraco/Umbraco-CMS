@@ -395,6 +395,8 @@
     <key alias="invalidMediaType">The chosen media type is invalid.</key>
     <key alias="multipleMediaNotAllowed">Multiple selected media is not allowed.</key>
     <key alias="invalidStartNode">The selected media is from the wrong folder.</key>
+    <key alias="notOneOfOptions">The value '%0%' is not one of the available options.</key>
+    <key alias="invalidColor">"The selected colour '%0%' is not one of the available options.</key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:

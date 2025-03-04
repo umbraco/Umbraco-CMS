@@ -22,19 +22,19 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	#selectionManager = new UmbSelectionManager<string>(this);
 
 	@state()
-	_options: Array<UmbDocumentVariantOptionModel> = [];
+	private _options: Array<UmbDocumentVariantOptionModel> = [];
 
 	@state()
-	_hasNotSelectedMandatory?: boolean;
+	private _hasNotSelectedMandatory?: boolean;
 
 	@state()
-	_selection: Array<string> = [];
+	private readonly _selection: Array<UmbDocumentScheduleSelectionModel> = [];
 
 	@state()
-	_isAllSelected = false;
+	private _isAllSelected = false;
 
 	@state()
-	_internalValues: Array<UmbDocumentScheduleSelectionModel> = [];
+	private _internalValues: Array<UmbDocumentScheduleSelectionModel> = [];
 
 	@state()
 	private _submitButtonState?: UUIButtonState;
@@ -60,7 +60,13 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				if (!this._options && !selection) return;
 
 				// New selections are mapped to the schedule data
-				this._selection = selection;
+				this._selection.length = 0;
+				for (const unique of selection) {
+					const existing = this._internalValues.find((s) => s.unique === unique);
+					if (existing) {
+						this._selection.push(existing);
+					}
+				}
 				this._isAllSelected = this.#isAllSelected();
 
 				//Getting not published mandatory options — the options that are mandatory and not currently published.
@@ -87,12 +93,22 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
 		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
-		this._options = this.data?.options.filter((option) => this.#pickableFilter(option)) ?? [];
+		this._options =
+			this.data?.options.filter(
+				(option) =>
+					(option.variant && option.variant.state === null) ||
+					isNotPublishedMandatory(option) ||
+					option.variant?.state !== UmbDocumentVariantState.NOT_CREATED,
+			) ?? [];
 
 		let selected = this.data?.activeVariants ?? [];
 
+		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
+		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
+		const validOptions = this._options.filter((option) => this.#pickableFilter(option));
+
 		// Filter selection based on options:
-		selected = selected.filter((unique) => this._options.some((o) => o.unique === unique));
+		selected = selected.filter((unique) => validOptions.some((o) => o.unique === unique));
 
 		this.#selectionManager.setSelection(selected);
 	}
@@ -103,7 +119,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			await this.#validation.validate();
 			this._submitButtonState = 'success';
 			this.value = {
-				selection: this._internalValues,
+				selection: this._selection,
 			};
 			this.modalContext?.submit();
 		} catch {
@@ -118,7 +134,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#isSelected(unique: string) {
-		return this._selection.includes(unique);
+		return this._selection.some((s) => s.unique === unique);
 	}
 
 	#onSelectAllChange(event: Event) {

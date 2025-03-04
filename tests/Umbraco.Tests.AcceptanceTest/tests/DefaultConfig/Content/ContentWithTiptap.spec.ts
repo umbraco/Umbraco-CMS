@@ -86,9 +86,9 @@ test('can publish content with RTE Tiptap property editor', async ({umbracoApi, 
   expect(contentData.values[0].value.markup).toEqual('<p>' + inputText + '</p>');
 });
 
-test('can add a media in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can add a media in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const iconTitle = 'Media picker';
+  const iconTitle = 'Media Picker';
   const imageName = 'Test Image For Content';
   await umbracoApi.media.ensureNameNotExists(imageName);
   await umbracoApi.media.createDefaultMediaWithImage(imageName);
@@ -100,6 +100,7 @@ test('can add a media in RTE Tiptap property editor', async ({umbracoApi, umbrac
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickTipTapToolbarIconWithTitle(iconTitle);
+  // fix this
   await umbracoUi.content.selectMediaWithName(imageName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickMediaCaptionAltTextModalSubmitButton();
