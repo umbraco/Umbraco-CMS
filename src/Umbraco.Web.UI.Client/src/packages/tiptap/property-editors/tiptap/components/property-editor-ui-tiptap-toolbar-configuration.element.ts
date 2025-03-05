@@ -284,7 +284,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 						compact
 						class=${forbidden ? 'forbidden' : ''}
 						draggable="true"
-						look=${forbidden ? 'placeholder' : 'secondary'}
+						look=${forbidden ? 'placeholder' : 'outline'}
 						title=${this.localize.string(item.label)}
 						?disabled=${forbidden}
 						@click=${() => this.#context.removeToolbarItem([rowIndex, groupIndex, itemIndex])}
@@ -498,7 +498,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 									}
 
 									uui-symbol-expand {
-										margin-left: var(--uui-size-space-4);
+										margin-left: var(--uui-size-space-2);
 									}
 								}
 							}
