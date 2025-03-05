@@ -302,9 +302,9 @@ export class UmbDefaultTreeContext<
 	 * @memberof UmbDefaultTreeContext
 	 * @returns {void}
 	 */
-	public openChild(entity: UmbEntityModel): void {
+	public openItem(entity: UmbEntityModel): void {
 		const currentValue = this.#expansion.getValue() ?? [];
-		const newValue = appendToFrozenArray(currentValue, { ...entity, expand: [] }, (x) => x?.unique);
+		const newValue = appendToFrozenArray(currentValue, entity, (x) => x?.unique);
 		this.#expansion.setValue(newValue);
 	}
 
@@ -316,7 +316,7 @@ export class UmbDefaultTreeContext<
 	 * @memberof UmbDefaultTreeContext
 	 * @returns {void}
 	 */
-	public closeChild(entity: UmbEntityModel): void {
+	public closeItem(entity: UmbEntityModel): void {
 		const currentValue = this.#expansion.getValue() ?? [];
 		const newValue = currentValue.filter((x) => x.entityType !== entity.entityType && x.unique !== entity.unique);
 		this.#expansion.setValue(newValue);

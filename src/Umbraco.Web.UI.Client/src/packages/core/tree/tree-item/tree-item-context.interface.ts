@@ -1,8 +1,7 @@
-import type { UmbTreeExpansionModel, UmbTreeItemModel } from '../types.js';
+import type { UmbTreeItemModel } from '../types.js';
 import type { UmbPaginationManager } from '../../utils/pagination-manager/pagination.manager.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> extends UmbApi {
 	unique?: string | null;
@@ -18,7 +17,6 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> exten
 	isOpen: Observable<boolean>;
 	hasActions: Observable<boolean>;
 	path: Observable<string>;
-	expansion: Observable<UmbTreeExpansionModel | undefined>;
 	pagination: UmbPaginationManager;
 	getTreeItem(): TreeItemType | undefined;
 	setTreeItem(treeItem: TreeItemType | undefined): void;
@@ -30,6 +28,4 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> exten
 	loadChildren(): void;
 	showChildren(): void;
 	hideChildren(): void;
-	openChild(entity: UmbEntityModel): void;
-	closeChild(entity: UmbEntityModel): void;
 }

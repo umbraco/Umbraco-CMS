@@ -3,15 +3,8 @@ import { UMB_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/inde
 import type { UmbTreeExpansionModel, UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
 import { UmbRequestReloadTreeItemChildrenEvent } from '../../entity-actions/reload-tree-item-children/index.js';
 import type { ManifestTreeItem } from '../../extensions/types.js';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import {
-	appendToFrozenArray,
-	UmbArrayState,
-	UmbBooleanState,
-	UmbObjectState,
-	UmbStringState,
-} from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -26,7 +19,7 @@ import {
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbEntityModel, UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 export abstract class UmbTreeItemContextBase<
 		TreeItemType extends UmbTreeItemModel,
@@ -76,9 +69,6 @@ export abstract class UmbTreeItemContextBase<
 
 	#isOpen = new UmbBooleanState(false);
 	isOpen = this.#isOpen.asObservable();
-
-	#expansion = new UmbObjectState<UmbTreeExpansionModel | undefined>(undefined);
-	expansion = this.#expansion.asObservable();
 
 	#foldersOnly = new UmbBooleanState(false);
 	readonly foldersOnly = this.#foldersOnly.asObservable();
@@ -246,34 +236,6 @@ export abstract class UmbTreeItemContextBase<
 		this.treeContext?.selection.deselect(this.unique);
 	}
 
-	/**
-	 * Opens a child tree item
-	 * @param {UmbEntityModel} entity The entity to open
-	 * @param {string} entity.entityType The entity type
-	 * @param {string} entity.unique The unique key
-	 * @memberof UmbTreeItemContextBase
-	 * @returns {void}
-	 */
-	public openChild(entity: UmbEntityModel): void {
-		const currentValue = this.#expansion.getValue() ?? [];
-		const newValue = appendToFrozenArray(currentValue, { ...entity, expand: [] }, (x) => x?.unique);
-		this.#expansion.setValue(newValue);
-	}
-
-	/**
-	 * Closes a child tree item
-	 * @param {UmbEntityModel} entity The entity to close
-	 * @param {string} entity.entityType The entity type
-	 * @param {string} entity.unique The unique key
-	 * @memberof UmbTreeItemContextBase
-	 * @returns {void}
-	 */
-	public closeChild(entity: UmbEntityModel): void {
-		const currentValue = this.#expansion.getValue() ?? [];
-		const newValue = currentValue.filter((x) => x.entityType !== entity.entityType && x.unique !== entity.unique);
-		this.#expansion.setValue(newValue);
-	}
-
 	public showChildren() {
 		const entityType = this.entityType;
 		const unique = this.unique;
@@ -286,9 +248,8 @@ export abstract class UmbTreeItemContextBase<
 			throw new Error('Could not show children, unique is missing');
 		}
 
-		// It is the parent that keeps track of the open children. We tell the parent to open this child
-		const parentContext = this.parentTreeItemContext ?? this.treeContext;
-		parentContext?.openChild({ entityType, unique });
+		// It is the tree that keeps track of the open children. We tell the tree to open this child
+		this.treeContext?.openItem({ entityType, unique });
 	}
 
 	public hideChildren() {
@@ -303,8 +264,7 @@ export abstract class UmbTreeItemContextBase<
 			throw new Error('Could not show children, unique is missing');
 		}
 
-		const parentContext = this.parentTreeItemContext ?? this.treeContext;
-		parentContext?.closeChild({ entityType, unique });
+		this.treeContext?.closeItem({ entityType, unique });
 	}
 
 	async #consumeContexts() {
@@ -324,12 +284,11 @@ export abstract class UmbTreeItemContextBase<
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
 			this.#observeFoldersOnly();
-			this.#observeExpansion(this.treeContext?.expansion);
+			this.#observeExpansion();
 		});
 
 		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (instance) => {
 			this.parentTreeItemContext = instance;
-			this.#observeExpansion(this.parentTreeItemContext.expansion);
 		}).skipHost();
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
@@ -426,27 +385,23 @@ export abstract class UmbTreeItemContextBase<
 		);
 	}
 
-	#observeExpansion(expansion: Observable<UmbTreeExpansionModel | undefined> | undefined) {
-		if (!expansion) return;
-
+	#observeExpansion() {
 		this.observe(
-			expansion,
+			this.treeContext?.expansion,
 			(expansion) => {
 				if (this.unique === undefined) return;
 
 				// Check if this item is in the expansion
-				const isSelfExpanded = expansion?.find(
-					(entry) => entry.entityType === this.entityType && entry.unique === this.unique,
-				);
+				const self = expansion?.find((entry) => entry.entityType === this.entityType && entry.unique === this.unique);
 
 				// If this item has children, load them
-				if (isSelfExpanded && this.#hasChildren.getValue()) {
-					this.#expansion.setValue(isSelfExpanded.expand);
+				if (self && this.#hasChildren.getValue()) {
 					this.loadChildren();
-					this.#checkIsOpen(expansion);
 				}
+
+				this.#checkIsOpen(expansion);
 			},
-			'observeLocation',
+			'observeExpansion',
 		);
 	}
 

@@ -48,22 +48,18 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 								{
 									entityType: 'data-type-root',
 									unique: null,
-									expand: [
-										{
-											entityType: 'data-type-folder',
-											unique: 'ed422666-d767-4281-a763-b114323e33a5',
-										},
-										{
-											entityType: 'data-type-folder',
-											unique: '883dd906-591d-421c-b055-22d625f5601b',
-											expand: [
-												{
-													entityType: 'data-type-folder',
-													unique: 'bbd6750a-bea9-4fcf-8ae3-26aca07e9f8d',
-												},
-											],
-										},
-									],
+								},
+								{
+									entityType: 'data-type-folder',
+									unique: 'ed422666-d767-4281-a763-b114323e33a5',
+								},
+								{
+									entityType: 'data-type-folder',
+									unique: '883dd906-591d-421c-b055-22d625f5601b',
+								},
+								{
+									entityType: 'data-type-folder',
+									unique: 'bbd6750a-bea9-4fcf-8ae3-26aca07e9f8d',
 								},
 							],
 						}}></umb-tree>

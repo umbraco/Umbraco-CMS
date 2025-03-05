@@ -32,8 +32,4 @@ export interface UmbTreeStartNode {
 	entityType: string;
 }
 
-export interface UmbTreeExpansionEntryModel extends UmbEntityModel {
-	expand: UmbTreeExpansionModel;
-}
-
-export type UmbTreeExpansionModel = Array<UmbTreeExpansionEntryModel>;
+export type UmbTreeExpansionModel = Array<UmbEntityModel>;
