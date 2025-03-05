@@ -125,6 +125,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="invalidRange">Værdien %0% forventes at have en værdi der er større end fra værdien.</key>
     <key alias="invalidObjectType">Det valgte indhold er af den forkerte type.</key>
     <key alias="notOneOfOptions">"Værdien '%0%' er ikke en af de tilgængelige valgmuligheder.</key>
+    <key alias="multipleNotOneOfOptions">Værdierne '%0%' er ikke tilstede i de tilgængelige valgmuligheder.</key>
     <key alias="invalidColor">"Den valgte farve '%0%' er ikke en af de tilgængelige valgmuligheder.</key>
   </area>
   <area alias="recycleBin">
