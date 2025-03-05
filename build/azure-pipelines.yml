@@ -313,8 +313,8 @@ stages:
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
             LinuxPart3Of3:
               vmImage: "ubuntu-latest"
-              # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
+              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName~ManagementApi)"
             macOSPart1Of3:
               vmImage: "macOS-latest"
               # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
@@ -325,8 +325,8 @@ stages:
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
             macOSPart3Of3:
               vmImage: "macOS-latest"
-              # Filter tests that are not part of the Umbraco.Infrastructure namespace.
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
+              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName~ManagementApi)"
         pool:
           vmImage: $(vmImage)
         variables:
@@ -389,8 +389,8 @@ stages:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
-              # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
+              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName~ManagementApi)"
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
               SA_PASSWORD: UmbracoIntegration123!
@@ -410,8 +410,8 @@ stages:
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-              # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
+              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName~ManagementApi)"
         pool:
           vmImage: $(vmImage)
         steps:
