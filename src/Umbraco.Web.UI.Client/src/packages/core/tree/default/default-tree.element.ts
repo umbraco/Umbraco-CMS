@@ -117,6 +117,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		return this.#treeContext?.selection.getSelection();
 	}
 
+	getExpansion() {
+		return this.#treeContext?.expansion.getExpansion();
+	}
+
 	override render() {
 		return html` ${this.#renderTreeRoot()} ${this.#renderRootItems()}`;
 	}
