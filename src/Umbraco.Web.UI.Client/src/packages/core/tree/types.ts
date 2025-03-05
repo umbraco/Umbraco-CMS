@@ -31,5 +31,3 @@ export interface UmbTreeStartNode {
 	unique: string;
 	entityType: string;
 }
-
-export type UmbTreeExpansionModel = Array<UmbEntityModel>;

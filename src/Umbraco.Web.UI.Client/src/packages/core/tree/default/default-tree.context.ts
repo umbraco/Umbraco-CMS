@@ -1,8 +1,9 @@
-import type { UmbTreeExpansionModel, UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
+import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
 import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { UmbTreeContext } from '../tree-context.interface.js';
 import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
 import type { ManifestTree } from '../extensions/types.js';
+import { UmbTreeExpansionManager } from '../expansion-manager/index.js';
 import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
 import { type UmbActionEventContext, UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -14,14 +15,9 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	type UmbEntityActionEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import {
-	appendToFrozenArray,
-	UmbArrayState,
-	UmbBooleanState,
-	UmbObjectState,
-} from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 
 export class UmbDefaultTreeContext<
 		TreeItemType extends UmbTreeItemModel,
@@ -40,13 +36,11 @@ export class UmbDefaultTreeContext<
 	#rootItems = new UmbArrayState<TreeItemType>([], (x) => x.unique);
 	rootItems = this.#rootItems.asObservable();
 
-	#expansion = new UmbObjectState<UmbTreeExpansionModel | undefined>(undefined);
-	expansion = this.#expansion.asObservable();
-
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 	public filter?: (item: TreeItemType) => boolean = () => true;
 	public readonly selection = new UmbSelectionManager(this._host);
 	public readonly pagination = new UmbPaginationManager();
+	public readonly expansion = new UmbTreeExpansionManager(this._host);
 
 	#hideTreeRoot = new UmbBooleanState(false);
 	hideTreeRoot = this.#hideTreeRoot.asObservable();
@@ -287,39 +281,11 @@ export class UmbDefaultTreeContext<
 	}
 
 	setExpansion(model: UmbTreeExpansionModel | undefined): void {
-		this.#expansion.setValue(model);
+		this.expansion.setExpansion(model);
 	}
 
 	getExpansion(): UmbTreeExpansionModel | undefined {
-		return this.#expansion.getValue();
-	}
-
-	/**
-	 * Opens a child tree item
-	 * @param {UmbEntityModel} entity The entity to open
-	 * @param {string} entity.entityType The entity type
-	 * @param {string} entity.unique The unique key
-	 * @memberof UmbDefaultTreeContext
-	 * @returns {void}
-	 */
-	public openItem(entity: UmbEntityModel): void {
-		const currentValue = this.#expansion.getValue() ?? [];
-		const newValue = appendToFrozenArray(currentValue, entity, (x) => x?.unique);
-		this.#expansion.setValue(newValue);
-	}
-
-	/**
-	 * Closes a child tree item
-	 * @param {UmbEntityModel} entity The entity to close
-	 * @param {string} entity.entityType The entity type
-	 * @param {string} entity.unique The unique key
-	 * @memberof UmbDefaultTreeContext
-	 * @returns {void}
-	 */
-	public closeItem(entity: UmbEntityModel): void {
-		const currentValue = this.#expansion.getValue() ?? [];
-		const newValue = currentValue.filter((x) => x.entityType !== entity.entityType && x.unique !== entity.unique);
-		this.#expansion.setValue(newValue);
+		return this.expansion.getExpansion();
 	}
 
 	#resetTree() {

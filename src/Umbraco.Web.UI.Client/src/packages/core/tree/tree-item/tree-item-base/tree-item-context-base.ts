@@ -1,6 +1,6 @@
 import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
 import { UMB_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/index.js';
-import type { UmbTreeExpansionModel, UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
 import { UmbRequestReloadTreeItemChildrenEvent } from '../../entity-actions/reload-tree-item-children/index.js';
 import type { ManifestTreeItem } from '../../extensions/types.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
@@ -20,6 +20,7 @@ import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action
 import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { UmbTreeExpansionModel } from '../../expansion-manager/types.js';
 
 export abstract class UmbTreeItemContextBase<
 		TreeItemType extends UmbTreeItemModel,
@@ -249,7 +250,7 @@ export abstract class UmbTreeItemContextBase<
 		}
 
 		// It is the tree that keeps track of the open children. We tell the tree to open this child
-		this.treeContext?.openItem({ entityType, unique });
+		this.treeContext?.expansion.expandItem({ entityType, unique });
 	}
 
 	public hideChildren() {
@@ -264,7 +265,7 @@ export abstract class UmbTreeItemContextBase<
 			throw new Error('Could not show children, unique is missing');
 		}
 
-		this.treeContext?.closeItem({ entityType, unique });
+		this.treeContext?.expansion.contractItem({ entityType, unique });
 	}
 
 	async #consumeContexts() {
@@ -387,7 +388,7 @@ export abstract class UmbTreeItemContextBase<
 
 	#observeExpansion() {
 		this.observe(
-			this.treeContext?.expansion,
+			this.treeContext?.expansion.expansion,
 			(expansion) => {
 				if (this.unique === undefined) return;
 
