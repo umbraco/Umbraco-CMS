@@ -146,7 +146,8 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 				--uui-button-font-weight: normal;
 				--uui-menu-item-flat-structure: 1;
 
-				margin-inline-start: var(--uui-size-space-1);
+				margin-left: var(--uui-size-space-1);
+				margin-bottom: var(--uui-size-space-1);
 			}
 
 			uui-button > uui-symbol-expand {
