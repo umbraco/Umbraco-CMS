@@ -582,6 +582,18 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 			],
 		},
 	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.CharacterMap',
+		name: 'Character Map Tiptap Extension',
+		api: () => import('./toolbar/character-map.tiptap-toolbar-api.js'),
+		meta: {
+			alias: 'umbCharacterMap',
+			icon: 'icon-omega',
+			label: 'Character map',
+		},
+	},
 ];
 
 const extensions = [
