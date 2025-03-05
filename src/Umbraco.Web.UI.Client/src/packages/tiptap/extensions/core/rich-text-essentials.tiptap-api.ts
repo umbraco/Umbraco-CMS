@@ -1,10 +1,18 @@
 import { UmbTiptapExtensionApiBase } from '../base.js';
 import { css } from '@umbraco-cms/backoffice/external/lit';
-import { Div, HtmlGlobalAttributes, Span, StarterKit, TrailingNode } from '@umbraco-cms/backoffice/external/tiptap';
+import {
+	Anchor,
+	Div,
+	HtmlGlobalAttributes,
+	Span,
+	StarterKit,
+	TrailingNode,
+} from '@umbraco-cms/backoffice/external/tiptap';
 
 export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionApiBase {
 	getTiptapExtensions = () => [
 		StarterKit,
+		Anchor,
 		Div,
 		Span,
 		HtmlGlobalAttributes.configure({
@@ -74,6 +82,18 @@ export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionA
 			> p {
 				margin: 0;
 				padding: 0;
+			}
+		}
+
+		span[data-umb-anchor] {
+			&.ProseMirror-selectednode {
+				background-color: var(--uui-color-background);
+			}
+
+			uui-icon {
+				height: 1rem;
+				width: 1rem;
+				vertical-align: text-bottom;
 			}
 		}
 	`;

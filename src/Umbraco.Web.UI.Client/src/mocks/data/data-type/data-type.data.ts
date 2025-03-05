@@ -1070,7 +1070,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 							'Umb.Tiptap.Toolbar.Blockquote',
 							'Umb.Tiptap.Toolbar.HorizontalRule',
 						],
-						['Umb.Tiptap.Toolbar.Link', 'Umb.Tiptap.Toolbar.Unlink'],
+						['Umb.Tiptap.Toolbar.Anchor', 'Umb.Tiptap.Toolbar.Link', 'Umb.Tiptap.Toolbar.Unlink'],
 						['Umb.Tiptap.Toolbar.Table', 'Umb.Tiptap.Toolbar.MediaPicker', 'Umb.Tiptap.Toolbar.EmbeddedMedia'],
 					],
 				],
