@@ -28,10 +28,10 @@ internal class RichTextEditorBlockValidator: BlockEditorValidatorBase<RichTextBl
     }
 
     protected override string ContentDataGroupJsonPath =>
-        $"{nameof(RichTextEditorValue.Blocks).ToFirstLowerInvariant()}.{nameof(RichTextBlockValue.ContentData).ToFirstLowerInvariant()}";
+        $"{nameof(RichTextEditorValue.Blocks).ToFirstLowerInvariant()}.{base.ContentDataGroupJsonPath}";
 
     protected override string SettingsDataGroupJsonPath =>
-        $"{nameof(RichTextEditorValue.Blocks).ToFirstLowerInvariant()}.{nameof(RichTextBlockValue.SettingsData).ToFirstLowerInvariant()}";
+        $"{nameof(RichTextEditorValue.Blocks).ToFirstLowerInvariant()}.{base.SettingsDataGroupJsonPath}";
 
     protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object? value, PropertyValidationContext validationContext)
     {
