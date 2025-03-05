@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -88,7 +88,7 @@ public class PropertyValidationService : IPropertyValidationService
     {
         // Retrieve default messages used for required and regex validatation.  We'll replace these
         // if set with custom ones if they've been provided for a given property.
-        var requiredDefaultMessages = new[] { Constants.Validation.ErrorMessages.Properties.Missing };
+        var requiredDefaultMessages = new[] { Constants.Validation.ErrorMessages.Properties.Missing, Constants.Validation.ErrorMessages.Properties.Empty };
         var formatDefaultMessages = new[] { Constants.Validation.ErrorMessages.Properties.PatternMismatch };
 
         IDataValueEditor valueEditor = _valueEditorCache.GetValueEditor(editor, dataType);

@@ -48,7 +48,7 @@ export default {
 		notify: 'Notifications',
 		protect: 'Public Access',
 		publish: 'Publish',
-		refreshNode: 'Reload',
+		refreshNode: 'Reload children',
 		remove: 'Remove',
 		rename: 'Rename',
 		republish: 'Republish entire site',
