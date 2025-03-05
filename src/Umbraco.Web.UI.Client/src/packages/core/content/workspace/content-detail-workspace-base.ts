@@ -228,7 +228,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 					if (missingThis) {
 						const context = new UmbValidationController(this);
 						context.inheritFrom(this.validationContext, '$');
-						context.messages.debugFiltered('' + variantOption.unique);
 						context.setVariantId(UmbVariantId.Create(variantOption));
 						this.#variantValidationContexts.push(context);
 					}
