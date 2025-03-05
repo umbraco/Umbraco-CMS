@@ -1123,9 +1123,6 @@ legacy: true,
 hidden: true,
 path: () => import("./icons/icon-old-phone.js"),
 },{
-name: "icon-omega",
-path: () => import("./icons/icon-omega.js"),
-},{
 name: "icon-operator",
 path: () => import("./icons/icon-operator.js"),
 },{

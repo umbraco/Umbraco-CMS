@@ -1388,10 +1388,6 @@
 			"legacy": true
 		},
 		{
-			"name": "icon-omega",
-			"file": "omega.svg"
-		},
-		{
 			"name": "icon-operator",
 			"file": "user-cog.svg"
 		},
