@@ -4,6 +4,7 @@ import type { UmbTreeContext } from '../tree-context.interface.js';
 import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
 import type { ManifestTree } from '../extensions/types.js';
 import { UmbTreeExpansionManager } from '../expansion-manager/index.js';
+import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
 import { type UmbActionEventContext, UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -17,7 +18,6 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 
 export class UmbDefaultTreeContext<
 		TreeItemType extends UmbTreeItemModel,
