@@ -14,7 +14,7 @@ using Umbraco.Cms.Core.Strings;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
 [TestFixture]
-public class IntegerValueEditorTests
+public class IntegerPropertyValueEditorTests
 {
     // annoyingly we can't use decimals etc. in attributes, so we can't turn these into test cases :(
     private Dictionary<object?,object?> _valuesAndExpectedResults = new();

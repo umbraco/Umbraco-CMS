@@ -45,7 +45,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
         new MultipleTextStringConfigurationEditor(_ioHelper);
 
     /// <summary>
-    /// Custom value editor so we can format the value for the editor and the database.
+    /// Defines the value editor for the multiple text string property editor.
     /// </summary>
     internal class MultipleTextStringPropertyValueEditor : DataValueEditor
     {

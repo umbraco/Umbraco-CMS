@@ -15,7 +15,7 @@ using Umbraco.Cms.Core.Strings;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
 [TestFixture]
-public class MultipleTextStringValueEditorTests
+public class MultipleTextStringPropertyValueEditorTests
 {
     [Test]
     public void Can_Handle_Invalid_Values_From_Editor()
