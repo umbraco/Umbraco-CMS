@@ -1,4 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 
@@ -12,13 +15,26 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     // TODO: We could further reduce circular dependencies with PropertyEditorCollection by not having IDataValueReference implemented
     // by property editors and instead just use the already built in IDataValueReferenceFactory and/or refactor that into a more normal collection
 
+    private readonly ILogger<DataValueReferenceFactoryCollection> _logger;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="DataValueReferenceFactoryCollection" /> class.
     /// </summary>
     /// <param name="items">The items.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
     public DataValueReferenceFactoryCollection(Func<IEnumerable<IDataValueReferenceFactory>> items)
-        : base(items)
+        : this(
+              items,
+              StaticServiceProvider.Instance.GetRequiredService<ILogger<DataValueReferenceFactoryCollection>>())
     { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DataValueReferenceFactoryCollection" /> class.
+    /// </summary>
+    /// <param name="items">The items.</param>
+    /// <param name="logger">The logger.</param>
+    public DataValueReferenceFactoryCollection(Func<IEnumerable<IDataValueReferenceFactory>> items, ILogger<DataValueReferenceFactoryCollection> logger)
+        : base(items) => _logger = logger;
 
     /// <summary>
     /// Gets all unique references from the specified properties.
@@ -75,13 +91,14 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     /// </returns>
     public ISet<UmbracoEntityReference> GetReferences(IDataEditor dataEditor, IEnumerable<object?> values) =>
         GetReferencesEnumerable(dataEditor, values).ToHashSet();
+
     private IEnumerable<UmbracoEntityReference> GetReferencesEnumerable(IDataEditor dataEditor, IEnumerable<object?> values)
     {
         // TODO: We will need to change this once we support tracking via variants/segments
         // for now, we are tracking values from ALL variants
         if (dataEditor.GetValueEditor() is IDataValueReference dataValueReference)
         {
-            foreach (UmbracoEntityReference reference in values.SelectMany(dataValueReference.GetReferences))
+            foreach (UmbracoEntityReference reference in GetReferences(values, dataValueReference))
             {
                 yield return reference;
             }
@@ -91,7 +108,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
         // implementation of GetReferences in IDataValueReference.
         // Allows developers to add support for references by a
         // package /property editor that did not implement IDataValueReference themselves
-                foreach (IDataValueReferenceFactory dataValueReferenceFactory in this)
+        foreach (IDataValueReferenceFactory dataValueReferenceFactory in this)
         {
             // Check if this value reference is for this datatype/editor
             // Then call it's GetReferences method - to see if the value stored
@@ -107,6 +124,32 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
         }
     }
 
+    private IEnumerable<UmbracoEntityReference> GetReferences(IEnumerable<object?> values, IDataValueReference dataValueReference)
+    {
+        var result = new List<UmbracoEntityReference>();
+        foreach (var value in values)
+        {
+            // When property editors on data types are changed, we could have values that are incompatible with the new editor.
+            // Leading to issues such as:
+            // - https://github.com/umbraco/Umbraco-CMS/issues/17628
+            // - https://github.com/umbraco/Umbraco-CMS/issues/17725
+            // Although some changes like this are not intended to be compatible, we should handle them gracefully and not
+            // error in retrieving references, which would prevent manipulating or deleting the content that uses the data type.
+            try
+            {
+                IEnumerable<UmbracoEntityReference> references = dataValueReference.GetReferences(value);
+                result.AddRange(references);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception but don't throw, continue with the next value.
+                _logger.LogError(ex, "Error getting references for value {Value} with data editor {DataEditor}.", value, dataValueReference.GetType().FullName);
+            }
+        }
+
+        return result;
+    }
+
     /// <summary>
     /// Gets all relation type aliases that are automatically tracked.
     /// </summary>
@@ -117,6 +160,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     [Obsolete("Use GetAllAutomaticRelationTypesAliases. This will be removed in Umbraco 15.")]
     public ISet<string> GetAutomaticRelationTypesAliases(PropertyEditorCollection propertyEditors) =>
         GetAllAutomaticRelationTypesAliases(propertyEditors);
+
     public ISet<string> GetAllAutomaticRelationTypesAliases(PropertyEditorCollection propertyEditors)
     {
         // Always add default automatic relation types
