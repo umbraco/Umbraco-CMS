@@ -221,38 +221,45 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly ILocalizedTextService _localizedTextService;
 
-        public MinMaxValidator(ILocalizedTextService localizedTextService)
-        {
-            _localizedTextService = localizedTextService;
-        }
+        public MinMaxValidator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
 
         public IEnumerable<ValidationResult> Validate(
-            LinkDto[]? links,
-            MultiUrlPickerConfiguration? configuration,
+            LinkDto[]? linksDtos,
+            MultiUrlPickerConfiguration? multiUrlPickerConfiguration,
             string? valueType,
             PropertyValidationContext validationContext)
         {
-           var validationResults = new List<ValidationResult>();
-
-           if (links is null || configuration is null)
+           if (multiUrlPickerConfiguration is null || (linksDtos is null && multiUrlPickerConfiguration.MinNumber == 0))
            {
-               return validationResults;
+               return [];
            }
 
-           // Look at: MediaPicker3PropertyValueEditor
-            // Too few
-           validationResults.Add(new ValidationResult(
-                _localizedTextService.Localize(
-                    "validation",
-                    "entriesShort",
-                    [configuration.MinNumber.ToString(), (configuration.MinNumber - links.Length).ToString()]),
-                ["value"]));
+           if (linksDtos is null || linksDtos.Length < multiUrlPickerConfiguration.MinNumber)
+           {
+               return [new ValidationResult(
+                   _localizedTextService.Localize(
+                       "validation",
+                       "entriesShort",
+                       [multiUrlPickerConfiguration.MinNumber.ToString(), (multiUrlPickerConfiguration.MinNumber - (linksDtos?.Length ?? 0)).ToString()]),
+                   ["value"])];
+           }
 
+           if (linksDtos.Length > multiUrlPickerConfiguration.MaxNumber)
+           {
+               return
+               [
+                   new ValidationResult(
+                       _localizedTextService.Localize(
+                           "validation",
+                           "entriesExceed",
+                           [
+                               multiUrlPickerConfiguration.MaxNumber.ToString(),
+                               (linksDtos.Length - multiUrlPickerConfiguration.MaxNumber).ToString()
+                           ]),
+                       ["value"])
+               ];
+           }
 
-            // Too many
-           validationResults.Add(new ValidationResult(
-                _localizedTextService.Localize("validation", "entriesExceed"),
-                ["value"]));
            return [];
         }
     }
