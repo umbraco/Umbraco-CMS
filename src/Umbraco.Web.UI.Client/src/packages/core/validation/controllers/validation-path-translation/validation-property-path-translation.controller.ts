@@ -17,7 +17,7 @@ export class UmbValidationPropertyPathTranslationController extends UmbControlle
 		queryConstructor: (entry: UmbPropertyValueDataPotentiallyWithEditorAlias) => string,
 	): Promise<Array<string>> {
 		return await umbQueryMapperForJsonPaths(paths, data, queryConstructor, async (scopedPaths: Array<string>, data) => {
-			return await this.translateProperty(scopedPaths, data);
+			return data ? await this.translateProperty(scopedPaths, data) : scopedPaths;
 		});
 	}
 

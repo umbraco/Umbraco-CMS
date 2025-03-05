@@ -42,6 +42,34 @@ describe('UmbValidationPropertyPathTranslationController', () => {
 		});
 	});
 
+	describe('capital Value Without translators', () => {
+		let host: UmbTestControllerHostElement;
+		let ctrl!: UmbValidationPropertyPathTranslationController;
+		let propertiesData: Array<UmbPropertyValueDataPotentiallyWithEditorAlias> = [
+			{
+				alias: 'test-alias',
+				editorAlias: 'Umbraco.TestProperty',
+				Value: 'Value1',
+			} as any,
+		];
+
+		beforeEach(async () => {
+			host = new UmbTestControllerHostElement();
+			ctrl = new UmbValidationPropertyPathTranslationController(host);
+		});
+		afterEach(async () => {
+			host.destroy();
+		});
+
+		it('returns Value', async () => {
+			const paths: Array<string> = ['$[0].Value'];
+
+			const result = await ctrl.translateProperties(paths, propertiesData, UmbDataPathPropertyValueQuery);
+
+			expect(result[0]).to.be.equal(`$[${UmbDataPathPropertyValueQuery(propertiesData[0])}].Value`);
+		});
+	});
+
 	type ComplexPropertyTypeValue = {
 		inner: Array<{
 			key: string;

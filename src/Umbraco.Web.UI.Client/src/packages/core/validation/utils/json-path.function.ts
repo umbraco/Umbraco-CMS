@@ -4,8 +4,8 @@
  * @param {string} path - the JSON path to the value that should be found
  * @returns {unknown} - the found value.
  */
-export function GetValueByJsonPath(data: unknown, path: string): unknown {
-	if (path === '$') return data;
+export function GetValueByJsonPath<ReturnType = unknown>(data: unknown, path: string): ReturnType | undefined {
+	if (path === '$') return data as ReturnType;
 	// strip $ from the path:
 	if (path.startsWith('$[')) {
 		return _GetNextArrayEntryFromPath(data as Array<unknown>, path.slice(2));

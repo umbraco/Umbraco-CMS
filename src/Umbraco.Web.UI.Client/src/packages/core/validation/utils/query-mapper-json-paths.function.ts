@@ -12,7 +12,7 @@ export async function umbQueryMapperForJsonPaths<T>(
 	scopePaths: Array<string>,
 	scopeData: Array<T>,
 	queryConstructor: (entry: T) => string,
-	mapper?: (scopedPaths: Array<string>, propertyData: T) => Promise<Array<string>>,
+	mapper?: (scopedPaths: Array<string>, propertyData: T | undefined) => Promise<Array<string>>,
 ): Promise<Array<string>> {
 	const uniquePointers: Array<string> = [];
 
@@ -47,7 +47,7 @@ export async function umbQueryMapperForJsonPaths<T>(
 	if (mapper) {
 		// map each property:
 		for (const uniquePath of uniquePointers) {
-			const propertyData = GetValueByJsonPath(scopeData, `$[${uniquePath}]`) as T;
+			const propertyData = GetValueByJsonPath<T>(scopeData, `$[${uniquePath}]`);
 
 			pathsWithQueries = await umbScopeMapperForJsonPaths(
 				pathsWithQueries,

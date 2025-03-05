@@ -31,8 +31,8 @@ export abstract class UmbBlockEditorValidationPropertyPathTranslatorBase<Propert
 				(block) => {
 					return UmbDataPathBlockElementDataQuery(block);
 				},
-				async (paths: string[], block: UmbBlockDataModel) => {
-					if (block.values.length === 0) {
+				async (paths: string[], block: UmbBlockDataModel | undefined) => {
+					if (!block || block.values.length === 0) {
 						return paths;
 					}
 					return await umbScopeMapperForJsonPaths(paths, '$.values', async (paths) => {

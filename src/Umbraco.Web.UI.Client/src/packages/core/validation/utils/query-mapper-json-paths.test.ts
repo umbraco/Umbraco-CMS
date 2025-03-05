@@ -59,11 +59,11 @@ describe('umbQueryMapperForJsonPaths', () => {
 					expect(paths.length).to.eq(2);
 					expect(paths[0]).to.eq(`$.value.hey`);
 					expect(paths[1]).to.eq(`$.value`);
-					expect(data.value).to.eq(`one`);
+					expect(data?.value).to.eq(`one`);
 				} else if (testCounter === 2) {
 					expect(paths.length).to.eq(1);
 					expect(paths[0]).to.eq(`$.value`);
-					expect(data.value).to.eq(`two`);
+					expect(data?.value).to.eq(`two`);
 				} else {
 					assert.fail('The mapper should only run twice');
 				}
