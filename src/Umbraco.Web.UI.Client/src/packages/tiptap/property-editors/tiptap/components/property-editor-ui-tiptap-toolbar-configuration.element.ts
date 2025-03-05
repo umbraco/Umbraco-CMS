@@ -164,6 +164,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 					<uui-button
 						compact
 						class=${forbidden ? 'forbidden' : ''}
+						data-mark="tiptap-toolbar-item:${item.alias}"
 						draggable="true"
 						look=${forbidden ? 'placeholder' : 'outline'}
 						?disabled=${forbidden || inUse}
@@ -278,6 +279,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 			<uui-button
 				compact
 				class=${forbidden ? 'forbidden' : ''}
+				data-mark="tiptap-toolbar-item:${item.alias}"
 				draggable="true"
 				look=${forbidden ? 'placeholder' : 'outline'}
 				title=${this.localize.string(item.label)}
