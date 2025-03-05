@@ -22,7 +22,7 @@ internal class MediaPicker3ValueEditorValidationTests
     [TestCase(false, false)]
     public void Validates_Start_Node_Immediate_Parent(bool shouldSucceed, bool hasValidParentKey)
     {
-        var (valueEditor, mediaTypeServiceMock, mediaNavigationQueryServiceMock) = CreateValueEditor();
+        var (valueEditor, mediaTypeServiceMock, _, mediaNavigationQueryServiceMock) = CreateValueEditor();
 
         Guid? validParentKey = Guid.NewGuid();
         var mediaKey = Guid.NewGuid();
@@ -49,7 +49,7 @@ internal class MediaPicker3ValueEditorValidationTests
     [Test]
     public void Validates_Start_Node_Parent_Not_Found()
     {
-        var (valueEditor, mediaTypeServiceMock, mediaNavigationQueryServiceMock) = CreateValueEditor();
+        var (valueEditor, mediaTypeServiceMock, _, mediaNavigationQueryServiceMock) = CreateValueEditor();
 
         Guid? parentKey = null;
         var mediaKey = Guid.NewGuid();
@@ -71,7 +71,7 @@ internal class MediaPicker3ValueEditorValidationTests
     [TestCase(false, true, false)]
     public void Validates_Start_Node_Ancestor(bool shouldSucceed, bool findsAncestor, bool hasValidAncestorKey)
     {
-        var (valueEditor, mediaTypeServiceMock, mediaNavigationQueryServiceMock) = CreateValueEditor();
+        var (valueEditor, mediaTypeServiceMock, _, mediaNavigationQueryServiceMock) = CreateValueEditor();
 
         Guid ancestorKey = Guid.NewGuid();
         Guid? parentKey = Guid.NewGuid();
@@ -90,26 +90,32 @@ internal class MediaPicker3ValueEditorValidationTests
         ValidateResult(shouldSucceed, result);
     }
 
-    [TestCase(true, true, true)]
-    [TestCase(false, true, false)]
-    [TestCase(false, false, true)]
-    public void Validates_Allowed_Type(bool shouldSucceed, bool hasAllowedType, bool findsMediaType)
+    [TestCase(true, true, true, false)]
+    [TestCase(false, true, false, false)]
+    [TestCase(false, false, true, false)]
+    [TestCase(true, true, true, true)]
+    [TestCase(false, true, false, true)]
+    [TestCase(false, false, true, true)]
+    public void Validates_Allowed_Type(bool shouldSucceed, bool hasAllowedType, bool findsMediaType, bool valueProvidesMediaTypeAlias)
     {
-        var (valueEditor, mediaTypeServiceMock, mediaNavigationQueryServiceMock) = CreateValueEditor();
+        var (valueEditor, mediaTypeServiceMock, mediaServiceMock, mediaNavigationQueryServiceMock) = CreateValueEditor();
 
         var mediaKey = Guid.NewGuid();
         var mediaTypeKey = Guid.NewGuid();
         var mediaTypeAlias = "Alias";
         valueEditor.ConfigurationObject = new MediaPicker3Configuration() { Filter = $"{mediaTypeKey}" };
         var mediaTypeMock = new Mock<IMediaType>();
+        var mediaMock = new Mock<IMedia>();
 
         if (hasAllowedType)
         {
             mediaTypeMock.Setup(x => x.Key).Returns(mediaTypeKey);
+            mediaMock.SetupGet(x => x.ContentType.Alias).Returns(mediaTypeAlias);
         }
         else
         {
             mediaTypeMock.Setup(x => x.Key).Returns(Guid.NewGuid());
+            mediaMock.SetupGet(x => x.ContentType.Alias).Returns("AnotherAlias");
         }
 
         if (findsMediaType)
@@ -121,7 +127,13 @@ internal class MediaPicker3ValueEditorValidationTests
             mediaTypeServiceMock.Setup(x => x.Get(It.IsAny<string>())).Returns((IMediaType)null);
         }
 
-        var value = "[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"" + mediaKey + "\",\n  \"mediaTypeAlias\" : \"" + mediaTypeAlias + "\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]";
+        if (valueProvidesMediaTypeAlias is false)
+        {
+            mediaServiceMock.Setup(x => x.GetByIds(It.Is<IEnumerable<Guid>>(y => y.First() == mediaKey))).Returns([mediaMock.Object]);
+        }
+
+        var providedMediaTypeAlias = valueProvidesMediaTypeAlias ? mediaTypeAlias : string.Empty;
+        var value = "[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"" + mediaKey + "\",\n  \"mediaTypeAlias\" : \"" + providedMediaTypeAlias + "\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]";
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
 
         ValidateResult(shouldSucceed, result);
@@ -134,7 +146,7 @@ internal class MediaPicker3ValueEditorValidationTests
     [TestCase("[]", false, true)]
     public void Validates_Multiple(string value, bool multiple, bool succeed)
     {
-        var (valueEditor, mediaTypeServiceMock, mediaNavigationQueryServiceMock) = CreateValueEditor();
+        var (valueEditor, mediaTypeServiceMock, _, mediaNavigationQueryServiceMock) = CreateValueEditor();
 
         valueEditor.ConfigurationObject = new MediaPicker3Configuration() { Multiple = multiple };
 
@@ -150,7 +162,7 @@ internal class MediaPicker3ValueEditorValidationTests
     [TestCase("[]", 0, true)]
     public void Validates_Min_Limit(string value, int min, bool succeed)
     {
-        var (valueEditor, mediaTypeServiceMock, mediaNavigationQueryServiceMock) = CreateValueEditor();
+        var (valueEditor, mediaTypeServiceMock, _, mediaNavigationQueryServiceMock) = CreateValueEditor();
 
         valueEditor.ConfigurationObject = new MediaPicker3Configuration() { Multiple = true, ValidationLimit = new MediaPicker3Configuration.NumberRange { Min = min } };
 
@@ -168,7 +180,7 @@ internal class MediaPicker3ValueEditorValidationTests
     [TestCase("[]", 0, true)]
     public void Validates_Max_Limit(string value, int max, bool succeed)
     {
-        var (valueEditor, mediaTypeServiceMock, mediaNavigationQueryServiceMock) = CreateValueEditor();
+        var (valueEditor, mediaTypeServiceMock, _, mediaNavigationQueryServiceMock) = CreateValueEditor();
 
         valueEditor.ConfigurationObject = new MediaPicker3Configuration() { Multiple = true, ValidationLimit = new MediaPicker3Configuration.NumberRange { Max = max } };
 
@@ -188,9 +200,10 @@ internal class MediaPicker3ValueEditorValidationTests
         }
     }
 
-    private static (MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor ValueEditor, Mock<IMediaTypeService> MediaTypeServiceMock, Mock<IMediaNavigationQueryService> MediaNavigationQueryServiceMock) CreateValueEditor()
+    private static (MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor ValueEditor, Mock<IMediaTypeService> MediaTypeServiceMock, Mock<IMediaService> MediaServiceMock, Mock<IMediaNavigationQueryService> MediaNavigationQueryServiceMock) CreateValueEditor()
     {
         var mediaTypeServiceMock = new Mock<IMediaTypeService>();
+        var mediaServiceMock = new Mock<IMediaService>();
         var mediaNavigationQueryServiceMock = new Mock<IMediaNavigationQueryService>();
         var valueEditor = new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
@@ -198,7 +211,7 @@ internal class MediaPicker3ValueEditorValidationTests
             Mock.Of<IIOHelper>(),
             new DataEditorAttribute("alias"),
             Mock.Of<IMediaImportService>(),
-            Mock.Of<IMediaService>(),
+            mediaServiceMock.Object,
             Mock.Of<ITemporaryFileService>(),
             Mock.Of<IScopeProvider>(),
             Mock.Of<IBackOfficeSecurityAccessor>(),
@@ -210,6 +223,6 @@ internal class MediaPicker3ValueEditorValidationTests
             ConfigurationObject = new MediaPicker3Configuration()
         };
 
-        return (valueEditor, mediaTypeServiceMock, mediaNavigationQueryServiceMock);
+        return (valueEditor, mediaTypeServiceMock, mediaServiceMock, mediaNavigationQueryServiceMock);
     }
 }
