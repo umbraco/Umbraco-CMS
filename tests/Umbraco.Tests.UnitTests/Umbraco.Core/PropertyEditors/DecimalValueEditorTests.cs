@@ -88,7 +88,7 @@ public class DecimalValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, $"The value {value} is not a valid decimal");
+            Assert.AreEqual($"The value {value} is not a valid decimal", validationResult.ErrorMessage);
         }
     }
 
@@ -108,7 +108,7 @@ public class DecimalValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMinimum");
+            Assert.AreEqual("validation_outOfRangeMinimum", validationResult.ErrorMessage);
         }
     }
 
@@ -128,7 +128,7 @@ public class DecimalValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMaximum");
+            Assert.AreEqual("validation_outOfRangeMaximum", validationResult.ErrorMessage);
         }
     }
 
@@ -167,7 +167,7 @@ public class DecimalValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, "validation_invalidStep");
+            Assert.AreEqual("validation_invalidStep", validationResult.ErrorMessage);
         }
     }
 

@@ -400,6 +400,7 @@
     <key alias="invalidStartNode">The selected item is from the wrong folder.</key>
     <key alias="invalidObjectType">The selected item is of the wrong type.</key>
     <key alias="notOneOfOptions">"The value '%0%' is not one of the available options.</key>
+    <key alias="multipleNotOneOfOptions">The values '%0%' are not found in the the available options.</key>
     <key alias="invalidColor">The selected color '%0%' is not one of the available options.</key>
   </area>
   <area alias="healthcheck">
