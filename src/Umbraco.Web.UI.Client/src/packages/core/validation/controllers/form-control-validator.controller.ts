@@ -35,8 +35,6 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 			}
 		});
 		this.#control = formControl;
-		this.#control.addEventListener(UmbValidationInvalidEvent.TYPE, this.#setInvalid);
-		this.#control.addEventListener(UmbValidationValidEvent.TYPE, this.#setValid);
 	}
 
 	get isValid(): boolean {
@@ -82,12 +80,18 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 
 	override hostConnected(): void {
 		super.hostConnected();
+		this.#control.addEventListener(UmbValidationInvalidEvent.TYPE, this.#setInvalid);
+		this.#control.addEventListener(UmbValidationValidEvent.TYPE, this.#setValid);
 		if (this.#context) {
 			this.#context.addValidator(this);
 		}
 	}
 	override hostDisconnected(): void {
 		super.hostDisconnected();
+		if (this.#control) {
+			this.#control.removeEventListener(UmbValidationInvalidEvent.TYPE, this.#setInvalid);
+			this.#control.removeEventListener(UmbValidationValidEvent.TYPE, this.#setValid);
+		}
 		if (this.#context) {
 			this.#context.removeValidator(this);
 			// Remove any messages that this validator has added:
@@ -99,11 +103,9 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 	}
 
 	override destroy(): void {
+		super.destroy();
 		if (this.#control) {
-			this.#control.removeEventListener(UmbValidationInvalidEvent.TYPE, this.#setInvalid);
-			this.#control.removeEventListener(UmbValidationValidEvent.TYPE, this.#setValid);
 			this.#control = undefined as any;
 		}
-		super.destroy();
 	}
 }

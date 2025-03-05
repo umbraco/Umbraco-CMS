@@ -24,6 +24,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		UmbValidationController,
 		UmbValidationController
 	>;
+	#inUnprovidingState: boolean = false;
 
 	// Local version of the data send to the server, only use-case is for translation.
 	#translationData = new UmbObjectState<any>(undefined);
@@ -110,16 +111,25 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 */
 	provideAt(controllerHost: UmbClassInterface): void {
 		if (this.#currentProvideHost === controllerHost) return;
-		this.#providerCtrl?.destroy();
+
+		this.unprovide();
+
+		if (this.messages === undefined) {
+			throw new Error('This Validation Context has been destroyed and can not be provided.');
+		}
 		this.#currentProvideHost = controllerHost;
 		this.#providerCtrl = controllerHost.provideContext(UMB_VALIDATION_CONTEXT, this);
 	}
 
 	unprovide(): void {
-		const ctrl = this.#providerCtrl;
-		this.#providerCtrl = undefined;
-		ctrl?.destroy();
-		this.#currentProvideHost = undefined;
+		if (this.#providerCtrl) {
+			// We need to set this in Unprovide state, so this context can be provided again later.
+			this.#inUnprovidingState = true;
+			this.#providerCtrl.destroy();
+			this.#providerCtrl = undefined;
+			this.#inUnprovidingState = false;
+			this.#currentProvideHost = undefined;
+		}
 	}
 
 	/**
@@ -362,10 +372,14 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	}
 
 	override destroy(): void {
+		if (this.#inUnprovidingState === true) {
+			return;
+		}
 		this.unprovide();
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
+		throw new Error('HERE....');
 		this.#parent = undefined;
 		this.#destroyValidators();
 		this.messages?.destroy();
