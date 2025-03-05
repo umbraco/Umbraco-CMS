@@ -36,8 +36,6 @@ import {
 	UmbDataPathVariantQuery,
 	UmbServerModelValidatorContext,
 	UmbValidationController,
-	UmbVariantsValidationPathTranslator,
-	UmbVariantValuesValidationPathTranslator,
 } from '@umbraco-cms/backoffice/validation';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -217,9 +215,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				return [] as Array<VariantOptionModelType>;
 			},
 		);
-
-		new UmbVariantValuesValidationPathTranslator(this);
-		new UmbVariantsValidationPathTranslator(this);
 
 		this.observe(
 			this.variantOptions,

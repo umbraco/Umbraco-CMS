@@ -20,7 +20,6 @@ import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms
 import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
-import { UmbBlockElementDataValidationPathTranslator } from '@umbraco-cms/backoffice/block';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 import '../../components/block-grid-entries/index.js';
