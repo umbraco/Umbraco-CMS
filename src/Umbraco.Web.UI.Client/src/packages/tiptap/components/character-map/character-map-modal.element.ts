@@ -392,7 +392,6 @@ export class UmbCharacterMapModalElement extends UmbModalBaseElement<
 										([code]) => code,
 										([code, label]) => html`
 											<uui-button
-												look="outline"
 												label=${label}
 												title=${label}
 												@click=${() => this.#onClickCharacter(code)}
@@ -416,6 +415,7 @@ export class UmbCharacterMapModalElement extends UmbModalBaseElement<
 	static override styles = [
 		css`
 			:host {
+				--umb-body-layout-color-background: var(--uui-color-surface);
 				--uui-menu-item-flat-structure: 1;
 			}
 
@@ -431,11 +431,6 @@ export class UmbCharacterMapModalElement extends UmbModalBaseElement<
 				gap: var(--uui-size-space-4);
 			}
 
-			uui-input[type='search'] {
-				/* Calculated width, to match the character grid (8 columns + 7 gaps) */
-				width: calc((var(--uui-size-14) * 8) + (var(--uui-size-5) * 7));
-			}
-
 			uui-scroll-container {
 				height: 300px;
 				width: calc(450px + var(--uui-size-layout-1));
@@ -445,12 +440,18 @@ export class UmbCharacterMapModalElement extends UmbModalBaseElement<
 				display: grid;
 				grid-template-columns: repeat(auto-fill, var(--uui-size-14));
 				gap: var(--uui-size-5);
+				padding: var(--uui-size-1);
 
 				uui-button {
-					--uui-button-background-color-hover: var(--uui-color-surface);
 					--uui-button-font-weight: normal;
 
+					border-radius: var(--uui-border-radius);
 					font-size: 1.5rem;
+
+					&:focus,
+					&:hover {
+						outline: 2px solid var(--uui-color-selected);
+					}
 				}
 			}
 
