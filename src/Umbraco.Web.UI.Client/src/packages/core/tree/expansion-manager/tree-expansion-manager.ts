@@ -4,6 +4,12 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
+/**
+ * Manages the expansion state of a tree
+ * @exports
+ * @class UmbTreeExpansionManager
+ * @augments {UmbControllerBase}
+ */
 export class UmbTreeExpansionManager extends UmbControllerBase {
 	#expansion = new UmbObjectState<UmbTreeExpansionModel | undefined>(undefined);
 	expansion = this.#expansion.asObservable();
@@ -25,7 +31,7 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @param {UmbEntityModel} entity The entity to open
 	 * @param {string} entity.entityType The entity type
 	 * @param {string} entity.unique The unique key
-	 * @memberof UmbDefaultTreeContext
+	 * @memberof UmbTreeExpansionManager
 	 * @returns {void}
 	 */
 	public expandItem(entity: UmbEntityModel): void {
@@ -39,12 +45,21 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @param {UmbEntityModel} entity The entity to close
 	 * @param {string} entity.entityType The entity type
 	 * @param {string} entity.unique The unique key
-	 * @memberof UmbDefaultTreeContext
+	 * @memberof UmbTreeExpansionManager
 	 * @returns {void}
 	 */
 	public collapseItem(entity: UmbEntityModel): void {
 		const currentValue = this.#expansion.getValue() ?? [];
 		const newValue = currentValue.filter((x) => x.entityType !== entity.entityType && x.unique !== entity.unique);
 		this.#expansion.setValue(newValue);
+	}
+
+	/**
+	 * Closes all child tree items
+	 * @memberof UmbTreeExpansionManager
+	 * @returns {void}
+	 */
+	public collapseAll(): void {
+		this.#expansion.setValue([]);
 	}
 }
