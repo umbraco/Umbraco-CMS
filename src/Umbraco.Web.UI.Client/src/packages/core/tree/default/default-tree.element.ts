@@ -42,7 +42,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	filter: (item: UmbTreeItemModelBase) => boolean = () => true;
 
 	@property({ attribute: false })
-	expand?: UmbTreeExpansionModel;
+	expansion?: UmbTreeExpansionModel;
 
 	@state()
 	private _rootItems: UmbTreeItemModel[] = [];
@@ -108,8 +108,8 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			this.#treeContext!.filter = this.filter;
 		}
 
-		if (_changedProperties.has('expand')) {
-			this.#treeContext!.setExpansion(this.expand);
+		if (_changedProperties.has('expansion')) {
+			this.#treeContext!.setExpansion(this.expansion);
 		}
 	}
 
