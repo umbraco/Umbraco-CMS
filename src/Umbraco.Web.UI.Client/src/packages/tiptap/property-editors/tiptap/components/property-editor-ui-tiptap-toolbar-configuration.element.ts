@@ -160,9 +160,8 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	#renderAvailableItem(item: UmbTiptapToolbarExtension) {
 		const forbidden = !this.#context.isExtensionEnabled(item.alias);
 		const inUse = this.#context.isExtensionInUse(item.alias);
-		return inUse || forbidden
-			? nothing
-			: html`
+		if (inUse || forbidden) return nothing;
+		return html`
 			<uui-button
 				compact
 				class=${forbidden ? 'forbidden' : ''}
@@ -275,7 +274,31 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	#renderItem(alias: string, rowIndex = 0, groupIndex = 0, itemIndex = 0) {
 		const item = this.#context?.getExtensionByAlias(alias);
 		if (!item) return nothing;
+
 		const forbidden = !this.#context?.isExtensionEnabled(item.alias);
+
+		switch (item.kind) {
+			case 'menu':
+				return html`
+					<uui-button
+						compact
+						class=${forbidden ? 'forbidden' : ''}
+						draggable="true"
+						look=${forbidden ? 'placeholder' : 'secondary'}
+						title=${this.localize.string(item.label)}
+						?disabled=${forbidden}
+						@click=${() => this.#context.removeToolbarItem([rowIndex, groupIndex, itemIndex])}
+						@dragend=${this.#onDragEnd}
+						@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias, [rowIndex, groupIndex, itemIndex])}>
+						<div class="inner">
+							<span>${this.localize.string(item.label)}</span>
+						</div>
+						<uui-symbol-expand slot="extra" open></uui-symbol-expand>
+					</uui-button>
+				`;
+
+			case 'button':
+			default:
 				return html`
 					<uui-button
 						compact
@@ -297,6 +320,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 					</uui-button>
 				`;
 		}
+	}
 
 	static override readonly styles = [
 		UmbTextStyles,
@@ -471,6 +495,10 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 									div {
 										display: flex;
 										gap: var(--uui-size-1);
+									}
+
+									uui-symbol-expand {
+										margin-left: var(--uui-size-space-4);
 									}
 								}
 							}
