@@ -2,7 +2,6 @@ import type { UmbAnchorModalData, UmbAnchorModalValue } from './anchor-modal.tok
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-anchor-modal')
 export class UmbAnchorModalElement extends UmbModalBaseElement<UmbAnchorModalData, UmbAnchorModalValue> {
@@ -24,18 +23,18 @@ export class UmbAnchorModalElement extends UmbModalBaseElement<UmbAnchorModalDat
 
 	override render() {
 		return html`
-			<umb-body-layout>
+			<uui-dialog-layout>
 				<uui-form>
 					<form id="form" @submit=${this.#onSubmit}>
 						<uui-form-layout-item>
 							<uui-label for="name" slot="label" required>Enter an anchor ID</uui-label>
 							<uui-input
 								type="text"
+								required
 								id="name"
 								name="name"
 								label="Enter an anchor ID"
 								.value=${this.data?.id || ''}
-								required
 								${umbFocus()}></uui-input>
 						</uui-form-layout-item>
 					</form>
@@ -51,15 +50,22 @@ export class UmbAnchorModalElement extends UmbModalBaseElement<UmbAnchorModalDat
 					color="positive"
 					look="primary"
 					label=${this.localize.term('general_submit')}></uui-button>
-			</umb-body-layout>
+			</uui-dialog-layout>
 		`;
 	}
 
 	static override styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				--umb-body-layout-color-background: var(--uui-color-surface);
+			}
+
+			uui-dialog-layout {
+				width: var(--uui-size-100);
+			}
+
+			uui-input {
+				width: 100%;
 			}
 		`,
 	];
