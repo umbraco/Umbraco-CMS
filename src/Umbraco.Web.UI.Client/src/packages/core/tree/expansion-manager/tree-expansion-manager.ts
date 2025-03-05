@@ -42,7 +42,7 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @memberof UmbDefaultTreeContext
 	 * @returns {void}
 	 */
-	public contractItem(entity: UmbEntityModel): void {
+	public collapseItem(entity: UmbEntityModel): void {
 		const currentValue = this.#expansion.getValue() ?? [];
 		const newValue = currentValue.filter((x) => x.entityType !== entity.entityType && x.unique !== entity.unique);
 		this.#expansion.setValue(newValue);

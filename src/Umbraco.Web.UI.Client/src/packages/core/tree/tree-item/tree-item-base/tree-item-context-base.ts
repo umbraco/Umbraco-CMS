@@ -265,7 +265,7 @@ export abstract class UmbTreeItemContextBase<
 			throw new Error('Could not show children, unique is missing');
 		}
 
-		this.treeContext?.expansion.contractItem({ entityType, unique });
+		this.treeContext?.expansion.collapseItem({ entityType, unique });
 	}
 
 	async #consumeContexts() {
