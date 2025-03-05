@@ -121,29 +121,23 @@ export class UmbDocumentPublishingServerDataSource {
 
 		const taskId = data.taskId;
 
-		// Poll until we know publishing is finished.
-		let isPolling = true;
+		// Poll until we know publishing is finished, then return the result.
 		let isFirstPoll = true;
-		while (isPolling) {
+		while (true) {
 			await new Promise((resolve) => setTimeout(resolve, isFirstPoll ? 1000 : 5000));
 			isFirstPoll = false;
 			const { data, error } = await tryExecuteAndNotify(
 				this.#host,
-				DocumentService.getDocumentByIdPublishWithDescendantsStatusByTaskId({ id: unique, taskId }));
+				DocumentService.getDocumentByIdPublishWithDescendantsResultByTaskId({ id: unique, taskId }));
 			if (error || !data) {
 				return { error };
 			}
 
-			if (!data.isPublishing) {
-				isPolling = false;
+			if (data.isComplete) {
+				return { error: null };
 			}
-		}
 
-		// Get and return the result.
-		return await tryExecuteAndNotify(
-			this.#host,
-			DocumentService.getDocumentByIdPublishWithDescendantsResultByTaskId({ id: unique, taskId }),
-		);
+		}
 	}
 
 	/**

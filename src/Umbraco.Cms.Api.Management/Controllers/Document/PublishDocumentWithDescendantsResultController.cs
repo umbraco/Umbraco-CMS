@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -29,7 +30,8 @@ public class PublishDocumentWithDescendantsResultController : DocumentController
 
     [HttpGet("{id:guid}/publish-with-descendants/result/{taskId:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PublishWithDescendantsResultModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PublishWithDescendantsResult(CancellationToken cancellationToken, Guid id, Guid taskId)
     {
@@ -43,10 +45,25 @@ public class PublishDocumentWithDescendantsResultController : DocumentController
             return Forbidden();
         }
 
+        // Check if the publishing task has completed, if not, return the status.
+        var isPublishing = await _contentPublishingService.IsPublishingBranchAsync(taskId);
+        if (isPublishing)
+        {
+            return Ok(new PublishWithDescendantsResultModel
+            {
+                TaskId = taskId,
+                IsComplete = false
+            });
+        };
+
+        // If completed, get the result and return the status.
         Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus> attempt = await _contentPublishingService.GetPublishBranchResultAsync(taskId);
         return attempt.Success
-            ? Ok()
+            ? Ok(new PublishWithDescendantsResultModel
+            {
+                TaskId = taskId,
+                IsComplete = true
+            })
             : DocumentPublishingOperationStatusResult(attempt.Status, failedBranchItems: attempt.Result.FailedItems);
-
     }
 }

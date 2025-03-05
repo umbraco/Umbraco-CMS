@@ -1,8 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
-public class PublishWithDescendantsStatusModel
+public class PublishWithDescendantsResultModel
 {
     public Guid TaskId { get; set; }
 
-    public bool IsPublishing { get; set; }
+    public bool IsComplete { get; set; }
 }

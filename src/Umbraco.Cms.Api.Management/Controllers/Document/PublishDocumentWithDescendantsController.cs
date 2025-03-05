@@ -35,7 +35,7 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
 
     [HttpPut("{id:guid}/publish-with-descendants")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PublishWithDescendantsStatusModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PublishWithDescendantsResultModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PublishWithDescendants(CancellationToken cancellationToken, Guid id, PublishDocumentWithDescendantsRequestModel requestModel)
@@ -58,10 +58,10 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
             true);
 
         return attempt.Success && attempt.Result.AcceptedTaskId.HasValue
-            ? Ok(new PublishWithDescendantsStatusModel
+            ? Ok(new PublishWithDescendantsResultModel
             {
                 TaskId = attempt.Result.AcceptedTaskId.Value,
-                IsPublishing = true
+                IsComplete = false
             })
             : DocumentPublishingOperationStatusResult(attempt.Status, failedBranchItems: attempt.Result.FailedItems);
     }

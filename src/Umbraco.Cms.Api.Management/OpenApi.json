@@ -8893,7 +8893,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PublishWithDescendantsStatusModel"
+                      "$ref": "#/components/schemas/PublishWithDescendantsResultModel"
                     }
                   ]
                 }
@@ -9006,71 +9006,27 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ProblemDetails"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/document/{id}/publish-with-descendants/status/{taskId}": {
-      "get": {
-        "tags": [
-          "Document"
-        ],
-        "operationId": "GetDocumentByIdPublishWithDescendantsStatusByTaskId",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "taskId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PublishWithDescendantsStatusModel"
+                      "$ref": "#/components/schemas/PublishWithDescendantsResultModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
                     }
                   ]
                 }
@@ -42993,9 +42949,9 @@
         },
         "additionalProperties": false
       },
-      "PublishWithDescendantsStatusModel": {
+      "PublishWithDescendantsResultModel": {
         "required": [
-          "isPublishing",
+          "isComplete",
           "taskId"
         ],
         "type": "object",
@@ -43004,7 +42960,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "isPublishing": {
+          "isComplete": {
             "type": "boolean"
           }
         },
