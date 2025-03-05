@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -25,6 +26,12 @@ internal class RichTextEditorBlockValidator: BlockEditorValidatorBase<RichTextBl
         _jsonSerializer = jsonSerializer;
         _logger = logger;
     }
+
+    protected override string ContentDataGroupJsonPath =>
+        $"{nameof(RichTextEditorValue.Blocks).ToFirstLowerInvariant()}.{nameof(RichTextBlockValue.ContentData).ToFirstLowerInvariant()}";
+
+    protected override string SettingsDataGroupJsonPath =>
+        $"{nameof(RichTextEditorValue.Blocks).ToFirstLowerInvariant()}.{nameof(RichTextBlockValue.SettingsData).ToFirstLowerInvariant()}";
 
     protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object? value, PropertyValidationContext validationContext)
     {
