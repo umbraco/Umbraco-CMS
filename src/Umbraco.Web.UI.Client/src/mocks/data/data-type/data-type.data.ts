@@ -271,10 +271,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: false,
 			},
 			{
-				alias: 'showOpenButton',
-				value: true,
-			},
-			{
 				alias: 'filter',
 				value: '',
 			},

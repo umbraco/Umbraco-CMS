@@ -66,9 +66,6 @@ export class UmbPropertyEditorUIContentPickerElement
 	_allowedContentTypeUniques?: string | null;
 
 	@state()
-	_showOpenButton?: boolean;
-
-	@state()
 	_rootUnique?: string | null;
 
 	@state()
@@ -98,7 +95,6 @@ export class UmbPropertyEditorUIContentPickerElement
 		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
 
 		this._allowedContentTypeUniques = config.getValueByAlias('filter');
-		this._showOpenButton = config.getValueByAlias('showOpenButton');
 
 		this._minMessage = `${this.localize.term('validation_minCount')} ${this._min} ${this.localize.term('validation_items')}`;
 		this._maxMessage = `${this.localize.term('validation_maxCount')} ${this._max} ${this.localize.term('validation_itemsSelected')}`;
@@ -168,7 +164,6 @@ export class UmbPropertyEditorUIContentPickerElement
 				.maxMessage=${this._maxMessage}
 				.startNode=${startNode}
 				.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
-				?showOpenButton=${this._showOpenButton}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-content>
 		`;

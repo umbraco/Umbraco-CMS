@@ -50,7 +50,6 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 				.min=${this._min}
 				.max=${this._max}
 				.value=${this.value}
-				?showOpenButton=${true}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}></umb-input-member-group>
 		`;
