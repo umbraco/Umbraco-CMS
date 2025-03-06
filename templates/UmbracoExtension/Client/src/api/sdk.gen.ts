@@ -31,7 +31,7 @@ export class UmbracoExtensionService {
                     type: 'http'
                 }
             ],
-            url: '/umbraco/hackclient/api/v1/ping',
+            url: '/umbraco/umbracoextension/api/v1/ping',
             ...options
         });
     }
@@ -44,7 +44,7 @@ export class UmbracoExtensionService {
                     type: 'http'
                 }
             ],
-            url: '/umbraco/hackclient/api/v1/whatsMyName',
+            url: '/umbraco/umbracoextension/api/v1/whatsMyName',
             ...options
         });
     }
@@ -57,7 +57,7 @@ export class UmbracoExtensionService {
                     type: 'http'
                 }
             ],
-            url: '/umbraco/hackclient/api/v1/whatsTheTimeMrWolf',
+            url: '/umbraco/umbracoextension/api/v1/whatsTheTimeMrWolf',
             ...options
         });
     }
@@ -70,7 +70,7 @@ export class UmbracoExtensionService {
                     type: 'http'
                 }
             ],
-            url: '/umbraco/hackclient/api/v1/whoAmI',
+            url: '/umbraco/umbracoextension/api/v1/whoAmI',
             ...options
         });
     }
