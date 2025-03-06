@@ -73,6 +73,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 
 	#updateQueryRequest(update: Partial<UmbExecuteTemplateQueryRequestModel>) {
 		this._queryRequest = { ...this._queryRequest, ...update };
+		console.log(this._queryRequest);
 		this.#executeTemplateQuery();
 	}
 
@@ -135,29 +136,21 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 
 	#setSortProperty(event: Event) {
 		const target = event.target as UUIComboboxListElement;
-
-		if (!this._queryRequest.sort) this.#setSortDirection();
-
-		this.#updateQueryRequest({
-			sort: { ...this._queryRequest.sort, propertyAlias: target.value as string },
-		});
+		this.#setSort(target.value as string, this._queryRequest.sort?.direction as SortOrder ?? this._defaultSortDirection);
 	}
 
 	#setSortDirection() {
-		if (!this._queryRequest.sort?.direction) {
-			this.#updateQueryRequest({
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				sort: { ...this._queryRequest.sort, direction: this._defaultSortDirection },
-			});
-			return;
-		}
+		const direction = this._queryRequest.sort?.direction
+			? this._queryRequest.sort.direction === SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending
+			: this._defaultSortDirection;
+		this.#setSort(this._queryRequest.sort?.propertyAlias ?? "", direction);
+	}
 
+	#setSort(propertyAlias: string, direction: SortOrder) {
 		this.#updateQueryRequest({
 			sort: {
-				...this._queryRequest.sort,
-				direction:
-					this._queryRequest.sort?.direction === SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending,
+				propertyAlias,
+				direction
 			},
 		});
 	}
