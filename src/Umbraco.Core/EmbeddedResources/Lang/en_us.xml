@@ -387,6 +387,9 @@
     <key alias="duplicateUsername">Username '%0%' is already taken</key>
     <key alias="outOfRangeMinimum">The value %0% is less than the allowed minimum value of %1%</key>
     <key alias="outOfRangeMaximum">The value %0% is greater than the allowed maximum value of %1%</key>
+    <key alias="outOfRangeSingleItemMinimum">The 1 item provided is less than the allowed minimum of %1%</key>
+    <key alias="outOfRangeMultipleItemsMinimum">The %0% items provided are less than the allowed minimum of %1%</key>
+    <key alias="outOfRangeMultipleItemsMaximum">The %0% items provided are greater than the allowed maximum of %1%</key>
     <key alias="invalidStep">The value %0% does not correspond with the configured step value of %1% and minimum value of %2%</key>
     <key alias="unexpectedRange">The value %0% is not expected to contain a range</key>
     <key alias="invalidRange">The value %0% is not expected to have a to value less than the from value</key>

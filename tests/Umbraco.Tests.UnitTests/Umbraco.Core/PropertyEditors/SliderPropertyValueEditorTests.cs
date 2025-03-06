@@ -15,7 +15,7 @@ using Umbraco.Cms.Infrastructure.Serialization;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
 [TestFixture]
-public class SliderValueEditorTests
+public class SliderPropertyValueEditorTests
 {
 #pragma warning disable IDE1006 // Naming Styles
     public static object[] InvalidCaseData = new object[]
