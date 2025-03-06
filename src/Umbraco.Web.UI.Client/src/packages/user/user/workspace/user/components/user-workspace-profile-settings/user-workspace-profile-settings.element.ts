@@ -97,6 +97,7 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 				<uui-input
 					slot="editor"
 					name="username"
+					autocomplete="off"
 					label="${this.localize.term('user_loginname')}"
 					@change="${this.#onUsernameChange}"
 					required

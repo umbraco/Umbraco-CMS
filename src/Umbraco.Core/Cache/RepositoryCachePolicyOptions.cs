@@ -11,6 +11,7 @@ public class RepositoryCachePolicyOptions
     public RepositoryCachePolicyOptions(Func<int> performCount)
     {
         PerformCount = performCount;
+        CacheNullValues = false;
         GetAllCacheValidateCount = true;
         GetAllCacheAllowZeroCount = false;
     }
@@ -21,6 +22,7 @@ public class RepositoryCachePolicyOptions
     public RepositoryCachePolicyOptions()
     {
         PerformCount = null;
+        CacheNullValues = false;
         GetAllCacheValidateCount = false;
         GetAllCacheAllowZeroCount = false;
     }
@@ -29,6 +31,11 @@ public class RepositoryCachePolicyOptions
     ///     Callback required to get count for GetAllCacheValidateCount
     /// </summary>
     public Func<int>? PerformCount { get; set; }
+
+    /// <summary>
+    ///     True if the Get method will cache null results so that the db is not hit for repeated lookups
+    /// </summary>
+    public bool CacheNullValues { get; set; }
 
     /// <summary>
     ///     True/false as to validate the total item count when all items are returned from cache, the default is true but this

@@ -1784,9 +1784,6 @@ export default {
 		notificationEmailsCheckSuccessMessage: 'Un email de notification a été envoyé à <strong>%0%</strong>.',
 		notificationEmailsCheckErrorMessage:
 			"L'adresse email de notification est toujours à sa valeur par défaut : <strong>%0%</strong>.",
-		scheduledHealthCheckEmailBody:
-			"<html><body><p>Les résultats de l'exécution du Umbraco Health Checks planifiée le %0% à %1% sont les suivants :</p>%2%</body></html>",
-		scheduledHealthCheckEmailSubject: 'Statut du Umbraco Health Check: %0%',
 	},
 	redirectUrls: {
 		disableUrlTracker: 'Désactiver URL tracker',

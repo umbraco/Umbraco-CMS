@@ -43,6 +43,7 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 			userContext.allowedSections,
 			(allowedSections) => {
 				if (!allowedSections) return;
+				// TODO: Please be aware that we re-initialize this initializer based on user permissions. I suggest we should solve this specific case should be improved by the ability to change the filter [NL]
 				new UmbExtensionsManifestInitializer(
 					this,
 					umbExtensionsRegistry,

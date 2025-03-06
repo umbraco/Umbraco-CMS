@@ -1,3 +1,4 @@
+import type { UmbTogglePropertyEditorUiValue } from './types.js';
 import type { UmbInputToggleElement } from '@umbraco-cms/backoffice/components';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -6,23 +7,32 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_VALIDATION_FALSE_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
-/**
- * @element umb-property-editor-ui-toggle
- */
 @customElement('umb-property-editor-ui-toggle')
-export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property({ type: Boolean })
-	value: undefined | boolean = undefined;
+export class UmbPropertyEditorUIToggleElement
+	extends UmbFormControlMixin<UmbTogglePropertyEditorUiValue, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
+	@property({ type: String })
+	name?: string;
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
-	 * @attr
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+
+	/**
+	 * Sets the input to mandatory, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	mandatory?: boolean;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_FALSE_LOCALIZATION_KEY;
 
 	@state()
 	_ariaLabel?: string;
@@ -33,36 +43,39 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 	@state()
 	_labelOn?: string;
 
-	@property({ type: String })
-	name?: string;
-
 	@state()
 	_showLabels = false;
 
-
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
-		this.value ??= config.getValueByAlias('default') ?? false;
-
 		this._labelOff = config.getValueByAlias('labelOff');
 		this._labelOn = config.getValueByAlias('labelOn');
 		this._showLabels = Boolean(config.getValueByAlias('showLabels'));
 		this._ariaLabel = config.getValueByAlias('ariaLabel');
 	}
 
+	protected override firstUpdated(): void {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-toggle')!);
+	}
+
 	#onChange(event: CustomEvent & { target: UmbInputToggleElement }) {
-		this.value = event.target.checked;
+		const checked = event.target.checked;
+		this.value = this.mandatory ? (checked ?? null) : checked;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	override render() {
 		return html`
 			<umb-input-toggle
-
-				.ariaLabel=${this._ariaLabel ? this.localize.string(this._ariaLabel) : this.localize.term('general_toggleFor', [this.name])}
+				.ariaLabel=${this._ariaLabel
+					? this.localize.string(this._ariaLabel)
+					: this.localize.term('general_toggleFor', [this.name])}
+				.labelOn=${this._labelOn}
 				.labelOff=${this._labelOff}
 				?checked=${this.value}
 				?showLabels=${this._showLabels}
+				?required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}>
 			</umb-input-toggle>

@@ -21,6 +21,7 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
 
     protected ContentCollectionControllerBase(IUmbracoMapper mapper) => _mapper = mapper;
 
+    [Obsolete("This method is no longer used and will be removed in Umbraco 17.")]
     protected IActionResult CollectionResult(ListViewPagedModel<TContent> result)
     {
         PagedModel<TContent> collectionItemsResult = result.Items;
@@ -42,6 +43,17 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
         {
             Items = collectionResponseModels,
             Total = collectionItemsResult.Total,
+        };
+
+        return Ok(pageViewModel);
+    }
+
+    protected IActionResult CollectionResult(List<TCollectionResponseModel> collectionResponseModels, long totalNumberOfItems)
+    {
+        var pageViewModel = new PagedViewModel<TCollectionResponseModel>
+        {
+            Items = collectionResponseModels,
+            Total = totalNumberOfItems,
         };
 
         return Ok(pageViewModel);

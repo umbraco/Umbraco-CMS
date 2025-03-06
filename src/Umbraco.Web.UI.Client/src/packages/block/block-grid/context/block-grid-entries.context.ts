@@ -14,6 +14,7 @@ import type {
 	UmbBlockGridValueModel,
 } from '../types.js';
 import { forEachBlockLayoutEntryOf } from '../utils/index.js';
+import type { UmbBlockGridPropertyEditorConfig } from '../property-editors/block-grid-editor/types.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context-token.js';
 import type { UmbBlockGridScalableContainerContext } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
 import {
@@ -40,6 +41,7 @@ interface UmbBlockGridAreaTypeInvalidRuleType {
 	minRequirement: number;
 	maxRequirement: number;
 }
+
 export class UmbBlockGridEntriesContext
 	extends UmbBlockEntriesContext<
 		typeof UMB_BLOCK_GRID_MANAGER_CONTEXT,
@@ -169,7 +171,7 @@ export class UmbBlockGridEntriesContext
 
 				// TODO: consider moving some of this logic to the clipboard property context
 				const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
-				const config = propertyContext.getConfig();
+				const config = propertyContext.getConfig() as UmbBlockGridPropertyEditorConfig;
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
 				return {
@@ -197,7 +199,8 @@ export class UmbBlockGridEntriesContext
 									clipboardEntryDetail.values,
 									UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 								);
-								return pasteTranslator.isCompatibleValue(value, config);
+
+								return pasteTranslator.isCompatibleValue(value, config, (value) => this.#clipboardEntriesFilter(value));
 							}
 
 							return true;
@@ -266,6 +269,21 @@ export class UmbBlockGridEntriesContext
 				const newPath = routeBuilder({});
 				this._workspacePath.setValue(newPath);
 			});
+	}
+
+	async #clipboardEntriesFilter(propertyValue: UmbBlockGridValueModel) {
+		const allowedElementTypeKeys = this.#retrieveAllowedElementTypes().map((x) => x.contentElementTypeKey);
+
+		const rootContentKeys = propertyValue.layout['Umbraco.BlockGrid']?.map((block) => block.contentKey) ?? [];
+		const rootContentTypeKeys = propertyValue.contentData
+			.filter((content) => rootContentKeys.includes(content.key))
+			.map((content) => content.contentTypeKey);
+
+		const allContentTypesAllowed = rootContentTypeKeys.every((contentKey) =>
+			allowedElementTypeKeys.includes(contentKey),
+		);
+
+		return allContentTypesAllowed;
 	}
 
 	protected _gotBlockManager() {
@@ -409,6 +427,12 @@ export class UmbBlockGridEntriesContext
 		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard', index: index });
 	}
 
+	isBlockTypeAllowed(contentTypeKey: string) {
+		return this.#allowedBlockTypes.asObservablePart((types) =>
+			types.some((x) => x.contentElementTypeKey === contentTypeKey),
+		);
+	}
+
 	/*
 	async setLayouts(layouts: Array<UmbBlockGridLayoutModel>) {
 		await this._retrieveManager;
@@ -429,7 +453,7 @@ export class UmbBlockGridEntriesContext
 		originData?: UmbBlockGridWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
-		return this._manager?.create(contentElementTypeKey, partialLayoutEntry, originData);
+		return await this._manager?.createWithPresets(contentElementTypeKey, partialLayoutEntry, originData);
 	}
 
 	// insert Block?
@@ -559,6 +583,7 @@ export class UmbBlockGridEntriesContext
 		}
 	}
 
+	// Property to hold the result of the check, used to make a meaningful Validation Message
 	#invalidBlockTypeLimits?: Array<UmbBlockGridAreaTypeInvalidRuleType>;
 
 	getInvalidBlockTypeLimits() {
@@ -625,8 +650,48 @@ export class UmbBlockGridEntriesContext
 				return undefined;
 			})
 			.filter((x) => x !== undefined) as Array<UmbBlockGridAreaTypeInvalidRuleType>;
-		const hasInvalidRules = this.#invalidBlockTypeLimits.length > 0;
-		return hasInvalidRules === false;
+		return this.#invalidBlockTypeLimits.length === 0;
+	}
+
+	#invalidBlockTypeConfigurations?: Array<string>;
+
+	getInvalidBlockTypeConfigurations() {
+		return this.#invalidBlockTypeConfigurations ?? [];
+	}
+	/**
+	 * @internal
+	 * @returns {boolean} - True if the block type limits are valid, otherwise false.
+	 */
+	checkBlockTypeConfigurationValidity(): boolean {
+		this.#invalidBlockTypeConfigurations = [];
+
+		const layoutEntries = this._layoutEntries.getValue();
+		if (layoutEntries.length === 0) return true;
+
+		// Check all layout entries if they are allowed.
+		const allowedBlocks = this.#allowedBlockTypes.getValue();
+		if (allowedBlocks.length === 0) return false;
+
+		const allowedKeys = allowedBlocks.map((x) => x.contentElementTypeKey);
+		// get content for each layout entry:
+		const invalidEntries = layoutEntries.filter((entry) => {
+			const contentTypeKey = this._manager!.getContentTypeKeyOfContentKey(entry.contentKey);
+			if (!contentTypeKey) {
+				// We could not find the content type key, so we cant determin if this is valid or not when the content is missing.
+				// This should be captured elsewhere as the Block then becomes invalid. So the unsupported Block should capture this.
+				return false;
+			}
+			const isBad = allowedKeys.indexOf(contentTypeKey) === -1;
+			if (contentTypeKey && isBad) {
+				// if bad, then add the ContentTypeName to the list of invalids (if we could not find the name add the key)
+				this.#invalidBlockTypeConfigurations?.push(
+					this._manager?.getContentTypeNameOf(contentTypeKey) ?? contentTypeKey,
+				);
+			}
+			return isBad;
+		});
+
+		return invalidEntries.length === 0;
 	}
 
 	/**

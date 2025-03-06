@@ -122,11 +122,10 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         var options = new RepositoryCachePolicyOptions
         {
             // allow zero to be cached
-            GetAllCacheAllowZeroCount = true,
+            GetAllCacheAllowZeroCount = true
         };
 
-        return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, int>(GlobalIsolatedCache, ScopeAccessor,
-            options);
+        return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, int>(GlobalIsolatedCache, ScopeAccessor, options);
     }
 
     private IDictionaryItem ConvertFromDto(DictionaryDto dto, IDictionary<int, ILanguage> languagesById)
@@ -217,11 +216,10 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
             var options = new RepositoryCachePolicyOptions
             {
                 // allow zero to be cached
-                GetAllCacheAllowZeroCount = true,
+                GetAllCacheAllowZeroCount = true
             };
 
-            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(GlobalIsolatedCache, ScopeAccessor,
-                options);
+            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(GlobalIsolatedCache, ScopeAccessor, options);
         }
 
         protected override IEnumerable<IDictionaryItem> PerformGetAll(params Guid[]? ids)
@@ -272,12 +270,13 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         {
             var options = new RepositoryCachePolicyOptions
             {
+                // allow null to be cached
+                CacheNullValues = true,
                 // allow zero to be cached
-                GetAllCacheAllowZeroCount = true,
+                GetAllCacheAllowZeroCount = true
             };
 
-            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor,
-                options);
+            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor, options);
         }
 
         protected override IEnumerable<IDictionaryItem> PerformGetAll(params string[]? ids)

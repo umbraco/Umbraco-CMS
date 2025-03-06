@@ -22,7 +22,9 @@ export class UmbConfirmModalElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-dialog-layout class="uui-text" .headline=${this.localize.string(this.data?.headline) ?? null}>
-				${unsafeHTML(this.localize.string(this.data?.content))}
+				${typeof this.data?.content === 'string'
+					? unsafeHTML(this.localize.string(this.data?.content))
+					: this.data?.content}
 
 				<uui-button
 					slot="actions"

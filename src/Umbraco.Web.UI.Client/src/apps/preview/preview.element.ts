@@ -4,12 +4,10 @@ import { css, customElement, html, nothing, state, when } from '@umbraco-cms/bac
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const elementName = 'umb-preview';
-
 /**
  * @element umb-preview
  */
-@customElement(elementName)
+@customElement('umb-preview')
 export class UmbPreviewElement extends UmbLitElement {
 	#context = new UmbPreviewContext(this);
 
@@ -199,6 +197,6 @@ export default UmbPreviewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPreviewElement;
+		'umb-preview': UmbPreviewElement;
 	}
 }

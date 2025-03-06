@@ -9,6 +9,7 @@
  * Language Culture: en-GB
  */
 import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localization-api';
+
 export default {
 	actions: {
 		assigndomain: 'Culture and Hostnames',
@@ -34,8 +35,8 @@ export default {
 		export: 'Export',
 		exportDocumentType: 'Export Document Type',
 		folderCreate: 'Create folder',
-		folderDelete: 'Delete folder',
-		folderRename: 'Rename folder',
+		folderDelete: 'Delete',
+		folderRename: 'Rename',
 		import: 'Import',
 		importdocumenttype: 'Import Document Type',
 		importPackage: 'Import Package',
@@ -48,7 +49,7 @@ export default {
 		protect: 'Public Access',
 		publish: 'Publish',
 		readOnly: 'Read-only',
-		refreshNode: 'Reload',
+		refreshNode: 'Reload children',
 		remove: 'Remove',
 		rename: 'Rename',
 		republish: 'Republish entire site',
@@ -271,9 +272,9 @@ export default {
 		noVariantsToProcess: 'There are no available variants',
 		releaseDate: 'Publish at',
 		unpublishDate: 'Unpublish at',
-		removeDate: 'Clear Date',
+		removeDate: 'Clear date',
 		setDate: 'Set date',
-		sortDone: 'Sortorder is updated',
+		sortDone: 'Sort order is updated',
 		sortHelp:
 			'To sort the nodes, simply drag the nodes or click one of the column headers. You can select\n      multiple nodes by holding the "shift" or "control" key while selecting\n    ',
 		statistics: 'Statistics',
@@ -294,6 +295,7 @@ export default {
 		notmemberof: 'Not a member of group(s)',
 		childItems: 'Child items',
 		target: 'Target',
+		scheduledPendingChanges: 'This schedule has changes that will take effect when you click "%0%".',
 		scheduledPublishServerTime: 'This translates to the following time on the server:',
 		scheduledPublishDocumentation:
 			'<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">What does this mean?</a>',
@@ -315,6 +317,9 @@ export default {
 		removeTextBox: 'Remove this text box',
 		contentRoot: 'Content root',
 		includeUnpublished: 'Include unpublished content items.',
+		forceRepublish: 'Publish unchanged items.',
+		forceRepublishWarning: 'WARNING: Publishing all pages below this one in the content tree, whether or not they have changed, can be an expensive and long-running operation.',
+		forceRepublishAdvisory: 'This should not be necessary in normal circumstances so please only proceed with this option selected if you are certain it is required.',
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your\n      website administrator.\n    ',
 		isSensitiveValue_short: 'This value is hidden.',
@@ -437,10 +442,10 @@ export default {
 		compositionDescription:
 			"Defines a re-usable set of properties that can be included in the definition of\n      multiple other Document Types. For example, a set of 'Common Page Settings'.\n    ",
 		folder: 'Folder',
-		folderDescription:
-			'Used to organise the Document Types, Compositions and Element Types created in this\n      Document Type tree.\n    ',
+		folderDescription: 'Used to organise items and other folders. Keep items structured and easy to access.',
 		newFolder: 'New folder',
 		newDataType: 'New Data Type',
+		newDataTypeDescription: 'Used to define a configuration for a Property Type on a Content Type.',
 		newJavascriptFile: 'New JavaScript file',
 		newEmptyPartialView: 'New empty partial view',
 		newPartialViewMacro: 'New partial view macro',
@@ -508,6 +513,11 @@ export default {
 		confirmremoveusageof: 'Are you sure you want to remove the usage of <strong>%0%</strong>',
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
+		confirmTrash: (name: string) => `Are you sure you want to move <strong>${name}</strong> to the Recycle Bin?`,
+		confirmBulkTrash: (total: number) =>
+			`Are you sure you want to move <strong>${total} ${total === 1 ? 'item' : 'items'}</strong> to the Recycle Bin?`,
+		confirmBulkDelete: (total: number) =>
+			`Are you sure you want to delete <strong>${total} ${total === 1 ? 'item' : 'items'}</strong>?`,
 		cut: 'Cut',
 		editDictionary: 'Edit dictionary item',
 		editLanguage: 'Edit language',
@@ -523,7 +533,7 @@ export default {
 		languagedeletewarning: 'This will delete the language and all content related to the language',
 		languageChangeWarning:
 			'Changing the culture for a language may be an expensive operation and will result\n      in the content cache and indexes being rebuilt\n    ',
-		lastEdited: 'Last Edited',
+		lastEdited: 'Last edited',
 		link: 'Link',
 		linkinternal: 'Internal link',
 		linklocaltip: 'When using local links, insert "#" in front of link',
@@ -610,16 +620,20 @@ export default {
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
 		selectEditorConfiguration: 'Select configuration',
+		seeErrorAction: 'See error',
+		seeErrorDialogHeadline: 'Error details',
 	},
 	dictionary: {
 		importDictionaryItemHelp:
-			'\n      To import a dictionary item, find the ".udt" file on your computer by clicking the\n      "Import" button (you\'ll be asked for confirmation on the next screen)\n    ',
+			'To import a dictionary item, find the ".udt" file on your computer by clicking the "Add" button (you\'ll be asked for confirmation on the next screen).',
 		itemDoesNotExists: 'Dictionary item does not exist.',
 		parentDoesNotExists: 'Parent item does not exist.',
 		noItems: 'There are no dictionary items.',
 		noItemsInFile: 'There are no dictionary items in this file.',
 		noItemsFound: 'There were no dictionary items found.',
 		createNew: 'Create dictionary item',
+		pickFile: 'Select file',
+		pickFileRequired: 'Please select a ".udt" file',
 	},
 	dictionaryItem: {
 		description: "Edit the different language versions for the dictionary item '%0%' below",
@@ -862,6 +876,7 @@ export default {
 		next: 'Next',
 		no: 'No',
 		nodeName: 'Node Name',
+		notFound: 'Not found',
 		of: 'of',
 		off: 'Off',
 		ok: 'OK',
@@ -911,6 +926,7 @@ export default {
 		unknown: 'Unknown',
 		unknownUser: 'Unknown user',
 		under: 'under',
+		unnamed: 'Unnamed',
 		up: 'Up',
 		update: 'Update',
 		upgrade: 'Upgrade',
@@ -946,9 +962,11 @@ export default {
 		avatar: 'Avatar for',
 		header: 'Header',
 		systemField: 'system field',
-		lastUpdated: 'Last Updated',
+		lastUpdated: 'Last updated',
+		selectAll: 'Select all',
 		skipToMenu: 'Skip to menu',
 		skipToContent: 'Skip to content',
+		readOnly: 'Read-only',
 		restore: 'Restore',
 		primary: 'Primary',
 		change: 'Change',
@@ -958,6 +976,10 @@ export default {
 		revert: 'Revert',
 		validate: 'Validate',
 		newVersionAvailable: 'New version available',
+		duration: (duration: string, date: Date | string, now: Date | string) => {
+			if (new Date(date).getTime() < new Date(now).getTime()) return `${duration} ago`;
+			return `in ${duration}`;
+		},
 	},
 	colors: {
 		blue: 'Blue',
@@ -971,7 +993,6 @@ export default {
 		addChild: 'Add child',
 		editDataType: 'Edit data type',
 		navigateSections: 'Navigate sections',
-		selectAll: 'Select all',
 		shortcut: 'Shortcuts',
 		showShortcuts: 'show shortcuts',
 		toggleListView: 'Toggle list view',
@@ -1245,6 +1266,13 @@ export default {
 	colorpicker: {
 		noColors: 'You have not configured any approved colours',
 	},
+	colorPickerConfigurations: {
+		colorsTitle: 'Colours',
+		colorsDescription: 'Add, remove or sort colours',
+		showLabelTitle: 'Include labels?',
+		showLabelDescription:
+			'Stores colours as a JSON object containing both the colour hex string and label, rather than just the hex string.',
+	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
 		pickedTrashedItem: 'You have picked a content item currently deleted or in the recycle bin',
@@ -1401,7 +1429,7 @@ export default {
 		folderUploadNotAllowed:
 			'This file is being uploaded as part of a folder, but creating a new folder is not allowed here',
 		folderCreationNotAllowed: 'Creating a new folder is not allowed here',
-		contentPublishedFailedByEvent: 'Content could not be published, a 3rd party add-in cancelled the action',
+		contentPublishedFailedByEvent: 'Document could not be published, a 3rd party add-in cancelled the action',
 		contentTypeDublicatePropertyType: 'Property type already exists',
 		contentTypePropertyTypeCreated: 'Property type created',
 		contentTypePropertyTypeCreatedText: 'Name: %0% <br /> DataType: %1%',
@@ -1415,12 +1443,13 @@ export default {
 		cssSavedText: 'Stylesheet saved without any errors',
 		dataTypeSaved: 'Datatype saved',
 		dictionaryItemSaved: 'Dictionary item saved',
-		editContentPublishedFailedByParent: 'Content could not be published, because a parent page is not published',
-		editContentPublishedHeader: 'Content published',
-		editContentPublishedText: 'and visible on the website',
+		editContentPublishedFailedByValidation: 'Document could not be published, but we saved it for you',
+		editContentPublishedFailedByParent: 'Document could not be published, because a parent page is not published',
+		editContentPublishedHeader: 'Document published',
+		editContentPublishedText: 'and is visible on the website',
 		editBlueprintSavedHeader: 'Document Blueprint saved',
 		editBlueprintSavedText: 'Changes have been successfully saved',
-		editContentSavedHeader: 'Content saved',
+		editContentSavedHeader: 'Document saved',
 		editContentSavedText: 'Remember to publish to make changes visible',
 		editContentSendToPublish: 'Sent For Approval',
 		editContentSendToPublishText: 'Changes have been sent for approval',
@@ -1482,10 +1511,11 @@ export default {
 		cannotCopyInformation: 'Could not copy your system information to the clipboard',
 		webhookSaved: 'Webhook saved',
 		operationSavedHeaderReloadUser: 'Saved. To view the changes please reload your browser',
-		editMultiContentPublishedText: '%0% documents published and visible on the website',
-		editVariantPublishedText: '%0% published and visible on the website',
-		editMultiVariantPublishedText: '%0% documents published for languages %1% and visible on the website',
+		editMultiContentPublishedText: '%0% documents published and are visible on the website',
+		editVariantPublishedText: '%0% published and is visible on the website',
+		editMultiVariantPublishedText: '%0% documents published for languages %1% and are visible on the website',
 		editContentScheduledSavedText: 'A schedule for publishing has been updated',
+		editContentScheduledNotSavedText: 'The schedule for publishing could not be updated',
 		editVariantSavedText: '%0% saved',
 		editVariantSendToPublishText: '%0% changes have been sent for approval',
 		contentCultureUnpublished: 'Content variation %0% unpublished',
@@ -1783,6 +1813,7 @@ export default {
 		selectEventFirst: 'Please select an event first.',
 		selectEvents: 'Select events',
 		statusCode: 'Status code',
+		unnamedWebhook: 'Unnamed webhook',
 	},
 	languages: {
 		addLanguage: 'Add language',
@@ -2016,6 +2047,8 @@ export default {
 		permissionsDefault: 'Default permissions',
 		permissionsGranular: 'Granular permissions',
 		permissionsGranularHelp: 'Set permissions for specific nodes',
+		granularRightsLabel: 'Documents',
+		granularRightsDescription: 'Assign permissions to specific documents',
 		permissionsEntityGroup_document: 'Content',
 		permissionsEntityGroup_media: 'Media',
 		permissionsEntityGroup_member: 'Member',
@@ -2032,6 +2065,8 @@ export default {
 		chooseUserGroup: (multiple: boolean) => {
 			return multiple ? 'Choose User Groups' : 'Choose User Group';
 		},
+		entityPermissionsLabel: 'Permissions',
+		entityPermissionsDescription: 'Assign permissions for actions',
 		noStartNode: 'No start node selected',
 		noStartNodes: 'No start nodes selected',
 		startnode: 'Content start node',
@@ -2127,6 +2162,7 @@ export default {
 		invalidEmail: 'Invalid email',
 		invalidNull: 'Value cannot be null',
 		invalidEmpty: 'Value cannot be empty',
+		invalidFalse: 'This field must be turned on',
 		invalidPattern: 'Value is invalid, it does not match the correct pattern',
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
@@ -2204,9 +2240,6 @@ export default {
 		notificationEmailsCheckSuccessMessage: 'Notification email has been set to <strong>%0%</strong>.',
 		notificationEmailsCheckErrorMessage:
 			'Notification email is still set to the default value of <strong>%0%</strong>.',
-		scheduledHealthCheckEmailBody:
-			'<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>',
-		scheduledHealthCheckEmailSubject: 'Umbraco Health Check Status: %0%',
 		checkGroup: 'Check group',
 		helpText:
 			'\n        <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.\n        You can add your own health checks, have a look at <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>\n        ',
@@ -2618,6 +2651,8 @@ export default {
 		labelInlineMode: 'Display inline with text',
 		notExposedLabel: 'Draft',
 		notExposedDescription: 'This Block is not yet created for this variant',
+		areaValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in this area.',
+		rootValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in the root of this property.',
 		unsupportedBlockName: 'Unsupported',
 		unsupportedBlockDescription:
 			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',
@@ -2690,7 +2725,21 @@ export default {
 		wordWrapConfigLabel: 'Word wrap',
 		wordWrapConfigDescription: 'Enable word wrapping in the code editor.',
 	},
+	rte: {
+		config_blocks: 'Available Blocks',
+		config_blocks_description: 'Define the available blocks.',
+		config_ignoreUserStartNodes: 'Ignore User Start Nodes',
+		config_maxImageSize: 'Maximum size for inserted images',
+		config_maxImageSize_description: 'Maximum width or height - enter 0 to disable resizing.',
+		config_mediaParentId: 'Image Upload Folder',
+		config_mediaParentId_description: 'Choose the upload location of pasted images.',
+		config_overlaySize: 'Overlay size',
+		config_overlaySize_description: 'Select the width of the overlay (link picker).',
+	},
 	tiptap: {
+		config_dimensions_description: 'Set the maximum width and height of the editor. This excludes the toolbar height.',
+		config_extensions: 'Capabilities',
+		config_toolbar: 'Toolbar',
 		extGroup_formatting: 'Text formatting',
 		extGroup_interactive: 'Interactive elements',
 		extGroup_media: 'Embeds and media',
@@ -2706,6 +2755,7 @@ export default {
 		toolbar_removeGroup: 'Remove group',
 		toolbar_removeItem: 'Remove action',
 		toolbar_emptyGroup: 'Empty',
+		sourceCodeEdit: 'Edit source code',
 	},
 	linkPicker: {
 		modalSource: 'Source',
@@ -2715,5 +2765,9 @@ export default {
 		resetUrlHeadline: 'Reset URL?',
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',
+	},
+	collection: {
+		noItemsTitle: 'No items',
+		addCollectionConfiguration: 'Add collection',
 	},
 } as UmbLocalizationDictionary;

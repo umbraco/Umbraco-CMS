@@ -43,7 +43,7 @@ test('can create child node', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   expect(childData[0].variants[0].name).toBe(childContentName);
   // verify that the child content displays in the tree after reloading children
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickReloadButton();
+  await umbracoUi.content.clickReloadChildrenButton();
   await umbracoUi.content.clickCaretButtonForContentName(contentName);
   await umbracoUi.content.doesContentTreeHaveName(childContentName);
 
