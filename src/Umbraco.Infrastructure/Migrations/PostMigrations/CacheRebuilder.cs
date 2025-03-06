@@ -27,7 +27,7 @@ public class CacheRebuilder : ICacheRebuilder
     /// <inheritdoc />
     public void Rebuild()
     {
-        _databaseCacheRebuilder.Rebuild();
+        _databaseCacheRebuilder.Rebuild(false);
         _distributedCache.RefreshAllPublishedSnapshot();
     }
 }
