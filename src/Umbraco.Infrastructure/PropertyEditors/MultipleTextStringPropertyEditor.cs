@@ -190,7 +190,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
                 }
             }
 
-            if (stringCount > multipleTextStringConfiguration.Max)
+            if (multipleTextStringConfiguration.Max > 0 && stringCount > multipleTextStringConfiguration.Max)
             {
                 yield return new ValidationResult(
                     _localizedTextService.Localize("validation", "outOfRangeMultipleItemsMaximum", [stringCount.ToString(), multipleTextStringConfiguration.Max.ToString()]),
