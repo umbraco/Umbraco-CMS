@@ -11,6 +11,9 @@ type AsPromiseOptionsType = {
 
 /**
  * @class UmbContextConsumer
+ * @description The context consumer class, used to consume a context from a host element.
+ * Notice it is not recommended to use this class directly, but rather use the `consumeContext` method from a `UmbElement` or `UmbElementMixin` or `UmbControllerBase` or `UmbClassMixin`.
+ * Alternatively, you can use the `UmbContextConsumerController` to consume a context from a host element. But this does require that you can implement one of the Class Mixins mentioned above.
  */
 export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType = BaseType> {
 	protected _retrieveHost: HostElementMethod;
@@ -19,8 +22,8 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	#stopAtContextMatch = true;
 	#callback?: UmbContextCallback<ResultType>;
 	#promise?: Promise<ResultType | undefined>;
-	#promiseResolver?: (instance: ResultType | undefined) => void;
-	#promiseRejecter?: (instance: ResultType | undefined) => void;
+	#promiseResolver?: (instance: ResultType) => void;
+	#promiseRejecter?: (instance?: ResultType) => void;
 
 	#instance?: ResultType;
 	get instance() {
@@ -88,7 +91,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 			throw new Error('Not allowed to set context api instance to undefined.');
 		}
 		if (this.#discriminator) {
-			// Notice if discriminator returns false, we do not want to setInstance.
+			// Notice if discriminator returns false, we do not want to setInstance. [NL]
 			if (this.#discriminator(instance)) {
 				this.setInstance(instance as unknown as ResultType);
 				return true;
@@ -149,13 +152,13 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		);
 		(this.#skipHost ? this._retrieveHost()?.parentNode : this._retrieveHost())?.dispatchEvent(event);
 
-		// await 200 request animation frames
-		let i = 200;
+		// await 300 request animation frames, equivalent to 5seconds in a 60fps rendering scenario. [NL]
+		let i = 300;
 		while (i-- > 0 && this.#promiseRejecter) {
 			await new Promise((resolve) => requestAnimationFrame(resolve));
 		}
-		// If we still have the rejecter, it means that the context was not found immediately, so lets reject the promise.
-		this.#promiseRejecter?.(undefined);
+		// If we still have the rejecter, it means that the context was not found immediately, so lets reject the promise. [NL]
+		this.#promiseRejecter?.();
 	}
 
 	public hostConnected(): void {
@@ -180,7 +183,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		}
 	};
 
-	//Niels: I'm keeping this code around as it might be relevant, but I wanted to try to see if leaving this feature out for now could work for us.
+	//Niels: I'm keeping this code around as it might be relevant, but I wanted to try to see if leaving this feature out for now could work for us. [NL]
 	/*
 	#handleRemovedProvider = (event: Event) => {
 		// Does seem a bit unnecessary, we could just assume the type via type casting...
