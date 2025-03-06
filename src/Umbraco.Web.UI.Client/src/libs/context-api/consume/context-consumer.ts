@@ -7,6 +7,7 @@ type HostElementMethod = () => Element | undefined;
 
 export type UmbContextConsumerAsPromiseOptionsType = {
 	preventTimeout?: boolean;
+	timeoutFrames?: number;
 };
 
 /**
@@ -24,6 +25,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	#promise?: Promise<ResultType | undefined>;
 	#promiseResolver?: (instance: ResultType) => void;
 	#promiseRejecter?: (instance?: ResultType) => void;
+	#timeoutFrames?: number;
 
 	#instance?: ResultType;
 	get instance() {
@@ -131,6 +133,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 					this.#promiseRejecter = undefined;
 					resolve(this.#instance);
 				} else {
+					this.#timeoutFrames = options?.timeoutFrames;
 					this.#promiseResolver = resolve;
 					this.#promiseRejecter = options?.preventTimeout ? undefined : reject;
 				}
@@ -153,7 +156,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		(this.#skipHost ? this._retrieveHost()?.parentNode : this._retrieveHost())?.dispatchEvent(event);
 
 		// await 120 request animation frames, equivalent to 2seconds in a 60fps rendering scenario. [NL]
-		let i = 120;
+		let i: number = this.#timeoutFrames ?? 120;
 		while (i-- > 0 && this.#promiseRejecter) {
 			await new Promise((resolve) => requestAnimationFrame(resolve));
 		}
