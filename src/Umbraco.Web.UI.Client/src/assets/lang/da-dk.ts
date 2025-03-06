@@ -298,6 +298,9 @@ export default {
 		removeTextBox: 'Fjern denne tekstboks',
 		contentRoot: 'Indholdsrod',
 		includeUnpublished: 'Inkluder ikke-udgivet indhold.',
+		forceRepublish: 'Udgiv uændrede elementer.',
+		forceRepublishWarning: 'ADVARSEL: Udgivelse af alle sider under denne i indholdstræet, uanset om de er ændret eller ej, kan være en ressourcekrævende og langvarig proces.',
+		forceRepublishAdvisory: 'Dette bør ikke være nødvendigt under normale omstændigheder, så fortsæt kun med denne handling, hvis du er sikker på, at det er nødvendigt.',
 		isSensitiveValue:
 			'Denne værdi er skjult.Hvis du har brug for adgang til at se denne værdi, bedes du\n      kontakte din web-administrator.\n    ',
 		isSensitiveValue_short: 'Denne værdi er skjult.',
@@ -584,6 +587,8 @@ export default {
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
+		seeErrorAction: 'Se fejlen',
+		seeErrorDialogHeadline: 'Fejl detaljer',
 	},
 	dictionary: {
 		noItems: 'Der er ingen ordbogselementer.',
@@ -909,22 +914,27 @@ export default {
 		videos: 'Videoer',
 		avatar: 'Avatar til',
 		header: 'Overskrift',
+		selectAll: 'Vælg alle',
 		systemField: 'system felt',
 		readOnly: 'Skrivebeskyttet',
 		restore: 'Genskab',
-		generic: 'Generic',
+		generic: 'Generisk',
 		media: 'Media',
-		nodeName: 'Node Name',
-		revert: 'Revert',
+		nodeName: 'Node navn',
+		revert: 'Fortryd',
 		umbracoInfo: 'Umbraco info',
-		shared: 'Shared',
-		success: 'Success',
-		typeName: 'Type Name',
-		validate: 'Validate',
-		lastUpdated: 'Last Updated',
-		skipToMenu: 'Skip to menu',
-		skipToContent: 'Skip to content',
+		shared: 'Delt',
+		success: 'Succes',
+		typeName: 'Type navn',
+		validate: 'Valider',
+		lastUpdated: 'Sidst opdateret',
+		skipToMenu: 'Spring til menu',
+		skipToContent: 'Spring til indhold',
 		newVersionAvailable: 'Ny version tilgængelig',
+		duration: (duration: string, date: Date | string, now: Date | string) => {
+			if (new Date(date).getTime() < new Date(now).getTime()) return `for ${duration} siden`;
+			return `om ${duration}`;
+		},
 	},
 	colors: {
 		blue: 'Blå',
@@ -1209,6 +1219,12 @@ export default {
 	},
 	colorpicker: {
 		noColors: 'Du har ikke konfigureret nogen godkendte farver',
+	},
+	colorPickerConfigurations: {
+		colorsTitle: 'Farver',
+		colorsDescription: 'Tilføj, fjern eller sorter farver',
+		showLabelTitle: 'Inkluder label?',
+		showLabelDescription: 'Gemmer farver som et Json-objekt, der både indeholder farvens hex streng og label, i stedet for kun at gemme hex strengen.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'Du kan kun vælge følgende type(r) dokumenter: %0%',
@@ -1674,6 +1690,7 @@ export default {
 		elementDoesNotSupport: 'Dette benyttes ikke for en Element-type',
 		propertyHasChanges: 'Du har lavet ændringer til denne egenskab. Er du sikker på at du vil kassere dem?\n    ',
 		displaySettingsHeadline: 'Visning',
+		displaySettingsLabelOnLeft: 'Label på venstre side',
 		displaySettingsLabelOnTop: 'Label hen over (fuld bredde)',
 		removeChildNode: 'Du fjerner noden',
 		removeChildNodeWarning:
@@ -1915,6 +1932,8 @@ export default {
 		permissionsDefault: 'Standardrettigheder',
 		permissionsGranular: 'Granulære rettigheder',
 		permissionsGranularHelp: 'Sæt rettigheder for specifikke noder',
+		granularRightsLabel: 'Dokumenter',
+		granularRightsDescription: 'Tillad adgang til specifikke dokumenter',
 		permissionsEntityGroup_document: 'Indhold',
 		permissionsEntityGroup_media: 'Medie',
 		permissionsEntityGroup_member: 'Medlemmer',
@@ -1931,6 +1950,8 @@ export default {
 		chooseUserGroup: (multiple: boolean) => {
 			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';
 		},
+		entityPermissionsLabel: 'Handlingsrettigheder',
+		entityPermissionsDescription: 'Tildel tilladelser til handlinger',
 		noStartNode: 'Ingen startnode valgt',
 		noStartNodes: 'Ingen startnoder valgt',
 		startnode: 'Indhold startnode',
@@ -2017,6 +2038,7 @@ export default {
 	},
 	validation: {
 		validation: 'Validering',
+		validateNothing: 'Ingen validering',
 		validateAsEmail: 'Valider som e-mail',
 		validateAsNumber: 'Valider som tal',
 		validateAsUrl: 'Valider som URL',
@@ -2038,6 +2060,7 @@ export default {
 		invalidEmail: 'Ugyldig e-mail',
 		invalidNull: 'Værdien kan ikke være tom',
 		invalidEmpty: 'Værdien kan ikke være tom',
+		invalidFalse: 'Dette felt skal være slået til',
 		invalidPattern: 'Værdien er ugyldig, som ikke matcher det korrekte format',
 		customValidation: 'Selvvalgt validering',
 		entriesShort: 'Minimum %0% element(er), tilføj <strong>%1%</strong> mere.',
@@ -2430,8 +2453,8 @@ export default {
 		searchResults: 'resultater',
 	},
 	propertyEditorPicker: {
-		title: 'Select Property Editor',
-		openPropertyEditorPicker: 'Select Property Editor',
+		title: 'Vælg Property Editor',
+		openPropertyEditorPicker: 'Vælg Property Editor',
 	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",
@@ -2607,5 +2630,9 @@ export default {
 		toolbar_removeGroup: 'Fjern gruppe',
 		toolbar_removeItem: 'Fjern handling',
 		toolbar_emptyGroup: 'Tom',
+	},
+	collection: {
+		noItemsTitle: 'Intet indhold',
+		addCollectionConfiguration: 'Tilføj samling',
 	},
 } as UmbLocalizationDictionary;

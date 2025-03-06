@@ -10,7 +10,14 @@ import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
 
 const ObserveRepositoryAlias = Symbol();
 
-// TODO: v16 - add entityType to the type
+interface UmbRepositoryItemsStatus {
+	state: {
+		type: 'success' | 'error' | 'loading';
+		error?: string;
+	};
+	unique: string;
+}
+
 export class UmbRepositoryItemsManager<ItemType extends { unique: string }> extends UmbControllerBase {
 	//
 	repository?: UmbItemRepository<ItemType>;
@@ -30,6 +37,9 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 
 	#items = new UmbArrayState<ItemType>([], (x) => this.#getUnique(x));
 	items = this.#items.asObservable();
+
+	#statuses = new UmbArrayState<UmbRepositoryItemsStatus>([], (x) => x.unique);
+	statuses = this.#statuses.asObservable();
 
 	/**
 	 * Creates an instance of UmbRepositoryItemsManager.
@@ -91,13 +101,12 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		);
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
-			this.#eventContext = context;
-
-			this.#eventContext.removeEventListener(
+			this.#eventContext?.removeEventListener(
 				UmbEntityUpdatedEvent.TYPE,
 				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);
 
+			this.#eventContext = context;
 			this.#eventContext.addEventListener(
 				UmbEntityUpdatedEvent.TYPE,
 				this.#onEntityUpdatedEvent as unknown as EventListener,
@@ -133,15 +142,71 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		await this.#init;
 		if (!this.repository) throw new Error('Repository is not initialized');
 
+		const requestedUniques = this.getUniques();
+
+		this.#statuses.setValue(
+			requestedUniques.map((unique) => ({
+				state: {
+					type: 'loading',
+				},
+				unique,
+			})),
+		);
+
 		// TODO: Test if its just some items that is gone now, if so then just filter them out. (maybe use code from #removeItem)
 		// This is where this.#getUnique comes in play. Unless that can come from the repository, but that collides with the idea of having a multi-type repository. If that happens.
-		const request = this.repository.requestItems(this.getUniques());
+		const request = this.repository.requestItems(requestedUniques);
 		this.#currentRequest = request;
-		const { asObservable } = await request;
+		const { asObservable, data, error } = await request;
 
 		if (this.#currentRequest !== request) {
 			// You are not the newest request, so please back out.
 			return;
+		}
+
+		if (error) {
+			this.#statuses.append(
+				requestedUniques.map((unique) => ({
+					state: {
+						type: 'error',
+						error: '#general_error',
+					},
+					unique,
+				})),
+			);
+			return;
+		}
+
+		// find uniques not resolved:
+		if (data) {
+			// find rejected uniques:
+			const rejectedUniques = requestedUniques.filter(
+				(unique) => !data.find((item) => this.#getUnique(item) === unique),
+			);
+			const resolvedUniques = requestedUniques.filter((unique) => !rejectedUniques.includes(unique));
+			this.#items.remove(rejectedUniques);
+
+			this.#statuses.append([
+				...rejectedUniques.map(
+					(unique) =>
+						({
+							state: {
+								type: 'error',
+								error: '#general_notFound',
+							},
+							unique,
+						}) as UmbRepositoryItemsStatus,
+				),
+				...resolvedUniques.map(
+					(unique) =>
+						({
+							state: {
+								type: 'success',
+							},
+							unique,
+						}) as UmbRepositoryItemsStatus,
+				),
+			]);
 		}
 
 		if (asObservable) {
@@ -159,7 +224,17 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		await this.#init;
 		if (!this.repository) throw new Error('Repository is not initialized');
 
-		const { data } = await this.repository.requestItems([unique]);
+		const { data, error } = await this.repository.requestItems([unique]);
+
+		if (error) {
+			this.#statuses.appendOne({
+				state: {
+					type: 'error',
+					error: '#general_notFound',
+				},
+				unique,
+			} as UmbRepositoryItemsStatus);
+		}
 
 		if (data) {
 			const items = this.getItems();

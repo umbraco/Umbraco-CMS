@@ -1,16 +1,1 @@
-export default `<!-- @license lucide-static v0.471.0 - ISC -->
-<svg
-  class="lucide lucide-arrow-up-to-line"
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="1.75"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M5 3h14" />
-  <path d="m18 13-6-6-6 6" />
-  <path d="M12 7v14" />
-</svg>
-`;
+export default `<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" class="lucide lucide-arrow-up-to-line" viewBox="0 0 24 24"><path d="M5 3h14M18 13l-6-6-6 6M12 7v14"/></svg>`;

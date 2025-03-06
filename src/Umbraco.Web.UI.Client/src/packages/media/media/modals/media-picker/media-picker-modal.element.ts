@@ -18,10 +18,10 @@ import {
 	type PropertyValues,
 	nothing,
 } from '@umbraco-cms/backoffice/external/lit';
-import { debounce } from '@umbraco-cms/backoffice/utils';
+import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONTENT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
-import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputEvent, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
@@ -43,6 +43,12 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 	@state()
 	private _currentChildren: Array<UmbMediaTreeItemModel> = [];
+
+	@state()
+	private _currentPage = 1;
+
+	@state()
+	private _currentTotalPages = 0;
 
 	@state()
 	private _searchResult: Array<UmbMediaSearchItemModel> = [];
@@ -67,6 +73,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 	@query('#dropzone')
 	private _dropzone!: UmbDropzoneElement;
+
+	#pagingMap = new Map<string, UmbPaginationManager>();
 
 	constructor() {
 		super();
@@ -109,17 +117,32 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	}
 
 	async #loadChildrenOfCurrentMediaItem() {
+		const key = this._currentMediaEntity.entityType + this._currentMediaEntity.unique;
+		let paginationManager = this.#pagingMap.get(key);
+
+		if (!paginationManager) {
+			paginationManager = new UmbPaginationManager();
+			paginationManager.setPageSize(100);
+			this.#pagingMap.set(key, paginationManager);
+		}
+
+		const skip = paginationManager.getSkip();
+		const take = paginationManager.getPageSize();
+
 		const { data } = await this.#mediaTreeRepository.requestTreeItemsOf({
 			parent: {
 				unique: this._currentMediaEntity.unique,
 				entityType: this._currentMediaEntity.entityType,
 			},
 			dataType: this.#dataType,
-			skip: 0,
-			take: 100,
+			skip,
+			take,
 		});
 
 		this._currentChildren = data?.items ?? [];
+		paginationManager.setTotalItems(data?.total ?? 0);
+		this._currentPage = paginationManager.getCurrentPageNumber();
+		this._currentTotalPages = paginationManager.getTotalPages();
 	}
 
 	#onOpen(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
@@ -216,6 +239,22 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		this.#loadChildrenOfCurrentMediaItem();
 	}
 
+	#onPageChange(event: UUIPaginationEvent) {
+		event.stopPropagation();
+		const key = this._currentMediaEntity.entityType + this._currentMediaEntity.unique;
+
+		const paginationManager = this.#pagingMap.get(key);
+
+		if (!paginationManager) {
+			throw new Error('Pagination manager not found');
+		}
+
+		paginationManager.setCurrentPageNumber(event.target.current);
+		this.#pagingMap.set(key, paginationManager);
+
+		this.#loadChildrenOfCurrentMediaItem();
+	}
+
 	#allowNavigateToMedia(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel): boolean {
 		return isUmbracoFolder(item.mediaType.unique) || item.hasChildren;
 	}
@@ -275,12 +314,18 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			${!this._currentChildren.length
 				? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
 				: html`<div id="media-grid">
-						${repeat(
-							this._currentChildren,
-							(item) => item.unique,
-							(item) => this.#renderCard(item),
-						)}
-					</div>`}
+							${repeat(
+								this._currentChildren,
+								(item) => item.unique,
+								(item) => this.#renderCard(item),
+							)}
+						</div>
+						${this._currentTotalPages > 1
+							? html`<uui-pagination
+									.current=${this._currentPage}
+									.total=${this._currentTotalPages}
+									@change=${this.#onPageChange}></uui-pagination>`
+							: nothing}`}
 		`;
 	}
 
@@ -415,6 +460,11 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			.not-allowed {
 				cursor: not-allowed;
 				opacity: 0.5;
+			}
+
+			uui-pagination {
+				display: block;
+				margin-top: var(--uui-size-layout-1);
 			}
 		`,
 	];

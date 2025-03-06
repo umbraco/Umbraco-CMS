@@ -565,6 +565,7 @@ export type DataTypeTreeItemResponseModel = {
 };
 
 export type DefaultReferenceResponseModel = {
+    $type: string;
     id: string;
     name?: (string) | null;
     type?: (string) | null;
@@ -640,6 +641,8 @@ export type DocumentCollectionResponseModel = {
     creator?: (string) | null;
     sortOrder: number;
     documentType: (DocumentTypeCollectionReferenceResponseModel);
+    isTrashed: boolean;
+    isProtected: boolean;
     updater?: (string) | null;
 };
 
@@ -686,6 +689,7 @@ export type DocumentRecycleBinItemResponseModel = {
 };
 
 export type DocumentReferenceResponseModel = {
+    $type: string;
     id: string;
     name?: (string) | null;
     published?: (boolean) | null;
@@ -1213,6 +1217,7 @@ export type MediaRecycleBinItemResponseModel = {
 };
 
 export type MediaReferenceResponseModel = {
+    $type: string;
     id: string;
     name?: (string) | null;
     mediaType: (TrackedReferenceMediaTypeModel);
@@ -2045,6 +2050,7 @@ export type PublishDocumentRequestModel = {
 
 export type PublishDocumentWithDescendantsRequestModel = {
     includeUnpublishedDescendants: boolean;
+    forceRepublish: boolean;
     cultures: Array<(string)>;
 };
 
@@ -3530,6 +3536,7 @@ export type PutDocumentTypeByIdResponse = (string);
 
 export type GetDocumentTypeByIdAllowedChildrenData = {
     id: string;
+    parentContentKey?: string;
     skip?: number;
     take?: number;
 };
@@ -4135,6 +4142,7 @@ export type PutMediaTypeByIdResponse = (string);
 
 export type GetMediaTypeByIdAllowedChildrenData = {
     id: string;
+    parentContentKey?: string;
     skip?: number;
     take?: number;
 };

@@ -20,7 +20,6 @@ internal sealed class ContentEditingService
     private readonly IUserService _userService;
     private readonly ILocalizationService _localizationService;
     private readonly ILanguageService _languageService;
-    private readonly ContentSettings _contentSettings;
 
     public ContentEditingService(
         IContentService contentService,
@@ -36,8 +35,20 @@ internal sealed class ContentEditingService
         IUserService userService,
         ILocalizationService localizationService,
         ILanguageService languageService,
-        IOptions<ContentSettings> contentSettings)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, contentValidationService, treeEntitySortingService)
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService)
+        : base(
+            contentService,
+            contentTypeService,
+            propertyEditorCollection,
+            dataTypeService,
+            logger,
+            scopeProvider,
+            userIdKeyResolver,
+            contentValidationService,
+            treeEntitySortingService,
+            optionsMonitor,
+            relationService)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _templateService = templateService;
@@ -45,7 +56,6 @@ internal sealed class ContentEditingService
         _userService = userService;
         _localizationService = localizationService;
         _languageService = languageService;
-        _contentSettings = contentSettings.Value;
     }
 
     public async Task<IContent?> GetAsync(Guid key)
@@ -169,7 +179,7 @@ internal sealed class ContentEditingService
         }
 
         // If property does not support merging, we still need to overwrite if we are not allowed to edit invariant properties.
-        if (_contentSettings.AllowEditInvariantFromNonDefault is false && allowedToEditDefaultLanguage is false)
+        if (ContentSettings.AllowEditInvariantFromNonDefault is false && allowedToEditDefaultLanguage is false)
         {
             foreach (IProperty property in invariantProperties)
             {
@@ -192,7 +202,7 @@ internal sealed class ContentEditingService
             var mergedValue = propertyWithEditor.DataEditor.MergeVariantInvariantPropertyValue(
                 currentValue,
                 editedValue,
-                _contentSettings.AllowEditInvariantFromNonDefault || (defaultLanguage is not null && allowedCultures.Contains(defaultLanguage.IsoCode)),
+                ContentSettings.AllowEditInvariantFromNonDefault || (defaultLanguage is not null && allowedCultures.Contains(defaultLanguage.IsoCode)),
                 allowedCultures);
 
             propertyWithEditor.Property.SetValue(mergedValue, null, null);
@@ -243,10 +253,10 @@ internal sealed class ContentEditingService
         => await HandleMoveToRecycleBinAsync(key, userKey);
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey)
-        => await HandleDeleteAsync(key, userKey, true);
+        => await HandleDeleteAsync(key, userKey,true);
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
-        => await HandleDeleteAsync(key, userKey, false);
+        => await HandleDeleteAsync(key, userKey,false);
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);
@@ -303,11 +313,9 @@ internal sealed class ContentEditingService
     protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
         => ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, userId);
 
-    protected override OperationResult? MoveToRecycleBin(IContent content, int userId)
-        => ContentService.MoveToRecycleBin(content, userId);
+    protected override OperationResult? MoveToRecycleBin(IContent content, int userId) => ContentService.MoveToRecycleBin(content, userId);
 
-    protected override OperationResult? Delete(IContent content, int userId)
-        => ContentService.Delete(content, userId);
+    protected override OperationResult? Delete(IContent content, int userId) => ContentService.Delete(content, userId);
 
     protected override IEnumerable<IContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total)
         => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total);
