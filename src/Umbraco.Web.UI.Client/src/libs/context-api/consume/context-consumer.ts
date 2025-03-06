@@ -5,7 +5,7 @@ import { UmbContextRequestEventImplementation } from './context-request.event.js
 
 type HostElementMethod = () => Element | undefined;
 
-type AsPromiseOptionsType = {
+export type UmbContextConsumerAsPromiseOptionsType = {
 	preventTimeout?: boolean;
 };
 
@@ -118,11 +118,11 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	/**
 	 * @public
 	 * @memberof UmbContextConsumer
-	 * @param {AsPromiseOptionsType} options - Prevent the promise from timing out.
+	 * @param {UmbContextConsumerAsPromiseOptionsType} options - Prevent the promise from timing out.
 	 * @description Get the context as a promise.
 	 * @returns {UmbContextConsumer} - A promise that resolves when the context is consumed.
 	 */
-	public asPromise(options?: AsPromiseOptionsType): Promise<ResultType | undefined> {
+	public asPromise(options?: UmbContextConsumerAsPromiseOptionsType): Promise<ResultType | undefined> {
 		return (
 			this.#promise ??
 			(this.#promise = new Promise<ResultType | undefined>((resolve, reject) => {
@@ -152,8 +152,8 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		);
 		(this.#skipHost ? this._retrieveHost()?.parentNode : this._retrieveHost())?.dispatchEvent(event);
 
-		// await 300 request animation frames, equivalent to 5seconds in a 60fps rendering scenario. [NL]
-		let i = 300;
+		// await 120 request animation frames, equivalent to 2seconds in a 60fps rendering scenario. [NL]
+		let i = 120;
 		while (i-- > 0 && this.#promiseRejecter) {
 			await new Promise((resolve) => requestAnimationFrame(resolve));
 		}

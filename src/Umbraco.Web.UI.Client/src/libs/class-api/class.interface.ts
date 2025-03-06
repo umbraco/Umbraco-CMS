@@ -1,5 +1,6 @@
 import type {
 	UmbContextCallback,
+	UmbContextConsumerAsPromiseOptionsType,
 	UmbContextConsumerController,
 	UmbContextProviderController,
 	UmbContextToken,
@@ -64,5 +65,6 @@ export interface UmbClassInterface extends UmbControllerHost {
 	 */
 	getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 		alias: string | UmbContextToken<BaseType, ResultType>,
+		options?: UmbContextConsumerAsPromiseOptionsType,
 	): Promise<ResultType | undefined>;
 }

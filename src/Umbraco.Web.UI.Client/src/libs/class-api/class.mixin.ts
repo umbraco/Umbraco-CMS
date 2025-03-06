@@ -11,6 +11,7 @@ import {
 	type UmbContextCallback,
 	UmbContextConsumerController,
 	UmbContextProviderController,
+	type UmbContextConsumerAsPromiseOptionsType,
 } from '@umbraco-cms/backoffice/context-api';
 import { type ObserverCallback, UmbObserverController, simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 
@@ -98,10 +99,11 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 
 		async getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
+			options?: UmbContextConsumerAsPromiseOptionsType,
 		): Promise<ResultType | undefined> {
 			const controller = new UmbContextConsumerController(this, contextAlias);
 			const promise = controller
-				.asPromise()
+				.asPromise(options)
 				.then((result) => {
 					controller.destroy();
 					return result;
