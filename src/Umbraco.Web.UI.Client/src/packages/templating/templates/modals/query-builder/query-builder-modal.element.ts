@@ -73,7 +73,6 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 
 	#updateQueryRequest(update: Partial<UmbExecuteTemplateQueryRequestModel>) {
 		this._queryRequest = { ...this._queryRequest, ...update };
-		console.log(this._queryRequest);
 		this.#executeTemplateQuery();
 	}
 
