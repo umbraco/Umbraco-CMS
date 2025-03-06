@@ -74,7 +74,10 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 			<div id="headerColumn">
 				<uui-label id="label" title=${this.alias} ?required=${this.mandatory}>
 					${this.localize.string(this.label)}
-					${when(this.invalid, () => html`<uui-badge color="invalid" attention>!</uui-badge>`)}
+					${when(
+						this.invalid,
+						() => html`<div id="invalid-badge"><uui-badge color="invalid" attention>!</uui-badge></div>`,
+					)}
 				</uui-label>
 				<slot name="action-menu"></slot>
 				${this.#renderDescription()}
@@ -133,8 +136,14 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 				position: relative;
 				word-break: break-word;
 			}
+			#invalid-badge {
+				display: inline-block;
+				position: relative;
+				width: 18px;
+				height: 1em;
+				margin-right: 6px;
+			}
 			uui-badge {
-				right: -30px;
 				background-color: var(--uui-color-invalid);
 				color: var(--uui-color-invalid-contrast);
 			}
