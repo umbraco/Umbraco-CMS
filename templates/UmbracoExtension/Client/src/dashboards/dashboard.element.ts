@@ -15,7 +15,7 @@ import {
   UMB_CURRENT_USER_CONTEXT,
   UmbCurrentUserModel,
 } from "@umbraco-cms/backoffice/current-user";
-import { HackClientService, UserModel } from "../api/index.js";
+import { UmbracoExtensionService, UserModel } from "../api/index.js";
 
 @customElement("example-dashboard")
 export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
@@ -54,7 +54,7 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
     const buttonElement = ev.target as UUIButtonElement;
     buttonElement.state = "waiting";
 
-    const { data, error } = await HackClientService.whoAmI();
+    const { data, error } = await UmbracoExtensionService.whoAmI();
 
     if (error) {
       buttonElement.state = "failed";
@@ -82,7 +82,7 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
     buttonElement.state = "waiting";
 
     // Getting a string - should I expect a datetime?!
-    const { data, error } = await HackClientService.whatsTheTimeMrWolf();
+    const { data, error } = await UmbracoExtensionService.whatsTheTimeMrWolf();
 
     if (error) {
       buttonElement.state = "failed";
@@ -100,7 +100,7 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
     const buttonElement = ev.target as UUIButtonElement;
     buttonElement.state = "waiting";
 
-    const { data, error } = await HackClientService.whatsMyName();
+    const { data, error } = await UmbracoExtensionService.whatsMyName();
 
     if (error) {
       buttonElement.state = "failed";

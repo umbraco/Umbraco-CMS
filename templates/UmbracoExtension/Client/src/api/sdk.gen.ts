@@ -22,7 +22,7 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
     meta?: Record<string, unknown>;
 };
 
-export class HackClientService {
+export class UmbracoExtensionService {
     public static ping<ThrowOnError extends boolean = false>(options?: Options<PingData, ThrowOnError>) {
         return (options?.client ?? _heyApiClient).get<PingResponse, unknown, ThrowOnError>({
             security: [
