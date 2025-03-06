@@ -59,14 +59,18 @@ describe('UmbContextConsumer', () => {
 			const element = document.createElement('div');
 			document.body.appendChild(element);
 
-			const localConsumer = new UmbContextConsumer(element, testContextAlias, (_instance: undefined) => {
-				if (_instance) {
-					expect(_instance.prop).to.eq('value from provider');
-					done();
-					localConsumer.hostDisconnected();
-					provider.hostDisconnected();
-				}
-			});
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(
+				element,
+				testContextAlias,
+				(_instance) => {
+					if (_instance) {
+						expect(_instance.prop).to.eq('value from provider');
+						done();
+						localConsumer.hostDisconnected();
+						provider.hostDisconnected();
+					}
+				},
+			);
 			localConsumer.hostConnected();
 		});
 
@@ -77,12 +81,12 @@ describe('UmbContextConsumer', () => {
 			const element = document.createElement('div');
 			document.body.appendChild(element);
 
-			const localConsumer = new UmbContextConsumer(element, testContextAlias);
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(element, testContextAlias);
 			localConsumer.hostConnected();
 			localConsumer
 				.asPromise()
 				.then((instance) => {
-					expect(instance.prop).to.eq('value from provider');
+					expect(instance?.prop).to.eq('value from provider');
 					localConsumer.hostDisconnected();
 					provider.hostDisconnected();
 					done();
@@ -118,10 +122,10 @@ describe('UmbContextConsumer', () => {
 		it('works with host method returning undefined', async () => {
 			const element = undefined;
 
-			const localConsumer = new UmbContextConsumer(
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(
 				() => element,
 				testContextAlias,
-				(_instance: UmbTestContextConsumerClass | undefined) => {
+				(_instance) => {
 					if (_instance) {
 						expect.fail('Callback should not be called when never permitted');
 					}
@@ -177,14 +181,18 @@ describe('UmbContextConsumer', () => {
 			const element = document.createElement('div');
 			document.body.appendChild(element);
 
-			const localConsumer = new UmbContextConsumer(element, testContextAliasAndApiAlias, (_instance) => {
-				if (_instance) {
-					expect((_instance as UmbTestContextConsumerClass).prop).to.eq('value from provider');
-					localConsumer.hostDisconnected();
-					provider.hostDisconnected();
-					done();
-				}
-			});
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(
+				element,
+				testContextAliasAndApiAlias,
+				(_instance) => {
+					if (_instance) {
+						expect(_instance.prop).to.eq('value from provider');
+						localConsumer.hostDisconnected();
+						provider.hostDisconnected();
+						done();
+					}
+				},
+			);
 			localConsumer.hostConnected();
 		});
 
