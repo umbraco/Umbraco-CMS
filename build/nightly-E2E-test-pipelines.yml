@@ -88,31 +88,12 @@ stages:
           matrix:
             #            Windows:
             #              vmImage: 'windows-latest'
-            # We split the tests into 3 parts for each OS to reduce the time it takes to run them on the pipeline
-            LinuxPart1Of3:
+            Linux:
               vmImage: "ubuntu-latest"
-              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
-              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
-            LinuxPart2Of3:
-              vmImage: "ubuntu-latest"
-              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
-              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
-            LinuxPart3Of3:
-              vmImage: "ubuntu-latest"
-              # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
-            macOSPart1Of3:
+              testFilter: "(FullyQualifiedName~ManagementApi)"
+            macOS:
               vmImage: "macOS-latest"
-              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
-              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
-            macOSPart2Of3:
-              vmImage: "macOS-latest"
-              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
-              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
-            macOSPart3Of3:
-              vmImage: "macOS-latest"
-              # Filter tests that are not part of the Umbraco.Infrastructure namespace.
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
+              testFilter: "(FullyQualifiedName~ManagementApi)"
         pool:
           vmImage: $(vmImage)
         variables:
