@@ -5,6 +5,10 @@ import { UmbContextRequestEventImplementation } from './context-request.event.js
 
 type HostElementMethod = () => Element | undefined;
 
+type AsPromiseOptionsType = {
+	preventTimeout?: boolean;
+};
+
 /**
  * @class UmbContextConsumer
  */
@@ -111,10 +115,11 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	/**
 	 * @public
 	 * @memberof UmbContextConsumer
+	 * @param {AsPromiseOptionsType} options - Prevent the promise from timing out.
 	 * @description Get the context as a promise.
 	 * @returns {UmbContextConsumer} - A promise that resolves when the context is consumed.
 	 */
-	public asPromise(): Promise<ResultType | undefined> {
+	public asPromise(options?: AsPromiseOptionsType): Promise<ResultType | undefined> {
 		return (
 			this.#promise ??
 			(this.#promise = new Promise<ResultType | undefined>((resolve, reject) => {
@@ -124,7 +129,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 					resolve(this.#instance);
 				} else {
 					this.#promiseResolver = resolve;
-					this.#promiseRejecter = reject;
+					this.#promiseRejecter = options?.preventTimeout ? undefined : reject;
 				}
 			}))
 		);
@@ -144,7 +149,11 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		);
 		(this.#skipHost ? this._retrieveHost()?.parentNode : this._retrieveHost())?.dispatchEvent(event);
 
-		await Promise.resolve();
+		// await 200 request animation frames
+		let i = 200;
+		while (i-- > 0 && this.#promiseRejecter) {
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+		}
 		// If we still have the rejecter, it means that the context was not found immediately, so lets reject the promise.
 		this.#promiseRejecter?.(undefined);
 	}
