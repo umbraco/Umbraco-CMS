@@ -1,6 +1,6 @@
 import { LitElement, css, html, customElement, state } from "@umbraco-cms/backoffice/external/lit";
 import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
-import { UmbracoExtensionService, UserModel } from "../api";
+import { UmbracoExtensionService, UserModel } from "../api/index.js";
 import { UUIButtonElement } from "@umbraco-cms/backoffice/external/uui";
 import { UMB_NOTIFICATION_CONTEXT, UmbNotificationContext } from "@umbraco-cms/backoffice/notification";
 import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from "@umbraco-cms/backoffice/current-user";
