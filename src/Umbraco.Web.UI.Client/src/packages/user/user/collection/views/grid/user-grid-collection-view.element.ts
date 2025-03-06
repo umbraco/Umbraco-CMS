@@ -145,19 +145,21 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 
 			#user-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 				gap: var(--uui-size-space-4);
 			}
 
 			uui-card-user {
 				width: 100%;
-				height: 180px;
 				justify-content: normal;
 				padding-top: var(--uui-size-space-5);
+				flex-direction: column;
 			}
 
 			.user-login-time {
 				margin-top: auto;
+				width: 100%;
+    			word-wrap: break-word;
 			}
 		`,
 	];
