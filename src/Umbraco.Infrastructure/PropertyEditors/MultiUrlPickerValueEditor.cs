@@ -45,7 +45,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
         _jsonSerializer = jsonSerializer;
         _contentService = contentService;
         _mediaService = mediaService;
-        Validators.Add(new TypedJsonValidatorRunner<LinkDto[], MultiUrlPickerConfiguration>(
+        Validators.Add(new TypedJsonValidatorRunner<LinkDisplay[], MultiUrlPickerConfiguration>(
             _jsonSerializer,
             new MinMaxValidator(localizedTextService)));
     }
@@ -217,14 +217,14 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
         public string? QueryString { get; set; }
     }
 
-    internal class MinMaxValidator : ITypedJsonValidator<LinkDto[], MultiUrlPickerConfiguration>
+    internal class MinMaxValidator : ITypedJsonValidator<LinkDisplay[], MultiUrlPickerConfiguration>
     {
         private readonly ILocalizedTextService _localizedTextService;
 
         public MinMaxValidator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
 
         public IEnumerable<ValidationResult> Validate(
-            LinkDto[]? linksDtos,
+            LinkDisplay[]? linksDtos,
             MultiUrlPickerConfiguration? multiUrlPickerConfiguration,
             string? valueType,
             PropertyValidationContext validationContext)
@@ -244,7 +244,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                    ["value"])];
            }
 
-           if (linksDtos.Length > multiUrlPickerConfiguration.MaxNumber)
+           if (linksDtos.Length > multiUrlPickerConfiguration.MaxNumber && multiUrlPickerConfiguration.MaxNumber > 0)
            {
                return
                [
