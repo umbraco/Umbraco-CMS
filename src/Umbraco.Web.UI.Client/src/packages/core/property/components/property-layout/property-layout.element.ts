@@ -134,17 +134,12 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 				word-break: break-word;
 			}
 			:host([invalid]) #label {
-				color: var(--umb-validation-look-danger, var(--uui-color-danger))
-					var(--umb-validation-look-warning, var(--uui-color-warning-standalone));
+				color: var(--uui-color-invalid);
 			}
 			uui-badge {
 				right: -30px;
-
-				background-color: var(--umb-validation-look-danger, var(--uui-color-danger))
-					var(--umb-validation-look-warning, var(--uui-color-warning));
-
-				color: var(--umb-validation-look-danger, var(--uui-color-danger-contrast))
-					var(--umb-validation-look-warning, var(--uui-color-warning-contrast));
+				background-color: var(--uui-color-invalid);
+				color: var(--uui-color-invalid-contrast);
 			}
 
 			#description {

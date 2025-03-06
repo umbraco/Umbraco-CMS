@@ -504,7 +504,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 			:host([settings-invalid])::after,
 			:host([content-invalid])::after {
-				border-color: var(--uui-color-danger);
+				border-color: var(--uui-color-invalid);
 			}
 
 			uui-action-bar {

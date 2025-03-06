@@ -643,7 +643,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			:host([location-invalid])::after,
 			:host([settings-invalid])::after,
 			:host([content-invalid])::after {
-				border-color: var(--uui-color-danger);
+				border-color: var(--uui-color-invalid);
 			}
 
 			#invalidLocation {
