@@ -49,7 +49,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
         var references = new HashSet<UmbracoEntityReference>();
 
         // Group by property editor alias to avoid duplicate lookups and optimize value parsing
-        foreach (var propertyValuesByPropertyEditorAlias in properties.GroupBy(x => x.PropertyType.PropertyEditorAlias, x => x.Values))
+        foreach (IGrouping<string, IReadOnlyCollection<IPropertyValue>> propertyValuesByPropertyEditorAlias in properties.GroupBy(x => x.PropertyType.PropertyEditorAlias, x => x.Values))
         {
             if (!propertyEditors.TryGet(propertyValuesByPropertyEditorAlias.Key, out IDataEditor? dataEditor))
             {
@@ -64,7 +64,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
                 values.Add(propertyValue.PublishedValue);
             }
 
-            references.UnionWith(GetReferences(dataEditor, values));
+            references.UnionWith(GetReferences(dataEditor, values, propertyValuesByPropertyEditorAlias.Key));
         }
 
         return references;
@@ -90,15 +90,18 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     /// The references.
     /// </returns>
     public ISet<UmbracoEntityReference> GetReferences(IDataEditor dataEditor, IEnumerable<object?> values) =>
-        GetReferencesEnumerable(dataEditor, values).ToHashSet();
+        GetReferencesEnumerable(dataEditor, values, null).ToHashSet();
 
-    private IEnumerable<UmbracoEntityReference> GetReferencesEnumerable(IDataEditor dataEditor, IEnumerable<object?> values)
+    private ISet<UmbracoEntityReference> GetReferences(IDataEditor dataEditor, IEnumerable<object?> values, string propertyEditorAlias) =>
+        GetReferencesEnumerable(dataEditor, values, propertyEditorAlias).ToHashSet();
+
+    private IEnumerable<UmbracoEntityReference> GetReferencesEnumerable(IDataEditor dataEditor, IEnumerable<object?> values, string? propertyEditorAlias)
     {
         // TODO: We will need to change this once we support tracking via variants/segments
         // for now, we are tracking values from ALL variants
         if (dataEditor.GetValueEditor() is IDataValueReference dataValueReference)
         {
-            foreach (UmbracoEntityReference reference in GetReferences(values, dataValueReference))
+            foreach (UmbracoEntityReference reference in GetReferencesFromPropertyValues(values, dataValueReference, propertyEditorAlias))
             {
                 yield return reference;
             }
@@ -124,7 +127,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
         }
     }
 
-    private IEnumerable<UmbracoEntityReference> GetReferences(IEnumerable<object?> values, IDataValueReference dataValueReference)
+    private IEnumerable<UmbracoEntityReference> GetReferencesFromPropertyValues(IEnumerable<object?> values, IDataValueReference dataValueReference, string? propertyEditorAlias)
     {
         var result = new List<UmbracoEntityReference>();
         foreach (var value in values)
@@ -143,7 +146,13 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
             catch (Exception ex)
             {
                 // Log the exception but don't throw, continue with the next value.
-                _logger.LogError(ex, "Error getting references for value {Value} with data editor {DataEditor}.", value, dataValueReference.GetType().FullName);
+                _logger.LogError(
+                    ex,
+                    "Error getting references from value {Value} with data editor {DataEditor} and property editor alias {PropertyEditorAlias}.",
+                    value,
+                    dataValueReference.GetType().FullName,
+                    propertyEditorAlias ?? "n/a");
+                throw;
             }
         }
 
