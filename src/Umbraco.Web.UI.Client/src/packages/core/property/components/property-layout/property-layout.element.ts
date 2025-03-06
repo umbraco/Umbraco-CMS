@@ -134,11 +134,11 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 				word-break: break-word;
 			}
 			:host([invalid]) #label {
-				color: var(--uui-color-invalid);
+				color: var(--uui-color-invalid-standalone);
 			}
 			uui-badge {
 				right: -30px;
-				background-color: var(--uui-color-invalid);
+				background-color: var(--uui-color-invalid-standalone);
 				color: var(--uui-color-invalid-contrast);
 			}
 
