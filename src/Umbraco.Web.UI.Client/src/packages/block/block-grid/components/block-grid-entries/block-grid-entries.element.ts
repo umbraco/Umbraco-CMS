@@ -428,6 +428,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		return html`
 			<uui-button
 				look="placeholder"
+				color=${this.pristine === false && this.validity.valid === false ? 'invalid' : 'default'}
 				label=${this._configCreateLabel ?? this._createLabel ?? ''}
 				href=${this.#context.getPathForCreateBlock(-1) ?? ''}
 				?disabled=${this._isReadOnly}></uui-button>
@@ -493,6 +494,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				--umb-block-grid--create-button--is-dragging--variable: var(--umb-block-grid--is-dragging) none;
 				display: var(--umb-block-grid--create-button--is-dragging--variable, grid);
 			}
+			/*
 			:host(:not([pristine]):invalid) #createButton {
 				--uui-button-contrast: var(--uui-color-invalid);
 				--uui-button-contrast-hover: var(--uui-color-invalid);
@@ -500,6 +502,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				--uui-button-border-color: var(--uui-color-invalid);
 				--uui-button-border-color-hover: var(--uui-color-invalid);
 			}
+				*/
 
 			.umb-block-grid__layout-container[data-area-length='0'] {
 				--umb-block-grid--layout-container--is-dragging--variable: var(--umb-block-grid--is-dragging) 1;
