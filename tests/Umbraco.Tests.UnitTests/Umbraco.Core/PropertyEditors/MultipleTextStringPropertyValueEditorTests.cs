@@ -171,6 +171,17 @@ public class MultipleTextStringPropertyValueEditorTests
         }
     }
 
+    [Test]
+    public void Max_Item_Validation_Respects_0_As_Unlimited()
+    {
+        var value = Enumerable.Range(1, 100).Select(x => x.ToString());
+        var editor = CreateValueEditor();
+        editor.ConfigurationObject = new MultipleTextStringConfiguration();
+
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        Assert.IsEmpty(result);
+    }
+
     private static object? FromEditor(object? value, int max = 0)
         => CreateValueEditor().FromEditor(new ContentPropertyData(value, new MultipleTextStringConfiguration { Max = max }), null);
 
