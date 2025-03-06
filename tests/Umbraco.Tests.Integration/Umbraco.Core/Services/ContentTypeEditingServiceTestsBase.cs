@@ -180,4 +180,11 @@ public abstract class ContentTypeEditingServiceTestsBase : UmbracoIntegrationTes
             Type = type,
             Key = key ?? Guid.NewGuid(),
         };
+
+    protected static IEnumerable<string> DifferentCapitalizedAlias(string baseAlias)
+    {
+        yield return baseAlias;
+        yield return baseAlias.ToLowerInvariant();
+        yield return baseAlias.ToUpperInvariant();
+    }
 }
