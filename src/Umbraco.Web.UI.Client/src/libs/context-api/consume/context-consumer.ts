@@ -14,8 +14,9 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	#skipHost?: boolean;
 	#stopAtContextMatch = true;
 	#callback?: UmbContextCallback<ResultType>;
-	#promise?: Promise<ResultType>;
-	#promiseResolver?: (instance: ResultType) => void;
+	#promise?: Promise<ResultType | undefined>;
+	#promiseResolver?: (instance: ResultType | undefined) => void;
+	#promiseRejecter?: (instance: ResultType | undefined) => void;
 
 	#instance?: ResultType;
 	get instance() {
@@ -102,6 +103,8 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		if (promiseResolver && instance !== undefined) {
 			promiseResolver(instance);
 			this.#promise = undefined;
+			this.#promiseResolver = undefined;
+			this.#promiseRejecter = undefined;
 		}
 	}
 
@@ -111,14 +114,17 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @description Get the context as a promise.
 	 * @returns {UmbContextConsumer} - A promise that resolves when the context is consumed.
 	 */
-	public asPromise(): Promise<ResultType> {
+	public asPromise(): Promise<ResultType | undefined> {
 		return (
 			this.#promise ??
-			(this.#promise = new Promise<ResultType>((resolve) => {
+			(this.#promise = new Promise<ResultType | undefined>((resolve, reject) => {
 				if (this.#instance) {
+					this.#promiseResolver = undefined;
+					this.#promiseRejecter = undefined;
 					resolve(this.#instance);
 				} else {
 					this.#promiseResolver = resolve;
+					this.#promiseRejecter = reject;
 				}
 			}))
 		);
@@ -129,7 +135,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @memberof UmbContextConsumer
 	 * @description Request the context from the host element.
 	 */
-	public request(): void {
+	public async request(): Promise<void> {
 		const event = new UmbContextRequestEventImplementation(
 			this.#contextAlias,
 			this.#apiAlias,
@@ -137,6 +143,10 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 			this.#stopAtContextMatch,
 		);
 		(this.#skipHost ? this._retrieveHost()?.parentNode : this._retrieveHost())?.dispatchEvent(event);
+
+		await Promise.resolve();
+		// If we still have the rejecter, it means that the context was not found immediately, so lets reject the promise.
+		this.#promiseRejecter?.(undefined);
 	}
 
 	public hostConnected(): void {
@@ -186,6 +196,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		this.#callback = undefined;
 		this.#promise = undefined;
 		this.#promiseResolver = undefined;
+		this.#promiseRejecter = undefined;
 		this.#instance = undefined;
 		this.#discriminator = undefined;
 	}

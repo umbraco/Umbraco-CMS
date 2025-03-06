@@ -59,19 +59,38 @@ describe('UmbContextConsumer', () => {
 			const element = document.createElement('div');
 			document.body.appendChild(element);
 
-			const localConsumer = new UmbContextConsumer(
-				element,
-				testContextAlias,
-				(_instance: UmbTestContextConsumerClass | undefined) => {
-					if (_instance) {
-						expect(_instance.prop).to.eq('value from provider');
-						done();
-						localConsumer.hostDisconnected();
-						provider.hostDisconnected();
-					}
-				},
-			);
+			const localConsumer = new UmbContextConsumer(element, testContextAlias, (_instance: undefined) => {
+				if (_instance) {
+					expect(_instance.prop).to.eq('value from provider');
+					done();
+					localConsumer.hostDisconnected();
+					provider.hostDisconnected();
+				}
+			});
 			localConsumer.hostConnected();
+		});
+
+		it('works with asPromise for UmbContextProvider', (done) => {
+			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+			provider.hostConnected();
+
+			const element = document.createElement('div');
+			document.body.appendChild(element);
+
+			const localConsumer = new UmbContextConsumer(element, testContextAlias);
+			localConsumer.hostConnected();
+			localConsumer
+				.asPromise()
+				.then((instance) => {
+					expect(instance.prop).to.eq('value from provider');
+					localConsumer.hostDisconnected();
+					provider.hostDisconnected();
+					done();
+				})
+				.catch(() => {
+					expect.fail('Promise should not reject');
+					done();
+				});
 		});
 
 		it('works with host as a method', (done) => {

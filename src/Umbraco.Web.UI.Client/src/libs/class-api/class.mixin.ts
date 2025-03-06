@@ -98,12 +98,18 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 
 		async getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
-		): Promise<ResultType> {
+		): Promise<ResultType | undefined> {
 			const controller = new UmbContextConsumerController(this, contextAlias);
-			const promise = controller.asPromise().then((result) => {
-				controller.destroy();
-				return result;
-			});
+			const promise = controller
+				.asPromise()
+				.then((result) => {
+					controller.destroy();
+					return result;
+				})
+				.catch(() => {
+					controller.destroy();
+					return undefined;
+				});
 			return promise;
 		}
 
