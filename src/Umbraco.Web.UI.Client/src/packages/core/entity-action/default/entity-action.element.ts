@@ -49,8 +49,13 @@ export class UmbEntityActionDefaultElement<
 	async #onClickLabel(event: UUIMenuItemEvent) {
 		if (!this._href) {
 			event.stopPropagation();
-			await this.#api?.execute();
+			try {
+				await this.#api?.execute();
+			} catch (error) {
+				return;
+			}
 		}
+		console.log('success');
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
