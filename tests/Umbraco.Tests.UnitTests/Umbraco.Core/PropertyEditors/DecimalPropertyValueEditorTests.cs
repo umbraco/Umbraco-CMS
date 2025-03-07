@@ -14,7 +14,7 @@ using Umbraco.Cms.Core.Strings;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
 [TestFixture]
-public class IntegerValueEditorTests
+public class DecimalPropertyValueEditorTests
 {
     // annoyingly we can't use decimals etc. in attributes, so we can't turn these into test cases :(
     private Dictionary<object?,object?> _valuesAndExpectedResults = new();
@@ -22,13 +22,13 @@ public class IntegerValueEditorTests
     [SetUp]
     public void SetUp() => _valuesAndExpectedResults = new Dictionary<object?, object?>
     {
-        { 123m, 123 },
-        { 123, 123 },
-        { -123, -123 },
-        { 123.45d, null },
-        { "123.45", null },
-        { "1234.56", null },
-        { "123,45", null },
+        { 123m, 123m },
+        { 123, 123m },
+        { -123, -123m },
+        { 123.45d, 123.45m },
+        { "123.45", 123.45m },
+        { "1234.56", 1234.56m },
+        { "123,45", 12345m },
         { "1.234,56", null },
         { "123 45", null },
         { "something", null },
@@ -74,8 +74,8 @@ public class IntegerValueEditorTests
     }
 
     [TestCase("x", false)]
-    [TestCase(10, true)]
-    public void Validates_Is_Integer(object value, bool expectedSuccess)
+    [TestCase(1.5, true)]
+    public void Validates_Is_Decimal(object value, bool expectedSuccess)
     {
         var editor = CreateValueEditor();
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
@@ -88,13 +88,13 @@ public class IntegerValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual($"The value {value} is not a valid integer", validationResult.ErrorMessage);
+            Assert.AreEqual($"The value {value} is not a valid decimal", validationResult.ErrorMessage);
         }
     }
 
-    [TestCase(8, false)]
-    [TestCase(10, true)]
-    [TestCase(12, true)]
+    [TestCase(0.9, false)]
+    [TestCase(1.1, true)]
+    [TestCase(1.3, true)]
     public void Validates_Is_Greater_Than_Or_Equal_To_Configured_Min(object value, bool expectedSuccess)
     {
         var editor = CreateValueEditor();
@@ -112,9 +112,9 @@ public class IntegerValueEditorTests
         }
     }
 
-    [TestCase(18, true)]
-    [TestCase(20, true)]
-    [TestCase(22, false)]
+    [TestCase(1.7, true)]
+    [TestCase(1.9, true)]
+    [TestCase(2.1, false)]
     public void Validates_Is_Less_Than_Or_Equal_To_Configured_Max(object value, bool expectedSuccess)
     {
         var editor = CreateValueEditor();
@@ -132,10 +132,29 @@ public class IntegerValueEditorTests
         }
     }
 
-    [TestCase(2, 17, false)]
-    [TestCase(2, 18, true)]
-    [TestCase(0, 17, true)] // A step of zero would trigger a divide by zero error in evaluating. So we always pass validation for zero, as effectively any step value is valid.
-    public void Validates_Matches_Configured_Step(int step, object value, bool expectedSuccess)
+    [TestCase(1.8, true)]
+    [TestCase(2.2, false)]
+    public void Validates_Is_Less_Than_Or_Equal_To_Configured_Max_With_Configured_Whole_Numbers(object value, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor(min: 1, max: 2);
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMaximum");
+        }
+    }
+
+    [TestCase(0.2, 1.4, false)]
+    [TestCase(0.2, 1.5, true)]
+    [TestCase(0.0, 1.4, true)] // A step of zero would trigger a divide by zero error in evaluating. So we always pass validation for zero, as effectively any step value is valid.
+    public void Validates_Matches_Configured_Step(double step, object value, bool expectedSuccess)
     {
         var editor = CreateValueEditor(step: step);
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
@@ -165,7 +184,7 @@ public class IntegerValueEditorTests
         return CreateValueEditor().ToEditor(property.Object);
     }
 
-    private static IntegerPropertyEditor.IntegerPropertyValueEditor CreateValueEditor(int step = 2)
+    private static DecimalPropertyEditor.DecimalPropertyValueEditor CreateValueEditor(double min = 1.1, double max = 1.9, double step = 0.2)
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
         localizedTextServiceMock.Setup(x => x.Localize(
@@ -174,19 +193,45 @@ public class IntegerValueEditorTests
                 It.IsAny<CultureInfo>(),
                 It.IsAny<IDictionary<string, string>>()))
             .Returns((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => $"{key}_{alias}");
-        return new IntegerPropertyEditor.IntegerPropertyValueEditor(
+
+        // When configuration is populated from the deserialized JSON, whole number values are deserialized as integers.
+        // So we want to replicate that in our tests.
+        var configuration = new Dictionary<string, object>();
+        if (min % 1 == 0)
+        {
+            configuration.Add("min", (int)min);
+        }
+        else
+        {
+            configuration.Add("min", min);
+        }
+
+        if (max % 1 == 0)
+        {
+            configuration.Add("max", (int)max);
+        }
+        else
+        {
+            configuration.Add("max", max);
+        }
+
+        if (step % 1 == 0)
+        {
+            configuration.Add("step", (int)step);
+        }
+        else
+        {
+            configuration.Add("step", step);
+        }
+
+        return new DecimalPropertyEditor.DecimalPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
             new DataEditorAttribute("alias"),
             localizedTextServiceMock.Object)
         {
-            ConfigurationObject = new Dictionary<string, object>
-            {
-                { "min", 10 },
-                { "max", 20 },
-                { "step", step }
-            }
+            ConfigurationObject = configuration
         };
     }
 }

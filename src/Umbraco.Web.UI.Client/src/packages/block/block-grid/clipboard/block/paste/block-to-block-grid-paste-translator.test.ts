@@ -5,6 +5,7 @@ import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../../property-e
 import type { UmbBlockGridValueModel } from '../../../types.js';
 import { UmbBlockToBlockGridClipboardPastePropertyValueTranslator } from './block-to-block-grid-paste-translator.js';
 import type { UmbBlockClipboardEntryValueModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockGridPropertyEditorConfig } from '../../../property-editors/block-grid-editor/types.js';
 
 @customElement('test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -55,22 +56,26 @@ describe('UmbBlockToBlockGridClipboardPastePropertyValueTranslator', () => {
 		settingsData: blockGridPropertyValue.settingsData,
 	};
 
-	const config1: Array<{ alias: string; value: [{ contentElementTypeKey: string }] }> = [
+	const config1: UmbBlockGridPropertyEditorConfig = [
 		{
 			alias: 'blocks',
 			value: [
 				{
+					allowAtRoot: true,
+					allowInAreas: true,
 					contentElementTypeKey: 'contentTypeKey',
 				},
 			],
 		},
 	];
 
-	const config2: Array<{ alias: string; value: [{ contentElementTypeKey: string }] }> = [
+	const config2: UmbBlockGridPropertyEditorConfig = [
 		{
 			alias: 'blocks',
 			value: [
 				{
+					allowAtRoot: true,
+					allowInAreas: true,
 					contentElementTypeKey: 'contentTypeKey2',
 				},
 			],
@@ -101,12 +106,12 @@ describe('UmbBlockToBlockGridClipboardPastePropertyValueTranslator', () => {
 
 	describe('isCompatibleValue', () => {
 		it('returns true if the value is compatible', async () => {
-			const result = await copyTranslator.isCompatibleValue(blockClipboardEntryValue, config1);
+			const result = await copyTranslator.isCompatibleValue(blockGridPropertyValue, config1);
 			expect(result).to.be.true;
 		});
 
 		it('returns false if the value is not compatible', async () => {
-			const result = await copyTranslator.isCompatibleValue(blockClipboardEntryValue, config2);
+			const result = await copyTranslator.isCompatibleValue(blockGridPropertyValue, config2);
 			expect(result).to.be.false;
 		});
 	});
