@@ -6,6 +6,7 @@ const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Textstring';
 const contentText = 'This is test content text';
+const referenceHeadline = 'The following items depend on this';
 
 test.beforeEach(async ({umbracoApi}) => {
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -29,7 +30,8 @@ test('can trash an invariant content', {tag: '@smoke'}, async ({umbracoApi, umbr
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashButton();
-  // TODO: verify the references list not displayed
+  //verify the references list not displayed
+  await umbracoUi.content.isReferenceHeadlineVisible(false);
   await umbracoUi.content.clickConfirmTrashButton();
 
   // Assert
@@ -49,7 +51,8 @@ test('can trash a variant content', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashButton();
-  // TODO: verify the references list not displayed
+  //verify the references list not displayed
+  await umbracoUi.content.isReferenceHeadlineVisible(false);
   await umbracoUi.content.clickConfirmTrashButton();
 
   // Assert
@@ -70,7 +73,8 @@ test('can trash a published content', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashButton();
-  // TODO: verify the references list not displayed
+  //verify the references list not displayed
+  await umbracoUi.content.isReferenceHeadlineVisible(false);
   await umbracoUi.content.clickConfirmTrashButton();
 
   // Assert
@@ -91,6 +95,7 @@ test('can trash an invariant content that references one item', async ({umbracoA
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashButton();
   // verify the references list
+  await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.clickConfirmTrashButton();
 
   // Assert
