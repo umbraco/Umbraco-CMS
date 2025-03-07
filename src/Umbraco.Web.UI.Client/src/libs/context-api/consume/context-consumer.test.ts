@@ -82,12 +82,11 @@ describe('UmbContextConsumer', () => {
 
 		it('works with asPromise for UmbContextProvider', (done) => {
 			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
-			provider.hostConnected();
 
 			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(element, testContextAlias);
 			localConsumer.hostConnected();
 			localConsumer
-				.asPromise({ timeoutFrames: 10 }) // Just limiting the time out to make sure the other tests are working as expected. [NL]
+				.asPromise()
 				.then((instance) => {
 					expect(instance?.prop).to.eq('value from provider');
 					localConsumer.hostDisconnected();
@@ -97,13 +96,15 @@ describe('UmbContextConsumer', () => {
 				.catch(() => {
 					expect.fail('Promise should not reject');
 				});
+
+			provider.hostConnected();
 		});
 
 		it('gets rejected when using asPromise that does not resolve', (done) => {
 			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(element, testContextAlias);
 
 			localConsumer
-				.asPromise({ timeoutFrames: 10 })
+				.asPromise()
 				.then((instance) => {
 					expect.fail('Promise should reject');
 				})
@@ -126,7 +127,7 @@ describe('UmbContextConsumer', () => {
 
 			try {
 				localConsumer
-					.asPromise({ preventTimeout: true, timeoutFrames: 10 })
+					.asPromise({ preventTimeout: true })
 					.then((instance) => {
 						clearTimeout(timeout);
 						expect.fail('Promise should not resolve');

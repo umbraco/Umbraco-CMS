@@ -7,7 +7,6 @@ type HostElementMethod = () => Element | undefined;
 
 export type UmbContextConsumerAsPromiseOptionsType = {
 	preventTimeout?: boolean;
-	timeoutFrames?: number;
 };
 
 /**
@@ -25,7 +24,6 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	#promise?: Promise<ResultType | undefined>;
 	#promiseResolver?: (instance: ResultType) => void;
 	#promiseRejecter?: (instance?: ResultType) => void;
-	#timeoutFrames?: number;
 
 	#instance?: ResultType;
 	get instance() {
@@ -133,7 +131,6 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 					this.#promiseRejecter = undefined;
 					resolve(this.#instance);
 				} else {
-					this.#timeoutFrames = options?.timeoutFrames;
 					this.#promiseResolver = resolve;
 					this.#promiseRejecter = options?.preventTimeout ? undefined : reject;
 				}
@@ -146,7 +143,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @memberof UmbContextConsumer
 	 * @description Request the context from the host element.
 	 */
-	public async request(): Promise<void> {
+	public request(): void {
 		const event = new UmbContextRequestEventImplementation(
 			this.#contextAlias,
 			this.#apiAlias,
@@ -155,13 +152,16 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		);
 		(this.#skipHost ? this._retrieveHost()?.parentNode : this._retrieveHost())?.dispatchEvent(event);
 
-		// await 60 request animation frames, equivalent to 1 second in a 60fps rendering scenario. [NL]
-		let i: number = this.#timeoutFrames ?? 60;
+		/*
+		let i: number = this.#timeoutFrames ?? 1;
 		while (i-- > 0 && this.#promiseRejecter) {
 			await new Promise((resolve) => requestAnimationFrame(resolve));
 		}
-		// If we still have the rejecter, it means that the context was not found immediately, so lets reject the promise. [NL]
-		this.#promiseRejecter?.();
+		*/
+		requestAnimationFrame(() => {
+			// If we still have the rejecter, it means that the context was not found immediately, so lets reject the promise. [NL]
+			this.#promiseRejecter?.();
+		});
 	}
 
 	public hostConnected(): void {
