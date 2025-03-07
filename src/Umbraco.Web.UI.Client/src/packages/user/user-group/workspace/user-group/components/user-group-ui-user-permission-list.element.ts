@@ -2,25 +2,25 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { ManifestContextualUserPermission } from '@umbraco-cms/backoffice/user-permission';
+import type { ManifestUiUserPermission } from '@umbraco-cms/backoffice/user-permission';
 
-@customElement('umb-user-group-contextual-user-permission-list')
-export class UmbUserGroupContextualUserPermissionListElement extends UmbLitElement {
+@customElement('umb-user-group-ui-user-permission-list')
+export class UmbUserGroupUiUserPermissionListElement extends UmbLitElement {
 	@state()
 	private _groups: Array<string> = [];
 
 	constructor() {
 		super();
-		this.#observeContextualUserPermissionGroups();
+		this.#observeUiUserPermissionGroups();
 	}
 
-	#observeContextualUserPermissionGroups() {
+	#observeUiUserPermissionGroups() {
 		this.observe(
-			umbExtensionsRegistry.byType('contextualUserPermission'),
+			umbExtensionsRegistry.byType('uiUserPermission'),
 			(manifests) => {
 				this._groups = [...new Set(manifests.flatMap((manifest) => manifest.meta.group))];
 			},
-			'umbContextualUserPermissionObserver',
+			'umbUiUserPermissionObserver',
 		);
 	}
 
@@ -33,9 +33,9 @@ export class UmbUserGroupContextualUserPermissionListElement extends UmbLitEleme
 			<h4>${group}</h4>
 			<umb-extension-slot
 				slot="editor"
-				type="contextualUserPermission"
-				default-element="umb-input-contextual-user-permission"
-				.filter=${(manifest: ManifestContextualUserPermission) => manifest.meta.group === group}></umb-extension-slot>
+				type="uiUserPermission"
+				default-element="umb-input-ui-user-permission"
+				.filter=${(manifest: ManifestUiUserPermission) => manifest.meta.group === group}></umb-extension-slot>
 		`;
 	}
 
@@ -44,6 +44,6 @@ export class UmbUserGroupContextualUserPermissionListElement extends UmbLitEleme
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-group-contextual-user-permission-list': UmbUserGroupContextualUserPermissionListElement;
+		'umb-user-group-ui-user-permission-list': UmbUserGroupUiUserPermissionListElement;
 	}
 }

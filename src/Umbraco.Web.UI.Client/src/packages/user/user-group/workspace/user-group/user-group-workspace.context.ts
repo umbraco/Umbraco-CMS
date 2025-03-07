@@ -3,7 +3,7 @@ import { UMB_USER_GROUP_DETAIL_REPOSITORY_ALIAS, type UmbUserGroupDetailReposito
 import { UMB_USER_GROUP_ENTITY_TYPE, UMB_USER_GROUP_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UmbUserGroupWorkspaceEditorElement } from './user-group-workspace-editor.element.js';
 import { UMB_USER_GROUP_WORKSPACE_ALIAS } from './constants.js';
-import type { UmbContextualUserPermissionModel, UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
+import type { UmbUiUserPermissionModel, UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
 import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbEntityDetailWorkspaceContextBase,
@@ -70,7 +70,7 @@ export class UmbUserGroupWorkspaceContext
 	/**
 	 * Gets the user group user permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
-	 * @returns {Array<UmbUserPermissionModel | UmbContextualUserPermissionModel>} The user group user permissions.
+	 * @returns {Array<UmbUserPermissionModel | UmbUiUserPermissionModel>} The user group user permissions.
 	 */
 	getPermissions() {
 		return this._data.getCurrent()?.permissions ?? [];
@@ -81,18 +81,18 @@ export class UmbUserGroupWorkspaceContext
 	 * @param {Array<UmbUserPermissionModel>} permissions
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
-	setPermissions(permissions: Array<UmbUserPermissionModel | UmbContextualUserPermissionModel>) {
+	setPermissions(permissions: Array<UmbUserPermissionModel | UmbUiUserPermissionModel>) {
 		this._data.updateCurrent({ permissions: permissions });
 	}
 
-	addContextualPermission(permission: UmbContextualUserPermissionModel) {
+	addUiPermission(permission: UmbUiUserPermissionModel) {
 		const currentPermissions = this.getPermissions();
 		// get the permission if it already exists
 		const existingPermission = currentPermissions.find((currentPermissions) =>
-			this.#isSameContextualPermission(currentPermissions, permission),
+			this.#isSameUiPermission(currentPermissions, permission),
 		);
 
-		let updatedPermissions: Array<UmbContextualUserPermissionModel> = [];
+		let updatedPermissions: Array<UmbUiUserPermissionModel> = [];
 
 		if (existingPermission) {
 			// add the new verbs to the existing permission
@@ -112,12 +112,12 @@ export class UmbUserGroupWorkspaceContext
 		this.setPermissions(updatedPermissions);
 	}
 
-	removeContextualPermission(permission: UmbContextualUserPermissionModel) {
+	removeUiPermission(permission: UmbUiUserPermissionModel) {
 		const currentPermissions = this.getPermissions();
 
 		const existingPermission = currentPermissions.find((currentPermission) =>
-			this.#isSameContextualPermission(currentPermission, permission),
-		) as UmbContextualUserPermissionModel;
+			this.#isSameUiPermission(currentPermission, permission),
+		) as UmbUiUserPermissionModel;
 
 		if (!existingPermission) {
 			return;
@@ -126,17 +126,17 @@ export class UmbUserGroupWorkspaceContext
 		// remove the verbs from the existing permission
 		const updatedVerbs = existingPermission.verbs.filter((verb) => !permission.verbs.includes(verb));
 		const uniqueVerbs = [...new Set(updatedVerbs)];
-		let updatedPermissions: Array<UmbContextualUserPermissionModel> = [];
+		let updatedPermissions: Array<UmbUiUserPermissionModel> = [];
 
 		if (uniqueVerbs.length === 0) {
 			// remove the permission if there are no verbs left
 			updatedPermissions = currentPermissions.filter(
-				(currentPermission) => !this.#isSameContextualPermission(currentPermission, permission),
+				(currentPermission) => !this.#isSameUiPermission(currentPermission, permission),
 			);
 		} else {
 			// replace the existing permission with the updated one
 			updatedPermissions = currentPermissions.map((currentPermission) =>
-				this.#isSameContextualPermission(currentPermission, permission)
+				this.#isSameUiPermission(currentPermission, permission)
 					? { ...existingPermission, verbs: uniqueVerbs }
 					: currentPermission,
 			);
@@ -145,7 +145,7 @@ export class UmbUserGroupWorkspaceContext
 		this.setPermissions(updatedPermissions);
 	}
 
-	#isSameContextualPermission(a: UmbContextualUserPermissionModel, b: UmbContextualUserPermissionModel) {
+	#isSameUiPermission(a: UmbUiUserPermissionModel, b: UmbUiUserPermissionModel) {
 		return (
 			a.$type === 'UnknownTypePermissionPresentationModel' &&
 			b.$type === 'UnknownTypePermissionPresentationModel' &&

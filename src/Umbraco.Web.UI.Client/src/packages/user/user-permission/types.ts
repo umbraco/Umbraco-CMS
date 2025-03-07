@@ -1,4 +1,4 @@
-export type * from './contextual-user-permission/types.js';
+export type * from './ui-user-permission/types.js';
 export type * from './entity-user-permission/types.js';
 export type * from './entity-user-permission/types.js';
 export type * from './granular-user-permission/types.js';

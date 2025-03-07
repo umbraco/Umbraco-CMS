@@ -1,0 +1,30 @@
+import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
+
+export type UmbUiUserPermissionConditionConfig = UmbConditionConfigBase<'Umb.Condition.UiUserPermission'> & {
+	/**
+	 * The user must have a permission with this context for the condition to be met.
+	 * @example
+	 * ["Umbraco.UmbracoNews", "Umbraco.UmbracoNews"]
+	 */
+	context: string;
+
+	/**
+	 * The user must have all of the permissions in this array for the condition to be met.
+	 * @example
+	 * ["Umb.UmbracoNews.View"]
+	 */
+	allOf?: Array<string>;
+
+	/**
+	 * The user must have at least one of the permissions in this array for the condition to be met.
+	 * @example
+	 * ["Umb.UmbracoNews.View"]
+	 */
+	oneOf?: Array<string>;
+};
+
+declare global {
+	interface UmbExtensionConditionConfigMap {
+		UmbUiUserPermissionConditionConfig: UmbUiUserPermissionConditionConfig;
+	}
+}

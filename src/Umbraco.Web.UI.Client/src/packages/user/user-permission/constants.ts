@@ -1,1 +1,1 @@
-export * from './contextual-user-permission/constants.js';
+export * from './ui-user-permission/constants.js';

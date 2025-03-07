@@ -1,17 +1,17 @@
-import { UMB_USER_PERMISSION_CONTEXT_UMBRACO_NEWS, UMB_USER_PERMISSION_UMBRACO_NEWS_BROWSE } from './constants.js';
+import { UMB_UMBRACO_NEWS_UI_USER_PERMISSION, UMB_USER_PERMISSION_UMBRACO_NEWS_SEE } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		type: 'contextualUserPermission',
-		alias: 'Umb.UserPermission.UmbracoNews.Dashboard.Browse',
-		name: 'Browse Umbraco News Dashboard User Permission',
+		type: 'uiUserPermission',
+		alias: 'Umb.UiUserPermission.UmbracoNews.Dashboard.See',
+		name: 'See Umbraco News Dashboard User Permission',
 		meta: {
-			label: 'Browse',
-			description: 'Allow access to browse the Getting Started Dashboard',
+			label: 'See',
+			description: 'Allow to see the Getting Started Dashboard',
 			group: 'Getting Started',
 			permission: {
-				context: UMB_USER_PERMISSION_CONTEXT_UMBRACO_NEWS,
-				verbs: [UMB_USER_PERMISSION_UMBRACO_NEWS_BROWSE],
+				context: UMB_UMBRACO_NEWS_UI_USER_PERMISSION,
+				verbs: [UMB_USER_PERMISSION_UMBRACO_NEWS_SEE],
 			},
 		},
 	},
