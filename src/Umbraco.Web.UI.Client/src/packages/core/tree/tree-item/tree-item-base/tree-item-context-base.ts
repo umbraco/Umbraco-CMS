@@ -396,7 +396,7 @@ export abstract class UmbTreeItemContextBase<
 				const self = expansion?.find((entry) => entry.entityType === this.entityType && entry.unique === this.unique);
 
 				// If this item has children, load them
-				if (self && this.#hasChildren.getValue()) {
+				if (self && this.#hasChildren.getValue() && this.#isOpen.getValue() === false) {
 					this.loadChildren();
 				}
 
