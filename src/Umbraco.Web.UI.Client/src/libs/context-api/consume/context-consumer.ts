@@ -155,8 +155,8 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		);
 		(this.#skipHost ? this._retrieveHost()?.parentNode : this._retrieveHost())?.dispatchEvent(event);
 
-		// await 120 request animation frames, equivalent to 2seconds in a 60fps rendering scenario. [NL]
-		let i: number = this.#timeoutFrames ?? 120;
+		// await 60 request animation frames, equivalent to 1 second in a 60fps rendering scenario. [NL]
+		let i: number = this.#timeoutFrames ?? 60;
 		while (i-- > 0 && this.#promiseRejecter) {
 			await new Promise((resolve) => requestAnimationFrame(resolve));
 		}
