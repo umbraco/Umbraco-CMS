@@ -38,9 +38,9 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @param {string} entity.entityType The entity type
 	 * @param {string} entity.unique The unique key
 	 * @memberof UmbTreeExpansionManager
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
-	public expandItem(entity: UmbEntityModel): void {
+	public async expandItem(entity: UmbEntityModel): Promise<void> {
 		const currentValue = this.#expansion.getValue() ?? [];
 		const newValue = appendToFrozenArray(currentValue, entity, (x) => x?.unique);
 		this.#expansion.setValue(newValue);
@@ -52,9 +52,9 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @param {string} entity.entityType The entity type
 	 * @param {string} entity.unique The unique key
 	 * @memberof UmbTreeExpansionManager
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
-	public collapseItem(entity: UmbEntityModel): void {
+	public async collapseItem(entity: UmbEntityModel): Promise<void> {
 		const currentValue = this.#expansion.getValue() ?? [];
 		const newValue = currentValue.filter((x) => x.entityType !== entity.entityType || x.unique !== entity.unique);
 		this.#expansion.setValue(newValue);
@@ -63,9 +63,9 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	/**
 	 * Closes all child tree items
 	 * @memberof UmbTreeExpansionManager
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
-	public collapseAll(): void {
+	public async collapseAll(): Promise<void> {
 		this.#expansion.setValue([]);
 	}
 }

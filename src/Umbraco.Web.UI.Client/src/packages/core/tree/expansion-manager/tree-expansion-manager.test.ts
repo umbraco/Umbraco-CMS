@@ -64,15 +64,15 @@ describe('UmbTreeExpansionManager', () => {
 	});
 
 	describe('expandItem', () => {
-		it('expands an item', () => {
-			manager.expandItem(item);
+		it('expands an item', async () => {
+			await manager.expandItem(item);
 			expect(manager.getExpansion()).to.deep.equal([item]);
 		});
 	});
 
 	describe('collapseItem', () => {
-		it('collapses an item', () => {
-			manager.expandItem(item);
+		it('collapses an item', async () => {
+			await manager.expandItem(item);
 			expect(manager.getExpansion()).to.deep.equal([item]);
 			manager.collapseItem(item);
 			expect(manager.getExpansion()).to.deep.equal([]);
