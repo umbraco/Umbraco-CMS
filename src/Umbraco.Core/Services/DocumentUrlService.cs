@@ -390,7 +390,7 @@ public class DocumentUrlService : IDocumentUrlService
                 LanguageId = language.Id,
                 UrlSegments = draftUrlSegments.ToArray(),
                 IsDraft = true
-            }, true);
+            }, document.Trashed is false);
         }
     }
 

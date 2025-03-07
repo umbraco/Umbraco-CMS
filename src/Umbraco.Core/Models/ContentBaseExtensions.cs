@@ -27,7 +27,7 @@ public static class ContentBaseExtensions
         var urlSegment = GetUrlSegments(content, urlSegmentProviders, culture, published).FirstOrDefault();
 
         // Ensure we have at least the segment from the default URL provider returned.
-        urlSegment ??= GetDefaultUrlSegment(shortStringHelper, content, culture);
+        urlSegment ??= GetDefaultUrlSegment(shortStringHelper, content, culture, published);
 
         return urlSegment;
     }
@@ -48,7 +48,7 @@ public static class ContentBaseExtensions
         // Ensure we have at least the segment from the default URL provider returned.
         if (urlSegments.Count == 0)
         {
-            var defaultUrlSegment = GetDefaultUrlSegment(shortStringHelper, content, culture);
+            var defaultUrlSegment = GetDefaultUrlSegment(shortStringHelper, content, culture, published);
             if (defaultUrlSegment is not null)
             {
                 urlSegments.Add(defaultUrlSegment);
@@ -82,9 +82,10 @@ public static class ContentBaseExtensions
     private static string? GetDefaultUrlSegment(
         IShortStringHelper shortStringHelper,
         IContentBase content,
-        string? culture)
+        string? culture,
+        bool published)
     {
         _defaultUrlSegmentProvider ??= new DefaultUrlSegmentProvider(shortStringHelper);
-        return _defaultUrlSegmentProvider.GetUrlSegment(content, culture);
+        return _defaultUrlSegmentProvider.GetUrlSegment(content, published, culture);
     }
 }
