@@ -14,7 +14,7 @@ using Umbraco.Cms.Core.Strings;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
 [TestFixture]
-public class IntegerValueEditorTests
+public class IntegerPropertyValueEditorTests
 {
     // annoyingly we can't use decimals etc. in attributes, so we can't turn these into test cases :(
     private Dictionary<object?,object?> _valuesAndExpectedResults = new();
@@ -132,11 +132,12 @@ public class IntegerValueEditorTests
         }
     }
 
-    [TestCase(17, false)]
-    [TestCase(18, true)]
-    public void Validates_Matches_Configured_Step(object value, bool expectedSuccess)
+    [TestCase(2, 17, false)]
+    [TestCase(2, 18, true)]
+    [TestCase(0, 17, true)] // A step of zero would trigger a divide by zero error in evaluating. So we always pass validation for zero, as effectively any step value is valid.
+    public void Validates_Matches_Configured_Step(int step, object value, bool expectedSuccess)
     {
-        var editor = CreateValueEditor();
+        var editor = CreateValueEditor(step: step);
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
@@ -164,7 +165,7 @@ public class IntegerValueEditorTests
         return CreateValueEditor().ToEditor(property.Object);
     }
 
-    private static IntegerPropertyEditor.IntegerPropertyValueEditor CreateValueEditor()
+    private static IntegerPropertyEditor.IntegerPropertyValueEditor CreateValueEditor(int step = 2)
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
         localizedTextServiceMock.Setup(x => x.Localize(
@@ -184,7 +185,7 @@ public class IntegerValueEditorTests
             {
                 { "min", 10 },
                 { "max", 20 },
-                { "step", 2 }
+                { "step", step }
             }
         };
     }

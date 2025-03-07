@@ -632,6 +632,7 @@ public class VariationTests
         var dataValueEditorFactory = Mock.Of<IDataValueEditorFactory>(x
             => x.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()) == new TextOnlyValueEditor(
                 attribute,
+                Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IShortStringHelper>(),
                 new SystemTextJsonSerializer(),
                 Mock.Of<IIOHelper>()));

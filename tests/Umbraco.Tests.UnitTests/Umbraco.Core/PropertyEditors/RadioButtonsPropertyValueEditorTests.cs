@@ -28,7 +28,7 @@ public class RadioButtonsPropertyValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, "validation_notOneOfOptions");
+            Assert.AreEqual("validation_notOneOfOptions", validationResult.ErrorMessage);
         }
     }
 

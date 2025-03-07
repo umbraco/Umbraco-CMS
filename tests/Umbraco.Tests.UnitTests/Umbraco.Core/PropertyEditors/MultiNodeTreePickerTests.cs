@@ -1,13 +1,16 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.Data;
+using System.Text.Json.Nodes;
 using Moq;
 using NUnit.Framework;
-using Org.BouncyCastle.Asn1.X500;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Serialization;
 
@@ -244,11 +247,30 @@ public class MultiNodeTreePickerTests
     private static MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor CreateValueEditor(
         IJsonSerializer? jsonSerializer = null)
     {
+        var mockScope = new Mock<IScope>();
+        var mockScopeProvider = new Mock<ICoreScopeProvider>();
+        mockScopeProvider
+            .Setup(x => x.CreateCoreScope(
+                It.IsAny<IsolationLevel>(),
+                It.IsAny<RepositoryCacheMode>(),
+                It.IsAny<IEventDispatcher>(),
+                It.IsAny<IScopedNotificationPublisher>(),
+                It.IsAny<bool?>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>()))
+            .Returns(mockScope.Object);
+
         var valueEditor = new MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
             jsonSerializer ?? Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias"));
+            new DataEditorAttribute("alias"),
+            Mock.Of<ILocalizedTextService>(),
+            Mock.Of<IEntityService>(),
+            mockScopeProvider.Object,
+            Mock.Of<IContentService>(),
+            Mock.Of<IMediaService>(),
+            Mock.Of<IMemberService>());
         return valueEditor;
     }
 

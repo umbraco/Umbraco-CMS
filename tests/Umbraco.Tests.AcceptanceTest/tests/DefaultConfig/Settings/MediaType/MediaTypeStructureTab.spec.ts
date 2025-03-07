@@ -104,7 +104,7 @@ test('can configure a collection for a media type', async ({umbracoApi, umbracoU
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickStructureTab();
-  await umbracoUi.mediaType.clickConfigureAsACollectionButton();
+  await umbracoUi.mediaType.clickAddCollectionButton();
   await umbracoUi.mediaType.clickTextButtonWithName(collectionDataTypeName);
   await umbracoUi.mediaType.clickSaveButton();
 
