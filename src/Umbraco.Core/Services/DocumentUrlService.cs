@@ -107,7 +107,7 @@ public class DocumentUrlService : IDocumentUrlService
 
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
         var languageIdToIsoCode = languages.ToDictionary(x => x.Id, x => x.IsoCode);
-        foreach (PublishedDocumentUrlSegment publishedDocumentUrlSegment in publishedDocumentUrlSegments)
+        foreach (PublishedDocumentUrlSegments publishedDocumentUrlSegment in ConvertToCacheModel(publishedDocumentUrlSegments))
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -136,58 +136,6 @@ public class DocumentUrlService : IDocumentUrlService
 
     private string GetCurrentRebuildValue() => string.Join("|", _urlSegmentProviderCollection.Select(x => x.GetType().Name));
 
-    private void UpdateCache(IScopeContext scopeContext, PublishedDocumentUrlSegment publishedDocumentUrlSegment, string isoCode)
-    {
-        var cacheKey = CreateCacheKey(publishedDocumentUrlSegment.DocumentKey, isoCode, publishedDocumentUrlSegment.IsDraft);
-
-        scopeContext.Enlist("UpdateCache_" + cacheKey, () =>
-        {
-            _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegments? existingValue);
-
-            if (existingValue is null)
-            {
-                if (_cache.TryAdd(cacheKey, CreateCacheValue(publishedDocumentUrlSegment)) is false)
-                {
-                    _logger.LogError("Could not add to the document url cache.");
-                    return false;
-                }
-            }
-            else
-            {
-                if (_cache.TryUpdate(cacheKey, CreateCacheValue(publishedDocumentUrlSegment, existingValue), existingValue) is false)
-                {
-                    _logger.LogError("Could not update the document url cache.");
-                    return false;
-                }
-            }
-
-            return true;
-        });
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static string CreateCacheKey(Guid documentKey, string culture, bool isDraft) => $"{documentKey}|{culture}|{isDraft}".ToLowerInvariant();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static PublishedDocumentUrlSegments CreateCacheValue(PublishedDocumentUrlSegment publishedDocumentUrlSegment)
-        => new PublishedDocumentUrlSegments()
-        {
-            DocumentKey = publishedDocumentUrlSegment.DocumentKey,
-            LanguageId = publishedDocumentUrlSegment.LanguageId,
-            UrlSegments = [publishedDocumentUrlSegment.UrlSegment],
-            IsDraft = publishedDocumentUrlSegment.IsDraft
-        };
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static PublishedDocumentUrlSegments CreateCacheValue(PublishedDocumentUrlSegment publishedDocumentUrlSegment, PublishedDocumentUrlSegments existingValue)
-        => new PublishedDocumentUrlSegments()
-        {
-            DocumentKey = publishedDocumentUrlSegment.DocumentKey,
-            LanguageId = publishedDocumentUrlSegment.LanguageId,
-            UrlSegments = existingValue.UrlSegments.Union([publishedDocumentUrlSegment.UrlSegment]).Distinct().ToArray(),
-            IsDraft = publishedDocumentUrlSegment.IsDraft
-        };
-
     /// <inheritdoc/>
     public async Task RebuildAllUrlsAsync()
     {
@@ -202,6 +150,90 @@ public class DocumentUrlService : IDocumentUrlService
 
         scope.Complete();
     }
+
+    private static IEnumerable<PublishedDocumentUrlSegments> ConvertToCacheModel(IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments)
+    {
+        var cacheModels = new List<PublishedDocumentUrlSegments>();
+        foreach (PublishedDocumentUrlSegment model in publishedDocumentUrlSegments)
+        {
+            PublishedDocumentUrlSegments? existingCacheModel = cacheModels
+                .SingleOrDefault(x => x.DocumentKey == model.DocumentKey && x.LanguageId == model.LanguageId && x.IsDraft == model.IsDraft);
+            if (existingCacheModel is null)
+            {
+                cacheModels.Add(new PublishedDocumentUrlSegments
+                {
+                    DocumentKey = model.DocumentKey,
+                    LanguageId = model.LanguageId,
+                    UrlSegments = [model.UrlSegment],
+                    IsDraft = model.IsDraft
+                });
+            }
+            else
+            {
+                existingCacheModel.UrlSegments = existingCacheModel.UrlSegments.Union([model.UrlSegment]).Distinct().ToArray();
+            }
+        }
+
+        return cacheModels;
+    }
+
+    private void RemoveFromCache(IScopeContext scopeContext, Guid documentKey, string isoCode, bool isDraft)
+    {
+        var cacheKey = CreateCacheKey(documentKey, isoCode, isDraft);
+
+        scopeContext.Enlist("RemoveFromCache_" + cacheKey, () =>
+        {
+            if (_cache.TryRemove(cacheKey, out _) is false)
+            {
+                _logger.LogDebug("Could not remove the document url cache. But the important thing is that it is not there.");
+                return false;
+            }
+
+            return true;
+        });
+    }
+
+    private void UpdateCache(IScopeContext scopeContext, PublishedDocumentUrlSegments publishedDocumentUrlSegments, string isoCode)
+    {
+        var cacheKey = CreateCacheKey(publishedDocumentUrlSegments.DocumentKey, isoCode, publishedDocumentUrlSegments.IsDraft);
+
+        scopeContext.Enlist("UpdateCache_" + cacheKey, () =>
+        {
+            _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegments? existingValue);
+
+            if (existingValue is null)
+            {
+                if (_cache.TryAdd(cacheKey, publishedDocumentUrlSegments) is false)
+                {
+                    _logger.LogError("Could not add to the document url cache.");
+                    return false;
+                }
+            }
+            else
+            {
+                if (_cache.TryUpdate(cacheKey, publishedDocumentUrlSegments, existingValue) is false)
+                {
+                    _logger.LogError("Could not update the document url cache.");
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static string CreateCacheKey(Guid documentKey, string culture, bool isDraft) => $"{documentKey}|{culture}|{isDraft}".ToLowerInvariant();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static PublishedDocumentUrlSegments CreateCacheValue(PublishedDocumentUrlSegment publishedDocumentUrlSegment, PublishedDocumentUrlSegments existingValue)
+        => new PublishedDocumentUrlSegments()
+        {
+            DocumentKey = publishedDocumentUrlSegment.DocumentKey,
+            LanguageId = publishedDocumentUrlSegment.LanguageId,
+            UrlSegments = existingValue.UrlSegments.Union([publishedDocumentUrlSegment.UrlSegment]).Distinct().ToArray(),
+            IsDraft = publishedDocumentUrlSegment.IsDraft
+        };
 
     /// <inheritdoc/>
     public string? GetUrlSegment(Guid documentKey, string culture, bool isDraft)
@@ -296,9 +328,9 @@ public class DocumentUrlService : IDocumentUrlService
 
     private void HandleCaching(IScopeContext scopeContext, IContent document, string? culture, ILanguage language, List<PublishedDocumentUrlSegment> toSave)
     {
-        IEnumerable<(PublishedDocumentUrlSegment model, bool shouldCache)> modelsAndStatus = GenerateModels(document, culture, language);
+        IEnumerable<(PublishedDocumentUrlSegments model, bool shouldCache)> modelsAndStatus = GenerateModels(document, culture, language);
 
-        foreach ((PublishedDocumentUrlSegment model, bool shouldCache) in modelsAndStatus)
+        foreach ((PublishedDocumentUrlSegments model, bool shouldCache) in modelsAndStatus)
         {
             if (shouldCache is false)
             {
@@ -306,13 +338,13 @@ public class DocumentUrlService : IDocumentUrlService
             }
             else
             {
-                toSave.Add(model);
+                toSave.AddRange(ConvertToPersistedModel(model));
                 UpdateCache(scopeContext, model, language.IsoCode);
             }
         }
     }
 
-    private IEnumerable<(PublishedDocumentUrlSegment model, bool shouldCache)> GenerateModels(IContent document, string? culture, ILanguage language)
+    private IEnumerable<(PublishedDocumentUrlSegments model, bool shouldCache)> GenerateModels(IContent document, string? culture, ILanguage language)
     {
         if (document.Trashed is false
             && (IsInvariantAndPublished(document) || IsVariantAndPublishedForCulture(document, culture)))
@@ -324,25 +356,22 @@ public class DocumentUrlService : IDocumentUrlService
             }
             else
             {
-                foreach (var publishedUrlSegment in publishedUrlSegments)
+                yield return (new PublishedDocumentUrlSegments
                 {
-                    yield return (new PublishedDocumentUrlSegment()
-                    {
-                        DocumentKey = document.Key,
-                        LanguageId = language.Id,
-                        UrlSegment = publishedUrlSegment,
-                        IsDraft = false
-                    }, true);
-                }
+                    DocumentKey = document.Key,
+                    LanguageId = language.Id,
+                    UrlSegments = publishedUrlSegments.ToArray(),
+                    IsDraft = false
+                }, true);
             }
         }
         else
         {
-            yield return (new PublishedDocumentUrlSegment()
+            yield return (new PublishedDocumentUrlSegments
             {
                 DocumentKey = document.Key,
                 LanguageId = language.Id,
-                UrlSegment = string.Empty,
+                UrlSegments = [],
                 IsDraft = false
             }, false);
         }
@@ -355,17 +384,13 @@ public class DocumentUrlService : IDocumentUrlService
         }
         else
         {
-            foreach (var draftUrlSegment in draftUrlSegments)
+            yield return (new PublishedDocumentUrlSegments
             {
-
-                yield return (new PublishedDocumentUrlSegment()
-                {
-                    DocumentKey = document.Key,
-                    LanguageId = language.Id,
-                    UrlSegment = draftUrlSegment,
-                    IsDraft = true
-                }, document.Trashed is false);
-            }
+                DocumentKey = document.Key,
+                LanguageId = language.Id,
+                UrlSegments = draftUrlSegments.ToArray(),
+                IsDraft = true
+            }, true);
         }
     }
 
@@ -378,20 +403,18 @@ public class DocumentUrlService : IDocumentUrlService
     private static bool IsVariantAndPublishedForCulture(IContent document, string? culture) =>
         document.PublishCultureInfos?.Values.Any(x => x.Culture == culture) ?? false;
 
-    private void RemoveFromCache(IScopeContext scopeContext, Guid documentKey, string isoCode, bool isDraft)
+    private IEnumerable<PublishedDocumentUrlSegment> ConvertToPersistedModel(PublishedDocumentUrlSegments model)
     {
-        var cacheKey = CreateCacheKey(documentKey, isoCode, isDraft);
-
-        scopeContext.Enlist("RemoveFromCache_" + cacheKey, () =>
+        foreach (string urlSegment in model.UrlSegments)
         {
-            if (_cache.TryRemove(cacheKey, out _) is false)
+            yield return new PublishedDocumentUrlSegment
             {
-                _logger.LogDebug("Could not remove the document url cache. But the important thing is that it is not there.");
-                return false;
-            }
-
-            return true;
-        });
+                DocumentKey = model.DocumentKey,
+                LanguageId = model.LanguageId,
+                UrlSegment = urlSegment,
+                IsDraft = model.IsDraft
+            };
+        }
     }
 
     /// <inheritdoc/>
