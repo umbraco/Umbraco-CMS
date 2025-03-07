@@ -16,7 +16,6 @@ import {
 	UmbFormControlMixin,
 	UmbValidationContext,
 } from '@umbraco-cms/backoffice/validation';
-import { UmbBlockElementDataValidationPathTranslator } from '@umbraco-cms/backoffice/block';
 
 export abstract class UmbPropertyEditorUiRteElementBase
 	extends UmbFormControlMixin<UmbPropertyEditorRteValueType | undefined, typeof UmbLitElement, undefined>(UmbLitElement)

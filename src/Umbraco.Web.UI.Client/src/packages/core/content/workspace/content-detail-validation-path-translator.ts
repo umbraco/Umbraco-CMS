@@ -7,7 +7,7 @@ import {
 	umbScopeMapperForJsonPaths,
 	type UmbValidationPathTranslator,
 } from '@umbraco-cms/backoffice/validation';
-import type { UmbContentDetailModel } from '../types';
+import type { UmbContentDetailModel } from '../types.js';
 
 export class UmbContentDetailValidationPathTranslator
 	extends UmbControllerBase
