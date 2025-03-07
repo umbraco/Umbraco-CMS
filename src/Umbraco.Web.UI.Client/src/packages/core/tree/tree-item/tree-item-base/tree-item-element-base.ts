@@ -102,7 +102,6 @@ export abstract class UmbTreeItemElementBase<
 
 	private _onShowChildren(event: UUIMenuItemEvent) {
 		event.stopPropagation();
-		this.#api?.loadChildren();
 		this.#api?.showChildren();
 	}
 
