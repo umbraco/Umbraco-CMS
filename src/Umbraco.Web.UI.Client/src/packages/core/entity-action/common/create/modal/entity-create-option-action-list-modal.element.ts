@@ -68,7 +68,11 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 			throw new Error('No API found');
 		}
 
-		await controller.api.execute();
+		try {
+			await controller.api.execute();
+		} catch (error) {
+			return;
+		}
 
 		this._submitModal();
 	}
@@ -135,7 +139,7 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 				icon=${manifest.meta.icon}
 				href=${ifDefined(href)}
 				target=${this.#getTarget(href)}
-				@open=${(event: Event) => this.#onOpen(event, controller)}
+				@open=${async (event: Event) => await this.#onOpen(event, controller).catch(() => undefined)}
 				@click=${(event: Event) => this.#onNavigate(event, href)}>
 			</umb-ref-item>
 		`;

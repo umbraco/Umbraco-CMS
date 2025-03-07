@@ -6,7 +6,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { ManifestBlockEditorCustomView } from '@umbraco-cms/backoffice/block-custom-view';
 
 @customElement('umb-block-type-custom-view-guide')
@@ -82,13 +82,10 @@ export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
 	};
 
 	async #viewManifest(manifest: ManifestBlockEditorCustomView) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		modalManager.open(this, UMB_MANIFEST_VIEWER_MODAL, { data: manifest });
+		umbOpenModal(this, UMB_MANIFEST_VIEWER_MODAL, { data: manifest });
 	}
 
 	async #generateManifest() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-
 		const manifest: UmbExtensionManifest = {
 			type: 'blockEditorCustomView',
 			alias: 'Local.blockEditorCustomView.' + this.#contentTypeAlias,
@@ -97,7 +94,7 @@ export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
 			forContentTypeAlias: this.#contentTypeAlias,
 			forBlockEditor: this.#blockEditorType,
 		};
-		modalManager.open(this, UMB_MANIFEST_VIEWER_MODAL, { data: manifest });
+		umbOpenModal(this, UMB_MANIFEST_VIEWER_MODAL, { data: manifest });
 	}
 
 	override render() {

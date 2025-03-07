@@ -42,7 +42,11 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 		}
 
 		if (!controller.api) throw new Error('No API found');
-		await controller.api.execute();
+		try {
+			await controller.api.execute();
+		} catch (error) {
+			return;
+		}
 	}
 
 	constructor() {

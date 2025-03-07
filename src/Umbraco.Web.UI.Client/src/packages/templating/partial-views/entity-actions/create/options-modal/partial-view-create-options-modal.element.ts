@@ -34,7 +34,7 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 			await this.#createFolderAction?.execute();
 			this._submitModal();
 		} catch (error) {
-			console.error(error);
+			return;
 		}
 	}
 

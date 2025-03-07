@@ -45,7 +45,7 @@ export class UmbMediaTypeCreateOptionsModalElement extends UmbModalBaseElement<U
 			await this.#createFolderAction?.execute();
 			this._submitModal();
 		} catch (error) {
-			console.error(error);
+			return;
 		}
 	}
 

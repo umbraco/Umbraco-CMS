@@ -16,6 +16,9 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
+		if (!entityContext) {
+			throw new Error('Entity context not found');
+		}
 		const entityType = entityContext.getEntityType();
 		const unique = entityContext.getUnique();
 

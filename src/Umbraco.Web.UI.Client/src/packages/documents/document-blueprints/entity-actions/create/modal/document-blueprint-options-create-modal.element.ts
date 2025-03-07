@@ -54,7 +54,7 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 			await this.#createFolderAction?.execute();
 			this._submitModal();
 		} catch (error) {
-			console.error(error);
+			return;
 		}
 	}
 

@@ -26,7 +26,11 @@ export class UmbEntityBulkActionDefaultElement<
 	async #onClick(event: PointerEvent) {
 		if (!this.api) return;
 		event.stopPropagation();
-		await this.api.execute();
+		try {
+			await this.api.execute();
+		} catch (error) {
+			return;
+		}
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 

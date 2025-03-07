@@ -14,6 +14,9 @@ import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/e
 export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
+		if (!entityContext) {
+			throw new Error('Entity context not found');
+		}
 		const entityType = entityContext.getEntityType();
 		const unique = entityContext.getUnique();
 
