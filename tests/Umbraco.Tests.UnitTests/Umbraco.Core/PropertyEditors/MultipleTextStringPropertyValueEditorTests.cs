@@ -1,9 +1,12 @@
-﻿using Moq;
+using System.Globalization;
+using System.Text.Json.Nodes;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -12,7 +15,7 @@ using Umbraco.Cms.Core.Strings;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
 [TestFixture]
-public class MultipleTextStringValueEditorTests
+public class MultipleTextStringPropertyValueEditorTests
 {
     [Test]
     public void Can_Handle_Invalid_Values_From_Editor()
@@ -114,6 +117,71 @@ public class MultipleTextStringValueEditorTests
         Assert.IsEmpty(result);
     }
 
+    [Test]
+    public void Validates_Null_As_Below_Configured_Min()
+    {
+        var editor = CreateValueEditor();
+        var result = editor.Validate(null, false, null, PropertyValidationContext.Empty());
+        Assert.AreEqual(1, result.Count());
+
+        var validationResult = result.First();
+        Assert.AreEqual($"validation_outOfRangeMultipleItemsMinimum", validationResult.ErrorMessage);
+    }
+
+    [TestCase(0, false, "outOfRangeMultipleItemsMinimum")]
+    [TestCase(1, false, "outOfRangeSingleItemMinimum")]
+    [TestCase(2, true, "")]
+    [TestCase(3, true, "")]
+    public void Validates_Number_Of_Items_Is_Greater_Than_Or_Equal_To_Configured_Min(int numberOfStrings, bool expectedSuccess, string expectedValidationMessageKey)
+    {
+        var value = Enumerable.Range(1, numberOfStrings).Select(x => x.ToString());
+        var editor = CreateValueEditor();
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual($"validation_{expectedValidationMessageKey}", validationResult.ErrorMessage);
+        }
+    }
+
+    [TestCase(3, true)]
+    [TestCase(4, true)]
+    [TestCase(5, false)]
+    public void Validates_Number_Of_Items_Is_Less_Than_Or_Equal_To_Configured_Max(int numberOfStrings, bool expectedSuccess)
+    {
+        var value = Enumerable.Range(1, numberOfStrings).Select(x => x.ToString());
+        var editor = CreateValueEditor();
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual("validation_outOfRangeMultipleItemsMaximum", validationResult.ErrorMessage);
+        }
+    }
+
+    [Test]
+    public void Max_Item_Validation_Respects_0_As_Unlimited()
+    {
+        var value = Enumerable.Range(1, 100).Select(x => x.ToString());
+        var editor = CreateValueEditor();
+        editor.ConfigurationObject = new MultipleTextStringConfiguration();
+
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        Assert.IsEmpty(result);
+    }
+
     private static object? FromEditor(object? value, int max = 0)
         => CreateValueEditor().FromEditor(new ContentPropertyData(value, new MultipleTextStringConfiguration { Max = max }), null);
 
@@ -129,11 +197,25 @@ public class MultipleTextStringValueEditorTests
 
     private static MultipleTextStringPropertyEditor.MultipleTextStringPropertyValueEditor CreateValueEditor()
     {
-        var valueEditor = new MultipleTextStringPropertyEditor.MultipleTextStringPropertyValueEditor(
+        var localizedTextServiceMock = new Mock<ILocalizedTextService>();
+        localizedTextServiceMock.Setup(x => x.Localize(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CultureInfo>(),
+                It.IsAny<IDictionary<string, string>>()))
+            .Returns((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => $"{key}_{alias}");
+        return new MultipleTextStringPropertyEditor.MultipleTextStringPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias"));
-        return valueEditor;
+            new DataEditorAttribute("alias"),
+            localizedTextServiceMock.Object)
+        {
+            ConfigurationObject = new MultipleTextStringConfiguration
+            {
+                Min = 2,
+                Max = 4
+            },
+        };
     }
 }

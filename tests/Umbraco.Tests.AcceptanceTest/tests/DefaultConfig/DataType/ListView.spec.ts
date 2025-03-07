@@ -208,7 +208,7 @@ for (const listViewType of listViewTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
-      await umbracoUi.dataType.clickBulkActionPermissionsSliderByValue(bulkActionPermissionValue);
+      await umbracoUi.dataType.clickBulkActionPermissionsToggleByValue(bulkActionPermissionValue);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
@@ -262,7 +262,7 @@ for (const listViewType of listViewTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
-      await umbracoUi.dataType.clickShowContentWorkspaceViewFirstSlider();
+      await umbracoUi.dataType.clickShowContentWorkspaceViewFirstToggle();
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
@@ -280,7 +280,7 @@ for (const listViewType of listViewTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
-      await umbracoUi.dataType.clickEditInInfiniteEditorSlider();
+      await umbracoUi.dataType.clickEditInInfiniteEditorToggle();
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert

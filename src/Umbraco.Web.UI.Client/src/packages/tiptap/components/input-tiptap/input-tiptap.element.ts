@@ -1,6 +1,6 @@
 import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
 import type { UmbTiptapToolbarValue } from '../types.js';
-import { css, customElement, html, property, state, unsafeCSS, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, map, property, state, unsafeCSS, when } from '@umbraco-cms/backoffice/external/lit';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { Editor } from '@umbraco-cms/backoffice/external/tiptap';
@@ -17,6 +17,8 @@ const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
 
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
+	#stylesheets = new Set(['/umbraco/backoffice/css/rte-content.css']);
+
 	@property({ type: String })
 	override set value(value: string) {
 		if (value === this.#value) return;
@@ -121,6 +123,11 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			element.setAttribute('style', `height: ${dimensions.height}px;`);
 		}
 
+		const stylesheets = this.configuration?.getValueByAlias<Array<string>>('stylesheets');
+		if (stylesheets?.length) {
+			stylesheets.forEach((x) => this.#stylesheets.add(x));
+		}
+
 		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
 
 		const tiptapExtensions: Extensions = [];
@@ -179,6 +186,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	#renderStyles() {
 		if (!this._styles?.length) return;
 		return html`
+			${map(this.#stylesheets, (stylesheet) => html`<link rel="stylesheet" href=${stylesheet} />`)}
 			<style>
 				${this._styles.map((style) => unsafeCSS(style))}
 			</style>
@@ -217,7 +225,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			}
 
 			#editor {
-				/* Required as overflow is set to auto, so that the scrollbars don't appear. */
 				display: flex;
 				overflow: auto;
 				border-radius: var(--uui-border-radius);
@@ -229,8 +236,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				box-sizing: border-box;
 				height: 100%;
 				width: 100%;
+				max-width: 100%;
 
-				.tiptap {
+				> .tiptap {
 					height: 100%;
 					width: 100%;
 					outline: none;
@@ -244,47 +252,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 						float: left;
 						height: 0;
 						pointer-events: none;
-					}
-				}
-
-				/* The following styles are required for the "StarterKit" extension. */
-				pre {
-					background-color: var(--uui-color-surface-alt);
-					padding: var(--uui-size-space-2) var(--uui-size-space-4);
-					border-radius: calc(var(--uui-border-radius) * 2);
-					overflow-x: auto;
-				}
-
-				code:not(pre > code) {
-					background-color: var(--uui-color-surface-alt);
-					padding: var(--uui-size-space-1) var(--uui-size-space-2);
-					border-radius: calc(var(--uui-border-radius) * 2);
-				}
-
-				code {
-					font-family: 'Roboto Mono', monospace;
-					background: none;
-					color: inherit;
-					font-size: 0.8rem;
-					padding: 0;
-				}
-
-				h1,
-				h2,
-				h3,
-				h4,
-				h5,
-				h6 {
-					margin-top: 0;
-					margin-bottom: 0.5em;
-				}
-
-					max-width: 100%;
-
-				li {
-					> p {
-						margin: 0;
-						padding: 0;
 					}
 				}
 			}

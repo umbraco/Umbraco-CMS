@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 ///         be refactored, really.
 ///     </para>
 /// </remarks>
+[Obsolete("This is no longer used. Scheduled for removal in Umbraco 17.")]
 public interface ICacheRebuilder
 {
     /// <summary>
