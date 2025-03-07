@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -24,8 +25,60 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
 
         builder.Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
+
+        builder.UrlSegmentProviders().Insert<CustomUrlSegmentProvider1>();
+        builder.UrlSegmentProviders().Insert<CustomUrlSegmentProvider2>();
     }
 
+    private abstract class CustomUrlSegmentProviderBase
+    {
+        private readonly IUrlSegmentProvider _defaultProvider;
+
+        public CustomUrlSegmentProviderBase(IShortStringHelper stringHelper) => _defaultProvider = new DefaultUrlSegmentProvider(stringHelper);
+
+        protected string? GetUrlSegment(IContentBase content, string? culture, Guid pageKey)
+        {
+            if (content.Key != pageKey)
+            {
+                return null;
+            }
+
+            var segment = _defaultProvider.GetUrlSegment(content, culture);
+            return segment is not null ? segment + "-custom" : null;
+        }
+    }
+
+    /// <summary>
+    /// A test implementation of <see cref="IUrlSegmentProvider"/> that provides a custom URL segment for a specific page
+    /// and allows for additional providers to provide segments too.
+    /// </summary>
+    private class CustomUrlSegmentProvider1 : CustomUrlSegmentProviderBase, IUrlSegmentProvider
+    {
+        public CustomUrlSegmentProvider1(IShortStringHelper stringHelper)
+            : base(stringHelper)
+        {
+        }
+
+        public bool AllowAdditionalSegments => true;
+
+        public string? GetUrlSegment(IContentBase content, string? culture = null)
+            => GetUrlSegment(content, culture, Guid.Parse(SubPageKey));
+    }
+
+    /// <summary>
+    /// A test implementation of <see cref="IUrlSegmentProvider"/> that provides a custom URL segment for a specific page
+    /// and terminates, not allowing additional providers to provide segments too.
+    /// </summary>
+    private class CustomUrlSegmentProvider2 : CustomUrlSegmentProviderBase, IUrlSegmentProvider
+    {
+        public CustomUrlSegmentProvider2(IShortStringHelper stringHelper)
+            : base(stringHelper)
+        {
+        }
+
+        public string? GetUrlSegment(IContentBase content, string? culture = null)
+            => GetUrlSegment(content, culture, Guid.Parse(SubPage2Key));
+    }
 
     public override void Setup()
     {
@@ -91,14 +144,17 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
         Assert.IsNull(actual);
     }
 
-    [Test]
     [TestCase("/", "en-US", true, ExpectedResult = TextpageKey)]
     [TestCase("/text-page-1", "en-US", true, ExpectedResult = SubPageKey)]
-    [TestCase("/text-page-2", "en-US", true, ExpectedResult = SubPage2Key)]
+    [TestCase("/text-page-1-custom", "en-US", true, ExpectedResult = SubPageKey)] // Uses the segment registered by the custom IIUrlSegmentProvider that allows for more than one segment per document.
+    [TestCase("/text-page-2", "en-US", true, ExpectedResult = null)]
+    [TestCase("/text-page-2-custom", "en-US", true, ExpectedResult = SubPage2Key)] // Uses the segment registered by the custom IIUrlSegmentProvider that does not allow for more than one segment per document.
     [TestCase("/text-page-3", "en-US", true, ExpectedResult = SubPage3Key)]
     [TestCase("/", "en-US", false, ExpectedResult = TextpageKey)]
     [TestCase("/text-page-1", "en-US", false, ExpectedResult = SubPageKey)]
-    [TestCase("/text-page-2", "en-US", false, ExpectedResult = SubPage2Key)]
+    [TestCase("/text-page-1-custom", "en-US", false, ExpectedResult = SubPageKey)] // Uses the segment registered by the custom IIUrlSegmentProvider that allows for more than one segment per document.
+    [TestCase("/text-page-2", "en-US", false, ExpectedResult = null)]
+    [TestCase("/text-page-2-custom", "en-US", false, ExpectedResult = SubPage2Key)] // Uses the segment registered by the custom IIUrlSegmentProvider that does not allow for more than one segment per document.
     [TestCase("/text-page-3", "en-US", false, ExpectedResult = SubPage3Key)]
     public string? Expected_Routes(string route, string isoCode, bool loadDraft)
     {

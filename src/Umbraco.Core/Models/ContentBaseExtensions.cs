@@ -43,7 +43,9 @@ public static class ContentBaseExtensions
     /// <returns>The collection of URL segments.</returns>
     public static IEnumerable<string> GetUrlSegments(this IContentBase content, IShortStringHelper shortStringHelper, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, string? culture = null, bool published = true)
     {
-        var urlSegments = GetUrlSegments(content, urlSegmentProviders, culture, published).ToList();
+        var urlSegments = GetUrlSegments(content, urlSegmentProviders, culture, published).Distinct().ToList();
+
+        // Ensure we have at least the segment from the default URL provider returned.
         if (urlSegments.Count == 0)
         {
             var defaultUrlSegment = GetDefaultUrlSegment(shortStringHelper, content, culture);
@@ -61,11 +63,21 @@ public static class ContentBaseExtensions
         IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
         string? culture,
         bool published)
-        => urlSegmentProviders
-            .Select(p => p.GetUrlSegment(content, published, culture))
-            .Where(u => u != null)
-            .Select(u => u!)
-            .Distinct();
+    {
+        foreach (IUrlSegmentProvider urlSegmentProvider in urlSegmentProviders)
+        {
+            var segment = urlSegmentProvider.GetUrlSegment(content, published, culture);
+            if (string.IsNullOrEmpty(segment) == false)
+            {
+                yield return segment;
+
+                if (urlSegmentProvider.AllowAdditionalSegments is false)
+                {
+                    yield break;
+                }
+            }
+        }
+    }
 
     private static string? GetDefaultUrlSegment(
         IShortStringHelper shortStringHelper,

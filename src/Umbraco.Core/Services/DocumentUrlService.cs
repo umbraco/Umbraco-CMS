@@ -148,7 +148,7 @@ public class DocumentUrlService : IDocumentUrlService
             {
                 if (_cache.TryAdd(cacheKey, CreateCacheValue(publishedDocumentUrlSegment)) is false)
                 {
-                    _logger.LogError("Could not add the document url cache.");
+                    _logger.LogError("Could not add to the document url cache.");
                     return false;
                 }
             }
@@ -558,9 +558,9 @@ public class DocumentUrlService : IDocumentUrlService
     {
         foreach (Guid childKey in childKeys)
         {
-            var childUrlSegment = GetUrlSegment(childKey, culture, isDraft);
+            IEnumerable<string> childUrlSegments = GetUrlSegments(childKey, culture, isDraft);
 
-            if (string.Equals(childUrlSegment, urlSegment))
+            if (childUrlSegments.Contains(urlSegment))
             {
                 return childKey;
             }
