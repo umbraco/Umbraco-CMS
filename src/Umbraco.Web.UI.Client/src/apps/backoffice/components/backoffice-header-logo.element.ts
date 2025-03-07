@@ -88,7 +88,10 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 
 	async #openSystemInformation() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		if (!modalManager) return;
+		if (!modalManager) {
+			throw new Error('Modal manager not found');
+		}
+
 		modalManager
 			.open(this, UMB_SYSINFO_MODAL)
 			.onSubmit()

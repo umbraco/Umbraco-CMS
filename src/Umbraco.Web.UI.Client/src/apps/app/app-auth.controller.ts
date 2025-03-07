@@ -33,7 +33,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 	 * If not, the authorization flow is started.
 	 */
 	async isAuthorized(): Promise<boolean> {
-		await this.#retrievedModal;
+		await this.#retrievedModal.catch(() => undefined);
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
@@ -65,7 +65,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 	 * @param userLoginState
 	 */
 	async makeAuthorizationRequest(userLoginState: UmbUserLoginState = 'loggingIn'): Promise<boolean> {
-		await this.#retrievedModal;
+		await this.#retrievedModal.catch(() => undefined);
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
@@ -114,7 +114,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 	}
 
 	async #showLoginModal(userLoginState: UmbUserLoginState): Promise<boolean> {
-		await this.#retrievedModal;
+		await this.#retrievedModal.catch(() => undefined);
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}

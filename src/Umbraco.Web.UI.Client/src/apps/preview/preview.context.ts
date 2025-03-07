@@ -24,24 +24,22 @@ export class UmbPreviewContext extends UmbContextBase<UmbPreviewContext> {
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_PREVIEW_CONTEXT);
-		this.#init();
-	}
 
-	async #init() {
-		const appContext = await this.getContext(UMB_APP_CONTEXT);
-		this.#serverUrl = appContext.getServerUrl();
+		this.consumeContext(UMB_APP_CONTEXT, (appContext) => {
+			this.#serverUrl = appContext.getServerUrl();
 
-		const params = new URLSearchParams(window.location.search);
+			const params = new URLSearchParams(window.location.search);
 
-		this.#culture = params.get('culture');
-		this.#unique = params.get('id');
+			this.#culture = params.get('culture');
+			this.#unique = params.get('id');
 
-		if (!this.#unique) {
-			console.error('No unique ID found in query string.');
-			return;
-		}
+			if (!this.#unique) {
+				console.error('No unique ID found in query string.');
+				return;
+			}
 
-		this.#setPreviewUrl();
+			this.#setPreviewUrl();
+		});
 	}
 
 	#configureWebSocket() {
