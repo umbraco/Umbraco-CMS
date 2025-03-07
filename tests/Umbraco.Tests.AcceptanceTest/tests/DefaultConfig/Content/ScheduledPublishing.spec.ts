@@ -36,7 +36,7 @@ test('can schedule the publishing of invariant unpublish content', async ({umbra
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickScheduleButton();
   const publishDateTime = await umbracoApi.getCurrentTimePlusMinute();
-  const publishedTime = await umbracoApi.covertDateFormat(publishDateTime);
+  const publishedTime = await umbracoApi.convertDateFormat(publishDateTime);
   await umbracoUi.content.enterPublishTime(publishDateTime);
   await umbracoUi.content.clickScheduleModalButton();
   
@@ -72,7 +72,7 @@ test('can schedule the publishing of invariant published content', async ({umbra
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickScheduleButton();
   const publishDateTime = await umbracoApi.getCurrentTimePlusMinute();
-  const publishedTime = await umbracoApi.covertDateFormat(publishDateTime);
+  const publishedTime = await umbracoApi.convertDateFormat(publishDateTime);
   await umbracoUi.content.enterPublishTime(publishDateTime);
   await umbracoUi.content.clickScheduleModalButton();
   
@@ -106,7 +106,7 @@ test('can schedule the publishing of variant unpublish content', async ({umbraco
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickScheduleButton();
   const publishDateTime = await umbracoApi.getCurrentTimePlusMinute();
-  const publishedTime = await umbracoApi.covertDateFormat(publishDateTime);
+  const publishedTime = await umbracoApi.convertDateFormat(publishDateTime);
   await umbracoUi.content.enterPublishTime(publishDateTime);
   await umbracoUi.content.clickScheduleModalButton();
   
@@ -142,7 +142,7 @@ test('can schedule the publishing of variant published content', async ({umbraco
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickScheduleButton();
   const publishDateTime = await umbracoApi.getCurrentTimePlusMinute();
-  const publishedTime = await umbracoApi.covertDateFormat(publishDateTime);
+  const publishedTime = await umbracoApi.convertDateFormat(publishDateTime);
   await umbracoUi.content.enterPublishTime(publishDateTime);
   await umbracoUi.content.clickScheduleModalButton();
   
@@ -180,7 +180,7 @@ test('can schedule the publishing of invariant unpublish child content', async (
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickScheduleButton();
   const publishDateTime = await umbracoApi.getCurrentTimePlusMinute();
-  const publishedTime = await umbracoApi.covertDateFormat(publishDateTime);
+  const publishedTime = await umbracoApi.convertDateFormat(publishDateTime);
   await umbracoUi.content.enterPublishTime(publishDateTime);
   await umbracoUi.content.clickScheduleModalButton();
   
@@ -218,7 +218,7 @@ test('can schedule the publishing of variant unpublish child content', async ({u
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickScheduleButton();
   const publishDateTime = await umbracoApi.getCurrentTimePlusMinute();
-  const publishedTime = await umbracoApi.covertDateFormat(publishDateTime);
+  const publishedTime = await umbracoApi.convertDateFormat(publishDateTime);
   await umbracoUi.content.enterPublishTime(publishDateTime);
   await umbracoUi.content.clickScheduleModalButton();
   
@@ -257,7 +257,7 @@ test('can schedule the publishing of invariant published child content', async (
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickScheduleButton();
   const publishDateTime = await umbracoApi.getCurrentTimePlusMinute();
-  const publishedTime = await umbracoApi.covertDateFormat(publishDateTime);
+  const publishedTime = await umbracoApi.convertDateFormat(publishDateTime);
   await umbracoUi.content.enterPublishTime(publishDateTime);
   await umbracoUi.content.clickScheduleModalButton();
   
@@ -296,7 +296,7 @@ test('can schedule the publishing of variant published child content', async ({u
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickScheduleButton();
   const publishDateTime = await umbracoApi.getCurrentTimePlusMinute();
-  const publishedTime = await umbracoApi.covertDateFormat(publishDateTime);
+  const publishedTime = await umbracoApi.convertDateFormat(publishDateTime);
   await umbracoUi.content.enterPublishTime(publishDateTime);
   await umbracoUi.content.clickScheduleModalButton();
   
@@ -347,7 +347,7 @@ test('can schedule the publishing of multiple culture variants content', async (
   const firstCulture = 'en-US';
   const secondCulture = 'da';
   const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
-  await umbracoApi.document.createDocumentWithTwoCultureAndTextContent(contentName, documentTypeId, contentText, dataTypeName, firstCulture, secondCulture);
+  await umbracoApi.document.createDocumentWithTwoCulturesAndTextContent(contentName, documentTypeId, contentText, dataTypeName, firstCulture, secondCulture);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -357,7 +357,7 @@ test('can schedule the publishing of multiple culture variants content', async (
   await umbracoUi.content.clickScheduleButton();
   await umbracoUi.content.clickSelectAllCheckbox();
   const firstPublishDateTime = await umbracoApi.getCurrentTimePlusMinute();
-  const firstPublishedTime = await umbracoApi.covertDateFormat(firstPublishDateTime);
+  const firstPublishedTime = await umbracoApi.convertDateFormat(firstPublishDateTime);
   await umbracoUi.content.enterPublishTime(firstPublishDateTime);
   const secondPublishDateTime = await umbracoApi.getCurrentTimePlusMinute(2);
   await umbracoUi.content.enterPublishTime(secondPublishDateTime, 1);
@@ -458,7 +458,7 @@ test('can schedule the unpublishing of invariant published content', async ({umb
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickScheduleButton();
   const unpublishDateTime = await umbracoApi.getCurrentTimePlusMinute();
-  const unpublishedTime = await umbracoApi.covertDateFormat(unpublishDateTime);
+  const unpublishedTime = await umbracoApi.convertDateFormat(unpublishDateTime);
   await umbracoUi.content.enterUnpublishTime(unpublishDateTime);
   await umbracoUi.content.clickScheduleModalButton();
   
@@ -493,7 +493,7 @@ test('can schedule the unpublishing of variant published content', async ({umbra
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickScheduleButton();
   const unpublishDateTime = await umbracoApi.getCurrentTimePlusMinute();
-  const unpublishedTime = await umbracoApi.covertDateFormat(unpublishDateTime);
+  const unpublishedTime = await umbracoApi.convertDateFormat(unpublishDateTime);
   await umbracoUi.content.enterUnpublishTime(unpublishDateTime);
   await umbracoUi.content.clickScheduleModalButton();
   
@@ -530,7 +530,7 @@ test('can schedule the unpublishing of invariant published child content', async
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickScheduleButton();
   const unpublishDateTime = await umbracoApi.getCurrentTimePlusMinute();
-  const unpublishedTime = await umbracoApi.covertDateFormat(unpublishDateTime);
+  const unpublishedTime = await umbracoApi.convertDateFormat(unpublishDateTime);
   await umbracoUi.content.enterUnpublishTime(unpublishDateTime);
   await umbracoUi.content.clickScheduleModalButton();
   
@@ -567,7 +567,7 @@ test('can schedule the unpublishing of variant published child content', async (
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickScheduleButton();
   const unpublishDateTime = await umbracoApi.getCurrentTimePlusMinute();
-  const unpublishedTime = await umbracoApi.covertDateFormat(unpublishDateTime);
+  const unpublishedTime = await umbracoApi.convertDateFormat(unpublishDateTime);
   await umbracoUi.content.enterUnpublishTime(unpublishDateTime);
   await umbracoUi.content.clickScheduleModalButton();
   
