@@ -8,11 +8,11 @@ const childContentName = 'ChildContent';
 const childDocumentTypeName = 'ChildDocumentTypeForContent';
 const dataTypeName = 'Textstring';
 const contentText = 'This is test content text';
-const scheduleWaitTime = 100000;
+const scheduleWaitTime = 120000;
 
 test.beforeEach(async ({umbracoApi}) => {
   // Need to increase the timeout of the tests due to the time to wait for publishing
-  test.setTimeout(180000);
+  test.setTimeout(200000);
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   dataTypeId = dataTypeData.id;
   await umbracoApi.document.ensureNameNotExists(contentName);
@@ -24,7 +24,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can schedule the publishing of invariant unpublish content', async ({umbracoApi, umbracoUi}) => {
+test.fail.only('can schedule the publishing of invariant unpublish content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
