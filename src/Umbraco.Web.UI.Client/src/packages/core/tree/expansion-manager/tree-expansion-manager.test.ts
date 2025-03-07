@@ -26,23 +26,23 @@ describe('UmbTreeExpansionManager', () => {
 
 		describe('methods', () => {
 			it('has a setExpansion method', () => {
-				expect(manager).to.have.property('addState').that.is.a('function');
+				expect(manager).to.have.property('setExpansion').that.is.a('function');
 			});
 
 			it('has a getExpansion method', () => {
-				expect(manager).to.have.property('addStates').that.is.a('function');
+				expect(manager).to.have.property('getExpansion').that.is.a('function');
 			});
 
 			it('has a expandItem method', () => {
-				expect(manager).to.have.property('removeState').that.is.a('function');
+				expect(manager).to.have.property('expandItem').that.is.a('function');
 			});
 
 			it('has a collapseItem method', () => {
-				expect(manager).to.have.property('getStates').that.is.a('function');
+				expect(manager).to.have.property('collapseItem').that.is.a('function');
 			});
 
 			it('has a collapseAll method', () => {
-				expect(manager).to.have.property('clear').that.is.a('function');
+				expect(manager).to.have.property('collapseAll').that.is.a('function');
 			});
 		});
 	});
