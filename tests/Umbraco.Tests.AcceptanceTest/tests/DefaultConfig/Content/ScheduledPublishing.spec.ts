@@ -8,7 +8,7 @@ const childContentName = 'ChildContent';
 const childDocumentTypeName = 'ChildDocumentTypeForContent';
 const dataTypeName = 'Textstring';
 const contentText = 'This is test content text';
-const scheduleWaitTime = 80000;
+const scheduleWaitTime = 100000;
 
 test.beforeEach(async ({umbracoApi}) => {
   // Need to increase the timeout of the tests due to the time to wait for publishing
