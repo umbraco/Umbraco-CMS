@@ -26,7 +26,7 @@ test('can show open button', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
   // Act
-  await umbracoUi.dataType.clickShowOpenButtonSlider();
+  await umbracoUi.dataType.clickShowOpenButtonToggle();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
@@ -43,7 +43,7 @@ test('can ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
   // Act
-  await umbracoUi.dataType.clickIgnoreUserStartNodesSlider();
+  await umbracoUi.dataType.clickIgnoreUserStartNodesToggle();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert

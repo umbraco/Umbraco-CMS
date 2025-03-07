@@ -22996,6 +22996,38 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/published-cache/rebuild/status": {
+      "get": {
+        "tags": [
+          "Published Cache"
+        ],
+        "operationId": "GetPublishedCacheRebuildStatus",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/RebuildStatusModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/published-cache/reload": {
       "post": {
         "tags": [
@@ -42900,6 +42932,18 @@
             "nullable": true
           },
           "isTrashed": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RebuildStatusModel": {
+        "required": [
+          "isRebuilding"
+        ],
+        "type": "object",
+        "properties": {
+          "isRebuilding": {
             "type": "boolean"
           }
         },

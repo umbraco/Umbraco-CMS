@@ -360,7 +360,7 @@ test('can set is mandatory for a property in a document type', {tag: '@smoke'}, 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickEditorSettingsButton();
-  await umbracoUi.documentType.clickMandatorySlider();
+  await umbracoUi.documentType.clickMandatoryToggle();
   await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickSaveButton();
 
@@ -403,7 +403,7 @@ test('can allow vary by culture for a property in a document type', {tag: '@smok
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickEditorSettingsButton();
-  await umbracoUi.documentType.clickVaryByCultureSlider();
+  await umbracoUi.documentType.clickVaryByCultureToggle();
   await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickSaveButton();
 
