@@ -1,6 +1,5 @@
 import type { UmbTreeExpansionModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
@@ -14,14 +13,21 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	#expansion = new UmbObjectState<UmbTreeExpansionModel | undefined>(undefined);
 	expansion = this.#expansion.asObservable();
 
-	constructor(host: UmbControllerHost) {
-		super(host);
-	}
-
+	/**
+	 * Sets the expansion state
+	 * @param {UmbTreeExpansionModel | undefined} expansion The expansion state
+	 * @memberof UmbTreeExpansionManager
+	 * @returns {void}
+	 */
 	setExpansion(expansion: UmbTreeExpansionModel | undefined): void {
 		this.#expansion.setValue(expansion);
 	}
 
+	/**
+	 * Gets the expansion state
+	 * @memberof UmbTreeExpansionManager
+	 * @returns {UmbTreeExpansionModel | undefined} The expansion state
+	 */
 	getExpansion(): UmbTreeExpansionModel | undefined {
 		return this.#expansion.getValue();
 	}
