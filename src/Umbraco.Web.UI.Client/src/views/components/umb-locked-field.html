@@ -31,28 +31,28 @@
     </div>
 
     <div ng-messages="lockedFieldForm.lockedField.$error" show-validation-on-submit>
-      <div class="umb-validation-label"
-           ng-class="{ '-left': validationPosition === 'left', '-right': validationPosition === 'right' }"
-           ng-message="required">
-        <localize key="general_required">Required</localize> <localize key="content_alias">alias</localize>
-      </div>
-      <div class="umb-validation-label"
-           ng-class="{ '-left': validationPosition === 'left', '-right': validationPosition === 'right' }"
-           ng-if="regexValidation.length > 0"
-           ng-message="valRegex">
-        <localize key="general_invalid">Invalid</localize> <localize key="content_alias">alias</localize>
-      </div>
-      <div class="umb-validation-label"
-           ng-class="{ '-left': validationPosition === 'left', '-right': validationPosition === 'right' }"
-           ng-if="serverValidationField.length > 0"
-           ng-message="valServerField">
-        {{lockedFieldForm.lockedField.errorMsg}}
-      </div>
-      <div class="umb-validation-label"
-           ng-class="{ '-left': validationPosition === 'left', '-right': validationPosition === 'right' }"
-           ng-if="ngModel.length > 255">
-        <localize key="general_invalid">Invalid</localize> <localize key="content_alias">alias</localize>
-      </div>
+        <div class="umb-validation-label"
+             ng-class="{ '-left': validationPosition === 'left', '-right': validationPosition === 'right' }"
+             ng-message="required">
+          <localize key="general_required">Required</localize> <localize key="content_alias">alias</localize>
+        </div>
+        <div class="umb-validation-label"
+             ng-class="{ '-left': validationPosition === 'left', '-right': validationPosition === 'right' }"
+             ng-if="regexValidation.length > 0"
+             ng-message="valRegex">
+          <localize key="general_invalid">Invalid</localize> <localize key="content_alias">alias</localize>
+        </div>
+        <div class="umb-validation-label"
+             ng-class="{ '-left': validationPosition === 'left', '-right': validationPosition === 'right' }"
+             ng-if="serverValidationField.length > 0"
+             ng-message="valServerField">
+          {{lockedFieldForm.lockedField.errorMsg}}
+        </div>
+        <div class="umb-validation-label"
+             ng-class="{ '-left': validationPosition === 'left', '-right': validationPosition === 'right' }"
+             ng-if="ngModel.length > 255">
+          <localize key="general_invalid">Invalid</localize> <localize key="content_alias">alias</localize>
+        </div>
     </div>
 
 </ng-form>
