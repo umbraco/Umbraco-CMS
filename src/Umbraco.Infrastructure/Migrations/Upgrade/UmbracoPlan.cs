@@ -111,5 +111,8 @@ public class UmbracoPlan : MigrationPlan
 
         // To 15.3.0
         To<V_15_3_0.AddNameAndDescriptionToWebhooks>("{7B11F01E-EE33-4B0B-81A1-F78F834CA45B}");
+
+        // To 15.4.0
+        To<V_15_4_0.IncludeUrlSegmentInDocumentUrlUniqueIndex>("{A9E72794-4036-4563-B543-1717C73B8879}");
     }
 }

@@ -37,8 +37,19 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IPublishStatusQueryService _publishStatusQueryService;
     private readonly IDomainCacheService _domainCacheService;
 
-    private readonly ConcurrentDictionary<string, PublishedDocumentUrlSegment> _cache = new();
+    private readonly ConcurrentDictionary<string, PublishedDocumentUrlSegments> _cache = new();
     private bool _isInitialized;
+
+    private class PublishedDocumentUrlSegments
+    {
+        public required Guid DocumentKey { get; set; }
+
+        public required int LanguageId { get; set; }
+
+        public required string[] UrlSegments { get; set; }
+
+        public required bool IsDraft { get; set; }
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
@@ -131,11 +142,11 @@ public class DocumentUrlService : IDocumentUrlService
 
         scopeContext.Enlist("UpdateCache_" + cacheKey, () =>
         {
-            _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegment? existingValue);
+            _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegments? existingValue);
 
             if (existingValue is null)
             {
-                if (_cache.TryAdd(cacheKey, publishedDocumentUrlSegment) is false)
+                if (_cache.TryAdd(cacheKey, CreateCacheValue(publishedDocumentUrlSegment)) is false)
                 {
                     _logger.LogError("Could not add the document url cache.");
                     return false;
@@ -143,7 +154,7 @@ public class DocumentUrlService : IDocumentUrlService
             }
             else
             {
-                if (_cache.TryUpdate(cacheKey, publishedDocumentUrlSegment, existingValue) is false)
+                if (_cache.TryUpdate(cacheKey, CreateCacheValue(publishedDocumentUrlSegment, existingValue), existingValue) is false)
                 {
                     _logger.LogError("Could not update the document url cache.");
                     return false;
@@ -156,6 +167,26 @@ public class DocumentUrlService : IDocumentUrlService
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static string CreateCacheKey(Guid documentKey, string culture, bool isDraft) => $"{documentKey}|{culture}|{isDraft}".ToLowerInvariant();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static PublishedDocumentUrlSegments CreateCacheValue(PublishedDocumentUrlSegment publishedDocumentUrlSegment)
+        => new PublishedDocumentUrlSegments()
+        {
+            DocumentKey = publishedDocumentUrlSegment.DocumentKey,
+            LanguageId = publishedDocumentUrlSegment.LanguageId,
+            UrlSegments = [publishedDocumentUrlSegment.UrlSegment],
+            IsDraft = publishedDocumentUrlSegment.IsDraft
+        };
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static PublishedDocumentUrlSegments CreateCacheValue(PublishedDocumentUrlSegment publishedDocumentUrlSegment, PublishedDocumentUrlSegments existingValue)
+        => new PublishedDocumentUrlSegments()
+        {
+            DocumentKey = publishedDocumentUrlSegment.DocumentKey,
+            LanguageId = publishedDocumentUrlSegment.LanguageId,
+            UrlSegments = existingValue.UrlSegments.Union([publishedDocumentUrlSegment.UrlSegment]).Distinct().ToArray(),
+            IsDraft = publishedDocumentUrlSegment.IsDraft
+        };
 
     /// <inheritdoc/>
     public async Task RebuildAllUrlsAsync()
@@ -178,9 +209,20 @@ public class DocumentUrlService : IDocumentUrlService
         ThrowIfNotInitialized();
         var cacheKey = CreateCacheKey(documentKey, culture, isDraft);
 
-        _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegment? urlSegment);
+        _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegments? urlSegment);
 
-        return urlSegment?.UrlSegment;
+        return urlSegment?.UrlSegments.FirstOrDefault();
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<string> GetUrlSegments(Guid documentKey, string culture, bool isDraft)
+    {
+        ThrowIfNotInitialized();
+        var cacheKey = CreateCacheKey(documentKey, culture, isDraft);
+
+        _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegments? urlSegments);
+
+        return urlSegments?.UrlSegments ?? Enumerable.Empty<string>();
     }
 
     private void ThrowIfNotInitialized()
@@ -275,21 +317,23 @@ public class DocumentUrlService : IDocumentUrlService
         if (document.Trashed is false
             && (IsInvariantAndPublished(document) || IsVariantAndPublishedForCulture(document, culture)))
         {
-            var publishedUrlSegment =
-                document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture);
-            if (publishedUrlSegment.IsNullOrWhiteSpace())
+            IEnumerable<string> publishedUrlSegments = document.GetUrlSegments(_shortStringHelper, _urlSegmentProviderCollection, culture);
+            if (publishedUrlSegments.Any() is false)
             {
-                _logger.LogWarning("No published url segment found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
+                _logger.LogWarning("No published URL segments found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
             }
             else
             {
-                yield return (new PublishedDocumentUrlSegment()
+                foreach (var publishedUrlSegment in publishedUrlSegments)
                 {
-                    DocumentKey = document.Key,
-                    LanguageId = language.Id,
-                    UrlSegment = publishedUrlSegment,
-                    IsDraft = false
-                }, true);
+                    yield return (new PublishedDocumentUrlSegment()
+                    {
+                        DocumentKey = document.Key,
+                        LanguageId = language.Id,
+                        UrlSegment = publishedUrlSegment,
+                        IsDraft = false
+                    }, true);
+                }
             }
         }
         else
@@ -303,21 +347,25 @@ public class DocumentUrlService : IDocumentUrlService
             }, false);
         }
 
-        var draftUrlSegment = document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture, false);
+        IEnumerable<string> draftUrlSegments = document.GetUrlSegments(_shortStringHelper, _urlSegmentProviderCollection, culture, false);
 
-        if (draftUrlSegment.IsNullOrWhiteSpace())
+        if (draftUrlSegments.Any() is false)
         {
-            _logger.LogWarning("No draft url segment found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
+            _logger.LogWarning("No draft URL segments found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
         }
         else
         {
-            yield return (new PublishedDocumentUrlSegment()
+            foreach (var draftUrlSegment in draftUrlSegments)
             {
-                DocumentKey = document.Key,
-                LanguageId = language.Id,
-                UrlSegment = draftUrlSegment,
-                IsDraft = true
-            }, document.Trashed is false);
+
+                yield return (new PublishedDocumentUrlSegment()
+                {
+                    DocumentKey = document.Key,
+                    LanguageId = language.Id,
+                    UrlSegment = draftUrlSegment,
+                    IsDraft = true
+                }, document.Trashed is false);
+            }
         }
     }
 
@@ -626,9 +674,9 @@ public class DocumentUrlService : IDocumentUrlService
                 break;
             }
 
-            if (_cache.TryGetValue(CreateCacheKey(ancestorOrSelfKey, cultureOrDefault, isDraft), out PublishedDocumentUrlSegment? publishedDocumentUrlSegment))
+            if (_cache.TryGetValue(CreateCacheKey(ancestorOrSelfKey, cultureOrDefault, isDraft), out PublishedDocumentUrlSegments? publishedDocumentUrlSegments))
             {
-                urlSegments.Add(publishedDocumentUrlSegment.UrlSegment);
+                urlSegments.AddRange(publishedDocumentUrlSegments.UrlSegments);
             }
 
             if (foundDomain is not null)
@@ -768,9 +816,9 @@ public class DocumentUrlService : IDocumentUrlService
 
                 if (_cache.TryGetValue(
                         CreateCacheKey(ancestorOrSelfKey, culture, false),
-                        out PublishedDocumentUrlSegment? publishedDocumentUrlSegment))
+                        out PublishedDocumentUrlSegments? publishedDocumentUrlSegments))
                 {
-                    urlSegments.Add(publishedDocumentUrlSegment.UrlSegment);
+                    urlSegments.AddRange(publishedDocumentUrlSegments.UrlSegments);
                 }
                 else
                 {

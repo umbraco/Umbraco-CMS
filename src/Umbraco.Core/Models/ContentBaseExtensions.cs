@@ -64,7 +64,8 @@ public static class ContentBaseExtensions
         => urlSegmentProviders
             .Select(p => p.GetUrlSegment(content, published, culture))
             .Where(u => u != null)
-            .Select(u => u!);
+            .Select(u => u!)
+            .Distinct();
 
     private static string? GetDefaultUrlSegment(
         IShortStringHelper shortStringHelper,

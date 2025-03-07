@@ -21,13 +21,23 @@ public interface IDocumentUrlService
     Task RebuildAllUrlsAsync();
 
     /// <summary>
-    /// Gets the URL segment from a document key and culture. Preview urls are returned if isDraft is true.
+    /// Gets a single URL segment from a document key and culture. Preview urls are returned if isDraft is true.
+    /// </summary>
+    /// <param name="documentKey">The key of the document.</param>
+    /// <param name="culture">The culture code.</param>
+    /// <param name="isDraft">Whether to get the url of the draft or published document.</param>
+    /// <returns>A URL segment for the document.</returns>
+    /// <remarks>If more than one segment is available, the first retrieved will be returned.</remarks>
+    string? GetUrlSegment(Guid documentKey, string culture, bool isDraft);
+
+    /// <summary>
+    /// Gets the URL segments from a document key and culture. Preview urls are returned if isDraft is true.
     /// </summary>
     /// <param name="documentKey">The key of the document.</param>
     /// <param name="culture">The culture code.</param>
     /// <param name="isDraft">Whether to get the url of the draft or published document.</param>
     /// <returns>The URL segment for the document.</returns>
-    string? GetUrlSegment(Guid documentKey, string culture, bool isDraft);
+    IEnumerable<string> GetUrlSegments(Guid documentKey, string culture, bool isDraft);
 
     /// <summary>
     /// Creates or updates the URL segments for a single document.
