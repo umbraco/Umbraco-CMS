@@ -45,6 +45,9 @@ export class UmbDefaultTreeContext<
 	#hideTreeRoot = new UmbBooleanState(false);
 	hideTreeRoot = this.#hideTreeRoot.asObservable();
 
+	#expandTreeRoot = new UmbBooleanState(undefined);
+	expandTreeRoot = this.#expandTreeRoot.asObservable();
+
 	#startNode = new UmbObjectState<UmbTreeStartNode | undefined>(undefined);
 	startNode = this.#startNode.asObservable();
 
@@ -159,6 +162,10 @@ export class UmbDefaultTreeContext<
 		if (data) {
 			this.#treeRoot.setValue(data);
 			this.pagination.setTotalItems(1);
+
+			if (this.getExpandTreeRoot()) {
+				this.#toggleTreeRootExpansion(true);
+			}
 		}
 	}
 
@@ -280,12 +287,54 @@ export class UmbDefaultTreeContext<
 		return this.#additionalRequestArgs.getValue();
 	}
 
-	setExpansion(model: UmbTreeExpansionModel | undefined): void {
-		this.expansion.setExpansion(model);
+	/**
+	 * Sets the expansion state
+	 * @param {UmbTreeExpansionModel | undefined} data - The expansion state
+	 * @returns {void}
+	 * @memberof UmbDefaultTreeContext
+	 */
+	setExpansion(data: UmbTreeExpansionModel | undefined): void {
+		this.expansion.setExpansion(data);
 	}
 
+	/**
+	 * Gets the expansion state
+	 * @returns {UmbTreeExpansionModel | undefined} - The expansion state
+	 * @memberof UmbDefaultTreeContext
+	 */
 	getExpansion(): UmbTreeExpansionModel | undefined {
 		return this.expansion.getExpansion();
+	}
+
+	/**
+	 * Sets the expandTreeRoot config
+	 * @param {boolean} expandTreeRoot - Whether to expand the tree root
+	 * @memberof UmbDefaultTreeContext
+	 */
+	setExpandTreeRoot(expandTreeRoot: boolean) {
+		this.#expandTreeRoot.setValue(expandTreeRoot);
+		this.#toggleTreeRootExpansion(expandTreeRoot);
+	}
+
+	/**
+	 * Gets the expandTreeRoot config
+	 * @returns {boolean | undefined} - Whether to expand the tree root
+	 * @memberof UmbDefaultTreeContext
+	 */
+	getExpandTreeRoot(): boolean | undefined {
+		return this.#expandTreeRoot.getValue();
+	}
+
+	#toggleTreeRootExpansion(expand: boolean) {
+		const treeRoot = this.#treeRoot.getValue();
+		if (!treeRoot) return;
+		const treeRootEntity = { entityType: treeRoot.entityType, unique: treeRoot.unique };
+
+		if (expand) {
+			this.expansion.expandItem(treeRootEntity);
+		} else {
+			this.expansion.collapseItem(treeRootEntity);
+		}
 	}
 
 	#resetTree() {

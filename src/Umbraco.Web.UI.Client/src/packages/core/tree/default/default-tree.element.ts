@@ -29,6 +29,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: false })
 	hideTreeRoot: boolean = false;
 
+	@property({ type: Boolean, attribute: false })
+	expandTreeRoot: boolean = false;
+
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
@@ -94,6 +97,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 		if (_changedProperties.has('hideTreeRoot')) {
 			this.#treeContext!.setHideTreeRoot(this.hideTreeRoot);
+		}
+
+		if (_changedProperties.has('expandTreeRoot')) {
+			this.#treeContext!.setExpandTreeRoot(this.expandTreeRoot);
 		}
 
 		if (_changedProperties.has('foldersOnly')) {
