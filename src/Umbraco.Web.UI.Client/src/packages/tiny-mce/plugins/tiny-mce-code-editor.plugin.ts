@@ -1,7 +1,7 @@
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_CODE_EDITOR_MODAL } from '@umbraco-cms/backoffice/code-editor';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbTinyMceCodeEditorPlugin extends UmbTinyMcePluginBase {
 	constructor(args: TinyMcePluginArguments) {
@@ -16,16 +16,14 @@ export default class UmbTinyMceCodeEditorPlugin extends UmbTinyMcePluginBase {
 	}
 
 	async #showCodeEditor() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modal = modalManager.open(this, UMB_CODE_EDITOR_MODAL, {
+		const value = await umbOpenModal(this, UMB_CODE_EDITOR_MODAL, {
 			data: {
 				headline: 'Edit source code',
 				content: this.editor.getContent() ?? '',
 				language: 'html',
 			},
-		});
+		}).catch(() => undefined);
 
-		const value = await modal.onSubmit().catch(() => undefined);
 		if (!value) {
 			return;
 		}

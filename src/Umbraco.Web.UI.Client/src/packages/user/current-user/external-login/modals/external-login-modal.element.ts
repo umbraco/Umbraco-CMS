@@ -168,6 +168,9 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 				color: 'positive',
 			});
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
+			if (!authContext) {
+				throw new Error('Auth context is missing');
+			}
 			await authContext.linkLogin(item.providerSchemeName);
 		} catch (error) {
 			if (error instanceof Error) {

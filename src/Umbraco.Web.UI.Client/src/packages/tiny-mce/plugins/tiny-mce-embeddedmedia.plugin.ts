@@ -1,7 +1,7 @@
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import type { UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalValue } from '@umbraco-cms/backoffice/embedded-media';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_EMBEDDED_MEDIA_MODAL } from '@umbraco-cms/backoffice/embedded-media';
 
 export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase {
@@ -76,12 +76,10 @@ export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase 
 	}
 
 	async #showModal(selectedElm: HTMLElement, embeddedMediaModalData: UmbEmbeddedMediaModalData) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalHandler = modalManager.open(this, UMB_EMBEDDED_MEDIA_MODAL, { data: embeddedMediaModalData });
+		const result = await umbOpenModal(this, UMB_EMBEDDED_MEDIA_MODAL, { data: embeddedMediaModalData }).catch(
+			() => undefined,
+		);
 
-		if (!modalHandler) return;
-
-		const result = await modalHandler.onSubmit();
 		if (!result) return;
 
 		this.#insertInEditor(result, selectedElm);
