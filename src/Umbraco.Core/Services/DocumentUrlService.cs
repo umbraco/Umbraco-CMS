@@ -1,6 +1,8 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -46,9 +48,22 @@ public class DocumentUrlService : IDocumentUrlService
 
         public required int LanguageId { get; set; }
 
-        public required string[] UrlSegments { get; set; }
+        public required IList<UrlSegment> UrlSegments { get; set; }
 
         public required bool IsDraft { get; set; }
+
+        public class UrlSegment
+        {
+            public UrlSegment(string segment, bool isPrimary)
+            {
+                Segment = segment;
+                IsPrimary = isPrimary;
+            }
+
+            public string Segment { get; }
+
+            public bool IsPrimary { get; }
+        }
     }
 
     /// <summary>
@@ -164,13 +179,19 @@ public class DocumentUrlService : IDocumentUrlService
                 {
                     DocumentKey = model.DocumentKey,
                     LanguageId = model.LanguageId,
-                    UrlSegments = [model.UrlSegment],
+                    UrlSegments = [new PublishedDocumentUrlSegments.UrlSegment(model.UrlSegment, model.IsPrimary)],
                     IsDraft = model.IsDraft
                 });
             }
             else
             {
-                existingCacheModel.UrlSegments = existingCacheModel.UrlSegments.Union([model.UrlSegment]).Distinct().ToArray();
+                IList<PublishedDocumentUrlSegments.UrlSegment> urlSegments = existingCacheModel.UrlSegments;
+                if (urlSegments.FirstOrDefault(x => x.Segment == model.UrlSegment) is null)
+                {
+                    urlSegments.Add(new PublishedDocumentUrlSegments.UrlSegment(model.UrlSegment, model.IsPrimary));
+                }
+
+                existingCacheModel.UrlSegments = urlSegments;
             }
         }
 
@@ -225,16 +246,6 @@ public class DocumentUrlService : IDocumentUrlService
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static string CreateCacheKey(Guid documentKey, string culture, bool isDraft) => $"{documentKey}|{culture}|{isDraft}".ToLowerInvariant();
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static PublishedDocumentUrlSegments CreateCacheValue(PublishedDocumentUrlSegment publishedDocumentUrlSegment, PublishedDocumentUrlSegments existingValue)
-        => new PublishedDocumentUrlSegments()
-        {
-            DocumentKey = publishedDocumentUrlSegment.DocumentKey,
-            LanguageId = publishedDocumentUrlSegment.LanguageId,
-            UrlSegments = existingValue.UrlSegments.Union([publishedDocumentUrlSegment.UrlSegment]).Distinct().ToArray(),
-            IsDraft = publishedDocumentUrlSegment.IsDraft
-        };
-
     /// <inheritdoc/>
     public string? GetUrlSegment(Guid documentKey, string culture, bool isDraft)
     {
@@ -243,7 +254,7 @@ public class DocumentUrlService : IDocumentUrlService
 
         _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegments? urlSegment);
 
-        return urlSegment?.UrlSegments.FirstOrDefault();
+        return urlSegment?.UrlSegments.FirstOrDefault(x => x.IsPrimary)?.Segment;
     }
 
     /// <inheritdoc/>
@@ -254,7 +265,7 @@ public class DocumentUrlService : IDocumentUrlService
 
         _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegments? urlSegments);
 
-        return urlSegments?.UrlSegments ?? Enumerable.Empty<string>();
+        return urlSegments?.UrlSegments.Select(x => x.Segment) ?? Enumerable.Empty<string>();
     }
 
     private void ThrowIfNotInitialized()
@@ -360,7 +371,9 @@ public class DocumentUrlService : IDocumentUrlService
                 {
                     DocumentKey = document.Key,
                     LanguageId = language.Id,
-                    UrlSegments = publishedUrlSegments.ToArray(),
+                    UrlSegments = publishedUrlSegments
+                        .Select((x, i) => new PublishedDocumentUrlSegments.UrlSegment(x, i == 0))
+                        .ToList(),
                     IsDraft = false
                 }, true);
             }
@@ -388,7 +401,9 @@ public class DocumentUrlService : IDocumentUrlService
             {
                 DocumentKey = document.Key,
                 LanguageId = language.Id,
-                UrlSegments = draftUrlSegments.ToArray(),
+                UrlSegments = draftUrlSegments
+                    .Select((x, i) => new PublishedDocumentUrlSegments.UrlSegment(x, i == 0))
+                    .ToList(),
                 IsDraft = true
             }, document.Trashed is false);
         }
@@ -405,14 +420,15 @@ public class DocumentUrlService : IDocumentUrlService
 
     private IEnumerable<PublishedDocumentUrlSegment> ConvertToPersistedModel(PublishedDocumentUrlSegments model)
     {
-        foreach (string urlSegment in model.UrlSegments)
+        foreach (PublishedDocumentUrlSegments.UrlSegment urlSegment in model.UrlSegments)
         {
             yield return new PublishedDocumentUrlSegment
             {
                 DocumentKey = model.DocumentKey,
                 LanguageId = model.LanguageId,
-                UrlSegment = urlSegment,
-                IsDraft = model.IsDraft
+                UrlSegment = urlSegment.Segment,
+                IsDraft = model.IsDraft,
+                IsPrimary = urlSegment.IsPrimary
             };
         }
     }
@@ -697,9 +713,9 @@ public class DocumentUrlService : IDocumentUrlService
                 break;
             }
 
-            if (_cache.TryGetValue(CreateCacheKey(ancestorOrSelfKey, cultureOrDefault, isDraft), out PublishedDocumentUrlSegments? publishedDocumentUrlSegments))
+            if (TryGetPrimaryUrlSegment(ancestorOrSelfKey, cultureOrDefault, isDraft, out string ? segment))
             {
-                urlSegments.AddRange(publishedDocumentUrlSegments.UrlSegments);
+                urlSegments.Add(segment);
             }
 
             if (foundDomain is not null)
@@ -837,11 +853,9 @@ public class DocumentUrlService : IDocumentUrlService
                     }
                 }
 
-                if (_cache.TryGetValue(
-                        CreateCacheKey(ancestorOrSelfKey, culture, false),
-                        out PublishedDocumentUrlSegments? publishedDocumentUrlSegments))
+                if (TryGetPrimaryUrlSegment(ancestorOrSelfKey, culture, false, out string? segment))
                 {
-                    urlSegments.AddRange(publishedDocumentUrlSegments.UrlSegments);
+                    urlSegments.Add(segment);
                 }
                 else
                 {
@@ -907,5 +921,23 @@ public class DocumentUrlService : IDocumentUrlService
         }
 
         return result;
+    }
+
+    private bool TryGetPrimaryUrlSegment(Guid documentKey, string culture, bool isDraft, [NotNullWhen(true)] out string? segment)
+    {
+        if (_cache.TryGetValue(
+            CreateCacheKey(documentKey, culture, isDraft),
+            out PublishedDocumentUrlSegments? publishedDocumentUrlSegments))
+        {
+            PublishedDocumentUrlSegments.UrlSegment? primaryUrlSegment = publishedDocumentUrlSegments.UrlSegments.FirstOrDefault(x => x.IsPrimary);
+            if (primaryUrlSegment is not null)
+            {
+                segment = primaryUrlSegment.Segment;
+                return true;
+            }
+        }
+
+        segment = null;
+        return false;
     }
 }

@@ -95,7 +95,8 @@ public class DocumentUrlRepository : IDocumentUrlRepository
             UrlSegment = dto.UrlSegment,
             DocumentKey = dto.UniqueId,
             LanguageId = dto.LanguageId,
-            IsDraft = dto.IsDraft
+            IsDraft = dto.IsDraft,
+            IsPrimary = dto.IsPrimary
         };
 
     private DocumentUrlDto BuildDto(PublishedDocumentUrlSegment model)
@@ -106,6 +107,7 @@ public class DocumentUrlRepository : IDocumentUrlRepository
             UniqueId = model.DocumentKey,
             LanguageId = model.LanguageId,
             IsDraft = model.IsDraft,
+            IsPrimary = model.IsPrimary,
         };
     }
 }

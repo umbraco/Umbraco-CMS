@@ -27,7 +27,7 @@ public interface IDocumentUrlService
     /// <param name="culture">The culture code.</param>
     /// <param name="isDraft">Whether to get the url of the draft or published document.</param>
     /// <returns>A URL segment for the document.</returns>
-    /// <remarks>If more than one segment is available, the first retrieved will be returned.</remarks>
+    /// <remarks>If more than one segment is available, the first retrieved and indicated as primary will be returned.</remarks>
     string? GetUrlSegment(Guid documentKey, string culture, bool isDraft);
 
     /// <summary>

@@ -32,4 +32,7 @@ public class DocumentUrlDto
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string UrlSegment { get; set; } = string.Empty;
 
+    [Column("isPrimary")]
+    public bool IsPrimary { get; set; }
+
 }
