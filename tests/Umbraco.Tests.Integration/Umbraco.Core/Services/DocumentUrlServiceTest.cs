@@ -17,6 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
 {
     protected IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
+
     protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
@@ -105,7 +106,7 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     // }
 
     [Test]
-    public async Task Trashed_documents_do_not_have_a_url_segment()
+    public async Task GetUrlSegment_For_Deleted_Document_Does_Not_Have_Url_Segment()
     {
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
@@ -117,7 +118,7 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     //TODO test with the urlsegment property value!
 
     [Test]
-    public async Task Deleted_documents_do_not_have_a_url_segment__Parent_deleted()
+    public async Task GetUrlSegment_For_Document_With_Parent_Deleted_Does_Not_Have_Url_Segment()
     {
         ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
 
@@ -131,7 +132,7 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public async Task Deleted_documents_do_not_have_a_url_segment()
+    public async Task GetUrlSegment_For_Published_Then_Deleted_Document_Does_Not_Have_Url_Segment()
     {
         ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
 
@@ -156,7 +157,7 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     [TestCase("/text-page-2", "en-US", false, ExpectedResult = null)]
     [TestCase("/text-page-2-custom", "en-US", false, ExpectedResult = SubPage2Key)] // Uses the segment registered by the custom IIUrlSegmentProvider that does not allow for more than one segment per document.
     [TestCase("/text-page-3", "en-US", false, ExpectedResult = SubPage3Key)]
-    public string? Expected_Routes(string route, string isoCode, bool loadDraft)
+    public string? GetDocumentKeyByRoute_Returns_Expected_Route(string route, string isoCode, bool loadDraft)
     {
         if (loadDraft is false)
         {
@@ -167,16 +168,16 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void No_Published_Route_when_not_published()
+    public void GetDocumentKeyByRoute_UnPublished_Documents_Have_No_Published_Route()
     {
         Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, true));
         Assert.IsNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false));
     }
 
     [Test]
-    public void Unpublished_Pages_Are_not_available()
+    public void GetDocumentKeyByRoute_Published_Then_Unpublished_Documents_Have_No_Published_Route()
     {
-        //Arrange
+        // Arrange
         ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         Assert.Multiple(() =>
@@ -187,7 +188,7 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
             Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false));
         });
 
-        //Act
+        // Act
         ContentService.Unpublish(Textpage );
 
         Assert.Multiple(() =>
@@ -204,10 +205,9 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     }
 
 
-    [Test]
     [TestCase("/text-page-1/sub-page-1", "en-US", true, ExpectedResult = "DF49F477-12F2-4E33-8563-91A7CC1DCDBB")]
     [TestCase("/text-page-1/sub-page-1", "en-US", false, ExpectedResult = "DF49F477-12F2-4E33-8563-91A7CC1DCDBB")]
-    public string? Expected_Routes_with_subpages(string route, string isoCode, bool loadDraft)
+    public string? GetDocumentKeyByRoute_Returns_Expected_Route_For_SubPages(string route, string isoCode, bool loadDraft)
     {
         // Create a subpage
         var subsubpage = ContentBuilder.CreateSimpleContent(ContentType, "Sub Page 1", Subpage.Id);
@@ -223,10 +223,9 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
     }
 
-    [Test]
     [TestCase("/second-root", "en-US", true, ExpectedResult = "8E21BCD4-02CA-483D-84B0-1FC92702E198")]
     [TestCase("/second-root", "en-US", false, ExpectedResult = "8E21BCD4-02CA-483D-84B0-1FC92702E198")]
-    public string? Second_root_cannot_hide_url(string route, string isoCode, bool loadDraft)
+    public string? GetDocumentKeyByRoute_Second_Root_Does_Not_Hide_Url(string route, string isoCode, bool loadDraft)
     {
         // Create a second root
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
@@ -243,10 +242,9 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
     }
 
-    [Test]
     [TestCase("/child-of-second-root", "en-US", true, ExpectedResult = "FF6654FB-BC68-4A65-8C6C-135567F50BD6")]
     [TestCase("/child-of-second-root", "en-US", false, ExpectedResult = "FF6654FB-BC68-4A65-8C6C-135567F50BD6")]
-    public string? Child_of_second_root_do_not_have_parents_url_as_prefix(string route, string isoCode, bool loadDraft)
+    public string? GetDocumentKeyByRoute_Child_Of_Second_Root_Does_Not_Have_Parents_Url_As_Prefix(string route, string isoCode, bool loadDraft)
     {
         // Create a second root
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
