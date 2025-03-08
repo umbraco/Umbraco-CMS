@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -16,6 +17,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Mock)]
 public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
 {
+    private const string SubSubPage2Key = "48AE405E-5142-4EBE-929F-55EB616F51F2";
+    private const string SubSubPage3Key = "AACF2979-3F53-4184-B071-BA34D3338497";
+
     protected IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
 
     protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();
@@ -37,9 +41,9 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
 
         public CustomUrlSegmentProviderBase(IShortStringHelper stringHelper) => _defaultProvider = new DefaultUrlSegmentProvider(stringHelper);
 
-        protected string? GetUrlSegment(IContentBase content, string? culture, Guid pageKey)
+        protected string? GetUrlSegment(IContentBase content, string? culture, params Guid[] pageKeys)
         {
-            if (content.Key != pageKey)
+            if (pageKeys.Contains(content.Key) is false)
             {
                 return null;
             }
@@ -63,7 +67,7 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
         public bool AllowAdditionalSegments => true;
 
         public string? GetUrlSegment(IContentBase content, string? culture = null)
-            => GetUrlSegment(content, culture, Guid.Parse(SubPageKey));
+            => GetUrlSegment(content, culture, Guid.Parse(SubPageKey), Guid.Parse(SubSubPage3Key));
     }
 
     /// <summary>
@@ -78,7 +82,7 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
         }
 
         public string? GetUrlSegment(IContentBase content, string? culture = null)
-            => GetUrlSegment(content, culture, Guid.Parse(SubPage2Key));
+            => GetUrlSegment(content, culture, Guid.Parse(SubPage2Key), Guid.Parse(SubSubPage2Key));
     }
 
     public override void Setup()
@@ -201,17 +205,32 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
             Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, true));
             Assert.IsNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false));
         });
-
     }
-
 
     [TestCase("/text-page-1/sub-page-1", "en-US", true, ExpectedResult = "DF49F477-12F2-4E33-8563-91A7CC1DCDBB")]
     [TestCase("/text-page-1/sub-page-1", "en-US", false, ExpectedResult = "DF49F477-12F2-4E33-8563-91A7CC1DCDBB")]
-    public string? GetDocumentKeyByRoute_Returns_Expected_Route_For_SubPages(string route, string isoCode, bool loadDraft)
+    public string? GetDocumentKeyByRoute_Returns_Expected_Route_For_SubPage(string route, string isoCode, bool loadDraft)
+        => ExecuteSubPageTest("DF49F477-12F2-4E33-8563-91A7CC1DCDBB", "Sub Page 1", route, isoCode, loadDraft);
+
+    [TestCase("/text-page-1/sub-page-2-custom", "en-US", true, ExpectedResult = SubSubPage2Key)]
+    [TestCase("/text-page-1/sub-page-2-custom", "en-US", false, ExpectedResult = SubSubPage2Key)]
+    [TestCase("/text-page-1/sub-page-2", "en-US", true, ExpectedResult = null)]
+    [TestCase("/text-page-1/sub-page-2", "en-US", false, ExpectedResult = null)]
+    public string? GetDocumentKeyByRoute_Returns_Expected_Route_For_SubPage_With_Terminating_Custom_Url_Provider(string route, string isoCode, bool loadDraft)
+        => ExecuteSubPageTest(SubSubPage2Key, "Sub Page 2", route, isoCode, loadDraft);
+
+    [TestCase("/text-page-1/sub-page-3-custom", "en-US", true, ExpectedResult = SubSubPage3Key)]
+    [TestCase("/text-page-1/sub-page-3-custom", "en-US", false, ExpectedResult = SubSubPage3Key)]
+    [TestCase("/text-page-1/sub-page-3", "en-US", true, ExpectedResult = SubSubPage3Key)]
+    [TestCase("/text-page-1/sub-page-3", "en-US", false, ExpectedResult = SubSubPage3Key)]
+    public string? GetDocumentKeyByRoute_Returns_Expected_Route_For_SubPage_With_Non_Terminating_Custom_Url_Provider(string route, string isoCode, bool loadDraft)
+        => ExecuteSubPageTest(SubSubPage3Key, "Sub Page 3", route, isoCode, loadDraft);
+
+    private string? ExecuteSubPageTest(string documentKey, string documentName, string route, string isoCode, bool loadDraft)
     {
         // Create a subpage
-        var subsubpage = ContentBuilder.CreateSimpleContent(ContentType, "Sub Page 1", Subpage.Id);
-        subsubpage.Key = new Guid("DF49F477-12F2-4E33-8563-91A7CC1DCDBB");
+        var subsubpage = ContentBuilder.CreateSimpleContent(ContentType, documentName, Subpage.Id);
+        subsubpage.Key = Guid.Parse(documentKey);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
         ContentService.Save(subsubpage, -1, contentSchedule);
 
@@ -220,7 +239,7 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
             ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
 
-        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
+        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode, null, loadDraft)?.ToString()?.ToUpper();
     }
 
     [TestCase("/second-root", "en-US", true, ExpectedResult = "8E21BCD4-02CA-483D-84B0-1FC92702E198")]
@@ -259,12 +278,21 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
         // Publish both the main root and the second root with descendants
         if (loadDraft is false)
         {
-
             ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
             ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
+    }
+
+    [TestCase(TextpageKey, "en-US", ExpectedResult = "/")]
+    [TestCase(SubPageKey, "en-US", ExpectedResult = "/text-page-1-custom")]  // Has non-terminating custom URL segment provider.
+    [TestCase(SubPage2Key, "en-US", ExpectedResult = "/text-page-2-custom")] // Has terminating custom URL segment provider.
+    [TestCase(SubPage3Key, "en-US", ExpectedResult = "/text-page-3")]
+    public string? GetLegacyRouteFormat_Returns_Expected_Route(string documentKey, string culture)
+    {
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        return DocumentUrlService.GetLegacyRouteFormat(Guid.Parse(documentKey), culture, false);
     }
 
 
