@@ -62,7 +62,7 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
     {
     }
 
-    public Task HandleAsync(RuntimeUnattendedUpgradeNotification notification, CancellationToken cancellationToken)
+    public async Task HandleAsync(RuntimeUnattendedUpgradeNotification notification, CancellationToken cancellationToken)
     {
         if (_runtimeState.RunUnattendedBootLogic())
         {
@@ -70,26 +70,26 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
             {
                 case RuntimeLevelReason.UpgradeMigrations:
                 {
-                    RunUpgrade(notification);
+                    await RunUpgradeAsync(notification);
 
                     // If we errored out when upgrading don't do anything.
                     if (notification.UnattendedUpgradeResult is RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors)
                     {
-                        return Task.CompletedTask;
+                        return;
                     }
 
                     // It's entirely possible that there's both a core upgrade and package migrations to run, so try and run package migrations too.
                     // but only if upgrade unattended is enabled.
                     if (_unattendedSettings.PackageMigrationsUnattended)
                     {
-                        RunPackageMigrations(notification);
+                        await RunPackageMigrationsAsync(notification);
                     }
                 }
 
                 break;
                 case RuntimeLevelReason.UpgradePackageMigrations:
                 {
-                    RunPackageMigrations(notification);
+                    await RunPackageMigrationsAsync(notification);
                 }
 
                 break;
@@ -97,11 +97,9 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
                 throw new InvalidOperationException("Invalid reason " + _runtimeState.Reason);
             }
         }
-
-        return Task.CompletedTask;
     }
 
-    private void RunPackageMigrations(RuntimeUnattendedUpgradeNotification notification)
+    private async Task RunPackageMigrationsAsync(RuntimeUnattendedUpgradeNotification notification)
     {
         if (_runtimeState.StartupState.TryGetValue(
                 RuntimeState.PendingPackageMigrationsStateKey,
@@ -127,7 +125,7 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
 
         try
         {
-            _packageMigrationRunner.RunPackagePlans(pendingMigrations);
+            await _packageMigrationRunner.RunPackagePlansAsync(pendingMigrations);
             notification.UnattendedUpgradeResult = RuntimeUnattendedUpgradeNotification.UpgradeResult
                 .PackageMigrationComplete;
         }
@@ -139,14 +137,14 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
         }
     }
 
-    private void RunUpgrade(RuntimeUnattendedUpgradeNotification notification)
+    private async Task RunUpgradeAsync(RuntimeUnattendedUpgradeNotification notification)
     {
         var plan = new UmbracoPlan(_umbracoVersion);
         using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Verbose) ? null : _profilingLogger.TraceDuration<UnattendedUpgrader>(
                    "Starting unattended upgrade.",
                    "Unattended upgrade completed."))
         {
-            DatabaseBuilder.Result? result = _databaseBuilder.UpgradeSchemaAndData(plan);
+            DatabaseBuilder.Result? result = await _databaseBuilder.UpgradeSchemaAndDataAsync(plan);
             if (result?.Success == false)
             {
                 var innerException = new UnattendedInstallException(

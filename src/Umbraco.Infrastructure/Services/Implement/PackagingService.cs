@@ -181,13 +181,13 @@ public class PackagingService : IPackagingService
     }
 
     /// <inheritdoc/>
-    public async Task<PagedModel<PackageDefinition>> GetCreatedPackagesAsync(int skip, int take)
+    public Task<PagedModel<PackageDefinition>> GetCreatedPackagesAsync(int skip, int take)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
         PackageDefinition[] packages = _createdPackages.GetAll().WhereNotNull().ToArray();
         var pagedModel = new PagedModel<PackageDefinition>(packages.Length, packages.Skip(skip).Take(take));
 
-        return pagedModel;
+        return Task.FromResult(pagedModel);
     }
 
     /// <inheritdoc/>

@@ -483,8 +483,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    protected override async Task<IdentityUserLogin<string>?> FindUserLoginAsync(string userId, string loginProvider,
-        string providerKey, CancellationToken cancellationToken)
+    protected override async Task<IdentityUserLogin<string>?> FindUserLoginAsync(string userId, string loginProvider, string providerKey, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -502,15 +501,14 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         MemberIdentityUser? user = await FindUserAsync(userId, cancellationToken);
         if (user?.Id is null)
         {
-            return await Task.FromResult<IdentityUserLogin<string>?>(null);
+            return null;
         }
 
         IList<UserLoginInfo> logins = await GetLoginsAsync(user, cancellationToken);
-        UserLoginInfo? found =
-            logins.FirstOrDefault(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider);
+        UserLoginInfo? found = logins.FirstOrDefault(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider);
         if (found is null)
         {
-            return await Task.FromResult<IdentityUserLogin<string>?>(null);
+            return null;
         }
 
         return new IdentityUserLogin<string>
@@ -524,8 +522,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    protected override Task<IdentityUserLogin<string>?> FindUserLoginAsync(string loginProvider, string providerKey,
-        CancellationToken cancellationToken)
+    protected override Task<IdentityUserLogin<string>?> FindUserLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();

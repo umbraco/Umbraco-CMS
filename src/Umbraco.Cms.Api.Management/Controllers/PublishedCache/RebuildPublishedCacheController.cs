@@ -15,7 +15,7 @@ public class RebuildPublishedCacheController : PublishedCacheControllerBase
     [HttpPost("rebuild")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Rebuild(CancellationToken cancellationToken)
+    public Task<IActionResult> Rebuild(CancellationToken cancellationToken)
     {
         if (_databaseCacheRebuilder.IsRebuilding())
         {

@@ -159,23 +159,23 @@ public class DomainService : RepositoryService, IDomainService
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(Guid contentKey, bool includeWildcards)
+    public Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(Guid contentKey, bool includeWildcards)
     {
         IContent? content = _contentService.GetById(contentKey);
         if (content == null)
         {
-            return await Task.FromResult(Enumerable.Empty<IDomain>());
+            return Task.FromResult(Enumerable.Empty<IDomain>());
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return _domainRepository.GetAssignedDomains(content.Id, includeWildcards);
+        return Task.FromResult(_domainRepository.GetAssignedDomains(content.Id, includeWildcards));
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<IDomain>> GetAllAsync(bool includeWildcards)
+    public Task<IEnumerable<IDomain>> GetAllAsync(bool includeWildcards)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return await Task.FromResult(_domainRepository.GetAll(includeWildcards));
+        return Task.FromResult(_domainRepository.GetAll(includeWildcards));
     }
 
     /// <inheritdoc />

@@ -50,7 +50,7 @@ public class ContentSettings
     /// <summary>
     ///     Gets or sets a value for the collection of error pages.
     /// </summary>
-    public ContentErrorPage[] Error404Collection { get; set; } = Array.Empty<ContentErrorPage>();
+    public ISet<ContentErrorPage> Error404Collection { get; set; } = new HashSet<ContentErrorPage>();
 
     /// <summary>
     ///     Gets or sets a value for the preview badge mark-up.
@@ -134,18 +134,18 @@ public class ContentSettings
     /// <summary>
     ///     Gets or sets a value for the collection of file extensions that are allowed for upload.
     /// </summary>
-    public string[] AllowedUploadedFileExtensions { get; set; } = Array.Empty<string>();
+    public ISet<string> AllowedUploadedFileExtensions { get; set; } = new HashSet<string>();
 
     /// <summary>
     ///     Gets or sets a value for the collection of file extensions that are disallowed for upload.
     /// </summary>
     [DefaultValue(StaticDisallowedUploadFiles)]
-    public string[] DisallowedUploadedFileExtensions { get; set; } = StaticDisallowedUploadFiles.Split(',');
+    public ISet<string> DisallowedUploadedFileExtensions { get; set; } = new HashSet<string>(StaticDisallowedUploadFiles.Split(Constants.CharArrays.Comma));
 
     /// <summary>
     /// Gets or sets the allowed external host for media. If empty only relative paths are allowed.
     /// </summary>
-    public string[] AllowedMediaHosts { get; set; } = Array.Empty<string>();
+    public ISet<string> AllowedMediaHosts { get; set; } = new HashSet<string>();
 
     /// <summary>
     /// Gets or sets a value indicating whether to show domain warnings.
