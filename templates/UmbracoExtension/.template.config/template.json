@@ -140,14 +140,14 @@
     {
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
       "args": {
-        "executable": "powershell",
-        "args": "cd Client;npm install;npm run build;",
+        "executable": "npm-scripts.cmd",
+        "args": "",
         "redirectStandardError": false,
         "redirectStandardOutput": false
       },
       "manualInstructions": [
         {
-          "text": "From the 'Client' folder run 'npm install' and then 'npm run build'"
+          "text": "From the 'YOUR_PACKAGE_NAME' folder run 'npm install' and then 'npm run build'"
         }
       ],
       "continueOnError": true,
