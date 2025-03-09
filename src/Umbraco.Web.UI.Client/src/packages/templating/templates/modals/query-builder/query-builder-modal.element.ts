@@ -8,7 +8,7 @@ import type {
 } from './query-builder-modal.token.js';
 import type { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, query, queryAll, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement, UMB_MODAL_MANAGER_CONTEXT, umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type {
 	TemplateQueryResultResponseModel,
 	TemplateQuerySettingsResponseModel,

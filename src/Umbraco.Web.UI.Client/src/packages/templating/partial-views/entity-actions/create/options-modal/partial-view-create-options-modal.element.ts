@@ -30,12 +30,10 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 	async #onCreateFolderClick(event: PointerEvent) {
 		event.stopPropagation();
 
-		try {
-			await this.#createFolderAction?.execute();
-			this._submitModal();
-		} catch (error) {
-			return;
-		}
+		await this.#createFolderAction
+			?.execute()
+			.then(() => this._submitModal())
+			.catch(() => undefined);
 	}
 
 	async #onCreateFromSnippetClick(event: PointerEvent) {

@@ -68,13 +68,12 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 			throw new Error('No API found');
 		}
 
-		try {
-			await controller.api.execute();
-		} catch (error) {
-			return;
-		}
-
-		this._submitModal();
+		controller.api
+			.execute()
+			.then(() => {
+				this._submitModal();
+			})
+			.catch(() => {});
 	}
 
 	async #onNavigate(event: Event, href: string | undefined) {

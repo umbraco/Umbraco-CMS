@@ -6,7 +6,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
-import { UMB_MODAL_MANAGER_CONTEXT, umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { ManifestBlockEditorCustomView } from '@umbraco-cms/backoffice/block-custom-view';
 
 @customElement('umb-block-type-custom-view-guide')

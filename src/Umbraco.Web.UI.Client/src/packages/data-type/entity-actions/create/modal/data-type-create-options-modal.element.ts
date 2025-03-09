@@ -51,12 +51,10 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 	async #onCreateFolderClick(event: PointerEvent) {
 		event.stopPropagation();
 
-		try {
-			await this.#createFolderAction?.execute();
-			this._submitModal();
-		} catch (error) {
-			return;
-		}
+		await this.#createFolderAction
+			?.execute()
+			.then(() => this._submitModal())
+			.catch(() => undefined);
 	}
 
 	override render() {

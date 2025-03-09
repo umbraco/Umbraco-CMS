@@ -2,7 +2,7 @@ import { UmbUnpublishDocumentEntityAction } from '../entity-action/index.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_UNPUBLISH_MODAL } from '../../../constants.js';
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
-import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -54,8 +54,6 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 			culture: language.unique,
 			segment: null,
 		}));
-
-		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		if (!eventContext) {

@@ -18,7 +18,7 @@ import type {
 	UmbWorkspaceViewElement,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
-import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 

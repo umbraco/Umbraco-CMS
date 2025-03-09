@@ -104,11 +104,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		}
 
 		event.stopPropagation();
-		try {
-			await this._firstActionApi?.execute();
-		} catch (error) {
-			return;
-		}
+		await this._firstActionApi?.execute().catch(() => {});
 	}
 
 	#onActionExecuted() {

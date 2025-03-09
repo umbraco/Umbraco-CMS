@@ -29,12 +29,12 @@ export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
 	async #onCreateFolderClick(event: PointerEvent) {
 		event.stopPropagation();
 
-		try {
-			await this.#createFolderAction?.execute();
-			this._submitModal();
-		} catch (error) {
-			return;
-		}
+		this.#createFolderAction
+			?.execute()
+			.then(() => {
+				this._submitModal();
+			})
+			.catch(() => {});
 	}
 
 	// close the modal when navigating to data type

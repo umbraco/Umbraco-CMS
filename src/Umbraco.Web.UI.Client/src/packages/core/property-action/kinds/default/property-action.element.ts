@@ -34,11 +34,7 @@ export class UmbPropertyActionElement<
 	async #onClickLabel(event: UUIMenuItemEvent) {
 		if (!this._href) {
 			event.stopPropagation();
-			try {
-				await this.#api?.execute();
-			} catch (error) {
-				return;
-			}
+			await this.#api?.execute().catch(() => {});
 		}
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}

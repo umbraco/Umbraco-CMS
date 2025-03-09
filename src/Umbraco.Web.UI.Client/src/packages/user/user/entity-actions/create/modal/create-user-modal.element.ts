@@ -6,7 +6,7 @@ import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-grou
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-create-user-modal')
