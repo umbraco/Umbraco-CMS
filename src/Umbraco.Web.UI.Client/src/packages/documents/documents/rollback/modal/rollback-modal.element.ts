@@ -216,6 +216,9 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		}
 
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!actionEventContext) {
+			throw new Error('Action event context not found');
+		}
 
 		const reloadStructureEvent = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 		actionEventContext.dispatchEvent(reloadStructureEvent);

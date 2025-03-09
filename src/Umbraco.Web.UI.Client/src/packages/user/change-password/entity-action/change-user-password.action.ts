@@ -21,6 +21,7 @@ export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<never
 				},
 			},
 		}).catch(() => undefined);
+		if (!data) return;
 
 		const currentUserContext = await this.getContext(UMB_CURRENT_USER_CONTEXT);
 		if (!currentUserContext) {

@@ -34,6 +34,9 @@ export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbWorkspaceAction
 
 	override async execute() {
 		const workspaceContext = await this.getContext(UMB_DOCUMENT_WORKSPACE_CONTEXT);
+		if (!workspaceContext) {
+			throw new Error('Document workspace context not found');
+		}
 		workspaceContext.saveAndPreview();
 	}
 }
