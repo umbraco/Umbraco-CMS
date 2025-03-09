@@ -33,7 +33,7 @@ export class UmbBlockGridManagerContext<
 		return this.#inlineEditingMode.getValue();
 	}
 
-	#initAppUrl: Promise<void>;
+	#initAppUrl: Promise<unknown>;
 
 	#serverUrl?: string;
 
@@ -87,9 +87,9 @@ export class UmbBlockGridManagerContext<
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.#initAppUrl = this.getContext(UMB_APP_CONTEXT).then((appContext) => {
+		this.#initAppUrl = this.consumeContext(UMB_APP_CONTEXT, (appContext) => {
 			this.#serverUrl = appContext.getServerUrl();
-		});
+		}).asPromise();
 	}
 	/**
 	 * @deprecated Use createWithPresets instead. Will be removed in v.17.

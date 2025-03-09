@@ -133,6 +133,9 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 					propContextConsumer.asPromise(),
 					this.#initPromise,
 				]);
+				if (!contentContext || !propContext) {
+					throw new Error('Could not get content or property context');
+				}
 				const propertyEditorName = this.#propertyEditorUIs.find((ui) => ui.alias === params.uiAlias)?.name;
 				const dataTypeName = `${contentContext?.getName() ?? ''} - ${propContext.getName() ?? ''} - ${propertyEditorName}`;
 

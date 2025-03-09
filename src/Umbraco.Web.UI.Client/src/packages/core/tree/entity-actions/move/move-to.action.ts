@@ -31,6 +31,7 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 
 	async #reloadMenu() {
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!actionEventContext) throw new Error('Action Event Context is not available');
 		const event = new UmbRequestReloadStructureForEntityEvent({
 			unique: this.args.unique,
 			entityType: this.args.entityType,

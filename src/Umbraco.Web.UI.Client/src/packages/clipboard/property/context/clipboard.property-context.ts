@@ -99,6 +99,9 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 		propertyEditorUiAlias: string;
 	}): Promise<UmbClipboardEntryDetailModel | undefined> {
 		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
+		if (!clipboardContext) {
+			throw new Error('Clipboard context is required');
+		}
 
 		const copyValueResolver = new UmbClipboardCopyPropertyValueTranslatorValueResolver(this);
 		const values = await copyValueResolver.resolve(args.propertyValue, args.propertyEditorUiAlias);
@@ -129,7 +132,11 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 
 		const pasteTranslatorManifests = this.getPasteTranslatorManifests(args.propertyEditorUiAlias);
 		const propertyEditorUiManifest = await this.#findPropertyEditorUiManifest(args.propertyEditorUiAlias);
-		const config = (await this.getContext(UMB_PROPERTY_CONTEXT)).getConfig();
+		const config = (await this.getContext(UMB_PROPERTY_CONTEXT))?.getConfig();
+
+		if (!config) {
+			throw new Error('Property context is required');
+		}
 
 		const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
@@ -223,6 +230,9 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 		}
 
 		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
+		if (!clipboardContext) {
+			throw new Error('Clipboard context is required');
+		}
 		const entry = await clipboardContext.read(clipboardEntryUnique);
 
 		if (!entry) {

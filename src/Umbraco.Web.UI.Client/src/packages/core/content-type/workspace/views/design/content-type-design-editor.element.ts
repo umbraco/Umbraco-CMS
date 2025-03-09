@@ -18,7 +18,7 @@ import type {
 	UmbWorkspaceViewElement,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
-import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
@@ -367,15 +367,13 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			isNew: this.#workspaceContext.getIsNew()!,
 		};
 
-		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManagerContext.open(this, UMB_COMPOSITION_PICKER_MODAL, {
+		const value = await umbOpenModal(this, UMB_COMPOSITION_PICKER_MODAL, {
 			data: compositionConfiguration,
-		});
-		await modalContext?.onSubmit();
+		}).catch(() => undefined);
 
-		if (!modalContext?.value) return;
+		if (!value) return;
 
-		const compositionIds = modalContext.getValue().selection;
+		const compositionIds = value.selection;
 
 		this.#workspaceContext?.setCompositions(
 			compositionIds.map((unique) => ({ contentType: { unique }, compositionType: CompositionTypeModel.COMPOSITION })),

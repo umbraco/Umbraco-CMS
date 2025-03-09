@@ -3,7 +3,6 @@ import type { UmbDocumentItemModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
@@ -23,7 +22,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	#propertyDataSetCulture?: UmbVariantId;
 	#data?: DataType | undefined;
 
-	#init: Promise<[UmbAppLanguageContext]>;
+	#init: Promise<unknown>;
 
 	#unique = new UmbStringState(undefined);
 	public readonly unique = this.#unique.asObservable();
@@ -47,12 +46,12 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 		super(host);
 
 		// We do not depend on this context because we know is it only available in some cases
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-			this.#propertyDataSetCulture = context.getVariantId();
-			this.#setVariantAwareValues();
-		});
-
 		this.#init = Promise.all([
+			this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
+				this.#propertyDataSetCulture = context.getVariantId();
+				this.#setVariantAwareValues();
+			}).asPromise(),
+
 			this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (context) => {
 				this.observe(context.appLanguageCulture, (culture) => {
 					this.#appCulture = culture;

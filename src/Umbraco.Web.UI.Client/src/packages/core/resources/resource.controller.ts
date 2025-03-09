@@ -108,6 +108,9 @@ export class UmbResourceController extends UmbControllerBase {
 					case 401: {
 						// See if we can get the UmbAuthContext and let it know the user is timed out
 						const authContext = await this.getContext(UMB_AUTH_CONTEXT);
+						if (!authContext) {
+							throw new Error('Could not get the auth context');
+						}
 						authContext.timeOut();
 						break;
 					}
