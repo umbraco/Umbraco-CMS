@@ -176,6 +176,9 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		}
 
 		const context = await this.getContext(UMB_PROPERTY_CONTEXT);
+		if (!context) {
+			throw new Error('Property context not found.');
+		}
 
 		// TODO: We should most likely consume already, in this way I avoid having the reset this consumption.
 		context.setValue(appendToFrozenArray(context.getValue() ?? [], this.#data.getValue(), (x) => x?.key));
