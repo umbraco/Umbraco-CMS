@@ -87,6 +87,8 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 						this.#setValue(tmpValue);
 						this.#syncViewModel();
 					}
+
+					this.requestUpdate('_extensions');
 				},
 				'_observeBlocks',
 			);

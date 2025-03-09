@@ -23,6 +23,8 @@ public class ContentSettings
     internal const string StaticLoginLogoImage = "assets/logo_light.svg";
     internal const string StaticLoginLogoImageAlternative = "assets/logo_dark.svg";
     internal const string StaticBackOfficeLogo = "assets/logo.svg";
+    internal const string StaticBackOfficeLogoAlternative = "assets/logo_blue.svg";
+    internal const bool StaticHideBackOfficeLogo = false;
     internal const bool StaticDisableDeleteWhenReferenced = false;
     internal const bool StaticDisableUnpublishWhenReferenced = false;
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
@@ -87,8 +89,24 @@ public class ContentSettings
     /// <summary>
     ///     Gets or sets a value for the path to the backoffice logo.
     /// </summary>
+    /// <remarks>The alternative version of this logo can be found at <see cref="BackOfficeLogoAlternative"/>.</remarks>
     [DefaultValue(StaticBackOfficeLogo)]
     public string BackOfficeLogo { get; set; } = StaticBackOfficeLogo;
+
+    /// <summary>
+    ///     Gets or sets a value for the path to the alternative backoffice logo, which can be shown
+    ///     on top of a light background.
+    /// </summary>
+    /// <remarks>This is the alternative version to the regular logo found at <see cref="BackOfficeLogo"/>.</remarks>
+    [DefaultValue(StaticBackOfficeLogoAlternative)]
+    public string BackOfficeLogoAlternative { get; set; } = StaticBackOfficeLogoAlternative;
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.
+    /// </summary>
+    [DefaultValue(StaticHideBackOfficeLogo)]
+    [Obsolete("This setting is no longer used and will be removed in future versions. An alternative BackOffice logo can be set using the BackOfficeLogo setting.")]
+    public bool HideBackOfficeLogo { get; set; } = StaticHideBackOfficeLogo;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to disable the deletion of items referenced by other items.

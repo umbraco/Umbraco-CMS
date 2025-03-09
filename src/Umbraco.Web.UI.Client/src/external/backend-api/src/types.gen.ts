@@ -2064,6 +2064,10 @@ export type PublishedDocumentResponseModel = {
     isTrashed: boolean;
 };
 
+export type RebuildStatusModel = {
+    isRebuilding: boolean;
+};
+
 export enum RedirectStatusModel {
     ENABLED = 'Enabled',
     DISABLED = 'Disabled'
@@ -3536,6 +3540,7 @@ export type PutDocumentTypeByIdResponse = (string);
 
 export type GetDocumentTypeByIdAllowedChildrenData = {
     id: string;
+    parentContentKey?: string;
     skip?: number;
     take?: number;
 };
@@ -4141,6 +4146,7 @@ export type PutMediaTypeByIdResponse = (string);
 
 export type GetMediaTypeByIdAllowedChildrenData = {
     id: string;
+    parentContentKey?: string;
     skip?: number;
     take?: number;
 };
@@ -4613,6 +4619,8 @@ export type GetPropertyTypeIsUsedData = {
 export type GetPropertyTypeIsUsedResponse = (boolean);
 
 export type PostPublishedCacheRebuildResponse = (string);
+
+export type GetPublishedCacheRebuildStatusResponse = ((RebuildStatusModel));
 
 export type PostPublishedCacheReloadResponse = (string);
 

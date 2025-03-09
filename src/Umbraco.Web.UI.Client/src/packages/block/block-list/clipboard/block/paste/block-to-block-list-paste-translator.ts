@@ -35,19 +35,19 @@ export class UmbBlockToBlockListClipboardPastePropertyValueTranslator
 
 	/**
 	 * Checks if the clipboard entry value is compatible with the config.
-	 * @param {UmbBlockClipboardEntryValueModel} value - The block clipboard entry value.
+	 * @param {UmbBlockListValueModel} propertyValue - The property value
 	 * @param {*} config - The Property Editor config.
 	 * @returns {Promise<boolean>} - Whether the clipboard entry value is compatible with the config.
 	 * @memberof UmbBlockToBlockListClipboardPastePropertyValueTranslator
 	 */
 	async isCompatibleValue(
-		value: UmbBlockClipboardEntryValueModel,
+		propertyValue: UmbBlockListValueModel,
 		// TODO: Replace any with the correct type.
 		config: Array<{ alias: string; value: [{ contentElementTypeKey: string }] }>,
 	): Promise<boolean> {
 		const allowedBlockContentTypes =
 			config.find((c) => c.alias === 'blocks')?.value.map((b) => b.contentElementTypeKey) ?? [];
-		const blockContentTypes = value.contentData.map((c) => c.contentTypeKey);
+		const blockContentTypes = propertyValue.contentData.map((c) => c.contentTypeKey);
 		return blockContentTypes?.every((b) => allowedBlockContentTypes.includes(b)) ?? false;
 	}
 }

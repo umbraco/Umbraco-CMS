@@ -299,7 +299,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     {
         _appCaches.RuntimeCache.Clear();
         _appCaches.IsolatedCaches.ClearAllCaches();
-        _databaseCacheRebuilder.Rebuild();
+        _databaseCacheRebuilder.Rebuild(false);
         _distributedCache.RefreshAllPublishedSnapshot();
     }
 

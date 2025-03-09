@@ -26,7 +26,7 @@ test('can update preset value state', async ({umbracoApi, umbracoUi}) => {
   };
 
   // Act
-  await umbracoUi.dataType.clickPresetValueSlider();
+  await umbracoUi.dataType.clickPresetValueToggle();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
@@ -42,7 +42,7 @@ test('can update show toggle labels', async ({umbracoApi, umbracoUi}) => {
   };
 
   // Act
-  await umbracoUi.dataType.clickShowToggleLabelsSlider();
+  await umbracoUi.dataType.clickShowToggleLabelsToggle();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
