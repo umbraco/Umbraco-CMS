@@ -317,20 +317,6 @@ public class NotificationService : INotificationService
 
     #region private methods
 
-    /// <summary>
-    ///     Sends the notification
-    /// </summary>
-    /// <param name="performingUser"></param>
-    /// <param name="mailingUser"></param>
-    /// <param name="content"></param>
-    /// <param name="oldDoc"></param>
-    /// <param name="actionName">
-    ///     The action readable name - currently an action is just a single letter, this is the name
-    ///     associated with the letter
-    /// </param>
-    /// <param name="siteUri"></param>
-    /// <param name="createSubject">Callback to create the mail subject</param>
-    /// <param name="createBody">Callback to create the mail body</param>
     private NotificationRequest CreateNotificationRequest(
         IUser performingUser,
         IUser mailingUser,
@@ -341,131 +327,32 @@ public class NotificationService : INotificationService
         Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
         Func<(IUser user, NotificationEmailBodyParams body, bool isHtml), string> createBody)
     {
-        if (performingUser == null)
-        {
-            throw new ArgumentNullException("performingUser");
-        }
+        ValidateParameters(performingUser, mailingUser, content, siteUri, createSubject, createBody);
 
-        if (mailingUser == null)
-        {
-            throw new ArgumentNullException("mailingUser");
-        }
+        var summary = BuildSummary(content, oldDoc);
 
-        if (content == null)
-        {
-            throw new ArgumentNullException("content");
-        }
-
-        if (siteUri == null)
-        {
-            throw new ArgumentNullException("siteUri");
-        }
-
-        if (createSubject == null)
-        {
-            throw new ArgumentNullException("createSubject");
-        }
-
-        if (createBody == null)
-        {
-            throw new ArgumentNullException("createBody");
-        }
-
-        // build summary
-        var summary = new StringBuilder();
-
-        if (content.ContentType.VariesByNothing())
-        {
-            if (!_contentSettings.Notifications.DisableHtmlEmail)
-            {
-                // create the HTML summary for invariant content
-
-                // list all of the property values like we used to
-                summary.Append("<table style=\"width: 100 %; \">");
-                foreach (IProperty p in content.Properties)
-                {
-                    // TODO: doesn't take into account variants
-                    var newText = p.GetValue() != null ? p.GetValue()?.ToString() : string.Empty;
-                    var oldText = newText;
-
-                    // check if something was changed and display the changes otherwise display the fields
-                    if (oldDoc?.Properties.Contains(p.PropertyType.Alias) ?? false)
-                    {
-                        IProperty? oldProperty = oldDoc.Properties[p.PropertyType.Alias];
-                        oldText = oldProperty?.GetValue() != null ? oldProperty.GetValue()?.ToString() : string.Empty;
-
-                        // replace HTML with char equivalent
-                        ReplaceHtmlSymbols(ref oldText);
-                        ReplaceHtmlSymbols(ref newText);
-                    }
-
-                    // show the values
-                    summary.Append("<tr>");
-                    summary.Append(
-                        "<th style='text-align: left; vertical-align: top; width: 25%;border-bottom: 1px solid #CCC'>");
-                    summary.Append(p.PropertyType.Name);
-                    summary.Append("</th>");
-                    summary.Append("<td style='text-align: left; vertical-align: top;border-bottom: 1px solid #CCC'>");
-                    summary.Append(newText);
-                    summary.Append("</td>");
-                    summary.Append("</tr>");
-                }
-
-                summary.Append("</table>");
-            }
-        }
-        else if (content.ContentType.VariesByCulture())
-        {
-            // it's variant, so detect what cultures have changed
-            if (!_contentSettings.Notifications.DisableHtmlEmail)
-            {
-                // Create the HTML based summary (ul of culture names)
-                IEnumerable<string>? culturesChanged = content.CultureInfos?.Values.Where(x => x.WasDirty())
-                    .Select(x => x.Culture)
-                    .Select(_localizationService.GetLanguageByIsoCode)
-                    .WhereNotNull()
-                    .Select(x => x.CultureName);
-                summary.Append("<ul>");
-                if (culturesChanged is not null)
-                {
-                    foreach (var culture in culturesChanged)
-                    {
-                        summary.Append("<li>");
-                        summary.Append(culture);
-                        summary.Append("</li>");
-                    }
-                }
-
-                summary.Append("</ul>");
-            }
-            else
-            {
-                // Create the text based summary (csv of culture names)
-                var culturesChanged = string.Join(", ", content.CultureInfos!.Values.Where(x => x.WasDirty())
-                    .Select(x => x.Culture)
-                    .Select(_localizationService.GetLanguageByIsoCode)
-                    .WhereNotNull()
-                    .Select(x => x.CultureName));
-
-                summary.Append("'");
-                summary.Append(culturesChanged);
-                summary.Append("'");
-            }
-        }
-        else
-        {
-            // not supported yet...
-            throw new NotSupportedException();
-        }
-
-        var protocol = _globalSettings.UseHttps ? "https" : "http";
+        var bodyVars = CreateBodyVariables(performingUser, mailingUser, content, actionName, siteUri, summary);
 
         var subjectVars = new NotificationEmailSubjectParams(
             string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(Constants.System.DefaultUmbracoPath)),
             actionName,
             content.Name);
 
-        var bodyVars = new NotificationEmailBodyParams(
+        var fromMail = _contentSettings.Notifications.Email ?? _globalSettings.Smtp?.From;
+
+        var subject = createSubject((mailingUser, subjectVars));
+        var (body, isBodyHtml) = CreateEmailBody(mailingUser, bodyVars, createBody, siteUri);
+
+        var mail = new EmailMessage(fromMail, mailingUser.Email, subject, body, isBodyHtml);
+        return new NotificationRequest(mail, actionName, mailingUser.Name, mailingUser.Email);
+    }
+
+    private NotificationEmailBodyParams CreateBodyVariables(
+        IUser performingUser, IUser mailingUser, IContent content, string? actionName, Uri siteUri, string summary)
+    {
+        var protocol = _globalSettings.UseHttps ? "https" : "http";
+
+        return new NotificationEmailBodyParams(
             mailingUser.Name,
             actionName,
             content.Name,
@@ -473,51 +360,38 @@ public class NotificationService : INotificationService
             string.Format(
                 "{2}://{0}/{1}",
                 string.Concat(siteUri.Authority),
-
-                // TODO: RE-enable this so we can have a nice URL
-                /*umbraco.library.NiceUrl(documentObject.Id))*/
                 string.Concat(content.Id, ".aspx"),
-                protocol),
+                protocol
+            ),
             performingUser.Name,
             string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(Constants.System.DefaultUmbracoPath)),
-            summary.ToString());
+            summary
+        );
+    }
 
-        var fromMail = _contentSettings.Notifications.Email ?? _globalSettings.Smtp?.From;
+    private void Enqueue(NotificationRequest notification)
+    {
+        Queue.Add(notification);
+        if (_running) return;
 
-        var subject = createSubject((mailingUser, subjectVars));
-        var body = string.Empty;
-        var isBodyHtml = false;
-
-        if (_contentSettings.Notifications.DisableHtmlEmail)
+        lock (Locker)
         {
-            body = createBody((user: mailingUser, body: bodyVars, false));
-        }
-        else
-        {
-            isBodyHtml = true;
-            body =
-                string.Concat(
-                    @"<html><head>
-</head>
-<body style='font-family: Trebuchet MS, arial, sans-serif; font-color: black;'>
-",
-                    createBody((user: mailingUser, body: bodyVars, true)));
-        }
+            if (_running) return;
 
-        // nh, issue 30724. Due to hardcoded http strings in resource files, we need to check for https replacements here
-        // adding the server name to make sure we don't replace external links
-        if (_globalSettings.UseHttps && string.IsNullOrEmpty(body) == false)
-        {
-            var serverName = siteUri.Host;
-            body = body.Replace(
-                $"http://{serverName}",
-                $"https://{serverName}");
+            ProcessQueue();
+            _running = true;
         }
+    }
 
-        // create the mail message
-        var mail = new EmailMessage(fromMail, mailingUser.Email, subject, body, isBodyHtml);
+    private void ProcessQueue()
+    {
+        Process(Queue);
+    }
 
-        return new NotificationRequest(mail, actionName, mailingUser.Name, mailingUser.Email);
+    private string ReplaceLinks(string text, Uri siteUri)
+    {
+        var domain = $"{(_globalSettings.UseHttps ? "https" : "http") }://{siteUri.Authority}/";
+        return text.Replace("href=\"/", $"href=\"{domain}").Replace("src=\"/", $"src=\"{domain}");
     }
 
     private string ReplaceLinks(string text, Uri siteUri)
