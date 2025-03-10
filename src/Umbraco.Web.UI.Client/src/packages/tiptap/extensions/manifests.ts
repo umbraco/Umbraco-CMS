@@ -402,6 +402,18 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.Anchor',
+		name: 'Anchor Tiptap Extension',
+		api: () => import('./toolbar/anchor.tiptap-toolbar-api.js'),
+		meta: {
+			alias: 'anchor',
+			icon: 'icon-anchor',
+			label: '#tiptap_anchor',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Blockquote',
 		name: 'Blockquote Tiptap Extension',
 		api: () => import('./toolbar/blockquote.tiptap-toolbar-api.js'),
@@ -580,6 +592,18 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 				{ label: '26pt', data: '26pt;' },
 				{ label: '48pt', data: '48pt;' },
 			],
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.CharacterMap',
+		name: 'Character Map Tiptap Extension',
+		api: () => import('./toolbar/character-map.tiptap-toolbar-api.js'),
+		meta: {
+			alias: 'umbCharacterMap',
+			icon: 'icon-omega',
+			label: '#tiptap_charmap',
 		},
 	},
 ];
