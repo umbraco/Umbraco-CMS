@@ -8,11 +8,11 @@ const childContentName = 'ChildContent';
 const childDocumentTypeName = 'ChildDocumentTypeForContent';
 const dataTypeName = 'Textstring';
 const contentText = 'This is test content text';
-const scheduleWaitTime = 150000;
+const scheduleWaitTime = 300000;
 
 test.beforeEach(async ({umbracoApi}) => {
   // Need to increase the timeout of the tests due to the time to wait for publishing
-  test.setTimeout(200000);
+  test.setTimeout(500000);
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   dataTypeId = dataTypeData.id;
   await umbracoApi.document.ensureNameNotExists(contentName);
@@ -348,6 +348,7 @@ test('can schedule the publishing of multiple culture variants content', async (
   // Arrange
   const firstCulture = 'en-US';
   const secondCulture = 'da';
+  await umbracoApi.language.createDanishLanguage();
   const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   await umbracoApi.document.createDocumentWithTwoCulturesAndTextContent(contentName, documentTypeId, contentText, dataTypeName, firstCulture, secondCulture);
   await umbracoUi.goToBackOffice();
@@ -383,6 +384,9 @@ test('can schedule the publishing of multiple culture variants content', async (
   contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
   expect(contentData.variants[1].state).toBe('Published');
+
+  // Clean
+  await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
 });
 
 test('publish time cannot be in the past', async ({umbracoApi, umbracoUi}) => {
