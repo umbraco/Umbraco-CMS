@@ -87,7 +87,8 @@ export class UmbTiptapRichTextEssentialsExtensionApi extends UmbTiptapExtensionA
 
 		span[data-umb-anchor] {
 			&.ProseMirror-selectednode {
-				background-color: var(--uui-color-background);
+				border-radius: var(--uui-border-radius);
+				outline: 2px solid var(--uui-color-selected);
 			}
 
 			uui-icon {
