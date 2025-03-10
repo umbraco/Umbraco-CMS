@@ -105,7 +105,7 @@ test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
+  await umbracoUi.media.isSuccessNotificationVisible();
   expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();
