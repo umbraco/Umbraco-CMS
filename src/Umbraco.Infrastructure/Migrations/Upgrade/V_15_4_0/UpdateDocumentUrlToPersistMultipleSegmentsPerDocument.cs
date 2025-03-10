@@ -1,20 +1,26 @@
-using System.Data.Common;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_4_0;
 
+/// <summary>
+/// Migration to make necessary schema updates to support multiple segments per document.
+/// </summary>
 public class UpdateDocumentUrlToPersistMultipleSegmentsPerDocument : MigrationBase
 {
     private readonly ILogger<UpdateDocumentUrlToPersistMultipleSegmentsPerDocument> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateDocumentUrlToPersistMultipleSegmentsPerDocument"/> class.
+    /// </summary>
     public UpdateDocumentUrlToPersistMultipleSegmentsPerDocument(IMigrationContext context, ILogger<UpdateDocumentUrlToPersistMultipleSegmentsPerDocument> logger)
         : base(context)
     {
         _logger = logger;
     }
 
+    /// <inheritdoc/>
     protected override void Migrate()
     {
         Logger.LogDebug("Schema updates to {TableName} for support of multiple segments per document", Constants.DatabaseSchema.Tables.DocumentUrl);
@@ -26,7 +32,8 @@ public class UpdateDocumentUrlToPersistMultipleSegmentsPerDocument : MigrationBa
         }
         else
         {
-            Logger.LogWarning($"Table {Constants.DatabaseSchema.Tables.DocumentUrl} does not exist so the migration {nameof(UpdateDocumentUrlToPersistMultipleSegmentsPerDocument)} could not be completed.");
+            throw new InvalidOperationException(
+                $"Table {Constants.DatabaseSchema.Tables.DocumentUrl} does not exist so the migration {nameof(UpdateDocumentUrlToPersistMultipleSegmentsPerDocument)} could not be completed.");
         }
     }
 
