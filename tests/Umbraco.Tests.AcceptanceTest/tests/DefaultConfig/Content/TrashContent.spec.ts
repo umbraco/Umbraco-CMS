@@ -40,7 +40,7 @@ test('can trash an invariant content', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesDocumentItemExistInRecycleBin(contentName)).toBeTruthy();
+  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
 });
 
 test('can trash a variant content', async ({umbracoApi, umbracoUi}) => {
@@ -61,7 +61,7 @@ test('can trash a variant content', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesDocumentItemExistInRecycleBin(contentName)).toBeTruthy();
+  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
 });
 
 test('can trash a published content', async ({umbracoApi, umbracoUi}) => {
@@ -83,7 +83,7 @@ test('can trash a published content', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesDocumentItemExistInRecycleBin(contentName)).toBeTruthy();
+  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
 });
 
 test('can trash an invariant content that references one item', async ({umbracoApi, umbracoUi}) => {
@@ -110,7 +110,7 @@ test('can trash an invariant content that references one item', async ({umbracoA
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesDocumentItemExistInRecycleBin(contentName)).toBeTruthy();
+  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
 });
 
 test('can trash a variant content that references one item', async ({umbracoApi, umbracoUi}) => {
@@ -137,7 +137,7 @@ test('can trash a variant content that references one item', async ({umbracoApi,
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesDocumentItemExistInRecycleBin(contentName)).toBeTruthy();
+  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
 });
 
 test('can trash an invariant content that references more than 3 items', async ({umbracoApi, umbracoUi}) => {
@@ -173,7 +173,7 @@ test('can trash an invariant content that references more than 3 items', async (
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesDocumentItemExistInRecycleBin(contentName)).toBeTruthy();
+  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentPickerName2[1]);
@@ -214,7 +214,7 @@ test('can trash a variant content that references more than 3 items', async ({um
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesDocumentItemExistInRecycleBin(contentName)).toBeTruthy();
+  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentPickerName2[1]);
@@ -250,7 +250,7 @@ test('can trash a multiple culture content that references one item', async ({um
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesDocumentItemExistInRecycleBin(contentName)).toBeTruthy();
+  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
 
   // Clean
   await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
