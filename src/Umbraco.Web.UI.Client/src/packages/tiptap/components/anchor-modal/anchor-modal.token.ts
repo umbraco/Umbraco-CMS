@@ -1,11 +1,15 @@
+import { UMB_TIPTAP_ANCHOR_MODAL_ALIAS } from './constants.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export type UmbAnchorModalData = {
+export type UmbTiptapAnchorModalData = {
 	id?: string;
 };
 
-export type UmbAnchorModalValue = string;
+export type UmbTiptapAnchorModalValue = string;
 
-export const UMB_ANCHOR_MODAL = new UmbModalToken<UmbAnchorModalData, UmbAnchorModalValue>('Umb.Modal.Anchor', {
-	modal: { size: 'medium', type: 'dialog' },
-});
+export const UMB_TIPTAP_ANCHOR_MODAL = new UmbModalToken<UmbTiptapAnchorModalData, UmbTiptapAnchorModalValue>(
+	UMB_TIPTAP_ANCHOR_MODAL_ALIAS,
+	{
+		modal: { type: 'dialog' },
+	},
+);

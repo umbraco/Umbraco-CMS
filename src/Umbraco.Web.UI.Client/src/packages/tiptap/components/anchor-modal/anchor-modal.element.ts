@@ -1,10 +1,13 @@
-import type { UmbAnchorModalData, UmbAnchorModalValue } from './anchor-modal.token.js';
+import type { UmbTiptapAnchorModalData, UmbTiptapAnchorModalValue } from './anchor-modal.token.js';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
-@customElement('umb-anchor-modal')
-export class UmbAnchorModalElement extends UmbModalBaseElement<UmbAnchorModalData, UmbAnchorModalValue> {
+@customElement('umb-tiptap-anchor-modal')
+export class UmbTiptapAnchorModalElement extends UmbModalBaseElement<
+	UmbTiptapAnchorModalData,
+	UmbTiptapAnchorModalValue
+> {
 	async #onSubmit(event: SubmitEvent) {
 		event.preventDefault();
 
@@ -71,10 +74,10 @@ export class UmbAnchorModalElement extends UmbModalBaseElement<UmbAnchorModalDat
 	];
 }
 
-export { UmbAnchorModalElement as element };
+export { UmbTiptapAnchorModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-anchor-modal': UmbAnchorModalElement;
+		'umb-tiptap-anchor-modal': UmbTiptapAnchorModalElement;
 	}
 }
