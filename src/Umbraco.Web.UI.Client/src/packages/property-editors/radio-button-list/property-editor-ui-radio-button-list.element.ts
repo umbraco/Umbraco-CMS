@@ -1,7 +1,7 @@
 import type { UmbInputRadioButtonListElement, UmbRadioButtonItem } from '@umbraco-cms/backoffice/components';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -47,7 +47,7 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement imp
 
 	#onChange(event: CustomEvent & { target: UmbInputRadioButtonListElement }) {
 		this.value = event.target.value;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
