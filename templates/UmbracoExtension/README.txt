@@ -21,14 +21,14 @@
 * https://docs.volta.sh/guide/getting-started
 
 == Steps ==
-* Open a terminal inside the `\Client` folder
+* Open a terminal inside the `\UmbracoExtension` folder
 * Run `npm install` to install all the dependencies
 * Run `npm run build` to build the project
 * The build output is copied to `wwwroot\App_Plugins\UmbracoExtension\umbraco-extension.js`
 
 == File Watching ==
 * Add this Razor Class Library Project as a project reference to an Umbraco Website project
-* From the `\Client` folder run the command `npm run watch` this will monitor the changes to the *.ts files and rebuild the project
+* From the `\UmbracoExtension` folder run the command `npm run watch` this will monitor the changes to the *.ts files and rebuild the project
 * With the Umbraco website project running the Razor Class Library Project will refresh the browser when the build is complete
 
 == Suggestion ==
