@@ -97,7 +97,3 @@ test.skip('can delete a relation type', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.relationType.doesNameExist(relationTypeName)).toBeFalsy();
   // TODO: when frontend is ready, verify the deleted relation type name is NOT displayed in the Relation Types tree
 });
-
-test.skip('can show relations of a relation type', async ({umbracoApi, umbracoUi}) => {
-  // TODO: implement this later as the frontend is missing now
-});
