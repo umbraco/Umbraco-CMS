@@ -36,8 +36,9 @@ public interface IDocumentUrlService
     /// <param name="documentKey">The key of the document.</param>
     /// <param name="culture">The culture code.</param>
     /// <param name="isDraft">Whether to get the url of the draft or published document.</param>
-    /// <returns>The URL segment for the document.</returns>
-    IEnumerable<string> GetUrlSegments(Guid documentKey, string culture, bool isDraft);
+    /// <returns>The URL segments for the document.</returns>
+    IEnumerable<string> GetUrlSegments(Guid documentKey, string culture, bool isDraft)
+        => throw new NotImplementedException();
 
     /// <summary>
     /// Creates or updates the URL segments for a single document.
