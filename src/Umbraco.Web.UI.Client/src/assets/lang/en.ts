@@ -2737,6 +2737,8 @@ export default {
 		config_overlaySize_description: 'Select the width of the overlay (link picker).',
 	},
 	tiptap: {
+		anchor: 'Anchor',
+		anchor_input: 'Enter an anchor ID',
 		config_dimensions_description: 'Set the maximum width and height of the editor. This excludes the toolbar height.',
 		config_extensions: 'Capabilities',
 		config_toolbar: 'Toolbar',

@@ -25,18 +25,19 @@ export class UmbTiptapAnchorModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
+		const label = this.localize.term('tiptap_anchor_input');
 		return html`
 			<uui-dialog-layout>
 				<uui-form>
 					<form id="form" @submit=${this.#onSubmit}>
 						<uui-form-layout-item>
-							<uui-label for="name" slot="label" required>Enter an anchor ID</uui-label>
+							<uui-label for="name" slot="label" required>${label}</uui-label>
 							<uui-input
 								type="text"
 								required
 								id="name"
 								name="name"
-								label="Enter an anchor ID"
+								label=${label}
 								.value=${this.data?.id || ''}
 								${umbFocus()}></uui-input>
 						</uui-form-layout-item>

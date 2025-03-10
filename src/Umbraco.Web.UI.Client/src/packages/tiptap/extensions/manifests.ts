@@ -408,7 +408,7 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 		meta: {
 			alias: 'anchor',
 			icon: 'icon-anchor',
-			label: 'Anchor',
+			label: '#tiptap_anchor',
 		},
 	},
 	{
