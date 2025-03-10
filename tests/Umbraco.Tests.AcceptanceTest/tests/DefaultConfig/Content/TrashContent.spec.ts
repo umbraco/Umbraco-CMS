@@ -7,7 +7,7 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Textstring';
 const contentText = 'This is test content text';
 const referenceHeadline = 'The following items depend on this';
-const pickerDocumentTypeName = 'TestDocumentTypeForPicker';
+const documentPickerName = ['TestPicker', 'DocumentTypeForPicker'];
 
 test.beforeEach(async ({umbracoApi}) => {
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -19,7 +19,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.emptyRecycleBin();
-  await umbracoApi.documentType.ensureNameNotExists(pickerDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(documentPickerName[1]);
 });
 
 test('can trash an invariant content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -88,20 +88,22 @@ test('can trash a published content', async ({umbracoApi, umbracoUi}) => {
 
 test('can trash an invariant content that references one item', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const documentPickerName = 'TestPicker';
+  // Create an invariant published content
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   const contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
   await umbracoApi.document.publish(contentId);
-  await umbracoApi.document.createDefaultDocumentWithOneDocumentLink(documentPickerName, contentName, contentId, pickerDocumentTypeName);
+  // Create a document link picker
+  await umbracoApi.document.createDefaultDocumentWithOneDocumentLink(documentPickerName[0], contentName, contentId, documentPickerName[1]);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashButton();
-  await umbracoUi.waitForTimeout(2000);
   // verify the references list
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
+  await umbracoUi.content.doesReferenceItemsHaveCount(1);
+  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
   await umbracoUi.content.clickConfirmTrashButton();
 
   // Assert
@@ -111,14 +113,145 @@ test('can trash an invariant content that references one item', async ({umbracoA
   expect(await umbracoApi.document.doesDocumentItemExistInRecycleBin(contentName)).toBeTruthy();
 });
 
-test.fixme('can trash a variant content that references one item', async ({umbracoApi, umbracoUi}) => {
+test('can trash a variant content that references one item', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  // Create a variant published content
+  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
+  const contentId = await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, contentText, dataTypeName);
+  await umbracoApi.document.publishDocumentWithCulture(contentId, 'en-US');
+  // Create a document link picker
+  await umbracoApi.document.createDefaultDocumentWithOneDocumentLink(documentPickerName[0], contentName, contentId, documentPickerName[1]);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  await umbracoUi.content.clickTrashButton();
+  // verify the references list
+  await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
+  await umbracoUi.content.doesReferenceItemsHaveCount(1);
+  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
+  await umbracoUi.content.clickConfirmTrashButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
+  await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
+  expect(await umbracoApi.document.doesDocumentItemExistInRecycleBin(contentName)).toBeTruthy();
 });
 
-test.fixme('can trash an invariant content that references more than 3 items', async ({umbracoApi, umbracoUi}) => {
+test('can trash an invariant content that references more than 3 items', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const documentPickerName2 = ['TestPicker2', 'DocumentTypeForPicker2'];
+  const documentPickerName3 = ['TestPicker3', 'DocumentTypeForPicker3'];
+  const documentPickerName4 = ['TestPicker4', 'DocumentTypeForPicker4'];
+  // Create an invariant published content
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
+  const contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
+  await umbracoApi.document.publish(contentId);
+  // Create 4 document link pickers
+  await umbracoApi.document.createDefaultDocumentWithOneDocumentLink(documentPickerName[0], contentName, contentId, documentPickerName[1]);
+  await umbracoApi.document.createDefaultDocumentWithOneDocumentLink(documentPickerName2[0], contentName, contentId, documentPickerName2[1]);
+  await umbracoApi.document.createDefaultDocumentWithOneDocumentLink(documentPickerName3[0], contentName, contentId, documentPickerName3[1]);
+  await umbracoApi.document.createDefaultDocumentWithOneDocumentLink(documentPickerName4[0], contentName, contentId, documentPickerName4[1]);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  await umbracoUi.content.clickTrashButton();
+  // verify the references list has 3 items and has ...more
+  await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
+  await umbracoUi.content.doesReferenceItemsHaveCount(3);
+  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
+  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName2[0]);
+  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName3[0]);
+  await umbracoUi.content.doesReferencesContainText('...and one more item');
+  await umbracoUi.content.clickConfirmTrashButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
+  await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
+  expect(await umbracoApi.document.doesDocumentItemExistInRecycleBin(contentName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(documentPickerName2[1]);
+  await umbracoApi.documentType.ensureNameNotExists(documentPickerName3[1]);
+  await umbracoApi.documentType.ensureNameNotExists(documentPickerName4[1]);
 });
 
-test.fixme('can trash a variant content that references more than 3 items', async ({umbracoApi, umbracoUi}) => {
+test('can trash a variant content that references more than 3 items', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const documentPickerName2 = ['TestPicker2', 'DocumentTypeForPicker2'];
+  const documentPickerName3 = ['TestPicker3', 'DocumentTypeForPicker3'];
+  const documentPickerName4 = ['TestPicker4', 'DocumentTypeForPicker4'];
+  // Create a variant published content
+  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
+  const contentId = await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, contentText, dataTypeName);
+  await umbracoApi.document.publishDocumentWithCulture(contentId, 'en-US');
+  // Create 4 document link pickers
+  await umbracoApi.document.createDefaultDocumentWithOneDocumentLink(documentPickerName[0], contentName, contentId, documentPickerName[1]);
+  await umbracoApi.document.createDefaultDocumentWithOneDocumentLink(documentPickerName2[0], contentName, contentId, documentPickerName2[1]);
+  await umbracoApi.document.createDefaultDocumentWithOneDocumentLink(documentPickerName3[0], contentName, contentId, documentPickerName3[1]);
+  await umbracoApi.document.createDefaultDocumentWithOneDocumentLink(documentPickerName4[0], contentName, contentId, documentPickerName4[1]);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  await umbracoUi.content.clickTrashButton();
+  // verify the references list has 3 items and has the text '...and one more item'
+  await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
+  await umbracoUi.content.doesReferenceItemsHaveCount(3);
+  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
+  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName2[0]);
+  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName3[0]);
+  await umbracoUi.content.doesReferencesContainText('...and one more item');
+  await umbracoUi.content.clickConfirmTrashButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
+  await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
+  expect(await umbracoApi.document.doesDocumentItemExistInRecycleBin(contentName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(documentPickerName2[1]);
+  await umbracoApi.documentType.ensureNameNotExists(documentPickerName3[1]);
+  await umbracoApi.documentType.ensureNameNotExists(documentPickerName4[1]);
 });
 
-test.fixme('can trash a multiple culture content that references one item', async ({umbracoApi, umbracoUi}) => {
+test('can trash a multiple culture content that references one item', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const firstCulture = 'en-US';
+  const secondCulture = 'da';
+  await umbracoApi.language.createDanishLanguage();
+  // Create a multiple culture content
+  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
+  const contentId = await umbracoApi.document.createDocumentWithTwoCulturesAndTextContent(contentName, documentTypeId, contentText, dataTypeName, firstCulture, secondCulture);
+  await umbracoApi.document.publishDocumentWithCulture(contentId, firstCulture);
+  await umbracoApi.document.publishDocumentWithCulture(contentId, secondCulture);
+  // Create a document link picker
+  await umbracoApi.document.createDefaultDocumentWithOneDocumentLink(documentPickerName[0], contentName, contentId, documentPickerName[1]);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  await umbracoUi.content.clickTrashButton();
+  // verify the references list
+  await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
+  await umbracoUi.content.doesReferenceItemsHaveCount(1);
+  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
+  await umbracoUi.content.clickConfirmTrashButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
+  await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
+  expect(await umbracoApi.document.doesDocumentItemExistInRecycleBin(contentName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
 });
