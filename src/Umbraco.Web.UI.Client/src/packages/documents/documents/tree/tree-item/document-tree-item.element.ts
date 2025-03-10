@@ -21,6 +21,8 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 			this.observe(this.#api.name, (name) => (this._name = name || ''));
 			this.observe(this.#api.isDraft, (isDraft) => (this._isDraft = isDraft || false));
 			this.observe(this.#api.icon, (icon) => (this._icon = icon || ''));
+			this.observe(this.#api.isEdited, (isEdited) => (this._isEdited = isEdited || false));
+
 		}
 
 		super.api = value;
@@ -34,6 +36,9 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 	@state()
 	private _icon = '';
+
+	@state()
+    private _isEdited = false;
 
 	override renderIconContainer() {
 		const icon = this._icon;
@@ -64,8 +69,12 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 			return this.#renderIsCollectionIcon();
 		}
 
-		return nothing;
-	}
+        if (this._isEdited) {
+            return this.#renderIsEditedIcon();
+        }
+
+        return nothing;
+    }
 
 	#renderIsCollectionIcon() {
 		return html`<umb-icon id="state-icon" slot="icon" name="icon-grid" title="Collection"></umb-icon>`;
@@ -74,6 +83,10 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	#renderIsProtectedIcon() {
 		return html`<umb-icon id="state-icon" slot="icon" name="icon-lock" title="Protected"></umb-icon>`;
 	}
+	
+	#renderIsEditedIcon() {
+        return html`<umb-icon id="state-icon" slot="icon" name="icon-edit" title="Edited"></umb-icon>`;
+    }
 
 	static override styles = [
 		UmbTextStyles,

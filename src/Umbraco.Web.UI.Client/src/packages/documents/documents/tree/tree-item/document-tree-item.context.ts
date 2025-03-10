@@ -15,6 +15,8 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	readonly name = this.#item.name;
 	readonly icon = this.#item.icon;
 	readonly isDraft = this.#item.isDraft;
+	readonly isEdited = this.#item.isEdited;
+
 
 	readonly isTrashed = this._treeItem.asObservablePart((item) => item?.isTrashed ?? false);
 
