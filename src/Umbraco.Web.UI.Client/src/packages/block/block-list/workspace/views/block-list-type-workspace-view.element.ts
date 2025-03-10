@@ -75,7 +75,7 @@ export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement 
 				<umb-property
 					label=${this.localize.term('blockEditor_forceHideContentEditor')}
 					alias="forceHideContentEditorInOverlay"
-					description="Hide the content edit button and the content editor from the Block Editor overlay."
+					description=${this.localize.term('blockEditor_forceHideContentEditorHelp')}
 					property-editor-ui-alias="Umb.PropertyEditorUi.Toggle"></umb-property>
 			</uui-box>
 		`;
