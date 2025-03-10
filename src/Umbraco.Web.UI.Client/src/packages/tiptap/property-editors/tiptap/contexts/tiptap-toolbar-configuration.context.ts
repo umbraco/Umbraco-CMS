@@ -56,7 +56,7 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTipt
 		numlist: 'Umb.Tiptap.Toolbar.OrderedList',
 		outdent: null,
 		indent: null,
-		anchor: null,
+		anchor: 'Umb.Tiptap.Toolbar.Anchor',
 		table: 'Umb.Tiptap.Toolbar.Table',
 		hr: 'Umb.Tiptap.Toolbar.HorizontalRule',
 		subscript: 'Umb.Tiptap.Toolbar.Subscript',

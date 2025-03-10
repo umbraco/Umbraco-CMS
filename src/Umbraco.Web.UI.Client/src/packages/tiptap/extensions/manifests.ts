@@ -402,6 +402,18 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.Anchor',
+		name: 'Anchor Tiptap Extension',
+		api: () => import('./toolbar/anchor.tiptap-toolbar-api.js'),
+		meta: {
+			alias: 'anchor',
+			icon: 'icon-anchor',
+			label: '#tiptap_anchor',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Blockquote',
 		name: 'Blockquote Tiptap Extension',
 		api: () => import('./toolbar/blockquote.tiptap-toolbar-api.js'),
