@@ -7,6 +7,7 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Textstring';
 const contentText = 'This is test content text';
 const referenceHeadline = 'The following items depend on this';
+const pickerDocumentTypeName = 'TestDocumentTypeForPicker';
 
 test.beforeEach(async ({umbracoApi}) => {
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -18,6 +19,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.emptyRecycleBin();
+  await umbracoApi.documentType.ensureNameNotExists(pickerDocumentTypeName);
 });
 
 test('can trash an invariant content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -86,14 +88,18 @@ test('can trash a published content', async ({umbracoApi, umbracoUi}) => {
 
 test('can trash an invariant content that references one item', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const documentPickerName = 'TestPicker';
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   const contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
+  await umbracoApi.document.publish(contentId);
+  await umbracoApi.document.createDefaultDocumentWithOneDocumentLink(documentPickerName, contentName, contentId, pickerDocumentTypeName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashButton();
+  await umbracoUi.waitForTimeout(2000);
   // verify the references list
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.clickConfirmTrashButton();
