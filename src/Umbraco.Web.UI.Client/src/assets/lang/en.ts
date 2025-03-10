@@ -2756,6 +2756,7 @@ export default {
 		toolbar_removeItem: 'Remove action',
 		toolbar_emptyGroup: 'Empty',
 		sourceCodeEdit: 'Edit source code',
+		charmap: 'Character map',
 		charmap_headline: 'Special character',
 		charmap_currency: 'Currency',
 		charmap_text: 'Text',

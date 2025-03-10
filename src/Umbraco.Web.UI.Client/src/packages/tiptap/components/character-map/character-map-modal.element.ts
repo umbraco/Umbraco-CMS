@@ -1,12 +1,12 @@
-import type { UmbCharacterMapModalData, UmbCharacterMapModalValue } from './character-map-modal.token.js';
+import type { UmbTiptapCharacterMapModalData, UmbTiptapCharacterMapModalValue } from './character-map-modal.token.js';
 import { css, customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-character-map-modal')
 export class UmbCharacterMapModalElement extends UmbModalBaseElement<
-	UmbCharacterMapModalData,
-	UmbCharacterMapModalValue
+	UmbTiptapCharacterMapModalData,
+	UmbTiptapCharacterMapModalValue
 > {
 	/* The character mapping code has been derived from TinyMCE.
 	 * https://github.com/tinymce/tinymce/blob/6.8.5/modules/tinymce/src/plugins/charmap/main/ts/core/CharMap.ts#L20-L362

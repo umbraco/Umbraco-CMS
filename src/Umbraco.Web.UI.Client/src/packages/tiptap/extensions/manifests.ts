@@ -591,7 +591,7 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 		meta: {
 			alias: 'umbCharacterMap',
 			icon: 'icon-omega',
-			label: 'Character map',
+			label: '#tiptap_charmap',
 		},
 	},
 ];
