@@ -173,8 +173,7 @@ public class DocumentUrlService : IDocumentUrlService
         var cacheModels = new List<PublishedDocumentUrlSegments>();
         foreach (PublishedDocumentUrlSegment model in publishedDocumentUrlSegments)
         {
-            PublishedDocumentUrlSegments? existingCacheModel = cacheModels
-                .SingleOrDefault(x => x.DocumentKey == model.DocumentKey && x.LanguageId == model.LanguageId && x.IsDraft == model.IsDraft);
+            PublishedDocumentUrlSegments? existingCacheModel = GetModelFromCache(cacheModels, model);
             if (existingCacheModel is null)
             {
                 cacheModels.Add(new PublishedDocumentUrlSegments
@@ -187,17 +186,27 @@ public class DocumentUrlService : IDocumentUrlService
             }
             else
             {
-                IList<PublishedDocumentUrlSegments.UrlSegment> urlSegments = existingCacheModel.UrlSegments;
-                if (urlSegments.FirstOrDefault(x => x.Segment == model.UrlSegment) is null)
-                {
-                    urlSegments.Add(new PublishedDocumentUrlSegments.UrlSegment(model.UrlSegment, model.IsPrimary));
-                }
-
-                existingCacheModel.UrlSegments = urlSegments;
+                existingCacheModel.UrlSegments = GetUpdatedUrlSegments(existingCacheModel.UrlSegments, model.UrlSegment, model.IsPrimary);
             }
         }
 
         return cacheModels;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static PublishedDocumentUrlSegments? GetModelFromCache(List<PublishedDocumentUrlSegments> cacheModels, PublishedDocumentUrlSegment model)
+        => cacheModels
+            .SingleOrDefault(x => x.DocumentKey == model.DocumentKey && x.LanguageId == model.LanguageId && x.IsDraft == model.IsDraft);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static IList<PublishedDocumentUrlSegments.UrlSegment> GetUpdatedUrlSegments(IList<PublishedDocumentUrlSegments.UrlSegment> urlSegments, string segment, bool isPrimary)
+    {
+        if (urlSegments.FirstOrDefault(x => x.Segment == segment) is null)
+        {
+            urlSegments.Add(new PublishedDocumentUrlSegments.UrlSegment(segment, isPrimary));
+        }
+
+        return urlSegments;
     }
 
     private void RemoveFromCache(IScopeContext scopeContext, Guid documentKey, string isoCode, bool isDraft)
@@ -681,7 +690,7 @@ public class DocumentUrlService : IDocumentUrlService
             return "#";
         }
 
-        var cultureOrDefault = string.IsNullOrWhiteSpace(culture) is false ? culture : _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        string cultureOrDefault = GetCultureOrDefault(culture);
 
         Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
         ILookup<Guid, Domain?> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToLookup(x => x, ancestorKey =>
@@ -697,9 +706,7 @@ public class DocumentUrlService : IDocumentUrlService
 
             // If no culture is specified, we assume invariant and return the first domain.
             // This is also only used to later to specify the node id in the route, so it does not matter what culture it is.
-            return string.IsNullOrEmpty(culture)
-                ? domains.FirstOrDefault()
-                : domains.FirstOrDefault(x => x.Culture?.Equals(culture, StringComparison.InvariantCultureIgnoreCase) ?? false);
+            return GetDomainForCultureOrInvariant(domains, culture);
         });
 
         var urlSegments = new List<string>();
@@ -715,7 +722,7 @@ public class DocumentUrlService : IDocumentUrlService
                 break;
             }
 
-            if (TryGetPrimaryUrlSegment(ancestorOrSelfKey, cultureOrDefault, isDraft, out string ? segment))
+            if (TryGetPrimaryUrlSegment(ancestorOrSelfKey, cultureOrDefault, isDraft, out string? segment))
             {
                 urlSegments.Add(segment);
             }
@@ -726,8 +733,7 @@ public class DocumentUrlService : IDocumentUrlService
             }
         }
 
-        var leftToRight = _globalSettings.ForceCombineUrlPathLeftToRight
-                          || CultureInfo.GetCultureInfo(cultureOrDefault).TextInfo.IsRightToLeft is false;
+        bool leftToRight = ArePathsLeftToRight(cultureOrDefault);
         if (leftToRight)
         {
             urlSegments.Reverse();
@@ -742,6 +748,23 @@ public class DocumentUrlService : IDocumentUrlService
         var isRootFirstItem = GetTopMostRootKey(isDraft, cultureOrDefault) == ancestorsOrSelfKeysArray.Last();
         return GetFullUrl(isRootFirstItem, urlSegments, null, leftToRight);
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private string GetCultureOrDefault(string? culture)
+        => string.IsNullOrWhiteSpace(culture) is false
+            ? culture
+            : _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool ArePathsLeftToRight(string cultureOrDefault)
+        => _globalSettings.ForceCombineUrlPathLeftToRight ||
+            CultureInfo.GetCultureInfo(cultureOrDefault).TextInfo.IsRightToLeft is false;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static Domain? GetDomainForCultureOrInvariant(IEnumerable<Domain> domains, string? culture)
+        => string.IsNullOrEmpty(culture)
+            ? domains.FirstOrDefault()
+            : domains.FirstOrDefault(x => x.Culture?.Equals(culture, StringComparison.InvariantCultureIgnoreCase) ?? false);
 
     private string GetFullUrl(bool isRootFirstItem, List<string> segments, Domain? foundDomain, bool leftToRight)
     {
