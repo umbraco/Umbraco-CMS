@@ -395,7 +395,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderBlock() {
-		return this.contentKey
+		return this.contentKey && (this._contentTypeAlias || this._unsupported)
 			? html`
 					<div class="umb-block-list__block">
 						<umb-extension-slot

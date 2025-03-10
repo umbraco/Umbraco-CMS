@@ -625,13 +625,15 @@ export default {
 	},
 	dictionary: {
 		importDictionaryItemHelp:
-			'\n      To import a dictionary item, find the ".udt" file on your computer by clicking the\n      "Import" button (you\'ll be asked for confirmation on the next screen)\n    ',
+			'To import a dictionary item, find the ".udt" file on your computer by clicking the "Add" button (you\'ll be asked for confirmation on the next screen).',
 		itemDoesNotExists: 'Dictionary item does not exist.',
 		parentDoesNotExists: 'Parent item does not exist.',
 		noItems: 'There are no dictionary items.',
 		noItemsInFile: 'There are no dictionary items in this file.',
 		noItemsFound: 'There were no dictionary items found.',
 		createNew: 'Create dictionary item',
+		pickFile: 'Select file',
+		pickFileRequired: 'Please select a ".udt" file',
 	},
 	dictionaryItem: {
 		description: "Edit the different language versions for the dictionary item '%0%' below",

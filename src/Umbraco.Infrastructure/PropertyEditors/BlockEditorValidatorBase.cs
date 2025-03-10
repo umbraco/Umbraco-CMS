@@ -51,6 +51,12 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
         return elementTypeValidation;
     }
 
+    protected virtual string ContentDataGroupJsonPath =>
+        nameof(BlockValue<TLayout>.ContentData).ToFirstLowerInvariant();
+
+    protected virtual string SettingsDataGroupJsonPath =>
+        nameof(BlockValue<TLayout>.SettingsData).ToFirstLowerInvariant();
+
     private IEnumerable<ElementTypeValidationModel> GetBlockEditorDataValidation(BlockEditorData<TValue, TLayout> blockEditorData, string? culture, string? segment)
     {
         // There is no guarantee that the client will post data for every property defined in the Element Type but we still
@@ -74,8 +80,8 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
 
         var itemDataGroups = new[]
         {
-            new { Path = nameof(BlockValue<TLayout>.ContentData).ToFirstLowerInvariant(), Items = blockEditorData.BlockValue.ContentData.Where(cd => exposedContentKeys.Contains(cd.Key)).ToArray() },
-            new { Path = nameof(BlockValue<TLayout>.SettingsData).ToFirstLowerInvariant(), Items = blockEditorData.BlockValue.SettingsData.Where(sd => exposedSettingsKeys.Contains(sd.Key)).ToArray() }
+            new { Path = ContentDataGroupJsonPath, Items = blockEditorData.BlockValue.ContentData.Where(cd => exposedContentKeys.Contains(cd.Key)).ToArray() },
+            new { Path = SettingsDataGroupJsonPath, Items = blockEditorData.BlockValue.SettingsData.Where(sd => exposedSettingsKeys.Contains(sd.Key)).ToArray() }
         };
 
         var valuesJsonPathPart = nameof(BlockItemData.Values).ToFirstLowerInvariant();
