@@ -29,7 +29,7 @@ public interface ITwoFactorLoginService : IService
     ///     The returned type can be anything depending on the setup providers. You will need to cast it to the type handled by
     ///     the provider.
     /// </remarks>
-    [Obsolete("Use IUserTwoFactorLoginService.GetSetupInfoWithStatusAsync. This will be removed in Umbraco 15.")]
+    [Obsolete("Use IUserTwoFactorLoginService.GetSetupInfoAsync. This will be removed in Umbraco 15.")]
     Task<object?> GetSetupInfoAsync(Guid userOrMemberKey, string providerName);
 
     /// <summary>
