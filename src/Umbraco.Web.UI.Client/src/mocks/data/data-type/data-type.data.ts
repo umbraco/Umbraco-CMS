@@ -1063,7 +1063,12 @@ export const data: Array<UmbMockDataTypeModel> = [
 							'Umb.Tiptap.Toolbar.TextAlignCenter',
 							'Umb.Tiptap.Toolbar.TextAlignRight',
 						],
-						['Umb.Tiptap.Toolbar.TextDirectionRtl', 'Umb.Tiptap.Toolbar.TextDirectionLtr'],
+						['Umb.Tiptap.Toolbar.Subscript', 'Umb.Tiptap.Toolbar.Superscript'],
+						[
+							'Umb.Tiptap.Toolbar.CharacterMap',
+							'Umb.Tiptap.Toolbar.TextDirectionRtl',
+							'Umb.Tiptap.Toolbar.TextDirectionLtr',
+						],
 						[
 							'Umb.Tiptap.Toolbar.BulletList',
 							'Umb.Tiptap.Toolbar.OrderedList',

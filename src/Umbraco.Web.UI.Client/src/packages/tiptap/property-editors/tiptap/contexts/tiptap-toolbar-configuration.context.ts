@@ -61,7 +61,7 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTipt
 		hr: 'Umb.Tiptap.Toolbar.HorizontalRule',
 		subscript: 'Umb.Tiptap.Toolbar.Subscript',
 		superscript: 'Umb.Tiptap.Toolbar.Superscript',
-		charmap: null,
+		charmap: 'Umb.Tiptap.Toolbar.CharacterMap',
 		rtl: 'Umb.Tiptap.Toolbar.TextDirectionRtl',
 		ltr: 'Umb.Tiptap.Toolbar.TextDirectionLtr',
 		link: 'Umb.Tiptap.Toolbar.Link',
