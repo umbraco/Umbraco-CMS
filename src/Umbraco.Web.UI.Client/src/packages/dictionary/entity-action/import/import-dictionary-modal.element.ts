@@ -175,14 +175,14 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 			<uui-form>
 				<form id="form" name="form" @submit=${this.#onUpload}>
 					<uui-form-layout-item>
-						<uui-label for="file" slot="label" required>${this.localize.term('formFileUpload_pickFile')}</uui-label>
+						<uui-label for="file" slot="label" required>${this.localize.term('dictionary_pickFile')}</uui-label>
 						<uui-input-file
 							accept=".udt"
 							name="file"
 							id="file"
 							@input=${this.#onFileInput}
 							required
-							required-message=${this.localize.term('formFileUpload_pickFile')}></uui-input-file>
+							required-message=${this.localize.term('dictionary_pickFileRequired')}></uui-input-file>
 					</uui-form-layout-item>
 				</form>
 			</uui-form>`;

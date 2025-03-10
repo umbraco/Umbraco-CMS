@@ -2064,6 +2064,10 @@ export type PublishedDocumentResponseModel = {
     isTrashed: boolean;
 };
 
+export type RebuildStatusModel = {
+    isRebuilding: boolean;
+};
+
 export enum RedirectStatusModel {
     ENABLED = 'Enabled',
     DISABLED = 'Disabled'
@@ -4615,6 +4619,8 @@ export type GetPropertyTypeIsUsedData = {
 export type GetPropertyTypeIsUsedResponse = (boolean);
 
 export type PostPublishedCacheRebuildResponse = (string);
+
+export type GetPublishedCacheRebuildStatusResponse = ((RebuildStatusModel));
 
 export type PostPublishedCacheReloadResponse = (string);
 

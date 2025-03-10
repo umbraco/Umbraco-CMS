@@ -319,7 +319,7 @@ test('can allow access to all documents for a user', async ({umbracoApi, umbraco
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
-  await umbracoUi.user.clickAllowAccessToAllDocumentsSlider();
+  await umbracoUi.user.clickAllowAccessToAllDocumentsToggle();
   await umbracoUi.user.clickSaveButton();
 
   // Assert
@@ -336,7 +336,7 @@ test('can allow access to all media for a user', async ({umbracoApi, umbracoUi})
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
-  await umbracoUi.user.clickAllowAccessToAllMediaSlider();
+  await umbracoUi.user.clickAllowAccessToAllMediaToggle();
   await umbracoUi.user.clickSaveButton();
 
   // Assert
