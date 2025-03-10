@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors.Validation;
-using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -261,7 +260,7 @@ public class SliderPropertyEditor : DataEditor
                         ["value"]);
                 }
 
-                if (sliderRange.To > sliderConfiguration.MaximumValue)
+                if (sliderConfiguration.MaximumValue != 0 && sliderRange.To > sliderConfiguration.MaximumValue)
                 {
                     yield return new ValidationResult(
                         LocalizedTextService.Localize("validation", "outOfRangeMaximum", [sliderRange.To.ToString(), sliderConfiguration.MaximumValue.ToString()]),
