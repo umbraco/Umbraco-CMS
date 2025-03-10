@@ -66,6 +66,69 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.DocumentUrlServiceTest.Child_of_second_root_do_not_have_parents_url_as_prefix(System.String,System.String,System.Boolean)</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.DocumentUrlServiceTest.Deleted_documents_do_not_have_a_url_segment</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.DocumentUrlServiceTest.Deleted_documents_do_not_have_a_url_segment__Parent_deleted</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.DocumentUrlServiceTest.Expected_Routes_with_subpages(System.String,System.String,System.Boolean)</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.DocumentUrlServiceTest.Expected_Routes(System.String,System.String,System.Boolean)</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.DocumentUrlServiceTest.No_Published_Route_when_not_published</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.DocumentUrlServiceTest.Second_root_cannot_hide_url(System.String,System.String,System.Boolean)</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.DocumentUrlServiceTest.Trashed_documents_do_not_have_a_url_segment</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.DocumentUrlServiceTest.Unpublished_Pages_Are_not_available</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.TemplateServiceTests.Deleting_Master_Template_Also_Deletes_Children</Target>
     <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
