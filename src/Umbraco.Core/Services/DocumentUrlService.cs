@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -42,6 +41,9 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly ConcurrentDictionary<string, PublishedDocumentUrlSegments> _cache = new();
     private bool _isInitialized;
 
+    /// <summary>
+    /// Model used to cache a single published document along with all it's URL segments.
+    /// </summary>
     private class PublishedDocumentUrlSegments
     {
         public required Guid DocumentKey { get; set; }
