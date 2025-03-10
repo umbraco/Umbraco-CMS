@@ -8,7 +8,7 @@ const childContentName = 'ChildContent';
 const childDocumentTypeName = 'ChildDocumentTypeForContent';
 const dataTypeName = 'Textstring';
 const contentText = 'This is test content text';
-const scheduleWaitTime = 120000;
+const scheduleWaitTime = 150000;
 
 test.beforeEach(async ({umbracoApi}) => {
   // Need to increase the timeout of the tests due to the time to wait for publishing
@@ -37,6 +37,7 @@ test('can schedule the publishing of invariant unpublish content', {tag: '@smoke
   await umbracoUi.content.clickScheduleButton();
   const publishDateTime = await umbracoApi.getCurrentTimePlusMinute();
   const publishedTime = await umbracoApi.convertDateFormat(publishDateTime);
+  console.log(publishDateTime);
   await umbracoUi.content.enterPublishTime(publishDateTime);
   await umbracoUi.content.clickScheduleModalButton();
   
@@ -50,6 +51,7 @@ test('can schedule the publishing of invariant unpublish content', {tag: '@smoke
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
   // verify the status of content after the publish time is Published
   await umbracoUi.waitForTimeout(scheduleWaitTime);
+  console.log(await umbracoApi.getCurrentTimePlusMinute(0));
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
   await umbracoUi.reloadPage();
