@@ -24,7 +24,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test.fail.only('can schedule the publishing of invariant unpublish content', async ({umbracoApi, umbracoUi}) => {
+test('can schedule the publishing of invariant unpublish content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
