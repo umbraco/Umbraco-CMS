@@ -1,21 +1,23 @@
 import { manifest as sliderSchemaManifest } from './Umbraco.Slider.js';
+import { UMB_SLIDER_PROPERTY_EDITOR_SCHEMA_ALIAS, UMB_SLIDER_PROPERTY_EDITOR_UI_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyValuePreset',
-		forPropertyEditorSchemaAlias: 'Umbraco.Slider',
+		forPropertyEditorSchemaAlias: UMB_SLIDER_PROPERTY_EDITOR_SCHEMA_ALIAS,
+		forPropertyEditorUiAlias: UMB_SLIDER_PROPERTY_EDITOR_UI_ALIAS,
 		alias: 'Umb.PropertyValuePreset.Slider',
 		name: 'Property Editor Schema Slider Preset for Initial Values',
 		api: () => import('./slider-property-value-preset.js'),
 	},
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.Slider',
+		alias: UMB_SLIDER_PROPERTY_EDITOR_UI_ALIAS,
 		name: 'Slider Property Editor UI',
 		element: () => import('./property-editor-ui-slider.element.js'),
 		meta: {
 			label: 'Slider',
-			propertyEditorSchemaAlias: 'Umbraco.Slider',
+			propertyEditorSchemaAlias: UMB_SLIDER_PROPERTY_EDITOR_SCHEMA_ALIAS,
 			icon: 'icon-navigation-horizontal',
 			group: 'common',
 			supportsReadOnly: true,

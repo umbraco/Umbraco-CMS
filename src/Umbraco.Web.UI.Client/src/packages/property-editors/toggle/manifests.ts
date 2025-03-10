@@ -1,21 +1,22 @@
 import { manifest as trueFalseSchemaManifest } from './Umbraco.TrueFalse.js';
+import { UMB_TOGGLE_PROPERTY_EDITOR_SCHEMA_ALIAS, UMB_TOGGLE_PROPERTY_EDITOR_UI_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyValuePreset',
-		forPropertyEditorSchemaAlias: 'Umbraco.TrueFalse',
+		forPropertyEditorSchemaAlias: UMB_TOGGLE_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		alias: 'Umb.PropertyValuePreset.TrueFalse',
 		name: 'Property Editor Schema True/False Preset for Initial State',
 		api: () => import('./true-false-property-value-preset.js'),
 	},
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.Toggle',
+		alias: UMB_TOGGLE_PROPERTY_EDITOR_UI_ALIAS,
 		name: 'Toggle Property Editor UI',
 		element: () => import('./property-editor-ui-toggle.element.js'),
 		meta: {
 			label: 'Toggle',
-			propertyEditorSchemaAlias: 'Umbraco.TrueFalse',
+			propertyEditorSchemaAlias: UMB_TOGGLE_PROPERTY_EDITOR_SCHEMA_ALIAS,
 			icon: 'icon-checkbox',
 			group: 'common',
 			supportsReadOnly: true,
@@ -24,7 +25,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 					{
 						alias: 'default',
 						label: 'Preset value',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+						propertyEditorUiAlias: UMB_TOGGLE_PROPERTY_EDITOR_UI_ALIAS,
 						config: [
 							{
 								alias: 'ariaLabel',
@@ -35,7 +36,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 					{
 						alias: 'showLabels',
 						label: 'Show on/off labels',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+						propertyEditorUiAlias: UMB_TOGGLE_PROPERTY_EDITOR_UI_ALIAS,
 						config: [
 							{
 								alias: 'ariaLabel',
