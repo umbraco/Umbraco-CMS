@@ -1,6 +1,18 @@
+import { UMB_USER_PERMISSION_DOCUMENT_TYPE_STRUCTURE_PROPERTY_SEE } from './constants.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
+	{
+		type: 'entityUserPermission',
+		alias: 'Umb.EntityUserPermission.DocumentType.Structure.Property.See',
+		name: 'See Document Type Structure Property User Permission',
+		forEntityTypes: ['document-type-property'],
+		meta: {
+			verbs: [UMB_USER_PERMISSION_DOCUMENT_TYPE_STRUCTURE_PROPERTY_SEE],
+			label: 'See',
+			description: 'See Document Type Property when editing documents',
+		},
+	},
 	{
 		type: 'userGranularPermission',
 		alias: 'Umb.UserGranularPermission.ContentType.Structure',
