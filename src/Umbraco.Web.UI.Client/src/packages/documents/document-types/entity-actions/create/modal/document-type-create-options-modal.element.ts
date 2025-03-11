@@ -11,10 +11,10 @@ import { html, customElement, map } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 
-const UMB_CREATE_FOLDER_PRESET = 'folder';
+const CREATE_FOLDER_PRESET = 'folder';
 
 // Include the types from the DocumentTypeWorkspacePresetType + folder.
-type OptionsPresetType = UmbCreateDocumentTypeWorkspacePresetType | typeof UMB_CREATE_FOLDER_PRESET | null;
+type OptionsPresetType = UmbCreateDocumentTypeWorkspacePresetType | typeof CREATE_FOLDER_PRESET | null;
 
 /** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 @customElement('umb-document-type-create-options-modal')
@@ -53,7 +53,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 		// 	icon: 'icon-plugin',
 		// },
 		{
-			preset: UMB_CREATE_FOLDER_PRESET,
+			preset: CREATE_FOLDER_PRESET,
 			label: this.localize.term('create_folder'),
 			description: this.localize.term('create_folderDescription'),
 			icon: 'icon-folder',
@@ -74,7 +74,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 
 	async #onClick(presetAlias: OptionsPresetType) {
 		switch (presetAlias) {
-			case UMB_CREATE_FOLDER_PRESET: {
+			case CREATE_FOLDER_PRESET: {
 				try {
 					await this.#createFolderAction?.execute();
 					this._submitModal();
