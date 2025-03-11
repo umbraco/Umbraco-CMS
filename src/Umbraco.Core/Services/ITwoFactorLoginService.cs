@@ -60,13 +60,13 @@ public interface ITwoFactorLoginService : IService
     /// <summary>
     /// Disables 2FA with Code.
     /// </summary>
-    [Obsolete("Use IUserTwoFactorLoginService.DisableByCodeWithStatusAsync. This will be removed in Umbraco 15.")]
+    [Obsolete("Use IUserTwoFactorLoginService.DisableByCodeAsync. This will be removed in Umbraco 15.")]
     Task<bool> DisableWithCodeAsync(string providerName, Guid userOrMemberKey, string code);
 
     /// <summary>
     /// Validates and Saves.
     /// </summary>
-    [Obsolete("Use IUserTwoFactorLoginService.ValidateAndSaveWithStatusAsync. This will be removed in Umbraco 15.")]
+    [Obsolete("Use IUserTwoFactorLoginService.ValidateAndSaveAsync. This will be removed in Umbraco 15.")]
     Task<bool> ValidateAndSaveAsync(string providerName, Guid userKey, string secret, string code);
 
 }
