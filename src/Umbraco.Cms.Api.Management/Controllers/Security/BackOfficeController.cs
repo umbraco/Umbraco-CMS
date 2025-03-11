@@ -34,6 +34,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Security;
 [ApiExplorerSettings(IgnoreApi = true)]
 public class BackOfficeController : SecurityControllerBase
 {
+    private static long? _loginDurationAverage;
+
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IBackOfficeSignInManager _backOfficeSignInManager;
     private readonly IBackOfficeUserManager _backOfficeUserManager;
@@ -72,45 +74,65 @@ public class BackOfficeController : SecurityControllerBase
     [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
     public async Task<IActionResult> Login(CancellationToken cancellationToken, LoginRequestModel model)
     {
-        IdentitySignInResult result = await _backOfficeSignInManager.PasswordSignInAsync(
-            model.Username, model.Password, true, true);
+        // Start a timed scope to ensure failed responses return is a consistent time
+        var loginDuration = Math.Max(_loginDurationAverage ?? _securitySettings.Value.UserDefaultFailedLoginDurationInMilliseconds, _securitySettings.Value.UserMinimumFailedLoginDurationInMilliseconds);
+        await using var timedScope = new TimedScope(loginDuration, cancellationToken);
 
-        if (result.IsNotAllowed)
+        IdentitySignInResult result = await _backOfficeSignInManager.PasswordSignInAsync(model.Username, model.Password, true, true);
+        if (result.Succeeded is false)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
-                .WithTitle("User is not allowed")
-                .WithDetail("The operation is not allowed on the user")
-                .Build());
-        }
-
-        if (result.IsLockedOut)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
-                .WithTitle("User is locked")
-                .WithDetail("The user is locked, and need to be unlocked before more login attempts can be executed.")
-                .Build());
-        }
-
-        if(result.RequiresTwoFactor)
-        {
-            string? twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(model.Username);
-            BackOfficeIdentityUser? attemptingUser = await _backOfficeUserManager.FindByNameAsync(model.Username);
-            IEnumerable<string> enabledProviders = (await _userTwoFactorLoginService.GetProviderNamesAsync(attemptingUser!.Key)).Result.Where(x=>x.IsEnabledOnUser).Select(x=>x.ProviderName);
-            return StatusCode(StatusCodes.Status402PaymentRequired, new RequiresTwoFactorResponseModel()
+            // TODO: The result should include the user and whether the credentials were valid to avoid these additional checks
+            BackOfficeIdentityUser? user = await _backOfficeUserManager.FindByNameAsync(model.Username.Trim()); // Align with UmbracoSignInManager and trim username!
+            if (user is not null &&
+                await _backOfficeUserManager.CheckPasswordAsync(user, model.Password))
             {
-                TwoFactorLoginView = twofactorView,
-                EnabledTwoFactorProviderNames = enabledProviders
-            });
+                // The credentials were correct, so cancel timed scope and provide a more detailed failure response
+                await timedScope.CancelAsync();
+
+                if (result.IsNotAllowed)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                        .WithTitle("User is not allowed")
+                        .WithDetail("The operation is not allowed on the user")
+                        .Build());
+                }
+
+                if (result.IsLockedOut)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                        .WithTitle("User is locked")
+                        .WithDetail("The user is locked, and need to be unlocked before more login attempts can be executed.")
+                        .Build());
+                }
+
+                if (result.RequiresTwoFactor)
+                {
+                    string? twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(model.Username);
+                    IEnumerable<string> enabledProviders = (await _userTwoFactorLoginService.GetProviderNamesAsync(user.Key)).Result.Where(x => x.IsEnabledOnUser).Select(x => x.ProviderName);
+
+                    return StatusCode(StatusCodes.Status402PaymentRequired, new RequiresTwoFactorResponseModel()
+                    {
+                        TwoFactorLoginView = twofactorView,
+                        EnabledTwoFactorProviderNames = enabledProviders
+                    });
+                }
+            }
+
+            return StatusCode(StatusCodes.Status401Unauthorized, new ProblemDetailsBuilder()
+                .WithTitle("Invalid credentials")
+                .WithDetail("The provided credentials are invalid. User has not been signed in.")
+                .Build());
         }
 
-        if (result.Succeeded)
-        {
-            return Ok();
-        }
-        return StatusCode(StatusCodes.Status401Unauthorized, new ProblemDetailsBuilder()
-            .WithTitle("Invalid credentials")
-            .WithDetail("The provided credentials are invalid. User has not been signed in.")
-            .Build());
+        // Set initial or update average (successful) login duration
+        _loginDurationAverage = _loginDurationAverage is long average
+            ? (average + (long)timedScope.Elapsed.TotalMilliseconds) / 2
+            : (long)timedScope.Elapsed.TotalMilliseconds;
+
+        // Cancel the timed scope (we don't want to unnecessarily wait on a successful response)
+        await timedScope.CancelAsync();
+
+        return Ok();
     }
 
     [AllowAnonymous]
