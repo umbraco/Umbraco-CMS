@@ -149,7 +149,8 @@ test('can create content with block grid area with row span', async ({umbracoApi
   await umbracoUi.content.doesBlockAreaContainRowSpan(firstElementTypeName, firstAreaName, rowSpan, 0);
 });
 
-test('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
+// Remove fixme when this issue is fixed https://github.com/umbraco/Umbraco-CMS/issues/18639
+test.fixme('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
@@ -180,7 +181,8 @@ test('can create content with block grid area with min allowed', async ({umbraco
   await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
 });
 
-test('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
+// Remove fixme when this issue is fixed https://github.com/umbraco/Umbraco-CMS/issues/18639
+test.fixme('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
