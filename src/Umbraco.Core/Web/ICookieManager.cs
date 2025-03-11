@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Core.Web;
 
 /// <summary>
-/// Defines a cookie related operations.
+/// Defines cookie related operations.
 /// </summary>
 public interface ICookieManager
 {
