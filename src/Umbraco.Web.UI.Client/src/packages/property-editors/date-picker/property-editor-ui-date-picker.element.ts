@@ -1,4 +1,3 @@
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -6,6 +5,7 @@ import type {
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * This property editor allows the user to pick a date, datetime-local, or time.
@@ -140,7 +140,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 		const valueHasChanged = this.value !== value;
 		if (valueHasChanged) {
 			this.value = value;
-			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+			this.dispatchEvent(new UmbChangeEvent());
 		}
 	}
 
