@@ -66,7 +66,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	_workspaceEditSettingsPath?: string;
 
 	@state()
-	_contentElementTypeAlias?: string;
+	_contentTypeAlias?: string;
 
 	@state()
 	_contentTypeName?: string;
@@ -115,7 +115,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.observe(
 			this.#context.contentElementTypeAlias,
 			(alias) => {
-				this._contentElementTypeAlias = alias;
+				this._contentTypeAlias = alias;
 			},
 			null,
 		);
@@ -230,7 +230,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	readonly #filterBlockCustomViews = (manifest: ManifestBlockEditorCustomView) => {
-		const elementTypeAlias = this._contentElementTypeAlias ?? '';
+		const elementTypeAlias = this._contentTypeAlias ?? '';
 		const isForBlockEditor =
 			!manifest.forBlockEditor || stringOrStringArrayContains(manifest.forBlockEditor, UMB_BLOCK_RTE);
 		const isForContentTypeAlias =
@@ -256,23 +256,25 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	};
 
 	#renderBlock() {
-		return html`
-			<div class="uui-text uui-font">
-				<umb-extension-slot
-					type="blockEditorCustomView"
-					default-element="umb-ref-rte-block"
-					.renderMethod=${this.#extensionSlotRenderMethod}
-					.props=${this._blockViewProps}
-					.filter=${this.#filterBlockCustomViews}
-					single>
-					${this.#renderRefBlock()}
-				</umb-extension-slot>
-				<uui-action-bar> ${this.#renderEditAction()} ${this.#renderEditSettingsAction()} </uui-action-bar>
-				${!this._showContentEdit && this._contentInvalid
-					? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
-					: nothing}
-			</div>
-		`;
+		return this.contentKey && this._contentTypeAlias
+			? html`
+					<div class="uui-text uui-font">
+						<umb-extension-slot
+							type="blockEditorCustomView"
+							default-element="umb-ref-rte-block"
+							.renderMethod=${this.#extensionSlotRenderMethod}
+							.props=${this._blockViewProps}
+							.filter=${this.#filterBlockCustomViews}
+							single>
+							${this.#renderRefBlock()}
+						</umb-extension-slot>
+						<uui-action-bar> ${this.#renderEditAction()} ${this.#renderEditSettingsAction()} </uui-action-bar>
+						${!this._showContentEdit && this._contentInvalid
+							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+							: nothing}
+					</div>
+				`
+			: nothing;
 	}
 
 	#renderRefBlock() {

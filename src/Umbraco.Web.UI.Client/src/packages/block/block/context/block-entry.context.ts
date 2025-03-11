@@ -398,11 +398,11 @@ export abstract class UmbBlockEntryContext<
 
 		this.observe(
 			observeMultiple([this.settingsKey, this.blockType]),
-			([settingsKey, blockType]) => {
+			async ([settingsKey, blockType]) => {
 				if (!this.#contentKey || settingsKey === undefined || !blockType) return;
 				if (settingsKey == null && blockType.settingsElementTypeKey) {
 					// We have a settings ElementType in config but not in data, so lets create the scaffold for that: [NL]
-					const settingsData = this._manager!.createBlockSettingsData(blockType.contentElementTypeKey); // Yes its on purpose we use the contentElementTypeKey here, as this is our identifier for a BlockType. [NL]
+					const settingsData = await this._manager!.createBlockSettingsData(blockType.contentElementTypeKey); // Yes its on purpose we use the contentElementTypeKey here, as this is our identifier for a BlockType. [NL]
 					this._manager?.setOneSettings(settingsData);
 					this._layout.update({ settingsKey: settingsData.key } as Partial<BlockLayoutType>);
 				} else if (settingsKey && blockType.settingsElementTypeKey === undefined) {

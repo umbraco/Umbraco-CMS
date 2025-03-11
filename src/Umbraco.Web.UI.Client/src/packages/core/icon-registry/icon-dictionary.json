@@ -1388,6 +1388,10 @@
 			"legacy": true
 		},
 		{
+			"name": "icon-omega",
+			"file": "omega.svg"
+		},
+		{
 			"name": "icon-operator",
 			"file": "user-cog.svg"
 		},
@@ -2076,6 +2080,14 @@
 		{
 			"name": "icon-text-align-right",
 			"file": "align-right.svg"
+		},
+		{
+			"name": "icon-text-direction-ltr",
+			"file": "pilcrow-right.svg"
+		},
+		{
+			"name": "icon-text-direction-rtl",
+			"file": "pilcrow-left.svg"
 		},
 		{
 			"name": "icon-theater",

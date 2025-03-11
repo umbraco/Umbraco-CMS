@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -358,8 +357,8 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
             foreach (BlockPropertyValue targetBlockPropertyValue in targetBlockItem.Values)
             {
-                BlockPropertyValue? sourceBlockPropertyValue =
-                    sourceBlockItem?.Values.FirstOrDefault(v => v.Culture == targetBlockPropertyValue.Culture);
+                BlockPropertyValue? sourceBlockPropertyValue = sourceBlockItem?.Values.FirstOrDefault(v
+                    => v.Alias == targetBlockPropertyValue.Alias && v.Culture == targetBlockPropertyValue.Culture);
 
                 // todo double check if this path can have an invariant value, but it shouldn't right???
                 // => it can be a null culture, but we shouldn't do anything? as the invariant section should have done it already

@@ -35,7 +35,7 @@ import {
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
 type ContentModel = UmbDocumentDetailModel;
@@ -82,6 +82,7 @@ export class UmbDocumentWorkspaceContext
 			contentValidationRepository: UmbDocumentValidationRepository,
 			skipValidationOnSubmit: true,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
+			contentTypePropertyName: 'documentType',
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
 		});
 
@@ -177,10 +178,15 @@ export class UmbDocumentWorkspaceContext
 		]);
 	}
 
+	override resetState(): void {
+		super.resetState();
+		this.#isTrashedContext.setIsTrashed(false);
+	}
+
 	override async load(unique: string) {
 		const response = await super.load(unique);
 
-		if (response.data) {
+		if (response?.data) {
 			this.#isTrashedContext.setIsTrashed(response.data.isTrashed);
 		}
 
@@ -283,7 +289,8 @@ export class UmbDocumentWorkspaceContext
 
 		const appContext = await this.getContext(UMB_APP_CONTEXT);
 
-		const previewUrl = new URL(appContext.getBackofficePath() + '/preview', appContext.getServerUrl());
+		const backofficePath = appContext.getBackofficePath();
+		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', appContext.getServerUrl());
 		previewUrl.searchParams.set('id', unique);
 
 		if (culture && culture !== UMB_INVARIANT_CULTURE) {

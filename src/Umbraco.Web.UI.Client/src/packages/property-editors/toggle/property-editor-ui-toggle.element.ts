@@ -1,7 +1,8 @@
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbTogglePropertyEditorUiValue } from './types.js';
 import type { UmbInputToggleElement } from '@umbraco-cms/backoffice/components';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -10,7 +11,7 @@ import { UMB_VALIDATION_FALSE_LOCALIZATION_KEY, UmbFormControlMixin } from '@umb
 
 @customElement('umb-property-editor-ui-toggle')
 export class UmbPropertyEditorUIToggleElement
-	extends UmbFormControlMixin<boolean, typeof UmbLitElement, undefined>(UmbLitElement)
+	extends UmbFormControlMixin<UmbTogglePropertyEditorUiValue, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
 	@property({ type: String })
@@ -47,8 +48,6 @@ export class UmbPropertyEditorUIToggleElement
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
-		// TODO: Do not set value here, but use future feature of Value Presets. [NL]
-		this.value ??= config.getValueByAlias('default') ?? false;
 		this._labelOff = config.getValueByAlias('labelOff');
 		this._labelOn = config.getValueByAlias('labelOn');
 		this._showLabels = Boolean(config.getValueByAlias('showLabels'));
@@ -60,8 +59,9 @@ export class UmbPropertyEditorUIToggleElement
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputToggleElement }) {
-		this.value = event.target.checked;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		const checked = event.target.checked;
+		this.value = this.mandatory ? (checked ?? null) : checked;
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

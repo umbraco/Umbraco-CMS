@@ -29,7 +29,7 @@ test('can see correct information when published', async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();
-  await umbracoUi.content.doesLinkHaveText(notPublishContentLink);
+  await umbracoUi.content.doesDocumentHaveLink(notPublishContentLink);
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
@@ -46,7 +46,7 @@ test('can see correct information when published', async ({umbracoApi, umbracoUi
     hour12: true,
   });
   await umbracoUi.content.doesCreatedDateHaveText(expectedCreatedDate);
-  await umbracoUi.content.doesLinkHaveText(contentData.urls[0].url ? contentData.urls[0].url : '/');
+  await umbracoUi.content.doesDocumentHaveLink(contentData.urls[0].url ? contentData.urls[0].url : '/');
   // TODO: Uncomment this when front-end is ready. Currently the publication status of content is not changed to "Published" immediately after publishing it
   //await umbracoUi.content.doesPublicationStatusHaveText(contentData.variants[0].state === 'Draft' ? 'Unpublished' : contentData.variants[0].state);
 });

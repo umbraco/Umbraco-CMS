@@ -3,13 +3,13 @@ import type { UmbInputContentPickerSourceElement } from './input-content-picker-
 import {
 	type UmbPropertyEditorUiElement,
 	type UmbPropertyEditorConfigCollection,
-	UmbPropertyValueChangeEvent,
 } from '@umbraco-cms/backoffice/property-editor';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // import of local component
 import './input-content-picker-source.element.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-content-picker-source
@@ -31,7 +31,7 @@ export class UmbPropertyEditorUIContentPickerSourceElement extends UmbLitElement
 			dynamicRoot: target.dynamicRoot,
 		};
 
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

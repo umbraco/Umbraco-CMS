@@ -1123,6 +1123,9 @@ legacy: true,
 hidden: true,
 path: () => import("./icons/icon-old-phone.js"),
 },{
+name: "icon-omega",
+path: () => import("./icons/icon-omega.js"),
+},{
 name: "icon-operator",
 path: () => import("./icons/icon-operator.js"),
 },{
@@ -1692,6 +1695,12 @@ path: () => import("./icons/icon-text-align-left.js"),
 },{
 name: "icon-text-align-right",
 path: () => import("./icons/icon-text-align-right.js"),
+},{
+name: "icon-text-direction-ltr",
+path: () => import("./icons/icon-text-direction-ltr.js"),
+},{
+name: "icon-text-direction-rtl",
+path: () => import("./icons/icon-text-direction-rtl.js"),
 },{
 name: "icon-theater",
 path: () => import("./icons/icon-theater.js"),
