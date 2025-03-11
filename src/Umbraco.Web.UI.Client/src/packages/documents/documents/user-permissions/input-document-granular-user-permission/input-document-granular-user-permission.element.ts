@@ -121,12 +121,18 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		return documentItem;
 	}
 
-	async #selectEntityUserPermissionsForDocument(item: UmbDocumentItemModel, allowedVerbs: Array<string> = []) {
+	async #selectEntityUserPermissionsForDocument(item: UmbDocumentItemModel, allowedVerbs?: Array<string>) {
 		// TODO: get correct variant name
 		const name = item.variants[0]?.name;
 		const headline = name ? `Permissions for ${name}` : 'Permissions';
-		const fallbackVerbs = this.#getFallbackPermissionVerbsForEntityType(item.entityType);
-		const value = allowedVerbs.length > 0 ? { allowedVerbs } : undefined;
+		const fallbackVerbs = this.#getFallbackPermissionVerbsForEntityType(item.entityType).flatMap(
+			(permission) => permission.meta.verbs,
+		);
+
+		const uniqueFallbackVerbs = [...new Set([...fallbackVerbs])];
+
+		const value = allowedVerbs || uniqueFallbackVerbs;
+
 		this.#entityUserPermissionModalContext = this.#modalManagerContext?.open(this, UMB_ENTITY_USER_PERMISSION_MODAL, {
 			data: {
 				unique: item.unique,
@@ -136,7 +142,9 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 					allowedVerbs: fallbackVerbs,
 				},
 			},
-			value,
+			value: {
+				allowedVerbs: value,
+			},
 		});
 
 		try {
@@ -244,17 +252,12 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 	#getFallbackPermissionVerbsForEntityType(entityType: string) {
 		// get all permissions that are allowed for the entity type and have at least one of the fallback permissions
 		// this is used to determine the default permissions for a document
-		const verbs = umbExtensionsRegistry
-			.getByTypeAndFilter(
-				'entityUserPermission',
-				(manifest) =>
-					manifest.forEntityTypes.includes(entityType) &&
-					this.fallbackPermissions.map((verb) => manifest.meta.verbs.includes(verb)).includes(true),
-			)
-			.flatMap((permission) => permission.meta.verbs);
-
-		// ensure that the verbs are unique
-		return [...new Set([...verbs])];
+		return umbExtensionsRegistry.getByTypeAndFilter(
+			'entityUserPermission',
+			(manifest) =>
+				manifest.forEntityTypes.includes(entityType) &&
+				this.fallbackPermissions.map((verb) => manifest.meta.verbs.includes(verb)).includes(true),
+		);
 	}
 
 	static override styles = [
