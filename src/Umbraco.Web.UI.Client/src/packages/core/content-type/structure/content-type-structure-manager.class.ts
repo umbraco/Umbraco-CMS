@@ -19,6 +19,7 @@ import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyVisibilityStateManager } from '@umbraco-cms/backoffice/property';
 
 type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
 
@@ -97,6 +98,8 @@ export class UmbContentTypeStructureManager<
 
 	readonly variesByCulture = createObservablePart(this.ownerContentType, (x) => x?.variesByCulture);
 	readonly variesBySegment = createObservablePart(this.ownerContentType, (x) => x?.variesBySegment);
+
+	public readonly propertyVisibilityState = new UmbPropertyVisibilityStateManager(this);
 
 	#containers: UmbArrayState<UmbPropertyTypeContainerModel> = new UmbArrayState<UmbPropertyTypeContainerModel>(
 		[],
