@@ -2,7 +2,7 @@ import type { UmbDocumentUserPermissionModel } from '../types.js';
 import { UmbDocumentItemRepository } from '../../item/index.js';
 import type { UmbDocumentItemModel } from '../../item/types.js';
 import { UMB_DOCUMENT_PICKER_MODAL } from '../../constants.js';
-import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -26,6 +26,9 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		const uniques = value.map((item) => item.document.id);
 		this.#observePickedDocuments(uniques);
 	}
+
+	@property({ type: Array, attribute: false })
+	fallbackPermissions: Array<string> = [];
 
 	@state()
 	private _items?: Array<UmbDocumentItemModel>;
@@ -118,10 +121,17 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		return documentItem;
 	}
 
-	async #selectEntityUserPermissionsForDocument(item: UmbDocumentItemModel, allowedVerbs: Array<string> = []) {
+	async #selectEntityUserPermissionsForDocument(item: UmbDocumentItemModel, allowedVerbs?: Array<string>) {
 		// TODO: get correct variant name
 		const name = item.variants[0]?.name;
 		const headline = name ? `Permissions for ${name}` : 'Permissions';
+		const fallbackVerbs = this.#getFallbackPermissionVerbsForEntityType(item.entityType).flatMap(
+			(permission) => permission.meta.verbs,
+		);
+
+		const uniqueFallbackVerbs = [...new Set([...fallbackVerbs])];
+
+		const value = allowedVerbs || uniqueFallbackVerbs;
 
 		this.#entityUserPermissionModalContext = this.#modalManagerContext?.open(this, UMB_ENTITY_USER_PERMISSION_MODAL, {
 			data: {
@@ -130,7 +140,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 				headline,
 			},
 			value: {
-				allowedVerbs,
+				allowedVerbs: value,
 			},
 		});
 
@@ -224,16 +234,25 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		if (!permission) return;
 
 		return umbExtensionsRegistry
-			.getAllExtensions()
-			.filter((manifest) => manifest.type === 'entityUserPermission')
-			.filter((manifest) =>
-				(manifest as ManifestEntityUserPermission).meta.verbs.every((verb) => permission.verbs.includes(verb)),
+			.getByTypeAndFilter('entityUserPermission', (manifest) =>
+				manifest.meta.verbs.every((verb) => permission.verbs.includes(verb)),
 			)
 			.map((m) => {
 				const manifest = m as ManifestEntityUserPermission;
 				return manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
 			})
 			.join(', ');
+	}
+
+	#getFallbackPermissionVerbsForEntityType(entityType: string) {
+		// get all permissions that are allowed for the entity type and have at least one of the fallback permissions
+		// this is used to determine the default permissions for a document
+		return umbExtensionsRegistry.getByTypeAndFilter(
+			'entityUserPermission',
+			(manifest) =>
+				manifest.forEntityTypes.includes(entityType) &&
+				this.fallbackPermissions.map((verb) => manifest.meta.verbs.includes(verb)).includes(true),
+		);
 	}
 
 	static override styles = [
