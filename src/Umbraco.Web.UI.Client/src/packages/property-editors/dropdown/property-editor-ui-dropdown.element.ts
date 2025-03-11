@@ -1,25 +1,38 @@
-import { css, customElement, html, map, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, map, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-dropdown
  */
 @customElement('umb-property-editor-ui-dropdown')
-export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUIDropdownElement
+	extends UmbFormControlMixin<Array<string> | string | undefined, typeof UmbLitElement, undefined>(
+		UmbLitElement,
+		undefined,
+	)
+	implements UmbPropertyEditorUiElement
+{
 	#selection: Array<string> = [];
 
+	@state()
+	private _multiple: boolean = false;
+
+	@state()
+	private _options: Array<Option & { invalid?: boolean }> = [];
+
 	@property({ type: Array })
-	public set value(value: Array<string> | string | undefined) {
+	public override set value(value: Array<string> | string | undefined) {
 		this.#selection = Array.isArray(value) ? value : value ? [value] : [];
 	}
-	public get value(): Array<string> | undefined {
+	public override get value(): Array<string> | undefined {
 		return this.#selection;
 	}
 
@@ -31,6 +44,19 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+
+	/**
+	 * Sets the input to mandatory, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	mandatory?: boolean;
+
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
+
+	@property({ type: String })
+	name?: string;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -46,16 +72,30 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 							value: item.value,
 							selected: this.#selection.includes(item.value),
 						}));
+
+			// If selection includes a value that is not in the list, add it to the list
+			this.#selection.forEach((value) => {
+				if (!this._options.find((item) => item.value === value)) {
+					this._options.push({
+						name: `${value} (${this.localize.term('validation_legacyOption')})`,
+						value,
+						selected: true,
+						invalid: true,
+					});
+				}
+			});
 		}
 
 		this._multiple = config.getValueByAlias<boolean>('multiple') ?? false;
 	}
 
-	@state()
-	private _multiple: boolean = false;
-
-	@state()
-	private _options: Array<Option> = [];
+	protected override firstUpdated() {
+		if (this._multiple) {
+			this.addFormControlElement(this.shadowRoot!.querySelector('select')!);
+		} else {
+			this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-dropdown-list')!);
+		}
+	}
 
 	#onChange(event: UUISelectEvent) {
 		const value = event.target.value as string;
@@ -71,11 +111,18 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	#setValue(value: Array<string> | string | null | undefined) {
 		if (!value) return;
 		this.value = value;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
-		return this._multiple ? this.#renderDropdownMultiple() : this.#renderDropdownSingle();
+		return html`
+			${when(
+				this._multiple,
+				() => this.#renderDropdownMultiple(),
+				() => this.#renderDropdownSingle(),
+			)}
+			${this.#renderDropdownValidation()}
+		`;
 	}
 
 	#renderDropdownMultiple() {
@@ -84,7 +131,7 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 		}
 
 		return html`
-			<select id="native" multiple @change=${this.#onChangeMulitple}>
+			<select id="native" multiple ?required=${this.mandatory} @change=${this.#onChangeMulitple}>
 				${map(
 					this._options,
 					(item) => html`<option value=${item.value} ?selected=${item.selected}>${item.name}</option>`,
@@ -96,17 +143,39 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	#renderDropdownSingle() {
 		return html`
 			<umb-input-dropdown-list
+				.name=${this.name}
 				.options=${this._options}
-				@change=${this.#onChange}
-				?readonly=${this.readonly}></umb-input-dropdown-list>
+				.required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
+				?readonly=${this.readonly}
+				@change=${this.#onChange}>
+			</umb-input-dropdown-list>
 		`;
 	}
 
-	static override styles = [
+	#renderDropdownValidation() {
+		const selectionHasInvalids = this.#selection.some((value) => {
+			const option = this._options.find((item) => item.value === value);
+			return option ? option.invalid : false;
+		});
+
+		if (selectionHasInvalids) {
+			return html`<div class="error"><umb-localize key="validation_legacyOptionDescription"></umb-localize></div>`;
+		}
+
+		return nothing;
+	}
+
+	static override readonly styles = [
 		UUISelectElement.styles,
 		css`
 			#native {
 				height: auto;
+			}
+
+			.error {
+				color: var(--uui-color-danger);
+				font-size: var(--uui-font-size-small);
 			}
 		`,
 	];

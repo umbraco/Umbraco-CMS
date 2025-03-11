@@ -23,6 +23,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{T}" />
     /// </returns>
+    [Obsolete("Please use the skip & take instead of pageIndex & pageSize, scheduled for removal in v17")]
     IEnumerable<IMember> GetAll(
         long pageIndex,
         int pageSize,
@@ -217,6 +218,15 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType);
 
     /// <summary>
+    ///     Saves an <see cref="IMembershipUser" />
+    /// </summary>
+    /// <remarks>An <see cref="IMembershipUser" /> can be of type <see cref="IMember" /> or <see cref="IUser" /></remarks>
+    /// <param name="member"><see cref="IMember" /> or <see cref="IUser" /> to Save</param>
+    /// <param name="publishNotificationSaveOptions"> Enum for deciding which notifications to publish.</param>
+    /// <param name="userId">Id of the User saving the Member</param>
+    Attempt<OperationResult?> Save(IMember member, PublishNotificationSaveOptions publishNotificationSaveOptions, int userId = Constants.Security.SuperUserId) => Save(member, userId);
+
+    /// <summary>
     ///     Saves a single <see cref="IMember" /> object
     /// </summary>
     /// <param name="media">The <see cref="IMember" /> to save</param>
@@ -266,6 +276,21 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     ///     <see cref="IMember" />
     /// </returns>
     IMember? GetById(int id);
+
+    /// <summary>
+    ///     Get an list of <see cref="IMember"/> for all members with the specified email.
+    /// </summary>
+    /// <param name="email">Email to use for retrieval</param>
+    /// <returns>
+    ///     <see cref="IEnumerable{IMember}" />
+    /// </returns>
+    IEnumerable<IMember> GetMembersByEmail(string email)
+        =>
+        // TODO (V16): Remove this default implementation.
+        // The following is very inefficient, but will return the correct data, so probably better than throwing a NotImplementedException
+        // in the default implentation here, for, presumably rare, cases where a custom IMemberService implementation has been registered and
+        // does not override this method.
+        GetAllMembers().Where(x => x.Email.Equals(email));
 
     /// <summary>
     ///     Gets all Members for the specified MemberType alias

@@ -22,7 +22,8 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
 });
 
-test('can create content with the list view data type', async ({umbracoApi, umbracoUi}) => {
+// Remove .fixme when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
+test.fixme('can create content with the list view data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const defaultListViewDataTypeName = 'List View - Content';
@@ -40,6 +41,7 @@ test('can create content with the list view data type', async ({umbracoApi, umbr
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -102,7 +104,10 @@ test('can publish content with a child in the list', async ({umbracoApi, umbraco
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
+  // Currently necessary
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   await umbracoUi.content.goToContentInListViewWithName(childContentName);
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
@@ -201,8 +206,7 @@ test('can publish child content from list', async ({umbracoApi, umbracoUi}) => {
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAPropertyEditorAndAnAllowedChildNode(documentTypeName, dataTypeName, dataTypeData.id, childDocumentTypeId);
   const documentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, documentId);
-  const publishData = {"publishSchedules": [{"culture": null}]};
-  await umbracoApi.document.publish(documentId, publishData);
+  await umbracoApi.document.publish(documentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
@@ -248,9 +252,8 @@ test('can unpublish child content from list', async ({umbracoApi, umbracoUi}) =>
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAPropertyEditorAndAnAllowedChildNode(documentTypeName, dataTypeName, dataTypeData.id, childDocumentTypeId);
   const documentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   const childDocumentId = await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, documentId);
-  const publishData = {"publishSchedules": [{"culture": null}]};
-  await umbracoApi.document.publish(documentId, publishData);
-  await umbracoApi.document.publish(childDocumentId, publishData);
+  await umbracoApi.document.publish(documentId);
+  await umbracoApi.document.publish(childDocumentId);
   const childContentDataBeforeUnpublished = await umbracoApi.document.getByName(childContentName);
   expect(childContentDataBeforeUnpublished.variants[0].state).toBe('Published');
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);

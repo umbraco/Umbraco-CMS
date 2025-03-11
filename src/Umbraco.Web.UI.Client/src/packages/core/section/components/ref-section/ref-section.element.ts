@@ -1,4 +1,4 @@
-import type { UmbSectionItemModel } from '../../repository/index.js';
+import type { UmbSectionItemModel } from '../../repository/types.js';
 import { UUIRefElement } from '@umbraco-cms/backoffice/external/uui';
 import { html, customElement, css, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';

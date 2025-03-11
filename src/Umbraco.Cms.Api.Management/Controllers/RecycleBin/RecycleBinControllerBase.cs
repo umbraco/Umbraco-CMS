@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Controllers.Content;
@@ -54,6 +54,7 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
         var viewModel = new TItem
         {
             Id = entity.Key,
+            CreateDate = entity.CreateDate,
             HasChildren = entity.HasChildren,
             Parent = parentKey.HasValue
                 ? new ItemReferenceByIdResponseModel

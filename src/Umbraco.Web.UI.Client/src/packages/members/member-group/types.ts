@@ -5,3 +5,7 @@ export interface UmbMemberGroupDetailModel {
 	unique: string;
 	name: string;
 }
+
+export type { UmbMemberGroupEntityType, UmbMemberGroupRootEntityType } from './entity.js';
+
+export type * from './repository/types.js';

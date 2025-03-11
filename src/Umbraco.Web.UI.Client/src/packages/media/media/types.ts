@@ -3,6 +3,16 @@ import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbrac
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbContentDetailModel, UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 
+export type * from './audit-log/types.js';
+export type * from './collection/types.js';
+export type * from './dropzone/types.js';
+export type * from './modals/types.js';
+export type * from './recycle-bin/types.js';
+export type * from './repository/types.js';
+export type * from './search/types.js';
+export type * from './tree/types.js';
+export type * from './url/types.js';
+
 export interface UmbMediaDetailModel extends UmbContentDetailModel {
 	mediaType: {
 		unique: string;

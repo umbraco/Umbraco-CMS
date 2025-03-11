@@ -1,5 +1,5 @@
 import { UmbDocumentCreateBlueprintRepository } from './repository/document-create-blueprint.repository.js';
-import { UMB_CREATE_BLUEPRINT_MODAL } from './modal/create-blueprint-modal.token.js';
+import { UMB_CREATE_BLUEPRINT_MODAL } from './constants.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

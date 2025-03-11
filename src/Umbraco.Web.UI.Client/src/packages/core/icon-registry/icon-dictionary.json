@@ -380,6 +380,22 @@
 			"legacy": true
 		},
 		{
+			"name": "icon-clipboard",
+			"file": "clipboard.svg"
+		},
+		{
+			"name": "icon-clipboard-copy",
+			"file": "clipboard-copy.svg"
+		},
+		{
+			"name": "icon-clipboard-entry",
+			"file": "clipboard.svg"
+		},
+		{
+			"name": "icon-clipboard-paste",
+			"file": "clipboard-paste.svg"
+		},
+		{
 			"name": "icon-cloud-drive",
 			"file": "hard-drive.svg"
 		},
@@ -625,7 +641,8 @@
 		{
 			"name": "icon-document-dashed-line",
 			"file": "file.svg",
-			"missing": "TODO:"
+			"missing": "TODO: Legacy until se have made a custom",
+			"legacy": true
 		},
 		{
 			"name": "icon-document",
@@ -1054,7 +1071,7 @@
 		},
 		{
 			"name": "icon-layers",
-			"file": "layers-3.svg"
+			"file": "layers.svg"
 		},
 		{
 			"name": "icon-layout",
@@ -1369,6 +1386,10 @@
 			"name": "icon-old-phone",
 			"file": "phone.svg",
 			"legacy": true
+		},
+		{
+			"name": "icon-omega",
+			"file": "omega.svg"
 		},
 		{
 			"name": "icon-operator",
@@ -2061,6 +2082,14 @@
 			"file": "align-right.svg"
 		},
 		{
+			"name": "icon-text-direction-ltr",
+			"file": "pilcrow-right.svg"
+		},
+		{
+			"name": "icon-text-direction-rtl",
+			"file": "pilcrow-left.svg"
+		},
+		{
 			"name": "icon-theater",
 			"file": "drama.svg"
 		},
@@ -2344,6 +2373,11 @@
 		},
 		{
 			"name": "icon-umb-manifest",
+			"file": "puzzle.svg",
+			"internal": true
+		},
+		{
+			"name": "icon-puzzle-piece",
 			"file": "puzzle.svg"
 		},
 		{
@@ -2435,10 +2469,6 @@
 		{
 			"name": "icon-google",
 			"file": "google.svg"
-		},
-		{
-			"name": "icon-linkedin",
-			"file": "linkedin.svg"
 		},
 		{
 			"name": "icon-mastodon",
@@ -2688,6 +2718,11 @@
 		{
 			"name": "icon-keyhole",
 			"file": "icon-keyhole.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-linkedin",
+			"file": "icon-linkedin.svg",
 			"legacy": true
 		},
 		{

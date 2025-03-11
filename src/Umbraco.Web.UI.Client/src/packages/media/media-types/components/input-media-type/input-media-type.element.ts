@@ -1,4 +1,4 @@
-import type { UmbMediaTypeItemModel } from '../../repository/index.js';
+import type { UmbMediaTypeItemModel } from '../../types.js';
 import { UmbMediaTypePickerInputContext } from './input-media-type.context.js';
 import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';

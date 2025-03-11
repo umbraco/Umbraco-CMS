@@ -117,7 +117,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         {
             result.Add(new ContentSchedule(
                 scheduleDto.Id,
-                LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? string.Empty,
+                LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? Constants.System.InvariantCulture,
                 scheduleDto.Date,
                 scheduleDto.Action == ContentScheduleAction.Release.ToString()
                     ? ContentScheduleAction.Release

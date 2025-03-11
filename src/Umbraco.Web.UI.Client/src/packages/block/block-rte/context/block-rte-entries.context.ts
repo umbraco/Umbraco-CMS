@@ -1,6 +1,6 @@
 import type { UmbBlockDataModel } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
-import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
+import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel, UmbBlockRteValueModel } from '../types.js';
 import {
 	UMB_BLOCK_RTE_WORKSPACE_MODAL,
 	type UmbBlockRteWorkspaceOriginData,
@@ -9,7 +9,7 @@ import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from './block-rte-manager.context-token
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoffice/rte';
 
 export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT,
@@ -19,11 +19,6 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	UmbBlockRteWorkspaceOriginData
 > {
 	//
-	readonly #catalogueModal: UmbModalRouteRegistrationController<
-		typeof UMB_BLOCK_CATALOGUE_MODAL.DATA,
-		typeof UMB_BLOCK_CATALOGUE_MODAL.VALUE
-	>;
-	readonly #workspaceModal;
 
 	// We will just say its always allowed for RTE for now: [NL]
 	public readonly canCreate = new UmbBooleanState(true).asObservable();
@@ -31,9 +26,8 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_RTE_MANAGER_CONTEXT);
 
-		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
-			.addUniquePaths(['propertyAlias', 'variantId'])
-			.addAdditionalPath(':view')
+		new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
+			.addAdditionalPath('_catalogue/:view')
 			.onSetup((routingInfo) => {
 				return {
 					data: {
@@ -68,8 +62,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				this._catalogueRouteBuilderState.setValue(routeBuilder);
 			});
 
-		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_RTE_WORKSPACE_MODAL)
-			.addUniquePaths(['propertyAlias', 'variantId'])
+		new UmbModalRouteRegistrationController(this, UMB_BLOCK_RTE_WORKSPACE_MODAL)
 			.addAdditionalPath('block')
 			.onSetup(() => {
 				return { data: { entityType: 'block', preset: {}, baseDataPath: this._dataPath }, modal: { size: 'medium' } };
@@ -78,12 +71,6 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				const newPath = routeBuilder({});
 				this._workspacePath.setValue(newPath);
 			});
-
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (dataset) => {
-			const variantId = dataset.getVariantId();
-			this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
-			this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
-		});
 	}
 
 	protected _gotBlockManager() {
@@ -102,15 +89,6 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				this._manager?.setLayouts(layouts);
 			},
 			'observeThisLayouts',
-		);
-
-		this.observe(
-			this._manager.propertyAlias,
-			(alias) => {
-				this.#catalogueModal.setUniquePathValue('propertyAlias', alias ?? 'null');
-				this.#workspaceModal.setUniquePathValue('propertyAlias', alias ?? 'null');
-			},
-			'observePropertyAlias',
 		);
 	}
 
@@ -133,7 +111,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		originData?: UmbBlockRteWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
-		return this._manager?.create(contentElementTypeKey, partialLayoutEntry, originData);
+		return await this._manager?.createWithPresets(contentElementTypeKey, partialLayoutEntry, originData);
 	}
 
 	// insert Block?
@@ -150,8 +128,24 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 
 	// create Block?
 	override async delete(contentKey: string) {
-		// TODO: Loop through children and delete them as well?
 		await super.delete(contentKey);
 		this._manager?.deleteLayoutElement(contentKey);
+	}
+
+	protected async _insertFromPropertyValue(value: UmbBlockRteValueModel, originData: UmbBlockRteWorkspaceOriginData) {
+		const layoutEntries = value.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS];
+
+		if (!layoutEntries) {
+			throw new Error('No layout entries found');
+		}
+
+		await Promise.all(
+			layoutEntries.map(async (layoutEntry) => {
+				this._insertBlockFromPropertyValue(layoutEntry, value, originData);
+				// TODO: Missing some way to insert a Block HTML Element into the RTE at the current cursor point. (hopefully the responsibilit can be avoided here, but there is some connection missing at this point) [NL]
+			}),
+		);
+
+		return originData;
 	}
 }

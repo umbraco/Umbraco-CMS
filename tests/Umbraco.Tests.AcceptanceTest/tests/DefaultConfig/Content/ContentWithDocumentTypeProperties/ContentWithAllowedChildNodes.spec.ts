@@ -11,7 +11,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
@@ -29,7 +29,7 @@ test('can create content with allowed child node enabled', async ({umbracoApi, u
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
-  
+
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
@@ -71,8 +71,6 @@ test('can create multiple child nodes with different document types', async ({um
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(secondChildDocumentTypeName);
-  // This wait is needed
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.enterContentName(secondChildContentName);
   await umbracoUi.content.clickSaveButton();
 
@@ -85,7 +83,7 @@ test('can create multiple child nodes with different document types', async ({um
   expect(childData[1].variants[0].name).toBe(secondChildContentName);
   // verify that the child content displays in the tree after reloading children
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickReloadButton();
+  await umbracoUi.content.clickReloadChildrenButton();
   await umbracoUi.content.clickCaretButtonForContentName(contentName);
   await umbracoUi.content.doesContentTreeHaveName(firstChildContentName);
   await umbracoUi.content.doesContentTreeHaveName(secondChildContentName);

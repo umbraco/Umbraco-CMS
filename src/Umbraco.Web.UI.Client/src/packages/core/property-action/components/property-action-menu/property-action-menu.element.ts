@@ -1,4 +1,4 @@
-import type { UmbPropertyActionArgs } from '../property-action/types.js';
+import type { UmbPropertyActionArgs } from '../../types.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyAction, MetaPropertyAction } from '@umbraco-cms/backoffice/property-action';

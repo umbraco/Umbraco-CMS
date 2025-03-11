@@ -1,4 +1,4 @@
-import type { UmbUserGroupDetailModel } from '../../index.js';
+import type { UmbUserGroupDetailModel } from '../../types.js';
 import { UMB_USER_GROUP_ROOT_WORKSPACE_PATH } from '../../paths.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context-token.js';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -12,10 +12,10 @@ import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbInputLanguageElement } from '@umbraco-cms/backoffice/language';
 import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
+import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 
 import './components/user-group-entity-user-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
-import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
@@ -244,7 +244,9 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					<uui-box>
 						<div slot="headline"><umb-localize key="user_permissionsDefault"></umb-localize></div>
 
-						<umb-property-layout label="Entity permissions" description="Assign permissions for an entity type">
+						<umb-property-layout
+							label=${this.localize.term('user_entityPermissionsLabel')}
+							description=${this.localize.term('user_entityPermissionsDescription')}>
 							<umb-user-group-entity-user-permission-list slot="editor"></umb-user-group-entity-user-permission-list>
 						</umb-property-layout>
 					</uui-box>

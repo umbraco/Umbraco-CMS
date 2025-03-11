@@ -1,4 +1,4 @@
-export const UMB_MEDIA_TYPE_COMPOSITION_REPOSITORY_ALIAS = 'Umb.Repository.MediaType.Composition';
+import { UMB_MEDIA_TYPE_COMPOSITION_REPOSITORY_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

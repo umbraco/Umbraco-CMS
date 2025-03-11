@@ -1,3 +1,1 @@
-export type { UmbMoveDataSource } from './move-data-source.interface.js';
-export type { UmbMoveRepository } from './move-repository.interface.js';
-export type * from './types.js';
+export { UmbMoveToEntityAction } from './move-to.action.js';

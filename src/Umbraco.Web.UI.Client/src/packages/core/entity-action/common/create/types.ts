@@ -1,5 +1,4 @@
-import type { MetaEntityActionDefaultKind } from '../../default/index.js';
-import type { ManifestEntityAction } from '../../entity-action.extension.js';
+import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '../../types.js';
 
 export interface ManifestEntityActionCreateKind extends ManifestEntityAction<MetaEntityActionCreateKind> {
 	type: 'entityAction';

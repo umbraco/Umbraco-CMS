@@ -76,17 +76,7 @@ internal class MediaCacheService : IMediaCacheService
             return null;
         }
 
-        ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
-            $"{key}", // Unique key to the cache entry
-            async cancel =>
-            {
-                using ICoreScope scope = _scopeProvider.CreateCoreScope();
-                ContentCacheNode? mediaCacheNode = await _databaseCacheRepository.GetMediaSourceAsync(idAttempt.Result);
-                scope.Complete();
-                return mediaCacheNode;
-            }, GetEntryOptions(key));
-
-        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode).CreateModel(_publishedModelFactory);
+        return await GetNodeAsync(key);
     }
 
     public async Task<IPublishedContent?> GetByIdAsync(int id)
@@ -96,19 +86,33 @@ internal class MediaCacheService : IMediaCacheService
         {
             return null;
         }
+
         Guid key = keyAttempt.Result;
 
+        return await GetNodeAsync(key);
+    }
+
+    private async Task<IPublishedContent?> GetNodeAsync(Guid key)
+    {
+        var cacheKey = $"{key}";
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
-            $"{keyAttempt.Result}", // Unique key to the cache entry
+            cacheKey, // Unique key to the cache entry
             async cancel =>
             {
                 using ICoreScope scope = _scopeProvider.CreateCoreScope();
-                ContentCacheNode? mediaCacheNode = await _databaseCacheRepository.GetMediaSourceAsync(id);
+                ContentCacheNode? mediaCacheNode = await _databaseCacheRepository.GetMediaSourceAsync(key);
                 scope.Complete();
                 return mediaCacheNode;
             }, GetEntryOptions(key));
 
-        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode).CreateModel(_publishedModelFactory);
+        // We don't want to cache removed items, this may cause issues if the L2 serializer changes.
+        if (contentCacheNode is null)
+        {
+            await _hybridCache.RemoveAsync(cacheKey);
+            return null;
+        }
+
+        return _publishedContentFactory.ToIPublishedMedia(contentCacheNode).CreateModel(_publishedModelFactory);
     }
 
     public async Task<bool> HasContentByIdAsync(int id)

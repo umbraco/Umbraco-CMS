@@ -1,5 +1,6 @@
 import type { ManifestTiptapExtension } from './tiptap.extension.js';
 import type { ManifestTiptapToolbarExtension } from './tiptap-toolbar.extension.js';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import type { Editor, Extension, Mark, Node } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -17,6 +18,11 @@ export interface UmbTiptapExtensionApi extends UmbApi {
 	 * Sets the editor instance to the extension.
 	 */
 	setEditor(editor: Editor): void;
+
+	/**
+	 * Gets the styles for the extension
+	 */
+	getStyles(): CSSResultGroup | null | undefined;
 
 	/**
 	 * Gets the Tiptap extensions for the editor.
@@ -42,7 +48,7 @@ export interface UmbTiptapToolbarElementApi extends UmbApi, UmbTiptapExtensionAr
 	/**
 	 * Executes the toolbar element action.
 	 */
-	execute(editor?: Editor): void;
+	execute(editor?: Editor, ...args: Array<unknown>): void;
 
 	/**
 	 * Checks if the toolbar element is active.

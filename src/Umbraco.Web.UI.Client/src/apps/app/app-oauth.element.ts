@@ -8,7 +8,6 @@ import './app-error.element.js';
  */
 @customElement('umb-app-oauth')
 export class UmbAppOauthElement extends UmbLitElement {
-
 	/**
 	 * Set to true if the login failed. A message will be shown instead of the loader.
 	 * @attr

@@ -54,6 +54,7 @@ export class UmbCurrentUserServerDataSource {
 				permissions: data.permissions,
 				unique: data.id,
 				userName: data.userName,
+				userGroupUniques: data.userGroupIds.map((group) => group.id),
 			};
 			return { data: user };
 		}

@@ -1,23 +1,21 @@
-import { UMB_MEMBER_GROUP_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbMemberGroupDetailModel } from '../../types.js';
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
-import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './manifests.js';
+import { UMB_MEMBER_GROUP_DETAIL_REPOSITORY_ALIAS } from '../../constants.js';
+import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './constants.js';
 import { UmbMemberGroupWorkspaceEditorElement } from './member-group-workspace-editor.element.js';
 import {
 	type UmbSubmittableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
-	UmbEntityDetailWorkspaceContextBase,
+	UmbEntityNamedDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_USER_GROUP_ROOT_ENTITY_TYPE } from '@umbraco-cms/backoffice/user-group';
 
 export class UmbMemberGroupWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<UmbMemberGroupDetailModel>
+	extends UmbEntityNamedDetailWorkspaceContextBase<UmbMemberGroupDetailModel>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
-
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			workspaceAlias: UMB_MEMBER_GROUP_WORKSPACE_ALIAS,
@@ -48,14 +46,6 @@ export class UmbMemberGroupWorkspaceContext
 				},
 			},
 		]);
-	}
-
-	getName() {
-		return this._data.getCurrent()?.name;
-	}
-
-	setName(name: string | undefined) {
-		this._data.updateCurrent({ name });
 	}
 }
 

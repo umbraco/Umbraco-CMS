@@ -1,5 +1,6 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
 import type { UmbBlockGridWorkspaceOriginData } from '../index.js';
+import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET } from './constants.js';
 import {
 	appendToFrozenArray,
 	pushAtToUniqueArray,
@@ -9,13 +10,11 @@ import {
 import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataModel, UmbBlockDataObjectModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-
-export const UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET = '/umbraco/backoffice/css/umbraco-blockgridlayout.css';
 
 /**
  * A implementation of the Block Manager specifically for the Block Grid Editor.
@@ -92,15 +91,30 @@ export class UmbBlockGridManagerContext<
 			this.#serverUrl = appContext.getServerUrl();
 		});
 	}
-
+	/**
+	 * @deprecated Use createWithPresets instead. Will be removed in v.17.
+	 */
 	create(
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		contentElementTypeKey: string,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		// This property is used by some implementations, but not used in this. Do not remove. [NL]
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		_originData?: UmbBlockGridWorkspaceOriginData,
+	) {
+		throw new Error('Method deparecated use createWithPresets');
+		return {} as UmbBlockDataObjectModel<BlockLayoutType>;
+	}
+
+	async createWithPresets(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
 		// This property is used by some implementations, but not used in this.
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		originData?: UmbBlockGridWorkspaceOriginData,
 	) {
-		return super._createBlockData(contentElementTypeKey, partialLayoutEntry);
+		return await super._createBlockData(contentElementTypeKey, partialLayoutEntry);
 	}
 
 	/**
@@ -133,14 +147,15 @@ export class UmbBlockGridManagerContext<
 			// Lets check if we found the right parent layout entry:
 			if (currentEntry.contentKey === parentId) {
 				// Append the layout entry to be inserted and unfreeze the rest of the data:
-				const areas = currentEntry.areas.map((x) =>
-					x.key === areaKey
-						? {
-								...x,
-								items: pushAtToUniqueArray([...x.items], insert, (x) => x.contentKey === insert.contentKey, index),
-							}
-						: x,
-				);
+				const areas =
+					currentEntry.areas?.map((x) =>
+						x.key === areaKey
+							? {
+									...x,
+									items: pushAtToUniqueArray([...x.items], insert, (x) => x.contentKey === insert.contentKey, index),
+								}
+							: x,
+					) ?? [];
 				return appendToFrozenArray(
 					entries,
 					{
@@ -151,38 +166,39 @@ export class UmbBlockGridManagerContext<
 				);
 			}
 			// Otherwise check if any items of the areas are the parent layout entry we are looking for. We do so based on parentId, recursively:
-			let y: number = currentEntry.areas?.length;
-			while (y--) {
-				// Recursively ask the items of this area to insert the layout entry, if something returns there was a match in this branch. [NL]
-				const correctedAreaItems = this.#appendLayoutEntryToArea(
-					insert,
-					currentEntry.areas[y].items,
-					parentId,
-					areaKey,
-					index,
-				);
-				if (correctedAreaItems) {
-					// This area got a corrected set of items, lets append those to the area and unfreeze the surrounding data:
-					const area = currentEntry.areas[y];
-					return appendToFrozenArray(
-						entries,
-						{
-							...currentEntry,
-							areas: appendToFrozenArray(
-								currentEntry.areas,
-								{ ...area, items: correctedAreaItems },
-								(z) => z.key === area.key,
-							),
-						},
-						(x) => x.contentKey === currentEntry.contentKey,
+			if (currentEntry.areas) {
+				let y: number = currentEntry.areas.length;
+				while (y--) {
+					// Recursively ask the items of this area to insert the layout entry, if something returns there was a match in this branch. [NL]
+					const correctedAreaItems = this.#appendLayoutEntryToArea(
+						insert,
+						currentEntry.areas[y].items,
+						parentId,
+						areaKey,
+						index,
 					);
+					if (correctedAreaItems) {
+						// This area got a corrected set of items, lets append those to the area and unfreeze the surrounding data:
+						const area = currentEntry.areas[y];
+						return appendToFrozenArray(
+							entries,
+							{
+								...currentEntry,
+								areas: appendToFrozenArray(
+									currentEntry.areas,
+									{ ...area, items: correctedAreaItems },
+									(z) => z.key === area.key,
+								),
+							},
+							(x) => x.contentKey === currentEntry.contentKey,
+						);
+					}
 				}
 			}
 		}
 		return undefined;
 	}
 
-	// TODO: Remove dependency on modalData object here. [NL] Maybe change it into requiring the originData object instead.
 	insert(
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataModel,

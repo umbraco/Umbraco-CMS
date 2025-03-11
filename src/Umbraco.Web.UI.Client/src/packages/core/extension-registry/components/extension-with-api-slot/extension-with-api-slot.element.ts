@@ -1,6 +1,6 @@
 import { umbExtensionsRegistry } from '../../registry.js';
 import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
-import { css, repeat, customElement, property, state, html } from '@umbraco-cms/backoffice/external/lit';
+import { css, repeat, customElement, property, state, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import {
 	type UmbExtensionElementAndApiInitializer,
 	UmbExtensionsElementAndApiInitializer,
@@ -141,7 +141,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	public renderMethod?: (
 		extension: UmbExtensionElementAndApiInitializer,
 		index: number,
-	) => TemplateResult | HTMLElement | null | undefined;
+	) => TemplateResult | TemplateResult<1> | HTMLElement | null | undefined | typeof nothing;
 
 	override connectedCallback(): void {
 		super.connectedCallback();
@@ -172,6 +172,9 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 				undefined, // We can leave the alias to undefined, as we destroy this our selfs.
 				this.defaultElement,
 				this.defaultApi,
+				{
+					single: this.single,
+				},
 			);
 			this.#extensionsController.apiProperties = this.#apiProps;
 			this.#extensionsController.elementProperties = this.#elProps;
@@ -181,11 +184,9 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	override render() {
 		return this._permitted
 			? this._permitted.length > 0
-				? this.single
-					? this.#renderExtension(this._permitted[0], 0)
-					: repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
+				? repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
 				: html`<slot></slot>`
-			: '';
+			: nothing;
 	}
 
 	#renderExtension = (ext: UmbExtensionElementAndApiInitializer, i: number) => {

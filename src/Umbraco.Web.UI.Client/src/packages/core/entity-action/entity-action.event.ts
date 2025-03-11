@@ -2,21 +2,29 @@ import { UmbControllerEvent } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbEntityActionEventArgs extends UmbEntityModel {}
+export interface UmbEntityActionEventArgs extends UmbEntityModel {
+	eventUnique?: string;
+}
 
-export class UmbEntityActionEvent extends UmbControllerEvent {
-	#args: UmbEntityActionEventArgs;
+export class UmbEntityActionEvent<
+	ArgsType extends UmbEntityActionEventArgs = UmbEntityActionEventArgs,
+> extends UmbControllerEvent {
+	protected _args: ArgsType;
 
-	public constructor(type: string, args: UmbEntityActionEventArgs) {
+	public constructor(type: string, args: ArgsType) {
 		super(type);
-		this.#args = args;
+		this._args = args;
 	}
 
 	getEntityType(): string {
-		return this.#args.entityType;
+		return this._args.entityType;
 	}
 
 	getUnique(): string | null {
-		return this.#args.unique;
+		return this._args.unique;
+	}
+
+	getEventUnique(): string | undefined {
+		return this._args.eventUnique;
 	}
 }

@@ -24,6 +24,7 @@ export class UmbServerModelValidatorContext
 {
 	#validatePromise?: Promise<void>;
 	#validatePromiseResolve?: () => void;
+	#validatePromiseReject?: () => void;
 
 	#context?: typeof UMB_VALIDATION_CONTEXT.TYPE;
 	#isValid = true;
@@ -50,9 +51,10 @@ export class UmbServerModelValidatorContext
 		this.#context?.messages.removeMessagesByType('server');
 
 		this.#isValid = false;
-		//this.#validatePromiseReject?.();
-		this.#validatePromise = new Promise<void>((resolve) => {
+		this.#validatePromiseReject?.();
+		this.#validatePromise = new Promise<void>((resolve, reject) => {
 			this.#validatePromiseResolve = resolve;
+			this.#validatePromiseReject = reject;
 		});
 
 		// Store this state of the data for translator look ups:
@@ -100,6 +102,7 @@ export class UmbServerModelValidatorContext
 
 		this.#validatePromiseResolve?.();
 		this.#validatePromiseResolve = undefined;
+		this.#validatePromiseReject = undefined;
 	}
 
 	get isValid(): boolean {
@@ -112,7 +115,12 @@ export class UmbServerModelValidatorContext
 		return this.#isValid ? Promise.resolve() : Promise.reject();
 	}
 
-	reset(): void {}
+	reset(): void {
+		this.#isValid = true;
+		this.#validatePromiseReject?.();
+		this.#validatePromiseResolve = undefined;
+		this.#validatePromiseReject = undefined;
+	}
 
 	focusFirstInvalidElement(): void {}
 

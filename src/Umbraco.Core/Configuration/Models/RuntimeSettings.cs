@@ -21,6 +21,7 @@ public class RuntimeSettings
     /// <summary>
     /// Gets or sets a value for the maximum query string length.
     /// </summary>
+    [Obsolete("No longer used and will be removed in Umbraco 16.")]
     public int? MaxQueryStringLength { get; set; }
 
     /// <summary>

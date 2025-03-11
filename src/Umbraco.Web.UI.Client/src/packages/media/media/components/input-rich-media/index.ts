@@ -1,4 +1,4 @@
-import type { UmbMediaCardItemModel } from '../../modals/index.js';
+import type { UmbMediaCardItemModel } from '../../modals/types.js';
 
 export * from './input-rich-media.element.js';
 

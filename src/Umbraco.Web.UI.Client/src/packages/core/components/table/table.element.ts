@@ -170,16 +170,6 @@ export class UmbTableElement extends LitElement {
 		this.dispatchEvent(new UmbTableDeselectedEvent());
 	}
 
-	#onClickRow(key: string) {
-		if (this._selectionMode) {
-			if (this._isSelected(key)) {
-				this._deselectRow(key);
-			} else {
-				this._selectRow(key);
-			}
-		}
-	}
-
 	override render() {
 		return html`
 			<uui-table class="uui-text">
@@ -244,8 +234,7 @@ export class UmbTableElement extends LitElement {
 				?select-only=${this._selectionMode}
 				?selected=${this._isSelected(item.id)}
 				@selected=${() => this._selectRow(item.id)}
-				@deselected=${() => this._deselectRow(item.id)}
-				@click=${() => this.#onClickRow(item.id)}>
+				@deselected=${() => this._deselectRow(item.id)}>
 				${this._renderRowCheckboxCell(item)} ${this.columns.map((column) => this._renderRowCell(column, item))}
 			</uui-table-row>
 		`;

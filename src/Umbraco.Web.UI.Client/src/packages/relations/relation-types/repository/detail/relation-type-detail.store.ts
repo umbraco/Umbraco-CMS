@@ -1,5 +1,5 @@
 import type { UmbRelationTypeDetailModel } from '../../types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_RELATION_TYPE_DETAIL_STORE_CONTEXT } from './relation-type-detail.store.context-token.js';
 import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -20,7 +20,3 @@ export class UmbRelationTypeDetailStore extends UmbDetailStoreBase<UmbRelationTy
 }
 
 export default UmbRelationTypeDetailStore;
-
-export const UMB_RELATION_TYPE_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbRelationTypeDetailStore>(
-	'UmbRelationTypeDetailStore',
-);

@@ -34,8 +34,8 @@ test('can create an empty partial view', {tag: '@smoke'}, async ({umbracoApi, um
 
 test('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const expectedPartialViewContentWindows = '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n@using Umbraco.Cms.Core.Routing\r\n@using Umbraco.Extensions\r\n\n@inject IPublishedUrlProvider PublishedUrlProvider\r\n@*\r\n    This snippet makes a breadcrumb of parents using an unordered HTML list.\r\n\r\n    How it works:\r\n    - It uses the Ancestors() method to get all parents and then generates links so the visitor can go back\r\n    - Finally it outputs the name of the current page (without a link)\r\n*@\r\n\r\n@{ var selection = Model.Ancestors().ToArray(); }\r\n\r\n@if (selection?.Length > 0)\r\n{\r\n    <ul class=\"breadcrumb\">\r\n        @* For each page in the ancestors collection which have been ordered by Level (so we start with the highest top node first) *@\r\n        @foreach (var item in selection.OrderBy(x => x.Level))\r\n        {\r\n            <li><a href=\"@item.Url(PublishedUrlProvider)\">@item.Name</a> <span class=\"divider\">/</span></li>\r\n        }\r\n\r\n        @* Display the current page as the last item in the list *@\r\n        <li class=\"active\">@Model.Name</li>\r\n    </ul>\r\n}';
-  const expectedPartialViewContentLinux = '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n@using Umbraco.Cms.Core.Routing\n@using Umbraco.Extensions\n\n@inject IPublishedUrlProvider PublishedUrlProvider\n@*\n    This snippet makes a breadcrumb of parents using an unordered HTML list.\n\n    How it works:\n    - It uses the Ancestors() method to get all parents and then generates links so the visitor can go back\n    - Finally it outputs the name of the current page (without a link)\n*@\n\n@{ var selection = Model.Ancestors().ToArray(); }\n\n@if (selection?.Length > 0)\n{\n    <ul class=\"breadcrumb\">\n        @* For each page in the ancestors collection which have been ordered by Level (so we start with the highest top node first) *@\n        @foreach (var item in selection.OrderBy(x => x.Level))\n        {\n            <li><a href=\"@item.Url(PublishedUrlProvider)\">@item.Name</a> <span class=\"divider\">/</span></li>\n        }\n\n        @* Display the current page as the last item in the list *@\n        <li class=\"active\">@Model.Name</li>\n    </ul>\n}';
+  const expectedPartialViewContentWindows = '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n@using Umbraco.Cms.Core.PublishedCache\r\n@using Umbraco.Cms.Core.Routing\r\n@using Umbraco.Cms.Core.Services.Navigation\r\n\n@inject IPublishedContentCache PublishedContentCache\r\n@inject IDocumentNavigationQueryService DocumentNavigationQueryService\r\n@inject IPublishedUrlProvider PublishedUrlProvider\r\n@*\r\n    This snippet makes a breadcrumb of parents using an unordered HTML list.\r\n\r\n    How it works:\r\n    - It uses the Ancestors method to get all parents and then generates links so the visitor can go back\r\n    - Finally it outputs the name of the current page (without a link)\r\n*@\r\n\r\n@{ var selection = Model.Ancestors(PublishedContentCache, DocumentNavigationQueryService).ToArray(); }\r\n\r\n@if (selection?.Length > 0)\r\n{\r\n    <ul class=\"breadcrumb\">\r\n        @* For each page in the ancestors collection which have been ordered by Level (so we start with the highest top node first) *@\r\n        @foreach (var item in selection.OrderBy(x => x.Level))\r\n        {\r\n            <li><a href=\"@item.Url(PublishedUrlProvider)\">@item.Name</a> <span class=\"divider\">/</span></li>\r\n        }\r\n\r\n        @* Display the current page as the last item in the list *@\r\n        <li class=\"active\">@Model.Name</li>\r\n    </ul>\r\n}';
+  const expectedPartialViewContentLinux = '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n@using Umbraco.Cms.Core.PublishedCache\n@using Umbraco.Cms.Core.Routing\n@using Umbraco.Cms.Core.Services.Navigation\n\n@inject IPublishedContentCache PublishedContentCache\n@inject IDocumentNavigationQueryService DocumentNavigationQueryService\n@inject IPublishedUrlProvider PublishedUrlProvider\n@*\n    This snippet makes a breadcrumb of parents using an unordered HTML list.\n\n    How it works:\n    - It uses the Ancestors method to get all parents and then generates links so the visitor can go back\n    - Finally it outputs the name of the current page (without a link)\n*@\n\n@{ var selection = Model.Ancestors(PublishedContentCache, DocumentNavigationQueryService).ToArray(); }\n\n@if (selection?.Length > 0)\n{\n    <ul class=\"breadcrumb\">\n        @* For each page in the ancestors collection which have been ordered by Level (so we start with the highest top node first) *@\n        @foreach (var item in selection.OrderBy(x => x.Level))\n        {\n            <li><a href=\"@item.Url(PublishedUrlProvider)\">@item.Name</a> <span class=\"divider\">/</span></li>\n        }\n\n        @* Display the current page as the last item in the list *@\n        <li class=\"active\">@Model.Name</li>\n    </ul>\n}';
 
   // Act
   await umbracoUi.partialView.clickActionsMenuAtRoot();
@@ -111,7 +111,8 @@ test('can update a partial view content', {tag: '@smoke'}, async ({umbracoApi, u
   expect(updatedPartialView.content).toBe(updatedPartialViewContent);
 });
 
-test('can use query builder with Order By statement for a partial view', async ({umbracoApi, umbracoUi}) => {
+// Remove .fixme when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18536
+test.fixme('can use query builder with Order By statement for a partial view', async ({umbracoApi, umbracoUi}) => {
   //Arrange
   const propertyAliasValue = 'UpdateDate';
   const isAscending = true;
@@ -150,7 +151,8 @@ test('can use query builder with Order By statement for a partial view', async (
   expect(updatedPartialView.content).toBe(expectedTemplateContent);
 });
 
-test('can use query builder with Where statement for a partial view', async ({umbracoApi, umbracoUi}) => {
+// Remove .fixme when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18536
+test.fixme('can use query builder with Where statement for a partial view', async ({umbracoApi, umbracoUi}) => {
   //Arrange
   const propertyAliasValue = 'Name';
   const operatorValue = 'is';
@@ -178,7 +180,6 @@ test('can use query builder with Where statement for a partial view', async ({um
 
   // Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.partialView.addQueryBuilderWithWhereStatement(propertyAliasValue, operatorValue, constrainValue);
   // Verify that the code is shown
   await umbracoUi.partialView.isQueryBuilderCodeShown(expectedCode);

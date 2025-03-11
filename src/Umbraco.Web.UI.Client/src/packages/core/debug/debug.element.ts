@@ -3,7 +3,7 @@ import { css, customElement, html, map, nothing, property, state, when } from '@
 import { contextData, UmbContextDebugRequest } from '@umbraco-cms/backoffice/context-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { UmbDebugContextData, UmbDebugContextItemData } from '@umbraco-cms/backoffice/context-api';
+import type { UmbDebugContextItemData } from '@umbraco-cms/backoffice/context-api';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-debug')
@@ -15,7 +15,7 @@ export class UmbDebugElement extends UmbLitElement {
 	dialog = false;
 
 	@state()
-	private _contextData = Array<UmbDebugContextData>();
+	private _contexts = new Map<any, any>();
 
 	@state()
 	private _debugPaneOpen = false;
@@ -37,11 +37,7 @@ export class UmbDebugElement extends UmbLitElement {
 				// to the root of <umb-app> which then uses the callback prop
 				// of this event that has been raised to assign the contexts
 				// back to this property of the WebComponent
-
-				// Massage the data into a simplier array of objects
-				// from a function in the context-api.
-				this._contextData = contextData(contexts);
-				this.requestUpdate('_contextData');
+				this._contexts = contexts;
 			}),
 		);
 	}
@@ -92,8 +88,9 @@ export class UmbDebugElement extends UmbLitElement {
 	}
 
 	#renderContextAliases() {
+		const data = contextData(this._contexts);
 		return html`<div class="events">
-			${map(this._contextData, (context) => {
+			${map(data, (context) => {
 				return html`
 					<details>
 						<summary><strong>${context.alias}</strong></summary>

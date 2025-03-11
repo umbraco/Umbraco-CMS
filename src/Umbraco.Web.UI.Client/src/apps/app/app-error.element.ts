@@ -167,8 +167,8 @@ export class UmbAppErrorElement extends UmbLitElement {
 		return html`
 			<div id="background"></div>
 
-			<div id="logo" aria-hidden="true">
-				<img src="/umbraco/backoffice/assets/umbraco_logomark_white.svg" alt="Umbraco" />
+			<div id="logo">
+				<umb-app-logo></umb-app-logo>
 			</div>
 
 			<div id="container" class="uui-text">
@@ -220,10 +220,6 @@ export class UmbAppErrorElement extends UmbLitElement {
 				top: var(--uui-size-space-5);
 				left: var(--uui-size-space-5);
 				height: 30px;
-			}
-
-			#logo img {
-				height: 100%;
 			}
 
 			#container {

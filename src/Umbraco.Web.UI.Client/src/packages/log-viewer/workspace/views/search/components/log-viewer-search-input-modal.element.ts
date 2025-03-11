@@ -1,14 +1,10 @@
+import type {
+	UmbContextSaveSearchModalData,
+	UmbContextSaveSearchModalValue,
+} from './log-viewer-search-input-modal.modal-token.js';
 import { html, css, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-
-export interface UmbContextSaveSearchModalData {
-	query: string;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbContextSaveSearchModalValue extends SavedLogSearchResponseModel {}
 
 @customElement('umb-log-viewer-save-search-modal')
 export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElement<

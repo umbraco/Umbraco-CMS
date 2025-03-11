@@ -53,10 +53,8 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 
 		if (!value) return;
 
-		const regex = /^%2F|%25dot%25cshtml$/g;
-		const prettyPath = value.replace(regex, '').replace(/%2F/g, '/');
 		this.value = {
-			value: prettyPath,
+			value: value,
 			type: CodeSnippetType.partialView,
 		};
 		this.modalContext?.submit();

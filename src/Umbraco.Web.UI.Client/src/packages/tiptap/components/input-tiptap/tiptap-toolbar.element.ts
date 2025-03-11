@@ -6,11 +6,9 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-import '../toolbar/tiptap-toolbar-dropdown-base.element.js';
+import '../cascading-menu-popover/cascading-menu-popover.element.js';
 
-const elementName = 'umb-tiptap-toolbar';
-
-@customElement(elementName)
+@customElement('umb-tiptap-toolbar')
 export class UmbTiptapToolbarElement extends UmbLitElement {
 	#attached = false;
 	#extensionsController?: UmbExtensionsElementAndApiInitializer;
@@ -55,6 +53,9 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			(extensionControllers) => {
 				this._lookup = new Map(extensionControllers.map((ext) => [ext.alias, ext.component]));
 			},
+			undefined,
+			undefined,
+			() => import('../toolbar/default-tiptap-toolbar-element.api.js'),
 		);
 
 		this.#extensionsController.apiProperties = { configuration: this.configuration };
@@ -88,22 +89,28 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			border: 1px solid var(--uui-color-border);
 			border-bottom-left-radius: 0;
 			border-bottom-right-radius: 0;
-			box-shadow:
-				0 2px 2px -2px rgba(34, 47, 62, 0.1),
-				0 8px 8px -4px rgba(34, 47, 62, 0.07);
 
-			background-color: var(--uui-color-surface-alt);
+			border-top-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+			border-left-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+			border-right-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+
+			background-color: var(--uui-color-surface);
 			color: var(--color-text);
+			font-size: var(--uui-type-default-size);
 
 			display: flex;
 			flex-direction: column;
 
 			position: sticky;
 			top: -25px;
-			left: 0px;
-			right: 0px;
+			left: 0;
+			right: 0;
 			padding: var(--uui-size-3);
 			z-index: 9999999;
+
+			box-shadow:
+				0 2px 2px -2px rgba(34, 47, 62, 0.1),
+				0 8px 8px -4px rgba(34, 47, 62, 0.07);
 		}
 
 		.row {
@@ -113,6 +120,7 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 
 			.group {
 				display: inline-flex;
+				flex-wrap: wrap;
 				align-items: stretch;
 
 				&:not(:last-child)::after {
@@ -130,6 +138,6 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbTiptapToolbarElement;
+		'umb-tiptap-toolbar': UmbTiptapToolbarElement;
 	}
 }

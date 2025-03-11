@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DOCUMENT_BLUEPRINT_OPTIONS_CREATE_MODAL } from './modal/index.js';
+import { UMB_DOCUMENT_BLUEPRINT_OPTIONS_CREATE_MODAL } from './constants.js';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

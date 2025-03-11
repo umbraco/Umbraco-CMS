@@ -5,7 +5,7 @@
   <base href="/"/>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="robots" content="noindex, nofollow"/>
   <meta name="pinterest" content="nopin"/>
   <title>Umbraco</title>
@@ -38,8 +38,8 @@
     }
   </style>
   <div id="noscript-container">
-    <h1 class="uui-h3" style="display: inline-flex; align-items: center; gap: 10px">
-      <img aria-hidden="true" alt="logo" src="/logo_dark.svg" style="width: 100%" />
+    <h1 aria-hidden="true" class="uui-h3" style="display: inline-flex; align-items: center; gap: 10px">
+      <img alt="logo" src="/umbraco/management/api/v1/security/back-office/graphics/login-logo-alternative" style="width: 100%" />
     </h1>
     <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
     <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" rel="noopener"
@@ -47,9 +47,9 @@
     </div>
   </noscript>
   <umb-auth
-    logo-image="/logo_light.svg"
-    logo-image-alternative="/logo_dark.svg"
-    background-image="/login.jpg"
+    logo-image="/umbraco/management/api/v1/security/back-office/graphics/login-logo"
+    logo-image-alternative="/umbraco/management/api/v1/security/back-office/graphics/login-logo-alternative"
+    background-image="/umbraco/management/api/v1/security/back-office/graphics/login-background"
     username-is-email="true"
     allow-password-reset
     allow-user-invite></umb-auth>

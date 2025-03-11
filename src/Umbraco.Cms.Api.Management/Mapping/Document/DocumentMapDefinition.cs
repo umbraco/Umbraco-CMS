@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.Content;
+using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint;
@@ -16,8 +16,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
     private readonly CommonMapper _commonMapper;
 
     public DocumentMapDefinition(PropertyEditorCollection propertyEditorCollection, CommonMapper commonMapper)
-        : base(propertyEditorCollection)
-        => _commonMapper = commonMapper;
+        : base(propertyEditorCollection) => _commonMapper = commonMapper;
 
     public void DefineMaps(IUmbracoMapper mapper)
     {
@@ -25,6 +24,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         mapper.Define<IContent, PublishedDocumentResponseModel>((_, _) => new PublishedDocumentResponseModel(), Map);
         mapper.Define<IContent, DocumentCollectionResponseModel>((_, _) => new DocumentCollectionResponseModel(), Map);
         mapper.Define<IContent, DocumentBlueprintResponseModel>((_, _) => new DocumentBlueprintResponseModel(), Map);
+        mapper.Define<ContentScheduleCollection, DocumentResponseModel>(Map);
     }
 
     // Umbraco.Code.MapAll -Urls -Template
@@ -67,7 +67,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.IsTrashed = source.Trashed;
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -IsProtected
     private void Map(IContent source, DocumentCollectionResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -75,6 +75,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.SortOrder = source.SortOrder;
         target.Creator = _commonMapper.GetOwnerName(source, context);
         target.Updater = _commonMapper.GetCreatorName(source, context);
+        target.IsTrashed = source.Trashed;
 
         // If there's a set of property aliases specified in the collection configuration, we will check if the current property's
         // value should be mapped. If it isn't one of the ones specified in 'includeProperties', we will just return the result
@@ -113,4 +114,31 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
                 documentVariantViewModel.State = DocumentVariantState.Draft;
             });
     }
+
+    private void Map(ContentScheduleCollection source, DocumentResponseModel target, MapperContext context)
+    {
+        foreach (ContentSchedule schedule in source.FullSchedule)
+        {
+            DocumentVariantResponseModel? variant = target.Variants
+                .FirstOrDefault(v =>
+                    v.Culture == schedule.Culture ||
+                    (IsInvariant(v.Culture) && IsInvariant(schedule.Culture)));
+            if (variant is null)
+            {
+                continue;
+            }
+
+            switch (schedule.Action)
+            {
+                case ContentScheduleAction.Release:
+                    variant.ScheduledPublishDate = new DateTimeOffset(schedule.Date, TimeSpan.Zero);
+                    break;
+                case ContentScheduleAction.Expire:
+                    variant.ScheduledUnpublishDate = new DateTimeOffset(schedule.Date, TimeSpan.Zero);
+                    break;
+            }
+        }
+    }
+
+    private static bool IsInvariant(string? culture) => culture.IsNullOrWhiteSpace() || culture == Core.Constants.System.InvariantCulture;
 }

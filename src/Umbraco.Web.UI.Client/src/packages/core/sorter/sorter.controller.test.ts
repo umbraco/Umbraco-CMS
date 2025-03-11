@@ -120,17 +120,19 @@ describe('UmbSorterController', () => {
 			expect(items.length).to.equal(4);
 		});
 
-		it('sets all allowed draggable items to draggable', () => {
+		it('sets all allowed draggable items to draggable="false"', async () => {
 			const items = element.getSortableItems();
 			expect(items.length).to.equal(3);
+			await aTimeout(100);
 			items.forEach((item) => {
-				expect(item.draggable).to.be.true;
+				expect(item.draggable).to.be.false;
 			});
 		});
 
-		it('sets all disabled items non draggable', () => {
+		it('sets all disabled items non draggable', async () => {
 			const items = element.getDisabledItems();
 			expect(items.length).to.equal(1);
+			await aTimeout(100);
 			items.forEach((item) => {
 				expect(item.draggable).to.be.false;
 			});
@@ -138,9 +140,10 @@ describe('UmbSorterController', () => {
 	});
 
 	describe('disable', () => {
-		it('sets all items to non draggable', () => {
+		it('sets all items to non draggable', async () => {
 			element.sorter.disable();
 			const items = element.getAllItems();
+			await aTimeout(100);
 			items.forEach((item) => {
 				expect(item.draggable).to.be.false;
 			});
@@ -148,7 +151,7 @@ describe('UmbSorterController', () => {
 	});
 
 	describe('enable', () => {
-		it('sets all allowed items to draggable', async () => {
+		it('sets all allowed items to draggable="false"', async () => {
 			const items = element.getSortableItems();
 			expect(items.length).to.equal(3);
 
@@ -157,13 +160,14 @@ describe('UmbSorterController', () => {
 
 			// Expect all items to be draggable
 			items.forEach((item) => {
-				expect(item.draggable).to.be.true;
+				expect(item.draggable).to.be.false;
 			});
 		});
 
-		it('sets all disabled items non draggable', () => {
+		it('sets all disabled items non draggable', async () => {
 			const items = element.getDisabledItems();
 			expect(items.length).to.equal(1);
+			await aTimeout(100);
 			items.forEach((item) => {
 				expect(item.draggable).to.be.false;
 			});

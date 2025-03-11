@@ -1,5 +1,6 @@
 import type { UmbDataTypeEntityType } from './entity.js';
 
+export type * from './entity.js';
 export interface UmbDataTypeDetailModel {
 	entityType: UmbDataTypeEntityType;
 	unique: string;

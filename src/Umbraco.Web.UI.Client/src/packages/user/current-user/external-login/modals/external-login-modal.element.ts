@@ -144,7 +144,6 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 						<uui-button
 							type="button"
 							look="secondary"
-							color="success"
 							.label=${this.localize.term('defaultdialogs_linkYour', item.displayName)}
 							?disabled=${!item.existsOnServer || !item.hasManualLinkingEnabled}
 							@click=${() => this.#onProviderEnable(item)}>

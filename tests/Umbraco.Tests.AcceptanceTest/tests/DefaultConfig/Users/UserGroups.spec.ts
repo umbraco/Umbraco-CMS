@@ -3,7 +3,7 @@ import {expect} from "@playwright/test";
 
 const allPermissions = {
   uiPermission:
-    ['Browse Node',
+    ['Browse',
       'Create Document Blueprint',
       'Delete',
       'Create',
@@ -51,11 +51,10 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
-test('can create an empty user group', async ({page, umbracoApi, umbracoUi}) => {
+test('can create an empty user group', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.userGroup.clickUserGroupsButton();
-  await page.pause();
-  await umbracoUi.userGroup.clickCreateButton();
+  await umbracoUi.userGroup.clickCreateLink();
   await umbracoUi.userGroup.enterUserGroupName(userGroupName);
   await umbracoUi.userGroup.clickSaveButton();
 
@@ -114,7 +113,7 @@ test('can delete a user group', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.userGroup.clickActionsButton();
-  await umbracoUi.userGroup.clickDeleteThreeDotsButton();
+  await umbracoUi.userGroup.clickDeleteButton();
   await umbracoUi.userGroup.clickConfirmToDeleteButton();
 
   // Assert
@@ -328,8 +327,8 @@ test('can add a media start node to a user group', async ({umbracoApi, umbracoUi
 
   // Act
   await umbracoUi.userGroup.clickChooseMediaStartNodeButton();
-  await umbracoUi.userGroup.clickMediaCardWithName(mediaName);
-  await umbracoUi.userGroup.clickSubmitButton();
+  await umbracoUi.userGroup.selectMediaWithName(mediaName);
+  await umbracoUi.userGroup.clickChooseModalButton();
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert

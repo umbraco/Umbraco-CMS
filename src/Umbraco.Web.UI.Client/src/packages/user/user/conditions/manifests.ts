@@ -5,6 +5,7 @@ import { manifests as userAllowEnableActionManifests } from './allow-enable/mani
 import { manifests as userAllowExternalLoginActionManifests } from './allow-external-login/manifests.js';
 import { manifests as userAllowMfaActionManifests } from './allow-mfa/manifests.js';
 import { manifests as userAllowUnlockActionManifests } from './allow-unlock/manifests.js';
+import { manifests as userIsDefaultKindManifests } from './is-default-kind/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...userAllowChangePasswordActionManifests,
@@ -14,4 +15,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...userAllowExternalLoginActionManifests,
 	...userAllowMfaActionManifests,
 	...userAllowUnlockActionManifests,
+	...userIsDefaultKindManifests,
 ];

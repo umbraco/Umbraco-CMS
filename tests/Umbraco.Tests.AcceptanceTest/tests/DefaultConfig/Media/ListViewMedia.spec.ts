@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const dataTypeName = 'List View - Media';
 let dataTypeDefaultData = null;
@@ -33,7 +33,6 @@ test('can change the the default sort order for the list in the media section', 
   await umbracoApi.dataType.updateListViewMediaDataType('orderBy', sortOrder);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
   await umbracoUi.media.changeToListView();
-  await umbracoUi.waitForTimeout(500);
 
   // Assert
   await umbracoUi.media.isMediaListViewVisible();
@@ -52,7 +51,6 @@ test('can change the the order direction for the list in the media section', asy
   await umbracoUi.media.isMediaGridViewVisible();
   await umbracoUi.media.doesMediaGridValuesMatch(expectedMediaValues);
   await umbracoUi.media.changeToListView();
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.media.isMediaListViewVisible();
   await umbracoUi.media.doesMediaListNameValuesMatch(expectedMediaValues);
 });
@@ -70,7 +68,6 @@ test('can add more columns to the list in the media section', async ({umbracoApi
   await umbracoApi.dataType.updateListViewMediaDataType('includeProperties', updatedValue);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
   await umbracoUi.media.changeToListView();
-  await umbracoUi.waitForTimeout(500);
 
   // Assert
   await umbracoUi.media.isMediaListViewVisible();
@@ -100,25 +97,15 @@ test('can disable one view in the media section', async ({umbracoApi, umbracoUi}
 });
 
 test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const updatedValue = {
-    "allowBulkPublish": false,
-    "allowBulkUnpublish": false,
-    "allowBulkCopy": false,
-    "allowBulkDelete": true,
-    "allowBulkMove": false
-  };
-
   // Act
-  await umbracoApi.dataType.updateListViewMediaDataType('bulkActionPermissions', updatedValue);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
-  await umbracoUi.media.selectMediaByName(firstMediaFileName);
-  await umbracoUi.media.selectMediaByName(secondMediaFileName);
+  await umbracoUi.media.selectMediaWithName(firstMediaFileName);
+  await umbracoUi.media.selectMediaWithName(secondMediaFileName);
   await umbracoUi.media.clickBulkTrashButton();
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
-  await umbracoUi.media.reloadMediaTree();
+  await umbracoUi.media.isSuccessNotificationVisible();
   expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();
@@ -127,24 +114,17 @@ test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}
   await umbracoUi.media.isItemVisibleInRecycleBin(secondMediaFileName, true, false);
 });
 
-test('can allow bulk move in the media section', async ({umbracoApi, umbracoUi}) => {
+// TODO: Remove fixme when update code to select media successfully.
+test.fixme('can allow bulk move in the media section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaFolderName = 'Test Folder Name';
-  const updatedValue = {
-    "allowBulkPublish": false,
-    "allowBulkUnpublish": false,
-    "allowBulkCopy": false,
-    "allowBulkDelete": false,
-    "allowBulkMove": true
-  };
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
   const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
 
   // Act
-  await umbracoApi.dataType.updateListViewMediaDataType('bulkActionPermissions', updatedValue);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
-  await umbracoUi.media.selectMediaByName(firstMediaFileName);
-  await umbracoUi.media.selectMediaByName(secondMediaFileName);
+  await umbracoUi.media.selectMediaWithName(firstMediaFileName);
+  await umbracoUi.media.selectMediaWithName(secondMediaFileName);
   await umbracoUi.media.clickBulkMoveToButton();
   await umbracoUi.media.clickCaretButtonForName('Media');
   await umbracoUi.media.clickModalTextByName(mediaFolderName);

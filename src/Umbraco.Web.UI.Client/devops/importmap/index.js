@@ -15,7 +15,6 @@ export const createImportMap = (args) => {
 			let modulePath = value;
 			if (typeof args.rootDir !== 'undefined') modulePath = modulePath.replace(/^\.\/dist-cms/, args.rootDir);
 			if (args.replaceModuleExtensions) modulePath = modulePath.replace('.js', '.ts');
-			console.log('replacing', value, 'with', modulePath);
 			const importAlias = `${packageJsonName}/${moduleName}`;
 
 			imports[importAlias] = modulePath;

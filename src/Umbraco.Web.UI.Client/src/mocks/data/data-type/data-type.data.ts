@@ -407,6 +407,27 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
+		name: 'Dropdown (Multiple)',
+		id: 'dt-dropdown-multiple',
+		parent: null,
+		editorAlias: 'Umbraco.DropDown.Flexible',
+		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'multiple',
+				value: true,
+			},
+			{
+				alias: 'items',
+				value: ['First Option', 'Second Option', 'I Am the third Option'],
+			},
+		],
+	},
+	{
 		name: 'Dropdown Alignment Options',
 		id: 'dt-dropdown-align',
 		parent: null,
@@ -701,7 +722,70 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'fileExtensions',
-				value: ['jpg', 'jpeg', 'png', 'pdf'],
+				value: ['jpg', 'jpeg', 'png', 'svg'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Upload Field (Files)',
+		id: 'dt-uploadFieldFiles',
+		parent: null,
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['pdf', 'iso'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Upload Field (Movies)',
+		id: 'dt-uploadFieldMovies',
+		parent: null,
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['mp4', 'mov'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Upload Field (Vector)',
+		id: 'dt-uploadFieldVector',
+		parent: null,
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['svg'],
 			},
 			{
 				alias: 'multiple',
@@ -857,8 +941,16 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'layouts',
 				value: [
-					{ icon: 'icon-grid', isSystem: true, name: 'Grid', path: '', selected: true },
-					{ icon: 'icon-list', isSystem: true, name: 'Table', path: '', selected: true },
+					{
+						icon: 'icon-grid',
+						name: 'Document Grid Collection View',
+						collectionView: 'Umb.CollectionView.Document.Grid',
+					},
+					{
+						icon: 'icon-list',
+						name: 'Document Table Collection View',
+						collectionView: 'Umb.CollectionView.Document.Table',
+					},
 				],
 			},
 			{ alias: 'icon', value: 'icon-layers' },
@@ -891,8 +983,16 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'layouts',
 				value: [
-					{ icon: 'icon-grid', isSystem: true, name: 'Grid', path: '', selected: true },
-					{ icon: 'icon-list', isSystem: true, name: 'Table', path: '', selected: true },
+					{
+						icon: 'icon-grid',
+						name: 'Media Grid Collection View',
+						collectionView: 'Umb.CollectionView.Media.Grid',
+					},
+					{
+						icon: 'icon-list',
+						name: 'Media Table Collection View',
+						collectionView: 'Umb.CollectionView.Media.Table',
+					},
 				],
 			},
 			{ alias: 'icon', value: 'icon-layers' },
@@ -923,9 +1023,68 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		values: [
+			{
+				alias: 'extensions',
+				value: [
+					'Umb.Tiptap.RichTextEssentials',
+					'Umb.Tiptap.Embed',
+					'Umb.Tiptap.Figure',
+					'Umb.Tiptap.Image',
+					'Umb.Tiptap.Link',
+					'Umb.Tiptap.MediaUpload',
+					'Umb.Tiptap.Subscript',
+					'Umb.Tiptap.Superscript',
+					'Umb.Tiptap.Table',
+					'Umb.Tiptap.TextAlign',
+					'Umb.Tiptap.TextDirection',
+					'Umb.Tiptap.Underline',
+				],
+			},
+			{
+				alias: 'toolbar',
+				value: [
+					[
+						[
+							'Umb.Tiptap.Toolbar.SourceEditor',
+							'Umb.Tiptap.Toolbar.Undo',
+							'Umb.Tiptap.Toolbar.Redo',
+							'Umb.Tiptap.Toolbar.ClearFormatting',
+						],
+						['Umb.Tiptap.Toolbar.StyleSelect', 'Umb.Tiptap.Toolbar.FontFamily', 'Umb.Tiptap.Toolbar.FontSize'],
+						[
+							'Umb.Tiptap.Toolbar.Bold',
+							'Umb.Tiptap.Toolbar.Italic',
+							'Umb.Tiptap.Toolbar.Underline',
+							'Umb.Tiptap.Toolbar.Strike',
+						],
+						['Umb.Tiptap.Toolbar.TextColorForeground', 'Umb.Tiptap.Toolbar.TextColorBackground'],
+						[
+							'Umb.Tiptap.Toolbar.TextAlignLeft',
+							'Umb.Tiptap.Toolbar.TextAlignCenter',
+							'Umb.Tiptap.Toolbar.TextAlignRight',
+						],
+						['Umb.Tiptap.Toolbar.Subscript', 'Umb.Tiptap.Toolbar.Superscript'],
+						[
+							'Umb.Tiptap.Toolbar.CharacterMap',
+							'Umb.Tiptap.Toolbar.TextDirectionRtl',
+							'Umb.Tiptap.Toolbar.TextDirectionLtr',
+						],
+						[
+							'Umb.Tiptap.Toolbar.BulletList',
+							'Umb.Tiptap.Toolbar.OrderedList',
+							'Umb.Tiptap.Toolbar.Blockquote',
+							'Umb.Tiptap.Toolbar.HorizontalRule',
+						],
+						['Umb.Tiptap.Toolbar.Anchor', 'Umb.Tiptap.Toolbar.Link', 'Umb.Tiptap.Toolbar.Unlink'],
+						['Umb.Tiptap.Toolbar.Table', 'Umb.Tiptap.Toolbar.MediaPicker', 'Umb.Tiptap.Toolbar.EmbeddedMedia'],
+					],
+				],
+			},
+			{ alias: 'stylesheets', value: ['/rte-styles.css'] },
 			{ alias: 'dimensions', value: { height: 500 } },
 			{ alias: 'maxImageSize', value: 500 },
 			{ alias: 'ignoreUserStartNodes', value: false },
+			{ alias: 'overlaySize', value: 'medium' },
 		],
 	},
 	{
@@ -952,7 +1111,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 					'+a[id|style|rel|data-id|data-udi|rev|charset|hreflang|dir|lang|tabindex|accesskey|type|name|href|target|title|class|onfocus|onblur|onclick|ondblclick|onmousedown|onmouseup|onmouseover|onmousemove|onmouseout|onkeypress|onkeydown|onkeyup],-strong/-b[class|style],-em/-i[class|style],-strike[class|style],-s[class|style],-u[class|style],#p[id|style|dir|class|align],-ol[class|reversed|start|style|type],-ul[class|style],-li[class|style],br[class],img[id|dir|lang|longdesc|usemap|style|class|src|onmouseover|onmouseout|border|alt=|title|hspace|vspace|width|height|align|umbracoorgwidth|umbracoorgheight|onresize|onresizestart|onresizeend|rel|data-id],-sub[style|class],-sup[style|class],-blockquote[dir|style|class],-table[border=0|cellspacing|cellpadding|width|height|class|align|summary|style|dir|id|lang|bgcolor|background|bordercolor],-tr[id|lang|dir|class|rowspan|width|height|align|valign|style|bgcolor|background|bordercolor],tbody[id|class],thead[id|class],tfoot[id|class],#td[id|lang|dir|class|colspan|rowspan|width|height|align|valign|style|bgcolor|background|bordercolor|scope],-th[id|lang|dir|class|colspan|rowspan|width|height|align|valign|style|scope],caption[id|lang|dir|class|style],-div[id|dir|class|align|style],-span[class|align|style],-pre[class|align|style],address[class|align|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align|style],hr[class|style],small[class|style],dd[id|class|title|style|dir|lang],dl[id|class|title|style|dir|lang],dt[id|class|title|style|dir|lang],object[class|id|width|height|codebase|*],param[name|value|_value|class],embed[type|width|height|src|class|*],map[name|class],area[shape|coords|href|alt|target|class],bdo[class],button[class],iframe[*],figure,figcaption,video[*],audio[*],picture[*],source[*],canvas[*]',
 			},
 			{ alias: 'invalidElements', value: 'font' },
-			{ alias: 'stylesheets', value: [] },
+			{ alias: 'stylesheets', value: ['/rte-styles.css'] },
 			{
 				alias: 'toolbar',
 				value: [
@@ -960,11 +1119,20 @@ export const data: Array<UmbMockDataTypeModel> = [
 					'undo',
 					'redo',
 					'styles',
+					'fontfamily',
+					'fontsize',
+					'forecolor',
+					'backcolor',
+					'blockquote',
+					'removeformat',
 					'bold',
 					'italic',
+					'underline',
+					'strikethrough',
 					'alignleft',
 					'aligncenter',
 					'alignright',
+					'alignjustify',
 					'bullist',
 					'numlist',
 					'outdent',
@@ -972,6 +1140,12 @@ export const data: Array<UmbMockDataTypeModel> = [
 					'link',
 					'unlink',
 					'anchor',
+					'hr',
+					'subscript',
+					'superscript',
+					'charmap',
+					'rtl',
+					'ltr',
 					'table',
 					'umbmediapicker',
 					'umbembeddialog',

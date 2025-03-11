@@ -1,13 +1,13 @@
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbSliderPropertyEditorUiValue } from './types.js';
 import type { UmbInputSliderElement } from '@umbraco-cms/backoffice/components';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-
-export type UmbSliderValue = { from: number; to: number } | undefined;
 
 /**
  * @element umb-property-editor-ui-slider
@@ -15,7 +15,7 @@ export type UmbSliderValue = { from: number; to: number } | undefined;
 @customElement('umb-property-editor-ui-slider')
 export class UmbPropertyEditorUISliderElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Object })
-	value: UmbSliderValue | undefined;
+	value: UmbSliderPropertyEditorUiValue | undefined;
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -27,22 +27,25 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 	readonly = false;
 
 	@state()
-	_enableRange = false;
+	private _enableRange = false;
 
 	@state()
-	_initVal1: number = 0;
+	private _initVal1: number = 0;
 
 	@state()
-	_initVal2: number = 1;
+	private _initVal2: number = 1;
 
 	@state()
-	_step = 1;
+	private _label?: string;
 
 	@state()
-	_min = 0;
+	private _step = 1;
 
 	@state()
-	_max = 100;
+	private _min = 0;
+
+	@state()
+	private _max = 100;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -59,19 +62,37 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 		const initVal2 = Number(config.getValueByAlias('initVal2'));
 		this._initVal2 = isNaN(initVal2) ? this._initVal1 + this._step : initVal2;
 
-		const minVal = Number(config.getValueByAlias('minVal'));
-		this._min = isNaN(minVal) ? 0 : minVal;
-
-		const maxVal = Number(config.getValueByAlias('maxVal'));
-		this._max = isNaN(maxVal) ? 100 : maxVal;
+		this._min = this.#parseInt(config.getValueByAlias('minVal')) || 0;
+		this._max = this.#parseInt(config.getValueByAlias('maxVal')) || 100;
 
 		if (this._min === this._max) {
 			this._max = this._min + 100;
-			//TODO Maybe we want to show some kind of error element rather than trying to fix the mistake made by the user...?
-			throw new Error(
-				`Property Editor Slider: min and max are currently equal. Please change your data type configuration. To render the slider correctly, we changed this slider to: min = ${this._min}, max = ${this._max}`,
+			console.warn(
+				`Property Editor (Slider) has been misconfigured, 'min' and 'max' are equal values. Please correct your data type configuration. To render the slider correctly, we changed this slider to: min = ${this._min}, max = ${this._max}`,
+				this,
 			);
 		}
+	}
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this._label = context.getLabel();
+		});
+	}
+
+	protected override firstUpdated() {
+		if (this._min && this._max && this._min > this._max) {
+			console.warn(
+				`Property '${this._label}' (Slider) has been misconfigured, 'min' is greater than 'max'. Please correct your data type configuration.`,
+				this,
+			);
+		}
+	}
+
+	#parseInt(input: unknown): number | undefined {
+		const num = Number(input);
+		return Number.isNaN(num) ? undefined : num;
 	}
 
 	#getValueObject(value: string) {
@@ -81,12 +102,13 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 
 	#onChange(event: CustomEvent & { target: UmbInputSliderElement }) {
 		this.value = this.#getValueObject(event.target.value as string);
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
 		return html`
 			<umb-input-slider
+				.label=${this._label ?? 'Slider'}
 				.valueLow=${this.value?.from ?? this._initVal1}
 				.valueHigh=${this.value?.to ?? this._initVal2}
 				.step=${this._step}

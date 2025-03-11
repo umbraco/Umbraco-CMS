@@ -20,6 +20,8 @@ public class DeliveryApiTests
 
     protected IPublishedPropertyType DefaultPropertyType { get; private set; }
 
+    protected IPublishStatusQueryService PublishStatusQueryService { get; private set; }
+
     [SetUp]
     public virtual void Setup()
     {
@@ -57,6 +59,13 @@ public class DeliveryApiTests
         defaultPropertyValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
 
         DefaultPropertyType = SetupPublishedPropertyType(defaultPropertyValueConverter.Object, "default", "Default.Editor");
+
+        var publishStatusQueryService = new Mock<IPublishStatusQueryService>();
+        publishStatusQueryService
+            .Setup(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
+            .Returns(true);
+
+        PublishStatusQueryService = publishStatusQueryService.Object;
     }
 
     protected IPublishedPropertyType SetupPublishedPropertyType(IPropertyValueConverter valueConverter, string propertyTypeAlias, string editorAlias, object? dataTypeConfiguration = null)
@@ -104,20 +113,22 @@ public class DeliveryApiTests
         content.SetupGet(c => c.ContentType).Returns(contentType);
         content.SetupGet(c => c.Properties).Returns(properties);
         content.SetupGet(c => c.ItemType).Returns(contentType.ItemType);
+        content.SetupGet(c => c.Level).Returns(1);
         content.Setup(c => c.IsPublished(It.IsAny<string?>())).Returns(true);
     }
 
     protected string DefaultUrlSegment(string name, string? culture = null)
         => $"{name.ToLowerInvariant().Replace(" ", "-")}{(culture.IsNullOrWhiteSpace() ? string.Empty : $"-{culture}")}";
 
-    protected ApiContentRouteBuilder CreateContentRouteBuilder(
+    protected virtual ApiContentRouteBuilder CreateContentRouteBuilder(
         IApiContentPathProvider contentPathProvider,
         IOptions<GlobalSettings> globalSettings,
         IVariationContextAccessor? variationContextAccessor = null,
         IRequestPreviewService? requestPreviewService = null,
         IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null,
         IPublishedContentCache? contentCache = null,
-        IDocumentNavigationQueryService? navigationQueryService = null)
+        IDocumentNavigationQueryService? navigationQueryService = null,
+        IPublishStatusQueryService? publishStatusQueryService = null)
     {
         if (requestHandlerSettingsMonitor == null)
         {
@@ -133,6 +144,7 @@ public class DeliveryApiTests
             requestPreviewService ?? Mock.Of<IRequestPreviewService>(),
             requestHandlerSettingsMonitor,
             contentCache ?? Mock.Of<IPublishedContentCache>(),
-            navigationQueryService ?? Mock.Of<IDocumentNavigationQueryService>());
+            navigationQueryService ?? Mock.Of<IDocumentNavigationQueryService>(),
+            publishStatusQueryService ?? PublishStatusQueryService);
     }
 }

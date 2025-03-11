@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 
@@ -10,15 +12,31 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     private readonly ILogger<PublishStatusService> _logger;
     private readonly IPublishStatusRepository _publishStatusRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
+    private readonly ILanguageService _languageService;
     private readonly IDictionary<Guid, ISet<string>> _publishedCultures = new Dictionary<Guid, ISet<string>>();
+
+    private string? DefaultCulture { get; set; }
+
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 17.")]
     public PublishStatusService(
         ILogger<PublishStatusService> logger,
         IPublishStatusRepository publishStatusRepository,
         ICoreScopeProvider coreScopeProvider)
+        : this(logger, publishStatusRepository, coreScopeProvider, StaticServiceProvider.Instance.GetRequiredService<ILanguageService>())
+    {
+
+    }
+
+    public PublishStatusService(
+        ILogger<PublishStatusService> logger,
+        IPublishStatusRepository publishStatusRepository,
+        ICoreScopeProvider coreScopeProvider,
+        ILanguageService languageService)
     {
         _logger = logger;
         _publishStatusRepository = publishStatusRepository;
         _coreScopeProvider = coreScopeProvider;
+        _languageService = languageService;
     }
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
@@ -39,14 +57,31 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
             }
         }
 
-
+        DefaultCulture = await _languageService.GetDefaultIsoCodeAsync();
     }
 
     public bool IsDocumentPublished(Guid documentKey, string culture)
     {
+        if (string.IsNullOrEmpty(culture) && DefaultCulture is not null)
+        {
+            culture = DefaultCulture;
+        }
+
         if (_publishedCultures.TryGetValue(documentKey, out ISet<string>? publishedCultures))
         {
             return publishedCultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase);
+        }
+
+        _logger.LogDebug("Document {DocumentKey} not found in the publish status cache", documentKey);
+        return false;
+    }
+
+    /// <inheritdoc />
+    public bool IsDocumentPublishedInAnyCulture(Guid documentKey)
+    {
+        if (_publishedCultures.TryGetValue(documentKey, out ISet<string>? publishedCultures))
+        {
+            return publishedCultures.Count > 0;
         }
 
         _logger.LogDebug("Document {DocumentKey} not found in the publish status cache", documentKey);

@@ -1,8 +1,9 @@
+import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DUPLICATE_DOCUMENT_MODAL } from './modal/index.js';
 import { UmbDuplicateDocumentRepository } from './repository/index.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbEntityActionBase, UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never> {
 	override async execute() {
@@ -32,22 +33,28 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 			});
 
 			if (!error) {
-				this.#reloadMenu();
+				this.#reloadMenu(destinationUnique);
 			}
 		} catch (error) {
 			console.log(error);
 		}
 	}
 
-	async #reloadMenu() {
+	async #reloadMenu(destinationUnique: string | null) {
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			unique: this.args.unique,
-			entityType: this.args.entityType,
+
+		// When duplicating, the destination entity type may or may not be the same as that of
+		// the item selected for duplication (that is available in this.args).
+		// For documents though, we know the entity type will be "document", unless we are duplicating
+		// to the root (when the destinationUnique will be null).
+		const destinationEntityType = destinationUnique === null ? UMB_DOCUMENT_ROOT_ENTITY_TYPE : UMB_DOCUMENT_ENTITY_TYPE;
+
+		const event = new UmbRequestReloadChildrenOfEntityEvent({
+			unique: destinationUnique,
+			entityType: destinationEntityType,
 		});
 
 		actionEventContext.dispatchEvent(event);
-		// TODO: Reload destination
 	}
 }
 

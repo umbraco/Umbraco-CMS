@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -42,17 +42,19 @@ public partial class ContentPublishingServiceTests
         VerifyIsPublished(Subpage.Key);
     }
 
-    [TestCase(true)]
-    [TestCase(false)]
-    public async Task Publish_Branch_Does_Not_Publish_Unpublished_Children_Unless_Explicitly_Instructed_To(bool force)
+    [TestCase(PublishBranchFilter.Default)]
+    [TestCase(PublishBranchFilter.IncludeUnpublished)]
+    [TestCase(PublishBranchFilter.ForceRepublish)]
+    [TestCase(PublishBranchFilter.All)]
+    public async Task Publish_Branch_Does_Not_Publish_Unpublished_Children_Unless_Instructed_To(PublishBranchFilter publishBranchFilter)
     {
-        var result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, force, Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, publishBranchFilter, Constants.Security.SuperUserKey);
 
         Assert.IsTrue(result.Success);
 
         VerifyIsPublished(Textpage.Key);
 
-        if (force)
+        if (publishBranchFilter.HasFlag(PublishBranchFilter.IncludeUnpublished))
         {
             AssertBranchResultSuccess(result.Result, Textpage.Key, Subpage.Key, Subpage2.Key, Subpage3.Key);
             VerifyIsPublished(Subpage.Key);
@@ -76,7 +78,7 @@ public partial class ContentPublishingServiceTests
         ContentService.Save(subpage2Subpage, -1);
 
         VerifyIsNotPublished(Subpage2.Key);
-        var result = await ContentPublishingService.PublishBranchAsync(Subpage2.Key, _allCultures, true, Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishBranchAsync(Subpage2.Key, _allCultures, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey);
 
         Assert.IsTrue(result.Success);
         AssertBranchResultSuccess(result.Result, Subpage2.Key, subpage2Subpage.Key);
@@ -187,7 +189,7 @@ public partial class ContentPublishingServiceTests
         child.SetValue("title", "DA child title", culture: langDa.IsoCode);
         ContentService.Save(child);
 
-        var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode, langDa.IsoCode }, true, Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode, langDa.IsoCode }, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         AssertBranchResultSuccess(result.Result, root.Key, child.Key);
 
@@ -249,7 +251,7 @@ public partial class ContentPublishingServiceTests
         child.SetValue("title", "DA child title", culture: langDa.IsoCode);
         ContentService.Save(child);
 
-        var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode }, true, Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode }, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         AssertBranchResultSuccess(result.Result, root.Key, child.Key);
 
@@ -288,7 +290,7 @@ public partial class ContentPublishingServiceTests
         child.SetValue("title", "DA child title", culture: langDa.IsoCode);
         ContentService.Save(child);
 
-        var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode }, true, Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode }, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         AssertBranchResultSuccess(result.Result, root.Key, child.Key);
 
@@ -335,7 +337,7 @@ public partial class ContentPublishingServiceTests
     public async Task Cannot_Publish_Branch_Of_Non_Existing_Content()
     {
         var key = Guid.NewGuid();
-        var result = await ContentPublishingService.PublishBranchAsync(key, _allCultures, true, Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishBranchAsync(key, _allCultures, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey);
         Assert.IsFalse(result);
         AssertBranchResultFailed(result.Result, (key, ContentPublishingOperationStatus.ContentNotFound));
     }
@@ -367,7 +369,7 @@ public partial class ContentPublishingServiceTests
         ContentService.Save(child, -1);
         Assert.AreEqual(content.Id, ContentService.GetById(child.Key)!.ParentId);
 
-        var result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, true, Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey);
 
         Assert.IsFalse(result.Success);
         AssertBranchResultSuccess(result.Result, Textpage.Key, Subpage.Key, Subpage2.Key, Subpage3.Key);
@@ -448,7 +450,7 @@ public partial class ContentPublishingServiceTests
         child.SetValue("title", "DA child title", culture: langDa.IsoCode);
         ContentService.Save(child);
 
-        var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode, langDa.IsoCode }, true, Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode, langDa.IsoCode }, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         AssertBranchResultFailed(result.Result, (root.Key, ContentPublishingOperationStatus.ContentInvalid));
 
@@ -541,7 +543,7 @@ public partial class ContentPublishingServiceTests
     [Test]
     public async Task Cannot_Republish_Branch_After_Adding_Mandatory_Property()
     {
-        var result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, true, Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         VerifyIsPublished(Textpage.Key);
         VerifyIsPublished(Subpage.Key);
@@ -571,7 +573,7 @@ public partial class ContentPublishingServiceTests
         textPage.SetValue("mandatoryProperty", "This is a valid value");
         ContentService.Save(textPage);
 
-        result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, true, Constants.Security.SuperUserKey);
+        result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.FailedBranch, result.Status);
         AssertBranchResultSuccess(result.Result, Textpage.Key);
@@ -626,6 +628,28 @@ public partial class ContentPublishingServiceTests
 
         var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { cultureCode }), Constants.Security.SuperUserKey);
 
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Publish_Invariant_Content_With_Cultures_Provided_If_The_Default_Culture_Is_Exclusively_Provided()
+    {
+        var result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(new HashSet<string>() { "en-US" }), Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+    }
+
+    [Test]
+    public async Task Can_Publish_Invariant_Content_With_Cultures_Provided_If_The_Default_Culture_Is_Provided_With_Other_Cultures()
+    {
+        var result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(new HashSet<string>() { "en-US", "da-DK" }), Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+    }
+
+    [Test]
+    public async Task Cannot_Publish_Invariant_Content_With_Cultures_Provided_That_Do_Not_Include_The_Default_Culture()
+    {
+        var result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(new HashSet<string>() { "da-DK" }), Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Status);
     }

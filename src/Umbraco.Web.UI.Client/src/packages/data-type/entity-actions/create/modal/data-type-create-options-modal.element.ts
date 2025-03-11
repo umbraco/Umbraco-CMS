@@ -1,12 +1,30 @@
 import { UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../tree/index.js';
-import type { UmbDataTypeCreateOptionsModalData } from './index.js';
+import type { UmbDataTypeCreateOptionsModalData } from './constants.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
+/**
+ * @deprecated This element is deprecated and will be removed in v.17.0.0.
+ * Please use the UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL instead.
+ * @exports
+ * @class UmbDataTypeCreateOptionsModalElement
+ * @augments {UmbModalBaseElement<UmbDataTypeCreateOptionsModalData>}
+ */
 @customElement('umb-data-type-create-options-modal')
 export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<UmbDataTypeCreateOptionsModalData> {
 	#createFolderAction?: UmbCreateFolderEntityAction;
+
+	constructor() {
+		super();
+
+		new UmbDeprecation({
+			deprecated: 'umb-data-type-create-options-modal',
+			removeInVersion: '17.0.0',
+			solution: 'Use UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL instead',
+		}).warn();
+	}
 
 	override connectedCallback(): void {
 		super.connectedCallback();

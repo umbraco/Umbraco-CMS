@@ -8,7 +8,7 @@ import type {
 } from '../types.js';
 import type { UmbCollectionFilterModel } from '../collection-filter-model.interface.js';
 import type { UmbCollectionRepository } from '../repository/collection-repository.interface.js';
-import type { ManifestCollection } from '../extensions/index.js';
+import type { ManifestCollection } from '../extensions/types.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbBasicState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -336,5 +336,13 @@ export class UmbDefaultCollectionContext<
 	 */
 	public getManifest() {
 		return this._manifest;
+	}
+
+	/**
+	 * Returns the items in the collection.
+	 * @returns {Array<CollectionItemType>} - The items in the collection.
+	 */
+	public getItems() {
+		return this._items.getValue();
 	}
 }

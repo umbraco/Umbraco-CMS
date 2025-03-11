@@ -44,8 +44,9 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 		switch (status) {
 			case HealthStatusModel.HEALTHY:
 				return html`<umb-icon name="icon-check color-green"></umb-icon>`;
+			case HealthStatusModel.CORRUPT:
 			case HealthStatusModel.UNHEALTHY:
-				return html`<umb-icon name="icon-error color-red"></umb-icon>`;
+				return html`<umb-icon name="icon-alert color-red"></umb-icon>`;
 			case HealthStatusModel.REBUILDING:
 				return html`<umb-icon name="icon-time color-yellow"></umb-icon>`;
 			default:

@@ -3,12 +3,15 @@ import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-tok
 import { UmbMemberKind, type UmbMemberKindType } from '../../../../utils/index.js';
 import { TimeFormatOptions } from './utils.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbMemberTypeItemRepository } from '@umbraco-cms/backoffice/member-type';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-member-workspace-view-member-info')
 export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -35,6 +38,9 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 
 	@state()
 	private _memberKind?: UmbMemberKindType;
+
+	@state()
+	private _hasSettingsAccess: boolean = false;
 
 	#workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
 	#memberTypeItemRepository: UmbMemberTypeItemRepository = new UmbMemberTypeItemRepository(this);
@@ -64,6 +70,17 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 			this._memberTypeName = memberType.name;
 			this._memberTypeIcon = memberType.icon;
 		});
+
+		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					match: UMB_SETTINGS_SECTION_ALIAS,
+				},
+				onChange: (permitted: boolean) => {
+					this._hasSettingsAccess = permitted;
+				},
+			},
+		]);
 	}
 
 	#setDateFormat(date: string | undefined | null): string {
@@ -91,7 +108,10 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 					<uui-ref-node
 						standalone
 						.name=${this._memberTypeName}
-						.href=${this._editMemberTypePath + 'edit/' + this._memberTypeUnique}>
+						href=${ifDefined(
+							this._hasSettingsAccess ? this._editMemberTypePath + 'edit/' + this._memberTypeUnique : undefined,
+						)}
+						?readonly=${!this._hasSettingsAccess}>
 						<umb-icon slot="icon" .name=${this._memberTypeIcon}></umb-icon>
 					</uui-ref-node>
 				</div>
@@ -116,6 +136,11 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 		css`
 			h4 {
 				margin: 0;
+			}
+
+			uui-ref-node[readonly] {
+				padding-top: 7px;
+				padding-bottom: 7px;
 			}
 		`,
 	];

@@ -75,7 +75,7 @@ export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPicker
 												name=${this.localize.string(item.label)}
 												detail=${ifDefined(item.description)}
 												icon=${ifDefined(item.icon)}
-												@click=${() => this.#submit(item)}>
+												@open=${() => this.#submit(item)}>
 											</umb-ref-item>
 										`,
 									)}

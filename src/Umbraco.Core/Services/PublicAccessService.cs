@@ -1,5 +1,8 @@
 using System.Globalization;
+using System.Runtime.InteropServices;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -16,7 +19,9 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
     private readonly IPublicAccessRepository _publicAccessRepository;
     private readonly IEntityService _entityService;
     private readonly IContentService _contentService;
+    private readonly IIdKeyMap _idKeyMap;
 
+    [Obsolete("Please use the constructor that accepts all parameter. Will be removed in V16.")]
     public PublicAccessService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -24,11 +29,31 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         IPublicAccessRepository publicAccessRepository,
         IEntityService entityService,
         IContentService contentService)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            publicAccessRepository,
+            entityService,
+            contentService,
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+    {
+    }
+
+    public PublicAccessService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IPublicAccessRepository publicAccessRepository,
+        IEntityService entityService,
+        IContentService contentService,
+        IIdKeyMap idKeyMap)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _publicAccessRepository = publicAccessRepository;
         _entityService = entityService;
         _contentService = contentService;
+        _idKeyMap = idKeyMap;
     }
 
     /// <summary>
@@ -75,9 +100,9 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         {
             // This will retrieve from cache!
             var entries = _publicAccessRepository.GetMany().ToList();
-            foreach (var id in ids)
+            foreach (var id in CollectionsMarshal.AsSpan(ids))
             {
-                PublicAccessEntry? found = entries.FirstOrDefault(x => x.ProtectedNodeId == id);
+                PublicAccessEntry? found = entries.Find(x => x.ProtectedNodeId == id);
                 if (found != null)
                 {
                     return found;
@@ -379,6 +404,23 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         }
 
         return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, entry));
+    }
+
+    public async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKeyWithoutAncestorsAsync(Guid key)
+    {
+        Attempt<PublicAccessEntry?, PublicAccessOperationStatus> result = await GetEntryByContentKeyAsync(key);
+        if (result.Success is false || result.Result is null)
+        {
+            return result;
+        }
+
+        Attempt<Guid> idToKeyAttempt = _idKeyMap.GetKeyForId(result.Result.ProtectedNodeId, UmbracoObjectTypes.Document);
+        if (idToKeyAttempt.Success is false || idToKeyAttempt.Result != key)
+        {
+            return Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.EntryNotFound, null);
+        }
+
+        return result;
     }
 
     public async Task<Attempt<PublicAccessOperationStatus>> DeleteAsync(Guid key)

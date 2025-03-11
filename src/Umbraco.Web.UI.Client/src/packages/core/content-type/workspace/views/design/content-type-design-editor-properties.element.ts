@@ -1,8 +1,8 @@
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '../../../types.js';
 import { UmbContentTypePropertyStructureHelper } from '../../../structure/index.js';
-import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context.js';
 import type { UmbContentTypeDesignEditorPropertyElement } from './content-type-design-editor-property.element.js';
+import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context-token.js';
 import {
 	css,
 	customElement,
@@ -46,19 +46,26 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	#sorter = new UmbSorterController<UmbPropertyTypeModel, UmbContentTypeDesignEditorPropertyElement>(this, {
 		...SORTER_CONFIG,
 		onChange: ({ model }) => {
-			this._propertyStructure = model;
+			this._properties = model;
+		},
+		onContainerChange: ({ item }) => {
+			if (this._containerId === undefined) {
+				throw new Error('ContainerId is not set');
+			}
+			this.#propertyStructureHelper.partialUpdateProperty(item.id, {
+				container: this._containerId ? { id: this._containerId } : null,
+			});
 		},
 		onEnd: ({ item }) => {
 			if (this._containerId === undefined) {
-				throw new Error('ContainerId is not set, we have not made a local duplicated of this container.');
-				return;
+				throw new Error('ContainerId is not set.');
 			}
 			/**
 			 * Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
 			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
 			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
 			 */
-			const model = this._propertyStructure;
+			const model = this._properties;
 			const newIndex = model.findIndex((entry) => entry.id === item.id);
 
 			// Doesn't exist in model
@@ -122,7 +129,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	editContentTypePath?: string;
 
 	@state()
-	private _propertyStructure: Array<UmbPropertyTypeModel> = [];
+	private _properties: Array<UmbPropertyTypeModel> = [];
 
 	@state()
 	private _ownerContentTypeUnique?: string;
@@ -163,8 +170,8 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			this.createPropertyTypeWorkspaceRoutes();
 		});
 		this.observe(this.#propertyStructureHelper.propertyStructure, (propertyStructure) => {
-			this._propertyStructure = propertyStructure;
-			this.#sorter.setModel(this._propertyStructure);
+			this._properties = propertyStructure;
+			this.#sorter.setModel(this._properties);
 		});
 	}
 
@@ -189,7 +196,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 					let sortOrderInt = parseInt(params.sortOrder);
 					if (sortOrderInt === -1) {
 						// Find the highest sortOrder and add 1 to it:
-						sortOrderInt = Math.max(...this._propertyStructure.map((x) => x.sortOrder), -1) + 1;
+						sortOrderInt = Math.max(...this._properties.map((x) => x.sortOrder), -1) + 1;
 					}
 					preset.sortOrder = sortOrderInt;
 				}
@@ -202,6 +209,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 						containerUnique: this._containerId!,
 					});
 			});
+
 		if (this._containerId !== undefined) {
 			this.#addPropertyModal?.setUniquePathValue(
 				'container-id',
@@ -237,7 +245,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			? html`
 					<div id="property-list" ?sort-mode-active=${this._sortModeActive}>
 						${repeat(
-							this._propertyStructure,
+							this._properties,
 							(property) => property.id,
 							(property) => {
 								return html`

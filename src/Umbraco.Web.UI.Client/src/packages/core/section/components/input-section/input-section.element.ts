@@ -1,4 +1,4 @@
-import type { UmbSectionItemModel } from '../../repository/index.js';
+import type { UmbSectionItemModel } from '../../types.js';
 import { UmbSectionPickerInputContext } from './input-section.context.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

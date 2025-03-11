@@ -11,6 +11,10 @@ export type PermittedControllerType<ControllerType extends { manifest: any }> = 
 	manifest: Required<Pick<ControllerType, 'manifest'>>;
 };
 
+export interface UmbBaseExtensionsInitializerArgs {
+	single?: boolean;
+}
+
 /**
  * This abstract Controller holds the core to manage a multiple Extensions.
  * When one or more extensions are permitted to be used, then the extender of this class can instantiate the relevant single extension initiator relevant for this type.
@@ -28,6 +32,7 @@ export abstract class UmbBaseExtensionsInitializer<
 	#extensionRegistry: UmbExtensionRegistry<ManifestType>;
 	#type: ManifestTypeName | Array<ManifestTypeName>;
 	#filter: undefined | null | ((manifest: ManifestType) => boolean);
+	#single: boolean = false;
 	#onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void;
 	protected _extensions: Array<ControllerType> = [];
 	#permittedExts: Array<MyPermittedControllerType> = [];
@@ -51,12 +56,14 @@ export abstract class UmbBaseExtensionsInitializer<
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
 		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void,
 		controllerAlias?: string,
+		args: UmbBaseExtensionsInitializerArgs = {},
 	) {
 		super(host, controllerAlias ?? 'extensionsInitializer_' + (Array.isArray(type) ? type.join('_') : type));
 		this.#extensionRegistry = extensionRegistry;
 		this.#type = type;
 		this.#filter = filter;
 		this.#onChange = onChange;
+		this.#single = args.single ?? false;
 	}
 	protected _init() {
 		let source;
@@ -102,7 +109,7 @@ export abstract class UmbBaseExtensionsInitializer<
 		this._extensions = this._extensions.filter((extension) => {
 			if (!manifests.find((manifest) => manifest.alias === extension.alias)) {
 				extension.destroy();
-				// destroying the controller will, if permitted, make a last callback with isPermitted = false. This will also remove it from the _permittedExts array.
+				// destroying the controller will, if permitted, make a last callback with isPermitted = false. This will also remove it from the _permittedExts array. [NL]
 				return false;
 			}
 			return true;
@@ -121,7 +128,7 @@ export abstract class UmbBaseExtensionsInitializer<
 	protected _extensionChanged = (isPermitted: boolean, controller: ControllerType) => {
 		let hasChanged = false;
 
-		// This might be called after this is destroyed, so we need to check if the _permittedExts is still available:
+		// This might be called after this is destroyed, so we need to check if the _permittedExts is still available: [NL]
 		const existingIndex = this.#permittedExts?.indexOf(controller as unknown as MyPermittedControllerType);
 		if (isPermitted) {
 			if (existingIndex === -1) {
@@ -147,23 +154,30 @@ export abstract class UmbBaseExtensionsInitializer<
 		// This means that we have been destroyed:
 		if (this.#permittedExts === undefined) return;
 
-		// The final list of permitted extensions to be displayed, this will be stripped from extensions that are overwritten by another extension and sorted accordingly.
-		this.#exposedPermittedExts = [...this.#permittedExts];
+		// The final list of permitted extensions to be displayed, this will be stripped from extensions that are overwritten by another extension and sorted accordingly. [NL]
+		let approvedExtensions = [...this.#permittedExts];
 
-		// Removal of overwritten extensions:
+		// Removal of overwritten extensions (Its important that this does not use the filtered list of extensions, as we want overridden approved extensions to clean up their overrides). [NL]
 		this.#permittedExts.forEach((extCtrl) => {
 			// Check if it overwrites another extension:
-			// if so, look up the extension it overwrites, and remove it from the list. and check that for if it overwrites another extension and so on.
+			// if so, look up the extension it overwrites, and remove it from the list. and check that for if it overwrites another extension and so on. [NL]
 			if (extCtrl.overwrites.length > 0) {
 				extCtrl.overwrites.forEach((overwrite) => {
-					this.#removeOverwrittenExtensions(this.#exposedPermittedExts!, overwrite);
+					this.#removeOverwrittenExtensions(approvedExtensions, overwrite);
 				});
 			}
 		});
 
 		// Sorting:
-		this.#exposedPermittedExts.sort((a, b) => b.weight - a.weight);
+		approvedExtensions.sort((a, b) => b.weight - a.weight);
 
+		if (this.#single && approvedExtensions.length > 1) {
+			approvedExtensions = [approvedExtensions[0]];
+		}
+
+		this.#exposedPermittedExts = approvedExtensions;
+
+		// TODO: Option to first resolve once all have responded are completed. [NL]
 		if (this.#exposedPermittedExts.length > 0) {
 			this.#promiseResolvers.forEach((x) => x());
 			this.#promiseResolvers = [];
@@ -197,7 +211,7 @@ export abstract class UmbBaseExtensionsInitializer<
 	}
 
 	public override destroy() {
-		// The this.#extensionRegistry is an indication of wether this is already destroyed.
+		// The this.#extensionRegistry is an indication of wether this is already destroyed. [NL]
 		if (!this.#extensionRegistry) return;
 
 		const oldPermittedExtsLength = this.#exposedPermittedExts?.length ?? 0;

@@ -1,6 +1,6 @@
 import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../types.js';
-import { type UmbDataTypeDetailRepository, UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
-import { UMB_DATA_TYPE_ENTITY_TYPE } from '../entity.js';
+import { UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS, UMB_DATA_TYPE_ENTITY_TYPE } from '../constants.js';
+import type { UmbDataTypeDetailRepository } from '../repository/index.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import { UMB_DATA_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
@@ -11,7 +11,7 @@ import type {
 import {
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
-	UmbEntityDetailWorkspaceContextBase,
+	UmbEntityNamedDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -20,7 +20,6 @@ import type {
 	PropertyEditorSettingsProperty,
 } from '@umbraco-cms/backoffice/property-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 type EntityType = UmbDataTypeDetailModel;
 
@@ -42,10 +41,9 @@ type EntityType = UmbDataTypeDetailModel;
  * - a new property editor ui is picked for a data-type, uses the data-type configuration to set the schema, if such is configured for the Property Editor UI. (The user picks the UI via the UI, the schema comes from the UI that the user picked, we store both on the data-type)
  */
 export class UmbDataTypeWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<EntityType, UmbDataTypeDetailRepository>
+	extends UmbEntityNamedDetailWorkspaceContextBase<EntityType, UmbDataTypeDetailRepository>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 	readonly propertyEditorUiAlias = this._data.createObservablePartOfCurrent((data) => data?.editorUiAlias);
 	readonly propertyEditorSchemaAlias = this._data.createObservablePartOfCurrent((data) => data?.editorAlias);
 
@@ -81,8 +79,6 @@ export class UmbDataTypeWorkspaceContext
 			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS,
 		});
-
-		this.addValidationContext(new UmbValidationContext(this));
 
 		this.#observePropertyEditorSchemaAlias();
 		this.#observePropertyEditorUIAlias();
@@ -231,14 +227,35 @@ export class UmbDataTypeWorkspaceContext
 		const data = this._data.getCurrent();
 		if (!data) return;
 
+		// We are going to transfer the default data from the schema and the UI (the UI can override the schema data).
+		// Let us figure out which editors are alike from the inherited data, so we can keep that data around and only transfer the data that is not
+		// inherited from the previous data type.
 		this.#settingsDefaultData = [
 			...this.#propertyEditorSchemaSettingsDefaultData,
 			...this.#propertyEditorUISettingsDefaultData,
 		] satisfies Array<UmbDataTypePropertyValueModel>;
-		// We check for satisfied type, because we will be directly transferring them to become value. Future note, if they are not satisfied, we need to transfer alias and value. [NL]
 
-		this._data.updatePersisted({ values: this.#settingsDefaultData });
-		this._data.updateCurrent({ values: this.#settingsDefaultData });
+		const values: Array<UmbDataTypePropertyValueModel> = [];
+
+		// We want to keep the existing data, if it is not in the default data, and if it is in the default data, then we want to keep the default data.
+		for (const defaultDataItem of this.#properties.getValue()) {
+			// We are matching on the alias, as we assume that the alias is unique for the data type.
+			// TODO: Consider if we should also match on the editorAlias just to be on the safe side [JOV]
+			const existingData = data.values?.find((x) => x.alias === defaultDataItem.alias);
+			if (existingData) {
+				values.push(existingData);
+				continue;
+			}
+
+			// If the data is not in the existing data, then we want to add the default data if it exists.
+			const existingDefaultData = this.#settingsDefaultData.find((x) => x.alias === defaultDataItem.alias);
+			if (existingDefaultData) {
+				values.push(existingDefaultData);
+			}
+		}
+
+		this._data.updatePersisted({ values });
+		this._data.updateCurrent({ values });
 	}
 
 	public getPropertyDefaultValue(alias: string) {
@@ -247,14 +264,6 @@ export class UmbDataTypeWorkspaceContext
 
 	createPropertyDatasetContext(host: UmbControllerHost): UmbPropertyDatasetContext {
 		return new UmbInvariantWorkspacePropertyDatasetContext(host, this);
-	}
-
-	getName() {
-		return this._data.getCurrent()?.name;
-	}
-
-	setName(name: string | undefined) {
-		this._data.updateCurrent({ name });
 	}
 
 	getPropertyEditorSchemaAlias() {

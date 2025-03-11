@@ -131,7 +131,6 @@ for (const listViewType of listViewTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
-      await umbracoUi.waitForTimeout(500);
       await umbracoUi.dataType.addLayouts(layoutName);
       await umbracoUi.dataType.clickSaveButton();
 
@@ -192,7 +191,8 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test('can update bulk action permission', async ({umbracoApi, umbracoUi}) => {
+    // Skip this test as currently there is no setting for bulk action permission
+    test.skip('can update bulk action permission', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const bulkActionPermissionValue = 'Allow bulk trash';
       const expectedDataTypeValues = {
@@ -208,7 +208,7 @@ for (const listViewType of listViewTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
-      await umbracoUi.dataType.clickBulkActionPermissionsSliderByValue(bulkActionPermissionValue);
+      await umbracoUi.dataType.clickBulkActionPermissionsToggleByValue(bulkActionPermissionValue);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
@@ -262,7 +262,7 @@ for (const listViewType of listViewTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
-      await umbracoUi.dataType.clickShowContentWorkspaceViewFirstSlider();
+      await umbracoUi.dataType.clickShowContentWorkspaceViewFirstToggle();
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
@@ -280,7 +280,7 @@ for (const listViewType of listViewTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
-      await umbracoUi.dataType.clickEditInInfiniteEditorSlider();
+      await umbracoUi.dataType.clickEditInInfiniteEditorToggle();
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert

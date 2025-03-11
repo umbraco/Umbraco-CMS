@@ -1,4 +1,4 @@
-import { UMB_STYLESHEET_CREATE_OPTIONS_MODAL } from './options-modal/index.js';
+import { UMB_STYLESHEET_CREATE_OPTIONS_MODAL } from './options-modal/stylesheet-create-options.modal-token.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 

@@ -1,16 +1,19 @@
 import type { UmbInputRichMediaElement } from '../../components/input-rich-media/input-rich-media.element.js';
-import type { UmbCropModel, UmbMediaPickerPropertyValue } from '../types.js';
+import type { UmbCropModel, UmbMediaPickerValueModel } from '../types.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 import '../../components/input-rich-media/input-rich-media.element.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 const elementName = 'umb-property-editor-ui-media-picker';
 
@@ -18,10 +21,10 @@ const elementName = 'umb-property-editor-ui-media-picker';
  * @element umb-property-editor-ui-media-picker
  */
 @customElement(elementName)
-export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property({ attribute: false })
-	value?: Array<UmbMediaPickerPropertyValue>;
-
+export class UmbPropertyEditorUIMediaPickerElement
+	extends UmbFormControlMixin<UmbMediaPickerValueModel | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
@@ -29,12 +32,24 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		this._focalPointEnabled = Boolean(config.getValueByAlias('enableLocalFocalPoint'));
 		this._multiple = Boolean(config.getValueByAlias('multiple'));
 		this._preselectedCrops = config?.getValueByAlias<Array<UmbCropModel>>('crops') ?? [];
-		this._startNode = config.getValueByAlias<string>('startNodeId') ?? '';
+
+		const startNodeId = config.getValueByAlias<string>('startNodeId') ?? '';
+		this._startNode = startNodeId ? { unique: startNodeId, entityType: UMB_MEDIA_ENTITY_TYPE } : undefined;
 
 		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 		this._min = minMax?.min ?? 0;
 		this._max = minMax?.max ?? Infinity;
 	}
+
+	/**
+	 * Sets the input to mandatory, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	mandatory?: boolean;
+
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -46,7 +61,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	readonly = false;
 
 	@state()
-	private _startNode: string = '';
+	private _startNode?: UmbTreeStartNode;
 
 	@state()
 	private _focalPointEnabled: boolean = false;
@@ -81,9 +96,18 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		});
 	}
 
+	override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-rich-media')!);
+	}
+
+	override focus() {
+		return this.shadowRoot?.querySelector<UmbInputRichMediaElement>('umb-input-rich-media')?.focus();
+	}
+
 	#onChange(event: CustomEvent & { target: UmbInputRichMediaElement }) {
-		this.value = event.target.items;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		const isEmpty = event.target.value?.length === 0;
+		this.value = isEmpty ? undefined : event.target.value;
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
@@ -92,12 +116,14 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 				.alias=${this._alias}
 				.allowedContentTypeIds=${this._allowedMediaTypes}
 				.focalPointEnabled=${this._focalPointEnabled}
-				.items=${this.value ?? []}
+				.value=${this.value ?? []}
 				.max=${this._max}
 				.min=${this._min}
 				.preselectedCrops=${this._preselectedCrops}
 				.startNode=${this._startNode}
 				.variantId=${this._variantId}
+				.required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
 				?multiple=${this._multiple}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}>

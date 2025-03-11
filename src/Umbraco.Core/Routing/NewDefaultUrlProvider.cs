@@ -1,7 +1,9 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -23,6 +25,7 @@ public class NewDefaultUrlProvider : IUrlProvider
     private readonly IIdKeyMap _idKeyMap;
     private readonly IDocumentUrlService _documentUrlService;
     private readonly IDocumentNavigationQueryService _navigationQueryService;
+    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
     private readonly ILocalizedTextService? _localizedTextService;
     private readonly ILogger<DefaultUrlProvider> _logger;
     private readonly ISiteDomainMapper _siteDomainMapper;
@@ -41,7 +44,8 @@ public class NewDefaultUrlProvider : IUrlProvider
         IDomainCache domainCache,
         IIdKeyMap idKeyMap,
         IDocumentUrlService documentUrlService,
-        IDocumentNavigationQueryService navigationQueryService)
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
     {
         _requestSettings = requestSettings.CurrentValue;
         _logger = logger;
@@ -54,8 +58,38 @@ public class NewDefaultUrlProvider : IUrlProvider
         _idKeyMap = idKeyMap;
         _documentUrlService = documentUrlService;
         _navigationQueryService = navigationQueryService;
+        _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
 
         requestSettings.OnChange(x => _requestSettings = x);
+    }
+
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
+    public NewDefaultUrlProvider(
+        IOptionsMonitor<RequestHandlerSettings> requestSettings,
+        ILogger<DefaultUrlProvider> logger,
+        ISiteDomainMapper siteDomainMapper,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        UriUtility uriUtility,
+        ILocalizationService localizationService,
+        IPublishedContentCache publishedContentCache,
+        IDomainCache domainCache,
+        IIdKeyMap idKeyMap,
+        IDocumentUrlService documentUrlService,
+        IDocumentNavigationQueryService navigationQueryService)
+        : this(
+            requestSettings,
+            logger,
+            siteDomainMapper,
+            umbracoContextAccessor,
+            uriUtility,
+            localizationService,
+            publishedContentCache,
+            domainCache,
+            idKeyMap,
+            documentUrlService,
+            navigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
+    {
     }
 
     #region GetOtherUrls
@@ -89,8 +123,6 @@ public class NewDefaultUrlProvider : IUrlProvider
             yield break;
         }
 
-
-
         // look for domains, walking up the tree
         IPublishedContent? n = node;
         IEnumerable<DomainAndUri>? domainUris =
@@ -99,7 +131,7 @@ public class NewDefaultUrlProvider : IUrlProvider
         // n is null at root
         while (domainUris == null && n != null)
         {
-            n = n.Parent<IPublishedContent>(_publishedContentCache, _navigationQueryService); // move to parent node
+            n = n.Parent<IPublishedContent>(_navigationQueryService, _publishedContentStatusFilteringService); // move to parent node
             domainUris = n == null
                 ? null
                 : DomainUtilities.DomainsForNode(_domainCache, _siteDomainMapper, n.Id, current);
@@ -117,7 +149,7 @@ public class NewDefaultUrlProvider : IUrlProvider
 
             // although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
             var route = GetLegacyRouteFormatById(key, culture);
-            if (route == null)
+            if (route == null || route == "#")
             {
                 continue;
             }
@@ -145,8 +177,10 @@ public class NewDefaultUrlProvider : IUrlProvider
 
     private string GetLegacyRouteFormatById(Guid key, string? culture)
     {
+        var isDraft = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
 
-        return _documentUrlService.GetLegacyRouteFormat(key, culture, _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode);
+
+        return _documentUrlService.GetLegacyRouteFormat(key, culture, isDraft);
 
 
     }
@@ -163,9 +197,22 @@ public class NewDefaultUrlProvider : IUrlProvider
             throw new ArgumentException("Current URL must be absolute.", nameof(current));
         }
 
+        // This might seem to be some code duplication, as we do the same check in GetLegacyRouteFormat
+        // but this is strictly neccesary, as if we're coming from a published notification
+        // this document will still not always be in the memory cache. And thus we have to hit the DB
+        // We have the published content now, so we can check if the culture is published, and thus avoid the DB hit.
+        string route;
+        var isDraft = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
+        if(isDraft is false && string.IsNullOrWhiteSpace(culture) is false && content.Cultures.Any() && content.IsInvariantOrHasCulture(culture) is false)
+        {
+            route = "#";
+        }
+        else
+        {
+            route = GetLegacyRouteFormatById(content.Key, culture);
+        }
 
         // will not use cache if previewing
-        var route = GetLegacyRouteFormatById(content.Key, culture);
 
         return GetUrlFromRoute(route, content.Id, current, mode, culture);
     }

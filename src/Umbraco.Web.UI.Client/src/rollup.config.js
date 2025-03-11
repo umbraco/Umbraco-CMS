@@ -1,5 +1,4 @@
 import esbuild from 'rollup-plugin-esbuild';
-import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import css from 'rollup-plugin-import-css';
 import replace from '@rollup/plugin-replace';
@@ -54,6 +53,7 @@ console.log('--- Copying TinyMCE i18n done ---');
 console.log('--- Copying monaco-editor ---');
 cpSync('./node_modules/monaco-editor/esm/vs/editor/editor.worker.js', `${DIST_DIRECTORY}/monaco-editor/vs/editor/editor.worker.js`);
 cpSync('./node_modules/monaco-editor/esm/vs/language', `${DIST_DIRECTORY}/monaco-editor/vs/language`, { recursive: true });
+cpSync('./node_modules/monaco-editor/min/vs/base/browser/ui/codicons', `${DIST_DIRECTORY}/assets/fonts`, { recursive: true });
 console.log('--- Copying monaco-editor done ---');
 
 const readFolders = (path) => readdirSync(path).filter((folder) => lstatSync(`${path}/${folder}`).isDirectory());
@@ -81,7 +81,6 @@ const libraries = allowed.map((module) => {
 			format: 'es',
 		},
 		plugins: [
-			commonjs(),
 			nodeResolve({ preferBuiltins: false, browser: true }),
 			// Replace the vite specific inline query with nothing so that the import is valid
 			replace({

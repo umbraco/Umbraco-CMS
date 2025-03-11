@@ -1,7 +1,6 @@
-import { UMB_MEDIA_COLLECTION_ALIAS } from '../../collection/index.js';
+import { UMB_MEDIA_COLLECTION_ALIAS, UMB_MEDIA_TREE_ALIAS } from '../../constants.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
-import { UMB_MEDIA_TREE_ALIAS } from '../../tree/constants.js';
-import { UMB_BULK_MOVE_MEDIA_REPOSITORY_ALIAS } from './repository/constants.js';
+import { UMB_BULK_MOVE_MEDIA_REPOSITORY_ALIAS } from './constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 

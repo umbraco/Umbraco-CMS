@@ -338,6 +338,26 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 			},
 			{
+				id: '19',
+				container: { id: 'all-properties-group-key' },
+				alias: 'dropdownMultiple',
+				name: 'Dropdown (Multiple)',
+				description: '',
+				dataType: { id: 'dt-dropdown-multiple' },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 11,
+				validation: {
+					mandatory: true,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
 				id: '11',
 				container: { id: 'all-properties-group-key' },
 				alias: 'textArea',

@@ -3,7 +3,7 @@ import {expect} from "@playwright/test";
 
 const dataTypeName = 'Approved Color';
 let dataTypeDefaultData = null;
-let dataTypeData = null;  
+let dataTypeData = null;
 const colorValue = 'ffffff';
 const colorLabel = '';
 
@@ -34,10 +34,11 @@ test('can include label', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
   // Act
-  await umbracoUi.dataType.clickIncludeLabelsSlider();
+  await umbracoUi.dataType.clickIncludeLabelsToggle();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.values).toEqual(expectedDataTypeValues);
 });
@@ -66,11 +67,12 @@ test('can add color', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.values).toEqual(expectedDataTypeValues);
 });
 
-test('can remove color', async ({umbracoApi, umbracoUi}) => {  
+test('can remove color', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const removedDataTypeValues = [
     {
@@ -94,6 +96,7 @@ test('can remove color', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.values).toEqual([]);
 });

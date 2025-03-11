@@ -1,9 +1,10 @@
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEDIA_SEARCH_PROVIDER_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		name: 'Media Search Provider',
-		alias: 'Umb.SearchProvider.Media',
+		alias: UMB_MEDIA_SEARCH_PROVIDER_ALIAS,
 		type: 'searchProvider',
 		api: () => import('./media.search-provider.js'),
 		weight: 700,

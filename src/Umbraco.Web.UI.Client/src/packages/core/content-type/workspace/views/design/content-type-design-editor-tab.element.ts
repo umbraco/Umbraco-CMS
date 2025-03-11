@@ -1,7 +1,7 @@
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
 import type { UmbContentTypeModel, UmbPropertyTypeContainerModel } from '../../../types.js';
 import { UmbContentTypeContainerStructureHelper } from '../../../structure/index.js';
-import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context.js';
+import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context-token.js';
 import type { UmbContentTypeWorkspaceViewEditGroupElement } from './content-type-design-editor-group.element.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -16,8 +16,10 @@ import './content-type-design-editor-group.element.js';
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerModel, UmbContentTypeWorkspaceViewEditGroupElement> = {
 	getUniqueOfElement: (element) => element.group?.id,
 	getUniqueOfModel: (modelEntry) => modelEntry.id,
+	// TODO: Make specific to the current owner document. [NL]
 	identifier: 'content-type-container-sorter',
-	itemSelector: '.container-handle',
+	itemSelector: 'umb-content-type-design-editor-group',
+	handleSelector: '.drag-handle',
 	containerSelector: '.container-list',
 };
 
@@ -183,7 +185,6 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 						(group) => group.id,
 						(group) => html`
 							<umb-content-type-design-editor-group
-								class="container-handle"
 								?sort-mode-active=${this._sortModeActive}
 								.editContentTypePath=${this._editContentTypePath}
 								.group=${group}
@@ -210,14 +211,6 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 
 	static override styles = [
 		css`
-			[drag-placeholder] {
-				opacity: 0.5;
-			}
-
-			[drag-placeholder] > * {
-				visibility: hidden;
-			}
-
 			#btn-add {
 				width: 100%;
 				--uui-button-height: var(--uui-size-24);

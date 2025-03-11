@@ -1,5 +1,6 @@
 import type { UmbUserGroupEntityType } from './entity.js';
 
+export type * from './entity.js';
 export interface UmbUserGroupDetailModel {
 	alias: string;
 	aliasCanBeChanged: boolean;

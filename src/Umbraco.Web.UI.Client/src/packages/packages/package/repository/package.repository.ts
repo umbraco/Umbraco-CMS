@@ -1,5 +1,5 @@
 import type { UmbCreatedPackageDefinition, UmbCreatedPackages } from '../../types.js';
-import { UMB_PACKAGE_STORE_TOKEN } from './package.store.js';
+import { UMB_PACKAGE_STORE_TOKEN } from './package.store.context-token.js';
 import { UmbPackageServerDataSource } from './sources/package.server.data.js';
 import type { UmbPackageStore } from './package.store.js';
 import { isManifestBaseType } from '@umbraco-cms/backoffice/extension-api';

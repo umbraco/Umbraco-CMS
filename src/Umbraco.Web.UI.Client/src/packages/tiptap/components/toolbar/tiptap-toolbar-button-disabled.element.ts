@@ -1,23 +1,22 @@
 import { UmbTiptapToolbarButtonElement } from './tiptap-toolbar-button.element.js';
-import { customElement, html, ifDefined, when } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, when } from '@umbraco-cms/backoffice/external/lit';
 
-const elementName = 'umb-tiptap-toolbar-button-disabled';
-
-@customElement(elementName)
+@customElement('umb-tiptap-toolbar-button-disabled')
 export class UmbTiptapToolbarButtonDisabledElement extends UmbTiptapToolbarButtonElement {
 	override render() {
+		const label = this.localize.string(this.manifest?.meta.label);
 		return html`
 			<uui-button
 				compact
 				look="default"
-				label=${ifDefined(this.manifest?.meta.label)}
-				title=${this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : ''}
+				label=${label}
+				title=${label}
 				?disabled=${!this.isActive}
-				@click=${() => (this.api && this.editor ? this.api.execute(this.editor) : null)}>
+				@click=${() => this.api?.execute(this.editor)}>
 				${when(
 					this.manifest?.meta.icon,
 					() => html`<umb-icon name=${this.manifest!.meta.icon}></umb-icon>`,
-					() => html`<span>${this.manifest?.meta.label}</span>`,
+					() => html`<span>${label}</span>`,
 				)}
 			</uui-button>
 		`;
@@ -28,6 +27,6 @@ export { UmbTiptapToolbarButtonDisabledElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbTiptapToolbarButtonDisabledElement;
+		'umb-tiptap-toolbar-button-disabled': UmbTiptapToolbarButtonDisabledElement;
 	}
 }

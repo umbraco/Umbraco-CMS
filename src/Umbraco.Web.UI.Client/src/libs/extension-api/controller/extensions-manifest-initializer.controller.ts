@@ -4,8 +4,15 @@ import {
 	type PermittedControllerType,
 	UmbBaseExtensionsInitializer,
 } from './base-extensions-initializer.controller.js';
-import type { ManifestBase, UmbExtensionRegistry } from '@umbraco-cms/backoffice/extension-api';
+import type {
+	ManifestBase,
+	UmbBaseExtensionsInitializerArgs,
+	UmbExtensionRegistry,
+} from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbExtensionsManifestInitializerArgs extends UmbBaseExtensionsInitializerArgs {}
 
 /**
  */
@@ -32,8 +39,9 @@ export class UmbExtensionsManifestInitializer<
 		filter: null | ((manifest: ManifestType) => boolean),
 		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void,
 		controllerAlias?: string,
+		args?: UmbExtensionsManifestInitializerArgs,
 	) {
-		super(host, extensionRegistry, type, filter, onChange, controllerAlias);
+		super(host, extensionRegistry, type, filter, onChange, controllerAlias, args);
 		this.#extensionRegistry = extensionRegistry;
 		this._init();
 	}

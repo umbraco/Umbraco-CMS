@@ -1,4 +1,5 @@
-import { UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS, UMB_PARTIAL_VIEW_FOLDER_STORE_ALIAS } from './constants.js';
+export const UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.PartialView.Folder';
+export const UMB_PARTIAL_VIEW_FOLDER_STORE_ALIAS = 'Umb.Store.PartialView.Folder';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

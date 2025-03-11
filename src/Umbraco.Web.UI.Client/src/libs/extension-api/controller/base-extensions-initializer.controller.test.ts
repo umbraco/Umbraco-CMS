@@ -1,7 +1,7 @@
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types/index.js';
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
-import type { PermittedControllerType } from './index.js';
+import type { PermittedControllerType, UmbBaseExtensionsInitializerArgs } from './index.js';
 import { UmbBaseExtensionInitializer, UmbBaseExtensionsInitializer } from './index.js';
 import { expect, fixture } from '@open-wc/testing';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -21,7 +21,7 @@ class UmbTestExtensionController extends UmbBaseExtensionInitializer {
 		alias: string,
 		onPermissionChanged: (isPermitted: boolean, controller: UmbTestExtensionController) => void,
 	) {
-		super(host, extensionRegistry, 'test_', alias, onPermissionChanged);
+		super(host, extensionRegistry, 'test', alias, onPermissionChanged);
 		this._init();
 	}
 
@@ -57,8 +57,9 @@ class UmbTestExtensionsController<
 		type: myTestManifestTypes,
 		filter: null | ((manifest: ManifestWithDynamicConditions) => boolean),
 		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void,
+		args?: UmbBaseExtensionsInitializerArgs,
 	) {
-		super(host, extensionRegistry, type, filter, onChange);
+		super(host, extensionRegistry, type, filter, onChange, 'testController', args);
 		this.#extensionRegistry = extensionRegistry;
 		this._init();
 	}
@@ -125,9 +126,32 @@ describe('UmbBaseExtensionsController', () => {
 						expect(permitted.length).to.eq(2);
 						extensionsInitController.destroy();
 					} else if (count === 2) {
+						// because we destroy above there is a last callback with no permitted controllers. [NL]
 						done();
 					}
 				},
+			);
+		});
+
+		it('exposes only one manifests in single mode', (done) => {
+			let count = 0;
+
+			const extensionsInitController = new UmbTestExtensionsController(
+				hostElement,
+				testExtensionRegistry,
+				'extension-type',
+				null,
+				(permitted) => {
+					count++;
+					if (count === 1) {
+						expect(permitted.length).to.eq(1);
+						extensionsInitController.destroy();
+					} else if (count === 2) {
+						// because we destroy above there is a last callback with no permitted controllers. [NL]
+						done();
+					}
+				},
+				{ single: true },
 			);
 		});
 
@@ -213,6 +237,33 @@ describe('UmbBaseExtensionsController', () => {
 						extensionsInitController.destroy();
 					}
 				},
+			);
+		});
+
+		it('change the exposed manifests even in single mode', (done) => {
+			let count = 0;
+			const extensionsInitController = new UmbTestExtensionsController(
+				hostElement,
+				testExtensionRegistry,
+				'extension-type',
+				null,
+				(permitted) => {
+					count++;
+					if (count === 1) {
+						// Still just equal one, as the second one overwrites the first one. [NL]
+						expect(permitted.length).to.eq(1);
+						expect(permitted[0].alias).to.eq('Umb.Test.Extension.B');
+
+						// lets remove the overwriting extension to see the original coming back. [NL]
+						testExtensionRegistry.unregister('Umb.Test.Extension.B');
+					} else if (count === 2) {
+						expect(permitted.length).to.eq(1);
+						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
+						done();
+						extensionsInitController.destroy();
+					}
+				},
+				{ single: true },
 			);
 		});
 	});

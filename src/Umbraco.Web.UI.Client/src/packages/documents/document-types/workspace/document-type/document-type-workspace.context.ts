@@ -6,8 +6,7 @@ import {
 	type UmbCreateDocumentTypeWorkspacePresetType,
 } from '../../paths.js';
 import type { UmbDocumentTypeDetailModel } from '../../types.js';
-import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../constants.js';
 import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -183,7 +182,7 @@ export class UmbDocumentTypeWorkspaceContext
 	async #createAndAssignTemplate() {
 		const { data: templateScaffold } = await this.#templateRepository.createScaffold({
 			name: this.getName(),
-			alias: this.getAlias(),
+			alias: this.getName(), // NOTE: Uses "name" over alias, as the server handle the template filename. [LK]
 		});
 
 		if (!templateScaffold) throw new Error('Could not create template scaffold');

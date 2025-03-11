@@ -1,27 +1,30 @@
-import { UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS } from '../repository/index.js';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
-import { UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UMB_DOCUMENT_PICKER_MODAL } from '../../modals/index.js';
+import { UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS, UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
 import {
+	UMB_DOCUMENT_ENTITY_TYPE,
+	UMB_DOCUMENT_PICKER_MODAL,
 	UMB_USER_PERMISSION_DOCUMENT_DELETE,
 	UMB_USER_PERMISSION_DOCUMENT_MOVE,
-} from '../../user-permissions/constants.js';
+} from '../../constants.js';
+import { UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS } from '../../reference/constants.js';
+import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../item/constants.js';
+import { manifests as bulkTrashManifests } from './bulk-trash/manifests.js';
 import {
 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 	UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
 } from '@umbraco-cms/backoffice/recycle-bin';
+import { UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS } from '@umbraco-cms/backoffice/entity-action';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
-		kind: 'trash',
+		kind: 'trashWithRelation',
 		alias: 'Umb.EntityAction.Document.RecycleBin.Trash',
 		name: 'Trash Document Entity Action',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
 			recycleBinRepositoryAlias: UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
+			referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
@@ -68,6 +71,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_DELETE],
 			},
+			{
+				alias: UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS,
+			},
 		],
 	},
+	...bulkTrashManifests,
 ];

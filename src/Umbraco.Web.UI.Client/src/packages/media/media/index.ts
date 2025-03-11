@@ -1,24 +1,12 @@
 export * from './components/index.js';
+export * from './constants.js';
 export * from './dropzone/index.js';
-export * from './entity.js';
-export * from './paths.js';
 export * from './reference/index.js';
 export * from './repository/index.js';
 export * from './search/index.js';
+export * from './url/index.js';
 export * from './utils/index.js';
-export * from './workspace/index.js';
 
-export { UMB_MEDIA_TREE_ALIAS, UMB_MEDIA_TREE_PICKER_MODAL } from './tree/index.js';
-export { UMB_MEDIA_COLLECTION_ALIAS } from './collection/index.js';
-export { UMB_MEDIA_MENU_ALIAS } from './menu/index.js';
-export { UMB_MEDIA_PICKER_MODAL } from './modals/media-picker/index.js';
-export {
-	UMB_MEDIA_CAPTION_ALT_TEXT_MODAL,
-	type UmbMediaCaptionAltTextModalData,
-	type UmbMediaCaptionAltTextModalValue,
-} from './modals/media-caption-alt-text/index.js';
-
-export type { UmbMediaTreeItemModel } from './tree/index.js';
 export { UmbMediaAuditLogRepository } from './audit-log/index.js';
 
 export type * from './types.js';

@@ -1,1 +1,2 @@
-export type * from './picker-search-result-item.extension.js';
+export { UmbPickerSearchResultItemElementBase } from './picker-search-result-item-element-base.js';
+export * from './default/index.js';

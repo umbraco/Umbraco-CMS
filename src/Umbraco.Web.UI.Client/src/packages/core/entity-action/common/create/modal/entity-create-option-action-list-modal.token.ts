@@ -1,4 +1,3 @@
-import { UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL_ALIAS } from './constants.js';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
@@ -12,7 +11,7 @@ export type UmbEntityCreateOptionActionListModalValue = never;
 export const UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL = new UmbModalToken<
 	UmbEntityCreateOptionActionListModalData,
 	UmbEntityCreateOptionActionListModalValue
->(UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL_ALIAS, {
+>('Umb.Modal.Entity.CreateOptionActionList', {
 	modal: {
 		type: 'sidebar',
 		size: 'small',

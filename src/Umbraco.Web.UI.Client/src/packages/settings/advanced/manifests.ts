@@ -1,4 +1,4 @@
-import { UMB_SETTINGS_SECTION_ALIAS } from '../section/index.js';
+import { UMB_SETTINGS_SECTION_ALIAS } from '../constants.js';
 import { UMB_ADVANCED_SETTINGS_MENU_ALIAS } from './constants.js';
 
 export const manifests = [

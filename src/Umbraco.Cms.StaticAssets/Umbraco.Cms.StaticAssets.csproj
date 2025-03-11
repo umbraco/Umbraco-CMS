@@ -72,6 +72,10 @@
     <Content Remove="$(LoginAssetsPath)\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="wwwroot\umbraco\assets\README.md" />
+  </ItemGroup>
+
   <Target Name="RestoreLogin" Inputs="$(LoginProjectDirectory)package-lock.json" Outputs="$(LoginProjectDirectory)node_modules/.package-lock.json">
     <Message Importance="high" Text="Restoring Login NPM packages..." />
     <Exec Command="npm ci --no-fund --no-audit --prefer-offline" WorkingDirectory="$(LoginProjectDirectory)" />

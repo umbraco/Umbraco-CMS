@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Composing;
 /// </remarks>
 public sealed class TypeLoader
 {
-    private readonly object _locko = new();
+    private readonly Lock _locko = new();
     private readonly ILogger<TypeLoader> _logger;
 
     private readonly Dictionary<CompositeTypeTypeKey, TypeList> _types = new();
@@ -342,11 +342,7 @@ public sealed class TypeLoader
         // if we are to cache the results, do so
         if (cache)
         {
-            var added = _types.ContainsKey(listKey) == false;
-            if (added)
-            {
-                _types[listKey] = typeList;
-            }
+            var added = _types.TryAdd(listKey, typeList);
             if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
             {
                 _logger.LogDebug("Got {TypeName}, caching ({CacheType}).", GetName(baseType, attributeType), added.ToString().ToLowerInvariant());

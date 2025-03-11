@@ -1,4 +1,4 @@
-export const UMB_CULTURE_REPOSITORY_ALIAS = 'Umb.Repository.Culture';
+import { UMB_CULTURE_REPOSITORY_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

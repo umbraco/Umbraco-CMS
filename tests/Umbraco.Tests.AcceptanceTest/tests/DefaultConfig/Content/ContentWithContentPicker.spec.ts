@@ -120,6 +120,7 @@ test('can choose start node for the content picker in the content', async ({umbr
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   await umbracoApi.document.ensureNameNotExists(childContentPickerName);
+  await umbracoApi.documentType.ensureNameNotExists(childContentPickerDocumentTypeName);
 });
 
 test.skip('can ignore user start node for the content picker in the content', async ({umbracoApi, umbracoUi}) => {
@@ -150,6 +151,7 @@ test.skip('can ignore user start node for the content picker in the content', as
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   await umbracoApi.document.ensureNameNotExists(childContentPickerName);
+  await umbracoApi.documentType.ensureNameNotExists(childContentPickerDocumentTypeName);
 });
 
 test('can remove content picker in the content', async ({umbracoApi, umbracoUi}) => {

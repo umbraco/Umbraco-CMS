@@ -1,5 +1,4 @@
-import type { MetaEntityActionDefaultKind } from '../../default/index.js';
-import type { ManifestEntityAction } from '../../entity-action.extension.js';
+import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '../../types.js';
 
 export interface ManifestEntityActionDeleteKind extends ManifestEntityAction<MetaEntityActionDeleteKind> {
 	type: 'entityAction';
@@ -9,6 +8,10 @@ export interface ManifestEntityActionDeleteKind extends ManifestEntityAction<Met
 export interface MetaEntityActionDeleteKind extends MetaEntityActionDefaultKind {
 	detailRepositoryAlias: string;
 	itemRepositoryAlias: string;
+	confirm?: {
+		headline?: string;
+		message?: string;
+	};
 }
 
 declare global {

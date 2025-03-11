@@ -7,7 +7,5 @@ export const manifest: ManifestPropertyValueResolver = {
 	alias: 'Umb.PropertyValueResolver.RichTextBlocks',
 	name: 'Block Value Resolver',
 	api: UmbRteBlockValueResolver,
-	meta: {
-		editorAlias: UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS,
-	},
+	forEditorAlias: UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS,
 };

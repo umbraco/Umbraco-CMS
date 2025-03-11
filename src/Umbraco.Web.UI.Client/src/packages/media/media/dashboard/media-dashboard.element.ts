@@ -1,5 +1,5 @@
 import { UmbMediaCollectionRepository } from '../collection/repository/index.js';
-import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/index.js';
+import { UMB_MEDIA_COLLECTION_ALIAS } from '../constants.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';

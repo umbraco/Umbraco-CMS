@@ -1,4 +1,4 @@
-import { UMB_DATA_TYPE_ITEM_STORE_CONTEXT } from '../../repository/item/data-type-item.store.js';
+import { UMB_DATA_TYPE_ITEM_STORE_CONTEXT } from '../../constants.js';
 import type { UmbDataTypeItemStore } from '../../repository/item/data-type-item.store.js';
 import type { UmbDataTypeCollectionFilterModel } from '../types.js';
 import { UmbDataTypeCollectionServerDataSource } from './data-type-collection.server.data-source.js';

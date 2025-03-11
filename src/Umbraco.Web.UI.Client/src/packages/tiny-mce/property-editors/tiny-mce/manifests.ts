@@ -1,6 +1,5 @@
+import { UMB_BLOCK_RTE_PROPERTY_EDITOR_UI_ALIAS } from './constants.js';
 import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoffice/rte';
-
-export const UMB_BLOCK_RTE_PROPERTY_EDITOR_UI_ALIAS = 'Umb.PropertyEditorUi.TinyMCE';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -65,22 +64,22 @@ export const manifests: Array<UmbExtensionManifest> = [
 					},
 					{
 						alias: 'stylesheets',
-						label: 'Stylesheets',
+						label: '#treeHeaders_stylesheets',
 						description: 'Pick the stylesheets whose editor styles should be available when editing',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.StylesheetsConfiguration',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.StylesheetPicker',
 						weight: 20,
 					},
 					{
 						alias: 'dimensions',
-						label: 'Dimensions',
+						label: '#general_dimensions',
 						description: 'Set the editor dimensions',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.DimensionsConfiguration',
 						weight: 30,
 					},
 					{
 						alias: 'maxImageSize',
-						label: 'Maximum size for inserted images',
-						description: 'Maximum width or height - enter 0 to disable resizing',
+						label: '#rte_config_maxImageSize',
+						description: '{#rte_config_maxImageSize_description}',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.MaxImageSizeConfiguration',
 						weight: 40,
 					},
@@ -94,8 +93,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 					},
 					{
 						alias: 'overlaySize',
-						label: 'Overlay Size',
-						description: 'Select the width of the overlay (link picker)',
+						label: '#rte_config_overlaySize',
+						description: '{#rte_config_overlaySize_description}',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
 						weight: 81,
 					},

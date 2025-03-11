@@ -1,16 +1,22 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/index.js';
-import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../constants.js';
 import { UmbRollbackRepository } from '../repository/rollback.repository.js';
-import type { UmbRollbackModalData, UmbRollbackModalValue } from './rollback-modal.token.js';
+import { UmbDocumentDetailRepository } from '../../repository/index.js';
+import type { UmbDocumentDetailModel } from '../../types.js';
+import type { UmbRollbackModalData, UmbRollbackModalValue } from './types.js';
 import { diffWords, type Change } from '@umbraco-cms/backoffice/external/diff';
 import { css, customElement, html, nothing, repeat, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-
-import '../../modals/shared/document-variant-language-picker.element.js';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+
+import '../../modals/shared/document-variant-language-picker.element.js';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbEntityUpdatedEvent, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 type DocumentVersion = {
 	id: string;
@@ -23,10 +29,10 @@ type DocumentVersion = {
 @customElement('umb-rollback-modal')
 export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModalData, UmbRollbackModalValue> {
 	@state()
-	versions: DocumentVersion[] = [];
+	_versions: DocumentVersion[] = [];
 
 	@state()
-	currentVersion?: {
+	_selectedVersion?: {
 		date: string;
 		name: string;
 		user: string;
@@ -38,17 +44,19 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	};
 
 	@state()
-	currentCulture?: string;
+	_selectedCulture: string | null = null;
 
 	@state()
-	availableVariants: Option[] = [];
+	_isInvariant = true;
+
+	@state()
+	_availableVariants: Option[] = [];
+
+	@state()
+	_diffs: Array<{ alias: string; diff: Change[] }> = [];
 
 	#rollbackRepository = new UmbRollbackRepository(this);
 	#userItemRepository = new UmbUserItemRepository(this);
-
-	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
-
-	#propertyDatasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
 	#localizeDateOptions: Intl.DateTimeFormatOptions = {
 		day: 'numeric',
@@ -57,37 +65,76 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		minute: '2-digit',
 	};
 
+	#currentDocument: UmbDocumentDetailModel | undefined;
+	#currentAppCulture: string | undefined;
+	#currentDatasetCulture: string | undefined;
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (instance) => {
-			this.#propertyDatasetContext = instance;
-			this.currentCulture = instance.getVariantId().culture ?? undefined;
-			this.#requestVersions();
+			this.#currentDatasetCulture = instance.getVariantId().culture ?? undefined;
+			this.#selectCulture();
 		});
 
-		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance;
+		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
+			this.#currentAppCulture = instance.getAppCulture();
+			this.#selectCulture();
+		});
 
-			this.observe(instance.variantOptions, (options) => {
-				this.availableVariants = options.map((option) => {
+		this.consumeContext(UMB_ENTITY_CONTEXT, async (instance) => {
+			if (instance.getEntityType() !== UMB_DOCUMENT_ENTITY_TYPE) {
+				throw new Error(`Entity type is not ${UMB_DOCUMENT_ENTITY_TYPE}`);
+			}
+
+			const unique = instance?.getUnique();
+
+			if (!unique) {
+				throw new Error('Document unique is not set');
+			}
+
+			const { data } = await new UmbDocumentDetailRepository(this).requestByUnique(unique);
+			if (!data) return;
+
+			this.#currentDocument = data;
+			const itemVariants = this.#currentDocument?.variants ?? [];
+
+			this._isInvariant = itemVariants.length === 1 && new UmbVariantId(itemVariants[0].culture).isInvariant();
+			this.#selectCulture();
+
+			const cultures = itemVariants.map((x) => x.culture).filter((x) => x !== null) as string[];
+			const { data: languageItems } = await new UmbLanguageItemRepository(this).requestItems(cultures);
+
+			if (languageItems) {
+				this._availableVariants = languageItems.map((language) => {
 					return {
-						name: option.language.name,
-						value: option.language.unique,
-						selected: option.language.unique === this.currentCulture,
+						name: language.name,
+						value: language.unique,
+						selected: language.unique === this._selectedCulture,
 					};
 				});
-			});
+			} else {
+				this._availableVariants = [];
+			}
+
+			this.#requestVersions();
 		});
 	}
 
+	#selectCulture() {
+		const contextCulture = this.#currentDatasetCulture ?? this.#currentAppCulture ?? null;
+		this._selectedCulture = this._isInvariant ? null : contextCulture;
+	}
+
 	async #requestVersions() {
-		if (!this.#propertyDatasetContext) return;
+		if (!this.#currentDocument?.unique) {
+			throw new Error('Document unique is not set');
+		}
 
-		const documentId = this.#propertyDatasetContext.getUnique();
-		if (!documentId) return;
-
-		const { data } = await this.#rollbackRepository.requestVersionsByDocumentId(documentId, this.currentCulture);
+		const { data } = await this.#rollbackRepository.requestVersionsByDocumentId(
+			this.#currentDocument?.unique,
+			this._selectedCulture ?? undefined,
+		);
 		if (!data) return;
 
 		const tempItems: DocumentVersion[] = [];
@@ -109,28 +156,38 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			});
 		});
 
-		this.versions = tempItems;
+		this._versions = tempItems;
 		const id = tempItems.find((item) => item.isCurrentlyPublishedVersion)?.id;
 
 		if (id) {
-			this.#setCurrentVersion(id);
+			this.#selectVersion(id);
 		}
 	}
 
-	async #setCurrentVersion(id: string) {
-		const version = this.versions.find((item) => item.id === id);
-		if (!version) return;
+	async #selectVersion(id: string) {
+		const version = this._versions.find((item) => item.id === id);
+
+		if (!version) {
+			this._selectedVersion = undefined;
+			this._diffs = [];
+			return;
+		}
 
 		const { data } = await this.#rollbackRepository.requestVersionById(id);
-		if (!data) return;
 
-		this.currentVersion = {
+		if (!data) {
+			this._selectedVersion = undefined;
+			this._diffs = [];
+			return;
+		}
+
+		this._selectedVersion = {
 			date: version.date,
 			user: version.user,
-			name: data.variants.find((x) => x.culture === this.currentCulture)?.name || data.variants[0].name,
+			name: data.variants.find((x) => x.culture === this._selectedCulture)?.name || data.variants[0].name,
 			id: data.id,
 			properties: data.values
-				.filter((x) => x.culture === this.currentCulture || !x.culture) // When invariant, culture is undefined or null.
+				.filter((x) => x.culture === this._selectedCulture || !x.culture) // When invariant, culture is undefined or null.
 				.map((value: any) => {
 					return {
 						alias: value.alias,
@@ -138,20 +195,35 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 					};
 				}),
 		};
+
+		await this.#setDiffs();
 	}
 
-	#onRollback() {
-		if (!this.currentVersion) return;
+	async #onRollback() {
+		if (!this._selectedVersion) return;
 
-		const id = this.currentVersion.id;
-		const culture = this.availableVariants.length > 1 ? this.currentCulture : undefined;
-		this.#rollbackRepository.rollback(id, culture);
+		const id = this._selectedVersion.id;
+		const culture = this._selectedCulture ?? undefined;
 
-		const docUnique = this.#workspaceContext?.getUnique() ?? '';
-		// TODO Use the load method on the context instead of location.href, when it works.
-		// this.#workspaceContext?.load(docUnique);
-		location.href = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: docUnique });
-		this.modalContext?.reject();
+		const { error } = await this.#rollbackRepository.rollback(id, culture);
+		if (error) return;
+
+		const unique = this.#currentDocument?.unique;
+		const entityType = this.#currentDocument?.entityType;
+
+		if (!unique || !entityType) {
+			throw new Error('Document unique or entity type is not set');
+		}
+
+		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+
+		const reloadStructureEvent = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+		actionEventContext.dispatchEvent(reloadStructureEvent);
+
+		const entityUpdatedEvent = new UmbEntityUpdatedEvent({ unique, entityType });
+		actionEventContext.dispatchEvent(entityUpdatedEvent);
+
+		this.modalContext?.submit();
 	}
 
 	#onCancel() {
@@ -159,7 +231,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	}
 
 	#onVersionClicked(id: string) {
-		this.#setCurrentVersion(id);
+		this.#selectVersion(id);
 	}
 
 	#onPreventCleanup(event: Event, id: string, preventCleanup: boolean) {
@@ -167,7 +239,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		event.stopImmediatePropagation();
 		this.#rollbackRepository.setPreventCleanup(id, preventCleanup);
 
-		const version = this.versions.find((item) => item.id === id);
+		const version = this._versions.find((item) => item.id === id);
 		if (!version) return;
 
 		version.preventCleanup = preventCleanup;
@@ -177,125 +249,147 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	#onChangeCulture(event: UUISelectEvent) {
 		const value = event.target.value;
 
-		this.currentCulture = value.toString();
+		this._selectedCulture = value.toString();
 		this.#requestVersions();
 	}
 
+	#trimQuotes(str: string): string {
+		return str.replace(/^['"]|['"]$/g, '');
+	}
+
 	#renderCultureSelect() {
-		if (this.availableVariants.length < 2) return nothing;
 		return html`
-			<div id="language-select">
-				<b>${this.localize.term('general_language')}</b>
-				<uui-select @change=${this.#onChangeCulture} .options=${this.availableVariants}></uui-select>
-			</div>
+			<uui-select
+				id="language-select"
+				@change=${this.#onChangeCulture}
+				.options=${this._availableVariants}></uui-select>
 		`;
 	}
 
 	#renderVersions() {
-		return html` ${this.#renderCultureSelect()}
-		${repeat(
-			this.versions,
-			(item) => item.id,
-			(item) => {
-				return html`
-					<div
-						@click=${() => this.#onVersionClicked(item.id)}
-						@keydown=${() => {}}
-						class="rollback-item ${this.currentVersion?.id === item.id ? 'active' : ''}">
-						<div>
-							<p class="rollback-item-date">
-								<umb-localize-date date="${item.date}" .options=${this.#localizeDateOptions}></umb-localize-date>
-							</p>
-							<p>${item.user}</p>
-							<p>${item.isCurrentlyPublishedVersion ? this.localize.term('rollback_currentPublishedVersion') : ''}</p>
+		if (!this._versions.length) {
+			return html`<uui-box headline=${this.localize.term('rollback_versions')}>No versions available</uui-box>`;
+		}
+
+		return html` <uui-box id="versions-box" headline=${this.localize.term('rollback_versions')}>
+			${repeat(
+				this._versions,
+				(item) => item.id,
+				(item) => {
+					return html`
+						<div
+							@click=${() => this.#onVersionClicked(item.id)}
+							@keydown=${() => {}}
+							class="rollback-item ${this._selectedVersion?.id === item.id ? 'active' : ''}">
+							<div>
+								<p class="rollback-item-date">
+									<umb-localize-date date="${item.date}" .options=${this.#localizeDateOptions}></umb-localize-date>
+								</p>
+								<p>${item.user}</p>
+								<p>${item.isCurrentlyPublishedVersion ? this.localize.term('rollback_currentPublishedVersion') : ''}</p>
+							</div>
+							<uui-button
+								look="secondary"
+								@click=${(event: Event) => this.#onPreventCleanup(event, item.id, !item.preventCleanup)}
+								label=${item.preventCleanup
+									? this.localize.term('contentTypeEditor_historyCleanupEnableCleanup')
+									: this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}></uui-button>
 						</div>
-						<uui-button
-							look="secondary"
-							@click=${(event: Event) => this.#onPreventCleanup(event, item.id, !item.preventCleanup)}
-							label=${item.preventCleanup
-								? this.localize.term('contentTypeEditor_historyCleanupEnableCleanup')
-								: this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}></uui-button>
-					</div>
-				`;
-			},
-		)}`;
+					`;
+				},
+			)}</uui-box
+		>`;
 	}
 
-	#renderCurrentVersion() {
-		if (!this.currentVersion) return;
+	async #setDiffs() {
+		if (!this._selectedVersion) return;
 
-		let draftValues =
-			(this.#workspaceContext?.getData()?.values as Array<{ alias: string; culture: string; value: any }>) ?? [];
+		const currentPropertyValues = this.#currentDocument?.values.filter(
+			(x) => x.culture === this._selectedCulture || !x.culture,
+		); // When invariant, culture is undefined or null.
 
-		draftValues = draftValues.filter((x) => x.culture === this.currentCulture || !x.culture); // When invariant, culture is undefined or null.
+		if (!currentPropertyValues) {
+			throw new Error('Current property values are not set');
+		}
+
+		const currentName = this.#currentDocument?.variants.find((x) => x.culture === this._selectedCulture)?.name;
+
+		if (!currentName) {
+			throw new Error('Current name is not set');
+		}
 
 		const diffs: Array<{ alias: string; diff: Change[] }> = [];
 
-		const nameDiff = diffWords(this.#workspaceContext?.getName() ?? '', this.currentVersion.name);
+		const nameDiff = diffWords(currentName, this._selectedVersion.name);
 		diffs.push({ alias: 'name', diff: nameDiff });
 
-		this.currentVersion.properties.forEach((item) => {
-			const draftValue = draftValues.find((x) => x.alias === item.alias);
+		this._selectedVersion.properties.forEach((item) => {
+			const draftValue = currentPropertyValues.find((x) => x.alias === item.alias);
 
 			if (!draftValue) return;
 
-			const draftValueString = trimQuotes(JSON.stringify(draftValue.value));
-			const versionValueString = trimQuotes(JSON.stringify(item.value));
+			const draftValueString = this.#trimQuotes(JSON.stringify(draftValue.value));
+			const versionValueString = this.#trimQuotes(JSON.stringify(item.value));
 
 			const diff = diffWords(draftValueString, versionValueString);
 			diffs.push({ alias: item.alias, diff });
 		});
 
-		/**
-		 *
-		 * @param str
-		 */
-		function trimQuotes(str: string): string {
-			return str.replace(/^['"]|['"]$/g, '');
-		}
+		this._diffs = [...diffs];
+	}
+
+	#renderSelectedVersion() {
+		if (!this._selectedVersion)
+			return html`
+				<uui-box id="box-right" style="display: flex; align-items: center; justify-content: center;"
+					>No selected version</uui-box
+				>
+			`;
 
 		return html`
-			${unsafeHTML(this.localize.term('rollback_diffHelp'))}
-			<uui-table>
-				<uui-table-column style="width: 0"></uui-table-column>
-				<uui-table-column></uui-table-column>
+			<uui-box headline=${this.currentVersionHeader} id="box-right">
+				${unsafeHTML(this.localize.term('rollback_diffHelp'))}
+				<uui-table>
+					<uui-table-column style="width: 0"></uui-table-column>
+					<uui-table-column></uui-table-column>
 
-				<uui-table-head>
-					<uui-table-head-cell>${this.localize.term('general_alias')}</uui-table-head-cell>
-					<uui-table-head-cell>${this.localize.term('general_value')}</uui-table-head-cell>
-				</uui-table-head>
-				${repeat(
-					diffs,
-					(item) => item.alias,
-					(item) => {
-						const diff = diffs.find((x) => x?.alias === item.alias);
-						return html`
-							<uui-table-row>
-								<uui-table-cell>${item.alias}</uui-table-cell>
-								<uui-table-cell>
-									${diff
-										? diff.diff.map((part) =>
-												part.added
-													? html`<span class="diff-added">${part.value}</span>`
-													: part.removed
-														? html`<span class="diff-removed">${part.value}</span>`
-														: part.value,
-											)
-										: nothing}
-								</uui-table-cell>
-							</uui-table-row>
-						`;
-					},
-				)}
-			</uui-table>
+					<uui-table-head>
+						<uui-table-head-cell>${this.localize.term('general_alias')}</uui-table-head-cell>
+						<uui-table-head-cell>${this.localize.term('general_value')}</uui-table-head-cell>
+					</uui-table-head>
+					${repeat(
+						this._diffs,
+						(item) => item.alias,
+						(item) => {
+							const diff = this._diffs.find((x) => x?.alias === item.alias);
+							return html`
+								<uui-table-row>
+									<uui-table-cell>${item.alias}</uui-table-cell>
+									<uui-table-cell>
+										${diff
+											? diff.diff.map((part) =>
+													part.added
+														? html`<span class="diff-added">${part.value}</span>`
+														: part.removed
+															? html`<span class="diff-removed">${part.value}</span>`
+															: part.value,
+												)
+											: nothing}
+									</uui-table-cell>
+								</uui-table-row>
+							`;
+						},
+					)}
+				</uui-table>
+			</uui-box>
 		`;
 	}
 
 	get currentVersionHeader() {
 		return (
-			this.localize.date(this.currentVersion?.date ?? new Date(), this.#localizeDateOptions) +
+			this.localize.date(this._selectedVersion?.date ?? new Date(), this.#localizeDateOptions) +
 			' - ' +
-			this.currentVersion?.user
+			this._selectedVersion?.user
 		);
 	}
 
@@ -303,10 +397,17 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		return html`
 			<umb-body-layout headline="Rollback">
 				<div id="main">
-					<uui-box headline=${this.localize.term('rollback_versions')} id="box-left">
-						<div>${this.#renderVersions()}</div>
-					</uui-box>
-					<uui-box headline=${this.currentVersionHeader} id="box-right"> ${this.#renderCurrentVersion()} </uui-box>
+					<div id="box-left">
+						${this._availableVariants.length
+							? html`
+									<uui-box id="language-box" headline=${this.localize.term('general_language')}>
+										${this.#renderCultureSelect()}
+									</uui-box>
+								`
+							: nothing}
+						${this.#renderVersions()}
+					</div>
+					${this.#renderSelectedVersion()}
 				</div>
 				<umb-footer-layout slot="footer">
 					<uui-button
@@ -318,7 +419,8 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 						slot="actions"
 						look="primary"
 						@click=${this.#onRollback}
-						label=${this.localize.term('actions_rollback')}></uui-button>
+						label=${this.localize.term('actions_rollback')}
+						?disabled=${!this._selectedVersion}></uui-button>
 				</umb-footer-layout>
 			</umb-body-layout>
 		`;
@@ -330,14 +432,15 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			:host {
 				color: var(--uui-color-text);
 			}
-			#language-select {
-				display: flex;
-				flex-direction: column;
-				padding: var(--uui-size-space-5);
-				padding-bottom: 0;
-				gap: var(--uui-size-space-2);
-				font-size: 15px;
+
+			#language-box {
+				margin-bottom: var(--uui-size-space-2);
 			}
+
+			#language-select {
+				width: 100%;
+			}
+
 			uui-table {
 				--uui-table-cell-padding: var(--uui-size-space-1) var(--uui-size-space-4);
 				margin-top: var(--uui-size-space-5);
@@ -411,15 +514,19 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			.rollback-item uui-button {
 				white-space: nowrap;
 			}
+
 			#main {
 				display: flex;
-				gap: var(--uui-size-space-4);
+				gap: var(--uui-size-space-5);
 				width: 100%;
 				height: 100%;
 			}
 
-			#box-left {
+			#versions-box {
 				--uui-box-default-padding: 0;
+			}
+
+			#box-left {
 				max-width: 500px;
 				flex: 1;
 				overflow: auto;

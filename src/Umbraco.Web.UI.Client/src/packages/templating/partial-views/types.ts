@@ -1,5 +1,7 @@
 import type { UmbPartialViewEntityType, UmbPartialViewFolderEntityType } from './entity.js';
 
+export type * from './tree/types.js';
+
 export interface UmbPartialViewDetailModel {
 	entityType: UmbPartialViewEntityType;
 	unique: string;

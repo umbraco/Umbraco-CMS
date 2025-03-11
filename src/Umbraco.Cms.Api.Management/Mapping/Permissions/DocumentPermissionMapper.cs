@@ -42,16 +42,31 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
 
     public IEnumerable<IGranularPermission> MapToGranularPermissions(IPermissionPresentationModel permissionViewModel)
     {
-        if (permissionViewModel is DocumentPermissionPresentationModel documentPermissionPresentationModel)
+        if (permissionViewModel is not DocumentPermissionPresentationModel documentPermissionPresentationModel)
         {
-            foreach (var verb in documentPermissionPresentationModel.Verbs)
+            yield break;
+        }
+
+        if(documentPermissionPresentationModel.Verbs.Any() is false || (documentPermissionPresentationModel.Verbs.Count == 1 && documentPermissionPresentationModel.Verbs.Contains(string.Empty)))
+        {
+            yield return new DocumentGranularPermission
             {
-                yield return new DocumentGranularPermission
-                {
-                    Key = documentPermissionPresentationModel.Document.Id,
-                    Permission = verb,
-                };
+                Key = documentPermissionPresentationModel.Document.Id,
+                Permission = string.Empty,
+            };
+            yield break;
+        }
+        foreach (var verb in documentPermissionPresentationModel.Verbs)
+        {
+            if (string.IsNullOrEmpty(verb))
+            {
+                continue;
             }
+            yield return new DocumentGranularPermission
+            {
+                Key = documentPermissionPresentationModel.Document.Id,
+                Permission = verb,
+            };
         }
     }
 }

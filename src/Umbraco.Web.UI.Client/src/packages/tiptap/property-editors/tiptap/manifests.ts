@@ -15,40 +15,47 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 				properties: [
 					{
 						alias: 'extensions',
-						label: 'Capabilities',
-						description: `Enable extensions enhance the capabilities of the Tiptap editor.
+						label: '#tiptap_config_extensions',
+						description: `Choose which Tiptap extensions to enable
 
-_Once enabled, the extensions will be available in the toolbar._`,
+_Once enabled, the related actions will be available for the toolbar._`,
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Tiptap.ExtensionsConfiguration',
 						weight: 10,
 					},
 					{
 						alias: 'toolbar',
-						label: 'Toolbar',
-						description: `Configure the toolbar for the intended editing experience.
+						label: '#tiptap_config_toolbar',
+						description: `Design the available actions
 
-_Drag and drop the available items onto the toolbar designer._`,
+_Drag and drop the available actions onto the toolbar._`,
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Tiptap.ToolbarConfiguration',
 						weight: 15,
 					},
 					{
-						alias: 'dimensions',
-						label: 'Dimensions',
-						description: 'Set the maximum width and height of the editor',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.DimensionsConfiguration',
+						alias: 'stylesheets',
+						label: '#treeHeaders_stylesheets',
+						description: 'Pick the stylesheets whose editor styles should be available when editing!!!',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.StylesheetPicker',
 						weight: 20,
 					},
 					{
+						alias: 'dimensions',
+						label: '#general_dimensions',
+						description: '{#tiptap_config_dimensions_description}',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.DimensionsConfiguration',
+						weight: 30,
+					},
+					{
 						alias: 'maxImageSize',
-						label: 'Maximum size for inserted images',
-						description: 'Maximum width or height - enter 0 to disable resizing',
+						label: '#rte_config_maxImageSize',
+						description: '{#rte_config_maxImageSize_description}',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.MaxImageSizeConfiguration',
 						weight: 40,
 					},
 					{
 						alias: 'overlaySize',
-						label: 'Overlay Size',
-						description: 'Select the width of the overlay (link picker)',
+						label: '#rte_config_overlaySize',
+						description: '{#rte_config_overlaySize_description}',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
 						weight: 50,
 					},

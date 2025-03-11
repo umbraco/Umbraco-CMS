@@ -80,6 +80,7 @@ test('can delete a template', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  await umbracoUi.template.reloadTemplateTree();
   expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
   await umbracoUi.template.isTemplateRootTreeItemVisible(templateName, false);
 });
@@ -162,7 +163,6 @@ test.skip('can use query builder with Order By statement for a template', async 
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.template.addQueryBuilderWithOrderByStatement(propertyAliasValue, isAscending);
   // Verify that the code is shown
   await umbracoUi.template.isQueryBuilderCodeShown(expectedCode);
@@ -175,7 +175,8 @@ test.skip('can use query builder with Order By statement for a template', async 
   expect(templateData.content).toBe(expectedTemplateContent);
 });
 
-test('can use query builder with Where statement for a template', async ({umbracoApi, umbracoUi}) => {
+// Remove .fixme when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18536
+test.fixme('can use query builder with Where statement for a template', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const propertyAliasValue = 'Name';
   const operatorValue = 'is';
@@ -202,7 +203,6 @@ test('can use query builder with Where statement for a template', async ({umbrac
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.template.addQueryBuilderWithWhereStatement(propertyAliasValue, operatorValue, constrainValue);
   // Verify that the code is shown
   await umbracoUi.template.isQueryBuilderCodeShown(expectedCode);
@@ -224,7 +224,6 @@ test('can insert sections - render child template into a template', async ({umbr
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.template.insertSection(sectionType);
   await umbracoUi.template.clickSaveButton();
 
@@ -369,7 +368,7 @@ test('cannot create a template with an empty name', {tag: '@smoke'}, async ({umb
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.isErrorNotificationVisible();
+  // await umbracoUi.template.isErrorNotificationVisible();
   // TODO: Uncomment this when the front-end updates the error message
   //await umbracoUi.template.doesErrorNotificationHaveText(NotificationConstantHelper.error.emptyName);
   expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();

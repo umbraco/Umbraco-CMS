@@ -122,7 +122,8 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 		// Find the resolver for this editor alias:
 		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
 			'propertyValueResolver',
-			(x) => x.meta.editorAlias === editorAlias,
+			// TODO: Remove depcrated filter in v.17 [NL]
+			(x) => x.forEditorAlias === editorAlias || x.meta?.editorAlias === editorAlias,
 		)[0];
 
 		if (!manifest) {
@@ -150,13 +151,14 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 			}
 
 			let valuesIndex = 0;
-			newValue = await api.processValues(newValue, async (values) => {
-				// got some values (content and/or settings):
-				// but how to get the persisted and the draft of this.....
-				const persistedValues = persistedValuesHolder[valuesIndex++];
+			newValue =
+				(await api.processValues(newValue, async (values) => {
+					// got some values (content and/or settings):
+					// but how to get the persisted and the draft of this.....
+					const persistedValues = persistedValuesHolder[valuesIndex++];
 
-				return await this.#processValues(persistedValues, values, variantsToStore);
-			});
+					return await this.#processValues(persistedValues, values, variantsToStore);
+				})) ?? newValue;
 		}
 
 		if (api.processVariants) {
@@ -171,18 +173,19 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 			}
 
 			let valuesIndex = 0;
-			newValue = await api.processVariants(newValue, async (values) => {
-				// got some values (content and/or settings):
-				// but how to get the persisted and the draft of this.....
-				const persistedVariants = persistedVariantsHolder[valuesIndex++];
+			newValue =
+				(await api.processVariants(newValue, async (values) => {
+					// got some values (content and/or settings):
+					// but how to get the persisted and the draft of this.....
+					const persistedVariants = persistedVariantsHolder[valuesIndex++];
 
-				return await this.#processVariants(
-					persistedVariants,
-					values,
-					variantsToStore,
-					api.compareVariants ?? defaultCompareVariantMethod,
-				);
-			});
+					return await this.#processVariants(
+						persistedVariants,
+						values,
+						variantsToStore,
+						api.compareVariants ?? defaultCompareVariantMethod,
+					);
+				})) ?? newValue;
 		}
 
 		/*

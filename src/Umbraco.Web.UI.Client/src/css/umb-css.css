@@ -3,3 +3,9 @@
 	--umb-header-layout-height: 70px;
 	--umb-section-sidebar-width: 300px;
 }
+
+@font-face{
+	font-display:block;
+	font-family:codicon;
+	src:url('/umbraco/backoffice/assets/fonts/codicon/codicon.ttf') format("truetype")
+}

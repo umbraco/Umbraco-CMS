@@ -1,6 +1,5 @@
+import { UMB_MEMBER_GROUP_TABLE_COLLECTION_VIEW_ALIAS } from './constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-
-export const UMB_MEMBER_GROUP_TABLE_COLLECTION_VIEW_ALIAS = 'Umb.CollectionView.MemberGroup.Table';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

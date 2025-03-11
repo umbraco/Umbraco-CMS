@@ -4,12 +4,11 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.Locking;
-using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -28,7 +27,8 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         IDocumentTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
         : base(
             provider,
             loggerFactory,
@@ -38,7 +38,8 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             entityContainerRepository,
             entityRepository,
             eventAggregator,
-            userIdKeyResolver) =>
+            userIdKeyResolver,
+            contentTypeFilters) =>
         ContentService = contentService;
 
     [Obsolete("Use the ctor specifying all dependencies instead")]
@@ -63,6 +64,32 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             entityRepository,
             eventAggregator,
             StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+    { }
+
+    [Obsolete("Use the ctor specifying all dependencies instead")]
+    public ContentTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IContentService contentService,
+        IContentTypeRepository repository,
+        IAuditRepository auditRepository,
+        IDocumentTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            contentService,
+            repository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            StaticServiceProvider.Instance.GetRequiredService<ContentTypeFilterCollection>())
     { }
 
     protected override int[] ReadLockIds => ContentTypeLocks.ReadLockIds;

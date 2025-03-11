@@ -1,4 +1,4 @@
-import type { UmbCreatePartialViewFromSnippetModalData } from './create-from-snippet-modal.token.js';
+import type { UmbCreatePartialViewFromSnippetModalData } from './index.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

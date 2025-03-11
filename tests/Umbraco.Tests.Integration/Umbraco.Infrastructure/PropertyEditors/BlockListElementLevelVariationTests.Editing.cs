@@ -1,5 +1,7 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -7,13 +9,15 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
-public partial class BlockListElementLevelVariationTests
+internal partial class BlockListElementLevelVariationTests
 {
     [TestCase(true)]
     [TestCase(false)]
+    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault(bool updateWithLimitedUserAccess)
     {
         await LanguageService.CreateAsync(
@@ -77,6 +81,7 @@ public partial class BlockListElementLevelVariationTests
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         ContentService.Save(content);
+
 
         blockListValue.ContentData[0].Values[0].Value = "#1: The second invariant content value";
         blockListValue.ContentData[0].Values[1].Value = "#1: The second content value in English";
@@ -152,6 +157,136 @@ public partial class BlockListElementLevelVariationTests
         {
             Assert.Multiple(() =>
             {
+                Assert.AreEqual("#1: The second content value in English", blockListValue.ContentData[0].Values[1].Value);
+                Assert.AreEqual("#1: The second settings value in English", blockListValue.SettingsData[0].Values[1].Value);
+                Assert.AreEqual("#1: The second content value in German", blockListValue.ContentData[0].Values[3].Value);
+                Assert.AreEqual("#1: The second settings value in German", blockListValue.SettingsData[0].Values[3].Value);
+
+                Assert.AreEqual("#2: The second content value in English", blockListValue.ContentData[1].Values[1].Value);
+                Assert.AreEqual("#2: The second settings value in English", blockListValue.SettingsData[1].Values[1].Value);
+                Assert.AreEqual("#2: The second content value in German", blockListValue.ContentData[1].Values[3].Value);
+                Assert.AreEqual("#2: The second settings value in German", blockListValue.SettingsData[1].Values[3].Value);
+            });
+        }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
+    public async Task Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault_WithoutInitialValues(bool updateWithLimitedUserAccess)
+    {
+        await LanguageService.CreateAsync(
+            new Language("de-DE", "German"), Constants.Security.SuperUserKey);
+        var userKey = updateWithLimitedUserAccess
+            ? (await CreateLimitedUser()).Key
+            : Constants.Security.SuperUserKey;
+
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var content = CreateContent(contentType, elementType, [], false);
+        content.SetCultureName("Home (de)", "de-DE");
+        ContentService.Save(content);
+
+
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#1: The second invariant content value" },
+                            new() { Alias = "variantText", Value = "#1: The second content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#1: The second content value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#1: The second content value in German", Culture = "de-DE" }
+                        },
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#1: The second invariant settings value" },
+                            new() { Alias = "variantText", Value = "#1: The second settings value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#1: The second settings value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#1: The second settings value in German", Culture = "de-DE" }
+                        },
+                        null,
+                        null
+                    )
+                ),
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#2: The second invariant content value" },
+                            new() { Alias = "variantText", Value = "#2: The second content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#2: The second content value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#2: The second content value in German", Culture = "de-DE" }
+                        },
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#2: The second invariant settings value" },
+                            new() { Alias = "variantText", Value = "#2: The second settings value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#2: The second settings value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#2: The second settings value in German", Culture = "de-DE" }
+                        },
+                        null,
+                        null
+                    )
+                )
+            ]
+        );
+
+        var updateModel = new ContentUpdateModel
+        {
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
+            },
+            Variants = new[]
+            {
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US", Properties = [] },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK", Properties = [] },
+                new VariantModel { Name = content.GetCultureName("de-DE")!, Culture = "de-DE", Properties = [] }
+            }
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
+        Assert.IsTrue(result.Success);
+
+        content = ContentService.GetById(content.Key);
+        var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
+        Assert.NotNull(savedBlocksValue);
+        blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
+
+        // the Danish and invariant values should be updated regardless of the executing user
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("#1: The second invariant content value", blockListValue.ContentData[0].Values.Single(v => v.Culture == null).Value);
+            Assert.AreEqual("#1: The second content value in Danish", blockListValue.ContentData[0].Values.Single(v => v.Culture == "da-DK").Value);
+            Assert.AreEqual("#1: The second invariant settings value", blockListValue.SettingsData[0].Values.Single(v => v.Culture == null).Value);
+            Assert.AreEqual("#1: The second settings value in Danish", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "da-DK").Value);
+
+            Assert.AreEqual("#2: The second invariant content value", blockListValue.ContentData[1].Values.Single(v => v.Culture == null).Value);
+            Assert.AreEqual("#2: The second content value in Danish", blockListValue.ContentData[1].Values.Single(v => v.Culture == "da-DK").Value);
+            Assert.AreEqual("#2: The second invariant settings value", blockListValue.SettingsData[1].Values.Single(v => v.Culture == null).Value);
+            Assert.AreEqual("#2: The second settings value in Danish", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "da-DK").Value);
+        });
+
+        // limited user access means English and German should not have been updated - changes should be rolled back to the initial block values
+        if (updateWithLimitedUserAccess)
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(2, blockListValue.ContentData[0].Values.Count);
+                Assert.AreEqual(2, blockListValue.ContentData[1].Values.Count);
+            });
+        }
+        else
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(4, blockListValue.ContentData[0].Values.Count);
+                Assert.AreEqual(4, blockListValue.ContentData[1].Values.Count);
+
                 Assert.AreEqual("#1: The second content value in English", blockListValue.ContentData[0].Values[1].Value);
                 Assert.AreEqual("#1: The second settings value in English", blockListValue.SettingsData[0].Values[1].Value);
                 Assert.AreEqual("#1: The second content value in German", blockListValue.ContentData[0].Values[3].Value);
@@ -325,6 +460,135 @@ public partial class BlockListElementLevelVariationTests
 
     [TestCase(true)]
     [TestCase(false)]
+    public async Task Can_Handle_Limited_User_Access_To_Languages_Without_AllowEditInvariantFromNonDefault_WithoutInitialValue(bool updateWithLimitedUserAccess)
+    {
+        await LanguageService.CreateAsync(
+            new Language("de-DE", "German"), Constants.Security.SuperUserKey);
+        var userKey = updateWithLimitedUserAccess
+            ? (await CreateLimitedUser()).Key
+            : Constants.Security.SuperUserKey;
+
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var content = CreateContent(contentType, elementType, [], false);
+        content.SetCultureName("Home (de)", "de-DE");
+        ContentService.Save(content);
+
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#1: The second invariant content value" },
+                            new() { Alias = "variantText", Value = "#1: The second content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#1: The second content value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#1: The second content value in German", Culture = "de-DE" }
+                        },
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#1: The second invariant settings value" },
+                            new() { Alias = "variantText", Value = "#1: The second settings value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#1: The second settings value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#1: The second settings value in German", Culture = "de-DE" }
+                        },
+                        null,
+                        null
+                    )
+                ),
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#2: The second invariant content value" },
+                            new() { Alias = "variantText", Value = "#2: The second content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#2: The second content value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#2: The second content value in German", Culture = "de-DE" }
+                        },
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#2: The second invariant settings value" },
+                            new() { Alias = "variantText", Value = "#2: The second settings value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#2: The second settings value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#2: The second settings value in German", Culture = "de-DE" }
+                        },
+                        null,
+                        null
+                    )
+                )
+            ]
+        );
+
+        var updateModel = new ContentUpdateModel
+        {
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
+            },
+            Variants = new[]
+            {
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US", Properties = [] },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK", Properties = [] },
+                new VariantModel { Name = content.GetCultureName("de-DE")!, Culture = "de-DE", Properties = [] }
+            }
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
+        Assert.IsTrue(result.Success);
+
+        content = ContentService.GetById(content.Key);
+        var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
+        Assert.NotNull(savedBlocksValue);
+        blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
+
+        // the Danish values should be updated regardless of the executing user
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("#1: The second content value in Danish", blockListValue.ContentData[0].Values.Single(v => v.Culture == "da-DK").Value);
+            Assert.AreEqual("#1: The second settings value in Danish", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "da-DK").Value);
+
+            Assert.AreEqual("#2: The second content value in Danish", blockListValue.ContentData[1].Values.Single(v => v.Culture == "da-DK").Value);
+            Assert.AreEqual("#2: The second settings value in Danish", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "da-DK").Value);
+        });
+
+        // limited user access means invariant, English and German should not have been updated - changes should be rolled back to the initial block values
+        if (updateWithLimitedUserAccess)
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(1, blockListValue.ContentData[0].Values.Count);
+                Assert.AreEqual(1, blockListValue.ContentData[1].Values.Count);
+            });
+        }
+        else
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(4, blockListValue.ContentData[0].Values.Count);
+                Assert.AreEqual(4, blockListValue.ContentData[1].Values.Count);
+
+                Assert.AreEqual("#1: The second invariant content value", blockListValue.ContentData[0].Values[0].Value);
+                Assert.AreEqual("#1: The second invariant settings value", blockListValue.SettingsData[0].Values[0].Value);
+                Assert.AreEqual("#1: The second content value in English", blockListValue.ContentData[0].Values[1].Value);
+                Assert.AreEqual("#1: The second settings value in English", blockListValue.SettingsData[0].Values[1].Value);
+                Assert.AreEqual("#1: The second content value in German", blockListValue.ContentData[0].Values[3].Value);
+                Assert.AreEqual("#1: The second settings value in German", blockListValue.SettingsData[0].Values[3].Value);
+
+                Assert.AreEqual("#2: The second invariant content value", blockListValue.ContentData[1].Values[0].Value);
+                Assert.AreEqual("#2: The second invariant settings value", blockListValue.SettingsData[1].Values[0].Value);
+                Assert.AreEqual("#2: The second content value in English", blockListValue.ContentData[1].Values[1].Value);
+                Assert.AreEqual("#2: The second settings value in English", blockListValue.SettingsData[1].Values[1].Value);
+                Assert.AreEqual("#2: The second content value in German", blockListValue.ContentData[1].Values[3].Value);
+                Assert.AreEqual("#2: The second settings value in German", blockListValue.SettingsData[1].Values[3].Value);
+            });
+        }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Handle_Limited_User_Access_To_Languages_In_Nested_Blocks_Without_Access_With_AllowEditInvariantFromNonDefault(bool updateWithLimitedUserAccess)
     {
         await LanguageService.CreateAsync(

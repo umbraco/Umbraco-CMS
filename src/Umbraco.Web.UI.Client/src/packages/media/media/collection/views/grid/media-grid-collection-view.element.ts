@@ -96,13 +96,13 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name)}
+				data-mark="${item.entityType}:${item.unique}"
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
 				href=${this.#getEditUrl(item)}
 				@selected=${() => this.#onSelect(item)}
-				@deselected=${() => this.#onDeselect(item)}
-				class="media-item">
+				@deselected=${() => this.#onDeselect(item)}>
 				<umb-imaging-thumbnail
 					unique=${item.unique}
 					alt=${ifDefined(item.name)}
@@ -113,8 +113,12 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 
 	#renderPlaceholder(item: UmbMediaCollectionItemModel) {
 		const complete = item.status === UmbFileDropzoneItemStatus.COMPLETE;
+		const error = item.status !== UmbFileDropzoneItemStatus.WAITING && !complete;
 		return html`<uui-card-media disabled class="media-placeholder-item" name=${ifDefined(item.name)}>
-			<umb-temporary-file-badge ?complete=${complete}></umb-temporary-file-badge>
+			<umb-temporary-file-badge
+				.progress=${item.progress ?? 0}
+				?complete=${complete}
+				?error=${error}></umb-temporary-file-badge>
 		</uui-card-media>`;
 	}
 
@@ -130,10 +134,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				display: flex;
 				justify-content: center;
 				align-items: center;
-			}
-
-			.media-placeholder-item {
-				font-style: italic;
 			}
 
 			/** TODO: Remove this fix when UUI gets upgrade to 1.3 */

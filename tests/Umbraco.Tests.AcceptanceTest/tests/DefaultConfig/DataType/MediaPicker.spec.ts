@@ -28,7 +28,7 @@ for (const dataTypeName of dataTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(dataTypeName);
-      await umbracoUi.dataType.clickPickMultipleItemsSlider();
+      await umbracoUi.dataType.clickPickMultipleItemsToggle();
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
@@ -67,7 +67,7 @@ for (const dataTypeName of dataTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(dataTypeName);
-      await umbracoUi.dataType.clickEnableFocalPointSlider();
+      await umbracoUi.dataType.clickEnableFocalPointToggle();
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
@@ -92,14 +92,17 @@ for (const dataTypeName of dataTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(dataTypeName);
+      await umbracoUi.waitForTimeout(500);
       await umbracoUi.dataType.enterCropValues(
         cropData[0].toString(),
         cropData[1].toString(),
         cropData[2].toString(),
         cropData[3].toString()
       );
+      await umbracoUi.waitForTimeout(500);
       await umbracoUi.dataType.clickAddCropButton();
       await umbracoUi.dataType.clickSaveButton();
+      await umbracoUi.waitForTimeout(500);
 
       // Assert
       dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -115,7 +118,7 @@ for (const dataTypeName of dataTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(dataTypeName);
-      await umbracoUi.dataType.clickIgnoreUserStartNodesSlider();
+      await umbracoUi.dataType.clickIgnoreUserStartNodesToggle();
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
