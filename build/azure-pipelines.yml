@@ -593,7 +593,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Install Playwright and dependencies
-          - pwsh: npx playwright install-deps chromium
+          - pwsh: npx playwright install chromium
             displayName: Install Playwright only with Chromium browser
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
@@ -760,7 +760,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Install Playwright and dependencies
-          - pwsh: npx playwright install-deps chromium
+          - pwsh: npx playwright install chromium
             displayName: Install Playwright only with Chromium browser
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
