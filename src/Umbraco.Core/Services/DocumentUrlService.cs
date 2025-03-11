@@ -181,7 +181,7 @@ public class DocumentUrlService : IDocumentUrlService
                     DocumentKey = model.DocumentKey,
                     LanguageId = model.LanguageId,
                     UrlSegments = [new PublishedDocumentUrlSegments.UrlSegment(model.UrlSegment, model.IsPrimary)],
-                    IsDraft = model.IsDraft
+                    IsDraft = model.IsDraft,
                 });
             }
             else
@@ -307,7 +307,7 @@ public class DocumentUrlService : IDocumentUrlService
 
         await CreateOrUpdateUrlSegmentsAsync(new List<IContent>(descendants)
         {
-            item
+            item,
         });
     }
 
@@ -371,8 +371,8 @@ public class DocumentUrlService : IDocumentUrlService
         if (document.Trashed is false
             && (IsInvariantAndPublished(document) || IsVariantAndPublishedForCulture(document, culture)))
         {
-            IEnumerable<string> publishedUrlSegments = document.GetUrlSegments(_shortStringHelper, _urlSegmentProviderCollection, culture);
-            if (publishedUrlSegments.Any() is false)
+            string[] publishedUrlSegments = document.GetUrlSegments(_shortStringHelper, _urlSegmentProviderCollection, culture).ToArray();
+            if (publishedUrlSegments.Length == 0)
             {
                 _logger.LogWarning("No published URL segments found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
             }
@@ -385,7 +385,7 @@ public class DocumentUrlService : IDocumentUrlService
                     UrlSegments = publishedUrlSegments
                         .Select((x, i) => new PublishedDocumentUrlSegments.UrlSegment(x, i == 0))
                         .ToList(),
-                    IsDraft = false
+                    IsDraft = false,
                 }, true);
             }
         }
@@ -396,11 +396,11 @@ public class DocumentUrlService : IDocumentUrlService
                 DocumentKey = document.Key,
                 LanguageId = language.Id,
                 UrlSegments = [],
-                IsDraft = false
+                IsDraft = false,
             }, false);
         }
 
-        IEnumerable<string> draftUrlSegments = document.GetUrlSegments(_shortStringHelper, _urlSegmentProviderCollection, culture, false);
+        string[] draftUrlSegments = document.GetUrlSegments(_shortStringHelper, _urlSegmentProviderCollection, culture, false).ToArray();
 
         if (draftUrlSegments.Any() is false)
         {
@@ -415,7 +415,7 @@ public class DocumentUrlService : IDocumentUrlService
                 UrlSegments = draftUrlSegments
                     .Select((x, i) => new PublishedDocumentUrlSegments.UrlSegment(x, i == 0))
                     .ToList(),
-                IsDraft = true
+                IsDraft = true,
             }, document.Trashed is false);
         }
     }
@@ -439,7 +439,7 @@ public class DocumentUrlService : IDocumentUrlService
                 LanguageId = model.LanguageId,
                 UrlSegment = urlSegment.Segment,
                 IsDraft = model.IsDraft,
-                IsPrimary = urlSegment.IsPrimary
+                IsPrimary = urlSegment.IsPrimary,
             };
         }
     }
@@ -601,7 +601,7 @@ public class DocumentUrlService : IDocumentUrlService
             return childrenKeys;
         }
 
-        return Enumerable.Empty<Guid>();
+        return [];
     }
 
     private Guid? GetChildWithUrlSegment(IEnumerable<Guid> childKeys, string urlSegment, string culture, bool isDraft)
