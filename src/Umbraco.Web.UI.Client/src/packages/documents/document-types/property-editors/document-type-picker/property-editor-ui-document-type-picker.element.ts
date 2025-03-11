@@ -1,7 +1,7 @@
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputDocumentTypeElement } from '../../components/input-document-type/input-document-type.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -38,7 +38,7 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 
 	#onChange(event: CustomEvent & { target: UmbInputDocumentTypeElement }) {
 		this.value = event.target.value;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

@@ -3,10 +3,10 @@ import type { MediaValueType } from './types.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	type UmbPropertyEditorUiElement,
-	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-upload-field
@@ -26,7 +26,7 @@ export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement impleme
 
 	#onChange(event: CustomEvent) {
 		this.value = (event.target as UmbInputUploadFieldElement).value;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
