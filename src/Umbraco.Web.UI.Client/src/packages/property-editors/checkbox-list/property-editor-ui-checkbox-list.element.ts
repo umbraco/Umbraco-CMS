@@ -4,13 +4,13 @@ import type {
 } from './components/input-checkbox-list/input-checkbox-list.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 
 import './components/input-checkbox-list/input-checkbox-list.element.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-checkbox-list
@@ -65,7 +65,7 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 
 	#onChange(event: CustomEvent & { target: UmbInputCheckboxListElement }) {
 		this.value = event.target.selection;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
