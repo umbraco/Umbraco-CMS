@@ -256,6 +256,7 @@ public class ContentController : ContentControllerBase
     ///     Permission check is done for letter 'R' which is for <see cref="ActionRights" /> which the user must have access to
     ///     update
     /// </remarks>
+    [HttpPost]
     public async Task<ActionResult<IEnumerable<AssignedUserGroupPermissions?>?>> PostSaveUserGroupPermissions(
         UserGroupPermissionsSave saveModel)
     {
@@ -902,6 +903,7 @@ public class ContentController : ContentControllerBase
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     [FileUploadCleanupFilter]
     [ContentSaveValidation(skipUserAccessValidation:true)] // skip user access validation because we "only" require Settings access to create new blueprints from scratch
+    [HttpPost]
     public async Task<ActionResult<ContentItemDisplay<ContentVariantDisplay>?>?> PostSaveBlueprint(
         [ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
     {
@@ -939,6 +941,7 @@ public class ContentController : ContentControllerBase
     [FileUploadCleanupFilter]
     [ContentSaveValidation]
     [OutgoingEditorModelEvent]
+    [HttpPost]
     public async Task<ActionResult<ContentItemDisplay<ContentVariantScheduleDisplay>?>> PostSave(
         [ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
     {
@@ -2124,6 +2127,7 @@ public class ContentController : ContentControllerBase
     ///     does not have Publish access to this node.
     /// </remarks>
     [Authorize(Policy = AuthorizationPolicies.ContentPermissionPublishById)]
+    [HttpPost]
     public IActionResult PostPublishById(int id)
     {
         IContent? foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
@@ -2155,6 +2159,7 @@ public class ContentController : ContentControllerBase
     ///     does not have Publish access to this node.
     /// </remarks>
     [Authorize(Policy = AuthorizationPolicies.ContentPermissionPublishById)]
+    [HttpPost]
     public IActionResult PostPublishByIdAndCulture(PublishContent model)
     {
         var languageCount = _allLangs.Value.Count();
@@ -2278,6 +2283,7 @@ public class ContentController : ContentControllerBase
     /// </summary>
     /// <param name="sorted"></param>
     /// <returns></returns>
+    [HttpPost]
     public async Task<IActionResult> PostSort(ContentSortOrder sorted)
     {
         if (sorted == null)
@@ -2329,6 +2335,7 @@ public class ContentController : ContentControllerBase
     /// </summary>
     /// <param name="move"></param>
     /// <returns></returns>
+    [HttpPost]
     public async Task<IActionResult?> PostMove(MoveOrCopy move)
     {
         // Authorize...
@@ -2368,6 +2375,7 @@ public class ContentController : ContentControllerBase
     /// </summary>
     /// <param name="copy"></param>
     /// <returns></returns>
+    [HttpPost]
     public async Task<ActionResult<IContent>?> PostCopy(MoveOrCopy copy)
     {
         // Authorize...
@@ -2407,6 +2415,7 @@ public class ContentController : ContentControllerBase
     /// <param name="model">The content and variants to unpublish</param>
     /// <returns></returns>
     [OutgoingEditorModelEvent]
+    [HttpPost]
     public async Task<ActionResult<ContentItemDisplayWithSchedule?>> PostUnpublish(UnpublishContent model)
     {
         IContent? foundContent = _contentService.GetById(model.Id);
@@ -3131,6 +3140,7 @@ public class ContentController : ContentControllerBase
         return notifications;
     }
 
+    [HttpPost]
     public IActionResult PostNotificationOptions(
         int contentId,
         [FromQuery(Name = "notifyOptions[]")] string[] notifyOptions)
