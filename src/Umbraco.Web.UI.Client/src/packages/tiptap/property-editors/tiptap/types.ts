@@ -1,4 +1,5 @@
 export type UmbTiptapToolbarExtension = {
+	kind?: string;
 	alias: string;
 	label: string;
 	icon: string;

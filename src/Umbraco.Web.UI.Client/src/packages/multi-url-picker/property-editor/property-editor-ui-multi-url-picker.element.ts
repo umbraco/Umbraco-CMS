@@ -2,7 +2,6 @@ import type { UmbLinkPickerLink } from '../link-picker-modal/types.js';
 import type { UmbInputMultiUrlElement } from '../components/input-multi-url/index.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -11,6 +10,7 @@ import type {
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 import '../components/input-multi-url/index.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
@@ -85,7 +85,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 
 	#onChange(event: CustomEvent & { target: UmbInputMultiUrlElement }) {
 		this.value = event.target.urls;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

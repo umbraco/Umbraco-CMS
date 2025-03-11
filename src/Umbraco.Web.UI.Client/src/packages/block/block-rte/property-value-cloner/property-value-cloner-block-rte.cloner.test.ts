@@ -4,7 +4,7 @@ import { UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/propert
 import { manifests } from './manifests';
 import {
 	UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS,
-	type UmbPropertyEditorUiValueType,
+	type UmbPropertyEditorRteValueType,
 } from '@umbraco-cms/backoffice/rte';
 import { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
 
@@ -65,7 +65,7 @@ describe('UmbBlockRtePropertyValueCloner', () => {
 				},
 			};
 
-			const result = (await ctrl.clone(value)) as { value: UmbPropertyEditorUiValueType | undefined };
+			const result = (await ctrl.clone(value)) as { value: UmbPropertyEditorRteValueType | undefined };
 
 			const newContentKey = result.value?.blocks.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].contentKey;
 			const newSettingsKey = result.value?.blocks.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].settingsKey;

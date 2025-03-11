@@ -7,6 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 /// <summary>
 ///     Implements <see cref="ICacheRebuilder" /> in Umbraco.Web (rebuilding).
 /// </summary>
+[Obsolete("This is no longer used. Scheduled for removal in Umbraco 17.")]
 public class CacheRebuilder : ICacheRebuilder
 {
     private readonly DistributedCache _distributedCache;
@@ -26,7 +27,7 @@ public class CacheRebuilder : ICacheRebuilder
     /// <inheritdoc />
     public void Rebuild()
     {
-        _databaseCacheRebuilder.Rebuild();
+        _databaseCacheRebuilder.Rebuild(false);
         _distributedCache.RefreshAllPublishedSnapshot();
     }
 }

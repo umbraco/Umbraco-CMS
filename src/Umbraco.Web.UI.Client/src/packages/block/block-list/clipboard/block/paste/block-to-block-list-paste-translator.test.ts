@@ -94,12 +94,12 @@ describe('UmbBlockToBlockListClipboardPastePropertyValueTranslator', () => {
 
 	describe('isCompatibleValue', () => {
 		it('should return true if the content types are allowed', async () => {
-			const result = await pasteTranslator.isCompatibleValue(blockClipboardEntryValue, config);
+			const result = await pasteTranslator.isCompatibleValue(blockListPropertyValue, config);
 			expect(result).to.be.true;
 		});
 
 		it('should return false if the content types are not allowed', async () => {
-			const result = await pasteTranslator.isCompatibleValue(blockClipboardEntryValue, config2);
+			const result = await pasteTranslator.isCompatibleValue(blockListPropertyValue, config2);
 			expect(result).to.be.false;
 		});
 	});
