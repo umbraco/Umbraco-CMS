@@ -31,6 +31,12 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	@state()
 	_dataPaths?: Array<string>;
 
+	@state()
+	_visiblePropertyAliases: Array<string> = [];
+
+	@state()
+	_visibleProperties: Array<UmbPropertyTypeModel> = [];
+
 	constructor() {
 		super();
 
@@ -39,11 +45,17 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 				// Assuming its the same content model type that we are working with here... [NL]
 				workspaceContext.structure as unknown as UmbContentTypeStructureManager<UmbContentTypeModel>,
 			);
+
+			this.observe(workspaceContext.structure.propertyVisibilityState.states, (states) => {
+				this._visiblePropertyAliases = states.map((state) => state.propertyAlias) ?? [];
+			});
 		});
+
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (datasetContext) => {
 			this.#variantId = datasetContext.getVariantId();
 			this.#generatePropertyDataPath();
 		});
+
 		this.observe(
 			this.#propertyStructureHelper.propertyStructure,
 			(propertyStructure) => {
@@ -66,10 +78,14 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 		);
 	}
 
+	#getVisibleProperties() {
+		return this._propertyStructure?.filter((property) => this._visiblePropertyAliases.includes(property.alias)) ?? [];
+	}
+
 	override render() {
 		return this._propertyStructure && this._dataPaths
 			? repeat(
-					this._propertyStructure,
+					this.#getVisibleProperties(),
 					(property) => property.alias,
 					(property, index) =>
 						html`<umb-property-type-based-property
