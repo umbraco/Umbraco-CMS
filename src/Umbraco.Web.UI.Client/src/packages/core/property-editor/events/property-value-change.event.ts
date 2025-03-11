@@ -1,5 +1,5 @@
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbDeprecation } from '../../utils/deprecation';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @deprecated Use UmbChangeEvent instead, this will be removed as of v.18.0.0
