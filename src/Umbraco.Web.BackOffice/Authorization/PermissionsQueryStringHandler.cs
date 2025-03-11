@@ -50,11 +50,17 @@ public abstract class PermissionsQueryStringHandler<T> : MustSatisfyRequirementA
     protected IEntityService EntityService { get; set; }
 
     /// <summary>
+    /// Defaults to Unknown so all types are allowed, since Keys are unique across all node types this works,
+    /// but it if you are certain you are looking for a specific type this should be overwritten for DB query performance.
+    /// </summary>
+    protected virtual UmbracoObjectTypes KeyParsingFilterType => UmbracoObjectTypes.Unknown;
+
+    /// <summary>
     ///     Attempts to parse a node ID from a string representation found in a querystring value.
     /// </summary>
     /// <param name="argument">Querystring value.</param>
     /// <param name="nodeId">Output parsed Id.</param>
-    /// <returns>True of node ID could be parased, false it not.</returns>
+    /// <returns>True of node ID could be parsed, false it not.</returns>
     protected bool TryParseNodeId(string argument, out int nodeId)
     {
         // If the argument is an int, it will parse and can be assigned to nodeId.
@@ -75,7 +81,7 @@ public abstract class PermissionsQueryStringHandler<T> : MustSatisfyRequirementA
 
         if (Guid.TryParse(argument, out Guid key))
         {
-            nodeId = EntityService.GetId(key, UmbracoObjectTypes.Document).Result;
+            nodeId = EntityService.GetId(key, KeyParsingFilterType).Result;
             return true;
         }
 

@@ -48,7 +48,7 @@
     <PackageVersion Include="Serilog.Sinks.Async" Version="1.5.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageVersion Include="Serilog.Sinks.Map" Version="1.0.2" />
-    <PackageVersion Include="SixLabors.ImageSharp" Version="2.1.9" />
+    <PackageVersion Include="SixLabors.ImageSharp" Version="2.1.10" />
     <PackageVersion Include="SixLabors.ImageSharp.Web" Version="2.0.2" />
     <PackageVersion Include="Smidge.InMemory" Version="4.3.0" />
     <PackageVersion Include="Smidge.Nuglify" Version="4.2.1" />
