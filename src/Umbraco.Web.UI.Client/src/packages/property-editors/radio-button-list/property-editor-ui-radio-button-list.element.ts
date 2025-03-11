@@ -2,6 +2,7 @@ import type { UmbInputRadioButtonListElement, UmbRadioButtonItem } from '@umbrac
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -11,9 +12,12 @@ import type {
  * @element umb-property-editor-ui-radio-button-list
  */
 @customElement('umb-property-editor-ui-radio-button-list')
-export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property()
-	value?: string = '';
+export class UmbPropertyEditorUIRadioButtonListElement
+	extends UmbFormControlMixin<string | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
+	@state()
+	private _list: Array<UmbRadioButtonItem> = [];
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -23,6 +27,16 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement imp
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+
+	/**
+	 * Sets the input to mandatory, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	mandatory?: boolean;
+
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -42,8 +56,9 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement imp
 		}
 	}
 
-	@state()
-	private _list: Array<UmbRadioButtonItem> = [];
+	protected override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-radio-button-list')!);
+	}
 
 	#onChange(event: CustomEvent & { target: UmbInputRadioButtonListElement }) {
 		this.value = event.target.value;
@@ -54,9 +69,12 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement imp
 		return html`
 			<umb-input-radio-button-list
 				.list=${this._list}
+				.required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
 				.value=${this.value ?? ''}
-				@change=${this.#onChange}
-				?readonly=${this.readonly}></umb-input-radio-button-list>
+				?readonly=${this.readonly}
+				@change=${this.#onChange}>
+			</umb-input-radio-button-list>
 		`;
 	}
 }

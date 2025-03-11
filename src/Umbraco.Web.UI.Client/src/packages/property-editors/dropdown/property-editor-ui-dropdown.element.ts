@@ -1,5 +1,6 @@
-import { css, customElement, html, map, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, map, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -12,14 +13,26 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
  * @element umb-property-editor-ui-dropdown
  */
 @customElement('umb-property-editor-ui-dropdown')
-export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUIDropdownElement
+	extends UmbFormControlMixin<Array<string> | string | undefined, typeof UmbLitElement, undefined>(
+		UmbLitElement,
+		undefined,
+	)
+	implements UmbPropertyEditorUiElement
+{
 	#selection: Array<string> = [];
 
+	@state()
+	private _multiple: boolean = false;
+
+	@state()
+	private _options: Array<Option & { invalid?: boolean }> = [];
+
 	@property({ type: Array })
-	public set value(value: Array<string> | string | undefined) {
+	public override set value(value: Array<string> | string | undefined) {
 		this.#selection = Array.isArray(value) ? value : value ? [value] : [];
 	}
-	public get value(): Array<string> | undefined {
+	public override get value(): Array<string> | undefined {
 		return this.#selection;
 	}
 
@@ -31,6 +44,19 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+
+	/**
+	 * Sets the input to mandatory, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	mandatory?: boolean;
+
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
+
+	@property({ type: String })
+	name?: string;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -63,11 +89,13 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 		this._multiple = config.getValueByAlias<boolean>('multiple') ?? false;
 	}
 
-	@state()
-	private _multiple: boolean = false;
-
-	@state()
-	private _options: Array<Option & { invalid?: boolean }> = [];
+	protected override firstUpdated() {
+		if (this._multiple) {
+			this.addFormControlElement(this.shadowRoot!.querySelector('select')!);
+		} else {
+			this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-dropdown-list')!);
+		}
+	}
 
 	#onChange(event: UUISelectEvent) {
 		const value = event.target.value as string;
@@ -87,7 +115,14 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	}
 
 	override render() {
-		return this._multiple ? this.#renderDropdownMultiple() : this.#renderDropdownSingle();
+		return html`
+			${when(
+				this._multiple,
+				() => this.#renderDropdownMultiple(),
+				() => this.#renderDropdownSingle(),
+			)}
+			${this.#renderDropdownValidation()}
+		`;
 	}
 
 	#renderDropdownMultiple() {
@@ -96,23 +131,25 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 		}
 
 		return html`
-			<select id="native" multiple @change=${this.#onChangeMulitple}>
+			<select id="native" multiple ?required=${this.mandatory} @change=${this.#onChangeMulitple}>
 				${map(
 					this._options,
 					(item) => html`<option value=${item.value} ?selected=${item.selected}>${item.name}</option>`,
 				)}
 			</select>
-			${this.#renderDropdownValidation()}
 		`;
 	}
 
 	#renderDropdownSingle() {
 		return html`
 			<umb-input-dropdown-list
+				.name=${this.name}
 				.options=${this._options}
-				@change=${this.#onChange}
-				?readonly=${this.readonly}></umb-input-dropdown-list>
-			${this.#renderDropdownValidation()}
+				.required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
+				?readonly=${this.readonly}
+				@change=${this.#onChange}>
+			</umb-input-dropdown-list>
 		`;
 	}
 
