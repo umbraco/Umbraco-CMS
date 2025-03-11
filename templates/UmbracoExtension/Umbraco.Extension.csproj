@@ -40,12 +40,12 @@
   </ItemGroup>
 
   <!-- Restore and build Client files -->
-  <Target Name="RestoreClient" Inputs="Client\package-lock.json" Outputs="Client\node_modules\.package-lock.json">
+  <Target Name="RestoreClient" Inputs="Client\package.json;Client\package-lock.json" Outputs="Client\node_modules\.package-lock.json">
     <Message Importance="high" Text="Restoring Client NPM packages..." />
-    <Exec Command="npm i --no-fund --no-audit --prefer-offline" WorkingDirectory="Client" />
+    <Exec Command="npm i" WorkingDirectory="Client" />
   </Target>
 
-  <Target Name="BuildClient" DependsOnTargets="RestoreClient" Inputs="@(ClientAssetsInputs)" Outputs="$(IntermediateOutputPath)client.complete.txt">
+  <Target Name="BuildClient" BeforeTargets="AssignTargetPaths" DependsOnTargets="RestoreClient" Inputs="@(ClientAssetsInputs)" Outputs="$(IntermediateOutputPath)client.complete.txt">
     <Message Importance="high" Text="Executing Client NPM build script..." />
     <Exec Command="npm run build" WorkingDirectory="Client" />
     <ItemGroup>
