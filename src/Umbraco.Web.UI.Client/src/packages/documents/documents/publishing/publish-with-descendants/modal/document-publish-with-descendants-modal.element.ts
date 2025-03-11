@@ -5,7 +5,7 @@ import type {
 	UmbDocumentPublishWithDescendantsModalValue,
 } from './document-publish-with-descendants-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
-import { umbConfirmModal, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
