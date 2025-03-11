@@ -7,10 +7,11 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		alias: 'Umb.EntityUserPermission.DocumentType.Structure.Property.See',
 		name: 'See Document Type Structure Property User Permission',
 		forEntityTypes: ['document-type-property'],
+		weight: 200,
 		meta: {
 			verbs: [UMB_USER_PERMISSION_DOCUMENT_TYPE_STRUCTURE_PROPERTY_SEE],
 			label: 'See',
-			description: 'See Document Type Property when editing documents',
+			description: 'See Document Type Property',
 		},
 	},
 	{
