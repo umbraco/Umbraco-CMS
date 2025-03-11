@@ -59,43 +59,11 @@ public enum ContentSaveAction
     ///     Saves and publishes the content item including all descendants regardless of whether they have a published version
     ///     or not.
     /// </summary>
-    [Obsolete("This option is no longer used as the 'force' aspect has been extended into options for publishing unpublished and re-publishing changed content. Please use one of those options instead.")]
     PublishWithDescendantsForce = 10,
 
     /// <summary>
     ///     Creates and publishes the new content item including all descendants regardless of whether they have a published
     ///     version or not.
     /// </summary>
-    [Obsolete("This option is no longer used as the 'force' aspect has been extended into options for publishing unpublished and re-publishing changed content. Please use one of those options instead.")]
     PublishWithDescendantsForceNew = 11,
-
-    /// <summary>
-    ///     Saves and publishes the content item including all descendants including publishing previously unpublished content.
-    /// </summary>
-    PublishWithDescendantsIncludeUnpublished = 12,
-
-    /// <summary>
-    ///     Saves and publishes the new content item including all descendants including publishing previously unpublished content.
-    /// </summary>
-    PublishWithDescendantsIncludeUnpublishedNew = 13,
-
-    /// <summary>
-    ///     Saves and publishes the content item including all descendants irrespective of whether there are any pending changes.
-    /// </summary>
-    PublishWithDescendantsForceRepublish = 14,
-
-    /// <summary>
-    ///     Saves and publishes the new content item including all descendants including publishing previously unpublished content.
-    /// </summary>
-    PublishWithDescendantsForceRepublishNew = 15,
-
-    /// <summary>
-    ///     Saves and publishes the content item including all descendants including publishing previously unpublished content and irrespective of whether there are any pending changes.
-    /// </summary>
-    PublishWithDescendantsIncludeUnpublishedAndForceRepublish = 16,
-
-    /// <summary>
-    ///     Saves and publishes the new content item including all descendants including publishing previously unpublished content and irrespective of whether there are any pending changes.
-    /// </summary>
-    PublishWithDescendantsIncludeUnpublishedAndForceRepublishNew = 17,
 }

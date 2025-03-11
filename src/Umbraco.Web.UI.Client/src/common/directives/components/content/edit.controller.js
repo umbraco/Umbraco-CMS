@@ -963,7 +963,7 @@
                         //we need to return this promise so that the dialog can handle the result and wire up the validation response
                         return performSave({
                             saveMethod: function (content, create, files, showNotifications) {
-                                return contentResource.publishWithDescendants(content, create, model.includeUnpublished, model.forceRepublish, files, showNotifications);
+                                return contentResource.publishWithDescendants(content, create, model.includeUnpublished, files, showNotifications);
                             },
                             action: "publishDescendants",
                             showNotifications: false,
