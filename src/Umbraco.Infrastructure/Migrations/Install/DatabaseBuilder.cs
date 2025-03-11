@@ -353,7 +353,13 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             }
         }
 
+        [Obsolete("Use UpgradeSchemaAndDataAsync instead. Scheduled for removal in Umbraco 18.")]
         public Result? UpgradeSchemaAndData(UmbracoPlan plan) => UpgradeSchemaAndData((MigrationPlan)plan);
+
+        [Obsolete("Use UpgradeSchemaAndDataAsync instead. Scheduled for removal in Umbraco 18.")]
+        public Result? UpgradeSchemaAndData(MigrationPlan plan) => UpgradeSchemaAndDataAsync(plan).GetAwaiter().GetResult();
+
+        public async Task<Result?> UpgradeSchemaAndDataAsync(UmbracoPlan plan) => await UpgradeSchemaAndDataAsync((MigrationPlan)plan).ConfigureAwait(false);
 
         /// <summary>
         /// Upgrades the database schema and data by running migrations.
@@ -363,7 +369,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// configured and it is possible to connect to the database.</para>
         /// <para>Runs whichever migrations need to run.</para>
         /// </remarks>
-        public Result? UpgradeSchemaAndData(MigrationPlan plan)
+        public async Task<Result?> UpgradeSchemaAndDataAsync(MigrationPlan plan)
         {
             try
             {
@@ -377,7 +383,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
                 // upgrade
                 var upgrader = new Upgrader(plan);
-                ExecutedMigrationPlan result = upgrader.Execute(_migrationPlanExecutor, _scopeProvider, _keyValueService);
+                ExecutedMigrationPlan result = await upgrader.ExecuteAsync(_migrationPlanExecutor, _scopeProvider, _keyValueService).ConfigureAwait(false);
 
                 _aggregator.Publish(new UmbracoPlanExecutedNotification { ExecutedPlan = result });
 

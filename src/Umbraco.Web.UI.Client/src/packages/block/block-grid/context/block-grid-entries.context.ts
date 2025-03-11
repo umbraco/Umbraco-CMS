@@ -14,6 +14,7 @@ import type {
 	UmbBlockGridValueModel,
 } from '../types.js';
 import { forEachBlockLayoutEntryOf } from '../utils/index.js';
+import type { UmbBlockGridPropertyEditorConfig } from '../property-editors/block-grid-editor/types.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context-token.js';
 import type { UmbBlockGridScalableContainerContext } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
 import {
@@ -170,7 +171,7 @@ export class UmbBlockGridEntriesContext
 
 				// TODO: consider moving some of this logic to the clipboard property context
 				const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
-				const config = propertyContext.getConfig();
+				const config = propertyContext.getConfig() as UmbBlockGridPropertyEditorConfig;
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
 				return {
@@ -198,7 +199,8 @@ export class UmbBlockGridEntriesContext
 									clipboardEntryDetail.values,
 									UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 								);
-								return pasteTranslator.isCompatibleValue(value, config);
+
+								return pasteTranslator.isCompatibleValue(value, config, (value) => this.#clipboardEntriesFilter(value));
 							}
 
 							return true;
@@ -267,6 +269,21 @@ export class UmbBlockGridEntriesContext
 				const newPath = routeBuilder({});
 				this._workspacePath.setValue(newPath);
 			});
+	}
+
+	async #clipboardEntriesFilter(propertyValue: UmbBlockGridValueModel) {
+		const allowedElementTypeKeys = this.#retrieveAllowedElementTypes().map((x) => x.contentElementTypeKey);
+
+		const rootContentKeys = propertyValue.layout['Umbraco.BlockGrid']?.map((block) => block.contentKey) ?? [];
+		const rootContentTypeKeys = propertyValue.contentData
+			.filter((content) => rootContentKeys.includes(content.key))
+			.map((content) => content.contentTypeKey);
+
+		const allContentTypesAllowed = rootContentTypeKeys.every((contentKey) =>
+			allowedElementTypeKeys.includes(contentKey),
+		);
+
+		return allContentTypesAllowed;
 	}
 
 	protected _gotBlockManager() {
@@ -436,7 +453,7 @@ export class UmbBlockGridEntriesContext
 		originData?: UmbBlockGridWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
-		return this._manager?.create(contentElementTypeKey, partialLayoutEntry, originData);
+		return await this._manager?.createWithPresets(contentElementTypeKey, partialLayoutEntry, originData);
 	}
 
 	// insert Block?

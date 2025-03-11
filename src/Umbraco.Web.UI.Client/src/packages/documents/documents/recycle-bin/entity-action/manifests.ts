@@ -7,10 +7,12 @@ import {
 } from '../../constants.js';
 import { UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS } from '../../reference/constants.js';
 import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../item/constants.js';
+import { manifests as bulkTrashManifests } from './bulk-trash/manifests.js';
 import {
 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 	UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
 } from '@umbraco-cms/backoffice/recycle-bin';
+import { UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS } from '@umbraco-cms/backoffice/entity-action';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -69,6 +71,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_DELETE],
 			},
+			{
+				alias: UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS,
+			},
 		],
 	},
+	...bulkTrashManifests,
 ];

@@ -911,24 +911,33 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: {
 					blocks: undefined,
 					markup: `
+						<p><a id="anchor"></a> Here is a link for <a href="https://gist.github.com/leekelleher/9490718" target="_blank">all HTML tags</a>.</p>
 						<p>
-							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
+							<span id="foo">Some</span> value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a>.
 						</p>
+						<div data-foo-bar="123">
+							<span>This is a plain old span tag.</span>
+							<span style="color:red;">Hello <span style="color:blue;">world</span>.</span>
+						</div>
 						<table style="width: 100%;">
 							<thead>
 								<tr>
-									<th>Name</th>
-									<th>Alias</th>
+									<th>Version</th>
+									<th>Date</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr>
-									<td>Lee</td>
-									<td>lke</td>
+									<td>15.3</td>
+									<td>2025-03-20</td>
 								</tr>
 								<tr>
-									<td>Jacob</td>
-									<td>jov</td>
+									<td>16.0</td>
+									<td>2025-06-12</td>
+								</tr>
+								<tr>
+									<td>17.0</td>
+									<td>2025-11-27</td>
 								</tr>
 							</tbody>
 						</table>

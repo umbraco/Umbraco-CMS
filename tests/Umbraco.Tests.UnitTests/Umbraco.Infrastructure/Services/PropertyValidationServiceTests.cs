@@ -279,7 +279,7 @@ public class PropertyValidationServiceTests
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper)
-            : base(attribute, shortStringHelper, jsonSerializer, ioHelper)
+            : base(attribute, Mock.Of<ILocalizedTextService>(), shortStringHelper, jsonSerializer, ioHelper)
         {
         }
 

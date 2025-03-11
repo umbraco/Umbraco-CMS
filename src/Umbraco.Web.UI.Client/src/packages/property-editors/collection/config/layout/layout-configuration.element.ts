@@ -11,8 +11,8 @@ import {
 import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
 import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbInputManifestElement } from '@umbraco-cms/backoffice/components';
@@ -50,7 +50,7 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 		containerSelector: '#layout-wrapper',
 		onChange: ({ model }) => {
 			this.value = model;
-			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
 
@@ -93,7 +93,7 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 			},
 		];
 
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 
 		this.#focusNewItem();
 	}
@@ -102,14 +102,14 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 		const values = [...(this.value ?? [])];
 		values[index] = { ...values[index], name: e.target.value as string };
 		this.value = values;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#onRemove(unique: number) {
 		const values = [...(this.value ?? [])];
 		values.splice(unique, 1);
 		this.value = values;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	async #onIconChange(icon: typeof UMB_ICON_PICKER_MODAL.VALUE, index: number) {
@@ -121,7 +121,7 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 		const values = [...(this.value ?? [])];
 		values[index] = { ...values[index], icon: `${picked.icon} color-${picked.color}` };
 		this.value = values;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#parseIcon(iconString: string | undefined): typeof UMB_ICON_PICKER_MODAL.VALUE {

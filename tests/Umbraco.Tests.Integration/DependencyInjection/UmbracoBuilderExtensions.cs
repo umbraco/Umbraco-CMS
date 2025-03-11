@@ -21,6 +21,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Persistence.EFCore.Locking;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
@@ -95,6 +96,8 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism<TestUmbracoDbContext>>();
         builder.Services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism<TestUmbracoDbContext>>();
 
+        builder.Services.AddSingleton<IReservedFieldNamesService, ReservedFieldNamesService>();
+
         return builder;
     }
 
@@ -105,7 +108,6 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     private static ILocalizedTextService GetLocalizedTextService(IServiceProvider factory)
     {
-        var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
         var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
         var appCaches = factory.GetRequiredService<AppCaches>();
 
@@ -130,7 +132,7 @@ public static class UmbracoBuilderExtensions
                     uiProject.Create();
                 }
 
-                var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, Constants.System.DefaultUmbracoPath.TrimStart("~/"), "config", "lang"));
+                var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, Constants.System.DefaultUmbracoPath.TrimStart(Constants.CharArrays.TildeForwardSlash), "config", "lang"));
 
                 return new LocalizedTextServiceFileSources(
                     loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),

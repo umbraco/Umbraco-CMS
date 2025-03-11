@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -43,11 +43,11 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
     }
 
     /// <inheritdoc />
-    public async Task<EntityContainer?> GetAsync(Guid id)
+    public Task<EntityContainer?> GetAsync(Guid id)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         ReadLock(scope);
-        return await Task.FromResult(_entityContainerRepository.Get(id));
+        return Task.FromResult(_entityContainerRepository.Get(id));
     }
 
 
@@ -67,12 +67,12 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
     }
 
     /// <inheritdoc />
-    public async Task<EntityContainer?> GetParentAsync(EntityContainer container)
-        => await Task.FromResult(GetParent(container));
+    public Task<EntityContainer?> GetParentAsync(EntityContainer container)
+        => Task.FromResult(GetParent(container));
 
     /// <inheritdoc />
-    public async Task<EntityContainer?> GetParentAsync(TTreeEntity entity)
-        => await Task.FromResult(GetParent(entity));
+    public Task<EntityContainer?> GetParentAsync(TTreeEntity entity)
+        => Task.FromResult(GetParent(entity));
 
     /// <inheritdoc />
     public async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> CreateAsync(Guid? key, string name, Guid? parentKey, Guid userKey)

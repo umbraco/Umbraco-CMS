@@ -1,6 +1,6 @@
 import type { UmbInputTiptapElement } from '../../components/input-tiptap/input-tiptap.element.js';
 import { UmbPropertyEditorUiRteElementBase } from '@umbraco-cms/backoffice/rte';
-import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 import '../../components/input-tiptap/input-tiptap.element.js';
 
@@ -9,9 +9,15 @@ import '../../components/input-tiptap/input-tiptap.element.js';
  */
 @customElement('umb-property-editor-ui-tiptap')
 export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElementBase {
+	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.firstUpdated(_changedProperties);
+
+		this.addFormControlElement(this.shadowRoot?.querySelector('umb-input-tiptap') as UmbInputTiptapElement);
+	}
+
 	#onChange(event: CustomEvent & { target: UmbInputTiptapElement }) {
 		const tipTapElement = event.target;
-		const value = tipTapElement.value;
+		const markup = tipTapElement.value;
 
 		// If we don't get any markup clear the property editor value.
 		if (tipTapElement.isEmpty()) {
@@ -28,24 +34,20 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 			/<umb-rte-block(?:-inline)?(?: class="(?:.[^"]*)")? data-content-key="(?<key>.[^"]*)">(?:<!--Umbraco-Block-->)?<\/umb-rte-block(?:-inline)?>/gi,
 		);
 		let blockElement: RegExpExecArray | null;
-		while ((blockElement = regex.exec(value)) !== null) {
+		while ((blockElement = regex.exec(markup)) !== null) {
 			if (blockElement.groups?.key) {
 				usedContentKeys.push(blockElement.groups.key);
 			}
 		}
 
-		this._filterUnusedBlocks(usedContentKeys);
-
-		this._latestMarkup = value;
-
 		if (this.value) {
 			this.value = {
 				...this.value,
-				markup: this._latestMarkup,
+				markup: markup,
 			};
 		} else {
 			this.value = {
-				markup: this._latestMarkup,
+				markup: markup,
 				blocks: {
 					layout: {},
 					contentData: [],
@@ -54,6 +56,9 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 				},
 			};
 		}
+
+		// lets run this one after we set the value, to make sure we don't reset the value.
+		this._filterUnusedBlocks(usedContentKeys);
 
 		this._fireChangeEvent();
 	}
@@ -64,6 +69,8 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 				.configuration=${this._config}
 				.value=${this._markup}
 				?readonly=${this.readonly}
+				?required=${this.mandatory}
+				?required-message=${this.mandatoryMessage}
 				@change=${this.#onChange}></umb-input-tiptap>
 		`;
 	}

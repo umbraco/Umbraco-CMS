@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -23,13 +23,13 @@ public class SearchMemberItemController : MemberItemControllerBase
 
     [NonAction]
     [Obsolete("Scheduled to be removed in v16, use the non obsoleted method instead")]
-    public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
-        => await SearchWithAllowedTypes(cancellationToken, query, skip, take);
+    public Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
+        => SearchWithAllowedTypes(cancellationToken, query, skip, take);
 
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<MemberItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchWithAllowedTypes(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, [FromQuery]IEnumerable<Guid>? allowedMemberTypes = null)
+    public Task<IActionResult> SearchWithAllowedTypes(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, [FromQuery]IEnumerable<Guid>? allowedMemberTypes = null)
     {
         PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Member, query, null, allowedMemberTypes, skip, take);
         var result = new PagedModel<MemberItemResponseModel>
@@ -38,6 +38,6 @@ public class SearchMemberItemController : MemberItemControllerBase
             Total = searchResult.Total
         };
 
-        return await Task.FromResult(Ok(result));
+        return Task.FromResult<IActionResult>(Ok(result));
     }
 }

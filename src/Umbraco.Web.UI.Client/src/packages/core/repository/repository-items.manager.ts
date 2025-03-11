@@ -213,7 +213,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 			this.observe(
 				asObservable(),
 				(data) => {
-					this.#items.append(this.#sortByUniques(data));
+					this.#items.setValue(this.#sortByUniques(data));
 				},
 				ObserveRepositoryAlias,
 			);

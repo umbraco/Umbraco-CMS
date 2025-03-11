@@ -1,9 +1,5 @@
 import { UmbDeprecation } from '../utils/index.js';
-
-export type UmbObjectWithVariantProperties = {
-	culture: string | null;
-	segment: string | null;
-};
+import type { UmbObjectWithVariantProperties } from './types.js';
 
 /**
  *

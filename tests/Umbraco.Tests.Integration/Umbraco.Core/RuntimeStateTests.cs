@@ -79,7 +79,7 @@ public class RuntimeStateTests : UmbracoIntegrationTest
         protected override void DefinePlan() => To<TestMigration>(TestMigrationFinalState);
     }
 
-    private class TestMigration : PackageMigrationBase
+    private sealed class TestMigration : AsyncPackageMigrationBase
     {
         public TestMigration(
             IPackagingService packagingService,
@@ -91,9 +91,13 @@ public class RuntimeStateTests : UmbracoIntegrationTest
             IMigrationContext context,
             IOptions<PackageMigrationSettings> options)
             : base(packagingService, mediaService, mediaFileManager, mediaUrlGenerators, shortStringHelper, contentTypeBaseServiceProvider, context, options)
-        {
-        }
+        { }
 
-        protected override void Migrate() => ImportPackage.FromEmbeddedResource<TestMigration>().Do();
+        protected override Task MigrateAsync()
+        {
+            ImportPackage.FromEmbeddedResource<TestMigration>().Do();
+
+            return Task.CompletedTask;
+        }
     }
 }

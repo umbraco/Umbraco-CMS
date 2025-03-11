@@ -13,6 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-history',
 			label: '#actions_rollback',
+			additionalOptions: true,
 		},
 		conditions: [
 			{
