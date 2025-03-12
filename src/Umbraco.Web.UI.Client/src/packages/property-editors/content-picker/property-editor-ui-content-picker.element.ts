@@ -90,6 +90,9 @@ export class UmbPropertyEditorUIContentPickerElement
 			this._rootUnique = startNode.id;
 			this._rootEntityType = this.#entityTypeDictionary[startNode.type];
 			this.#dynamicRoot = startNode.dynamicRoot;
+
+			// NOTE: Filter out any items that do not match the entity type. [LK]
+			this.#value = this.#value?.filter((x) => x.type === this._rootEntityType);
 		}
 
 		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
