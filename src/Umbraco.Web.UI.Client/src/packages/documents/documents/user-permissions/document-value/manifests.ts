@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		meta: {
 			verbs: [UMB_USER_PERMISSION_DOCUMENT_VALUE_SEE],
 			label: 'See',
-			description: 'See Document value',
+			description: 'See Document values',
 		},
 	},
 	{
