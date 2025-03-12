@@ -1,10 +1,10 @@
-import type { UmbDocumentTypeStructureUserPermissionModel } from '../types.js';
-import { UmbDocumentTypeItemRepository } from '../../../repository/item/index.js';
-import type { UmbDocumentTypeItemModel } from '../../../repository/item/types.js';
-import type { UmbDocumentTypeTreeItemModel } from '../../../tree/types.js';
-import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '../../../modals/index.js';
-import { UMB_DOCUMENT_TYPE_PROPERTY_PICKER_MODAL } from '../../property-picker-modal/document-type-property-picker-modal.token.js';
-import { UmbDocumentTypeDetailRepository } from '../../../repository/detail/index.js';
+import type { UmbDocumentTypeStructureUserPermissionModel } from '../../../../document-types/structure/user-permission/types.js';
+import { UmbDocumentTypeItemRepository } from '../../../../document-types/repository/item/index.js';
+import type { UmbDocumentTypeItemModel } from '../../../../document-types/repository/item/types.js';
+import type { UmbDocumentTypeTreeItemModel } from '../../../../document-types/tree/types.js';
+import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '../../../../document-types/modals/index.js';
+import { UMB_DOCUMENT_TYPE_PROPERTY_PICKER_MODAL } from '../../../../document-types/structure/property-picker-modal/document-type-property-picker-modal.token.js';
+import { UmbDocumentTypeDetailRepository } from '../../../../document-types/repository/detail/index.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
