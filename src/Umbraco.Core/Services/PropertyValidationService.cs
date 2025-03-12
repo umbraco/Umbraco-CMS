@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Validation;
@@ -17,16 +15,6 @@ public class PropertyValidationService : IPropertyValidationService
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IValueEditorCache _valueEditorCache;
     private readonly ICultureDictionary _cultureDictionary;
-
-    [Obsolete("Use the constructor that accepts ICultureDictionary. Will be removed in V15.")]
-    public PropertyValidationService(
-        PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService,
-        ILocalizedTextService textService,
-        IValueEditorCache valueEditorCache)
-        : this(propertyEditors, dataTypeService, textService, valueEditorCache, StaticServiceProvider.Instance.GetRequiredService<ICultureDictionary>())
-    {
-    }
 
     public PropertyValidationService(
         PropertyEditorCollection propertyEditors,

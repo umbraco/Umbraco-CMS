@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -11,14 +9,6 @@ public class PropertyTypeUsageService : IPropertyTypeUsageService
     private readonly IPropertyTypeUsageRepository _propertyTypeUsageRepository;
     private readonly IContentTypeService _contentTypeService;
     private readonly ICoreScopeProvider _scopeProvider;
-
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
-    public PropertyTypeUsageService(
-        IPropertyTypeUsageRepository propertyTypeUsageRepository,
-        ICoreScopeProvider scopeProvider): this(propertyTypeUsageRepository, StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>(), scopeProvider)
-    {
-
-    }
 
     public PropertyTypeUsageService(
         IPropertyTypeUsageRepository propertyTypeUsageRepository,
