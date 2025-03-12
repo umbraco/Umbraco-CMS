@@ -166,7 +166,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                             out IEnumerable<EntityContainer> dataTypeEntityContainersInstalled),
                     LanguagesInstalled = ImportLanguages(compiledPackage.Languages, userId),
                     DictionaryItemsInstalled = ImportDictionaryItems(compiledPackage.DictionaryItems, userId),
-                    TemplatesInstalled = ImportTemplates(compiledPackage.Templates.ToList(), userId),
+                    TemplatesInstalled = ImportTemplatesAsync(compiledPackage.Templates.ToList(), userId).GetAwaiter().GetResult(),
                     DocumentTypesInstalled =
                         ImportDocumentTypes(compiledPackage.DocumentTypes, userId,
                             out IEnumerable<EntityContainer> documentTypeEntityContainersInstalled),
