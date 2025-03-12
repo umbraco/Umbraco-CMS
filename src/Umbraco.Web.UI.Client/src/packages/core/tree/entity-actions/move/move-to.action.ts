@@ -16,6 +16,7 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 			data: {
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
+				pickableFilter: (treeItem) => treeItem.unique !== this.args.unique,
 			},
 		});
 

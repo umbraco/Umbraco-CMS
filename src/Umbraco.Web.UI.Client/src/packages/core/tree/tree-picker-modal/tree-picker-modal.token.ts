@@ -1,4 +1,4 @@
-import type { UmbTreeStartNode } from '../types.js';
+import type { UmbTreeItemModel, UmbTreeStartNode } from '../types.js';
 import { UMB_TREE_PICKER_MODAL_ALIAS } from './constants.js';
 import type { UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import type { UmbWorkspaceModalData } from '@umbraco-cms/backoffice/workspace';
@@ -14,7 +14,7 @@ export interface UmbTreePickerModalCreateActionData<PathPatternParamsType extend
 }
 
 export interface UmbTreePickerModalData<
-	TreeItemType,
+	TreeItemType = UmbTreeItemModel,
 	PathPatternParamsType extends UmbPathPatternParamsType = UmbPathPatternParamsType,
 > extends UmbPickerModalData<TreeItemType> {
 	hideTreeRoot?: boolean;
@@ -28,7 +28,7 @@ export interface UmbTreePickerModalData<
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbTreePickerModalValue extends UmbPickerModalValue {}
 
-export const UMB_TREE_PICKER_MODAL = new UmbModalToken<UmbTreePickerModalData<unknown>, UmbTreePickerModalValue>(
+export const UMB_TREE_PICKER_MODAL = new UmbModalToken<UmbTreePickerModalData, UmbTreePickerModalValue>(
 	UMB_TREE_PICKER_MODAL_ALIAS,
 	{
 		modal: {

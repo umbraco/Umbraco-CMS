@@ -28,6 +28,7 @@ export { TextAlign } from '@tiptap/extension-text-align';
 export { Underline } from '@tiptap/extension-underline';
 
 // CUSTOM EXTENSIONS
+export * from './extensions/tiptap-anchor.extension.js';
 export * from './extensions/tiptap-div.extension.js';
 export * from './extensions/tiptap-figcaption.extension.js';
 export * from './extensions/tiptap-figure.extension.js';
