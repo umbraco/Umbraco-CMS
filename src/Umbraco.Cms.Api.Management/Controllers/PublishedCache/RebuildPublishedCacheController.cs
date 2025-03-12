@@ -21,7 +21,7 @@ public class RebuildPublishedCacheController : PublishedCacheControllerBase
         {
             var problemDetails = new ProblemDetails
             {
-                Title = "Database cache not be rebuilt",
+                Title = "Database cache cannot be rebuilt",
                 Detail = $"The database cache is in the process of rebuilding.",
                 Status = StatusCodes.Status400BadRequest,
                 Type = "Error",

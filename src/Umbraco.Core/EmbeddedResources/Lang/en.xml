@@ -378,6 +378,7 @@
     <key alias="invalidPattern">Value is invalid, it does not match the correct pattern</key>
     <key alias="entriesShort"><![CDATA[Minimum %0% entries, requires <strong>%1%</strong> more.]]></key>
     <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
+    <key alias="stringLengthExceeded">The string length exceeds the maximum length of %0% characters.</key>
     <key alias="entriesAreasMismatch">The content amount requirements are not met for one or more areas.</key>
     <key alias="invalidMemberGroupName">Invalid member group name</key>
     <key alias="invalidUserGroupName">Invalid user group name</key>
@@ -389,12 +390,22 @@
     <key alias="duplicateUsername">Username '%0%' is already taken</key>
     <key alias="outOfRangeMinimum">The value %0% is less than the allowed minimum value of %1%</key>
     <key alias="outOfRangeMaximum">The value %0% is greater than the allowed maximum value of %1%</key>
+    <key alias="outOfRangeSingleItemMinimum">The 1 item provided is less than the allowed minimum of %1%</key>
+    <key alias="outOfRangeMultipleItemsMinimum">The %0% items provided are less than the allowed minimum of %1%</key>
+    <key alias="outOfRangeMultipleItemsMaximum">The %0% items provided are greater than the allowed maximum of %1%</key>
     <key alias="invalidStep">The value %0% does not correspond with the configured step value of %1% and minimum value of %2%</key>
     <key alias="unexpectedRange">The value %0% is not expected to contain a range</key>
     <key alias="invalidRange">The value %0% is not expected to have a to value less than the from value</key>
     <key alias="invalidMediaType">The chosen media type is invalid.</key>
+    <key alias="invalidContentType">The chosen content is of invalid type.</key>
+    <key alias="missingContent">The chosen content does not exist.</key>
     <key alias="multipleMediaNotAllowed">Multiple selected media is not allowed.</key>
-    <key alias="invalidStartNode">The selected media is from the wrong folder.</key>
+    <key alias="notOneOfOptions">The value '%0%' is not one of the available options.</key>
+    <key alias="multipleNotOneOfOptions">The values '%0%' are not found in the the available options.</key>
+    <key alias="invalidColor">"The selected colour '%0%' is not one of the available options.</key>
+    <key alias="invalidStartNode">The selected item is from the wrong folder.</key>
+    <key alias="invalidObjectType">The selected item is of the wrong type.</key>
+    <key alias="notOneOfOptions">"The value '%0%' is not one of the available options.</key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:

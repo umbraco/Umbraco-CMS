@@ -6,13 +6,13 @@ import '@umbraco-cms/backoffice/static-file';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	type UmbPropertyEditorUiElement,
-	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-property-editor-ui-block-grid-layout-stylesheet')
 export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
@@ -66,7 +66,7 @@ export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
 		} else {
 			this._value = (event.target as UmbInputStaticFileElement).selection;
 		}
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	// TODO: Implement mandatory?

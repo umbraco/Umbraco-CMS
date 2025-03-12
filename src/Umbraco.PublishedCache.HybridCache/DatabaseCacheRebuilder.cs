@@ -55,7 +55,6 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
     public bool IsRebuilding() => _runtimeCache.Get(IsRebuildingDatabaseCacheRuntimeCacheKey) is not null;
 
     /// <inheritdoc/>
-    [Obsolete("Use the overload with the useBackgroundThread parameter. Scheduled for removal in Umbraco 17.")]
     public void Rebuild() => Rebuild(false);
 
     /// <inheritdoc/>
