@@ -136,6 +136,8 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 			}
 
 			.handle {
+				align-self: start;
+				margin-top: var(--uui-size-3);
 				cursor: move;
 			}
 		`,
