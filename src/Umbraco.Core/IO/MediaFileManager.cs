@@ -1,7 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Strings;
@@ -29,18 +27,6 @@ public sealed class MediaFileManager
         _shortStringHelper = shortStringHelper;
         _serviceProvider = serviceProvider;
         FileSystem = fileSystem;
-    }
-
-    [Obsolete("Use the ctr that doesn't include unused parameters.")]
-    public MediaFileManager(
-        IFileSystem fileSystem,
-        IMediaPathScheme mediaPathScheme,
-        ILogger<MediaFileManager> logger,
-        IShortStringHelper shortStringHelper,
-        IServiceProvider serviceProvider,
-        IOptions<ContentSettings> contentSettings)
-        : this(fileSystem, mediaPathScheme, logger, shortStringHelper, serviceProvider)
-    {
     }
 
     /// <summary>
