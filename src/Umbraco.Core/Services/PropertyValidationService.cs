@@ -57,12 +57,6 @@ public class PropertyValidationService : IPropertyValidationService
         return ValidatePropertyValue(dataEditor, dataType, postedValue, propertyType.Mandatory, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage, validationContext);
     }
 
-    [Obsolete("Please use the overload that accepts a PropertyValidationContext. Will be removed in V16.")]
-    public IEnumerable<ValidationResult> ValidatePropertyValue(
-        IPropertyType propertyType,
-        object? postedValue)
-        => ValidatePropertyValue(propertyType, postedValue, PropertyValidationContext.Empty());
-
     /// <inheritdoc />
     public IEnumerable<ValidationResult> ValidatePropertyValue(
         IDataEditor editor,
@@ -98,17 +92,6 @@ public class PropertyValidationService : IPropertyValidationService
             yield return validationResult;
         }
     }
-
-    [Obsolete("Please use the overload that accepts a PropertyValidationContext. Will be removed in V16.")]
-    public IEnumerable<ValidationResult> ValidatePropertyValue(
-        IDataEditor editor,
-        IDataType dataType,
-        object? postedValue,
-        bool isRequired,
-        string? validationRegExp,
-        string? isRequiredMessage,
-        string? validationRegExpMessage)
-        => ValidatePropertyValue(editor, dataType, postedValue, isRequired, validationRegExp, isRequiredMessage, validationRegExpMessage, PropertyValidationContext.Empty());
 
     /// <inheritdoc />
     public bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact? impact)
@@ -162,10 +145,6 @@ public class PropertyValidationService : IPropertyValidationService
 
         return invalidProperties.Length == 0;
     }
-
-    [Obsolete("Please use the overload that accepts a PropertyValidationContext. Will be removed in V16.")]
-    public bool IsPropertyValid(IProperty property, string culture = "*", string segment = "*")
-        => IsPropertyValid(property, PropertyValidationContext.CultureAndSegment(culture, segment));
 
     /// <inheritdoc />
     public bool IsPropertyValid(IProperty property, PropertyValidationContext validationContext)
