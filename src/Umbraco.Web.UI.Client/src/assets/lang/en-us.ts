@@ -320,9 +320,6 @@ export default {
 		removeTextBox: 'Remove this text box',
 		contentRoot: 'Content root',
 		includeUnpublished: 'Include unpublished content items.',
-		forceRepublish: 'Publish unchanged items.',
-		forceRepublishWarning: 'WARNING: Publishing all pages below this one in the content tree, whether or not they have changed, can be an expensive and long-running operation.',
-		forceRepublishAdvisory: 'This should not be necessary in normal circumstances so please only proceed with this option selected if you are certain it is required.',
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your\n      website administrator.\n    ',
 		isSensitiveValue_short: 'This value is hidden.',
