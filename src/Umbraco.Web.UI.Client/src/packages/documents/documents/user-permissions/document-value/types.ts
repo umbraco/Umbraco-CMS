@@ -4,7 +4,7 @@ export interface UmbReferencedByAlias {
 	alias: string;
 }
 
-export interface UmbDocumentTypeStructureUserPermissionModel extends UmbUserPermissionModel {
+export interface UmbDocumentValueUserPermissionModel extends UmbUserPermissionModel {
 	documentType: {
 		unique: string;
 	};
