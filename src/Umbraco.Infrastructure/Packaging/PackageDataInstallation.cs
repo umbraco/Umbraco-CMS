@@ -1709,17 +1709,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #region Templates
 
-        [Obsolete("Use Async version instead, Scheduled to be removed in v17")]
-        public IEnumerable<ITemplate> ImportTemplate(XElement templateElement, int userId)
-            => ImportTemplates(new[] { templateElement }, userId);
-
         public async Task<IEnumerable<ITemplate>> ImportTemplateAsync(XElement templateElement, int userId)
             => ImportTemplatesAsync(new[] {templateElement}, userId).GetAwaiter().GetResult();
-
-
-        [Obsolete("Use Async version instead, Scheduled to be removed in v17")]
-        public IReadOnlyList<ITemplate> ImportTemplates(IReadOnlyCollection<XElement> templateElements, int userId)
-            => ImportTemplatesAsync(templateElements, userId).GetAwaiter().GetResult();
 
         /// <summary>
         /// Imports and saves package xml as <see cref="ITemplate"/>
