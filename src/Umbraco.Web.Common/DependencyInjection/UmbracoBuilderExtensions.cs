@@ -119,8 +119,7 @@ public static partial class UmbracoBuilderExtensions
 
         TypeLoader typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), loggerFactory, config);
 
-        IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
-        return new UmbracoBuilder(services, config, typeLoader, loggerFactory, profiler, appCaches, tempHostingEnvironment);
+        return new UmbracoBuilder(services, config, typeLoader, loggerFactory, profiler, appCaches);
     }
 
     /// <summary>

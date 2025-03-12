@@ -48,7 +48,6 @@ using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
-using Umbraco.Cms.Core.Services.Filters;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {
@@ -65,10 +64,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// <inheritdoc />
         public ILoggerFactory BuilderLoggerFactory { get; }
 
-        /// <inheritdoc />
-        [Obsolete("Only here to comply with obsolete implementation. Scheduled for removal in v16")]
-        public IHostingEnvironment? BuilderHostingEnvironment { get; }
-
         public IProfiler Profiler { get; }
 
         public AppCaches AppCaches { get; }
@@ -77,32 +72,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class primarily for testing.
         /// </summary>
         public UmbracoBuilder(IServiceCollection services, IConfiguration config, TypeLoader typeLoader)
-            : this(services, config, typeLoader, NullLoggerFactory.Instance, new NoopProfiler(), AppCaches.Disabled, null)
+            : this(services, config, typeLoader, NullLoggerFactory.Instance, new NoopProfiler(), AppCaches.Disabled)
         { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class.
-        /// </summary>
-        [Obsolete("Use a non obsolete constructor instead. Scheduled for removal in v16")]
-        public UmbracoBuilder(
-            IServiceCollection services,
-            IConfiguration config,
-            TypeLoader typeLoader,
-            ILoggerFactory loggerFactory,
-            IProfiler profiler,
-            AppCaches appCaches,
-            IHostingEnvironment? hostingEnvironment)
-        {
-            Services = services;
-            Config = config;
-            BuilderLoggerFactory = loggerFactory;
-            BuilderHostingEnvironment = hostingEnvironment;
-            Profiler = profiler;
-            AppCaches = appCaches;
-            TypeLoader = typeLoader;
-
-            AddCoreServices();
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class.

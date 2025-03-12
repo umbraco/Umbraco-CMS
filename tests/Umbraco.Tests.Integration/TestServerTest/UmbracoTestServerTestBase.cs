@@ -237,11 +237,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         {
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
 
-            Core.Hosting.IHostingEnvironment hostingEnvironment = TestHelper.GetHostingEnvironment();
-
             TypeLoader typeLoader = services.AddTypeLoader(
                 GetType().Assembly,
-                hostingEnvironment,
                 TestHelper.ConsoleLoggerFactory,
                 AppCaches.NoCache,
                 Configuration,
@@ -249,7 +246,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
             services.AddLogger(TestHelper.GetWebHostEnvironment(), Configuration);
 
-            var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache, hostingEnvironment);
+            var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache);
             builder.Services.AddTransient<IHostedService>(sp => new TestDatabaseHostedLifecycleService(() => UseTestDatabase(sp)));
 
             builder

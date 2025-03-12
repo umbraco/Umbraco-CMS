@@ -173,7 +173,6 @@ public static class ServiceCollectionExtensions
     public static TypeLoader AddTypeLoader(
         this IServiceCollection services,
         Assembly entryAssembly,
-        IHostingEnvironment hostingEnvironment,
         ILoggerFactory loggerFactory,
         AppCaches appCaches,
         IConfiguration configuration,
