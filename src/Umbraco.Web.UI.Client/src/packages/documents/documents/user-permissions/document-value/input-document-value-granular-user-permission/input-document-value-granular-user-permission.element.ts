@@ -1,10 +1,4 @@
-import type { UmbDocumentTypeStructureUserPermissionModel } from '../../../../document-types/structure/user-permission/types.js';
-import { UmbDocumentTypeItemRepository } from '../../../../document-types/repository/item/index.js';
-import type { UmbDocumentTypeItemModel } from '../../../../document-types/repository/item/types.js';
-import type { UmbDocumentTypeTreeItemModel } from '../../../../document-types/tree/types.js';
-import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '../../../../document-types/modals/index.js';
-import { UMB_DOCUMENT_TYPE_PROPERTY_PICKER_MODAL } from '../../../../document-types/structure/property-picker-modal/document-type-property-picker-modal.token.js';
-import { UmbDocumentTypeDetailRepository } from '../../../../document-types/repository/detail/index.js';
+import type { UmbDocumentValueUserPermissionModel } from '../types.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
@@ -18,14 +12,22 @@ import {
 	type ManifestEntityUserPermission,
 } from '@umbraco-cms/backoffice/user-permission';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import {
+	UMB_DOCUMENT_TYPE_PICKER_MODAL,
+	UMB_DOCUMENT_TYPE_PROPERTY_PICKER_MODAL,
+	UmbDocumentTypeDetailRepository,
+	UmbDocumentTypeItemRepository,
+	type UmbDocumentTypeItemModel,
+	type UmbDocumentTypeTreeItemModel,
+} from '@umbraco-cms/backoffice/document-type';
 
-@customElement('umb-content-type-structure-document-granular-user-permission')
-export class UmbInputDocumentTypeStructureGranularUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
-	_permissions: Array<UmbDocumentTypeStructureUserPermissionModel> = [];
-	public get permissions(): Array<UmbDocumentTypeStructureUserPermissionModel> {
+@customElement('umb-document-value-granular-user-permission')
+export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
+	_permissions: Array<UmbDocumentValueUserPermissionModel> = [];
+	public get permissions(): Array<UmbDocumentValueUserPermissionModel> {
 		return this._permissions;
 	}
-	public set permissions(value: Array<UmbDocumentTypeStructureUserPermissionModel>) {
+	public set permissions(value: Array<UmbDocumentValueUserPermissionModel>) {
 		this._permissions = value;
 		const uniques = value.map((item) => item.documentType.unique);
 		this.#observePickedDocumentTypes(uniques);
@@ -295,10 +297,10 @@ export class UmbInputDocumentTypeStructureGranularUserPermissionElement extends 
 	];
 }
 
-export { UmbInputDocumentTypeStructureGranularUserPermissionElement as element };
+export { UmbInputDocumentValueGranularUserPermissionElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-type-structure-granular-user-permission': UmbInputDocumentTypeStructureGranularUserPermissionElement;
+		'umb-document-value-granular-user-permission': UmbInputDocumentValueGranularUserPermissionElement;
 	}
 }
