@@ -22,6 +22,17 @@ public class SearchDocumentTypeItemController : DocumentTypeItemControllerBase
     {
     }
 
+    [Obsolete("Please use ctor that only accepts IUmbracoMapper & IContentTypeSearchService, scheduled for removal in v17")]
+    // We need to have this constructor, or else we get ambiguous constructor error
+    public SearchDocumentTypeItemController(
+        IEntitySearchService entitySearchService,
+        IContentTypeService contentTypeService,
+        IUmbracoMapper mapper,
+        IContentTypeSearchService contentTypeSearchService)
+        : this(mapper, contentTypeSearchService)
+    {
+    }
+
     [ActivatorUtilitiesConstructor]
     public SearchDocumentTypeItemController(IUmbracoMapper mapper, IContentTypeSearchService contentTypeSearchService)
     {
