@@ -124,7 +124,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		if (user.kind === UmbUserKind.API) return nothing;
 
 		if (!user.lastLoginDate) {
-			return html`<div class="user-login-time">${`${user.name} ${this.localize.term('user_noLogin')}`}</div>`;
+			return html`<div title="${user.name}" class="user-login-time">${`${user.name} `}</div> <label>${this.localize.term('user_noLogin')}</label>`;
 		}
 		const lastLoggedinLocalTime: Date = new Date(user.lastLoginDate);
 		const formattedTime = lastLoggedinLocalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -157,7 +157,14 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 			}
 
 			.user-login-time {
-				margin-top: auto;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				vertical-align: center;
+				margin-top: 3px;
+				font-weight: 700;
 				width: 100%;
     			word-wrap: break-word;
 			}
