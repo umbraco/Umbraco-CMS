@@ -23,7 +23,7 @@ internal sealed class ContentTypeSearchService : IContentTypeSearchService
         Guid.TryParse(query, out Guid guidQuery);
 
         IQuery<IContentType> nameQuery = isElement is not null ?
-            _sqlContext.Query<IContentType>().Where(x => x.Name!.Contains(query) || x.Key == guidQuery || x.IsElement == isElement) :
+            _sqlContext.Query<IContentType>().Where(x => (x.Name!.Contains(query) || x.Key == guidQuery) && x.IsElement == isElement) :
             _sqlContext.Query<IContentType>().Where(x => x.Name!.Contains(query) || x.Key == guidQuery);
 
         IContentType[] contentTypes = (await _contentTypeService.GetByQueryAsync(nameQuery, cancellationToken)).ToArray();
