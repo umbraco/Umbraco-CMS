@@ -427,13 +427,6 @@ internal partial class UserService : RepositoryService, IUserService
     }
 
     /// <summary>
-    ///     This is just the default user group that the membership provider will use
-    /// </summary>
-    /// <returns></returns>
-    [Obsolete("No (backend) code path is using this anymore, so it can not be considered the default. Planned for removal in V16.")]
-    public string GetDefaultMemberType() => Constants.Security.WriterGroupAlias;
-
-    /// <summary>
     ///     Finds a list of <see cref="IUser" /> objects by a partial email string
     /// </summary>
     /// <param name="emailStringToMatch">Partial email string to match</param>
