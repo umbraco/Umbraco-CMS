@@ -8,5 +8,5 @@ export interface UmbDocumentTypeStructureUserPermissionModel extends UmbUserPerm
 	documentType: {
 		unique: string;
 	};
-	properties: Array<UmbReferencedByAlias>;
+	property: UmbReferencedByAlias;
 }
