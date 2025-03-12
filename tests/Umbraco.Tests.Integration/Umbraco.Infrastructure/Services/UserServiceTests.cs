@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using NUnit.Framework;
@@ -17,7 +15,6 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -30,6 +27,8 @@ public class UserServiceTests : UmbracoIntegrationTest
 {
     private UserService UserService => (UserService)GetRequiredService<IUserService>();
 
+    private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
+
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private IFileService FileService => GetRequiredService<IFileService>();
@@ -37,15 +36,15 @@ public class UserServiceTests : UmbracoIntegrationTest
     private IContentService ContentService => GetRequiredService<IContentService>();
 
     [Test]
-    public void Get_User_Permissions_For_Unassigned_Permission_Nodes()
+    public async Task Get_User_Permissions_For_Unassigned_Permission_Nodes()
     {
         // Arrange
-        var user = CreateTestUser(out _);
+        var (user, _) = await CreateTestUserAndGroup();
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         Content[] content =
         {
@@ -65,15 +64,15 @@ public class UserServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_User_Permissions_For_Assigned_Permission_Nodes()
+    public async Task Get_User_Permissions_For_Assigned_Permission_Nodes()
     {
         // Arrange
-        var user = CreateTestUser(out var userGroup);
+        var (user, userGroup) = await CreateTestUserAndGroup();
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         Content[] content =
         {
@@ -99,15 +98,15 @@ public class UserServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_UserGroup_Assigned_Permissions()
+    public async Task Get_UserGroup_Assigned_Permissions()
     {
         // Arrange
-        var userGroup = CreateTestUserGroup();
+        var userGroup = await CreateTestUserGroup();
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         Content[] content =
         {
@@ -134,15 +133,15 @@ public class UserServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_UserGroup_Assigned_And_Default_Permissions()
+    public async Task Get_UserGroup_Assigned_And_Default_Permissions()
     {
         // Arrange
-        var userGroup = CreateTestUserGroup();
+        var userGroup = await CreateTestUserGroup();
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         Content[] content =
         {
@@ -168,12 +167,12 @@ public class UserServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_All_User_Permissions_For_All_Nodes_With_Explicit_Permission()
+    public async Task Get_All_User_Permissions_For_All_Nodes_With_Explicit_Permission()
     {
         // Arrange
-        var userGroup1 = CreateTestUserGroup();
-        var userGroup2 = CreateTestUserGroup("test2", "Test 2");
-        var userGroup3 = CreateTestUserGroup("test3", "Test 3");
+        var userGroup1 = await CreateTestUserGroup();
+        var userGroup2 = await CreateTestUserGroup("test2", "Test 2");
+        var userGroup3 = await CreateTestUserGroup("test3", "Test 3");
         var user = UserService.CreateUserWithIdentity("John Doe", "john@umbraco.io");
 
         var defaultPermissionCount = userGroup3.Permissions.Count();
@@ -186,7 +185,7 @@ public class UserServiceTests : UmbracoIntegrationTest
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         Content[] content =
         {
@@ -260,15 +259,15 @@ public class UserServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_All_User_Group_Permissions_For_All_Nodes()
+    public async Task Get_All_User_Group_Permissions_For_All_Nodes()
     {
         // Arrange
-        var userGroup = CreateTestUserGroup();
+        var userGroup = await CreateTestUserGroup();
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         Content[] content =
         {
@@ -406,15 +405,15 @@ public class UserServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_User_Implicit_Permissions()
+    public async Task Get_User_Implicit_Permissions()
     {
         // Arrange
-        var userGroup = CreateTestUserGroup();
+        var userGroup = await CreateTestUserGroup();
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(parent);
@@ -602,10 +601,10 @@ public class UserServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_All_Paged_Users_For_Group()
+    public async Task Get_All_Paged_Users_For_Group()
     {
         var userGroup = UserGroupBuilder.CreateUserGroup();
-        UserService.Save(userGroup);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         var users = UserBuilder.CreateMulipleUsers(10).ToArray();
         for (var i = 0; i < 10;)
@@ -626,10 +625,10 @@ public class UserServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_All_Paged_Users_For_Group_With_Filter()
+    public async Task Get_All_Paged_Users_For_Group_With_Filter()
     {
         var userGroup = UserGroupBuilder.CreateUserGroup();
-        UserService.Save(userGroup);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         var users = UserBuilder.CreateMulipleUsers(10).ToArray();
         for (var i = 0; i < 10;)
@@ -749,14 +748,14 @@ public class UserServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Add_And_Remove_Sections_From_UserGroup()
+    public async Task Can_Add_And_Remove_Sections_From_UserGroup()
     {
         var userGroup = new UserGroup(ShortStringHelper) { Alias = "Group1", Name = "Group 1" };
         userGroup.AddAllowedSection("content");
         userGroup.AddAllowedSection("mediat");
-        UserService.Save(userGroup);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
-        var result1 = UserService.GetUserGroupById(userGroup.Id);
+        var result1 = await UserGroupService.GetAsync(userGroup.Id);
 
         Assert.AreEqual(2, result1.AllowedSections.Count());
 
@@ -765,9 +764,9 @@ public class UserServiceTests : UmbracoIntegrationTest
         userGroup.AddAllowedSection("test2");
         userGroup.AddAllowedSection("test3");
         userGroup.AddAllowedSection("test4");
-        UserService.Save(userGroup);
+        await UserGroupService.UpdateAsync(userGroup, Constants.Security.SuperUserKey);
 
-        result1 = UserService.GetUserGroupById(userGroup.Id);
+        result1 = await UserGroupService.GetAsync(userGroup.Id);
 
         Assert.AreEqual(6, result1.AllowedSections.Count());
 
@@ -780,40 +779,40 @@ public class UserServiceTests : UmbracoIntegrationTest
         // now just re-add a couple
         result1.AddAllowedSection("test3");
         result1.AddAllowedSection("test4");
-        UserService.Save(result1);
+        await UserGroupService.UpdateAsync(result1, Constants.Security.SuperUserKey);
 
         // Assert
         // re-get
-        result1 = UserService.GetUserGroupById(userGroup.Id);
+        result1 = await UserGroupService.GetAsync(userGroup.Id);
         Assert.AreEqual(2, result1.AllowedSections.Count());
     }
 
     [Test]
-    public void Can_Remove_Section_From_All_Assigned_UserGroups()
+    public async Task Can_Remove_Section_From_All_Assigned_UserGroups()
     {
         var userGroup1 = new UserGroup(ShortStringHelper) { Alias = "Group1", Name = "Group 1" };
         var userGroup2 = new UserGroup(ShortStringHelper) { Alias = "Group2", Name = "Group 2" };
-        UserService.Save(userGroup1);
-        UserService.Save(userGroup2);
+        await UserGroupService.CreateAsync(userGroup1, Constants.Security.SuperUserKey);
+        await UserGroupService.CreateAsync(userGroup2, Constants.Security.SuperUserKey);
 
         // adds some allowed sections
         userGroup1.AddAllowedSection("test");
         userGroup2.AddAllowedSection("test");
-        UserService.Save(userGroup1);
-        UserService.Save(userGroup2);
+        await UserGroupService.UpdateAsync(userGroup1, Constants.Security.SuperUserKey);
+        await UserGroupService.UpdateAsync(userGroup2, Constants.Security.SuperUserKey);
 
         // now clear the section from all users
         UserService.DeleteSectionFromAllUserGroups("test");
 
         // Assert
-        var result1 = UserService.GetUserGroupById(userGroup1.Id);
-        var result2 = UserService.GetUserGroupById(userGroup2.Id);
+        var result1 = await UserGroupService.GetAsync(userGroup1.Id);
+        var result2 = await UserGroupService.GetAsync(userGroup2.Id);
         Assert.IsFalse(result1.AllowedSections.Contains("test"));
         Assert.IsFalse(result2.AllowedSections.Contains("test"));
     }
 
     [Test]
-    public void Can_Add_Section_To_All_UserGroups()
+    public async Task Can_Add_Section_To_All_UserGroups()
     {
         var userGroup1 = new UserGroup(ShortStringHelper) { Alias = "Group1", Name = "Group 1" };
         userGroup1.AddAllowedSection("test");
@@ -822,14 +821,14 @@ public class UserServiceTests : UmbracoIntegrationTest
         userGroup2.AddAllowedSection("test");
 
         var userGroup3 = new UserGroup(ShortStringHelper) { Alias = "Group3", Name = "Group 3" };
-        UserService.Save(userGroup1);
-        UserService.Save(userGroup2);
-        UserService.Save(userGroup3);
+        await UserGroupService.CreateAsync(userGroup1, Constants.Security.SuperUserKey);
+        await UserGroupService.CreateAsync(userGroup2, Constants.Security.SuperUserKey);
+        await UserGroupService.CreateAsync(userGroup3, Constants.Security.SuperUserKey);
 
         // Assert
-        var result1 = UserService.GetUserGroupById(userGroup1.Id);
-        var result2 = UserService.GetUserGroupById(userGroup2.Id);
-        var result3 = UserService.GetUserGroupById(userGroup3.Id);
+        var result1 = await UserGroupService.GetAsync(userGroup1.Id);
+        var result2 = await UserGroupService.GetAsync(userGroup2.Id);
+        var result3 = await UserGroupService.GetAsync(userGroup3.Id);
         Assert.IsTrue(result1.AllowedSections.Contains("test"));
         Assert.IsTrue(result2.AllowedSections.Contains("test"));
         Assert.IsFalse(result3.AllowedSections.Contains("test"));
@@ -838,13 +837,13 @@ public class UserServiceTests : UmbracoIntegrationTest
         foreach (var userGroup in new[] { userGroup1, userGroup2, userGroup3 })
         {
             userGroup.AddAllowedSection("test");
-            UserService.Save(userGroup);
+            await UserGroupService.UpdateAsync(userGroup, Constants.Security.SuperUserKey);
         }
 
         // Assert
-        result1 = UserService.GetUserGroupById(userGroup1.Id);
-        result2 = UserService.GetUserGroupById(userGroup2.Id);
-        result3 = UserService.GetUserGroupById(userGroup3.Id);
+        result1 = await UserGroupService.GetAsync(userGroup1.Id);
+        result2 = await UserGroupService.GetAsync(userGroup2.Id);
+        result3 = await UserGroupService.GetAsync(userGroup3.Id);
         Assert.IsTrue(result1.AllowedSections.Contains("test"));
         Assert.IsTrue(result2.AllowedSections.Contains("test"));
         Assert.IsTrue(result3.AllowedSections.Contains("test"));
@@ -926,10 +925,10 @@ public class UserServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_User_By_Username()
+    public async Task Get_User_By_Username()
     {
         // Arrange
-        var originalUser = CreateTestUser(out _);
+        var (originalUser, _) = await CreateTestUserAndGroup();
 
         // Act
         var updatedItem = (User)UserService.GetByUsername(originalUser.Username);
@@ -950,11 +949,11 @@ public class UserServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Get_Assigned_StartNodes_For_User()
+    public async Task Can_Get_Assigned_StartNodes_For_User()
     {
-        var startContentItems = BuildContentItems(3);
+        var startContentItems = await BuildContentItems(3);
 
-        var testUserGroup = CreateTestUserGroup();
+        var testUserGroup = await CreateTestUserGroup();
 
         var userGroupId = testUserGroup.Id;
 
@@ -1017,12 +1016,12 @@ public class UserServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(expectedResult, result);
     }
 
-    private Content[] BuildContentItems(int numberToCreate)
+    private async Task<Content[]> BuildContentItems(int numberToCreate)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         var startContentItems = new List<Content>();
 
@@ -1036,9 +1035,9 @@ public class UserServiceTests : UmbracoIntegrationTest
         return startContentItems.ToArray();
     }
 
-    private IUser CreateTestUser(out IUserGroup userGroup)
+    private async Task<(IUser, IUserGroup)> CreateTestUserAndGroup()
     {
-        userGroup = CreateTestUserGroup();
+        var userGroup = await CreateTestUserGroup();
 
         var user = UserService.CreateUserWithIdentity("test1", "test1@test.com");
 
@@ -1046,12 +1045,12 @@ public class UserServiceTests : UmbracoIntegrationTest
 
         UserService.Save(user);
 
-        return user;
+        return (user, userGroup);
     }
 
     private async Task<IUser> CreateTestUser(UserKind userKind)
     {
-        var userGroup = CreateTestUserGroup();
+        var userGroup = await CreateTestUserGroup();
 
         var result = await UserService.CreateAsync(
             Constants.Security.SuperUserKey,
@@ -1088,12 +1087,12 @@ public class UserServiceTests : UmbracoIntegrationTest
         return users;
     }
 
-    private UserGroup CreateTestUserGroup(string alias = "testGroup", string name = "Test Group")
+    private async Task<UserGroup> CreateTestUserGroup(string alias = "testGroup", string name = "Test Group")
     {
         var permissions = "ABCDEFGHIJ1234567".ToCharArray().Select(x => x.ToString()).ToHashSet();
         var userGroup = UserGroupBuilder.CreateUserGroup(alias, name, permissions: permissions);
 
-        UserService.Save(userGroup);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         return userGroup;
     }

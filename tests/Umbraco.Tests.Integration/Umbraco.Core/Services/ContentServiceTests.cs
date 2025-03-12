@@ -1913,11 +1913,11 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Ensures_Permissions_Are_Retained_For_Copied_Descendants_With_Explicit_Permissions()
+    public async Task Ensures_Permissions_Are_Retained_For_Copied_Descendants_With_Explicit_Permissions()
     {
         // Arrange
         var userGroup = UserGroupBuilder.CreateUserGroup("1");
-        UserService.Save(userGroup);
+        await UserGroupService.UpdateAsync(userGroup, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -1954,11 +1954,11 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Ensures_Permissions_Are_Inherited_For_Copied_Descendants()
+    public async Task Ensures_Permissions_Are_Inherited_For_Copied_Descendants()
     {
         // Arrange
         var userGroup = UserGroupBuilder.CreateUserGroup("1");
-        UserService.Save(userGroup);
+        await UserGroupService.UpdateAsync(userGroup, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -1969,7 +1969,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         {
             new(contentType.Key, 0, contentType.Alias)
         };
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parentPage = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(parentPage);
@@ -2060,7 +2060,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
         editorGroup.StartContentId = content1.Id;
-        UserService.Save(editorGroup);
+        await UserGroupService.UpdateAsync(editorGroup, Constants.Security.SuperUserKey);
 
         var admin = await UserService.GetAsync(Constants.Security.SuperUserKey);
         admin.StartContentIds = new[] { content1.Id };
@@ -2075,7 +2075,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsTrue(PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
         var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
-        var userGroup = UserService.GetUserGroupByAlias(user.Groups.First().Alias);
+        var userGroup = await UserGroupService.GetAsync(user.Groups.First().Alias);
         Assert.IsNotNull(NotificationService.CreateNotification(user, content1, "X"));
 
         ContentService.SetPermission(content1, "A", new[] { userGroup.Id });

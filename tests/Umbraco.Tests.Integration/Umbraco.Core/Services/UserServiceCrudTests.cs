@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -82,7 +82,8 @@ public partial class UserServiceCrudTests : UmbracoIntegrationTestWithContent
             GetRequiredService<IShortStringHelper>(),
             GetRequiredService<IOptions<ContentSettings>>(),
             GetRequiredService<IIsoCodeValidator>(),
-            GetRequiredService<IUserForgotPasswordSender>());
+            GetRequiredService<IUserForgotPasswordSender>(),
+            GetRequiredService<IUserIdKeyResolver>());
     }
 
 
