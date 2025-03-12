@@ -1,16 +1,15 @@
 ﻿import {ConstantHelper, NotificationConstantHelper, test} from "@umbraco/playwright-testhelpers";
-import {beforeEach} from "node:test";
 
-// Document Types
+// Document Type
 const documentTypeName = 'DocumentTypeName';
 let documentTypeId = null;
 const documentTypeGroupName = 'DocumentGroup';
 
-// Block Lists
+// Block List
 const blockListName = 'BlockListName';
 let blockListId = null;
 
-// Element Types
+// Element Type
 const blockName = 'BlockName';
 let elementTypeId = null;
 const elementGroupName = 'ElementGroup';
@@ -24,15 +23,14 @@ const textStringText = 'ThisIsATextString';
 // Content Name
 const contentName = 'ContentName';
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
+test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureIsoCodeNotExists('da');
   const textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
   textStringDataTypeId = textStringDataType.id;
   await umbracoApi.language.createDanishLanguage();
-
 });
 
-test.afterEach(async ({umbracoApi, umbracoUi}) => {
+test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureIsoCodeNotExists('da');
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(blockName);
@@ -198,4 +196,3 @@ test('variant document type with invariant block list with variant block with an
   await umbracoUi.content.goToBlockListBlockWithName(documentTypeGroupName, blockListName, blockName);
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);
 });
-
