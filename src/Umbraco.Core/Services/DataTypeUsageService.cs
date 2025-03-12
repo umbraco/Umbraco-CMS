@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -12,15 +10,6 @@ public class DataTypeUsageService : IDataTypeUsageService
     private readonly IDataTypeUsageRepository _dataTypeUsageRepository;
     private readonly IDataTypeService _dataTypeService;
     private readonly ICoreScopeProvider _scopeProvider;
-
-
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
-    public DataTypeUsageService(
-        IDataTypeUsageRepository dataTypeUsageRepository,
-        ICoreScopeProvider scopeProvider)
-        : this(dataTypeUsageRepository, StaticServiceProvider.Instance.GetRequiredService<IDataTypeService>(), scopeProvider)
-    {
-    }
 
     public DataTypeUsageService(
         IDataTypeUsageRepository dataTypeUsageRepository,
