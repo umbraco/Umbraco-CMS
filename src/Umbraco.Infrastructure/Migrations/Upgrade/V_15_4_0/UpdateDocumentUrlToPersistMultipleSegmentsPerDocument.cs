@@ -61,7 +61,6 @@ public class UpdateDocumentUrlToPersistMultipleSegmentsPerDocument : MigrationBa
             .SingleOrDefault(x => x.TableName == Constants.DatabaseSchema.Tables.DocumentUrl && x.ColumnName == IsPrimaryColumnName) is null)
         {
             AddColumn<DocumentUrlDto>(Constants.DatabaseSchema.Tables.DocumentUrl, IsPrimaryColumnName);
-            Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.DocumentUrl} SET {IsPrimaryColumnName} = 1").Do();
         }
     }
 }
