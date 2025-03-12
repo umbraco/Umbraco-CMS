@@ -19,9 +19,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		alias: 'Umb.UserGranularPermission.ContentType.Structure',
 		name: 'Content Type Structure Granular User Permission',
 		element: () =>
-			import(
-				'../../../documents/user-permissions/document-value/input-document-value-granular-user-permission/input-docum-value-granular-user-permission.element.js'
-			),
+			import('./input-document-value-granular-user-permission/input-docum-value-granular-user-permission.element.js'),
 		meta: {
 			schemaType: 'DocumentTypeStructurePermissionPresentationModel',
 			label: 'Document Type Structure',
