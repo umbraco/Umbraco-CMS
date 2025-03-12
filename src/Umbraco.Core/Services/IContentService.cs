@@ -376,12 +376,6 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="userId">The identifier of the user performing the action.</param>
     PublishResult Publish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
 
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(PublishBranch)} instead. Will be removed in V16")]
-    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = Constants.Security.SuperUserId);
-
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(PublishBranch)} instead. Will be removed in V16")]
-    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId);
-
     /// <summary>
     ///     Publishes a document branch.
     /// </summary>
@@ -411,10 +405,7 @@ public interface IContentService : IContentServiceBase<IContent>
     ///         The root of the branch is always published, regardless of <paramref name="publishBranchFilter" />.
     ///     </para>
     /// </remarks>
-    IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => SaveAndPublishBranch(content, publishBranchFilter.HasFlag(PublishBranchFilter.IncludeUnpublished), cultures, userId);
-#pragma warning restore CS0618 // Type or member is obsolete
+    IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Unpublishes a document.

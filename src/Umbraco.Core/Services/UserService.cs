@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
@@ -52,49 +51,6 @@ internal partial class UserService : RepositoryService, IUserService
     private readonly IUserRepository _userRepository;
     private readonly ContentSettings _contentSettings;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-
-    [Obsolete("Use the constructor that takes an IUserIdKeyResolver instead. Scheduled for removal in V15.")]
-    public UserService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IUserRepository userRepository,
-        IUserGroupRepository userGroupRepository,
-        IOptions<GlobalSettings> globalSettings,
-        IOptions<SecuritySettings> securitySettings,
-        UserEditorAuthorizationHelper userEditorAuthorizationHelper,
-        IServiceScopeFactory serviceScopeFactory,
-        IEntityService entityService,
-        ILocalLoginSettingProvider localLoginSettingProvider,
-        IUserInviteSender inviteSender,
-        MediaFileManager mediaFileManager,
-        ITemporaryFileService temporaryFileService,
-        IShortStringHelper shortStringHelper,
-        IOptions<ContentSettings> contentSettings,
-        IIsoCodeValidator isoCodeValidator,
-        IUserForgotPasswordSender forgotPasswordSender)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            userRepository,
-            userGroupRepository,
-            globalSettings,
-            securitySettings,
-            userEditorAuthorizationHelper,
-            serviceScopeFactory,
-            entityService,
-            localLoginSettingProvider,
-            inviteSender,
-            mediaFileManager,
-            temporaryFileService,
-            shortStringHelper,
-            contentSettings,
-            isoCodeValidator,
-            forgotPasswordSender,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    {
-    }
 
     public UserService(
         ICoreScopeProvider provider,
