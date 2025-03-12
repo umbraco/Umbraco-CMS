@@ -136,22 +136,6 @@
       ],
       "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
       "continueOnError": true
-    },
-    {
-      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
-      "args": {
-        "executable": "powershell",
-        "args": "cd Client;npm install;npm run build;",
-        "redirectStandardError": false,
-        "redirectStandardOutput": false
-      },
-      "manualInstructions": [
-        {
-          "text": "From the 'Client' folder run 'npm install' and then 'npm run build'"
-        }
-      ],
-      "continueOnError": true,
-      "description ": "Installs node modules"
     }
   ],
   "sources": [
@@ -160,8 +144,7 @@
         {
           "condition": "(!IncludeExample)",
           "exclude": [
-            "[Cc]lient/src/dashboards/**",
-            "[Cc]lient/src/api/schemas.gen.ts"
+            "[Cc]lient/src/dashboards/**"
           ]
         }
       ]

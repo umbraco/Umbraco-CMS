@@ -2,7 +2,7 @@
   "id": "Umbraco.Extension",
   "name": "Umbraco.Extension",
   "version": "0.0.0",
-  "allowPackageTelemetry": true,
+  "allowTelemetry": true,
   "extensions": [
     {
       "name": "Umbraco ExtensionBundle",

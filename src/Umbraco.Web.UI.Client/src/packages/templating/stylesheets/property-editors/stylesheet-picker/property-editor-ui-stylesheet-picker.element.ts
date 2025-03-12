@@ -1,12 +1,12 @@
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbStylesheetInputElement } from '@umbraco-cms/backoffice/stylesheet';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-property-editor-ui-stylesheet-picker')
 export class UmbPropertyEditorUIStylesheetPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -29,7 +29,7 @@ export class UmbPropertyEditorUIStylesheetPickerElement extends UmbLitElement im
 	#onChange(event: CustomEvent) {
 		const target = event.target as UmbStylesheetInputElement;
 		this.#value = target.selection ?? [];
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

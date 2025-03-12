@@ -1,7 +1,6 @@
 import type { UmbInputStaticFileElement } from '../../components/index.js';
 import {
 	type UmbPropertyEditorUiElement,
-	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -9,6 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import '../../components/input-static-file/index.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-property-editor-ui-static-file-picker')
 export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -58,7 +58,7 @@ export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement im
 		} else {
 			this._value = (event.target as UmbInputStaticFileElement).selection;
 		}
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	// TODO: Implement mandatory?
