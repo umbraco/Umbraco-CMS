@@ -51,16 +51,16 @@ test('can create content with a block grid with an empty block in a area', {tag:
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(firstElementTypeName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   await umbracoUi.reloadPage();
   await umbracoUi.content.doesBlockContainBlockInAreaWithName(firstElementTypeName, firstAreaName, firstElementTypeName);
   await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 1);
 });
 
-test('can create content with a block grid with two empty blocks in a area', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can create content with a block grid with two empty blocks in a area', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithAllowInAreas(blockGridDataTypeName, firstElementTypeId, firstAreaName, toAllowInAreas, areaCreateLabel);
@@ -80,7 +80,7 @@ test('can create content with a block grid with two empty blocks in a area', {ta
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   await umbracoUi.reloadPage();
   await umbracoUi.content.doesBlockContainCountOfBlockInArea(firstElementTypeName, firstAreaName, firstElementTypeName, 2);
 
@@ -106,8 +106,10 @@ test('can create content with block grid area with a create label', async ({umbr
   // Act
   await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   await umbracoUi.content.doesBlockGridBlockWithAreaContainCreateLabel(firstElementTypeName, createLabel);
 });
 
@@ -125,8 +127,10 @@ test('can create content with block grid area with column span', async ({umbraco
   // Act
   await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   await umbracoUi.content.doesBlockAreaContainColumnSpan(firstElementTypeName, firstAreaName, columnSpan, 0);
 });
 
@@ -144,8 +148,10 @@ test('can create content with block grid area with row span', async ({umbracoApi
   // Act
   await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   await umbracoUi.content.doesBlockAreaContainRowSpan(firstElementTypeName, firstAreaName, rowSpan, 0);
 });
 
