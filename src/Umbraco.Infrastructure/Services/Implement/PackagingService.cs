@@ -131,21 +131,6 @@ public class PackagingService : IPackagingService
 
     #region Created/Installed Package Repositories
 
-    [Obsolete("Use DeleteCreatedPackageAsync instead. Scheduled for removal in Umbraco 15.")]
-    public void DeleteCreatedPackage(int id, int userId = Constants.Security.SuperUserId)
-    {
-        Guid key, currentUserKey;
-
-        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            PackageDefinition? package = GetCreatedPackageById(id);
-            key = package?.PackageId ?? Guid.Empty;
-            currentUserKey = _userService.GetUserById(id)?.Key ?? Constants.Security.SuperUserKey;
-        }
-
-        DeleteCreatedPackageAsync(key, currentUserKey).GetAwaiter().GetResult();
-    }
-
     /// <inheritdoc/>
     public async Task<Attempt<PackageDefinition?, PackageOperationStatus>> DeleteCreatedPackageAsync(Guid key, Guid userKey)
     {
@@ -165,14 +150,6 @@ public class PackagingService : IPackagingService
         return Attempt.SucceedWithStatus<PackageDefinition?, PackageOperationStatus>(PackageOperationStatus.Success, package);
     }
 
-    public IEnumerable<PackageDefinition?> GetAllCreatedPackages()
-    {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
-
-        return _createdPackages.GetAll();
-    }
-
-    [Obsolete("Use GetCreatedPackagesAsync instead. Scheduled for removal in Umbraco 15.")]
     public PackageDefinition? GetCreatedPackageById(int id)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
@@ -196,17 +173,6 @@ public class PackagingService : IPackagingService
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
 
         return Task.FromResult(_createdPackages.GetByKey(key));
-    }
-
-    [Obsolete("Use CreateCreatedPackageAsync or UpdateCreatedPackageAsync instead. Scheduled for removal in Umbraco 15.")]
-    public bool SaveCreatedPackage(PackageDefinition definition)
-    {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-
-        var success = _createdPackages.SavePackage(definition);
-        scope.Complete();
-
-        return success;
     }
 
     /// <inheritdoc/>
@@ -256,11 +222,7 @@ public class PackagingService : IPackagingService
     }
 
     public InstalledPackage? GetInstalledPackageByName(string packageName)
-        => GetAllInstalledPackages().Where(x => x.PackageName?.InvariantEquals(packageName) ?? false).FirstOrDefault();
-
-    [Obsolete("Use GetAllInstalledPackagesAsync instead. Scheduled for removal in Umbraco 15.")]
-    public IEnumerable<InstalledPackage> GetAllInstalledPackages()
-        => GetAllInstalledPackagesAsync().GetAwaiter().GetResult();
+        => GetAllInstalledPackagesAsync().GetAwaiter().GetResult().Where(x => x.PackageName?.InvariantEquals(packageName) ?? false).FirstOrDefault();
 
     public async Task<IEnumerable<InstalledPackage>> GetAllInstalledPackagesAsync()
     {
