@@ -28,10 +28,10 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html` <uui-box headline=${this.localize.term('user_access')}>
+		return html` <uui-box headline=${this.localize.term('user_accessSummary')}>
 			<div slot="header" class="faded-text">
-				<umb-localize key="user_accessHelp"
-					>Based on the assigned groups and start nodes, the user has access to the following nodes</umb-localize
+				<umb-localize key="user_accessSummaryHelp"
+					>Based on the assigned access and user groups, the user has access to the following items</umb-localize
 				>
 			</div>
 
