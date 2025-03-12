@@ -33,15 +33,6 @@ public class DataTypeUsageService : IDataTypeUsageService
     }
 
     /// <inheritdoc/>
-    [Obsolete("Please use HasSavedValuesAsync. Scheduled for removable in Umbraco 15.")]
-    public bool HasSavedValues(int dataTypeId)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-
-        return _dataTypeUsageRepository.HasSavedValues(dataTypeId);
-    }
-
-    /// <inheritdoc/>
     public async Task<Attempt<bool, DataTypeOperationStatus>> HasSavedValuesAsync(Guid dataTypeKey)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
