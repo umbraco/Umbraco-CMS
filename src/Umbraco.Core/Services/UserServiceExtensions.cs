@@ -86,7 +86,4 @@ public static class UserServiceExtensions
             return asProfile ?? new UserProfile(user.Id, user.Name);
         });
     }
-
-    [Obsolete("Use IUserService.GetAsync that takes a Guid instead. Scheduled for removal in V15.")]
-    public static IUser? GetByKey(this IUserService userService, Guid key) => userService.GetAsync(key).GetAwaiter().GetResult();
 }
