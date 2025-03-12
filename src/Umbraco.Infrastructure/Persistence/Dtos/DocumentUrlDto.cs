@@ -33,6 +33,6 @@ public class DocumentUrlDto
     public string UrlSegment { get; set; } = string.Empty;
 
     [Column("isPrimary")]
-    [Constraint(Default = true)]
+    [Constraint(Default = 1)]
     public bool IsPrimary { get; set; }
 }
