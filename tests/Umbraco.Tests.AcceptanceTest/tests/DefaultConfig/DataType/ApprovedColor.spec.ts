@@ -100,3 +100,11 @@ test('can remove color', async ({umbracoApi, umbracoUi}) => {
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.values).toEqual([]);
 });
+
+test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
+  // Act
+  await umbracoUi.dataType.goToDataType(dataTypeName);
+
+  // Assert
+
+});
