@@ -1,9 +1,9 @@
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbSliderPropertyEditorUiValue } from './types.js';
 import type { UmbInputSliderElement } from '@umbraco-cms/backoffice/components';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -102,7 +102,7 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 
 	#onChange(event: CustomEvent & { target: UmbInputSliderElement }) {
 		this.value = this.#getValueObject(event.target.value as string);
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
