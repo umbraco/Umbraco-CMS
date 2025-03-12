@@ -57,12 +57,4 @@ public abstract class PublishedCacheBase : IPublishedCache
     public abstract bool HasContent(bool preview);
 
     public bool HasContent() => HasContent(PreviewDefault);
-
-    public abstract IPublishedContentType? GetContentType(int id);
-
-    public abstract IPublishedContentType? GetContentType(string alias);
-
-    public abstract IPublishedContentType? GetContentType(Guid key);
-
-    public virtual IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType) => throw new NotImplementedException();
 }
