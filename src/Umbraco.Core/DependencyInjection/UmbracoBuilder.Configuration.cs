@@ -79,7 +79,6 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<UmbracoPluginSettings>()
             .AddUmbracoOptions<UnattendedSettings>()
             .AddUmbracoOptions<BasicAuthSettings>()
-            .AddUmbracoOptions<RuntimeMinificationSettings>()
             .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
             .AddUmbracoOptions<PackageMigrationSettings>()
             .AddUmbracoOptions<HelpPageSettings>()
