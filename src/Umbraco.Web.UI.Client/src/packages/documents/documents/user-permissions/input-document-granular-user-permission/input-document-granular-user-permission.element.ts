@@ -121,7 +121,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		return documentItem;
 	}
 
-	async #selectEntityUserPermissionsForDocument(item: UmbDocumentItemModel, allowedVerbs?: Array<string>) {
+	async #selectEntityUserPermissionsForDocument(item: UmbDocumentItemModel, allowedVerbs: Array<string> = []) {
 		// TODO: get correct variant name
 		const name = item.variants[0]?.name;
 		const headline = name ? `Permissions for ${name}` : 'Permissions';
@@ -131,19 +131,17 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 
 		const uniqueFallbackVerbs = [...new Set([...fallbackVerbs])];
 
-		const value = allowedVerbs || uniqueFallbackVerbs;
-
 		this.#entityUserPermissionModalContext = this.#modalManagerContext?.open(this, UMB_ENTITY_USER_PERMISSION_MODAL, {
 			data: {
 				unique: item.unique,
 				entityType: item.entityType,
 				headline,
 				preset: {
-					allowedVerbs: fallbackVerbs,
+					allowedVerbs: uniqueFallbackVerbs,
 				},
 			},
 			value: {
-				allowedVerbs: value,
+				allowedVerbs: allowedVerbs,
 			},
 		});
 
