@@ -22,7 +22,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentPickerName[1]);
 });
 
-test('can trash an invariant content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can trash an invariant content node', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
@@ -32,7 +32,7 @@ test('can trash an invariant content', {tag: '@smoke'}, async ({umbracoApi, umbr
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashButton();
-  //verify the references list not displayed
+  // Verify the references list not displayed
   await umbracoUi.content.isReferenceHeadlineVisible(false);
   await umbracoUi.content.clickConfirmTrashButton();
 
@@ -43,7 +43,7 @@ test('can trash an invariant content', {tag: '@smoke'}, async ({umbracoApi, umbr
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
 });
 
-test('can trash a variant content', async ({umbracoApi, umbracoUi}) => {
+test('can trash a variant content node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, contentText, dataTypeName);
@@ -53,7 +53,7 @@ test('can trash a variant content', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashButton();
-  //verify the references list not displayed
+  // Verify the references list not displayed
   await umbracoUi.content.isReferenceHeadlineVisible(false);
   await umbracoUi.content.clickConfirmTrashButton();
 
@@ -64,7 +64,7 @@ test('can trash a variant content', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
 });
 
-test('can trash a published content', async ({umbracoApi, umbracoUi}) => {
+test('can trash a published content node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   const contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
@@ -75,7 +75,7 @@ test('can trash a published content', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashButton();
-  //verify the references list not displayed
+  // Verify the references list not displayed
   await umbracoUi.content.isReferenceHeadlineVisible(false);
   await umbracoUi.content.clickConfirmTrashButton();
 
@@ -86,9 +86,9 @@ test('can trash a published content', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
 });
 
-test('can trash an invariant content that references one item', async ({umbracoApi, umbracoUi}) => {
+test('can trash an invariant content node that references one item', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  // Create an invariant published content
+  // Create an invariant published content node
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   const contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
   await umbracoApi.document.publish(contentId);
@@ -100,7 +100,7 @@ test('can trash an invariant content that references one item', async ({umbracoA
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashButton();
-  // verify the references list
+  // Verify the references list
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
@@ -113,9 +113,9 @@ test('can trash an invariant content that references one item', async ({umbracoA
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
 });
 
-test('can trash a variant content that references one item', async ({umbracoApi, umbracoUi}) => {
+test('can trash a variant content node that references one item', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  // Create a variant published content
+  // Create a variant published content node
   const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   const contentId = await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, contentText, dataTypeName);
   await umbracoApi.document.publishDocumentWithCulture(contentId, 'en-US');
@@ -127,7 +127,7 @@ test('can trash a variant content that references one item', async ({umbracoApi,
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashButton();
-  // verify the references list
+  // Verify the references list
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
@@ -140,12 +140,12 @@ test('can trash a variant content that references one item', async ({umbracoApi,
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
 });
 
-test('can trash an invariant content that references more than 3 items', async ({umbracoApi, umbracoUi}) => {
+test('can trash an invariant content node that references more than 3 items', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentPickerName2 = ['TestPicker2', 'DocumentTypeForPicker2'];
   const documentPickerName3 = ['TestPicker3', 'DocumentTypeForPicker3'];
   const documentPickerName4 = ['TestPicker4', 'DocumentTypeForPicker4'];
-  // Create an invariant published content
+  // Create an invariant published content node
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   const contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
   await umbracoApi.document.publish(contentId);
@@ -160,7 +160,7 @@ test('can trash an invariant content that references more than 3 items', async (
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashButton();
-  // verify the references list has 3 items and has ...more
+  // Verify the references list has 3 items and has the text '...and one more item'
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(3);
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
@@ -181,12 +181,12 @@ test('can trash an invariant content that references more than 3 items', async (
   await umbracoApi.documentType.ensureNameNotExists(documentPickerName4[1]);
 });
 
-test('can trash a variant content that references more than 3 items', async ({umbracoApi, umbracoUi}) => {
+test('can trash a variant content node that references more than 3 items', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentPickerName2 = ['TestPicker2', 'DocumentTypeForPicker2'];
   const documentPickerName3 = ['TestPicker3', 'DocumentTypeForPicker3'];
   const documentPickerName4 = ['TestPicker4', 'DocumentTypeForPicker4'];
-  // Create a variant published content
+  // Create a variant published content node
   const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   const contentId = await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, contentText, dataTypeName);
   await umbracoApi.document.publishDocumentWithCulture(contentId, 'en-US');
@@ -201,7 +201,7 @@ test('can trash a variant content that references more than 3 items', async ({um
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashButton();
-  // verify the references list has 3 items and has the text '...and one more item'
+  // Verify the references list has 3 items and has the text '...and one more item'
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(3);
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
@@ -222,12 +222,12 @@ test('can trash a variant content that references more than 3 items', async ({um
   await umbracoApi.documentType.ensureNameNotExists(documentPickerName4[1]);
 });
 
-test('can trash a multiple culture content that references one item', async ({umbracoApi, umbracoUi}) => {
+test('can trash a content node with multiple cultures that references one item', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const firstCulture = 'en-US';
   const secondCulture = 'da';
   await umbracoApi.language.createDanishLanguage();
-  // Create a multiple culture content
+  // Create a content node with multiple cultures
   const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   const contentId = await umbracoApi.document.createDocumentWithTwoCulturesAndTextContent(contentName, documentTypeId, contentText, dataTypeName, firstCulture, secondCulture);
   await umbracoApi.document.publishDocumentWithCulture(contentId, firstCulture);
@@ -240,7 +240,7 @@ test('can trash a multiple culture content that references one item', async ({um
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashButton();
-  // verify the references list
+  // Verify the references list
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
