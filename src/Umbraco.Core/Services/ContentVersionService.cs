@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
@@ -52,51 +50,12 @@ internal class ContentVersionService : IContentVersionService
         _userIdKeyResolver = userIdKeyResolver;
     }
 
-    [Obsolete("Use the non obsolete constructor instead. Scheduled to be removed in v15")]
-    public ContentVersionService(
-        ILogger<ContentVersionService> logger,
-        IDocumentVersionRepository documentVersionRepository,
-        IContentVersionCleanupPolicy contentVersionCleanupPolicy,
-        ICoreScopeProvider scopeProvider,
-        IEventMessagesFactory eventMessagesFactory,
-        IAuditRepository auditRepository,
-        ILanguageRepository languageRepository)
-    {
-        _logger = logger;
-        _documentVersionRepository = documentVersionRepository;
-        _contentVersionCleanupPolicy = contentVersionCleanupPolicy;
-        _scopeProvider = scopeProvider;
-        _eventMessagesFactory = eventMessagesFactory;
-        _auditRepository = auditRepository;
-        _languageRepository = languageRepository;
-        _entityService = StaticServiceProvider.Instance.GetRequiredService<IEntityService>();
-        _contentService = StaticServiceProvider.Instance.GetRequiredService<IContentService>();
-        _userIdKeyResolver = StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>();
-    }
-
     /// <inheritdoc />
     public IReadOnlyCollection<ContentVersionMeta> PerformContentVersionCleanup(DateTime asAtDate) =>
 
         // Media - ignored
         // Members - ignored
         CleanupDocumentVersions(asAtDate);
-
-    /// <inheritdoc />
-    [Obsolete("Use the async version instead. Scheduled to be removed in v15")]
-    public IEnumerable<ContentVersionMeta>? GetPagedContentVersions(int contentId, long pageIndex, int pageSize, out long totalRecords, string? culture = null)
-    {
-        if (pageIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageIndex));
-        }
-
-        if (pageSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-        }
-
-        return HandleGetPagedContentVersions(contentId, pageIndex, pageSize, out totalRecords, culture);
-    }
 
     public ContentVersionMeta? Get(int versionId)
     {
