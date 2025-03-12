@@ -29,10 +29,15 @@ public class SearchDocumentTypeItemController : DocumentTypeItemControllerBase
         _contentTypeSearchService = contentTypeSearchService;
     }
 
+    [NonAction]
+    [Obsolete("Scheduled to be removed in v16, use the non obsoleted method instead")]
+    public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
+        => await SearchDocumentType(cancellationToken, query, null, skip, take);
+
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, bool? isElement = null, int skip = 0, int take = 100)
+    public async Task<IActionResult> SearchDocumentType(CancellationToken cancellationToken, string query,bool? isElement = null, int skip = 0, int take = 100)
     {
         PagedModel<IContentType> contentTypes = await _contentTypeSearchService.SearchAsync(query, isElement, cancellationToken, skip, take);
         var result = new PagedModel<DocumentTypeItemResponseModel>
