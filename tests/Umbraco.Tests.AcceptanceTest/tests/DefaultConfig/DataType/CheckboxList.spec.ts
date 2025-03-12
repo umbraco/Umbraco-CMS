@@ -1,9 +1,11 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Checkbox list';
 let dataTypeDefaultData = null; 
 let dataTypeData = null;
+const editorAlias = 'Umbraco.CheckBoxList';
+const editorUiAlias = 'Umb.PropertyEditorUi.CheckBoxList';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
@@ -95,4 +97,18 @@ test('can update option', async ({umbracoApi, umbracoUi}) => {
   // Assert
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.values).toEqual(expectedOptionValues);
+});
+
+test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
+  // Act
+  await umbracoUi.dataType.goToDataType(dataTypeName);
+
+  // Assert
+  await umbracoUi.dataType.doesSettingHaveConfig(ConstantHelper.checkboxListSettings);
+  await umbracoUi.dataType.doesPropertyEditorHaveSchemaAlias(editorAlias);
+  await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorUiAlias);
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeData.editorAlias).toBe(editorAlias);
+  expect(dataTypeData.editorUiAlias).toBe(editorUiAlias);
+  expect(dataTypeData.values).toEqual([]);
 });
