@@ -135,8 +135,8 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 							this.#documentTypePickerModalContext?.reject();
 							this.#documentTypePropertyPickerModalContext?.reject();
 
-							const permissionItem: UmbDocumentTypeStructureUserPermissionModel = {
-								$type: 'DocumentTypeStructurePermissionPresentationModel',
+							const permissionItem: UmbDocumentValueUserPermissionModel = {
+								$type: 'DocumentValuePermissionPresentationModel',
 								documentType: { unique },
 								property: { alias: propertyAlias },
 								verbs: result,
