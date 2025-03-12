@@ -1,12 +1,9 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
@@ -18,22 +15,6 @@ public class DomainService : RepositoryService, IDomainService
     private readonly IDomainRepository _domainRepository;
     private readonly ILanguageService _languageService;
     private readonly IContentService _contentService;
-
-    [Obsolete("Please use the constructor that accepts ILanguageService and IContentService. Will be removed in V15.")]
-    public DomainService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IDomainRepository domainRepository)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            domainRepository,
-            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IContentService>())
-    {
-    }
 
     public DomainService(
         ICoreScopeProvider provider,
