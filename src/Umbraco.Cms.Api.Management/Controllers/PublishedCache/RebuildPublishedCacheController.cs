@@ -15,14 +15,14 @@ public class RebuildPublishedCacheController : PublishedCacheControllerBase
     [HttpPost("rebuild")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public Task<IActionResult> Rebuild(CancellationToken cancellationToken)
+    public async Task<IActionResult> Rebuild(CancellationToken cancellationToken)
     {
         if (_databaseCacheRebuilder.IsRebuilding())
         {
             var problemDetails = new ProblemDetails
             {
                 Title = "Database cache can not be rebuilt",
-                Detail = $"The database cache is in the process of rebuilding.",
+                Detail = "The database cache is in the process of rebuilding.",
                 Status = StatusCodes.Status400BadRequest,
                 Type = "Error",
             };
