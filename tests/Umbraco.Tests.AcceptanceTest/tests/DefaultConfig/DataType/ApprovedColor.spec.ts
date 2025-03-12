@@ -1,4 +1,4 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Approved Color';
@@ -6,6 +6,8 @@ let dataTypeDefaultData = null;
 let dataTypeData = null;
 const colorValue = 'ffffff';
 const colorLabel = '';
+const editorAlias = 'Umbraco.ColorPicker';
+const editorUiAlias = 'Umb.PropertyEditorUi.ColorPicker';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
@@ -106,5 +108,11 @@ test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
   // Assert
-
+  await umbracoUi.dataType.doesSettingHaveConfig(ConstantHelper.approvedColorSettings);
+  await umbracoUi.dataType.doesPropertyEditorHaveSchemaAlias(editorAlias);
+  await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorUiAlias);
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeData.editorAlias).toBe(editorAlias);
+  expect(dataTypeData.editorUiAlias).toBe(editorUiAlias);
+  expect(dataTypeData.values).toEqual([]);
 });
