@@ -106,7 +106,6 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 				() => html`
 					<uui-button
 						compact
-						color="danger"
 						label="${this.localize.term('general_remove')} ${this.value}"
 						look="outline"
 						?disabled=${this.disabled}
@@ -139,6 +138,10 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 				align-self: start;
 				margin-top: var(--uui-size-3);
 				cursor: move;
+			}
+
+			uui-button {
+				align-self: start;
 			}
 		`,
 	];
