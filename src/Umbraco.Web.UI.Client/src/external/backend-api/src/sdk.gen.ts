@@ -1207,7 +1207,7 @@ export class DocumentService {
             errors: {
                 400: 'Bad Request',
                 401: 'The resource is protected and requires an authentication token',
-                403: 'The authenticated user do not have access to this resource',
+                403: 'The authenticated user does not have access to this resource',
                 404: 'Not Found'
             }
         });
@@ -6036,20 +6036,6 @@ export class PublishedCacheService {
             method: 'POST',
             url: '/umbraco/management/api/v1/published-cache/rebuild',
             responseHeader: 'Umb-Notifications',
-            errors: {
-                401: 'The resource is protected and requires an authentication token'
-            }
-        });
-    }
-    
-    /**
-     * @returns unknown OK
-     * @throws ApiError
-     */
-    public static getPublishedCacheRebuildStatus(): CancelablePromise<GetPublishedCacheRebuildStatusResponse> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/published-cache/rebuild/status',
             errors: {
                 401: 'The resource is protected and requires an authentication token'
             }
