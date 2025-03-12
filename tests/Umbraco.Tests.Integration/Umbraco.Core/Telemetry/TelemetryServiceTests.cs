@@ -68,10 +68,11 @@ public class TelemetryServiceTests : UmbracoIntegrationTest
         expectedData.AddRange(WebhookEventCollection.Select(eventInfo => $"{Constants.Telemetry.WebhookPrefix}{eventInfo.Alias}"));
 
         await MetricsConsentService.SetConsentLevelAsync(TelemetryLevel.Detailed);
-        var success = TelemetryService.TryGetTelemetryReportData(out var telemetryReportData);
-        var detailed = telemetryReportData.Detailed.ToArray();
+        var telemetryReportData = await TelemetryService.GetTelemetryReportDataAsync();
+        Assert.IsNotNull(telemetryReportData);
 
-        Assert.IsTrue(success);
+        var detailed = telemetryReportData!.Detailed.ToArray();
+
         Assert.Multiple(() =>
         {
             Assert.IsNotNull(detailed);
