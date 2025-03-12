@@ -1,13 +1,12 @@
 import { customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbBindToValidation, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import {
 	UMB_SUBMITTABLE_WORKSPACE_CONTEXT,
 	UmbSubmittableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputMultipleTextStringElement } from '@umbraco-cms/backoffice/components';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -97,7 +96,7 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 		event.stopPropagation();
 		const target = event.currentTarget as UmbInputMultipleTextStringElement;
 		this.value = target.items;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	// Prevent valid events from bubbling outside the message element

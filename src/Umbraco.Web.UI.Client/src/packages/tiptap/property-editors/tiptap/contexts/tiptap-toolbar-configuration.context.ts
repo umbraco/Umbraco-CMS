@@ -39,8 +39,8 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTipt
 		fontname: 'Umb.Tiptap.Toolbar.FontFamily',
 		fontfamily: 'Umb.Tiptap.Toolbar.FontFamily',
 		fontsize: 'Umb.Tiptap.Toolbar.FontSize',
-		forecolor: null,
-		backcolor: null,
+		forecolor: 'Umb.Tiptap.Toolbar.TextColorForeground',
+		backcolor: 'Umb.Tiptap.Toolbar.TextColorBackground',
 		blockquote: 'Umb.Tiptap.Toolbar.Blockquote',
 		formatblock: null,
 		removeformat: 'Umb.Tiptap.Toolbar.ClearFormatting',
@@ -56,14 +56,14 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTipt
 		numlist: 'Umb.Tiptap.Toolbar.OrderedList',
 		outdent: null,
 		indent: null,
-		anchor: null,
+		anchor: 'Umb.Tiptap.Toolbar.Anchor',
 		table: 'Umb.Tiptap.Toolbar.Table',
 		hr: 'Umb.Tiptap.Toolbar.HorizontalRule',
 		subscript: 'Umb.Tiptap.Toolbar.Subscript',
 		superscript: 'Umb.Tiptap.Toolbar.Superscript',
-		charmap: null,
-		rtl: null,
-		ltr: null,
+		charmap: 'Umb.Tiptap.Toolbar.CharacterMap',
+		rtl: 'Umb.Tiptap.Toolbar.TextDirectionRtl',
+		ltr: 'Umb.Tiptap.Toolbar.TextDirectionLtr',
 		link: 'Umb.Tiptap.Toolbar.Link',
 		unlink: 'Umb.Tiptap.Toolbar.Unlink',
 		sourcecode: 'Umb.Tiptap.Toolbar.SourceEditor',
@@ -76,12 +76,15 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTipt
 		super(host, UMB_TIPTAP_TOOLBAR_CONFIGURATION_CONTEXT);
 
 		this.observe(umbExtensionsRegistry.byType('tiptapToolbarExtension'), (extensions) => {
-			const _extensions = extensions.map((ext) => ({
-				alias: ext.alias,
-				label: ext.meta.label,
-				icon: ext.meta.icon,
-				dependencies: ext.forExtensions,
-			}));
+			const _extensions = extensions
+				.sort((a, b) => a.alias.localeCompare(b.alias))
+				.map((ext) => ({
+					kind: (ext.kind as string) ?? 'button',
+					alias: ext.alias,
+					label: ext.meta.label,
+					icon: ext.meta.icon,
+					dependencies: ext.forExtensions,
+				}));
 
 			this.#extensions.setValue(_extensions);
 

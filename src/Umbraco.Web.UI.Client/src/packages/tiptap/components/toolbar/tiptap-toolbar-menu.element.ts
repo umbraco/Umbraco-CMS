@@ -129,7 +129,7 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 					</uui-button>
 				`,
 				() => html`
-					<uui-button compact look="secondary" label=${ifDefined(label)} popovertarget="popover-menu">
+					<uui-button compact label=${ifDefined(label)} popovertarget="popover-menu">
 						<span>${label}</span>
 						<uui-symbol-expand slot="extra" open></uui-symbol-expand>
 					</uui-button>
@@ -146,11 +146,12 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 				--uui-button-font-weight: normal;
 				--uui-menu-item-flat-structure: 1;
 
-				margin-inline-start: var(--uui-size-space-1);
+				margin-left: var(--uui-size-space-1);
+				margin-bottom: var(--uui-size-space-1);
 			}
 
 			uui-button > uui-symbol-expand {
-				margin-left: var(--uui-size-space-4);
+				margin-left: var(--uui-size-space-2);
 			}
 		`,
 	];

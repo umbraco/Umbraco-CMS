@@ -1,8 +1,8 @@
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-tiny-mce-maximagesize
@@ -14,7 +14,7 @@ export class UmbPropertyEditorUITinyMceMaxImageSizeElement extends UmbLitElement
 
 	#onChange(e: UUIInputEvent) {
 		this.value = Number(e.target.value as string);
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

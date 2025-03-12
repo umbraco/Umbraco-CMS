@@ -1,8 +1,8 @@
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTogglePropertyEditorUiValue } from './types.js';
 import type { UmbInputToggleElement } from '@umbraco-cms/backoffice/components';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -61,7 +61,7 @@ export class UmbPropertyEditorUIToggleElement
 	#onChange(event: CustomEvent & { target: UmbInputToggleElement }) {
 		const checked = event.target.checked;
 		this.value = this.mandatory ? (checked ?? null) : checked;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
