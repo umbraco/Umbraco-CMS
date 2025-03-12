@@ -5,12 +5,10 @@
 
         var vm = this;
         vm.includeUnpublished = $scope.model.includeUnpublished || false;
-        vm.forceRepublish = $scope.model.forceRepublish || false;
         vm.publishAll = false;
 
         vm.changeSelection = changeSelection;
         vm.toggleIncludeUnpublished = toggleIncludeUnpublished;
-        vm.toggleForceRepublish = toggleForceRepublish;
         vm.changePublishAllSelection = changePublishAllSelection;
 
         function onInit() {
@@ -28,11 +26,6 @@
             if (!vm.labels.includeUnpublished) {
                 localizationService.localize("content_includeUnpublished").then(value => {
                     vm.labels.includeUnpublished = value;
-                });
-            }
-            if (!vm.labels.forceRepublish) {
-                localizationService.localize("content_forceRepublish").then(value => {
-                    vm.labels.forceRepublish = value;
                 });
             }
 
@@ -72,11 +65,6 @@
         function toggleIncludeUnpublished() {
             vm.includeUnpublished = !vm.includeUnpublished;
             $scope.model.includeUnpublished = vm.includeUnpublished;
-        }
-
-        function toggleForceRepublish() {
-            vm.forceRepublish = !vm.forceRepublish;
-            $scope.model.forceRepublish = vm.forceRepublish;
         }
 
         /** Returns true if publishing is possible based on if there are un-published mandatory languages */
