@@ -23,16 +23,6 @@ public interface ITwoFactorLoginService : IService
     Task<string?> GetSecretForUserAndProviderAsync(Guid userOrMemberKey, string providerName);
 
     /// <summary>
-    ///     Gets the setup info for a specific user or member and a specific provider.
-    /// </summary>
-    /// <remarks>
-    ///     The returned type can be anything depending on the setup providers. You will need to cast it to the type handled by
-    ///     the provider.
-    /// </remarks>
-    [Obsolete("Use IUserTwoFactorLoginService.GetSetupInfoAsync. This will be removed in Umbraco 15.")]
-    Task<object?> GetSetupInfoAsync(Guid userOrMemberKey, string providerName);
-
-    /// <summary>
     ///     Gets all registered providers names.
     /// </summary>
     IEnumerable<string> GetAllProviderNames();
@@ -56,17 +46,4 @@ public interface ITwoFactorLoginService : IService
     /// Gets all the enabled 2FA providers for the user or member with the specified key.
     /// </summary>
     Task<IEnumerable<string>> GetEnabledTwoFactorProviderNamesAsync(Guid userOrMemberKey);
-
-    /// <summary>
-    /// Disables 2FA with Code.
-    /// </summary>
-    [Obsolete("Use IUserTwoFactorLoginService.DisableByCodeAsync. This will be removed in Umbraco 15.")]
-    Task<bool> DisableWithCodeAsync(string providerName, Guid userOrMemberKey, string code);
-
-    /// <summary>
-    /// Validates and Saves.
-    /// </summary>
-    [Obsolete("Use IUserTwoFactorLoginService.ValidateAndSaveAsync. This will be removed in Umbraco 15.")]
-    Task<bool> ValidateAndSaveAsync(string providerName, Guid userKey, string secret, string code);
-
 }
