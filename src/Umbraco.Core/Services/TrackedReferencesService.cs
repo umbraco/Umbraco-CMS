@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -23,66 +21,6 @@ public class TrackedReferencesService : ITrackedReferencesService
         _entityService = entityService;
     }
 
-    [Obsolete("Please use ctor that does not take an IEntityService, scheduled for removal in V15")]
-    public TrackedReferencesService(
-        ITrackedReferencesRepository trackedReferencesRepository,
-        ICoreScopeProvider scopeProvider): this(trackedReferencesRepository, scopeProvider, StaticServiceProvider.Instance.GetRequiredService<IEntityService>())
-    {
-
-    }
-
-    /// <summary>
-    ///     Gets a paged result of items which are in relation with the current item.
-    ///     Basically, shows the items which depend on the current item.
-    /// </summary>
-    [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
-    public PagedResult<RelationItem> GetPagedRelationsForItem(int id, long pageIndex, int pageSize, bool filterMustBeIsDependency)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<RelationItem> items = _trackedReferencesRepository.GetPagedRelationsForItem(id, pageIndex, pageSize, filterMustBeIsDependency, out var totalItems);
-
-        return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
-    }
-
-    /// <summary>
-    ///     Gets a paged result of items used in any kind of relation from selected integer ids.
-    /// </summary>
-    [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
-    public PagedResult<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<RelationItem> items = _trackedReferencesRepository.GetPagedItemsWithRelations(ids, pageIndex, pageSize, filterMustBeIsDependency, out var totalItems);
-
-        return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
-    }
-
-    /// <summary>
-    ///     Gets a paged result of the descending items that have any references, given a parent id.
-    /// </summary>
-    [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
-    public PagedResult<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-
-        IEnumerable<RelationItem> items = _trackedReferencesRepository.GetPagedDescendantsInReferences(
-            parentId,
-            pageIndex,
-            pageSize,
-            filterMustBeIsDependency,
-            out var totalItems);
-        return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
-    }
-
-    [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
-    public PagedModel<RelationItemModel> GetPagedRelationsForItem(int id, long skip, long take, bool filterMustBeIsDependency)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<RelationItemModel> items = _trackedReferencesRepository.GetPagedRelationsForItem(id, skip, take, filterMustBeIsDependency, out var totalItems);
-        var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
-
-        return pagedModel;
-    }
-
     public Task<PagedModel<RelationItemModel>> GetPagedRelationsForItemAsync(Guid key, long skip, long take, bool filterMustBeIsDependency)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
@@ -90,22 +28,6 @@ public class TrackedReferencesService : ITrackedReferencesService
         var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
 
         return Task.FromResult(pagedModel);
-    }
-
-    [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
-    public PagedModel<RelationItemModel> GetPagedDescendantsInReferences(int parentId, long skip, long take, bool filterMustBeIsDependency)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-
-        IEnumerable<RelationItemModel> items = _trackedReferencesRepository.GetPagedDescendantsInReferences(
-            parentId,
-            skip,
-            take,
-            filterMustBeIsDependency,
-            out var totalItems);
-        var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
-
-        return pagedModel;
     }
 
     public Task<PagedModel<RelationItemModel>> GetPagedDescendantsInReferencesAsync(Guid parentKey, long skip, long take, bool filterMustBeIsDependency)
@@ -121,16 +43,6 @@ public class TrackedReferencesService : ITrackedReferencesService
         var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
 
         return Task.FromResult(pagedModel);
-    }
-
-    [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
-    public PagedModel<RelationItemModel> GetPagedItemsWithRelations(int[] ids, long skip, long take, bool filterMustBeIsDependency)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<RelationItemModel> items = _trackedReferencesRepository.GetPagedItemsWithRelations(ids, skip, take, filterMustBeIsDependency, out var totalItems);
-        var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
-
-        return pagedModel;
     }
 
     public Task<PagedModel<RelationItemModel>> GetPagedItemsWithRelationsAsync(ISet<Guid> keys, long skip, long take, bool filterMustBeIsDependency)
