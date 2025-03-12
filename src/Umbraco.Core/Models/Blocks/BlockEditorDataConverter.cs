@@ -17,18 +17,6 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
 {
     private readonly IJsonSerializer _jsonSerializer;
 
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V15.")]
-    protected BlockEditorDataConverter(string propertyEditorAlias)
-        : this(propertyEditorAlias, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V15.")]
-    protected BlockEditorDataConverter(string propertyEditorAlias, IJsonSerializer jsonSerializer)
-        : this(jsonSerializer)
-    {
-    }
-
     protected BlockEditorDataConverter(IJsonSerializer jsonSerializer)
         => _jsonSerializer = jsonSerializer;
 
