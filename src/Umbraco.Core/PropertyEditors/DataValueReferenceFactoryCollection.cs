@@ -114,9 +114,6 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     /// <returns>
     /// All relation type aliases that are automatically tracked.
     /// </returns>
-    [Obsolete("Use GetAllAutomaticRelationTypesAliases. This will be removed in Umbraco 15.")]
-    public ISet<string> GetAutomaticRelationTypesAliases(PropertyEditorCollection propertyEditors) =>
-        GetAllAutomaticRelationTypesAliases(propertyEditors);
     public ISet<string> GetAllAutomaticRelationTypesAliases(PropertyEditorCollection propertyEditors)
     {
         // Always add default automatic relation types
@@ -126,23 +123,6 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
         foreach (IDataEditor dataEditor in propertyEditors)
         {
             automaticRelationTypeAliases.UnionWith(GetAutomaticRelationTypesAliases(dataEditor));
-        }
-
-        return automaticRelationTypeAliases;
-    }
-    [Obsolete("Use non-obsolete GetAutomaticRelationTypesAliases. This will be removed in Umbraco 15.")]
-    public ISet<string> GetAutomaticRelationTypesAliases(IPropertyCollection properties, PropertyEditorCollection propertyEditors)
-    {
-        // Always add default automatic relation types
-        var automaticRelationTypeAliases = new HashSet<string>(Constants.Conventions.RelationTypes.AutomaticRelationTypes);
-
-        // Only add relation types that are used in the properties
-        foreach (IProperty property in properties)
-        {
-            if (propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor))
-            {
-                automaticRelationTypeAliases.UnionWith(GetAutomaticRelationTypesAliasesEnumerable(dataEditor));
-            }
         }
 
         return automaticRelationTypeAliases;
