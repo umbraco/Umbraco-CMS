@@ -1,7 +1,8 @@
 import { UmbContentPickerDynamicRootRepository } from './dynamic-root/repository/index.js';
 import type { UmbInputContentElement } from './components/input-content/index.js';
 import type { UmbContentPickerSource, UmbContentPickerSourceType } from './types.js';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
@@ -15,16 +16,13 @@ import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 // import of local component
 import './components/input-content/index.js';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 type UmbContentPickerValueType = UmbInputContentElement['selection'];
-
-const elementName = 'umb-property-editor-ui-content-picker';
 
 /**
  * @element umb-property-editor-ui-content-picker
  */
-@customElement(elementName)
+@customElement('umb-property-editor-ui-content-picker')
 export class UmbPropertyEditorUIContentPickerElement
 	extends UmbFormControlMixin<UmbContentPickerValueType | undefined, typeof UmbLitElement>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
@@ -170,7 +168,8 @@ export class UmbPropertyEditorUIContentPickerElement
 				.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
 				?showOpenButton=${this._showOpenButton}
 				?readonly=${this.readonly}
-				@change=${this.#onChange}></umb-input-content>
+				@change=${this.#onChange}>
+			</umb-input-content>
 		`;
 	}
 }
@@ -179,6 +178,6 @@ export { UmbPropertyEditorUIContentPickerElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPropertyEditorUIContentPickerElement;
+		'umb-property-editor-ui-content-picker': UmbPropertyEditorUIContentPickerElement;
 	}
 }
