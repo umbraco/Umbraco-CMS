@@ -11,7 +11,7 @@ internal sealed class ContentTypeSearchService : IContentTypeSearchService
     private readonly ISqlContext _sqlContext;
     private readonly IContentTypeService _contentTypeService;
 
-    public ContentTypeSearchService(IEntityService entityService, ISqlContext sqlContext, IContentTypeService contentTypeService)
+    public ContentTypeSearchService(ISqlContext sqlContext, IContentTypeService contentTypeService)
     {
         _sqlContext = sqlContext;
         _contentTypeService = contentTypeService;
@@ -19,12 +19,12 @@ internal sealed class ContentTypeSearchService : IContentTypeSearchService
 
     public async Task<PagedModel<IContentType>> SearchAsync(string query, bool? isElement, CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
-        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize);
-
         // if the query is a GUID, search for that explicitly
         Guid.TryParse(query, out Guid guidQuery);
 
-        IQuery<IContentType> nameQuery = _sqlContext.Query<IContentType>().Where(x => x.Name!.Contains(query) || x.Key == guidQuery);
+        IQuery<IContentType> nameQuery = isElement is not null ?
+            _sqlContext.Query<IContentType>().Where(x => x.Name!.Contains(query) || x.Key == guidQuery || x.IsElement == isElement) :
+            _sqlContext.Query<IContentType>().Where(x => x.Name!.Contains(query) || x.Key == guidQuery);
 
         IContentType[] contentTypes = (await _contentTypeService.GetByQueryAsync(nameQuery, cancellationToken)).ToArray();
 
