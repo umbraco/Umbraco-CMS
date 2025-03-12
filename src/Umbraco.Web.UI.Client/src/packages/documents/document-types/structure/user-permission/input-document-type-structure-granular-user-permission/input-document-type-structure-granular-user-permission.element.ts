@@ -4,6 +4,7 @@ import type { UmbDocumentTypeItemModel } from '../../../repository/item/types.js
 import type { UmbDocumentTypeTreeItemModel } from '../../../tree/types.js';
 import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '../../../modals/index.js';
 import { UMB_DOCUMENT_TYPE_PROPERTY_PICKER_MODAL } from '../../property-picker-modal/document-type-property-picker-modal.token.js';
+import { UmbDocumentTypeDetailRepository } from '../../../repository/detail/index.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
@@ -16,7 +17,6 @@ import {
 	UMB_ENTITY_USER_PERMISSION_MODAL,
 	type ManifestEntityUserPermission,
 } from '@umbraco-cms/backoffice/user-permission';
-import { UmbDocumentTypeDetailRepository } from '../../../repository/detail/index.js';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 
 @customElement('umb-content-type-structure-document-granular-user-permission')
