@@ -42795,15 +42795,11 @@
       "PublishDocumentWithDescendantsRequestModel": {
         "required": [
           "cultures",
-          "forceRepublish",
           "includeUnpublishedDescendants"
         ],
         "type": "object",
         "properties": {
           "includeUnpublishedDescendants": {
-            "type": "boolean"
-          },
-          "forceRepublish": {
             "type": "boolean"
           },
           "cultures": {
