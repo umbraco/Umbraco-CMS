@@ -4,7 +4,6 @@ import type { UmbContentPickerSource, UmbContentPickerSourceType } from './types
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
 import { UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
@@ -16,6 +15,7 @@ import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 // import of local component
 import './components/input-content/index.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 type UmbContentPickerValueType = UmbInputContentElement['selection'];
 
@@ -149,7 +149,7 @@ export class UmbPropertyEditorUIContentPickerElement
 
 	#onChange(event: CustomEvent & { target: UmbInputContentElement }) {
 		this.value = event.target.selection;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

@@ -38,18 +38,19 @@ export class UmbTiptapToolbarButtonElement extends UmbLitElement {
 	};
 
 	override render() {
+		const label = this.localize.string(this.manifest?.meta.label);
 		return html`
 			<uui-button
 				compact
 				look=${this.isActive ? 'outline' : 'default'}
 				label=${ifDefined(this.manifest?.meta.label)}
-				title=${this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : ''}
+				title=${label}
 				?disabled=${this.api && this.editor && this.api.isDisabled(this.editor)}
-				@click=${() => (this.api && this.editor ? this.api.execute(this.editor) : null)}>
+				@click=${() => this.api?.execute(this.editor)}>
 				${when(
 					this.manifest?.meta.icon,
 					(icon) => html`<umb-icon name=${icon}></umb-icon>`,
-					() => html`<span>${this.manifest?.meta.label}</span>`,
+					() => html`<span>${label}</span>`,
 				)}
 			</uui-button>
 		`;

@@ -96,7 +96,8 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 			<umb-property-layout
 				data-mark="property:editorUiAlias"
 				label="Property Editor"
-				description=${this.localize.term('propertyEditorPicker_title')}>
+				description=${this.localize.term('propertyEditorPicker_title')}
+				mandatory>
 				<uui-button
 					slot="editor"
 					id="btn-add"
@@ -116,7 +117,8 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 			<umb-property-layout
 				data-mark="property:editorUiAlias"
 				label="Property Editor"
-				description=${this.localize.term('propertyEditorPicker_title')}>
+				description=${this.localize.term('propertyEditorPicker_title')}
+				mandatory>
 				<umb-ref-property-editor-ui
 					slot="editor"
 					name=${this._propertyEditorUiName ?? ''}

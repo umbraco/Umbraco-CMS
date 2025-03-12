@@ -7,7 +7,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  *
- 
+
  * @class UmbDocumentTypeStructureServerDataSource
  * @augments {UmbContentTypeStructureServerDataSourceBase}
  */
@@ -20,10 +20,10 @@ export class UmbDocumentTypeStructureServerDataSource extends UmbContentTypeStru
 	}
 }
 
-const getAllowedChildrenOf = (unique: string | null) => {
+const getAllowedChildrenOf = (unique: string | null, parentContentUnique: string | null) => {
 	if (unique) {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DocumentTypeService.getDocumentTypeByIdAllowedChildren({ id: unique });
+		return DocumentTypeService.getDocumentTypeByIdAllowedChildren({ id: unique, parentContentKey: parentContentUnique ?? undefined });
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DocumentTypeService.getDocumentTypeAllowedAtRoot({});
