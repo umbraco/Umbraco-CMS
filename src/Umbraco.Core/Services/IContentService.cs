@@ -380,12 +380,6 @@ public interface IContentService : IContentServiceBase<IContent>
 
     #region Publish Document
 
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(Publish)} instead. Will be removed in V16")]
-    PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId);
-
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(Publish)} instead. Will be removed in V16")]
-    PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
-
     /// <summary>
     ///     Publishes a document.
     /// </summary>
