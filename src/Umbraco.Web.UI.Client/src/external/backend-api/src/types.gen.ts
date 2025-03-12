@@ -2050,7 +2050,6 @@ export type PublishDocumentRequestModel = {
 
 export type PublishDocumentWithDescendantsRequestModel = {
     includeUnpublishedDescendants: boolean;
-    forceRepublish: boolean;
     cultures: Array<(string)>;
 };
 
