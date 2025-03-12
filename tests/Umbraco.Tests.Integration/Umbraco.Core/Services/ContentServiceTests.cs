@@ -1917,7 +1917,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var userGroup = UserGroupBuilder.CreateUserGroup("1");
-        await UserGroupService.UpdateAsync(userGroup, Constants.Security.SuperUserKey);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -1958,7 +1958,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var userGroup = UserGroupBuilder.CreateUserGroup("1");
-        await UserGroupService.UpdateAsync(userGroup, Constants.Security.SuperUserKey);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
