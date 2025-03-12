@@ -26,21 +26,6 @@ public class TextOnlyValueEditor : DataValueEditor
         : base(shortStringHelper, jsonSerializer, ioHelper, attribute) =>
         Validators.Add(new LengthValidator(localizedTextService));
 
-    [Obsolete($"Use the constructor that accepts {nameof(ILocalizedTextService)}. Will be removed in V16.")]
-    public TextOnlyValueEditor(
-        DataEditorAttribute attribute,
-        IShortStringHelper shortStringHelper,
-        IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper)
-        : this(
-            attribute,
-            StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>(),
-            shortStringHelper,
-            jsonSerializer,
-            ioHelper)
-    {
-    }
-
     /// <summary>
     ///     A method used to format the database value to a value that can be used by the editor
     /// </summary>
