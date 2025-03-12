@@ -4,7 +4,7 @@ import type { UmbDocumentTypeItemModel } from '../../../repository/item/types.js
 import type { UmbDocumentTypeTreeItemModel } from '../../../tree/types.js';
 import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '../../../modals/index.js';
 import { UMB_DOCUMENT_TYPE_PROPERTY_PICKER_MODAL } from '../../property-picker-modal/document-type-property-picker-modal.token.js';
-import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -16,6 +16,8 @@ import {
 	UMB_ENTITY_USER_PERMISSION_MODAL,
 	type ManifestEntityUserPermission,
 } from '@umbraco-cms/backoffice/user-permission';
+import { UmbDocumentTypeDetailRepository } from '../../../repository/detail/index.js';
+import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 
 @customElement('umb-content-type-structure-document-granular-user-permission')
 export class UmbInputDocumentTypeStructureGranularUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -29,10 +31,14 @@ export class UmbInputDocumentTypeStructureGranularUserPermissionElement extends 
 		this.#observePickedDocumentTypes(uniques);
 	}
 
+	@property({ type: Array, attribute: false })
+	fallbackPermissions: Array<string> = [];
+
 	@state()
 	private _items?: Array<UmbDocumentTypeItemModel>;
 
 	#documentTypeItemRepository = new UmbDocumentTypeItemRepository(this);
+	#documentTypeDetailRepository = new UmbDocumentTypeDetailRepository(this);
 	#modalManagerContext?: UmbModalManagerContext;
 	#documentTypePickerModalContext?: any;
 	#documentTypePropertyPickerModalContext?: any;
@@ -115,7 +121,14 @@ export class UmbInputDocumentTypeStructureGranularUserPermissionElement extends 
 						throw new Error('Could not open permissions modal, no property alias was provided');
 					}
 
-					this.#selectEntityUserPermissionsForDocumentType(documentTypeItem).then(
+					const { data: documentTypeDetails } = await this.#documentTypeDetailRepository.requestByUnique(unique);
+					const property = documentTypeDetails?.properties.find((p) => p.alias === propertyAlias);
+
+					if (!property) {
+						throw new Error('Could not open permissions modal, no property was found');
+					}
+
+					this.#selectEntityUserPermissionsForProperty(property).then(
 						(result) => {
 							this.#documentTypePickerModalContext?.reject();
 							this.#documentTypePropertyPickerModalContext?.reject();
@@ -149,19 +162,23 @@ export class UmbInputDocumentTypeStructureGranularUserPermissionElement extends 
 		return documentItem;
 	}
 
-	async #selectEntityUserPermissionsForDocumentType(item: UmbDocumentTypeItemModel, allowedVerbs: Array<string> = []) {
+	async #selectEntityUserPermissionsForProperty(property: UmbPropertyTypeModel, allowedVerbs: Array<string> = []) {
 		// TODO: get correct variant name
-		const name = item.name;
+		const name = property.name;
 		const headline = name ? `Permissions for ${name}` : 'Permissions';
+		const fallbackVerbs = this.#getFallbackPermissionVerbsForEntityType('document-type-property');
 
 		this.#documentTypePropertyPickerModalContext = this.#modalManagerContext?.open(
 			this,
 			UMB_ENTITY_USER_PERMISSION_MODAL,
 			{
 				data: {
-					unique: item.unique,
+					unique: property.alias,
 					entityType: 'document-type-property',
 					headline,
+					preset: {
+						allowedVerbs: fallbackVerbs,
+					},
 				},
 				value: {
 					allowedVerbs,
@@ -243,16 +260,30 @@ export class UmbInputDocumentTypeStructureGranularUserPermissionElement extends 
 		if (!permission) return;
 
 		return umbExtensionsRegistry
-			.getAllExtensions()
-			.filter((manifest) => manifest.type === 'entityUserPermission')
-			.filter((manifest) =>
-				(manifest as ManifestEntityUserPermission).meta.verbs.every((verb) => permission.verbs.includes(verb)),
+			.getByTypeAndFilter('entityUserPermission', (manifest) =>
+				manifest.meta.verbs.every((verb) => permission.verbs.includes(verb)),
 			)
 			.map((m) => {
 				const manifest = m as ManifestEntityUserPermission;
 				return manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
 			})
 			.join(', ');
+	}
+
+	#getFallbackPermissionVerbsForEntityType(entityType: string) {
+		// get all permissions that are allowed for the entity type and have at least one of the fallback permissions
+		// this is used to determine the default permissions for a document
+		const verbs = umbExtensionsRegistry
+			.getByTypeAndFilter(
+				'entityUserPermission',
+				(manifest) =>
+					manifest.forEntityTypes.includes(entityType) &&
+					this.fallbackPermissions.map((verb) => manifest.meta.verbs.includes(verb)).includes(true),
+			)
+			.flatMap((permission) => permission.meta.verbs);
+
+		// ensure that the verbs are unique
+		return [...new Set([...verbs])];
 	}
 
 	static override styles = [
