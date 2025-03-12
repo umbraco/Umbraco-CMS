@@ -31,15 +31,6 @@ public class PropertyTypeUsageService : IPropertyTypeUsageService
     }
 
     /// <inheritdoc/>
-    [Obsolete("Please use HasSavedPropertyValuesAsync. Scheduled for removable in Umbraco 15.")]
-    public bool HasSavedPropertyValues(string propertyTypeAlias)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-
-        return _propertyTypeUsageRepository.HasSavedPropertyValues(propertyTypeAlias);
-    }
-
-    /// <inheritdoc/>
     public async Task<Attempt<bool, PropertyTypeOperationStatus>> HasSavedPropertyValuesAsync(Guid contentTypeKey, string propertyAlias)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);

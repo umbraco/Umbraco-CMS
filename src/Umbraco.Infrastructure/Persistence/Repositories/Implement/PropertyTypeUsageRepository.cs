@@ -22,29 +22,6 @@ internal class PropertyTypeUsageRepository : IPropertyTypeUsageRepository
         _scopeAccessor = scopeAccessor;
     }
 
-    [Obsolete("Please use HasSavedPropertyValuesAsync. Scheduled for removable in Umbraco 15.")]
-    public bool HasSavedPropertyValues(string propertyTypeAlias)
-    {
-        IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
-
-        if (database is null)
-        {
-            throw new InvalidOperationException("A scope is required to query the database");
-        }
-
-        Sql<ISqlContext> selectQuery = database.SqlContext.Sql()
-            .SelectAll()
-            .From<PropertyTypeDto>("m")
-            .InnerJoin<PropertyDataDto>("p")
-            .On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id, "p", "m")
-            .Where<PropertyTypeDto>(m => m.Alias == propertyTypeAlias, "m");
-
-        Sql<ISqlContext> hasValuesQuery = database.SqlContext.Sql()
-            .SelectAnyIfExists(selectQuery);
-
-        return database.ExecuteScalar<bool>(hasValuesQuery);
-    }
-
     public Task<bool> HasSavedPropertyValuesAsync(Guid contentTypeKey, string propertyAlias)
     {
         IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
