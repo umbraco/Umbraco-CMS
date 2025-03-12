@@ -3,11 +3,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Item;
 
@@ -18,10 +17,9 @@ public class SearchDocumentTypeItemController : DocumentTypeItemControllerBase
     private readonly IContentTypeSearchService _contentTypeSearchService;
 
     [Obsolete("Please use ctor that only accepts IUmbracoMapper & IContentTypeSearchService, scheduled for removal in v17")]
-    public SearchDocumentTypeItemController(IEntitySearchService entitySearchService, IContentTypeService contentTypeService, IUmbracoMapper mapper, IContentTypeSearchService contentTypeSearchService)
+    public SearchDocumentTypeItemController(IEntitySearchService entitySearchService, IContentTypeService contentTypeService, IUmbracoMapper mapper)
+    : this(mapper, StaticServiceProvider.Instance.GetRequiredService<IContentTypeSearchService>())
     {
-        _mapper = mapper;
-        _contentTypeSearchService = contentTypeSearchService;
     }
 
     [ActivatorUtilitiesConstructor]
