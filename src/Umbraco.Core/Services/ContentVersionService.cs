@@ -66,11 +66,6 @@ internal class ContentVersionService : IContentVersionService
         }
     }
 
-    /// <inheritdoc />
-    [Obsolete("Use the async version instead. Scheduled to be removed in v15")]
-    public void SetPreventCleanup(int versionId, bool preventCleanup, int userId = Constants.Security.SuperUserId)
-        => HandleSetPreventCleanup(versionId, preventCleanup, userId);
-
     public Task<Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>> GetPagedContentVersionsAsync(Guid contentId, string? culture, int skip, int take)
     {
         IEntitySlim? document = _entityService.Get(contentId, UmbracoObjectTypes.Document);
