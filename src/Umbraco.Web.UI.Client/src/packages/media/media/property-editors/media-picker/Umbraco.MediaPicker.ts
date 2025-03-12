@@ -29,7 +29,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 				},
 				{
 					alias: 'startNodeId',
-					label: 'Start node',
+					label: 'Limit access',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaEntityPicker',
 					config: [{ alias: 'validationLimit', value: { min: 0, max: 1 } }],
 				},
