@@ -20,7 +20,7 @@ public class NoSniffCheck : BaseHttpHeaderCheck
     ///     Initializes a new instance of the <see cref="NoSniffCheck" /> class.
     /// </summary>
     public NoSniffCheck(IHostingEnvironment hostingEnvironment, ILocalizedTextService textService)
-        : base(hostingEnvironment, textService, "X-Content-Type-Options", "noSniff", false)
+        : base(hostingEnvironment, textService, "X-Content-Type-Options", "noSniff", false, false)
     {
     }
 
