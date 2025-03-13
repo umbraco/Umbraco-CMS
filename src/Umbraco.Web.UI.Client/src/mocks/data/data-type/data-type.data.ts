@@ -1037,6 +1037,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 					'Umb.Tiptap.Table',
 					'Umb.Tiptap.TextAlign',
 					'Umb.Tiptap.TextDirection',
+					'Umb.Tiptap.TextIndent',
 					'Umb.Tiptap.Underline',
 				],
 			},
@@ -1069,6 +1070,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 							'Umb.Tiptap.Toolbar.TextDirectionRtl',
 							'Umb.Tiptap.Toolbar.TextDirectionLtr',
 						],
+						['Umb.Tiptap.Toolbar.TextIndent', 'Umb.Tiptap.Toolbar.TextOutdent'],
 						[
 							'Umb.Tiptap.Toolbar.BulletList',
 							'Umb.Tiptap.Toolbar.OrderedList',
