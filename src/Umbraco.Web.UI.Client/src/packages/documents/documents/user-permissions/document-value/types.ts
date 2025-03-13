@@ -4,7 +4,7 @@ export interface UmbDocumentValueUserPermissionModel extends UmbUserPermissionMo
 	documentType: {
 		unique: string;
 	};
-	property: {
+	propertyType: {
 		unique: string;
 	};
 }
