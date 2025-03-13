@@ -626,7 +626,7 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 		forExtensions: ['Umb.Tiptap.TextIndent'],
 		meta: {
 			alias: 'indent',
-			icon: 'icon-science',
+			icon: 'icon-indent',
 			label: 'Indent',
 		},
 	},
@@ -639,7 +639,7 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 		forExtensions: ['Umb.Tiptap.TextIndent'],
 		meta: {
 			alias: 'outdent',
-			icon: 'icon-science',
+			icon: 'icon-outdent',
 			label: 'Outdent',
 		},
 	},
