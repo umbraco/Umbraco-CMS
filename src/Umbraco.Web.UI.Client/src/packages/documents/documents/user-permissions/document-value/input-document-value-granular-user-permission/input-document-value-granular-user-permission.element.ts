@@ -3,7 +3,6 @@ import { css, customElement, html, property, repeat, state } from '@umbraco-cms/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbChangeEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
@@ -92,14 +91,13 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 			},
 		});
 
-		this.#documentTypePickerModalContext?.addEventListener(UmbSelectedEvent.TYPE, async (event: UmbDeselectedEvent) => {
+		this.#documentTypePickerModalContext?.addEventListener(UmbSelectedEvent.TYPE, async (event: UmbSelectedEvent) => {
 			const selectedEvent = event as UmbSelectedEvent;
-			const unique = selectedEvent.unique;
-			if (!unique) {
+			const documentTypeUnique = selectedEvent.unique;
+
+			if (!documentTypeUnique) {
 				throw new Error('Could not open Document type property modal, no unique was provided');
 			}
-
-			const documentTypeItem = await this.#requestDocumentTypeItem(unique);
 
 			this.#documentTypePropertyPickerModalContext = this.#modalManagerContext?.open(
 				this,
@@ -107,7 +105,7 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 				{
 					data: {
 						documentType: {
-							unique: documentTypeItem.unique,
+							unique: documentTypeUnique,
 						},
 					},
 				},
@@ -117,14 +115,15 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 				UmbSelectedEvent.TYPE,
 				async (event: UmbSelectedEvent) => {
 					const selectedEvent = event as UmbSelectedEvent;
-					const propertyUnique = selectedEvent.unique;
+					const propertyTypeUnique = selectedEvent.unique;
 
-					if (!propertyUnique) {
+					if (!propertyTypeUnique) {
 						throw new Error('Could not open permissions modal, no property alias was provided');
 					}
 
-					const { data: documentTypeDetails } = await this.#documentTypeDetailRepository.requestByUnique(unique);
-					const property = documentTypeDetails?.properties.find((p) => p.unique === propertyUnique);
+					const { data: documentTypeDetails } =
+						await this.#documentTypeDetailRepository.requestByUnique(documentTypeUnique);
+					const property = documentTypeDetails?.properties.find((p) => p.unique === propertyTypeUnique);
 
 					if (!property) {
 						throw new Error('Could not open permissions modal, no property was found');
@@ -137,8 +136,8 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 
 							const permissionItem: UmbDocumentValueUserPermissionModel = {
 								$type: 'DocumentValuePermissionPresentationModel',
-								documentType: { unique },
-								propertyType: { unique: propertyUnique },
+								documentType: { unique: documentTypeUnique },
+								propertyType: { unique: propertyTypeUnique },
 								verbs: result,
 							};
 
@@ -154,16 +153,6 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 		});
 	}
 
-	async #requestDocumentTypeItem(unique: string) {
-		if (!unique) throw new Error('Could not open permissions modal, no unique was provided');
-
-		const { data } = await this.#documentTypeItemRepository.requestItems([unique]);
-
-		const documentItem = data?.[0];
-		if (!documentItem) throw new Error('No document item found');
-		return documentItem;
-	}
-
 	async #selectEntityUserPermissionsForProperty(property: UmbPropertyTypeModel, allowedVerbs: Array<string> = []) {
 		// TODO: get correct variant name
 		const name = property.name;
@@ -175,7 +164,6 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 			UMB_ENTITY_USER_PERMISSION_MODAL,
 			{
 				data: {
-					unique: property.alias,
 					entityType: 'document-value',
 					headline,
 					preset: {

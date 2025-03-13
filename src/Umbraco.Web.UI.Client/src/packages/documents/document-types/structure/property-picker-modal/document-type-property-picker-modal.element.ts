@@ -33,14 +33,14 @@ export class UmbDocumentTypePropertyPickerModalElement extends UmbModalBaseEleme
 
 	#onItemSelected(event: CustomEvent, item: UmbPropertyTypeModel) {
 		event.stopPropagation();
-		this.#selectionManager.select(item.alias);
-		this.modalContext?.dispatchEvent(new UmbSelectedEvent(item.alias));
+		this.#selectionManager.select(item.unique);
+		this.modalContext?.dispatchEvent(new UmbSelectedEvent(item.unique));
 	}
 
 	#onItemDeselected(event: CustomEvent, item: UmbPropertyTypeModel) {
 		event.stopPropagation();
-		this.#selectionManager.deselect(item.alias);
-		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(item.alias));
+		this.#selectionManager.deselect(item.unique);
+		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(item.unique));
 	}
 
 	override async firstUpdated() {
@@ -66,7 +66,7 @@ export class UmbDocumentTypePropertyPickerModalElement extends UmbModalBaseEleme
 				${this.#filteredProperties.length > 0
 					? repeat(
 							this.#filteredProperties,
-							(item) => item.alias,
+							(item) => item.unique,
 							(item) => html`
 								<uui-ref-node
 									name=${item.name ?? ''}
@@ -75,7 +75,7 @@ export class UmbDocumentTypePropertyPickerModalElement extends UmbModalBaseEleme
 									select-only
 									@selected=${(event: CustomEvent) => this.#onItemSelected(event, item)}
 									@deselected=${(event: CustomEvent) => this.#onItemDeselected(event, item)}
-									?selected=${this.value.selection.includes(item.alias)}>
+									?selected=${this.value.selection.includes(item.unique)}>
 									<uui-icon slot="icon" name="icon-settings"></uui-icon>
 								</uui-ref-node>
 							`,
