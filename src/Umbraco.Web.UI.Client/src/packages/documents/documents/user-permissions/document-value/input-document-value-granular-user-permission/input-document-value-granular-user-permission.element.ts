@@ -168,7 +168,7 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 		// TODO: get correct variant name
 		const name = property.name;
 		const headline = name ? `Permissions for ${name}` : 'Permissions';
-		const fallbackVerbs = this.#getFallbackPermissionVerbsForEntityType('document-type-property');
+		const fallbackVerbs = this.#getFallbackPermissionVerbsForEntityType('document-value');
 
 		this.#documentTypePropertyPickerModalContext = this.#modalManagerContext?.open(
 			this,
@@ -176,7 +176,7 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 			{
 				data: {
 					unique: property.alias,
-					entityType: 'document-type-property',
+					entityType: 'document-value',
 					headline,
 					preset: {
 						allowedVerbs: fallbackVerbs,
