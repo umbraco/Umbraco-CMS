@@ -23,6 +23,7 @@ import type {
 	ManifestGranularUserPermission,
 	ManifestEntityUserPermission,
 } from '@umbraco-cms/backoffice/user-permission';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 const permissions: Array<ManifestEntityUserPermission> = [
 	{
@@ -213,7 +214,7 @@ export const granularPermissions: Array<ManifestGranularUserPermission> = [
 	},
 ];
 
-export const manifests: Array<UmbExtensionManifest> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	...repositoryManifests,
 	...permissions,
 	...granularPermissions,
