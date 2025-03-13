@@ -48,8 +48,7 @@ public interface IDocumentPresentationFactory
             {
                 model.Add(new CulturePublishScheduleModel
                 {
-                    Culture = cultureAndScheduleRequestModel.Culture
-                              ?? Constants.System.InvariantCulture
+                    Culture = cultureAndScheduleRequestModel.Culture ?? "*"
                 });
                 continue;
             }
