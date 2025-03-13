@@ -1,1 +1,1 @@
-export * from './property-picker-modal/constants.js';
+export * from './property-type-picker-modal/constants.js';
