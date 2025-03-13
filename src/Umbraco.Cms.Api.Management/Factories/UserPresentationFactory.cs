@@ -136,12 +136,11 @@ public class UserPresentationFactory : IUserPresentationFactory
         return Task.FromResult(inviteModel);
     }
 
-    public Task<CurrenUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync()
+    public Task<CurrentUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync()
     {
-        var model = new CurrenUserConfigurationResponseModel
+        var model = new CurrentUserConfigurationResponseModel
         {
             KeepUserLoggedIn = _securitySettings.KeepUserLoggedIn,
-            UsernameIsEmail = _securitySettings.UsernameIsEmail,
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
 
             // You should not be able to change any password or set 2fa if any providers has deny local login set.

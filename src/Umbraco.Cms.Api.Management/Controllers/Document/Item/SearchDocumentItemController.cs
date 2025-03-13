@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,16 +20,6 @@ public class SearchDocumentItemController : DocumentItemControllerBase
         _indexedEntitySearchService = indexedEntitySearchService;
         _documentPresentationFactory = documentPresentationFactory;
     }
-
-    [NonAction]
-    [Obsolete("Scheduled to be removed in v16, use the non obsoleted method instead")]
-    public Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
-        => SearchFromParent(cancellationToken, query, skip, take);
-
-    [NonAction]
-    [Obsolete("Scheduled to be removed in v16, use the non obsoleted method instead")]
-    public async Task<IActionResult> SearchFromParent(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, Guid? parentId = null)
-        => await SearchFromParentWithAllowedTypes(cancellationToken, query, skip, take, parentId);
 
     [HttpGet("search")]
     [MapToApiVersion("1.0")]

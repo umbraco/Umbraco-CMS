@@ -9305,149 +9305,6 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/document/{id}/validate": {
-      "put": {
-        "tags": [
-          "Document"
-        ],
-        "operationId": "PutDocumentByIdValidate",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateDocumentRequestModel"
-                  }
-                ]
-              }
-            },
-            "text/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateDocumentRequestModel"
-                  }
-                ]
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateDocumentRequestModel"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ProblemDetails"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ProblemDetails"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user does not have access to this resource",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            }
-          }
-        },
-        "deprecated": true,
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
     "/umbraco/management/api/v1.1/document/{id}/validate": {
       "put": {
         "tags": [
@@ -22929,40 +22786,6 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/published-cache/collect": {
-      "post": {
-        "tags": [
-          "Published Cache"
-        ],
-        "operationId": "PostPublishedCacheCollect",
-        "responses": {
-          "501": {
-            "description": "Not Implemented",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "deprecated": true,
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
     "/umbraco/management/api/v1/published-cache/rebuild": {
       "post": {
         "tags": [
@@ -23054,28 +22877,6 @@
             "description": "The resource is protected and requires an authentication token"
           }
         },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/published-cache/status": {
-      "get": {
-        "tags": [
-          "Published Cache"
-        ],
-        "operationId": "GetPublishedCacheStatus",
-        "responses": {
-          "501": {
-            "description": "Not Implemented"
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "deprecated": true,
         "security": [
           {
             "Backoffice User": [ ]
@@ -32118,7 +31919,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/CurrenUserConfigurationResponseModel"
+                      "$ref": "#/components/schemas/CurrentUserConfigurationResponseModel"
                     }
                   ]
                 }
@@ -36063,22 +35864,17 @@
         },
         "additionalProperties": false
       },
-      "CurrenUserConfigurationResponseModel": {
+      "CurrentUserConfigurationResponseModel": {
         "required": [
           "allowChangePassword",
           "allowTwoFactor",
           "keepUserLoggedIn",
-          "passwordConfiguration",
-          "usernameIsEmail"
+          "passwordConfiguration"
         ],
         "type": "object",
         "properties": {
           "keepUserLoggedIn": {
             "type": "boolean"
-          },
-          "usernameIsEmail": {
-            "type": "boolean",
-            "deprecated": true
           },
           "passwordConfiguration": {
             "oneOf": [

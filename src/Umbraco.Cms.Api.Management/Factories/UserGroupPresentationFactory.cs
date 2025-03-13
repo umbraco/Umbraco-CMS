@@ -1,10 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.Mapping;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
@@ -22,16 +20,6 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
     private readonly ILanguageService _languageService;
     private readonly IPermissionPresentationFactory _permissionPresentationFactory;
     private readonly ILogger<UserGroupPresentationFactory> _logger;
-
-    [Obsolete("Use the new constructor instead, will be removed in v16.")]
-    public UserGroupPresentationFactory(
-        IEntityService entityService,
-        IShortStringHelper shortStringHelper,
-        ILanguageService languageService,
-        IPermissionPresentationFactory permissionPresentationFactory)
-    : this(entityService, shortStringHelper, languageService, permissionPresentationFactory, StaticServiceProvider.Instance.GetRequiredService<ILogger<UserGroupPresentationFactory>>())
-    {
-    }
 
     public UserGroupPresentationFactory(
         IEntityService entityService,
