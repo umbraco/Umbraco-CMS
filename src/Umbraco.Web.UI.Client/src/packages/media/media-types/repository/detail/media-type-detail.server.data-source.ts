@@ -87,6 +87,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			properties: data.properties.map((property) => {
 				return {
 					id: property.id,
+					unique: property.id,
 					container: property.container,
 					sortOrder: property.sortOrder,
 					alias: property.alias,
