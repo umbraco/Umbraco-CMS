@@ -14,7 +14,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Media;
 
-[ApiVersion("1.0")]
 [ApiVersion("2.0")]
 public class QueryMediaApiController : MediaApiControllerBase
 {
@@ -26,19 +25,6 @@ public class QueryMediaApiController : MediaApiControllerBase
         IApiMediaQueryService apiMediaQueryService)
         : base(publishedMediaCache, apiMediaWithCropsResponseBuilder)
         => _apiMediaQueryService = apiMediaQueryService;
-
-    [HttpGet]
-    [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<IApiMediaWithCropsResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [Obsolete("Please use version 2 of this API. Will be removed in V15.")]
-    public Task<IActionResult> Query(
-        string? fetch,
-        [FromQuery] string[] filter,
-        [FromQuery] string[] sort,
-        int skip = 0,
-        int take = 10)
-        => Task.FromResult(HandleRequest(fetch, filter, sort, skip, take));
 
     /// <summary>
     ///     Gets a paginated list of media item(s) from query.
