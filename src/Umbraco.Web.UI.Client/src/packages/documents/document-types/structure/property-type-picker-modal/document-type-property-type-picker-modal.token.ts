@@ -1,7 +1,8 @@
 import { UMB_DOCUMENT_TYPE_PROPERTY_TYPE_PICKER_MODAL_ALIAS } from './constants.js';
+import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbModalToken, type UmbPickerModalData, type UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbDocumentTypePropertyTypePickerModalData extends UmbPickerModalData<any> {
+export interface UmbDocumentTypePropertyTypePickerModalData extends UmbPickerModalData<UmbPropertyTypeModel> {
 	documentType: {
 		unique: string;
 	};
