@@ -138,7 +138,7 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 							const permissionItem: UmbDocumentValueUserPermissionModel = {
 								$type: 'DocumentValuePermissionPresentationModel',
 								documentType: { unique },
-								property: { unique: propertyUnique },
+								propertyType: { unique: propertyUnique },
 								verbs: result,
 							};
 
