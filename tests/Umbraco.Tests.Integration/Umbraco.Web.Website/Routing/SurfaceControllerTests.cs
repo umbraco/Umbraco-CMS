@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +18,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Routing;
 
 [TestFixture]
-public class SurfaceControllerTests : UmbracoTestServerTestBase
+internal sealed class SurfaceControllerTests : UmbracoTestServerTestBase
 {
     [Test]
     public async Task Auto_Routes_For_Default_Action()

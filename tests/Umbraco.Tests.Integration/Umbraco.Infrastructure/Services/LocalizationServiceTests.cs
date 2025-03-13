@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class LocalizationServiceTests : UmbracoIntegrationTest
+internal sealed class LocalizationServiceTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUp() => CreateTestData();

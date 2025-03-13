@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations;
 // These tests depend on the key-value table, so we need a schema to run these tests.
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 [TestFixture]
-public class PartialMigrationsTests : UmbracoIntegrationTest
+internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 {
     public const string TableName = "testTable";
     public const string ColumnName = "testColumn";

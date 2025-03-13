@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class TagRepositoryTest : UmbracoIntegrationTest
+internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 {
     private IFileService FileService => GetRequiredService<IFileService>();
 

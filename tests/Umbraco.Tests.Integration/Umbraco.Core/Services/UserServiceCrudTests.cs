@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public partial class UserServiceCrudTests : UmbracoIntegrationTestWithContent
+internal sealed partial class UserServiceCrudTests : UmbracoIntegrationTestWithContent
 {
     private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 

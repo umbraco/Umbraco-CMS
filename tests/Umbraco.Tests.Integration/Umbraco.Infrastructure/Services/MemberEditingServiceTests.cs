@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [TestFixture]
 [Category("Slow")]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MemberEditingServiceTests : UmbracoIntegrationTest
+internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
 {
     private IMemberEditingService MemberEditingService => GetRequiredService<IMemberEditingService>();
 

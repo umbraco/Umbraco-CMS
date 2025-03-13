@@ -4,9 +4,9 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class MediaNavigationServiceTests
+internal sealed partial class MediaNavigationServiceTests
 {
-[Test]
+    [Test]
     public async Task Structure_Does_Not_Update_When_Updating_Media()
     {
         // Arrange

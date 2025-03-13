@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging;
 [TestFixture]
 [Category("Slow")]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
-public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
+internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 {
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 

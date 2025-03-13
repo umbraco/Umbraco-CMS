@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
-public class AdvancedMigrationTests : UmbracoIntegrationTest
+internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
 {
     private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
     private IEventAggregator EventAggregator => GetRequiredService<IEventAggregator>();

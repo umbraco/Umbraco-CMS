@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class RuntimeStateTests : UmbracoIntegrationTest
+internal sealed class RuntimeStateTests : UmbracoIntegrationTest
 {
     private IRuntimeState RuntimeState => Services.GetRequiredService<IRuntimeState>();
 

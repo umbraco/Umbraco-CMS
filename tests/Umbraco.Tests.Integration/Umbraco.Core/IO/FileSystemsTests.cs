@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO;
 
 [TestFixture]
 [UmbracoTest]
-public class FileSystemsTests : UmbracoIntegrationTest
+internal sealed class FileSystemsTests : UmbracoIntegrationTest
 {
     [Test]
     public void Can_Get_MediaFileManager()

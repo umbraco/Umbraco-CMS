@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class DocumentNavigationServiceTests
+internal sealed partial class DocumentNavigationServiceTests
 {
     [Test]
     public async Task Structure_Can_Rebuild()

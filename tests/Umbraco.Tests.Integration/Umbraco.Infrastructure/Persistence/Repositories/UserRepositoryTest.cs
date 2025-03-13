@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]
-public class UserRepositoryTest : UmbracoIntegrationTest
+internal sealed class UserRepositoryTest : UmbracoIntegrationTest
 {
     private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
 

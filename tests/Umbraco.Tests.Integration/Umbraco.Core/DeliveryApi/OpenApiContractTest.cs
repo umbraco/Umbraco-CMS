@@ -8,7 +8,7 @@ using Umbraco.Cms.Tests.Integration.TestServerTest;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.DeliveryApi;
 
 [TestFixture]
-public class OpenApiContractTest : UmbracoTestServerTestBase
+internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
 {
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 

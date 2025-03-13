@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Mock)]
-public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
+internal sealed class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
 {
     protected IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
     protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();

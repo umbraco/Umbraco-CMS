@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.None)]
-public class PartialViewRepositoryTests : UmbracoIntegrationTest
+internal sealed class PartialViewRepositoryTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUp() =>

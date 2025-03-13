@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Telemetry;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class TelemetryServiceTests : UmbracoIntegrationTest
+internal sealed class TelemetryServiceTests : UmbracoIntegrationTest
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder) =>
         builder.Services.Configure<GlobalSettings>(options => options.Id = Guid.NewGuid().ToString());
