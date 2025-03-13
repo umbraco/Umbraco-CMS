@@ -237,7 +237,7 @@ public static class ContentExtensions
 
         if (!content.ContentType.VariesByCulture())
         {
-            culture = Constants.System.InvariantCulture;
+            culture = string.Empty;
         }
         else if (culture.IsNullOrWhiteSpace())
         {

@@ -328,7 +328,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         contentSchedule = ContentService.GetContentScheduleByContentId(content.Id);
         var sched = contentSchedule.FullSchedule;
         Assert.AreEqual(1, sched.Count);
-        Assert.AreEqual(1, sched.Count(x => x.Culture == Constants.System.InvariantCulture));
+        Assert.AreEqual(1, sched.Count(x => x.Culture == string.Empty));
         contentSchedule.Clear(ContentScheduleAction.Expire);
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
 

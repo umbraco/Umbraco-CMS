@@ -64,7 +64,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     public static ContentScheduleCollection CreateWithEntry(DateTime? release, DateTime? expire)
     {
         var schedule = new ContentScheduleCollection();
-        schedule.Add(Constants.System.InvariantCulture, release, expire);
+        schedule.Add(string.Empty, release, expire);
         return schedule;
     }
 
@@ -98,7 +98,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// </summary>
     /// <param name="releaseDate"></param>
     /// <param name="expireDate"></param>
-    public bool Add(DateTime? releaseDate, DateTime? expireDate) => Add(Constants.System.InvariantCulture, releaseDate, expireDate);
+    public bool Add(DateTime? releaseDate, DateTime? expireDate) => Add(string.Empty, releaseDate, expireDate);
 
     /// <summary>
     ///     Adds a new schedule for a culture
@@ -202,7 +202,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// <param name="action"></param>
     /// <param name="changeDate">If specified, will clear all entries with dates less than or equal to the value</param>
     public void Clear(ContentScheduleAction action, DateTime? changeDate = null) =>
-        Clear(Constants.System.InvariantCulture, action, changeDate);
+        Clear(string.Empty, action, changeDate);
 
     /// <summary>
     ///     Clear all of the scheduled change type for the culture
@@ -252,7 +252,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// </summary>
     /// <returns></returns>
     public IEnumerable<ContentSchedule> GetSchedule(ContentScheduleAction? action = null) =>
-        GetSchedule(Constants.System.InvariantCulture, action);
+        GetSchedule(string.Empty, action);
 
     /// <summary>
     ///     Gets the schedule for a culture

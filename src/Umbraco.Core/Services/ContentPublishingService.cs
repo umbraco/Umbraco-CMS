@@ -52,13 +52,13 @@ internal sealed class ContentPublishingService : IContentPublishingService
         Guid userKey)
     {
         var culturesToPublishImmediately =
-            culturesToPublishOrSchedule.Where(culture => culture.Schedule is null).Select(c => c.Culture ?? Constants.System.InvariantCulture).ToHashSet();
+            culturesToPublishOrSchedule.Where(culture => culture.Schedule is null).Select(c => c.Culture ?? "*").ToHashSet();
 
         ContentScheduleCollection schedules = _contentService.GetContentScheduleByContentId(key);
 
         foreach (CulturePublishScheduleModel cultureToSchedule in culturesToPublishOrSchedule.Where(c => c.Schedule is not null))
         {
-            var culture = cultureToSchedule.Culture ?? Constants.System.InvariantCulture;
+            var culture = cultureToSchedule.Culture ?? "*";
 
             if (cultureToSchedule.Schedule!.PublishDate is null)
             {
@@ -150,7 +150,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.CultureMissing, new ContentPublishingResult());
             }
 
-            if (cultures.Any(x => x == Constants.System.InvariantCulture))
+            if (cultures.Any(x => x == "*"))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant, new ContentPublishingResult());
@@ -165,7 +165,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         }
         else
         {
-            if (cultures.Length != 1 || cultures.Any(x => x != Constants.System.InvariantCulture))
+            if (cultures.Length != 1 || cultures.Any(x => x != "*"))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());
