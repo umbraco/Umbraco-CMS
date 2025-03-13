@@ -117,14 +117,14 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 				UmbSelectedEvent.TYPE,
 				async (event: UmbSelectedEvent) => {
 					const selectedEvent = event as UmbSelectedEvent;
-					const propertyAlias = selectedEvent.unique;
+					const propertyUnique = selectedEvent.unique;
 
-					if (!propertyAlias) {
+					if (!propertyUnique) {
 						throw new Error('Could not open permissions modal, no property alias was provided');
 					}
 
 					const { data: documentTypeDetails } = await this.#documentTypeDetailRepository.requestByUnique(unique);
-					const property = documentTypeDetails?.properties.find((p) => p.alias === propertyAlias);
+					const property = documentTypeDetails?.properties.find((p) => p.unique === propertyUnique);
 
 					if (!property) {
 						throw new Error('Could not open permissions modal, no property was found');
@@ -138,7 +138,7 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 							const permissionItem: UmbDocumentValueUserPermissionModel = {
 								$type: 'DocumentValuePermissionPresentationModel',
 								documentType: { unique },
-								property: { alias: propertyAlias },
+								property: { unique: propertyUnique },
 								verbs: result,
 							};
 
