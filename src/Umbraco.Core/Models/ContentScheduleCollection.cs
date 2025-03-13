@@ -170,11 +170,10 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
         }
     }
 
-    public void RemoveIfExists(string culture, ContentScheduleAction action)
+    internal void RemoveIfExists(string culture, ContentScheduleAction action)
     {
-        ContentSchedule? changeToRemove = FullSchedule.FirstOrDefault(change =>
-            change.Culture == culture
-            && change.Action == action);
+        ContentSchedule? changeToRemove = FullSchedule.FirstOrDefault(schedule =>
+            MatchingScheduleTakingIntoAccountDifferentInvariantNotations(schedule, culture, action));
         if (changeToRemove is not null)
         {
             Remove(changeToRemove);
@@ -184,9 +183,8 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     public void AddOrUpdate(string culture, DateTime dateTime, ContentScheduleAction action)
     {
         // we need to remove the old one as ContentSchedule.Date is immutable
-        ContentSchedule? changeToRemove = FullSchedule.FirstOrDefault(change =>
-            change.Culture == culture
-            && change.Action == action);
+        ContentSchedule? changeToRemove = FullSchedule.FirstOrDefault(schedule =>
+            MatchingScheduleTakingIntoAccountDifferentInvariantNotations(schedule, culture, action));
 
         if (changeToRemove is not null)
         {
@@ -194,6 +192,22 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
         }
 
         Add(new ContentSchedule(culture, dateTime, action));
+    }
+
+    private bool MatchingScheduleTakingIntoAccountDifferentInvariantNotations(ContentSchedule change, string culture,
+        ContentScheduleAction action)
+    {
+        if (change.Action != action)
+        {
+            return false;
+        }
+
+        if (culture is "" or "*")
+        {
+            return change.Culture is "" or "*";
+        }
+
+        return change.Culture == culture;
     }
 
     /// <summary>
