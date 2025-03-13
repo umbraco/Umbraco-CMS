@@ -32,11 +32,9 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CLIPBOARD_PROPERTY_CONTEXT);
 
-		this.#init = Promise.all([
-			this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
-				this.#modalManagerContext = context;
-			}).asPromise(),
-		]);
+		this.#init = this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
+			this.#modalManagerContext = context;
+		}).asPromise();
 	}
 
 	/**
