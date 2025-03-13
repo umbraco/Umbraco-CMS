@@ -9,15 +9,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_4_0;
 /// </summary>
 public class UpdateDocumentUrlToPersistMultipleSegmentsPerDocument : MigrationBase
 {
-    private readonly ILogger<UpdateDocumentUrlToPersistMultipleSegmentsPerDocument> _logger;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateDocumentUrlToPersistMultipleSegmentsPerDocument"/> class.
     /// </summary>
-    public UpdateDocumentUrlToPersistMultipleSegmentsPerDocument(IMigrationContext context, ILogger<UpdateDocumentUrlToPersistMultipleSegmentsPerDocument> logger)
+    public UpdateDocumentUrlToPersistMultipleSegmentsPerDocument(IMigrationContext context)
         : base(context)
     {
-        _logger = logger;
     }
 
     /// <inheritdoc/>
