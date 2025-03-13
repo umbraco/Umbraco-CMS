@@ -60,6 +60,13 @@ export class UmbDocumentTypePropertyPickerModalElement extends UmbModalBaseEleme
 		}
 	}
 
+	#getItemDetail(item: UmbPropertyTypeModel): string {
+		const isMandatory = item.validation?.mandatory ? ' - Mandatory' : '';
+		const variesByCulture = item.variesByCulture ? ' - Varies by culture' : '';
+		const variesBySegment = item.variesBySegment ? ' - Varies by segment' : '';
+		return `${item.alias} ${isMandatory} ${variesByCulture} ${variesBySegment}`;
+	}
+
 	override render() {
 		return html`<umb-body-layout headline="Select Properties">
 			<uui-box>
@@ -70,7 +77,7 @@ export class UmbDocumentTypePropertyPickerModalElement extends UmbModalBaseEleme
 							(item) => html`
 								<uui-ref-node
 									name=${item.name ?? ''}
-									detail=${item.alias ?? ''}
+									detail=${this.#getItemDetail(item)}
 									selectable
 									select-only
 									@selected=${(event: CustomEvent) => this.#onItemSelected(event, item)}
