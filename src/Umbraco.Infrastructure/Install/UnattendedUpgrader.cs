@@ -45,23 +45,6 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
         _unattendedSettings = unattendedSettings.Value;
     }
 
-    [Obsolete("Use constructor that takes IOptions<UnattendedSettings>, this will be removed in V16")]
-    public UnattendedUpgrader(
-        IProfilingLogger profilingLogger,
-        IUmbracoVersion umbracoVersion,
-        DatabaseBuilder databaseBuilder,
-        IRuntimeState runtimeState,
-        PackageMigrationRunner packageMigrationRunner)
-    : this(
-        profilingLogger,
-        umbracoVersion,
-        databaseBuilder,
-        runtimeState,
-        packageMigrationRunner,
-        StaticServiceProvider.Instance.GetRequiredService<IOptions<UnattendedSettings>>())
-    {
-    }
-
     public async Task HandleAsync(RuntimeUnattendedUpgradeNotification notification, CancellationToken cancellationToken)
     {
         if (_runtimeState.RunUnattendedBootLogic())

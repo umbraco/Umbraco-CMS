@@ -1,9 +1,6 @@
-﻿using Examine;
+using Examine;
 using Examine.Search;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
@@ -22,17 +19,6 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
     private readonly IContentService _contentService;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
     private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
-
-    [Obsolete("Use the constructor that takes an IDeliveryApiCompositeIdHandler instead, scheduled for removal in v15")]
-    public DeliveryApiContentIndexHandleContentTypeChanges(
-        IList<KeyValuePair<int, ContentTypeChangeTypes>> changes,
-        DeliveryApiIndexingHandler deliveryApiIndexingHandler,
-        IDeliveryApiContentIndexValueSetBuilder deliveryApiContentIndexValueSetBuilder,
-        IContentService contentService,
-        IBackgroundTaskQueue backgroundTaskQueue)
-    : this(changes, deliveryApiIndexingHandler, deliveryApiContentIndexValueSetBuilder, contentService, backgroundTaskQueue, StaticServiceProvider.Instance.GetRequiredService<IDeliveryApiCompositeIdHandler>())
-    {
-    }
 
     public DeliveryApiContentIndexHandleContentTypeChanges(
         IList<KeyValuePair<int, ContentTypeChangeTypes>> changes,

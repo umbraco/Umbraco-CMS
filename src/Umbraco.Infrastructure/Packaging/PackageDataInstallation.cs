@@ -78,42 +78,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _templateService = templateService;
         }
 
-        [Obsolete("Please use new constructor, scheduled for removal in v15")]
-        public PackageDataInstallation(
-            IDataValueEditorFactory dataValueEditorFactory,
-            ILogger<PackageDataInstallation> logger,
-            IFileService fileService,
-            ILocalizationService localizationService,
-            IDataTypeService dataTypeService,
-            IEntityService entityService,
-            IContentTypeService contentTypeService,
-            IContentService contentService,
-            PropertyEditorCollection propertyEditors,
-            IScopeProvider scopeProvider,
-            IShortStringHelper shortStringHelper,
-            IConfigurationEditorJsonSerializer serializer,
-            IMediaService mediaService,
-            IMediaTypeService mediaTypeService)
-            : this(
-                dataValueEditorFactory,
-                logger,
-                fileService,
-                localizationService,
-                dataTypeService,
-                entityService,
-                contentTypeService,
-                contentService,
-                propertyEditors,
-                scopeProvider,
-                shortStringHelper,
-                serializer,
-                mediaService,
-                mediaTypeService,
-                StaticServiceProvider.Instance.GetRequiredService<ITemplateContentParserService>(),
-                StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
-        {
-        }
-
         // Also remove factory service registration when this constructor is removed
         [Obsolete("Use the constructor with Infrastructure.IScopeProvider and without global settings and hosting environment instead.")]
         public PackageDataInstallation(

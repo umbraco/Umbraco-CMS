@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -24,29 +22,6 @@ internal sealed class MemberEditingService : IMemberEditingService
     private readonly ILogger<MemberEditingService> _logger;
     private readonly IMemberGroupService _memberGroupService;
     private readonly SecuritySettings _securitySettings;
-
-    [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V16.")]
-    public MemberEditingService(
-        IMemberService memberService,
-        IMemberTypeService memberTypeService,
-        IMemberContentEditingService memberContentEditingService,
-        IMemberManager memberManager,
-        ITwoFactorLoginService twoFactorLoginService,
-        IPasswordChanger<MemberIdentityUser> passwordChanger,
-        ILogger<MemberEditingService> logger,
-        IMemberGroupService memberGroupService)
-        : this(
-              memberService,
-              memberTypeService,
-              memberContentEditingService,
-              memberManager,
-              twoFactorLoginService,
-              passwordChanger,
-              logger,
-              memberGroupService,
-              StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
-    {
-    }
 
     public MemberEditingService(
         IMemberService memberService,

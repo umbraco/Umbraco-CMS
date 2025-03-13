@@ -44,7 +44,9 @@ public static partial class UmbracoBuilderExtensions
                 true,
                 factory.GetRequiredService<ILocalizationService>(),
                 factory.GetRequiredService<IContentTypeService>(),
-                factory.GetRequiredService<ILogger<ContentValueSetBuilder>>()));
+                factory.GetRequiredService<ILogger<ContentValueSetBuilder>>(),
+                factory.GetRequiredService<IDocumentUrlService>(),
+                factory.GetRequiredService<ILanguageService>()));
         builder.Services.AddUnique<IContentValueSetBuilder>(factory =>
             new ContentValueSetBuilder(
                 factory.GetRequiredService<PropertyEditorCollection>(),
@@ -55,7 +57,9 @@ public static partial class UmbracoBuilderExtensions
                 false,
                 factory.GetRequiredService<ILocalizationService>(),
                 factory.GetRequiredService<IContentTypeService>(),
-                factory.GetRequiredService<ILogger<ContentValueSetBuilder>>()));
+                factory.GetRequiredService<ILogger<ContentValueSetBuilder>>(),
+                factory.GetRequiredService<IDocumentUrlService>(),
+                factory.GetRequiredService<ILanguageService>()));
         builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
         builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexValueSetBuilder, DeliveryApiContentIndexValueSetBuilder>();
@@ -63,9 +67,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDeliveryApiContentIndexHelper, DeliveryApiContentIndexHelper>();
         builder.Services.AddSingleton<IDeliveryApiIndexingHandler, DeliveryApiIndexingHandler>();
 
-        builder.Services.AddSingleton<ExamineIndexRebuilder>();  //TODO remove in Umbraco 15. Only the interface should be in the service provider
-
         builder.Services.AddUnique<IDeliveryApiCompositeIdHandler, DeliveryApiCompositeIdHandler>();
+
+        builder.Services.AddTransient<IIndexRebuilder, ExamineIndexRebuilder>();
 
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<PublicAccessCacheRefresherNotification, ContentIndexingNotificationHandler>();
