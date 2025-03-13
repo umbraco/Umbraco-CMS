@@ -37,6 +37,7 @@ public static class PublishedModelUtility
         switch (itemType)
         {
             case PublishedItemType.Content:
+            case PublishedItemType.Element:
                 return publishedSnapshot.Content?.GetContentType(alias);
             case PublishedItemType.Media:
                 return publishedSnapshot.Media?.GetContentType(alias);

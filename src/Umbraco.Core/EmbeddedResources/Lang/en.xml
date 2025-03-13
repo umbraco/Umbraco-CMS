@@ -55,6 +55,9 @@
     <key alias="unlock">Unlock</key>
     <key alias="createblueprint">Create Content Template</key>
     <key alias="resendInvite">Resend Invitation</key>
+    <key alias="toggleHideUnavailable">Hide unavailable options</key>
+    <key alias="changeDataType">Change Data Type</key>
+    <key alias="editContent">Edit content</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Content</key>
@@ -157,6 +160,14 @@
     <key alias="confirmActionConfirm">Confirm</key>
     <key alias="morePublishingOptions">More publishing options</key>
     <key alias="submitChanges">Submit</key>
+    <key alias="generateModelsAndClose">Generate models and close</key>
+  </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media deleted</key>
+    <key alias="move">Media moved</key>
+    <key alias="copy">Media copied</key>
+    <key alias="save">Media saved</key>
+    <key alias="new">Media created</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
@@ -180,6 +191,7 @@
     <key alias="smallPublishVariant">Publish</key>
     <key alias="smallMove">Move</key>
     <key alias="smallSave">Save</key>
+    <key alias="smallNew">New</key>
     <key alias="smallSaveVariant">Save</key>
     <key alias="smallDelete">Delete</key>
     <key alias="smallUnpublish">Unpublish</key>
@@ -191,6 +203,8 @@
     <key alias="smallContentVersionPreventCleanup">Save</key>
     <key alias="smallContentVersionEnableCleanup">Save</key>
     <key alias="historyIncludingVariants">History (all variants)</key>
+    <key alias="unpublishvariant">Content unpublished for languages: %0%</key>
+    <key alias="smallUnpublishVariant">Unpublish</key>
   </area>
   <area alias="codefile">
     <key alias="createFolderIllegalChars">The folder name cannot contain illegal characters.</key>
@@ -318,6 +332,13 @@
     <key alias="createEmpty">Create new</key>
     <key alias="createFromClipboard">Paste from clipboard</key>
     <key alias="nodeIsInTrash">This item is in the Recycle Bin</key>
+    <key alias="noProperties">No content can be added for this item</key>
+    <key alias="variantSaveNotAllowed">Save is not allowed</key>
+    <key alias="variantPublishNotAllowed">Publish is not allowed</key>
+    <key alias="variantSendForApprovalNotAllowed">Send for approval is not allowed</key>
+    <key alias="variantScheduleNotAllowed">Schedule is not allowed</key>
+    <key alias="variantUnpublishNotAllowed">Unpublish is not allowed</key>
+    <key alias="selectAllVariants">Select all variants</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Create a new Content Template from <em>%0%</em>]]></key>
@@ -341,12 +362,20 @@
     <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
     <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
     <key alias="dragAndDropYourFilesIntoTheArea">Drag and drop your file(s) into the area</key>
+    <key alias="fileSecurityValidationFailure">One or more file security validations have failed</key>
+    <key alias="moveToSameFolderFailed">Parent and destination folders cannot be the same</key>
+    <key alias="uploadNotAllowed">Upload is not allowed in this location.</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
     <key alias="allMembers">All Members</key>
     <key alias="memberGroupNoProperties">Member groups have no additional properties for editing.</key>
     <key alias="2fa">Two-Factor Authentication</key>
+    <key alias="duplicateMemberLogin">A member with this login already exists</key>
+    <key alias="memberHasGroup">The member is already in group '%0%'</key>
+    <key alias="memberHasPassword">The member already has a password set</key>
+    <key alias="memberLockoutNotEnabled">Lockout is not enabled for this member</key>
+    <key alias="memberNotInGroup">The member is not in group '%0%'</key>
   </area>
   <area alias="contentType">
     <key alias="copyFailed">Failed to copy content type</key>
@@ -468,7 +497,6 @@
     <key alias="urlLinkPicker">Link</key>
     <key alias="anchorLinkPicker">Anchor / querystring</key>
     <key alias="anchorInsert">Name</key>
-    <key alias="assignDomain">Manage hostnames</key>
     <key alias="closeThisWindow">Close this window</key>
     <key alias="confirmdelete">Are you sure you want to delete</key>
     <key alias="confirmdeleteNumberOfItems"><![CDATA[Are you sure you want to delete <strong>%0%</strong> of <strong>%1%</strong> items]]></key>
@@ -478,9 +506,10 @@
     <key alias="confirmlogout">Are you sure?</key>
     <key alias="confirmSure">Are you sure?</key>
     <key alias="cut">Cut</key>
-    <key alias="editdictionary">Edit Dictionary Item</key>
-    <key alias="editlanguage">Edit Language</key>
+    <key alias="editDictionary">Edit dictionary item</key>
+    <key alias="editLanguage">Edit language</key>
     <key alias="editSelectedMedia">Edit selected media</key>
+    <key alias="editWebhook">Edit webhook</key>
     <key alias="insertAnchor">Insert local link</key>
     <key alias="insertCharacter">Insert character</key>
     <key alias="insertgraphicheadline">Insert graphic headline</key>
@@ -534,6 +563,7 @@
     <key alias="openInNewWindow">Opens the linked document in a new window or tab</key>
     <key alias="linkToMedia">Link to media</key>
     <key alias="selectContentStartNode">Select content start node</key>
+    <key alias="selectEvent">Select event</key>
     <key alias="selectMedia">Select media</key>
     <key alias="selectMediaType">Select media type</key>
     <key alias="selectIcon">Select icon</key>
@@ -571,6 +601,7 @@
     <key alias="yesRemove">Yes, remove</key>
     <key alias="deleteLayout">You are deleting the layout</key>
     <key alias="deletingALayout">Modifying layout will result in loss of data for any existing content that is based on this configuration.</key>
+    <key alias="selectEditorConfiguration">Select configuration</key>
   </area>
   <area alias="dictionary">
     <key alias="importDictionaryItemHelp">
@@ -679,6 +710,9 @@
     <key alias="selectFolder">Select the folder to move</key>
     <key alias="inTheTree">to in the tree structure below</key>
     <key alias="wasMoved">was moved underneath</key>
+    <key alias="canChangePropertyEditorHelp">Changing a property editor on a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.</key>
+    <key alias="hasReferencesDeleteConsequence"><![CDATA[Deleting <strong>%0%</strong> will delete the properties and their data from the following items]]></key>
+    <key alias="acceptDeleteConsequence">I understand this action will delete the properties and data based on this Data Type</key>
   </area>
   <area alias="errorHandling">
     <key alias="errorButDataWasSaved">Your data has been saved, but before you can publish this page there are some
@@ -719,6 +753,8 @@
     <key alias="tableColMergeLeft">Please place cursor at the left of the two cells you wish to merge</key>
     <key alias="tableSplitNotSplittable">You cannot split a cell that hasn't been merged.</key>
     <key alias="propertyHasErrors">This property is invalid</key>
+    <key alias="defaultError">An unknown failure has occurred</key>
+    <key alias="concurrencyError">Optimistic concurrency failure, object has been modified</key>
   </area>
   <area alias="general">
     <key alias="about">About</key>
@@ -883,6 +919,13 @@
     <key alias="lastUpdated">Last Updated</key>
     <key alias="skipToMenu">Skip to menu</key>
     <key alias="skipToContent">Skip to content</key>
+    <key alias="primary">Primary</key>
+    <key alias="change">Change</key>
+    <key alias="cropSection">Crop section</key>
+    <key alias="generic">Generic</key>
+    <key alias="media">Media</key>
+    <key alias="revert">Revert</key>
+    <key alias="validate">Validate</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
@@ -909,6 +952,7 @@
     <key alias="generalHeader">General</key>
     <key alias="editorHeader">Editor</key>
     <key alias="toggleAllowCultureVariants">Toggle allow culture variants</key>
+    <key alias="addTab">Add tab</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background colour</key>
@@ -1057,16 +1101,17 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="renewSession">Renew now to save your work</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Happy super Sunday</key>
-    <key alias="greeting1">Happy marvelous Monday</key>
-    <key alias="greeting2">Happy tubular Tuesday</key>
-    <key alias="greeting3">Happy wonderful Wednesday</key>
-    <key alias="greeting4">Happy thunderous Thursday</key>
-    <key alias="greeting5">Happy funky Friday</key>
-    <key alias="greeting6">Happy Caturday</key>
+    <key alias="greeting0">Welcome</key>
+    <key alias="greeting1">Welcome</key>
+    <key alias="greeting2">Welcome</key>
+    <key alias="greeting3">Welcome</key>
+    <key alias="greeting4">Welcome</key>
+    <key alias="greeting5">Welcome</key>
+    <key alias="greeting6">Welcome</key>
     <key alias="instruction">Log in below</key>
     <key alias="signInWith">Sign in with</key>
     <key alias="timeout">Session timed out</key>
+    <key alias="userFailedLogin">Oops! We couldn't log you in. Please check your credentials and try again.</key>
     <key alias="bottomText">
       <![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Forgotten password?</key>
@@ -1357,6 +1402,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       so uninstall with caution. If in doubt, contact the package author.]]></key>
     <key alias="packageVersion">Package version</key>
     <key alias="verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco Cloud</key>
+    <key alias="packageMigrationsComplete">Package migrations have successfully completed.</key>
+    <key alias="packageMigrationsNonePending">All package migrations have successfully completed.</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Paste with full formatting (Not recommended)</key>
@@ -1414,6 +1461,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="publishHelp"><![CDATA[Click <em>Publish</em> to publish <strong>%0%</strong> and thereby making its content publicly available.<br/><br />
       You can publish this page and all its subpages by checking <em>Include unpublished subpages</em> below.
       ]]>    </key>
+    <key alias="invalidPublishBranchPermissions">Insufficient user permissions to publish all descendant documents</key>
+    <key alias="contentPublishedFailedIsTrashed">%0% could not be published because the item is in the recycle bin.</key>
+    <key alias="contentPublishedFailedReqCultureValidationError">Validation failed for required language '%0%'. This language was saved but not published.</key>
   </area>
   <area alias="colorpicker">
     <key alias="noColors">You have not configured any approved colours</key>
@@ -1422,6 +1472,42 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="allowedItemTypes">You can only select items of type(s): %0%</key>
     <key alias="pickedTrashedItem">You have picked a content item currently deleted or in the recycle bin</key>
     <key alias="pickedTrashedItems">You have picked content items currently deleted or in the recycle bin</key>
+    <key alias="specifyPickerRootTitle">Specify root</key>
+    <key alias="defineRootNode">Pick root node</key>
+    <key alias="defineXPathOrigin">Specify via XPath</key>
+    <key alias="defineDynamicRoot">Specify a Dynamic Root</key>
+  </area>
+  <area alias="dynamicRoot">
+    <key alias="configurationTitle">Dynamic Root Query</key>
+    <key alias="pickDynamicRootOriginTitle">Pick origin</key>
+    <key alias="pickDynamicRootOriginDesc">Define the origin for your Dynamic Root Query</key>
+    <key alias="originRootTitle">Root</key>
+    <key alias="originRootDesc">Root node of this editing session</key>
+    <key alias="originParentTitle">Parent</key>
+    <key alias="originParentDesc">The parent node of the source in this editing session</key>
+    <key alias="originCurrentTitle">Current</key>
+    <key alias="originCurrentDesc">The content node that is source for this editing session</key>
+    <key alias="originSiteTitle">Site</key>
+    <key alias="originSiteDesc">Find nearest node with a hostname</key>
+    <key alias="originByKeyTitle">Specific Node</key>
+    <key alias="originByKeyDesc">Pick a specific Node as the origin for this query</key>
+    <key alias="pickDynamicRootQueryStepTitle">Append step to query</key>
+    <key alias="pickDynamicRootQueryStepDesc">Define the next step of your Dynamic Root Query</key>
+    <key alias="queryStepNearestAncestorOrSelfTitle">Nearest Ancestor Or Self</key>
+    <key alias="queryStepNearestAncestorOrSelfDesc">Query the nearest ancestor or self that fits with one of the configured types</key>
+    <key alias="queryStepFurthestAncestorOrSelfTitle">Furthest Ancestor Or Self</key>
+    <key alias="queryStepFurthestAncestorOrSelfDesc">Query the Furthest ancestor or self that fits with one of the configured types</key>
+    <key alias="queryStepNearestDescendantOrSelfTitle">Nearest Descendant Or Self</key>
+    <key alias="queryStepNearestDescendantOrSelfDesc">Query the nearest descendant or self that fits with one of the configured types</key>
+    <key alias="queryStepFurthestDescendantOrSelfTitle">Furthest Descendant Or Self</key>
+    <key alias="queryStepFurthestDescendantOrSelfDesc">Query the Furthest descendant or self that fits with one of the configured types</key>
+    <key alias="queryStepCustomTitle">Custom</key>
+    <key alias="queryStepCustomDesc">Query the using a custom Query Step</key>
+    <key alias="addQueryStep">Add query step</key>
+    <key alias="queryStepTypes">That matches types: </key>
+    <key alias="noValidStartNodeTitle">No matching content</key>
+    <key alias="noValidStartNodeDesc">The configuration of this property does not match any content. Create the missing content or contact your administrator to adjust the Dynamic Root settings for this property.</key>
+    <key alias="cancelAndClearQuery">Cancel and clear query</key>
   </area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Deleted item</key>
@@ -1471,25 +1557,22 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="rollbackTo">Rollback to</key>
     <key alias="selectVersion">Select version</key>
     <key alias="view">View</key>
+    <key alias="pagination"><![CDATA[Showing version %0% to %1% of %2% versions]]></key>
+    <key alias="versions">Versions</key>
+    <key alias="currentDraftVersion">Current draft version</key>
+    <key alias="currentPublishedVersion">Current published version</key>
   </area>
   <area alias="scripts">
     <key alias="editscript">Edit script file</key>
   </area>
   <area alias="sections">
-    <key alias="concierge">Concierge</key>
     <key alias="content">Content</key>
-    <key alias="courier">Courier</key>
-    <key alias="developer">Developer</key>
     <key alias="forms">Forms</key>
-    <key alias="help" version="7.0">Help</key>
-    <key alias="installer">Umbraco Configuration Wizard</key>
     <key alias="media">Media</key>
     <key alias="member">Members</key>
-    <key alias="newsletters">Newsletters</key>
     <key alias="packages">Packages</key>
     <key alias="marketplace">Marketplace</key>
     <key alias="settings">Settings</key>
-    <key alias="statistics">Statistics</key>
     <key alias="translation">Translation</key>
     <key alias="users">Users</key>
   </area>
@@ -1530,6 +1613,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       column headers to sort the entire collection of items
     </key>
     <key alias="sortPleaseWait"><![CDATA[Please wait. Items are being sorted, this can take a while.]]></key>
+    <key alias="sortEmptyState">This node has no child nodes to sort</key>
   </area>
   <area alias="speechBubbles">
     <key alias="validationFailedHeader">Validation</key>
@@ -1541,7 +1625,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="operationCancelledText">Operation was cancelled by a 3rd party add-in</key>
     <key alias="folderUploadNotAllowed">This file is being uploaded as part of a folder, but creating a new folder is not allowed here</key>
     <key alias="folderCreationNotAllowed">Creating a new folder is not allowed here</key>
-    <key alias="contentPublishedFailedByEvent">Publishing was cancelled by a 3rd party add-in</key>
     <key alias="contentTypeDublicatePropertyType">Property type already exists</key>
     <key alias="contentTypePropertyTypeCreated">Property type created</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Name: %0% <br /> DataType: %1%]]></key>
@@ -1555,7 +1638,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="cssSavedText">Stylesheet saved without any errors</key>
     <key alias="dataTypeSaved">Datatype saved</key>
     <key alias="dictionaryItemSaved">Dictionary item saved</key>
-    <key alias="editContentPublishedFailedByParent">Publishing failed because the parent page isn't published</key>
     <key alias="editContentPublishedHeader">Content published</key>
     <key alias="editContentPublishedText">and visible on the website</key>
     <key alias="editBlueprintSavedHeader">Content Template saved</key>
@@ -1620,8 +1702,28 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="publishWithMissingDomain">There is no domain configured for %0%, please contact an administrator, see
       log for more information
     </key>
+    <key alias="publishWithNoUrl">The document does not have a URL, possibly due to a naming collision with another document. More details can be found under Info.</key>
     <key alias="copySuccessMessage">Your system information has successfully been copied to the clipboard</key>
     <key alias="cannotCopyInformation">Could not copy your system information to the clipboard</key>
+    <key alias="webhookSaved">Webhook saved</key>
+    <key alias="operationSavedHeaderReloadUser">Saved. To view the changes please reload your browser</key>
+    <key alias="editMultiContentPublishedText">%0% documents published and visible on the website</key>
+    <key alias="editVariantPublishedText">%0% published and visible on the website</key>
+    <key alias="editMultiVariantPublishedText">%0% documents published for languages %1% and visible on the website</key>
+    <key alias="editContentScheduledSavedText">A schedule for publishing has been updated</key>
+    <key alias="editVariantSavedText">%0% saved</key>
+    <key alias="editVariantSendToPublishText">%0% changes have been sent for approval</key>
+    <key alias="contentCultureUnpublished">Content variation %0% unpublished</key>
+    <key alias="contentMandatoryCultureUnpublished">The mandatory language '%0%' was unpublished. All languages for this content item are now unpublished.</key>
+    <key alias="contentReqCulturePublishError">Cannot publish the document since the required '%0%' is not published</key>
+    <key alias="contentCultureValidationError">Validation failed for language '%0%'</key>
+    <key alias="scheduleErrReleaseDate1">The release date cannot be in the past</key>
+    <key alias="scheduleErrReleaseDate2">Cannot schedule the document for publishing since the required '%0%' is not published</key>
+    <key alias="scheduleErrReleaseDate3">Cannot schedule the document for publishing since the required '%0%' has a publish date later than a non mandatory language</key>
+    <key alias="scheduleErrExpireDate1">The expire date cannot be in the past</key>
+    <key alias="scheduleErrExpireDate2">The expire date cannot be before the release date</key>
+    <key alias="preventCleanupEnableError">An error occurred while enabling version cleanup for %0%</key>
+    <key alias="preventCleanupDisableError">An error occurred while disabling version cleanup for %0%</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Add style</key>
@@ -1803,14 +1905,14 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       type.
     </key>
     <key alias="chooseChildNode">Choose child node</key>
-    <key alias="compositionsDescription">Inherit tabs and properties from an existing Document Type. New tabs will be
-      added to the current Document Type or merged if a tab with an identical name exists.
+    <key alias="compositionsDescription">Inherit tabs and properties from an existing Content Type. New tabs will be
+      added to the current Content Type or merged if a tab with an identical name exists.
     </key>
     <key alias="compositionInUse">This Content Type is used in a composition, and therefore cannot be composed itself.
     </key>
     <key alias="noAvailableCompositions">There are no Content Types available to use as a composition.</key>
     <key alias="compositionRemoveWarning">Removing a composition will delete all the associated property data. Once you
-      save the Document Type there's no way back.
+      save the Content Type there's no way back.
     </key>
     <key alias="availableEditors">Create new</key>
     <key alias="reuse">Use existing</key>
@@ -1885,6 +1987,43 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="historyCleanupPreventCleanup">Prevent cleanup</key>
     <key alias="historyCleanupEnableCleanup">Enable cleanup</key>
     <key alias="historyCleanupGloballyDisabled"><![CDATA[<strong>NOTE!</strong> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
+    <key alias="groupReorderSameAliasError">You can't move the group %0% to this tab because the group will get the same alias as a tab: "%1%". Rename the group to continue.</key>
+    <key alias="searchResultSettings">Available configurations</key>
+    <key alias="searchResultEditors">Create a new configuration</key>
+    <key alias="confirmDeleteTabMessage"><![CDATA[Are you sure you want to delete the tab <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeleteGroupMessage"><![CDATA[Are you sure you want to delete the group <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeletePropertyMessage"><![CDATA[Are you sure you want to delete the property <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeleteTabNotice">This will also delete all items below this tab.</key>
+    <key alias="confirmDeleteGroupNotice">This will also delete all items below this group.</key>
+    <key alias="addTab">Add tab</key>
+    <key alias="convertToTab">Convert to tab</key>
+    <key alias="tabDirectPropertiesDropZone">Drag properties here to place directly on the tab</key>
+    <key alias="changeDataTypeHelpText">Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.</key>
+  </area>
+  <area alias="webhooks">
+    <key alias="addWebhook">Create webhook</key>
+    <key alias="addWebhookHeader">Add webhook header</key>
+    <key alias="addDocumentType">Add Document Type</key>
+    <key alias="addMediaType">Add Media Type</key>
+    <key alias="createHeader">Create header</key>
+    <key alias="deliveries">Deliveries</key>
+    <key alias="noHeaders">No webhook headers have been added</key>
+    <key alias="noEventsFound">No events were found.</key>
+    <key alias="enabled">Enabled</key>
+    <key alias="events">Events</key>
+    <key alias="event">Event</key>
+    <key alias="url">Url</key>
+    <key alias="types">Types</key>
+    <key alias="webhookKey">Webhook key</key>
+    <key alias="retryCount">Retry count</key>
+    <key alias="urlDescription">The url to call when the webhook is triggered.</key>
+    <key alias="eventDescription">The events for which the webhook should be triggered.</key>
+    <key alias="contentTypeDescription">Only trigger the webhook for a specific content type.</key>
+    <key alias="enabledDescription">Is the webhook enabled?</key>
+    <key alias="headersDescription">Custom headers to include in the webhook request.</key>
+    <key alias="contentType">Content Type</key>
+    <key alias="headers">Headers</key>
+    <key alias="selectEventFirst">Please select an event first.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -1903,6 +2042,11 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     </key>
     <key alias="fallbackLanguage">Fall back language</key>
     <key alias="none">none</key>
+    <key alias="invariantPropertyUnlockHelp"><![CDATA[<strong>%0%</strong> is shared across languages and segments.]]></key>
+    <key alias="invariantCulturePropertyUnlockHelp"><![CDATA[<strong>%0%</strong> is shared across all languages.]]></key>
+    <key alias="invariantSegmentPropertyUnlockHelp"><![CDATA[<strong>%0%</strong> is shared across all segments.]]></key>
+    <key alias="invariantLanguageProperty">Shared: Languages</key>
+    <key alias="invariantSegmentProperty">Shared: Segments</key>
   </area>
   <area alias="macro">
     <key alias="addParameter">Add parameter</key>
@@ -2024,6 +2168,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="settingsGroup">Settings</key>
     <key alias="templatingGroup">Templating</key>
     <key alias="thirdPartyGroup">Third Party</key>
+    <key alias="webhooks">Webhooks</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">New update ready</key>
@@ -2255,10 +2400,22 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="2faProviderIsDisabledMsg">This two-factor provider is now disabled</key>
     <key alias="2faProviderIsNotDisabledMsg">Something went wrong with trying to disable this two-factor provider</key>
     <key alias="2faDisableForUser">Do you want to disable this two-factor provider for this user?</key>
+    <key alias="duplicateLogin">A user with this login already exists</key>
+    <key alias="passwordRequiresDigit">The password must have at least one digit ('0'-'9')</key>
+    <key alias="passwordRequiresLower">The password must have at least one lowercase ('a'-'z')</key>
+    <key alias="passwordRequiresNonAlphanumeric">The password must have at least one non alphanumeric character</key>
+    <key alias="passwordRequiresUniqueChars">The password must use at least %0% different characters</key>
+    <key alias="passwordRequiresUpper">The password must have at least one uppercase ('A'-'Z')</key>
+    <key alias="passwordTooShort">The password must be at least %0% characters long</key>
+    <key alias="allowAccessToAllLanguages">Allow access to all languages</key>
+    <key alias="userHasPassword">The user already has a password set</key>
+    <key alias="userHasGroup">The user is already in group '%0%'</key>
+    <key alias="userLockoutNotEnabled">Lockout is not enabled for this user</key>
+    <key alias="userNotInGroup">The user is not in group '%0%'</key>
+    <key alias="configureTwoFactor">Configure Two-Factor</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validation</key>
-    <key alias="noValidation">No validation</key>
     <key alias="validateAsEmail">Validate as an email address</key>
     <key alias="validateAsNumber">Validate as a number</key>
     <key alias="validateAsUrl">Validate as a URL</key>
@@ -2285,6 +2442,14 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="entriesShort"><![CDATA[Minimum %0% entries, requires <strong>%1%</strong> more.]]></key>
     <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
     <key alias="entriesAreasMismatch">The content amount requirements are not met for one or more areas.</key>
+    <key alias="invalidMemberGroupName">Invalid member group name</key>
+    <key alias="invalidUserGroupName">Invalid user group name</key>
+    <key alias="invalidToken">Invalid token</key>
+    <key alias="invalidUsername">Invalid username</key>
+    <key alias="duplicateEmail">Email '%0%' is already taken</key>
+    <key alias="duplicateUserGroupName">User group name '%0%' is already taken</key>
+    <key alias="duplicateMemberGroupName">Member group name '%0%' is already taken</key>
+    <key alias="duplicateUsername">Username '%0%' is already taken</key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:
@@ -2417,6 +2582,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="disableError">Error disabling the URL tracker, more information can be found in your log file.</key>
     <key alias="enabledConfirm">URL tracker has now been enabled.</key>
     <key alias="enableError">Error enabling the URL tracker, more information can be found in your log file.</key>
+    <key alias="culture">Culture</key>
   </area>
   <area alias="emptyStates">
     <key alias="emptyDictionaryTree">No Dictionary items to choose from</key>
@@ -2465,6 +2631,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Getting Started</key>
     <key alias="formsInstall">Install Umbraco Forms</key>
+    <key alias="settingsAnalytics">Telemetry data</key>
   </area>
   <area alias="visuallyHiddenTexts">
     <key alias="goBack">Go back</key>
@@ -2518,6 +2685,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="addImageCaption">Add image caption</key>
     <key alias="searchContentTree">Search content tree</key>
     <key alias="maxAmount">Maximum amount</key>
+    <key alias="expandChildItems">Expand child items for</key>
+    <key alias="openContextNode">Open context node for</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2533,6 +2702,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="unpublishWarning">This item or its descendants is being used. Unpublishing can lead to broken links on your website. Please take the appropriate actions.</key>
     <key alias="deleteDisabledWarning">This item or its descendants is being used. Therefore, deletion has been disabled.</key>
     <key alias="listViewDialogWarning">The following items you are trying to %0% are used by other content.</key>
+    <key alias="labelUsedByItems">Referenced by the following items</key>
+    <key alias="labelDependsOnThis">The following items depend on this</key>
+    <key alias="labelDependentDescendants">The following descending items have dependencies</key>
   </area>
   <area alias="logViewer">
     <key alias="deleteSavedSearch">Delete Saved Search</key>
@@ -2670,7 +2842,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     </key>
     <key alias="learningBaseDescription">
       <![CDATA[
-        <p>Want to master Umbraco? Spend a few minutes learning some best practices by visiting <a href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">the Umbraco Learning Base Youtube channel</a>. Here you can find a bunch of video material covering many aspects of Umbraco.</p>
+        <p>Want to master Umbraco? Spend a few minutes learning some best practices by visiting <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">the Umbraco Learning Base Youtube channel</a>. Here you can find a bunch of video material covering many aspects of Umbraco.</p>
       ]]>
     </key>
     <key alias="getStarted">To get you started</key>
@@ -2837,6 +3009,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="configureArea">Configure area</key>
     <key alias="deleteArea">Delete area</key>
     <key alias="addColumnSpanOption">Add spanning %0% columns option</key>
+    <key alias="insertBlock">Insert Block</key>
+    <key alias="labelInlineMode">Display inline with text</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>
@@ -2887,5 +3061,30 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="treeSearch">
     <key alias="searchResult">item returned</key>
     <key alias="searchResults">items returned</key>
+  </area>
+  <area alias="propertyEditorPicker">
+    <key alias="title">Select Property Editor</key>
+    <key alias="openPropertyEditorPicker">Select Property Editor</key>
+  </area>
+  <area alias="analytics">
+    <key alias="consentForAnalytics">Consent for telemetry data</key>
+    <key alias="analyticsLevelSavedSuccess">Telemetry level saved!</key>
+    <key alias="analyticsDescription"><![CDATA[In order to improve Umbraco and add new functionality based on as relevant information as possible,
+<br>we would like to collect system- and usage information from your installation.
+<br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.
+<br>Hopefully, you will help us collect some valuable data.
+<br>
+<br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.]]></key>
+    <key alias="minimalLevelDescription">We will only send an anonymized site ID to let us know that the site exists.</key>
+    <key alias="basicLevelDescription">We will send an anonymized site ID, Umbraco version, and packages installed</key>
+    <key alias="detailedLevelDescription"><![CDATA[We will send:
+<ul>
+    <li>Anonymized site ID, Umbraco version, and packages installed.</li>
+    <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Property Types, Compositions, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, Webhooks, rich text datatypes, blocks used in rich text datatypes, and Property Editors in use.</li>
+    <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
+    <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, whether the delivery API is enabled, and allows public access, and if you are in debug mode.</li>
+</ul>
+<em>We might change what we send on the Detailed level in the future. If so, it will be listed above.
+<br>By choosing "Detailed" you agree to current and future anonymized information being collected.</em>]]></key>
   </area>
 </language>

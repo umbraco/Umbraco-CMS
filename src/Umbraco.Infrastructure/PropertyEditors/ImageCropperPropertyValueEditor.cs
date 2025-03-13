@@ -5,11 +5,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -23,7 +25,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core vs web?
 {
-    private readonly IDataTypeService _dataTypeService;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
+    private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
     private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
     private ContentSettings _contentSettings;
@@ -37,13 +40,15 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         IOptionsMonitor<ContentSettings> contentSettings,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
-        IDataTypeService dataTypeService)
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
+        IFileStreamSecurityValidator fileStreamSecurityValidator)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
         _contentSettings = contentSettings.CurrentValue;
-        _dataTypeService = dataTypeService;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
+        _fileStreamSecurityValidator = fileStreamSecurityValidator;
         contentSettings.OnChange(x => _contentSettings = x);
     }
 
@@ -69,10 +74,10 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             value = new ImageCropperValue { Src = val.ToString() };
         }
 
-        IDataType? dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
-        if (dataType?.Configuration != null)
+        var configuration = _dataTypeConfigurationCache.GetConfigurationAs<ImageCropperConfiguration>(property.PropertyType.DataTypeKey);
+        if (configuration is not null)
         {
-            value?.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperConfiguration>());
+            value?.ApplyConfiguration(configuration);
         }
 
         return value;
@@ -212,8 +217,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         }
 
         // more magic here ;-(
-        ImageCropperConfiguration? configuration = _dataTypeService.GetDataType(propertyType.DataTypeId)
-            ?.ConfigurationAs<ImageCropperConfiguration>();
+        ImageCropperConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<ImageCropperConfiguration>(propertyType.DataTypeKey);
         ImageCropperConfiguration.Crop[] crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.Crop>();
 
         return JsonConvert.SerializeObject(
@@ -236,6 +240,11 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
 
         using (FileStream filestream = File.OpenRead(file.TempFilePath))
         {
+            if (_fileStreamSecurityValidator.IsConsideredSafe(filestream) == false)
+            {
+                return null;
+            }
+
             // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
             // since we'd need to be able to return values for other properties from these methods
             _mediaFileManager.FileSystem.AddFile(filepath, filestream, true); // must overwrite!

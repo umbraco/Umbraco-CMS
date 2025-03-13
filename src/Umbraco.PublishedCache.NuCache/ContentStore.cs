@@ -27,6 +27,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache;
 /// </remarks>
 public class ContentStore
 {
+    private static readonly TimeSpan _monitorTimeout = TimeSpan.FromSeconds(30);
+
     // TODO: collection trigger (ok for now)
     // see SnapDictionary notes
     private const long CollectMinGenDelta = 8;
@@ -50,9 +52,9 @@ public class ContentStore
     // SnapDictionary has unit tests to ensure it all works correctly
     // For locking information, see SnapDictionary
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-    private readonly object _rlocko = new();
     private readonly IVariationContextAccessor _variationContextAccessor;
-    private readonly object _wlocko = new();
+    private readonly object _rlocko = new();
+    private readonly SemaphoreSlim _writeLock = new(1);
     private Task? _collectTask;
     private GenObj? _genObj;
     private long _liveGen;
@@ -317,7 +319,7 @@ public class ContentStore
 
     private void EnsureLocked()
     {
-        if (!Monitor.IsEntered(_wlocko))
+        if (_writeLock.CurrentCount != 0)
         {
             throw new InvalidOperationException("Write lock must be acquried.");
         }
@@ -325,18 +327,26 @@ public class ContentStore
 
     private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
     {
-        if (Monitor.IsEntered(_wlocko))
+        if (_writeLock.CurrentCount == 0)
         {
             throw new InvalidOperationException("Recursive locks not allowed");
         }
 
-        Monitor.Enter(_wlocko, ref lockInfo.Taken);
+        if (_writeLock.Wait(_monitorTimeout))
+        {
+            lockInfo.Taken = true;
+        }
+        else
+        {
+            throw new TimeoutException("Could not enter monitor before timeout in content store");
+        }
 
         lock (_rlocko)
         {
             // see SnapDictionary
             try
             {
+                // Run all code in finally to ensure ThreadAbortException does not interrupt execution
             }
             finally
             {
@@ -367,6 +377,7 @@ public class ContentStore
                     // see SnapDictionary
                     try
                     {
+                        // Run all code in finally to ensure ThreadAbortException does not interrupt execution
                     }
                     finally
                     {
@@ -402,7 +413,7 @@ public class ContentStore
         {
             if (lockInfo.Taken)
             {
-                Monitor.Exit(_wlocko);
+                _writeLock.Release();
             }
         }
     }
@@ -736,16 +747,22 @@ public class ContentStore
     {
         EnsureLocked();
 
-        IPublishedContentType?[] contentTypes = _contentTypesById
+        IPublishedContentType[] contentTypes = _contentTypesById
             .Where(kvp =>
                 kvp.Value.Value != null &&
                 kvp.Value.Value.PropertyTypes.Any(p => dataTypeIds.Contains(p.DataType.Id)))
             .Select(kvp => kvp.Value.Value)
             .Select(x => getContentType(x!.Id))
-            .Where(x => x != null) // poof, gone, very unlikely and probably an anomaly
+            .WhereNotNull() // poof, gone, very unlikely and probably an anomaly
             .ToArray();
 
-        var contentTypeIdsA = contentTypes.Select(x => x!.Id).ToArray();
+        // all content types that are affected by this data type update must be updated
+        foreach (IPublishedContentType contentType in contentTypes)
+        {
+            SetContentTypeLocked(contentType);
+        }
+
+        var contentTypeIdsA = contentTypes.Select(x => x.Id).ToArray();
         var contentTypeNodes = new Dictionary<int, List<int>>();
         foreach (var id in contentTypeIdsA)
         {
@@ -761,7 +778,7 @@ public class ContentStore
             }
         }
 
-        foreach (IPublishedContentType contentType in contentTypes.WhereNotNull())
+        foreach (IPublishedContentType contentType in contentTypes)
         {
             // again, weird situation
             if (contentTypeNodes.ContainsKey(contentType.Id) == false)
@@ -1259,48 +1276,42 @@ public class ContentStore
 
         // try to find the content
         // if it is not there, nothing to do
-        _contentNodes.TryGetValue(id, out LinkedNode<ContentNode?>? link); // else null
-        if (link?.Value == null)
+        if (_contentNodes.TryGetValue(id, out LinkedNode<ContentNode?>? link) &&
+            link.Value is ContentNode content)
         {
-            return false;
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Clear content ID: {ContentId}", content.Id);
+            }
+
+            // clear the entire branch
+            ClearBranchLocked(content);
+
+            // manage the tree
+            RemoveTreeNodeLocked(content);
+
+            return true;
         }
 
-        ContentNode? content = link.Value;
-
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Clear content ID: {ContentId}", content.Id);
-        }
-
-        // clear the entire branch
-        ClearBranchLocked(content);
-
-        // manage the tree
-        RemoveTreeNodeLocked(content);
-
-        return true;
+        return false;
     }
 
     private void ClearBranchLocked(int id)
     {
-        _contentNodes.TryGetValue(id, out LinkedNode<ContentNode?>? link);
-        if (link?.Value == null)
+        if (_contentNodes.TryGetValue(id, out LinkedNode<ContentNode?>? link) &&
+            link.Value is ContentNode content)
         {
-            return;
-        }
+            // clear the entire branch
+            ClearBranchLocked(content);
 
-        ClearBranchLocked(link.Value);
+            // manage the tree
+            RemoveTreeNodeLocked(content);
+        }
     }
 
-    private void ClearBranchLocked(ContentNode? content)
+    private void ClearBranchLocked(ContentNode content)
     {
-        // This should never be null, all code that calls this method is null checking but we've seen
-        // issues of null ref exceptions in issue reports so we'll double check here
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
-
+        // Clear content node
         SetValueLocked(_contentNodes, content.Id, null);
         if (_localDb != null)
         {
@@ -1309,14 +1320,21 @@ public class ContentStore
 
         _contentKeyToIdMap.TryRemove(content.Uid, out _);
 
-        var id = content.FirstChildContentId;
-        while (id > 0)
+        // Clear children
+        int childId = content.FirstChildContentId;
+        if (childId > 0)
         {
-            // get the required link node, this ensures that both `link` and `link.Value` are not null
-            LinkedNode<ContentNode> link = GetRequiredLinkedNode(id, "child", null);
-            ContentNode? linkValue = link.Value; // capture local since clearing in recurse can clear it
-            ClearBranchLocked(linkValue); // recurse
-            id = linkValue?.NextSiblingContentId ?? 0;
+            ContentNode childContent = GetRequiredLinkedNode(childId, "first child", null).Value!;
+            ClearBranchLocked(childContent); // recurse
+
+            // Clear all siblings of child
+            int siblingId = childContent.NextSiblingContentId;
+            while (siblingId > 0)
+            {
+                ContentNode siblingContent = GetRequiredLinkedNode(siblingId, "next sibling", null).Value!;
+                ClearBranchLocked(siblingContent); // recurse
+                siblingId = siblingContent.NextSiblingContentId;
+            }
         }
     }
 
@@ -1804,7 +1822,7 @@ public class ContentStore
             // else we need to try to create a new gen ref
             // whether we are wlocked or not, noone can rlock while we do,
             // so _liveGen and _nextGen are safe
-            if (Monitor.IsEntered(_wlocko))
+            if (_writeLock.CurrentCount == 0)
             {
                 // write-locked, cannot use latest gen (at least 1) so use previous
                 var snapGen = _nextGen ? _liveGen - 1 : _liveGen;
@@ -1816,8 +1834,7 @@ public class ContentStore
                 }
                 else if (_genObj.Gen != snapGen)
                 {
-                    throw new PanicException(
-                        $"The generation {_genObj.Gen} does not equal the snapshot generation {snapGen}");
+                    throw new PanicException($"The generation {_genObj.Gen} does not equal the snapshot generation {snapGen}");
                 }
             }
             else

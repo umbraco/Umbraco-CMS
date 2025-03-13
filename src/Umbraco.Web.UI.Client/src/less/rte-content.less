@@ -44,6 +44,15 @@
 }
 
 .umb-rte *[data-mce-selected="inline-boundary"] {
-    background:rgba(0,0,0,0.025);
+    background: rgba(0,0,0,.025);
+    color: @blueExtraDark;
     outline: 2px solid @pinkLight;
+}
+
+
+.umb-rte.mce-content-body umb-rte-block[data-mce-selected], 
+.umb-rte.mce-content-body umb-rte-block-inline[data-mce-selected] {
+  cursor: auto;
+  --umb-rte-block--selected: 1;
+  outline: none;
 }

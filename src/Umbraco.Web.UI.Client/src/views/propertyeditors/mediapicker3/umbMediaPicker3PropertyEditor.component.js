@@ -80,7 +80,7 @@
             vm.sortableOptions.disabled = vm.readonly || vm.singleMode;
         });
 
-        vm.$onInit = function() {
+      vm.$onInit = function() {
             vm.node = vm.node || editorState.getCurrent();
 
             // If we do not have a node on the scope, then disallow drop media
@@ -179,7 +179,8 @@
                 vm.allowAdd = hasAccessToMedia;
 
                 mediaUploader.init(uploaderOptions).then(() => {
-                    vm.loading = false;
+                  vm.loading = false;
+                  $scope.$apply();
                 });
             });
         };

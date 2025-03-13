@@ -43,15 +43,16 @@
                         disabled="page.uploadsInProgress">
                     </umb-button>
 
-                    <umb-button
-                        alias="preview"
+                    <umb-button-group
                         ng-if="!page.isNew && content.allowPreview && page.showPreviewButton"
-                        type="button"
-                        button-style="link"
-                        action="preview(content)"
-                        label-key="buttons_saveAndPreview"
+                        button-style="info"
+                        default-button="previewDefaultButton"
+                        sub-buttons="previewSubButtons"
+                        state="page.previewButtonState"
+                        direction="up"
+                        float="right"
                         disabled="page.uploadsInProgress">
-                    </umb-button>
+                    </umb-button-group>
 
                     <umb-button
                         ng-if="page.showSaveButton"
@@ -59,7 +60,7 @@
                         type="button"
                         button-style="{{page.saveButtonStyle}}"
                         state="page.saveButtonState"
-                        action="save(content)"
+                        action="save()"
                         label-key="buttons_save"
                         shortcut="ctrl+s"
                         add-ellipsis="{{page.saveButtonEllipsis}}"

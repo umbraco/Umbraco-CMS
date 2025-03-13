@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Umbraco.Cms.Core;
@@ -132,9 +133,7 @@ public static class TypeExtensions
     ///     <c>true</c> if [is of generic type] [the specified type]; otherwise, <c>false</c>.
     /// </returns>
     public static bool IsOfGenericType(this Type type, Type genericType)
-    {
-        return type.TryGetGenericArguments(genericType, out Type[]? args);
-    }
+        => type.TryGetGenericArguments(genericType, out _);
 
     /// <summary>
     ///     Will find the generic type of the 'type' parameter passed in that is equal to the 'genericType' parameter passed in
@@ -143,17 +142,10 @@ public static class TypeExtensions
     /// <param name="genericType"></param>
     /// <param name="genericArgType"></param>
     /// <returns></returns>
-    public static bool TryGetGenericArguments(this Type type, Type genericType, out Type[]? genericArgType)
+    public static bool TryGetGenericArguments(this Type type, Type genericType, [NotNullWhen(true)] out Type[]? genericArgType)
     {
-        if (type == null)
-        {
-            throw new ArgumentNullException("type");
-        }
-
-        if (genericType == null)
-        {
-            throw new ArgumentNullException("genericType");
-        }
+        ArgumentNullException.ThrowIfNull(type);
+        ArgumentNullException.ThrowIfNull(genericType);
 
         if (genericType.IsGenericType == false)
         {
@@ -219,96 +211,52 @@ public static class TypeExtensions
     /// <returns></returns>
     public static PropertyInfo[] GetAllProperties(this Type type)
     {
-        if (type.IsInterface)
-        {
-            var propertyInfos = new List<PropertyInfo>();
-
-            var considered = new List<Type>();
-            var queue = new Queue<Type>();
-            considered.Add(type);
-            queue.Enqueue(type);
-            while (queue.Count > 0)
-            {
-                Type subType = queue.Dequeue();
-                foreach (Type subInterface in subType.GetInterfaces())
-                {
-                    if (considered.Contains(subInterface))
-                    {
-                        continue;
-                    }
-
-                    considered.Add(subInterface);
-                    queue.Enqueue(subInterface);
-                }
-
-                PropertyInfo[] typeProperties = subType.GetProperties(
-                    BindingFlags.FlattenHierarchy
-                    | BindingFlags.Public
-                    | BindingFlags.NonPublic
-                    | BindingFlags.Instance);
-
-                IEnumerable<PropertyInfo> newPropertyInfos = typeProperties
-                    .Where(x => !propertyInfos.Contains(x));
-
-                propertyInfos.InsertRange(0, newPropertyInfos);
-            }
-
-            return propertyInfos.ToArray();
-        }
-
-        return type.GetProperties(BindingFlags.FlattenHierarchy
-                                  | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        const BindingFlags bindingFlags = BindingFlags.FlattenHierarchy
+                                          | BindingFlags.Public
+                                          | BindingFlags.NonPublic
+                                          | BindingFlags.Instance;
+        return type.GetAllMemberInfos(t => t.GetProperties(bindingFlags));
     }
 
     /// <summary>
-    ///     Returns all public properties including inherited properties even for interfaces
+    ///     Returns public properties including inherited properties even for interfaces
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    /// <remarks>
-    ///     taken from
-    ///     http://stackoverflow.com/questions/358835/getproperties-to-return-all-properties-for-an-interface-inheritance-hierarchy
-    /// </remarks>
     public static PropertyInfo[] GetPublicProperties(this Type type)
     {
-        if (type.IsInterface)
-        {
-            var propertyInfos = new List<PropertyInfo>();
+        const BindingFlags bindingFlags = BindingFlags.FlattenHierarchy
+                                          | BindingFlags.Public
+                                          | BindingFlags.Instance;
+        return type.GetAllMemberInfos(t => t.GetProperties(bindingFlags));
+    }
 
-            var considered = new List<Type>();
-            var queue = new Queue<Type>();
-            considered.Add(type);
-            queue.Enqueue(type);
-            while (queue.Count > 0)
-            {
-                Type subType = queue.Dequeue();
-                foreach (Type subInterface in subType.GetInterfaces())
-                {
-                    if (considered.Contains(subInterface))
-                    {
-                        continue;
-                    }
+    /// <summary>
+    ///     Returns public methods including inherited methods even for interfaces
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public static MethodInfo[] GetPublicMethods(this Type type)
+    {
+        const BindingFlags bindingFlags = BindingFlags.FlattenHierarchy
+                                          | BindingFlags.Public
+                                          | BindingFlags.Instance;
+        return type.GetAllMemberInfos(t => t.GetMethods(bindingFlags));
+    }
 
-                    considered.Add(subInterface);
-                    queue.Enqueue(subInterface);
-                }
-
-                PropertyInfo[] typeProperties = subType.GetProperties(
-                    BindingFlags.FlattenHierarchy
-                    | BindingFlags.Public
-                    | BindingFlags.Instance);
-
-                IEnumerable<PropertyInfo> newPropertyInfos = typeProperties
-                    .Where(x => !propertyInfos.Contains(x));
-
-                propertyInfos.InsertRange(0, newPropertyInfos);
-            }
-
-            return propertyInfos.ToArray();
-        }
-
-        return type.GetProperties(BindingFlags.FlattenHierarchy
-                                  | BindingFlags.Public | BindingFlags.Instance);
+    /// <summary>
+    ///     Returns all methods including inherited methods even for interfaces
+    /// </summary>
+    /// <remarks>Includes both Public and Non-Public methods</remarks>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public static MethodInfo[] GetAllMethods(this Type type)
+    {
+        const BindingFlags bindingFlags = BindingFlags.FlattenHierarchy
+                                          | BindingFlags.Public
+                                          | BindingFlags.NonPublic
+                                          | BindingFlags.Instance;
+        return type.GetAllMemberInfos(t => t.GetMethods(bindingFlags));
     }
 
     /// <summary>
@@ -511,5 +459,48 @@ public static class TypeExtensions
         }
 
         return attempt;
+    }
+
+    /// <remarks>
+    ///     taken from
+    ///     http://stackoverflow.com/questions/358835/getproperties-to-return-all-properties-for-an-interface-inheritance-hierarchy
+    /// </remarks>
+    private static T[] GetAllMemberInfos<T>(this Type type, Func<Type, T[]> getMemberInfos)
+        where T : MemberInfo
+    {
+        if (type.IsInterface is false)
+        {
+            return getMemberInfos(type);
+        }
+
+        var memberInfos = new List<T>();
+
+        var considered = new List<Type>();
+        var queue = new Queue<Type>();
+        considered.Add(type);
+        queue.Enqueue(type);
+        while (queue.Count > 0)
+        {
+            Type subType = queue.Dequeue();
+            foreach (Type subInterface in subType.GetInterfaces())
+            {
+                if (considered.Contains(subInterface))
+                {
+                    continue;
+                }
+
+                considered.Add(subInterface);
+                queue.Enqueue(subInterface);
+            }
+
+            T[] typeMethodInfos = getMemberInfos(subType);
+
+            IEnumerable<T> newMethodInfos = typeMethodInfos
+                .Where(x => !memberInfos.Contains(x));
+
+            memberInfos.InsertRange(0, newMethodInfos);
+        }
+
+        return memberInfos.ToArray();
     }
 }

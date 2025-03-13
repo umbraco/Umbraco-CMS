@@ -30,6 +30,7 @@ public class CreateUnattendedUserNotificationHandler : INotificationAsyncHandler
     ///     Listening for when the UnattendedInstallNotification fired after a sucessfulk
     /// </summary>
     /// <param name="notification"></param>
+    /// <param name="cancellationToken"></param>
     public async Task HandleAsync(UnattendedInstallNotification notification, CancellationToken cancellationToken)
     {
         UnattendedSettings? unattendedSettings = _unattendedSettings.Value;

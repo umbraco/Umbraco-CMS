@@ -7,7 +7,7 @@
     <ul class="umb-tree">
         <li class="root">
             <ul class="umb-search-group">
-                <li class="umb-search-group-item" ng-repeat="result in results">
+                <li class="umb-search-group-item" ng-class="{ 'not-published': !result.metaData.published }" ng-repeat="result in results">
                     <div ng-class="{ 'umb-tree-node-checked': result.selected }">
                         <button type="button"
                                 class="btn-reset umb-search-group-item-link"

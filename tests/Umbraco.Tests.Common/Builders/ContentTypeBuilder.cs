@@ -22,6 +22,7 @@ public class ContentTypeBuilder
     private readonly List<TemplateBuilder> _templateBuilders = new();
     private ContentVariation? _contentVariation;
     private int? _defaultTemplateId;
+    private bool? _isElement;
     private PropertyTypeCollection _propertyTypeCollection;
 
     private int? _propertyTypeIdsIncrementingFrom;
@@ -45,6 +46,12 @@ public class ContentTypeBuilder
     public ContentTypeBuilder WithDefaultTemplateId(int templateId)
     {
         _defaultTemplateId = templateId;
+        return this;
+    }
+
+    public ContentTypeBuilder WithIsElement(bool isElement)
+    {
+        _isElement = isElement;
         return this;
     }
 
@@ -117,6 +124,7 @@ public class ContentTypeBuilder
         contentType.CreatorId = GetCreatorId();
         contentType.Trashed = GetTrashed();
         contentType.IsContainer = GetIsContainer();
+        contentType.IsElement = _isElement ?? false;
         contentType.HistoryCleanup = new HistoryCleanup();
 
         contentType.Variations = contentVariation;

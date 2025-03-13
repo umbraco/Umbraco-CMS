@@ -67,6 +67,7 @@ test.describe('BlockGridEditorContent', () => {
     await page.locator('[id="sub-view-0"]').locator('[id="title"]').fill(newContentValue);
     await umbracoUi.clickDataElementByElementName('sub-view-settings');
     // Adds text to the setting element
+    await page.waitForTimeout(500);
     await page.locator('[id="sub-view-1"]').locator('[id="title"]').fill(newSettingValue);
     await page.locator('[label="Submit"]').click();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
@@ -231,7 +232,7 @@ test.describe('BlockGridEditorContent', () => {
       const dragFromLocator = await page.locator('[data-content-element-type-key="' + element['key'] + '"]', {hasText: bottomBlock});
       const dragToLocator = await page.locator('[data-content-element-type-key="' + element['key'] + '"]', {hasText: topBlock});
       await umbracoUi.dragAndDrop(dragFromLocator, dragToLocator, 10, -5, 15);
-
+      await page.waitForTimeout(500);
       // Assert
       // Checks if the BottomBlock is moved to be under TopBlock
       await expect(page.locator('[data-content-element-type-key="' + element['key'] + '"]').nth(1)).toContainText(bottomBlock);
@@ -346,7 +347,7 @@ test.describe('BlockGridEditorContent', () => {
 
     // Selects the created image for the block
     await page.locator('[data-content-element-type-key="' + element['key'] + '"]').click();
-    await page.locator('[data-element="property-image"]').locator('[key="' + ConstantHelper.buttons.add + '"]').click();
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
     await page.locator('[data-element="media-grid"] >> [title="' + imageName + '"]').click();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.select));
     await page.locator('[label="Submit"]').click();
@@ -390,10 +391,9 @@ test.describe('BlockGridEditorContent', () => {
       await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
 
       // Assert
-      await umbracoUi.getSuccessNotification();
+      await umbracoUi.isSuccessNotificationVisible();
       // Checks if there are two blocks in the area
       await expect(page.locator('[data-element="property-' + blockGridAlias + '"]').locator('umb-block-grid-entry')).toHaveCount(2);
-
     });
 
     test('can set a maximum of required blocks in content with a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
@@ -458,10 +458,11 @@ test.describe('BlockGridEditorContent', () => {
       await page.locator('[title="Delete"]').nth(2).click();
       await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey('actions_delete'));
 
+      await page.waitForTimeout(1000);
       await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
 
       // Assert
-      await umbracoUi.getSuccessNotification();
+      await umbracoUi.isSuccessNotificationVisible();
       // Checks if there are two blocks in the area
       await expect(page.locator('[data-element="property-' + blockGridAlias + '"]').locator('umb-block-grid-entry')).toHaveCount(2);
     });
@@ -476,7 +477,7 @@ test.describe('BlockGridEditorContent', () => {
       const dataTypeBlockGrid = new BlockGridDataTypeBuilder()
         .withName(blockGridName)
         .addBlock()
-          // We use the a label so we can see if the block is live updated when content is being written to the element
+          // We use the label so we can see if the block is live updated when content is being written to the element
           .withLabel('{{' + element.groups[0].properties[0].alias + '}}')
           .withContentElementTypeKey(element['key'])
           .withEditorSize('small')

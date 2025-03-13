@@ -69,7 +69,6 @@ public class ContentBlueprintTreeController : TreeController
             root.HasChildren = _contentService.GetBlueprintsForContentTypes()?.Any() ?? false;
         }
 
-
         return root;
     }
 
@@ -78,34 +77,34 @@ public class ContentBlueprintTreeController : TreeController
         var nodes = new TreeNodeCollection();
 
         //get all blueprints
-        IEntitySlim[] entities = _entityService.GetChildren(Constants.System.Root, UmbracoObjectTypes.DocumentBlueprint)
-            .ToArray();
+        IEnumerable<IEntitySlim> entities = _entityService.GetChildren(Constants.System.Root, UmbracoObjectTypes.DocumentBlueprint);
 
         //check if we're rendering the root in which case we'll render the content types that have blueprints
         if (id == Constants.System.RootString)
         {
             //get all blueprint content types
-            IEnumerable<string> contentTypeAliases =
-                entities.Select(x => ((IContentEntitySlim)x).ContentTypeAlias).Distinct();
+            IEnumerable<string> contentTypeAliases = entities.Select(x => ((IContentEntitySlim)x).ContentTypeAlias).Distinct();
+
             //get the ids
             var contentTypeIds = _contentTypeService.GetAllContentTypeIds(contentTypeAliases.ToArray()).ToArray();
 
-            //now get the entities ... it's a bit round about but still smaller queries than getting all document types
-            IEntitySlim[] docTypeEntities = contentTypeIds.Length == 0
-                ? new IEntitySlim[0]
-                : _entityService.GetAll(UmbracoObjectTypes.DocumentType, contentTypeIds).ToArray();
+            if (contentTypeIds.Any())
+            {
+                //now get the entities ... it's a bit round about but still smaller queries than getting all document types
+                IEnumerable<IEntitySlim> docTypeEntities = _entityService.GetAll(UmbracoObjectTypes.DocumentType, contentTypeIds);
 
-            nodes.AddRange(docTypeEntities
-                .Select(entity =>
-                {
-                    TreeNode treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id,
-                        queryStrings, Constants.Icons.ContentType, true);
-                    treeNode.Path = $"-1,{entity.Id}";
-                    treeNode.NodeType = "document-type-blueprints";
-                    // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
-                    treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
-                    return treeNode;
-                }));
+                nodes.AddRange(docTypeEntities
+                    .OrderBy(entity => entity.Name)
+                    .Select(entity =>
+                    {
+                        TreeNode treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings, Constants.Icons.ContentType, true);
+                        treeNode.Path = $"-1,{entity.Id}";
+                        treeNode.NodeType = "document-type-blueprints";
+                        // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
+                        treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
+                        return treeNode;
+                    }));
+            }
 
             return nodes;
         }
@@ -117,14 +116,16 @@ public class ContentBlueprintTreeController : TreeController
 
         //Get the content type
         IContentType? ct = _contentTypeService.Get(intId);
+
         if (ct == null)
         {
             return nodes;
         }
 
-        IEnumerable<IEntitySlim> blueprintsForDocType =
-            entities.Where(x => ct.Alias == ((IContentEntitySlim)x).ContentTypeAlias);
+        IEnumerable<IEntitySlim> blueprintsForDocType = entities.Where(x => ct.Alias == ((IContentEntitySlim)x).ContentTypeAlias);
+
         nodes.AddRange(blueprintsForDocType
+            .OrderBy(entity => entity.Name)
             .Select(entity =>
             {
                 TreeNode treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings,

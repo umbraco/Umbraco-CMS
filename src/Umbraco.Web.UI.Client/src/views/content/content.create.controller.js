@@ -22,6 +22,7 @@ function contentCreateController($scope,
     function initialize() {
         $scope.loading = true;
         $scope.allowedTypes = null;
+        $scope.runtimeModeProduction = Umbraco.Sys.ServerVariables.application.runtimeMode == 'Production';
 
         var getAllowedTypes = contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
             $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
@@ -85,7 +86,7 @@ function contentCreateController($scope,
         });
         $scope.docType = docType;
         if (blueprints.length) {
-            if (blueprintConfig.skipSelect) {
+            if (blueprintConfig.skipSelect && blueprints.length === 1) {
                 createFromBlueprint(blueprints[0].id);
             } else {
                 $scope.selectContentType = false;

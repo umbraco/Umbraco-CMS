@@ -588,13 +588,13 @@
     <key alias="renewSession">已更新，继续工作。</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">星期一快乐</key>
-    <key alias="greeting1">星期二快乐</key>
-    <key alias="greeting2">星期三快乐</key>
-    <key alias="greeting3">星期四快乐</key>
-    <key alias="greeting4">星期五快乐</key>
-    <key alias="greeting5">星期六快乐</key>
-    <key alias="greeting6">星期天快乐</key>
+    <key alias="greeting0">欢迎</key>
+    <key alias="greeting1">欢迎</key>
+    <key alias="greeting2">欢迎</key>
+    <key alias="greeting3">欢迎</key>
+    <key alias="greeting4">欢迎</key>
+    <key alias="greeting5">欢迎</key>
+    <key alias="greeting6">欢迎</key>
     <key alias="instruction">在下方登录</key>
     <key alias="signInWith">登录</key>
     <key alias="timeout">会话超时</key>

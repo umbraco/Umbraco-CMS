@@ -17,5 +17,21 @@ public static partial class Constants
             /// </summary>
             public const string PreviewContentPathPrefix = "preview-";
         }
+
+        /// <summary>
+        ///     Constants for Delivery API output cache.
+        /// </summary>
+        public static class OutputCache
+        {
+            /// <summary>
+            ///     Output cache policy name for content
+            /// </summary>
+            public const string ContentCachePolicy = "DeliveryApiContent";
+
+            /// <summary>
+            ///     Output cache policy name for media
+            /// </summary>
+            public const string MediaCachePolicy = "DeliveryApiMedia";
+        }
     }
 }

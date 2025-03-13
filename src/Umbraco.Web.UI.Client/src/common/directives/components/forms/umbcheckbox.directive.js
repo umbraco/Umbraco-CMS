@@ -26,7 +26,7 @@
 @param {string} value Set the value of the checkbox.
 @param {string} name Set the name of the checkbox.
 @param {string} text Set the text for the checkbox label.
-@param {string} labelKey Set a dictinary/localization string for the checkbox label
+@param {string} labelKey Set a dictionary/localization string for the checkbox label
 @param {string} serverValidationField Set the <code>val-server-field</code> of the checkbox.
 @param {boolean} disabled Set the checkbox to be disabled.
 @param {boolean} required Set the checkbox to be required.

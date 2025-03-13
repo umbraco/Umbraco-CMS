@@ -1,9 +1,12 @@
 using System.Data.Common;
 using System.Globalization;
 using System.Linq.Expressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
@@ -25,8 +28,11 @@ internal class UserService : RepositoryService, IUserService
     private readonly ILogger<UserService> _logger;
     private readonly IRuntimeState _runtimeState;
     private readonly IUserGroupRepository _userGroupRepository;
+    private readonly IRequestCache _requestCache;
     private readonly IUserRepository _userRepository;
 
+
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
     public UserService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -35,11 +41,26 @@ internal class UserService : RepositoryService, IUserService
         IUserRepository userRepository,
         IUserGroupRepository userGroupRepository,
         IOptions<GlobalSettings> globalSettings)
+        : this(provider, loggerFactory, eventMessagesFactory, runtimeState, userRepository, userGroupRepository, globalSettings, StaticServiceProvider.Instance.GetRequiredService<IRequestCache>())
+    {
+
+    }
+
+    public UserService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IRuntimeState runtimeState,
+        IUserRepository userRepository,
+        IUserGroupRepository userGroupRepository,
+        IOptions<GlobalSettings> globalSettings,
+        IRequestCache requestCache)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _runtimeState = runtimeState;
         _userRepository = userRepository;
         _userGroupRepository = userGroupRepository;
+        _requestCache = requestCache;
         _globalSettings = globalSettings.Value;
         _logger = loggerFactory.CreateLogger<UserService>();
     }
@@ -140,7 +161,7 @@ internal class UserService : RepositoryService, IUserService
     /// <summary>
     ///     Gets a User by its integer id
     /// </summary>
-    /// <param name="id"><see cref="System.int" /> Id</param>
+    /// <param name="id"><see cref="int" /> Id</param>
     /// <returns>
     ///     <see cref="IUser" />
     /// </returns>
@@ -535,7 +556,7 @@ internal class UserService : RepositoryService, IUserService
     ///     but that is how MS have made theirs so we'll follow that principal.
     /// </remarks>
     /// <param name="countType"><see cref="MemberCountType" /> to count by</param>
-    /// <returns><see cref="System.int" /> with number of Users for passed in type</returns>
+    /// <returns><see cref="int" /> with number of Users for passed in type</returns>
     public int GetCount(MemberCountType countType)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -945,19 +966,12 @@ internal class UserService : RepositoryService, IUserService
     }
 
     /// <summary>
-    ///     Saves a UserGroup
+    ///     Saves a UserGroup.
     /// </summary>
-    /// <param name="userGroup">UserGroup to save</param>
+    /// <param name="userGroup">UserGroup to save.</param>
     /// <param name="userIds">
     ///     If null than no changes are made to the users who are assigned to this group, however if a value is passed in
-    ///     than all users will be removed from this group and only these users will be added
-    /// </param>
-    /// Default is
-    /// <c>True</c>
-    /// otherwise set to
-    /// <c>False</c>
-    /// to not raise events
-    /// </param>
+    ///     than all users will be removed from this group and only these users will be added.</param>
     public void Save(IUserGroup userGroup, int[]? userIds = null)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -1132,17 +1146,23 @@ internal class UserService : RepositoryService, IUserService
     /// <param name="path">Path to check permissions for</param>
     public EntityPermissionSet GetPermissionsForPath(IUser? user, string? path)
     {
-        var nodeIds = path?.GetIdsFromPathReversed();
-
-        if (nodeIds is null || nodeIds.Length == 0 || user is null)
+        var result = (EntityPermissionSet?)_requestCache.Get($"{nameof(GetPermissionsForPath)}|{path}|{user?.Id}", () =>
         {
-            return EntityPermissionSet.Empty();
-        }
+            var nodeIds = path?.GetIdsFromPathReversed();
 
-        // collect all permissions structures for all nodes for all groups belonging to the user
-        EntityPermission[] groupPermissions = GetPermissionsForPath(user.Groups.ToArray(), nodeIds, true).ToArray();
+            if (nodeIds is null || nodeIds.Length == 0 || user is null)
+            {
+                return EntityPermissionSet.Empty();
+            }
 
-        return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
+            // collect all permissions structures for all nodes for all groups belonging to the user
+            EntityPermission[] groupPermissions = GetPermissionsForPath(user.Groups.ToArray(), nodeIds, true).ToArray();
+
+            return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
+        });
+
+        return result ?? EntityPermissionSet.Empty();
+
     }
 
     /// <summary>

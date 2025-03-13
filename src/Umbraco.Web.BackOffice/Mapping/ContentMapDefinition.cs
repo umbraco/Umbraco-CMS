@@ -128,7 +128,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.AdditionalPreviewUrls = source.AdditionalPreviewUrls;
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -ContentDto
     private void Map(ContentItemDisplay source, ContentItemDisplayWithSchedule target, MapperContext context)
     {
         foreach (KeyValuePair<string, object> additionalData in source.AdditionalData)
@@ -140,7 +140,6 @@ internal class ContentMapDefinition : IMapDefinition
         target.AllowedTemplates = source.AllowedTemplates;
         target.AllowPreview = source.AllowPreview;
         target.ContentApps = source.ContentApps;
-        target.ContentDto = source.ContentDto;
         target.ContentTypeAlias = source.ContentTypeAlias;
         target.ContentTypeId = source.ContentTypeId;
         target.ContentTypeKey = source.ContentTypeKey;
@@ -207,7 +206,7 @@ internal class ContentMapDefinition : IMapDefinition
         }
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -ContentDto
     private static void Map(ContentItemDisplayWithSchedule source, ContentItemDisplay target, MapperContext context)
     {
         foreach (KeyValuePair<string, object> additionalData in source.AdditionalData)
@@ -219,7 +218,6 @@ internal class ContentMapDefinition : IMapDefinition
         target.AllowedTemplates = source.AllowedTemplates;
         target.AllowPreview = source.AllowPreview;
         target.ContentApps = source.ContentApps;
-        target.ContentDto = source.ContentDto;
         target.ContentTypeAlias = source.ContentTypeAlias;
         target.ContentTypeId = source.ContentTypeId;
         target.ContentTypeKey = source.ContentTypeKey;
@@ -253,7 +251,7 @@ internal class ContentMapDefinition : IMapDefinition
     private static void Map(IContent source, ContentPropertyCollectionDto target, MapperContext context) =>
         target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties).WhereNotNull();
 
-    // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent
+    // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent -ContentDto
     private void Map<TVariant>(IContent source, ContentItemDisplay<TVariant> target, MapperContext context)
         where TVariant : ContentVariantDisplay
     {
@@ -300,11 +298,6 @@ internal class ContentMapDefinition : IMapDefinition
         target.Updater = _commonMapper.GetCreator(source, context);
         target.Urls = GetUrls(source);
         target.Variants = _contentVariantMapper.Map<TVariant>(source, context);
-
-        target.ContentDto = new ContentPropertyCollectionDto
-        {
-            Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties).WhereNotNull()
-        };
     }
 
     // Umbraco.Code.MapAll -Segment -Language -DisplayName -AdditionalPreviewUrls

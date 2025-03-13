@@ -45,7 +45,7 @@ public class PackagesTreeController : TreeController
         {
             // This will load in a custom UI instead of the dashboard for the root node
             root.RoutePath = $"{Constants.Applications.Packages}/{Constants.Trees.Packages}/repo";
-            root.Icon = Constants.Icons.Packages;
+            root.Icon = Constants.Icons.Package;
 
             root.HasChildren = false;
         }

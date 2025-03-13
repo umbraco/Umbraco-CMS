@@ -80,7 +80,7 @@ public class MacroRenderingController : UmbracoAuthorizedJsonController
     /// <param name="pageId"></param>
     /// <param name="macroParams">
     ///     To send a dictionary as a GET parameter the query should be structured like:
-    ///     ?macroAlias=Test&pageId=3634&macroParams[0].key=myKey&macroParams[0].value=myVal&macroParams[1].key=anotherKey
+    ///     ?macroAlias=Test&amp;pageId=3634&amp;macroParams[0].key=myKey&amp;macroParams[0].value=myVal&amp;macroParams[1].key=anotherKey
     ///     &macroParams[1].value=anotherVal
     /// </param>
     /// <returns></returns>

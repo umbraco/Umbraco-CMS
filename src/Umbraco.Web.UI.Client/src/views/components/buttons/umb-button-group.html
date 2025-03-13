@@ -8,7 +8,7 @@
       href-target="{{defaultButton.hrefTarget}}"
       button-style="{{buttonStyle}}"
       state="state"
-      label="{{defaultButton.labelKey}}"
+      label="{{defaultButton.label}}"
       label-key="{{defaultButton.labelKey}}"
       shortcut="{{defaultButton.hotKey}}"
       shortcut-when-hidden="{{defaultButton.hotKeyWhenHidden}}"
@@ -29,7 +29,7 @@
       ng-disabled="disabled">
          <span class="caret">
             <span class="sr-only">
-               <localize key="{{labelKey}}">{{label}}</localize>
+               {{defaultButton.label}}
             </span>
          </span>
    </button>
@@ -48,7 +48,7 @@
             hotkey="{{subButton.hotKey}}"
             hotkey-when-hidden="{{subButton.hotKeyWhenHidden}}"
             ng-disabled="disabled">
-               <localize key="{{subButton.labelKey}}">{{subButton.labelKey}}</localize>
+               <span>{{subButton.label}}</span>
                <span ng-if="subButton.addEllipsis === 'true'">...</span>
          </button>
       </umb-dropdown-item>

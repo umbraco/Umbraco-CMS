@@ -9,10 +9,10 @@
             <h5 ng-show="selectBlueprint"><localize key="blueprints_selectBlueprint">Select a blueprint</localize></h5>
 
             <div ng-if="allowedTypes && allowedTypes.length === 0">
-                <p class="abstract" ng-if="!hasSettingsAccess">
+                <p class="abstract" ng-if="!hasSettingsAccess || runtimeModeProduction">
                     <localize key="create_noDocumentTypesWithNoSettingsAccess">The selected page in the content tree doesn't allow for any pages to be created below it.</localize>
                 </p>
-                <div ng-if="hasSettingsAccess && currentNode.id >= 0">
+                <div ng-if="hasSettingsAccess && currentNode.id >= 0 && !runtimeModeProduction">
                     <p class="abstract">
                         <localize key="create_noDocumentTypes">There are no allowed Document Types available for creating content here. You must enable these in <strong>Document
                             Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node

@@ -4,19 +4,18 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;
 
 internal abstract partial class ApiRichTextParserBase
 {
     private readonly IApiContentRouteBuilder _apiContentRouteBuilder;
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
+    private readonly IApiMediaUrlProvider _apiMediaUrlProvider;
 
-    protected ApiRichTextParserBase(IApiContentRouteBuilder apiContentRouteBuilder, IPublishedUrlProvider publishedUrlProvider)
+    protected ApiRichTextParserBase(IApiContentRouteBuilder apiContentRouteBuilder, IApiMediaUrlProvider apiMediaUrlProvider)
     {
         _apiContentRouteBuilder = apiContentRouteBuilder;
-        _publishedUrlProvider = publishedUrlProvider;
+        _apiMediaUrlProvider = apiMediaUrlProvider;
     }
 
     protected void ReplaceLocalLinks(IPublishedSnapshot publishedSnapshot, string href, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl, Action handleInvalidLink)
@@ -52,7 +51,7 @@ internal abstract partial class ApiRichTextParserBase
                 if (media != null)
                 {
                     handled = true;
-                    handleMediaUrl(_publishedUrlProvider.GetMediaUrl(media, UrlMode.Absolute));
+                    handleMediaUrl(_apiMediaUrlProvider.GetUrl(media));
                 }
 
                 break;
@@ -77,7 +76,7 @@ internal abstract partial class ApiRichTextParserBase
             return;
         }
 
-        handleMediaUrl(_publishedUrlProvider.GetMediaUrl(media, UrlMode.Absolute));
+        handleMediaUrl(_apiMediaUrlProvider.GetUrl(media));
     }
 
     [GeneratedRegex("{localLink:(?<udi>umb:.+)}")]

@@ -10,10 +10,8 @@ public class ConfigurationEditorJsonSerializer : JsonNetSerializer, IConfigurati
 {
     public ConfigurationEditorJsonSerializer()
     {
-        JsonSerializerSettings.Converters.Add(new FuzzyBooleanConverter());
-        JsonSerializerSettings.ContractResolver = new ConfigurationCustomContractResolver();
-        JsonSerializerSettings.Formatting = Formatting.None;
-        JsonSerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+        Settings.Converters.Add(new FuzzyBooleanConverter());
+        Settings.ContractResolver = new ConfigurationCustomContractResolver();
     }
 
     private class ConfigurationCustomContractResolver : DefaultContractResolver

@@ -13,7 +13,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
 /// <summary>
-///     Backoffice controller supporting the dashboard for viewing logs with some simple graphs & filtering
+///     Backoffice controller supporting the dashboard for viewing logs with some simple graphs &amp; filtering
 /// </summary>
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]

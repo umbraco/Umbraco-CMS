@@ -36,7 +36,9 @@ public interface ICacheInstructionService
     /// <summary>
     ///     Processes and then prunes pending database cache instructions.
     /// </summary>
-    /// <param name="released">Flag indicating if process is shutting now and operations should exit.</param>
+    /// <param name="cacheRefreshers">Cache refreshers.</param>
+    /// <param name="serverRole">Server role.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <param name="localIdentity">Local identity of the executing AppDomain.</param>
     /// <param name="lastPruned">Date of last prune operation.</param>
     /// <param name="lastId">Id of the latest processed instruction</param>

@@ -1,4 +1,4 @@
-﻿.umb-code-snippet {
+.umb-code-snippet {
 
     .umb-code-snippet__header {
         box-sizing: content-box;
@@ -39,6 +39,17 @@
             border-radius: 0 0 3px 3px;
             overflow: auto;
             white-space: nowrap;
+        }
+    }
+
+    &--wrap {
+        pre {
+            word-wrap: break-word;
+
+            code {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
         }
     }
 }

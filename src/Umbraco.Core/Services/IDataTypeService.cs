@@ -14,6 +14,7 @@ public interface IDataTypeService : IService
     /// <param name="id"></param>
     /// <returns></returns>
     IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
+    IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id) => throw new NotImplementedException();
 
     Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId);
     

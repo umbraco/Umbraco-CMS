@@ -84,7 +84,7 @@ public class MediaTreeController : ContentTreeControllerBase, ISearchableTree, I
     /// <summary>
     ///     Creates a tree node for a content item based on an UmbracoEntity
     /// </summary>
-    /// <param name="e"></param>
+    /// <param name="entity"></param>
     /// <param name="parentId"></param>
     /// <param name="queryStrings"></param>
     /// <returns></returns>

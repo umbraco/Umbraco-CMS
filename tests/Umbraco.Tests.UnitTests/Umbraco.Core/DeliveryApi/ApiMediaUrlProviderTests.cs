@@ -21,7 +21,7 @@ public class ApiMediaUrlProviderTests : PropertyValueConverterTests
 
         var publishedUrlProvider = new Mock<IPublishedUrlProvider>();
         publishedUrlProvider
-            .Setup(p => p.GetMediaUrl(content.Object, UrlMode.Relative, It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
+            .Setup(p => p.GetMediaUrl(content.Object, UrlMode.Default, It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns(publishedUrl);
 
         var apiMediaUrlProvider = new ApiMediaUrlProvider(publishedUrlProvider.Object);

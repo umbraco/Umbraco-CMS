@@ -17,6 +17,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
+[DefaultPropertyValueConverter(typeof(JsonValueConverter))]
 public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly IJsonSerializer _jsonSerializer;
@@ -106,6 +107,8 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
             {
                 LinkType type = LinkType.External;
                 var url = dto.Url;
+                var name = dto.Name;
+                IPublishedContent? content = null;
 
                 if (dto.Udi is not null)
                 {
@@ -113,7 +116,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
                         ? LinkType.Media
                         : LinkType.Content;
 
-                    IPublishedContent? content = type == LinkType.Media
+                    content = type == LinkType.Media
                         ? publishedSnapshot.Media?.GetById(preview, dto.Udi.Guid)
                         : publishedSnapshot.Content?.GetById(preview, dto.Udi.Guid);
 
@@ -122,16 +125,22 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
                         continue;
                     }
 
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        name = content.Name;
+                    }
+
                     url = content.Url(_publishedUrlProvider);
                 }
 
                 links.Add(
                     new Link
                     {
-                        Name = dto.Name,
+                        Name = name,
                         Target = dto.Target,
                         Type = type,
                         Udi = dto.Udi,
+                        Content = content,
                         Url = url + dto.QueryString,
                     });
             }
@@ -184,6 +193,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
                         ? null
                         : ApiLink.Content(
                             item.Name.IfNullOrWhiteSpace(_apiContentNameProvider.GetName(content)),
+                            item.QueryString,
                             item.Target,
                             content.Key,
                             content.ContentType.Alias,
@@ -194,12 +204,13 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
                         ? null
                         : ApiLink.Media(
                             item.Name.IfNullOrWhiteSpace(_apiContentNameProvider.GetName(media)),
-                            _apiMediaUrlProvider.GetUrl(media),
+                            $"{_apiMediaUrlProvider.GetUrl(media)}{item.QueryString}",
+                            item.QueryString,
                             item.Target,
                             media.Key,
                             media.ContentType.Alias);
                 default:
-                    return ApiLink.External(item.Name, $"{item.Url}{item.QueryString}", item.Target);
+                    return ApiLink.External(item.Name, $"{item.Url}{item.QueryString}", item.QueryString, item.Target);
             }
         }
 

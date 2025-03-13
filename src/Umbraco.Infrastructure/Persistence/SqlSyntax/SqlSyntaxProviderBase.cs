@@ -421,6 +421,9 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual string DeleteDefaultConstraint =>
         throw new NotSupportedException("Default constraints are not supported");
 
+    public virtual string Length => "LEN";
+    public virtual string Substring => "SUBSTRING";
+
     public virtual string CreateTable => "CREATE TABLE {0} ({1})";
 
     public virtual string DropTable => "DROP TABLE {0}";

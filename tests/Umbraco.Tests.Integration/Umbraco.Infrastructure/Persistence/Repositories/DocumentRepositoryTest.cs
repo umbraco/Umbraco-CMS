@@ -21,6 +21,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Persistence.SqlServer.Services;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -76,21 +77,21 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
         // Create and Save Content "Homepage" based on "umbTextpage" -> (_textpage.Id)
         _textpage = ContentBuilder.CreateSimpleContent(_contentType);
         _textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
-        ContentService.Save(_textpage, 0);
+        ContentService.Save(_textpage, -1);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> (_subpage.Id)
         _subpage = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 1", _textpage.Id);
         _subpage.Key = new Guid("FF11402B-7E53-4654-81A7-462AC2108059");
-        ContentService.Save(_subpage, 0);
+        ContentService.Save(_subpage, -1);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> (_subpage2.Id)
         _subpage2 = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 2", _textpage.Id);
-        ContentService.Save(_subpage2, 0);
+        ContentService.Save(_subpage2, -1);
 
         // Create and Save Content "Text Page Deleted" based on "umbTextpage" -> (_trashed.Id)
         _trashed = ContentBuilder.CreateSimpleContent(_contentType, "Text Page Deleted", -20);
         _trashed.Trashed = true;
-        ContentService.Save(_trashed, 0);
+        ContentService.Save(_trashed, -1);
     }
 
     private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository, out DataTypeRepository dtdRepository, AppCaches appCaches = null)
@@ -742,6 +743,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void GetAllContentManyVersions()
     {
         IContent[] result;

@@ -29,7 +29,7 @@
 
     > div {
         overflow: hidden;
-        border-radius: @baseBorderRadius;
+        border-radius: 0 0 @baseBorderRadius @baseBorderRadius;
     }
 
 }
@@ -106,6 +106,7 @@
    position: relative;
    object-fit: contain;
    height: 100%;
+   border-radius: @baseBorderRadius;
 }
 
 .umb-media-grid__item-image-placeholder {

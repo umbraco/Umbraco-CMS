@@ -44,7 +44,7 @@ public class MediaPermissionsResourceHandlerTests
     }
 
     [Test]
-    public async Task Resource_With_Node_Id_Withou_Permission_Is_Not_Authorized()
+    public async Task Resource_With_Node_Id_Without_Permission_Is_Not_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext(NodeId, true);
         var sut = CreateHandler(NodeId, 1001);

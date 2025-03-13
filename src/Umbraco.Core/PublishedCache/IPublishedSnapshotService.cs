@@ -125,4 +125,8 @@ public interface IPublishedSnapshotService : IDisposable
     ///     Cleans up unused snapshots
     /// </summary>
     Task CollectAsync();
+
+    void ResetLocalDb()
+    {
+    }
 }

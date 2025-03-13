@@ -112,6 +112,12 @@
       zijn op de huidige node, tenzij een domein hieronder ook van toepassing is.]]></key>
     <key alias="setDomains">Domeinen</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media verwijderd</key>
+    <key alias="move">Media verplaatst</key>
+    <key alias="copy">Media gekopieerd</key>
+    <key alias="save">Media bewaard</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Tonen voor</key>
     <key alias="delete">Inhoud verwijderd</key>
@@ -340,6 +346,7 @@
     <key alias="renameFolderFailed">Kan de map met id %0% niet hernoemen</key>
     <key alias="dragAndDropYourFilesIntoTheArea">Sleep en zet je bestand(en) neer in dit gebied</key>
     <key alias="uploadNotAllowed">Upload is niet toegelaten in deze locatie.</key>
+    <key alias="fileSecurityValidationFailure">Een of meerdere veiligheid validaties zijn gefaald voor het bestand</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Maak nieuw lid aan</key>
@@ -536,6 +543,7 @@
   </area>
   <area alias="dictionary">
     <key alias="noItems">Er zijn geen woordenboekitems.</key>
+    <key alias="noItemsFound">Er zijn geen woordenboekitems gevonden.</key>
     <key alias="createNew">Woordenboekitem aanmaken</key>
   </area>
   <area alias="dictionaryItem">
@@ -698,7 +706,7 @@
     <key alias="close">Sluiten</key>
     <key alias="closewindow">Sluit venster</key>
     <key alias="closepane">Sluit paneel</key>
-    <key alias="comment">Comment</key>
+    <key alias="comment">Commentaar</key>
     <key alias="confirm">Bevestig</key>
     <key alias="constrain">Beperken</key>
     <key alias="constrainProportions">Verhoudingen behouden</key>
@@ -737,7 +745,7 @@
     <key alias="history">Geschiedenis</key>
     <key alias="icon">Icoon</key>
     <key alias="id">Id</key>
-    <key alias="import">Import</key>
+    <key alias="import">Importeren</key>
     <key alias="excludeFromSubFolders">Alleen in deze map zoeken</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Binnenste marge</key>
@@ -970,13 +978,13 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="renewSession">Vernieuw je sessie om je wijzigingen te behouden</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Fijne super zondag</key>
-    <key alias="greeting1">Fijne manische maandag</key>
-    <key alias="greeting2">Fijne dinsdag</key>
-    <key alias="greeting3">Fijne geweldige woensdag</key>
-    <key alias="greeting4">Fijne donderende donderdag</key>
-    <key alias="greeting5">Fijne funky vrijdag</key>
-    <key alias="greeting6">Fijne zaterdag</key>
+    <key alias="greeting0">Welkom</key>
+    <key alias="greeting1">Welkom</key>
+    <key alias="greeting2">Welkom</key>
+    <key alias="greeting3">Welkom</key>
+    <key alias="greeting4">Welkom</key>
+    <key alias="greeting5">Welkom</key>
+    <key alias="greeting6">Welkom</key>
     <key alias="instruction">log hieronder in</key>
     <key alias="signInWith">Inloggen met</key>
     <key alias="timeout">Sessie is verlopen</key>
@@ -1226,6 +1234,10 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="pickedTrashedItems">Je hebt content-items geselecteerd die op dit ogenblik verwijderd of in the
       prullenbak zijn
     </key>
+  </area>
+  <area alias="dynamicRoot">
+    <key alias="noValidStartNodeTitle">Geen overeenkomende inhoud</key>
+    <key alias="noValidStartNodeDesc">De configuratie van deze eigenschap komt met geen enkele inhoud overeen. Maak de ontbrekende inhoud aan of neem contact op met uw beheerder om de dynamische root-instellingen voor deze eigenschap aan te passen.</key>
   </area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Verwijderd item</key>
@@ -1698,6 +1710,13 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="historyCleanupEnableCleanup">Opschonen aanzetten</key>
     <key alias="historyCleanupGloballyDisabled">Geschiedenis opschonen is globaal uitgeschakeld. Deze instellingen worden pas van kracht nadat ze zijn ingeschakeld.</key>
   </area>
+  <area alias="webhooks">
+    <key alias="addWebhook">Webhook aanmaken</key>
+    <key alias="addWebhookHeader">Webhook header toevoegen</key>
+    <key alias="logs">Logboek</key>
+    <key alias="addDocumentType">Documenttype toevoegen</key>
+    <key alias="addMediaType">Mediatype toevoegen</key>
+  </area>
   <area alias="languages">
     <key alias="addLanguage">Taal toevoegen</key>
     <key alias="mandatoryLanguage">Verplichte taal</key>
@@ -1838,6 +1857,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="settingsGroup">Instellingen</key>
     <key alias="templatingGroup">Sjabloon</key>
     <key alias="thirdPartyGroup">Derde partij</key>
+    <key alias="webhooks">Webhooks</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nieuwe update beschikbaar</key>

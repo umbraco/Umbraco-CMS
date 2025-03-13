@@ -1,4 +1,4 @@
-<div class="umb-property-editor db">
+<div class="umb-property-editor db" ng-class="{'is-preview': preview}">
 
     <div ng-if="preview && allowUnlock" class="umb-property-editor__lock-overlay-container">
         <div class="umb-property-editor__lock-overlay">
@@ -13,7 +13,7 @@
             <umb-button button-style="success" type="button" action="unlock()" label-key="general_edit" size="xxs"></umb-button>
         </div>
     </div>
-    
+
     <!-- layer to prevent clicks on elements with high z-index-->
     <div ng-if="preview" class="umb-property-editor__preview-overlay"></div>
 

@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -118,6 +119,9 @@ public class VariationTests
     /// <summary>
     ///     Asserts the result of <see cref="ContentVariationExtensions.ValidateVariation" />
     /// </summary>
+    /// <param name="variation">The variation to validate</param>
+    /// <param name="culture">The culture to validate</param>
+    /// <param name="segment">The segment to validate</param>
     /// <param name="exactAndWildcards">Validate using Exact + Wildcards flags</param>
     /// <param name="nonExactAndNoWildcards">Validate using non Exact + no Wildcard flags</param>
     /// <param name="exactAndNoWildcards">Validate using Exact + no Wildcard flags</param>
@@ -612,6 +616,7 @@ public class VariationTests
             propertyEditorCollection,
             dataTypeService,
             localizedTextService,
-            new ValueEditorCache());
+            new ValueEditorCache(),
+            Mock.Of<ICultureDictionary>());
     }
 }

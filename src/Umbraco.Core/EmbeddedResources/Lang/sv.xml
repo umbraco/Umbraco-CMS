@@ -4,9 +4,6 @@
     <name>The Umbraco community</name>
     <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
-  <area alias="apps">
-    <key alias="umbContent">Innehåll</key>
-  </area>
   <area alias="actions">
     <key alias="assigndomain">Hantera domännamn</key>
     <key alias="auditTrail">Hantera versioner</key>
@@ -14,13 +11,16 @@
     <key alias="changeDocType">Ändra dokumenttyp</key>
     <key alias="copy">Kopiera</key>
     <key alias="create">Skapa</key>
+    <key alias="export">Exportera</key>
     <key alias="createGroup">Skapa grupp</key>
     <key alias="createPackage">Skapa paket</key>
     <key alias="createblueprint">Skapa innehållsmall</key>
     <key alias="defaultValue">Standardvärde</key>
     <key alias="delete">Ta bort</key>
     <key alias="disable">Avaktivera</key>
+    <key alias="editSettings">Ändra inställningar</key>
     <key alias="emptyrecyclebin">Töm papperskorgen</key>
+    <key alias="enable">Aktivera</key>
     <key alias="exportDocumentType">Exportera dokumenttyp</key>
     <key alias="importdocumenttype">Importera dokumenttyp</key>
     <key alias="importPackage">Importera paket</key>
@@ -40,12 +40,23 @@
     <key alias="translate">Översätt</key>
     <key alias="unpublish">Avpublicera</key>
     <key alias="update">Uppdatera</key>
+    <key alias="setPermissions">Ändra rättigheter</key>
+    <key alias="unlock">Lås upp</key>
+    <key alias="createblueprint">Skapa innehållsmall</key>
+    <key alias="resendInvite">Skicka inbjudan igen</key>
+    <key alias="toggleHideUnavailable">Dölj otillgängliga alternativ</key>
+    <key alias="changeDataType">Ändra datatyp</key>
+    <key alias="editContent">Redigera innehåll</key>
   </area>
   <area alias="actionCategories">
     <key alias="administration">Administration</key>
     <key alias="structure">Struktur</key>
     <key alias="other">Övrigt</key>
     <key alias="content">Innehåll</key>
+  </area>
+  <area alias="apps">
+    <key alias="umbContent">Innehåll</key>
+    <key alias="umbInfo">Info</key>
   </area>
   <area alias="assignDomain">
     <key alias="addNew">Lägg till nytt domännamn</key>
@@ -66,6 +77,12 @@
     <key alias="setLanguage">Kultur</key>
     <key alias="setLanguageHelp"><![CDATA[Sätt kulturen för noder under aktuell nod,<br /> eller ärv kulturen från föregående noder. Appliceras även<br />
      på befintlig nod.]]></key>
+  </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media raderat</key>
+    <key alias="move">Media flyttat</key>
+    <key alias="copy">Media kopierat</key>
+    <key alias="save">Media sparat</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Visar för</key>
@@ -103,6 +120,25 @@
     <key alias="blockHasChanges">Du har gjort ändringar i detta innehåll. Är du säker på att du vill ta bort dem?</key>
     <key alias="confirmCancelBlockCreationHeadline">Ignorera skapandet</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Är du säker på att du vill avbryta skapandet?]]></key>
+    <key alias="areaValidationEntriesShort"><![CDATA[<strong>%0%</strong> måste vara närvarande åtminstone <strong>%2%</strong> time(s).]]></key>
+    <key alias="areaValidationEntriesExceed"><![CDATA[<strong>%0%</strong> måste maximalt finnas <strong>%3%</strong> time(s).]]></key>
+  </area>
+  <area alias="validation">
+    <key alias="invalidEmail">Ogiltig e-postadress</key>
+    <key alias="invalidNull">Värde får inte vara 'null'</key>
+    <key alias="invalidEmpty">Värde får inte vara tomt</key>
+    <key alias="invalidPattern">Värdet är ogiltigt och matchar inte det korrekta formatet</key>
+    <key alias="entriesShort"><![CDATA[Minsta %0% poster, kräver <strong>%1%</strong> mer.]]></key>
+    <key alias="entriesExceed"><![CDATA[Max %0% poster, <strong>%1%</strong> för många.]]></key>
+    <key alias="entriesAreasMismatch">Innehållskraven har ej godkänts på ett eller flera områden.</key>
+    <key alias="invalidMemberGroupName">Ogiltigt namn för medlemsgrupp</key>
+    <key alias="invalidUserGroupName">Ogiltigt namn för användargrupp</key>
+    <key alias="invalidToken">Ogiltig token</key>
+    <key alias="invalidUsername">Ogiltigt användarnamn</key>
+    <key alias="duplicateEmail">E-postadressen '%0%' är redan tagen</key>
+    <key alias="duplicateUserGroupName">Namnet '%0%' är redan taget</key>
+    <key alias="duplicateMemberGroupName">Namnet '%0%' är redan taget</key>
+    <key alias="duplicateUsername">Användarnamnet '%0%' är redan taget</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Skapa en ny innehållsmall för <em>%0%</em>]]></key>
@@ -164,6 +200,7 @@
     <key alias="clickToEdit">Klicka för att redigera detta objekt</key>
     <key alias="createBy">Skapad av</key>
     <key alias="createByDesc">Ursprunglig författare</key>
+    <key alias="updatedBy" version="7.0">Uppdaterad av</key>
     <key alias="createDate">Skapad</key>
     <key alias="createDateDesc">Datum/tid som dokumentet skapades</key>
     <key alias="documentType">Dokumenttyp</key>
@@ -211,7 +248,7 @@
     <key alias="publishedPendingChanges">Publicerad (osparade ändringar)</key>
     <key alias="listViewNoContent">Inga undernoder har lagts till</key>
     <key alias="noChanges">Inga ändringar har gjorts</key>
-    <key alias="notCreated">Ej skapad</key>    
+    <key alias="notCreated">Ej skapad</key>
   </area>
   <area alias="contentTypeEditor">
     <key alias="yesDelete">Ja, ta bort</key>
@@ -239,6 +276,60 @@
     <key alias="settingsWelcome">Välkommen</key>
     <key alias="memberIntro">Komma igång</key>
     <key alias="formsInstall">Installera Umbraco Forms</key>
+  </area>
+  <area alias="visuallyHiddenTexts">
+    <key alias="goBack">Backa</key>
+    <key alias="activeListLayout">Aktiv layout:</key>
+    <key alias="jumpTo">Hoppa till</key>
+    <key alias="group">grupp</key>
+    <key alias="passed">godkänd</key>
+    <key alias="warning">varning</key>
+    <key alias="failed">underkänd</key>
+    <key alias="suggestion">förslag</key>
+    <key alias="checkPassed">Godkänd</key>
+    <key alias="checkFailed">Underkänd</key>
+    <key alias="openBackofficeSearch">Öppna sökfunktion (backoffice)</key>
+    <key alias="openCloseBackofficeHelp">Öppna/stäng hjälpfunktion</key>
+    <key alias="openCloseBackofficeProfileOptions">Öppna/stäng personliga inställningar</key>
+    <key alias="assignDomainDescription">Redigera språk och värdnamn för %0%</key>
+    <key alias="createDescription">Skapa en ny nod under %0%</key>
+    <key alias="protectDescription">Ändra behörigheter för %0%</key>
+    <key alias="rightsDescription">Redigera behörigheter för %0%</key>
+    <key alias="sortDescription">Ändra sortering av %0%</key>
+    <key alias="createblueprintDescription">Skapa innehållsmall baserad på %0%</key>
+    <key alias="openContextMenu">Öppna kontextmeny för </key>
+    <key alias="currentLanguage">Aktuellt språk</key>
+    <key alias="switchLanguage">Byt språk till</key>
+    <key alias="createNewFolder">Skapa ny mapp</key>
+    <key alias="newPartialView">Del av vy</key>
+    <key alias="newPartialViewMacro">Del av vy (makro)</key>
+    <key alias="newMember">Medlem</key>
+    <key alias="newDataType">Datatyp</key>
+    <key alias="redirectDashboardSearchLabel">Sök bland omdirigeringar</key>
+    <key alias="userGroupSearchLabel">Sök bland användargrupper</key>
+    <key alias="userSearchLabel">Sök bland användare</key>
+    <key alias="createItem">Skapa post</key>
+    <key alias="create">Skapa</key>
+    <key alias="edit">Redigera</key>
+    <key alias="name">Namn</key>
+    <key alias="addNewRow">Lägg till ny rad</key>
+    <key alias="tabExpand">Visa fler alternativ</key>
+    <key alias="searchOverlayTitle">Sök i Umbraco backoffice</key>
+    <key alias="searchOverlayDescription">Sök efter innehåll, media etc i hela Umbraco.</key>
+    <key alias="searchInputDescription">När det finns automatförslag, använd pil upp eller ner, eller använd tabbtangenten. Använd enter för att välja.
+    </key>
+    <key alias="path">Sökväg:</key>
+    <key alias="foundIn">Hittad i</key>
+    <key alias="hasTranslation">Har översättning</key>
+    <key alias="noTranslation">Saknar översättning</key>
+    <key alias="dictionaryListCaption">Post i ordlista</key>
+    <key alias="contextMenuDescription">Välj ett av alternativen för att redigera noden.</key>
+    <key alias="contextDialogDescription">Utför %0% på noden %1%</key>
+    <key alias="addImageCaption">Lägg till bildtext</key>
+    <key alias="searchContentTree">Sök i innehållsträdet</key>
+    <key alias="maxAmount">Maximalt värde</key>
+    <key alias="expandChildItems">Visa underliggande noder för</key>
+    <key alias="openContextNode">Öppna kontext för</key>
   </area>
   <area alias="prompt">
     <key alias="stay">Stanna</key>
@@ -493,6 +584,29 @@
     <key alias="retrieve">Hämta</key>
     <key alias="selected">valda</key>
   </area>
+  <area alias="colors">
+    <key alias="blue">Blå</key>
+  </area>
+  <area alias="shortcuts">
+    <key alias="addGroup">Lägg till grupp</key>
+    <key alias="addProperty">Lägg till egenskap</key>
+    <key alias="addEditor">Lägg till redigerare</key>
+    <key alias="addTemplate">Lägg till mall</key>
+    <key alias="editDataType">Ändra datatyp</key>
+    <key alias="shortcut">Genvägar</key>
+    <key alias="showShortcuts">visa genvägar</key>
+    <key alias="toggleListView">Toggle list view</key>
+    <key alias="toggleAllowAsRoot">Toggle allow as root</key>
+    <key alias="commentLine">Kommentera bort/återställ rader</key>
+    <key alias="removeLine">Radera rad</key>
+    <key alias="copyLineUp">Kopiera upp rader</key>
+    <key alias="copyLineDown">Kopiera ned rader</key>
+    <key alias="moveLineUp">Flytta upp rader</key>
+    <key alias="moveLineDown">Flytta ned rader</key>
+    <key alias="generalHeader">Allmänt</key>
+    <key alias="editorHeader">Redigerare</key>
+    <key alias="addTab">Lägg till tabb</key>
+  </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Bakgrundsfärg</key>
     <key alias="bold">Fetstil</key>
@@ -570,13 +684,13 @@
   </area>
   <area alias="login">
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
-    <key alias="greeting0">Happy super Sunday</key>
-    <key alias="greeting1">Happy manic Monday</key>
-    <key alias="greeting2">Happy tremendous Tuesday</key>
-    <key alias="greeting3">Happy wonderful Wednesday</key>
-    <key alias="greeting4">Happy thunderous Thursday</key>
-    <key alias="greeting5">Happy friendly Friday</key>
-    <key alias="greeting6">Happy shiny Saturday</key>
+    <key alias="greeting0">Välkommen</key>
+    <key alias="greeting1">Välkommen</key>
+    <key alias="greeting2">Välkommen</key>
+    <key alias="greeting3">Välkommen</key>
+    <key alias="greeting4">Välkommen</key>
+    <key alias="greeting5">Välkommen</key>
+    <key alias="greeting6">Välkommen</key>
     <key alias="instruction">Logga in nedan</key>
     <key alias="signInWith">Logga in med</key>
     <key alias="timeout">Sessionen har nått sin maxgräns</key>
@@ -595,6 +709,11 @@
     <key alias="createNewMember">Skapa en ny medlem</key>
     <key alias="allMembers">Alla medlemmar</key>
     <key alias="memberGroupNoProperties">Medlemsgrupper har inga extra egenskaper för redigering.</key>
+    <key alias="duplicateMemberLogin">En medlem med detta inlogg existerar redan</key>
+    <key alias="memberHasGroup">Medlem finns redan i gruppen '%0%'</key>
+    <key alias="memberHasPassword">Medlem har redan ett lösenord</key>
+    <key alias="memberLockoutNotEnabled">Avstängning är inte aktiverat för denna medlem</key>
+    <key alias="memberNotInGroup">Medlem är inte med i gruppen '%0%'</key>
   </area>
   <area alias="moveOrCopy">
     <key alias="choose">Välj sida ovan...</key>
@@ -1021,9 +1140,45 @@
     <key alias="sortCreateDateAscending">Äldst</key>
     <key alias="sortCreateDateDescending">Nyast</key>
     <key alias="sortLastLoginDateDescending">Senaste login</key>
+    <key alias="duplicateLogin">En användare med detta inlogg existerar redan</key>
+    <key alias="passwordRequiresDigit">Lösenordet måste innehålla minst en siffra ('0'-'9')</key>
+    <key alias="passwordRequiresLower">Lösenordet måste innehålla minst en liten bokstav ('a'-'z')</key>
+    <key alias="passwordRequiresNonAlphanumeric">Lösenordet måste innehålla minst ett specialtecken</key>
+    <key alias="passwordRequiresUniqueChars">Lösenordet måste innehålla minst %0% unika tecken</key>
+    <key alias="passwordRequiresUpper">Lösenordet måste innehålla minst en stor bokstav ('A'-'Z')</key>
+    <key alias="passwordTooShort">Lösenordet måste vara minst %0% tecken</key>
+    <key alias="userHasPassword">Användaren har redan ett lösenord</key>
+    <key alias="userHasGroup">Användaren finns redan i gruppen '%0%'</key>
+    <key alias="userLockoutNotEnabled">Avstängning är inte aktiverat för denna användaren</key>
+    <key alias="userNotInGroup">Användaren finns inte i gruppen '%0%'</key>
   </area>
   <area alias="logViewer">
     <key alias="selectAllLogLevelFilters">Välj alla</key>
     <key alias="deselectAllLogLevelFilters">Avmarkera alla</key>
   </area>
+  <area alias="preview">
+    <key alias="endLabel">Avsluta</key>
+    <key alias="endTitle">Avsluta förhandsvisning</key>
+    <key alias="openWebsiteLabel">Förhandsvisa webbplats</key>
+    <key alias="openWebsiteTitle">Öppna webbplats i förhandsvisningsläge</key>
+    <key alias="returnToPreviewHeadline">Förhandsvisa webbplats?</key>
+    <key alias="returnToPreviewDescription">Du har avslutat förhandsvisningsläge, vill du aktivera det igen för att se senast sparade version av webbplatsen?</key>
+    <key alias="returnToPreviewAcceptButton">Förhandsvisa senaste version</key>
+    <key alias="returnToPreviewDeclineButton">Visa publicerad version</key>
+    <key alias="viewPublishedContentHeadline">Visa publicerad version?</key>
+    <key alias="viewPublishedContentDescription">Du visar webbplats i förhandsvisningsläge, vill du avsluta förhandsvisning och visa senaste publicerad version av webbplatsen?
+    </key>
+    <key alias="viewPublishedContentAcceptButton">Visa publicerad version</key>
+    <key alias="viewPublishedContentDeclineButton">Fortsätt förhandsvisning</key>
+  </area>
+  <area alias="permissions">
+    <key alias="FolderCreation">Skapa kataloger</key>
+    <key alias="FileWritingForPackages">Skriva filer till paket</key>
+    <key alias="FileWriting">Skriva filer</key>
+    <key alias="MediaFolderCreation">Skapa media-kataloger</key>
+  </area>
+  <area alias="analytics">
+    <key alias="minimalLevelDescription">Vi kommer endast att skicka ett anonymt Id så att vi informeras om att webbplatsens finns.</key>
+    <key alias="basicLevelDescription">Vi kommer att skicka ett anonymt Id, Umbraco-version och installerade paket</key>
+    </area>
 </language>

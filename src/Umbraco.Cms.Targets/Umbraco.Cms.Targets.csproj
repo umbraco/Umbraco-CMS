@@ -21,7 +21,7 @@
     <NoWarn>NU5100;NU5128</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Umbraco.JsonSchema.Extensions" Version="0.3.0" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" GeneratePathProperty="true" />
     <None Include="$(PkgUmbraco_JsonSchema_Extensions)\tasks\netstandard2.0\**" Pack="true" PackagePath="tasks\netstandard2.0" Visible="false" />
     <Content Include="$(_UmbracoCmsJsonSchemaReference)" PackagePath="" Visible="false" />
   </ItemGroup>
@@ -40,7 +40,7 @@
   <!-- Generate JSON schema on build (and before copying to project) -->
   <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build;CopyUmbracoJsonSchemaFiles" Condition="!Exists('$(_UmbracoCmsJsonSchemaReference)')">
     <Message Text="Generating $(_UmbracoCmsJsonSchemaReference) because it doesn't exist" Importance="high" />
-    <Exec WorkingDirectory="$(MSBuildThisFileDirectory)..\..\tools\Umbraco.JsonSchema" Command="dotnet run --configuration $(Configuration) -- --outputFile &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsJsonSchemaReference)&quot;" />
+    <Exec WorkingDirectory="$(MSBuildThisFileDirectory)..\..\tools\Umbraco.JsonSchema" Command="dotnet run --configuration $(Configuration) -- --outputFile &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsJsonSchemaReference)&quot;" Timeout="600000" />
   </Target>
 
   <!-- Remove generated JSON schema on clean -->

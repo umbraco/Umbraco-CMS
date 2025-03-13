@@ -1,17 +1,21 @@
 <div>
-
     <div class="__label">{{vm.area.alias}}</div>
 
     <div class="umb-block-grid__area--actions">
-
-        <button type="button" class="btn-reset umb-outline action --edit" localize="title" title="blockEditor_configureArea"
+        <button type="button"
+                class="btn-reset umb-outline action --edit"
+                localize="title"
+                title="@blockEditor_configureArea"
                 ng-click="vm.onEditClick($event);">
             <umb-icon icon="icon-edit" class="icon"></umb-icon>
             <span class="sr-only">
                 <localize key="blockEditor_configureArea">Edit</localize>
             </span>
         </button>
-        <button type="button" class="btn-reset umb-outline action --delete" localize="title" title="blockEditor_deleteArea"
+        <button type="button"
+                class="btn-reset umb-outline action --delete"
+                localize="title"
+                title="@blockEditor_deleteArea"
                 ng-click="vm.onDeleteClick($event);">
             <umb-icon icon="icon-trash" class="icon"></umb-icon>
             <span class="sr-only">
@@ -19,10 +23,14 @@
             </span>
         </button>
     </div>
-
-    <button type="button" class="btn-reset umb-block-grid-area-editor__scale-handler umb-outline" ng-mousedown="vm.scaleHandlerMouseDown($event)" ng-keyup="vm.scaleHandlerKeyUp($event)">
+    
+    <button type="button"
+            class="btn-reset umb-block-grid-area-editor__scale-handler umb-outline"
+            ng-mousedown="vm.scaleHandlerMouseDown($event)"
+            ng-keyup="vm.scaleHandlerKeyUp($event)">
     </button>
+    
     <div class="umb-block-grid-area-editor__scale-label">
         {{vm.area.columnSpan}} x {{vm.area.rowSpan}}
     </div>
-<div>
+</div>

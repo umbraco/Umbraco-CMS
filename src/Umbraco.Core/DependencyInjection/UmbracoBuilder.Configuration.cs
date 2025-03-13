@@ -50,6 +50,7 @@ public static partial class UmbracoBuilderExtensions
         builder
             .AddUmbracoOptions<ModelsBuilderSettings>()
             .AddUmbracoOptions<ActiveDirectorySettings>()
+            .AddUmbracoOptions<IndexCreatorSettings>()
             .AddUmbracoOptions<MarketplaceSettings>()
             .AddUmbracoOptions<ContentSettings>()
             .AddUmbracoOptions<DeliveryApiSettings>()
@@ -65,7 +66,7 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<HealthChecksSettings>()
             .AddUmbracoOptions<HostingSettings>()
             .AddUmbracoOptions<ImagingSettings>()
-            .AddUmbracoOptions<IndexCreatorSettings>()
+            .AddUmbracoOptions<IndexingSettings>()
             .AddUmbracoOptions<KeepAliveSettings>()
             .AddUmbracoOptions<LoggingSettings>()
             .AddUmbracoOptions<MemberPasswordConfigurationSettings>()
@@ -86,7 +87,8 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<PackageMigrationSettings>()
             .AddUmbracoOptions<ContentDashboardSettings>()
             .AddUmbracoOptions<HelpPageSettings>()
-            .AddUmbracoOptions<DataTypesSettings>();
+            .AddUmbracoOptions<DataTypesSettings>()
+            .AddUmbracoOptions<WebhookSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();

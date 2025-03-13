@@ -320,6 +320,8 @@ public static class ContentExtensions
     ///     Stores a file.
     /// </summary>
     /// <param name="content"><see cref="IContentBase" />A content item.</param>
+    /// <param name="mediaFileManager">The media file manager.</param>
+    /// <param name="contentTypeBaseServiceProvider">The content type base service provider.</param>
     /// <param name="propertyTypeAlias">The property alias.</param>
     /// <param name="filename">The name of the file.</param>
     /// <param name="filestream">A stream containing the file data.</param>

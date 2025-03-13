@@ -124,9 +124,9 @@ namespace Umbraco.Extensions
         /// Outputs a .txt format log at /App_Data/Logs/
         /// </summary>
         /// <param name="logConfig">A Serilog LoggerConfiguration</param>
-        /// <param name="loggingConfiguration"></param>
+        /// <param name="hostingEnvironment"></param>
         /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
-        /// <param name="retainedFileCount">The number of days to keep log files. Default is set to null which means all logs are kept</param>
+        ///
         [Obsolete("Will be removed in Umbraco 13.")]
         public static LoggerConfiguration OutputDefaultTextFile(
             this LoggerConfiguration logConfig,

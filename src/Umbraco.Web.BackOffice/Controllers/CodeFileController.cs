@@ -633,7 +633,7 @@ public class CodeFileController : BackOfficeNotificationsController
     /// <param name="data">The style sheet data</param>
     /// <returns>The style sheet combined from the CSS and the rules</returns>
     /// <remarks>
-    ///     Any "umbraco style rules" in the CSS will be removed and replaced with the rules passed in <see cref="data" />
+    ///     Any "umbraco style rules" in the CSS will be removed and replaced with the rules passed in <paramref name="data"/>
     /// </remarks>
     public string? PostInterpolateStylesheetRules(StylesheetData data)
     {

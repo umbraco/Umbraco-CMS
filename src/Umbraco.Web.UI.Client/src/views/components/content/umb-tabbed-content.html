@@ -1,24 +1,27 @@
 <div>
     <ng-form name="tabbedContentForm">
 
+        <!-- TABS GO HERE -->
         <umb-editor-tab-bar ng-if="tabs.length > 0">
             <umb-tabs-nav tabs="tabs" on-tab-change="setActiveTab(tab)"></umb-tabs-nav>
         </umb-editor-tab-bar>
 
+        <!-- TABS CONTENT GO HERE -->
         <umb-box ng-repeat="tab in tabs track by tab.key" ng-show="tab.alias === activeTabAlias && tab.properties.length > 0">
-            <umb-box-content data-element="tab-content-{{tab.alias}}">
+            <umb-box-content role="tabpanel" id="tabpanel-{{tab.alias}}" aria-labelledby="tab-{{tab.alias}}" data-element="tab-content-{{tab.alias}}">
                 <umb-property
                     data-element="property-{{property.alias}}"
                     ng-repeat="property in tab.properties track by property.alias"
                     property="property"
                     node="contentNodeModel"
                     show-inherit="contentNodeModel.variants.length > 1 && property.variation !== 'CultureAndSegment'"
-                    inherits-from="defaultVariant.displayName">
+                    inherits-from="defaultVariant.displayName"
+                    preview="isPreview(property)">
 
                     <umb-property-editor
                         model="property"
                         node="contentNodeModel"
-                        preview="((property.readonly || !allowUpdate) && !property.supportsReadOnly) || (propertyEditorDisabled(property) && allowUpdate)"
+                        preview="isPreview(property)"
                         allow-unlock="!property.readonly && allowUpdate && allowEditInvariantFromNonDefault"
                         on-unlock="unlockInvariantValue(property)"
                         ng-attr-readonly="{{property.readonly || !allowUpdate || undefined}}">
@@ -47,12 +50,13 @@
                     property="property"
                     node="contentNodeModel"
                     show-inherit="contentNodeModel.variants.length > 1 && property.variation !== 'CultureAndSegment'"
-                    inherits-from="defaultVariant.displayName">
+                    inherits-from="defaultVariant.displayName"
+                    preview="isPreview(property)">
 
                     <umb-property-editor
                         model="property"
                         node="contentNodeModel"
-                        preview="((property.readonly || !allowUpdate) && !property.supportsReadOnly) || (propertyEditorDisabled(property) && allowUpdate)"
+                        preview="isPreview(property)"
                         allow-unlock="!property.readonly && allowUpdate && allowEditInvariantFromNonDefault"
                         on-unlock="unlockInvariantValue(property)"
                         ng-attr-readonly="{{property.readonly || !allowUpdate || undefined}}">

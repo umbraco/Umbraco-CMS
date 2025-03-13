@@ -88,26 +88,27 @@
 
                 // If an infinite editor is being closed then we reset the focus to the element that triggered the the overlay
                 if(closingEditor){
-
                     // If there is only one editor open, search for the "editor-info" inside it and set focus on it
                     // This is relevant when a property editor has been selected and the editor where we selected it from
                     // is closed taking us back to the first layer
                     // Otherwise set it to the last element in the lastKnownFocusedElements array
-                    if(infiniteEditors && infiniteEditors.length === 1){
-                        var editorInfo = infiniteEditors[0].querySelector('.editor-info');
-                        if(infiniteEditors && infiniteEditors.length === 1 && editorInfo !== null) {
-                            lastKnownElement = editorInfo;
 
-                            // Clear the array
-                            clearLastKnownFocusedElements();
-                        }
+                    var editorInfo = (infiniteEditors && infiniteEditors.length === 1)
+                      ? infiniteEditors[0].querySelector('.editor-info')
+                      : null;
+
+                    if(editorInfo !== null){
+                      lastKnownElement = editorInfo;
+
+                      // Clear the array
+                      clearLastKnownFocusedElements();
                     }
-                    else {
-                        var lastItemIndex = $rootScope.lastKnownFocusableElements.length - 1;
-                        lastKnownElement = $rootScope.lastKnownFocusableElements[lastItemIndex];
+                    else{
+                      var lastIndex = $rootScope.lastKnownFocusableElements.length - 1;
+                      lastKnownElement = $rootScope.lastKnownFocusableElements[lastIndex];
 
-                        // Remove the last item from the array so we always set the correct lastKnowFocus for each layer
-                        $rootScope.lastKnownFocusableElements.splice(lastItemIndex, 1);
+                      // Remove the last item from the array so we always set the correct lastKnowFocus for each layer
+                      $rootScope.lastKnownFocusableElements.splice(lastIndex, 1);
                     }
 
                     // Update the lastknowelement variable here
@@ -124,7 +125,8 @@
                 }
                 else if(defaultFocusedElement === null ){
                     // If the first focusable elements are either items from the umb-sub-views-nav menu or the umb-button-ellipsis we most likely want to start the focus on the second item
-                    var avoidStartElm = focusableElements.findIndex(elm => elm.classList.contains('umb-button-ellipsis') || elm.classList.contains('umb-sub-views-nav-item__action') || elm.classList.contains('umb-tab-button'));
+                    // We don't want to focus the second button if it's in a tab otherwise the second tab is highlighted as well as the first tab
+                    var avoidStartElm = focusableElements.findIndex(elm => elm.classList.contains('umb-button-ellipsis') || elm.classList.contains('umb-sub-views-nav-item__action') || (elm.classList.contains('umb-tab-button') && !elm.parentElement.classList.contains('umb-tab')));
 
                     if(avoidStartElm === 0) {
                         focusableElements[1].focus();

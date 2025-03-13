@@ -43,7 +43,7 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
 
     return blockGridType;
   }
-  
+
   test('can create empty block grid editor', async ({page, umbracoApi, umbracoUi}) => {
     await umbracoUi.goToSection(ConstantHelper.sections.settings);
 
@@ -261,7 +261,7 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
 
   test('can create a block grid datatype with multiple groups and multiple element in each group', async ({page, umbracoApi, umbracoUi},testInfo) => {
     await testInfo.slow();
-    
+
     const GroupOne = 'GroupOne';
     const elementNameFourth = 'FourthElement';
     const elementFourthAlias = AliasHelper.toAlias(elementNameFourth);
@@ -362,7 +362,7 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
     await expect(await umbracoApi.dataTypes.exists(blockGridName)).toBe(true);
     await umbracoUi.doesDataTypeExist(blockGridName);
 
-    // Clean 
+    // Clean
     await umbracoApi.documentTypes.ensureNameNotExists(elementName);
     await umbracoApi.documentTypes.ensureNameNotExists(elementNameTwo);
     await umbracoApi.documentTypes.ensureNameNotExists(elementNameThree);
@@ -552,6 +552,9 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
     await umbracoUi.clickDataElementByElementName(ConstantHelper.actions.delete);
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.delete));
 
+    // We need a wait to make sure the block grid editor is deleted
+    await page.waitForTimeout(1000);
+
     // Assert
     // Checks if the block grid editor still exists
     await umbracoUi.goToSection(ConstantHelper.sections.settings);
@@ -586,7 +589,8 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
     const dragFrom = await page.locator('.umb-block-card-group').nth(0).locator('[data-content-element-type-key="' + element['key'] + '"]');
     const dragTo = await page.locator('[key="blockEditor_addBlockType"]').nth(1);
     await umbracoUi.dragAndDrop(dragFrom, dragTo, 0, 0, 15);
-    
+// We need a wait to make sure the element is moved
+    await page.waitForTimeout(2000);
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
     // Assert
@@ -626,7 +630,7 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
     const dragFrom = await page.locator('.umb-block-card-group >> [icon="icon-navigation"]').nth(0);
     const dragTo = await page.locator('[key="blockEditor_addBlockType"]').nth(2);
     await umbracoUi.dragAndDrop(dragFrom, dragTo, 0, 0, 15);
-    
+
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
     // Assert
@@ -642,7 +646,7 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
 
   test('can move a group with elements in a block grid editor', async ({page, umbracoApi, umbracoUi}, testInfo) => {
     await testInfo.slow();
-    
+
     const GroupMove = 'GroupMove';
     const GroupNotMoving = 'GroupNotMoving';
 
@@ -685,9 +689,9 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
     const dragFrom = await page.locator('.umb-block-card-group >> [icon="icon-navigation"]').nth(0);
     const dragTo = await page.locator('[key="blockEditor_addBlockType"]').nth(2);
     await umbracoUi.dragAndDrop(dragFrom, dragTo, 20, 0, 15);
-    
+
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
-    
+
     // Assert
     await umbracoUi.isSuccessNotificationVisible();
     // Checks if the elements were moved with their group

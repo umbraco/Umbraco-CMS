@@ -35,6 +35,7 @@ public class TextBuilder : Builder
     ///     Initializes a new instance of the <see cref="TextBuilder" /> class with a list of models to generate
     ///     and the result of code parsing.
     /// </summary>
+    /// <param name="config">The models builder configuration.</param>
     /// <param name="typeModels">The list of models to generate.</param>
     public TextBuilder(ModelsBuilderSettings config, IList<TypeModel> typeModels)
         : base(config, typeModels)
@@ -50,7 +51,15 @@ public class TextBuilder : Builder
     ///     Outputs an "auto-generated" header to a string builder.
     /// </summary>
     /// <param name="sb">The string builder.</param>
-    public static void WriteHeader(StringBuilder sb) => TextHeaderWriter.WriteHeader(sb);
+    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 17.")]
+    public static void WriteHeader(StringBuilder sb) => WriteHeader(sb, true);
+
+    /// <summary>
+    ///     Outputs an "auto-generated" header to a string builder.
+    /// </summary>
+    /// <param name="sb">The string builder.</param>
+    /// <param name="includeVersion">Flag indicating whether the tool version number should be included in the output.</param>
+    public static void WriteHeader(StringBuilder sb, bool includeVersion) => TextHeaderWriter.WriteHeader(sb, includeVersion);
 
     /// <summary>
     ///     Outputs a generated model to a string builder.
@@ -59,7 +68,7 @@ public class TextBuilder : Builder
     /// <param name="typeModel">The model to generate.</param>
     public void Generate(StringBuilder sb, TypeModel typeModel)
     {
-        WriteHeader(sb);
+        WriteHeader(sb, Config.IncludeVersionNumberInGeneratedModels);
 
         foreach (var t in TypesUsing)
         {
@@ -82,7 +91,7 @@ public class TextBuilder : Builder
     /// <param name="typeModels">The models to generate.</param>
     public void Generate(StringBuilder sb, IEnumerable<TypeModel> typeModels)
     {
-        WriteHeader(sb);
+        WriteHeader(sb, Config.IncludeVersionNumberInGeneratedModels);
 
         foreach (var t in TypesUsing)
         {
@@ -142,14 +151,17 @@ public class TextBuilder : Builder
     //
     // note that the blog post above clearly states that "Nor should it be applied at the type level if the type being generated is a partial class."
     // and since our models are partial classes, we have to apply the attribute against the individual members, not the class itself.
-    private static void WriteGeneratedCodeAttribute(StringBuilder sb, string tabs) => sb.AppendFormat(
+    private void WriteGeneratedCodeAttribute(StringBuilder sb, string tabs) => sb.AppendFormat(
         "{0}[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"Umbraco.ModelsBuilder.Embedded\", \"{1}\")]\n",
-        tabs, ApiVersion.Current.Version);
+        tabs,
+        Config.IncludeVersionNumberInGeneratedModels ? ApiVersion.Current.Version : null);
 
     // writes an attribute that specifies that an output may be null.
     // (useful for consuming projects with nullable reference types enabled)
     private static void WriteMaybeNullAttribute(StringBuilder sb, string tabs, bool isReturn = false) =>
-        sb.AppendFormat("{0}[{1}global::System.Diagnostics.CodeAnalysis.MaybeNull]\n", tabs,
+        sb.AppendFormat(
+            "{0}[{1}global::System.Diagnostics.CodeAnalysis.MaybeNull]\n",
+            tabs,
             isReturn ? "return: " : string.Empty);
 
     private static string MixinStaticGetterName(string clrName) => string.Format("Get{0}", clrName);

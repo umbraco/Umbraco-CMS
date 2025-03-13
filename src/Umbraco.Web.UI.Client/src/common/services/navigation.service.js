@@ -14,8 +14,8 @@
  *
  */
 function navigationService($routeParams, $location, $q, $injector, eventsService, umbModelMapper, treeService, appState, backdropService) {
-
     //the promise that will be resolved when the navigation is ready
+    var activeElement = undefined;
     var navReadyPromise = $q.defer();
 
     //the main tree's API reference, this is acquired when the tree has initialized
@@ -82,7 +82,6 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                 if (appState.getGlobalState("isTablet") === true) {
                     appState.setGlobalState("showNavigation", false);
                 }
-
                 break;
         }
     }
@@ -134,7 +133,18 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                 backdropService.close();
                 leftColumn.classList.remove(aboveClass);
             }
+
+            returnFocusToTriggerElement();
         }
+    }
+
+    function returnFocusToTriggerElement() {
+        if(!activeElement) return;
+
+        const elementToFocus = activeElement.querySelector(".umb-tree-item__inner .umb-button-ellipsis");
+        document.body.classList.add("tabbing-active");
+        elementToFocus.style.backgroundColor = "hsla(0,0%,100%,.8)";
+        elementToFocus.focus();
     }
 
     function showBackdrop() {
@@ -680,9 +690,12 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             if (appState.getMenuState("allowHideMenuDialog") === false) {
                 return;
             }
+
             if (showMenu) {
                 this.showMenu({ skipDefault: true, node: appState.getMenuState("currentNode") });
             } else {
+                activeElement = document.querySelector("#tree .active");
+
                 closeBackdrop();
                 setMode("default");
             }

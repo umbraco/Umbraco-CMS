@@ -15,7 +15,7 @@ public interface IEmbedProvider
     /// <summary>
     ///     A collection of querystring request parameters to append to the API URL
     /// </summary>
-    /// <example>?key=value&key2=value2</example>
+    /// <example>?key=value&amp;key2=value2</example>
     Dictionary<string, string> RequestParams { get; }
 
     string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);

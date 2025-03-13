@@ -194,7 +194,7 @@ public static class StringExtensions
     /// <returns></returns>
     /// <remarks>
     ///     This methods ensures that the resulting URL is structured correctly, that there's only one '?' and that things are
-    ///     delimited properly with '&'
+    ///     delimited properly with '&amp;'
     /// </remarks>
     public static string AppendQueryStringToUrl(this string url, params string[] queryStrings)
     {
@@ -419,7 +419,7 @@ public static class StringExtensions
     ///     returns <see langword="false" />.
     /// </returns>
     public static bool IsNullOrWhiteSpace([NotNullWhen(false)] this string? value) => string.IsNullOrWhiteSpace(value);
-    
+
     [return: NotNullIfNotNull("defaultValue")]
     public static string? IfNullOrWhiteSpace(this string? str, string? defaultValue) =>
         str.IsNullOrWhiteSpace() ? defaultValue : str;
@@ -1557,4 +1557,9 @@ public static class StringExtensions
 
         yield return sb.ToString();
     }
+
+    // having benchmarked various solutions (incl. for/foreach, split and LINQ based ones),
+    // this is by far the fastest way to find string needles in a string haystack
+    public static int CountOccurrences(this string haystack, string needle)
+        => haystack.Length - haystack.Replace(needle, string.Empty).Length;
 }

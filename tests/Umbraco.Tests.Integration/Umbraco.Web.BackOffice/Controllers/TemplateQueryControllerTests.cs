@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.TemplateQuery;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Umbraco.Cms.Web.BackOffice.Controllers;
@@ -19,6 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers;
 public class TemplateQueryControllerTests : UmbracoTestServerTestBase
 {
     [Test]
+    [LongRunning]
     public async Task GetContentTypes__Ensure_camel_case()
     {
         var url = PrepareApiControllerUrl<TemplateQueryController>(x => x.GetContentTypes());

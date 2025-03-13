@@ -22,7 +22,6 @@ public interface IBackOfficeExternalLoginProviders
     ///     Returns the authentication type for the last registered external login (oauth) provider that specifies an
     ///     auto-login redirect option
     /// </summary>
-    /// <param name="manager"></param>
     /// <returns></returns>
     string? GetAutoLoginProvider();
 

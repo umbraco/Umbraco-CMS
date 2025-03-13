@@ -14,6 +14,7 @@ public class NuCacheSettings
     internal const string StaticNuCacheSerializerType = "MessagePack";
     internal const int StaticSqlPageSize = 1000;
     internal const int StaticKitBatchSize = 1;
+    internal const bool StaticUsePagedSqlQuery = true;
 
     /// <summary>
     ///     Gets or sets a value defining the BTree block size.
@@ -39,4 +40,7 @@ public class NuCacheSettings
     public int KitBatchSize { get; set; } = StaticKitBatchSize;
 
     public bool UnPublishedContentCompression { get; set; } = false;
+
+    [DefaultValue(StaticUsePagedSqlQuery)]
+    public bool UsePagedSqlQuery { get; set; } = true;
 }

@@ -17,12 +17,14 @@ public class ConfigureUmbracoDeliveryApiSwaggerGenOptions: IConfigureOptions<Swa
             {
                 Title = DeliveryApiConfiguration.ApiTitle,
                 Version = "Latest",
-                Description = $"You can find out more about the {DeliveryApiConfiguration.ApiTitle} in [the documentation]({DeliveryApiConfiguration.ApiDocumentationArticleLink})."
+                Description = $"You can find out more about the {DeliveryApiConfiguration.ApiTitle} in [the documentation]({DeliveryApiConfiguration.ApiDocumentationContentArticleLink})."
             });
 
         swaggerGenOptions.DocumentFilter<MimeTypeDocumentFilter>(DeliveryApiConfiguration.ApiName);
 
-        swaggerGenOptions.OperationFilter<SwaggerDocumentationFilter>();
-        swaggerGenOptions.ParameterFilter<SwaggerDocumentationFilter>();
+        swaggerGenOptions.OperationFilter<SwaggerContentDocumentationFilter>();
+        swaggerGenOptions.OperationFilter<SwaggerMediaDocumentationFilter>();
+        swaggerGenOptions.ParameterFilter<SwaggerContentDocumentationFilter>();
+        swaggerGenOptions.ParameterFilter<SwaggerMediaDocumentationFilter>();
     }
 }

@@ -7,6 +7,7 @@ using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -99,7 +100,7 @@ public class LoadTestController : Controller
     private readonly IDataTypeService _dataTypeService;
     private readonly IFileService _fileService;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
-    private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly IHostEnvironment _hostEnvironment;
     private readonly IShortStringHelper _shortStringHelper;
 
     public LoadTestController(
@@ -108,7 +109,7 @@ public class LoadTestController : Controller
         IDataTypeService dataTypeService,
         IFileService fileService,
         IShortStringHelper shortStringHelper,
-        IHostingEnvironment hostingEnvironment,
+        IHostEnvironment hostEnvironment,
         IHostApplicationLifetime hostApplicationLifetime)
     {
         _contentTypeService = contentTypeService;
@@ -116,7 +117,7 @@ public class LoadTestController : Controller
         _dataTypeService = dataTypeService;
         _fileService = fileService;
         _shortStringHelper = shortStringHelper;
-        _hostingEnvironment = hostingEnvironment;
+        _hostEnvironment = hostEnvironment;
         _hostApplicationLifetime = hostApplicationLifetime;
     }
 
@@ -321,7 +322,7 @@ public class LoadTestController : Controller
     public IActionResult ColdBootRestart()
     {
         Directory.Delete(
-            _hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.TempData, "DistCache")),
+            _hostEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.TempData, "DistCache")),
             true);
 
         DoRestart();

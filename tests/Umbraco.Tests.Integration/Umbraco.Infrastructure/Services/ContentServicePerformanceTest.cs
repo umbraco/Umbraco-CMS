@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -47,6 +48,7 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Retrieving_All_Content_In_Site()
     {
         // NOTE: Doing this the old 1 by 1 way and based on the results of the ContentServicePerformanceTest.Retrieving_All_Content_In_Site
@@ -112,6 +114,7 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Creating_100_Items()
     {
         // Arrange
@@ -120,7 +123,7 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
 
         // Act
         var watch = Stopwatch.StartNew();
-        ContentService.Save(pages, 0);
+        ContentService.Save(pages, -1);
         watch.Stop();
         var elapsed = watch.ElapsedMilliseconds;
 
@@ -131,6 +134,7 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Creating_1000_Items()
     {
         // Arrange
@@ -139,7 +143,7 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
 
         // Act
         var watch = Stopwatch.StartNew();
-        ContentService.Save(pages, 0);
+        ContentService.Save(pages, -1);
         watch.Stop();
         var elapsed = watch.ElapsedMilliseconds;
 
@@ -150,12 +154,13 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Getting_100_Uncached_Items()
     {
         // Arrange
         var contentType = ContentTypeService.Get(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
-        ContentService.Save(pages, 0);
+        ContentService.Save(pages, -1);
 
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -177,12 +182,13 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Getting_1000_Uncached_Items()
     {
         // Arrange
         var contentType = ContentTypeService.Get(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
-        ContentService.Save(pages, 0);
+        ContentService.Save(pages, -1);
 
         using (var scope = ScopeProvider.CreateScope())
         {
@@ -203,12 +209,13 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Getting_100_Cached_Items()
     {
         // Arrange
         var contentType = ContentTypeService.Get(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
-        ContentService.Save(pages, 0);
+        ContentService.Save(pages, -1);
 
         using (var scope = ScopeProvider.CreateScope())
         {
@@ -232,12 +239,13 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Getting_1000_Cached_Items()
     {
         // Arrange
         var contentType = ContentTypeService.Get(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
-        ContentService.Save(pages, 0);
+        ContentService.Save(pages, -1);
 
         using (var scope = ScopeProvider.CreateScope())
         {

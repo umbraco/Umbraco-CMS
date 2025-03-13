@@ -10,7 +10,8 @@ public abstract class QueryOptionBase
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IRequestRoutingService _requestRoutingService;
 
-    public QueryOptionBase(IPublishedSnapshotAccessor publishedSnapshotAccessor,
+    public QueryOptionBase(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IRequestRoutingService requestRoutingService)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;

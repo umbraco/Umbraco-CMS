@@ -317,13 +317,7 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeW
 
         if (_emailSender.CanSendRequiredEmail())
         {
-            menu.Items.Add(new MenuItem("notify", LocalizedTextService)
-            {
-                Icon = "icon-megaphone",
-                SeparatorBefore = true,
-                OpensDialog = true,
-                UseLegacyIcon = false
-            });
+            AddActionNode<ActionNotify>(item, menu, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
         }
 
         if ((item is DocumentEntitySlim documentEntity && documentEntity.IsContainer) == false)

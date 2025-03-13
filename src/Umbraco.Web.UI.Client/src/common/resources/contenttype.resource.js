@@ -323,7 +323,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                         "contentTypeApiBaseUrl",
                         "DeleteContainer",
                         [{ id: id }])),
-                'Failed to delete content type contaier');
+                'Failed to delete content type container');
         },
 
         /**

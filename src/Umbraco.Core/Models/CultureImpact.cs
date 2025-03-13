@@ -182,7 +182,6 @@ public sealed class CultureImpact
     /// </summary>
     /// <param name="culture">The culture code.</param>
     /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
-    /// <param name="allowEditInvariantFromNonDefault">A value indicating if publishing invariant properties from non-default language.</param>
     [Obsolete("Use ICultureImpactService instead.")]
     public static CultureImpact Explicit(string? culture, bool isDefault)
     {
@@ -211,7 +210,6 @@ public sealed class CultureImpact
     /// <param name="culture">The culture code.</param>
     /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
     /// <param name="content">The content item.</param>
-    /// <param name="allowEditInvariantFromNonDefault">A value indicating if publishing invariant properties from non-default language.</param>
     /// <remarks>
     ///     <para>Validates that the culture is compatible with the variation.</para>
     /// </remarks>

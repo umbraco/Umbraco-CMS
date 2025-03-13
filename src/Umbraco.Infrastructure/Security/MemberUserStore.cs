@@ -96,7 +96,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 throw new ArgumentNullException(nameof(user));
             }
 
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             // create member
             IMember memberEntity = _memberService.CreateMember(
@@ -110,7 +110,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             UpdateMemberProperties(memberEntity, user, out bool _);
 
             // create the member
-            _memberService.Save(memberEntity);
+            _memberService.Save(memberEntity, PublishNotificationSaveOptions.Saving);
 
             // We need to add roles now that the member has an Id. It do not work implicit in UpdateMemberProperties
             _memberService.AssignRoles(
@@ -150,6 +150,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                         x.Value)));
             }
 
+            scope.Complete();
             return Task.FromResult(IdentityResult.Success);
         }
         catch (Exception ex)
@@ -179,7 +180,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
             }
 
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             IMember? found = _memberService.GetById(asInt);
             if (found != null)
@@ -220,6 +221,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 }
             }
 
+            scope.Complete();
             return Task.FromResult(IdentityResult.Success);
         }
         catch (Exception ex)
@@ -319,9 +321,20 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             throw new ArgumentNullException(nameof(userId));
         }
 
-        IMember? user = Guid.TryParse(userId, out Guid key)
-            ? _memberService.GetByKey(key)
-            : _memberService.GetById(UserIdToInt(userId));
+        // With external member providers we can get a ID here that's not a GUID or integer.
+        // We can't retrieve the member, but if that's the case we shouldn't throw an exception,
+        // just return null in the same way as when the member isn't found.
+        // See: https://github.com/umbraco/Umbraco-CMS/issues/14713
+        IMember? user = null;
+        if (Guid.TryParse(userId, out Guid key))
+        {
+            user = _memberService.GetByKey(key);
+        }
+        else if (TryUserIdToInt(userId, out int id))
+        {
+            user = _memberService.GetById(id);
+        }
+
         if (user == null)
         {
             return Task.FromResult((MemberIdentityUser)null!)!;

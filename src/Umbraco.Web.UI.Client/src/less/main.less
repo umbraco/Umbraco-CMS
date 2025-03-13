@@ -432,22 +432,21 @@ table thead button:focus{
 
 /* UI interactions */
 
-.ui-sortable-handle {
-    cursor: move;
+.ui-sortable:not(.ui-sortable-disabled) .ui-sortable-handle {
+  cursor: move;
 }
 
-.umb-table tbody.ui-sortable tr
-{
-    cursor:pointer;
+.umb-table tbody.ui-sortable tr {
+  cursor: pointer;
 }
 
 .umb-table tbody.ui-sortable tr.ui-sortable-helper {
   background-color: @sortableHelperBg;
   border: none;
 }
-.umb-table tbody.ui-sortable tr.ui-sortable-helper td
- {
-    border:none;
+
+.umb-table tbody.ui-sortable tr.ui-sortable-helper td {
+  border: none;
 }
 
 .umb-table tbody.ui-sortable tr.ui-sortable-placeholder {

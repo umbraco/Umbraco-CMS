@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
@@ -19,9 +20,9 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IPublishedValueFallback _publishedValueFallback;
-    private readonly IApiMediaBuilder _apiMediaBuilder;
+    private readonly IApiMediaWithCropsBuilder _apiMediaWithCropsBuilder;
 
-    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
+    [Obsolete($"Use constructor that takes {nameof(IApiMediaWithCropsBuilder)}, scheduled for removal in V14")]
     public MediaPickerWithCropsValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedUrlProvider publishedUrlProvider,
@@ -32,8 +33,36 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
             publishedUrlProvider,
             publishedValueFallback,
             jsonSerializer,
-            StaticServiceProvider.Instance.GetRequiredService<IApiMediaBuilder>()
+            StaticServiceProvider.Instance.GetRequiredService<IApiMediaWithCropsBuilder>()
         )
+    {
+    }
+
+    [Obsolete($"Use constructor that takes {nameof(IApiMediaWithCropsBuilder)}, scheduled for removal in V14")]
+    public MediaPickerWithCropsValueConverter(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IPublishedUrlProvider publishedUrlProvider,
+        IPublishedValueFallback publishedValueFallback,
+        IJsonSerializer jsonSerializer,
+        IApiMediaBuilder apiMediaBuilder)
+        : this(
+            publishedSnapshotAccessor,
+            publishedUrlProvider,
+            publishedValueFallback,
+            jsonSerializer,
+            StaticServiceProvider.Instance.GetRequiredService<IApiMediaWithCropsBuilder>())
+    {
+    }
+
+    [Obsolete($"Use constructor that takes {nameof(IApiMediaWithCropsBuilder)} and no {nameof(IApiMediaBuilder)}, scheduled for removal in V14")]
+    public MediaPickerWithCropsValueConverter(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IPublishedUrlProvider publishedUrlProvider,
+        IPublishedValueFallback publishedValueFallback,
+        IJsonSerializer jsonSerializer,
+        IApiMediaBuilder apiMediaBuilder,
+        IApiMediaWithCropsBuilder apiMediaWithCropsBuilder)
+        : this(publishedSnapshotAccessor, publishedUrlProvider, publishedValueFallback, jsonSerializer, apiMediaWithCropsBuilder)
     {
     }
 
@@ -42,14 +71,14 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
         IPublishedUrlProvider publishedUrlProvider,
         IPublishedValueFallback publishedValueFallback,
         IJsonSerializer jsonSerializer,
-        IApiMediaBuilder apiMediaBuilder)
+        IApiMediaWithCropsBuilder apiMediaWithCropsBuilder)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         _publishedUrlProvider = publishedUrlProvider;
         _publishedValueFallback = publishedValueFallback;
         _jsonSerializer = jsonSerializer;
-        _apiMediaBuilder = apiMediaBuilder;
+        _apiMediaWithCropsBuilder = apiMediaWithCropsBuilder;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -122,26 +151,15 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
 
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
 
-    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<ApiMediaWithCrops>);
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
+
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiMediaWithCrops>);
 
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
         var isMultiple = IsMultipleDataType(propertyType.DataType);
 
-        ApiMediaWithCrops ToApiMedia(MediaWithCrops media)
-        {
-            IApiMedia inner = _apiMediaBuilder.Build(media.Content);
-
-            // make sure we merge crops and focal point defined at media level with the locally defined ones (local ones take precedence in case of a conflict)
-            ImageCropperValue? mediaCrops = media.Content.Value<ImageCropperValue>(_publishedValueFallback, Constants.Conventions.Media.File);
-            ImageCropperValue localCrops = media.LocalCrops;
-            if (mediaCrops != null)
-            {
-                localCrops = localCrops.Merge(mediaCrops);
-            }
-
-            return new ApiMediaWithCrops(inner, localCrops.FocalPoint, localCrops.Crops);
-        }
+        IApiMediaWithCrops ToApiMedia(MediaWithCrops media) => _apiMediaWithCropsBuilder.Build(media);
 
         // NOTE: eventually we might implement this explicitly instead of piggybacking on the default object conversion. however, this only happens once per cache rebuild,
         // and the performance gain from an explicit implementation is negligible, so... at least for the time being this will do just fine.
@@ -155,7 +173,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
             return new [] { ToApiMedia(mediaWithCrops) };
         }
 
-        return Array.Empty<ApiMediaWithCrops>();
+        return Array.Empty<IApiMediaWithCrops>();
     }
 
     private bool IsMultipleDataType(PublishedDataType dataType) =>

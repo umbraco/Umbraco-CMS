@@ -134,7 +134,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, null);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
 
@@ -160,7 +160,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, null);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
 
@@ -186,7 +186,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, null);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
 
@@ -213,7 +213,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, null);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
 
@@ -250,7 +250,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, null);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
 
@@ -288,7 +288,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, null);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
 
@@ -336,7 +336,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, null);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
 

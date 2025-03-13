@@ -159,6 +159,12 @@
     <key alias="morePublishingOptions">Mehr Veröffentlichungs Optionen</key>
     <key alias="submitChanges">Senden</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Medie gelöscht</key>
+    <key alias="move">Medie verschoben</key>
+    <key alias="copy">Medie kopiert</key>
+    <key alias="save">Medie gesichert</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Anzeigen als</key>
     <key alias="delete">Inhalt gelöscht</key>
@@ -679,7 +685,7 @@
     <key alias="folderWasRenamed">%0% wurde umbenannt in %1%</key>
   </area>
   <area alias="editdatatype">
-  <key alias="canChangePropertyEditorHelp">Ändern des Editors in einem Datatyps mit gespeicherten Werten ist nicht erlaubt. Um es zu erlauben müssen Sie die Umbraco:CMS:DataTypes:CanBeChanged Einstellung in der appsettings.json ändern.</key>
+    <key alias="canChangePropertyEditorHelp">Ändern des Editors in einem Datatyps mit gespeicherten Werten ist nicht erlaubt. Um es zu erlauben müssen Sie die Umbraco:CMS:DataTypes:CanBeChanged Einstellung in der appsettings.json ändern.</key>
     <key alias="addPrevalue">Neuer Vorgabewert</key>
     <key alias="dataBaseDatatype">Feldtyp in der Datenbank</key>
     <key alias="guid">Datentyp-GUID</key>
@@ -1048,13 +1054,13 @@
     <key alias="renewSession">Erneuern Sie, um Ihre Arbeit zu speichern ...</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Einen wunderbaren Sonntag</key>
-    <key alias="greeting1">Schönen Montag</key>
-    <key alias="greeting2">Einen großartigen Dienstag</key>
-    <key alias="greeting3">Wunderbaren Mittwoch</key>
-    <key alias="greeting4">Donnerwetter Donnerstag</key>
-    <key alias="greeting5">Frohen freundlichen Freitag</key>
-    <key alias="greeting6">Wunderbaren sonnigen Samstag</key>
+    <key alias="greeting0">Willkommen</key>
+    <key alias="greeting1">Willkommen</key>
+    <key alias="greeting2">Willkommen</key>
+    <key alias="greeting3">Willkommen</key>
+    <key alias="greeting4">Willkommen</key>
+    <key alias="greeting5">Willkommen</key>
+    <key alias="greeting6">Willkommen</key>
     <key alias="instruction">Hier anmelden:</key>
     <key alias="signInWith">Anmelden mit</key>
     <key alias="timeout">Sitzung abgelaufen</key>
@@ -1780,10 +1786,9 @@
       Erlaubt es Inhalt der angegebenen Typen unterhalb Inhalten dieses Typs anzulegen
     </key>
     <key alias="chooseChildNode">Wählen Sie einen Unterknoten</key>
-    <!--???-->
-    <key alias="compositionsDescription">Übernimm Tabs und Eigenschaften vone einem vorhandenen Dokumenttyp. Neue Tabs werden zum vorliegenden Dokumenttyp hinzugefügt oder mit einem gleichnamigen Tab zusammengeführt.</key>
-    <key alias="compositionInUse">Dieser Dokumenttyp wird in einer Mischung verwendet und kann deshalb nicht selbst zusammengemischt werden.</key>
-    <key alias="noAvailableCompositions">Es sind keine Dokumenttypen für eine Mischung vorhanden.</key>
+    <key alias="compositionsDescription">Übernimm Tabs und Eigenschaften vone einem vorhandenen Inhaltstyp. Neue Tabs werden zum vorliegenden Inhaltstyp hinzugefügt oder mit einem gleichnamigen Tab zusammengeführt.</key>
+    <key alias="compositionInUse">Dieser Inhaltstyp wird in einer Mischung verwendet und kann deshalb nicht selbst zusammengemischt werden.</key>
+    <key alias="noAvailableCompositions">Es sind keine Inhaltstypen für eine Mischung vorhanden.</key>
     <key alias="availableEditors">Neu anlegen</key>
     <key alias="reuse">Vorhandenen nutzen</key>
     <key alias="editorSettings">Editor-Einstellungen</key>

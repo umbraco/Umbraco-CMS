@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage, notificationsService, clipboardService) {
+        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, dateHelper, editorService, umbSessionStorage, notificationsService, clipboardService) {
 
             var vm = this;
 
@@ -103,43 +103,43 @@ angular.module("umbraco")
                 $scope.target = dialogOptions.currentTarget;
             }
 
-          function setTitle(data) {
-            if (!$scope.model.title)
-              $scope.model.title = data[0];        
-          }
-
-          function setNavigation(data) {
-            if (!vm.navigation.length) { 
-            vm.navigation = [{
-              "alias": "empty",
-              "name": data[0],
-              "icon": "icon-umb-media",
-              "active": true,
-              "view": ""
-            }];
-            if (vm.clipboardItems) {
-              vm.navigation.push({
-                "alias": "clipboard",
-                "name": data[1],
-                "icon": "icon-paste-in",
-                "view": "",
-                "disabled": vm.clipboardItems.length === 0
-              });
+            function setTitle(data) {
+                if (!$scope.model.title)
+                    $scope.model.title = data[0];
             }
-              vm.activeTab = vm.navigation[0];
-            }       
-          }
+
+            function setNavigation(data) {
+                if (!vm.navigation.length) {
+                    vm.navigation = [{
+                        "alias": "empty",
+                        "name": data[0],
+                        "icon": "icon-umb-media",
+                        "active": true,
+                        "view": ""
+                    }];
+                    if (vm.clipboardItems) {
+                        vm.navigation.push({
+                            "alias": "clipboard",
+                            "name": data[1],
+                            "icon": "icon-paste-in",
+                            "view": "",
+                            "disabled": vm.clipboardItems.length === 0
+                        });
+                    }
+                    vm.activeTab = vm.navigation[0];
+                }
+            }
 
 
-          function onInit() {
+            function onInit() {
 
 
-              localizationService.localizeMany(["defaultdialogs_selectMedia", "mediaPicker_tabClipboard"])
-                .then(function (localizationResult) {
-                  setTitle(localizationResult);
-                  setNavigation(localizationResult);
-                });
-               
+                localizationService.localizeMany(["defaultdialogs_selectMedia", "mediaPicker_tabClipboard"])
+                    .then(function (localizationResult) {
+                        setTitle(localizationResult);
+                        setNavigation(localizationResult);
+                    });
+
 
                 userService.getCurrentUser().then(function (userData) {
                     userStartNodes = userData.startMediaIds;
@@ -264,18 +264,24 @@ angular.module("umbraco")
                                 function (f) {
                                     return f.path.indexOf($scope.startNodeId) !== -1;
                                 });
+                            folder.path = $scope.path[0].path;
+                            performGotoFolder(folder);
                         });
                 } else {
                     $scope.path = [];
+                    performGotoFolder(folder);
                 }
 
+              return getChildren(folder.id);
+            }
+
+            function performGotoFolder(folder) {
                 mediaTypeHelper.getAllowedImagetypes(folder.id).then(function (types) { vm.acceptedMediatypes = types; });
+
                 $scope.lockedFolder = (folder.id === -1 && $scope.model.startNodeIsVirtual) || hasFolderAccess(folder) === false;
                 $scope.currentFolder = folder;
 
                 localStorageService.set("umbLastOpenedMediaNodeId", folder.id);
-
-                return getChildren(folder.id);
             }
 
             function toggleListView() {
@@ -431,9 +437,9 @@ angular.module("umbraco")
             };
 
             function onNavigationChanged(tab) {
-              vm.activeTab.active = false;
-              vm.activeTab = tab;
-              vm.activeTab.active = true;
+                vm.activeTab.active = false;
+                vm.activeTab = tab;
+                vm.activeTab.active = true;
             };
 
             function clickClearClipboard() {
@@ -490,7 +496,7 @@ angular.module("umbraco")
                         if (data.items) {
                             var allowedTypes = dialogOptions.filter ? dialogOptions.filter.split(",") : null;
 
-                            data.items.forEach(function(mediaItem) {
+                            data.items.forEach(function (mediaItem) {
                                 setMediaMetaData(mediaItem);
                                 mediaItem.filtered = allowedTypes && allowedTypes.indexOf(mediaItem.metaData.ContentTypeAlias) < 0;
                             });
@@ -577,7 +583,10 @@ angular.module("umbraco")
                     item.image = mediaHelper.resolveFileFromEntity(item, false);
                 }
                 if (item.metaData.UpdateDate !== null) {
-                    item.updateDate = item.metaData.UpdateDate;
+                    userService.getCurrentUser().then(currentUser => {
+                        item.updateDate = dateHelper.getLocalDate(item.metaData.UpdateDate, currentUser.locale, "LLL");
+                    });
+
                 }
             }
 

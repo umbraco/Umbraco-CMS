@@ -24,17 +24,38 @@ public sealed class RebuildOnStartupHandler : INotificationHandler<UmbracoReques
     private static bool _isReady;
     private static bool _isReadSet;
     private static object? _isReadyLock;
-    private readonly ExamineIndexRebuilder _backgroundIndexRebuilder;
     private readonly IRuntimeState _runtimeState;
     private readonly ISyncBootStateAccessor _syncBootStateAccessor;
+    private readonly IIndexRebuilder _indexRebuilder;
 
+    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in Umbraco 15.")]
     public RebuildOnStartupHandler(
         ISyncBootStateAccessor syncBootStateAccessor,
         ExamineIndexRebuilder backgroundIndexRebuilder,
         IRuntimeState runtimeState)
+        : this(syncBootStateAccessor, (IIndexRebuilder) backgroundIndexRebuilder, runtimeState)
+    {
+
+    }
+
+    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in Umbraco 15.")]
+    public RebuildOnStartupHandler(
+        ISyncBootStateAccessor syncBootStateAccessor,
+        ExamineIndexRebuilder backgroundIndexRebuilder,
+        IIndexRebuilder indexRebuilder,
+        IRuntimeState runtimeState)
+        : this(syncBootStateAccessor, indexRebuilder, runtimeState)
+    {
+
+    }
+
+    public RebuildOnStartupHandler(
+        ISyncBootStateAccessor syncBootStateAccessor,
+        IIndexRebuilder indexRebuilder,
+        IRuntimeState runtimeState)
     {
         _syncBootStateAccessor = syncBootStateAccessor;
-        _backgroundIndexRebuilder = backgroundIndexRebuilder;
+        _indexRebuilder = indexRebuilder;
         _runtimeState = runtimeState;
     }
 
@@ -58,7 +79,7 @@ public sealed class RebuildOnStartupHandler : INotificationHandler<UmbracoReques
                 SyncBootState bootState = _syncBootStateAccessor.GetSyncBootState();
 
                 // if it's not a cold boot, only rebuild empty ones
-                _backgroundIndexRebuilder.RebuildIndexes(
+                _indexRebuilder.RebuildIndexes(
                     bootState != SyncBootState.ColdBoot,
                     TimeSpan.FromMinutes(1));
 

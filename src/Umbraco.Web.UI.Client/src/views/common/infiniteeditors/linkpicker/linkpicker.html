@@ -13,10 +13,8 @@
         <umb-editor-container class="block-form">
             <umb-box>
                 <umb-box-content>
-
                     <div ng-class="{'flex': showAnchor}">
-
-                        <umb-control-group label="@defaultdialogs_urlLinkPicker" class="umb-linkpicker__url" alias="urlLinkPicker">
+                      <umb-control-group label="@defaultdialogs_urlLinkPicker" class="umb-linkpicker__url" alias="urlLinkPicker">
                             <input type="text"
                                     style="margin-right: 10px;"
                                     localize="placeholder"
@@ -45,10 +43,10 @@
 
                     <umb-control-group label="@defaultdialogs_nodeNameLinkPicker" alias="nodeNameLinkPicker">
                         <input type="text"
-                                localize="placeholder"
-                                placeholder="@placeholders_entername"
+                                placeholder="{{model.useNodeName && model.target.nodeName ? model.target.nodeName : placeholders_entername}}"
                                 class="umb-property-editor umb-textstring"
                                 ng-model="model.target.name"
+                                ng-change="trackUserInput(model.target.name)"
                                 id="nodeNameLinkPicker"/>
                     </umb-control-group>
 

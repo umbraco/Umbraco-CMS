@@ -1,6 +1,7 @@
-﻿angular.module("umbraco").controller("Umbraco.Login2faController",
+angular.module("umbraco").controller("Umbraco.Login2faController",
   function ($scope, userService, authResource) {
-    let vm = this;
+    const vm = this;
+
     vm.code = "";
     vm.provider = "";
     vm.providers = [];

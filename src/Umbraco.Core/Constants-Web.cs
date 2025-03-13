@@ -54,6 +54,7 @@ public static partial class Constants
             public const string BackOfficeArea = "UmbracoBackOffice"; // Used for area routes of non-api controllers
             public const string BackOfficeApiArea = "UmbracoApi"; // Same name as v8 so all routing remains the same
             public const string BackOfficeTreeArea = "UmbracoTrees"; // Same name as v8 so all routing remains the same
+            public const string BackOfficeLoginArea = "UmbracoLogin"; // Used for area routes of non-api controllers for login
         }
 
         public static class Routing
@@ -61,6 +62,7 @@ public static partial class Constants
             public const string ControllerToken = "controller";
             public const string ActionToken = "action";
             public const string AreaToken = "area";
+            public const string DynamicRoutePattern = "/{**umbracoSlug}";
         }
 
         public static class RoutePath

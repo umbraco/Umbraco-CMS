@@ -19,6 +19,7 @@ using Umbraco.Cms.Infrastructure.HostedServices;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices;
 
 [TestFixture]
+[Obsolete("Replaced by BackgroundJobs.Jobs.ScheduledPublishingJobTests")]
 public class ScheduledPublishingTests
 {
     private Mock<IContentService> _mockContentService;

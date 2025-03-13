@@ -8,6 +8,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_0_0;
 
+[Obsolete("This is no longer used and will be removed in V14.")]
 public class UseNvarcharInsteadOfNText : MigrationBase
 {
     public UseNvarcharInsteadOfNText(IMigrationContext context)
@@ -31,11 +32,27 @@ public class UseNvarcharInsteadOfNText : MigrationBase
         MigrateNtextColumn<PropertyDataDto>("textValue", Constants.DatabaseSchema.Tables.PropertyData, x => x.TextValue);
     }
 
+    private void RawMigrateNtextColumn(string columnName, string tableName)
+    {
+        var updateTypeSql = @$"
+ALTER TABLE {tableName}
+ALTER COLUMN {columnName} nvarchar(max)";
+        Sql<ISqlContext> copyDataQuery = Database.SqlContext.Sql(updateTypeSql);
+        Database.Execute(copyDataQuery);
+    }
+
     private void MigrateNtextColumn<TDto>(string columnName, string tableName, Expression<Func<TDto, object?>> fieldSelector, bool nullable = true)
     {
         var columnType = ColumnType(tableName, columnName);
         if (columnType is null || columnType.Equals("ntext", StringComparison.InvariantCultureIgnoreCase) is false)
         {
+            return;
+        }
+
+        // since it's ntext to nvarchar(max) we should be able to just raw query this without having issues with fallback values on sql server
+        if (Database.DatabaseType != DatabaseType.SQLite)
+        {
+            RawMigrateNtextColumn(columnName, tableName);
             return;
         }
 

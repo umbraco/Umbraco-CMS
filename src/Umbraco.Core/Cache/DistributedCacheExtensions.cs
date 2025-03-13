@@ -118,15 +118,37 @@ public static class DistributedCacheExtensions
     #region ContentCacheRefresher
 
     public static void RefreshAllContentCache(this DistributedCache dc)
+    {
+        ContentCacheRefresher.JsonPayload[] payloads = new[]
+        {
+            new ContentCacheRefresher.JsonPayload()
+            {
+                ChangeTypes = TreeChangeTypes.RefreshAll
+            }
+        };
+
         // note: refresh all content cache does refresh content types too
-        => dc.RefreshByPayload(ContentCacheRefresher.UniqueId, new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll).Yield());
+        dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
+    }
 
     [Obsolete("Use the overload accepting IEnumerable instead to avoid allocating arrays. This overload will be removed in Umbraco 13.")]
     public static void RefreshContentCache(this DistributedCache dc, TreeChange<IContent>[] changes)
         => dc.RefreshContentCache(changes.AsEnumerable());
 
     public static void RefreshContentCache(this DistributedCache dc, IEnumerable<TreeChange<IContent>> changes)
-        => dc.RefreshByPayload(ContentCacheRefresher.UniqueId, changes.DistinctBy(x => (x.Item.Id, x.Item.Key, x.ChangeTypes)).Select(x => new ContentCacheRefresher.JsonPayload(x.Item.Id, x.Item.Key, x.ChangeTypes)));
+    {
+        IEnumerable<ContentCacheRefresher.JsonPayload> payloads = changes.Select(x => new ContentCacheRefresher.JsonPayload()
+        {
+            Id = x.Item.Id,
+            Key = x.Item.Key,
+            ChangeTypes = x.ChangeTypes,
+            Blueprint = x.Item.Blueprint,
+            PublishedCultures = x.PublishedCultures?.ToArray(),
+            UnpublishedCultures = x.UnpublishedCultures?.ToArray()
+        });
+
+        dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
+    }
 
     #endregion
 

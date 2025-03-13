@@ -48,7 +48,7 @@ public class LogviewerTests
         File.Copy(exampleLogfilePath, _newLogfilePath, true);
 
         var logger = Mock.Of<ILogger<SerilogJsonLogViewer>>();
-        var logViewerConfig = new LogViewerConfig(LogViewerQueryRepository, Mock.Of<IScopeProvider>());
+        var logViewerConfig = new LogViewerConfig(LogViewerQueryRepository, TestHelper.ScopeProvider);
         var logLevelLoader = Mock.Of<ILogLevelLoader>();
         _logViewer =
             new SerilogJsonLogViewer(logger, logViewerConfig, loggingConfiguration, logLevelLoader, Log.Logger);

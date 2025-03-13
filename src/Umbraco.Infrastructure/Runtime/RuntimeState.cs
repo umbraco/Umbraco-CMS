@@ -325,18 +325,17 @@ public class RuntimeState : IRuntimeState
                 // All will be prefixed with the same key.
                 IReadOnlyDictionary<string, string?>? keyValues = database.GetFromKeyValueTable(Constants.Conventions.Migrations.KeyValuePrefix);
 
-                // This could need both an upgrade AND package migrations to execute but
-                // we will process them one at a time, first the upgrade, then the package migrations.
+                // This could need both an upgrade AND package migrations to execute, so always add any pending package migrations
+                IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetPendingPackageMigrations(keyValues);
+                _startupState[PendingPackageMigrationsStateKey] = packagesRequiringMigration;
+
                 if (DoesUmbracoRequireUpgrade(keyValues))
                 {
                     return UmbracoDatabaseState.NeedsUpgrade;
                 }
 
-                IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetPendingPackageMigrations(keyValues);
                 if (packagesRequiringMigration.Count > 0)
                 {
-                    _startupState[PendingPackageMigrationsStateKey] = packagesRequiringMigration;
-
                     return UmbracoDatabaseState.NeedsPackageMigration;
                 }
             }

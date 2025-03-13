@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -17,6 +18,7 @@ namespace Umbraco.Cms.Core.Models.Mapping;
 internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<ContentPropertyDisplay>
 {
     private readonly ICultureDictionary _cultureDictionary;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private readonly ILocalizedTextService _textService;
 
     public ContentPropertyDisplayMapper(
@@ -25,10 +27,12 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
         IEntityService entityService,
         ILocalizedTextService textService,
         ILogger<ContentPropertyDisplayMapper> logger,
-        PropertyEditorCollection propertyEditors)
+        PropertyEditorCollection propertyEditors,
+        IDataTypeConfigurationCache dataTypeConfigurationCache)
         : base(dataTypeService, entityService, logger, propertyEditors)
     {
         _cultureDictionary = cultureDictionary;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
         _textService = textService;
     }
 
@@ -38,7 +42,7 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
 
         var config = originalProp.PropertyType is null
             ? null
-            : DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId)?.Configuration;
+            : _dataTypeConfigurationCache.GetConfiguration(originalProp.PropertyType.DataTypeKey);
 
         // TODO: IDataValueEditor configuration - general issue
         // GetValueEditor() returns a non-configured IDataValueEditor
@@ -82,5 +86,7 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
         // Translate
         dest.Label = _textService.UmbracoDictionaryTranslate(_cultureDictionary, dest.Label);
         dest.Description = _textService.UmbracoDictionaryTranslate(_cultureDictionary, dest.Description);
+        dest.Validation.MandatoryMessage = _textService.UmbracoDictionaryTranslate(_cultureDictionary, dest.Validation.MandatoryMessage);
+        dest.Validation.PatternMessage = _textService.UmbracoDictionaryTranslate(_cultureDictionary, dest.Validation.PatternMessage);
     }
 }

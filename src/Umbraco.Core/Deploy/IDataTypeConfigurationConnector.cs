@@ -24,20 +24,20 @@ public interface IDataTypeConfigurationConnector
     /// </summary>
     /// <param name="dataType">The data type.</param>
     /// <param name="dependencies">The dependencies.</param>
+    /// <param name="contextCache">The context cache.</param>
     /// <returns>
     /// The artifact configuration value.
     /// </returns>
-    [Obsolete($"Implement {nameof(IDataTypeConfigurationConnector2)} and use the overload accepting {nameof(IContextCache)} instead. This overload will be removed in Umbraco 13.")]
-    string? ToArtifact(IDataType dataType, ICollection<ArtifactDependency> dependencies);
+    string? ToArtifact(IDataType dataType, ICollection<ArtifactDependency> dependencies, IContextCache contextCache);
 
     /// <summary>
     /// Gets the data type configuration corresponding to an artifact configuration value.
     /// </summary>
     /// <param name="dataType">The data type.</param>
     /// <param name="configuration">The artifact configuration value.</param>
+    /// <param name="contextCache">The context cache.</param>
     /// <returns>
     /// The data type configuration.
     /// </returns>
-    [Obsolete($"Implement {nameof(IDataTypeConfigurationConnector2)} and use the overload accepting {nameof(IContextCache)} instead. This overload will be removed in Umbraco 13.")]
-    object? FromArtifact(IDataType dataType, string? configuration);
+    object? FromArtifact(IDataType dataType, string? configuration, IContextCache contextCache);
 }

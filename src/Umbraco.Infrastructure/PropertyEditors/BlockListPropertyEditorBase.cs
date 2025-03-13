@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -35,29 +37,36 @@ public abstract class BlockListPropertyEditorBase : DataEditor
 
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
 
-
     #region Value Editor
 
+    /// <summary>
+    /// Instantiates a new <see cref="BlockEditorDataConverter"/> for use with the block list editor property value editor.
+    /// </summary>
+    /// <returns>A new instance of <see cref="BlockListEditorDataConverter"/>.</returns>
+    protected virtual BlockEditorDataConverter CreateBlockEditorDataConverter() => new BlockListEditorDataConverter();
+
     protected override IDataValueEditor CreateValueEditor() =>
-        DataValueEditorFactory.Create<BlockListEditorPropertyValueEditor>(Attribute!);
+        DataValueEditorFactory.Create<BlockListEditorPropertyValueEditor>(Attribute!, CreateBlockEditorDataConverter());
 
     internal class BlockListEditorPropertyValueEditor : BlockEditorPropertyValueEditor
     {
         public BlockListEditorPropertyValueEditor(
             DataEditorAttribute attribute,
+            BlockEditorDataConverter blockEditorDataConverter,
             PropertyEditorCollection propertyEditors,
-            IDataTypeService dataTypeService,
-            IContentTypeService contentTypeService,
+            DataValueReferenceFactoryCollection dataValueReferenceFactories,
+            IDataTypeConfigurationCache dataTypeConfigurationCache,
+            IBlockEditorElementTypeCache elementTypeCache,
             ILocalizedTextService textService,
             ILogger<BlockEditorPropertyValueEditor> logger,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             IPropertyValidationService propertyValidationService) :
-            base(attribute, propertyEditors, dataTypeService, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
+            base(attribute, propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
         {
-            BlockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypeService, logger);
-            Validators.Add(new BlockEditorValidator(propertyValidationService, BlockEditorValues, contentTypeService));
+            BlockEditorValues = new BlockEditorValues(blockEditorDataConverter, elementTypeCache, logger);
+            Validators.Add(new BlockEditorValidator(propertyValidationService, BlockEditorValues, elementTypeCache));
             Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
         }
 

@@ -14,6 +14,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices;
 ///     Will run on all servers - even though file upload should only be handled on the scheduling publisher, this will
 ///     ensure that in the case it happens on subscribers that they are cleaned up too.
 /// </remarks>
+[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.TempFileCleanupJob instead.  This class will be removed in Umbraco 14.")]
 public class TempFileCleanup : RecurringHostedServiceBase
 {
     private readonly TimeSpan _age = TimeSpan.FromDays(1);

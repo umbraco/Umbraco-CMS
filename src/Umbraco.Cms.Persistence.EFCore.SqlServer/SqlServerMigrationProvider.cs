@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
 using Umbraco.Extensions;
 
@@ -10,7 +11,7 @@ public class SqlServerMigrationProvider : IMigrationProvider
 
     public SqlServerMigrationProvider(IDbContextFactory<UmbracoDbContext> dbContextFactory) => _dbContextFactory = dbContextFactory;
 
-    public string ProviderName => "Microsoft.Data.SqlClient";
+    public string ProviderName => Constants.ProviderNames.SQLServer;
 
     public async Task MigrateAsync(EFCoreMigration migration)
     {

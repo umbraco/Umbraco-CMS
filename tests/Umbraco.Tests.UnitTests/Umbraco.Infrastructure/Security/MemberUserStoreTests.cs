@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
@@ -27,23 +28,12 @@ public class MemberUserStoreTests
     public MemberUserStore CreateSut()
     {
         _mockMemberService = new Mock<IMemberService>();
-        var mockScope = new Mock<IScope>();
-        var mockScopeProvider = new Mock<IScopeProvider>();
-        mockScopeProvider
-            .Setup(x => x.CreateScope(
-                It.IsAny<IsolationLevel>(),
-                It.IsAny<RepositoryCacheMode>(),
-                It.IsAny<IEventDispatcher>(),
-                It.IsAny<IScopedNotificationPublisher>(),
-                It.IsAny<bool?>(),
-                It.IsAny<bool>(),
-                It.IsAny<bool>()))
-            .Returns(mockScope.Object);
+        var mockScopeProvider = TestHelper.ScopeProvider;
 
         return new MemberUserStore(
             _mockMemberService.Object,
-            new UmbracoMapper(new MapDefinitionCollection(() => new List<IMapDefinition>()), mockScopeProvider.Object, NullLogger<UmbracoMapper>.Instance),
-            mockScopeProvider.Object,
+            new UmbracoMapper(new MapDefinitionCollection(() => new List<IMapDefinition>()), mockScopeProvider, NullLogger<UmbracoMapper>.Instance),
+            mockScopeProvider,
             new IdentityErrorDescriber(),
             Mock.Of<IPublishedSnapshotAccessor>(),
             Mock.Of<IExternalLoginWithKeyService>(),
@@ -132,7 +122,7 @@ public class MemberUserStoreTests
         _mockMemberService
             .Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(mockMember);
-        _mockMemberService.Setup(x => x.Save(mockMember));
+        _mockMemberService.Setup(x => x.Save(mockMember, PublishNotificationSaveOptions.Saving));
 
         // act
         var identityResult = await sut.CreateAsync(fakeUser, CancellationToken.None);
@@ -142,7 +132,7 @@ public class MemberUserStoreTests
         Assert.IsTrue(!identityResult.Errors.Any());
         _mockMemberService.Verify(x =>
             x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
-        _mockMemberService.Verify(x => x.Save(mockMember));
+        _mockMemberService.Verify(x => x.Save(mockMember, PublishNotificationSaveOptions.Saving));
     }
 
     [Test]

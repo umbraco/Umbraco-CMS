@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
@@ -18,6 +19,8 @@ public class
     ContentPermissionsQueryStringHandler : PermissionsQueryStringHandler<ContentPermissionsQueryStringRequirement>
 {
     private readonly ContentPermissions _contentPermissions;
+
+    protected override UmbracoObjectTypes KeyParsingFilterType => UmbracoObjectTypes.Document;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentPermissionsQueryStringHandler" /> class.
@@ -47,7 +50,11 @@ public class
                 return Task.FromResult(true);
             }
 
-            var argument = routeVal.ToString();
+            // Handle case where the incoming querystring could contain more than one value (e.g. ?id=1000&id=1001).
+            // It's the first one that'll be processed by the protected method so we should verify that.
+            var argument = routeVal.Count == 1
+                ? routeVal.ToString()
+                : routeVal.FirstOrDefault()?.ToString() ?? string.Empty;
 
             if (!TryParseNodeId(argument, out nodeId))
             {
@@ -60,9 +67,15 @@ public class
             nodeId = requirement.NodeId.Value;
         }
 
+        IUser? currentUser = BackOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        if (currentUser is null)
+        {
+            return Task.FromResult(false);
+        }
+
         ContentPermissions.ContentAccess permissionResult = _contentPermissions.CheckPermissions(
             nodeId,
-            BackOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser,
+            currentUser,
             out IContent? contentItem,
             new[] { requirement.PermissionToCheck });
 

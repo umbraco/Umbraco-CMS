@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -58,6 +59,7 @@ public class RedirectUrlServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Get_Most_Recent_RedirectUrl()
     {
         var redirect = RedirectUrlService.GetMostRecentRedirectUrl(Url);
@@ -65,6 +67,7 @@ public class RedirectUrlServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Get_Most_Recent_RedirectUrl_With_Culture()
     {
         var redirect = RedirectUrlService.GetMostRecentRedirectUrl(Url, CultureEnglish);
@@ -72,6 +75,7 @@ public class RedirectUrlServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Get_Most_Recent_RedirectUrl_With_Culture_When_No_CultureVariant_Exists()
     {
         var redirect = RedirectUrlService.GetMostRecentRedirectUrl(UrlAlt, UnusedCulture);

@@ -81,7 +81,11 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     }
 
     [TearDown]
-    public void TearDownAsync() => _host.StopAsync();
+    public void TearDownAsync()
+    {
+        _host.StopAsync();
+        Services.DisposeIfDisposable();
+    }
 
     /// <summary>
     ///     Create the Generic Host and execute startup ConfigureServices/Configure calls

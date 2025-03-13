@@ -1,10 +1,4 @@
-<div ng-controller="Umbraco.PropertyEditors.RTEController" class="umb-property-editor umb-rte" ng-class="{'--initialized': !isLoading}">
-    <umb-load-indicator ng-if="isLoading"></umb-load-indicator>
-
-    <ng-form name="rteForm">
-        <div class="umb-rte-editor-con">
-            <input type="text" id="{{model.alias}}" ng-focus="focus()" name="modelValue" ng-model="model.value" style="position:absolute;top:0;width:0;height:0;padding:0;border:none;" />
-            <div disable-hotkeys id="{{textAreaHtmlId}}" class="umb-rte-editor" ng-style="{ width: containerWidth, height: containerHeight, overflow: containerOverflow}"></div>
-        </div>
-    </ng-form>
-</div>
+<umb-rte-property-editor
+  model="model"
+  ng-attr-readonly="{{ readonly || undefined }}">
+</umb-rte-property-editor>

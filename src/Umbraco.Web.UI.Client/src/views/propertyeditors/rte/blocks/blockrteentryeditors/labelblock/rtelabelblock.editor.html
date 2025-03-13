@@ -1,0 +1,58 @@
+<style>
+    .blockelement-rteblock-editor {
+        position: relative;
+        border-radius: 3px;
+        min-height: 48px;
+        box-sizing: border-box;
+        border: 1px solid #E9E9EB;
+        background-color: white;
+    }
+
+    .blockelement-rteblock-editor > button {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        min-height: 48px;
+        cursor: pointer;
+        color: #1b264f;
+        background-color: white;
+        text-align: left;
+        padding: 0 20px;
+
+        border: none;
+        transition: border-color 120ms, background-color 120ms;
+    }
+    .blockelement-rteblock-editor > button:hover {
+        color: #2152A3;
+    }
+    .blockelement-rteblock-editor .icon {
+        font-size: 22px;
+        margin-right: 10px;
+        display: inline-block;
+    }
+
+    .blockelement-rteblock-editor > button > span {
+        position: relative;
+        display: inline-block;
+        padding-top:2px;
+        padding-bottom:2px;
+    }
+
+
+    .blockelement-rteblock-editor.--inline {
+        width: 240px;
+    }
+
+
+</style>
+
+<div class="blockelement-rteblock-editor" ng-class="{ '--active': block.active, '--inline': block.config.displayInline, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">
+    <button type="button"
+        ng-click="block.edit()"
+        ng-focus="block.focus"
+        val-server-property-class="">
+        <umb-icon icon="{{block.content.icon}}" class="icon"></umb-icon>
+        <span>{{block.label}}</span>
+    </button>
+</div>

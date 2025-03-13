@@ -5,9 +5,11 @@
 
         var vm = this;
         vm.includeUnpublished = $scope.model.includeUnpublished || false;
+        vm.publishAll = false;
 
         vm.changeSelection = changeSelection;
         vm.toggleIncludeUnpublished = toggleIncludeUnpublished;
+        vm.changePublishAllSelection = changePublishAllSelection;
 
         function onInit() {
 
@@ -19,11 +21,6 @@
             if (!$scope.model.title) {
                 localizationService.localize("buttons_publishDescendants").then(value => {
                     $scope.model.title = value;
-                });
-            }
-            if (!vm.labels.includeUnpublished) {
-                localizationService.localize("content_includeUnpublished").then(value => {
-                    vm.labels.includeUnpublished = value;
                 });
             }
             if (!vm.labels.includeUnpublished) {
@@ -48,8 +45,10 @@
                     active.publish = active.save = true;
                 }
 
-                $scope.model.disableSubmitButton = !canPublish();
+                updatePublishAllSelectionStatus();
                 
+                $scope.model.disableSubmitButton = !canPublish();
+
             } else {
                 // localize help text for invariant content
                 vm.labels.help = {
@@ -65,7 +64,6 @@
 
         function toggleIncludeUnpublished() {
             vm.includeUnpublished = !vm.includeUnpublished;
-            // make sure this value is pushed back to the scope
             $scope.model.includeUnpublished = vm.includeUnpublished;
         }
 
@@ -97,8 +95,20 @@
             $scope.model.disableSubmitButton = !canPublish();
             //need to set the Save state to true if publish is true
             variant.save = variant.publish;
+            updatePublishAllSelectionStatus();
         }
 
+        function changePublishAllSelection(){
+            vm.displayVariants.forEach(variant => {
+                variant.publish = vm.publishAll;
+                variant.save = variant.publish;
+            });
+            $scope.model.disableSubmitButton = !canPublish();
+        }
+
+        function updatePublishAllSelectionStatus(){
+            vm.publishAll = vm.displayVariants.every(x => x.publish);
+        }
         
         function isMandatoryFilter(variant) {
             //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's

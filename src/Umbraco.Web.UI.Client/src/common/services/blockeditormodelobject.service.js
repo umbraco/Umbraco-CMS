@@ -13,7 +13,7 @@
 (function () {
     'use strict';
 
-    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService, $compile) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService, $compile, editorState) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -31,7 +31,8 @@
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
 
-                    prop.value = dataModel[prop.alias];
+                    if (typeof (dataModel[prop.alias]) !== 'undefined')
+                        prop.value = dataModel[prop.alias];
                 }
             }
 
@@ -300,7 +301,7 @@
             this.value.settingsData = this.value.settingsData || [];
 
             this.propertyEditorAlias = propertyEditorAlias;
-            this.blockConfigurations = blockConfigurations;
+            this.blockConfigurations = blockConfigurations ?? [];
 
             this.blockConfigurations.forEach(blockConfiguration => {
                 if (blockConfiguration.view != null && blockConfiguration.view !== "") {
@@ -366,7 +367,6 @@
              * @name load
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Load the scaffolding models for the given configuration, these are needed to provide useful models for each block.
-             * @param {Object} blockObject BlockObject to receive data values from.
              * @returns {Promise} A Promise object which resolves when all scaffold models are loaded.
              */
             load: function () {
@@ -396,18 +396,30 @@
                 // removing duplicates.
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
-                tasks.push(contentResource.getScaffoldByKeys(-20, scaffoldKeys).then(scaffolds => {
-                    Object.values(scaffolds).forEach(scaffold => {
-                        // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
-                        if (self.scaffolds) {
-                            self.scaffolds.push(formatScaffoldData(scaffold));
-                        }
-                    });
-                }).catch(
-                    () => {
-                        // Do nothing if we get an error.
-                    }
-                ));
+                if(scaffoldKeys.length > 0) {
+                  // We need to know if we are in the document type editor or content editor.
+                  // If we are in the document type editor, we need to use -20 as the current page id.
+                  // If we are in the content editor, we need to use the current page id or parent id if the current page is new.
+                  // We can recognize a content editor context by checking if the current editor state has a contentTypeKey.
+                  // If no current is represented, we will use null.
+                  const currentEditorState = editorState.getCurrent();
+                  const currentPageId = currentEditorState ? currentEditorState.contentTypeKey ? currentEditorState.id || currentEditorState.parentId || -20 : -20 : null;
+
+                  // Load all scaffolds for the block types.
+                  // The currentPageId is used to determine the access level for the current user.
+                  tasks.push(contentResource.getScaffoldByKeys(currentPageId, scaffoldKeys).then(scaffolds => {
+                      Object.values(scaffolds).forEach(scaffold => {
+                          // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
+                          if (self.scaffolds) {
+                              self.scaffolds.push(formatScaffoldData(scaffold));
+                          }
+                      });
+                  }).catch(
+                      () => {
+                          // Do nothing if we get an error.
+                      }
+                  ));
+                }
 
                 return $q.all(tasks);
             },
@@ -525,17 +537,20 @@
                 }
 
                 var dataModel = getDataByUdi(contentUdi, this.value.contentData);
-
-                if (dataModel === null) {
-                    console.error("Couldn't find content data of UDI:", contentUdi, "layoutEntry:", layoutEntry)
-                    return null;
-                }
-
-                var blockConfiguration = this.getBlockConfiguration(dataModel.contentTypeKey);
+                var blockConfiguration = null;
                 var contentScaffold = null;
 
+                if (dataModel === null) {
+                  console.error("Couldn't find content data of UDI:", contentUdi, "layoutEntry:", layoutEntry)
+                  //return null;
+                } else {
+                  blockConfiguration = this.getBlockConfiguration(dataModel.contentTypeKey);
+                }
+
                 if (blockConfiguration === null) {
+                  if(dataModel) {
                     console.warn("The block of " + contentUdi + " is not being initialized because its contentTypeKey('" + dataModel.contentTypeKey + "') is not allowed for this PropertyEditor");
+                  }
                 } else {
                     contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey);
                     if (contentScaffold === null) {
@@ -622,28 +637,39 @@
                 }
 
                 blockObject.retrieveValuesFrom = function (content, settings) {
-                    if (this.content !== null) {
+                    if (this.content) {
                         mapElementValues(content, this.content);
+                        if (this.config.settingsElementTypeKey !== null) {
+                          mapElementValues(settings, this.settings);
+                      }
+                    } else {
+                      console.error("This data cannot be edited at the given movement. Maybe due to publishing while editing.");
                     }
-                    if (this.config.settingsElementTypeKey !== null) {
-                        mapElementValues(settings, this.settings);
-                    }
+
 
                 };
 
                 blockObject.sync = function () {
-                    if (this.content !== null) {
+                    if (this.content) {
                         mapToPropertyModel(this.content, this.data);
-                    }
-                    if (this.config.settingsElementTypeKey !== null) {
-                        mapToPropertyModel(this.settings, this.settingsData);
+                        if (this.config.settingsElementTypeKey !== null) {
+                            mapToPropertyModel(this.settings, this.settingsData);
+                        }
+                    } else {
+                      console.error("This data cannot be edited at the given movement. Maybe due to publishing while editing.");
                     }
                 };
                 // first time instant update of label.
               blockObject.label = blockObject.content?.contentTypeName || "";
-                blockObject.index = 0; 
+                blockObject.index = 0;
 
                 if (blockObject.config.label && blockObject.config.label !== "" && blockObject.config.unsupported !== true) {
+
+                    // If the label does not contain any AngularJS template, then the MutationObserver wont give us any updates. To ensure labels without angular JS template code, we will just set the label directly for ones without '{{':
+                    if(blockObject.config.label.indexOf("{{") === -1) {
+                        blockObject.label = blockObject.config.label;
+                    }
+
                     var labelElement = $('<div></div>', { text: blockObject.config.label});
 
                     var observer = new MutationObserver(function(mutations) {
@@ -673,6 +699,7 @@
                         this.__labelScope = Object.assign(this.__labelScope, labelVars);
 
                         $compile(labelElement.contents())(this.__labelScope);
+
                     }.bind(blockObject)
                 } else {
                     blockObject.__renderLabel = function() {};

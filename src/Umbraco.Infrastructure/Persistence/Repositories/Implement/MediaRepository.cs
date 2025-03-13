@@ -305,20 +305,20 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     public IMedia? GetMediaByPath(string mediaPath)
     {
-        var umbracoFileValue = mediaPath;
         const string pattern = ".*[_][0-9]+[x][0-9]+[.].*";
         var isResized = Regex.IsMatch(mediaPath, pattern);
+        var originalMediaPath = string.Empty;
 
         // If the image has been resized we strip the "_403x328" of the original "/media/1024/koala_403x328.jpg" URL.
         if (isResized)
         {
             var underscoreIndex = mediaPath.LastIndexOf('_');
             var dotIndex = mediaPath.LastIndexOf('.');
-            umbracoFileValue = string.Concat(mediaPath.Substring(0, underscoreIndex), mediaPath.Substring(dotIndex));
+            originalMediaPath = string.Concat(mediaPath.Substring(0, underscoreIndex), mediaPath.Substring(dotIndex));
         }
 
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single, joinMediaVersion: true)
-            .Where<MediaVersionDto>(x => x.Path == umbracoFileValue)
+            .Where<MediaVersionDto>(x => x.Path == mediaPath || (isResized && x.Path == originalMediaPath))
             .SelectTop(1);
 
         ContentDto? dto = Database.Fetch<ContentDto>(sql).FirstOrDefault();

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -18,6 +19,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal class FileUploadPropertyValueEditor : DataValueEditor
 {
     private readonly MediaFileManager _mediaFileManager;
+    private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
     private ContentSettings _contentSettings;
 
     public FileUploadPropertyValueEditor(
@@ -27,10 +29,12 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         IShortStringHelper shortStringHelper,
         IOptionsMonitor<ContentSettings> contentSettings,
         IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper)
+        IIOHelper ioHelper,
+        IFileStreamSecurityValidator fileStreamSecurityValidator)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
+        _fileStreamSecurityValidator = fileStreamSecurityValidator;
         _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
         contentSettings.OnChange(x => _contentSettings = x);
     }
@@ -147,6 +151,11 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
 
         using (FileStream filestream = File.OpenRead(file.TempFilePath))
         {
+            if (_fileStreamSecurityValidator.IsConsideredSafe(filestream) == false)
+            {
+                return null;
+            }
+
             // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
             // since we'd need to be able to return values for other properties from these methods
             _mediaFileManager.FileSystem.AddFile(filepath, filestream, true); // must overwrite!

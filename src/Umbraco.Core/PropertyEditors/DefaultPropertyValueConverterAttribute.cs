@@ -16,11 +16,10 @@ public class DefaultPropertyValueConverterAttribute : Attribute
     ///     a DefaultPropertyValueConverter can be more specific than another one.
     /// </summary>
     /// <remarks>
-    ///     An example where this is useful is that both the RelatedLiksEditorValueConverter and the JsonValueConverter
+    ///     An example where this is useful is that both the MultiUrlPickerValueConverter and the JsonValueConverter
     ///     will be returned as value converters for the Related Links Property editor, however the JsonValueConverter
-    ///     is a very generic converter and the RelatedLiksEditorValueConverter is more specific than it, so the
-    ///     RelatedLiksEditorValueConverter
-    ///     can specify that it 'shadows' the JsonValueConverter.
+    ///     is a very generic converter and the MultiUrlPickerValueConverter is more specific than it, so the
+    ///     MultiUrlPickerValueConverter can specify that it 'shadows' the JsonValueConverter.
     /// </remarks>
     public Type[] DefaultConvertersToShadow { get; }
 }

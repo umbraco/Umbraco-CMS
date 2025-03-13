@@ -2,6 +2,7 @@
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_1_0;
 
+[Obsolete("This is no longer used and will be removed in V14.")]
 public class TablesIndexesImprovement : MigrationBase
 {
     public TablesIndexesImprovement(IMigrationContext context) : base(context)

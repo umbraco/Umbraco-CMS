@@ -1,37 +1,51 @@
-<div ng-controller="Umbraco.PrevalueEditors.TreeSourceController" class="umb-property-editor umb-contentpicker">
+<div ng-controller="Umbraco.PrevalueEditors.TreeSourceController as vm" class="umb-property-editor umb-contentpicker">
 
-	<select ng-model="model.value.type" class="umb-property-editor" ng-change="clear()">
+	<select ng-model="model.value.type" class="umb-property-editor" ng-change="vm.clear()">
 		<option value="content">Content</option>
 		<option value="media">Media</option>
 		<option value="member">Members</option>
 	</select>
 
-    <umb-node-preview
-		ng-show="node"
-        class="mt1"
-		icon="node.icon"
-		name="node.name"
-		published="node.published"
-		description="node.path"
-		allow-remove="true"
-		allow-edit="true"
-		on-remove="clear()"
-		on-edit="openContentPicker()">
+  <h5 ng-if="node"><localize key="contentPicker_configurationStartNodeTitle">Root node</localize></h5>
+
+  <umb-node-preview
+		  ng-if="node"
+      class="mt1"
+		  icon="node.icon"
+		  name="node.name"
+		  published="node.published"
+		  description="node.path"
+		  allow-remove="true"
+		  allow-edit="true"
+		  on-remove="vm.clear()"
+		  on-edit="vm.openContentPicker()">
 	</umb-node-preview>
 
-    <div ng-if="!node && model.value.type !== 'member'" class="mt2">
-        <div ng-hide="showSearch || model.value.query">
-            <button type="button" class="umb-node-preview-add"
-                    ng-click="openContentPicker()">
-                <localize key="general_choose">Choose a root node</localize>
-            </button>
-            <div class="mt2" ng-show="model.value.type == 'content'">
-                <umb-icon icon="icon-search" class="icon"></umb-icon>
-                <button type="button" class="btn-link" ng-click="showSearch = true">Query for root node with XPath</button>
-            </div>
+    <div ng-if="!node && model.value.type === 'content'" class="mt2">
+        <div ng-hide="(vm.showXPath || model.value.query) || (vm.showDynamicStartNode || model.value.dynamicRoot)" class="flex">
+          <button
+            type="button"
+            class="umb-node-preview-add"
+            ng-click="vm.openContentPicker()">
+            <localize key="contentPicker_defineRootNode">Pick root node</localize>
+          </button>
+          <button
+            type="button"
+            class="umb-node-preview-add"
+            ng-click="vm.chooseXPath()">
+            <localize key="contentPicker_defineXPathOrigin">Specify root via XPath</localize>
+          </button>
+          <button
+            type="button"
+            class="umb-node-preview-add"
+            ng-click="vm.chooseDynamicStartNode()">
+            <localize key="contentPicker_defineDynamicRoot">Specify a Dynamic Root</localize>
+          </button>
         </div>
 
-        <div ng-show="showSearch || model.value.query">
+        <div ng-if="vm.showXPath || model.value.query">
+
+          <h5><localize key="contentPicker_configurationXPathTitle">XPath Query</localize></h5>
 
             <input type="text"
                    ng-model="model.value.query"
@@ -51,9 +65,9 @@
                         <p>
                             A placeholder finds the nearest published ID and runs its query from there, so for instance:
                         </p>
-                        
+
                         <pre>$parent/newsArticle</pre>
-                        
+
                         <p>
                             Will try to get the parent if available, but will then fall back to the nearest ancestor and query for all news article children there.
                         </p>
@@ -72,10 +86,54 @@
                 </li>
                 <li>
                     <umb-icon icon="icon-delete" class="icon red"></umb-icon>
-                    <button type="button" class="btn-link" ng-click="showSearch = false; model.value.query = ''"> Cancel and clear query</button>
+                    <button type="button" class="btn-link" ng-click="vm.clearXPath()">Cancel and clear query</button>
                 </li>
             </ul>
         </div>
+      <div ng-if="vm.showDynamicStartNode || model.value.dynamicRoot">
+
+        <h5><localize key="dynamicRoot_configurationTitle">Dynamic Root Query</localize></h5>
+
+        <!-- Origin -->
+        <umb-node-preview
+            single
+            icon="vm.dynamicRootOrigin.icon"
+            name="vm.dynamicRootOrigin.name"
+            description="vm.dynamicRootOrigin.description"
+            allow-change="true"
+            allow-remove="false"
+            on-change="vm.openDynamicRootOriginPicker()">
+        </umb-node-preview>
+
+        <!-- List of query steps -->
+        <div ui-sortable="vm.sortableOptionsForQuerySteps" ng-model="vm.sortableModel" ng-if="vm.querySteps">
+          <umb-node-preview
+              ng-repeat="queryStep in vm.querySteps track by $id(queryStep)"
+              single
+              class="mt1"
+              icon="queryStep.icon"
+              name="queryStep.name"
+              description="queryStep.description"
+              allow-edit="false"
+              allow-remove="true"
+              on-remove="vm.removeQueryStep(queryStep, $index)">
+          </umb-node-preview>
+        </div>
+
+        <button
+          type="button"
+          class="umb-node-preview-add mt1"
+          ng-click="vm.appendDynamicQueryStep()">
+          <localize key="dynamicRoot_addQueryStep">Add query step</localize>
+        </button>
+
+        <ul class="unstyled list-icons mt3">
+          <li>
+            <umb-icon icon="icon-delete" class="icon red"></umb-icon>
+            <button type="button" class="btn-link" ng-click="vm.clearDynamicStartNode()"><localize key="dynamicRoot_cancelAndClearQuery">Cancel and clear query</localize></button>
+          </li>
+        </ul>
+      </div>
     </div>
 
 </div>

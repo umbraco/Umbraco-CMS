@@ -209,7 +209,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         var languageNbNo = new LanguageBuilder()
             .WithCultureInfo("nb-NO")
             .Build();
-        LocalizationService.Save(languageNbNo, 0);
+        LocalizationService.Save(languageNbNo, -1);
         Assert.That(languageNbNo.HasIdentity, Is.True);
         var languageId = languageNbNo.Id;
 
@@ -227,7 +227,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("nb-NO")
             .WithFallbackLanguageId(languageDaDk.Id)
             .Build();
-        LocalizationService.Save(languageNbNo, 0);
+        LocalizationService.Save(languageNbNo, -1);
         var languageId = languageDaDk.Id;
 
         LocalizationService.Delete(languageDaDk);
@@ -445,8 +445,8 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("en-GB")
             .Build();
 
-        LocalizationService.Save(languageDaDk, 0);
-        LocalizationService.Save(languageEnGb, 0);
+        LocalizationService.Save(languageDaDk, -1);
+        LocalizationService.Save(languageEnGb, -1);
         _danishLangId = languageDaDk.Id;
         _englishLangId = languageEnGb.Id;
 

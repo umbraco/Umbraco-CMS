@@ -3,6 +3,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_2_0;
 
+[Obsolete("This is no longer used and will be removed in V14.")]
 public class AddUserGroup2LanguageTable : MigrationBase
 {
     public AddUserGroup2LanguageTable(IMigrationContext context) : base(context)

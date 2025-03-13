@@ -104,7 +104,7 @@ public class UmbracoRequestMiddleware : IMiddleware
         // Also MiniProfiler.Current becomes null if it is handled by the event aggregator due to async/await
         _profiler?.UmbracoApplicationBeginRequest(context, _runtimeState.Level);
 
-        _variationContextAccessor.VariationContext ??= new VariationContext(_defaultCultureAccessor.DefaultCulture);
+        _variationContextAccessor.VariationContext ??= new VariationContext(context.Request.ClientCulture() ?? _defaultCultureAccessor.DefaultCulture, context.Request.ClientSegment());
         UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
         Uri? currentApplicationUrl = GetApplicationUrlFromCurrentRequest(context.Request);

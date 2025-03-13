@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
@@ -122,7 +123,7 @@ public class ImagesController : UmbracoAuthorizedApiController
 
     private bool IsAllowed(string encodedImagePath)
     {
-        if(Uri.IsWellFormedUriString(encodedImagePath, UriKind.Relative))
+        if(WebPath.IsWellFormedWebPath(encodedImagePath, UriKind.Relative))
         {
             return true;
         }
@@ -149,6 +150,11 @@ public class ImagesController : UmbracoAuthorizedApiController
     /// <param name="focalPointLeft"></param>
     /// <param name="focalPointTop"></param>
     /// <param name="mode"></param>
+    /// <param name="cacheBusterValue"></param>
+    /// <param name="cropX1"></param>
+    /// <param name="cropX2"></param>
+    /// <param name="cropY1"></param>
+    /// <param name="cropY2"></param>
     /// <returns></returns>
     /// <remarks>
     /// If there is no media, image property or image file is found then this will return not found.

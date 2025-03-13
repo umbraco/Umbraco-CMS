@@ -95,6 +95,8 @@ Use this directive to render a tabs navigation.
         function link(scope, element, attrs, ctrl) {
 
             var tabNavItemsWidths = [];
+            var tabItems = [];
+            var firstTab, lastTab;
             // the parent is the component itself so we need to go one level higher
             var container = element.parent().parent();
 
@@ -107,6 +109,32 @@ Use this directive to render a tabs navigation.
             $timeout(function(){
                 element.find("li:not(umb-tab--expand)").each(function() {
                     tabNavItemsWidths.push($(this).outerWidth());
+                });
+
+                tabItems = Array.from(element.find(".umb-tab > button"));
+                firstTab = tabItems[0];
+                lastTab = tabItems[tabItems.length - 1];
+
+                tabItems.forEach(tab => {
+                    tab.addEventListener("keydown", event => {
+                        var currentTarget = event.currentTarget;
+                        switch (event.key) {
+                            case "ArrowLeft":
+                                moveFocusToPreviousTab(currentTarget);
+                                break;
+                            case "ArrowRight":
+                                moveFocusToNextTab(currentTarget);
+                                break;
+                            case "Home":
+                                firstTab.focus();
+                                break;
+                            case "End":
+                                lastTab.focus();
+                                break;
+                            default:
+                                break;
+                        }
+                    });
                 });
             });
 
@@ -121,7 +149,7 @@ Use this directive to render a tabs navigation.
 
                     // detect how many tabs we can show on the screen
                     for (var i = 0; i <= tabNavItemsWidths.length; i++) {
-                        
+
                         var tabWidth = tabNavItemsWidths[i];
                         tabsWidth += tabWidth;
 
@@ -132,8 +160,29 @@ Use this directive to render a tabs navigation.
                             break;
                         }
                     }
-                    
+
                 });
+            }
+
+            function moveFocusToNextTab(currentTab) {
+                var index = tabItems.indexOf(currentTab);
+
+                if (currentTab === lastTab) {
+                    firstTab.focus();
+                }
+                else {
+                    tabItems[index + 1].focus();
+                }
+            }
+
+            function moveFocusToPreviousTab(currentTab) {
+                var index = tabItems.indexOf(currentTab);
+                if(currentTab === firstTab) {
+                    lastTab.focus();
+                }
+                else {
+                    tabItems[index - 1].focus();
+                }
             }
 
             scope.$on('$destroy', function() {
@@ -152,7 +201,7 @@ Use this directive to render a tabs navigation.
             vm.clickTab = clickTab;
             vm.toggleTray = toggleTray;
             vm.hideTray = hideTray;
-    
+
             function clickTab($event, tab) {
                 if (vm.onTabChange) {
                     hideTray();
@@ -169,7 +218,6 @@ Use this directive to render a tabs navigation.
             function hideTray() {
                 vm.showTray = false;
             }
-
         }
 
         var directive = {

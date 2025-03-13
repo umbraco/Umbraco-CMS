@@ -4,7 +4,10 @@ public enum FilterOperation
 {
     Is,
     IsNot,
-    // TODO: how to handle these in Examine?
     Contains,
-    DoesNotContain
+    DoesNotContain,
+    LessThan,
+    LessThanOrEqual,
+    GreaterThan,
+    GreaterThanOrEqual
 }

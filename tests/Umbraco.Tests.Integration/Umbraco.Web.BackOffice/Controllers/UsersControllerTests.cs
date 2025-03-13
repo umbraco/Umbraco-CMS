@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
@@ -24,6 +25,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers;
 public class UsersControllerTests : UmbracoTestServerTestBase
 {
     [Test]
+    [LongRunning]
     public async Task Save_User()
     {
         var url = PrepareApiControllerUrl<UsersController>(x => x.PostSaveUser(null));
@@ -70,6 +72,7 @@ public class UsersControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task GetPagedUsers_Empty()
     {
         // We get page 2 to force an empty response because there always in the useradmin user
@@ -92,6 +95,7 @@ public class UsersControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task GetPagedUsers_multiple_pages()
     {
         var totalNumberOfUsers = 11;
@@ -130,6 +134,7 @@ public class UsersControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task PostUnlockUsers_When_UserIds_Not_Supplied_Expect_Ok_Response()
     {
         var url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(Array.Empty<int>()));
@@ -141,6 +146,7 @@ public class UsersControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task PostUnlockUsers_When_User_Does_Not_Exist_Expect_Zero_Users_Message()
     {
         var userId = 42; // Must not exist
@@ -157,6 +163,7 @@ public class UsersControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task PostUnlockUsers_When_One_UserId_Supplied_Expect_User_Locked_Out_With_Correct_Response_Message()
     {
         var userService = GetRequiredService<IUserService>();
@@ -186,6 +193,7 @@ public class UsersControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task
         PostUnlockUsers_When_Multiple_UserIds_Supplied_Expect_User_Locked_Out_With_Correct_Response_Message()
     {
@@ -228,6 +236,7 @@ public class UsersControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task Cannot_Disable_Invited_User()
     {
         var userService = GetRequiredService<IUserService>();
@@ -258,6 +267,7 @@ public class UsersControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task Can_Disable_Active_User()
     {
         var userService = GetRequiredService<IUserService>();

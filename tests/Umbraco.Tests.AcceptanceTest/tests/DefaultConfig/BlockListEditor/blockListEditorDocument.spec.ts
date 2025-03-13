@@ -17,12 +17,12 @@ test.describe('BlockListEditorDocument', () => {
     await umbracoApi.documentTypes.ensureNameNotExists(documentName);
     await umbracoApi.dataTypes.ensureNameNotExists(blockListName);
   });
-  
+
   test.afterEach(async ({page, umbracoApi, umbracoUi}) => {
     await umbracoApi.documentTypes.ensureNameNotExists(documentName);
     await umbracoApi.dataTypes.ensureNameNotExists(blockListName);
   });
-  
+
   test('can create empty block list in a document', async ({page, umbracoApi, umbracoUi}) => {
     const groupName = 'blockListGroup';
 
@@ -38,8 +38,7 @@ test.describe('BlockListEditorDocument', () => {
     await umbracoUi.goToAddEditor(groupName, blockListName);
     // Waits until the selector is visible
     await expect(page.locator('[data-element="datatype-Block List"]')).toBeVisible();
-    await umbracoUi.clickDataElementByElementName('datatype-Block List');
-
+    await page.getByRole('button', { name: 'Block List' }).click();
     // Creates new BlockList editor
     await page.locator('[title="Create a new configuration of Block List"]').click();
     await page.locator('[id="dataTypeName"]').fill(blockListName);
@@ -49,14 +48,14 @@ test.describe('BlockListEditorDocument', () => {
     // Checks to ensure that the button is visible
     await expect(page.locator('[name="propertySettingsForm"]').locator('[label-key=' + ConstantHelper.buttons.submit + ']')).toBeVisible();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.submit));
-    
+
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
     // Assert
     await expect(page.locator('.umb-notifications__notifications > .alert-success', {hasText: "Datatype saved"})).toBeVisible();
     await expect(page.locator('.umb-notifications__notifications > .alert-success', {hasText: "Document Type saved"})).toBeVisible();
   });
-  
+
   test('can create multiple block list editors in a document', async ({page, umbracoApi, umbracoUi}) => {
     const elementNameSecond = 'TestElementTwo';
     const blockListNameSecond = 'BlockListTestNumbaTwo';
@@ -127,7 +126,7 @@ test.describe('BlockListEditorDocument', () => {
     await umbracoApi.documentTypes.save(rootDocType);
 
     await umbracoUi.navigateToDocumentType(documentName);
-    
+
     // Adds another block list editor to the first group
     await page.locator('[data-element="group-TestName"]').locator('[data-element="property-add"]').click();
     await page.locator('[data-element="property-name"]').fill('TheBlock');
@@ -136,7 +135,7 @@ test.describe('BlockListEditorDocument', () => {
     await page.locator('[title="Select ' + blockListNameSecond + '"]').click();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.submit));
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
-    
+
     // Assert
     await expect(page.locator('.umb-notifications__notifications > .alert-success', {hasText: "Document Type saved"})).toBeVisible();
     // Checks if the new block list is in the group

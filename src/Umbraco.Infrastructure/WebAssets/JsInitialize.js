@@ -1,5 +1,5 @@
 [
-    
+
     'lib/jquery/jquery.min.js',
     'lib/jquery-ui/jquery-ui.min.js',
     'lib/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js',
@@ -37,6 +37,8 @@
 
     'lib/umbraco-ui/uui/dist/uui.min.js',
 
+    'login/login.iife.js',
+
     'js/utilities.min.js',
 
     'js/app.min.js',
@@ -48,5 +50,5 @@
     'js/umbraco.interceptors.min.js',
     'js/umbraco.controllers.min.js',
     'js/routes.min.js',
-    'js/init.min.js'    
+    'js/init.min.js'
 ]

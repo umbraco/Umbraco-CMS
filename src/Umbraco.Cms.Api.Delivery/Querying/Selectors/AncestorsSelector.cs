@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
@@ -10,10 +12,21 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
 {
     private const string AncestorsSpecifier = "ancestors:";
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IRequestPreviewService _requestPreviewService;
 
-    public AncestorsSelector(IPublishedSnapshotAccessor publishedSnapshotAccessor, IRequestRoutingService requestRoutingService)
-        : base(publishedSnapshotAccessor, requestRoutingService) =>
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
+    public AncestorsSelector(IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IRequestRoutingService requestRoutingService)
+        : this(publishedSnapshotAccessor, requestRoutingService, StaticServiceProvider.Instance.GetRequiredService<IRequestPreviewService>())
+    {
+    }
+
+    public AncestorsSelector(IPublishedSnapshotAccessor publishedSnapshotAccessor, IRequestRoutingService requestRoutingService, IRequestPreviewService requestPreviewService)
+        : base(publishedSnapshotAccessor, requestRoutingService)
+    {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _requestPreviewService = requestPreviewService;
+    }
 
     /// <inheritdoc />
     public bool CanHandle(string query)
@@ -37,10 +50,20 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
             };
         }
 
-        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
+        IPublishedContentCache contentCache = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot()?.Content
+                                         ?? throw new InvalidOperationException("Could not obtain the content cache");
 
-        IPublishedContent contentItem = publishedSnapshot.Content?.GetById((Guid)id)
-                                        ?? throw new InvalidOperationException("Could not obtain the content cache");
+        IPublishedContent? contentItem = contentCache.GetById(_requestPreviewService.IsPreview(), id.Value);
+
+        if (contentItem is null)
+        {
+            // no such content item, make sure the selector does not yield any results
+            return new SelectorOption
+            {
+                FieldName = AncestorsSelectorIndexer.FieldName,
+                Values = Array.Empty<string>()
+            };
+        }
 
         var ancestorKeys = contentItem.Ancestors().Select(a => a.Key.ToString("D")).ToArray();
 

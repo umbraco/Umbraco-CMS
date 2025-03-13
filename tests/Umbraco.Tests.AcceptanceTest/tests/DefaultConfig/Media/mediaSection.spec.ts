@@ -51,7 +51,7 @@ test.describe('Media', () => {
             }
         });
         await page.locator('[label-key="actions_move"]').click();
-        await page.locator('[data-element="editor-container"] >> "' + folderToMoveTooName + '"').click();
+        await page.locator('[data-element="editor-container"]').locator('[data-element="tree-item-MoveHere"]').click();
         await page.locator('[label-key="general_submit"]').click();
 
         // Assert

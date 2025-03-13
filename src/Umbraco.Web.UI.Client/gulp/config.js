@@ -36,7 +36,9 @@ module.exports = {
             preview: { files: "./src/less/canvas-designer.less", watch: "./src/less/**/*.less", out: "canvasdesigner.min.css" },
             umbraco: { files: "./src/less/belle.less", watch: "./src/**/*.less", out: "umbraco.min.css" },
             rteContent: { files: "./src/less/rte-content.less", watch: "./src/less/**/*.less", out: "rte-content.css" },
-            blockgridui: { files: "./src/views/propertyeditors/blockgrid/blockgridui.less", watch: "./src/views/propertyeditors/blockgrid/blockgridui.less", out: "blockgridui.css" }
+            icons: { files: "./src/less/icons.less", watch: "./src/less/**/*.less", out: "icons.css" },
+            blockgridui: { files: "./src/views/propertyeditors/blockgrid/blockgridui.less", watch: "./src/views/propertyeditors/blockgrid/blockgridui.less", out: "blockgridui.css" },
+            blockrteui: { files: "./src/views/propertyeditors/rte/blockrteui.less", watch: "./src/views/propertyeditors/rte/blockrteui.less", out: "blockrteui.css" }
         },
 
         // js files for backoffice

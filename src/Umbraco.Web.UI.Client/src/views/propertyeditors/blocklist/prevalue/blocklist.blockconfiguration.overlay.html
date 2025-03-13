@@ -110,7 +110,11 @@
                                     <label class="control-label" for="blockContentElemenType"><localize key="blockEditor_labelContentElementType">Content ElementType</localize></label>
                                     <div class="controls">
                                         <div class="__settings-input --hasValue" ng-if="vm.block.contentElementTypeKey !== null" >
-                                            <umb-node-preview icon="vm.contentPreview.icon" name="vm.contentPreview.name" alias="vm.contentPreview.alias"></umb-node-preview>
+                                            <umb-node-preview
+                                                icon="vm.contentPreview.icon"
+                                                name="vm.contentPreview.name"
+                                                alias="vm.contentPreview.alias">
+                                            </umb-node-preview>
                                             <div class="__control-actions">
                                                 <button type="button" id="blockContentElemenType" class="btn-reset __control-actions-btn --open umb-outline" ng-click="vm.openElementType(vm.block.contentElementTypeKey)">
                                                     <umb-icon icon="icon-edit" class="icon"></umb-icon>
@@ -127,9 +131,13 @@
                                     <label class="control-label" for="blockSettingsElemenType"><localize key="blockEditor_labelSettingsElementType">Settings Element Type</localize></label>
                                     <div class="controls">
                                         <div class="__settings-input --hasValue" ng-if="vm.block.settingsElementTypeKey !== null">
-                                            <umb-node-preview icon="vm.settingsPreview.icon" name="vm.settingsPreview.name" alias="vm.settingsPreview.alias"></umb-node-preview>
+                                            <umb-node-preview
+                                                icon="vm.settingsPreview.icon"
+                                                name="vm.settingsPreview.name"
+                                                alias="vm.settingsPreview.alias">
+                                            </umb-node-preview>
                                             <div class="__control-actions">
-                                                <button type="button" class="btn-reset __control-actions-btn --open umb-outline" ng-click="vm.openElementType(vm.block.settingsElementTypeKey)">
+                                                <button type="button" class="btn-reset __control-actions-btn --open umb-outline" ng-click="vm.openElementType(vm.block.settingsElementTypeKey)" ng-if="vm.settingsPreview && vm.settingsPreview.alias">
                                                     <umb-icon icon="icon-edit" class="icon"></umb-icon>
                                                 </button>
                                                 <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.requestRemoveSettingsForBlock(vm.block)">

@@ -47,7 +47,6 @@ public class DefaultUrlProvider : IUrlProvider
     /// <summary>
     ///     Gets the other URLs of a published content.
     /// </summary>
-    /// <param name="umbracoContextAccessor">The Umbraco context.</param>
     /// <param name="id">The published content id.</param>
     /// <param name="current">The current absolute URL.</param>
     /// <returns>The other URLs for the published content.</returns>

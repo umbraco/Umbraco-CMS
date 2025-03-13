@@ -5,6 +5,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// <summary>
 ///     Embed Provider for Twitter the popular online service for microblogging and social networking.
 /// </summary>
+[Obsolete("Please use X instead, scheduled for removal in v16")]
 public class Twitter : OEmbedProviderBase
 {
     public Twitter(IJsonSerializer jsonSerializer)

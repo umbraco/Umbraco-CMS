@@ -5,28 +5,27 @@ namespace Umbraco.Cms.Core.Deploy;
 /// <summary>
 /// Connects to an Umbraco service.
 /// </summary>
-/// <seealso cref="Umbraco.Cms.Core.Composing.IDiscoverable" />
 public interface IServiceConnector : IDiscoverable
 {
     /// <summary>
     /// Gets an artifact.
     /// </summary>
     /// <param name="udi">The entity identifier of the artifact.</param>
+    /// <param name="contextCache">The context cache.</param>
     /// <returns>
     /// The corresponding artifact, or null.
     /// </returns>
-    [Obsolete($"Implement {nameof(IServiceConnector2)} and use the overload accepting {nameof(IContextCache)} instead. This overload will be removed in Umbraco 13.")]
-    IArtifact? GetArtifact(Udi udi);
+    IArtifact? GetArtifact(Udi udi, IContextCache contextCache);
 
     /// <summary>
     /// Gets an artifact.
     /// </summary>
     /// <param name="entity">The entity.</param>
+    /// <param name="contextCache">The context cache.</param>
     /// <returns>
     /// The corresponding artifact.
     /// </returns>
-    [Obsolete($"Implement {nameof(IServiceConnector2)} and use the overload accepting {nameof(IContextCache)} instead. This overload will be removed in Umbraco 13.")]
-    IArtifact GetArtifact(object entity);
+    IArtifact GetArtifact(object entity, IContextCache contextCache);
 
     /// <summary>
     /// Initializes processing for an artifact.
@@ -47,10 +46,10 @@ public interface IServiceConnector : IDiscoverable
     void Process(ArtifactDeployState dart, IDeployContext context, int pass);
 
     /// <summary>
-    /// Explodes a range into udis.
+    /// Explodes a range into UDIs.
     /// </summary>
     /// <param name="range">The range.</param>
-    /// <param name="udis">The list of udis where to add the new udis.</param>
+    /// <param name="udis">The list of UDIs where to add the new UDIs.</param>
     /// <remarks>
     /// Also, it's cool to have a method named Explode. Kaboom!
     /// </remarks>
@@ -78,9 +77,9 @@ public interface IServiceConnector : IDiscoverable
     /// <remarks>
     /// <para>This is temporary. At least we thought it would be, in sept. 2016. What day is it now?</para>
     /// <para>
-    /// At the moment our UI has a hard time returning proper udis, mainly because Core's tree do
-    /// not manage guids but only ints... so we have to provide a way to support it. The string id here
-    /// can be either a real string (for string udis) or an "integer as a string", using the value "-1" to
+    /// At the moment our UI has a hard time returning proper UDIs, mainly because Core's tree do
+    /// not manage GUIDs but only integers... so we have to provide a way to support it. The string id here
+    /// can be either a real string (for string UDIs) or an "integer as a string", using the value "-1" to
     /// indicate the "root" i.e. an open udi.
     /// </para>
     /// </remarks>

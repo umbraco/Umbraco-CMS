@@ -59,6 +59,7 @@ public static class ContentRepositoryExtensions
     /// </summary>
     /// <param name="content"></param>
     /// <param name="date"></param>
+    /// <param name="publishing"></param>
     /// <remarks>
     ///     This is so that in an operation where (for example) 2 languages are updates like french and english, it is possible
     ///     that
@@ -173,15 +174,17 @@ public static class ContentRepositoryExtensions
         foreach (IProperty property in content.Properties)
         {
             // each property type may or may not support the variation
-            if (!property.PropertyType?.SupportsVariation(culture, "*", true) ?? false)
+            if ((!property.PropertyType?.SupportsVariation(culture, "*", true) ?? false) &&
+                    !(property.PropertyType?.Variations == ContentVariation.Nothing))
             {
                 continue;
             }
 
             foreach (IPropertyValue pvalue in property.Values)
             {
-                if ((property.PropertyType?.SupportsVariation(pvalue.Culture, pvalue.Segment, true) ?? false) &&
-                    (culture == "*" || (pvalue.Culture?.InvariantEquals(culture) ?? false)))
+                if (((property.PropertyType?.SupportsVariation(pvalue.Culture, pvalue.Segment, true) ?? false) &&
+                    (culture == "*" || (pvalue.Culture?.InvariantEquals(culture) ?? false))) ||
+                    property.PropertyType?.Variations == ContentVariation.Nothing)
                 {
                     property.SetValue(null, pvalue.Culture, pvalue.Segment);
                 }
@@ -192,7 +195,8 @@ public static class ContentRepositoryExtensions
         IPropertyCollection otherProperties = other.Properties;
         foreach (IProperty otherProperty in otherProperties)
         {
-            if (!otherProperty?.PropertyType?.SupportsVariation(culture, "*", true) ?? true)
+            if ((!otherProperty?.PropertyType?.SupportsVariation(culture, "*", true) ?? true) &&
+                    !(otherProperty?.PropertyType?.Variations == ContentVariation.Nothing))
             {
                 continue;
             }
@@ -202,8 +206,9 @@ public static class ContentRepositoryExtensions
             {
                 foreach (IPropertyValue pvalue in otherProperty.Values)
                 {
-                    if (otherProperty.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, true) &&
-                        (culture == "*" || (pvalue.Culture?.InvariantEquals(culture) ?? false)))
+                    if (((otherProperty?.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, true) ?? false) &&
+                        (culture == "*" ||(pvalue.Culture?.InvariantEquals(culture) ?? false))) ||
+                         otherProperty?.PropertyType?.Variations == ContentVariation.Nothing)
                     {
                         var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
                         content.SetValue(alias, value, pvalue.Culture, pvalue.Segment);

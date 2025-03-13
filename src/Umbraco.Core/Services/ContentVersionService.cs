@@ -66,9 +66,9 @@ internal class ContentVersionService : IContentVersionService
     }
 
     /// <inheritdoc />
-    public void SetPreventCleanup(int versionId, bool preventCleanup, int userId = -1)
+    public void SetPreventCleanup(int versionId, bool preventCleanup, int userId = Constants.Security.SuperUserId)
     {
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             scope.WriteLock(Constants.Locks.ContentTree);
             _documentVersionRepository.SetPreventCleanup(versionId, preventCleanup);
@@ -77,6 +77,7 @@ internal class ContentVersionService : IContentVersionService
 
             if (version is null)
             {
+                scope.Complete();
                 return;
             }
 
@@ -87,6 +88,7 @@ internal class ContentVersionService : IContentVersionService
             var message = $"set preventCleanup = '{preventCleanup}' for version '{versionId}'";
 
             Audit(auditType, userId, version.ContentId, message, $"{version.VersionDate}");
+            scope.Complete();
         }
     }
 
@@ -120,13 +122,14 @@ internal class ContentVersionService : IContentVersionService
          *
          * tl;dr lots of scopes to enable other connections to use the DB whilst we work.
          */
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             IReadOnlyCollection<ContentVersionMeta>? allHistoricVersions =
                 _documentVersionRepository.GetDocumentVersionsEligibleForCleanup();
 
             if (allHistoricVersions is null)
             {
+                scope.Complete();
                 return Array.Empty<ContentVersionMeta>();
             }
             if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
@@ -154,6 +157,8 @@ internal class ContentVersionService : IContentVersionService
 
                 versionsToDelete.Add(version);
             }
+
+            scope.Complete();
         }
 
         if (!versionsToDelete.Any())
@@ -169,7 +174,7 @@ internal class ContentVersionService : IContentVersionService
 
         foreach (IEnumerable<ContentVersionMeta> group in versionsToDelete.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
-            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
                 var groupEnumerated = group.ToList();
@@ -182,12 +187,16 @@ internal class ContentVersionService : IContentVersionService
                     scope.Notifications.Publish(
                         new ContentDeletedVersionsNotification(version.ContentId, messages, version.VersionId));
                 }
+
+                scope.Complete();
             }
         }
 
-        using (_scopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             Audit(AuditType.Delete, Constants.Security.SuperUserId, -1, $"Removed {versionsToDelete.Count} ContentVersion(s) according to cleanup policy");
+
+            scope.Complete();
         }
 
         return versionsToDelete;

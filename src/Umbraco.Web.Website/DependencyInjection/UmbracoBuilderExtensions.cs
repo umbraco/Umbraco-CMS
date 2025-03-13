@@ -64,6 +64,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IUmbracoVirtualPageRoute, UmbracoVirtualPageRoute>();
         builder.Services.AddSingleton<IUmbracoRouteValuesFactory, UmbracoRouteValuesFactory>();
         builder.Services.AddSingleton<IRoutableDocumentFilter, RoutableDocumentFilter>();
+        builder.Services.AddSingleton<MatcherPolicy, EagerMatcherPolicy>();
         builder.Services.AddSingleton<MatcherPolicy, SurfaceControllerMatcherPolicy>();
 
         builder.Services.AddSingleton<FrontEndRoutes>();

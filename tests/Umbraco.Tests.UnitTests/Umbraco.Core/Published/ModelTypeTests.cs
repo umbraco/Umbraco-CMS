@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
+using System.Collections;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Tests.Common.Published;
@@ -45,7 +45,7 @@ public class ModelTypeTests
 
         // Note the inner assembly qualified name
         Assert.AreEqual(
-            "System.Collections.Generic.IEnumerable`1[[System.Int32[], System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+            $"System.Collections.Generic.IEnumerable`1[[System.Int32[], System.Private.CoreLib, Version={typeof(IEnumerable).Assembly.GetName().Version}, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
             typeof(IEnumerable<>).MakeGenericType(type.MakeArrayType()).FullName);
     }
 

@@ -10,6 +10,17 @@
 
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
 
+        <div class="umb-list-item" ng-if="vm.availableVariants.length > 1">
+          <umb-checkbox
+                        model="vm.sendToPublishAll"
+                        name="sendToPublishAllVariantsSelector"
+                        on-change="vm.changeSendToPublishAllSelection()"
+                        disabled="vm.availableVariants.length == 0">
+          <span class="umb-variant-selector-entry__title">
+            <localize key="content_selectAllVariants">Select all variants</localize>
+          </span>
+        </div>
+
         <div class="umb-list-item" ng-repeat="variant in vm.availableVariants track by variant.compositeId">
             <ng-form name="publishVariantSelectorForm">
                 <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">

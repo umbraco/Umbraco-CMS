@@ -520,7 +520,7 @@ public static class ImageCropperTemplateCoreExtensions
             throw new ArgumentNullException(nameof(mediaItem));
         }
 
-        if (mediaItem.HasProperty(propertyAlias) == false || mediaItem.HasValue(propertyAlias) == false)
+        if (mediaItem.HasProperty(propertyAlias) == false || mediaItem.HasValue(publishedValueFallback, propertyAlias) == false)
         {
             return null;
         }

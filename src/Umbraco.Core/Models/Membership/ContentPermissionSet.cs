@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.Entities;
 namespace Umbraco.Cms.Core.Models.Membership;
 
 /// <summary>
-///     Represents an <see cref="IContent" /> -> user group & permission key value pair collection
+///     Represents an <see cref="IContent" /> -> user group &amp; permission key value pair collection
 /// </summary>
 /// <remarks>
 ///     This implements <see cref="IEntity" /> purely so it can be used with the repository layer which is why it's

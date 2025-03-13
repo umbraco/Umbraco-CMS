@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -18,11 +18,14 @@ namespace Umbraco.Cms.Web.BackOffice.Filters;
 ///     Validates the incoming <see cref="ContentItemSave" /> model along with if the user is allowed to perform the
 ///     operation
 /// </summary>
-internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
+public sealed class ContentSaveValidationAttribute : TypeFilterAttribute
 {
-    public ContentSaveValidationAttribute() : base(typeof(ContentSaveValidationFilter)) =>
+    public ContentSaveValidationAttribute(bool skipUserAccessValidation = false)
+        : base(typeof(ContentSaveValidationFilter))
+    {
         Order = -3000; // More important than ModelStateInvalidFilter.FilterOrder
-
+        Arguments = new object[] { skipUserAccessValidation };
+    }
 
     private sealed class ContentSaveValidationFilter : IAsyncActionFilter
     {
@@ -32,6 +35,7 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
         private readonly ILocalizationService _localizationService;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IPropertyValidationService _propertyValidationService;
+        private readonly bool _skipUserAccessValidation;
 
 
         public ContentSaveValidationFilter(
@@ -40,7 +44,8 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
             IPropertyValidationService propertyValidationService,
             IAuthorizationService authorizationService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            bool skipUserAccessValidation)
         {
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
@@ -49,6 +54,7 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
             _authorizationService = authorizationService;
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _localizationService = localizationService;
+            _skipUserAccessValidation = skipUserAccessValidation;
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -88,7 +94,7 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
                 return;
             }
 
-            if (!await ValidateUserAccessAsync(model, context))
+            if (_skipUserAccessValidation is false && await ValidateUserAccessAsync(model, context) is false)
             {
                 return;
             }
@@ -131,7 +137,6 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
         /// </summary>
         /// <param name="actionContext"></param>
         /// <param name="contentItem"></param>
-        /// <param name="backofficeSecurity"></param>
         private async Task<bool> ValidateUserAccessAsync(
             ContentItemSave? contentItem,
             ActionExecutingContext actionContext)
@@ -189,7 +194,7 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
                     break;
                 case ContentSaveAction.Schedule:
                     permissionToCheck.Add(ActionUpdate.ActionLetter);
-                    permissionToCheck.Add(ActionToPublish.ActionLetter);
+                    permissionToCheck.Add(ActionPublish.ActionLetter);
                     contentToCheck = contentItem.PersistedContent;
                     contentIdToCheck = contentToCheck?.Id ?? default;
                     break;
@@ -278,6 +283,7 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
 
             if (!authorizationResult.Succeeded)
             {
+                actionContext.Result = new ForbidResult();
                 return false;
             }
 

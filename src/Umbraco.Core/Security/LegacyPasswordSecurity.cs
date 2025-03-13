@@ -16,8 +16,11 @@ public class LegacyPasswordSecurity
     public static string GenerateSalt()
     {
         var numArray = new byte[16];
-        new RNGCryptoServiceProvider().GetBytes(numArray);
-        return Convert.ToBase64String(numArray);
+        using (var rng = new RNGCryptoServiceProvider())
+        {
+            rng.GetBytes(numArray);
+            return Convert.ToBase64String(numArray);
+        }
     }
 
     // TODO: Remove v11
@@ -86,7 +89,7 @@ public class LegacyPasswordSecurity
     /// </summary>
     public bool VerifyLegacyHashedPassword(string password, string dbPassword)
     {
-        var hashAlgorithm = new HMACSHA1
+        using var hashAlgorithm = new HMACSHA1
         {
             // the legacy salt was actually the password :(
             Key = Encoding.Unicode.GetBytes(password),
@@ -218,10 +221,9 @@ public class LegacyPasswordSecurity
     }
 
     /// <summary>
-    ///     Return the hash algorithm to use based on the <see cref="IPasswordConfiguration" />
+    ///     Return the hash algorithm to use based on the provided <paramref name="algorithm"/>.
     /// </summary>
     /// <param name="algorithm">The hashing algorithm name.</param>
-    /// <param name="password"></param>
     /// <returns></returns>
     private HashAlgorithm GetHashAlgorithm(string algorithm)
     {

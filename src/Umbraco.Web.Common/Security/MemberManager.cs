@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -124,8 +125,11 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     /// <inheritdoc />
     public virtual bool IsLoggedIn()
     {
-        HttpContext? httpContext = _httpContextAccessor.HttpContext;
-        return httpContext?.User.Identity?.IsAuthenticated ?? false;
+        // We have to try and specifically find the member identity, it's entirely possible for there to be both backoffice and member.
+        ClaimsIdentity? memberIdentity = _httpContextAccessor.HttpContext?.User.GetMemberIdentity();
+
+        return memberIdentity is not null &&
+               memberIdentity.IsAuthenticated;
     }
 
     /// <inheritdoc />
@@ -181,15 +185,19 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     /// <inheritdoc />
     public virtual async Task<MemberIdentityUser?> GetCurrentMemberAsync()
     {
-        if (_currentMember == null)
+        if (_currentMember is not null)
         {
-            if (!IsLoggedIn())
-            {
-                return null;
-            }
-
-            _currentMember = await GetUserAsync(_httpContextAccessor.HttpContext?.User!);
+            return _currentMember;
         }
+
+        if (IsLoggedIn() is false)
+        {
+            return null;
+        }
+
+        // Create a principal the represents the member security context.
+        var memberPrincipal = new ClaimsPrincipal(_httpContextAccessor.HttpContext?.User.GetMemberIdentity()!);
+        _currentMember = await GetUserAsync(memberPrincipal);
 
         return _currentMember;
     }
@@ -197,7 +205,7 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     public virtual IPublishedContent? AsPublishedMember(MemberIdentityUser user) => _store.GetPublishedMember(user);
 
     /// <summary>
-    ///     This will check if the member has access to this path
+    /// This will check if the member has access to this path.
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>

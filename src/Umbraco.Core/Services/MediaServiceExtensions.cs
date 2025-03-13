@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core;
@@ -34,7 +34,7 @@ public static class MediaServiceExtensions
         return mediaService.GetByIds(guids.Select(x => x.Guid));
     }
 
-    public static IMedia CreateMedia(this IMediaService mediaService, string name, Udi parentId, string mediaTypeAlias, int userId = 0)
+    public static IMedia CreateMedia(this IMediaService mediaService, string name, Udi parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
     {
         if (parentId is not GuidUdi guidUdi)
         {

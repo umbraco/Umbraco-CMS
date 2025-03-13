@@ -6,7 +6,7 @@
  * @requires angularHelper
  *
  * @description
- * Promise-based utillity service to lazy-load client-side dependencies inside angular controllers.
+ * Promise-based utility service to lazy-load client-side dependencies inside angular controllers.
  *
  * ##usage
  * To use, simply inject the assetsService into any controller that needs it, and make
@@ -20,10 +20,10 @@
  *      });
  * </pre>
  *
- * You can also load individual files, which gives you greater control over what attibutes are passed to the file, as well as timeout
+ * You can also load individual files, which gives you greater control over what attributes are passed to the file:
  *
  * <pre>
- *      angular.module("umbraco").controller("my.controller". function(assetsService){
+ *      angular.module("umbraco").controller("my.controller". function(assetsService) {
  *          assetsService.loadJs("script.js", $scope, {charset: 'utf-8'}, 10000 }).then(function(){
  *                 //this code executes when the script is done loading
  *          });
@@ -33,7 +33,7 @@
  * For these cases, there are 2 individual methods, one for javascript, and one for stylesheets:
  *
  * <pre>
- *      angular.module("umbraco").controller("my.controller". function(assetsService){
+ *      angular.module("umbraco").controller("my.controller". function(assetsService) {
  *          assetsService.loadCss("stye.css", $scope, {media: 'print'}, 10000 }).then(function(){
  *                 //loadcss cannot determine when the css is done loading, so this will trigger instantly
  *          });
@@ -55,7 +55,7 @@ angular.module('umbraco.services')
             var _op = (url.indexOf("?") > 0) ? "&" : "?";
             url = url + _op + "umb__rnd=" + rnd;
             return url;
-        };
+        }
 
         function convertVirtualPath(path) {
             //make this work for virtual paths
@@ -72,7 +72,7 @@ angular.module('umbraco.services')
         function getFlatpickrLocales(locales, supportedLocales) {
             return getLocales(locales, supportedLocales, 'lib/flatpickr/l10n/');
         }
-        
+
         function getLocales(locales, supportedLocales, path) {
             var localeUrls = [];
             locales = locales.split(',');
@@ -168,17 +168,13 @@ angular.module('umbraco.services')
              *
              * @param {String} path path to the css file to load
              * @param {Scope} scope optional scope to pass into the loader
-             * @param {Object} keyvalue collection of attributes to pass to the stylesheet element
-             * @param {Number} timeout in milliseconds
              * @returns {Promise} Promise object which resolves when the file has loaded
              */
-            loadCss: function (path, scope, attributes, timeout) {
+            loadCss: function (path, scope) {
 
                 path = convertVirtualPath(path);
 
-                var asset = this._getAssetPromise(path); // $q.defer();
-                var t = timeout || 5000;
-                var a = attributes || undefined;
+                const asset = this._getAssetPromise(path);
 
                 if (asset.state === "new") {
                     asset.state = "loading";
@@ -207,17 +203,13 @@ angular.module('umbraco.services')
              *
              * @param {String} path path to the js file to load
              * @param {Scope} scope optional scope to pass into the loader
-             * @param {Object} keyvalue collection of attributes to pass to the script element
-             * @param {Number} timeout in milliseconds
              * @returns {Promise} Promise object which resolves when the file has loaded
              */
-            loadJs: function (path, scope, attributes, timeout) {
+            loadJs: function (path, scope) {
 
                 path = convertVirtualPath(path);
 
-                var asset = this._getAssetPromise(path); // $q.defer();
-                var t = timeout || 5000;
-                var a = attributes || undefined;
+                const asset = this._getAssetPromise(path);
 
                 if (asset.state === "new") {
                     asset.state = "loading";
@@ -250,7 +242,7 @@ angular.module('umbraco.services')
              *
              * @param {Array} pathArray string array of paths to the files to load
              * @param {Scope} scope optional scope to pass into the loader
-             * @param {string} defaultAssetType optional default asset type used to load assets with no extension 
+             * @param {string} defaultAssetType optional default asset type used to load assets with no extension
              * @returns {Promise} Promise object which resolves when all the files has loaded
              */
             load: function (pathArray, scope, defaultAssetType) {

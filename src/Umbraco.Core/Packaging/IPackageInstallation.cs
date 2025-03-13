@@ -22,7 +22,7 @@ public interface IPackageInstallation
     /// <summary>
     ///     Reads the package xml and returns the <see cref="CompiledPackage" /> model
     /// </summary>
-    /// <param name="packageFile"></param>
+    /// <param name="packageXmlFile"></param>
     /// <returns></returns>
     CompiledPackage ReadPackage(XDocument? packageXmlFile);
 }

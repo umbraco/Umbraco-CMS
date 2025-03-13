@@ -48,7 +48,7 @@ public interface IMembershipMemberService<T> : IService
     ///     but that is how MS have made theirs so we'll follow that principal.
     /// </remarks>
     /// <param name="countType"><see cref="MemberCountType" /> to count by</param>
-    /// <returns><see cref="System.int" /> with number of Members or Users for passed in type</returns>
+    /// <returns><see cref="int" /> with number of Members or Users for passed in type</returns>
     int GetCount(MemberCountType countType);
 
     /// <summary>
@@ -134,6 +134,14 @@ public interface IMembershipMemberService<T> : IService
     /// <remarks>An <see cref="IMembershipUser" /> can be of type <see cref="IMember" /> or <see cref="IUser" /></remarks>
     /// <param name="entity"><see cref="IMember" /> or <see cref="IUser" /> to Save</param>
     void Save(T entity);
+
+    /// <summary>
+    ///     Saves an <see cref="IMembershipUser" />
+    /// </summary>
+    /// <remarks>An <see cref="IMembershipUser" /> can be of type <see cref="IMember" /> or <see cref="IUser" /></remarks>
+    /// <param name="entity"><see cref="IMember" /> or <see cref="IUser" /> to Save</param>
+    /// <param name="publishNotificationSaveOptions"> Enum for deciding which notifications to publish.</param>
+    void Save(T entity, PublishNotificationSaveOptions publishNotificationSaveOptions) => Save(entity);
 
     /// <summary>
     ///     Saves a list of <see cref="IMembershipUser" /> objects

@@ -92,7 +92,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     /// <para>Each migration in the plan, may or may not run in a scope depending on the type of plan.</para>
     /// <para>A plan can complete partially, the changes of each completed migration will be saved.</para>
     /// </remarks>
-    [Obsolete("This will return an ExecutedMigrationPlan in V13")]
     public ExecutedMigrationPlan ExecutePlan(MigrationPlan plan, string fromState)
     {
         plan.Validate();
@@ -127,7 +126,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                         continue;
                     }
 
-                    _logger.LogInformation($"PostMigration: {migrationContextPostMigration.FullName}.");
+                    _logger.LogInformation("PostMigration: {migrationContextFullName}.", migrationContextPostMigration.FullName);
                     MigrationBase postMigration = _migrationBuilder.Build(migrationContextPostMigration, executedMigrationContext);
                     postMigration.Run();
 

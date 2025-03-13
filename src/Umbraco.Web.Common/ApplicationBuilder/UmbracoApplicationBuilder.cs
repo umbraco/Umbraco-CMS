@@ -82,9 +82,14 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
         // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing?view=aspnetcore-5.0
         // where we need to have UseAuthentication and UseAuthorization proceeding this call but before
         // endpoints are defined.
+        RunPreRouting();
         AppBuilder.UseRouting();
+        RunPostRouting();
+
         AppBuilder.UseAuthentication();
         AppBuilder.UseAuthorization();
+
+        AppBuilder.UseAntiforgery();
 
         // This must come after auth because the culture is based on the auth'd user
         AppBuilder.UseRequestLocalization();
@@ -111,6 +116,22 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
         foreach (IUmbracoPipelineFilter filter in _umbracoPipelineStartupOptions.Value.PipelineFilters)
         {
             filter.OnPrePipeline(AppBuilder);
+        }
+    }
+
+    public void RunPreRouting()
+    {
+        foreach (IUmbracoPipelineFilter filter in _umbracoPipelineStartupOptions.Value.PipelineFilters)
+        {
+            filter.OnPreRouting(AppBuilder);
+        }
+    }
+
+    public void RunPostRouting()
+    {
+        foreach (IUmbracoPipelineFilter filter in _umbracoPipelineStartupOptions.Value.PipelineFilters)
+        {
+            filter.OnPostRouting(AppBuilder);
         }
     }
 

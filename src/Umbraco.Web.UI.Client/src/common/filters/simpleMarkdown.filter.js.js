@@ -11,8 +11,8 @@ angular.module("umbraco.filters").filter('simpleMarkdown', function () {
     }
 
     return text
-      .replace(/\*\*(.*)\*\*/gim, '<b>$1</b>')
-      .replace(/\*(.*)\*/gim, '<i>$1</i>')
+      .replace(/\*\*(.+?)\*\*/gim, '<b>$1</b>')
+      .replace(/\*(.+?)\*/gim, '<i>$1</i>')
       .replace(/!\[(.*?)\]\((.*?)\)/gim, "<img alt='$1' src='$2' />")
       .replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2' target='_blank' class='underline'>$1</a>")
       .replace(/\n/g, '<br />').trim();

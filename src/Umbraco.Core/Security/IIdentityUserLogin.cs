@@ -5,7 +5,6 @@ namespace Umbraco.Cms.Core.Security;
 /// <summary>
 ///     An external login provider linked to a user
 /// </summary>
-/// <typeparam name="TKey">The PK type for the user</typeparam>
 public interface IIdentityUserLogin : IEntity, IRememberBeingDirty
 {
     /// <summary>

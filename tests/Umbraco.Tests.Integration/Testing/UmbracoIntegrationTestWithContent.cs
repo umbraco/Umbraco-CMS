@@ -46,24 +46,24 @@ public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
         // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
         Textpage = ContentBuilder.CreateSimpleContent(ContentType);
         Textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
-        ContentService.Save(Textpage, 0);
+        ContentService.Save(Textpage, -1);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
         Subpage = ContentBuilder.CreateSimpleContent(ContentType, "Text Page 1", Textpage.Id);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
-        ContentService.Save(Subpage, 0, contentSchedule);
+        ContentService.Save(Subpage, -1, contentSchedule);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1055
         Subpage2 = ContentBuilder.CreateSimpleContent(ContentType, "Text Page 2", Textpage.Id);
-        ContentService.Save(Subpage2, 0);
+        ContentService.Save(Subpage2, -1);
 
 
         Subpage3 = ContentBuilder.CreateSimpleContent(ContentType, "Text Page 3", Textpage.Id);
-        ContentService.Save(Subpage3, 0);
+        ContentService.Save(Subpage3, -1);
 
         // Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1056
         Trashed = ContentBuilder.CreateSimpleContent(ContentType, "Text Page Deleted", -20);
         Trashed.Trashed = true;
-        ContentService.Save(Trashed, 0);
+        ContentService.Save(Trashed, -1);
     }
 }

@@ -21,7 +21,7 @@ public static class ViewDataExtensions
 
     public static bool FromTempData(this ViewDataDictionary viewData, ITempDataDictionary tempData, string token)
     {
-        if (tempData[token] == null)
+        if (tempData?[token] is null)
         {
             return false;
         }
@@ -122,9 +122,11 @@ public static class ViewDataExtensions
         this ViewDataDictionary viewData,
         BackOfficeExternalLoginProviderErrors errors) => viewData[TokenExternalSignInError] = errors;
 
+    [Obsolete("This is deprecated and will be removed in V15")]
     public static string? GetPasswordResetCode(this ViewDataDictionary viewData) =>
         (string?)viewData[TokenPasswordResetCode];
 
+    [Obsolete("This is deprecated and will be removed in V15")]
     public static void SetPasswordResetCode(this ViewDataDictionary viewData, string value) =>
         viewData[TokenPasswordResetCode] = value;
 

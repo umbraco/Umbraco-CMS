@@ -286,7 +286,7 @@ public class MacrosController : BackOfficeNotificationsController
     ///     Finds all the macro partials
     /// </summary>
     /// <returns>
-    ///     The <see cref="IEnumerable" />.
+    ///     The <see cref="IEnumerable{T}" />.
     /// </returns>
     private IEnumerable<string> FindPartialViewsFiles()
     {
@@ -302,7 +302,7 @@ public class MacrosController : BackOfficeNotificationsController
     ///     Finds all macro partials in the views folder
     /// </summary>
     /// <returns>
-    ///     The <see cref="IEnumerable" />.
+    ///     The <see cref="IEnumerable{T}" />.
     /// </returns>
     private IEnumerable<string> FindPartialViewFilesInViewsFolder()
     {
@@ -369,7 +369,7 @@ public class MacrosController : BackOfficeNotificationsController
     ///     The prefix virtual path.
     /// </param>
     /// <returns>
-    ///     The <see cref="IEnumerable" />.
+    ///     The <see cref="IEnumerable{T}" />.
     /// </returns>
     private IEnumerable<string> FindPartialViewFilesInFolder(string orgPath, string path, string prefixVirtualPath)
     {

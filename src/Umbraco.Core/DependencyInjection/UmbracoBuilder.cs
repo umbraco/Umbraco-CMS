@@ -35,7 +35,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Snippets;
+using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
@@ -317,8 +317,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<ConflictingPackageData>();
             Services.AddSingleton<CompiledPackageXmlParser>();
 
-            // Register a noop IHtmlSanitizer to be replaced
+            // Register a noop IHtmlSanitizer & IMarkdownSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
+            Services.AddUnique<IMarkdownSanitizer, NoopMarkdownSanitizer>();
 
             Services.AddUnique<IPropertyTypeUsageService, PropertyTypeUsageService>();
             Services.AddUnique<IDataTypeUsageService, DataTypeUsageService>();
@@ -326,6 +327,20 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ICultureImpactFactory>(provider => new CultureImpactFactory(provider.GetRequiredService<IOptionsMonitor<ContentSettings>>()));
             Services.AddUnique<IDictionaryService, DictionaryService>();
             Services.AddUnique<ITemporaryMediaService, TemporaryMediaService>();
+
+            // Register filestream security analyzers
+            Services.AddUnique<IFileStreamSecurityValidator,FileStreamSecurityValidator>();
+            Services.AddUnique<IDynamicRootService,DynamicRoot.DynamicRootService>();
+
+            // Register Webhook services
+            Services.AddUnique<IWebhookService, WebhookService>();
+            Services.AddUnique<IWebhookLogService, WebhookLogService>();
+            Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
+            Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
+
+            // Data type configuration cache
+            Services.AddUnique<IDataTypeConfigurationCache, DataTypeConfigurationCache>();
+            Services.AddNotificationHandler<DataTypeCacheRefresherNotification, DataTypeConfigurationCacheRefresher>();
         }
     }
 }

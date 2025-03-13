@@ -111,6 +111,12 @@ public sealed class UriUtility
         if (path != "/")
         {
             path = path.TrimEnd(Constants.CharArrays.ForwardSlash);
+
+            // perform fallback to root if the path was all slashes (i.e. https://some.where//////)
+            if (path == string.Empty)
+            {
+                path = "/";
+            }
         }
 
         return uri.Rewrite(path);

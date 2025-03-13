@@ -70,5 +70,15 @@ public static partial class Constants
         ///     ScheduledPublishing job.
         /// </summary>
         public const int ScheduledPublishing = -341;
+
+        /// <summary>
+        ///    All Webhook requests.
+        /// </summary>
+        public const int WebhookRequest = -342;
+
+        /// <summary>
+        ///     All webhook logs.
+        /// </summary>
+        public const int WebhookLogs = -343;
     }
 }

@@ -16,13 +16,13 @@ namespace Umbraco.Cms.Persistence.EFCore.Locking;
 internal class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLockingMechanism
     where T : DbContext
 {
-    private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
-    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+    private ConnectionStrings _connectionStrings;
+    private GlobalSettings _globalSettings;
     private readonly ILogger<SqlServerEFCoreDistributedLockingMechanism<T>> _logger;
     private readonly Lazy<IEFCoreScopeAccessor<T>> _scopeAccessor; // Hooray it's a circular dependency.
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="SqlServerDistributedLockingMechanism" /> class.
+    ///     Initializes a new instance of the <see cref="SqlServerEFCoreDistributedLockingMechanism{T}"/> class.
     /// </summary>
     public SqlServerEFCoreDistributedLockingMechanism(
         ILogger<SqlServerEFCoreDistributedLockingMechanism<T>> logger,
@@ -32,27 +32,29 @@ internal class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLocki
     {
         _logger = logger;
         _scopeAccessor = scopeAccessor;
-        _globalSettings = globalSettings;
-        _connectionStrings = connectionStrings;
+        _globalSettings = globalSettings.CurrentValue;
+        _connectionStrings = connectionStrings.CurrentValue;
+        globalSettings.OnChange(x=>_globalSettings = x);
+        connectionStrings.OnChange(x=>_connectionStrings = x);
     }
 
     public bool HasActiveRelatedScope => _scopeAccessor.Value.AmbientScope is not null;
 
     /// <inheritdoc />
-    public bool Enabled => _connectionStrings.CurrentValue.IsConnectionStringConfigured() &&
-                           string.Equals(_connectionStrings.CurrentValue.ProviderName, "Microsoft.Data.SqlClient", StringComparison.InvariantCultureIgnoreCase) && _scopeAccessor.Value.AmbientScope is not null;
+    public bool Enabled => _connectionStrings.IsConnectionStringConfigured() &&
+                           string.Equals(_connectionStrings.ProviderName, "Microsoft.Data.SqlClient", StringComparison.InvariantCultureIgnoreCase) && _scopeAccessor.Value.AmbientScope is not null;
 
     /// <inheritdoc />
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)
     {
-        obtainLockTimeout ??= _globalSettings.CurrentValue.DistributedLockingReadLockDefaultTimeout;
+        obtainLockTimeout ??= _globalSettings.DistributedLockingReadLockDefaultTimeout;
         return new SqlServerDistributedLock(this, lockId, DistributedLockType.ReadLock, obtainLockTimeout.Value);
     }
 
     /// <inheritdoc />
     public IDistributedLock WriteLock(int lockId, TimeSpan? obtainLockTimeout = null)
     {
-        obtainLockTimeout ??= _globalSettings.CurrentValue.DistributedLockingWriteLockDefaultTimeout;
+        obtainLockTimeout ??= _globalSettings.DistributedLockingWriteLockDefaultTimeout;
         return new SqlServerDistributedLock(this, lockId, DistributedLockType.WriteLock, obtainLockTimeout.Value);
     }
 
@@ -136,9 +138,7 @@ internal class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLocki
                         "A transaction with minimum ReadCommitted isolation level is required.");
                 }
 
-                await dbContext.Database.ExecuteSqlRawAsync($"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};");
-
-                var number = await dbContext.Database.ExecuteScalarAsync<int?>($"SELECT value FROM dbo.umbracoLock WITH (REPEATABLEREAD) WHERE id={LockId}");
+                var number = await dbContext.Database.ExecuteScalarAsync<int?>($"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};SELECT value FROM dbo.umbracoLock WITH (REPEATABLEREAD) WHERE id={LockId}");
 
                 if (number == null)
                 {
@@ -170,9 +170,9 @@ internal class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLocki
                         "A transaction with minimum ReadCommitted isolation level is required.");
                 }
 
-                await dbContext.Database.ExecuteSqlRawAsync($"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};");
-
-                var rowsAffected = await dbContext.Database.ExecuteSqlAsync(@$"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
+#pragma warning disable EF1002
+                var rowsAffected = await dbContext.Database.ExecuteSqlRawAsync(@$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
+#pragma warning restore EF1002
 
                 if (rowsAffected == 0)
                 {

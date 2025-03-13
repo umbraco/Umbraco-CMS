@@ -37,7 +37,7 @@ public class EventClearingObservableCollection<TValue> : ObservableCollection<TV
     }
 
     /// <summary>
-    ///     Clears all event handlers for the <see cref="CollectionChanged" /> event
+    ///     Clears all event handlers for the <see cref="INotifyCollectionChanged.CollectionChanged" /> event.
     /// </summary>
     public void ClearCollectionChangedEvents() => _changed = null;
 

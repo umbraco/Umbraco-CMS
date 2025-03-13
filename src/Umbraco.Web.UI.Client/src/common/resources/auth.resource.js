@@ -28,7 +28,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
      *    });
      * </pre>
      * @returns {Promise} resourcePromise object
-     * 
+     *
      */
     get2FAProviders: function () {
 
@@ -203,7 +203,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
             "PostRequestPasswordReset"), {
             email: email
           }),
-        'Request password reset failed for email ' + email);
+        'An email with password reset instructions will be sent to the specified address if it matched our records');
     },
 
     /**

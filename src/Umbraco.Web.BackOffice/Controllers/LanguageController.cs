@@ -35,7 +35,7 @@ public class LanguageController : UmbracoAuthorizedJsonController
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IDictionary<string, string> GetAllCultures()
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]public IDictionary<string, string> GetAllCultures()
             => CultureInfo.GetCultures(CultureTypes.AllCultures).DistinctBy(x => x.Name).OrderBy(x => x.EnglishName).ToDictionary(x => x.Name, x => x.EnglishName);
 
     /// <summary>
@@ -51,6 +51,7 @@ public class LanguageController : UmbracoAuthorizedJsonController
     }
 
     [HttpGet]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
     public ActionResult<Language?> GetLanguage(int id)
     {
         ILanguage? lang = _localizationService.GetLanguageById(id);

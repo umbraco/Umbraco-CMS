@@ -7,14 +7,28 @@
         vm.loading = true;
         vm.hasPristineVariants = false;
         vm.isNew = true;
+        vm.saveAll = false;
 
         vm.changeSelection = changeSelection;
+        vm.changeSaveAllSelection = changeSaveAllSelection;
 
         function changeSelection(variant) {
             var firstSelected = _.find(vm.variants, function (v) {
                 return v.save;
             });
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
+            updateSaveAllSelectionStatus();
+        }
+
+        function changeSaveAllSelection(){
+            vm.availableVariants.forEach(variant => {
+                variant.save = vm.saveAll;
+            });
+            $scope.model.disableSubmitButton = !vm.saveAll;
+        }
+
+        function updateSaveAllSelectionStatus(){
+            vm.saveAll = vm.availableVariants.every(x => x.save);
         }
 
         function allowUpdate (variant) {
@@ -91,6 +105,8 @@
                 }
 
                 vm.availableVariants = contentEditingHelper.getSortedVariantsAndSegments(vm.availableVariants);
+
+                updateSaveAllSelectionStatus();
 
             } else {
                 //disable save button if we have nothing to save

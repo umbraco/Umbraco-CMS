@@ -281,7 +281,20 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
 
-        IUser? user = _userService.GetUserById(UserIdToInt(userId));
+        // In the external login flow - see BackOfficeController.ExternalSignInAsync - we can have a situation where an
+        // error has occured but the user is signed in. For that reason, at the end of the process, if errors are
+        // recorded, the user is signed out.
+        // Before signing out, we request the user in order to update the security stamp - see UmbracoSignInManager.SignOutAsync.
+        // But we can have a situation where the signed in principal has the ID from the external provider, which may not be something
+        // we can parse to an integer.
+        // If that's the case, return null rather than throwing an exception. Without an Umbraco user, we can't update the security stamp,
+        // so no need to fail here.
+        if (!TryUserIdToInt(userId, out var userIdAsInt))
+        {
+            return Task.FromResult((BackOfficeIdentityUser?)null)!;
+        }
+
+        IUser? user = _userService.GetUserById(userIdAsInt);
         if (user == null)
         {
             return Task.FromResult((BackOfficeIdentityUser?)null)!;

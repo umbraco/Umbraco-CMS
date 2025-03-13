@@ -1253,7 +1253,7 @@ public static class PublishedContentExtensions
     /// </returns>
     /// <remarks>
     ///     This is the same as calling
-    ///     <see cref="Umbraco.Web.PublishedContentExtensions.AncestorOrSelf(IPublishedContent, int)" /> with <c>maxLevel</c>
+    ///     <see cref="AncestorOrSelf(IPublishedContent, int)" /> with <c>maxLevel</c>
     ///     set to 1.
     /// </remarks>
     public static IPublishedContent Root(this IPublishedContent content) => content.AncestorOrSelf(1);
@@ -1270,7 +1270,7 @@ public static class PublishedContentExtensions
     /// </returns>
     /// <remarks>
     ///     This is the same as calling
-    ///     <see cref="Umbraco.Web.PublishedContentExtensions.AncestorOrSelf{T}(IPublishedContent, int)" /> with
+    ///     <see cref="AncestorOrSelf{T}(IPublishedContent, int)" /> with
     ///     <c>maxLevel</c> set to 1.
     /// </remarks>
     public static T? Root<T>(this IPublishedContent content)

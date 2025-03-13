@@ -18,7 +18,7 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     Task<string> GetUserIdAsync(TUser user);
 
     /// <summary>
-    ///     Get the <see cref="TUser" /> from a <see cref="ClaimsPrincipal" />
+    ///     Get the <typeparamref name="TUser"/> from a <see cref="ClaimsPrincipal" />
     /// </summary>
     /// <param name="principal">The <see cref="ClaimsPrincipal" /></param>
     /// <returns>A <see cref="Task{TResult}" /> representing the result of the asynchronous operation.</returns>

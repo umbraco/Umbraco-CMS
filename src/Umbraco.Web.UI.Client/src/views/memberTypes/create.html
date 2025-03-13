@@ -1,4 +1,5 @@
 <div ng-controller="Umbraco.Editors.MemberTypes.CreateController">
+
     <div class="umbracoDialog umb-dialog-body with-footer">
         <div class="umb-pane" ng-if="!model.creatingFolder">
             <h5>
@@ -6,20 +7,20 @@
             </h5>
 
             <ul class="umb-actions umb-actions-child">
-                <li class="umb-action">
+                <li data-element="action-memberType" class="umb-action">
+                  <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="createMemberType()">
+                    <umb-icon icon="icon-item-arrangement" class="icon large"></umb-icon>
+                    <span class="menu-label">
+                      <localize key="general_new">New</localize>
+                      <localize key="content_memberType">Member type</localize>
+                    </span>
+                  </button>
+                </li>
+                <li data-element="action-folder" class="umb-action">
                     <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="showCreateFolder()">
                         <umb-icon icon="icon-folder" class="icon large"></umb-icon>
                         <span class="menu-label">
                             <localize key="general_folder">Folder</localize>
-                        </span>
-                    </button>
-                </li>
-                <li class="umb-action">
-                    <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="createMemberType()">
-                        <umb-icon icon="icon-item-arrangement" class="icon large"></umb-icon>
-                        <span class="menu-label">
-                            <localize key="general_new">New</localize>&nbsp;
-                            <localize key="content_memberType">Member type</localize>
                         </span>
                     </button>
                 </li>

@@ -2,6 +2,7 @@
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_5_0;
 
+[Obsolete("This is no longer used and will be removed in V14.")]
 public class AddPrimaryKeyConstrainToContentVersionCleanupDtos : MigrationBase
 {
     public AddPrimaryKeyConstrainToContentVersionCleanupDtos(IMigrationContext context) : base(context)

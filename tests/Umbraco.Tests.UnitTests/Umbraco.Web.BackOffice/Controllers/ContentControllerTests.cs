@@ -56,7 +56,7 @@ public class ContentControllerTests
         var notifications = new SimpleNotificationModel();
 
         var contentController = CreateContentController(domainServiceMock.Object);
-        contentController.AddDomainWarnings(rootNode, culturesPublished, notifications);
+        contentController.AddDomainWarnings(rootNode, culturesPublished, notifications, "en-us");
 
         Assert.IsEmpty(notifications.Notifications);
     }
@@ -82,7 +82,7 @@ public class ContentControllerTests
         var notifications = new SimpleNotificationModel();
 
         var contentController = CreateContentController(domainServiceMock.Object);
-        contentController.AddDomainWarnings(rootNode, culturesPublished, notifications);
+        contentController.AddDomainWarnings(rootNode, culturesPublished, notifications, "en-us");
 
         Assert.IsEmpty(notifications.Notifications);
     }
@@ -111,7 +111,7 @@ public class ContentControllerTests
         var notifications = new SimpleNotificationModel();
 
         var contentController = CreateContentController(domainServiceMock.Object);
-        contentController.AddDomainWarnings(rootNode, culturesPublished, notifications);
+        contentController.AddDomainWarnings(rootNode, culturesPublished, notifications, "en-us");
         Assert.AreEqual(1, notifications.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
     }
 
@@ -139,8 +139,36 @@ public class ContentControllerTests
         var notifications = new SimpleNotificationModel();
 
         var contentController = CreateContentController(domainServiceMock.Object);
-        contentController.AddDomainWarnings(rootNode, culturesPublished, notifications);
+        contentController.AddDomainWarnings(rootNode, culturesPublished, notifications, "en-us");
         Assert.AreEqual(3, notifications.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
+    }
+
+    [Test]
+    public void Does_Not_Warn_When_Only_Publishing_The_Default_Culture_With_No_Domains_Assigned()
+    {
+        var domainServiceMock = new Mock<IDomainService>();
+        domainServiceMock.Setup(x => x.GetAssignedDomains(It.IsAny<int>(), It.IsAny<bool>()))
+            .Returns(Enumerable.Empty<IDomain>());
+
+        var rootNode = new ContentBuilder()
+            .WithContentType(CreateContentType())
+            .WithId(1060)
+            .AddContentCultureInfosCollection()
+            .AddCultureInfos()
+            .WithCultureIso("da-dk")
+            .Done()
+            .AddCultureInfos()
+            .WithCultureIso("en-us")
+            .Done()
+            .Done()
+            .Build();
+
+        var culturesPublished = new[] { "en-us" };
+        var notifications = new SimpleNotificationModel();
+
+        var contentController = CreateContentController(domainServiceMock.Object);
+        contentController.AddDomainWarnings(rootNode, culturesPublished, notifications, "en-us");
+        Assert.IsEmpty(notifications.Notifications);
     }
 
     [Test]
@@ -189,7 +217,7 @@ public class ContentControllerTests
         var contentController = CreateContentController(domainServiceMock.Object);
         var notifications = new SimpleNotificationModel();
 
-        contentController.AddDomainWarnings(level3Node, culturesPublished, notifications);
+        contentController.AddDomainWarnings(level3Node, culturesPublished, notifications, "en-us");
 
         // We expect one error because all domains except "de-de" is registered somewhere in the ancestor path
         Assert.AreEqual(1, notifications.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
@@ -225,7 +253,7 @@ public class ContentControllerTests
         var notifications = new SimpleNotificationModel();
 
         var contentController = CreateContentController(domainServiceMock.Object);
-        contentController.AddDomainWarnings(rootNode, culturesPublished, notifications);
+        contentController.AddDomainWarnings(rootNode, culturesPublished, notifications, "en-us");
 
         // We only get two errors, one for each culture being published, so no errors from previously published cultures.
         Assert.AreEqual(2, notifications.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));

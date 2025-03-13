@@ -28,6 +28,83 @@
         </umb-box>
 
         <umb-tracked-references id="node.id"></umb-tracked-references>
+
+        <umb-box data-element="node-info-history">
+
+            <umb-box-header title-key="{{historyLabelKey}}" ng-if="historyLabelKey">
+                <umb-button ng-if="node.allowedActions.includes('K')"
+                            ng-hide="node.trashed || node.id === 0"
+                            type="button"
+                            button-style="outline"
+                            action="openRollback()"
+                            label-key="actions_rollback"
+                            size="xs"
+                            add-ellipsis="true">
+                </umb-button>
+            </umb-box-header>
+
+            <umb-box-content class="block-form">
+
+                <div style="position: relative;">
+
+                    <div ng-show="loadingAuditTrail" style="background: rgba(255, 255, 255, 0.8); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
+                    <umb-load-indicator ng-show="loadingAuditTrail"></umb-load-indicator>
+
+                    <div ng-show="auditTrail.length === 0" style="padding: 10px;">
+                        <umb-empty-state position="center"
+                                         size="small">
+                            <localize key="content_noChanges">No changes have been made</localize>
+                        </umb-empty-state>
+                    </div>
+
+                    <div class="history">
+
+                        <div ng-show="auditTrail.length > 1" class="history-line"></div>
+
+                        <div class="history-item" ng-repeat="item in auditTrail">
+
+                            <div class="history-item__break">
+                                <div class="history-item__avatar">
+                                    <umb-avatar color="secondary"
+                                                size="xs"
+                                                name="{{item.userName}}"
+                                                img-src="{{item.userAvatars[3]}}"
+                                                img-srcset="{{item.userAvatars[4]}} 2x, {{item.userAvatars[4]}} 3x">
+                                    </umb-avatar>
+                                </div>
+
+                                <div>
+                                    <div>{{ item.userName }}</div>
+                                    <div class="history-item__date">{{item.timestampFormatted}}</div>
+                                </div>
+                            </div>
+
+                            <div class="history-item__break">
+                                <umb-badge class="history-item__badge"
+                                           size="xs"
+                                           color="{{item.logTypeColor}}">
+                                    <localize key="auditTrails_small{{ item.logType }}">{{ item.logType }}</localize>
+                                </umb-badge>
+                                <span class="history-item__description">
+                                    <localize key="auditTrailsMedia_{{ item.logType | lowercase }}" tokens="[item.parameters]">{{ item.comment }}</localize>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="flex justify-center">
+                    <umb-pagination ng-if="auditTrailOptions.totalPages > 1"
+                                    page-number="auditTrailOptions.pageNumber"
+                                    total-pages="auditTrailOptions.totalPages"
+                                    on-change="auditTrailPageChange(pageNumber)">
+                    </umb-pagination>
+                </div>
+
+            </umb-box-content>
+        </umb-box>
     </div>
 
     <!-- Sidebar -->

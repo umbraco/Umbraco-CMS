@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Extensions;
 
@@ -36,6 +37,17 @@ public static partial class UmbracoApplicationBuilderExtensions
         builder.Services.Replace(ServiceDescriptor.Scoped(typeof(IMemberManager), customType));
         builder.Services.AddScoped(customType, services => services.GetRequiredService(userManagerType));
         builder.Services.Replace(ServiceDescriptor.Scoped(userManagerType, customType));
+        return builder;
+    }
+
+    public static IUmbracoBuilder SetMemberSignInManager<TSignInManager>(this IUmbracoBuilder builder)
+        where TSignInManager : SignInManager<MemberIdentityUser>, IMemberSignInManager
+    {
+        Type customType = typeof(TSignInManager);
+        Type signInManagerType = typeof(SignInManager<MemberIdentityUser>);
+        builder.Services.Replace(ServiceDescriptor.Scoped(typeof(IMemberSignInManager), customType));
+        builder.Services.AddScoped(customType, services => services.GetRequiredService(signInManagerType));
+        builder.Services.Replace(ServiceDescriptor.Scoped(signInManagerType, customType));
         return builder;
     }
 

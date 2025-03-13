@@ -1,6 +1,7 @@
-<ul role="tablist" class="umb-tabs-nav"> 
-    <li role="tab" aria-selected="{{tab.active}}" class="umb-tab" ng-repeat="tab in vm.tabs |  limitTo: vm.maxTabs" data-element="tab-{{tab.alias}}" ng-class="{'umb-tab--active': tab.active, 'umb-tab--error': valTab_tabHasError}" val-tab>
-        <button class="btn-reset umb-tab-button" ng-click="vm.clickTab($event, tab)" ng-disabled="tab.disabled" type="button">
+
+<ul role="tablist" class="umb-tabs-nav" aria-label="Content Fields">
+    <li class="umb-tab" ng-repeat="tab in vm.tabs |  limitTo: vm.maxTabs" data-element="tab-{{tab.alias}}" ng-class="{'umb-tab--active': tab.active, 'umb-tab--error': valTab_tabHasError}" val-tab>
+        <button role="tab" aria-selected="{{tab.active}}" aria-controls="tabpanel-{{tab.alias}}" tabindex="{{!tab.active ? '-1' : null}}" class="btn-reset umb-tab-button" ng-click="vm.clickTab($event, tab)" ng-disabled="tab.disabled" type="button">
             {{ tab.label }}
             <div ng-show="valTab_tabHasError && !tab.active" class="badge">!</div>
         </button>
@@ -16,7 +17,7 @@
         </umb-button-ellipsis>
 
         <umb-dropdown class="umb-tabs-tray" ng-if="vm.showTray" on-close="vm.hideTray()">
-            <umb-dropdown-item ng-repeat="tab in vm.tabs | limitTo: vm.overflowingTabs" ng-class="{'umb-tab--error': valTab_tabHasError}" val-tab>
+            <umb-dropdown-item ng-repeat="tab in vm.tabs | limitTo: vm.overflowingTabs" data-element="tab-{{tab.alias}}" ng-class="{'umb-tab--error': valTab_tabHasError}" val-tab>
                 <button
                     type="button"
                     class="btn-reset umb-tray-button"

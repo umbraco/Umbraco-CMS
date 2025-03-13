@@ -25,11 +25,12 @@
                 propertyAlias: "@",
                 showInherit: "<",
                 inheritsFrom: "<",
-                hideLabel: "<?"
+                hideLabel: "<?",
+                preview: "<?"
             }
         });
 
-    
+
 
     function UmbPropertyController($scope, userService, serverValidationManager, udiService, angularHelper) {
 
@@ -55,7 +56,7 @@
         // returns the validation path for the property to be used as the validation key for server side validation logic
         vm.getValidationPath = function () {
 
-            var parentValidationPath = vm.parentUmbProperty ? vm.parentUmbProperty.getValidationPath() : null;            
+            var parentValidationPath = vm.parentUmbProperty ? vm.parentUmbProperty.getValidationPath() : null;
             var propAlias = vm.propertyAlias ? vm.propertyAlias : vm.property.alias;
             // the elementKey will be empty when this is not a nested property
             var valPath = vm.elementKey ? vm.elementKey + "/" + propAlias : propAlias;
@@ -64,10 +65,13 @@
 
         function onInit() {
             vm.controlLabelTitle = null;
+            vm.controlAriaLabel = null;
             if (Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
                 userService.getCurrentUser().then(function (u) {
                     if (u.allowedSections.indexOf("settings") !== -1 ? true : false) {
                         vm.controlLabelTitle = vm.property.alias;
+                        // capitalize first letter of the alias for screen readers
+                        vm.controlAriaLabel = vm.property.alias.charAt(0).toUpperCase() + vm.property.alias.slice(1);
                     }
                 });
             }

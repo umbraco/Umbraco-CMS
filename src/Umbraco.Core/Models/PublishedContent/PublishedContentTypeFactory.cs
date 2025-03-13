@@ -10,8 +10,8 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
 {
     private readonly IDataTypeService _dataTypeService;
     private readonly PropertyValueConverterCollection _propertyValueConverters;
-    private readonly object _publishedDataTypesLocker = new();
     private readonly IPublishedModelFactory _publishedModelFactory;
+    private object _publishedDataTypesLocker = new();
     private Dictionary<int, PublishedDataType>? _publishedDataTypes;
 
     public PublishedContentTypeFactory(
@@ -52,19 +52,12 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
     /// <inheritdoc />
     public PublishedDataType GetDataType(int id)
     {
-        Dictionary<int, PublishedDataType>? publishedDataTypes;
-        lock (_publishedDataTypesLocker)
-        {
-            if (_publishedDataTypes == null)
-            {
-                IEnumerable<IDataType> dataTypes = _dataTypeService.GetAll();
-                _publishedDataTypes = dataTypes.ToDictionary(x => x.Id, CreatePublishedDataType);
-            }
+        Dictionary<int, PublishedDataType> publishedDataTypes = LazyInitializer.EnsureInitialized(
+            ref _publishedDataTypes,
+            ref _publishedDataTypesLocker,
+            () => _dataTypeService.GetAll().ToDictionary(x => x.Id, CreatePublishedDataType));
 
-            publishedDataTypes = _publishedDataTypes;
-        }
-
-        if (publishedDataTypes is null || !publishedDataTypes.TryGetValue(id, out PublishedDataType? dataType))
+        if (!publishedDataTypes.TryGetValue(id, out PublishedDataType? dataType))
         {
             throw new ArgumentException($"Could not find a datatype with identifier {id}.", nameof(id));
         }
@@ -73,24 +66,31 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
     }
 
     /// <inheritdoc />
-    public void NotifyDataTypeChanges(int[] ids)
+    public void NotifyDataTypeChanges(params int[] ids)
     {
+        if (_publishedDataTypes is null)
+        {
+            // Not initialized yet, so skip and avoid lock
+            return;
+        }
+
         lock (_publishedDataTypesLocker)
         {
-            if (_publishedDataTypes == null)
+            if (ids.Length == 0)
             {
-                IEnumerable<IDataType> dataTypes = _dataTypeService.GetAll();
-                _publishedDataTypes = dataTypes.ToDictionary(x => x.Id, CreatePublishedDataType);
+                // Clear cache (and let it lazy initialize again later)
+                _publishedDataTypes = null;
             }
             else
             {
+                // Remove items from cache (in case the data type is removed)
                 foreach (var id in ids)
                 {
                     _publishedDataTypes.Remove(id);
                 }
 
-                IEnumerable<IDataType> dataTypes = _dataTypeService.GetAll(ids);
-                foreach (IDataType dataType in dataTypes)
+                // Update cacheB
+                foreach (IDataType dataType in _dataTypeService.GetAll(ids))
                 {
                     _publishedDataTypes[dataType.Id] = CreatePublishedDataType(dataType);
                 }

@@ -11,6 +11,8 @@ using NUnit.Framework;
 using Serilog;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -26,7 +28,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 public abstract class UmbracoIntegrationTestBase
 {
     private static readonly object s_dbLocker = new();
-    private static ITestDatabase s_dbInstance;
+    private static ITestDatabase? s_dbInstance;
     private static TestDbMeta s_fixtureDbMeta;
     private static int s_testCount = 1;
     private readonly List<Action> _fixtureTeardown = new();
@@ -122,9 +124,16 @@ public abstract class UmbracoIntegrationTestBase
         var databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
         var connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
+        var eventAggregator = serviceProvider.GetRequiredService<IEventAggregator>();
 
         // This will create a db, install the schema and ensure the app is configured to run
         SetupTestDatabase(testDatabaseFactoryProvider, connectionStrings, databaseFactory, loggerFactory, state);
+
+        if (TestOptions.Database != UmbracoTestOptions.Database.None)
+        {
+            eventAggregator.Publish(new UnattendedInstallNotification());
+        }
+
     }
 
     private void ConfigureTestDatabaseFactory(

@@ -993,31 +993,20 @@ internal class DatabaseDataCreator
     private void CreateLockData()
     {
         // all lock objects
-        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
-            new LockDto { Id = Constants.Locks.Servers, Name = "Servers" });
-        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
-            new LockDto { Id = Constants.Locks.ContentTypes, Name = "ContentTypes" });
-        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
-            new LockDto { Id = Constants.Locks.ContentTree, Name = "ContentTree" });
-        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
-            new LockDto { Id = Constants.Locks.MediaTypes, Name = "MediaTypes" });
-        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
-            new LockDto { Id = Constants.Locks.MediaTree, Name = "MediaTree" });
-        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
-            new LockDto { Id = Constants.Locks.MemberTypes, Name = "MemberTypes" });
-        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
-            new LockDto { Id = Constants.Locks.MemberTree, Name = "MemberTree" });
-        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
-            new LockDto { Id = Constants.Locks.Domains, Name = "Domains" });
-        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
-            new LockDto { Id = Constants.Locks.KeyValues, Name = "KeyValues" });
-        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
-            new LockDto { Id = Constants.Locks.Languages, Name = "Languages" });
-        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
-            new LockDto { Id = Constants.Locks.ScheduledPublishing, Name = "ScheduledPublishing" });
-
-        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
-            new LockDto { Id = Constants.Locks.MainDom, Name = "MainDom" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.Servers, Name = "Servers" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.ContentTypes, Name = "ContentTypes" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.ContentTree, Name = "ContentTree" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.MediaTypes, Name = "MediaTypes" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.MediaTree, Name = "MediaTree" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.MemberTypes, Name = "MemberTypes" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.MemberTree, Name = "MemberTree" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.Domains, Name = "Domains" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.KeyValues, Name = "KeyValues" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.Languages, Name = "Languages" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.ScheduledPublishing, Name = "ScheduledPublishing" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.MainDom, Name = "MainDom" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.WebhookRequest, Name = "WebhookRequest" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.WebhookLogs, Name = "WebhookLogs" });
     }
 
     private void CreateContentTypeData()

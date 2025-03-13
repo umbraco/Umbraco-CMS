@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -14,14 +14,14 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 internal class BlockEditorValues
 {
-    private readonly Lazy<Dictionary<Guid, IContentType>> _contentTypes;
     private readonly BlockEditorDataConverter _dataConverter;
+    private readonly IBlockEditorElementTypeCache _elementTypeCache;
     private readonly ILogger _logger;
 
-    public BlockEditorValues(BlockEditorDataConverter dataConverter, IContentTypeService contentTypeService, ILogger logger)
+    public BlockEditorValues(BlockEditorDataConverter dataConverter, IBlockEditorElementTypeCache elementTypeCache, ILogger logger)
     {
-        _contentTypes = new Lazy<Dictionary<Guid, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Key));
         _dataConverter = dataConverter;
+        _elementTypeCache = elementTypeCache;
         _logger = logger;
     }
 
@@ -34,7 +34,17 @@ internal class BlockEditorValues
         }
 
         BlockEditorData blockEditorData = _dataConverter.Deserialize(propertyValueAsString);
+        return Clean(blockEditorData);
+    }
 
+    public BlockEditorData? ConvertAndClean(BlockValue blockValue)
+    {
+        BlockEditorData blockEditorData = _dataConverter.Convert(blockValue);
+        return Clean(blockEditorData);
+    }
+
+    private BlockEditorData? Clean(BlockEditorData blockEditorData)
+    {
         if (blockEditorData.BlockValue.ContentData.Count == 0)
         {
             // if there's no content ensure there's no settings too
@@ -45,10 +55,14 @@ internal class BlockEditorValues
         var contentTypePropertyTypes = new Dictionary<string, Dictionary<string, IPropertyType>>();
 
         // filter out any content that isn't referenced in the layout references
+        IEnumerable<Guid> contentTypeKeys = blockEditorData.BlockValue.ContentData.Select(x => x.ContentTypeKey)
+            .Union(blockEditorData.BlockValue.SettingsData.Select(x => x.ContentTypeKey)).Distinct();
+        IDictionary<Guid, IContentType> contentTypesDictionary = _elementTypeCache.GetAll(contentTypeKeys).ToDictionary(x=>x.Key);
+
         foreach (BlockItemData block in blockEditorData.BlockValue.ContentData.Where(x =>
                      blockEditorData.References.Any(r => x.Udi is not null && r.ContentUdi == x.Udi)))
         {
-            ResolveBlockItemData(block, contentTypePropertyTypes);
+            ResolveBlockItemData(block, contentTypePropertyTypes, contentTypesDictionary);
         }
 
         // filter out any settings that isn't referenced in the layout references
@@ -56,7 +70,7 @@ internal class BlockEditorValues
                      blockEditorData.References.Any(r =>
                          r.SettingsUdi is not null && x.Udi is not null && r.SettingsUdi == x.Udi)))
         {
-            ResolveBlockItemData(block, contentTypePropertyTypes);
+            ResolveBlockItemData(block, contentTypePropertyTypes, contentTypesDictionary);
         }
 
         // remove blocks that couldn't be resolved
@@ -66,16 +80,10 @@ internal class BlockEditorValues
         return blockEditorData;
     }
 
-    private IContentType? GetElementType(BlockItemData item)
-    {
-        _contentTypes.Value.TryGetValue(item.ContentTypeKey, out IContentType? contentType);
-        return contentType;
-    }
 
-    private bool ResolveBlockItemData(BlockItemData block, Dictionary<string, Dictionary<string, IPropertyType>> contentTypePropertyTypes)
+    private bool ResolveBlockItemData(BlockItemData block, Dictionary<string, Dictionary<string, IPropertyType>> contentTypePropertyTypes, IDictionary<Guid, IContentType> contentTypesDictionary)
     {
-        IContentType? contentType = GetElementType(block);
-        if (contentType == null)
+        if (contentTypesDictionary.TryGetValue(block.ContentTypeKey, out IContentType? contentType) is false)
         {
             return false;
         }

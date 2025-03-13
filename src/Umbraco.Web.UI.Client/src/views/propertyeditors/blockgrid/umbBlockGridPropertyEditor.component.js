@@ -369,7 +369,7 @@
                 let i = layoutEntry.areas.length;
                 while(i--) {
                     const layoutEntryArea = layoutEntry.areas[i];
-                    const areaConfigIndex = block.config.areas.findIndex(x => x.key === layoutEntryArea.key);
+                    const areaConfigIndex = block.config.unsupported ? -1 : block.config.areas.findIndex(x => x.key === layoutEntryArea.key);
                     if(areaConfigIndex === -1) {
                         layoutEntry.areas.splice(i, 1);
                     }
@@ -493,7 +493,7 @@
             block.showValidation = true;
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true;
-            block.showContent = !block.hideContentInOverlay && block.content?.variants[0].tabs[0]?.properties.length > 0;
+            block.showContent = !block.hideContentInOverlay && block.content?.variants[0].tabs?.some(tab=>tab.properties.length) === true;
             block.showSettings = block.config.settingsElementTypeKey != null;
 
             // If we have content, otherwise it doesn't make sense to copy.
@@ -605,7 +605,7 @@
                     // because no columnSpanOptions defined, then use contextual layout columns.
                     layoutEntry.columnSpan = area? area.$config.columnSpan : vm.gridColumns;
                 }
-                
+
             } else {
 
                 if(blockObject.config.columnSpanOptions.length > 0) {
@@ -621,7 +621,7 @@
 
             // add layout entry at the decided location in layout.
             if(parentBlock != null) {
-                
+
                 if(!area) {
                     console.error("Could not find area in block creation");
                 }
@@ -678,7 +678,7 @@
             }
             return null;
         }
-        
+
 
         // Used by umbblockgridentries.component to check how many block types that are available for creation in an area:
         vm.getAllowedTypesOf = getAllowedTypesOf;
@@ -705,7 +705,7 @@
                                     }
                                 }
                             });
-                        } else 
+                        } else
                         if(allowance.elementTypeKey) {
                             const blockType = vm.availableBlockTypes.find(x => x.blockConfigModel.contentElementTypeKey === allowance.elementTypeKey);
                             if(blockType && allowedElementTypes.indexOf(blockType) === -1) {
@@ -777,7 +777,7 @@
             */
 
             var wasNotActiveBefore = blockObject.active !== true;
-            
+
             // don't open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
             if (openSettings !== true && blockObject.hideContentInOverlay === true) {
                 return;
@@ -860,7 +860,7 @@
 
             const availableTypes = getAllowedTypesOf(parentBlock, areaKey);
 
-            if (availableTypes.length === 1) {
+          if (availableTypes.length === 1 && vm.clipboardItems.length === 0) {
                 var wasAdded = false;
                 var blockType = availableTypes[0];
 
@@ -896,7 +896,7 @@
             }
 
             const availableBlockGroups = vm.blockGroups.filter(group => !!availableTypes.find(item => item.blockConfigModel.groupKey === group.key));
-            
+
             var amountOfAvailableTypes = availableTypes.length;
             var availableContentTypesAliases = modelObject.getAvailableAliasesOfElementTypeKeys(availableTypes.map(x => x.blockConfigModel.contentElementTypeKey));
             var availableClipboardItems = vm.clipboardItems.filter(
@@ -917,7 +917,7 @@
                 createLabel = vm.createLabel;
             }
             const headline = createLabel || (amountOfAvailableTypes.length === 1 ? localizationService.tokenReplace(vm.labels.blockEditor_addThis, [availableTypes[0].elementTypeModel.name]) : vm.labels.grid_addElement);
-            
+
             var blockPickerModel = {
                 $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
                 $parentForm: vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
@@ -959,7 +959,7 @@
                 },
                 close: function() {
                     // if opened by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
-                    
+
                     // add layout entry at the decided location in layout.
                     if(parentBlock != null) {
                         var area = parentBlock.layout.areas.find(x => x.key === areaKey);
@@ -976,7 +976,7 @@
                             vm.setBlockFocus(blockOfInterest);
                         }
                     }
-                    
+
 
                     editorService.close();
                     vm.blockTypePickerIsOpen = false;
@@ -997,7 +997,7 @@
         }
         function userFlowWhenBlockWasCreated(parentBlock, areaKey, createIndex) {
             var blockObject;
-            
+
             if (parentBlock) {
                 var area = parentBlock.layout.areas.find(x => x.key === areaKey);
                 if (!area) {
@@ -1185,7 +1185,7 @@
             if (initializeLayoutEntry(layoutEntry, parentBlock, areaKey) === null) {
                 return null;
             }
-            
+
             if (layoutEntry.$block === null) {
                 // Initialization of the Block Object didn't go well, therefor we will fail the paste action.
                 return null;
@@ -1224,14 +1224,14 @@
                     vm.layout.push(layoutEntry);
                 }
             }
-            
+
             return {layoutEntry, failed: nestedBlockFailed};
         }
 
         function requestPasteFromClipboard(parentBlock, areaKey, index, pasteEntry, pasteType) {
 
             const data = pasteClipboardEntry(parentBlock, areaKey, index, pasteEntry, pasteType);
-            if(data) { 
+            if(data) {
                 if(data.failed === true) {
                     // one or more of nested block creation failed.
                     // Ask wether the user likes to continue:
@@ -1245,16 +1245,16 @@
                                 closeButtonLabel: localizations[2],
                                 submitButtonLabel: localizations[3],
                                 close: function () {
-                                    // revert: 
+                                    // revert:
                                     deleteBlock(blockToRevert);
                                     overlayService.close();
                                 },
                                 submit: function () {
-                                    // continue: 
+                                    // continue:
                                     overlayService.close();
                                 }
                             };
-            
+
                             overlayService.open(overlay);
                         });
                     } else {
@@ -1351,14 +1351,14 @@
 
             document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", ' ');
             firstLayoutContainer.style.minHeight = firstLayoutContainer.getBoundingClientRect().height + "px";
-            
+
         }
         vm.exitDraggingMode = exitDraggingMode;
         function exitDraggingMode() {
 
             document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 'initial');
             firstLayoutContainer.style.minHeight = "";
-            
+
         }
 
         function onAmountOfBlocksChanged() {
