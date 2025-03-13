@@ -1,9 +1,11 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Content Picker';
 let dataTypeDefaultData = null;
 let dataTypeData = null;
+const editorAlias = 'Umbraco.ContentPicker';
+const editorUiAlias = 'Umb.PropertyEditorUi.DocumentPicker';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
@@ -115,4 +117,18 @@ test('can remove start node', async ({umbracoApi, umbracoUi}) => {
   // Clean
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+});
+
+test('the default configuration is correct', async ({umbracoUi}) => {
+  // Act
+  await umbracoUi.dataType.goToDataType(dataTypeName);
+
+  // Assert
+  await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.contentPickerSettings);
+  await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.contentPickerSettings);
+  await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
+  await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
+  expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
+  expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
+  expect(dataTypeDefaultData.values).toEqual([]);
 });

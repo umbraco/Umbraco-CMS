@@ -1,9 +1,10 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Radiobox';
 let dataTypeDefaultData = null;
-let dataTypeData = null;
+const editorAlias = 'Umbraco.RadioButtonList';
+const editorUiAlias = 'Umb.PropertyEditorUi.RadioButtonList';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
@@ -20,16 +21,6 @@ test.afterEach(async ({umbracoApi}) => {
 test('can add option', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const optionName = 'Test option';
-  const expectedDataTypeValues = [
-    {
-      "alias": "items",
-      "value": [optionName]
-    }
-  ];
-  // Remove all existing options
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  dataTypeData.values = [];
-  await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
   // Act
@@ -38,30 +29,39 @@ test('can add option', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeData.values).toEqual(expectedDataTypeValues);
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'items', [optionName])).toBeTruthy();
 });
 
 test('can remove option', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const removedOptionName = 'Removed Option';
-  const removedOptionValues = [
-    {
-      "alias": "items",
-      "value": [removedOptionName]
-    }
-  ];
-  // Remove all existing options and add an option to remove
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  dataTypeData.values = removedOptionValues;
-  await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
-  await umbracoUi.dataType.goToDataType(dataTypeName);
+  const customDataType = 'Custom Radiobox';
+  await umbracoApi.dataType.createRadioDataTypeWithOptions(customDataType, [removedOptionName]);
+  await umbracoUi.dataType.goToDataType(customDataType);
 
   // Act
   await umbracoUi.dataType.removeOptionByName(removedOptionName);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeData.values).toEqual([]);
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataType, 'items', [removedOptionName])).toBeFalsy();
+
+  // Clean
+  await umbracoApi.dataType.ensureNameNotExists(customDataType);
+});
+
+test('the default configuration is correct', async ({umbracoUi}) => {
+  // Act
+  await umbracoUi.dataType.goToDataType(dataTypeName);
+
+  // Assert
+  await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.radioboxSettings);
+  await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.radioboxSettings);
+  await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
+  await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
+  expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
+  expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
+  expect(dataTypeDefaultData.values).toEqual([]);
 });

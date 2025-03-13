@@ -1,9 +1,11 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Dropdown';
 let dataTypeDefaultData = null;
 let dataTypeData = null;
+const editorAlias = 'Umbraco.ColorPicker';
+const editorUiAlias = 'Umb.PropertyEditorUi.ColorPicker';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
@@ -85,4 +87,18 @@ test('can remove option', async ({umbracoApi, umbracoUi}) => {
   // Assert
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.values).toEqual([]);
+});
+
+test('the default configuration is correct', async ({umbracoUi}) => {
+  // Act
+  await umbracoUi.dataType.goToDataType(dataTypeName);
+
+  // Assert
+  await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.dropdownSettings);
+  await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.dropdownSettings);
+  await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
+  await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
+  expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
+  expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
+  expect(dataTypeDefaultData.values).toEqual([]);
 });

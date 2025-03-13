@@ -1,6 +1,8 @@
-﻿import { test } from "@umbraco/playwright-testhelpers";
+﻿import { ConstantHelper, test } from "@umbraco/playwright-testhelpers";
 import { expect } from "@playwright/test";
 
+const editorAlias = 'Umbraco.DateTime';
+const editorUiAlias = 'Umb.PropertyEditorUi.DatePicker';
 const datePickerTypes = ['Date Picker', 'Date Picker with time'];
 for (const datePickerType of datePickerTypes) {
   test.describe(`${datePickerType} tests`, () => {
@@ -70,6 +72,21 @@ for (const datePickerType of datePickerTypes) {
       // Assert
       dataTypeData = await umbracoApi.dataType.getByName(datePickerType);
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+    });
+
+    test('the default configuration is correct', async ({umbracoUi}) => {
+      // Arrange
+      const defaultDateFormatValue =
+        datePickerType === "Date Picker" ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm:ss";
+
+      // Assert
+      await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.datePickerSettings);
+      await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.datePickerSettings);
+      await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
+      await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
+      expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
+      expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
+      expect(dataTypeDefaultData.values[0].value).toEqual(defaultDateFormatValue);
     });
   });
 }
