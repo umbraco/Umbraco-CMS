@@ -1,1 +1,1 @@
-export * from './property-picker-modal/index.js';
+export * from './property-type-picker-modal/index.js';

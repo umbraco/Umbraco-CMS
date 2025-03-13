@@ -1,8 +1,8 @@
 import { UmbDocumentTypeDetailRepository } from '../../repository/index.js';
 import type {
-	UmbDocumentTypePropertyPickerModalData,
-	UmbDocumentTypePropertyPickerModalValue,
-} from './document-type-property-picker-modal.token.js';
+	UmbDocumentTypePropertyTypePickerModalData,
+	UmbDocumentTypePropertyTypePickerModalValue,
+} from './document-type-property-type-picker-modal.token.js';
 import { html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -11,8 +11,8 @@ import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/ev
 
 @customElement('umb-document-type-property-picker-modal')
 export class UmbDocumentTypePropertyPickerModalElement extends UmbModalBaseElement<
-	UmbDocumentTypePropertyPickerModalData,
-	UmbDocumentTypePropertyPickerModalValue
+	UmbDocumentTypePropertyTypePickerModalData,
+	UmbDocumentTypePropertyTypePickerModalValue
 > {
 	@state()
 	private _properties: Array<UmbPropertyTypeModel> = [];
