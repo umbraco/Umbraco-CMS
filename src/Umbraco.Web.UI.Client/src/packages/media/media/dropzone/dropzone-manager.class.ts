@@ -16,7 +16,7 @@ import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observabl
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
@@ -132,9 +132,9 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	}
 
 	async #showDialogMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this.#host, UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL, { data: { options } });
-		const value = await modalContext.onSubmit().catch(() => undefined);
+		const value = await umbOpenModal(this.#host, UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL, { data: { options } }).catch(
+			() => undefined,
+		);
 		return value?.mediaTypeUnique;
 	}
 

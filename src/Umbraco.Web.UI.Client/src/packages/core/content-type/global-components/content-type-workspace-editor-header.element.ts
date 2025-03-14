@@ -51,6 +51,9 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 	private async _handleIconClick() {
 		const [alias, color] = this._icon?.replace('color-', '')?.split(' ') ?? [];
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		if (!modalManager) {
+			throw new Error('Modal manager not found.');
+		}
 		const modalContext = modalManager.open(this, UMB_ICON_PICKER_MODAL, {
 			value: {
 				icon: alias,

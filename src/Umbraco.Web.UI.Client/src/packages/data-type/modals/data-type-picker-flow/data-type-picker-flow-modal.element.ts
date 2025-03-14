@@ -129,10 +129,13 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 					this.removeUmbController(propContextConsumer);
 				}).passContextAliasMatches();
 				const [contentContext, propContext] = await Promise.all([
-					contentContextConsumer.asPromise(),
-					propContextConsumer.asPromise(),
+					contentContextConsumer.asPromise({ preventTimeout: true }),
+					propContextConsumer.asPromise({ preventTimeout: true }),
 					this.#initPromise,
 				]);
+				if (!contentContext || !propContext) {
+					throw new Error('Could not get content or property context');
+				}
 				const propertyEditorName = this.#propertyEditorUIs.find((ui) => ui.alias === params.uiAlias)?.name;
 				const dataTypeName = `${contentContext?.getName() ?? ''} - ${propContext.getName() ?? ''} - ${propertyEditorName}`;
 

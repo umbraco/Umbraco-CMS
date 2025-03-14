@@ -1,7 +1,7 @@
 import { UmbDocumentCreateBlueprintRepository } from './repository/document-create-blueprint.repository.js';
 import { UMB_CREATE_BLUEPRINT_MODAL } from './constants.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 
@@ -15,13 +15,11 @@ export class UmbCreateDocumentBlueprintEntityAction extends UmbEntityActionBase<
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is required');
 
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_CREATE_BLUEPRINT_MODAL, {
+		const value = await umbOpenModal(this, UMB_CREATE_BLUEPRINT_MODAL, {
 			data: { unique: this.args.unique },
 		});
-		await modalContext.onSubmit().catch(() => undefined);
 
-		const { name, parent } = modalContext.getValue();
+		const { name, parent } = value;
 		if (!name) return;
 
 		await this.#repository.create({ name, parent, document: { id: this.args.unique } });

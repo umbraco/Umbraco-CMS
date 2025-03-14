@@ -62,7 +62,7 @@ export abstract class UmbTreeRepositoryBase<
 
 		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
 			this._treeStore = instance;
-		}).asPromise();
+		}).asPromise({ preventTimeout: true });
 	}
 
 	/**

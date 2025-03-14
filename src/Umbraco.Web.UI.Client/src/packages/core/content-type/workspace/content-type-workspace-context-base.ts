@@ -153,6 +153,9 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 			this._data.setPersisted(this.structure.getOwnerContentType());
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			if (!eventContext) {
+				throw new Error('Could not get the action event context');
+			}
 			const event = new UmbRequestReloadChildrenOfEntityEvent({
 				entityType: parent.entityType,
 				unique: parent.unique,
@@ -176,6 +179,9 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 			this._data.setPersisted(this.structure.getOwnerContentType());
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			if (!actionEventContext) {
+				throw new Error('Could not get the action event context');
+			}
 			const event = new UmbRequestReloadStructureForEntityEvent({
 				unique: this.getUnique()!,
 				entityType: this.getEntityType(),

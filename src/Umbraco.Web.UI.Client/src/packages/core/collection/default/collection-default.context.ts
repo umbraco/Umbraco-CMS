@@ -292,6 +292,7 @@ export class UmbDefaultCollectionContext<
 	#onReloadChildrenRequest = async (event: UmbRequestReloadChildrenOfEntityEvent) => {
 		// check if the collection is in the same context as the entity from the event
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
+		if (!entityContext) return;
 		const unique = entityContext.getUnique();
 		const entityType = entityContext.getEntityType();
 

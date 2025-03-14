@@ -3,7 +3,7 @@ import type { UmbLinkPickerLink, UmbLinkPickerLinkType } from '../link-picker-mo
 import type { UmbLinkPickerModalValue } from '../link-picker-modal/link-picker-modal.token.js';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/tiny-mce';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { TinyMcePluginArguments } from '@umbraco-cms/backoffice/tiny-mce';
 
 type AnchorElementAttributes = {
@@ -76,8 +76,7 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 	}
 
 	async #openLinkPicker(currentTarget?: UmbLinkPickerLink) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalHandler = modalManager.open(this, UMB_LINK_PICKER_MODAL, {
+		const linkPickerData = await umbOpenModal(this, UMB_LINK_PICKER_MODAL, {
 			data: {
 				config: {},
 				index: null,
@@ -86,11 +85,8 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 			value: {
 				link: currentTarget ?? {},
 			},
-		});
+		}).catch(() => undefined);
 
-		if (!modalHandler) return;
-
-		const linkPickerData = await modalHandler.onSubmit().catch(() => undefined);
 		if (!linkPickerData) return;
 
 		// TODO: This is a workaround for the issue where the link picker modal is returning a frozen object, and we need to extract the link into smaller parts to avoid the frozen object issue.

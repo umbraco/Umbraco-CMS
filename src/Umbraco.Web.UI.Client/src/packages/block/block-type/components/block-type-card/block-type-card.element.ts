@@ -12,7 +12,7 @@ import { UUICardEvent } from '@umbraco-cms/backoffice/external/uui';
 @customElement('umb-block-type-card')
 export class UmbBlockTypeCardElement extends UmbLitElement {
 	//
-	#init: Promise<void>;
+	#init: Promise<unknown>;
 	#serverUrl: string = '';
 
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
@@ -76,9 +76,9 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.#init = this.getContext(UMB_APP_CONTEXT).then((appContext) => {
+		this.#init = this.consumeContext(UMB_APP_CONTEXT, (appContext) => {
 			this.#serverUrl = appContext.getServerUrl();
-		});
+		}).asPromise({ preventTimeout: true });
 
 		this.observe(this.#itemManager.statuses, async (statuses) => {
 			const status = statuses[0];
