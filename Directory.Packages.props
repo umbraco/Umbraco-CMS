@@ -45,8 +45,8 @@
     <PackageVersion Include="Asp.Versioning.Mvc" Version="7.1.1" />
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.1.0" />
     <PackageVersion Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
-    <PackageVersion Include="Examine" Version="3.5.0" />
-    <PackageVersion Include="Examine.Core" Version="3.5.0" />
+    <PackageVersion Include="Examine" Version="3.7.0" />
+    <PackageVersion Include="Examine.Core" Version="3.7.0" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.11.71" />
     <PackageVersion Include="K4os.Compression.LZ4" Version="1.3.8" />
     <PackageVersion Include="MailKit" Version="4.8.0" />
