@@ -15,12 +15,14 @@ export class UmbDocumentValueGranularUserPermissionFlowModalElement extends UmbM
 	UmbDocumentValueGranularUserPermissionFlowModalValue
 > {
 	@state()
-	_documentTypeUnique?: string;
+	_selection: Array<string> = [];
 
 	async #next() {
-		if (!this._documentTypeUnique) {
+		if (this._selection.length === 0) {
 			throw new Error('No document type selected');
 		}
+
+		const documentType = { unique: this._selection[0] };
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		if (!modalManager) {
@@ -29,9 +31,7 @@ export class UmbDocumentValueGranularUserPermissionFlowModalElement extends UmbM
 
 		const modal = modalManager.open(this, UMB_DOCUMENT_VALUE_GRANULAR_USER_PERMISSION_FLOW_PROPERTY_TYPE_MODAL, {
 			data: {
-				documentType: {
-					unique: this._documentTypeUnique,
-				},
+				documentType,
 			},
 		});
 
@@ -39,23 +39,19 @@ export class UmbDocumentValueGranularUserPermissionFlowModalElement extends UmbM
 			const value = await modal.onSubmit();
 
 			this.updateValue({
-				documentType: {
-					unique: this._documentTypeUnique,
-				},
+				documentType,
 				propertyType: value.propertyType,
 				verbs: value.verbs,
 			});
 
 			this._submitModal();
-		} catch (error) {
-			console.error(error);
-		}
+		} catch {}
 	}
 
 	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as UmbTreeElement;
 		const selection = target.getSelection();
-		this._documentTypeUnique = selection[0];
+		this._selection = [...selection];
 	}
 
 	override render() {
@@ -80,7 +76,7 @@ export class UmbDocumentValueGranularUserPermissionFlowModalElement extends UmbM
 						look="primary"
 						color="positive"
 						@click=${this.#next}
-						?disabled=${!this._documentTypeUnique}></uui-button>
+						?disabled=${this._selection.length === 0}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
