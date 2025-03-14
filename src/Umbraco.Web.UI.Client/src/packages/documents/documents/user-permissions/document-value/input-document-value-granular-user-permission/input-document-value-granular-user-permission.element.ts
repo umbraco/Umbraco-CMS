@@ -16,6 +16,7 @@ import {
 	UMB_DOCUMENT_TYPE_PROPERTY_PICKER_MODAL,
 	UmbDocumentTypeDetailRepository,
 	UmbDocumentTypeItemRepository,
+	type UmbDocumentTypeDetailModel,
 	type UmbDocumentTypeItemModel,
 	type UmbDocumentTypeTreeItemModel,
 } from '@umbraco-cms/backoffice/document-type';
@@ -41,8 +42,10 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 	#documentTypeItemRepository = new UmbDocumentTypeItemRepository(this);
 	#documentTypeDetailRepository = new UmbDocumentTypeDetailRepository(this);
 	#modalManagerContext?: UmbModalManagerContext;
-	#documentTypePickerModalContext?: any;
-	#documentTypePropertyPickerModalContext?: any;
+
+	#documentTypePickerModal?: any;
+	#propertyTypePickerModal?: any;
+	#entityUserPermissionModal?: any;
 
 	constructor() {
 		super();
@@ -82,7 +85,7 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 		*/
 
 	async #addGranularPermission() {
-		this.#documentTypePickerModalContext = this.#modalManagerContext?.open(this, UMB_DOCUMENT_TYPE_PICKER_MODAL, {
+		this.#documentTypePickerModal = this.#modalManagerContext?.open(this, UMB_DOCUMENT_TYPE_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				// prevent already selected items to be picked again
@@ -91,97 +94,97 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 			},
 		});
 
-		this.#documentTypePickerModalContext?.addEventListener(UmbSelectedEvent.TYPE, async (event: UmbSelectedEvent) => {
-			const selectedEvent = event as UmbSelectedEvent;
-			const documentTypeUnique = selectedEvent.unique;
-
-			if (!documentTypeUnique) {
-				throw new Error('Could not open Document type property modal, no unique was provided');
-			}
-
-			this.#documentTypePropertyPickerModalContext = this.#modalManagerContext?.open(
-				this,
-				UMB_DOCUMENT_TYPE_PROPERTY_PICKER_MODAL,
-				{
-					data: {
-						documentType: {
-							unique: documentTypeUnique,
-						},
-					},
-				},
-			);
-
-			this.#documentTypePropertyPickerModalContext?.addEventListener(
-				UmbSelectedEvent.TYPE,
-				async (event: UmbSelectedEvent) => {
-					const selectedEvent = event as UmbSelectedEvent;
-					const propertyTypeUnique = selectedEvent.unique;
-
-					if (!propertyTypeUnique) {
-						throw new Error('Could not open permissions modal, no property alias was provided');
-					}
-
-					const { data: documentTypeDetails } =
-						await this.#documentTypeDetailRepository.requestByUnique(documentTypeUnique);
-					const property = documentTypeDetails?.properties.find((p) => p.unique === propertyTypeUnique);
-
-					if (!property) {
-						throw new Error('Could not open permissions modal, no property was found');
-					}
-
-					this.#selectEntityUserPermissionsForProperty(property).then(
-						(result) => {
-							this.#documentTypePickerModalContext?.reject();
-							this.#documentTypePropertyPickerModalContext?.reject();
-
-							const permissionItem: UmbDocumentValueUserPermissionModel = {
-								$type: 'DocumentValuePermissionPresentationModel',
-								documentType: { unique: documentTypeUnique },
-								propertyType: { unique: propertyTypeUnique },
-								verbs: result,
-							};
-
-							this.permissions = [...this._permissions, permissionItem];
-							this.dispatchEvent(new UmbChangeEvent());
-						},
-						() => {
-							this.#documentTypePickerModalContext?.reject();
-						},
-					);
-				},
-			);
+		this.#documentTypePickerModal?.onSubmit().catch(() => {
+			this.#documentTypePickerModal.value = [];
 		});
+
+		this.#documentTypePickerModal?.addEventListener(UmbSelectedEvent.TYPE, async (event: UmbSelectedEvent) =>
+			this.#onDocumentTypeSelected(event),
+		);
 	}
 
-	async #selectEntityUserPermissionsForProperty(property: UmbPropertyTypeModel, allowedVerbs: Array<string> = []) {
-		// TODO: get correct variant name
-		const name = property.name;
-		const headline = name ? `Permissions for ${name}` : 'Permissions';
-		const fallbackVerbs = this.#getFallbackPermissionVerbsForEntityType('document-value');
+	#onDocumentTypeSelected(event: UmbSelectedEvent) {
+		const selectedEvent = event as UmbSelectedEvent;
+		const documentTypeUnique = selectedEvent.unique;
 
-		this.#documentTypePropertyPickerModalContext = this.#modalManagerContext?.open(
-			this,
-			UMB_ENTITY_USER_PERMISSION_MODAL,
-			{
-				data: {
-					entityType: 'document-value',
-					headline,
-					preset: {
-						allowedVerbs: fallbackVerbs,
-					},
-				},
-				value: {
-					allowedVerbs,
+		if (!documentTypeUnique) {
+			throw new Error('Could not open Document type property modal, no unique was provided');
+		}
+
+		this.#propertyTypePickerModal = this.#modalManagerContext?.open(this, UMB_DOCUMENT_TYPE_PROPERTY_PICKER_MODAL, {
+			data: {
+				documentType: {
+					unique: documentTypeUnique,
 				},
 			},
-		);
+		});
 
-		try {
-			const value = await this.#documentTypePropertyPickerModalContext?.onSubmit();
-			return value?.allowedVerbs;
-		} catch {
-			throw new Error();
+		this.#propertyTypePickerModal?.addEventListener(UmbSelectedEvent.TYPE, (event: UmbSelectedEvent) =>
+			this.#onPropertyTypeSelected(documentTypeUnique, event),
+		);
+	}
+
+	async #onPropertyTypeSelected(documentTypeUnique: string, event: UmbSelectedEvent) {
+		const selectedEvent = event as UmbSelectedEvent;
+		const propertyTypeUnique = selectedEvent.unique;
+
+		if (!propertyTypeUnique) {
+			throw new Error('Could not open permissions modal, no property alias was provided');
 		}
+
+		const { data: documentTypeDetails } = await this.#documentTypeDetailRepository.requestByUnique(documentTypeUnique);
+
+		if (!documentTypeDetails) {
+			throw new Error('Could not open permissions modal, no document type was found');
+		}
+
+		const property = documentTypeDetails.properties.find((p) => p.unique === propertyTypeUnique);
+
+		if (!property) {
+			throw new Error('Could not open permissions modal, no property was found');
+		}
+
+		this.#selectEntityUserPermissionsForProperty(documentTypeDetails, property)
+			.then((result) => {
+				this.#propertyTypePickerModal?.reject();
+				this.#documentTypePickerModal?.reject();
+
+				const permissionItem: UmbDocumentValueUserPermissionModel = {
+					$type: 'DocumentValuePermissionPresentationModel',
+					documentType: { unique: documentTypeUnique },
+					propertyType: { unique: propertyTypeUnique },
+					verbs: result,
+				};
+
+				this.permissions = [...this._permissions, permissionItem];
+				this.dispatchEvent(new UmbChangeEvent());
+			})
+			.catch(() => undefined);
+	}
+
+	async #selectEntityUserPermissionsForProperty(
+		documentType: UmbDocumentTypeDetailModel,
+		propertyType: UmbPropertyTypeModel,
+		allowedVerbs: Array<string> = [],
+	) {
+		const headline = `Permissions for ${documentType.name}: ${propertyType.name}`;
+		const fallbackVerbs = this.#getFallbackPermissionVerbsForEntityType('document-value');
+
+		this.#entityUserPermissionModal = this.#modalManagerContext?.open(this, UMB_ENTITY_USER_PERMISSION_MODAL, {
+			data: {
+				entityType: 'document-value',
+				headline,
+				preset: {
+					allowedVerbs: fallbackVerbs,
+				},
+			},
+			value: {
+				allowedVerbs,
+			},
+		});
+
+		const value = await this.#entityUserPermissionModal?.onSubmit().catch(() => undefined);
+		return value?.allowedVerbs;
 	}
 
 	#removeGranularPermission(item: UmbDocumentTypeItemModel) {
