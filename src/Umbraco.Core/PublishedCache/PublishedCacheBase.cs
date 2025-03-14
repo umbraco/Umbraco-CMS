@@ -1,26 +1,10 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Extensions;
-using StaticServiceProvider = Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider;
 
 namespace Umbraco.Cms.Core.PublishedCache;
 
 public abstract class PublishedCacheBase : IPublishedCache
 {
     private readonly IVariationContextAccessor? _variationContextAccessor;
-
-
-    [Obsolete("Use ctor with all parameters. This will be removed in V15")]
-    public PublishedCacheBase(IVariationContextAccessor variationContextAccessor)
-        : this(variationContextAccessor, false)
-    {
-    }
-
-    [Obsolete("Use ctor with all parameters. This will be removed in V15")]
-    protected PublishedCacheBase(bool previewDefault)
-        : this(StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(), previewDefault)
-    {
-    }
 
     public PublishedCacheBase(IVariationContextAccessor variationContextAccessor, bool previewDefault)
     {
