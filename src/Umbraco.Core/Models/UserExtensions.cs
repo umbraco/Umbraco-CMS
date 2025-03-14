@@ -137,7 +137,7 @@ public static class UserExtensions
             throw new ArgumentNullException("user");
         }
 
-        return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.SensitiveDataGroupAlias);
+        return user.Groups != null && user.Groups.Any(x => x.Key == Constants.Security.SensitiveDataGroupKey);
     }
 
     /// <summary>

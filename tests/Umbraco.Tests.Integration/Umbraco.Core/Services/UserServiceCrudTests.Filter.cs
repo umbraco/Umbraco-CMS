@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -242,7 +243,7 @@ internal sealed partial class UserServiceCrudTests
         var userService = CreateUserService();
         await CreateTestUsers(userService);
 
-        var writerGroup = await UserGroupService.GetAsync(Constants.Security.WriterGroupAlias);
+        var writerGroup = await UserGroupService.GetAsync(DatabaseDataCreator.WriterGroupAlias);
         var filter = new UserFilter
         {
             IncludedUserGroups = new HashSet<Guid> { writerGroup!.Key }
