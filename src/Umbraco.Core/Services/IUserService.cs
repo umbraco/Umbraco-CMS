@@ -79,6 +79,8 @@ public interface IUserService : IMembershipUserService
 
     Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeUserPasswordModel model);
 
+    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(IUser performingUser, ChangeUserPasswordModel model) => ChangePasswordAsync(performingUser.Key, model);
+
     Task<UserOperationStatus> ClearAvatarAsync(Guid userKey);
 
     Task<Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus>> GetLinkedLoginsAsync(Guid userKey);
