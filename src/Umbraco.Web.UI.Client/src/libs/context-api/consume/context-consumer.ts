@@ -23,7 +23,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	#callback?: UmbContextCallback<ResultType>;
 	#promise?: Promise<ResultType | undefined>;
 	#promiseResolver?: (instance: ResultType) => void;
-	#promiseRejecter?: (instance?: ResultType) => void;
+	#promiseRejecter?: (reason: string) => void;
 
 	#instance?: ResultType;
 	get instance() {
@@ -160,7 +160,9 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		*/
 		requestAnimationFrame(() => {
 			// If we still have the rejecter, it means that the context was not found immediately, so lets reject the promise. [NL]
-			this.#promiseRejecter?.();
+			this.#promiseRejecter?.(
+				`Context could not be found. (Context Alias: ${this.#contextAlias} with API Alias: ${this.#apiAlias})`,
+			);
 		});
 	}
 
