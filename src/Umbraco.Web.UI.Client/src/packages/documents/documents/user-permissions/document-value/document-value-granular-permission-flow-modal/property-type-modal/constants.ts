@@ -1,0 +1,2 @@
+export const UMB_DOCUMENT_VALUE_GRANULAR_USER_PERMISSION_FLOW_PROPERTY_TYPE_MODAL_ALIAS =
+	'Umb.Modal.DocumentValueGranularUserPermissionFlow.PropertyType';
