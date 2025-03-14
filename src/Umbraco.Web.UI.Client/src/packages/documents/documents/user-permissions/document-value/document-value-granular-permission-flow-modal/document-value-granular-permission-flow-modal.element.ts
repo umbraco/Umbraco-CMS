@@ -56,7 +56,7 @@ export class UmbDocumentValueGranularUserPermissionFlowModalElement extends UmbM
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('general_choose')}>
+			<umb-body-layout headline="Choose Document Type">
 				<uui-box>
 					<umb-tree
 						@selection-change=${this.#onTreeSelectionChange}
