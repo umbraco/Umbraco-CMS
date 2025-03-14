@@ -2,7 +2,6 @@ export * from './entity-actions/constants.js';
 export * from './paths.js';
 export * from './repository/constants.js';
 export * from './search/constants.js';
-export * from './structure/constants.js';
 export * from './tree/constants.js';
 export * from './workspace/constants.js';
 

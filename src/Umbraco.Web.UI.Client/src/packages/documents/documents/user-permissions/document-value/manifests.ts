@@ -1,4 +1,5 @@
 import { UMB_USER_PERMISSION_DOCUMENT_VALUE_READ, UMB_USER_PERMISSION_DOCUMENT_VALUE_WRITE } from './constants.js';
+import { manifests as documentValueGranularPermissionFlowModalManifests } from './document-value-granular-permission-flow-modal/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -40,4 +41,5 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			description: 'Assign Permissions to Document values',
 		},
 	},
+	...documentValueGranularPermissionFlowModalManifests,
 ];
