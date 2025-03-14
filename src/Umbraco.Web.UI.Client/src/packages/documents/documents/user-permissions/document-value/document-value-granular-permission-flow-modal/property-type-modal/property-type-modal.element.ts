@@ -90,30 +90,8 @@ export class UmbDocumentValueGranularUserPermissionFlowPropertyTypeModalElement 
 		}
 	}
 
-	/*
-	async #editGranularPermission(item: UmbDocumentTypeItemModel) {
-		const currentPermissionVerbs = this.#getPermissionForDocumentType(item.unique)?.verbs ?? [];
-		const result = await this.#selectEntityUserPermissionsForDocumentType(item, currentPermissionVerbs);
-		// don't do anything if the verbs have not been updated
-		if (JSON.stringify(result) === JSON.stringify(currentPermissionVerbs)) return;
-
-		// update permission with new verbs
-		this.permissions = this._permissions.map((permission) => {
-			if (permission.documentType.unique === item.unique) {
-				return {
-					...permission,
-					verbs: result,
-				};
-			}
-			return permission;
-		});
-
-		this.dispatchEvent(new UmbChangeEvent());
-	}
-	*/
-
 	override render() {
-		return html`<umb-body-layout headline="Select Properties">
+		return html`<umb-body-layout headline="Choose Property">
 			<uui-box>
 				${this._documentTypeProperties.length > 0
 					? repeat(
@@ -136,7 +114,12 @@ export class UmbDocumentValueGranularUserPermissionFlowPropertyTypeModalElement 
 			</uui-box>
 			<div slot="actions">
 				<uui-button label="Close" @click=${this._rejectModal}></uui-button>
-				<uui-button label="Submit" look="primary" color="positive" @click=${this.#next}></uui-button>
+				<uui-button
+					label="${this.localize.term('general_next')}"
+					look="primary"
+					color="positive"
+					@click=${this.#next}
+					?disabled=${!this._selectedItem}></uui-button>
 			</div>
 		</umb-body-layout> `;
 	}
