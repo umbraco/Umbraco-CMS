@@ -49,7 +49,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 		this.#gotPropertyContext = this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.#propertyContext = context;
-		}).asPromise();
+		}).asPromise({ preventTimeout: true });
 
 		this.routes.setRoutes([
 			{

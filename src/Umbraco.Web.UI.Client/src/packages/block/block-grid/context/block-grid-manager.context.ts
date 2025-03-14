@@ -89,7 +89,7 @@ export class UmbBlockGridManagerContext<
 
 		this.#initAppUrl = this.consumeContext(UMB_APP_CONTEXT, (appContext) => {
 			this.#serverUrl = appContext.getServerUrl();
-		}).asPromise();
+		}).asPromise({ preventTimeout: true });
 	}
 	/**
 	 * @deprecated Use createWithPresets instead. Will be removed in v.17.

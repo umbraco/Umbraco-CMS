@@ -25,7 +25,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 				},
 				'_authState',
 			);
-		}).asPromise();
+		}).asPromise({ preventTimeout: true });
 	}
 
 	/**

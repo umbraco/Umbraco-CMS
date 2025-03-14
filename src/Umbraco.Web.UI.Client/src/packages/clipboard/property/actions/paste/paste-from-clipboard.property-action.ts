@@ -73,7 +73,7 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 			// Todo: localize
 			await umbConfirmModal(this, {
 				headline: 'Paste from clipboard',
-				content: `The property already contains a value. Paste from the property action will overwrite the current value. 
+				content: `The property already contains a value. Paste from the property action will overwrite the current value.
 				Do you want to replace the current value with ${item.name}?`,
 				confirmLabel: 'Paste',
 			});

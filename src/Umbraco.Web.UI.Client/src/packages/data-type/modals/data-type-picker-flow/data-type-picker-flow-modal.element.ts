@@ -129,8 +129,8 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 					this.removeUmbController(propContextConsumer);
 				}).passContextAliasMatches();
 				const [contentContext, propContext] = await Promise.all([
-					contentContextConsumer.asPromise(),
-					propContextConsumer.asPromise(),
+					contentContextConsumer.asPromise({ preventTimeout: true }),
+					propContextConsumer.asPromise({ preventTimeout: true }),
 					this.#initPromise,
 				]);
 				if (!contentContext || !propContext) {

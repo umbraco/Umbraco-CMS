@@ -50,11 +50,11 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, async (context) => {
 				this.#documentWorkspaceContext = context;
 				this.#initPendingChanges();
-			}).asPromise(),
+			}).asPromise({ preventTimeout: true }),
 
 			this.consumeContext(UMB_ACTION_EVENT_CONTEXT, async (context) => {
 				this.#eventContext = context;
-			}).asPromise(),
+			}).asPromise({ preventTimeout: true }),
 		]);
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {

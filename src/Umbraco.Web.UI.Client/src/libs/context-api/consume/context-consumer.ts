@@ -18,6 +18,7 @@ export type UmbContextConsumerAsPromiseOptionsType = {
 export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType = BaseType> {
 	protected _retrieveHost: HostElementMethod;
 
+	#raf?: number;
 	#skipHost?: boolean;
 	#stopAtContextMatch = true;
 	#callback?: UmbContextCallback<ResultType>;
@@ -158,10 +159,11 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 			await new Promise((resolve) => requestAnimationFrame(resolve));
 		}
 		*/
-		requestAnimationFrame(() => {
+		this.#raf = requestAnimationFrame(() => {
+			const hostElement = this._retrieveHost();
 			// If we still have the rejecter, it means that the context was not found immediately, so lets reject the promise. [NL]
 			this.#promiseRejecter?.(
-				`Context could not be found. (Context Alias: ${this.#contextAlias} with API Alias: ${this.#apiAlias})`,
+				`Context could not be found. (Context Alias: ${this.#contextAlias} with API Alias: ${this.#apiAlias}). Controller is hosted on ${hostElement?.parentNode?.nodeName ?? 'Not attached node'} > ${hostElement?.nodeName}`,
 			);
 		});
 	}
@@ -174,6 +176,10 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	}
 
 	public hostDisconnected(): void {
+		if (this.#raf) {
+			cancelAnimationFrame(this.#raf);
+			this.#promiseRejecter?.('Context request was cancelled, host was disconnected.');
+		}
 		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
 		window.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#handleNewProvider);
 		//window.removeEventListener(umbContextUnprovidedEventType, this.#handleRemovedProvider);

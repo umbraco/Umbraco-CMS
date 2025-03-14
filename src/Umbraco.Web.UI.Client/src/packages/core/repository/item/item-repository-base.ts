@@ -23,7 +23,7 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 
 		this._init = this.consumeContext(itemStoreContextAlias, (instance) => {
 			this._itemStore = instance as UmbItemStore<ItemType>;
-		}).asPromise();
+		}).asPromise({ preventTimeout: true });
 	}
 
 	/**

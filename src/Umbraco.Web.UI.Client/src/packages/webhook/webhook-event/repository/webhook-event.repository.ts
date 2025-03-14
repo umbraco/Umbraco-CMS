@@ -16,11 +16,9 @@ export class UmbWebhookEventRepository extends UmbRepositoryBase implements UmbA
 
 		this.#source = new UmbWebhookEventServerDataSource(host);
 
-		this.#init = Promise.all([
-			this.consumeContext(UMB_WEBHOOK_EVENT_STORE_CONTEXT, (instance) => {
-				this.#store = instance;
-			}).asPromise(),
-		]);
+		this.#init = this.consumeContext(UMB_WEBHOOK_EVENT_STORE_CONTEXT, (instance) => {
+			this.#store = instance;
+		}).asPromise({ preventTimeout: true });
 	}
 
 	async requestEvents() {

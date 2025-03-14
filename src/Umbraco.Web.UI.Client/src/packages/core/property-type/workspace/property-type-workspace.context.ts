@@ -57,7 +57,7 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 			this.#contentTypeContext = context;
 		})
 			.skipHost()
-			.asPromise();
+			.asPromise({ preventTimeout: true });
 
 		this.routes.setRoutes([
 			{

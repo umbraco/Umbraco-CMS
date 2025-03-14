@@ -50,7 +50,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 			this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 				this.#propertyDataSetCulture = context.getVariantId();
 				this.#setVariantAwareValues();
-			}).asPromise(),
+			}).asPromise({ preventTimeout: true }),
 
 			this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (context) => {
 				this.observe(context.appLanguageCulture, (culture) => {

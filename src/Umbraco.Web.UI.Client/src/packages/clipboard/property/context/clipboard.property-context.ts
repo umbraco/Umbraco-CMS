@@ -12,7 +12,7 @@ import {
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from './clipboard.property-context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_PROPERTY_CONTEXT, UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/property';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
@@ -27,14 +27,8 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardPropertyContext> {
 	#init?: Promise<unknown>;
 
-	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
-
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CLIPBOARD_PROPERTY_CONTEXT);
-
-		this.#init = this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
-			this.#modalManagerContext = context;
-		}).asPromise();
 	}
 
 	/**
@@ -138,7 +132,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 
 		const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
-		const modal = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL, {
+		const result = await umbOpenModal(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL, {
 			data: {
 				asyncFilter: async (clipboardEntryDetail) => {
 					const hasSupportedPasteTranslator = this.hasSupportedPasteTranslator(
@@ -169,7 +163,6 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 			},
 		});
 
-		const result = await modal?.onSubmit();
 		const selection = result?.selection || [];
 
 		if (!selection.length) {
