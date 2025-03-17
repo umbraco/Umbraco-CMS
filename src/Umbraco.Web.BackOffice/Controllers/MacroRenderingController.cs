@@ -124,7 +124,7 @@ public class MacroRenderingController : UmbracoAuthorizedJsonController
         }
 
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-        IPublishedContent publishedContent = GetPagePublishedContent(pageId, umbracoContext);
+        IPublishedContent? publishedContent = GetPagePublishedContent(pageId, umbracoContext);
 
         //if it isn't supposed to be rendered in the editor then return an empty string
         //currently we cannot render a macro if the page doesn't yet exist
