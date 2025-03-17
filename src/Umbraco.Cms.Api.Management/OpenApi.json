@@ -36208,6 +36208,9 @@
                   "$ref": "#/components/schemas/DocumentPermissionPresentationModel"
                 },
                 {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
+                },
+                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -36489,6 +36492,9 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/DocumentPermissionPresentationModel"
+                },
+                {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
@@ -37783,6 +37789,48 @@
           }
         },
         "additionalProperties": false
+      },
+      "DocumentTypePermissionPresentationModel": {
+        "required": [
+          "$type",
+          "documentType",
+          "propertyType",
+          "verbs"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "propertyType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "verbs": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentTypePermissionPresentationModel": "#/components/schemas/DocumentTypePermissionPresentationModel"
+          }
+        }
       },
       "DocumentTypePropertyTypeContainerResponseModel": {
         "required": [
@@ -45937,6 +45985,9 @@
                   "$ref": "#/components/schemas/DocumentPermissionPresentationModel"
                 },
                 {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
+                },
+                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -46358,6 +46409,9 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/DocumentPermissionPresentationModel"
+                },
+                {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
