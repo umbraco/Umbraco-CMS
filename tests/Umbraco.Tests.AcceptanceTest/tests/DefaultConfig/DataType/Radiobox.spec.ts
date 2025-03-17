@@ -37,7 +37,7 @@ test('can remove option', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const removedOptionName = 'Removed Option';
   const customDataType = 'Custom Radiobox';
-  await umbracoApi.dataType.createRadioDataTypeWithOptions(customDataType, [removedOptionName]);
+  await umbracoApi.dataType.createRadioboxDataType(customDataType, [removedOptionName]);
   await umbracoUi.dataType.goToDataType(customDataType);
 
   // Act

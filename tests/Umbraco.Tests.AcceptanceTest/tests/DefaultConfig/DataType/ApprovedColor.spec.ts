@@ -2,28 +2,26 @@
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Approved Color';
-let dataTypeDefaultData = null;
-let dataTypeData = null;
-const colorValue = 'ffffff';
-const colorLabel = '';
+const customDataTypeName = 'Custom Approved Color';
 const editorAlias = 'Umbraco.ColorPicker';
 const editorUiAlias = 'Umb.PropertyEditorUi.ColorPicker';
+const colorValue = 'ffffff';
+const colorLabel = '';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
-  dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  if (dataTypeDefaultData !== null) {
-    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);
-  }
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can include label', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoUi.dataType.goToDataType(dataTypeName);
+  await umbracoApi.dataType.createDefaultApprovedColorDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
   await umbracoUi.dataType.clickIncludeLabelsToggle();
@@ -31,12 +29,13 @@ test('can include label', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'useLabel', true)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'useLabel', true)).toBeTruthy();
 });
 
 test('can add color', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoUi.dataType.goToDataType(dataTypeName);
+  await umbracoApi.dataType.createDefaultApprovedColorDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
   await umbracoUi.dataType.addColor(colorValue);
@@ -44,12 +43,11 @@ test('can add color', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  expect(await umbracoApi.dataType.doesApprovedColorHaveColor(dataTypeName, colorValue)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesApprovedColorHaveColor(customDataTypeName, colorValue)).toBeTruthy();
 });
 
 test('can remove color', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const customDataTypeName = 'Custom Approved Color';
   await umbracoApi.dataType.createApprovedColorDataTypeWithOneItem(customDataTypeName, colorLabel, colorValue);
 
   // Act
@@ -60,12 +58,9 @@ test('can remove color', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const customDataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
   expect(customDataTypeData.values).toEqual([]);
-
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('the default configuration is correct', async ({umbracoUi}) => {
+test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -74,6 +69,7 @@ test('the default configuration is correct', async ({umbracoUi}) => {
   await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.approvedColorSettings);
   await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
   await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
+  const dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
   expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
   expect(dataTypeDefaultData.values).toEqual([]);
