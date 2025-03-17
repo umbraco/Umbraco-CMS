@@ -5,7 +5,7 @@ export interface UmbDocumentValueGranularUserPermissionFlowPropertyTypeModalData
 	documentType: {
 		unique: string;
 	};
-	preset?: UmbDocumentValueGranularUserPermissionFlowPropertyTypeModalValue;
+	preset?: Partial<UmbDocumentValueGranularUserPermissionFlowPropertyTypeModalValue>;
 }
 
 export interface UmbDocumentValueGranularUserPermissionFlowPropertyTypeModalValue {

@@ -2,7 +2,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentValueGranularUserPermissionFlowModalData {
-	preset?: UmbDocumentValueGranularUserPermissionFlowModalValue;
+	preset?: Partial<UmbDocumentValueGranularUserPermissionFlowModalValue>;
 }
 
 export interface UmbDocumentValueGranularUserPermissionFlowModalValue {

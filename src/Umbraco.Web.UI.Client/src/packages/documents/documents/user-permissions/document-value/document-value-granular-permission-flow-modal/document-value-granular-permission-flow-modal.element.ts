@@ -32,6 +32,9 @@ export class UmbDocumentValueGranularUserPermissionFlowModalElement extends UmbM
 		const modal = modalManager.open(this, UMB_DOCUMENT_VALUE_GRANULAR_USER_PERMISSION_FLOW_PROPERTY_TYPE_MODAL, {
 			data: {
 				documentType,
+				preset: {
+					verbs: this.data?.preset?.verbs,
+				},
 			},
 		});
 

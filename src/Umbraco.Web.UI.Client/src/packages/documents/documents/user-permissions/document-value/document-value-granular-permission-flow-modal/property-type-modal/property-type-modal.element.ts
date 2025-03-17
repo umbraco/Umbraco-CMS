@@ -75,6 +75,9 @@ export class UmbDocumentValueGranularUserPermissionFlowPropertyTypeModalElement 
 			data: {
 				entityType: 'document-value',
 				headline,
+				preset: {
+					allowedVerbs: this.data?.preset?.verbs ?? [],
+				},
 			},
 		});
 
