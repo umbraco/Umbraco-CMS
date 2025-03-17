@@ -44,7 +44,13 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 			throw new Error('Could not open modal, no modal manager found');
 		}
 
-		const modal = modalManager.open(this, UMB_DOCUMENT_VALUE_GRANULAR_USER_PERMISSION_FLOW_MODAL);
+		const modal = modalManager.open(this, UMB_DOCUMENT_VALUE_GRANULAR_USER_PERMISSION_FLOW_MODAL, {
+			data: {
+				preset: {
+					verbs: this.#getFallbackPermissionVerbsForEntityType('document-value'),
+				},
+			},
+		});
 
 		try {
 			const value = await modal?.onSubmit();
