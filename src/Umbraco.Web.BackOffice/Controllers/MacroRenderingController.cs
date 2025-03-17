@@ -87,7 +87,7 @@ public class MacroRenderingController : UmbracoAuthorizedJsonController
     [HttpGet]
     public async Task<IActionResult> GetMacroResultAsHtmlForEditor(string macroAlias, int pageId,
         [FromQuery] IDictionary<string, object> macroParams) =>
-        await GetMacroResultAsHtml(macroAlias, pageId, macroParams);
+        await GetMacroResultAsHtml(macroAlias, pageId.ToString(), macroParams);
 
     /// <summary>
     ///     Gets a rendered macro as HTML for rendering in the rich text editor.
@@ -98,11 +98,24 @@ public class MacroRenderingController : UmbracoAuthorizedJsonController
     /// <param name="model"></param>
     /// <returns></returns>
     [HttpPost]
+    [NonAction]
+    [Obsolete("This endpoint is no longer used.")]
     public async Task<IActionResult> GetMacroResultAsHtmlForEditor(MacroParameterModel model) =>
+        await GetMacroResultAsHtml(model.MacroAlias, model.PageId.ToString(), model.MacroParams);
+
+    /// <summary>
+    ///     Gets a rendered macro as HTML for rendering in the rich text editor.
+    ///     Using HTTP POST instead of GET allows for more parameters to be passed as it's not dependent on URL-length
+    ///     limitations like GET.
+    ///     The method using GET is kept to maintain backwards compatibility
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<IActionResult> GetMacroResultAsHtmlForEditor(MacroParameterModel2 model) =>
         await GetMacroResultAsHtml(model.MacroAlias, model.PageId, model.MacroParams);
 
-    private async Task<IActionResult> GetMacroResultAsHtml(string? macroAlias, int pageId,
-        IDictionary<string, object>? macroParams)
+    private async Task<IActionResult> GetMacroResultAsHtml(string? macroAlias, string pageId, IDictionary<string, object>? macroParams)
     {
         IMacro? m = macroAlias is null ? null : _macroService.GetByAlias(macroAlias);
         if (m == null)
@@ -111,11 +124,11 @@ public class MacroRenderingController : UmbracoAuthorizedJsonController
         }
 
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-        IPublishedContent? publishedContent = umbracoContext.Content?.GetById(true, pageId);
+        IPublishedContent publishedContent = GetPagePublishedContent(pageId, umbracoContext);
 
         //if it isn't supposed to be rendered in the editor then return an empty string
         //currently we cannot render a macro if the page doesn't yet exist
-        if (pageId == -1 || publishedContent == null || m.DontRender)
+        if (publishedContent == null || m.DontRender)
         {
             //need to create a specific content result formatted as HTML since this controller has been configured
             //with only json formatters.
@@ -149,6 +162,21 @@ public class MacroRenderingController : UmbracoAuthorizedJsonController
         }
     }
 
+    private static IPublishedContent? GetPagePublishedContent(string pageId, IUmbracoContext umbracoContext)
+    {
+        if (int.TryParse(pageId, NumberStyles.Integer, CultureInfo.InvariantCulture, out int pageIdAsInt))
+        {
+            return umbracoContext.Content?.GetById(true, pageIdAsInt);
+        }
+
+        if (Guid.TryParse(pageId, out Guid pageIdAsGuid))
+        {
+            return umbracoContext.Content?.GetById(true, pageIdAsGuid);
+        }
+
+        return null;
+    }
+
     [HttpPost]
     public IActionResult CreatePartialViewMacroWithFile(CreatePartialViewMacroWithFileModel model)
     {
@@ -180,10 +208,18 @@ public class MacroRenderingController : UmbracoAuthorizedJsonController
         return Ok();
     }
 
+    [Obsolete("This model is no longer used and has been replaced with MacroParameterModel2 that changes the type of the PageId property.")]
     public class MacroParameterModel
     {
         public string? MacroAlias { get; set; }
         public int PageId { get; set; }
+        public IDictionary<string, object>? MacroParams { get; set; }
+    }
+
+    public class MacroParameterModel2
+    {
+        public string? MacroAlias { get; set; }
+        public string PageId { get; set; } = string.Empty;
         public IDictionary<string, object>? MacroParams { get; set; }
     }
 
