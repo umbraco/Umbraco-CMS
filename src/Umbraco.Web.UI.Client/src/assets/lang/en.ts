@@ -1278,6 +1278,11 @@ export default {
 		defineRootNode: 'Pick root node',
 		defineXPathOrigin: 'Specify via XPath',
 		defineDynamicRoot: 'Specify a Dynamic Root',
+		unsupportedHeadline: (type?: string) =>
+			`<strong>Unsupported ${type ?? 'content'} items</strong><br>The following content is no longer supported in this Editor.`,
+		unsupportedMessage:
+			'If you still require this content, please contact your administrator. Otherwise you can remove it.',
+		unsupportedRemove: 'Remove unsupported items?',
 	},
 	dynamicRoot: {
 		configurationTitle: 'Dynamic Root Query',
