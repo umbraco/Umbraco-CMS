@@ -32,10 +32,10 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	_dataPaths?: Array<string>;
 
 	@state()
-	_visiblePropertyAliases: Array<string> = [];
+	_readablePropertyUniques: Array<string> = [];
 
 	@state()
-	_visibleProperties: Array<UmbPropertyTypeModel> = [];
+	_writeablePropertyUniques: Array<string> = [];
 
 	constructor() {
 		super();
@@ -46,12 +46,17 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 				workspaceContext.structure as unknown as UmbContentTypeStructureManager<UmbContentTypeModel>,
 			);
 
-			this.observe(workspaceContext.structure.propertyVisibilityState.states, (states) => {
-				this._visiblePropertyAliases = states.map((state) => state.propertyAlias) ?? [];
+			this.observe(workspaceContext.structure.propertyReadState.states, (states) => {
+				this._readablePropertyUniques = states.map((state) => state.propertyType.unique) ?? [];
+			});
+
+			this.observe(workspaceContext.structure.propertyWriteState.states, (states) => {
+				this._writeablePropertyUniques = states.map((state) => state.propertyType.unique) ?? [];
 			});
 		});
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (datasetContext) => {
+			debugger;
 			this.#variantId = datasetContext.getVariantId();
 			this.#generatePropertyDataPath();
 		});
@@ -79,7 +84,11 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	}
 
 	#getVisibleProperties() {
-		return this._propertyStructure?.filter((property) => this._visiblePropertyAliases.includes(property.alias)) ?? [];
+		return this._propertyStructure?.filter((property) => this._readablePropertyUniques.includes(property.unique)) ?? [];
+	}
+
+	#isWritable(unique: string) {
+		return this._writeablePropertyUniques.includes(unique);
 	}
 
 	override render() {
@@ -91,7 +100,8 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 						html`<umb-property-type-based-property
 							class="property"
 							data-path=${this._dataPaths![index]}
-							.property=${property}></umb-property-type-based-property> `,
+							.property=${property}
+							?readonly=${this.#isWritable(property.unique)}></umb-property-type-based-property> `,
 				)
 			: '';
 	}
