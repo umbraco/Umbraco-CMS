@@ -93,6 +93,24 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 		this._states.setValue([]);
 	}
 
+	/**
+	 * Get if there are any states in the state manager
+	 * @returns {boolean} True if there are any states in the state manager
+	 * @memberof UmbStateManager
+	 */
+	getIsOn(): boolean {
+		return this.getStates().length > 0;
+	}
+
+	/**
+	 * Get if there are no states in the state manager
+	 * @returns {boolean} True if there are no states in the state manager
+	 * @memberof UmbStateManager
+	 */
+	getIsOff(): boolean {
+		return this.getStates().length === 0;
+	}
+
 	override destroy() {
 		super.destroy();
 		this._states.destroy();
