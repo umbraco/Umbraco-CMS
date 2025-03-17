@@ -3,7 +3,11 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
 import { type UmbControllerAlias, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbContextToken, UmbContextCallback } from '@umbraco-cms/backoffice/context-api';
+import type {
+	UmbContextToken,
+	UmbContextCallback,
+	UmbContextConsumerAsPromiseOptionsType,
+} from '@umbraco-cms/backoffice/context-api';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { ObserverCallback } from '@umbraco-cms/backoffice/observable-api';
 import { UmbObserverController, simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
@@ -74,12 +78,19 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 
 		async getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
-		): Promise<ResultType> {
+			options?: UmbContextConsumerAsPromiseOptionsType,
+		): Promise<ResultType | undefined> {
 			const controller = new UmbContextConsumerController(this, contextAlias);
-			const promise = controller.asPromise().then((result) => {
-				controller.destroy();
-				return result;
-			});
+			const promise = controller
+				.asPromise(options)
+				.then((result) => {
+					controller.destroy();
+					return result;
+				})
+				.catch(() => {
+					controller.destroy();
+					return undefined;
+				});
 			return promise;
 		}
 	}

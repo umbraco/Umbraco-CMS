@@ -116,7 +116,7 @@ export class UmbModalContext<
 
 	async _internal_removeCurrentModal() {
 		const routeContext = await this.getContext(UMB_ROUTE_CONTEXT);
-		routeContext._internal_removeModalPath(this.#activeModalPath);
+		routeContext?._internal_removeModalPath(this.#activeModalPath);
 	}
 
 	forceResolve() {
@@ -151,8 +151,9 @@ export class UmbModalContext<
 			this._internal_removeCurrentModal();
 			return;
 		}
-		this.#submitResolver?.(this.getValue());
+		const resolver = this.#submitResolver;
 		this.#markAsResolved();
+		resolver?.(this.getValue());
 		// TODO: Could we clean up this class here? (Example destroy the value state, and other things?)
 	}
 
@@ -171,8 +172,9 @@ export class UmbModalContext<
 			this._internal_removeCurrentModal();
 			return;
 		}
-		this.#submitRejecter?.(reason);
+		const resolver = this.#submitRejecter;
 		this.#markAsResolved();
+		resolver?.(reason);
 		// TODO: Could we clean up this class here? (Example destroy the value state, and other things?)
 	}
 
@@ -182,8 +184,8 @@ export class UmbModalContext<
 	 * @public
 	 * @memberof UmbModalContext
 	 */
-	public onSubmit() {
-		return this.#submitPromise;
+	public async onSubmit() {
+		return await this.#submitPromise;
 	}
 
 	/**

@@ -3,7 +3,7 @@ import { UMB_DOCUMENT_CREATE_OPTIONS_MODAL } from './document-create-options-mod
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 
 export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<never> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
@@ -22,15 +22,12 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<never> {
 			documentItem = data[0];
 		}
 
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_DOCUMENT_CREATE_OPTIONS_MODAL, {
+		await umbOpenModal(this, UMB_DOCUMENT_CREATE_OPTIONS_MODAL, {
 			data: {
 				parent: { unique: this.args.unique, entityType: this.args.entityType },
 				documentType: documentItem ? { unique: documentItem.documentType.unique } : null,
 			},
 		});
-
-		await modalContext.onSubmit();
 	}
 }
 export default UmbCreateDocumentEntityAction;

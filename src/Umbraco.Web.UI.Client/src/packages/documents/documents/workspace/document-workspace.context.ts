@@ -288,6 +288,9 @@ export class UmbDocumentWorkspaceContext
 		await new UmbDocumentPreviewRepository(this).enter();
 
 		const appContext = await this.getContext(UMB_APP_CONTEXT);
+		if (!appContext) {
+			throw new Error('App context is missing');
+		}
 
 		const backofficePath = appContext.getBackofficePath();
 		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', appContext.getServerUrl());

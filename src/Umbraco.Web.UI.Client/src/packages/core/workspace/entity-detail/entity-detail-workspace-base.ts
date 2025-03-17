@@ -4,7 +4,7 @@ import type { UmbEntityDetailWorkspaceContextArgs, UmbEntityDetailWorkspaceConte
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import { UMB_DISCARD_CHANGES_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_DISCARD_CHANGES_MODAL, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbEntityUpdatedEvent,
@@ -316,6 +316,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this._data.setCurrent(data);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) throw new Error('Event context not found.');
 		const event = new UmbRequestReloadChildrenOfEntityEvent({
 			entityType: parent.entityType,
 			unique: parent.unique,
@@ -337,6 +338,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		const entityType = this.getEntityType();
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) throw new Error('Event context not found.');
 		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 
 		eventContext.dispatchEvent(event);
@@ -372,12 +374,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			This push will make the "willchangestate" event happen again and due to this somewhat "backward" behavior,
 			we set an "allowNavigateAway"-flag to prevent the "discard-changes" functionality from running in a loop.*/
 			e.preventDefault();
-			const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-			const modal = modalManager.open(this, UMB_DISCARD_CHANGES_MODAL);
 
 			try {
 				// navigate to the new url when discarding changes
-				await modal.onSubmit();
+				await umbOpenModal(this, UMB_DISCARD_CHANGES_MODAL);
 				this.#allowNavigateAway = true;
 				history.pushState({}, '', e.detail.url);
 				return true;

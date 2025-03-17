@@ -4,7 +4,7 @@ import { css, html, customElement, repeat, property } from '@umbraco-cms/backoff
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-stylesheet-rule-input')
@@ -29,17 +29,11 @@ export class UmbStylesheetRuleInputElement extends UUIFormControlMixin(UmbLitEle
 	}
 
 	async #openRuleSettings(rule: UmbStylesheetRule | null = null) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-
-		const value = {
-			rule: rule ? { name: rule.name, selector: rule.selector, styles: rule.styles } : null,
-		};
-
-		const modalContext = modalManager.open(this, UMB_STYLESHEET_RULE_SETTINGS_MODAL, {
-			value,
+		return await umbOpenModal(this, UMB_STYLESHEET_RULE_SETTINGS_MODAL, {
+			value: {
+				rule: rule ? { name: rule.name, selector: rule.selector, styles: rule.styles } : null,
+			},
 		});
-
-		return modalContext?.onSubmit();
 	}
 
 	#appendRule = () => {

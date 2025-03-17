@@ -19,11 +19,9 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 
 		this.#publishingDataSource = new UmbDocumentPublishingServerDataSource(this);
 
-		this.#init = Promise.all([
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
-				this.#notificationContext = instance;
-			}).asPromise(),
-		]);
+		this.#init = this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
+			this.#notificationContext = instance;
+		}).asPromise({ preventTimeout: true });
 	}
 
 	/**
@@ -73,11 +71,7 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 * @param includeUnpublishedDescendants
 	 * @memberof UmbDocumentPublishingRepository
 	 */
-	async publishWithDescendants(
-		id: string,
-		variantIds: Array<UmbVariantId>,
-		includeUnpublishedDescendants: boolean,
-	) {
+	async publishWithDescendants(id: string, variantIds: Array<UmbVariantId>, includeUnpublishedDescendants: boolean) {
 		if (!id) throw new Error('id is missing');
 		if (!variantIds) throw new Error('variant IDs are missing');
 		await this.#init;

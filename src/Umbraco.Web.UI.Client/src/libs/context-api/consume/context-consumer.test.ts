@@ -52,34 +52,98 @@ describe('UmbContextConsumer', () => {
 	});
 
 	describe('Simple implementation', () => {
+		let element: HTMLElement;
+		beforeEach(() => {
+			element = document.createElement('div');
+			document.body.appendChild(element);
+		});
+		afterEach(() => {
+			document.body.removeChild(element);
+		});
+
 		it('works with UmbContextProvider', (done) => {
 			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
 			provider.hostConnected();
 
-			const element = document.createElement('div');
-			document.body.appendChild(element);
-
-			const localConsumer = new UmbContextConsumer(
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(
 				element,
 				testContextAlias,
-				(_instance: UmbTestContextConsumerClass | undefined) => {
+				(_instance) => {
 					if (_instance) {
 						expect(_instance.prop).to.eq('value from provider');
-						done();
 						localConsumer.hostDisconnected();
 						provider.hostDisconnected();
+						done();
 					}
 				},
 			);
 			localConsumer.hostConnected();
 		});
 
+		it('works with asPromise for UmbContextProvider', (done) => {
+			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(element, testContextAlias);
+			localConsumer.hostConnected();
+			localConsumer
+				.asPromise()
+				.then((instance) => {
+					expect(instance?.prop).to.eq('value from provider');
+					localConsumer.hostDisconnected();
+					provider.hostDisconnected();
+					done();
+				})
+				.catch(() => {
+					expect.fail('Promise should not reject');
+				});
+
+			provider.hostConnected();
+		});
+
+		it('gets rejected when using asPromise that does not resolve', (done) => {
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(element, testContextAlias);
+
+			localConsumer
+				.asPromise()
+				.then((instance) => {
+					expect.fail('Promise should reject');
+				})
+				.catch(() => {
+					localConsumer.hostDisconnected();
+					localConsumer.destroy();
+					done();
+				});
+			localConsumer.hostConnected();
+		});
+
+		it('never gets rejected when using asPromise that is set not to timeout and never will resolve', (done) => {
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(element, testContextAlias);
+			localConsumer.hostConnected();
+
+			const timeout = setTimeout(() => {
+				localConsumer.hostDisconnected();
+				done();
+			}, 200);
+
+			try {
+				localConsumer
+					.asPromise({ preventTimeout: true })
+					.then((instance) => {
+						clearTimeout(timeout);
+						expect.fail('Promise should not resolve');
+					})
+					.catch(() => {
+						clearTimeout(timeout);
+						expect.fail('Promise should not reject');
+					});
+			} catch (e) {
+				console.log('e', e);
+			}
+		});
+
 		it('works with host as a method', (done) => {
 			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
 			provider.hostConnected();
-
-			const element = document.createElement('div');
-			document.body.appendChild(element);
 
 			const localConsumer = new UmbContextConsumer(
 				() => element,
@@ -87,9 +151,9 @@ describe('UmbContextConsumer', () => {
 				(_instance: UmbTestContextConsumerClass | undefined) => {
 					if (_instance) {
 						expect(_instance.prop).to.eq('value from provider');
-						done();
 						localConsumer.hostDisconnected();
 						provider.hostDisconnected();
+						done();
 					}
 				},
 			);
@@ -97,12 +161,12 @@ describe('UmbContextConsumer', () => {
 		});
 
 		it('works with host method returning undefined', async () => {
-			const element = undefined;
+			const notExistingElement = undefined;
 
-			const localConsumer = new UmbContextConsumer(
-				() => element,
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(
+				() => notExistingElement,
 				testContextAlias,
-				(_instance: UmbTestContextConsumerClass | undefined) => {
+				(_instance) => {
 					if (_instance) {
 						expect.fail('Callback should not be called when never permitted');
 					}
@@ -147,6 +211,15 @@ describe('UmbContextConsumer', () => {
 	});
 
 	describe('Implementation with Api Alias', () => {
+		let element: HTMLElement;
+		beforeEach(() => {
+			element = document.createElement('div');
+			document.body.appendChild(element);
+		});
+		afterEach(() => {
+			document.body.removeChild(element);
+		});
+
 		it('responds when api alias matches', (done) => {
 			const provider = new UmbContextProvider(
 				document.body,
@@ -155,17 +228,18 @@ describe('UmbContextConsumer', () => {
 			);
 			provider.hostConnected();
 
-			const element = document.createElement('div');
-			document.body.appendChild(element);
-
-			const localConsumer = new UmbContextConsumer(element, testContextAliasAndApiAlias, (_instance) => {
-				if (_instance) {
-					expect((_instance as UmbTestContextConsumerClass).prop).to.eq('value from provider');
-					localConsumer.hostDisconnected();
-					provider.hostDisconnected();
-					done();
-				}
-			});
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(
+				element,
+				testContextAliasAndApiAlias,
+				(_instance) => {
+					if (_instance) {
+						expect(_instance.prop).to.eq('value from provider');
+						localConsumer.hostDisconnected();
+						provider.hostDisconnected();
+						done();
+					}
+				},
+			);
 			localConsumer.hostConnected();
 		});
 
@@ -176,9 +250,6 @@ describe('UmbContextConsumer', () => {
 				new UmbTestContextConsumerClass(),
 			);
 			provider.hostConnected();
-
-			const element = document.createElement('div');
-			document.body.appendChild(element);
 
 			const localConsumer = new UmbContextConsumer(element, testContextAliasAndNotExistingApiAlias, () => {
 				expect(false).to.be.true;
@@ -195,6 +266,15 @@ describe('UmbContextConsumer', () => {
 	});
 
 	describe('Implementation with discriminator method', () => {
+		let element: HTMLElement;
+		beforeEach(() => {
+			element = document.createElement('div');
+			document.body.appendChild(element);
+		});
+		afterEach(() => {
+			document.body.removeChild(element);
+		});
+
 		type A = { prop: string };
 
 		function discriminator(instance: unknown): instance is A {
@@ -208,16 +288,20 @@ describe('UmbContextConsumer', () => {
 		}
 
 		it('discriminator determines the instance type', (done) => {
+			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+
 			const localConsumer = new UmbContextConsumer(
-				document.body,
+				element,
 				new UmbContextToken(testContextAlias, undefined, discriminator),
 				(instance: A) => {
 					expect(instance.prop).to.eq('value from provider');
-					done();
+					provider.destroy();
 					localConsumer.destroy();
+					done();
 				},
 			);
 			localConsumer.hostConnected();
+			provider.hostConnected();
 
 			// This bit of code is not really a test but it serves as a TypeScript type test, making sure the given type is matches the one given from the Discriminator method.
 			type TestType = Exclude<typeof localConsumer.instance, undefined> extends A ? true : never;
@@ -229,17 +313,14 @@ describe('UmbContextConsumer', () => {
 			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
 			provider.hostConnected();
 
-			const element = document.createElement('div');
-			document.body.appendChild(element);
-
 			const localConsumer = new UmbContextConsumer(
 				element,
 				new UmbContextToken(testContextAlias, undefined, discriminator),
 				(_instance) => {
 					expect(_instance.prop).to.eq('value from provider');
-					done();
 					localConsumer.hostDisconnected();
 					provider.hostDisconnected();
+					done();
 				},
 			);
 			localConsumer.hostConnected();
@@ -248,9 +329,6 @@ describe('UmbContextConsumer', () => {
 		it('disapproving discriminator does not fire callback', (done) => {
 			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
 			provider.hostConnected();
-
-			const element = document.createElement('div');
-			document.body.appendChild(element);
 
 			const localConsumer = new UmbContextConsumer(
 				element,
@@ -263,18 +341,15 @@ describe('UmbContextConsumer', () => {
 
 			// Wait for to ensure the above request didn't succeed:
 			Promise.resolve().then(() => {
-				done();
 				localConsumer.hostDisconnected();
 				provider.hostDisconnected();
+				done();
 			});
 		});
 
 		it('context api of same context alias will prevent request from propagating', (done) => {
 			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
 			provider.hostConnected();
-
-			const element = document.createElement('div');
-			document.body.appendChild(element);
 
 			const alternativeProvider = new UmbContextProvider(
 				element,
@@ -294,18 +369,15 @@ describe('UmbContextConsumer', () => {
 
 			// Wait for to ensure the above request didn't succeed:
 			Promise.resolve().then(() => {
-				done();
 				localConsumer.hostDisconnected();
 				provider.hostDisconnected();
+				done();
 			});
 		});
 
 		it('context api of same context alias will NOT prevent request from propagating when set to exactMatch', (done) => {
 			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
 			provider.hostConnected();
-
-			const element = document.createElement('div');
-			document.body.appendChild(element);
 
 			const alternativeProvider = new UmbContextProvider(
 				element,
@@ -319,9 +391,9 @@ describe('UmbContextConsumer', () => {
 				new UmbContextToken(testContextAlias, undefined, discriminator),
 				(_instance) => {
 					expect(_instance.prop).to.eq('value from provider');
-					done();
 					localConsumer.hostDisconnected();
 					provider.hostDisconnected();
+					done();
 				},
 			);
 			localConsumer.passContextAliasMatches();

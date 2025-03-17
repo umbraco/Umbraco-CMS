@@ -363,6 +363,9 @@ export abstract class UmbBlockManagerContext<
 	protected async _createBlockElementData(key: string, contentTypeKey: string) {
 		//
 		const appLanguage = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+		if (!appLanguage) {
+			throw new Error('Could not retrieve app language context.');
+		}
 
 		const contentStructure = this.getStructure(contentTypeKey);
 		if (!contentStructure) {
@@ -501,6 +504,9 @@ export abstract class UmbBlockManagerContext<
 		if (varyByCulture) {
 			// get all mandatory cultures:
 			const appLanguageContext = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+			if (!appLanguageContext) {
+				throw new Error('Could not retrieve app language context.');
+			}
 			const mandatoryLanguages = await appLanguageContext.getMandatoryLanguages();
 			mandatoryLanguages.forEach((x) => {
 				// No need to insert the same expose twice:

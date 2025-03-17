@@ -48,7 +48,6 @@ export class UmbModalRouteRegistrationController<
 {
 	//
 	#init;
-	#contextConsumer;
 
 	#addendum?: string;
 	#additionalPath?: string;
@@ -101,11 +100,10 @@ export class UmbModalRouteRegistrationController<
 			);
 		});
 
-		this.#contextConsumer = this.consumeContext(UMB_ROUTE_CONTEXT, (_routeContext) => {
+		this.#init = this.consumeContext(UMB_ROUTE_CONTEXT, (_routeContext) => {
 			this.#routeContext = _routeContext;
 			this.#registerModal();
-		});
-		this.#init = this.#contextConsumer.asPromise();
+		}).asPromise({ preventTimeout: true });
 	}
 
 	/**
@@ -349,7 +347,6 @@ export class UmbModalRouteRegistrationController<
 
 	public override destroy(): void {
 		super.destroy();
-		this.#contextConsumer.destroy();
 		this.#modalRegistrationContext = undefined;
 		this.#uniquePaths = undefined as any;
 		this.#routeContext = undefined;

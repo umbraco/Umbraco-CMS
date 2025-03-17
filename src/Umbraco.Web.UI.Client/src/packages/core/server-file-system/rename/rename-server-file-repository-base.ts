@@ -37,6 +37,7 @@ export abstract class UmbRenameServerFileRepositoryBase<
 
 		if (data) {
 			const detailStore = await this.getContext(this.#detailStoreContextAlias);
+			if (!detailStore) throw new Error('Detail store is missing');
 
 			/* When renaming a file the unique changed because it is based on the path/name
 			We need to remove the old item and append the new item */
@@ -44,6 +45,7 @@ export abstract class UmbRenameServerFileRepositoryBase<
 			detailStore.append(data);
 
 			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+			if (!notificationContext) throw new Error('Notification context is missing');
 			const notification = { data: { message: `Renamed` } };
 			notificationContext.peek('positive', notification);
 		}

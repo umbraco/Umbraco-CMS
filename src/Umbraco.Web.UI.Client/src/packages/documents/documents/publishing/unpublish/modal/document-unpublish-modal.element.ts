@@ -120,6 +120,9 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		// If there are references, we also want to check if we are allowed to unpublish the document:
 		if (this._hasReferences) {
 			const documentConfigurationContext = await this.getContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT);
+			if (!documentConfigurationContext) {
+				throw new Error('Document configuration context not found');
+			}
 			this._hasUnpublishPermission =
 				(await documentConfigurationContext.getDocumentConfiguration())?.disableUnpublishWhenReferenced === false;
 		}

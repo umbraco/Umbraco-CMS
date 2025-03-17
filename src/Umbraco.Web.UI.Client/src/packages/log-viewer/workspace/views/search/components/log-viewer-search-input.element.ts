@@ -7,7 +7,7 @@ import { Subject, debounceTime, tap } from '@umbraco-cms/backoffice/external/rxj
 import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
-import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 
 import './log-viewer-search-input-modal.element.js';
 import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
@@ -111,16 +111,16 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	async #openSaveSearchDialog() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modal = modalManager.open(this, UMB_LOG_VIEWER_SAVE_SEARCH_MODAL, {
+		umbOpenModal(this, UMB_LOG_VIEWER_SAVE_SEARCH_MODAL, {
 			data: { query: this._inputQuery },
-		});
-		modal?.onSubmit().then((savedSearch) => {
-			if (savedSearch) {
-				this.#saveSearch(savedSearch);
-				this._isQuerySaved = true;
-			}
-		});
+		})
+			.then((savedSearch) => {
+				if (savedSearch) {
+					this.#saveSearch(savedSearch);
+					this._isQuerySaved = true;
+				}
+			})
+			.catch(() => {});
 	}
 
 	override render() {

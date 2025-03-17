@@ -1,14 +1,13 @@
 import type { UmbContentPickerSource } from '../../types.js';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
-const elementName = 'umb-input-content';
-@customElement(elementName)
+@customElement('umb-input-content')
 export class UmbInputContentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
 	UmbLitElement,
 ) {
@@ -164,6 +163,6 @@ export { UmbInputContentElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputContentElement;
+		'umb-input-content': UmbInputContentElement;
 	}
 }

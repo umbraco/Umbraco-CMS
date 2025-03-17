@@ -10,6 +10,7 @@ export default class UmbTiptapToolbarAnchorExtensionApi extends UmbTiptapToolbar
 		if (!attrs) return;
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		if (!modalManager) throw new Error('Modal manager not found');
 		const modal = modalManager.open(this, UMB_TIPTAP_ANCHOR_MODAL, { data: { id: attrs?.id } });
 		if (!modal) return;
 
