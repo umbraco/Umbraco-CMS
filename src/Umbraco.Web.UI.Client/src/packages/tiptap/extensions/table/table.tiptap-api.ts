@@ -2,6 +2,8 @@ import { UmbTiptapExtensionApiBase } from '../base.js';
 import { css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTable, UmbTableHeader, UmbTableRow, UmbTableCell } from '@umbraco-cms/backoffice/external/tiptap';
 
+import './components/table-column-menu.element.js';
+
 export default class UmbTiptapTableExtensionApi extends UmbTiptapExtensionApiBase {
 	getTiptapExtensions = () => [UmbTable, UmbTableHeader, UmbTableRow, UmbTableCell];
 

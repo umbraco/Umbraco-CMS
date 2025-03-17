@@ -100,7 +100,7 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 			:host {
 				--uui-menu-item-flat-structure: 1;
 
-				background: var(--uui-color-surface);
+				background-color: var(--uui-color-surface);
 				border-radius: var(--uui-border-radius);
 				box-shadow: var(--uui-shadow-depth-3);
 				padding: var(--uui-size-space-1);

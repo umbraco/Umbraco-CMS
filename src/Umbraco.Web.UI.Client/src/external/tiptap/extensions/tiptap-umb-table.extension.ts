@@ -1,16 +1,15 @@
 import { CellSelection, TableMap } from '@tiptap/pm/tables';
-import { Decoration, DecorationSet } from '@tiptap/pm/view';
-import { EditorState } from '@tiptap/pm/state';
-import { EditorView } from '@tiptap/pm/view';
-import { findParentNode, mergeAttributes, Editor, Node } from '@tiptap/core';
+import { Decoration, DecorationSet, EditorView } from '@tiptap/pm/view';
+import { EditorState, Plugin, Selection, Transaction } from '@tiptap/pm/state';
+import { findParentNode, Editor } from '@tiptap/core';
 import { Node as PMNode, ResolvedPos } from '@tiptap/pm/model';
-import { Plugin } from '@tiptap/pm/state';
-import { Selection, Transaction } from '@tiptap/pm/state';
 import { Table } from '@tiptap/extension-table';
 import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
 import { TableRow } from '@tiptap/extension-table-row';
+import type { PluginView } from '@tiptap/pm/state';
 import type { Rect } from '@tiptap/pm/tables';
+import type { UUIPopoverContainerElement } from '@umbraco-ui/uui';
 
 export const UmbTable = Table.configure({ resizable: true });
 
@@ -43,7 +42,13 @@ export const UmbTableHeader = TableHeader.extend({
 	},
 
 	addProseMirrorPlugins() {
+		const { editor } = this;
 		return [
+			new Plugin({
+				view(editorView) {
+					return new UmbTableColumnMenuPlugin(editor, editorView);
+				},
+			}),
 			new Plugin({
 				props: {
 					decorations: (state) => {
@@ -64,14 +69,18 @@ export const UmbTableHeader = TableHeader.extend({
 										const colSelected = isColumnSelected(index)(selection);
 										const className = colSelected ? 'grip-column selected' : 'grip-column';
 
+										const menu = document.createElement('h4');
+										menu.textContent = 'Column Menu';
+
 										const grip = document.createElement('a');
 										grip.appendChild(document.createElement('uui-symbol-more'));
 
 										grip.className = className;
+										grip.setAttribute('popovertarget', colSelected ? 'table-column-menu' : '');
+
 										grip.addEventListener('mousedown', (event) => {
 											event.preventDefault();
 											event.stopImmediatePropagation();
-
 											this.editor.view.dispatch(selectColumn(index)(this.editor.state.tr));
 										});
 
@@ -88,6 +97,44 @@ export const UmbTableHeader = TableHeader.extend({
 		];
 	},
 });
+
+class UmbTableColumnMenuPlugin implements PluginView {
+	editor: Editor;
+	tooltip: UUIPopoverContainerElement;
+
+	constructor(editor: Editor, view: EditorView) {
+		this.editor = editor;
+
+		this.tooltip = document.createElement('uui-popover-container') as UUIPopoverContainerElement;
+		this.tooltip.id = 'table-column-menu';
+		this.tooltip.setAttribute('placement', 'top');
+		this.tooltip.setAttribute('popover', 'manual');
+
+		const menu = document.createElement('umb-tiptap-table-column-menu');
+		menu.editor = editor;
+		this.tooltip.appendChild(menu);
+
+		view.dom.parentNode?.appendChild(this.tooltip);
+
+		this.update(view, null);
+	}
+
+	update(view: EditorView, prevState: EditorState | null) {
+		const editor = this.editor;
+		const { state } = view;
+		const { from } = state.selection;
+
+		if (isColumnGripSelected({ editor, view, state, from })) {
+			this.tooltip.showPopover();
+		} else {
+			this.tooltip.hidePopover();
+		}
+	}
+
+	destroy() {
+		this.tooltip.remove();
+	}
+}
 
 export const UmbTableCell = TableCell.extend({
 	addAttributes() {
@@ -449,7 +496,7 @@ const isColumnGripSelected = ({
 	return !!gripColumn;
 };
 
-export const isRowGripSelected = ({
+const isRowGripSelected = ({
 	editor,
 	view,
 	state,
