@@ -55,7 +55,7 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			(extensionControllers) => {
 				this._lookup = new Map(
 					extensionControllers.map((ext) => {
-						(ext.component as HTMLElement)?.setAttribute('data-mark', `tiptap-toolbar-item:${ext.alias}`);
+						(ext.component as HTMLElement)?.setAttribute('data-mark', `action:tiptap-toolbar:${ext.alias}`);
 						return [ext.alias, ext.component];
 					}),
 				);

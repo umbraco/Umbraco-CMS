@@ -179,7 +179,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 					</umb-tiptap-toolbar>
 				`,
 			)}
-			<div id="editor" data-mark="tiptap-rte"></div>
+			<div id="editor" data-mark="input:tiptap-rte"></div>
 		`;
 	}
 
