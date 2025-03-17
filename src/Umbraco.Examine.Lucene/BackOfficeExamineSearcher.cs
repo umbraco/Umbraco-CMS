@@ -135,6 +135,10 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                     ? currentUser.CalculateMediaStartNodeIds(_entityService, _appCaches)
                     : Array.Empty<int>();
                 AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
+                if (trashed.HasValue)
+                {
+                    AppendRequiredTrashPath(trashed.Value, sb, Constants.System.RecycleBinMedia);
+                }
                 break;
             case UmbracoEntityTypes.Document:
                 type = "content";
@@ -151,7 +155,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 
                 if (trashed.HasValue)
                 {
-                    AppendRequiredTrashPath(trashed.Value, sb);
+                    AppendRequiredTrashPath(trashed.Value, sb, Constants.System.RecycleBinContent);
                 }
 
                 break;
@@ -189,10 +193,11 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         return result;
     }
 
-    private void AppendRequiredTrashPath( bool trashed, StringBuilder sb)
+    private void AppendRequiredTrashPath( bool trashed, StringBuilder sb, int recycleBinId)
     {
+        // Constants.System.RecycleBinMedia
         string requiredOrNotString = trashed ? "+" : "!";
-        string trashPath = "-1,-20";
+        string trashPath = $"-1,{recycleBinId}";
         trashPath = trashPath.Replace("-", "\\-").Replace(",", "\\,");
         sb.Append($"{requiredOrNotString}__Path:{trashPath}\\,* ");
     }
