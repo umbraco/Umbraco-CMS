@@ -5,8 +5,14 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/user-permission';
-import { UmbDocumentTypeItemRepository, type UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
+import {
+	UMB_ENTITY_USER_PERMISSION_MODAL,
+	type ManifestEntityUserPermission,
+} from '@umbraco-cms/backoffice/user-permission';
+import {
+	UmbDocumentTypeDetailRepository,
+	type UmbDocumentTypeDetailModel,
+} from '@umbraco-cms/backoffice/document-type';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-document-value-granular-user-permission')
@@ -25,17 +31,23 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 	fallbackPermissions: Array<string> = [];
 
 	@state()
-	private _items?: Array<UmbDocumentTypeItemModel>;
+	private _documentTypes?: Array<UmbDocumentTypeDetailModel>;
 
-	#documentTypeItemRepository = new UmbDocumentTypeItemRepository(this);
+	#documentTypeDetailRepository = new UmbDocumentTypeDetailRepository(this);
 
 	protected override getFormElement() {
 		return undefined;
 	}
 
 	async #observePickedDocumentTypes(uniques: Array<string>) {
-		const { asObservable } = await this.#documentTypeItemRepository.requestItems(uniques);
-		this.observe(asObservable(), (items) => (this._items = items));
+		const promises = uniques.map((unique) => this.#documentTypeDetailRepository.requestByUnique(unique));
+		const responses = await Promise.allSettled(promises);
+
+		// TODO: handle errors
+		this._documentTypes = responses
+			.filter((response) => response.status === 'fulfilled')
+			.map((response) => response.value.data)
+			.filter((item) => item) as Array<UmbDocumentTypeDetailModel>;
 	}
 
 	async #addGranularPermission() {
@@ -70,70 +82,67 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 		}
 	}
 
-	#removeGranularPermission(item: UmbDocumentTypeItemModel) {
-		const permission = this.#getPermissionForDocumentType(item.unique);
-		if (!permission) return;
+	async #editGranularPermission(currentPermission: UmbDocumentValueUserPermissionModel) {
+		if (!currentPermission) {
+			throw new Error('Could not open permissions modal, no item was provided');
+		}
 
+		const documentType = this._documentTypes?.find((item) => item.unique === currentPermission.documentType.unique);
+
+		if (!documentType) {
+			throw new Error('Could not open permissions modal, no document type was found');
+		}
+
+		// TODO: show document type and property type name
+		const headline = `Permissions`;
+
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		if (!modalManager) {
+			throw new Error('Could not open permissions modal, modal manager is not available');
+		}
+
+		const modal = modalManager.open(this, UMB_ENTITY_USER_PERMISSION_MODAL, {
+			data: {
+				entityType: 'document-value',
+				headline,
+				preset: {
+					allowedVerbs: currentPermission.verbs,
+				},
+			},
+		});
+
+		try {
+			const value = await modal.onSubmit();
+
+			// don't do anything if the verbs have not been updated
+			if (JSON.stringify(value.allowedVerbs) === JSON.stringify(currentPermission.verbs)) return;
+
+			// update permission with new verbs
+			this.permissions = this._permissions.map((permission) => {
+				if (permission.propertyType.unique === currentPermission.propertyType.unique) {
+					return {
+						...permission,
+						verbs: value.allowedVerbs,
+					};
+				}
+				return permission;
+			});
+
+			this.dispatchEvent(new UmbChangeEvent());
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	#removeGranularPermission(permission: UmbDocumentValueUserPermissionModel) {
 		this.permissions = this._permissions.filter((v) => JSON.stringify(v) !== JSON.stringify(permission));
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	override render() {
-		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
-	}
-
-	#renderItems() {
-		if (!this._items) return;
-		return html`
-			<uui-ref-list>
-				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this.#renderRef(item),
-				)}
-			</uui-ref-list>
-		`;
-	}
-
-	#renderAddButton() {
-		return html`<uui-button
-			id="btn-add"
-			look="placeholder"
-			@click=${this.#addGranularPermission}
-			label=${this.localize.term('general_add')}></uui-button>`;
-	}
-
-	#renderRef(item: UmbDocumentTypeItemModel) {
-		if (!item.unique) return;
-		const name = item.name;
-		const permissionNames = this.#getPermissionNamesForDocumentType(item.unique);
-
-		return html`
-			<uui-ref-node .name=${name} .detail=${permissionNames || ''}>
-				${this.#renderIcon(item)}
-				<uui-action-bar slot="actions">${this.#renderRemoveButton(item)}</uui-action-bar>
-			</uui-ref-node>
-		`;
-	}
-
-	#renderIcon(item: UmbDocumentTypeItemModel) {
-		if (!item.icon) return;
-		return html`<uui-icon slot="icon" name=${item.icon}></uui-icon>`;
-	}
-
-	#renderRemoveButton(item: UmbDocumentTypeItemModel) {
-		return html`<uui-button
-			@click=${() => this.#removeGranularPermission(item)}
-			label=${this.localize.term('general_remove')}></uui-button>`;
-	}
-
-	#getPermissionForDocumentType(unique: string) {
-		return this._permissions?.find((permission) => permission.documentType.unique === unique);
-	}
-
-	#getPermissionNamesForDocumentType(unique: string) {
-		const permission = this.#getPermissionForDocumentType(unique);
-		if (!permission) return;
+	#getVerbNamesForPermission(permission: UmbDocumentValueUserPermissionModel) {
+		if (!permission) {
+			throw new Error('Could not find permission for property type');
+		}
 
 		return umbExtensionsRegistry
 			.getByTypeAndFilter('entityUserPermission', (manifest) =>
@@ -160,6 +169,63 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 
 		// ensure that the verbs are unique
 		return [...new Set([...verbs])];
+	}
+
+	override render() {
+		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
+	}
+
+	#renderItems() {
+		if (!this.permissions) return;
+		return html`
+			<uui-ref-list>
+				${repeat(
+					this.permissions,
+					(item) => item.propertyType.unique,
+					(item) => this.#renderRef(item),
+				)}
+			</uui-ref-list>
+		`;
+	}
+
+	#renderAddButton() {
+		return html`<uui-button
+			id="btn-add"
+			look="placeholder"
+			@click=${this.#addGranularPermission}
+			label=${this.localize.term('general_add')}></uui-button>`;
+	}
+
+	#renderRef(permission: UmbDocumentValueUserPermissionModel) {
+		if (!permission.propertyType.unique) {
+			throw new Error('Property type unique is required');
+		}
+
+		const documentType = this._documentTypes?.find((item) => item.unique === permission.documentType.unique);
+		const propertyType = documentType?.properties.find((item) => item.unique === permission.propertyType.unique);
+		const permissionName = `${documentType?.name}: ${propertyType?.name}`;
+		const verbNames = this.#getVerbNamesForPermission(permission);
+
+		return html`
+			<uui-ref-node .name=${permissionName} .detail=${verbNames || ''} readonly>
+				<uui-icon slot="icon" name=${documentType!.icon}></uui-icon>
+				<uui-action-bar slot="actions"
+					>${this.#renderEditButton(permission)} ${this.#renderRemoveButton(permission)}</uui-action-bar
+				>
+			</uui-ref-node>
+		`;
+	}
+
+	#renderEditButton(permission: UmbDocumentValueUserPermissionModel) {
+		return html`<uui-button
+			@click=${() => this.#editGranularPermission(permission)}
+			label=${this.localize.term('general_edit')}></uui-button>`;
+	}
+
+	#renderRemoveButton(permission: UmbDocumentValueUserPermissionModel) {
+		return html`<uui-button
+			@click=${() => this.#removeGranularPermission(permission)}
+			label=${this.localize.term('general_remove')}></uui-button>`;
 	}
 
 	static override styles = [
