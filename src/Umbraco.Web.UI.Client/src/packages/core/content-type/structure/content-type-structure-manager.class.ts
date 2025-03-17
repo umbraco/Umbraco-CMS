@@ -19,7 +19,10 @@ import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbPropertyReadStateManager, UmbPropertyWriteStateManager } from '@umbraco-cms/backoffice/property';
+import {
+	UmbVariantPropertyReadStateManager,
+	UmbVariantPropertyWriteStateManager,
+} from '@umbraco-cms/backoffice/variant';
 
 type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
 
@@ -99,8 +102,8 @@ export class UmbContentTypeStructureManager<
 	readonly variesByCulture = createObservablePart(this.ownerContentType, (x) => x?.variesByCulture);
 	readonly variesBySegment = createObservablePart(this.ownerContentType, (x) => x?.variesBySegment);
 
-	public readonly propertyReadState = new UmbPropertyReadStateManager(this);
-	public readonly propertyWriteState = new UmbPropertyWriteStateManager(this);
+	public readonly propertyReadState = new UmbVariantPropertyReadStateManager(this);
+	public readonly propertyWriteState = new UmbVariantPropertyWriteStateManager(this);
 
 	#containers: UmbArrayState<UmbPropertyTypeContainerModel> = new UmbArrayState<UmbPropertyTypeContainerModel>(
 		[],

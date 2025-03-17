@@ -9,12 +9,12 @@ import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/c
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import {
-	UMB_PROPERTY_DATASET_CONTEXT,
-	type UmbPropertyReadState,
-	type UmbPropertyWriteState,
-} from '@umbraco-cms/backoffice/property';
+import type {
+	UmbVariantId,
+	UmbVariantPropertyReadState,
+	UmbVariantPropertyWriteState,
+} from '@umbraco-cms/backoffice/variant';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { isReferenceByAlias, isReferenceByUnique, isReferenceByVariantId } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-content-workspace-view-edit-properties')
@@ -37,10 +37,10 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	_dataPaths?: Array<string>;
 
 	@state()
-	_propertyReadStates: Array<UmbPropertyReadState> = [];
+	_propertyReadStates: Array<UmbVariantPropertyReadState> = [];
 
 	@state()
-	_propertyWriteStates: Array<UmbPropertyWriteState> = [];
+	_propertyWriteStates: Array<UmbVariantPropertyWriteState> = [];
 
 	constructor() {
 		super();
