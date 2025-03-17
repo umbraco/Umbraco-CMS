@@ -48,6 +48,10 @@ export interface UmbEntityVariantPublishModel {
 	schedule?: ScheduleRequestModel | null;
 }
 
+export interface UmbReferenceByVariantId {
+	variantId: UmbVariantId;
+}
+
 /** @deprecated use `UmbEntityVariantPublishModel` instead */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbVariantPublishModel extends UmbEntityVariantPublishModel {}

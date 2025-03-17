@@ -10,7 +10,12 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import {
+	UMB_PROPERTY_DATASET_CONTEXT,
+	type UmbPropertyReadState,
+	type UmbPropertyWriteState,
+} from '@umbraco-cms/backoffice/property';
+import { isReferenceByAlias, isReferenceByUnique, isReferenceByVariantId } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-content-workspace-view-edit-properties')
 export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -32,10 +37,10 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	_dataPaths?: Array<string>;
 
 	@state()
-	_readablePropertyUniques: Array<string> = [];
+	_propertyReadStates: Array<UmbPropertyReadState> = [];
 
 	@state()
-	_writeablePropertyUniques: Array<string> = [];
+	_propertyWriteStates: Array<UmbPropertyWriteState> = [];
 
 	constructor() {
 		super();
@@ -46,13 +51,21 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 				workspaceContext.structure as unknown as UmbContentTypeStructureManager<UmbContentTypeModel>,
 			);
 
-			this.observe(workspaceContext.structure.propertyReadState.states, (states) => {
-				this._readablePropertyUniques = states.map((state) => state.propertyType.unique) ?? [];
-			});
+			this.observe(
+				workspaceContext.structure.propertyReadState.states,
+				(states) => {
+					this._propertyReadStates = states;
+				},
+				'umbObservePropertyReadStates',
+			);
 
-			this.observe(workspaceContext.structure.propertyWriteState.states, (states) => {
-				this._writeablePropertyUniques = states.map((state) => state.propertyType.unique) ?? [];
-			});
+			this.observe(
+				workspaceContext.structure.propertyWriteState.states,
+				(states) => {
+					this._propertyWriteStates = states;
+				},
+				'umbObservePropertyWriteStates',
+			);
 		});
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (datasetContext) => {
@@ -83,11 +96,33 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	}
 
 	#getReadableProperties() {
-		return this._propertyStructure?.filter((property) => this._readablePropertyUniques.includes(property.unique)) ?? [];
+		return this._propertyStructure?.filter((property) => this.#isReadablePropertyType(property)) || [];
 	}
 
-	#isWritablePropertyType(unique: string) {
-		return this._writeablePropertyUniques.includes(unique);
+	#isReadablePropertyType(property: UmbPropertyTypeModel) {
+		return this._propertyReadStates.some((state) => {
+			if (isReferenceByUnique(state.propertyType)) {
+				return state.propertyType.unique === property.unique;
+			} else if (isReferenceByAlias(state.propertyType)) {
+				return state.propertyType.alias === property.alias;
+			} else if (isReferenceByVariantId(state.propertyType)) {
+				return state.propertyType.variantId === this.#variantId;
+			}
+			return false;
+		});
+	}
+
+	#isWritablePropertyType(property: UmbPropertyTypeModel) {
+		return this._propertyWriteStates.some((state) => {
+			if (isReferenceByUnique(state.propertyType)) {
+				return state.propertyType.unique === property.unique;
+			} else if (isReferenceByAlias(state.propertyType)) {
+				return state.propertyType.alias === property.alias;
+			} else if (isReferenceByVariantId(state.propertyType)) {
+				return state.propertyType.variantId === this.#variantId;
+			}
+			return false;
+		});
 	}
 
 	override render() {
@@ -100,7 +135,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 							class="property"
 							data-path=${this._dataPaths![index]}
 							.property=${property}
-							?readonly=${!this.#isWritablePropertyType(property.unique)}></umb-property-type-based-property>`,
+							?readonly=${!this.#isWritablePropertyType(property)}></umb-property-type-based-property>`,
 				)
 			: '';
 	}
