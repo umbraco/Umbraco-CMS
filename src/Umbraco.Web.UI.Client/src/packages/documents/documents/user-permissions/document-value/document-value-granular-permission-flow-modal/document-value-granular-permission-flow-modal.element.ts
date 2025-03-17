@@ -62,6 +62,7 @@ export class UmbDocumentValueGranularUserPermissionFlowModalElement extends UmbM
 						@selection-change=${this.#onTreeSelectionChange}
 						.props=${{
 							hideTreeRoot: true,
+							hideTreeItemActions: true,
 							/*
 						pickableFilter: (treeItem: UmbDocumentTypeTreeItemModel) =>
 							!this._items?.map((i) => i.unique).includes(treeItem.unique),
