@@ -3,7 +3,7 @@ import { UmbChangeUserPasswordRepository } from '@umbraco-cms/backoffice/user';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserRepository } from '@umbraco-cms/backoffice/current-user';
 
 export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<never> {
@@ -14,18 +14,19 @@ export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<never
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_CHANGE_PASSWORD_MODAL, {
+		const data = await umbOpenModal(this, UMB_CHANGE_PASSWORD_MODAL, {
 			data: {
 				user: {
 					unique: this.args.unique,
 				},
 			},
-		});
-
-		const data = await modalContext.onSubmit();
+		}).catch(() => undefined);
+		if (!data) return;
 
 		const currentUserContext = await this.getContext(UMB_CURRENT_USER_CONTEXT);
+		if (!currentUserContext) {
+			throw new Error('Current user context is not available');
+		}
 		const isCurrentUser = await currentUserContext.isUserCurrentUser(this.args.unique);
 
 		if (isCurrentUser) {

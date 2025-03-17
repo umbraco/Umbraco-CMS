@@ -2,7 +2,7 @@ import { UmbEntityActionBase } from '../../entity-action-base.js';
 import type { UmbEntityActionArgs } from '../../types.js';
 import type { MetaEntityActionCreateKind } from './types.js';
 import { UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL } from './modal/constants.js';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
@@ -24,9 +24,9 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<MetaEntityActionC
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<MetaEntityActionCreateKind>) {
 		super(host, args);
 
-		/* This is wrapped in a promise to confirm whether only one option exists and to ensure 
-		that the API for this option has been created. We both need to wait for any options to 
-		be returned from the registry and for the API to be created. This is a custom promise implementation, 
+		/* This is wrapped in a promise to confirm whether only one option exists and to ensure
+		that the API for this option has been created. We both need to wait for any options to
+		be returned from the registry and for the API to be created. This is a custom promise implementation,
 		because using .asPromise() on the initializer does not wait for the async API creation in the callback.*/
 		this.#optionsInit = new Promise((resolve) => {
 			new UmbExtensionsManifestInitializer(
@@ -61,15 +61,12 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<MetaEntityActionC
 			return;
 		}
 
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL, {
+		await umbOpenModal(this, UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL, {
 			data: {
 				unique: this.args.unique,
 				entityType: this.args.entityType,
 			},
 		});
-
-		await modalContext.onSubmit();
 	}
 
 	async #createSingleOptionApi(

@@ -44,7 +44,7 @@ export class UmbServerModelValidatorContext
 			context.addValidator(this);
 
 			// Run translators?
-		}).asPromise();
+		}).asPromise({ preventTimeout: true });
 	}
 
 	async askServerForValidation(data: unknown, requestPromise: Promise<UmbDataSourceResponse<string>>): Promise<void> {

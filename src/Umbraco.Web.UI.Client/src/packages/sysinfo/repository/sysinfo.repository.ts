@@ -30,6 +30,10 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 	async serverUpgradeCheck(currentVersion: string): Promise<UmbServerUpgradeCheck | null> {
 		// Check if we are allowed to check again
 		const appContext = await this.getContext(UMB_APP_CONTEXT);
+		if (!appContext) {
+			throw new Error('Could not get the app context.');
+		}
+		// TODO: Provide a get method, so we do not need to observe in this case:
 		const versionCheckPeriod = await this.observe(appContext.getServerConnection().versionCheckPeriod).asPromise();
 
 		if (versionCheckPeriod <= 0) {

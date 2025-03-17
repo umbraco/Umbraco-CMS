@@ -5,17 +5,26 @@ import { UmbContextRequestEventImplementation } from './context-request.event.js
 
 type HostElementMethod = () => Element | undefined;
 
+export type UmbContextConsumerAsPromiseOptionsType = {
+	preventTimeout?: boolean;
+};
+
 /**
  * @class UmbContextConsumer
+ * @description The context consumer class, used to consume a context from a host element.
+ * Notice it is not recommended to use this class directly, but rather use the `consumeContext` method from a `UmbElement` or `UmbElementMixin` or `UmbControllerBase` or `UmbClassMixin`.
+ * Alternatively, you can use the `UmbContextConsumerController` to consume a context from a host element. But this does require that you can implement one of the Class Mixins mentioned above.
  */
 export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType = BaseType> {
 	protected _retrieveHost: HostElementMethod;
 
+	#raf?: number;
 	#skipHost?: boolean;
 	#stopAtContextMatch = true;
 	#callback?: UmbContextCallback<ResultType>;
-	#promise?: Promise<ResultType>;
+	#promise?: Promise<ResultType | undefined>;
 	#promiseResolver?: (instance: ResultType) => void;
+	#promiseRejecter?: (reason: string) => void;
 
 	#instance?: ResultType;
 	get instance() {
@@ -83,7 +92,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 			throw new Error('Not allowed to set context api instance to undefined.');
 		}
 		if (this.#discriminator) {
-			// Notice if discriminator returns false, we do not want to setInstance.
+			// Notice if discriminator returns false, we do not want to setInstance. [NL]
 			if (this.#discriminator(instance)) {
 				this.setInstance(instance as unknown as ResultType);
 				return true;
@@ -102,23 +111,29 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		if (promiseResolver && instance !== undefined) {
 			promiseResolver(instance);
 			this.#promise = undefined;
+			this.#promiseResolver = undefined;
+			this.#promiseRejecter = undefined;
 		}
 	}
 
 	/**
 	 * @public
 	 * @memberof UmbContextConsumer
+	 * @param {UmbContextConsumerAsPromiseOptionsType} options - Prevent the promise from timing out.
 	 * @description Get the context as a promise.
 	 * @returns {UmbContextConsumer} - A promise that resolves when the context is consumed.
 	 */
-	public asPromise(): Promise<ResultType> {
+	public asPromise(options?: UmbContextConsumerAsPromiseOptionsType): Promise<ResultType | undefined> {
 		return (
 			this.#promise ??
-			(this.#promise = new Promise<ResultType>((resolve) => {
+			(this.#promise = new Promise<ResultType | undefined>((resolve, reject) => {
 				if (this.#instance) {
+					this.#promiseResolver = undefined;
+					this.#promiseRejecter = undefined;
 					resolve(this.#instance);
 				} else {
 					this.#promiseResolver = resolve;
+					this.#promiseRejecter = options?.preventTimeout ? undefined : reject;
 				}
 			}))
 		);
@@ -137,6 +152,20 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 			this.#stopAtContextMatch,
 		);
 		(this.#skipHost ? this._retrieveHost()?.parentNode : this._retrieveHost())?.dispatchEvent(event);
+
+		/*
+		let i: number = this.#timeoutFrames ?? 1;
+		while (i-- > 0 && this.#promiseRejecter) {
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+		}
+		*/
+		this.#raf = requestAnimationFrame(() => {
+			const hostElement = this._retrieveHost();
+			// If we still have the rejecter, it means that the context was not found immediately, so lets reject the promise. [NL]
+			this.#promiseRejecter?.(
+				`Context could not be found. (Context Alias: ${this.#contextAlias} with API Alias: ${this.#apiAlias}). Controller is hosted on ${hostElement?.parentNode?.nodeName ?? 'Not attached node'} > ${hostElement?.nodeName}`,
+			);
+		});
 	}
 
 	public hostConnected(): void {
@@ -147,6 +176,10 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	}
 
 	public hostDisconnected(): void {
+		if (this.#raf) {
+			cancelAnimationFrame(this.#raf);
+			this.#promiseRejecter?.('Context request was cancelled, host was disconnected.');
+		}
 		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
 		window.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#handleNewProvider);
 		//window.removeEventListener(umbContextUnprovidedEventType, this.#handleRemovedProvider);
@@ -161,7 +194,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		}
 	};
 
-	//Niels: I'm keeping this code around as it might be relevant, but I wanted to try to see if leaving this feature out for now could work for us.
+	//Niels: I'm keeping this code around as it might be relevant, but I wanted to try to see if leaving this feature out for now could work for us. [NL]
 	/*
 	#handleRemovedProvider = (event: Event) => {
 		// Does seem a bit unnecessary, we could just assume the type via type casting...
@@ -186,6 +219,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		this.#callback = undefined;
 		this.#promise = undefined;
 		this.#promiseResolver = undefined;
+		this.#promiseRejecter = undefined;
 		this.#instance = undefined;
 		this.#discriminator = undefined;
 	}

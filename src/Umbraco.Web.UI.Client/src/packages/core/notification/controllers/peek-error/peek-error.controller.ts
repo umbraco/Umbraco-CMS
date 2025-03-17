@@ -8,6 +8,9 @@ import './peek-error-notification.element.js';
 export class UmbPeekErrorController extends UmbControllerBase {
 	async open(args: UmbPeekErrorArgs): Promise<void> {
 		const context = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		if (!context) {
+			throw new Error('Could not get notification context');
+		}
 
 		context.peek('danger', {
 			elementName: 'umb-peek-error-notification',

@@ -8,6 +8,7 @@ export default class UmbTiptapToolbarCharacterMapExtensionApi extends UmbTiptapT
 		if (!editor) return;
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		if (!modalManager) throw new Error('Modal manager not found');
 		const modal = modalManager.open(this, UMB_TIPTAP_CHARACTER_MAP_MODAL);
 
 		if (!modal) return;

@@ -10,6 +10,7 @@ export class UmbDisableUserEntityBulkAction extends UmbEntityBulkActionBase<obje
 		await repository.disable(this.selection);
 
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
+		if (!entityContext) throw new Error('Entity context not found');
 		const entityType = entityContext.getEntityType();
 		const unique = entityContext.getUnique();
 
@@ -17,6 +18,7 @@ export class UmbDisableUserEntityBulkAction extends UmbEntityBulkActionBase<obje
 		if (unique === undefined) throw new Error('Entity unique not found');
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) throw new Error('Event context not found');
 		const event = new UmbRequestReloadChildrenOfEntityEvent({
 			entityType,
 			unique,

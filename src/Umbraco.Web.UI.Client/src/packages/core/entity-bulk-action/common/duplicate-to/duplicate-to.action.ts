@@ -7,7 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/tree';
 import type { MetaEntityBulkActionDuplicateToKind } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -15,9 +15,7 @@ export class UmbMediaDuplicateEntityBulkAction extends UmbEntityBulkActionBase<M
 	async execute() {
 		if (this.selection?.length === 0) return;
 
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-
-		const modalContext = modalManager.open(this, UMB_TREE_PICKER_MODAL, {
+		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
 				foldersOnly: this.args.meta.foldersOnly,
 				hideTreeRoot: this.args.meta.hideTreeRoot,
@@ -25,7 +23,6 @@ export class UmbMediaDuplicateEntityBulkAction extends UmbEntityBulkActionBase<M
 			},
 		});
 
-		const value = await modalContext.onSubmit().catch(() => undefined);
 		if (!value?.selection?.length) return;
 
 		const destinationUnique = value.selection[0];

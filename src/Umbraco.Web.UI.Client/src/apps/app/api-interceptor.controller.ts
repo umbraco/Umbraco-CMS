@@ -29,6 +29,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			if (!isUmbNotifications(notifications)) return response;
 
 			this.getContext(UMB_NOTIFICATION_CONTEXT).then((notificationContext) => {
+				if (notificationContext === undefined) {
+					throw new Error('Notification context is not available');
+				}
 				for (const notification of notifications) {
 					notificationContext.peek(extractUmbNotificationColor(notification.type), {
 						data: { headline: notification.category, message: notification.message },

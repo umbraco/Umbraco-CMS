@@ -60,6 +60,9 @@ export class UmbDeleteEntityAction<
 
 	async #notify() {
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!actionEventContext) {
+			throw new Error('Action event context not found.');
+		}
 
 		const event = new UmbRequestReloadStructureForEntityEvent({
 			unique: this.args.unique,

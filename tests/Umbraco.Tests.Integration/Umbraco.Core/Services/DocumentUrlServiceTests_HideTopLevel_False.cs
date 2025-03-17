@@ -2,12 +2,10 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -17,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
-internal sealed class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegrationTestWithContent
+internal sealed class DocumentUrlServiceTests_HideTopLevel_False : UmbracoIntegrationTestWithContent
 {
     protected IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
     protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();
@@ -28,7 +26,6 @@ internal sealed class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegra
 
         builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
-
     }
 
     public override void Setup()
@@ -46,7 +43,7 @@ internal sealed class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegra
     [TestCase("/textpage/text-page-1", "en-US", false, ExpectedResult = SubPageKey)]
     [TestCase("/textpage/text-page-2", "en-US", false, ExpectedResult = SubPage2Key)]
     [TestCase("/textpage/text-page-3", "en-US", false, ExpectedResult = SubPage3Key)]
-    public string? Expected_Routes(string route, string isoCode, bool loadDraft)
+    public string? GetDocumentKeyByRoute_Returns_Expected_Route(string route, string isoCode, bool loadDraft)
     {
         if (loadDraft is false)
         {
@@ -60,7 +57,7 @@ internal sealed class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegra
     [Test]
     [TestCase("/textpage/text-page-1/sub-page-1", "en-US", true, ExpectedResult = "DF49F477-12F2-4E33-8563-91A7CC1DCDBB")]
     [TestCase("/textpage/text-page-1/sub-page-1", "en-US", false, ExpectedResult = "DF49F477-12F2-4E33-8563-91A7CC1DCDBB")]
-    public string? Expected_Routes_with_subpages(string route, string isoCode, bool loadDraft)
+    public string? GetDocumentKeyByRoute_Returns_Expected_Route_For_SubPage(string route, string isoCode, bool loadDraft)
     {
         // Create a subpage
         var subsubpage = ContentBuilder.CreateSimpleContent(ContentType, "Sub Page 1", Subpage.Id);
@@ -79,7 +76,7 @@ internal sealed class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegra
     [Test]
     [TestCase("/second-root", "en-US", true, ExpectedResult = "8E21BCD4-02CA-483D-84B0-1FC92702E198")]
     [TestCase("/second-root", "en-US", false, ExpectedResult = "8E21BCD4-02CA-483D-84B0-1FC92702E198")]
-    public string? Second_root_cannot_hide_url(string route, string isoCode, bool loadDraft)
+    public string? GetDocumentKeyByRoute_Second_Root_Does_Not_Hide_Url(string route, string isoCode, bool loadDraft)
     {
         // Create a second root
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
@@ -99,7 +96,7 @@ internal sealed class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegra
     [Test]
     [TestCase("/second-root/child-of-second-root", "en-US", true, ExpectedResult = "FF6654FB-BC68-4A65-8C6C-135567F50BD6")]
     [TestCase("/second-root/child-of-second-root", "en-US", false, ExpectedResult = "FF6654FB-BC68-4A65-8C6C-135567F50BD6")]
-    public string? Child_of_second_root_do_not_have_parents_url_as_prefix(string route, string isoCode, bool loadDraft)
+    public string? GetDocumentKeyByRoute_Child_Of_Second_Root_Does_Not_Have_Parents_Url_As_Prefix(string route, string isoCode, bool loadDraft)
     {
         // Create a second root
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);

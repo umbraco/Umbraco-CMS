@@ -38,14 +38,15 @@ export abstract class UmbDetailRepositoryBase<
 
 		this.detailDataSource = new detailSource(host) as UmbDetailDataSourceType;
 
+		// TODO: ideally no preventTimeouts here.. [NL]
 		this.#init = Promise.all([
 			this.consumeContext(detailStoreContextAlias, (instance) => {
 				this.#detailStore = instance;
-			}).asPromise(),
+			}).asPromise({ preventTimeout: true }),
 
 			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 				this.#notificationContext = instance;
-			}).asPromise(),
+			}).asPromise({ preventTimeout: true }),
 		]);
 	}
 

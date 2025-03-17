@@ -11,11 +11,9 @@ export class UmbDataTypeDetailRepository extends UmbDetailRepositoryBase<UmbData
 	constructor(host: UmbControllerHost) {
 		super(host, UmbDataTypeServerDataSource, UMB_DATA_TYPE_DETAIL_STORE_CONTEXT);
 
-		this.#init = Promise.all([
-			this.consumeContext(UMB_DATA_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
-				this.#detailStore = instance;
-			}).asPromise(),
-		]);
+		this.#init = this.consumeContext(UMB_DATA_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
+			this.#detailStore = instance;
+		}).asPromise({ preventTimeout: true });
 	}
 
 	async byPropertyEditorUiAlias(propertyEditorUiAlias: string) {

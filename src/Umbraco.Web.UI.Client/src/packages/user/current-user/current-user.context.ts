@@ -233,6 +233,9 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 		const url = new URL(window.location.href);
 
 		const appContext = await this.getContext(UMB_APP_CONTEXT);
+		if (!appContext) {
+			throw new Error('App context not available');
+		}
 		const backofficePath = appContext.getBackofficePath();
 
 		if (url.pathname === backofficePath || url.pathname === ensurePathEndsWithSlash(backofficePath)) {

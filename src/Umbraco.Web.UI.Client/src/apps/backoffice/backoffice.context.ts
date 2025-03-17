@@ -34,29 +34,26 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 			});
 		});
 
-		this.#init();
-	}
-
-	async #init() {
-		const userContext = await this.getContext(UMB_CURRENT_USER_CONTEXT);
-		this.observe(
-			userContext.allowedSections,
-			(allowedSections) => {
-				if (!allowedSections) return;
-				// TODO: Please be aware that we re-initialize this initializer based on user permissions. I suggest we should solve this specific case should be improved by the ability to change the filter [NL]
-				new UmbExtensionsManifestInitializer(
-					this,
-					umbExtensionsRegistry,
-					'section',
-					(manifest) => allowedSections.includes(manifest.alias),
-					async (sections) => {
-						this.#allowedSections.setValue([...sections]);
-					},
-					'umbAllowedSectionsManifestInitializer',
-				);
-			},
-			'umbAllowedSectionsObserver',
-		);
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (userContext) => {
+			this.observe(
+				userContext.allowedSections,
+				(allowedSections) => {
+					if (!allowedSections) return;
+					// TODO: Please be aware that we re-initialize this initializer based on user permissions. I suggest we should solve this specific case should be improved by the ability to change the filter [NL]
+					new UmbExtensionsManifestInitializer(
+						this,
+						umbExtensionsRegistry,
+						'section',
+						(manifest) => allowedSections.includes(manifest.alias),
+						async (sections) => {
+							this.#allowedSections.setValue([...sections]);
+						},
+						'umbAllowedSectionsManifestInitializer',
+					);
+				},
+				'umbAllowedSectionsObserver',
+			);
+		});
 	}
 
 	async #getVersion() {
