@@ -27,4 +27,6 @@ export * from './sanitize/sanitize-html.function.js';
 export * from './selection-manager/selection.manager.js';
 export * from './state-manager/index.js';
 export * from './string/index.js';
+export * from './deprecation/index.js';
+export * from './reference/index.js';
 export type * from './type/index.js';

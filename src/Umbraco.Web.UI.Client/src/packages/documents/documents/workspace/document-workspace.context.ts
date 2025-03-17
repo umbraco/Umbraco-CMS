@@ -195,7 +195,7 @@ export class UmbDocumentWorkspaceContext
 							},
 						},
 						onChange: (permitted: boolean) => {
-							const unique = 'UMB_PROPERTY_' + property.unique;
+							const unique = 'UMB_PROPERTY_UNIQUE_' + property.unique;
 
 							if (permitted) {
 								const state = {
@@ -224,7 +224,7 @@ export class UmbDocumentWorkspaceContext
 							},
 						},
 						onChange: (permitted: boolean) => {
-							const unique = 'UMB_PROPERTY_' + property.unique;
+							const unique = 'UMB_PROPERTY_UNIQUE_' + property.unique;
 
 							if (permitted) {
 								const state = {
@@ -234,6 +234,7 @@ export class UmbDocumentWorkspaceContext
 										unique: property.unique,
 									},
 								};
+
 								this.structure.propertyWriteState.addState(state);
 							} else {
 								this.structure.propertyWriteState.removeState(unique);
