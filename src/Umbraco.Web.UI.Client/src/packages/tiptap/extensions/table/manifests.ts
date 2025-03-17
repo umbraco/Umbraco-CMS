@@ -47,8 +47,8 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 				{
 					label: 'Row',
 					items: [
-						{ label: 'Add row before', data: 'addRowBefore' },
-						{ label: 'Add row after', data: 'addRowAfter' },
+						{ label: 'Add row before', icon: 'icon-page-up', data: 'addRowBefore' },
+						{ label: 'Add row after', icon: 'icon-page-down', data: 'addRowAfter' },
 						{ label: 'Delete row', icon: 'icon-trash', data: 'deleteRow' },
 						{ label: 'Toggle header row', data: 'toggleHeaderRow' },
 					],
@@ -56,8 +56,8 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 				{
 					label: 'Column',
 					items: [
-						{ label: 'Add column before', data: 'addColumnBefore' },
-						{ label: 'Add column after', data: 'addColumnAfter' },
+						{ label: 'Add column before', icon: 'icon-navigation-first', data: 'addColumnBefore' },
+						{ label: 'Add column after', icon: 'icon-tab-key', data: 'addColumnAfter' },
 						{ label: 'Delete column', icon: 'icon-trash', data: 'deleteColumn' },
 						{ label: 'Toggle header column', data: 'toggleHeaderColumn' },
 					],
