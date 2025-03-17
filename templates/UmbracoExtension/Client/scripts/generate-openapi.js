@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import chalk from 'chalk';
-import { createClient } from '@hey-api/openapi-ts';
+import { createClient, defaultPlugins } from '@hey-api/openapi-ts';
 
 // Start notifying user we are generating the TypeScript client
 console.log(chalk.green("Generating OpenAPI client..."));
@@ -20,7 +20,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 console.log("Ensure your Umbraco instance is running");
 console.log(`Fetching OpenAPI definition from ${chalk.yellow(swaggerUrl)}`);
 
-fetch(swaggerUrl).then(response => {
+fetch(swaggerUrl).then(async (response) => {
   if (!response.ok) {
     console.error(chalk.red(`ERROR: OpenAPI spec returned with a non OK (200) response: ${response.status} ${response.statusText}`));
     console.error(`The URL to your Umbraco instance may be wrong or the instance is not running`);
@@ -31,13 +31,21 @@ fetch(swaggerUrl).then(response => {
   console.log(`OpenAPI spec fetched successfully`);
   console.log(`Calling ${chalk.yellow('hey-api')} to generate TypeScript client`);
 
-  createClient({
-    client: '@hey-api/client-fetch',
+  await createClient({
     input: swaggerUrl,
     output: 'src/api',
-    services: {
-      asClass: true,
-    }
+    plugins: [
+      ...defaultPlugins,
+      '@hey-api/client-fetch',
+      {
+        name: '@hey-api/typescript',
+        enums: 'typescript'
+      },
+      {
+        name: '@hey-api/sdk',
+        asClass: true
+      }
+    ],
   });
 
 })

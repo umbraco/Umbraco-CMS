@@ -141,16 +141,18 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 						</div>
 					</uui-input>
 				</div>
-				<div class="available-items" dropzone="move" @drop=${this.#onDrop} @dragover=${this.#onDragOver}>
-					${when(
-						this._availableExtensions.length === 0,
-						() =>
-							html`<umb-localize key="tiptap_toobar_availableItemsEmpty"
-								>There are no toolbar extensions to show</umb-localize
-							>`,
-						() => repeat(this._availableExtensions, (item) => this.#renderAvailableItem(item)),
-					)}
-				</div>
+				<uui-scroll-container>
+					<div class="available-items" dropzone="move" @drop=${this.#onDrop} @dragover=${this.#onDragOver}>
+						${when(
+							this._availableExtensions.length === 0,
+							() =>
+								html`<umb-localize key="tiptap_toobar_availableItemsEmpty"
+									>There are no toolbar extensions to show</umb-localize
+								>`,
+							() => repeat(this._availableExtensions, (item) => this.#renderAvailableItem(item)),
+						)}
+					</div>
+				</uui-scroll-container>
 			</uui-box>
 		`;
 	}
@@ -158,25 +160,24 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	#renderAvailableItem(item: UmbTiptapToolbarExtension) {
 		const forbidden = !this.#context.isExtensionEnabled(item.alias);
 		const inUse = this.#context.isExtensionInUse(item.alias);
-		return inUse || forbidden
-			? nothing
-			: html`
-					<uui-button
-						compact
-						class=${forbidden ? 'forbidden' : ''}
-						data-mark="tiptap-toolbar-item:${item.alias}"
-						draggable="true"
-						look=${forbidden ? 'placeholder' : 'outline'}
-						?disabled=${forbidden || inUse}
-						@click=${() => this.#onClick(item)}
-						@dragstart=${(e: DragEvent) => this.#onDragStart(e, item.alias)}
-						@dragend=${this.#onDragEnd}>
-						<div class="inner">
-							${when(item.icon, () => html`<umb-icon .name=${item.icon}></umb-icon>`)}
-							<span>${this.localize.string(item.label)}</span>
-						</div>
-					</uui-button>
-				`;
+		if (inUse || forbidden) return nothing;
+		return html`
+			<uui-button
+				compact
+				class=${forbidden ? 'forbidden' : ''}
+				data-mark="tiptap-toolbar-item:${item.alias}"
+				draggable="true"
+				look=${forbidden ? 'placeholder' : 'outline'}
+				?disabled=${forbidden || inUse}
+				@click=${() => this.#onClick(item)}
+				@dragstart=${(e: DragEvent) => this.#onDragStart(e, item.alias)}
+				@dragend=${this.#onDragEnd}>
+				<div class="inner">
+					${when(item.icon, () => html`<umb-icon .name=${item.icon}></umb-icon>`)}
+					<span>${this.localize.string(item.label)}</span>
+				</div>
+			</uui-button>
+		`;
 	}
 
 	#renderDesigner() {
@@ -274,28 +275,53 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	#renderItem(alias: string, rowIndex = 0, groupIndex = 0, itemIndex = 0) {
 		const item = this.#context?.getExtensionByAlias(alias);
 		if (!item) return nothing;
+
 		const forbidden = !this.#context?.isExtensionEnabled(item.alias);
-		return html`
-			<uui-button
-				compact
-				class=${forbidden ? 'forbidden' : ''}
-				data-mark="tiptap-toolbar-item:${item.alias}"
-				draggable="true"
-				look=${forbidden ? 'placeholder' : 'outline'}
-				title=${this.localize.string(item.label)}
-				?disabled=${forbidden}
-				@click=${() => this.#context.removeToolbarItem([rowIndex, groupIndex, itemIndex])}
-				@dragend=${this.#onDragEnd}
-				@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias, [rowIndex, groupIndex, itemIndex])}>
-				<div class="inner">
-					${when(
-						item.icon,
-						() => html`<umb-icon .name=${item.icon}></umb-icon>`,
-						() => html`<span>${this.localize.string(item.label)}</span>`,
-					)}
-				</div>
-			</uui-button>
-		`;
+
+		switch (item.kind) {
+			case 'menu':
+				return html`
+					<uui-button
+						compact
+						class=${forbidden ? 'forbidden' : ''}
+						draggable="true"
+						look=${forbidden ? 'placeholder' : 'outline'}
+						title=${this.localize.string(item.label)}
+						?disabled=${forbidden}
+						@click=${() => this.#context.removeToolbarItem([rowIndex, groupIndex, itemIndex])}
+						@dragend=${this.#onDragEnd}
+						@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias, [rowIndex, groupIndex, itemIndex])}>
+						<div class="inner">
+							<span>${this.localize.string(item.label)}</span>
+						</div>
+						<uui-symbol-expand slot="extra" open></uui-symbol-expand>
+					</uui-button>
+				`;
+
+			case 'button':
+			default:
+				return html`
+					<uui-button
+						compact
+						class=${forbidden ? 'forbidden' : ''}
+						data-mark="tiptap-toolbar-item:${item.alias}"
+						draggable="true"
+						look=${forbidden ? 'placeholder' : 'outline'}
+						title=${this.localize.string(item.label)}
+						?disabled=${forbidden}
+						@click=${() => this.#context.removeToolbarItem([rowIndex, groupIndex, itemIndex])}
+						@dragend=${this.#onDragEnd}
+						@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias, [rowIndex, groupIndex, itemIndex])}>
+						<div class="inner">
+							${when(
+								item.icon,
+								() => html`<umb-icon .name=${item.icon}></umb-icon>`,
+								() => html`<span>${this.localize.string(item.label)}</span>`,
+							)}
+						</div>
+					</uui-button>
+				`;
+		}
 	}
 
 	static override readonly styles = [
@@ -339,6 +365,10 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 						color: var(--uui-color-border);
 					}
 				}
+			}
+
+			uui-scroll-container {
+				max-height: 350px;
 			}
 
 			.available-items {
@@ -467,6 +497,10 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 									div {
 										display: flex;
 										gap: var(--uui-size-1);
+									}
+
+									uui-symbol-expand {
+										margin-left: var(--uui-size-space-2);
 									}
 								}
 							}

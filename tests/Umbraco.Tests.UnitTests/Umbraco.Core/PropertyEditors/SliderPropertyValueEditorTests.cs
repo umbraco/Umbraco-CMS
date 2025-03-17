@@ -15,7 +15,7 @@ using Umbraco.Cms.Infrastructure.Serialization;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
 [TestFixture]
-public class SliderValueEditorTests
+public class SliderPropertyValueEditorTests
 {
 #pragma warning disable IDE1006 // Naming Styles
     public static object[] InvalidCaseData = new object[]
@@ -203,6 +203,21 @@ public class SliderValueEditorTests
             var validationResult = result.First();
             Assert.AreEqual("validation_outOfRangeMaximum", validationResult.ErrorMessage);
         }
+    }
+
+    [Test]
+    public void Max_Item_Validation_Respects_0_As_Unlimited()
+    {
+        var value = new JsonObject
+        {
+            { "from", 1.0m },
+            { "to", 1.0m },
+        };
+        var editor = CreateValueEditor();
+        editor.ConfigurationObject = new SliderConfiguration();
+
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        Assert.IsEmpty(result);
     }
 
     [TestCase(0.2, 1.3, 1.7, true)]

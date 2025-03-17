@@ -2050,7 +2050,6 @@ export type PublishDocumentRequestModel = {
 
 export type PublishDocumentWithDescendantsRequestModel = {
     includeUnpublishedDescendants: boolean;
-    forceRepublish: boolean;
     cultures: Array<(string)>;
 };
 
@@ -2062,6 +2061,10 @@ export type PublishedDocumentResponseModel = {
     urls: Array<(DocumentUrlInfoModel)>;
     template?: ((ReferenceByIdModel) | null);
     isTrashed: boolean;
+};
+
+export type RebuildStatusModel = {
+    isRebuilding: boolean;
 };
 
 export enum RedirectStatusModel {
@@ -4615,6 +4618,8 @@ export type GetPropertyTypeIsUsedData = {
 export type GetPropertyTypeIsUsedResponse = (boolean);
 
 export type PostPublishedCacheRebuildResponse = (string);
+
+export type GetPublishedCacheRebuildStatusResponse = ((RebuildStatusModel));
 
 export type PostPublishedCacheReloadResponse = (string);
 

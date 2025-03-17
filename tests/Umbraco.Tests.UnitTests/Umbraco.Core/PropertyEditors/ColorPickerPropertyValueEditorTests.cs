@@ -13,7 +13,7 @@ using Umbraco.Cms.Core.Strings;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
 [TestFixture]
-public class ColorPickerValueEditorTests
+public class ColorPickerPropertyValueEditorTests
 {
     [TestCase("#ffffff", true)]
     [TestCase("#f0f0f0", false)]

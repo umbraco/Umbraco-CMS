@@ -71,14 +71,12 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 * @param id
 	 * @param variantIds
 	 * @param includeUnpublishedDescendants
-	 * @param forceRepublish
 	 * @memberof UmbDocumentPublishingRepository
 	 */
 	async publishWithDescendants(
 		id: string,
 		variantIds: Array<UmbVariantId>,
 		includeUnpublishedDescendants: boolean,
-		forceRepublish: boolean,
 	) {
 		if (!id) throw new Error('id is missing');
 		if (!variantIds) throw new Error('variant IDs are missing');
@@ -88,7 +86,6 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 			id,
 			variantIds,
 			includeUnpublishedDescendants,
-			forceRepublish,
 		);
 
 		if (!error) {

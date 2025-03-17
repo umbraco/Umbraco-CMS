@@ -28,12 +28,14 @@ export { TextAlign } from '@tiptap/extension-text-align';
 export { Underline } from '@tiptap/extension-underline';
 
 // CUSTOM EXTENSIONS
+export * from './extensions/tiptap-anchor.extension.js';
 export * from './extensions/tiptap-div.extension.js';
 export * from './extensions/tiptap-figcaption.extension.js';
 export * from './extensions/tiptap-figure.extension.js';
 export * from './extensions/tiptap-span.extension.js';
 export * from './extensions/tiptap-html-global-attributes.extension.js';
 export * from './extensions/tiptap-text-direction-extension.js';
+export * from './extensions/tiptap-text-indent-extension.js';
 export * from './extensions/tiptap-trailing-node.extension.js';
 export * from './extensions/tiptap-umb-embedded-media.extension.js';
 export * from './extensions/tiptap-umb-image.extension.js';
