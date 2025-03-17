@@ -52,6 +52,14 @@ describe('UmbSelectionManager', () => {
 			it('has a clear method', () => {
 				expect(manager).to.have.property('clear').that.is.a('function');
 			});
+
+			it('has a getIsOn method', () => {
+				expect(manager).to.have.property('getIsOn').that.is.a('function');
+			});
+
+			it('has a getIsOff method', () => {
+				expect(manager).to.have.property('getIsOff').that.is.a('function');
+			});
 		});
 	});
 
@@ -136,6 +144,28 @@ describe('UmbSelectionManager', () => {
 					done();
 				})
 				.unsubscribe();
+		});
+	});
+
+	describe('getIsOn', () => {
+		it('returns true if there are states', () => {
+			manager.addState(state1);
+			expect(manager.getIsOn()).to.be.true;
+		});
+
+		it('returns false if there are no states', () => {
+			expect(manager.getIsOn()).to.be.false;
+		});
+	});
+
+	describe('getIsOff', () => {
+		it('returns true if there are no states', () => {
+			expect(manager.getIsOff()).to.be.true;
+		});
+
+		it('returns false if there are states', () => {
+			manager.addState(state1);
+			expect(manager.getIsOff()).to.be.false;
 		});
 	});
 });

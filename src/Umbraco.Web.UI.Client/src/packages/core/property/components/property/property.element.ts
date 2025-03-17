@@ -140,6 +140,31 @@ export class UmbPropertyElement extends UmbLitElement {
 		return this.#propertyContext.getDataPath();
 	}
 
+	/**
+	 * Sets the property to readonly, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @default false
+	 */
+	private _readonly: boolean = false;
+	@property({ type: Boolean, reflect: true })
+	public set readonly(value: boolean) {
+		this._readonly = value;
+
+		const unique = 'UMB_ELEMENT';
+
+		if (this._readonly) {
+			this.#propertyContext.readonlyState.addState({
+				unique,
+				message: '',
+			});
+		} else {
+			this.#propertyContext.readonlyState.removeState(unique);
+		}
+	}
+	public get readonly(): boolean {
+		return this._readonly;
+	}
+
 	@state()
 	private _variantDifference?: string;
 

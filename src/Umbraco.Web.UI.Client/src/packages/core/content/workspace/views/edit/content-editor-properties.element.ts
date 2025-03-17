@@ -56,7 +56,6 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 		});
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (datasetContext) => {
-			debugger;
 			this.#variantId = datasetContext.getVariantId();
 			this.#generatePropertyDataPath();
 		});
@@ -83,25 +82,25 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 		);
 	}
 
-	#getVisibleProperties() {
+	#getReadableProperties() {
 		return this._propertyStructure?.filter((property) => this._readablePropertyUniques.includes(property.unique)) ?? [];
 	}
 
-	#isWritable(unique: string) {
+	#isWritablePropertyType(unique: string) {
 		return this._writeablePropertyUniques.includes(unique);
 	}
 
 	override render() {
 		return this._propertyStructure && this._dataPaths
 			? repeat(
-					this.#getVisibleProperties(),
+					this.#getReadableProperties(),
 					(property) => property.alias,
 					(property, index) =>
 						html`<umb-property-type-based-property
 							class="property"
 							data-path=${this._dataPaths![index]}
 							.property=${property}
-							?readonly=${this.#isWritable(property.unique)}></umb-property-type-based-property> `,
+							?readonly=${!this.#isWritablePropertyType(property.unique)}></umb-property-type-based-property>`,
 				)
 			: '';
 	}
