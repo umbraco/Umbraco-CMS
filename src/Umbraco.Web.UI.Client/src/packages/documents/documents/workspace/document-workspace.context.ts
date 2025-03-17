@@ -17,6 +17,11 @@ import {
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, UmbDocumentPublishingRepository } from '../publishing/index.js';
 import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
+import {
+	UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ,
+	UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE,
+} from '../user-permissions/document-property-value/constants.js';
+import { UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_CONDITION_ALIAS } from '../user-permissions/document-property-value/conditions/constants.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -176,6 +181,68 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		]);
+
+		this.observe(this.structure.contentTypeProperties, (properties) => {
+			properties.forEach((property) => {
+				createExtensionApiByAlias(this, UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_CONDITION_ALIAS, [
+					{
+						config: {
+							allOf: [UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ],
+							match: {
+								propertyType: {
+									unique: property.unique,
+								},
+							},
+						},
+						onChange: (permitted: boolean) => {
+							const unique = 'UMB_PROPERTY_' + property.unique;
+
+							if (permitted) {
+								const state = {
+									unique,
+									message: '',
+									propertyType: {
+										unique: property.unique,
+									},
+								};
+								this.structure.propertyReadState.addState(state);
+							} else {
+								this.structure.propertyReadState.removeState(unique);
+							}
+						},
+					},
+				]);
+
+				createExtensionApiByAlias(this, UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_CONDITION_ALIAS, [
+					{
+						config: {
+							allOf: [UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE],
+							match: {
+								propertyType: {
+									unique: property.unique,
+								},
+							},
+						},
+						onChange: (permitted: boolean) => {
+							const unique = 'UMB_PROPERTY_' + property.unique;
+
+							if (permitted) {
+								const state = {
+									unique,
+									message: '',
+									propertyType: {
+										unique: property.unique,
+									},
+								};
+								this.structure.propertyWriteState.addState(state);
+							} else {
+								this.structure.propertyWriteState.removeState(unique);
+							}
+						},
+					},
+				]);
+			});
+		});
 	}
 
 	override resetState(): void {
