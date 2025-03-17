@@ -18,7 +18,7 @@ import {
 } from './constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as conditionManifests } from './conditions/manifests.js';
-import { manifests as documentValueManifests } from './document-value/manifests.js';
+import { manifests as documentPropertyValueManifests } from './document-property-value/manifests.js';
 import type {
 	ManifestGranularUserPermission,
 	ManifestEntityUserPermission,
@@ -219,5 +219,5 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...permissions,
 	...granularPermissions,
 	...conditionManifests,
-	...documentValueManifests,
+	...documentPropertyValueManifests,
 ];

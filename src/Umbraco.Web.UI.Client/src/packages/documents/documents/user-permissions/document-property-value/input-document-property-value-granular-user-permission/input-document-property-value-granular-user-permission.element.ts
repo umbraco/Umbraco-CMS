@@ -1,5 +1,5 @@
-import type { UmbDocumentValueUserPermissionModel } from '../types.js';
-import { UMB_DOCUMENT_VALUE_GRANULAR_USER_PERMISSION_FLOW_MODAL } from '../document-value-granular-permission-flow-modal/index.js';
+import type { UmbDocumentPropertyValueUserPermissionModel as UmbDocumentPropertyValueUserPermissionModel } from '../types.js';
+import { UMB_DOCUMENT_PROPERTY_VALUE_GRANULAR_USER_PERMISSION_FLOW_MODAL } from '../document-property-value-granular-permission-flow-modal/index.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -15,13 +15,13 @@ import {
 } from '@umbraco-cms/backoffice/document-type';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-@customElement('umb-document-value-granular-user-permission')
-export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
-	_permissions: Array<UmbDocumentValueUserPermissionModel> = [];
-	public get permissions(): Array<UmbDocumentValueUserPermissionModel> {
+@customElement('umb-document-property-value-granular-user-permission')
+export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
+	_permissions: Array<UmbDocumentPropertyValueUserPermissionModel> = [];
+	public get permissions(): Array<UmbDocumentPropertyValueUserPermissionModel> {
 		return this._permissions;
 	}
-	public set permissions(value: Array<UmbDocumentValueUserPermissionModel>) {
+	public set permissions(value: Array<UmbDocumentPropertyValueUserPermissionModel>) {
 		this._permissions = value;
 		const uniques = value.map((item) => item.documentType.unique);
 		this.#observePickedDocumentTypes(uniques);
@@ -56,10 +56,10 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 			throw new Error('Could not open modal, no modal manager found');
 		}
 
-		const modal = modalManager.open(this, UMB_DOCUMENT_VALUE_GRANULAR_USER_PERMISSION_FLOW_MODAL, {
+		const modal = modalManager.open(this, UMB_DOCUMENT_PROPERTY_VALUE_GRANULAR_USER_PERMISSION_FLOW_MODAL, {
 			data: {
 				preset: {
-					verbs: this.#getFallbackPermissionVerbsForEntityType('document-value'),
+					verbs: this.#getFallbackPermissionVerbsForEntityType('document-property-value'),
 				},
 			},
 		});
@@ -68,8 +68,8 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 			const value = await modal?.onSubmit();
 			if (!value) throw new Error('No result from modal');
 
-			const permissionItem: UmbDocumentValueUserPermissionModel = {
-				$type: 'DocumentValuePermissionPresentationModel',
+			const permissionItem: UmbDocumentPropertyValueUserPermissionModel = {
+				$type: 'DocumentPropertyValuePermissionPresentationModel',
 				documentType: value.documentType,
 				propertyType: value.propertyType,
 				verbs: value.verbs,
@@ -82,7 +82,7 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 		}
 	}
 
-	async #editGranularPermission(currentPermission: UmbDocumentValueUserPermissionModel) {
+	async #editGranularPermission(currentPermission: UmbDocumentPropertyValueUserPermissionModel) {
 		if (!currentPermission) {
 			throw new Error('Could not open permissions modal, no item was provided');
 		}
@@ -103,7 +103,7 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 
 		const modal = modalManager.open(this, UMB_ENTITY_USER_PERMISSION_MODAL, {
 			data: {
-				entityType: 'document-value',
+				entityType: 'document-property-value',
 				headline,
 				preset: {
 					allowedVerbs: currentPermission.verbs,
@@ -134,12 +134,12 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 		}
 	}
 
-	#removeGranularPermission(permission: UmbDocumentValueUserPermissionModel) {
+	#removeGranularPermission(permission: UmbDocumentPropertyValueUserPermissionModel) {
 		this.permissions = this._permissions.filter((v) => JSON.stringify(v) !== JSON.stringify(permission));
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#getVerbNamesForPermission(permission: UmbDocumentValueUserPermissionModel) {
+	#getVerbNamesForPermission(permission: UmbDocumentPropertyValueUserPermissionModel) {
 		if (!permission) {
 			throw new Error('Could not find permission for property type');
 		}
@@ -196,7 +196,7 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 			label=${this.localize.term('general_add')}></uui-button>`;
 	}
 
-	#renderRef(permission: UmbDocumentValueUserPermissionModel) {
+	#renderRef(permission: UmbDocumentPropertyValueUserPermissionModel) {
 		if (!permission.propertyType.unique) {
 			throw new Error('Property type unique is required');
 		}
@@ -216,13 +216,13 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 		`;
 	}
 
-	#renderEditButton(permission: UmbDocumentValueUserPermissionModel) {
+	#renderEditButton(permission: UmbDocumentPropertyValueUserPermissionModel) {
 		return html`<uui-button
 			@click=${() => this.#editGranularPermission(permission)}
 			label=${this.localize.term('general_edit')}></uui-button>`;
 	}
 
-	#renderRemoveButton(permission: UmbDocumentValueUserPermissionModel) {
+	#renderRemoveButton(permission: UmbDocumentPropertyValueUserPermissionModel) {
 		return html`<uui-button
 			@click=${() => this.#removeGranularPermission(permission)}
 			label=${this.localize.term('general_remove')}></uui-button>`;
@@ -237,10 +237,10 @@ export class UmbInputDocumentValueGranularUserPermissionElement extends UUIFormC
 	];
 }
 
-export { UmbInputDocumentValueGranularUserPermissionElement as element };
+export { UmbInputDocumentPropertyValueGranularUserPermissionElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-value-granular-user-permission': UmbInputDocumentValueGranularUserPermissionElement;
+		'umb-document-property-value-granular-user-permission': UmbInputDocumentPropertyValueGranularUserPermissionElement;
 	}
 }
