@@ -3768,6 +3768,7 @@ export class MediaService {
     }
     
     /**
+     * @deprecated
      * @returns unknown OK
      * @throws ApiError
      */

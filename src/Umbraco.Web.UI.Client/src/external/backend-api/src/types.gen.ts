@@ -647,10 +647,6 @@ export type DocumentConfigurationResponseModel = {
     disableUnpublishWhenReferenced: boolean;
     allowEditInvariantFromNonDefault: boolean;
     allowNonExistingSegmentsCreation: boolean;
-    /**
-     * @deprecated
-     */
-    reservedFieldNames: Array<(string)>;
 };
 
 export type DocumentItemResponseModel = {
@@ -1188,10 +1184,6 @@ export type MediaCollectionResponseModel = {
 export type MediaConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
-    /**
-     * @deprecated
-     */
-    reservedFieldNames: Array<(string)>;
 };
 
 export type MediaItemResponseModel = {
@@ -1374,10 +1366,7 @@ export type MediaVariantResponseModel = {
 };
 
 export type MemberConfigurationResponseModel = {
-    /**
-     * @deprecated
-     */
-    reservedFieldNames: Array<(string)>;
+    [key: string]: unknown;
 };
 
 export type MemberGroupItemResponseModel = {
