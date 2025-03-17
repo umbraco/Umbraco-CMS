@@ -100,7 +100,7 @@ export class UmbContentTypeStructureManager<
 	readonly variesBySegment = createObservablePart(this.ownerContentType, (x) => x?.variesBySegment);
 
 	public readonly propertyReadState = new UmbPropertyReadStateManager(this);
-	public readonly propertyWriteState = new UmbPropertyReadStateManager(this);
+	public readonly propertyWriteState = new UmbPropertyWriteStateManager(this);
 
 	#containers: UmbArrayState<UmbPropertyTypeContainerModel> = new UmbArrayState<UmbPropertyTypeContainerModel>(
 		[],
