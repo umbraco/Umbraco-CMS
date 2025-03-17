@@ -2,6 +2,7 @@ import type { UmbVariantId } from './variant-id.class.js';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { ScheduleRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
+import type { UmbReferenceByAlias, UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export type UmbObjectWithVariantProperties = {
 	culture: string | null;
@@ -51,6 +52,11 @@ export interface UmbEntityVariantPublishModel {
 export interface UmbReferenceByVariantId {
 	variantId: UmbVariantId;
 }
+
+export type UmbVariantPropertyTypeReferenceTypeUnion =
+	| UmbReferenceByUnique
+	| UmbReferenceByAlias
+	| UmbReferenceByVariantId;
 
 /** @deprecated use `UmbEntityVariantPublishModel` instead */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
