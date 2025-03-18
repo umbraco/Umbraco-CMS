@@ -246,7 +246,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 throw new ArgumentNullException(nameof(user));
             }
 
-            IMember? found = _memberService.GetByKey(user.Key);
+            IMember? found = _memberService.GetById(user.Key);
             if (found != null)
             {
                 _memberService.Delete(found);
@@ -286,7 +286,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             return null;
         }
 
-        IMember? member = _memberService.GetByKey(user.Key);
+        IMember? member = _memberService.GetById(user.Key);
         if (member == null)
         {
             return null;
@@ -324,7 +324,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         IMember? user = null;
         if (Guid.TryParse(userId, out Guid key))
         {
-            user = _memberService.GetByKey(key);
+            user = _memberService.GetById(key);
         }
         else if (TryResolveEntityIdFromIdentityId(userId, out int id))
         {
@@ -348,7 +348,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
         if (Guid.TryParse(identityId, out Guid key))
         {
-            IMember? member = _memberService.GetByKey(key);
+            IMember? member = _memberService.GetById(key);
             if (member is not null)
             {
                 entityId = member.Id;
