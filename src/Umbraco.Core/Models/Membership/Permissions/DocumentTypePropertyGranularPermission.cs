@@ -1,8 +1,8 @@
 namespace Umbraco.Cms.Core.Models.Membership.Permissions;
 
-public class DocumentTypeGranularPermission : INodeGranularPermission
+public class DocumentTypePropertyGranularPermission : INodeGranularPermission
 {
-    public const string ContextType = "DocumentType";
+    public const string ContextType = "DocumentTypeProperty";
 
     public required Guid Key { get; set; }
 
@@ -10,7 +10,7 @@ public class DocumentTypeGranularPermission : INodeGranularPermission
 
     public required string Permission { get; set; }
 
-    protected bool Equals(DocumentTypeGranularPermission other) => Key.Equals(other.Key) && Permission == other.Permission;
+    protected bool Equals(DocumentTypePropertyGranularPermission other) => Key.Equals(other.Key) && Permission == other.Permission;
 
     public override bool Equals(object? obj)
     {
@@ -29,7 +29,7 @@ public class DocumentTypeGranularPermission : INodeGranularPermission
             return false;
         }
 
-        return Equals((DocumentTypeGranularPermission)obj);
+        return Equals((DocumentTypePropertyGranularPermission)obj);
     }
 
     public override int GetHashCode() => HashCode.Combine(Key, Permission);
