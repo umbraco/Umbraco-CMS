@@ -2052,6 +2052,7 @@ export default {
 		permissionsEntityGroup_media: 'Media',
 		permissionsEntityGroup_member: 'Member',
 		'permissionsEntityGroup_document-property-value': 'Document Property Value',
+		permissionNoVerbs: 'No allowed permissions',
 		profile: 'Profile',
 		searchAllChildren: 'Search all children',
 		languagesHelp: 'Limit the languages users have access to edit',
