@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 
-public class DocumentTypePermissionPresentationModel : IPermissionPresentationModel
+public class DocumentTypePropertyPermissionPresentationModel : IPermissionPresentationModel
 {
     public required ReferenceByIdModel DocumentType { get; set; }
 

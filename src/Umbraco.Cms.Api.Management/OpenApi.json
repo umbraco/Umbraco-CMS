@@ -35921,7 +35921,7 @@
                   "$ref": "#/components/schemas/DocumentPermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
+                  "$ref": "#/components/schemas/DocumentTypePropertyPermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
@@ -36212,7 +36212,7 @@
                   "$ref": "#/components/schemas/DocumentPermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
+                  "$ref": "#/components/schemas/DocumentTypePropertyPermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
@@ -37484,7 +37484,7 @@
         },
         "additionalProperties": false
       },
-      "DocumentTypePermissionPresentationModel": {
+      "DocumentTypePropertyPermissionPresentationModel": {
         "required": [
           "$type",
           "documentType",
@@ -37522,7 +37522,7 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "DocumentTypePermissionPresentationModel": "#/components/schemas/DocumentTypePermissionPresentationModel"
+            "DocumentTypePropertyPermissionPresentationModel": "#/components/schemas/DocumentTypePropertyPermissionPresentationModel"
           }
         }
       },
@@ -45481,7 +45481,7 @@
                   "$ref": "#/components/schemas/DocumentPermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
+                  "$ref": "#/components/schemas/DocumentTypePropertyPermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
@@ -45907,7 +45907,7 @@
                   "$ref": "#/components/schemas/DocumentPermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
+                  "$ref": "#/components/schemas/DocumentTypePropertyPermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"

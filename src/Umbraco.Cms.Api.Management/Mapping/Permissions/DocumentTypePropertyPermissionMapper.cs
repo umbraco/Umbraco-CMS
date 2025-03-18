@@ -7,18 +7,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Permissions;
 
-public class DocumentTypePermissionMapper : IPermissionPresentationMapper, IPermissionMapper
+public class DocumentTypePropertyPermissionMapper : IPermissionPresentationMapper, IPermissionMapper
 {
-    public string Context => DocumentTypeGranularPermission.ContextType;
+    public string Context => DocumentTypePropertyGranularPermission.ContextType;
 
     public IGranularPermission MapFromDto(UserGroup2GranularPermissionDto dto) =>
-        new DocumentTypeGranularPermission()
+        new DocumentTypePropertyGranularPermission()
         {
             Key = dto.UniqueId!.Value,
             Permission = dto.Permission,
         };
 
-    public Type PresentationModelToHandle => typeof(DocumentTypePermissionPresentationModel);
+    public Type PresentationModelToHandle => typeof(DocumentTypePropertyPermissionPresentationModel);
 
     public IEnumerable<IPermissionPresentationModel> MapManyAsync(IEnumerable<IGranularPermission> granularPermissions)
     {
@@ -37,7 +37,7 @@ public class DocumentTypePermissionMapper : IPermissionPresentationMapper, IPerm
         {
             foreach (var propertyTypeGroup in documentTypeGroup.GroupBy(x => x.PropertyTypeId))
             {
-                yield return new DocumentTypePermissionPresentationModel
+                yield return new DocumentTypePropertyPermissionPresentationModel
                 {
                     DocumentType = new ReferenceByIdModel(documentTypeGroup.Key),
                     PropertyType = new ReferenceByIdModel(propertyTypeGroup.Key),
@@ -49,7 +49,7 @@ public class DocumentTypePermissionMapper : IPermissionPresentationMapper, IPerm
 
     public IEnumerable<IGranularPermission> MapToGranularPermissions(IPermissionPresentationModel permissionViewModel)
     {
-        if (permissionViewModel is not DocumentTypePermissionPresentationModel documentTypePermissionPresentationModel)
+        if (permissionViewModel is not DocumentTypePropertyPermissionPresentationModel documentTypePermissionPresentationModel)
         {
             yield break;
         }
@@ -61,7 +61,7 @@ public class DocumentTypePermissionMapper : IPermissionPresentationMapper, IPerm
                 continue;
             }
 
-            yield return new DocumentTypeGranularPermission
+            yield return new DocumentTypePropertyGranularPermission
             {
                 Key = documentTypePermissionPresentationModel.DocumentType.Id,
                 Permission = $"{documentTypePermissionPresentationModel.PropertyType.Id}|{verb}"

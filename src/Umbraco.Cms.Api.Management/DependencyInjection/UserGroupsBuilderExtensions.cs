@@ -16,8 +16,8 @@ internal static class UserGroupsBuilderExtensions
         builder.Services.AddSingleton<IPermissionMapper, DocumentPermissionMapper>();
         builder.Services.AddSingleton<IPermissionPresentationMapper, DocumentPermissionMapper>();
 
-        builder.Services.AddSingleton<IPermissionMapper, DocumentTypePermissionMapper>();
-        builder.Services.AddSingleton<IPermissionPresentationMapper, DocumentTypePermissionMapper>();
+        builder.Services.AddSingleton<IPermissionMapper, DocumentTypePropertyPermissionMapper>();
+        builder.Services.AddSingleton<IPermissionPresentationMapper, DocumentTypePropertyPermissionMapper>();
 
         return builder;
     }
