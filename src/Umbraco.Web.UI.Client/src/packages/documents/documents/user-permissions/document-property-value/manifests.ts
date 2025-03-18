@@ -37,6 +37,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		type: 'userGranularPermission',
 		alias: 'Umb.UserGranularPermission.Document.PropertyValue',
 		name: 'Document Property Values Granular User Permission',
+		weight: 950,
 		element: () =>
 			import(
 				'./input-document-property-value-granular-user-permission/input-document-property-value-granular-user-permission.element.js'
