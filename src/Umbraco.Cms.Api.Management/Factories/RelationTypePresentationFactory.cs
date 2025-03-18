@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
@@ -15,24 +16,28 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IEntityRepository _entityRepository;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
+    private readonly IScopeProvider _scopeProvider;
 
     [Obsolete("Please use the non obsoleted constructor. Scheduled for removal in v17")]
     public RelationTypePresentationFactory(IUmbracoMapper umbracoMapper)
         : this(
             umbracoMapper,
             StaticServiceProvider.Instance.GetRequiredService<IEntityRepository>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentPresentationFactory>())
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentPresentationFactory>(),
+            StaticServiceProvider.Instance.GetRequiredService<IScopeProvider>())
     {
     }
 
     public RelationTypePresentationFactory(
         IUmbracoMapper umbracoMapper,
         IEntityRepository entityRepository,
-        IDocumentPresentationFactory documentPresentationFactory)
+        IDocumentPresentationFactory documentPresentationFactory,
+        IScopeProvider scopeProvider)
     {
         _umbracoMapper = umbracoMapper;
         _entityRepository = entityRepository;
         _documentPresentationFactory = documentPresentationFactory;
+        _scopeProvider = scopeProvider;
     }
 
     public async Task<IEnumerable<IReferenceResponseModel>> CreateReferenceResponseModelsAsync(
@@ -41,6 +46,8 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
         Guid[] documentKeys = relationItemModels
             .Where(item => item.NodeType is Constants.UdiEntityType.Document)
             .Select(item => item.NodeKey).Distinct().ToArray();
+
+        using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
 
         var slimEntities = _entityRepository.GetAll(Constants.ObjectTypes.Document, documentKeys).ToList();
 
