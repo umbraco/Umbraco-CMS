@@ -2,8 +2,6 @@ import { UmbTiptapToolbarElementApiBase } from '../base.js';
 import type { MetaTiptapToolbarMenuItem } from '../types.js';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
-import './components/table-insert.element.js';
-
 export class UmbTiptapToolbarTableExtensionApi extends UmbTiptapToolbarElementApiBase {
 	#commands: Record<string, (editor?: Editor) => void> = {
 		// Cells
