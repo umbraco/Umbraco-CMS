@@ -156,6 +156,10 @@ export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends 
 			throw new Error('Could not find permission for property type');
 		}
 
+		if (permission.verbs.length === 0) {
+			return this.localize.term('user_permissionNoVerbs');
+		}
+
 		return umbExtensionsRegistry
 			.getByTypeAndFilter('entityUserPermission', (manifest) =>
 				manifest.meta.verbs.every((verb) => permission.verbs.includes(verb)),
