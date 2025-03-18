@@ -1,8 +1,9 @@
+import type { UmbDocumentPropertyValueUserPermissionType } from './user-permission.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
 
 export interface UmbDocumentPropertyValueUserPermissionModel extends UmbUserPermissionModel {
-	permissionType: 'document-property-value';
+	userPermissionType: UmbDocumentPropertyValueUserPermissionType;
 	documentType: UmbReferenceByUnique;
 	propertyType: UmbReferenceByUnique;
 }
