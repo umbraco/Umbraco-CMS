@@ -18,16 +18,20 @@ export class UmbDataSourceDataMapper<fromModelType = unknown, toModelType = unkn
 			throw new Error(message);
 		}
 
-		if (!args.forDataModel) {
-			const message = 'forDataModel is missing';
-			console.error(message);
-			throw new Error(message);
-		}
-
 		if (!args.data) {
 			const message = 'data is required';
 			console.error(message);
 			throw new Error(message);
+		}
+
+		if (!args.forDataModel && !args.fallback) {
+			const message = 'forDataModel is missing and no fallback provided.';
+			console.error(message);
+			throw new Error(message);
+		}
+
+		if (!args.forDataModel && args.fallback) {
+			return args.fallback(args.data);
 		}
 
 		const dataMapping = await this.#dataMappingResolver.resolve(args.forDataSource, args.forDataModel);
