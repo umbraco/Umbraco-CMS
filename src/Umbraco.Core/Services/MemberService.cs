@@ -850,7 +850,7 @@ namespace Umbraco.Cms.Core.Services
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
-        [Obsolete($"Use the {nameof(Save)} method that yields an Attempt. Will be removed in V15.")]
+        /// <inheritdoc />
         public void Save(IEnumerable<IMember> members)
             => Save(members, Constants.Security.SuperUserId);
 
