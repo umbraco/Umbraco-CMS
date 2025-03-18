@@ -1247,7 +1247,8 @@ export default {
 		colorsTitle: 'Colors',
 		colorsDescription: 'Add, remove or sort colors',
 		showLabelTitle: 'Include labels?',
-		showLabelDescription: 'Stores colors as a JSON object containing both the color hex string and label, rather than just the hex string.',
+		showLabelDescription:
+			'Stores colors as a JSON object containing both the color hex string and label, rather than just the hex string.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
@@ -1982,9 +1983,6 @@ export default {
 		permissionsGranularHelp: 'Set permissions for specific nodes',
 		granularRightsLabel: 'Documents',
 		granularRightsDescription: 'Assign permissions to specific documents',
-		permissionsEntityGroup_document: 'Content',
-		permissionsEntityGroup_media: 'Media',
-		permissionsEntityGroup_member: 'Member',
 		profile: 'Profile',
 		searchAllChildren: 'Search all children',
 		languagesHelp: 'Limit the languages users have access to edit',
