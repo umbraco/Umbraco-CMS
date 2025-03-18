@@ -1004,8 +1004,21 @@ public class UserServiceTests : UmbracoIntegrationTest
     [TestCase("@", UserClientCredentialsOperationStatus.InvalidClientId)]
     [TestCase("[", UserClientCredentialsOperationStatus.InvalidClientId)]
     [TestCase("]", UserClientCredentialsOperationStatus.InvalidClientId)]
-    [TestCase("More_Than_255_characters_012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789", UserClientCredentialsOperationStatus.InvalidClientId)]
     public async Task Can_Use_Only_Unreserved_Characters_For_ClientId(string clientId, UserClientCredentialsOperationStatus expectedResult)
+    {
+        // Arrange
+        var user = await CreateTestUser(UserKind.Api);
+
+        // Act
+        var result = await UserService.AddClientIdAsync(user.Key, clientId);
+
+        // Assert
+        Assert.AreEqual(expectedResult, result);
+    }
+
+    [TestCase("Less_Than_100_characters_0123456789012345678901234567890123456789012345678901234567890123456789", UserClientCredentialsOperationStatus.Success)]
+    [TestCase("More_Than_100_characters_01234567890123456789012345678901234567890123456789012345678901234567890123456789", UserClientCredentialsOperationStatus.InvalidClientId)]
+    public async Task Cannot_Create_Too_Long_ClientId(string clientId, UserClientCredentialsOperationStatus expectedResult)
     {
         // Arrange
         var user = await CreateTestUser(UserKind.Api);
