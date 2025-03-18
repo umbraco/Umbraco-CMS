@@ -22,6 +22,7 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 		alias: 'Umb.Tiptap.Toolbar.Table',
 		name: 'Table Tiptap Extension',
 		api: () => import('./table.tiptap-toolbar-api.js'),
+		element: () => import('./components/table-toolbar-menu.element.js'),
 		forExtensions: ['Umb.Tiptap.Table'],
 		meta: {
 			alias: 'table',
@@ -29,12 +30,6 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 			label: 'Table',
 			look: 'icon',
 			items: [
-				{
-					label: 'Table',
-					icon: 'icon-table',
-					items: [{ label: 'Insert table', elementName: 'umb-tiptap-table-insert' }],
-					separatorAfter: true,
-				},
 				{
 					label: 'Cell',
 					items: [
