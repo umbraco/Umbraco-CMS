@@ -176,7 +176,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	}
 
 	public hostDisconnected(): void {
-		if (this.#raf) {
+		if (this.#raf !== undefined) {
 			cancelAnimationFrame(this.#raf);
 			this.#promiseRejecter?.('Context request was cancelled, host was disconnected.');
 		}
