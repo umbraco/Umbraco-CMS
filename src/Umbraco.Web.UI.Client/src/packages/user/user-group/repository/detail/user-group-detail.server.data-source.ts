@@ -164,13 +164,9 @@ export class UmbUserGroupServerDataSource
 
 		const permissionDataPromises = model.permissions.map(async (item) => {
 			return this.#dataMapper.map({
-				forDataModel: item.permissionType,
+				forDataModel: item.userPermissionType,
 				data: item,
-				fallback: async () => {
-					return {
-						...item,
-					};
-				},
+				fallback: async () => item,
 			});
 		});
 
