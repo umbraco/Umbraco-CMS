@@ -89,8 +89,8 @@ test('invariant document type with invariant block grid with variant block with 
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);
 });
 
-// Remove fixme when this test works. Currently, the textstring value is is not saved when saving / publishing the document
-test.fixme('invariant document type with invariant block grid with variant block with an variant textString', async ({umbracoApi, umbracoUi}) => {
+// Remove fixme when this test works. Currently, the textstring value is not saved when saving / publishing the document
+test('invariant document type with invariant block grid with variant block with an variant textString', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   elementTypeId = await umbracoApi.documentType.createDefaultElementTypeWithVaryByCulture(blockName, elementGroupName, textStringName, textStringDataTypeId, true, true);
   blockGridId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridName, elementTypeId, true);
