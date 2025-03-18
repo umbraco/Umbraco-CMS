@@ -1,4 +1,4 @@
-import type { UmbMemberEntityType } from './entity.js';
+import type { UmbMemberEntityType, UmbMemberPropertyValueEntityType } from './entity.js';
 import type { UmbMemberKindType } from './utils/index.js';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbContentDetailModel, UmbElementValueModel } from '@umbraco-cms/backoffice/content';

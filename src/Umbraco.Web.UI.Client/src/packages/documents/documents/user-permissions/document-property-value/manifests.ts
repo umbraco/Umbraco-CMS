@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
 import {
 	UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ,
 	UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE,
@@ -12,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		type: 'entityUserPermission',
 		alias: 'Umb.EntityUserPermission.Document.PropertyValue.Read',
 		name: 'Read Document Property Value User Permission',
-		forEntityTypes: ['document-property-value'],
+		forEntityTypes: [UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE],
 		weight: 200,
 		meta: {
 			verbs: [UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ],
@@ -24,7 +25,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		type: 'entityUserPermission',
 		alias: 'Umb.EntityUserPermission.DocumentPropertyValue.Write',
 		name: 'Write Document Property Value User Permission',
-		forEntityTypes: ['document-property-value'],
+		forEntityTypes: [UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE],
 		weight: 200,
 		meta: {
 			verbs: [UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE],

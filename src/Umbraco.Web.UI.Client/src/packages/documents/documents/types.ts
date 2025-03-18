@@ -1,4 +1,4 @@
-import type { UmbDocumentEntityType } from './entity.js';
+import type { UmbDocumentEntityType, UmbDocumentPropertyValueEntityType } from './entity.js';
 import type {
 	UmbEntityVariantModel,
 	UmbEntityVariantOptionModel,

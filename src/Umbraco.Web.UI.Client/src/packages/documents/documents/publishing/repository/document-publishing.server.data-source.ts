@@ -1,5 +1,5 @@
 import type { UmbDocumentDetailModel, UmbDocumentVariantPublishModel } from '../../types.js';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
 import type {
 	CultureAndScheduleRequestModel,
 	PublishDocumentRequestModel,
@@ -137,6 +137,7 @@ export class UmbDocumentPublishingServerDataSource {
 			values: data.values.map((value) => {
 				return {
 					editorAlias: value.editorAlias,
+					entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
 					culture: value.culture || null,
 					segment: value.segment || null,
 					alias: value.alias,

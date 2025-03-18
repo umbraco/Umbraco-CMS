@@ -9,6 +9,7 @@ import type {
 import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 
 /**
  * A data source for the Document that fetches data from the server
@@ -93,6 +94,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 			values: data.values.map((value) => {
 				return {
 					editorAlias: value.editorAlias,
+					entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
 					culture: value.culture || null,
 					segment: value.segment || null,
 					alias: value.alias,
