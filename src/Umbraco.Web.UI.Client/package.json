@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "15.3.0-rc",
+	"version": "15.4.0-rc",
 	"type": "module",
 	"exports": {
 		".": null,
@@ -173,8 +173,8 @@
 		"generate:icons": "node ./devops/icons/index.js",
 		"generate:overrides": "node ./devops/tsc/index.js",
 		"generate:jsonschema:imports": "node ./devops/json-schema-generator/index.js",
-		"generate:jsonschema:dist": "typescript-json-schema --required --include \"./src/json-schema/umbraco-package-schema.ts\" --out dist-cms/umbraco-package-schema.json tsconfig.json UmbracoPackage",
-		"generate:jsonschema": "typescript-json-schema --required --include \"./src/json-schema/umbraco-package-schema.ts\"",
+		"generate:jsonschema:dist": "npm run generate:jsonschema -- --out dist-cms/umbraco-package-schema.json tsconfig.json UmbracoPackage",
+		"generate:jsonschema": "typescript-json-schema --skipLibCheck --ignoreErrors --excludePrivate --required --include \"./src/json-schema/umbraco-package-schema.ts\"",
 		"generate:check-const-test": "node ./devops/generate-check-const-test/index.js",
 		"lint:errors": "npm run lint -- --quiet",
 		"lint:fix": "npm run lint -- --fix",
