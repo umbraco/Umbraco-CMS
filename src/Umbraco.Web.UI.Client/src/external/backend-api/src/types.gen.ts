@@ -408,7 +408,7 @@ export type CreateUserGroupRequestModel = {
     mediaStartNode?: ((ReferenceByIdModel) | null);
     mediaRootAccess: boolean;
     fallbackPermissions: Array<(string)>;
-    permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
+    permissions: Array<(DocumentPermissionPresentationModel | DocumentTypePropertyPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
     id?: (string) | null;
 };
 
@@ -460,7 +460,7 @@ export type CurrentUserResponseModel = {
     hasAccessToAllLanguages: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<(string)>;
-    permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
+    permissions: Array<(DocumentPermissionPresentationModel | DocumentTypePropertyPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
     allowedSections: Array<(string)>;
     isAdmin: boolean;
 };
@@ -766,6 +766,13 @@ export type DocumentTypeItemResponseModel = {
     isElement: boolean;
     icon?: (string) | null;
     description?: (string) | null;
+};
+
+export type DocumentTypePropertyPermissionPresentationModel = {
+    $type: string;
+    documentType: (ReferenceByIdModel);
+    propertyType: (ReferenceByIdModel);
+    verbs: Array<(string)>;
 };
 
 export type DocumentTypePropertyTypeContainerResponseModel = {
@@ -2659,7 +2666,7 @@ export type UpdateUserGroupRequestModel = {
     mediaStartNode?: ((ReferenceByIdModel) | null);
     mediaRootAccess: boolean;
     fallbackPermissions: Array<(string)>;
-    permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
+    permissions: Array<(DocumentPermissionPresentationModel | DocumentTypePropertyPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
 };
 
 export type UpdateUserGroupsOnUserRequestModel = {
@@ -2759,7 +2766,7 @@ export type UserGroupResponseModel = {
     mediaStartNode?: ((ReferenceByIdModel) | null);
     mediaRootAccess: boolean;
     fallbackPermissions: Array<(string)>;
-    permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
+    permissions: Array<(DocumentPermissionPresentationModel | DocumentTypePropertyPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;
