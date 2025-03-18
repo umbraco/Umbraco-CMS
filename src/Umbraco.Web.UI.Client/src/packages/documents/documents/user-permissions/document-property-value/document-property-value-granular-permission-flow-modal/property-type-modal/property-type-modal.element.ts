@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '../../../../entity.js';
 import type {
 	UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModalData,
 	UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModalValue,
@@ -73,7 +74,7 @@ export class UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModal
 
 		const modal = modalManager.open(this, UMB_ENTITY_USER_PERMISSION_MODAL, {
 			data: {
-				entityType: 'document-property-value',
+				entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
 				headline,
 				preset: {
 					allowedVerbs: this.data?.preset?.verbs ?? [],

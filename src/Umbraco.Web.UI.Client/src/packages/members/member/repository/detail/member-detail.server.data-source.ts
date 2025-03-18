@@ -1,5 +1,5 @@
 import type { UmbMemberDetailModel } from '../../types.js';
-import { UMB_MEMBER_ENTITY_TYPE } from '../../entity.js';
+import { UMB_MEMBER_ENTITY_TYPE, UMB_MEMBER_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
 import { UmbMemberKind } from '../../utils/index.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
@@ -102,10 +102,11 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			groups: data.groups,
 			values: data.values.map((value) => {
 				return {
-					editorAlias: value.editorAlias,
-					culture: value.culture || null,
-					segment: value.segment || null,
 					alias: value.alias,
+					culture: value.culture || null,
+					editorAlias: value.editorAlias,
+					entityType: UMB_MEMBER_PROPERTY_VALUE_ENTITY_TYPE,
+					segment: value.segment || null,
 					value: value.value,
 				};
 			}),

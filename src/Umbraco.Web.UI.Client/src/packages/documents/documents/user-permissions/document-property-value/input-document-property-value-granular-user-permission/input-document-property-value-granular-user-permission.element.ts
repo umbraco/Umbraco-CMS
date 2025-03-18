@@ -1,6 +1,7 @@
 import type { UmbDocumentPropertyValueUserPermissionModel as UmbDocumentPropertyValueUserPermissionModel } from '../types.js';
 import { UMB_DOCUMENT_PROPERTY_VALUE_GRANULAR_USER_PERMISSION_FLOW_MODAL } from '../document-property-value-granular-permission-flow-modal/index.js';
 import { UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_TYPE } from '../user-permission.js';
+import { UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '../../../entity.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -60,7 +61,7 @@ export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends 
 		const modal = modalManager.open(this, UMB_DOCUMENT_PROPERTY_VALUE_GRANULAR_USER_PERMISSION_FLOW_MODAL, {
 			data: {
 				preset: {
-					verbs: this.#getFallbackPermissionVerbsForEntityType('document-property-value'),
+					verbs: this.#getFallbackPermissionVerbsForEntityType(UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE),
 				},
 			},
 		});
@@ -105,7 +106,7 @@ export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends 
 
 		const modal = modalManager.open(this, UMB_ENTITY_USER_PERMISSION_MODAL, {
 			data: {
-				entityType: 'document-property-value',
+				entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
 				headline,
 				preset: {
 					allowedVerbs: currentPermission.verbs,

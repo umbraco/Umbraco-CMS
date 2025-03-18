@@ -1,4 +1,5 @@
 import { UmbMediaDetailRepository } from '../media/repository/index.js';
+import { UMB_MEDIA_PROPERTY_VALUE_ENTITY_TYPE } from '../media/entity.js';
 import type { UmbMediaDetailModel, UmbMediaValueModel } from '../media/types.js';
 import { UmbFileDropzoneItemStatus } from './constants.js';
 import { UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL } from './modals/index.js';
@@ -318,6 +319,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			value: { temporaryFileId: item.temporaryFile?.temporaryUnique },
 			culture: null,
 			segment: null,
+			entityType: UMB_MEDIA_PROPERTY_VALUE_ENTITY_TYPE,
 		};
 
 		const preset: Partial<UmbMediaDetailModel> = {
