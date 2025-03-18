@@ -137,9 +137,9 @@ export class UmbDocumentPublishingServerDataSource {
 			values: data.values.map((value) => {
 				return {
 					editorAlias: value.editorAlias,
-					alias: value.alias,
 					culture: value.culture || null,
 					segment: value.segment || null,
+					alias: value.alias,
 					value: value.value,
 				};
 			}),

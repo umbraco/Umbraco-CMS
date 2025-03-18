@@ -30,6 +30,8 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 
 	override connectedCallback(): void {
 		super.connectedCallback();
+		this.setAttribute('data-mark', 'tiptap-toolbar');
+
 		this.#attached = true;
 		this.#observeExtensions();
 	}
@@ -51,7 +53,12 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			[],
 			(manifest) => this.toolbar.flat(2).includes(manifest.alias),
 			(extensionControllers) => {
-				this._lookup = new Map(extensionControllers.map((ext) => [ext.alias, ext.component]));
+				this._lookup = new Map(
+					extensionControllers.map((ext) => {
+						(ext.component as HTMLElement)?.setAttribute('data-mark', `action:tiptap-toolbar:${ext.alias}`);
+						return [ext.alias, ext.component];
+					}),
+				);
 			},
 			undefined,
 			undefined,
