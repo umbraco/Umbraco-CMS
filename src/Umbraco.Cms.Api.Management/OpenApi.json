@@ -16813,6 +16813,7 @@
             "description": "The authenticated user does not have access to this resource"
           }
         },
+        "deprecated": true,
         "security": [
           {
             "Backoffice User": [ ]
@@ -36735,8 +36736,7 @@
           "allowEditInvariantFromNonDefault",
           "allowNonExistingSegmentsCreation",
           "disableDeleteWhenReferenced",
-          "disableUnpublishWhenReferenced",
-          "reservedFieldNames"
+          "disableUnpublishWhenReferenced"
         ],
         "type": "object",
         "properties": {
@@ -36751,14 +36751,6 @@
           },
           "allowNonExistingSegmentsCreation": {
             "type": "boolean"
-          },
-          "reservedFieldNames": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "deprecated": true
           }
         },
         "additionalProperties": false
@@ -38942,8 +38934,7 @@
       "MediaConfigurationResponseModel": {
         "required": [
           "disableDeleteWhenReferenced",
-          "disableUnpublishWhenReferenced",
-          "reservedFieldNames"
+          "disableUnpublishWhenReferenced"
         ],
         "type": "object",
         "properties": {
@@ -38952,14 +38943,6 @@
           },
           "disableUnpublishWhenReferenced": {
             "type": "boolean"
-          },
-          "reservedFieldNames": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "deprecated": true
           }
         },
         "additionalProperties": false
@@ -39787,20 +39770,7 @@
         "additionalProperties": false
       },
       "MemberConfigurationResponseModel": {
-        "required": [
-          "reservedFieldNames"
-        ],
         "type": "object",
-        "properties": {
-          "reservedFieldNames": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "deprecated": true
-          }
-        },
         "additionalProperties": false
       },
       "MemberGroupItemResponseModel": {

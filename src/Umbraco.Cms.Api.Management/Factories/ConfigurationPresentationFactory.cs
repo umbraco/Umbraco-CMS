@@ -40,7 +40,6 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
             AllowEditInvariantFromNonDefault = _contentSettings.AllowEditInvariantFromNonDefault,
             AllowNonExistingSegmentsCreation = _segmentSettings.AllowCreation,
-            ReservedFieldNames = _reservedFieldNamesService.GetDocumentReservedFieldNames(),
         };
 
     public DocumentTypeConfigurationResponseModel CreateDocumentTypeConfigurationResponseModel() =>
@@ -53,10 +52,7 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         };
 
     public MemberConfigurationResponseModel CreateMemberConfigurationResponseModel() =>
-        new()
-        {
-            ReservedFieldNames = _reservedFieldNamesService.GetMemberReservedFieldNames(),
-        };
+        new();
 
     public MemberTypeConfigurationResponseModel CreateMemberTypeConfigurationResponseModel() =>
         new()
@@ -69,7 +65,6 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         {
             DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
-            ReservedFieldNames = _reservedFieldNamesService.GetMediaReservedFieldNames(),
         };
 
     public MediaTypeConfigurationResponseModel CreateMediaTypeConfigurationResponseModel() =>
