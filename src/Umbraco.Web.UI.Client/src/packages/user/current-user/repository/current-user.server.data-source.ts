@@ -1,23 +1,15 @@
 import type { UmbCurrentUserModel } from '../types.js';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the current user that fetches data from the server
  * @class UmbCurrentUserServerDataSource
  */
-export class UmbCurrentUserServerDataSource {
-	#host: UmbControllerHost;
-
-	/**
-	 * Creates an instance of UmbCurrentUserServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbCurrentUserServerDataSource
-	 */
-	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
+export class UmbCurrentUserServerDataSource extends UmbControllerBase {
+	#dataMapper = new UmbManagementApiDataMapper(this);
 
 	/**
 	 * Get the current user
@@ -25,9 +17,24 @@ export class UmbCurrentUserServerDataSource {
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getCurrentUser() {
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserService.getUserCurrent());
+		const { data, error } = await tryExecuteAndNotify(this, UserService.getUserCurrent());
 
 		if (data) {
+			const permissionDataPromises = data.permissions.map(async (item) => {
+				return this.#dataMapper.map({
+					forDataModel: item.$type,
+					data: item,
+					fallback: async () => {
+						return {
+							...item,
+							permissionType: 'unknown',
+						};
+					},
+				});
+			});
+
+			const permissions = await Promise.all(permissionDataPromises);
+
 			const user: UmbCurrentUserModel = {
 				allowedSections: data.allowedSections,
 				avatarUrls: data.avatarUrls,
@@ -51,7 +58,7 @@ export class UmbCurrentUserServerDataSource {
 					};
 				}),
 				name: data.name,
-				permissions: data.permissions,
+				permissions,
 				unique: data.id,
 				userName: data.userName,
 				userGroupUniques: data.userGroupIds.map((group) => group.id),
@@ -67,7 +74,7 @@ export class UmbCurrentUserServerDataSource {
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getExternalLoginProviders() {
-		return tryExecuteAndNotify(this.#host, UserService.getUserCurrentLoginProviders());
+		return tryExecuteAndNotify(this, UserService.getUserCurrentLoginProviders());
 	}
 
 	/**
@@ -75,7 +82,7 @@ export class UmbCurrentUserServerDataSource {
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getMfaLoginProviders() {
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserService.getUserCurrent2Fa());
+		const { data, error } = await tryExecuteAndNotify(this, UserService.getUserCurrent2Fa());
 
 		if (data) {
 			return { data };
@@ -127,7 +134,7 @@ export class UmbCurrentUserServerDataSource {
 	 */
 	async changePassword(newPassword: string, oldPassword: string) {
 		return tryExecuteAndNotify(
-			this.#host,
+			this,
 			UserService.postUserCurrentChangePassword({
 				requestBody: {
 					newPassword,
