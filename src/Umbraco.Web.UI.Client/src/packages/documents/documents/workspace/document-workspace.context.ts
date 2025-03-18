@@ -249,6 +249,8 @@ export class UmbDocumentWorkspaceContext
 	override resetState(): void {
 		super.resetState();
 		this.#isTrashedContext.setIsTrashed(false);
+		this.structure.propertyReadState.clear();
+		this.structure.propertyWriteState.clear();
 	}
 
 	override async load(unique: string) {
