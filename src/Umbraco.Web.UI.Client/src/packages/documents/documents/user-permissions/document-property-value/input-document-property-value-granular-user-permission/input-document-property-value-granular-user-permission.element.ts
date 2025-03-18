@@ -1,5 +1,6 @@
 import type { UmbDocumentPropertyValueUserPermissionModel as UmbDocumentPropertyValueUserPermissionModel } from '../types.js';
 import { UMB_DOCUMENT_PROPERTY_VALUE_GRANULAR_USER_PERMISSION_FLOW_MODAL } from '../document-property-value-granular-permission-flow-modal/index.js';
+import { UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_TYPE } from '../user-permission.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -70,7 +71,7 @@ export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends 
 
 			const permissionItem: UmbDocumentPropertyValueUserPermissionModel = {
 				$type: 'DocumentTypePropertyPermissionPresentationModel',
-				permissionType: 'document-property-value',
+				userPermissionType: UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_TYPE,
 				documentType: value.documentType,
 				propertyType: value.propertyType,
 				verbs: value.verbs,
