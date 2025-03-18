@@ -2,7 +2,16 @@ import type { UmbDocumentPropertyValueUserPermissionModel as UmbDocumentProperty
 import { UMB_DOCUMENT_PROPERTY_VALUE_GRANULAR_USER_PERMISSION_FLOW_MODAL } from '../document-property-value-granular-permission-flow-modal/index.js';
 import { UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_TYPE } from '../user-permission.js';
 import { UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '../../../entity.js';
-import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -211,7 +220,7 @@ export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends 
 
 		return html`
 			<uui-ref-node .name=${permissionName} .detail=${verbNames || ''} readonly>
-				<uui-icon slot="icon" name=${documentType!.icon}></uui-icon>
+				${documentType?.icon ? html`<uui-icon slot="icon" name=${ifDefined(documentType?.icon)}></uui-icon>` : nothing}
 				<uui-action-bar slot="actions"
 					>${this.#renderEditButton(permission)} ${this.#renderRemoveButton(permission)}</uui-action-bar
 				>
