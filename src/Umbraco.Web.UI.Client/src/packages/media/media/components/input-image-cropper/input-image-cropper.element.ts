@@ -1,11 +1,11 @@
 import type { UmbImageCropperPropertyEditorValue } from './types.js';
 import type { UmbInputImageCropperFieldElement } from './image-cropper-field.element.js';
-import { html, customElement, property, query, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, query, state, css, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
+import { UmbTemporaryFileConfigRepository, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
 import { assignToFrozenObject } from '@umbraco-cms/backoffice/observable-api';
 
 import './image-cropper.element.js';
@@ -50,7 +50,12 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	@state()
 	fileUnique?: string;
 
+	@state()
+	private _accept?: string;
+
 	#manager?: UmbTemporaryFileManager;
+
+	#temporaryFileConfig = new UmbTemporaryFileConfigRepository(this);
 
 	constructor() {
 		super();
@@ -67,6 +72,18 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 
 	protected override firstUpdated(): void {
 		this.#mergeCrops();
+		this.#observeAcceptedFileTypes();
+	}
+
+	async #observeAcceptedFileTypes() {
+		await this.#temporaryFileConfig.initialized;
+		this.observe(
+			this.#temporaryFileConfig.part('imageFileTypes'),
+			(imageFileTypes) => {
+				this._accept = imageFileTypes.join(',');
+			},
+			'_observeFileTypes',
+		);
 	}
 
 	#onUpload(e: UUIFileDropzoneEvent) {
@@ -131,7 +148,12 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 
 	#renderDropzone() {
 		return html`
-			<uui-file-dropzone id="dropzone" label="dropzone" @change="${this.#onUpload}" @click=${this.#onBrowse}>
+			<uui-file-dropzone
+				id="dropzone"
+				label="dropzone"
+				accept=${ifDefined(this._accept)}
+				@change="${this.#onUpload}"
+				@click=${this.#onBrowse}>
 				<uui-button label=${this.localize.term('media_clickToUpload')} @click="${this.#onBrowse}"></uui-button>
 			</uui-file-dropzone>
 		`;

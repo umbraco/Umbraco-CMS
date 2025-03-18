@@ -78,6 +78,7 @@ export class UmbTemporaryFileManager<
 	}
 
 	async #validateItem(item: UploadableItem): Promise<boolean> {
+		await this.#temporaryFileConfigRepository.initialized;
 		let maxFileSize = await this.observe(this.#temporaryFileConfigRepository.part('maxFileSize')).asPromise();
 		if (maxFileSize) {
 			// Convert from kilobytes to bytes
