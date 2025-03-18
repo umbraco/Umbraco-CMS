@@ -1,3 +1,4 @@
+import { UmbBubbleMenuPlugin } from './tiptap-umb-bubble-menu.extension.js';
 import { CellSelection, TableMap } from '@tiptap/pm/tables';
 import { Decoration, DecorationSet, EditorView } from '@tiptap/pm/view';
 import { EditorState, Plugin, Selection, Transaction } from '@tiptap/pm/state';
@@ -7,9 +8,7 @@ import { Table } from '@tiptap/extension-table';
 import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
 import { TableRow } from '@tiptap/extension-table-row';
-import type { PluginView } from '@tiptap/pm/state';
 import type { Rect } from '@tiptap/pm/tables';
-import type { UUIPopoverContainerElement } from '@umbraco-ui/uui';
 
 export const UmbTable = Table.configure({ resizable: true });
 
@@ -44,9 +43,12 @@ export const UmbTableHeader = TableHeader.extend({
 	addProseMirrorPlugins() {
 		const { editor } = this;
 		return [
-			new Plugin({
-				view(editorView) {
-					return new UmbTableColumnMenuPlugin(editor, editorView);
+			UmbBubbleMenuPlugin(this.editor, {
+				unique: 'table-column-menu',
+				placement: 'top',
+				elementName: 'umb-tiptap-table-column-menu',
+				shouldShow(props) {
+					return isColumnGripSelected(props);
 				},
 			}),
 			new Plugin({
@@ -67,15 +69,11 @@ export const UmbTableHeader = TableHeader.extend({
 								decorations.push(
 									Decoration.widget(pos + 1, () => {
 										const colSelected = isColumnSelected(index)(selection);
-										const className = colSelected ? 'grip-column selected' : 'grip-column';
-
-										const menu = document.createElement('h4');
-										menu.textContent = 'Column Menu';
 
 										const grip = document.createElement('a');
 										grip.appendChild(document.createElement('uui-symbol-more'));
 
-										grip.className = className;
+										grip.className = colSelected ? 'grip-column selected' : 'grip-column';
 										grip.setAttribute('popovertarget', colSelected ? 'table-column-menu' : '');
 
 										grip.addEventListener('mousedown', (event) => {
@@ -97,44 +95,6 @@ export const UmbTableHeader = TableHeader.extend({
 		];
 	},
 });
-
-class UmbTableColumnMenuPlugin implements PluginView {
-	editor: Editor;
-	tooltip: UUIPopoverContainerElement;
-
-	constructor(editor: Editor, view: EditorView) {
-		this.editor = editor;
-
-		this.tooltip = document.createElement('uui-popover-container') as UUIPopoverContainerElement;
-		this.tooltip.id = 'table-column-menu';
-		this.tooltip.setAttribute('placement', 'top');
-		this.tooltip.setAttribute('popover', 'manual');
-
-		const menu = document.createElement('umb-tiptap-table-column-menu');
-		menu.editor = editor;
-		this.tooltip.appendChild(menu);
-
-		view.dom.parentNode?.appendChild(this.tooltip);
-
-		this.update(view, null);
-	}
-
-	update(view: EditorView, prevState: EditorState | null) {
-		const editor = this.editor;
-		const { state } = view;
-		const { from } = state.selection;
-
-		if (isColumnGripSelected({ editor, view, state, from })) {
-			this.tooltip.showPopover();
-		} else {
-			this.tooltip.hidePopover();
-		}
-	}
-
-	destroy() {
-		this.tooltip.remove();
-	}
-}
 
 export const UmbTableCell = TableCell.extend({
 	addAttributes() {
@@ -173,7 +133,16 @@ export const UmbTableCell = TableCell.extend({
 	},
 
 	addProseMirrorPlugins() {
+		const { editor } = this;
 		return [
+			UmbBubbleMenuPlugin(this.editor, {
+				unique: 'table-row-menu',
+				placement: 'left',
+				elementName: 'umb-tiptap-table-row-menu',
+				shouldShow(props) {
+					return isRowGripSelected(props);
+				},
+			}),
 			new Plugin({
 				props: {
 					decorations: (state) => {
@@ -192,12 +161,13 @@ export const UmbTableCell = TableCell.extend({
 								decorations.push(
 									Decoration.widget(pos + 1, () => {
 										const rowSelected = isRowSelected(index)(selection);
-										const className = rowSelected ? 'grip-row selected' : 'grip-row';
 
 										const grip = document.createElement('a');
 										grip.appendChild(document.createElement('uui-symbol-more'));
 
-										grip.className = className;
+										grip.className = rowSelected ? 'grip-row selected' : 'grip-row';
+										grip.setAttribute('popovertarget', rowSelected ? 'table-row-menu' : '');
+
 										grip.addEventListener('mousedown', (event) => {
 											event.preventDefault();
 											event.stopImmediatePropagation();

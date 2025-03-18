@@ -1,9 +1,9 @@
 import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
+import type { Editor, UmbTiptapBubbleMenuElement } from '@umbraco-cms/backoffice/external/tiptap';
 
 @customElement('umb-tiptap-table-column-menu')
-export class UmbTableColumnMenuElement extends UmbLitElement {
+export class UmbTiptapTableColumnMenuElement extends UmbLitElement implements UmbTiptapBubbleMenuElement {
 	@property({ attribute: false })
 	editor?: Editor;
 
@@ -41,10 +41,10 @@ export class UmbTableColumnMenuElement extends UmbLitElement {
 	];
 }
 
-export { UmbTableColumnMenuElement as element };
+export default UmbTiptapTableColumnMenuElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tiptap-table-column-menu': UmbTableColumnMenuElement;
+		'umb-tiptap-table-column-menu': UmbTiptapTableColumnMenuElement;
 	}
 }
