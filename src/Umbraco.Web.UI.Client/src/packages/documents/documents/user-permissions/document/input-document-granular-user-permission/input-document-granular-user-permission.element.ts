@@ -1,7 +1,7 @@
 import type { UmbDocumentUserPermissionModel } from '../types.js';
-import { UmbDocumentItemRepository } from '../../item/index.js';
-import type { UmbDocumentItemModel } from '../../item/types.js';
-import { UMB_DOCUMENT_PICKER_MODAL } from '../../constants.js';
+import { UmbDocumentItemRepository } from '../../../item/index.js';
+import type { UmbDocumentItemModel } from '../../../item/types.js';
+import { UMB_DOCUMENT_PICKER_MODAL } from '../../../constants.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
