@@ -69,7 +69,8 @@ export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends 
 			if (!value) throw new Error('No result from modal');
 
 			const permissionItem: UmbDocumentPropertyValueUserPermissionModel = {
-				$type: 'DocumentPropertyValuePermissionPresentationModel',
+				$type: 'DocumentTypePropertyPermissionPresentationModel',
+				permissionType: 'document-property-value',
 				documentType: value.documentType,
 				propertyType: value.propertyType,
 				verbs: value.verbs,
