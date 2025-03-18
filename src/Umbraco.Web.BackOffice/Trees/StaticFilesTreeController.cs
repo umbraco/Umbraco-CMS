@@ -98,16 +98,6 @@ public class StaticFilesTreeController : TreeController
 
     private void AddPhysicalFiles(string path, FormCollection queryStrings, TreeNodeCollection nodes)
     {
-        IEnumerable<string> files = _fileSystem.GetFiles(path)
-            .Where(x => x.StartsWith(AppPlugins) || x.StartsWith(Webroot));
-
-        foreach (var file in files)
-        {
-            var name = Path.GetFileName(file);
-            TreeNode node = CreateTreeNode(WebUtility.UrlEncode(file), path, queryStrings, name, Constants.Icons.DefaultIcon, false);
-            nodes.Add(node);
-        }
-
         IEnumerable<string> directories = _fileSystem.GetDirectories(path);
 
         foreach (var directory in directories)
@@ -115,6 +105,16 @@ public class StaticFilesTreeController : TreeController
             var hasChildren = _fileSystem.GetFiles(directory).Any() || _fileSystem.GetDirectories(directory).Any();
             var name = Path.GetFileName(directory);
             TreeNode node = CreateTreeNode(WebUtility.UrlEncode(directory), path, queryStrings, name, Constants.Icons.Folder, hasChildren);
+            nodes.Add(node);
+        }
+
+        IEnumerable<string> files = _fileSystem.GetFiles(path)
+            .Where(x => x.StartsWith(AppPlugins) || x.StartsWith(Webroot));
+
+        foreach (var file in files)
+        {
+            var name = Path.GetFileName(file);
+            TreeNode node = CreateTreeNode(WebUtility.UrlEncode(file), path, queryStrings, name, Constants.Icons.DefaultIcon, false);
             nodes.Add(node);
         }
     }
