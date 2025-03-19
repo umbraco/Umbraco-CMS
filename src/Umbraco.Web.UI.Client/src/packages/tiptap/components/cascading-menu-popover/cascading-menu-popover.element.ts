@@ -55,7 +55,7 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 			<uui-scroll-container>
 				${when(
 					this.items?.length,
-					() => html` ${repeat(this.items!, (item, index) => this.#renderItem(item, index))} ${super.render()} `,
+					() => html`${repeat(this.items!, (item, index) => this.#renderItem(item, index))} ${super.render()}`,
 					() => super.render(),
 				)}
 			</uui-scroll-container>
@@ -63,11 +63,13 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 	}
 
 	#renderItem(item: UmbCascadingMenuItem, index: number) {
-		const element = item.element;
 		const popoverId = `item-${index}`;
+
+		const element = item.element;
 		if (element) {
 			element.setAttribute('popovertarget', popoverId);
 		}
+
 		return html`
 			<div
 				@mouseenter=${() => this.#onMouseEnter(item, popoverId)}
@@ -100,7 +102,7 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 			:host {
 				--uui-menu-item-flat-structure: 1;
 
-				background: var(--uui-color-surface);
+				background-color: var(--uui-color-surface);
 				border-radius: var(--uui-border-radius);
 				box-shadow: var(--uui-shadow-depth-3);
 				padding: var(--uui-size-space-1);

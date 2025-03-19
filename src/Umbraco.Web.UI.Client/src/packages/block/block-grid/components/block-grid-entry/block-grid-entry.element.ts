@@ -446,7 +446,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	override render() {
-		return this.contentKey
+		return this.contentKey && (this._contentTypeAlias || this._unsupported)
 			? html`
 					${this.#renderCreateBeforeInlineButton()}
 					<div class="umb-block-grid__block" part="umb-block-grid__block">

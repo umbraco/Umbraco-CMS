@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Security.OperationStatus;
 
@@ -20,7 +20,7 @@ public abstract class ClientCredentialsUserControllerBase : UserControllerBase
                 .Build()),
             BackOfficeUserClientCredentialsOperationStatus.InvalidClientId => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid client ID")
-                .WithDetail("The specified client ID is invalid. A valid client ID can only contain [a-z], [A-Z], [0-9], and [-._~]. Furthermore, including the prefix it cannot be longer than 255 characters.")
+                .WithDetail("The specified client ID is invalid. A valid client ID can only contain [a-z], [A-Z], [0-9], and [-._~]. Furthermore, including the prefix it cannot be longer than 100 characters.")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown client credentials operation status.")
