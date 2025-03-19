@@ -7,12 +7,12 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTemporaryFileConfigRepository, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
 import { assignToFrozenObject } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 import './image-cropper.element.js';
 import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
 import './image-cropper-field.element.js';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 const DefaultFocalPoint = { left: 0.5, top: 0.5 };
 const DefaultValue = {
@@ -53,13 +53,12 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	@state()
 	private _accept?: string;
 
-	#manager?: UmbTemporaryFileManager;
+	#manager = new UmbTemporaryFileManager(this);
 
 	#temporaryFileConfig = new UmbTemporaryFileConfigRepository(this);
 
 	constructor() {
 		super();
-		this.#manager = new UmbTemporaryFileManager(this);
 
 		this.addValidator(
 			'valueMissing',
