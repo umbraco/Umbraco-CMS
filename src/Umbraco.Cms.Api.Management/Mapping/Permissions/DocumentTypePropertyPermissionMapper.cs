@@ -54,13 +54,8 @@ public class DocumentTypePropertyPermissionMapper : IPermissionPresentationMappe
             yield break;
         }
 
-        foreach (var verb in documentTypePermissionPresentationModel.Verbs)
+        foreach (var verb in documentTypePermissionPresentationModel.Verbs.Distinct().DefaultIfEmpty(string.Empty))
         {
-            if (string.IsNullOrEmpty(verb))
-            {
-                continue;
-            }
-
             yield return new DocumentTypePropertyGranularPermission
             {
                 Key = documentTypePermissionPresentationModel.DocumentType.Id,
