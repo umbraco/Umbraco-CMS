@@ -4,7 +4,6 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UmbArrayState,
 	UmbBasicState,
-	UmbBooleanState,
 	UmbClassState,
 	UmbDeepState,
 	UmbObjectState,
@@ -22,7 +21,7 @@ import type {
 	UmbPropertyTypeAppearanceModel,
 	UmbPropertyTypeValidationModel,
 } from '@umbraco-cms/backoffice/content-type';
-import { UmbReadOnlyStateManager, UmbStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbReadOnlyStateManager } from '@umbraco-cms/backoffice/utils';
 
 export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPropertyContext<ValueType>> {
 	#alias = new UmbStringState(undefined);
