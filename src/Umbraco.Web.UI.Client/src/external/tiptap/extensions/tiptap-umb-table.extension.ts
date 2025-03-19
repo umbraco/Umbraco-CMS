@@ -1,11 +1,9 @@
+import { UmbBubbleMenuPlugin } from './tiptap-umb-bubble-menu.extension.js';
 import { CellSelection, TableMap } from '@tiptap/pm/tables';
-import { Decoration, DecorationSet } from '@tiptap/pm/view';
-import { EditorState } from '@tiptap/pm/state';
-import { EditorView } from '@tiptap/pm/view';
-import { findParentNode, mergeAttributes, Editor, Node } from '@tiptap/core';
+import { Decoration, DecorationSet, EditorView } from '@tiptap/pm/view';
+import { EditorState, Plugin, Selection, Transaction } from '@tiptap/pm/state';
+import { findParentNode, Editor } from '@tiptap/core';
 import { Node as PMNode, ResolvedPos } from '@tiptap/pm/model';
-import { Plugin } from '@tiptap/pm/state';
-import { Selection, Transaction } from '@tiptap/pm/state';
 import { Table } from '@tiptap/extension-table';
 import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
@@ -43,7 +41,16 @@ export const UmbTableHeader = TableHeader.extend({
 	},
 
 	addProseMirrorPlugins() {
+		const { editor } = this;
 		return [
+			UmbBubbleMenuPlugin(this.editor, {
+				unique: 'table-column-menu',
+				placement: 'top',
+				elementName: 'umb-tiptap-table-column-menu',
+				shouldShow(props) {
+					return isColumnGripSelected(props);
+				},
+			}),
 			new Plugin({
 				props: {
 					decorations: (state) => {
@@ -62,16 +69,16 @@ export const UmbTableHeader = TableHeader.extend({
 								decorations.push(
 									Decoration.widget(pos + 1, () => {
 										const colSelected = isColumnSelected(index)(selection);
-										const className = colSelected ? 'grip-column selected' : 'grip-column';
 
 										const grip = document.createElement('a');
 										grip.appendChild(document.createElement('uui-symbol-more'));
 
-										grip.className = className;
+										grip.className = colSelected ? 'grip-column selected' : 'grip-column';
+										grip.setAttribute('popovertarget', colSelected ? 'table-column-menu' : '');
+
 										grip.addEventListener('mousedown', (event) => {
 											event.preventDefault();
 											event.stopImmediatePropagation();
-
 											this.editor.view.dispatch(selectColumn(index)(this.editor.state.tr));
 										});
 
@@ -126,7 +133,16 @@ export const UmbTableCell = TableCell.extend({
 	},
 
 	addProseMirrorPlugins() {
+		const { editor } = this;
 		return [
+			UmbBubbleMenuPlugin(this.editor, {
+				unique: 'table-row-menu',
+				placement: 'left',
+				elementName: 'umb-tiptap-table-row-menu',
+				shouldShow(props) {
+					return isRowGripSelected(props);
+				},
+			}),
 			new Plugin({
 				props: {
 					decorations: (state) => {
@@ -145,12 +161,13 @@ export const UmbTableCell = TableCell.extend({
 								decorations.push(
 									Decoration.widget(pos + 1, () => {
 										const rowSelected = isRowSelected(index)(selection);
-										const className = rowSelected ? 'grip-row selected' : 'grip-row';
 
 										const grip = document.createElement('a');
 										grip.appendChild(document.createElement('uui-symbol-more'));
 
-										grip.className = className;
+										grip.className = rowSelected ? 'grip-row selected' : 'grip-row';
+										grip.setAttribute('popovertarget', rowSelected ? 'table-row-menu' : '');
+
 										grip.addEventListener('mousedown', (event) => {
 											event.preventDefault();
 											event.stopImmediatePropagation();
@@ -449,7 +466,7 @@ const isColumnGripSelected = ({
 	return !!gripColumn;
 };
 
-export const isRowGripSelected = ({
+const isRowGripSelected = ({
 	editor,
 	view,
 	state,
