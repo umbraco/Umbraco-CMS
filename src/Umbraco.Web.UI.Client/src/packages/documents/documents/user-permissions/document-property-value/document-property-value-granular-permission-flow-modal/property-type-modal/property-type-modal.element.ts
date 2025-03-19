@@ -23,6 +23,9 @@ export class UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModal
 	@state()
 	_selectedItem: UmbPropertyTypeModel | null = null;
 
+	@state()
+	_pickableFilter: (propertyType: UmbPropertyTypeModel) => boolean = () => true;
+
 	#detailRepository = new UmbDocumentTypeDetailRepository(this);
 
 	#onItemSelected(event: CustomEvent, item: UmbPropertyTypeModel) {
@@ -39,6 +42,8 @@ export class UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModal
 		if (!this.data?.documentType?.unique) {
 			throw new Error('Document type unique is required');
 		}
+
+		this._pickableFilter = this.data.pickableFilter ?? this._pickableFilter;
 
 		const { data } = await this.#detailRepository.requestByUnique(this.data.documentType.unique);
 		this._documentTypeProperties = data?.properties ?? [];
@@ -105,11 +110,12 @@ export class UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModal
 								<uui-ref-node
 									name=${item.name ?? ''}
 									detail=${this.#getItemDetail(item)}
-									selectable
+									?selectable=${this._pickableFilter(item)}
 									select-only
 									@selected=${(event: CustomEvent) => this.#onItemSelected(event, item)}
 									@deselected=${(event: CustomEvent) => this.#onItemDeselected(event)}
-									?selected=${this._selectedItem?.unique === item.unique}>
+									?selected=${this._selectedItem?.unique === item.unique}
+									?disabled=${!this._pickableFilter(item)}>
 									<uui-icon slot="icon" name="icon-settings"></uui-icon>
 								</uui-ref-node>
 							`,
