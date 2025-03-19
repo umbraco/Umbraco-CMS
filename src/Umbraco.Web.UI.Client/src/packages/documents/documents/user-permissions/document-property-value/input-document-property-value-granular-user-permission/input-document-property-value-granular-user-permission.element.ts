@@ -219,7 +219,7 @@ export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends 
 
 		const documentType = this._documentTypes?.find((item) => item.unique === permission.documentType.unique);
 		const propertyType = documentType?.properties.find((item) => item.unique === permission.propertyType.unique);
-		const permissionName = `${documentType?.name}: ${propertyType?.name}`;
+		const permissionName = `${documentType?.name}: ${propertyType?.name} (${propertyType?.alias})`;
 		const verbNames = this.#getVerbNamesForPermission(permission);
 
 		return html`
