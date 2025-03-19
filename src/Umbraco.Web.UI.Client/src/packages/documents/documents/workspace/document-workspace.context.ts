@@ -17,18 +17,10 @@ import {
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, UmbDocumentPublishingRepository } from '../publishing/index.js';
 import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
-import {
-	UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ,
-	UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE,
-} from '../user-permissions/document-property-value/constants.js';
-import { UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_CONDITION_ALIAS } from '../user-permissions/document-property-value/conditions/constants.js';
+import {} from '../user-permissions/document-property-value/constants.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import {
-	UMB_INVARIANT_CULTURE,
-	UmbVariantId,
-	type UmbVariantPropertyWriteState,
-} from '@umbraco-cms/backoffice/variant';
+import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	type UmbPublishableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
@@ -46,7 +38,6 @@ import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -186,84 +177,6 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		]);
-
-		this.observe(
-			observeMultiple([this.structure.contentTypeProperties, this.variantOptions]),
-			([properties, variantOptions]) => {
-				if (properties.length === 0) return;
-				if (variantOptions.length === 0) return;
-
-				properties.forEach((property) => {
-					createExtensionApiByAlias(this, UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_CONDITION_ALIAS, [
-						{
-							config: {
-								allOf: [UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ],
-								match: {
-									propertyType: {
-										unique: property.unique,
-									},
-								},
-							},
-							onChange: (permitted: boolean) => {
-								const variantIds = variantOptions?.map((variant) => new UmbVariantId(variant.culture, variant.segment));
-
-								const states: Array<UmbVariantPropertyWriteState> =
-									variantIds?.map((variantId) => {
-										return {
-											unique: 'UMB_PROPERTY_' + property.unique + '_' + variantId.toString(),
-											message: '',
-											propertyType: {
-												unique: property.unique,
-												variantId,
-											},
-										};
-									}) || [];
-
-								if (permitted) {
-									this.structure.propertyReadState.addStates(states);
-								} else {
-									this.structure.propertyReadState.removeStates(states.map((state) => state.unique));
-								}
-							},
-						},
-					]);
-
-					createExtensionApiByAlias(this, UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_CONDITION_ALIAS, [
-						{
-							config: {
-								allOf: [UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE],
-								match: {
-									propertyType: {
-										unique: property.unique,
-									},
-								},
-							},
-							onChange: (permitted: boolean) => {
-								const variantIds = variantOptions?.map((variant) => new UmbVariantId(variant.culture, variant.segment));
-
-								const states: Array<UmbVariantPropertyWriteState> =
-									variantIds?.map((variantId) => {
-										return {
-											unique: 'UMB_PROPERTY_' + property.unique + '_' + variantId.toString(),
-											message: '',
-											propertyType: {
-												unique: property.unique,
-												variantId,
-											},
-										};
-									}) || [];
-
-								if (permitted) {
-									this.structure.propertyWriteState.addStates(states);
-								} else {
-									this.structure.propertyWriteState.removeStates(states.map((state) => state.unique));
-								}
-							},
-						},
-					]);
-				});
-			},
-		);
 	}
 
 	override resetState(): void {

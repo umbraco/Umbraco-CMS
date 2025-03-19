@@ -6,6 +6,7 @@ import {
 import { manifests as documentPropertyValueGranularPermissionFlowModalManifests } from './document-property-value-granular-permission-flow-modal/manifests.js';
 import { manifests as conditionManifests } from './conditions/manifests.js';
 import { manifests as dataManifests } from './data/manifests.js';
+import { manifests as workspaceContextManifests } from './workspace-context/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -48,7 +49,8 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			description: 'Assign Permissions to Document property values',
 		},
 	},
-	...documentPropertyValueGranularPermissionFlowModalManifests,
 	...conditionManifests,
 	...dataManifests,
+	...documentPropertyValueGranularPermissionFlowModalManifests,
+	...workspaceContextManifests,
 ];
