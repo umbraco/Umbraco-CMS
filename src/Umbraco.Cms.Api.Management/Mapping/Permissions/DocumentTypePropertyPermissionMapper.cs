@@ -41,7 +41,10 @@ public class DocumentTypePropertyPermissionMapper : IPermissionPresentationMappe
                 {
                     DocumentType = new ReferenceByIdModel(documentTypeGroup.Key),
                     PropertyType = new ReferenceByIdModel(propertyTypeGroup.Key),
-                    Verbs = propertyTypeGroup.Select(x => x.Verb).ToHashSet(),
+                    Verbs = propertyTypeGroup
+                        .Select(x => x.Verb)
+                        .Where(verb => verb.IsNullOrWhiteSpace() is false)
+                        .ToHashSet(),
                 };
             }
         }
