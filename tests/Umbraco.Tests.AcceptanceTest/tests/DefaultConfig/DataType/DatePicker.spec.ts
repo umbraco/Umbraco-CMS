@@ -47,7 +47,7 @@ for (const datePickerType of datePickerTypes) {
             ];
 
       // Act
-      await umbracoUi.dataType.clickOffsetTimeSlider();
+      await umbracoUi.dataType.clickOffsetTimeToggle();
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert

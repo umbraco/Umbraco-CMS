@@ -360,7 +360,7 @@ test('can set is mandatory for a property in a document type', {tag: '@smoke'}, 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickEditorSettingsButton();
-  await umbracoUi.documentType.clickMandatorySlider();
+  await umbracoUi.documentType.clickMandatoryToggle();
   await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickSaveButton();
 
@@ -397,13 +397,13 @@ test('can enable validation for a property in a document type', async ({umbracoA
 test('can allow vary by culture for a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName, false);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName, true);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickEditorSettingsButton();
-  await umbracoUi.documentType.clickVaryByCultureSlider();
+  await umbracoUi.documentType.clickVaryByCultureToggle();
   await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickSaveButton();
 

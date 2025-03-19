@@ -229,7 +229,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			unique,
 			variantIds,
 			result.includeUnpublishedDescendants ?? false,
-			result.forceRepublish ?? false,
 		);
 
 		if (!error) {

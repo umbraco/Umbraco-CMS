@@ -260,7 +260,7 @@ public class SliderPropertyEditor : DataEditor
                         ["value"]);
                 }
 
-                if (sliderRange.To > sliderConfiguration.MaximumValue)
+                if (sliderConfiguration.MaximumValue != 0 && sliderRange.To > sliderConfiguration.MaximumValue)
                 {
                     yield return new ValidationResult(
                         LocalizedTextService.Localize("validation", "outOfRangeMaximum", [sliderRange.To.ToString(), sliderConfiguration.MaximumValue.ToString()]),
