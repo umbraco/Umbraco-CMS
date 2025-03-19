@@ -645,12 +645,11 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 	},
 ];
 
-const extensions = [
+export const manifests = [
+	...kinds,
 	...coreExtensions,
 	...toolbarExtensions,
 	...blockExtensions,
 	...styleSelectExtensions,
 	...tableExtensions,
 ];
-
-export const manifests = [...kinds, ...extensions];
