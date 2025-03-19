@@ -24,7 +24,12 @@ import {
 import { UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_CONDITION_ALIAS } from '../user-permissions/document-property-value/conditions/constants.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import {
+	UMB_INVARIANT_CULTURE,
+	UmbVariantId,
+	type UmbVariantPropertyReadState,
+	type UmbVariantPropertyWriteState,
+} from '@umbraco-cms/backoffice/variant';
 import {
 	type UmbPublishableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
@@ -195,19 +200,25 @@ export class UmbDocumentWorkspaceContext
 							},
 						},
 						onChange: (permitted: boolean) => {
-							const unique = 'UMB_PROPERTY_UNIQUE_' + property.unique;
+							const variantOptions = this.getVariants();
+							const variantIds = variantOptions?.map((variant) => new UmbVariantId(variant.culture, variant.segment));
+
+							const states: Array<UmbVariantPropertyWriteState> =
+								variantIds?.map((variantId) => {
+									return {
+										unique: 'UMB_PROPERTY_' + property.unique + '_' + variantId.toString(),
+										message: '',
+										propertyType: {
+											unique: property.unique,
+											variantId,
+										},
+									};
+								}) || [];
 
 							if (permitted) {
-								const state = {
-									unique,
-									message: '',
-									propertyType: {
-										unique: property.unique,
-									},
-								};
-								this.structure.propertyReadState.addState(state);
+								this.structure.propertyReadState.addStates(states);
 							} else {
-								this.structure.propertyReadState.removeState(unique);
+								this.structure.propertyReadState.removeStates(states.map((state) => state.unique));
 							}
 						},
 					},
@@ -224,20 +235,25 @@ export class UmbDocumentWorkspaceContext
 							},
 						},
 						onChange: (permitted: boolean) => {
-							const unique = 'UMB_PROPERTY_UNIQUE_' + property.unique;
+							const variantOptions = this.getVariants();
+							const variantIds = variantOptions?.map((variant) => new UmbVariantId(variant.culture, variant.segment));
+
+							const states: Array<UmbVariantPropertyWriteState> =
+								variantIds?.map((variantId) => {
+									return {
+										unique: 'UMB_PROPERTY_' + property.unique + '_' + variantId.toString(),
+										message: '',
+										propertyType: {
+											unique: property.unique,
+											variantId,
+										},
+									};
+								}) || [];
 
 							if (permitted) {
-								const state = {
-									unique,
-									message: '',
-									propertyType: {
-										unique: property.unique,
-									},
-								};
-
-								this.structure.propertyWriteState.addState(state);
+								this.structure.propertyWriteState.addStates(states);
 							} else {
-								this.structure.propertyWriteState.removeState(unique);
+								this.structure.propertyWriteState.removeStates(states.map((state) => state.unique));
 							}
 						},
 					},
