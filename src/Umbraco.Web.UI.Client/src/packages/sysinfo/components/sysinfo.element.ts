@@ -65,9 +65,25 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 				name: 'User languages',
 				data: currentUser.hasAccessToAllLanguages ? 'All' : currentUser.languages.join(', '),
 			});
+			let userDocumentAccess = 'None';
+			if (currentUser.hasDocumentRootAccess) {
+				userDocumentAccess = 'All';
+			} else if (currentUser.documentStartNodeUniques.length) {
+				userDocumentAccess = currentUser.documentStartNodeUniques.join(', ');
+			}
 			this.#serverKeyValues.push({
-				name: 'User document start nodes',
-				data: currentUser.documentStartNodeUniques.length ? currentUser.documentStartNodeUniques.join(', ') : 'None',
+				name: 'User Document access',
+				data: userDocumentAccess,
+			});
+			let userMediaAccess = 'None';
+			if (currentUser.hasMediaRootAccess) {
+				userMediaAccess = 'All';
+			} else if (currentUser.mediaStartNodeUniques.length) {
+				userMediaAccess = currentUser.mediaStartNodeUniques.join(', ');
+			}
+			this.#serverKeyValues.push({
+				name: 'User Media access',
+				data: userMediaAccess,
 			});
 		}
 

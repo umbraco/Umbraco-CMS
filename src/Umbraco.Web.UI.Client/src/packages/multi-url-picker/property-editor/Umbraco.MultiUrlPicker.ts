@@ -24,8 +24,8 @@ export const manifest: ManifestPropertyEditorSchema = {
 				},
 				{
 					alias: 'ignoreUserStartNodes',
-					label: 'Ignore user start nodes',
-					description: 'Selecting this option allows a user to choose nodes that they normally dont have access to.',
+					label: 'Ignore user access',
+					description: 'allow users to choose items exceeding their access.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],

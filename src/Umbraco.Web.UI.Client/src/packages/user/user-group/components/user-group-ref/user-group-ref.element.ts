@@ -174,7 +174,7 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 		return html`
 			<div>
 				<small>
-					<strong><umb-localize key="user_startnode">Document Start Node</umb-localize>:</strong>
+					<strong><umb-localize key="user_startnode">Document access</umb-localize>:</strong>
 					${this.documentRootAccess ? this.localize.term('contentTypeEditor_allDocuments') : this._documentLabel}
 				</small>
 			</div>
@@ -186,7 +186,7 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 		return html`
 			<div>
 				<small>
-					<strong><umb-localize key="user_mediastartnode">Media Start Node</umb-localize>:</strong>
+					<strong><umb-localize key="user_mediastartnode">Media access</umb-localize>:</strong>
 					${this.mediaRootAccess ? this.localize.term('contentTypeEditor_allMediaItems') : this._mediaLabel}
 				</small>
 			</div>

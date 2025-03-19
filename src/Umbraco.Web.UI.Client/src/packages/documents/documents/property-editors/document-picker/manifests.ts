@@ -16,7 +16,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 				properties: [
 					{
 						alias: 'startNodeId',
-						label: 'Start node',
+						label: 'Limit access',
 						description: '',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker',
 						config: [
