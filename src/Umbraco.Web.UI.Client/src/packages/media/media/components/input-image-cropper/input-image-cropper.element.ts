@@ -5,7 +5,7 @@ import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTemporaryFileConfigRepository, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
+import { UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
 import { assignToFrozenObject } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
@@ -58,8 +58,6 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 
 	#manager = new UmbTemporaryFileManager(this);
 
-	#temporaryFileConfig = new UmbTemporaryFileConfigRepository(this);
-
 	constructor() {
 		super();
 
@@ -78,9 +76,9 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	}
 
 	async #observeAcceptedFileTypes() {
-		await this.#temporaryFileConfig.initialized;
+		const config = await this.#manager.getConfiguration();
 		this.observe(
-			this.#temporaryFileConfig.part('imageFileTypes'),
+			config.part('imageFileTypes'),
 			(imageFileTypes) => {
 				this._accept = imageFileTypes.join(',');
 				this._loading = false;
