@@ -55,7 +55,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 * @param translator
 	 */
 	async addTranslator(translator: UmbValidationMessageTranslator) {
-		this.messages.addTranslator(translator);
+		this.messages?.addTranslator(translator);
 	}
 
 	/**
@@ -119,55 +119,58 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 				this.setTranslationData(data);
 			});
 
-			this.observe(
-				parent.messages.messagesOfPathAndDescendant(dataPath),
-				(msgs) => {
-					//this.messages.appendMessages(msgs);
-					if (this.#parentMessages) {
-						// Remove the local messages that does not exist in the parent anymore:
-						const toRemove = this.#parentMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
-						this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
-					}
-					this.#parentMessages = msgs;
-					msgs.forEach((msg) => {
-						const path = ReplaceStartOfPath(msg.path, this.#baseDataPath!, '$');
-						if (path === undefined) {
-							throw new Error(
-								'Path was not transformed correctly and can therefor not be transfered to the local validation context messages.',
-							);
+			if (parent.messages) {
+				this.observe(
+					parent.messages.messagesOfPathAndDescendant(dataPath),
+					(msgs) => {
+						//this.messages.appendMessages(msgs);
+						if (this.#parentMessages) {
+							// Remove the local messages that does not exist in the parent anymore:
+							const toRemove = this.#parentMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
+							this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
 						}
-						// Notice, the local message uses the same key. [NL]
-						this.messages.addMessage(msg.type, path, msg.body, msg.key);
-					});
-				},
-				'observeParentMessages',
-			);
+						this.#parentMessages = msgs;
+						msgs.forEach((msg) => {
+							const path = ReplaceStartOfPath(msg.path, this.#baseDataPath!, '$');
+							if (path === undefined) {
+								throw new Error(
+									'Path was not transformed correctly and can therefor not be transferred to the local validation context messages.',
+								);
+							}
+							// Notice, the local message uses the same key. [NL]
+							this.messages.addMessage(msg.type, path, msg.body, msg.key);
+						});
+					},
+					'observeParentMessages',
+				);
 
-			this.observe(
-				this.messages.messages,
-				(msgs) => {
-					if (!this.#parent) return;
-					//this.messages.appendMessages(msgs);
-					if (this.#localMessages) {
-						// Remove the parent messages that does not exist locally anymore:
-						const toRemove = this.#localMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
-						this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
-					}
-					this.#localMessages = msgs;
-					msgs.forEach((msg) => {
-						// replace this.#baseDataPath (if it starts with it) with $ in the path, so it becomes relative to the parent context
-						const path = ReplaceStartOfPath(msg.path, '$', this.#baseDataPath!);
-						if (path === undefined) {
-							throw new Error(
-								'Path was not transformed correctly and can therefor not be synced with parent messages.',
-							);
+				this.observe(
+					this.messages.messages,
+					(msgs) => {
+						if (!this.#parent) return;
+						//this.messages.appendMessages(msgs);
+						if (this.#localMessages) {
+							// Remove the parent messages that does not exist locally anymore:
+							const toRemove = this.#localMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
+							this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
 						}
-						// Notice, the parent message uses the same key. [NL]
-						this.#parent!.messages.addMessage(msg.type, path, msg.body, msg.key);
-					});
-				},
-				'observeLocalMessages',
-			);
+						this.#localMessages = msgs;
+						msgs.forEach((msg) => {
+							// replace this.#baseDataPath (if it starts with it) with $ in the path, so it becomes relative to the parent context
+							const path = ReplaceStartOfPath(msg.path, '$', this.#baseDataPath!);
+							if (path === undefined) {
+								throw new Error(
+									'Path was not transformed correctly and can therefor not be synced with parent messages.',
+								);
+							}
+							// Notice, the parent message uses the same key. [NL]
+							this.#parent!.messages.addMessage(msg.type, path, msg.body, msg.key);
+						});
+					},
+					'observeLocalMessages',
+				);
+			}
+
 		}).skipHost();
 		// Notice skipHost ^^, this is because we do not want it to consume it self, as this would be a match for this consumption, instead we will look at the parent and above. [NL]
 	}

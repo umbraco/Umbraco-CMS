@@ -14,7 +14,7 @@ export class UmbObserveValidationStateController extends UmbControllerBase {
 		super(host, controllerAlias ?? 'observeValidationState_' + dataPath);
 		if (dataPath) {
 			this.consumeContext(UMB_VALIDATION_CONTEXT, (context) => {
-				this.observe(context.messages.hasMessagesOfPathAndDescendant(dataPath), callback, ObserveSymbol);
+				this.observe(context.messages?.hasMessagesOfPathAndDescendant(dataPath), callback, ObserveSymbol);
 			});
 		}
 	}
