@@ -85,7 +85,7 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 
 	override render() {
 		return html`
-			${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-drag" class="handle"></uui-icon>`}
+			${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-grib" class="handle"></uui-icon>`}
 
 			<umb-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
 				<uui-input

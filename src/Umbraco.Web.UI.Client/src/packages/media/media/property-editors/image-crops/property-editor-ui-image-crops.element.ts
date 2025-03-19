@@ -193,7 +193,7 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 					(item) => item.alias,
 					(item) => html`
 						<div class="crop" data-alias="${item.alias}">
-							<uui-icon name="icon-drag" class="crop-drag"></uui-icon>
+							<uui-icon name="icon-grib" class="crop-drag"></uui-icon>
 							<span><strong>${item.label}</strong> <em>(${item.alias})</em></span>
 							<span class="crop-size">(${item.width} x ${item.height}px)</span>
 							<div class="crop-actions">
