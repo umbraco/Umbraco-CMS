@@ -161,6 +161,17 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 			group: '#tiptap_extGroup_media',
 		},
 	},
+	{
+		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.TextIndent',
+		name: 'Text Indent Tiptap Extension',
+		api: () => import('./core/text-indent.tiptap-api.js'),
+		meta: {
+			icon: 'icon-science',
+			label: 'Text Indent',
+			group: '#tiptap_extGroup_formatting',
+		},
+	},
 ];
 
 const toolbarExtensions: Array<UmbExtensionManifest> = [
@@ -402,6 +413,18 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.Anchor',
+		name: 'Anchor Tiptap Extension',
+		api: () => import('./toolbar/anchor.tiptap-toolbar-api.js'),
+		meta: {
+			alias: 'anchor',
+			icon: 'icon-anchor',
+			label: '#tiptap_anchor',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Blockquote',
 		name: 'Blockquote Tiptap Extension',
 		api: () => import('./toolbar/blockquote.tiptap-toolbar-api.js'),
@@ -582,14 +605,51 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 			],
 		},
 	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.CharacterMap',
+		name: 'Character Map Tiptap Extension',
+		api: () => import('./toolbar/character-map.tiptap-toolbar-api.js'),
+		meta: {
+			alias: 'umbCharacterMap',
+			icon: 'icon-omega',
+			label: '#tiptap_charmap',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.TextIndent',
+		name: 'Text Indent Tiptap Extension',
+		api: () => import('./toolbar/text-indent.tiptap-toolbar-api.js'),
+		forExtensions: ['Umb.Tiptap.TextIndent'],
+		meta: {
+			alias: 'indent',
+			icon: 'icon-indent',
+			label: 'Indent',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.TextOutdent',
+		name: 'Text Outdent Tiptap Extension',
+		api: () => import('./toolbar/text-outdent.tiptap-toolbar-api.js'),
+		forExtensions: ['Umb.Tiptap.TextIndent'],
+		meta: {
+			alias: 'outdent',
+			icon: 'icon-outdent',
+			label: 'Outdent',
+		},
+	},
 ];
 
-const extensions = [
+export const manifests = [
+	...kinds,
 	...coreExtensions,
 	...toolbarExtensions,
 	...blockExtensions,
 	...styleSelectExtensions,
 	...tableExtensions,
 ];
-
-export const manifests = [...kinds, ...extensions];

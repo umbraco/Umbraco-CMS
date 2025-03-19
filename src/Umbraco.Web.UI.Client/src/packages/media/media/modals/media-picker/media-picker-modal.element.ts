@@ -424,6 +424,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				width: 100%;
 				margin-bottom: var(--uui-size-3);
 			}
+			#search uui-input [slot='prepend'] {
+				display: flex;
+				align-items: center;
+			}
 
 			#searching-indicator {
 				margin-left: 7px;

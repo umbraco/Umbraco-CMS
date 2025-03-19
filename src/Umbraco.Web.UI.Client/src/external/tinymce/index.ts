@@ -25,6 +25,9 @@ export function renderEditor(userConfig?: RawEditorOptions) {
 // Declare a global variable to hold the TinyMCE instance
 declare global {
 	interface Window {
+		/**
+		 * @TJS-ignore
+		 */
 		tinymce: TinyMCE;
 	}
 }
