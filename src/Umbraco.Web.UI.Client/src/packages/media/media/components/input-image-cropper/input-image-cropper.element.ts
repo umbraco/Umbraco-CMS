@@ -53,6 +53,9 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	@state()
 	private _accept?: string;
 
+	@state()
+	private _loading = true;
+
 	#manager = new UmbTemporaryFileManager(this);
 
 	#temporaryFileConfig = new UmbTemporaryFileConfigRepository(this);
@@ -80,6 +83,7 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 			this.#temporaryFileConfig.part('imageFileTypes'),
 			(imageFileTypes) => {
 				this._accept = imageFileTypes.join(',');
+				this._loading = false;
 			},
 			'_observeFileTypes',
 		);
@@ -138,6 +142,10 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	}
 
 	override render() {
+		if (this._loading) {
+			return html`<div id="loader"><uui-loader></uui-loader></div>`;
+		}
+
 		if (this.value?.src || this.file) {
 			return this.#renderImageCropper();
 		}
@@ -187,6 +195,11 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 
 	static override styles = [
 		css`
+			#loader {
+				display: flex;
+				justify-content: center;
+			}
+
 			uui-file-dropzone {
 				position: relative;
 				display: block;
