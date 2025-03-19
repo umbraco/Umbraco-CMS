@@ -148,7 +148,7 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 
 	#handleGridDrag(event: PointerEvent) {
 		if (this.disabled || this.hideFocalPoint) return;
-		
+
 		const grid = this.wrapperElement;
 		const handle = this.focalPointElement;
 
@@ -169,7 +169,7 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 
 				this.coords.x = x;
 				this.coords.y = y;
-				
+
 				this.#setFocalPoint(x, y, width, height);
 			},
 			onStop: () => (this._isDraggingGridHandle = false),
@@ -177,8 +177,12 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		});
 	}
 
-	#changeFocalPoint(event: PointerEvent){
+	#changeFocalPoint(event: PointerEvent) {
 		if (this.disabled || this.hideFocalPoint) return;
+		if (event.pointerType === 'mouse' && event.button !== 0) {
+			// This is not a primary mouse button click, so lets not do anything.
+			return;
+		}
 
 		const grid = this.wrapperElement;
 		const handle = this.focalPointElement;
@@ -236,7 +240,11 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 	override render() {
 		if (!this.src) return nothing;
 		return html`
-			<div id="wrapper" @click=${this.#changeFocalPoint} @mousedown=${this.#handleGridDrag} @touchstart=${this.#handleGridDrag}>
+			<div
+				id="wrapper"
+				@click=${this.#changeFocalPoint}
+				@mousedown=${this.#handleGridDrag}
+				@touchstart=${this.#handleGridDrag}>
 				<img id="image" @keydown=${() => nothing} src=${this.src} alt="" />
 				<span
 					id="focal-point"
