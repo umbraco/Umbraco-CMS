@@ -52,17 +52,13 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 
 			this.observe(
 				workspaceContext.structure.propertyReadState.states,
-				(states) => {
-					this._propertyReadStates = states;
-				},
+				(states) => (this._propertyReadStates = states),
 				'umbObservePropertyReadStates',
 			);
 
 			this.observe(
 				workspaceContext.structure.propertyWriteState.states,
-				(states) => {
-					this._propertyWriteStates = states;
-				},
+				(states) => (this._propertyWriteStates = states),
 				'umbObservePropertyWriteStates',
 			);
 		});
