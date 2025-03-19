@@ -9,10 +9,10 @@ import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/c
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type {
+import {
 	UmbVariantId,
-	UmbVariantPropertyReadState,
-	UmbVariantPropertyWriteState,
+	type UmbVariantPropertyReadState,
+	type UmbVariantPropertyWriteState,
 } from '@umbraco-cms/backoffice/variant';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
@@ -95,14 +95,23 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	}
 
 	#isReadablePropertyType(property: UmbPropertyTypeModel) {
+		const propertyVariantId = this.#getPropertyVariantId(property);
 		return this._propertyReadStates.some(
-			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(this.#variantId!),
+			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(propertyVariantId),
 		);
 	}
 
 	#isWritablePropertyType(property: UmbPropertyTypeModel) {
+		const propertyVariantId = this.#getPropertyVariantId(property);
 		return this._propertyWriteStates.some(
-			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(this.#variantId!),
+			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(propertyVariantId),
+		);
+	}
+
+	#getPropertyVariantId(property: UmbPropertyTypeModel) {
+		return new UmbVariantId(
+			property.variesByCulture ? this.#variantId!.culture : null,
+			property.variesBySegment ? this.#variantId!.segment : null,
 		);
 	}
 
