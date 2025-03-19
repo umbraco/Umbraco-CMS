@@ -1,11 +1,10 @@
-import type { UmbPropertyTypeReferenceTypeUnion } from './types/index.js';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { UmbStateManager, type UmbState } from '@umbraco-cms/backoffice/utils';
 
-export interface UmbPropertyReadState<PropertyTypeReferenceType = UmbPropertyTypeReferenceTypeUnion> extends UmbState {
-	propertyType: PropertyTypeReferenceType;
+export interface UmbPropertyReadState extends UmbState {
+	propertyType: UmbReferenceByUnique;
 }
 
 export class UmbPropertyReadStateManager<
-	ReferenceType = UmbPropertyTypeReferenceTypeUnion,
-	ReadStateType extends UmbPropertyReadState<ReferenceType> = UmbPropertyReadState<ReferenceType>,
+	ReadStateType extends UmbPropertyReadState = UmbPropertyReadState,
 > extends UmbStateManager<ReadStateType> {}
