@@ -2,8 +2,6 @@ import {ConstantHelper, NotificationConstantHelper, test} from "@umbraco/playwri
 import {expect} from "@playwright/test";
 
 const tinyMCEName = 'TestTinyMCE';
-const tinyMCEAlias = 'Umbraco.RichText';
-const tinyMCEUiAlias = 'Umb.PropertyEditorUi.TinyMCE';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(tinyMCEName);
@@ -21,6 +19,22 @@ test('can create a rich text editor with tinyMCE', {tag: '@smoke'}, async ({umbr
   const tinyMCEFilterKeyword = 'Rich Text Editor';
   const tinyMCEAlias = 'Umbraco.RichText';
   const tinyMCEUiAlias = 'Umb.PropertyEditorUi.TinyMCE';
+  const toolbarValue = [
+    "styles",
+    "bold",
+    "italic",
+    "alignleft",
+    "aligncenter",
+    "alignright",
+    "bullist",
+    "numlist",
+    "outdent",
+    "indent",
+    "sourcecode",
+    "link",
+    "umbmediapicker",
+    "umbembeddialog"
+  ];
 
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
@@ -34,9 +48,17 @@ test('can create a rich text editor with tinyMCE', {tag: '@smoke'}, async ({umbr
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.dataType.doesNameExist(tinyMCEName)).toBeTruthy();
+  // Verify the default configuration
+  await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.tinyMCESettings);
+  await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.tinyMCESettings);
+  await umbracoUi.dataType.doesPropertyEditorHaveAlias(tinyMCEAlias);
+  await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(tinyMCEUiAlias);
   const dataTypeData = await umbracoApi.dataType.getByName(tinyMCEName);
   expect(dataTypeData.editorAlias).toBe(tinyMCEAlias);
   expect(dataTypeData.editorUiAlias).toBe(tinyMCEUiAlias);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tinyMCEName, 'maxImageSize', 500)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tinyMCEName, 'mode', 'Classic')).toBeTruthy();
+  expect(await umbracoApi.dataType.doesTinyMCEToolbarHaveItems(tinyMCEName, toolbarValue)).toBeTruthy();
 });
 
 test('can rename a rich text editor with tinyMCE', async ({umbracoApi, umbracoUi}) => {
