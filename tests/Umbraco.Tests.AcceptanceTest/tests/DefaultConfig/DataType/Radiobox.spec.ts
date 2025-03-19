@@ -2,26 +2,25 @@
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Radiobox';
-let dataTypeDefaultData = null;
 const editorAlias = 'Umbraco.RadioButtonList';
 const editorUiAlias = 'Umb.PropertyEditorUi.RadioButtonList';
+const customDataTypeName = 'Custom Radiobox';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
-  dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  if (dataTypeDefaultData !== null) {
-    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);
-  }
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can add option', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const optionName = 'Test option';
-  await umbracoUi.dataType.goToDataType(dataTypeName);
+  await umbracoApi.dataType.createRadioboxDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
   await umbracoUi.dataType.clickAddOptionButton();
@@ -52,7 +51,7 @@ test('can remove option', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.dataType.ensureNameNotExists(customDataType);
 });
 
-test('the default configuration is correct', async ({umbracoUi}) => {
+test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -61,7 +60,9 @@ test('the default configuration is correct', async ({umbracoUi}) => {
   await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.radioboxSettings);
   await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
   await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
+  const dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
   expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
   expect(dataTypeDefaultData.values).toEqual([]);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'items')).toBeFalsy();
 });

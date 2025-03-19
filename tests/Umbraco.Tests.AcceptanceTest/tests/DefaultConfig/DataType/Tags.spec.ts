@@ -2,26 +2,25 @@
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Tags';
-let dataTypeDefaultData = null;
 const editorAlias = 'Umbraco.Tags';
 const editorUiAlias = 'Umb.PropertyEditorUi.Tags';
+const customDataTypeName = 'Custom Tags';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
-  await umbracoUi.dataType.goToDataType(dataTypeName);
-  dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  if (dataTypeDefaultData !== null) {
-    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);   
-  }   
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can update define a tag group', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const tagGroup = 'testTagGroup';
+  await umbracoApi.dataType.createDefaultTagsDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
   await umbracoUi.dataType.enterDefineTagGroupValue(tagGroup);
@@ -35,6 +34,8 @@ test('can update define a tag group', async ({umbracoApi, umbracoUi}) => {
 test('can select storage type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const storageType = 'Csv';
+  await umbracoApi.dataType.createDefaultTagsDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
   await umbracoUi.dataType.selectStorageTypeOption(storageType);
@@ -45,13 +46,16 @@ test('can select storage type', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'storageType', storageType)).toBeTruthy();
 });
 
-// Remove fixme when the front-end ready. Currently the settings has no description.
-test.fixme('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
+test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
+  // Act
+  await umbracoUi.dataType.goToDataType(dataTypeName);
+
   // Assert
-  //await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.tagsSettings);
+  await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.tagsSettings);
   await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.tagsSettings);
   await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
   await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
+  const dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
   expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'group', 'default', dataTypeDefaultData)).toBeTruthy();

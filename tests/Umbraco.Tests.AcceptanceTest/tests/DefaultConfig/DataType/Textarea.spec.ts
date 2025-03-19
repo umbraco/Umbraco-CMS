@@ -2,26 +2,25 @@
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Textarea';
-let dataTypeDefaultData = null;
 const editorAlias = 'Umbraco.TextArea';
 const editorUiAlias = 'Umb.PropertyEditorUi.TextArea';
+const customDataTypeName = 'Custom Textarea';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
-  await umbracoUi.dataType.goToDataType(dataTypeName);
-  dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  if (dataTypeDefaultData !== null) {
-    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);
-  }
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can update maximum allowed characters value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const maxCharsValue = 126;
+  await umbracoApi.dataType.createTextareaDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
   await umbracoUi.dataType.enterMaximumAllowedCharactersValue(maxCharsValue.toString());
@@ -35,6 +34,8 @@ test('can update maximum allowed characters value', async ({umbracoApi, umbracoU
 test('can update number of rows value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const numberOfRowsValue = 9;
+  await umbracoApi.dataType.createTextareaDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
   await umbracoUi.dataType.enterNumberOfRowsValue(numberOfRowsValue.toString());
@@ -49,6 +50,8 @@ test('can update number of rows value', async ({umbracoApi, umbracoUi}) => {
 test.skip('can update min height (pixels) value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minHeightValue = 150;
+  await umbracoApi.dataType.createTextareaDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
   await umbracoUi.dataType.enterMinHeightValue(minHeightValue.toString());
@@ -63,6 +66,8 @@ test.skip('can update min height (pixels) value', async ({umbracoApi, umbracoUi}
 test.skip('can update max height (pixels) value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const maxHeightValue = 300;
+  await umbracoApi.dataType.createTextareaDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
   await umbracoUi.dataType.enterMaxHeightValue(maxHeightValue.toString());
@@ -73,11 +78,13 @@ test.skip('can update max height (pixels) value', async ({umbracoApi, umbracoUi}
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'maxHeight', maxHeightValue)).toBeTruthy();
 });
 
-// TODO: Remove skip when the front-end is ready. Currently you still can update the minimum greater than the maximum.
+// Skip this test as currently these settings are removed now
 test.skip('cannot update the min height greater than the max height', async ({umbracoUi}) => {
   // Arrange
   const minHeightValue = 150;
   const maxHeightValue = 100;
+  await umbracoApi.dataType.createTextareaDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
   await umbracoUi.dataType.enterMinHeightValue(minHeightValue.toString());
@@ -88,14 +95,19 @@ test.skip('cannot update the min height greater than the max height', async ({um
   await umbracoUi.dataType.isErrorNotificationVisible();
 });
 
-// Remove fixme when the front-end is ready. Two unneccessary settings: Min height and Max height should be removed.
-test.fixme('the default configuration is correct', async ({umbracoUi}) => {
+test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
+  // Act
+  await umbracoUi.dataType.goToDataType(dataTypeName);
+
   // Assert
   await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.textareaSettings);
   await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.textareaSettings);
   await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
   await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
+  const dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
   expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
   expect(dataTypeDefaultData.values).toEqual([]);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'maxChars')).toBeFalsy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'rows')).toBeFalsy();
 });
