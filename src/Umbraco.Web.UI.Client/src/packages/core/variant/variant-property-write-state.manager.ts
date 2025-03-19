@@ -1,10 +1,9 @@
-import type { UmbVariantPropertyTypeReferenceTypeUnion } from './types.js';
+import type { UmbReferenceByVariantId } from './types.js';
 import { UmbPropertyWriteStateManager, type UmbPropertyWriteState } from '@umbraco-cms/backoffice/property';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbVariantPropertyWriteState extends UmbPropertyWriteState<UmbVariantPropertyTypeReferenceTypeUnion> {}
+export interface UmbVariantPropertyWriteState extends UmbPropertyWriteState {
+	propertyType: UmbReferenceByUnique & UmbReferenceByVariantId;
+}
 
-export class UmbVariantPropertyWriteStateManager extends UmbPropertyWriteStateManager<
-	UmbVariantPropertyTypeReferenceTypeUnion,
-	UmbVariantPropertyWriteState
-> {}
+export class UmbVariantPropertyWriteStateManager extends UmbPropertyWriteStateManager<UmbVariantPropertyWriteState> {}

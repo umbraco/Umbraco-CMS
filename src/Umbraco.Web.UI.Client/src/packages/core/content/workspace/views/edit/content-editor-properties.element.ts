@@ -15,7 +15,6 @@ import type {
 	UmbVariantPropertyWriteState,
 } from '@umbraco-cms/backoffice/variant';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { isReferenceByAlias, isReferenceByUnique, isReferenceByVariantId } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-content-workspace-view-edit-properties')
 export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -100,29 +99,15 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	}
 
 	#isReadablePropertyType(property: UmbPropertyTypeModel) {
-		return this._propertyReadStates.some((state) => {
-			if (isReferenceByUnique(state.propertyType)) {
-				return state.propertyType.unique === property.unique;
-			} else if (isReferenceByAlias(state.propertyType)) {
-				return state.propertyType.alias === property.alias;
-			} else if (isReferenceByVariantId(state.propertyType)) {
-				return state.propertyType.variantId === this.#variantId;
-			}
-			return false;
-		});
+		return this._propertyReadStates.some(
+			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(this.#variantId!),
+		);
 	}
 
 	#isWritablePropertyType(property: UmbPropertyTypeModel) {
-		return this._propertyWriteStates.some((state) => {
-			if (isReferenceByUnique(state.propertyType)) {
-				return state.propertyType.unique === property.unique;
-			} else if (isReferenceByAlias(state.propertyType)) {
-				return state.propertyType.alias === property.alias;
-			} else if (isReferenceByVariantId(state.propertyType)) {
-				return state.propertyType.variantId === this.#variantId;
-			}
-			return false;
-		});
+		return this._propertyWriteStates.some(
+			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(this.#variantId!),
+		);
 	}
 
 	override render() {

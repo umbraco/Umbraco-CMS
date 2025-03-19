@@ -1,10 +1,9 @@
-import type { UmbVariantPropertyTypeReferenceTypeUnion } from './types.js';
+import type { UmbReferenceByVariantId } from './types.js';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { UmbPropertyReadStateManager, type UmbPropertyReadState } from '@umbraco-cms/backoffice/property';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbVariantPropertyReadState extends UmbPropertyReadState<UmbVariantPropertyTypeReferenceTypeUnion> {}
+export interface UmbVariantPropertyReadState extends UmbPropertyReadState {
+	propertyType: UmbReferenceByUnique & UmbReferenceByVariantId;
+}
 
-export class UmbVariantPropertyReadStateManager extends UmbPropertyReadStateManager<
-	UmbVariantPropertyTypeReferenceTypeUnion,
-	UmbVariantPropertyReadState
-> {}
+export class UmbVariantPropertyReadStateManager extends UmbPropertyReadStateManager<UmbVariantPropertyReadState> {}
