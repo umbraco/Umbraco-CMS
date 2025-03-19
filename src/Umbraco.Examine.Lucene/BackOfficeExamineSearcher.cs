@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -61,7 +62,19 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         out long totalFound,
         string? searchFrom = null,
         bool ignoreUserStartNodes = false)
-        => Search(query, entityType, pageSize, pageIndex, out totalFound, null, searchFrom, ignoreUserStartNodes);
+        => Search(query, entityType, pageSize, pageIndex, out totalFound, null, null, searchFrom, ignoreUserStartNodes);
+
+    [Obsolete("Please use the method that accepts all parameters. Will be removed in V17.")]
+    public IEnumerable<ISearchResult> Search(
+        string query,
+        UmbracoEntityTypes entityType,
+        int pageSize,
+        long pageIndex,
+        out long totalFound,
+        string[]? contentTypeAliases,
+        string? searchFrom = null,
+        bool ignoreUserStartNodes = false)
+        => Search(query, entityType, pageSize, pageIndex, out totalFound, contentTypeAliases, null, searchFrom, ignoreUserStartNodes);
 
     public IEnumerable<ISearchResult> Search(
         string query,
@@ -70,6 +83,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         long pageIndex,
         out long totalFound,
         string[]? contentTypeAliases,
+        bool? trashed,
         string? searchFrom = null,
         bool ignoreUserStartNodes = false)
     {
@@ -133,6 +147,12 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                     ? currentUser.CalculateMediaStartNodeIds(_entityService, _appCaches)
                     : Array.Empty<int>();
                 AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
+
+                if (trashed.HasValue)
+                {
+                    AppendRequiredTrashPath(trashed.Value, sb, Constants.System.RecycleBinMedia);
+                }
+
                 break;
             case UmbracoEntityTypes.Document:
                 type = "content";
@@ -146,6 +166,12 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                     ? currentUser.CalculateContentStartNodeIds(_entityService, _appCaches)
                     : Array.Empty<int>();
                 AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
+
+                if (trashed.HasValue)
+                {
+                    AppendRequiredTrashPath(trashed.Value, sb, Constants.System.RecycleBinContent);
+                }
+
                 break;
             default:
                 throw new NotSupportedException("The " + typeof(BackOfficeExamineSearcher) +
@@ -179,6 +205,14 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         totalFound = result.TotalItemCount;
 
         return result;
+    }
+
+    private void AppendRequiredTrashPath(bool trashed, StringBuilder sb, int recycleBinId)
+    {
+        var requiredOrNotString = trashed ? "+" : "!";
+        var trashPath = $"-1,{recycleBinId}";
+        trashPath = trashPath.Replace("-", "\\-").Replace(",", "\\,");
+        sb.Append($"{requiredOrNotString}__Path:{trashPath}\\,* ");
     }
 
     private bool BuildQuery(StringBuilder sb, string query, string? searchFrom, List<string> fields, string type)
@@ -394,6 +428,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
             searchFromId > 0
                 ? entityService.GetAllPaths(objectType, searchFromId).FirstOrDefault()
                 : null;
+
         if (entityPath != null)
         {
             // find... only what's underneath
