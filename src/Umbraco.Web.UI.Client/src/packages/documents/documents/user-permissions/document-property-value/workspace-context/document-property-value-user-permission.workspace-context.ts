@@ -76,7 +76,11 @@ export class UmbDocumentPropertyValueUserPermissionWorkspaceContext extends UmbC
 					},
 				},
 				onChange: (permitted: boolean) => {
-					const variantIds = args.variantOptions?.map((variant) => new UmbVariantId(variant.culture, variant.segment));
+					// If the property is invariant we only need one state for the property
+					const isInvariant = args.property.variesByCulture === false && args.property.variesBySegment === false;
+					const variantIds = isInvariant
+						? [new UmbVariantId()]
+						: args.variantOptions?.map((variant) => new UmbVariantId(variant.culture, variant.segment)) || [];
 
 					const states: Array<UmbVariantPropertyWriteState> =
 						variantIds?.map((variantId) => {
