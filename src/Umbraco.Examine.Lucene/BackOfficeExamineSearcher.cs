@@ -64,6 +64,18 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         bool ignoreUserStartNodes = false)
         => Search(query, entityType, pageSize, pageIndex, out totalFound, null, null, searchFrom, ignoreUserStartNodes);
 
+    [Obsolete("Please use the method that accepts all parameters. Will be removed in V17.")]
+    public IEnumerable<ISearchResult> Search(
+        string query,
+        UmbracoEntityTypes entityType,
+        int pageSize,
+        long pageIndex,
+        out long totalFound,
+        string[]? contentTypeAliases,
+        string? searchFrom = null,
+        bool ignoreUserStartNodes = false)
+        => Search(query, entityType, pageSize, pageIndex, out totalFound, contentTypeAliases, null, searchFrom, ignoreUserStartNodes);
+
     public IEnumerable<ISearchResult> Search(
         string query,
         UmbracoEntityTypes entityType,
