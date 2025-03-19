@@ -82,5 +82,6 @@ for (const dropdown of dropdowns) {
     } else {
       expect(dataTypeDefaultData.values).toEqual([]);
     }
+    expect(await umbracoApi.dataType.doesDataTypeHaveValue(dropdown.type, 'items')).toBeFalsy();
   });
 }

@@ -73,4 +73,6 @@ test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => 
   expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
   expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
   expect(dataTypeDefaultData.values).toEqual([]);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'useLabel')).toBeFalsy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'items')).toBeFalsy();
 });
