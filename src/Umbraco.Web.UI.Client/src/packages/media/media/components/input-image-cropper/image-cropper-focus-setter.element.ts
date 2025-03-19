@@ -148,6 +148,10 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 
 	#handleGridDrag(event: PointerEvent) {
 		if (this.disabled || this.hideFocalPoint) return;
+		if (event.button !== 0) {
+			// This is not a primary mouse button click, so lets not do anything.
+			return;
+		}
 
 		const grid = this.wrapperElement;
 		const handle = this.focalPointElement;
@@ -179,7 +183,7 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 
 	#changeFocalPoint(event: PointerEvent) {
 		if (this.disabled || this.hideFocalPoint) return;
-		if (event.pointerType === 'mouse' && event.button !== 0) {
+		if (event.button !== 0) {
 			// This is not a primary mouse button click, so lets not do anything.
 			return;
 		}
