@@ -5,8 +5,8 @@ using Umbraco.Cms.Api.Management.Mapping.Permissions;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
@@ -62,74 +62,58 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         var rootMediaFolder = MediaService.CreateMedia("Pictures Folder", Constants.System.Root, "Folder");
         MediaService.Save(rootMediaFolder);
 
-        var groupOne = new UserGroupBuilder()
-            .WithName("Group One")
-            .WithAlias("groupOne")
-            .WithAllowedLanguages([enUsLanguage.Id])
-            .WithStartMediaId(rootMediaFolder.Id)
-            .WithPermissions(new[] { "A", "B", "C" }.ToHashSet())
-            .WithGranularPermissions([
+        var groupOne = await CreateUserGroup(
+            "Group One",
+            "groupOne",
+            [enUsLanguage.Id],
+            ["A", "B", "C"],
+            [
                 new DocumentGranularPermission
                 {
                     Key = rootContentKey,
-                    Permission = "A"
+                    Permission = "A",
                 },
                 new DocumentGranularPermission
                 {
                     Key = rootContentKey,
-                    Permission = "E"
+                    Permission = "E",
                 },
                 new DocumentGranularPermission
                 {
                     Key = subPageContentKey,
-                    Permission = "F"
+                    Permission = "F",
                 },
                 new DocumentGranularPermission
                 {
                     Key = subPage2ContentKey,
-                    Permission = "F"
-                }])
-            .Build();
-        var createUserGroupResult = await UserGroupService.CreateAsync(groupOne, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createUserGroupResult.Success);
-
-        var groupTwo = new UserGroupBuilder()
-            .WithName("Group Two")
-            .WithAlias("groupTwo")
-            .WithAllowedLanguages([daDkLanguage.Id])
-            .WithStartMediaId(rootMediaFolder.Id)
-            .WithPermissions(new[] { "A", "B", "D" }.ToHashSet())
-            .WithGranularPermissions([
+                    Permission = "F",
+                }
+            ],
+            rootMediaFolder.Id);
+        var groupTwo = await CreateUserGroup(
+            "Group Two",
+            "groupTwo",
+            [daDkLanguage.Id],
+            ["A", "B", "D"],
+            [
                 new DocumentGranularPermission
                 {
                     Key = subPage2ContentKey,
-                    Permission = "G"
+                    Permission = "G",
                 },
                 new DocumentGranularPermission
                 {
                     Key = subPage2ContentKey,
-                    Permission = "H"
-                }])
-            .Build();
-        createUserGroupResult = await UserGroupService.CreateAsync(groupTwo, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createUserGroupResult.Success);
+                    Permission = "H",
+                }
+            ],
+            rootMediaFolder.Id);
 
-        var createUserAttempt = await UserService.CreateAsync(Constants.Security.SuperUserKey, new UserCreateModel
-        {
-            Email = "test@test.com",
-            Name = "Test User",
-            UserName = "test@test.com",
-            UserGroupKeys = new[] { groupOne.Key, groupTwo.Key }.ToHashSet(),
-        });
-        Assert.IsTrue(createUserAttempt.Success);
-
-        var userId = createUserAttempt.Result.CreatedUser.Key;
-
-        var user = await UserService.GetAsync(userId);
+        var user = await CreateUser([groupOne.Key, groupTwo.Key]);
 
         var model = await UserPresentationFactory.CreateCurrentUserResponseModelAsync(user);
 
-        Assert.AreEqual(userId, model.Id);
+        Assert.AreEqual(user.Key, model.Id);
         Assert.AreEqual("test@test.com", model.Email);
         Assert.AreEqual("Test User", model.Name);
         Assert.AreEqual("test@test.com", model.UserName);
@@ -168,5 +152,40 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         var subPage2ContentPermissions = model.Permissions.Cast<DocumentPermissionPresentationModel>().Single(x => x.Document.Id == subPage2ContentKey);
         Assert.AreEqual(3, subPage2ContentPermissions.Verbs.Count);
         Assert.IsTrue(subPage2ContentPermissions.Verbs.ContainsAll(["F", "G", "H"]));
+    }
+
+    private async Task<IUserGroup> CreateUserGroup(
+        string name,
+        string alias,
+        int[] allowedLanguages,
+        string[] permissions,
+        DocumentGranularPermission[] granularPermissions,
+        int startMediaId)
+    {
+        var userGroup = new UserGroupBuilder()
+            .WithName(name)
+            .WithAlias(alias)
+            .WithAllowedLanguages(allowedLanguages)
+            .WithStartMediaId(startMediaId)
+            .WithPermissions(permissions.ToHashSet())
+            .WithGranularPermissions(granularPermissions)
+            .Build();
+        var createUserGroupResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createUserGroupResult.Success);
+        return userGroup;
+    }
+
+    private async Task<IUser> CreateUser(Guid[] userGroupKeys)
+    {
+        var createUserAttempt = await UserService.CreateAsync(Constants.Security.SuperUserKey, new UserCreateModel
+        {
+            Email = "test@test.com",
+            Name = "Test User",
+            UserName = "test@test.com",
+            UserGroupKeys = userGroupKeys.ToHashSet(),
+        });
+        Assert.IsTrue(createUserAttempt.Success);
+
+        return await UserService.GetAsync(createUserAttempt.Result.CreatedUser.Key);
     }
 }

@@ -162,22 +162,35 @@ public class UserGroupBuilder<TParent>
             Permissions = _permissions,
         };
 
+        BuildAllowedSections(userGroup);
+        BuildAllowedLanguages(userGroup);
+        BuildGranularPermissions(userGroup);
+
+        return userGroup;
+    }
+
+    private void BuildAllowedSections(UserGroup userGroup)
+    {
         foreach (var section in _allowedSections)
         {
             userGroup.AddAllowedSection(section);
         }
+    }
 
+    private void BuildAllowedLanguages(UserGroup userGroup)
+    {
         foreach (var language in _allowedLanguages)
         {
             userGroup.AddAllowedLanguage(language);
         }
+    }
 
+    private void BuildGranularPermissions(UserGroup userGroup)
+    {
         foreach (var permission in _granularPermissions)
         {
             userGroup.GranularPermissions.Add(permission);
         }
-
-        return userGroup;
     }
 
     public static UserGroup CreateUserGroup(
