@@ -72,6 +72,8 @@ export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends 
 				preset: {
 					verbs: this.#getFallbackPermissionVerbsForEntityType(UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE),
 				},
+				pickablePropertyTypeFilter: (propertyType) =>
+					!this._permissions.some((permission) => permission.propertyType.unique === propertyType.unique),
 			},
 		});
 

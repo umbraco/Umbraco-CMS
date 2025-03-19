@@ -1,4 +1,5 @@
 import { UMB_DOCUMENT_PROPERTY_VALUE_GRANULAR_USER_PERMISSION_FLOW_PROPERTY_TYPE_MODAL_ALIAS } from './constants.js';
+import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModalData {
@@ -6,6 +7,7 @@ export interface UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeM
 		unique: string;
 	};
 	preset?: Partial<UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModalValue>;
+	pickableFilter?: (propertyType: UmbPropertyTypeModel) => boolean;
 }
 
 export interface UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModalValue {

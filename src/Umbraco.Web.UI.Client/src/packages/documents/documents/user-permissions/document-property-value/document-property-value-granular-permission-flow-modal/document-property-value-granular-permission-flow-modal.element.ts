@@ -38,6 +38,7 @@ export class UmbDocumentPropertyValueGranularUserPermissionFlowModalElement exte
 					preset: {
 						verbs: this.data?.preset?.verbs,
 					},
+					pickableFilter: this.data?.pickablePropertyTypeFilter,
 				},
 			},
 		);
@@ -70,10 +71,6 @@ export class UmbDocumentPropertyValueGranularUserPermissionFlowModalElement exte
 						.props=${{
 							hideTreeRoot: true,
 							hideTreeItemActions: true,
-							/*
-						pickableFilter: (treeItem: UmbDocumentTypeTreeItemModel) =>
-							!this._items?.map((i) => i.unique).includes(treeItem.unique),
-						*/
 						}}
 						alias=${UMB_DOCUMENT_TYPE_TREE_ALIAS}></umb-tree>
 				</uui-box>
