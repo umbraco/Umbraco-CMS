@@ -53,7 +53,9 @@ export class UmbDocumentPropertyValueGranularUserPermissionFlowModalElement exte
 			});
 
 			this._submitModal();
-		} catch {}
+		} catch (err) {
+			console.error(err);
+		}
 	}
 
 	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {

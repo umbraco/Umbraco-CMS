@@ -27,7 +27,6 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import {
 	UMB_INVARIANT_CULTURE,
 	UmbVariantId,
-	type UmbVariantPropertyReadState,
 	type UmbVariantPropertyWriteState,
 } from '@umbraco-cms/backoffice/variant';
 import {

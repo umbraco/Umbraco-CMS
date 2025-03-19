@@ -17,7 +17,6 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UmbPropertyReadStateManager } from '@umbraco-cms/backoffice/property';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbContentTypeWorkspaceContextArgs extends UmbEntityDetailWorkspaceContextArgs {}
