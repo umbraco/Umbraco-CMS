@@ -4,9 +4,9 @@ import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.DocumentPropertyValueGranularUserPermissionFlow',
-		name: 'Document Property Value Granular User Permission Flow Modal',
-		element: () => import('./document-property-value-granular-permission-flow-modal.element.js'),
+		alias: 'Umb.Modal.DocumentPropertyValueUserPermissionFlow',
+		name: 'Document Property Value User Permission Flow Modal',
+		element: () => import('./document-property-value-permission-flow-modal.element.js'),
 	},
 	...propertyTypeModalManifests,
 ];
