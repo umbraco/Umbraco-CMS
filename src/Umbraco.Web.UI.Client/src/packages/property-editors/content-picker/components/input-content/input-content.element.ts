@@ -48,9 +48,6 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	}
 	#allowedContentTypeIds: Array<string> = [];
 
-	@property({ type: Boolean })
-	showOpenButton?: boolean;
-
 	@property({ type: Array })
 	public set selection(values: Array<UmbReferenceByUniqueAndType>) {
 		this.#selection = values?.map((item) => item.unique) ?? [];
@@ -123,7 +120,6 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.minMessage=${this.minMessage}
 				.max=${this.max}
 				.maxMessage=${this.maxMessage}
-				?showOpenButton=${this.showOpenButton}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-document>
 		`;
@@ -138,7 +134,6 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.minMessage=${this.minMessage}
 				.max=${this.max}
 				.maxMessage=${this.maxMessage}
-				?showOpenButton=${this.showOpenButton}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-media>
 		`;
@@ -153,7 +148,6 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.minMessage=${this.minMessage}
 				.max=${this.max}
 				.maxMessage=${this.maxMessage}
-				?showOpenButton=${this.showOpenButton}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-member>
 		`;
