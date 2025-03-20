@@ -131,6 +131,19 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		return uploadedItems;
 	}
 
+	public removeOne(item: UmbUploadableItem) {
+		this.#progressItems.removeOne(item.unique);
+		if (item.temporaryFile) {
+			this.#tempFileManager.removeOne(item.temporaryFile.temporaryUnique);
+		}
+	}
+
+	public remove(items: Array<UmbUploadableItem>) {
+		this.#progressItems.remove(items.map((x) => x.unique));
+		const temporaryUniques = items.map((x) => x.temporaryFile?.temporaryUnique).filter((x): x is string => !!x);
+		this.#tempFileManager.remove(temporaryUniques);
+	}
+
 	async #showDialogMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>) {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManager.open(this.#host, UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL, { data: { options } });

@@ -173,21 +173,21 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 						() => html`
 							<uui-button
 								compact
-								@click=${() => this.#handleRemove(item)}
+								@click=${() => this.#handleCancel(item)}
 								label=${this.localize.term('general_cancel')}>
 								<uui-icon name="remove"></uui-icon>${this.localize.term('general_cancel')}
 							</uui-button>
 						`,
-						() => this.#renderButtonRemove(),
+						() => this.#renderButtonRemove(item),
 					)}
 				</div>
 			</div>
 		`;
 	}
 
-	#renderButtonRemove() {
+	#renderButtonRemove(item: UmbUploadableItem) {
 		return html`
-			<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
+			<uui-button compact @click=${() => this.#handleRemove(item)} label=${this.localize.term('content_uploadClear')}>
 				<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
 			</uui-button>
 		`;
@@ -199,27 +199,12 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		this._dropzone.browse();
 	}
 
-	#handleRemove(item?: UmbUploadableItem) {
-		// Remove single item
-		if (item) {
-			item.temporaryFile?.abortController?.abort();
-			const index = this._progressItems?.indexOf(item);
-			if (index !== undefined && index !== -1) {
-				this._progressItems?.splice(index, 1);
-				this.requestUpdate('_progressItems');
-			}
-			return;
-		}
+	#handleCancel(item: UmbUploadableItem) {
+		item.temporaryFile?.abortController?.abort();
+	}
 
-		// Remove all items
-		if (this._progressItems?.length) {
-			for (const item of this._progressItems) {
-				item.temporaryFile?.abortController?.abort();
-			}
-
-			this._progressItems.length = 0;
-			this.requestUpdate('_progressItems');
-		}
+	#handleRemove(item: UmbUploadableItem) {
+		this.#manager.removeOne(item);
 	}
 
 	async #onUpload(e: UUIFileDropzoneEvent) {
