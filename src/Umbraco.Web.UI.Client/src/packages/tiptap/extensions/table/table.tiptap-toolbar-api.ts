@@ -48,25 +48,13 @@ export class UmbTiptapToolbarTableExtensionApi extends UmbTiptapToolbarElementAp
 	}
 
 	#getModalData(editor?: Editor) {
-		if (!editor) return;
-
-		const tableStyles = editor?.getAttributes('table').style as string;
-		if (!tableStyles) return;
-
+		const tableStyles = (editor?.getAttributes('table').style as string) ?? '';
 		const table = document.createElement('table');
 		table.style.cssText = tableStyles;
 
 		const data: Record<string, unknown> = {};
 
-		data.alignment = 'none';
-		if (table.style.marginLeft === 'auto' && table.style.marginRight === 'auto') {
-			data.alignment = 'center';
-		} else if (table.style.marginRight === 'auto') {
-			data.alignment = 'left';
-		} else if (table.style.marginLeft === 'auto') {
-			data.alignment = 'right';
-		}
-
+		data.alignment = this.#getAlignment(table.style);
 		if (table.style.backgroundColor) data.backgroundColor = table.style.backgroundColor;
 		if (table.style.borderColor) data.borderColor = table.style.borderColor;
 		if (table.style.borderStyle) data.borderStyle = table.style.borderStyle;
@@ -75,6 +63,17 @@ export class UmbTiptapToolbarTableExtensionApi extends UmbTiptapToolbarElementAp
 		if (table.style.width) data.width = table.style.width;
 
 		return { data };
+	}
+
+	#getAlignment(style: CSSStyleDeclaration) {
+		if (style.marginLeft === 'auto' && style.marginRight === 'auto') {
+			return 'center';
+		} else if (style.marginRight === 'auto') {
+			return 'left';
+		} else if (style.marginLeft === 'auto') {
+			return 'right';
+		}
+		return 'none';
 	}
 
 	#getStyles(data: typeof UMB_TIPTAP_TABLE_PROPERTIES_MODAL.VALUE) {
