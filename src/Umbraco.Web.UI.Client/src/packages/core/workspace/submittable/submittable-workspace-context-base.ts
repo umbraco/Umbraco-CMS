@@ -98,6 +98,10 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 				onValid().then(this.#completeSubmit, this.#rejectSubmit);
 			},
 			async () => {
+				console.warn(
+					'Validation failed because it still has these validation messages',
+					this.#validationContexts.flatMap((x) => x.messages.getMessages()),
+				);
 				onInvalid().then(this.#resolveSubmit, this.#rejectSubmit);
 			},
 		);

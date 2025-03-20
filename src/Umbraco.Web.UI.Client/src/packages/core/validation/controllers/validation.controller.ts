@@ -229,7 +229,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			() => false,
 		);
 
-		if (!this.messages) {
+		if (this.messages === undefined) {
 			// This Context has been destroyed while is was validating, so we should not continue.
 			return Promise.reject();
 		}
