@@ -96,10 +96,10 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 			async () => {
 				onValid().then(this.#completeSubmit, this.#rejectSubmit);
 			},
-			async (error) => {
-				if (error) {
+			async (/*error*/) => {
+				/*if (error) {
 					throw new Error(error);
-				}
+				}*/
 				// TODO: Implement developer-mode logging here. [NL]
 				console.warn(
 					'Validation failed because of these validation messages still begin present: ',
@@ -112,10 +112,10 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		return this.#submitPromise;
 	}
 
-	#rejectSubmit = (error: any) => {
-		if (error) {
+	#rejectSubmit = (/*error: any*/) => {
+		/*if (error) {
 			throw new Error(error);
-		}
+		}*/
 		if (this.#submitPromise) {
 			// TODO: Capture the validation contexts messages on open, and then reset to them in this case. [NL]
 
