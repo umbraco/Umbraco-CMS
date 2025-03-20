@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '../../../../entity.js';
 import type {
-	UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModalData,
-	UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModalValue,
+	UmbDocumentPropertyValueUserPermissionFlowPropertyTypeModalData,
+	UmbDocumentPropertyValueUserPermissionFlowPropertyTypeModalValue,
 } from './property-type-modal.token.js';
 import { html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -9,10 +9,10 @@ import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type'
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { UMB_ENTITY_USER_PERMISSION_MODAL } from '@umbraco-cms/backoffice/user-permission';
 
-@customElement('umb-document-property-value-granular-user-permission-flow-property-type-modal')
-export class UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModalElement extends UmbModalBaseElement<
-	UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModalData,
-	UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModalValue
+@customElement('umb-document-property-value-user-permission-flow-property-type-modal')
+export class UmbDocumentPropertyValueUserPermissionFlowPropertyTypeModalElement extends UmbModalBaseElement<
+	UmbDocumentPropertyValueUserPermissionFlowPropertyTypeModalData,
+	UmbDocumentPropertyValueUserPermissionFlowPropertyTypeModalValue
 > {
 	@state()
 	private _documentTypeProperties: Array<UmbPropertyTypeModel> = [];
@@ -135,10 +135,10 @@ export class UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModal
 	}
 }
 
-export { UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModalElement as element };
+export { UmbDocumentPropertyValueUserPermissionFlowPropertyTypeModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-property-value-granular-user-permission-flow-property-type-modal': UmbDocumentPropertyValueGranularUserPermissionFlowPropertyTypeModalElement;
+		'umb-document-property-value-user-permission-flow-property-type-modal': UmbDocumentPropertyValueUserPermissionFlowPropertyTypeModalElement;
 	}
 }

@@ -1,18 +1,18 @@
-import { UMB_DOCUMENT_PROPERTY_VALUE_GRANULAR_USER_PERMISSION_FLOW_PROPERTY_TYPE_MODAL } from './property-type-modal/property-type-modal.token.js';
+import { UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_FLOW_PROPERTY_TYPE_MODAL } from './property-type-modal/property-type-modal.token.js';
 import type {
-	UmbDocumentPropertyValueGranularUserPermissionFlowModalData,
-	UmbDocumentPropertyValueGranularUserPermissionFlowModalValue,
-} from './document-property-value-granular-permission-flow-modal.token.js';
+	UmbDocumentPropertyValueUserPermissionFlowModalData,
+	UmbDocumentPropertyValueUserPermissionFlowModalValue,
+} from './document-property-value-permission-flow-modal.token.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_DOCUMENT_TYPE_TREE_ALIAS } from '@umbraco-cms/backoffice/document-type';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
 
-@customElement('umb-document-property-value-granular-user-permission-flow-modal')
-export class UmbDocumentPropertyValueGranularUserPermissionFlowModalElement extends UmbModalBaseElement<
-	UmbDocumentPropertyValueGranularUserPermissionFlowModalData,
-	UmbDocumentPropertyValueGranularUserPermissionFlowModalValue
+@customElement('umb-document-property-value-user-permission-flow-modal')
+export class UmbDocumentPropertyValueUserPermissionFlowModalElement extends UmbModalBaseElement<
+	UmbDocumentPropertyValueUserPermissionFlowModalData,
+	UmbDocumentPropertyValueUserPermissionFlowModalValue
 > {
 	@state()
 	_selection: Array<string> = [];
@@ -29,19 +29,15 @@ export class UmbDocumentPropertyValueGranularUserPermissionFlowModalElement exte
 			throw new Error('Could not get modal manager context');
 		}
 
-		const modal = modalManager.open(
-			this,
-			UMB_DOCUMENT_PROPERTY_VALUE_GRANULAR_USER_PERMISSION_FLOW_PROPERTY_TYPE_MODAL,
-			{
-				data: {
-					documentType,
-					preset: {
-						verbs: this.data?.preset?.verbs,
-					},
-					pickableFilter: this.data?.pickablePropertyTypeFilter,
+		const modal = modalManager.open(this, UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_FLOW_PROPERTY_TYPE_MODAL, {
+			data: {
+				documentType,
+				preset: {
+					verbs: this.data?.preset?.verbs,
 				},
+				pickableFilter: this.data?.pickablePropertyTypeFilter,
 			},
-		);
+		});
 
 		try {
 			const value = await modal.onSubmit();
@@ -90,10 +86,10 @@ export class UmbDocumentPropertyValueGranularUserPermissionFlowModalElement exte
 	}
 }
 
-export { UmbDocumentPropertyValueGranularUserPermissionFlowModalElement as element };
+export { UmbDocumentPropertyValueUserPermissionFlowModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-property-value-granular-user-permission-flow-modal': UmbDocumentPropertyValueGranularUserPermissionFlowModalElement;
+		'umb-document-property-value-user-permission-flow-modal': UmbDocumentPropertyValueUserPermissionFlowModalElement;
 	}
 }
