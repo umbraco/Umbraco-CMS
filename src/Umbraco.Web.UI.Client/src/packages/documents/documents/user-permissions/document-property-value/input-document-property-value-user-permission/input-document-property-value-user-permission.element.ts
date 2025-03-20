@@ -1,5 +1,5 @@
 import type { UmbDocumentPropertyValueUserPermissionModel as UmbDocumentPropertyValueUserPermissionModel } from '../types.js';
-import { UMB_DOCUMENT_PROPERTY_VALUE_GRANULAR_USER_PERMISSION_FLOW_MODAL } from '../document-property-value-granular-permission-flow-modal/index.js';
+import { UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_FLOW_MODAL } from '../document-property-value-permission-flow-modal/index.js';
 import { UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_TYPE } from '../user-permission.js';
 import { UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '../../../entity.js';
 import {
@@ -26,8 +26,8 @@ import {
 } from '@umbraco-cms/backoffice/document-type';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-@customElement('umb-document-property-value-granular-user-permission')
-export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
+@customElement('umb-input-document-property-value-user-permission')
+export class UmbInputDocumentPropertyValueUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
 	_permissions: Array<UmbDocumentPropertyValueUserPermissionModel> = [];
 	public get permissions(): Array<UmbDocumentPropertyValueUserPermissionModel> {
 		return this._permissions;
@@ -61,13 +61,13 @@ export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends 
 			.filter((item) => item) as Array<UmbDocumentTypeDetailModel>;
 	}
 
-	async #addGranularPermission() {
+	async #addPermission() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		if (!modalManager) {
 			throw new Error('Could not open modal, no modal manager found');
 		}
 
-		const modal = modalManager.open(this, UMB_DOCUMENT_PROPERTY_VALUE_GRANULAR_USER_PERMISSION_FLOW_MODAL, {
+		const modal = modalManager.open(this, UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_FLOW_MODAL, {
 			data: {
 				preset: {
 					verbs: this.#getFallbackPermissionVerbsForEntityType(UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE),
@@ -82,7 +82,7 @@ export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends 
 			if (!value) throw new Error('No result from modal');
 
 			const permissionItem: UmbDocumentPropertyValueUserPermissionModel = {
-				$type: 'DocumentTypePropertyPermissionPresentationModel',
+				$type: 'DocumentPropertyValuePermissionPresentationModel',
 				userPermissionType: UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_TYPE,
 				documentType: value.documentType,
 				propertyType: value.propertyType,
@@ -96,7 +96,7 @@ export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends 
 		}
 	}
 
-	async #editGranularPermission(currentPermission: UmbDocumentPropertyValueUserPermissionModel) {
+	async #editPermission(currentPermission: UmbDocumentPropertyValueUserPermissionModel) {
 		if (!currentPermission) {
 			throw new Error('Could not open permissions modal, no item was provided');
 		}
@@ -148,7 +148,7 @@ export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends 
 		}
 	}
 
-	#removeGranularPermission(permission: UmbDocumentPropertyValueUserPermissionModel) {
+	#removePermission(permission: UmbDocumentPropertyValueUserPermissionModel) {
 		this.permissions = this._permissions.filter((v) => JSON.stringify(v) !== JSON.stringify(permission));
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -210,7 +210,7 @@ export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends 
 		return html`<uui-button
 			id="btn-add"
 			look="placeholder"
-			@click=${this.#addGranularPermission}
+			@click=${this.#addPermission}
 			label=${this.localize.term('general_add')}></uui-button>`;
 	}
 
@@ -236,13 +236,13 @@ export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends 
 
 	#renderEditButton(permission: UmbDocumentPropertyValueUserPermissionModel) {
 		return html`<uui-button
-			@click=${() => this.#editGranularPermission(permission)}
+			@click=${() => this.#editPermission(permission)}
 			label=${this.localize.term('general_edit')}></uui-button>`;
 	}
 
 	#renderRemoveButton(permission: UmbDocumentPropertyValueUserPermissionModel) {
 		return html`<uui-button
-			@click=${() => this.#removeGranularPermission(permission)}
+			@click=${() => this.#removePermission(permission)}
 			label=${this.localize.term('general_remove')}></uui-button>`;
 	}
 
@@ -255,10 +255,10 @@ export class UmbInputDocumentPropertyValueGranularUserPermissionElement extends 
 	];
 }
 
-export { UmbInputDocumentPropertyValueGranularUserPermissionElement as element };
+export { UmbInputDocumentPropertyValueUserPermissionElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-property-value-granular-user-permission': UmbInputDocumentPropertyValueGranularUserPermissionElement;
+		'umb-input-document-property-value-user-permission': UmbInputDocumentPropertyValueUserPermissionElement;
 	}
 }

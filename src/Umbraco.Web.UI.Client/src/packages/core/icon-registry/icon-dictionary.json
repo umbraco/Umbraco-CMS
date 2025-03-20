@@ -893,6 +893,11 @@
 			"file": "grid-3x3.svg"
 		},
 		{
+			"name": "icon-drag",
+			"file": "grip-vertical.svg",
+			"internal": true
+		},
+		{
 			"name": "icon-hammer",
 			"file": "hammer.svg"
 		},

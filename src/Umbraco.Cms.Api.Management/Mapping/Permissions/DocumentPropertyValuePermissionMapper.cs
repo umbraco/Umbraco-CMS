@@ -7,18 +7,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Permissions;
 
-public class DocumentTypePropertyPermissionMapper : IPermissionPresentationMapper, IPermissionMapper
+public class DocumentPropertyValuePermissionMapper : IPermissionPresentationMapper, IPermissionMapper
 {
-    public string Context => DocumentTypePropertyGranularPermission.ContextType;
+    public string Context => DocumentPropertyValueGranularPermission.ContextType;
 
     public IGranularPermission MapFromDto(UserGroup2GranularPermissionDto dto) =>
-        new DocumentTypePropertyGranularPermission()
+        new DocumentPropertyValueGranularPermission()
         {
             Key = dto.UniqueId!.Value,
             Permission = dto.Permission,
         };
 
-    public Type PresentationModelToHandle => typeof(DocumentTypePropertyPermissionPresentationModel);
+    public Type PresentationModelToHandle => typeof(DocumentPropertyValuePermissionPresentationModel);
 
     public IEnumerable<IPermissionPresentationModel> MapManyAsync(IEnumerable<IGranularPermission> granularPermissions)
     {
@@ -37,7 +37,7 @@ public class DocumentTypePropertyPermissionMapper : IPermissionPresentationMappe
         {
             foreach (var propertyTypeGroup in documentTypeGroup.GroupBy(x => x.PropertyTypeId))
             {
-                yield return new DocumentTypePropertyPermissionPresentationModel
+                yield return new DocumentPropertyValuePermissionPresentationModel
                 {
                     DocumentType = new ReferenceByIdModel(documentTypeGroup.Key),
                     PropertyType = new ReferenceByIdModel(propertyTypeGroup.Key),
@@ -52,14 +52,14 @@ public class DocumentTypePropertyPermissionMapper : IPermissionPresentationMappe
 
     public IEnumerable<IGranularPermission> MapToGranularPermissions(IPermissionPresentationModel permissionViewModel)
     {
-        if (permissionViewModel is not DocumentTypePropertyPermissionPresentationModel documentTypePermissionPresentationModel)
+        if (permissionViewModel is not DocumentPropertyValuePermissionPresentationModel documentTypePermissionPresentationModel)
         {
             yield break;
         }
 
         foreach (var verb in documentTypePermissionPresentationModel.Verbs.Distinct().DefaultIfEmpty(string.Empty))
         {
-            yield return new DocumentTypePropertyGranularPermission
+            yield return new DocumentPropertyValueGranularPermission
             {
                 Key = documentTypePermissionPresentationModel.DocumentType.Id,
                 Permission = $"{documentTypePermissionPresentationModel.PropertyType.Id}|{verb}"

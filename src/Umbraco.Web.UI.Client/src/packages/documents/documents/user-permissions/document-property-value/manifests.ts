@@ -3,7 +3,7 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ,
 	UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE,
 } from './constants.js';
-import { manifests as documentPropertyValueGranularPermissionFlowModalManifests } from './document-property-value-granular-permission-flow-modal/manifests.js';
+import { manifests as documentPropertyValueUserPermissionFlowModalManifests } from './document-property-value-permission-flow-modal/manifests.js';
 import { manifests as conditionManifests } from './conditions/manifests.js';
 import { manifests as dataManifests } from './data/manifests.js';
 import { manifests as workspaceContextManifests } from './workspace-context/manifests.js';
@@ -41,16 +41,16 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		weight: 950,
 		element: () =>
 			import(
-				'./input-document-property-value-granular-user-permission/input-document-property-value-granular-user-permission.element.js'
+				'./input-document-property-value-user-permission/input-document-property-value-user-permission.element.js'
 			),
 		meta: {
-			schemaType: 'DocumentTypePropertyPermissionPresentationModel',
+			schemaType: 'DocumentPropertyValuePermissionPresentationModel',
 			label: 'Document Property Values',
 			description: 'Assign Permissions to Document property values',
 		},
 	},
 	...conditionManifests,
 	...dataManifests,
-	...documentPropertyValueGranularPermissionFlowModalManifests,
+	...documentPropertyValueUserPermissionFlowModalManifests,
 	...workspaceContextManifests,
 ];

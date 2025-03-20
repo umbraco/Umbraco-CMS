@@ -56,17 +56,15 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<uui-box class="uui-text">
-				<div class="headline">
-					<h1 class="uui-h2">Models Builder</h1>
-					<uui-button
-						.state="${this._buttonStateReload}"
-						look="secondary"
-						label="Reload"
-						@click="${this._onDashboardReload}">
+			<uui-box headline="Models Builder" class="overview">
+				<uui-button
+					slot="header-actions"
+					.state="${this._buttonStateReload}"
+					look="secondary"
+					label="Reload"
+					@click="${this._onDashboardReload}">
 						Reload
 					</uui-button>
-				</div>
 				<p>Version: ${this._modelsBuilder?.version}</p>
 				<div class="models-description">
 					<p>ModelsBuilder is enabled with the following configuration:</p>
@@ -136,12 +134,6 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 			:host {
 				display: block;
 				padding: var(--uui-size-layout-1);
-			}
-
-			.headline {
-				display: flex;
-				justify-content: space-between;
-				align-items: flex-start;
 			}
 
 			.models-description ul {

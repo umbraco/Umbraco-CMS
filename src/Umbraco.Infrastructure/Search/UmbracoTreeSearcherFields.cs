@@ -18,6 +18,7 @@ public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
         UmbracoExamineFieldNames.CategoryFieldName,
         "parentID",
         UmbracoExamineFieldNames.ItemTypeFieldName,
+        UmbracoExamineFieldNames.IndexPathFieldName,
     };
 
     private readonly ISet<string> _backOfficeMediaFieldsToLoad =
