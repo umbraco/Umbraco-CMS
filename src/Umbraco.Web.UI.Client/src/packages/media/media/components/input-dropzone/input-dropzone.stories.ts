@@ -46,3 +46,10 @@ export const WithAccept: Story = {
 		},
 	},
 };
+
+export const WithDefaultSlot: Story = {
+	render: () =>
+		html`<umb-input-dropzone>
+			<div>Custom slot</div>
+		</umb-input-dropzone>`,
+};

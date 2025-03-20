@@ -54,12 +54,6 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	@property({ type: String })
 	label = 'dropzone';
 
-	/**
-	 * The button text.
-	 */
-	@property({ type: String })
-	buttonText?: string;
-
 	@query('#dropzone', true)
 	private _dropzone?: UUIFileDropzoneElement;
 
@@ -101,9 +95,9 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				accept=${ifDefined(this.accept)}
 				@change=${this.#onUpload}
 				@click=${this.#handleBrowse}>
-				<uui-button
-					label=${this.buttonText ?? this.localize.term('media_clickToUpload')}
-					@click=${this.#handleBrowse}></uui-button>
+				<slot>
+					<uui-button label=${this.localize.term('media_clickToUpload')} @click=${this.#handleBrowse}></uui-button>
+				</slot>
 			</uui-file-dropzone>
 			${this.#renderUploader()}
 		`;
