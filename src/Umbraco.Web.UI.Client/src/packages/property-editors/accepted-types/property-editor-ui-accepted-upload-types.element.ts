@@ -40,7 +40,8 @@ export class UmbPropertyEditorUIAcceptedUploadTypesElement
 	}
 
 	#addValidators(config: UmbTemporaryFileConfigurationModel) {
-		this._inputElement?.addValidator(
+		const inputElement = this.shadowRoot?.querySelector('umb-input-multiple-text-string');
+		inputElement?.addValidator(
 			'badInput',
 			() => {
 				let message = this.localize.term('validation_invalidExtensions');
@@ -53,7 +54,7 @@ export class UmbPropertyEditorUIAcceptedUploadTypesElement
 				return message;
 			},
 			() => {
-				const extensions = this._inputElement?.items;
+				const extensions = inputElement?.items;
 				if (!extensions) return false;
 				if (
 					config.allowedUploadedFileExtensions.length &&
