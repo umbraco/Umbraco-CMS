@@ -74,7 +74,6 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	 * @returns Promise that resolves to void when the validation is complete.
 	 */
 	public async validate(): Promise<Array<void>> {
-		//return this.validation.validate();
 		return Promise.all(this.#validationContexts.map((context) => context.validate()));
 	}
 
@@ -97,9 +96,13 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 			async () => {
 				onValid().then(this.#completeSubmit, this.#rejectSubmit);
 			},
-			async () => {
+			async (error) => {
+				if (error) {
+					throw new Error(error);
+				}
+				// TODO: Implement developer-mode logging here. [NL]
 				console.warn(
-					'Validation failed because it still has these validation messages',
+					'Validation failed because of these validation messages still begin present: ',
 					this.#validationContexts.flatMap((x) => x.messages.getMessages()),
 				);
 				onInvalid().then(this.#resolveSubmit, this.#rejectSubmit);
@@ -109,7 +112,10 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		return this.#submitPromise;
 	}
 
-	#rejectSubmit = () => {
+	#rejectSubmit = (error: any) => {
+		if (error) {
+			throw new Error(error);
+		}
 		if (this.#submitPromise) {
 			// TODO: Capture the validation contexts messages on open, and then reset to them in this case. [NL]
 
