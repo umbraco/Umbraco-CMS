@@ -122,11 +122,12 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			this.observe(
 				parent.messages.messagesOfPathAndDescendant(dataPath),
 				(msgs) => {
+					this.messages.initiateChange();
 					//this.messages.appendMessages(msgs);
 					if (this.#parentMessages) {
 						// Remove the local messages that does not exist in the parent anymore:
 						const toRemove = this.#parentMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
-						this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
+						this.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
 					}
 					this.#parentMessages = msgs;
 					msgs.forEach((msg) => {
@@ -139,6 +140,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 						// Notice, the local message uses the same key. [NL]
 						this.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
+					this.messages.finishChange();
 				},
 				'observeParentMessages',
 			);
@@ -147,6 +149,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 				this.messages.messages,
 				(msgs) => {
 					if (!this.#parent) return;
+
+					this.#parent!.messages.initiateChange();
+
 					//this.messages.appendMessages(msgs);
 					if (this.#localMessages) {
 						// Remove the parent messages that does not exist locally anymore:
@@ -165,11 +170,26 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 						// Notice, the parent message uses the same key. [NL]
 						this.#parent!.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
+
+					this.#parent!.messages.finishChange();
 				},
 				'observeLocalMessages',
 			);
 		}).skipHost();
 		// Notice skipHost ^^, this is because we do not want it to consume it self, as this would be a match for this consumption, instead we will look at the parent and above. [NL]
+	}
+
+	override hostConnected(): void {
+		super.hostConnected();
+		if (this.#parent) {
+			this.#parent.addValidator(this);
+		}
+	}
+	override hostDisconnected(): void {
+		super.hostDisconnected();
+		if (this.#parent) {
+			this.#parent.removeValidator(this);
+		}
 	}
 
 	/**
@@ -229,18 +249,27 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			() => false,
 		);
 
+		if (this.#validators.length === 0 && resultsStatus === false) {
+			throw new Error('No validators to validate, but validation failed');
+		}
+
 		if (this.messages === undefined) {
 			// This Context has been destroyed while is was validating, so we should not continue.
 			return Promise.reject();
 		}
 
+		const hasMessages = this.messages.getHasAnyMessages();
+
 		// If we have any messages then we are not valid, otherwise lets check the validation results: [NL]
 		// This enables us to keep client validations though UI is not present anymore — because the client validations got defined as messages. [NL]
-		const isValid = this.messages.getHasAnyMessages() ? false : resultsStatus;
+		const isValid = hasMessages ? false : resultsStatus;
 
 		this.#isValid = isValid;
 
 		if (isValid === false) {
+			if (hasMessages === false && resultsStatus === false) {
+				throw new Error('Missing validation messages to represent why a child validation context is invalid.');
+			}
 			// Focus first invalid element:
 			this.focusFirstInvalidElement();
 			return Promise.reject();
@@ -278,6 +307,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	}
 
 	override destroy(): void {
+		this.#providerCtrl?.destroy();
 		this.#providerCtrl = undefined;
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
