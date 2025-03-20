@@ -114,5 +114,6 @@ public class UmbracoPlan : MigrationPlan
 
         // To 15.4.0
         To<V_15_4_0.UpdateDocumentUrlToPersistMultipleSegmentsPerDocument>("{A9E72794-4036-4563-B543-1717C73B8879}");
+        To<V_15_4_0.AddDocumentPropertyPermissions>("{D1568C33-A697-455F-8D16-48060CB954A1}");
     }
 }
