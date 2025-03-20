@@ -48,7 +48,7 @@ test('can update amount', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  expect(await umbracoApi.dataType.doesMediaPickerHaveAmount(customDataTypeName, minValue, maxValue)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesMediaPickerHaveMinAndMaxAmount(customDataTypeName, minValue, maxValue)).toBeTruthy();
 });
 
 test('can update enable focal point', async ({umbracoApi, umbracoUi}) => {
@@ -193,7 +193,7 @@ for (const mediaPicker of mediaPickerTypes) {
       expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'filter', imageTypeData.id)).toBeTruthy();
     }
     if (!mediaPicker.type.includes('Multiple')) {
-      expect(await umbracoApi.dataType.doesMediaPickerHaveAmount(mediaPicker.type, 0, 1)).toBeTruthy();
+      expect(await umbracoApi.dataType.doesMediaPickerHaveMinAndMaxAmount(mediaPicker.type, 0, 1)).toBeTruthy();
     }
     expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'startNodeId')).toBeFalsy();
     expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'ignoreUserStartNodes')).toBeFalsy();
