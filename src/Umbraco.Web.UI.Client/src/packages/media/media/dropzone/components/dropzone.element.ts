@@ -1,6 +1,6 @@
-import { UmbDropzoneManager } from './dropzone-manager.class.js';
-import { UmbDropzoneSubmittedEvent } from './dropzone-submitted.event.js';
-import { UmbFileDropzoneItemStatus, type UmbUploadableItem } from './types.js';
+import { UmbDropzoneManager } from '../dropzone-manager.class.js';
+import { UmbDropzoneSubmittedEvent } from '../dropzone-submitted.event.js';
+import { UmbFileDropzoneItemStatus, type UmbUploadableItem } from '../types.js';
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
