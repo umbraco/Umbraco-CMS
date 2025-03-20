@@ -820,6 +820,7 @@ export class UmbContentTypeStructureManager<
 		this.#containers.destroy();
 		this.propertyReadState.destroy();
 		this.propertyWriteState.destroy();
+		this.propertyReadOnlyState.destroy();
 		super.destroy();
 	}
 }

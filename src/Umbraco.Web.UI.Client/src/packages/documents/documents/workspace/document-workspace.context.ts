@@ -184,6 +184,7 @@ export class UmbDocumentWorkspaceContext
 		this.#isTrashedContext.setIsTrashed(false);
 		this.structure.propertyReadState.clear();
 		this.structure.propertyWriteState.clear();
+		this.structure.propertyReadOnlyState.clear();
 	}
 
 	override async load(unique: string) {
