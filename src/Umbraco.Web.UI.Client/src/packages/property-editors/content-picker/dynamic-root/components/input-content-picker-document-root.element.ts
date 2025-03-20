@@ -13,6 +13,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbDocumentTypeItemRepository } from '@umbraco-cms/backoffice/document-type';
 
 const elementName = 'umb-input-content-picker-document-root';
 @customElement(elementName)
@@ -34,6 +35,10 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 	data?: UmbContentPickerDynamicRoot;
 
 	#dynamicRootOrigin?: { label: string; icon: string; description?: string };
+
+	#queryStepManifestsDocTypeNameMap: Record<string, string> = {};
+
+	#documentTypeItemRepository: UmbDocumentTypeItemRepository = new UmbDocumentTypeItemRepository(this);
 
 	#modalContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
@@ -61,11 +66,12 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 		);
 	}
 
-	override connectedCallback(): void {
+	override async connectedCallback() {
 		super.connectedCallback();
 
 		this.#updateDynamicRootOrigin(this.data);
 		this.#updateDynamicRootQuerySteps(this.data?.querySteps);
+		await this.#populateQueryStepManifestsDocTypeNameMap();
 	}
 
 	#sorter = new UmbSorterController<UmbContentPickerDynamicRootQueryStep>(this, {
@@ -87,6 +93,21 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 		},
 	});
 
+	async #populateQueryStepManifestsDocTypeNameMap() {
+		const docTypeKeys = this.data?.querySteps?.flatMap(item => item.anyOfDocTypeKeys).filter(item => item !== undefined) ?? [];
+		if (docTypeKeys.length > 0) {
+			const { data } = await this.#documentTypeItemRepository.requestItems(docTypeKeys);
+			if (data) {
+				for (let index = 0; index < data.length; index++) {
+					const docTypeItem = data[index];
+					this.#queryStepManifestsDocTypeNameMap[docTypeItem.unique] = docTypeItem.name;
+				}
+			}
+		}
+
+		this.requestUpdate();
+	}
+
 	#openDynamicRootOriginPicker() {
 		this.#openModal = this.#modalContext?.open(this, UMB_CONTENT_PICKER_DOCUMENT_ROOT_ORIGIN_PICKER_MODAL, {
 			data: { items: this._originManifests },
@@ -104,10 +125,11 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 		this.#openModal = this.#modalContext?.open(this, UMB_CONTENT_PICKER_DOCUMENT_ROOT_QUERY_STEP_PICKER_MODAL, {
 			data: { items: this._queryStepManifests },
 		});
-		this.#openModal?.onSubmit().then((step) => {
+		this.#openModal?.onSubmit().then(async (step) => {
 			if (this.data) {
 				const querySteps = [...(this.data.querySteps ?? []), step];
 				this.#updateDynamicRootQuerySteps(querySteps);
+				await this.#populateQueryStepManifestsDocTypeNameMap();
 				this.dispatchEvent(new UmbChangeEvent());
 			}
 		});
@@ -140,10 +162,11 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 		label: string;
 		icon: string;
 		description?: string;
-	} {
+		} {
 		const step = this._queryStepManifests.find((step) => step.meta.queryStepAlias === item.alias)?.meta;
-		const docTypes = item.anyOfDocTypeKeys?.join(', ');
-		const description = docTypes ? this.localize.term('dynamicRoot_queryStepTypes') + docTypes : undefined;
+
+		const docTypeNames = item.anyOfDocTypeKeys?.map((item) => this.#queryStepManifestsDocTypeNameMap[item] ?? item).sort().join(', ') ?? '';
+		const description = item.anyOfDocTypeKeys ? this.localize.term('dynamicRoot_queryStepTypes') + docTypeNames : undefined;
 
 		return {
 			unique: item.unique,
