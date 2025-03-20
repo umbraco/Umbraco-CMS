@@ -20,7 +20,6 @@ import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action
 import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import type { UmbTreeExpansionModel } from '../../expansion-manager/types.js';
 
 export abstract class UmbTreeItemContextBase<
 		TreeItemType extends UmbTreeItemModel,
@@ -387,29 +386,22 @@ export abstract class UmbTreeItemContextBase<
 	}
 
 	#observeExpansion() {
+		if (this.unique === undefined) return;
+		if (!this.entityType) return;
+		if (!this.treeContext) return;
+
 		this.observe(
-			this.treeContext?.expansion.expansion,
-			(expansion) => {
-				if (this.unique === undefined) return;
-
-				// Check if this item is in the expansion
-				const self = expansion?.find((entry) => entry.entityType === this.entityType && entry.unique === this.unique);
-
+			this.treeContext.expansion.isExpanded({ entityType: this.entityType, unique: this.unique }),
+			(isExpanded) => {
 				// If this item has children, load them
-				if (self && this.#hasChildren.getValue() && this.#isOpen.getValue() === false) {
+				if (isExpanded && this.#hasChildren.getValue() && this.#isOpen.getValue() === false) {
 					this.loadChildren();
 				}
 
-				this.#checkIsOpen(expansion);
+				this.#isOpen.setValue(isExpanded);
 			},
 			'observeExpansion',
 		);
-	}
-
-	#checkIsOpen(expansion: UmbTreeExpansionModel | undefined) {
-		const isSelf = expansion?.find((entry) => entry.entityType === this.entityType && entry.unique === this.unique);
-		const isOpen = isSelf ? true : false;
-		this.#isOpen.setValue(isOpen);
 	}
 
 	#onReloadRequest = (event: UmbEntityActionEvent) => {
