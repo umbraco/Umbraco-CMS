@@ -307,27 +307,23 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         bool canUpdateInvariantData,
         HashSet<string> allowedCultures)
     {
-        source = UpdateSourceInvariantData(source, target, canUpdateInvariantData);
+        var mergedInvariant = UpdateSourceInvariantData(source, target, canUpdateInvariantData);
 
-        if (source is null && target is null)
+        // if the structure (invariant) is not defined after merger, the target content does not matter
+        if (mergedInvariant is null)
         {
             return null;
         }
 
-        if (source is null && target?.Layout is not null)
+        // since we merged the invariant data (layout) before we get to this point
+        // we just need an empty valid object to run comparisons at this point
+        if (source is null)
         {
-            source = new BlockEditorData<TValue, TLayout>([], CreateWithLayout(target.Layout));
-        }
-        else if (target is null && source?.Layout is not null)
-        {
-            target = new BlockEditorData<TValue, TLayout>([], CreateWithLayout(source.Layout));
+            source = new BlockEditorData<TValue, TLayout>([], new TValue());
         }
 
-        // at this point the layout should have been merged or fallback created
-        if (source is null || target is null)
-        {
-            throw new ArgumentException("invalid sourceValue or targetValue");
-        }
+        // update the target with the merged invariant
+        target!.BlockValue.Layout = mergedInvariant.BlockValue.Layout;
 
         // remove all the blocks that are no longer part of the layout
         target.BlockValue.ContentData.RemoveAll(contentBlock =>
