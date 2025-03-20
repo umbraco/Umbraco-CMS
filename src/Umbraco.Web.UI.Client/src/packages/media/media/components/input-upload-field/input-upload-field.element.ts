@@ -159,17 +159,15 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 			temporaryUnique: UmbId.new(),
 			status: TemporaryFileStatus.WAITING,
 			file: e.detail.files[0],
+			onProgress: (p) => {
+				this._progress = Math.ceil(p);
+			},
+			abortController: new AbortController(),
 		};
 
 		try {
 			this.#uploadAbort = new AbortController();
-			const uploaded = await this.#manager.uploadOne({
-				...this.temporaryFile,
-				onProgress: (p) => {
-					this._progress = Math.ceil(p);
-				},
-				abortSignal: this.#uploadAbort.signal,
-			});
+			const uploaded = await this.#manager.uploadOne(this.temporaryFile);
 
 			if (uploaded.status === TemporaryFileStatus.SUCCESS) {
 				this.temporaryFile.status = TemporaryFileStatus.SUCCESS;
