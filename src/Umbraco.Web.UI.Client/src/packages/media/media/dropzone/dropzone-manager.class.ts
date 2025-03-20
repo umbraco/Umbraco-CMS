@@ -11,7 +11,11 @@ import type {
 	UmbAllowedMediaTypesOfExtension,
 	UmbAllowedChildrenOfMediaType,
 } from './types.js';
-import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
+import {
+	TemporaryFileStatus,
+	UmbTemporaryFileManager,
+	type UmbTemporaryFileModel,
+} from '@umbraco-cms/backoffice/temporary-file';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -314,18 +318,25 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		const items: Array<UmbUploadableItem> = [];
 
 		for (const file of files) {
+			const temporaryFile: UmbTemporaryFileModel = {
+				file,
+				temporaryUnique: UmbId.new(),
+				abortController: new AbortController(),
+				onProgress: (progress) => this.#updateProgress(uploadableItem, progress),
+			};
+
 			const uploadableItem: UmbUploadableFile = {
 				unique: UmbId.new(),
 				parentUnique,
 				status: UmbFileDropzoneItemStatus.WAITING,
 				progress: 0,
-				temporaryFile: {
-					file,
-					temporaryUnique: UmbId.new(),
-					abortController: new AbortController(),
-				},
+				temporaryFile,
 			};
-			uploadableItem.temporaryFile.onProgress = (progress) => this.#updateProgress(uploadableItem, progress);
+
+			temporaryFile.abortController?.signal.addEventListener('abort', () => {
+				this.#updateStatus(uploadableItem, UmbFileDropzoneItemStatus.CANCELLED);
+			});
+
 			items.push(uploadableItem);
 		}
 
