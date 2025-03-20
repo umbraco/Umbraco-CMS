@@ -708,8 +708,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				async () => {
 					return this.performCreateOrUpdate(variantIds, saveData);
 				},
-				async () => {
-					return this.invalidSubmit();
+				async (reason?: any) => {
+					return this.invalidSubmit(reason);
 				},
 			);
 		} else {
