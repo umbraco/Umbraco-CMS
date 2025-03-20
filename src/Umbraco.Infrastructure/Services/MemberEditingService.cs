@@ -283,10 +283,13 @@ internal sealed class MemberEditingService : IMemberEditingService
             return MemberEditingOperationStatus.DuplicateUsername;
         }
 
-        IMember? byEmail = _memberService.GetByEmail(model.Email);
-        if (byEmail is not null && byEmail.Key != memberKey)
+        if (_securitySettings.MemberRequireUniqueEmail)
         {
-            return MemberEditingOperationStatus.DuplicateEmail;
+            IMember? byEmail = _memberService.GetByEmail(model.Email);
+            if (byEmail is not null && byEmail.Key != memberKey)
+            {
+                return MemberEditingOperationStatus.DuplicateEmail;
+            }
         }
 
         return MemberEditingOperationStatus.Success;
