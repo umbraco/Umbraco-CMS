@@ -82,7 +82,7 @@ export class UmbInputDocumentPropertyValueUserPermissionElement extends UUIFormC
 			if (!value) throw new Error('No result from modal');
 
 			const permissionItem: UmbDocumentPropertyValueUserPermissionModel = {
-				$type: 'DocumentTypePropertyPermissionPresentationModel',
+				$type: 'DocumentPropertyValuePermissionPresentationModel',
 				userPermissionType: UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_TYPE,
 				documentType: value.documentType,
 				propertyType: value.propertyType,

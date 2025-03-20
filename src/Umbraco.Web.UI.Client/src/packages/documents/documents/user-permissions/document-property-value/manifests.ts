@@ -44,7 +44,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 				'./input-document-property-value-user-permission/input-document-property-value-user-permission.element.js'
 			),
 		meta: {
-			schemaType: 'DocumentTypePropertyPermissionPresentationModel',
+			schemaType: 'DocumentPropertyValuePermissionPresentationModel',
 			label: 'Document Property Values',
 			description: 'Assign Permissions to Document property values',
 		},
