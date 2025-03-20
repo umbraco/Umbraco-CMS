@@ -240,8 +240,6 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	];
 }
 
-export { UmbInputDropzoneElement as element };
-
 export const UmbInputDropzoneDashedStyles = css`
 	umb-input-dropzone {
 		position: relative;
