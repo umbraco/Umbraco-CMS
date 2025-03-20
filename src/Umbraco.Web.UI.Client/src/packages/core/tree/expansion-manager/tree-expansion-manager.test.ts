@@ -25,6 +25,10 @@ describe('UmbTreeExpansionManager', () => {
 		});
 
 		describe('methods', () => {
+			it('has an isExpanded method', () => {
+				expect(manager).to.have.property('isExpanded').that.is.a('function');
+			});
+
 			it('has a setExpansion method', () => {
 				expect(manager).to.have.property('setExpansion').that.is.a('function');
 			});
@@ -43,6 +47,19 @@ describe('UmbTreeExpansionManager', () => {
 
 			it('has a collapseAll method', () => {
 				expect(manager).to.have.property('collapseAll').that.is.a('function');
+			});
+		});
+	});
+
+	describe('isExpanded', () => {
+		it('checks if an item is expanded', (done) => {
+			manager.setExpansion([item]);
+			const isExpanded = manager.isExpanded(item);
+			expect(isExpanded).to.be.an.instanceOf(Observable);
+			manager.isExpanded(item).subscribe((value) => {
+				console.log('VALUE', value);
+				expect(value).to.be.true;
+				done();
 			});
 		});
 	});
