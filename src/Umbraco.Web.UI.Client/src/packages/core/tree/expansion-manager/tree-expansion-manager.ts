@@ -1,7 +1,7 @@
 import type { UmbTreeExpansionModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * Manages the expansion state of a tree
@@ -10,7 +10,7 @@ import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/obs
  * @augments {UmbControllerBase}
  */
 export class UmbTreeExpansionManager extends UmbControllerBase {
-	#expansion = new UmbObjectState<UmbTreeExpansionModel | undefined>(undefined);
+	#expansion = new UmbArrayState<UmbEntityModel>([], (x) => x.unique);
 	expansion = this.#expansion.asObservable();
 
 	/**
@@ -19,16 +19,16 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @memberof UmbTreeExpansionManager
 	 * @returns {void}
 	 */
-	setExpansion(expansion: UmbTreeExpansionModel | undefined): void {
+	setExpansion(expansion: UmbTreeExpansionModel): void {
 		this.#expansion.setValue(expansion);
 	}
 
 	/**
 	 * Gets the expansion state
 	 * @memberof UmbTreeExpansionManager
-	 * @returns {UmbTreeExpansionModel | undefined} The expansion state
+	 * @returns {UmbTreeExpansionModel} The expansion state
 	 */
-	getExpansion(): UmbTreeExpansionModel | undefined {
+	getExpansion(): UmbTreeExpansionModel {
 		return this.#expansion.getValue();
 	}
 
@@ -41,9 +41,7 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @returns {Promise<void>}
 	 */
 	public async expandItem(entity: UmbEntityModel): Promise<void> {
-		const currentValue = this.#expansion.getValue() ?? [];
-		const newValue = appendToFrozenArray(currentValue, entity, (x) => x?.unique);
-		this.#expansion.setValue(newValue);
+		this.#expansion.appendOne(entity);
 	}
 
 	/**
@@ -55,9 +53,7 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @returns {Promise<void>}
 	 */
 	public async collapseItem(entity: UmbEntityModel): Promise<void> {
-		const currentValue = this.#expansion.getValue() ?? [];
-		const newValue = currentValue.filter((x) => x.entityType !== entity.entityType || x.unique !== entity.unique);
-		this.#expansion.setValue(newValue);
+		this.#expansion.filter((x) => x.entityType !== entity.entityType || x.unique !== entity.unique);
 	}
 
 	/**
