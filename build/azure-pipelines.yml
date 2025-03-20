@@ -352,7 +352,7 @@ stages:
               vmImage: 'ubuntu-latest'
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
-              Tests__Database__SQLServerMasterConnectionString: 'Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True;Encrypt=False;'
+              Tests__Database__SQLServerMasterConnectionString: 'Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True'
         pool:
           vmImage: $(vmImage)
         steps:
