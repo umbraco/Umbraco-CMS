@@ -2,18 +2,18 @@ import type { UmbDocumentPropertyValueUserPermissionModel } from '../types.js';
 import { UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_TYPE } from '../user-permission.js';
 import type { UmbDataSourceDataMapping } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { DocumentTypePropertyPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { DocumentPropertyValuePermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbDocumentPropertyValueUserPermissionFromManagementApiDataMapping
 	extends UmbControllerBase
 	implements
 		UmbDataSourceDataMapping<
-			DocumentTypePropertyPermissionPresentationModel,
+			DocumentPropertyValuePermissionPresentationModel,
 			UmbDocumentPropertyValueUserPermissionModel
 		>
 {
 	async map(
-		data: DocumentTypePropertyPermissionPresentationModel,
+		data: DocumentPropertyValuePermissionPresentationModel,
 	): Promise<UmbDocumentPropertyValueUserPermissionModel> {
 		return {
 			$type: data.$type,

@@ -5,7 +5,7 @@ import { UMB_MANAGEMENT_API_DATA_SOURCE_ALIAS } from '@umbraco-cms/backoffice/re
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'dataSourceDataMapping',
-		alias: 'Umb.DataSourceDataMapping.ManagementApi.To.DocumentTypePropertyPermissionPresentationModel',
+		alias: 'Umb.DataSourceDataMapping.ManagementApi.To.DocumentPropertyValuePermissionPresentationModel',
 		name: 'Document Property Value Permission To Management Api Data Mapping',
 		api: () => import('./to-server.management-api.mapping.js'),
 		forDataSource: UMB_MANAGEMENT_API_DATA_SOURCE_ALIAS,
@@ -13,10 +13,10 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	},
 	{
 		type: 'dataSourceDataMapping',
-		alias: 'Umb.DataSourceDataMapping.ManagementApi.From.DocumentTypePropertyPermissionPresentationModel',
+		alias: 'Umb.DataSourceDataMapping.ManagementApi.From.DocumentPropertyValuePermissionPresentationModel',
 		name: 'Document Property Value Permission From Management Api Data Mapping',
 		api: () => import('./from-server.management-api.mapping.js'),
 		forDataSource: UMB_MANAGEMENT_API_DATA_SOURCE_ALIAS,
-		forDataModel: 'DocumentTypePropertyPermissionPresentationModel',
+		forDataModel: 'DocumentPropertyValuePermissionPresentationModel',
 	},
 ];
