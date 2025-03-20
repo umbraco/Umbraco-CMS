@@ -1491,6 +1491,7 @@ export class DocumentService {
     /**
      * @param data The data for the request.
      * @param data.query
+     * @param data.trashed
      * @param data.skip
      * @param data.take
      * @param data.parentId
@@ -1504,6 +1505,7 @@ export class DocumentService {
             url: '/umbraco/management/api/v1/item/document/search',
             query: {
                 query: data.query,
+                trashed: data.trashed,
                 skip: data.skip,
                 take: data.take,
                 parentId: data.parentId,
@@ -2504,6 +2506,7 @@ export class DocumentTypeService {
     /**
      * @param data The data for the request.
      * @param data.query
+     * @param data.isElement
      * @param data.skip
      * @param data.take
      * @returns unknown OK
@@ -2515,6 +2518,7 @@ export class DocumentTypeService {
             url: '/umbraco/management/api/v1/item/document-type/search',
             query: {
                 query: data.query,
+                isElement: data.isElement,
                 skip: data.skip,
                 take: data.take
             },
@@ -3498,6 +3502,7 @@ export class MediaService {
     /**
      * @param data The data for the request.
      * @param data.query
+     * @param data.trashed
      * @param data.skip
      * @param data.take
      * @param data.parentId
@@ -3511,6 +3516,7 @@ export class MediaService {
             url: '/umbraco/management/api/v1/item/media/search',
             query: {
                 query: data.query,
+                trashed: data.trashed,
                 skip: data.skip,
                 take: data.take,
                 parentId: data.parentId,
