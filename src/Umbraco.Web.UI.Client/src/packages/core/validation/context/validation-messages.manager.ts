@@ -97,6 +97,7 @@ export class UmbValidationMessagesManager {
 		this.#messages.removeOne(key);
 	}
 	removeMessageByKeys(keys: Array<string>): void {
+		if (keys.length === 0) return;
 		this.#messages.filter((x) => keys.indexOf(x.key) === -1);
 	}
 	removeMessagesByType(type: UmbValidationMessageType): void {
