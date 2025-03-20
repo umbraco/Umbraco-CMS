@@ -129,9 +129,7 @@ export class UmbServerModelValidatorContext
 					pathTranslators: this.#pathTranslators,
 				});
 
-				console.log('incoming messages', messages);
 				messages = await ctrl.translate(messages);
-				console.log('translated messages', messages);
 				this.#context.messages.addMessageObjects(messages);
 			}
 		}
