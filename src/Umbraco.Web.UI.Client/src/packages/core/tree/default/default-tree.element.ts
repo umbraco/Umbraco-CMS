@@ -45,7 +45,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	filter: (item: UmbTreeItemModelBase) => boolean = () => true;
 
 	@property({ attribute: false })
-	expansion?: UmbTreeExpansionModel;
+	expansion: UmbTreeExpansionModel = [];
 
 	@state()
 	private _rootItems: UmbTreeItemModel[] = [];

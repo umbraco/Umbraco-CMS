@@ -289,20 +289,20 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Sets the expansion state
-	 * @param {UmbTreeExpansionModel | undefined} data - The expansion state
+	 * @param {UmbTreeExpansionModel} data - The expansion state
 	 * @returns {void}
 	 * @memberof UmbDefaultTreeContext
 	 */
-	setExpansion(data: UmbTreeExpansionModel | undefined): void {
+	setExpansion(data: UmbTreeExpansionModel): void {
 		this.expansion.setExpansion(data);
 	}
 
 	/**
 	 * Gets the expansion state
-	 * @returns {UmbTreeExpansionModel | undefined} - The expansion state
+	 * @returns {UmbTreeExpansionModel} - The expansion state
 	 * @memberof UmbDefaultTreeContext
 	 */
-	getExpansion(): UmbTreeExpansionModel | undefined {
+	getExpansion(): UmbTreeExpansionModel {
 		return this.expansion.getExpansion();
 	}
 
