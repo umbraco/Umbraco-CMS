@@ -11,15 +11,16 @@ import type {
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 import '../components/input-multi-url/index.js';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
  */
 @customElement('umb-property-editor-ui-multi-url-picker')
-export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property({ type: Array })
-	value: Array<UmbLinkPickerLink> = [];
-
+export class UmbPropertyEditorUIMultiUrlPickerElement
+	extends UmbFormControlMixin<Array<UmbLinkPickerLink>, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
@@ -81,6 +82,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 				this,
 			);
 		}
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-multi-url')!);
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputMultiUrlElement }) {

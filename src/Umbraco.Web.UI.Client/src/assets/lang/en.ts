@@ -374,8 +374,6 @@ export default {
 		fileSecurityValidationFailure: 'One or more file security validations have failed',
 		moveToSameFolderFailed: 'Parent and destination folders cannot be the same',
 		uploadNotAllowed: 'Upload is not allowed in this location.',
-		noticeExtensionsServerOverride:
-			'Regardless of the allowed file types, the following limitations apply system-wide due to the server configuration:',
 	},
 	member: {
 		'2fa': 'Two-Factor Authentication',
@@ -899,7 +897,6 @@ export default {
 		retrieve: 'Retrieve',
 		retry: 'Retry',
 		rights: 'Permissions',
-		serverConfiguration: 'Server Configuration',
 		scheduledPublishing: 'Scheduled Publishing',
 		umbracoInfo: 'Umbraco info',
 		search: 'Search',
