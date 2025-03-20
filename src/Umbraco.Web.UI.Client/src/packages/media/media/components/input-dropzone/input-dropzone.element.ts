@@ -38,14 +38,20 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	/**
 	 * Determines if the dropzone should create temporary files or media items directly.
 	 */
-	@property({ type: Boolean })
+	@property({ type: Boolean, attribute: 'create-as-temporary' })
 	createAsTemporary: boolean = false;
+
+	/**
+	 * Disallow folder uploads.
+	 */
+	@property({ type: Boolean, attribute: 'disallow-folder-upload' })
+	disallowFolderUpload: boolean = false;
 
 	/**
 	 * Create the media item below this parent.
 	 * @description This is only used when `createAsTemporary` is `false`.
 	 */
-	@property({ attribute: false })
+	@property({ type: String, attribute: 'parent-unique' })
 	parentUnique: string | null = null;
 
 	/**
@@ -98,8 +104,8 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 			<uui-file-dropzone
 				id="dropzone"
 				label=${this.label}
-				disallowFolderUpload
 				accept=${ifDefined(this.accept)}
+				?disallowFolderUpload=${this.disallowFolderUpload}
 				@change=${this.#onUpload}
 				@click=${this.#handleBrowse}>
 				<slot>
