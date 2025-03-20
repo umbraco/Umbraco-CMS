@@ -37,6 +37,22 @@ export class UmbValidationMessagesManager {
 		return this.#messages.getValue();
 	}
 
+	#updateLock = 0;
+	initiateChange() {
+		this.#updateLock++;
+		this.#messages.mute();
+		// TODO: When ready enable this code will enable handling a finish automatically by this implementation 'using myState.initiatePropertyValueChange()' (Relies on TS support of Using) [NL]
+		/*return {
+			[Symbol.dispose]: this.finishPropertyValueChange,
+		};*/
+	}
+	finishChange() {
+		this.#updateLock--;
+		if (this.#updateLock === 0) {
+			this.#messages.unmute();
+		}
+	}
+
 	getHasAnyMessages(): boolean {
 		return this.#messages.getValue().length !== 0;
 	}
@@ -79,7 +95,9 @@ export class UmbValidationMessagesManager {
 		if (this.#messages.getValue().find((x) => x.type === type && x.path === path && x.body === body)) {
 			return;
 		}
+		this.initiateChange();
 		this.#messages.appendOne({ type, key, path, body: body });
+		this.finishChange();
 	}
 
 	addMessages(type: UmbValidationMessageType, path: string, bodies: Array<string>): void {
@@ -90,28 +108,42 @@ export class UmbValidationMessagesManager {
 		const newBodies = bodies.filter(
 			(message) => existingMessages.find((x) => x.type === type && x.path === path && x.body === message) === undefined,
 		);
+		this.initiateChange();
 		this.#messages.append(newBodies.map((body) => ({ type, key: UmbId.new(), path, body })));
+		this.finishChange();
 	}
 
 	removeMessageByKey(key: string): void {
+		this.initiateChange();
 		this.#messages.removeOne(key);
+		this.finishChange();
 	}
 	removeMessageByKeys(keys: Array<string>): void {
 		if (keys.length === 0) return;
+		this.initiateChange();
 		this.#messages.filter((x) => keys.indexOf(x.key) === -1);
+		this.finishChange();
 	}
 	removeMessagesByType(type: UmbValidationMessageType): void {
+		this.initiateChange();
 		this.#messages.filter((x) => x.type !== type);
+		this.finishChange();
 	}
 	removeMessagesByPath(path: string): void {
+		this.initiateChange();
 		this.#messages.filter((x) => x.path !== path);
+		this.finishChange();
 	}
 	removeMessagesAndDescendantsByPath(path: string): void {
+		this.initiateChange();
 		this.#messages.filter((x) => MatchPathOrDescendantPath(x.path, path));
+		this.finishChange();
 	}
 	removeMessagesByTypeAndPath(type: UmbValidationMessageType, path: string): void {
 		//path = path.toLowerCase();
+		this.initiateChange();
 		this.#messages.filter((x) => !(x.type === type && x.path === path));
+		this.finishChange();
 	}
 
 	#translatePath(path: string): string | undefined {
@@ -129,6 +161,7 @@ export class UmbValidationMessagesManager {
 
 	#translators: Array<UmbValidationMessageTranslator> = [];
 	addTranslator(translator: UmbValidationMessageTranslator): void {
+		this.initiateChange();
 		if (this.#translators.indexOf(translator) === -1) {
 			this.#translators.push(translator);
 		}
@@ -142,6 +175,7 @@ export class UmbValidationMessagesManager {
 				this.#messages.updateOne(msg.key, { path: newPath });
 			}
 		}
+		this.finishChange();
 	}
 
 	removeTranslator(translator: UmbValidationMessageTranslator): void {
