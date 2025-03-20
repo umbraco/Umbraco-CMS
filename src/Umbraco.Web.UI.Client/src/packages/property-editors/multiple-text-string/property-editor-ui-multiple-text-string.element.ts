@@ -76,7 +76,7 @@ export class UmbPropertyEditorUIMultipleTextStringElement
 				this,
 			);
 		}
-		this.addFormControlElement(this.shadowRoot?.querySelector('umb-input-multiple-text-string')!);
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-multiple-text-string')!);
 	}
 
 	#onChange(event: UmbChangeEvent) {
