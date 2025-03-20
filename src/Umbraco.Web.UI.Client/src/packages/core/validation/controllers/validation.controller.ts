@@ -249,9 +249,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			() => false,
 		);
 
-		if (this.#validators.length === 0 && resultsStatus === false) {
+		/*if (this.#validators.length === 0 && resultsStatus === false) {
 			throw new Error('No validators to validate, but validation failed');
-		}
+		}*/
 
 		if (this.messages === undefined) {
 			// This Context has been destroyed while is was validating, so we should not continue.
@@ -267,9 +267,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		this.#isValid = isValid;
 
 		if (isValid === false) {
-			if (hasMessages === false && resultsStatus === false) {
+			/*if (hasMessages === false && resultsStatus === false) {
 				throw new Error('Missing validation messages to represent why a child validation context is invalid.');
-			}
+			}*/
 			// Focus first invalid element:
 			this.focusFirstInvalidElement();
 			return Promise.reject();
