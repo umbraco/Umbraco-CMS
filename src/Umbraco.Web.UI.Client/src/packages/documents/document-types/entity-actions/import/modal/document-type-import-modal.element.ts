@@ -6,7 +6,7 @@ import type {
 import { css, html, customElement, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbDropzoneElement } from '@umbraco-cms/backoffice/media';
+import type { UmbDropzoneElement } from '@umbraco-cms/backoffice/dropzone';
 
 interface UmbDocumentTypePreview {
 	unique: string;
