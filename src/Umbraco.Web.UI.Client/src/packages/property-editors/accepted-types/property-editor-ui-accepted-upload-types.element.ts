@@ -1,6 +1,5 @@
 import { UmbPropertyEditorUIMultipleTextStringElement } from '../multiple-text-string/property-editor-ui-multiple-text-string.element.js';
-import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { formatBytes } from '@umbraco-cms/backoffice/utils';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTemporaryFileConfigurationModel } from '@umbraco-cms/backoffice/temporary-file';
@@ -70,49 +69,8 @@ export class UmbPropertyEditorUIAcceptedUploadTypesElement
 		);
 	}
 
-	#renderAcceptedTypes() {
-		if (!this._acceptedTypes.length && !this._disallowedTypes.length && !this._maxFileSize) {
-			return nothing;
-		}
-
-		return html`
-			<uui-box id="notice" headline=${this.localize.term('general_serverConfiguration')}>
-				<p><umb-localize key="media_noticeExtensionsServerOverride"></umb-localize></p>
-				${when(
-					this._acceptedTypes.length,
-					() => html`
-						<p>
-							<umb-localize key="validation_allowedExtensions"></umb-localize>
-							<strong>${this._acceptedTypes.join(', ')}</strong>
-						</p>
-					`,
-				)}
-				${when(
-					this._disallowedTypes.length,
-					() => html`
-						<p>
-							<umb-localize key="validation_disallowedExtensions"></umb-localize>
-							<strong>${this._disallowedTypes.join(', ')}</strong>
-						</p>
-					`,
-				)}
-				${when(
-					this._maxFileSize,
-					() => html`
-						<p>
-							${this.localize.term('media_maxFileSize')}
-							<strong title="${this.localize.number(this._maxFileSize!)} bytes"
-								>${formatBytes(this._maxFileSize!, { decimals: 2 })}</strong
-							>.
-						</p>
-					`,
-				)}
-			</uui-box>
-		`;
-	}
-
 	override render() {
-		return html`${this.#renderAcceptedTypes()} ${super.render()}`;
+		return html`${super.render()}`;
 	}
 
 	static override readonly styles = [
