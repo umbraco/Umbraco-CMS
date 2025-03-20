@@ -698,9 +698,9 @@ path: () => import("./icons/icon-graduate.js"),
 name: "icon-grid",
 path: () => import("./icons/icon-grid.js"),
 },{
-name: "icon-drag",
+name: "icon-grip",
 hidden: true,
-path: () => import("./icons/icon-drag.js"),
+path: () => import("./icons/icon-grip.js"),
 },{
 name: "icon-hammer",
 path: () => import("./icons/icon-hammer.js"),
