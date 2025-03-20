@@ -18,6 +18,13 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { formatBytes } from '@umbraco-cms/backoffice/utils';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
+/**
+ * @element umb-input-dropzone
+ * @fires ProgressEvent When the progress of the upload changes.
+ * @fires UmbDropzoneChangeEvent When the upload is complete.
+ * @fires UmbDropzoneSubmittedEvent When the upload is submitted.
+ * @slot - The default slot.
+ */
 @customElement('umb-input-dropzone')
 export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableItem[], typeof UmbLitElement>(
 	UmbLitElement,
