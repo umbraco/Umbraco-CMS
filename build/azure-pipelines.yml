@@ -338,7 +338,9 @@ stages:
       # Integration Tests (SQL Server)
       - job:
         timeoutInMinutes: 120
-        condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerIntegrationTests}})
+        # We are currently encountering issues when running SQL Server Linux tests Microsoft.Data.SqlClient.SqlException (0x80131904)
+        # condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerIntegrationTests}})
+        condition: eq(${{parameters.sqlServerIntegrationTests}}, True)
         displayName: Integration Tests (SQL Server)
         strategy:
           matrix:
