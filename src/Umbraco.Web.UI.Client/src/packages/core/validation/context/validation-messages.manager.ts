@@ -143,6 +143,7 @@ export class UmbValidationMessagesManager {
 		this.finishChange();
 	}
 	removeMessageByKeys(keys: Array<string>): void {
+		if (keys.length === 0) return;
 		this.initiateChange();
 		this.#messages.filter((x) => keys.indexOf(x.key) === -1);
 		this.finishChange();

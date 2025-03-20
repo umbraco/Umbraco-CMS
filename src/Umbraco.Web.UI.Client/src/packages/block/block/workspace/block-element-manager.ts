@@ -194,7 +194,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
 		}
 
-		const entry = { ...variantId.toObject(), alias, editorAlias, value } as UmbBlockDataValueModel<ValueType>;
+		const entry = { editorAlias, ...variantId.toObject(), alias, value } as UmbBlockDataValueModel<ValueType>;
 
 		const currentData = this.getData();
 		if (currentData) {

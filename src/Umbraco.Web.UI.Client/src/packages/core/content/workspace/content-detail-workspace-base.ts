@@ -503,7 +503,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 
 		// Notice the order of the properties is important for our JSON String Compare function. [NL]
-		const entry = { editorAlias, alias, ...variantId.toObject(), value } as UmbElementValueModel;
+		const entry = { editorAlias, ...variantId.toObject(), alias, value } as UmbElementValueModel;
 
 		const currentData = this.getData();
 		if (currentData) {

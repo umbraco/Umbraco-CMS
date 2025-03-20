@@ -266,6 +266,19 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		this.removeUmbControllerByAlias('observeLocalMessages');
 	}
 
+	override hostConnected(): void {
+		super.hostConnected();
+		if (this.#parent) {
+			this.#parent.addValidator(this);
+		}
+	}
+	override hostDisconnected(): void {
+		super.hostDisconnected();
+		if (this.#parent) {
+			this.#parent.removeValidator(this);
+		}
+	}
+
 	/**
 	 * Get if this context is valid.
 	 * Notice this does not verify the validity.
@@ -323,18 +336,27 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			() => false,
 		);
 
+		if (this.#validators.length === 0 && resultsStatus === false) {
+			throw new Error('No validators to validate, but validation failed');
+		}
+
 		if (this.messages === undefined) {
 			// This Context has been destroyed while is was validating, so we should not continue.
 			return Promise.reject();
 		}
 
+		const hasMessages = this.messages.getHasAnyMessages();
+
 		// If we have any messages then we are not valid, otherwise lets check the validation results: [NL]
 		// This enables us to keep client validations though UI is not present anymore — because the client validations got defined as messages. [NL]
-		const isValid = this.messages.getHasAnyMessages() ? false : resultsStatus;
+		const isValid = hasMessages ? false : resultsStatus;
 
 		this.#isValid = isValid;
 
 		if (isValid === false) {
+			if (hasMessages === false && resultsStatus === false) {
+				throw new Error('Missing validation messages to represent why a child validation context is invalid.');
+			}
 			// Focus first invalid element:
 			this.focusFirstInvalidElement();
 			return Promise.reject();
@@ -379,7 +401,6 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
-		throw new Error('HERE....');
 		this.#parent = undefined;
 		this.#destroyValidators();
 		this.messages?.destroy();
