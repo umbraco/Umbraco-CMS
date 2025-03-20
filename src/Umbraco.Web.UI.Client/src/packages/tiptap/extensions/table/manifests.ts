@@ -1,6 +1,15 @@
-import type { ManifestTiptapExtension } from '../types.js';
+import { UMB_TIPTAP_TABLE_PROPERTIES_MODAL_ALIAS } from './components/constants.js';
 
-const coreExtensions: Array<ManifestTiptapExtension> = [
+const modals: Array<UmbExtensionManifest> = [
+	{
+		type: 'modal',
+		alias: UMB_TIPTAP_TABLE_PROPERTIES_MODAL_ALIAS,
+		name: 'Tiptap Table Properties Modal',
+		element: () => import('./components/table-properties-modal.element.js'),
+	},
+];
+
+const coreExtensions: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		kind: 'button',
@@ -22,6 +31,7 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 		alias: 'Umb.Tiptap.Toolbar.Table',
 		name: 'Table Tiptap Extension',
 		api: () => import('./table.tiptap-toolbar-api.js'),
+		element: () => import('./components/table-toolbar-menu.element.js'),
 		forExtensions: ['Umb.Tiptap.Table'],
 		meta: {
 			alias: 'table',
@@ -29,12 +39,6 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 			label: 'Table',
 			look: 'icon',
 			items: [
-				{
-					label: 'Table',
-					icon: 'icon-table',
-					items: [{ label: 'Insert table', elementName: 'umb-tiptap-table-insert' }],
-					separatorAfter: true,
-				},
 				{
 					label: 'Cell',
 					items: [
@@ -47,8 +51,8 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 				{
 					label: 'Row',
 					items: [
-						{ label: 'Add row before', data: 'addRowBefore' },
-						{ label: 'Add row after', data: 'addRowAfter' },
+						{ label: 'Add row before', icon: 'icon-page-up', data: 'addRowBefore' },
+						{ label: 'Add row after', icon: 'icon-page-down', data: 'addRowAfter' },
 						{ label: 'Delete row', icon: 'icon-trash', data: 'deleteRow' },
 						{ label: 'Toggle header row', data: 'toggleHeaderRow' },
 					],
@@ -56,17 +60,18 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 				{
 					label: 'Column',
 					items: [
-						{ label: 'Add column before', data: 'addColumnBefore' },
-						{ label: 'Add column after', data: 'addColumnAfter' },
+						{ label: 'Add column before', icon: 'icon-navigation-first', data: 'addColumnBefore' },
+						{ label: 'Add column after', icon: 'icon-tab-key', data: 'addColumnAfter' },
 						{ label: 'Delete column', icon: 'icon-trash', data: 'deleteColumn' },
 						{ label: 'Toggle header column', data: 'toggleHeaderColumn' },
 					],
 					separatorAfter: true,
 				},
+				{ label: 'Table properties', data: 'tableProperties' },
 				{ label: 'Delete table', icon: 'icon-trash', data: 'deleteTable' },
 			],
 		},
 	},
 ];
 
-export const manifests = [...coreExtensions, ...toolbarExtensions];
+export const manifests = [...modals, ...coreExtensions, ...toolbarExtensions];
