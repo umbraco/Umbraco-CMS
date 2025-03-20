@@ -62,6 +62,12 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	disabled: boolean = false;
 
 	/**
+	 * Determines if the dropzone should accept multiple files.
+	 */
+	@property({ type: Boolean })
+	multiple: boolean = false;
+
+	/**
 	 * The label for the dropzone.
 	 */
 	@property({ type: String })
@@ -105,6 +111,8 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				id="dropzone"
 				label=${this.label}
 				accept=${ifDefined(this.accept)}
+				?multiple=${this.multiple}
+				?disabled=${this.disabled}
 				?disallowFolderUpload=${this.disallowFolderUpload}
 				@change=${this.#onUpload}
 				@click=${this.#handleBrowse}>
@@ -117,6 +125,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	}
 
 	#renderUploader() {
+		if (this.disabled) return nothing;
 		if (!this._progressItems?.length) return nothing;
 
 		return html`
@@ -214,7 +223,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	}
 
 	async #onUpload(e: UUIFileDropzoneEvent) {
-		e.stopPropagation();
+		e.stopImmediatePropagation();
 
 		if (this.disabled) return;
 		if (!e.detail.files.length && !e.detail.folders.length) return;
