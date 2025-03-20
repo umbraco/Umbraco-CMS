@@ -1,6 +1,6 @@
-import { UmbMediaDetailRepository } from '../repository/index.js';
-import type { UmbMediaDetailModel, UmbMediaValueModel } from '../types.js';
-import { UmbFileDropzoneItemStatus } from './types.js';
+import { UmbMediaDetailRepository } from '../media/repository/index.js';
+import type { UmbMediaDetailModel, UmbMediaValueModel } from '../media/types.js';
+import { UmbFileDropzoneItemStatus } from './constants.js';
 import { UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL } from './modals/index.js';
 import type {
 	UmbUploadableFile,

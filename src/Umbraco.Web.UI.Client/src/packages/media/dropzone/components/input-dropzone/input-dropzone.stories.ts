@@ -1,8 +1,8 @@
 import type { UmbInputDropzoneElement } from './input-dropzone.element.js';
 import type { Meta, StoryObj } from '@storybook/web-components';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './input-dropzone.element.js';
-import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const meta: Meta<UmbInputDropzoneElement> = {
 	id: 'umb-input-dropzone',

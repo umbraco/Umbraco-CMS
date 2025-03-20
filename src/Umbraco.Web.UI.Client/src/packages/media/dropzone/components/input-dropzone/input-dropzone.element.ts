@@ -1,5 +1,6 @@
-import { UmbDropzoneChangeEvent, UmbDropzoneManager, UmbDropzoneSubmittedEvent } from '../../dropzone/index.js';
-import { UmbFileDropzoneItemStatus, type UmbUploadableItem } from '../../dropzone/types.js';
+import { UmbDropzoneChangeEvent, UmbDropzoneManager, UmbDropzoneSubmittedEvent } from '../../index.js';
+import type { UmbUploadableItem } from '../../types.js';
+import { UmbFileDropzoneItemStatus } from '../../constants.js';
 import {
 	css,
 	customElement,
