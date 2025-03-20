@@ -1,5 +1,5 @@
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { umbBindToValidation, UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import { umbBindToValidation, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -75,7 +75,7 @@ export class UmbPropertyEditorUIMultipleTextStringElement
 				this,
 			);
 		}
-		this.addFormControlElement(this.shadowRoot?.querySelector('umb-input-multiple-text-string')!);
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-multiple-text-string')!);
 	}
 
 	#onChange(event: UmbChangeEvent) {
