@@ -1,11 +1,11 @@
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-member-picker
@@ -29,7 +29,7 @@ export class UmbPropertyEditorUIMemberPickerElement extends UmbLitElement implem
 
 	#onChange(event: CustomEvent & { target: UmbInputMemberElement }) {
 		this.value = event.target.value;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

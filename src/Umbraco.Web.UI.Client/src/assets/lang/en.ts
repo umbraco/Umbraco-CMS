@@ -1278,6 +1278,11 @@ export default {
 		defineRootNode: 'Pick root node',
 		defineXPathOrigin: 'Specify via XPath',
 		defineDynamicRoot: 'Specify a Dynamic Root',
+		unsupportedHeadline: (type?: string) =>
+			`<strong>Unsupported ${type ?? 'content'} items</strong><br>The following content is no longer supported in this Editor.`,
+		unsupportedMessage:
+			'If you still require this content, please contact your administrator. Otherwise you can remove it.',
+		unsupportedRemove: 'Remove unsupported items?',
 	},
 	dynamicRoot: {
 		configurationTitle: 'Dynamic Root Query',
@@ -2734,6 +2739,8 @@ export default {
 		config_overlaySize_description: 'Select the width of the overlay (link picker).',
 	},
 	tiptap: {
+		anchor: 'Anchor',
+		anchor_input: 'Enter an anchor ID',
 		config_dimensions_description: 'Set the maximum width and height of the editor. This excludes the toolbar height.',
 		config_extensions: 'Capabilities',
 		config_toolbar: 'Toolbar',
@@ -2753,6 +2760,15 @@ export default {
 		toolbar_removeItem: 'Remove action',
 		toolbar_emptyGroup: 'Empty',
 		sourceCodeEdit: 'Edit source code',
+		charmap: 'Character map',
+		charmap_headline: 'Special character',
+		charmap_currency: 'Currency',
+		charmap_text: 'Text',
+		charmap_quotations: 'Quotations',
+		charmap_maths: 'Mathematical',
+		charmap_extlatin: 'Extended Latin',
+		charmap_symbols: 'Symbols',
+		charmap_arrows: 'Arrows',
 	},
 	linkPicker: {
 		modalSource: 'Source',

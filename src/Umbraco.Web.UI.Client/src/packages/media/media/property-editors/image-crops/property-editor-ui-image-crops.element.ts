@@ -2,9 +2,9 @@ import { html, customElement, property, css, repeat, state, query } from '@umbra
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export type UmbCrop = {
 	label: string;
@@ -53,13 +53,13 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 			const oldValue = this._value;
 			this._value = model;
 			this.requestUpdate('_value', oldValue);
-			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
 
 	#onRemove(alias: string) {
 		this.value = [...this.value.filter((item) => item.alias !== alias)];
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#onEdit(crop: UmbCrop) {
@@ -120,7 +120,7 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 		} else {
 			this.value = [...this.value, newCrop];
 		}
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 
 		form.reset();
 		this._labelInput.focus();
@@ -193,7 +193,7 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 					(item) => item.alias,
 					(item) => html`
 						<div class="crop" data-alias="${item.alias}">
-							<span class="crop-drag">+</span>
+							<uui-icon name="icon-grib" class="crop-drag"></uui-icon>
 							<span><strong>${item.label}</strong> <em>(${item.alias})</em></span>
 							<span class="crop-size">(${item.width} x ${item.height}px)</span>
 							<div class="crop-actions">
@@ -236,6 +236,11 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 				color: var(--uui-color-disabled-contrast);
 				font-weight: bold;
 			}
+
+			.crop-drag:active {
+				cursor: grabbing;
+			}
+
 			.crop-size {
 				font-size: 0.9em;
 				padding-inline: var(--uui-size-space-4);

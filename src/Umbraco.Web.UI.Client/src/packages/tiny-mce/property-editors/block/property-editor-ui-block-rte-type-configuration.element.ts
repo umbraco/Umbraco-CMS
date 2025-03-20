@@ -2,7 +2,7 @@ import { customElement, html, property, state, nothing } from '@umbraco-cms/back
 import { UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_BLOCK_RTE_TYPE } from '@umbraco-cms/backoffice/block-rte';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
@@ -57,7 +57,7 @@ export class UmbPropertyEditorUIBlockRteBlockConfigurationElement
 	#onChange(e: CustomEvent) {
 		e.stopPropagation();
 		this.value = (e.target as UmbInputBlockTypeElement).value;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
