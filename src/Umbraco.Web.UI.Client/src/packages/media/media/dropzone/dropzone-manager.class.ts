@@ -111,11 +111,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 		for (const item of uploadableItems) {
 			// Upload as temp file
-			const uploaded = await this.#tempFileManager.uploadOne({
-				temporaryUnique: item.temporaryFile.temporaryUnique,
-				file: item.temporaryFile.file,
-				onProgress: (progress) => this.#updateProgress(item, progress),
-			});
+			const uploaded = await this.#tempFileManager.uploadOne(item.temporaryFile);
 
 			// Update progress
 			if (uploaded.status === TemporaryFileStatus.SUCCESS) {
@@ -215,11 +211,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	}
 
 	#uploadAsTemporaryFile(item: UmbUploadableFile) {
-		return this.#tempFileManager.uploadOne({
-			temporaryUnique: item.temporaryFile.temporaryUnique,
-			file: item.temporaryFile.file,
-			onProgress: (progress) => this.#updateProgress(item, progress),
-		});
+		return this.#tempFileManager.uploadOne(item.temporaryFile);
 	}
 
 	// Media types
@@ -322,13 +314,19 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		const items: Array<UmbUploadableItem> = [];
 
 		for (const file of files) {
-			items.push({
+			const uploadableItem: UmbUploadableFile = {
 				unique: UmbId.new(),
 				parentUnique,
 				status: UmbFileDropzoneItemStatus.WAITING,
 				progress: 0,
-				temporaryFile: { file, temporaryUnique: UmbId.new() },
-			});
+				temporaryFile: {
+					file,
+					temporaryUnique: UmbId.new(),
+					abortController: new AbortController(),
+				},
+			};
+			uploadableItem.temporaryFile.onProgress = (progress) => this.#updateProgress(uploadableItem, progress);
+			items.push(uploadableItem);
 		}
 
 		for (const subfolder of folders) {

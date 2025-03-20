@@ -152,7 +152,7 @@ export class UmbTemporaryFileManager<
 				// Update progress in percent if a callback is provided
 				if (item.onProgress) item.onProgress((evt.loaded / evt.total) * 100);
 			},
-			item.abortSignal,
+			item.abortController?.signal ?? item.abortSignal,
 		);
 		const status = error ? TemporaryFileStatus.ERROR : TemporaryFileStatus.SUCCESS;
 
