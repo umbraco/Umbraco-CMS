@@ -1,5 +1,5 @@
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { umbBindToValidation, UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import { umbBindToValidation, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
