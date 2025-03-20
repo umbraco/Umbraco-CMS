@@ -229,6 +229,12 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				opacity: 0.5;
 				pointer-events: none;
 			}
+
+			#dropzone {
+				inset: 0;
+				backdrop-filter: opacity(1); /* Removes the built in blur effect */
+				overflow: clip;
+			}
 		`,
 	];
 }
@@ -239,10 +245,6 @@ export const UmbInputDropzoneDashedStyles = css`
 	umb-input-dropzone {
 		position: relative;
 		display: block;
-	}
-	umb-input-dropzone::after {
-		content: '';
-		position: absolute;
 		inset: 0;
 		cursor: pointer;
 		border: 1px dashed var(--uui-color-divider-emphasis);
