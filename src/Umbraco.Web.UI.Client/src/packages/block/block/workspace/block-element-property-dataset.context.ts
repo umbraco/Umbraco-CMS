@@ -1,4 +1,5 @@
 import type { UmbBlockElementManager } from './block-element-manager.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from './block-workspace.context-token.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -23,5 +24,16 @@ export class UmbBlockElementPropertyDatasetContext
 		this.getName = elementManager.getName;
 		this.culture = createObservablePart(elementManager.variantId, (v) => v?.culture);
 		this.segment = createObservablePart(elementManager.variantId, (v) => v?.segment);
+
+		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspace) => {
+			this.observe(
+				workspace.readOnlyState.states,
+				(states) => {
+					const isReadOnly = states.some((state) => state.variantId.equal(elementManager.getVariantId()));
+					this._readOnly.setValue(isReadOnly);
+				},
+				'umbObserveReadOnlyStates',
+			);
+		});
 	}
 }
