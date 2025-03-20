@@ -26,12 +26,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 							},
 						],
 					},
-					{
-						alias: 'showOpenButton',
-						label: 'Show open button',
-						description: 'Opens the node in a dialog',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-					},
 				],
 			},
 		},

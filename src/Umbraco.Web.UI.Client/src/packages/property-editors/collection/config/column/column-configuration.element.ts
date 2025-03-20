@@ -132,7 +132,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 	#renderColumn(column: UmbCollectionColumnConfiguration) {
 		return html`
 			<div class="layout-item" id=${column.alias}>
-				<uui-icon name="icon-navigation"></uui-icon>
+				<uui-icon class="drag-handle" name="icon-grib"></uui-icon>
 
 				<uui-input
 					required
@@ -192,6 +192,14 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 				flex: 0 0 auto;
 				display: flex;
 				justify-content: flex-end;
+			}
+
+			.drag-handle {
+				cursor: grab;
+			}
+
+			.drag-handle:active {
+				cursor: grabbing;
 			}
 		`,
 	];

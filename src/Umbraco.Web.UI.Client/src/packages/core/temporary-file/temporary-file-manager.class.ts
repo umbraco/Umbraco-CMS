@@ -22,6 +22,15 @@ export class UmbTemporaryFileManager<
 	readonly #queue = new UmbArrayState<UploadableItem>([], (item) => item.temporaryUnique);
 	public readonly queue = this.#queue.asObservable();
 
+	/**
+	 * Gets the temporary file configuration.
+	 * @returns {Promise<UmbTemporaryFileConfigRepository>} The temporary file configuration.
+	 */
+	async getConfiguration(): Promise<UmbTemporaryFileConfigRepository> {
+		await this.#temporaryFileConfigRepository.initialized;
+		return this.#temporaryFileConfigRepository;
+	}
+
 	async uploadOne(uploadableItem: UploadableItem, options?: UmbUploadOptions<UploadableItem>): Promise<UploadableItem> {
 		this.#queue.setValue([]);
 
@@ -78,7 +87,8 @@ export class UmbTemporaryFileManager<
 	}
 
 	async #validateItem(item: UploadableItem): Promise<boolean> {
-		let maxFileSize = await this.observe(this.#temporaryFileConfigRepository.part('maxFileSize')).asPromise();
+		const config = await this.getConfiguration();
+		let maxFileSize = await this.observe(config.part('maxFileSize')).asPromise();
 		if (maxFileSize) {
 			// Convert from kilobytes to bytes
 			maxFileSize *= 1024;
