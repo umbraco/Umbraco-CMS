@@ -12,7 +12,7 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 
-		this.addFormControlElement(this.shadowRoot?.querySelector('umb-input-tiptap') as UmbInputTiptapElement);
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-tiptap') as UmbInputTiptapElement);
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputTiptapElement }) {
