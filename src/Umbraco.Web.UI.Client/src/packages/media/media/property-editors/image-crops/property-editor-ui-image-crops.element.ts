@@ -193,7 +193,7 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 					(item) => item.alias,
 					(item) => html`
 						<div class="crop" data-alias="${item.alias}">
-							<uui-icon name="icon-grib" class="crop-drag"></uui-icon>
+							<uui-icon name="icon-grip" class="crop-drag"></uui-icon>
 							<span><strong>${item.label}</strong> <em>(${item.alias})</em></span>
 							<span class="crop-size">(${item.width} x ${item.height}px)</span>
 							<div class="crop-actions">
@@ -257,12 +257,15 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 				display: flex;
 				flex-direction: column;
 			}
+			uui-input[type='number'] {
+				text-align: right;
+			}
 			.append {
 				padding-inline: var(--uui-size-space-4);
 				background: var(--uui-color-disabled);
 				border-left: 1px solid var(--uui-color-border);
 				color: var(--uui-color-disabled-contrast);
-				font-size: 0.8em;
+				font-size: var(--uui-type-small-size);
 				display: flex;
 				align-items: center;
 			}
