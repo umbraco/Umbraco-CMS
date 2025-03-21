@@ -28,7 +28,7 @@ test('can update maximum allowed characters value', async ({umbracoApi, umbracoU
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'maxChars', maxCharsValue)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'maxChars', maxCharsValue)).toBeTruthy();
 });
 
 test('can update number of rows value', async ({umbracoApi, umbracoUi}) => {
@@ -43,7 +43,7 @@ test('can update number of rows value', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'rows', numberOfRowsValue)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'rows', numberOfRowsValue)).toBeTruthy();
 });
 
 // Skip this test as currently this setting is removed now
@@ -59,7 +59,7 @@ test.skip('can update min height (pixels) value', async ({umbracoApi, umbracoUi}
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'minHeight', minHeightValue)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'minHeight', minHeightValue)).toBeTruthy();
 });
 
 // Skip this test as currently this setting is removed now
@@ -75,7 +75,7 @@ test.skip('can update max height (pixels) value', async ({umbracoApi, umbracoUi}
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'maxHeight', maxHeightValue)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'maxHeight', maxHeightValue)).toBeTruthy();
 });
 
 // Skip this test as currently these settings are removed now

@@ -27,7 +27,7 @@ test('can update preset value state', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'default', true)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'default', true)).toBeTruthy();
 });
 
 test('can update show toggle labels', async ({umbracoApi, umbracoUi}) => {
@@ -41,7 +41,7 @@ test('can update show toggle labels', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'showLabels', true)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'showLabels', true)).toBeTruthy();
 });
 
 test('can update label on', async ({umbracoApi, umbracoUi}) => {
@@ -56,7 +56,7 @@ test('can update label on', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'labelOn', labelOnValue)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'labelOn', labelOnValue)).toBeTruthy();
 });
 
 test('can update label off', async ({umbracoApi, umbracoUi}) => {
@@ -71,7 +71,7 @@ test('can update label off', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'labelOff', labelOffValue)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'labelOff', labelOffValue)).toBeTruthy();
 });
 
 test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {

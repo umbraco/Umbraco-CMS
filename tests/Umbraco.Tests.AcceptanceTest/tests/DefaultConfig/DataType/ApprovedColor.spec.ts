@@ -5,8 +5,8 @@ const dataTypeName = 'Approved Color';
 const customDataTypeName = 'Custom Approved Color';
 const editorAlias = 'Umbraco.ColorPicker';
 const editorUiAlias = 'Umb.PropertyEditorUi.ColorPicker';
-const colorValue = 'ffffff';
-const colorLabel = '';
+const colorValue = '9c2121';
+const colorLabel = 'red';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
@@ -49,6 +49,7 @@ test('can add color', async ({umbracoApi, umbracoUi}) => {
 test('can remove color', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createApprovedColorDataTypeWithOneItem(customDataTypeName, colorLabel, colorValue);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
   await umbracoUi.dataType.removeColorByValue(colorValue);
@@ -56,8 +57,7 @@ test('can remove color', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const customDataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
-  expect(customDataTypeData.values).toEqual([]);
+  expect(await umbracoApi.dataType.doesApprovedColorHaveColor(customDataTypeName, colorValue)).toBeFalsy();;
 });
 
 test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {

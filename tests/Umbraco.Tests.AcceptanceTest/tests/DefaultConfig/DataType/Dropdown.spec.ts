@@ -77,11 +77,7 @@ for (const dropdown of dropdowns) {
     const dataTypeDefaultData = await umbracoApi.dataType.getByName(dropdown.type);
     expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
     expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
-    if (dropdown.multipleChoice) {
-      expect(await umbracoApi.dataType.doesDataTypeHaveValue(dropdown.type, 'multiple', true)).toBeFalsy();
-    } else {
-      expect(dataTypeDefaultData.values).toEqual([]);
-    }
+    expect(await umbracoApi.dataType.doesDataTypeHaveValue(dropdown.type, 'multiple', dropdown.multipleChoice)).toBeTruthy();
     expect(await umbracoApi.dataType.doesDataTypeHaveValue(dropdown.type, 'items')).toBeFalsy();
   });
 }

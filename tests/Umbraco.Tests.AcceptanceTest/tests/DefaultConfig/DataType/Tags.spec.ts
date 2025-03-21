@@ -28,7 +28,7 @@ test('can update define a tag group', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'group', tagGroup)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'group', tagGroup)).toBeTruthy();
 });
 
 test('can select storage type', async ({umbracoApi, umbracoUi}) => {
@@ -43,7 +43,7 @@ test('can select storage type', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'storageType', storageType)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'storageType', storageType)).toBeTruthy();
 });
 
 test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
