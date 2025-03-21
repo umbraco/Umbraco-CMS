@@ -132,6 +132,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	}
 
 	public removeOne(item: UmbUploadableItem) {
+		item.temporaryFile?.abortController?.abort();
 		this.#progressItems.removeOne(item.unique);
 		if (item.temporaryFile) {
 			this.#tempFileManager.removeOne(item.temporaryFile.temporaryUnique);
@@ -139,9 +140,24 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	}
 
 	public remove(items: Array<UmbUploadableItem>) {
-		this.#progressItems.remove(items.map((x) => x.unique));
+		const uniques: string[] = [];
+		for (const item of items) {
+			item.temporaryFile?.abortController?.abort();
+			if (item.temporaryFile) {
+				uniques.push(item.temporaryFile.temporaryUnique);
+			}
+		}
+		this.#progressItems.remove(uniques);
 		const temporaryUniques = items.map((x) => x.temporaryFile?.temporaryUnique).filter((x): x is string => !!x);
 		this.#tempFileManager.remove(temporaryUniques);
+	}
+
+	public removeAll() {
+		for (const item of this.#progressItems.getValue()) {
+			item.temporaryFile?.abortController?.abort();
+		}
+		this.#progressItems.setValue([]);
+		this.#tempFileManager.removeAll();
 	}
 
 	async #showDialogMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>) {

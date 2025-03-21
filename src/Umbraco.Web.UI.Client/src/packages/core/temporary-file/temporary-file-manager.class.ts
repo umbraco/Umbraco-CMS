@@ -62,6 +62,10 @@ export class UmbTemporaryFileManager<
 		this.#queue.remove(uniques);
 	}
 
+	removeAll() {
+		this.#queue.setValue([]);
+	}
+
 	async #handleQueue(options?: UmbUploadOptions<UploadableItem>): Promise<Array<UploadableItem>> {
 		const filesCompleted: Array<UploadableItem> = [];
 		const queue = this.#queue.getValue();
