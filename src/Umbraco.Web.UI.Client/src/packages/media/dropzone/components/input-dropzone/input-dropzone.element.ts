@@ -130,19 +130,28 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		if (!this._progressItems?.length) return nothing;
 
 		return html`
-			${repeat(
-				this._progressItems,
-				(item) => item.unique,
-				(item) => this.#renderPlaceholder(item),
-			)}
+			<div id="uploader">
+				${repeat(
+					this._progressItems,
+					(item) => item.unique,
+					(item) => this.#renderPlaceholder(item),
+				)}
+				<uui-button
+					id="uploader-clear"
+					compact
+					@click=${this.#handleRemove}
+					label=${this.localize.term('content_uploadClear')}>
+					<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
+				</uui-button>
+			</div>
 		`;
 	}
 
 	#renderPlaceholder(item: UmbUploadableItem) {
 		const file = item.temporaryFile?.file;
 		return html`
-			<div id="temporaryFile">
-				<div id="fileIcon">
+			<div class="placeholder">
+				<div class="fileIcon">
 					${when(
 						item.status === UmbFileDropzoneItemStatus.COMPLETE,
 						() => html`<umb-icon name="check" color="green"></umb-icon>`,
@@ -154,21 +163,24 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 						() => html`<umb-icon name="wrong" color="red"></umb-icon>`,
 					)}
 				</div>
-				<div id="fileDetails">
-					<div id="fileName">${file?.name}</div>
-					<div id="fileSize">${formatBytes(file?.size ?? 0, { decimals: 2 })}: ${item.progress}%</div>
+				<div class="fileDetails">
+					<div class="fileName" title=${file?.name ?? ''}>${file?.name ?? ''}</div>
+					<div class="fileSize">${formatBytes(file?.size ?? 0, { decimals: 2 })}: ${item.progress}%</div>
 					${when(
 						item.status === UmbFileDropzoneItemStatus.WAITING,
-						() => html`<div id="progress"><uui-loader-bar progress=${item.progress}></uui-loader-bar></div>`,
+						() => html`<div class="progress"><uui-loader-bar progress=${item.progress}></uui-loader-bar></div>`,
 					)}
-					${when(item.status === UmbFileDropzoneItemStatus.ERROR, () => html`<div id="error">An error occured</div>`)}
-					${when(item.status === UmbFileDropzoneItemStatus.CANCELLED, () => html`<div id="error">Cancelled</div>`)}
+					${when(
+						item.status === UmbFileDropzoneItemStatus.ERROR,
+						() => html`<div class="error">An error occured</div>`,
+					)}
+					${when(item.status === UmbFileDropzoneItemStatus.CANCELLED, () => html`<div class="error">Cancelled</div>`)}
 					${when(
 						item.status === UmbFileDropzoneItemStatus.NOT_ALLOWED,
-						() => html`<div id="error">File type not allowed</div>`,
+						() => html`<div class="error">File type not allowed</div>`,
 					)}
 				</div>
-				<div id="fileActions">
+				<div class="fileActions">
 					${when(
 						item.status === UmbFileDropzoneItemStatus.WAITING,
 						() => html`
@@ -179,18 +191,9 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 								<uui-icon name="icon-remove"></uui-icon>${this.localize.term('general_cancel')}
 							</uui-button>
 						`,
-						() => this.#renderButtonRemove(item),
 					)}
 				</div>
 			</div>
-		`;
-	}
-
-	#renderButtonRemove(item: UmbUploadableItem) {
-		return html`
-			<uui-button compact @click=${() => this.#handleRemove(item)} label=${this.localize.term('content_uploadClear')}>
-				<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
-			</uui-button>
 		`;
 	}
 
@@ -204,8 +207,8 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		item.temporaryFile?.abortController?.abort();
 	}
 
-	#handleRemove(item: UmbUploadableItem) {
-		this.#manager.removeOne(item);
+	#handleRemove() {
+		this.#manager.removeAll();
 	}
 
 	async #onUpload(e: UUIFileDropzoneEvent) {
@@ -235,6 +238,41 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				inset: 0;
 				backdrop-filter: opacity(1); /* Removes the built in blur effect */
 				overflow: clip;
+			}
+
+			#uploader {
+				display: flex;
+				flex-direction: column;
+				flex-wrap: wrap;
+				gap: var(--uui-size-space-3);
+
+				.placeholder {
+					display: grid;
+					grid-template-columns: 30px 200px 1fr;
+					padding: var(--uui-size-space-3);
+					border: 1px dashed var(--uui-color-divider-emphasis);
+				}
+
+				.fileIcon,
+				.fileActions {
+					place-self: center center;
+				}
+
+				.fileName {
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					font-size: var(--uui-size-5);
+				}
+
+				.fileSize {
+					font-size: var(--uui-font-size-small);
+					color: var(--uui-color-text-alt);
+				}
+
+				.error {
+					color: var(--uui-color-danger);
+				}
 			}
 		`,
 	];
