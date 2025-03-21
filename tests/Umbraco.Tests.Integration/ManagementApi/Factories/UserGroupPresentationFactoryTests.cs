@@ -7,6 +7,7 @@ using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -33,9 +34,10 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     {
         services.AddTransient<IUserGroupPresentationFactory, UserGroupPresentationFactory>();
         services.AddSingleton<IPermissionPresentationFactory, PermissionPresentationFactory>();
-        services.AddSingleton<DocumentPermissionMapper>();
-        services.AddSingleton<IPermissionMapper>(x=>x.GetRequiredService<DocumentPermissionMapper>());
-        services.AddSingleton<IPermissionPresentationMapper>(x=>x.GetRequiredService<DocumentPermissionMapper>());
+        services.AddSingleton<IPermissionMapper, DocumentPermissionMapper>();
+        services.AddSingleton<IPermissionPresentationMapper, DocumentPermissionMapper>();
+        services.AddSingleton<IPermissionMapper, DocumentPropertyValuePermissionMapper>();
+        services.AddSingleton<IPermissionPresentationMapper, DocumentPropertyValuePermissionMapper>();
     }
 
 
@@ -102,6 +104,40 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Cannot_Create_UserGroup_With_Unexisting_DocumentType_Reference()
+    {
+        var updateModel = new CreateUserGroupRequestModel()
+        {
+            Alias = "testAlias",
+            FallbackPermissions = new HashSet<string>(),
+            HasAccessToAllLanguages = true,
+            Languages = new List<string>(),
+            Name = "Test Name",
+            Sections = new [] {"Umb.Section.Content"},
+            Permissions = new HashSet<IPermissionPresentationModel>()
+            {
+                new DocumentPropertyValuePermissionPresentationModel()
+                {
+                    DocumentType = new ReferenceByIdModel(Guid.NewGuid()),
+                    PropertyType = new ReferenceByIdModel(Guid.NewGuid()),
+                    Verbs = new HashSet<string>()
+                }
+            }
+        };
+
+        var attempt = await UserGroupPresentationFactory.CreateAsync(updateModel);
+        Assert.IsTrue(attempt.Success);
+
+        var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(userGroupCreateAttempt.Success);
+            Assert.AreEqual(UserGroupOperationStatus.DocumentTypePermissionKeyNotFound, userGroupCreateAttempt.Status);
+        });
+    }
+
+    [Test]
     public async Task Can_Create_Usergroup_With_Empty_Granluar_Permissions_For_Document()
     {
         var contentKey = await CreateContent();
@@ -138,6 +174,170 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
             Assert.AreEqual(contentKey, userGroup.GranularPermissions.First().Key);
             Assert.AreEqual(string.Empty, userGroup.GranularPermissions.First().Permission);
         });
+    }
+
+    [Test]
+    public async Task Can_Create_Usergroup_With_Granluar_Permissions_For_Document_PropertyValue()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeEditingBuilder.CreateSimpleContentType(defaultTemplateKey: template.Key),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var propertyType = contentType.PropertyTypes.First();
+
+        var updateModel = new CreateUserGroupRequestModel()
+        {
+            Alias = "testAlias",
+            FallbackPermissions = new HashSet<string>(),
+            HasAccessToAllLanguages = true,
+            Languages = new List<string>(),
+            Name = "Test Name",
+            Sections = new [] {"Umb.Section.Content"},
+            Permissions = new HashSet<IPermissionPresentationModel>
+            {
+                new DocumentPropertyValuePermissionPresentationModel
+                {
+                    DocumentType = new ReferenceByIdModel(contentType.Key),
+                    PropertyType = new ReferenceByIdModel(propertyType.Key),
+                    Verbs = new HashSet<string>(["Some", "Another"])
+                }
+            }
+        };
+
+        var attempt = await UserGroupPresentationFactory.CreateAsync(updateModel);
+        Assert.IsTrue(attempt.Success);
+
+        var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
+        var userGroup = userGroupCreateAttempt.Result;
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(userGroupCreateAttempt.Success);
+            Assert.IsNotNull(userGroup);
+        });
+
+        Assert.AreEqual(2, userGroup.GranularPermissions.Count);
+        var documentTypeGranularPermissions = userGroup.GranularPermissions.OfType<DocumentPropertyValueGranularPermission>().ToArray();
+        Assert.AreEqual(2, documentTypeGranularPermissions.Length);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(documentTypeGranularPermissions.All(x => x.Key == contentType.Key));
+            Assert.AreEqual($"{propertyType.Key}|Some", documentTypeGranularPermissions.First().Permission);
+            Assert.AreEqual($"{propertyType.Key}|Another", documentTypeGranularPermissions.Last().Permission);
+        });
+    }
+
+    [Test]
+    public async Task Can_Create_Usergroup_With_Granluar_Permissions_For_Document_PropertyValue_Without_Verbs()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeEditingBuilder.CreateSimpleContentType(defaultTemplateKey: template.Key),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var propertyType = contentType.PropertyTypes.First();
+
+        var updateModel = new CreateUserGroupRequestModel()
+        {
+            Alias = "testAlias",
+            FallbackPermissions = new HashSet<string>(),
+            HasAccessToAllLanguages = true,
+            Languages = new List<string>(),
+            Name = "Test Name",
+            Sections = new [] {"Umb.Section.Content"},
+            Permissions = new HashSet<IPermissionPresentationModel>
+            {
+                new DocumentPropertyValuePermissionPresentationModel
+                {
+                    DocumentType = new ReferenceByIdModel(contentType.Key),
+                    PropertyType = new ReferenceByIdModel(propertyType.Key),
+                    Verbs = new HashSet<string>()
+                }
+            }
+        };
+
+        var attempt = await UserGroupPresentationFactory.CreateAsync(updateModel);
+        Assert.IsTrue(attempt.Success);
+
+        var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
+        var userGroup = userGroupCreateAttempt.Result;
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(userGroupCreateAttempt.Success);
+            Assert.IsNotNull(userGroup);
+        });
+
+        Assert.AreEqual(1, userGroup.GranularPermissions.Count);
+        var documentTypeGranularPermissions = userGroup.GranularPermissions.OfType<DocumentPropertyValueGranularPermission>().ToArray();
+        Assert.AreEqual(1, documentTypeGranularPermissions.Length);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(documentTypeGranularPermissions.All(x => x.Key == contentType.Key));
+            Assert.AreEqual($"{propertyType.Key}|", documentTypeGranularPermissions.First().Permission);
+        });
+    }
+
+    [Test]
+    public async Task Usergroup_Granluar_Permissions_For_Document_PropertyValue_Are_Cleaned_Up_When_DocumentType_Is_Deleted()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType1 = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeEditingBuilder.CreateSimpleContentType(defaultTemplateKey: template.Key),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var contentType2 = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeEditingBuilder.CreateSimpleContentType(alias: "anotherAlias", defaultTemplateKey: template.Key),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var propertyType1 = contentType1.PropertyTypes.First();
+        var propertyType2 = contentType2.PropertyTypes.First();
+
+        var updateModel = new CreateUserGroupRequestModel()
+        {
+            Alias = "testAlias",
+            FallbackPermissions = new HashSet<string>(),
+            HasAccessToAllLanguages = true,
+            Languages = new List<string>(),
+            Name = "Test Name",
+            Sections = new [] {"Umb.Section.Content"},
+            Permissions = new HashSet<IPermissionPresentationModel>
+            {
+                new DocumentPropertyValuePermissionPresentationModel
+                {
+                    DocumentType = new ReferenceByIdModel(contentType1.Key),
+                    PropertyType = new ReferenceByIdModel(propertyType1.Key),
+                    Verbs = new HashSet<string>(["Some", "Another"])
+                },
+                new DocumentPropertyValuePermissionPresentationModel
+                {
+                    DocumentType = new ReferenceByIdModel(contentType2.Key),
+                    PropertyType = new ReferenceByIdModel(propertyType2.Key),
+                    Verbs = new HashSet<string>(["Even", "More"])
+                }
+            }
+        };
+
+        var attempt = await UserGroupPresentationFactory.CreateAsync(updateModel);
+
+        var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
+        Assert.IsTrue(userGroupCreateAttempt.Success);
+        Assert.AreEqual(4, userGroupCreateAttempt.Result!.GranularPermissions.Count);
+
+        var deleteResult = await GetRequiredService<IContentTypeService>().DeleteAsync(contentType1.Key, Constants.Security.SuperUserKey);
+        Assert.AreEqual(ContentTypeOperationStatus.Success, deleteResult);
+
+        var userGroup = await UserGroupService.GetAsync(userGroupCreateAttempt.Result!.Key);
+        Assert.IsNotNull(userGroup);
+
+        Assert.AreEqual(2, userGroup.GranularPermissions.Count);
     }
 
     private async Task<Guid> CreateContent()
