@@ -217,6 +217,10 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	async #handleFile(item: UmbUploadableFile, mediaTypeUnique: string) {
 		// Upload the file as a temporary file and update progress.
 		const temporaryFile = await this.#uploadAsTemporaryFile(item);
+		if (temporaryFile.status === TemporaryFileStatus.CANCELLED) {
+			this.#updateStatus(item, UmbFileDropzoneItemStatus.CANCELLED);
+			return;
+		}
 		if (temporaryFile.status !== TemporaryFileStatus.SUCCESS) {
 			this.#updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
 			return;
