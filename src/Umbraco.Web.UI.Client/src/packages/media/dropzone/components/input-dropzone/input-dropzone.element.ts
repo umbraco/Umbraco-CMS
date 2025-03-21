@@ -167,7 +167,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 					<div class="fileName" title=${file?.name ?? ''}>${file?.name ?? ''}</div>
 					<div class="fileSize">
 						${formatBytes(file?.size ?? 0, { decimals: 2 })}:
-						${this.localize.number(item.progress, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%
+						${this.localize.number(item.progress, { maximumFractionDigits: 0 })}%
 					</div>
 					${when(
 						item.status === UmbFileDropzoneItemStatus.WAITING,
