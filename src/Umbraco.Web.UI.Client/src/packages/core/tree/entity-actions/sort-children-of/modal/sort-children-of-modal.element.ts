@@ -289,7 +289,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	#renderChild(item: UmbTreeItemModel) {
 		// TODO: find a way to get the icon for the item. We do not have the icon in the tree item model.
 		return html` <uui-table-row id="content-node" data-unique=${item.unique} class="${this._isSorting ? 'hidden' : ''}">
-			<uui-table-cell class="handle"><umb-icon name="icon-grib"></umb-icon></uui-table-cell>
+			<uui-table-cell class="handle"><umb-icon name="icon-grip"></umb-icon></uui-table-cell>
 			<uui-table-cell>${item.name}</uui-table-cell>
 			<uui-table-cell>${this.#renderCreateDate(item)}</uui-table-cell>
 		</uui-table-row>`;
