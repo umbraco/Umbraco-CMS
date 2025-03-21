@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
@@ -43,7 +43,9 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
     public async Task<IEnumerable<IReferenceResponseModel>> CreateReferenceResponseModelsAsync(
         IEnumerable<RelationItemModel> relationItemModels)
     {
-        Guid[] documentKeys = relationItemModels
+        IReadOnlyCollection<RelationItemModel> relationItemModelsCollection = relationItemModels.ToArray();
+
+        Guid[] documentKeys = relationItemModelsCollection
             .Where(item => item.NodeType is Constants.UdiEntityType.Document)
             .Select(item => item.NodeKey).Distinct().ToArray();
 
@@ -51,12 +53,12 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
 
         var slimEntities = _entityRepository.GetAll(Constants.ObjectTypes.Document, documentKeys).ToList();
 
-        IReferenceResponseModel[] result = relationItemModels.Select(relationItemModel =>
+        IReferenceResponseModel[] result = relationItemModelsCollection.Select(relationItemModel =>
             relationItemModel.NodeType switch
             {
                 Constants.UdiEntityType.Document => MapDocumentReference(relationItemModel, slimEntities),
                 Constants.UdiEntityType.Media => _umbracoMapper.Map<MediaReferenceResponseModel>(relationItemModel),
-                _ => _umbracoMapper.Map<DefaultReferenceResponseModel>(relationItemModel) as IReferenceResponseModel,
+                _ => _umbracoMapper.Map<DefaultReferenceResponseModel>(relationItemModel),
             }).WhereNotNull().ToArray();
 
         return await Task.FromResult(result);
