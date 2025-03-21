@@ -25,7 +25,6 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 		}
 
 		this._startNodeId = config.getValueByAlias('startNodeId');
-		this._showOpenButton = config.getValueByAlias('showOpenButton') ?? false;
 	}
 
 	/**
@@ -48,9 +47,6 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	@state()
 	private _startNodeId?: string;
 
-	@state()
-	private _showOpenButton?: boolean;
-
 	#onChange(event: CustomEvent & { target: UmbInputDocumentElement }) {
 		this.value = event.target.value;
 		this.dispatchEvent(new UmbChangeEvent());
@@ -67,7 +63,6 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 				.max=${this._max}
 				.startNode=${startNode}
 				.value=${this.value}
-				?showOpenButton=${this._showOpenButton}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}>
 			</umb-input-document>

@@ -95,7 +95,7 @@ public class TextOnlyValueEditor : DataValueEditor
                         _localizedTextService.Localize(
                             "validation",
                             "stringLengthExceeded",
-                            [maxCharacters.ToString()]),
+                            [maxCharacters.ToString(), (typedValue.Length - maxCharacters).ToString() ]),
                         ["value'"])
                 ];
             }

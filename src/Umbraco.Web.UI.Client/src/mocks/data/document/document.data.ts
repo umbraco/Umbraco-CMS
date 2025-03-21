@@ -919,7 +919,7 @@ export const data: Array<UmbMockDocumentModel> = [
 							<span>This is a plain old span tag.</span>
 							<span style="color:red;">Hello <span style="color:blue;">world</span>.</span>
 						</div>
-						<table style="width: 100%;">
+						<table>
 							<thead>
 								<tr>
 									<th>Version</th>

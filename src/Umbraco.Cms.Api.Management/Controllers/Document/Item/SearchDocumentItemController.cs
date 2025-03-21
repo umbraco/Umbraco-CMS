@@ -24,9 +24,16 @@ public class SearchDocumentItemController : DocumentItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<IActionResult> SearchFromParentWithAllowedTypes(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, Guid? parentId = null, [FromQuery]IEnumerable<Guid>? allowedDocumentTypes = null)
+    public Task<IActionResult> SearchWithTrashed(
+        CancellationToken cancellationToken,
+        string query,
+        bool? trashed = null,
+        int skip = 0,
+        int take = 100,
+        Guid? parentId = null,
+        [FromQuery] IEnumerable<Guid>? allowedDocumentTypes = null)
     {
-        PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Document, query, parentId, allowedDocumentTypes, skip, take);
+        PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Document, query, parentId, allowedDocumentTypes, trashed, skip, take);
         var result = new PagedModel<DocumentItemResponseModel>
         {
             Items = searchResult.Items.OfType<IDocumentEntitySlim>().Select(_documentPresentationFactory.CreateItemResponseModel),
