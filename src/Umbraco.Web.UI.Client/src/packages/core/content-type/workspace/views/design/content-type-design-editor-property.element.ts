@@ -241,7 +241,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				</div>
 				<uui-button
 					id="editor"
-					look="secondary"
+					look="outline"
 					label=${this.localize.term('contentTypeEditor_editorSettings')}
 					href=${this.editPropertyTypePath +
 					UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this.property.id })}>
