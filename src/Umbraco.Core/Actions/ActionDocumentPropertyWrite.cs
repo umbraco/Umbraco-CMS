@@ -3,7 +3,7 @@
 public class ActionDocumentPropertyWrite : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter" />
-    public const string ActionLetter = "Umb.Document.Property.Write";
+    public const string ActionLetter = "Umb.Document.PropertyValue.Write";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
     public const string ActionAlias = "documentpropertywrite";
