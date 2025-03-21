@@ -183,23 +183,6 @@ internal partial class UserService : RepositoryService, IUserService
     IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved) => CreateUserWithIdentity(username, email, passwordValue, isApproved);
 
     /// <summary>
-    ///     Gets a User by its integer id
-    /// </summary>
-    /// <param name="id"><see cref="int" /> Id</param>
-    /// <returns>
-    ///     <see cref="IUser" />
-    /// </returns>
-    [Obsolete("Please use GetAsync instead. Scheduled for removal in V15.")]
-    public IUser? GetById(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            Guid userKey = _userIdKeyResolver.GetAsync(id).GetAwaiter().GetResult();
-            return _userRepository.Get(userKey);
-        }
-    }
-
-    /// <summary>
     ///     Creates and persists a Member
     /// </summary>
     /// <remarks>
@@ -279,7 +262,25 @@ internal partial class UserService : RepositoryService, IUserService
     public IUser? GetByProviderKey(object id)
     {
         Attempt<int> asInt = id.TryConvertTo<int>();
-        return asInt.Success ? GetById(asInt.Result) : null;
+        Guid? userKey = null;
+        if (asInt.Success)
+        {
+            userKey = _userIdKeyResolver.GetAsync(asInt.Result).GetAwaiter().GetResult();
+        }
+        else if (Guid.TryParse(id.ToString(), out Guid idAsGuid))
+        {
+            userKey = idAsGuid;
+        }
+
+        if (userKey.HasValue is false)
+        {
+            return null;
+        }
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _userRepository.Get(userKey.Value);
+        }
     }
 
     /// <summary>
