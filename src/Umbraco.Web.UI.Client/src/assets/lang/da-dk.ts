@@ -1676,7 +1676,7 @@ export default {
 		cultureInvariantLabel: 'Delt påtværs af sprog',
 		segmentInvariantLabel: 'Delt påtværs af segmenteringer',
 		cultureVariantLabel: 'Sprog varierende',
-		segmentVariantLabel: 'Segmenteret værdi',
+		segmentVariantLabel: 'Segment varierende',
 		variantsDescription: 'Tillad at redaktører kan oprette indhold af denne type på flere sprog.',
 		cultureVariantDescription: 'Tillad at redaktører kan oprette dette indhold på flere sprog.',
 		segmentVariantDescription: 'Tillad at redaktører kan oprette flere udgaver af denne type indhold.',
