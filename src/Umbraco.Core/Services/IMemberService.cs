@@ -266,7 +266,8 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IMember" />
     /// </returns>
-    IMember? GetByKey(Guid id);
+    [Obsolete($"Use {nameof(GetById)}. Scheduled for removal in Umbraco 18.")]
+    IMember? GetByKey(Guid id) => GetById(id);
 
     /// <summary>
     ///     Gets a Member by its integer id

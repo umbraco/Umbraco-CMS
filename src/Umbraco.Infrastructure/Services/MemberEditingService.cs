@@ -46,7 +46,7 @@ internal sealed class MemberEditingService : IMemberEditingService
     }
 
     public Task<IMember?> GetAsync(Guid key)
-        => Task.FromResult(_memberService.GetByKey(key));
+        => Task.FromResult(_memberService.GetById(key));
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MemberCreateModel createModel)
         => await _memberContentEditingService.ValidateAsync(createModel, createModel.ContentTypeKey);
@@ -115,7 +115,7 @@ internal sealed class MemberEditingService : IMemberEditingService
     {
         var status = new MemberEditingStatus();
 
-        IMember? member = _memberService.GetByKey(key);
+        IMember? member = _memberService.GetById(key);
         if (member is null)
         {
             status.ContentEditingOperationStatus = ContentEditingOperationStatus.NotFound;
