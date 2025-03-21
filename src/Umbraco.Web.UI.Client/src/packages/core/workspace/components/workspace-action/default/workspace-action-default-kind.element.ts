@@ -118,7 +118,10 @@ export class UmbWorkspaceActionElement<
 				if (!this._additionalOptions) {
 					this._buttonState = 'success';
 				}
-			} catch {
+			} catch (reason) {
+				if (reason) {
+					console.warn(reason);
+				}
 				if (!this._additionalOptions) {
 					this._buttonState = 'failed';
 				}
