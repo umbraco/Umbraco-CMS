@@ -16,6 +16,3 @@ export class UmbDocumentTypePickerInputContext extends UmbPickerInputContext<
 		super(host, UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_TYPE_PICKER_MODAL);
 	}
 }
-
-/** @deprecated Use `UmbDocumentTypePickerInputContext` instead. This method will be removed in Umbraco 15. */
-export { UmbDocumentTypePickerInputContext as UmbDocumentTypePickerContext };
