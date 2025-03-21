@@ -1,5 +1,3 @@
-using System.ComponentModel;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -67,64 +65,6 @@ public class CoreRuntime : IRuntime
         _serviceProvider = serviceProvider;
         _hostApplicationLifetime = hostApplicationLifetime;
         _logger = _loggerFactory.CreateLogger<CoreRuntime>();
-    }
-
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete]
-    public CoreRuntime(
-        ILoggerFactory loggerFactory,
-        IRuntimeState state,
-        ComponentCollection components,
-        IApplicationShutdownRegistry applicationShutdownRegistry,
-        IProfilingLogger profilingLogger,
-        IMainDom mainDom,
-        IUmbracoDatabaseFactory databaseFactory,
-        IEventAggregator eventAggregator,
-        IHostingEnvironment hostingEnvironment,
-        IUmbracoVersion umbracoVersion,
-        IServiceProvider? serviceProvider)
-        : this(
-            state,
-            loggerFactory,
-            components,
-            applicationShutdownRegistry,
-            profilingLogger,
-            mainDom,
-            databaseFactory,
-            eventAggregator,
-            hostingEnvironment,
-            umbracoVersion,
-            serviceProvider,
-            serviceProvider?.GetRequiredService<IHostApplicationLifetime>())
-    {
-    }
-
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete]
-    public CoreRuntime(
-        ILoggerFactory loggerFactory,
-        IRuntimeState state,
-        ComponentCollection components,
-        IApplicationShutdownRegistry applicationShutdownRegistry,
-        IProfilingLogger profilingLogger,
-        IMainDom mainDom,
-        IUmbracoDatabaseFactory databaseFactory,
-        IEventAggregator eventAggregator,
-        IHostingEnvironment hostingEnvironment,
-        IUmbracoVersion umbracoVersion)
-        : this(
-            loggerFactory,
-            state,
-            components,
-            applicationShutdownRegistry,
-            profilingLogger,
-            mainDom,
-            databaseFactory,
-            eventAggregator,
-            hostingEnvironment,
-            umbracoVersion,
-            null)
-    {
     }
 
     /// <summary>

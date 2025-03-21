@@ -9,7 +9,6 @@ using Umbraco.Cms.Infrastructure.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Media;
 
-[ApiVersion("1.0")]
 [ApiVersion("2.0")]
 public class ByPathMediaApiController : MediaApiControllerBase
 {
@@ -21,14 +20,6 @@ public class ByPathMediaApiController : MediaApiControllerBase
         IApiMediaQueryService apiMediaQueryService)
         : base(publishedMediaCache, apiMediaWithCropsResponseBuilder)
         => _apiMediaQueryService = apiMediaQueryService;
-
-    [HttpGet("item/{*path}")]
-    [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IApiMediaWithCropsResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Obsolete("Please use version 2 of this API. Will be removed in V15.")]
-    public Task<IActionResult> ByPath(string path)
-        => Task.FromResult(HandleRequest(path));
 
     /// <summary>
     ///     Gets a media item by its path.

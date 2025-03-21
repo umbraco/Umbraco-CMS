@@ -1,12 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class TagRepositoryTest : UmbracoIntegrationTest
+internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 {
     private IFileService FileService => GetRequiredService<IFileService>();
 
@@ -651,12 +651,12 @@ public class TagRepositoryTest : UmbracoIntegrationTest
             ContentTypeRepository.Save(contentType);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            content1.PublishCulture(CultureImpact.Invariant);
+            content1.PublishCulture(CultureImpact.Invariant, DateTime.Now, GetRequiredService<PropertyEditorCollection>());
             content1.PublishedState = PublishedState.Publishing;
             DocumentRepository.Save(content1);
 
             var content2 = ContentBuilder.CreateSimpleContent(contentType);
-            content2.PublishCulture(CultureImpact.Invariant);
+            content2.PublishCulture(CultureImpact.Invariant, DateTime.Now, GetRequiredService<PropertyEditorCollection>());
             content2.PublishedState = PublishedState.Publishing;
             content2.Trashed = true;
             DocumentRepository.Save(content2);

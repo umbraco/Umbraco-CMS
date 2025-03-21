@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Infrastructure.Migrations;
 
 /// <inheritdoc />
-[Obsolete("Use AsyncMigrationBase instead. This class will be removed in a future version.")]
+[Obsolete("Use AsyncMigrationBase instead. Scheduled for removal in Umbraco 17.")]
 public abstract class MigrationBase : AsyncMigrationBase
 {
     /// <summary>

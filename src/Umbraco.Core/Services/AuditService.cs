@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -17,49 +15,6 @@ public sealed class AuditService : RepositoryService, IAuditService
     private readonly IAuditRepository _auditRepository;
     private readonly IEntityService _entityService;
     private readonly Lazy<bool> _isAvailable;
-
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V15.")]
-    public AuditService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IAuditRepository auditRepository,
-        IAuditEntryRepository auditEntryRepository,
-        IUserService userService,
-        IEntityRepository entityRepository)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            auditRepository,
-            auditEntryRepository,
-            userService,
-            StaticServiceProvider.Instance.GetRequiredService<IEntityService>()
-        )
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V15.")]
-    public AuditService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IAuditRepository auditRepository,
-        IAuditEntryRepository auditEntryRepository,
-        IUserService userService,
-        IEntityRepository entityRepository,
-        IEntityService entityService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            auditRepository,
-            auditEntryRepository,
-            userService,
-            entityService
-        )
-    {
-    }
 
     public AuditService(
         ICoreScopeProvider provider,

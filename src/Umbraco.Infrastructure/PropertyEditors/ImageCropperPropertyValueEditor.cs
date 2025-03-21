@@ -37,7 +37,6 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         DataEditorAttribute attribute,
         ILogger<ImageCropperPropertyValueEditor> logger,
         MediaFileManager mediaFileSystem,
-        ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IOptionsMonitor<ContentSettings> contentSettings,
         IJsonSerializer jsonSerializer,
@@ -46,7 +45,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         IScopeProvider scopeProvider,
         IFileStreamSecurityValidator fileStreamSecurityValidator,
         IDataTypeConfigurationCache dataTypeConfigurationCache)
-        : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+        : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));

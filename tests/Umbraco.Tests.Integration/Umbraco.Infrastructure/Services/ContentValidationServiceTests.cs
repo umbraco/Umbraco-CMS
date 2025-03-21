@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
     Database = UmbracoTestOptions.Database.NewSchemaPerTest,
     PublishedRepositoryEvents = true,
     WithApplication = true)]
-public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
+internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
 {
     private IContentValidationService ContentValidationService => GetRequiredService<IContentValidationService>();
 

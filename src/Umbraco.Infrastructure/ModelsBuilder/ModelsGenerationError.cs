@@ -1,11 +1,8 @@
 using System.Text;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
-using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder;
 
@@ -13,31 +10,6 @@ public sealed class ModelsGenerationError
 {
     private readonly IHostEnvironment _hostEnvironment;
     private ModelsBuilderSettings _config;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ModelsGenerationError" /> class.
-    /// </summary>
-    [Obsolete("Use a not obsoleted constructor instead. Scheduled for removal in v16")]
-    public ModelsGenerationError(IOptionsMonitor<ModelsBuilderSettings> config, IHostingEnvironment hostingEnvironment)
-    {
-        _config = config.CurrentValue;
-        config.OnChange(x => _config = x);
-        _hostEnvironment = StaticServiceProvider.Instance.GetRequiredService<IHostEnvironment>();
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ModelsGenerationError" /> class.
-    /// </summary>
-    [Obsolete("Use a not obsoleted constructor instead. Scheduled for removal in v16")]
-    public ModelsGenerationError(
-        IOptionsMonitor<ModelsBuilderSettings> config,
-        IHostingEnvironment hostingEnvironment,
-        IHostEnvironment hostEnvironment)
-    {
-        _config = config.CurrentValue;
-        config.OnChange(x => _config = x);
-        _hostEnvironment = hostEnvironment;
-    }
 
     public ModelsGenerationError(IOptionsMonitor<ModelsBuilderSettings> config, IHostEnvironment hostEnvironment)
     {

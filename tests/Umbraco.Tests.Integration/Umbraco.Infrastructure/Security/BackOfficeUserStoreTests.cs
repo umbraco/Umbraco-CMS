@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Security;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class BackOfficeUserStoreTests : UmbracoIntegrationTest
+internal sealed class BackOfficeUserStoreTests : UmbracoIntegrationTest
 {
     private IEntityService EntityService => GetRequiredService<IEntityService>();
 

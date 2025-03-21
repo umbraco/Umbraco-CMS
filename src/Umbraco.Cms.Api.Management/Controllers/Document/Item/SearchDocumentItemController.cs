@@ -21,28 +21,6 @@ public class SearchDocumentItemController : DocumentItemControllerBase
         _documentPresentationFactory = documentPresentationFactory;
     }
 
-    [NonAction]
-    [Obsolete("Scheduled to be removed in v16, use the non obsoleted method instead")]
-    public Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
-        => SearchFromParent(cancellationToken, query, skip, take);
-
-    [NonAction]
-    [Obsolete("Scheduled to be removed in v16, use the non obsoleted method instead")]
-    public async Task<IActionResult> SearchFromParent(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, Guid? parentId = null)
-        => await SearchWithTrashed(cancellationToken, query, null, skip, take, parentId);
-
-    [NonAction]
-    [Obsolete("Scheduled to be removed in v16, use the non obsoleted method instead")]
-    [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<IActionResult> SearchFromParentWithAllowedTypes(
-        CancellationToken cancellationToken,
-        string query,
-        int skip = 0,
-        int take = 100,
-        Guid? parentId = null,
-        [FromQuery] IEnumerable<Guid>? allowedDocumentTypes = null)
-        => SearchWithTrashed(cancellationToken, query, null, skip, take, parentId, allowedDocumentTypes);
-
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]

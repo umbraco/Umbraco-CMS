@@ -1,17 +1,13 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 
-[ApiVersion("1.0")]
 [ApiVersion("2.0")]
 public class ByRouteContentApiController : ContentApiItemControllerBase
 {
@@ -21,45 +17,6 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     private readonly IRequestMemberAccessService _requestMemberAccessService;
     private const string PreviewContentRequestPathPrefix = $"/{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}";
 
-    [Obsolete($"Please use the constructor that accepts {nameof(IApiContentPathResolver)}. Will be removed in V15.")]
-    public ByRouteContentApiController(
-        IApiPublishedContentCache apiPublishedContentCache,
-        IApiContentResponseBuilder apiContentResponseBuilder,
-        IRequestRoutingService requestRoutingService,
-        IRequestRedirectService requestRedirectService,
-        IRequestPreviewService requestPreviewService,
-        IRequestMemberAccessService requestMemberAccessService)
-        : this(
-            apiPublishedContentCache,
-            apiContentResponseBuilder,
-            requestRedirectService,
-            requestPreviewService,
-            requestMemberAccessService,
-            StaticServiceProvider.Instance.GetRequiredService<IApiContentPathResolver>())
-    {
-    }
-
-    [Obsolete($"Please use the non-obsolete constructor. Will be removed in V15.")]
-    public ByRouteContentApiController(
-        IApiPublishedContentCache apiPublishedContentCache,
-        IApiContentResponseBuilder apiContentResponseBuilder,
-        IPublicAccessService publicAccessService,
-        IRequestRoutingService requestRoutingService,
-        IRequestRedirectService requestRedirectService,
-        IRequestPreviewService requestPreviewService,
-        IRequestMemberAccessService requestMemberAccessService,
-        IApiContentPathResolver apiContentPathResolver)
-        : this(
-            apiPublishedContentCache,
-            apiContentResponseBuilder,
-            requestRedirectService,
-            requestPreviewService,
-            requestMemberAccessService,
-            apiContentPathResolver)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public ByRouteContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,
@@ -74,16 +31,6 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
         _requestMemberAccessService = requestMemberAccessService;
         _apiContentPathResolver = apiContentPathResolver;
     }
-
-    [HttpGet("item/{*path}")]
-    [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IApiContentResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Obsolete("Please use version 2 of this API. Will be removed in V15.")]
-    public async Task<IActionResult> ByRoute(string path = "")
-        => await HandleRequest(path);
 
     /// <summary>
     ///     Gets a content item by route.

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Mapping.Permissions;
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Factories;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
+internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
 {
     public IUserGroupPresentationFactory UserGroupPresentationFactory => GetRequiredService<IUserGroupPresentationFactory>();
     public IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();

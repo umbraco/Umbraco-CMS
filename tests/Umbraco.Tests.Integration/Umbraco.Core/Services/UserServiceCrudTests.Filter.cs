@@ -1,14 +1,15 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class UserServiceCrudTests
+internal sealed partial class UserServiceCrudTests
 {
     [Test]
     [TestCase(UserState.Disabled)]
@@ -242,7 +243,7 @@ public partial class UserServiceCrudTests
         var userService = CreateUserService();
         await CreateTestUsers(userService);
 
-        var writerGroup = await UserGroupService.GetAsync(Constants.Security.WriterGroupAlias);
+        var writerGroup = await UserGroupService.GetAsync(DatabaseDataCreator.WriterGroupAlias);
         var filter = new UserFilter
         {
             IncludedUserGroups = new HashSet<Guid> { writerGroup!.Key }

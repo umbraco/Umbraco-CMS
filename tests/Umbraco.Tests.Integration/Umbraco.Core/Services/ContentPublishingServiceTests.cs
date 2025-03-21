@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
     Database = UmbracoTestOptions.Database.NewSchemaPerTest,
     PublishedRepositoryEvents = true,
     WithApplication = true)]
-public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
+internal sealed class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
 {
     private const string UnknownCulture = "ke-Ke";
 

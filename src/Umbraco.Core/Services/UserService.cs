@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
@@ -52,49 +51,6 @@ internal partial class UserService : RepositoryService, IUserService
     private readonly IUserRepository _userRepository;
     private readonly ContentSettings _contentSettings;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-
-    [Obsolete("Use the constructor that takes an IUserIdKeyResolver instead. Scheduled for removal in V15.")]
-    public UserService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IUserRepository userRepository,
-        IUserGroupRepository userGroupRepository,
-        IOptions<GlobalSettings> globalSettings,
-        IOptions<SecuritySettings> securitySettings,
-        UserEditorAuthorizationHelper userEditorAuthorizationHelper,
-        IServiceScopeFactory serviceScopeFactory,
-        IEntityService entityService,
-        ILocalLoginSettingProvider localLoginSettingProvider,
-        IUserInviteSender inviteSender,
-        MediaFileManager mediaFileManager,
-        ITemporaryFileService temporaryFileService,
-        IShortStringHelper shortStringHelper,
-        IOptions<ContentSettings> contentSettings,
-        IIsoCodeValidator isoCodeValidator,
-        IUserForgotPasswordSender forgotPasswordSender)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            userRepository,
-            userGroupRepository,
-            globalSettings,
-            securitySettings,
-            userEditorAuthorizationHelper,
-            serviceScopeFactory,
-            entityService,
-            localLoginSettingProvider,
-            inviteSender,
-            mediaFileManager,
-            temporaryFileService,
-            shortStringHelper,
-            contentSettings,
-            isoCodeValidator,
-            forgotPasswordSender,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    {
-    }
 
     public UserService(
         ICoreScopeProvider provider,
@@ -227,23 +183,6 @@ internal partial class UserService : RepositoryService, IUserService
     IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved) => CreateUserWithIdentity(username, email, passwordValue, isApproved);
 
     /// <summary>
-    ///     Gets a User by its integer id
-    /// </summary>
-    /// <param name="id"><see cref="int" /> Id</param>
-    /// <returns>
-    ///     <see cref="IUser" />
-    /// </returns>
-    [Obsolete("Please use GetAsync instead. Scheduled for removal in V15.")]
-    public IUser? GetById(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            Guid userKey = _userIdKeyResolver.GetAsync(id).GetAwaiter().GetResult();
-            return _userRepository.Get(userKey);
-        }
-    }
-
-    /// <summary>
     ///     Creates and persists a Member
     /// </summary>
     /// <remarks>
@@ -323,7 +262,25 @@ internal partial class UserService : RepositoryService, IUserService
     public IUser? GetByProviderKey(object id)
     {
         Attempt<int> asInt = id.TryConvertTo<int>();
-        return asInt.Success ? GetById(asInt.Result) : null;
+        Guid? userKey = null;
+        if (asInt.Success)
+        {
+            userKey = _userIdKeyResolver.GetAsync(asInt.Result).GetAwaiter().GetResult();
+        }
+        else if (Guid.TryParse(id.ToString(), out Guid idAsGuid))
+        {
+            userKey = idAsGuid;
+        }
+
+        if (userKey.HasValue is false)
+        {
+            return null;
+        }
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _userRepository.Get(userKey.Value);
+        }
     }
 
     /// <summary>
@@ -469,13 +426,6 @@ internal partial class UserService : RepositoryService, IUserService
             scope.Complete();
         }
     }
-
-    /// <summary>
-    ///     This is just the default user group that the membership provider will use
-    /// </summary>
-    /// <returns></returns>
-    [Obsolete("No (backend) code path is using this anymore, so it can not be considered the default. Planned for removal in V16.")]
-    public string GetDefaultMemberType() => Constants.Security.WriterGroupAlias;
 
     /// <summary>
     ///     Finds a list of <see cref="IUser" /> objects by a partial email string
@@ -1935,173 +1885,6 @@ internal partial class UserService : RepositoryService, IUserService
             EntityPermission[] entityPermissions =
                 entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray();
             scope.Notifications.Publish(new AssignedUserGroupPermissionsNotification(entityPermissions, evtMsgs));
-        }
-    }
-
-    /// <summary>
-    ///     Gets all UserGroups or those specified as parameters
-    /// </summary>
-    /// <param name="ids">Optional Ids of UserGroups to retrieve</param>
-    /// <returns>An enumerable list of <see cref="IUserGroup" /></returns>
-    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
-    public IEnumerable<IUserGroup> GetAllUserGroups(params int[] ids)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _userGroupRepository.GetMany(ids).OrderBy(x => x.Name);
-        }
-    }
-
-    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
-    public IEnumerable<IUserGroup> GetUserGroupsByAlias(params string[] aliases)
-    {
-        if (aliases.Length == 0)
-        {
-            return Enumerable.Empty<IUserGroup>();
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IUserGroup> query = Query<IUserGroup>().Where(x => aliases.SqlIn(x.Alias));
-            IEnumerable<IUserGroup> contents = _userGroupRepository.Get(query);
-            return contents?.WhereNotNull().ToArray() ?? Enumerable.Empty<IUserGroup>();
-        }
-    }
-
-    /// <summary>
-    ///     Gets a UserGroup by its Alias
-    /// </summary>
-    /// <param name="alias">Alias of the UserGroup to retrieve</param>
-    /// <returns>
-    ///     <see cref="IUserGroup" />
-    /// </returns>
-    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
-    public IUserGroup? GetUserGroupByAlias(string alias)
-    {
-        if (string.IsNullOrWhiteSpace(alias))
-        {
-            throw new ArgumentException("Value cannot be null or whitespace.", "alias");
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IUserGroup> query = Query<IUserGroup>().Where(x => x.Alias == alias);
-            IEnumerable<IUserGroup> contents = _userGroupRepository.Get(query);
-            return contents?.FirstOrDefault();
-        }
-    }
-
-    /// <summary>
-    ///     Gets a UserGroup by its Id
-    /// </summary>
-    /// <param name="id">Id of the UserGroup to retrieve</param>
-    /// <returns>
-    ///     <see cref="IUserGroup" />
-    /// </returns>
-    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
-    public IUserGroup? GetUserGroupById(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _userGroupRepository.Get(id);
-        }
-    }
-
-    /// <summary>
-    ///     Saves a UserGroup.
-    /// </summary>
-    /// <param name="userGroup">UserGroup to save.</param>
-    /// <param name="userIds">
-    ///     If null than no changes are made to the users who are assigned to this group, however if a value is passed in
-    ///     than all users will be removed from this group and only these users will be added.</param>
-    [Obsolete("Use IUserGroupService.CreateAsync and IUserGroupService.UpdateAsync instead, scheduled for removal in V15.")]
-    public void Save(IUserGroup userGroup, int[]? userIds = null)
-    {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            // we need to figure out which users have been added / removed, for audit purposes
-            IUser[] empty = Array.Empty<IUser>();
-            IUser[] addedUsers = empty;
-            IUser[] removedUsers = empty;
-
-            if (userIds != null)
-            {
-                IUser[] groupUsers =
-                    userGroup.HasIdentity ? _userRepository.GetAllInGroup(userGroup.Id).ToArray() : empty;
-                var xGroupUsers = groupUsers.ToDictionary(x => x.Id, x => x);
-                var groupIds = groupUsers.Select(x => x.Id).ToArray();
-                var addedUserKeys = new List<Guid>();
-                foreach (var userId in userIds.Except(groupIds))
-                {
-                    Guid userKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-                    addedUserKeys.Add(userKey);
-                }
-
-                IEnumerable<int> addedUserIds = userIds.Except(groupIds);
-
-                addedUsers = addedUserIds.Count() > 0
-                    ? _userRepository.GetMany(addedUserKeys.ToArray()).Where(x => x.Id != 0).ToArray()
-                    : new IUser[] { };
-                removedUsers = groupIds.Except(userIds).Select(x => xGroupUsers[x]).Where(x => x.Id != 0).ToArray();
-            }
-
-            var userGroupWithUsers = new UserGroupWithUsers(userGroup, addedUsers, removedUsers);
-
-            // this is the default/expected notification for the IUserGroup entity being saved
-            var savingNotification = new UserGroupSavingNotification(userGroup, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            // this is an additional notification for special auditing
-            var savingUserGroupWithUsersNotification =
-                new UserGroupWithUsersSavingNotification(userGroupWithUsers, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingUserGroupWithUsersNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _userGroupRepository.AddOrUpdateGroupWithUsers(userGroup, userIds);
-
-            scope.Notifications.Publish(
-                new UserGroupSavedNotification(userGroup, evtMsgs).WithStateFrom(savingNotification));
-            scope.Notifications.Publish(
-                new UserGroupWithUsersSavedNotification(userGroupWithUsers, evtMsgs).WithStateFrom(
-                    savingUserGroupWithUsersNotification));
-
-            scope.Complete();
-        }
-    }
-
-    /// <summary>
-    ///     Deletes a UserGroup
-    /// </summary>
-    /// <param name="userGroup">UserGroup to delete</param>
-    [Obsolete("Use IUserGroupService.DeleteAsync instead, scheduled for removal in V15.")]
-    public void DeleteUserGroup(IUserGroup userGroup)
-    {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var deletingNotification = new UserGroupDeletingNotification(userGroup, evtMsgs);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _userGroupRepository.Delete(userGroup);
-
-            scope.Notifications.Publish(
-                new UserGroupDeletedNotification(userGroup, evtMsgs).WithStateFrom(deletingNotification));
-
-            scope.Complete();
         }
     }
 

@@ -13,23 +13,6 @@ public class DbProviderFactoryCreator : IDbProviderFactoryCreator
     private readonly IDictionary<string, IProviderSpecificMapperFactory> _providerSpecificMapperFactories;
     private readonly IDictionary<string, ISqlSyntaxProvider> _syntaxProviders;
 
-    [Obsolete("Please use an alternative constructor.")]
-    public DbProviderFactoryCreator(
-        Func<string, DbProviderFactory> getFactory,
-        IEnumerable<ISqlSyntaxProvider> syntaxProviders,
-        IEnumerable<IBulkSqlInsertProvider> bulkSqlInsertProviders,
-        IEnumerable<IDatabaseCreator> databaseCreators,
-        IEnumerable<IProviderSpecificMapperFactory> providerSpecificMapperFactories)
-        : this(
-            getFactory,
-            syntaxProviders,
-            bulkSqlInsertProviders,
-            databaseCreators,
-            providerSpecificMapperFactories,
-            Enumerable.Empty<IProviderSpecificInterceptor>())
-    {
-    }
-
     public DbProviderFactoryCreator(
         Func<string, DbProviderFactory> getFactory,
         IEnumerable<ISqlSyntaxProvider> syntaxProviders,

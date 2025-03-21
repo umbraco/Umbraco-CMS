@@ -31,18 +31,6 @@ public sealed class MediaFileManager
         FileSystem = fileSystem;
     }
 
-    [Obsolete("Use the ctr that doesn't include unused parameters.")]
-    public MediaFileManager(
-        IFileSystem fileSystem,
-        IMediaPathScheme mediaPathScheme,
-        ILogger<MediaFileManager> logger,
-        IShortStringHelper shortStringHelper,
-        IServiceProvider serviceProvider,
-        IOptions<ContentSettings> contentSettings)
-        : this(fileSystem, mediaPathScheme, logger, shortStringHelper, serviceProvider)
-    {
-    }
-
     /// <summary>
     ///     Gets the media filesystem.
     /// </summary>

@@ -32,7 +32,6 @@ public static partial class UmbracoBuilderExtensions
         .AddMembersIdentity()
         .AddUmbracoProfiler()
         .AddMvcAndRazor(configureMvc)
-        .AddWebServer()
         .AddRecurringBackgroundJobs()
         .AddUmbracoHybridCache()
         .AddDistributedCache()

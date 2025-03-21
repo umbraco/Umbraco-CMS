@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public abstract class DocumentNavigationServiceTestsBase : UmbracoIntegrationTest
+internal abstract class DocumentNavigationServiceTestsBase : UmbracoIntegrationTest
 {
     protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 

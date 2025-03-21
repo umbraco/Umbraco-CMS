@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
     PublishedRepositoryEvents = true,
     WithApplication = true,
     Logger = UmbracoTestOptions.Logger.Console)]
-public class ContentServiceNotificationTests : UmbracoIntegrationTest
+internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetupTest()
@@ -544,7 +544,7 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
         Assert.IsTrue(document.IsCulturePublished("en-US"));
     }
 
-    public class ContentNotificationHandler :
+    internal sealed class ContentNotificationHandler :
         INotificationHandler<ContentSavingNotification>,
         INotificationHandler<ContentSavedNotification>,
         INotificationHandler<ContentPublishingNotification>,

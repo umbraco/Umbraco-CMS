@@ -682,14 +682,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        [Obsolete("Please use GetReferencesAsync. Will be deleted in V15.")]
-        public IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id)
-        {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            return _dataTypeRepository.FindUsages(id);
-        }
-
-        /// <inheritdoc />
         public Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);

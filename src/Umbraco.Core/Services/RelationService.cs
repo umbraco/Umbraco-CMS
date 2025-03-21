@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -20,27 +18,6 @@ public class RelationService : RepositoryService, IRelationService
     private readonly IEntityService _entityService;
     private readonly IRelationRepository _relationRepository;
     private readonly IRelationTypeRepository _relationTypeRepository;
-
-    [Obsolete("Please use ctor that takes all parameters, scheduled for removal in V15")]
-    public RelationService(
-        ICoreScopeProvider uowProvider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IEntityService entityService,
-        IRelationRepository relationRepository,
-        IRelationTypeRepository relationTypeRepository,
-        IAuditRepository auditRepository)
-        : this(
-            uowProvider,
-            loggerFactory,
-            eventMessagesFactory,
-            entityService,
-            relationRepository,
-            relationTypeRepository,
-            auditRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    {
-    }
 
     public RelationService(
         ICoreScopeProvider uowProvider,

@@ -20,7 +20,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     [Test]
     public void MultiUrlPickerValueConverter_InSingleMode_ConvertsContentToLinksWithContentInfo()
     {
-        var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
@@ -52,7 +52,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     [Test]
     public void MultiUrlPickerValueConverter_InSingleMode_ConvertsMediaToLinksWithoutContentInfo()
     {
-        var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
@@ -82,7 +82,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     [Test]
     public void MultiUrlPickerValueConverter_InMultiMode_CanHandleMixedLinkTypes()
     {
-        var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 10 }));
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 10 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
@@ -135,7 +135,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     [Test]
     public void MultiUrlPickerValueConverter_ConvertsExternalUrlToLinks()
     {
-        var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
@@ -166,7 +166,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     [Test]
     public void MultiUrlPickerValueConverter_AppliesExplicitConfigurationToMediaLink()
     {
-        var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
@@ -199,7 +199,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     [Test]
     public void MultiUrlPickerValueConverter_AppliesExplicitConfigurationToContentLink()
     {
-        var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
@@ -231,7 +231,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     [Test]
     public void MultiUrlPickerValueConverter_PrioritizesContentUrlOverConfiguredUrl()
     {
-        var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
@@ -263,7 +263,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     [TestCase(null)]
     public void MultiUrlPickerValueConverter_InSingleMode_ConvertsInvalidValueToEmptyArray(object? inter)
     {
-        var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
@@ -279,7 +279,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     [TestCase(null)]
     public void MultiUrlPickerValueConverter_InMultiMode_ConvertsInvalidValueToEmptyArray(object? inter)
     {
-        var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 10 }));
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 10 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 

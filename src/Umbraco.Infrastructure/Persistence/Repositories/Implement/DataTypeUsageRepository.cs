@@ -15,29 +15,6 @@ public class DataTypeUsageRepository : IDataTypeUsageRepository
         _scopeAccessor = scopeAccessor;
     }
 
-    [Obsolete("Please use HasSavedValuesAsync. Scheduled for removable in Umbraco 15.")]
-    public bool HasSavedValues(int dataTypeId)
-    {
-        IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
-
-        if (database is null)
-        {
-            throw new InvalidOperationException("A scope is required to query the database");
-        }
-
-        Sql<ISqlContext> selectQuery = database.SqlContext.Sql()
-            .SelectAll()
-            .From<PropertyTypeDto>("pt")
-            .InnerJoin<PropertyDataDto>("pd")
-            .On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id, "pd", "pt")
-            .Where<PropertyTypeDto>(pt => pt.DataTypeId == dataTypeId, "pt");
-
-        Sql<ISqlContext> hasValueQuery = database.SqlContext.Sql()
-            .SelectAnyIfExists(selectQuery);
-
-        return database.ExecuteScalar<bool>(hasValueQuery);
-    }
-
     public Task<bool> HasSavedValuesAsync(Guid dataTypeKey)
     {
         IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;

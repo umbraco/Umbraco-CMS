@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
     Database = UmbracoTestOptions.Database.NewSchemaPerTest,
     PublishedRepositoryEvents = true,
     WithApplication = true)]
-public abstract class ContentTypeEditingServiceTestsBase : UmbracoIntegrationTest
+internal abstract class ContentTypeEditingServiceTestsBase : UmbracoIntegrationTest
 {
     protected IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
 
