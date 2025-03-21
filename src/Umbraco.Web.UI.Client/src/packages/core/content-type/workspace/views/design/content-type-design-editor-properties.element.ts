@@ -251,6 +251,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 								return html`
 									<umb-content-type-design-editor-property
 										data-umb-property-id=${property.id}
+										data-mark="property-type:${property.name}"
 										.editContentTypePath=${this.editContentTypePath}
 										.editPropertyTypePath=${this._editPropertyTypePath}
 										?sort-mode-active=${this._sortModeActive}

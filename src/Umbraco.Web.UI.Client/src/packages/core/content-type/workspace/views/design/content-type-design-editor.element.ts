@@ -489,6 +489,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		return html`
 			<uui-tab
 				id="root-tab"
+				data-mark="root-tab"
 				class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
 				label=${this.localize.term('general_generic')}
 				.active=${rootTabActive}
@@ -508,6 +509,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			.active=${tabActive}
 			href=${path}
 			data-umb-tab-id=${ifDefined(tab.id)}
+			data-mark="tab:${tab.name}"
 			?sortable=${ownedTab}>
 			${this.renderTabInner(tab, tabActive, ownedTab)}
 		</uui-tab>`;

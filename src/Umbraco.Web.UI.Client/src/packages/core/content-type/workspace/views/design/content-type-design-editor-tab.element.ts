@@ -190,7 +190,8 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 								.editContentTypePath=${this._editContentTypePath}
 								.group=${group}
 								.groupStructureHelper=${this.#groupStructureHelper as any}
-								data-umb-group-id=${group.id}>
+								data-umb-group-id=${group.id}
+								data-mark="group:${group.name}">
 							</umb-content-type-design-editor-group>
 						`,
 					)}
