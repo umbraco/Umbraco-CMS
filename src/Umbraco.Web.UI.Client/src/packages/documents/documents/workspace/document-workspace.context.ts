@@ -182,7 +182,7 @@ export class UmbDocumentWorkspaceContext
 	override resetState(): void {
 		super.resetState();
 		this.#isTrashedContext.setIsTrashed(false);
-		this.structure.propertyReadState.clear();
+		this.structure.propertyVisibilityState.clear();
 		this.structure.propertyWriteState.clear();
 		this.structure.propertyReadOnlyState.clear();
 	}
