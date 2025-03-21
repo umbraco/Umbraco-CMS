@@ -104,8 +104,9 @@ export class UmbServerModelValidatorContext
 					} else {
 						if (path.startsWith('.')) {
 							path = '$' + path;
+						} else {
+							path = '$.' + path;
 						}
-						path = '$.' + path;
 					}
 					newBodies.forEach((body: string) => messages.push({ type: 'server', key: UmbId.new(), path, body }));
 					//this.#context!.messages.addMessages('server', path, errorBody.errors[path]);
