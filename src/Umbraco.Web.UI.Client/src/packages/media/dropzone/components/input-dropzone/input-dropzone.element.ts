@@ -165,7 +165,10 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				</div>
 				<div class="fileDetails">
 					<div class="fileName" title=${file?.name ?? ''}>${file?.name ?? ''}</div>
-					<div class="fileSize">${formatBytes(file?.size ?? 0, { decimals: 2 })}: ${item.progress}%</div>
+					<div class="fileSize">
+						${formatBytes(file?.size ?? 0, { decimals: 2 })}:
+						${this.localize.number(item.progress, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%
+					</div>
 					${when(
 						item.status === UmbFileDropzoneItemStatus.WAITING,
 						() => html`<div class="progress"><uui-loader-bar progress=${item.progress}></uui-loader-bar></div>`,
