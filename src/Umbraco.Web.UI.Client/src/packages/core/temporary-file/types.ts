@@ -4,6 +4,7 @@ export enum TemporaryFileStatus {
 	SUCCESS = 'success',
 	WAITING = 'waiting',
 	ERROR = 'error',
+	CANCELLED = 'cancelled',
 }
 
 export interface UmbTemporaryFileModel {
