@@ -244,11 +244,13 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				display: flex;
 				flex-direction: column;
 				flex-wrap: wrap;
+				align-items: center;
 				gap: var(--uui-size-space-3);
 
 				.placeholder {
 					display: grid;
 					grid-template-columns: 30px 200px 1fr;
+					max-width: fit-content;
 					padding: var(--uui-size-space-3);
 					border: 1px dashed var(--uui-color-divider-emphasis);
 				}
