@@ -2096,218 +2096,272 @@ path: () => import("./icons/icon-twitter-x.js"),
 },{
 name: "icon-art-easel",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-art-easel.js"),
 },{
 name: "icon-article",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-article.js"),
 },{
 name: "icon-auction-hammer",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-auction-hammer.js"),
 },{
 name: "icon-badge-count",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-badge-count.js"),
 },{
 name: "icon-band-aid",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-band-aid.js"),
 },{
 name: "icon-baby-stroller",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-baby-stroller.js"),
 },{
 name: "icon-bill-dollar",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bill-dollar.js"),
 },{
 name: "icon-bill-euro",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bill-euro.js"),
 },{
 name: "icon-bill-pound",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bill-pound.js"),
 },{
 name: "icon-bill-yen",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bill-yen.js"),
 },{
 name: "icon-bill",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bill.js"),
 },{
 name: "icon-billboard",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-billboard.js"),
 },{
 name: "icon-bills-dollar",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bills-dollar.js"),
 },{
 name: "icon-bills-euro",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bills-euro.js"),
 },{
 name: "icon-bills-pound",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bills-pound.js"),
 },{
 name: "icon-bills-yen",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bills-yen.js"),
 },{
 name: "icon-bills",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bills.js"),
 },{
 name: "icon-blueprint",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-blueprint.js"),
 },{
 name: "icon-bomb",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bomb.js"),
 },{
 name: "icon-cash-register",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-cash-register.js"),
 },{
 name: "icon-checkbox-dotted-active",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-checkbox-dotted-active.js"),
 },{
 name: "icon-chess",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-chess.js"),
 },{
 name: "icon-circus",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-circus.js"),
 },{
 name: "icon-clothes-hanger",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-clothes-hanger.js"),
 },{
 name: "icon-coin",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coin.js"),
 },{
 name: "icon-coins-dollar-alt",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-dollar-alt.js"),
 },{
 name: "icon-coins-dollar",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-dollar.js"),
 },{
 name: "icon-coins-euro-alt",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-euro-alt.js"),
 },{
 name: "icon-coins-euro",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-euro.js"),
 },{
 name: "icon-coins-pound-alt",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-pound-alt.js"),
 },{
 name: "icon-coins-pound",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-pound.js"),
 },{
 name: "icon-coins-yen-alt",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-yen-alt.js"),
 },{
 name: "icon-coins-yen",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-yen.js"),
 },{
 name: "icon-comb",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-comb.js"),
 },{
 name: "icon-desk",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-desk.js"),
 },{
 name: "icon-dollar-bag",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-dollar-bag.js"),
 },{
 name: "icon-eject",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-eject.js"),
 },{
 name: "icon-euro-bag",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-euro-bag.js"),
 },{
 name: "icon-female-symbol",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-female-symbol.js"),
 },{
 name: "icon-firewall",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-firewall.js"),
 },{
 name: "icon-folder-open",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-folder-open.js"),
 },{
 name: "icon-folder-outline",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-folder-outline.js"),
 },{
 name: "icon-handprint",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-handprint.js"),
 },{
 name: "icon-hat",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-hat.js"),
 },{
 name: "icon-hd",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-hd.js"),
 },{
 name: "icon-inactive-line",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-inactive-line.js"),
 },{
 name: "icon-keychain",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-keychain.js"),
 },{
 name: "icon-keyhole",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-keyhole.js"),
 },{
 name: "icon-linkedin",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-linkedin.js"),
 },{
 name: "icon-linux-tux",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-linux-tux.js"),
 },{
 name: "icon-male-and-female",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-male-and-female.js"),
 },{
 name: "icon-male-symbol",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-male-symbol.js"),
 },{
 name: "icon-molecular-network",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-molecular-network.js"),
 },{
 name: "icon-molecular",
 legacy: true,
+hidden: true,
 path: () => import("./icons/icon-molecular.js"),
 },{
 name: "icon-umbraco",
