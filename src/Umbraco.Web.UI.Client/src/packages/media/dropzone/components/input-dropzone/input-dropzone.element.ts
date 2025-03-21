@@ -176,7 +176,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 								compact
 								@click=${() => this.#handleCancel(item)}
 								label=${this.localize.term('general_cancel')}>
-								<uui-icon name="remove"></uui-icon>${this.localize.term('general_cancel')}
+								<uui-icon name="icon-remove"></uui-icon>${this.localize.term('general_cancel')}
 							</uui-button>
 						`,
 						() => this.#renderButtonRemove(item),
