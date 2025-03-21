@@ -69,8 +69,6 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	#manifests: Array<ManifestFileUploadPreview> = [];
 
-	#uploadAbort?: AbortController;
-
 	override updated(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
 		super.updated(changedProperties);
 
@@ -154,19 +152,18 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	async #onUpload(e: UUIFileDropzoneEvent) {
-		//Property Editor for Upload field will always only have one file.
-		this.temporaryFile = {
-			temporaryUnique: UmbId.new(),
-			status: TemporaryFileStatus.WAITING,
-			file: e.detail.files[0],
-			onProgress: (p) => {
-				this._progress = Math.ceil(p);
-			},
-			abortController: new AbortController(),
-		};
-
 		try {
-			this.#uploadAbort = new AbortController();
+			//Property Editor for Upload field will always only have one file.
+			this.temporaryFile = {
+				temporaryUnique: UmbId.new(),
+				status: TemporaryFileStatus.WAITING,
+				file: e.detail.files[0],
+				onProgress: (p) => {
+					this._progress = Math.ceil(p);
+				},
+				abortController: new AbortController(),
+			};
+
 			const uploaded = await this.#manager.uploadOne(this.temporaryFile);
 
 			if (uploaded.status === TemporaryFileStatus.SUCCESS) {
@@ -188,8 +185,6 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 			}
 
 			// If the error was caused by the upload being aborted, do not show an error message.
-		} finally {
-			this.#uploadAbort = undefined;
 		}
 	}
 
@@ -290,13 +285,13 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	#handleRemove() {
+		// If the upload promise happens to be in progress, cancel it.
+		this.temporaryFile?.abortController?.abort();
+
 		this.value = { src: undefined };
 		this.temporaryFile = undefined;
 		this._progress = 0;
 		this.dispatchEvent(new UmbChangeEvent());
-
-		// If the upload promise happens to be in progress, cancel it.
-		this.#uploadAbort?.abort();
 	}
 
 	static override readonly styles = [
