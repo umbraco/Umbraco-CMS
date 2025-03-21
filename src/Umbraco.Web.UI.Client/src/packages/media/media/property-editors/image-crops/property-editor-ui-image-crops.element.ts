@@ -257,12 +257,15 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 				display: flex;
 				flex-direction: column;
 			}
+			uui-input[type='number'] {
+				text-align: right;
+			}
 			.append {
 				padding-inline: var(--uui-size-space-4);
 				background: var(--uui-color-disabled);
 				border-left: 1px solid var(--uui-color-border);
 				color: var(--uui-color-disabled-contrast);
-				font-size: 0.8em;
+				font-size: var(--uui-type-small-size);
 				display: flex;
 				align-items: center;
 			}
