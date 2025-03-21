@@ -98,6 +98,15 @@ export class UmbServerModelValidatorContext
 			if (errorBody?.errors) {
 				Object.keys(errorBody.errors).forEach((path) => {
 					const newBodies = errorBody.errors[path];
+					// Correct path to ensure it starts with `$.` (notice it mainly starts with `$.`, but the server sometimes does not include it)
+					if (path.startsWith('$.')) {
+						// Everything is good.
+					} else {
+						if (path.startsWith('.')) {
+							path = '$' + path;
+						}
+						path = '$.' + path;
+					}
 					newBodies.forEach((body: string) => messages.push({ type: 'server', key: UmbId.new(), path, body }));
 					//this.#context!.messages.addMessages('server', path, errorBody.errors[path]);
 				});
