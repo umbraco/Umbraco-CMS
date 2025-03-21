@@ -18,6 +18,8 @@ export class UmbDocumentPropertyDatasetContext extends UmbContentPropertyDataset
 	constructor(host: UmbControllerHost, dataOwner: UmbDocumentWorkspaceContext, variantId?: UmbVariantId) {
 		super(host, dataOwner, variantId);
 
+		this.#dataSetVariantId = variantId;
+
 		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
 			this.#documentConfiguration = (await context?.getDocumentConfiguration()) ?? undefined;
 
