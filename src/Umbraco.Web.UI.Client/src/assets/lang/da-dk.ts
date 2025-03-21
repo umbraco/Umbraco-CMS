@@ -1221,7 +1221,8 @@ export default {
 		colorsTitle: 'Farver',
 		colorsDescription: 'Tilføj, fjern eller sorter farver',
 		showLabelTitle: 'Inkluder label?',
-		showLabelDescription: 'Gemmer farver som et Json-objekt, der både indeholder farvens hex streng og label, i stedet for kun at gemme hex strengen.',
+		showLabelDescription:
+			'Gemmer farver som et Json-objekt, der både indeholder farvens hex streng og label, i stedet for kun at gemme hex strengen.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'Du kan kun vælge følgende type(r) dokumenter: %0%',

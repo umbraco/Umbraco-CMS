@@ -1,7 +1,6 @@
 import { expect } from '@open-wc/testing';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	ManifestPropertyValuePreset,
 	UmbPropertyTypePresetModel,
@@ -12,9 +11,6 @@ import type {
 } from './types.js';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyValuePresetVariantBuilderController } from './property-value-preset-variant-builder.controller.js';
-
-@customElement('umb-test-controller-host')
-export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 // Test with async APIs, espcially where the first one is slower than the last one.
 export class TestPropertyValuePresetFirstApi implements UmbPropertyValuePreset<string, UmbPropertyEditorConfig> {
@@ -50,7 +46,7 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 		});
 
 		it('creates culture variant values', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValuePresetVariantBuilderController(ctrlHost);
 			ctrl.setCultures(['cultureA', 'cultureB']);
 
@@ -73,7 +69,7 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 		});
 
 		it('creates culture variant values when no cultures available should fail', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValuePresetVariantBuilderController(ctrlHost);
 
 			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
@@ -92,7 +88,7 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 		});
 
 		it('creates segmented values', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValuePresetVariantBuilderController(ctrlHost);
 			ctrl.setSegments(['segmentA', 'segmentB']);
 
@@ -120,7 +116,7 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 		});
 
 		it('creates segmented values when no segments available', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValuePresetVariantBuilderController(ctrlHost);
 
 			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
@@ -141,7 +137,7 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 		});
 
 		it('creates culture variant and segmented values', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValuePresetVariantBuilderController(ctrlHost);
 			ctrl.setCultures(['cultureA', 'cultureB']);
 			ctrl.setSegments(['segmentA', 'segmentB']);

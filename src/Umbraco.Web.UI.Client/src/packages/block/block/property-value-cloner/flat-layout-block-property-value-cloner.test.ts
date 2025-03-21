@@ -1,13 +1,9 @@
 import { expect } from '@open-wc/testing';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbFlatLayoutBlockPropertyValueCloner } from './flat-layout-block-property-value-cloner.api';
 import { UmbPropertyValueCloneController, type ManifestPropertyValueCloner } from '@umbraco-cms/backoffice/property';
 import type { UmbBlockValueType } from '../types';
-
-@customElement('umb-test-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+import { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
 
 class TestUmbFlatLayoutBlockPropertyValueCloner extends UmbFlatLayoutBlockPropertyValueCloner {
 	constructor() {
@@ -33,7 +29,7 @@ describe('FlatLayoutBlockPropertyValueCloner', () => {
 		});
 
 		it('clones value', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValueCloneController(ctrlHost);
 
 			const value = {

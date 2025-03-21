@@ -1,7 +1,5 @@
 import { expect } from '@open-wc/testing';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	ManifestPropertyValuePreset,
 	UmbPropertyTypePresetModel,
@@ -10,9 +8,7 @@ import type {
 } from './types.js';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyValuePresetBuilderController } from './property-value-preset-builder.controller.js';
-
-@customElement('umb-test-controller-host')
-export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+import { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
 
 // TODO: Write test with config, investigate oppertunity to retrieve Config Object, for an simpler DX. [NL]
 
@@ -60,7 +56,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 		});
 
 		it('creates value', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValuePresetBuilderController(ctrlHost);
 
 			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
@@ -108,7 +104,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 		});
 
 		it('creates a combined value', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValuePresetBuilderController(ctrlHost);
 
 			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
@@ -156,7 +152,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 		});
 
 		it('creates a combined value', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValuePresetBuilderController(ctrlHost);
 
 			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
@@ -215,7 +211,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 		});
 
 		it('creates a combined value', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValuePresetBuilderController(ctrlHost);
 
 			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
@@ -284,7 +280,7 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 		});
 
 		it('creates only presets that fits the configuration', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbPropertyValuePresetBuilderController(ctrlHost);
 
 			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [

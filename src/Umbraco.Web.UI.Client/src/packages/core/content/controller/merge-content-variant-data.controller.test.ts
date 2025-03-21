@@ -8,11 +8,7 @@ import type {
 import { UmbVariantId, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 import { UmbMergeContentVariantDataController } from './merge-content-variant-data.controller.js';
 import type { UmbContentLikeDetailModel } from '../types.js';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-
-@customElement('umb-test-controller-host')
-export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+import { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
 
 type TestPropertyValueNestedType = {
 	nestedValue: UmbPropertyValueData;
@@ -64,7 +60,7 @@ describe('UmbMergeContentVariantDataController', () => {
 		});
 
 		it('transfers inner values of select variants', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
 
 			const persistedData: UmbContentLikeDetailModel = {
@@ -113,7 +109,7 @@ describe('UmbMergeContentVariantDataController', () => {
 		});
 
 		it('does not transfers inner values of a not selected variant', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrlHost = new UmbControllerHostElementElement();
 			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
 
 			const persistedData: UmbContentLikeDetailModel = {

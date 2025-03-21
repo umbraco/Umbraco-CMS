@@ -7,18 +7,12 @@ import type {
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
 import type { UmbControllerHostElement } from '../../controller-api/controller-host-element.interface.js';
-import { UmbControllerHostElementMixin } from '../../controller-api/controller-host-element.mixin.js';
 import { UmbBaseExtensionInitializer } from './index.js';
 import { expect, fixture } from '@open-wc/testing';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-
-@customElement('umb-test-controller-host')
-// Element is used in tests
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 class UmbTestExtensionController extends UmbBaseExtensionInitializer {
 	constructor(
@@ -64,7 +58,7 @@ describe('UmbBaseExtensionController', () => {
 		let manifest: ManifestWithDynamicConditions;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = await fixture(html`<umb-controller-host></umb-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
 				type: 'section',
@@ -100,7 +94,7 @@ describe('UmbBaseExtensionController', () => {
 		let manifest: ManifestWithDynamicConditions;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = await fixture(html`<umb-controller-host></umb-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
 				type: 'section',
@@ -139,7 +133,7 @@ describe('UmbBaseExtensionController', () => {
 		let conditionManifest: ManifestCondition;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = await fixture(html`<umb-controller-host></umb-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
 				type: 'section',
@@ -401,7 +395,7 @@ describe('UmbBaseExtensionController', () => {
 		let conditionManifest: ManifestCondition;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = await fixture(html`<umb-controller-host></umb-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
 				type: 'section',
@@ -490,7 +484,7 @@ describe('UmbBaseExtensionController', () => {
 		let manifest: ManifestWithDynamicConditions<UmbConditionConfigBase & { value: string }>;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = await fixture(html`<umb-controller-host></umb-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 
 			manifest = {
@@ -549,7 +543,7 @@ describe('UmbBaseExtensionController', () => {
 		let manifest: ManifestWithDynamicConditions<UmbConditionConfigBase & { value: string }>;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = await fixture(html`<umb-controller-host></umb-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 
 			manifest = {

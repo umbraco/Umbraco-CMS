@@ -2,18 +2,14 @@ import { UmbObjectState } from './states/object-state.js';
 import { UmbObserverController } from './observer.controller.js';
 import { simpleHashCode } from './utils/simple-hash-code.function.js';
 import { expect } from '@open-wc/testing';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-
-@customElement('test-my-observer-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 describe('UmbObserverController', () => {
 	describe('Observer Controllers against other Observer Controllers', () => {
-		let hostElement: UmbTestControllerHostElement;
+		let hostElement: UmbControllerHostElement;
 
 		beforeEach(() => {
-			hostElement = document.createElement('test-my-observer-controller-host') as UmbTestControllerHostElement;
+			hostElement = document.createElement('umb-controller-host') as UmbControllerHostElement;
 		});
 
 		it('controller is replaced by another controller using the same string as controller-alias', () => {

@@ -87,7 +87,8 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 		/**
 		 * Remove a controller from this element by its alias.
 		 * Notice this will also destroy the controller.
-		 * @param {string | symbol} controllerAlias
+		 * @param {string | symbol} controllerAlias - The alias of the controller to remove and destroy from this host.
+		 * @returns {void}
 		 */
 		removeUmbControllerByAlias(controllerAlias: UmbController['controllerAlias']): void {
 			if (controllerAlias) {
@@ -122,7 +123,7 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 				if (ctrl === prev) {
 					throw new Error(
 						`Controller with controller alias: '${ctrl.controllerAlias?.toString()}' and class name: '${
-							(ctrl as any).constructor.name
+							ctrl.constructor.name
 						}', does not remove it self when destroyed. This can cause memory leaks. Please fix this issue.\r\nThis usually occurs when you have a destroy() method that doesn't call super.destroy().`,
 					);
 				}

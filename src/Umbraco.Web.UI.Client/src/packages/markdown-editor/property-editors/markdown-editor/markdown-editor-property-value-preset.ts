@@ -1,6 +1,6 @@
+import type { UmbMarkdownPropertyEditorUiValue } from './types.js';
 import type { UmbPropertyValuePreset } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbMarkdownPropertyEditorUiValue } from './types.js';
 
 export class UmbMarkdownPropertyValuePreset implements UmbPropertyValuePreset<UmbMarkdownPropertyEditorUiValue> {
 	async processValue(value: undefined | UmbMarkdownPropertyEditorUiValue, config: UmbPropertyEditorConfig) {

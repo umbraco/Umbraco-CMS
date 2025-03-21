@@ -1,16 +1,12 @@
 import { expect } from '@open-wc/testing';
-import { customElement } from 'lit/decorators.js';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbBlockListValueModel } from '../../../types.js';
 import { UmbBlockListToBlockClipboardCopyPropertyValueTranslator } from './block-list-to-block-copy-translator';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../../property-editors/constants.js';
 import type { UmbBlockClipboardEntryValueModel } from '@umbraco-cms/backoffice/block';
-
-@customElement('test-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+import { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
 
 describe('UmbBlockListToBlockClipboardCopyPropertyValueTranslator', () => {
-	let hostElement: UmbTestControllerHostElement;
+	let hostElement: UmbControllerHostElementElement;
 	let copyTranslator: UmbBlockListToBlockClipboardCopyPropertyValueTranslator;
 
 	const blockListPropertyValue: UmbBlockListValueModel = {
@@ -59,7 +55,7 @@ describe('UmbBlockListToBlockClipboardCopyPropertyValueTranslator', () => {
 	};
 
 	beforeEach(async () => {
-		hostElement = new UmbTestControllerHostElement();
+		hostElement = new UmbControllerHostElementElement();
 		copyTranslator = new UmbBlockListToBlockClipboardCopyPropertyValueTranslator(hostElement);
 		document.body.innerHTML = '';
 		document.body.appendChild(hostElement);

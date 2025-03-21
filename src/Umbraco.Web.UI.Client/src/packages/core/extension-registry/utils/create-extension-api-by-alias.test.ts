@@ -1,12 +1,9 @@
 import { createExtensionApiByAlias } from './create-extension-api-by-alias.function.js';
 import type { ManifestApi, UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { expect, fixture } from '@open-wc/testing';
-import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-
-@customElement('umb-test-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+import type { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
 
 interface UmbExtensionApiBoolTestClass extends UmbApi {
 	isValidClassInstance(): boolean;
@@ -39,7 +36,7 @@ const jsModuleWithDefaultAndApiExport = {
 };
 
 describe('Create Extension Api By Alias Method', () => {
-	let hostElement: UmbTestControllerHostElement;
+	let hostElement: UmbControllerHostElementElement;
 
 	beforeEach(async () => {
 		hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);

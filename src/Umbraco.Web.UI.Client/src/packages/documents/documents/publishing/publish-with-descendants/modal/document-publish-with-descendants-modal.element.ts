@@ -84,7 +84,6 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	}
 
 	async #submit() {
-
 		this.value = {
 			selection: this.#selectionManager.getSelection(),
 			includeUnpublishedDescendants: this.#includeUnpublishedDescendants,

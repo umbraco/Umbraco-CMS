@@ -5,12 +5,12 @@ import type { PermittedControllerType, UmbBaseExtensionsInitializerArgs } from '
 import { UmbBaseExtensionInitializer, UmbBaseExtensionsInitializer } from './index.js';
 import { expect, fixture } from '@open-wc/testing';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
-
-@customElement('umb-test-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+import type {
+	UmbControllerHost,
+	UmbControllerHostElement,
+	UmbControllerHostElementElement,
+} from '@umbraco-cms/backoffice/controller-api';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 class UmbTestExtensionController extends UmbBaseExtensionInitializer {
 	testInsidesIsDestroyed?: boolean;
@@ -88,10 +88,10 @@ class UmbTestConditionAlwaysInvalid extends UmbControllerBase implements UmbExte
 
 describe('UmbBaseExtensionsController', () => {
 	describe('Manifests without conditions', () => {
-		let hostElement: UmbTestControllerHostElement;
+		let hostElement: UmbControllerHostElement;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = await fixture(html`<umb-controller-host></umb-controller-host>`);
 			const manifestA = {
 				type: 'extension-type',
 				name: 'test-extension-a',
@@ -190,10 +190,10 @@ describe('UmbBaseExtensionsController', () => {
 	});
 
 	describe('Manifests without conditions overwrites another', () => {
-		let hostElement: UmbTestControllerHostElement;
+		let hostElement: UmbControllerHostElement;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = await fixture(html`<umb-controller-host></umb-controller-host>`);
 			const manifestA = {
 				type: 'extension-type',
 				name: 'test-extension-a',
@@ -269,10 +269,10 @@ describe('UmbBaseExtensionsController', () => {
 	});
 
 	describe('Manifest with valid conditions overwrites another', () => {
-		let hostElement: UmbTestControllerHostElement;
+		let hostElement: UmbControllerHostElement;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = await fixture(html`<umb-controller-host></umb-controller-host>`);
 			const manifestA = {
 				type: 'extension-type',
 				name: 'test-extension-a',
@@ -348,10 +348,10 @@ describe('UmbBaseExtensionsController', () => {
 	});
 
 	describe('Manifest with invalid conditions does not overwrite another', () => {
-		let hostElement: UmbTestControllerHostElement;
+		let hostElement: UmbControllerHostElementElement;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = await fixture(html`<umb-controller-host></umb-controller-host>`);
 			const manifestA = {
 				type: 'extension-type',
 				name: 'test-extension-a',

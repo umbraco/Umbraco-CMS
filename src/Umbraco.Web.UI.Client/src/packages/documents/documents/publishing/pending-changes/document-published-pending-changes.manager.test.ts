@@ -1,20 +1,16 @@
 import { expect } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDocumentPublishedPendingChangesManager } from './document-published-pending-changes.manager.js';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { type UmbDocumentDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 
-@customElement('test-my-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
-
 describe('UmbSelectionManager', () => {
 	let manager: UmbDocumentPublishedPendingChangesManager;
 
 	beforeEach(() => {
-		const hostElement = new UmbTestControllerHostElement();
+		const hostElement = new UmbControllerHostElementElement();
 		manager = new UmbDocumentPublishedPendingChangesManager(hostElement);
 	});
 
@@ -38,7 +34,7 @@ describe('UmbSelectionManager', () => {
 
 	describe('process', () => {
 		beforeEach(() => {
-			const hostElement = new UmbTestControllerHostElement();
+			const hostElement = new UmbControllerHostElementElement();
 			manager = new UmbDocumentPublishedPendingChangesManager(hostElement);
 		});
 

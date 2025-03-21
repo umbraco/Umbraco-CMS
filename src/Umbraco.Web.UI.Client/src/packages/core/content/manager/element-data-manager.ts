@@ -3,6 +3,11 @@ import type { UmbElementDetailModel } from '../types.js';
 import { UmbVariantId, umbVariantObjectCompare } from '@umbraco-cms/backoffice/variant';
 import { UmbEntityWorkspaceDataManager, type UmbWorkspaceDataManager } from '@umbraco-cms/backoffice/workspace';
 
+/**
+ *
+ * @param a
+ * @param b
+ */
 function valueObjectCompare(a: any, b: any) {
 	return a.alias === b.alias && umbVariantObjectCompare(a, b);
 }

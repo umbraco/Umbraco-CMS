@@ -125,7 +125,8 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 			#chart {
 				width: 150px;
 				aspect-ratio: 1;
-				background: radial-gradient(white 40%, transparent 41%),
+				background:
+					radial-gradient(white 40%, transparent 41%),
 					conic-gradient(
 						var(--umb-log-viewer-debug-color) 0% 20%,
 						var(--umb-log-viewer-information-color) 20% 40%,

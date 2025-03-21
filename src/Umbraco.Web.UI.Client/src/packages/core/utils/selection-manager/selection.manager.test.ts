@@ -1,17 +1,13 @@
 import { UmbSelectionManager } from './selection.manager.js';
 import { expect } from '@open-wc/testing';
+import { UmbControllerHostElementElement } from '@umbraco-cms/backoffice/controller-api';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-
-@customElement('test-my-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 describe('UmbSelectionManager', () => {
 	let manager: UmbSelectionManager;
 
 	beforeEach(() => {
-		const hostElement = new UmbTestControllerHostElement();
+		const hostElement = new UmbControllerHostElementElement();
 		manager = new UmbSelectionManager(hostElement);
 		manager.setSelectable(true);
 		manager.setMultiple(true);

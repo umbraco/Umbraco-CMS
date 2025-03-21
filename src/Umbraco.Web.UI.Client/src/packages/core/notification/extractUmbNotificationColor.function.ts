@@ -1,5 +1,5 @@
-import { EventMessageTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbNotificationColor } from './types.js';
+import { EventMessageTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  *
