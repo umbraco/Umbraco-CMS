@@ -8,6 +8,9 @@ import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffi
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { ReplaceStartOfPath } from '../utils/replace-start-of-path.function.js';
+import type { UmbVariantId } from '../../variant/variant-id.class.js';
+
+const Regex = /@\.culture == ('[^']*'|null) *&& *@\.segment == ('[^']*'|null)/g;
 
 /**
  * Validation Context is the core of Validation.
@@ -21,6 +24,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		UmbValidationController,
 		UmbValidationController
 	>;
+	#inUnprovidingState: boolean = false;
 
 	// Local version of the data send to the server, only use-case is for translation.
 	#translationData = new UmbObjectState<any>(undefined);
@@ -43,11 +47,43 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	#localMessages?: Array<UmbValidationMessage>;
 	#baseDataPath?: string;
 
+	#variantId?: UmbVariantId;
+
 	public readonly messages = new UmbValidationMessagesManager();
 
 	constructor(host: UmbControllerHost) {
 		// This is overridden to avoid setting a controllerAlias, this might make sense, but currently i want to leave it out. [NL]
 		super(host);
+	}
+
+	setVariantId(variantId: UmbVariantId): void {
+		this.#variantId = variantId;
+		// @.culture == null && @.segment == null
+		this.messages.filter((msg) => {
+			// Figure out how many times '@.culture ==' is present in the path:
+			//const cultureMatches = (msg.path.match(/@\.culture ==/g) || []);
+			// I like a Regex that finds all the @.culture == and @.segment == in the path. they are adjacent. and I like to know the value following '== '
+			const variantMatches = [...msg.path.matchAll(Regex)];
+
+			// if not cultures, then we like to keep it:
+			if (variantMatches.length === 0) return true;
+
+			return (
+				// Find any bad matches:
+				!variantMatches.some((match) => {
+					const culture = match[1] === 'null' ? null : match[1].substring(1, match[1].length - 1);
+					const segment = match[2] === 'null' ? null : match[2].substring(1, match[2].length - 1);
+
+					const result =
+						(culture !== null && culture !== this.#variantId!.culture) || segment !== this.#variantId!.segment;
+					return result;
+				})
+			);
+		});
+	}
+
+	getVariantId(): UmbVariantId | undefined {
+		return this.#variantId;
 	}
 
 	/**
@@ -75,9 +111,25 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 */
 	provideAt(controllerHost: UmbClassInterface): void {
 		if (this.#currentProvideHost === controllerHost) return;
-		this.#providerCtrl?.destroy();
+
+		this.unprovide();
+
+		if (this.messages === undefined) {
+			throw new Error('This Validation Context has been destroyed and can not be provided.');
+		}
 		this.#currentProvideHost = controllerHost;
 		this.#providerCtrl = controllerHost.provideContext(UMB_VALIDATION_CONTEXT, this);
+	}
+
+	unprovide(): void {
+		if (this.#providerCtrl) {
+			// We need to set this in Unprovide state, so this context can be provided again later.
+			this.#inUnprovidingState = true;
+			this.#providerCtrl.destroy();
+			this.#providerCtrl = undefined;
+			this.#inUnprovidingState = false;
+			this.#currentProvideHost = undefined;
+		}
 	}
 
 	/**
@@ -103,33 +155,54 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			// cause maybe all the messages should be removed as we are not interested in the old once any more. But then on the other side, some might be relevant as this is the same entity that changed its paths?
 			throw new Error('Data path is already set, we do not support changing the context data-path as of now.');
 		}
-		if (!dataPath) return;
-		this.#baseDataPath = dataPath;
+		if (!dataPath) {
+			this.#stopInheritance();
+			return;
+		}
 
 		this.consumeContext(UMB_VALIDATION_CONTEXT, (parent) => {
-			if (this.#parent) {
-				this.#parent.removeValidator(this);
-			}
-			this.#parent = parent;
-			parent.addValidator(this);
+			this.inheritFrom(parent, dataPath);
+		}).skipHost();
+		// Notice skipHost ^^, this is because we do not want it to consume it self, as this would be a match for this consumption, instead we will look at the parent and above. [NL]
+	}
 
-			this.messages.clear();
+	/**
+	 * Inherit from a parent validation context, notice you should only use this method if you have the validation context at hand. Otherwise use setDataPath which uses Context-API to retrieve the right parent.
+	 * @param {UmbValidationController} parent - The parent validation context to inherit from.
+	 * @param {string} dataPath - The data path to bind this validation context to.
+	 */
+	inheritFrom(parent: UmbValidationController, dataPath: string): void {
+		if (this.#parent) {
+			this.#parent.removeValidator(this);
+		}
+		this.#parent = parent;
+		parent.addValidator(this);
 
-			this.observe(parent.translationDataOf(dataPath), (data) => {
+		this.messages.clear();
+
+		this.#baseDataPath = dataPath;
+
+		this.observe(
+			parent.translationDataOf(dataPath),
+			(data) => {
 				this.setTranslationData(data);
-			});
+			},
+			'observeTranslationData',
+		);
 
-			this.observe(
-				parent.messages.messagesOfPathAndDescendant(dataPath),
-				(msgs) => {
-					this.messages.initiateChange();
-					//this.messages.appendMessages(msgs);
-					if (this.#parentMessages) {
-						// Remove the local messages that does not exist in the parent anymore:
-						const toRemove = this.#parentMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
-						this.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
-					}
-					this.#parentMessages = msgs;
+		this.observe(
+			parent.messages.messagesOfPathAndDescendant(dataPath),
+			(msgs) => {
+				this.messages.initiateChange();
+				if (this.#parentMessages) {
+					// Remove the local messages that does not exist in the parent anymore:
+					const toRemove = this.#parentMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
+					this.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
+				}
+				this.#parentMessages = msgs;
+				if (this.#baseDataPath === '$') {
+					this.messages.addMessageObjects(msgs);
+				} else {
 					msgs.forEach((msg) => {
 						const path = ReplaceStartOfPath(msg.path, this.#baseDataPath!, '$');
 						if (path === undefined) {
@@ -140,25 +213,28 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 						// Notice, the local message uses the same key. [NL]
 						this.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
-					this.messages.finishChange();
-				},
-				'observeParentMessages',
-			);
+				}
+				this.messages.finishChange();
+			},
+			'observeParentMessages',
+		);
 
-			this.observe(
-				this.messages.messages,
-				(msgs) => {
-					if (!this.#parent) return;
+		this.observe(
+			this.messages.messages,
+			(msgs) => {
+				if (!this.#parent) return;
 
-					this.#parent!.messages.initiateChange();
+				this.#parent!.messages.initiateChange();
 
-					//this.messages.appendMessages(msgs);
-					if (this.#localMessages) {
-						// Remove the parent messages that does not exist locally anymore:
-						const toRemove = this.#localMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
-						this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
-					}
-					this.#localMessages = msgs;
+				if (this.#localMessages) {
+					// Remove the parent messages that does not exist locally anymore:
+					const toRemove = this.#localMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
+					this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
+				}
+				this.#localMessages = msgs;
+				if (this.#baseDataPath === '$') {
+					this.#parent!.messages.addMessageObjects(msgs);
+				} else {
 					msgs.forEach((msg) => {
 						// replace this.#baseDataPath (if it starts with it) with $ in the path, so it becomes relative to the parent context
 						const path = ReplaceStartOfPath(msg.path, '$', this.#baseDataPath!);
@@ -170,13 +246,24 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 						// Notice, the parent message uses the same key. [NL]
 						this.#parent!.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
+				}
 
-					this.#parent!.messages.finishChange();
-				},
-				'observeLocalMessages',
-			);
-		}).skipHost();
-		// Notice skipHost ^^, this is because we do not want it to consume it self, as this would be a match for this consumption, instead we will look at the parent and above. [NL]
+				this.#parent!.messages.finishChange();
+			},
+			'observeLocalMessages',
+		);
+	}
+
+	#stopInheritance(): void {
+		if (this.#parent) {
+			this.#parent.removeValidator(this);
+		}
+		this.messages.clear();
+		this.setTranslationData(undefined);
+
+		this.removeUmbControllerByAlias('observeTranslationData');
+		this.removeUmbControllerByAlias('observeParentMessages');
+		this.removeUmbControllerByAlias('observeLocalMessages');
 	}
 
 	override hostConnected(): void {
@@ -249,9 +336,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			() => false,
 		);
 
-		/*if (this.#validators.length === 0 && resultsStatus === false) {
+		if (this.#validators.length === 0 && resultsStatus === false) {
 			throw new Error('No validators to validate, but validation failed');
-		}*/
+		}
 
 		if (this.messages === undefined) {
 			// This Context has been destroyed while is was validating, so we should not continue.
@@ -267,9 +354,13 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		this.#isValid = isValid;
 
 		if (isValid === false) {
-			/*if (hasMessages === false && resultsStatus === false) {
-				throw new Error('Missing validation messages to represent why a child validation context is invalid.');
-			}*/
+			if (hasMessages === false && resultsStatus === false) {
+				const notValidValidators = this.#validators.filter((v) => v.isValid === false);
+				console.warn(
+					'Missing validation messages to represent why a child validation context is invalid. These Validators was not valid, one of these did not set a message to represent their state:',
+					notValidValidators,
+				);
+			}
 			// Focus first invalid element:
 			this.focusFirstInvalidElement();
 			return Promise.reject();
@@ -307,8 +398,10 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	}
 
 	override destroy(): void {
-		this.#providerCtrl?.destroy();
-		this.#providerCtrl = undefined;
+		if (this.#inUnprovidingState === true) {
+			return;
+		}
+		this.unprovide();
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
