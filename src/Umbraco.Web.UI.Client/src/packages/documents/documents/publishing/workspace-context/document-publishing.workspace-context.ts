@@ -153,7 +153,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 				const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
 				this.#eventContext?.dispatchEvent(structureEvent);
 			},
-			async () => {
+			async (reason?: any) => {
 				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 				if (!notificationContext) {
 					throw new Error('Notification context is missing');
@@ -162,7 +162,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 					data: { message: this.#localize.term('speechBubbles_editContentScheduledNotSavedText') },
 				});
 
-				return Promise.reject();
+				return Promise.reject(reason);
 			},
 		);
 	}
@@ -301,7 +301,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			async () => {
 				return this.#performSaveAndPublish(variantIds, saveData);
 			},
-			async () => {
+			async (reason?: any) => {
 				// If data of the selection is not valid Then just save:
 				await this.#documentWorkspaceContext!.performCreateOrUpdate(variantIds, saveData);
 				// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
@@ -314,7 +314,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 					data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
 				});
 				// Reject even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
-				return await Promise.reject();
+				return await Promise.reject(reason);
 			},
 		);
 	}

@@ -1,7 +1,7 @@
 import type { UmbValidationMessageTranslator } from '../translators/validation-message-path-translator.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
 export type UmbValidationMessageType = 'client' | 'server';
 export interface UmbValidationMessage {
@@ -26,15 +26,29 @@ function MatchPathOrDescendantPath(source: string, match: string): boolean {
 }
 
 export class UmbValidationMessagesManager {
+	#filter?: (msg: UmbValidationMessage) => boolean;
+
 	#messages = new UmbArrayState<UmbValidationMessage>([], (x) => x.key);
 	messages = this.#messages.asObservable();
+	filteredMessages = this.#messages.asObservablePart((msgs) => (this.#filter ? msgs.filter(this.#filter) : msgs));
+
+	getFilteredMessages(): Array<UmbValidationMessage> {
+		const msgs = this.#messages.getValue();
+		return this.#filter ? msgs.filter(this.#filter) : msgs;
+	}
 
 	debug(logName: string) {
 		this.messages.subscribe((x) => console.log(logName, x));
 	}
 
-	getMessages(): Array<UmbValidationMessage> {
-		return this.#messages.getValue();
+	debugFiltered(logName: string) {
+		this.filteredMessages.subscribe((x) => console.log(logName, x));
+	}
+
+	filter(method: (msg: UmbValidationMessage) => boolean): void {
+		this.#filter = method;
+		// This should maybe trigger a re-filter of the messages, but I'm not sure how we should do that properly of now. [NL]
+		// The reason is that maybe the filter changes while we have validation messages.
 	}
 
 	#updateLock = 0;
@@ -54,38 +68,42 @@ export class UmbValidationMessagesManager {
 	}
 
 	getHasAnyMessages(): boolean {
-		return this.#messages.getValue().length !== 0;
+		return this.getFilteredMessages().length !== 0;
 	}
 
 	getMessagesOfPathAndDescendant(path: string): Array<UmbValidationMessage> {
 		//path = path.toLowerCase();
-		return this.#messages.getValue().filter((x) => MatchPathOrDescendantPath(x.path, path));
+		return this.getFilteredMessages().filter((x) => MatchPathOrDescendantPath(x.path, path));
 	}
 
 	messagesOfPathAndDescendant(path: string): Observable<Array<UmbValidationMessage>> {
 		//path = path.toLowerCase();
-		return this.#messages.asObservablePart((msgs) => msgs.filter((x) => MatchPathOrDescendantPath(x.path, path)));
+		return createObservablePart(this.filteredMessages, (msgs) =>
+			msgs.filter((x) => MatchPathOrDescendantPath(x.path, path)),
+		);
 	}
 
 	messagesOfTypeAndPath(type: UmbValidationMessageType, path: string): Observable<Array<UmbValidationMessage>> {
 		//path = path.toLowerCase();
 		// Find messages that matches the given type and path.
-		return this.#messages.asObservablePart((msgs) => msgs.filter((x) => x.type === type && x.path === path));
+		return createObservablePart(this.filteredMessages, (msgs) =>
+			msgs.filter((x) => x.type === type && x.path === path),
+		);
 	}
 
 	hasMessagesOfPathAndDescendant(path: string): Observable<boolean> {
 		//path = path.toLowerCase();
-		return this.#messages.asObservablePart((msgs) => msgs.some((x) => MatchPathOrDescendantPath(x.path, path)));
+		return createObservablePart(this.filteredMessages, (msgs) =>
+			msgs.some((x) => MatchPathOrDescendantPath(x.path, path)),
+		);
 	}
 	getHasMessagesOfPathAndDescendant(path: string): boolean {
 		//path = path.toLowerCase();
-		return this.#messages
-			.getValue()
-			.some(
-				(x) =>
-					x.path.indexOf(path) === 0 &&
-					(x.path.length === path.length || x.path[path.length] === '.' || x.path[path.length] === '['),
-			);
+		return this.getFilteredMessages().some(
+			(x) =>
+				x.path.indexOf(path) === 0 &&
+				(x.path.length === path.length || x.path[path.length] === '.' || x.path[path.length] === '['),
+		);
 	}
 
 	addMessage(type: UmbValidationMessageType, path: string, body: string, key: string = UmbId.new()): void {
@@ -110,6 +128,12 @@ export class UmbValidationMessagesManager {
 		);
 		this.initiateChange();
 		this.#messages.append(newBodies.map((body) => ({ type, key: UmbId.new(), path, body })));
+		this.finishChange();
+	}
+
+	addMessageObjects(messages: Array<UmbValidationMessage>): void {
+		this.initiateChange();
+		this.#messages.append(messages);
 		this.finishChange();
 	}
 
