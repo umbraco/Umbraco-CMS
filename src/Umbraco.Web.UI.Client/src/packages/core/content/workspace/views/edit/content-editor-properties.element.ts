@@ -11,7 +11,7 @@ import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validatio
 import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbVariantId,
-	type UmbVariantPropertyReadState,
+	type UmbVariantPropertyVisibilityState,
 	type UmbVariantPropertyWriteState,
 } from '@umbraco-cms/backoffice/variant';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
@@ -36,7 +36,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	_dataPaths?: Array<string>;
 
 	@state()
-	_propertyReadStates: Array<UmbVariantPropertyReadState> = [];
+	_propertyVisibilityStates: Array<UmbVariantPropertyVisibilityState> = [];
 
 	@state()
 	_propertyWriteStates: Array<UmbVariantPropertyWriteState> = [];
@@ -51,9 +51,9 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 			);
 
 			this.observe(
-				workspaceContext.structure.propertyReadState.states,
-				(states) => (this._propertyReadStates = states),
-				'umbObservePropertyReadStates',
+				workspaceContext.structure.propertyVisibilityState.states,
+				(states) => (this._propertyVisibilityStates = states),
+				'umbObservePropertyVisibilityStates',
 			);
 
 			this.observe(
@@ -90,13 +90,13 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 		);
 	}
 
-	#getReadableProperties() {
-		return this._propertyStructure?.filter((property) => this.#isReadablePropertyType(property)) || [];
+	#getVisibleProperties() {
+		return this._propertyStructure?.filter((property) => this.#isVisiblePropertyType(property)) || [];
 	}
 
-	#isReadablePropertyType(property: UmbPropertyTypeModel) {
+	#isVisiblePropertyType(property: UmbPropertyTypeModel) {
 		const propertyVariantId = this.#getPropertyVariantId(property);
-		return this._propertyReadStates.some(
+		return this._propertyVisibilityStates.some(
 			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(propertyVariantId),
 		);
 	}
@@ -118,7 +118,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	override render() {
 		return this._propertyStructure && this._dataPaths
 			? repeat(
-					this.#getReadableProperties(),
+					this.#getVisibleProperties(),
 					(property) => property.alias,
 					(property, index) =>
 						html`<umb-property-type-based-property
