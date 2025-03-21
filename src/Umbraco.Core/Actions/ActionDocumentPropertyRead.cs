@@ -3,7 +3,7 @@
 public class ActionDocumentPropertyRead : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter" />
-    public const string ActionLetter = "Umb.Document.Property.Read";
+    public const string ActionLetter = "Umb.Document.PropertyValue.Read";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
     public const string ActionAlias = "documentpropertyread";
