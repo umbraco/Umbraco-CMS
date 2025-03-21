@@ -116,8 +116,8 @@ internal sealed class MemberEditingService : IMemberEditingService
             return IdentityMemberCreationFailed(createResult, status);
         }
 
-        IMember member = _memberService.GetByEmail(createModel.Email)
-                          ?? throw new InvalidOperationException("Member creation succeeded, but member could not be found by email.");
+        IMember member = _memberService.GetByUsername(createModel.Username)
+                          ?? throw new InvalidOperationException("Member creation succeeded, but member could not be found by username.");
 
         var updateRolesResult = await UpdateRoles(createModel.Roles, identityMember);
         if (updateRolesResult is false)
