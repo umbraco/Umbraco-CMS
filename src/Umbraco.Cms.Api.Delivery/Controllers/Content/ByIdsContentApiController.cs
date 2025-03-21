@@ -8,7 +8,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 
-[ApiVersion("1.0")]
 [ApiVersion("2.0")]
 public class ByIdsContentApiController : ContentApiItemControllerBase
 {
