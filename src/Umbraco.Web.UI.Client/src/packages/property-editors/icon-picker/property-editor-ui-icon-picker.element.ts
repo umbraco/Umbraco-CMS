@@ -53,9 +53,8 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 			<uui-button
 				compact
 				label=${this.localize.term('defaultdialogs_selectIcon')}
-				look="secondary"
-				@click=${this._openModal}
-				style="margin-right: var(--uui-size-space-3)">
+				look="outline"
+				@click=${this._openModal}>
 				${this._color
 					? html` <uui-icon name="${this._icon}" style="color:var(${extractUmbColorVariable(this._color)})"></uui-icon>`
 					: html` <uui-icon name="${this._icon}"></uui-icon>`}

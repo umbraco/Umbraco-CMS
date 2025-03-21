@@ -198,8 +198,8 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 			:host {
 				display: grid;
 				gap: var(--uui-size-space-3);
-				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-				grid-template-rows: repeat(auto-fill, minmax(160px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
+				grid-template-rows: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 			}
 
 			#btn-add {
