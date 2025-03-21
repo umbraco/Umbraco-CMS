@@ -357,6 +357,24 @@ path: () => import("./icons/icon-colorpicker.js"),
 name: "icon-columns",
 path: () => import("./icons/icon-columns.js"),
 },{
+name: "icon-columns-2",
+path: () => import("./icons/icon-columns-2.js"),
+},{
+name: "icon-columns-3",
+path: () => import("./icons/icon-columns-3.js"),
+},{
+name: "icon-columns-4",
+path: () => import("./icons/icon-columns-4.js"),
+},{
+name: "icon-rows-2",
+path: () => import("./icons/icon-rows-2.js"),
+},{
+name: "icon-rows-3",
+path: () => import("./icons/icon-rows-3.js"),
+},{
+name: "icon-rows-4",
+path: () => import("./icons/icon-rows-4.js"),
+},{
 name: "icon-combination-lock-open",
 path: () => import("./icons/icon-combination-lock-open.js"),
 },{
@@ -1997,6 +2015,63 @@ path: () => import("./icons/icon-document-play.js"),
 },{
 name: "icon-document-play",
 path: () => import("./icons/icon-document-play.js"),
+},{
+name: "icon-shared-value",
+path: () => import("./icons/icon-shared-value.js"),
+},{
+name: "icon-layout-masonry",
+path: () => import("./icons/icon-layout-masonry.js"),
+},{
+name: "icon-layout-grid",
+path: () => import("./icons/icon-layout-grid.js"),
+},{
+name: "icon-layout-list",
+path: () => import("./icons/icon-layout-list.js"),
+},{
+name: "icon-layout-panel-left",
+path: () => import("./icons/icon-layout-panel-left.js"),
+},{
+name: "icon-spray-can",
+path: () => import("./icons/icon-spray-can.js"),
+},{
+name: "icon-swatch-book",
+path: () => import("./icons/icon-swatch-book.js"),
+},{
+name: "icon-shape-cylinder",
+path: () => import("./icons/icon-shape-cylinder.js"),
+},{
+name: "icon-shape-triangle-right",
+path: () => import("./icons/icon-shape-triangle-right.js"),
+},{
+name: "icon-shape-triangle",
+path: () => import("./icons/icon-shape-triangle.js"),
+},{
+name: "icon-shape-circle",
+path: () => import("./icons/icon-shape-circle.js"),
+},{
+name: "icon-shape-square",
+path: () => import("./icons/icon-shape-square.js"),
+},{
+name: "icon-shape-hexagon",
+path: () => import("./icons/icon-shape-hexagon.js"),
+},{
+name: "icon-shape-rectangle-horizontal",
+path: () => import("./icons/icon-shape-rectangle-horizontal.js"),
+},{
+name: "icon-shape-rectangle-vertical",
+path: () => import("./icons/icon-shape-rectangle-vertical.js"),
+},{
+name: "icon-shapes",
+path: () => import("./icons/icon-shapes.js"),
+},{
+name: "icon-layout-dislocated",
+path: () => import("./icons/icon-layout-dislocated.js"),
+},{
+name: "icon-blend",
+path: () => import("./icons/icon-blend.js"),
+},{
+name: "icon-land-plot",
+path: () => import("./icons/icon-land-plot.js"),
 },{
 name: "icon-facebook",
 path: () => import("./icons/icon-facebook.js"),
