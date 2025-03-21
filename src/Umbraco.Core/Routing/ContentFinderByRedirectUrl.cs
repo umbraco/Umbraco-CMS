@@ -53,18 +53,27 @@ public class ContentFinderByRedirectUrl : IContentFinder
             return false;
         }
 
-        var route = frequest.Domain != null
-            ? frequest.Domain.ContentId +
-              DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.AbsolutePathDecoded)
-            : frequest.AbsolutePathDecoded;
-
+        var route = frequest.AbsolutePathDecoded;
         IRedirectUrl? redirectUrl = await _redirectUrlService.GetMostRecentRedirectUrlAsync(route, frequest.Culture);
 
-        if (redirectUrl == null)
+        if (redirectUrl is null)
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug("No match for route: {Route}", route);
+            }
+
+            // Pre-15 routes under domains were stored with the integer ID of the content where the domains were defined as the first part of the route,
+            // so if we haven't found a redirect, try using that format too.
+            if (frequest.Domain is not null)
+            {
+                route = frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.AbsolutePathDecoded);
+                redirectUrl = await _redirectUrlService.GetMostRecentRedirectUrlAsync(route, frequest.Culture);
+
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("No match for route with domain: {Route}", route);
+                }
             }
 
             return false;
