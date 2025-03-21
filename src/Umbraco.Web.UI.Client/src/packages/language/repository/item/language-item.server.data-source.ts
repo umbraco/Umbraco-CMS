@@ -1,3 +1,4 @@
+import { UMB_LANGUAGE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbLanguageItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { LanguageItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -33,5 +34,6 @@ const mapper = (item: LanguageItemResponseModel): UmbLanguageItemModel => {
 	return {
 		unique: item.isoCode,
 		name: item.name,
+		entityType: UMB_LANGUAGE_ENTITY_TYPE,
 	};
 };

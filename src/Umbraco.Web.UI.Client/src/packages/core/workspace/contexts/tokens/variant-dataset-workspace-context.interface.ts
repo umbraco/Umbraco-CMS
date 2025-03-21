@@ -4,6 +4,7 @@ import type { UmbSubmittableWorkspaceContext } from './submittable-workspace-con
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantId, UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 
 export interface UmbVariantDatasetWorkspaceContext<VariantType extends UmbEntityVariantModel = UmbEntityVariantModel>
 	extends UmbSubmittableWorkspaceContext {
@@ -28,4 +29,5 @@ export interface UmbVariantDatasetWorkspaceContext<VariantType extends UmbEntity
 	setPropertyValue(alias: string, value: unknown, variantId?: UmbVariantId): Promise<void>;
 
 	createPropertyDatasetContext(host: UmbControllerHost, variantId?: UmbVariantId): UmbPropertyDatasetContext;
+	getVariantValidationContext(variantId: UmbVariantId): UmbValidationController | undefined;
 }
