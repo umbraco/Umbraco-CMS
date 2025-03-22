@@ -13,15 +13,9 @@ public partial class DocumentNavigationServiceTests
     public async Task Structure_Can_Rebuild() => await Perform_Structure_Can_Rebuild();
 
     [Test]
-    public async Task Structure_Can_Rebuild_Multiple_Times()
-    {
-        for (int i = 0; i < 2; i++)
-        {
-            await Perform_Structure_Can_Rebuild();
-        }
-    }
+    public async Task Structure_Can_Rebuild_Multiple_Times() => await Perform_Structure_Can_Rebuild(2);
 
-    private async Task Perform_Structure_Can_Rebuild()
+    private async Task Perform_Structure_Can_Rebuild(int numberOfRebuilds = 1)
     {
         // Arrange
         Guid nodeKey = Root.Key;
@@ -42,8 +36,10 @@ public partial class DocumentNavigationServiceTests
         var initialNodeExists = newDocumentNavigationService.TryGetParentKey(nodeKey, out _);
 
         // Act
-        await newDocumentNavigationService.RebuildAsync();
-        await newDocumentNavigationService.RebuildAsync();
+        for (int i = 0; i < numberOfRebuilds; i++)
+        {
+            await newDocumentNavigationService.RebuildAsync();
+        }
 
         // Capture rebuilt state
         var nodeExists = newDocumentNavigationService.TryGetParentKey(nodeKey, out Guid? parentKeyFromRebuild);
@@ -75,15 +71,9 @@ public partial class DocumentNavigationServiceTests
     public async Task Bin_Structure_Can_Rebuild() => await Perform_Bin_Structure_Can_Rebuild();
 
     [Test]
-    public async Task Bin_Structure_Can_Rebuild_Multiple_Times()
-    {
-        for (int i = 0; i < 2; i++)
-        {
-            await Perform_Bin_Structure_Can_Rebuild();
-        }
-    }
+    public async Task Bin_Structure_Can_Rebuild_Multiple_Times() => await Perform_Bin_Structure_Can_Rebuild(2);
 
-    private async Task Perform_Bin_Structure_Can_Rebuild()
+    private async Task Perform_Bin_Structure_Can_Rebuild(int numberOfRebuilds = 1)
     {
         // Arrange
         Guid nodeKey = Root.Key;
@@ -105,7 +95,10 @@ public partial class DocumentNavigationServiceTests
         var initialNodeExists = newDocumentNavigationService.TryGetParentKeyInBin(nodeKey, out _);
 
         // Act
-        await newDocumentNavigationService.RebuildBinAsync();
+        for (int i = 0; i < numberOfRebuilds; i++)
+        {
+            await newDocumentNavigationService.RebuildBinAsync();
+        }
 
         // Capture rebuilt state
         var nodeExists = newDocumentNavigationService.TryGetParentKeyInBin(nodeKey, out Guid? parentKeyFromRebuild);
