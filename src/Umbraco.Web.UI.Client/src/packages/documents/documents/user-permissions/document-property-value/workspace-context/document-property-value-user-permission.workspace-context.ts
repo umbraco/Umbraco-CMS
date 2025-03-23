@@ -4,7 +4,6 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ,
 	UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE,
 } from '../constants.js';
-import { UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT } from '../../../constants.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
