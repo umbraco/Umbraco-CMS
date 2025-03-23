@@ -13,7 +13,7 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import {
 	UmbVariantId,
 	type UmbEntityVariantOptionModel,
-	type UmbVariantPropertyVisibilityState,
+	type UmbVariantPropertyViewState,
 	type UmbVariantPropertyWriteState,
 } from '@umbraco-cms/backoffice/variant';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
@@ -43,7 +43,7 @@ export class UmbDocumentPropertyValueUserPermissionWorkspaceContext extends UmbC
 				properties.forEach((property) => {
 					this.#setPermissionForProperty({
 						verb: UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ,
-						stateManager: this.#workspaceContext!.structure.propertyVisibilityState,
+						stateManager: this.#workspaceContext!.structure.propertyViewState,
 						property,
 						variantOptions,
 					});
@@ -61,7 +61,7 @@ export class UmbDocumentPropertyValueUserPermissionWorkspaceContext extends UmbC
 
 	#setPermissionForProperty(args: {
 		verb: string;
-		stateManager: UmbStateManager<UmbVariantPropertyVisibilityState | UmbVariantPropertyWriteState>;
+		stateManager: UmbStateManager<UmbVariantPropertyViewState | UmbVariantPropertyWriteState>;
 		property: UmbPropertyTypeModel;
 		variantOptions: Array<UmbEntityVariantOptionModel<UmbDocumentVariantModel>>;
 	}) {
