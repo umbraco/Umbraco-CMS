@@ -7,4 +7,19 @@ export interface UmbPropertyWriteState extends UmbState {
 
 export class UmbPropertyWriteStateManager<
 	WriteStateType extends UmbPropertyWriteState = UmbPropertyWriteState,
-> extends UmbStateManager<WriteStateType> {}
+> extends UmbStateManager<WriteStateType> {
+	/**
+	 * Get the writable state
+	 * @returns {Observable<boolean>} True if the property is writable
+	 * @memberof UmbPropertyWriteStateManager
+	 */
+	public readonly isWritable = this.isOn;
+
+	/**
+	 * Get the property writable state
+	 * @returns {boolean} True if the property is writable
+	 */
+	public getIsWritable(): boolean {
+		return this.getIsOn();
+	}
+}
