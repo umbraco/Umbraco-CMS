@@ -11,7 +11,7 @@ import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validatio
 import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbVariantId,
-	type UmbVariantPropertyVisibilityState,
+	type UmbVariantPropertyViewState,
 	type UmbVariantPropertyWriteState,
 } from '@umbraco-cms/backoffice/variant';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
@@ -36,7 +36,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	_dataPaths?: Array<string>;
 
 	@state()
-	_propertyVisibilityStates: Array<UmbVariantPropertyVisibilityState> = [];
+	_propertyViewStates: Array<UmbVariantPropertyViewState> = [];
 
 	@state()
 	_propertyWriteStates: Array<UmbVariantPropertyWriteState> = [];
@@ -51,9 +51,9 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 			);
 
 			this.observe(
-				workspaceContext.structure.propertyVisibilityState.states,
-				(states) => (this._propertyVisibilityStates = states),
-				'umbObservePropertyVisibilityStates',
+				workspaceContext.structure.propertyViewState.states,
+				(states) => (this._propertyViewStates = states),
+				'umbObservePropertyViewStates',
 			);
 
 			this.observe(
@@ -96,7 +96,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 
 	#isVisiblePropertyType(property: UmbPropertyTypeModel) {
 		const propertyVariantId = this.#getPropertyVariantId(property);
-		return this._propertyVisibilityStates.some(
+		return this._propertyViewStates.some(
 			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(propertyVariantId),
 		);
 	}
