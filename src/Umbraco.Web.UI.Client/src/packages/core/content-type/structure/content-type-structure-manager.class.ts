@@ -22,7 +22,7 @@ import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/bac
 import {
 	UmbVariantPropertyViewStateManager,
 	UmbVariantPropertyWriteStateManager,
-} from '@umbraco-cms/backoffice/variant';
+} from '@umbraco-cms/backoffice/property';
 
 type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
 
