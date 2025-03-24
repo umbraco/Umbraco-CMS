@@ -535,6 +535,24 @@ export class UmbExtensionRegistry<
 	}
 
 	/**
+	 * Get all extensions that matches the given extension type.
+	 * @param {string} type  - The type of the extension to get.
+	 * @returns {ManifestBase | undefined} - The extension manifest that matches the alias.
+	 */
+	getByType<Key extends string, T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>>(
+		type: Key,
+	): Array<T> {
+		const exts = this._extensions.getValue().filter((ext) => ext.type === type) as unknown as T[];
+		if (exts.length === 0) {
+			return [];
+		}
+		const kinds = this._kinds.getValue();
+		return exts
+			.map((ext) => (ext?.kind ? (this.#mergeExtensionWithKinds([ext, kinds]) ?? ext) : ext))
+			.sort(sortExtensions);
+	}
+
+	/**
 	 * Get an observable that provides extensions matching given types.
 	 * @param {Array<string>} types - The types of the extensions to get.
 	 * @returns {Observable<ManifestBase | undefined>} - An observable of the extensions that matches the types.
