@@ -11,7 +11,7 @@ public static class ContentBaseExtensions
     private static DefaultUrlSegmentProvider? _defaultUrlSegmentProvider;
 
     /// <summary>
-    ///     Gets the URL segment for a specified content and culture.
+    /// Gets a single URL segment for a specified content and culture.
     /// </summary>
     /// <param name="content">The content.</param>
     /// <param name="shortStringHelper"></param>
@@ -19,29 +19,73 @@ public static class ContentBaseExtensions
     /// <param name="culture">The culture.</param>
     /// <param name="published">Whether to get the published or draft.</param>
     /// <returns>The URL segment.</returns>
+    /// <remarks>
+    /// If more than one URL segment provider is available, the first one that returns a non-null value will be returned.
+    /// </remarks>
     public static string? GetUrlSegment(this IContentBase content, IShortStringHelper shortStringHelper, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, string? culture = null, bool published = true)
     {
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
+        var urlSegment = GetUrlSegments(content, urlSegmentProviders, culture, published).FirstOrDefault();
 
-        if (urlSegmentProviders == null)
-        {
-            throw new ArgumentNullException(nameof(urlSegmentProviders));
-        }
+        // Ensure we have at least the segment from the default URL provider returned.
+        urlSegment ??= GetDefaultUrlSegment(shortStringHelper, content, culture, published);
 
-        var url = urlSegmentProviders.Select(p => p.GetUrlSegment(content, published, culture)).FirstOrDefault(u => u != null);
-        if (url == null)
+        return urlSegment;
+    }
+
+    /// <summary>
+    /// Gets all URL segments for a specified content and culture.
+    /// </summary>
+    /// <param name="content">The content.</param>
+    /// <param name="shortStringHelper"></param>
+    /// <param name="urlSegmentProviders"></param>
+    /// <param name="culture">The culture.</param>
+    /// <param name="published">Whether to get the published or draft.</param>
+    /// <returns>The collection of URL segments.</returns>
+    public static IEnumerable<string> GetUrlSegments(this IContentBase content, IShortStringHelper shortStringHelper, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, string? culture = null, bool published = true)
+    {
+        var urlSegments = GetUrlSegments(content, urlSegmentProviders, culture, published).Distinct().ToList();
+
+        // Ensure we have at least the segment from the default URL provider returned.
+        if (urlSegments.Count == 0)
         {
-            if (_defaultUrlSegmentProvider == null)
+            var defaultUrlSegment = GetDefaultUrlSegment(shortStringHelper, content, culture, published);
+            if (defaultUrlSegment is not null)
             {
-                _defaultUrlSegmentProvider = new DefaultUrlSegmentProvider(shortStringHelper);
+                urlSegments.Add(defaultUrlSegment);
             }
-
-            url = _defaultUrlSegmentProvider.GetUrlSegment(content, culture); // be safe
         }
 
-        return url;
+        return urlSegments;
+    }
+
+    private static IEnumerable<string> GetUrlSegments(
+        IContentBase content,
+        IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+        string? culture,
+        bool published)
+    {
+        foreach (IUrlSegmentProvider urlSegmentProvider in urlSegmentProviders)
+        {
+            var segment = urlSegmentProvider.GetUrlSegment(content, published, culture);
+            if (string.IsNullOrEmpty(segment) == false)
+            {
+                yield return segment;
+
+                if (urlSegmentProvider.AllowAdditionalSegments is false)
+                {
+                    yield break;
+                }
+            }
+        }
+    }
+
+    private static string? GetDefaultUrlSegment(
+        IShortStringHelper shortStringHelper,
+        IContentBase content,
+        string? culture,
+        bool published)
+    {
+        _defaultUrlSegmentProvider ??= new DefaultUrlSegmentProvider(shortStringHelper);
+        return _defaultUrlSegmentProvider.GetUrlSegment(content, published, culture);
     }
 }

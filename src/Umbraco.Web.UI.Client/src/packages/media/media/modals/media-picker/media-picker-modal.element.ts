@@ -445,9 +445,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 			#media-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-				grid-auto-rows: 150px;
 				gap: var(--uui-size-space-5);
+				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
+				grid-auto-rows: var(--umb-card-medium-min-width);
 				padding-bottom: 5px; /** The modal is a bit jumpy due to the img card focus/hover border. This fixes the issue. */
 			}
 

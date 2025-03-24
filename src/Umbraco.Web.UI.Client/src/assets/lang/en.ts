@@ -374,8 +374,6 @@ export default {
 		fileSecurityValidationFailure: 'One or more file security validations have failed',
 		moveToSameFolderFailed: 'Parent and destination folders cannot be the same',
 		uploadNotAllowed: 'Upload is not allowed in this location.',
-		noticeExtensionsServerOverride:
-			'Regardless of the allowed file types, the following limitations apply system-wide due to the server configuration:',
 	},
 	member: {
 		'2fa': 'Two-Factor Authentication',
@@ -901,7 +899,6 @@ export default {
 		retrieve: 'Retrieve',
 		retry: 'Retry',
 		rights: 'Permissions',
-		serverConfiguration: 'Server Configuration',
 		scheduledPublishing: 'Scheduled Publishing',
 		umbracoInfo: 'Umbraco info',
 		search: 'Search',
@@ -1278,6 +1275,11 @@ export default {
 		defineRootNode: 'Pick root node',
 		defineXPathOrigin: 'Specify via XPath',
 		defineDynamicRoot: 'Specify a Dynamic Root',
+		unsupportedHeadline: (type?: string) =>
+			`<strong>Unsupported ${type ?? 'content'} items</strong><br>The following content is no longer supported in this Editor.`,
+		unsupportedMessage:
+			'If you still require this content, please contact your administrator. Otherwise you can remove it.',
+		unsupportedRemove: 'Remove unsupported items?',
 	},
 	dynamicRoot: {
 		configurationTitle: 'Dynamic Root Query',

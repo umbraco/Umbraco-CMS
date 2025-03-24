@@ -17,23 +17,6 @@ test.afterEach(async ({umbracoApi}) => {
   }
 });
 
-test('can show open button', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const expectedDataTypeValues = {
-    "alias": "showOpenButton",
-    "value": true
-  };
-  await umbracoUi.dataType.goToDataType(dataTypeName);
-
-  // Act
-  await umbracoUi.dataType.clickShowOpenButtonToggle();
-  await umbracoUi.dataType.clickSaveButton();
-
-  // Assert
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-});
-
 test('can ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedDataTypeValues = {

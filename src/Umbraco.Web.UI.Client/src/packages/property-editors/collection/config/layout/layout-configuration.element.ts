@@ -158,7 +158,7 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 		const varName = icon.color ? extractUmbColorVariable(icon.color) : undefined;
 		return html`
 			<div class="layout-item" id=${this.#getUnique(layout)}>
-				<uui-icon name="icon-navigation"></uui-icon>
+				<uui-icon class="drag-handle" name="icon-grip"></uui-icon>
 
 				<uui-button compact look="outline" label="pick icon" @click=${() => this.#onIconChange(icon, index)}>
 					${when(
@@ -223,6 +223,14 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 				flex: 0 0 auto;
 				display: flex;
 				justify-content: flex-end;
+			}
+
+			.drag-handle {
+				cursor: grab;
+			}
+
+			.drag-handle:active {
+				cursor: grabbing;
 			}
 		`,
 	];

@@ -89,9 +89,6 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
 
-	@property({ type: Boolean })
-	showOpenButton?: boolean;
-
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
