@@ -1,6 +1,6 @@
-import type { UmbReferenceByVariantId } from './types.js';
-import { UmbPropertyReadOnlyStateManager, type UmbPropertyReadOnlyState } from '@umbraco-cms/backoffice/property';
+import { UmbPropertyReadOnlyStateManager, type UmbPropertyReadOnlyState } from './property-read-only-state.manager.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import type { UmbReferenceByVariantId } from '@umbraco-cms/backoffice/variant';
 
 export interface UmbVariantPropertyReadOnlyState extends UmbPropertyReadOnlyState {
 	propertyType: UmbReferenceByUnique & UmbReferenceByVariantId;
