@@ -1,5 +1,5 @@
 import type { UmbFormControlMixinInterface } from '../mixins/index.js';
-import type { UmbBindServerValidationToFormControl, UmbFormControlValidator } from '../controllers/index.js';
+import { UmbBindServerValidationToFormControl, UmbFormControlValidator } from '../controllers/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { AsyncDirective, directive, nothing, type ElementPart } from '@umbraco-cms/backoffice/external/lit';
 
