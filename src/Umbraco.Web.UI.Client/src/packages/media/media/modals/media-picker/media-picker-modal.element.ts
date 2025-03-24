@@ -6,7 +6,7 @@ import { UmbMediaSearchProvider } from '../../search/index.js';
 import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
-import type { UmbDropzoneElement } from '@umbraco-cms/backoffice/dropzone';
+import type { UmbDropzoneElement } from '@umbraco-cms/backoffice/media';
 import {
 	css,
 	html,
