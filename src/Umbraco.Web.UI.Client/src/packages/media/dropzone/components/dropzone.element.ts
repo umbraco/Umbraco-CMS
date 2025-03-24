@@ -8,7 +8,7 @@ import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/
 
 @customElement('umb-dropzone')
 export class UmbDropzoneElement extends UmbLitElement {
-	@property({ attribute: false })
+	@property({ attribute: 'parent-unique' })
 	parentUnique: string | null = null;
 
 	@property({ type: Boolean, attribute: 'create-as-temporary' })
