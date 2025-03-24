@@ -1,12 +1,11 @@
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../workspace/media-workspace.context-token.js';
-import type { UmbDropzoneSubmittedEvent } from '../dropzone/dropzone-submitted.event.js';
-import type { UmbDropzoneElement } from '../dropzone/dropzone.element.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
 import { customElement, html, ref, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import type { UmbDropzoneElement, UmbDropzoneSubmittedEvent } from '@umbraco-cms/backoffice/dropzone';
 
 @customElement('umb-media-collection')
 export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
