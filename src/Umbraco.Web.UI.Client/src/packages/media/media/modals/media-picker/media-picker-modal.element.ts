@@ -149,7 +149,6 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			const selectedItem = this._currentChildren.find(x => x.unique == selectedItems[0].unique);
 			if(selectedItem){
 				this.#onSelected(selectedItem);
-				this._submitModal();
 			}
 		}
 	}
