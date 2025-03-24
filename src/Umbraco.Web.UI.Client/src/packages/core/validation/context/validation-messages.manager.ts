@@ -32,6 +32,10 @@ export class UmbValidationMessagesManager {
 	messages = this.#messages.asObservable();
 	filteredMessages = this.#messages.asObservablePart((msgs) => (this.#filter ? msgs.filter(this.#filter) : msgs));
 
+	getMessages(): Array<UmbValidationMessage> {
+		return this.#messages.getValue();
+	}
+
 	getFilteredMessages(): Array<UmbValidationMessage> {
 		const msgs = this.#messages.getValue();
 		return this.#filter ? msgs.filter(this.#filter) : msgs;
