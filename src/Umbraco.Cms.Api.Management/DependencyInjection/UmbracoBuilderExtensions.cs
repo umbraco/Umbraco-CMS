@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.Configuration;
@@ -19,13 +19,12 @@ public static partial class UmbracoBuilderExtensions
 {
     public static IUmbracoBuilder AddUmbracoManagementApi(this IUmbracoBuilder builder)
     {
-        IServiceCollection services = builder.Services;
         builder.Services.AddSingleton<BackOfficeAreaRoutes>();
         builder.Services.AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>();
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
         builder.AddUmbracoApiOpenApiUI();
 
-        if (!services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(JsonPatchService)))
+        if (!builder.Services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(JsonPatchService)))
         {
             ModelsBuilderBuilderExtensions.AddModelsBuilder(builder)
                 .AddJson()
@@ -74,7 +73,7 @@ public static partial class UmbracoBuilderExtensions
                 .AddExport()
                 .AddImport();
 
-            services
+            builder.Services
                 .ConfigureOptions<ConfigureApiBehaviorOptions>()
                 .AddControllers()
                 .AddJsonOptions(_ =>
@@ -83,11 +82,11 @@ public static partial class UmbracoBuilderExtensions
                 })
                 .AddJsonOptions(Constants.JsonOptionsNames.BackOffice, _ => { });
 
-            services.ConfigureOptions<ConfigureUmbracoBackofficeJsonOptions>();
-            services.ConfigureOptions<ConfigureUmbracoManagementApiSwaggerGenOptions>();
+            builder.Services.ConfigureOptions<ConfigureUmbracoBackofficeJsonOptions>();
+            builder.Services.ConfigureOptions<ConfigureUmbracoManagementApiSwaggerGenOptions>();
             builder.Services.ConfigureOptions<ManagementApiMvcConfigurationOptions>();
 
-            services.Configure<UmbracoPipelineOptions>(options =>
+            builder.Services.Configure<UmbracoPipelineOptions>(options =>
             {
                 options.AddFilter(new UmbracoPipelineFilter(
                     "BackOfficeManagementApiFilter",
