@@ -11,6 +11,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
+using Umbraco.Cms.Web.Common.Mvc;
 
 namespace Umbraco.Extensions;
 
@@ -84,6 +85,7 @@ public static partial class UmbracoBuilderExtensions
 
             services.ConfigureOptions<ConfigureUmbracoBackofficeJsonOptions>();
             services.ConfigureOptions<ConfigureUmbracoManagementApiSwaggerGenOptions>();
+            builder.Services.ConfigureOptions<ManagementApiMvcConfigurationOptions>();
 
             services.Configure<UmbracoPipelineOptions>(options =>
             {
