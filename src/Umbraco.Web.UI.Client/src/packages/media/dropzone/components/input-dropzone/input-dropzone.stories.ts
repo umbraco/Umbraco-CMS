@@ -11,7 +11,6 @@ const meta: Meta<UmbInputDropzoneElement> = {
 	args: {
 		disabled: false,
 		accept: '',
-		createAsTemporary: true,
 	},
 	decorators: [(Story) => html`<div style="width: 300px">${Story()}</div>`],
 	parameters: {
