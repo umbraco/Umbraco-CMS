@@ -9,6 +9,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { ReplaceStartOfPath } from '../utils/replace-start-of-path.function.js';
 import type { UmbVariantId } from '../../variant/variant-id.class.js';
+import { UmbDeprecation } from '../../utils/deprecation/deprecation.js';
 
 const Regex = /@\.culture == ('[^']*'|null) *&& *@\.segment == ('[^']*'|null)/g;
 
@@ -26,15 +27,31 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	>;
 	#inUnprovidingState: boolean = false;
 
+	// @reprecated - Will be removed in v.17
 	// Local version of the data send to the server, only use-case is for translation.
 	#translationData = new UmbObjectState<any>(undefined);
+	/**
+	 * @deprecated Use extension type 'propertyValidationPathTranslator' instead. Will be removed in v.17
+	 */
 	translationDataOf(path: string): any {
 		return this.#translationData.asObservablePart((data) => GetValueByJsonPath(data, path));
 	}
+	/**
+	 * @deprecated Use extension type 'propertyValidationPathTranslator' instead. Will be removed in v.17
+	 */
 	setTranslationData(data: any): void {
 		this.#translationData.setValue(data);
 	}
+	/**
+	 * @deprecated Use extension type 'propertyValidationPathTranslator' instead. Will be removed in v.17
+	 */
 	getTranslationData(): any {
+		new UmbDeprecation({
+			removeInVersion: '17',
+			deprecated: 'getTranslationData',
+			solution: 'getTranslationData is deprecated.',
+		}).warn();
+
 		return this.#translationData.getValue();
 	}
 
@@ -182,6 +199,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 		this.#baseDataPath = dataPath;
 
+		// @deprecated - Will be removed in v.17
 		this.observe(
 			parent.translationDataOf(dataPath),
 			(data) => {
@@ -218,53 +236,67 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			},
 			'observeParentMessages',
 		);
-
-		this.observe(
-			this.messages.messages,
-			(msgs) => {
-				if (!this.#parent) return;
-
-				this.#parent!.messages.initiateChange();
-
-				if (this.#localMessages) {
-					// Remove the parent messages that does not exist locally anymore:
-					const toRemove = this.#localMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
-					this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
-				}
-				this.#localMessages = msgs;
-				if (this.#baseDataPath === '$') {
-					this.#parent!.messages.addMessageObjects(msgs);
-				} else {
-					msgs.forEach((msg) => {
-						// replace this.#baseDataPath (if it starts with it) with $ in the path, so it becomes relative to the parent context
-						const path = ReplaceStartOfPath(msg.path, '$', this.#baseDataPath!);
-						if (path === undefined) {
-							throw new Error(
-								'Path was not transformed correctly and can therefor not be synced with parent messages.',
-							);
-						}
-						// Notice, the parent message uses the same key. [NL]
-						this.#parent!.messages.addMessage(msg.type, path, msg.body, msg.key);
-					});
-				}
-
-				this.#parent!.messages.finishChange();
-			},
-			'observeLocalMessages',
-		);
 	}
 
 	#stopInheritance(): void {
+		this.removeUmbControllerByAlias('observeTranslationData');
+		this.removeUmbControllerByAlias('observeParentMessages');
+
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
 		this.messages.clear();
 		this.setTranslationData(undefined);
+	}
 
-		this.removeUmbControllerByAlias('observeTranslationData');
-		this.removeUmbControllerByAlias('observeParentMessages');
+	/**
+	 * Continuously synchronize the messages from this context to the parent context.
+	 */
+	sync() {
+		this.observe(this.messages.messages, this.#syncHandler, 'observeLocalMessages');
+	}
+
+	// Currently no need for this:
+	/*
+	#stopSync() {
 		this.removeUmbControllerByAlias('observeLocalMessages');
 	}
+	*/
+
+	/**
+	 * Performe a one time transfer of the messages from this context to the parent context.
+	 */
+	syncOnce(): void {
+		this.#syncHandler(this.messages.getMessages());
+	}
+
+	#syncHandler = (msgs: Array<UmbValidationMessage>) => {
+		if (!this.#parent) return;
+
+		this.#parent!.messages.initiateChange();
+
+		if (this.#localMessages) {
+			// Remove the parent messages that does not exist locally anymore:
+			const toRemove = this.#localMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
+			this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
+		}
+		this.#localMessages = msgs;
+		if (this.#baseDataPath === '$') {
+			this.#parent!.messages.addMessageObjects(msgs);
+		} else {
+			msgs.forEach((msg) => {
+				// replace this.#baseDataPath (if it starts with it) with $ in the path, so it becomes relative to the parent context
+				const path = ReplaceStartOfPath(msg.path, '$', this.#baseDataPath!);
+				if (path === undefined) {
+					throw new Error('Path was not transformed correctly and can therefor not be synced with parent messages.');
+				}
+				// Notice, the parent message uses the same key. [NL]
+				this.#parent!.messages.addMessage(msg.type, path, msg.body, msg.key);
+			});
+		}
+
+		this.#parent!.messages.finishChange();
+	};
 
 	override hostConnected(): void {
 		super.hostConnected();

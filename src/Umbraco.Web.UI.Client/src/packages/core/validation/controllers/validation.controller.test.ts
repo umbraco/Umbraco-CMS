@@ -71,7 +71,7 @@ describe('UmbValidationController', () => {
 			child = new UmbValidationController(host);
 		});
 
-		it('is invalid when not inherited a message', async () => {
+		it('is valid when not inherited a message', async () => {
 			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-other')].value.test", 'test');
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
 
@@ -92,9 +92,10 @@ describe('UmbValidationController', () => {
 			expect(child.messages.getFilteredMessages()?.[0].body).to.be.equal('test-body');
 		});
 
-		it('is invalid base on a message bubbling up', async () => {
+		it('is invalid bases on a message from a child', async () => {
 			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-property')].value.test", 'test-body');
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.sync();
 
 			await ctrl.validate().catch(() => undefined);
 			expect(ctrl.isValid).to.be.false;
@@ -105,6 +106,7 @@ describe('UmbValidationController', () => {
 		it('is valid when a message has been removed from a child context', async () => {
 			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-property')].value.test", 'test-body');
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.sync();
 
 			// First they are invalid:
 			await ctrl.validate().catch(() => undefined);
@@ -124,12 +126,13 @@ describe('UmbValidationController', () => {
 		});
 
 		describe('Inheritance + Variant Filter', () => {
-			it('is invalid when not inherited a message', async () => {
+			it('is valid when not inherited a message', async () => {
 				child.setVariantId(new UmbVariantId('en-us'));
 				child.inheritFrom(
 					ctrl,
 					"$.values[?(@.alias == 'my-property' && @.culture == 'en-us' && @.segment == null)].value",
 				);
+				child.sync();
 
 				ctrl.messages.addMessage(
 					'server',
@@ -168,6 +171,7 @@ describe('UmbValidationController', () => {
 					'test-body',
 				);
 				child.inheritFrom(ctrl, '$');
+				child.sync();
 
 				// First they are invalid:
 				await ctrl.validate().catch(() => undefined);
