@@ -91,8 +91,9 @@ export async function findUmbConstExports() {
 
 	const content = `export const foundConsts = [${foundConsts.join(',\n')}];`;
 
-	const outputPath = path.join(projectRoot, './utils/all-umb-consts/index.ts');
-	fs.writeFileSync(outputPath, content);
+	const outputPath = path.join(projectRoot, './utils/all-umb-consts');
+	fs.mkdirSync(outputPath, { recursive: true });
+	fs.writeFileSync(path.join(outputPath, 'index.ts'), content, {});
 
 	generatetestImportFile(projectRoot);
 
@@ -149,8 +150,9 @@ function generatetestImportFile(projectRoot) {
 		];
 	`
 
-	const outputPath = path.join(projectRoot, './utils/all-umb-consts/imports.ts');
-	fs.writeFileSync(outputPath, content);
+	const outputPath = path.join(projectRoot, './utils/all-umb-consts');
+	fs.mkdirSync(outputPath, { recursive: true });
+	fs.writeFileSync(path.join(outputPath, 'imports.ts'), content);
 }
 
 
