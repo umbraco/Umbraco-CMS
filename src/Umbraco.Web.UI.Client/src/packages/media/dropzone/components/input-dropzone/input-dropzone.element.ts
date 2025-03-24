@@ -1,6 +1,6 @@
-import { UmbDropzoneChangeEvent, UmbDropzoneManager, UmbDropzoneSubmittedEvent } from '../../index.js';
 import type { UmbUploadableItem } from '../../types.js';
 import { UmbFileDropzoneItemStatus } from '../../constants.js';
+import { UmbDropzoneManager } from '../../dropzone-manager.class.js';
 import {
 	css,
 	customElement,
@@ -18,6 +18,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { formatBytes } from '@umbraco-cms/backoffice/utils';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbDropzoneChangeEvent } from '../../dropzone-change.event.js';
+import { UmbDropzoneSubmittedEvent } from '../../dropzone-submitted.event.js';
 
 /**
  * A dropzone for uploading files and folders.
