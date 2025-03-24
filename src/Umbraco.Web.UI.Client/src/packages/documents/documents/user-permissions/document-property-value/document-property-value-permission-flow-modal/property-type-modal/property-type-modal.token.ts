@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_FLOW_PROPERTY_TYPE_MODAL_ALIAS } from './constants.js';
+import { UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_FLOW_PROPERTY_TYPE_MODAL_ALIAS } from './manifests.js';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
