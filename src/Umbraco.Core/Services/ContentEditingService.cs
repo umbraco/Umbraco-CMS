@@ -192,7 +192,7 @@ internal sealed class ContentEditingService
             }
         }
 
-        // if the property varies by x, simply overwrite the edited property value with the current property value for every x
+        // if the property varies by culture, simply overwrite the edited property value with the current property value for every culture
         foreach (IProperty property in variantProperties)
         {
             foreach (var culture in disallowedCultures)
@@ -214,7 +214,7 @@ internal sealed class ContentEditingService
             }
         }
 
-        // if the property does not vary by x and the data editor supports variance within invariant property values,
+        // if the property does not vary by culture and the data editor supports variance within invariant property values,
         // we need perform a merge between the edited property value and the current property value
         foreach ((IProperty Property, IDataEditor DataEditor) propertyWithEditor in invariantWithVariantSupportProperties)
         {
@@ -223,7 +223,7 @@ internal sealed class ContentEditingService
             var editedValue = contentWithPotentialUnallowedChanges.Properties
                 .First(x => x.Alias == propertyWithEditor.Property.Alias).GetValue(null, null, false);
 
-            // update the editedValue with a merged value of invariant data and allowed x data using the currentValue as a fallback.
+            // update the editedValue with a merged value of invariant data and allowed culture data using the currentValue as a fallback.
             var mergedValue = propertyWithEditor.DataEditor.MergeVariantInvariantPropertyValue(
                 currentValue,
                 editedValue,
