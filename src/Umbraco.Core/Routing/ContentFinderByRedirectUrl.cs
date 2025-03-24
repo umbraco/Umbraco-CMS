@@ -63,20 +63,28 @@ public class ContentFinderByRedirectUrl : IContentFinder
                 _logger.LogDebug("No match for route: {Route}", route);
             }
 
-            // Pre-15 routes under domains were stored with the integer ID of the content where the domains were defined as the first part of the route,
+            // Routes under domains can be stored with the integer ID of the content where the domains were defined as the first part of the route,
             // so if we haven't found a redirect, try using that format too.
+            // See: TBC
             if (frequest.Domain is not null)
             {
                 route = frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.AbsolutePathDecoded);
                 redirectUrl = await _redirectUrlService.GetMostRecentRedirectUrlAsync(route, frequest.Culture);
 
-                if (_logger.IsEnabled(LogLevel.Debug))
+                if (redirectUrl is null)
                 {
-                    _logger.LogDebug("No match for route with domain: {Route}", route);
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                    {
+                        _logger.LogDebug("No match for route with domain: {Route}", route);
+                    }
+
+                    return false;
                 }
             }
-
-            return false;
+            else
+            {
+                return false;
+            }
         }
 
         IPublishedContent? content = umbracoContext.Content?.GetById(redirectUrl.ContentId);
