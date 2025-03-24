@@ -43,10 +43,16 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	createAsTemporary: boolean = false;
 
 	/**
-	 * Disallow folder uploads.
+	 * Disable folder uploads.
 	 */
-	@property({ type: Boolean, attribute: 'disallow-folder-upload' })
-	disallowFolderUpload: boolean = false;
+	@property({ type: Boolean, attribute: 'disable-folder-upload', reflect: true })
+	public set disableFolderUpload(isAllowed: boolean) {
+		this.#manager.setIsFoldersAllowed(!isAllowed);
+	}
+	public get disableFolderUpload() {
+		return this._disableFolderUpload;
+	}
+	private readonly _disableFolderUpload = false;
 
 	/**
 	 * Create the media item below this parent.
@@ -114,7 +120,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				accept=${ifDefined(this.accept)}
 				?multiple=${this.multiple}
 				?disabled=${this.disabled}
-				?disallowFolderUpload=${this.disallowFolderUpload}
+				?disallowFolderUpload=${this.disableFolderUpload}
 				@change=${this.#onUpload}
 				@click=${this.#handleBrowse}>
 				<slot>

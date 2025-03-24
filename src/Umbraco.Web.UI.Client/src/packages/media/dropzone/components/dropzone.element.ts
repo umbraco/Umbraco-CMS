@@ -24,11 +24,11 @@ export class UmbDropzoneElement extends UmbLitElement {
 	disabled = false;
 
 	@property({ type: Boolean, attribute: 'disable-folder-upload', reflect: true })
-	public get disableFolderUpload() {
-		return this._disableFolderUpload;
-	}
 	public set disableFolderUpload(isAllowed: boolean) {
 		this.#dropzoneManager.setIsFoldersAllowed(!isAllowed);
+	}
+	public get disableFolderUpload() {
+		return this._disableFolderUpload;
 	}
 	private readonly _disableFolderUpload = false;
 
@@ -131,6 +131,7 @@ export class UmbDropzoneElement extends UmbLitElement {
 			id="dropzone"
 			accept=${ifDefined(this.accept)}
 			?multiple=${this.multiple}
+			?disallowFolderUpload=${this.disableFolderUpload}
 			@change=${this.#onDropFiles}
 			label=${this.localize.term('media_dragAndDropYourFilesIntoTheArea')}></uui-file-dropzone>`;
 	}
