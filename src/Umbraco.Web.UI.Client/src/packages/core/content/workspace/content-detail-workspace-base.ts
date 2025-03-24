@@ -521,7 +521,15 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 
 		// Notice the order of the properties is important for our JSON String Compare function. [NL]
-		const entry = { editorAlias, ...variantId.toObject(), alias, value } as UmbElementValueModel;
+		const entry: UmbElementValueModel = {
+			editorAlias,
+			// Be aware that this solution is a bit magical, and based on a naming convention.
+			// We might want to make this more flexible at some point and get the entityType from somewhere instead of constructing it here.
+			entityType: `${this.getEntityType()}-property-value`,
+			...variantId.toObject(),
+			alias,
+			value,
+		};
 
 		const currentData = this.getData();
 		if (currentData) {
