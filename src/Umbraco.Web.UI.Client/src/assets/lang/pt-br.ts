@@ -129,12 +129,6 @@ export default {
 		visit: 'Visitar',
 		welcome: 'Bem Vindo(a)',
 	},
-	prompt: {
-		stay: 'Stay',
-		discardChanges: 'Discard changes',
-		unsavedChanges: 'Discard unsaved changes',
-		unsavedChangesWarning: 'Are you sure you want to navigate away from this page? - you have unsaved changes',
-	},
 	bulk: {
 		done: 'Done',
 		deletedItem: 'Deleted %0% item',
