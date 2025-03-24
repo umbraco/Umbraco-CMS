@@ -7,4 +7,7 @@ export * from './property-view-state.manager.js';
 export * from './property-write-state.manager.js';
 export * from './property-view-state.manager.js';
 export * from './property-write-state.manager.js';
+export * from './variant-property-view-state.manager.js';
+export * from './variant-property-write-state.manager.js';
+
 export type * from './types.js';

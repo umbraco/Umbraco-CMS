@@ -5,11 +5,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UmbVariantId,
-	type UmbVariantPropertyViewState,
-	type UmbVariantPropertyWriteState,
-} from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantPropertyViewState, UmbVariantPropertyWriteState } from '@umbraco-cms/backoffice/property';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 

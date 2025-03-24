@@ -8,11 +8,8 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UmbVariantId,
-	type UmbVariantPropertyViewState,
-	type UmbVariantPropertyWriteState,
-} from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantPropertyViewState, UmbVariantPropertyWriteState } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbStateManager } from '@umbraco-cms/backoffice/utils';
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
