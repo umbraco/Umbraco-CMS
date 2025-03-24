@@ -4,7 +4,7 @@ import {
 	UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 	UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 } from '../../constants.js';
-import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../../context/block-grid-manager.context-token.js';
+import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../../block-grid-manager/block-grid-manager.context-token.js';
 import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../block-grid-entries/block-grid-entries.context-token.js';
 import {
 	type UmbBlockGridScalableContext,

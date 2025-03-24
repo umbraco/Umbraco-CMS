@@ -1,4 +1,4 @@
-import { UmbBlockGridManagerContext } from '../../context/block-grid-manager.context.js';
+import { UmbBlockGridManagerContext } from '../../block-grid-manager/index.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
