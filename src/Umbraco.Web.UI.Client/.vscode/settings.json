@@ -28,7 +28,9 @@
 		"uninitialize",
 		"unprovide",
 		"unpublishing",
-		"variantable"
+		"variantable",
+		"viewability",
+		"writability"
 	],
 	"exportall.config.folderListener": [],
 	"exportall.config.relExclusion": [],
