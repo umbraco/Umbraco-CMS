@@ -65,7 +65,7 @@ public class ContentFinderByRedirectUrl : IContentFinder
 
             // Routes under domains can be stored with the integer ID of the content where the domains were defined as the first part of the route,
             // so if we haven't found a redirect, try using that format too.
-            // See: TBC
+            // See: https://github.com/umbraco/Umbraco-CMS/pull/18160
             if (frequest.Domain is not null)
             {
                 route = frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.AbsolutePathDecoded);
