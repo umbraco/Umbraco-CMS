@@ -11,6 +11,7 @@ import {
 	type UmbVariantPropertyWriteState,
 } from '@umbraco-cms/backoffice/variant';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-block-workspace-view-edit-properties')
 export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -45,7 +46,13 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	private _ownerEntityType?: string;
 
 	@state()
+	_propertyViewStateIsRunning = true;
+
+	@state()
 	_propertyViewStates: Array<UmbVariantPropertyViewState> = [];
+
+	@state()
+	_propertyWriteStateIsRunning = true;
 
 	@state()
 	_propertyWriteStates: Array<UmbVariantPropertyWriteState> = [];
@@ -86,14 +93,20 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 		);
 
 		this.observe(
-			structureManager.propertyViewState.states,
-			(states) => (this._propertyViewStates = states),
-			'umbObservePropertyReadStates',
+			observeMultiple([structureManager.propertyViewState.isRunning, structureManager.propertyViewState.states]),
+			([isRunning, states]) => {
+				this._propertyViewStateIsRunning = isRunning;
+				this._propertyViewStates = states;
+			},
+			'umbObservePropertyViewStates',
 		);
 
 		this.observe(
-			structureManager.propertyWriteState.states,
-			(states) => (this._propertyWriteStates = states),
+			observeMultiple([structureManager.propertyWriteState.isRunning, structureManager.propertyWriteState.states]),
+			([isEnabled, states]) => {
+				this._propertyWriteStateIsRunning = isEnabled;
+				this._propertyWriteStates = states;
+			},
 			'umbObservePropertyWriteStates',
 		);
 	}
@@ -118,10 +131,15 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	}
 
 	#getVisibleProperties() {
-		return this._propertyStructure?.filter((property) => this.#isVisiblePropertyType(property)) || [];
+		return this._propertyStructure?.filter((property) => this.#isViewablePropertyType(property)) || [];
 	}
 
-	#isVisiblePropertyType(property: UmbPropertyTypeModel) {
+	#isViewablePropertyType(property: UmbPropertyTypeModel) {
+		// The state is not running, so the property is viewable by default.
+		if (this._propertyViewStateIsRunning === false) {
+			return true;
+		}
+
 		const propertyVariantId = this.#getPropertyVariantId(property);
 		return this._propertyViewStates.some(
 			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(propertyVariantId),
@@ -129,6 +147,11 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	}
 
 	#isWritablePropertyType(property: UmbPropertyTypeModel) {
+		// The state is not running, so the property is writable by default.
+		if (this._propertyWriteStateIsRunning === false) {
+			return true;
+		}
+
 		const propertyVariantId = this.#getPropertyVariantId(property);
 		return this._propertyWriteStates.some(
 			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(propertyVariantId),
