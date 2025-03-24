@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -346,6 +346,7 @@ public partial class ContentEditingServiceTests
             InvariantName = "Updated Name",
             InvariantProperties = new[]
             {
+                new PropertyValueModel { Alias = "title", Value = "The initial title" },
                 new PropertyValueModel { Alias = "label", Value = "The updated label value" }
             }
         };
