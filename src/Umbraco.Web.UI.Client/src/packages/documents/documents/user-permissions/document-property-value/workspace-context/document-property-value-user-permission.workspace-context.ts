@@ -4,66 +4,114 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ,
 	UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE,
 } from '../constants.js';
-import type { UmbDocumentVariantModel } from '../../../types.js';
-import { UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_WORKSPACE_CONTEXT } from './document-property-value-user-permission.workspace-context.token.js';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UmbVariantId,
-	type UmbEntityVariantOptionModel,
-	type UmbVariantPropertyVisibilityState,
-	type UmbVariantPropertyWriteState,
-} from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantPropertyViewState, UmbVariantPropertyWriteState } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbStateManager } from '@umbraco-cms/backoffice/utils';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
-export class UmbDocumentPropertyValueUserPermissionWorkspaceContext extends UmbContextBase<UmbDocumentPropertyValueUserPermissionWorkspaceContext> {
-	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+export class UmbDocumentPropertyValueUserPermissionWorkspaceContext extends UmbControllerBase {
+	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+	#blockWorkspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_WORKSPACE_CONTEXT);
+		super(host);
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
-			this.#workspaceContext = context;
-			this.#observeStructure();
+			this.#documentWorkspaceContext = context;
+			this.#observeDocumentProperties();
+		});
+
+		// TODO: investigate if block workspace can provide a property structure context so we can use the same context for both block and document
+		// TODO: only apply to blocks within a document
+		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, async (context) => {
+			this.#blockWorkspaceContext = context;
+			this.#observeDocumentBlockProperties();
 		});
 	}
 
-	#observeStructure() {
-		if (!this.#workspaceContext) return;
+	#observeDocumentProperties() {
+		if (!this.#documentWorkspaceContext) return;
+
+		const structureManager = this.#documentWorkspaceContext.structure;
 
 		this.observe(
-			observeMultiple([this.#workspaceContext.structure.contentTypeProperties, this.#workspaceContext.variantOptions]),
+			observeMultiple([
+				this.#documentWorkspaceContext.structure.contentTypeProperties,
+				this.#documentWorkspaceContext.variantOptions,
+			]),
 			([properties, variantOptions]) => {
 				if (properties.length === 0) return;
 				if (variantOptions.length === 0) return;
 
-				properties.forEach((property) => {
-					this.#setPermissionForProperty({
-						verb: UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ,
-						stateManager: this.#workspaceContext!.structure.propertyVisibilityState,
-						property,
-						variantOptions,
-					});
+				const variantIds = variantOptions?.map((variant) => new UmbVariantId(variant.culture, variant.segment));
 
-					this.#setPermissionForProperty({
-						verb: UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE,
-						stateManager: this.#workspaceContext!.structure.propertyWriteState,
-						property,
-						variantOptions,
-					});
-				});
+				this.#setPermissions(
+					properties,
+					variantIds,
+					structureManager.propertyViewState,
+					structureManager.propertyWriteState,
+				);
 			},
 		);
 	}
 
+	async #observeDocumentBlockProperties() {
+		if (!this.#blockWorkspaceContext) return;
+		const datasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
+		if (!datasetContext) return;
+
+		const structureManager = this.#blockWorkspaceContext.content.structure;
+
+		this.observe(
+			observeMultiple([structureManager.contentTypeProperties, this.#blockWorkspaceContext.variantId]),
+			([properties, variantId]) => {
+				if (properties.length === 0) return;
+				if (!variantId) return;
+
+				this.#setPermissions(
+					properties,
+					[variantId],
+					structureManager.propertyViewState,
+					structureManager.propertyWriteState,
+				);
+			},
+		);
+	}
+
+	#setPermissions(
+		properties: Array<UmbPropertyTypeModel>,
+		variantIds: Array<UmbVariantId>,
+		propertyVisibilityState: UmbStateManager<UmbVariantPropertyViewState>,
+		propertyWriteState: UmbStateManager<UmbVariantPropertyWriteState>,
+	) {
+		properties.forEach((property) => {
+			this.#setPermissionForProperty({
+				verb: UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ,
+				stateManager: propertyVisibilityState,
+				property,
+				variantIds,
+			});
+
+			this.#setPermissionForProperty({
+				verb: UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE,
+				stateManager: propertyWriteState,
+				property,
+				variantIds,
+			});
+		});
+	}
+
 	#setPermissionForProperty(args: {
 		verb: string;
-		stateManager: UmbStateManager<UmbVariantPropertyVisibilityState | UmbVariantPropertyWriteState>;
+		stateManager: UmbStateManager<UmbVariantPropertyViewState | UmbVariantPropertyWriteState>;
 		property: UmbPropertyTypeModel;
-		variantOptions: Array<UmbEntityVariantOptionModel<UmbDocumentVariantModel>>;
+		variantIds: Array<UmbVariantId>;
 	}) {
 		createExtensionApiByAlias(this, UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_CONDITION_ALIAS, [
 			{
@@ -78,9 +126,7 @@ export class UmbDocumentPropertyValueUserPermissionWorkspaceContext extends UmbC
 				onChange: (permitted: boolean) => {
 					// If the property is invariant we only need one state for the property
 					const isInvariant = args.property.variesByCulture === false && args.property.variesBySegment === false;
-					const variantIds = isInvariant
-						? [new UmbVariantId()]
-						: args.variantOptions?.map((variant) => new UmbVariantId(variant.culture, variant.segment)) || [];
+					const variantIds = isInvariant ? [new UmbVariantId()] : args.variantIds;
 
 					const states: Array<UmbVariantPropertyWriteState> =
 						variantIds?.map((variantId) => {

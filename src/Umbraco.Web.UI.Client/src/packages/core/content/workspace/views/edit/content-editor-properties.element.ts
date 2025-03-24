@@ -9,12 +9,10 @@ import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/c
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import {
-	UmbVariantId,
-	type UmbVariantPropertyVisibilityState,
-	type UmbVariantPropertyWriteState,
-} from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantPropertyViewState, UmbVariantPropertyWriteState } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-content-workspace-view-edit-properties')
 export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -36,7 +34,13 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	_dataPaths?: Array<string>;
 
 	@state()
-	_propertyVisibilityStates: Array<UmbVariantPropertyVisibilityState> = [];
+	_propertyViewStateIsRunning = true;
+
+	@state()
+	_propertyViewStates: Array<UmbVariantPropertyViewState> = [];
+
+	@state()
+	_propertyWriteStateIsRunning = true;
 
 	@state()
 	_propertyWriteStates: Array<UmbVariantPropertyWriteState> = [];
@@ -54,14 +58,26 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 			);
 
 			this.observe(
-				workspaceContext.structure.propertyVisibilityState.states,
-				(states) => (this._propertyVisibilityStates = states),
-				'umbObservePropertyVisibilityStates',
+				observeMultiple([
+					workspaceContext.structure.propertyViewState.isRunning,
+					workspaceContext.structure.propertyViewState.states,
+				]),
+				([isRunning, states]) => {
+					this._propertyViewStateIsRunning = isRunning;
+					this._propertyViewStates = states;
+				},
+				'umbObservePropertyViewStates',
 			);
 
 			this.observe(
-				workspaceContext.structure.propertyWriteState.states,
-				(states) => (this._propertyWriteStates = states),
+				observeMultiple([
+					workspaceContext.structure.propertyWriteState.isRunning,
+					workspaceContext.structure.propertyWriteState.states,
+				]),
+				([isEnabled, states]) => {
+					this._propertyWriteStateIsRunning = isEnabled;
+					this._propertyWriteStates = states;
+				},
 				'umbObservePropertyWriteStates',
 			);
 
@@ -100,17 +116,27 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	}
 
 	#getVisibleProperties() {
-		return this._propertyStructure?.filter((property) => this.#isVisiblePropertyType(property)) || [];
+		return this._propertyStructure?.filter((property) => this.#isViewablePropertyType(property)) || [];
 	}
 
-	#isVisiblePropertyType(property: UmbPropertyTypeModel) {
+	#isViewablePropertyType(property: UmbPropertyTypeModel) {
+		// The state is not running, so the property is viewable by default.
+		if (this._propertyViewStateIsRunning === false) {
+			return true;
+		}
+
 		const propertyVariantId = this.#getPropertyVariantId(property);
-		return this._propertyVisibilityStates.some(
+		return this._propertyViewStates.some(
 			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(propertyVariantId),
 		);
 	}
 
 	#isWritablePropertyType(property: UmbPropertyTypeModel) {
+		// The state is not running, so the property is writable by default.
+		if (this._propertyWriteStateIsRunning === false) {
+			return true;
+		}
+
 		const propertyVariantId = this.#getPropertyVariantId(property);
 
 		// Check if the property is writable

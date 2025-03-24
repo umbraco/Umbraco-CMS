@@ -1,4 +1,8 @@
-export { UMB_MEMBER_ENTITY_TYPE, UMB_MEMBER_ROOT_ENTITY_TYPE } from './entity.js';
+export {
+	UMB_MEMBER_ENTITY_TYPE,
+	UMB_MEMBER_ROOT_ENTITY_TYPE,
+	UMB_MEMBER_PROPERTY_VALUE_ENTITY_TYPE,
+} from './entity.js';
 export { UMB_MEMBER_VARIANT_CONTEXT } from './property-dataset-context/member-property-dataset.context-token.js';
 
 export * from './collection/constants.js';

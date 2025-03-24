@@ -1,6 +1,5 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 export interface UmbState {
 	unique: string;
@@ -15,6 +14,9 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	protected _states = new UmbArrayState<StateType>([], (x) => x.unique);
 	public states = this._states.asObservable();
 
+	protected _isRunning = new UmbBooleanState(true);
+	public readonly isRunning = this._isRunning.asObservable();
+
 	/**
 	 * Observable that emits true if there are any states in the state manager
 	 * @memberof UmbStateManager
@@ -28,12 +30,28 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	public isOff = this._states.asObservablePart((x) => x.length === 0);
 
 	/**
-	 * Creates an instance of UmbStateManager.
-	 * @param {UmbControllerHost} host
+	 * Start the state - this will allow the state to be used.
+	 */
+	public start() {
+		this._states.unmute();
+		this._isRunning.setValue(true);
+	}
+
+	/**
+	 * Stop the state - this will prevent the state from being used
+	 */
+	public stop() {
+		this._states.mute();
+		this._isRunning.setValue(false);
+	}
+
+	/**
+	 * Get whether the state is running
+	 * @returns {boolean} True if the state is running
 	 * @memberof UmbStateManager
 	 */
-	constructor(host: UmbControllerHost) {
-		super(host);
+	public getIsRunning(): boolean {
+		return this._isRunning.getValue();
 	}
 
 	/**
@@ -42,6 +60,10 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	 * @memberof UmbStateManager
 	 */
 	addState(state: StateType) {
+		if (this.getIsRunning() === false) {
+			throw new Error('State manager is not running. Call start() before adding states');
+		}
+		if (!state) throw new Error('State must be defined');
 		if (!state.unique) throw new Error('State must have a unique property');
 		if (this._states.getValue().find((x) => x.unique === state.unique)) {
 			throw new Error('State with unique already exists');
@@ -55,12 +77,16 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	 * @memberof UmbStateManager
 	 */
 	addStates(states: StateType[]) {
+		if (this.getIsRunning() === false) {
+			throw new Error('State manager is not running. Call start() before adding states');
+		}
+
 		states.forEach((state) => this.addState(state));
 	}
 
 	/**
 	 * Remove a state from the state manager
-	 * @param {StateType['unique']} unique
+	 * @param {StateType['unique']} unique Unique value of the state to remove
 	 * @memberof UmbStateManager
 	 */
 	removeState(unique: StateType['unique']) {
@@ -69,7 +95,7 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 
 	/**
 	 * Remove multiple states from the state manager
-	 * @param {StateType['unique'][]} uniques
+	 * @param {StateType['unique'][]} uniques Array of unique values to remove
 	 * @memberof UmbStateManager
 	 */
 	removeStates(uniques: StateType['unique'][]) {
@@ -112,7 +138,8 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	}
 
 	override destroy() {
-		super.destroy();
 		this._states.destroy();
+		this._isRunning.destroy();
+		super.destroy();
 	}
 }

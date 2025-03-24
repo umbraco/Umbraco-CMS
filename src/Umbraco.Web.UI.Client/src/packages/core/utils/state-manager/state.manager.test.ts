@@ -33,6 +33,14 @@ describe('UmbSelectionManager', () => {
 		});
 
 		describe('methods', () => {
+			it('has a start method', () => {
+				expect(manager).to.have.property('start').that.is.a('function');
+			});
+
+			it('has a stop method', () => {
+				expect(manager).to.have.property('stop').that.is.a('function');
+			});
+
 			it('has a addState method', () => {
 				expect(manager).to.have.property('addState').that.is.a('function');
 			});
@@ -88,6 +96,11 @@ describe('UmbSelectionManager', () => {
 					done();
 				})
 				.unsubscribe();
+		});
+
+		it('throws an error if the state manager is not running', () => {
+			manager.stop();
+			expect(() => manager.addState(state1)).to.throw();
 		});
 	});
 
@@ -166,6 +179,21 @@ describe('UmbSelectionManager', () => {
 		it('returns false if there are states', () => {
 			manager.addState(state1);
 			expect(manager.getIsOff()).to.be.false;
+		});
+	});
+
+	describe('start', () => {
+		it('starts the state manager', () => {
+			manager.stop();
+			manager.start();
+			expect(manager.getIsRunning()).to.be.true;
+		});
+	});
+
+	describe('stop', () => {
+		it('stops the state manager', () => {
+			manager.stop();
+			expect(manager.getIsRunning()).to.be.false;
 		});
 	});
 });

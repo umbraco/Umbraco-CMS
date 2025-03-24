@@ -21,9 +21,9 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbVariantPropertyReadOnlyStateManager,
-	UmbVariantPropertyVisibilityStateManager,
+	UmbVariantPropertyViewStateManager,
 	UmbVariantPropertyWriteStateManager,
-} from '@umbraco-cms/backoffice/variant';
+} from '@umbraco-cms/backoffice/property';
 
 type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
 
@@ -103,7 +103,7 @@ export class UmbContentTypeStructureManager<
 	readonly variesByCulture = createObservablePart(this.ownerContentType, (x) => x?.variesByCulture);
 	readonly variesBySegment = createObservablePart(this.ownerContentType, (x) => x?.variesBySegment);
 
-	public readonly propertyVisibilityState = new UmbVariantPropertyVisibilityStateManager(this);
+	public readonly propertyViewState = new UmbVariantPropertyViewStateManager(this);
 	public readonly propertyWriteState = new UmbVariantPropertyWriteStateManager(this);
 	public readonly propertyReadOnlyState = new UmbVariantPropertyReadOnlyStateManager(this);
 
@@ -818,7 +818,7 @@ export class UmbContentTypeStructureManager<
 	public override destroy() {
 		this.#contentTypes.destroy();
 		this.#containers.destroy();
-		this.propertyVisibilityState.destroy();
+		this.propertyViewState.destroy();
 		this.propertyWriteState.destroy();
 		this.propertyReadOnlyState.destroy();
 		super.destroy();
