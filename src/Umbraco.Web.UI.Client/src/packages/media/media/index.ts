@@ -10,8 +10,7 @@ export { UmbMediaAuditLogRepository } from './audit-log/index.js';
 
 export type * from './types.js';
 
-// #region Dropzone
-// TODO: The following import and export were introduced for backward compatibility in V15 because the components were once part of this package. Remove later on.
-import '@umbraco-cms/backoffice/dropzone';
+/**
+ * @deprecated Please import directly from the `@umbraco-cms/backoffice/dropzone` package instead. This package will be removed in Umbraco 18.
+ */
 export * from '@umbraco-cms/backoffice/dropzone';
-// #endregion
