@@ -145,7 +145,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		this._currentPage = paginationManager.getCurrentPageNumber();
 		this._currentTotalPages = paginationManager.getTotalPages();
 
-		if(selectedItems && selectedItems.length){
+		if (selectedItems?.length){
 			const selectedItem = this._currentChildren.find(x => x.unique == selectedItems[0].unique);
 			if(selectedItem){
 				this.#onSelected(selectedItem);
