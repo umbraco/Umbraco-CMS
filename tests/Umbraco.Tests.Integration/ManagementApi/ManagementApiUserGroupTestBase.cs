@@ -3,10 +3,12 @@ using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Tests.Common.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 
 [TestFixture]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
 public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     where T : ManagementApiControllerBase
 {
@@ -49,7 +51,7 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     [Test]
     public virtual async Task As_Admin_I_Have_Specified_Access()
     {
-        var response = await AuthorizedRequest(Constants.Security.AdminGroupKey);
+        var response = await AuthorizedRequest(Constants.Security.AdminGroupKey, "Admin");
 
         Assert.AreEqual(AdminUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
@@ -58,7 +60,7 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     [Test]
     public virtual async Task As_Editor_I_Have_Specified_Access()
     {
-        var response = await AuthorizedRequest(Constants.Security.EditorGroupKey);
+        var response = await AuthorizedRequest(Constants.Security.EditorGroupKey, "Editor");
 
         Assert.AreEqual(EditorUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
@@ -67,7 +69,7 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     [Test]
     public virtual async Task As_Sensitive_Data_I_Have_Specified_Access()
     {
-        var response = await AuthorizedRequest(Constants.Security.SensitiveDataGroupKey);
+        var response = await AuthorizedRequest(Constants.Security.SensitiveDataGroupKey, "SensitiveData");
 
         Assert.AreEqual(SensitiveDataUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
@@ -76,7 +78,7 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     [Test]
     public virtual async Task As_Translator_I_Have_Specified_Access()
     {
-        var response = await AuthorizedRequest(Constants.Security.TranslatorGroupKey);
+        var response = await AuthorizedRequest(Constants.Security.TranslatorGroupKey, "Translator");
 
         Assert.AreEqual(TranslatorUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
@@ -85,7 +87,7 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     [Test]
     public virtual async Task As_Writer_I_Have_Specified_Access()
     {
-        var response = await AuthorizedRequest(Constants.Security.WriterGroupKey);
+        var response = await AuthorizedRequest(Constants.Security.WriterGroupKey, "Writer");
 
         Assert.AreEqual(WriterUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
@@ -99,14 +101,14 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
         Assert.AreEqual(UnauthorizedUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
-    protected virtual async Task<HttpResponseMessage> AuthorizedRequest(Guid userGroupKey)
+    protected virtual async Task<HttpResponseMessage> AuthorizedRequest(Guid userGroupKey, string groupName)
     {
-        await AuthenticateUser(userGroupKey);
+        await AuthenticateUser(userGroupKey, groupName);
 
         return await ClientRequest();
     }
 
-    protected virtual async Task AuthenticateUser(Guid userGroupKey) => await AuthenticateClientAsync(Client, UserEmail, UserPassword, userGroupKey);
+    protected virtual async Task AuthenticateUser(Guid userGroupKey, string groupName) => await AuthenticateClientAsync(Client, groupName + UserEmail, UserPassword, userGroupKey);
 
     protected virtual async Task<HttpResponseMessage> ClientRequest() => await Client.GetAsync(Url);
 }
