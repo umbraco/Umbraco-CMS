@@ -1,8 +1,8 @@
+import { UmbDropzoneMediaManager } from './dropzone-media-manager.class.js';
 import {
 	UmbInputDropzoneElement,
 	UmbFileDropzoneItemStatus,
 	UmbDropzoneSubmittedEvent,
-	UmbDropzoneManager,
 	type UmbUploadableItem,
 } from '@umbraco-cms/backoffice/dropzone';
 import { css, customElement, property } from '@umbraco-cms/backoffice/external/lit';
@@ -29,7 +29,7 @@ export class UmbDropzoneElement extends UmbInputDropzoneElement {
 	@property({ type: Boolean, attribute: 'create-as-temporary' })
 	createAsTemporary: boolean = false;
 
-	#dropzoneManager = new UmbDropzoneManager(this);
+	#dropzoneManager = new UmbDropzoneMediaManager(this);
 
 	/**
 	 * @deprecated Please use `getItems()` instead; this method will be removed in Umbraco 17.
@@ -137,16 +137,6 @@ export class UmbDropzoneElement extends UmbInputDropzoneElement {
 				border-radius: var(--uui-border-radius);
 				border: 1px solid var(--uui-color-focus);
 			}
-			/*
-			#dropzone:after {
-				content: '';
-				display: block;
-				position: absolute;
-				inset: 0;
-				border-radius: var(--uui-border-radius);
-				background-color: var(--uui-color-focus);
-				opacity: 0.2;
-			}*/
 		`,
 	];
 }
