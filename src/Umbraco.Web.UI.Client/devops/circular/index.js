@@ -48,7 +48,7 @@ if (circular.length) {
 	} catch { console.warn('No image generated. Make sure Graphviz is in your $PATH if you want a visualization'); }
 
 	// TODO: Remove this check and set an exit with argument 1 when we have fixed all circular dependencies.
-	if (circular.length > 9)
+	if (circular.length > 8)
 		process.exit(1)
 	else
 		process.exit(0)
