@@ -391,6 +391,7 @@ public partial class ContentEditingServiceTests
                     Name = "Updated English Name",
                     Properties = new []
                     {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The initial English title" },
                         new PropertyValueModel { Alias = "variantLabel", Value = "The updated English label value" }
                     }
                 },
@@ -400,6 +401,7 @@ public partial class ContentEditingServiceTests
                     Name = "Updated Danish Name",
                     Properties = new []
                     {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The initial Danish title" },
                         new PropertyValueModel { Alias = "variantLabel", Value = "The updated Danish  label value" }
                     }
                 }
