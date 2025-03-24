@@ -11,7 +11,7 @@ export class UmbDropzoneElement extends UmbLitElement {
 	@property({ attribute: false })
 	parentUnique: string | null = null;
 
-	@property({ type: Boolean })
+	@property({ type: Boolean, attribute: 'create-as-temporary' })
 	createAsTemporary: boolean = false;
 
 	@property({ type: String })

@@ -125,15 +125,19 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 							label=${this.localize.term('general_remove')}></uui-button>
 					</uui-ref-node>`,
 				() =>
-					/**TODO Add localizations */
 					html`<div id="wrapper">
-						Drag and drop your file here
-						<uui-button look="primary" label="or click here to choose a file" @click=${this.#onBrowse}></uui-button>
+						<umb-localize key="media_dragAndDropYourFilesIntoTheArea"
+							>Drag and drop your file(s) into the area
+						</umb-localize>
+						<uui-button
+							look="primary"
+							label="${this.localize.term('media_Click to upload')}"
+							@click=${this.#onBrowse}></uui-button>
 						<umb-dropzone
 							id="dropzone"
 							accept=".udt"
-							@complete=${this.#onUploadCompleted}
-							createAsTemporary></umb-dropzone>
+							create-as-temporary
+							@complete=${this.#onUploadCompleted}></umb-dropzone>
 					</div>`,
 			)}
 		`;
