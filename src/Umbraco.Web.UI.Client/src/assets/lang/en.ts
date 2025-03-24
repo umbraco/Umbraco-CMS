@@ -35,8 +35,8 @@ export default {
 		export: 'Export',
 		exportDocumentType: 'Export Document Type',
 		folderCreate: 'Create folder',
-		folderDelete: 'Delete folder',
-		folderRename: 'Rename folder',
+		folderDelete: 'Delete',
+		folderRename: 'Rename',
 		import: 'Import',
 		importdocumenttype: 'Import Document Type',
 		importPackage: 'Import Package',
@@ -49,7 +49,7 @@ export default {
 		protect: 'Public Access',
 		publish: 'Publish',
 		readOnly: 'Read-only',
-		refreshNode: 'Reload',
+		refreshNode: 'Reload children',
 		remove: 'Remove',
 		rename: 'Rename',
 		republish: 'Republish entire site',
@@ -317,9 +317,6 @@ export default {
 		removeTextBox: 'Remove this text box',
 		contentRoot: 'Content root',
 		includeUnpublished: 'Include unpublished content items.',
-		forceRepublish: 'Publish unchanged items.',
-		forceRepublishWarning: 'WARNING: Publishing all pages below this one in the content tree, whether or not they have changed, can be an expensive and long-running operation.',
-		forceRepublishAdvisory: 'This should not be necessary in normal circumstances so please only proceed with this option selected if you are certain it is required.',
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your\n      website administrator.\n    ',
 		isSensitiveValue_short: 'This value is hidden.',
@@ -377,8 +374,6 @@ export default {
 		fileSecurityValidationFailure: 'One or more file security validations have failed',
 		moveToSameFolderFailed: 'Parent and destination folders cannot be the same',
 		uploadNotAllowed: 'Upload is not allowed in this location.',
-		noticeExtensionsServerOverride:
-			'Regardless of the allowed file types, the following limitations apply system-wide due to the server configuration:',
 	},
 	member: {
 		'2fa': 'Two-Factor Authentication',
@@ -625,13 +620,15 @@ export default {
 	},
 	dictionary: {
 		importDictionaryItemHelp:
-			'\n      To import a dictionary item, find the ".udt" file on your computer by clicking the\n      "Import" button (you\'ll be asked for confirmation on the next screen)\n    ',
+			'To import a dictionary item, find the ".udt" file on your computer by clicking the "Add" button (you\'ll be asked for confirmation on the next screen).',
 		itemDoesNotExists: 'Dictionary item does not exist.',
 		parentDoesNotExists: 'Parent item does not exist.',
 		noItems: 'There are no dictionary items.',
 		noItemsInFile: 'There are no dictionary items in this file.',
 		noItemsFound: 'There were no dictionary items found.',
 		createNew: 'Create dictionary item',
+		pickFile: 'Select file',
+		pickFileRequired: 'Please select a ".udt" file',
 	},
 	dictionaryItem: {
 		description: "Edit the different language versions for the dictionary item '%0%' below",
@@ -902,7 +899,6 @@ export default {
 		retrieve: 'Retrieve',
 		retry: 'Retry',
 		rights: 'Permissions',
-		serverConfiguration: 'Server Configuration',
 		scheduledPublishing: 'Scheduled Publishing',
 		umbracoInfo: 'Umbraco info',
 		search: 'Search',
@@ -1279,6 +1275,11 @@ export default {
 		defineRootNode: 'Pick root node',
 		defineXPathOrigin: 'Specify via XPath',
 		defineDynamicRoot: 'Specify a Dynamic Root',
+		unsupportedHeadline: (type?: string) =>
+			`<strong>Unsupported ${type ?? 'content'} items</strong><br>The following content is no longer supported in this Editor.`,
+		unsupportedMessage:
+			'If you still require this content, please contact your administrator. Otherwise you can remove it.',
+		unsupportedRemove: 'Remove unsupported items?',
 	},
 	dynamicRoot: {
 		configurationTitle: 'Dynamic Root Query',
@@ -2735,6 +2736,8 @@ export default {
 		config_overlaySize_description: 'Select the width of the overlay (link picker).',
 	},
 	tiptap: {
+		anchor: 'Anchor',
+		anchor_input: 'Enter an anchor ID',
 		config_dimensions_description: 'Set the maximum width and height of the editor. This excludes the toolbar height.',
 		config_extensions: 'Capabilities',
 		config_toolbar: 'Toolbar',
@@ -2754,6 +2757,15 @@ export default {
 		toolbar_removeItem: 'Remove action',
 		toolbar_emptyGroup: 'Empty',
 		sourceCodeEdit: 'Edit source code',
+		charmap: 'Character map',
+		charmap_headline: 'Special character',
+		charmap_currency: 'Currency',
+		charmap_text: 'Text',
+		charmap_quotations: 'Quotations',
+		charmap_maths: 'Mathematical',
+		charmap_extlatin: 'Extended Latin',
+		charmap_symbols: 'Symbols',
+		charmap_arrows: 'Arrows',
 	},
 	linkPicker: {
 		modalSource: 'Source',

@@ -1267,7 +1267,7 @@ public class ContentService : RepositoryService, IContentService
         // we need to guard against unsaved changes before proceeding; the content will be saved, but we're not firing any saved notifications
         if (HasUnsavedChanges(content))
         {
-            return new PublishResult(PublishResultType.FailedPublishUnsavedChanges, EventMessagesFactory.Get(), content);
+            return new PublishResult(PublishResultType.FailedPublishUnsavedChanges, evtMsgs, content);
         }
 
         if (content.Name != null && content.Name.Length > 255)
@@ -1324,13 +1324,8 @@ public class ContentService : RepositoryService, IContentService
 
             // Change state to publishing
             content.PublishedState = PublishedState.Publishing;
-            var publishingNotification = new ContentPublishingNotification(content, evtMsgs);
-            if (scope.Notifications.PublishCancelable(publishingNotification))
-            {
-                return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
-            }
 
-            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, publishingNotification.State, userId);
+            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, new Dictionary<string, object?>(), userId);
             scope.Complete();
             return result;
         }

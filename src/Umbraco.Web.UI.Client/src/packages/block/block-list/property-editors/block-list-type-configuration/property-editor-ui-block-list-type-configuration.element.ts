@@ -3,13 +3,13 @@ import { UMB_BLOCK_LIST_TYPE } from '../../constants.js';
 import type { UmbBlockTypeBaseModel, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
 import {
 	type UmbPropertyEditorUiElement,
-	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-block-list-type-configuration
@@ -58,7 +58,7 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement
 	#onChange(e: CustomEvent) {
 		e.stopPropagation();
 		this.value = (e.target as UmbInputBlockTypeElement).value;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

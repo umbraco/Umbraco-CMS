@@ -35,8 +35,7 @@ import {
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbDataPathVariantQuery,
 	UmbServerModelValidatorContext,
-	UmbVariantsValidationPathTranslator,
-	UmbVariantValuesValidationPathTranslator,
+	UmbValidationController,
 } from '@umbraco-cms/backoffice/validation';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -52,6 +51,7 @@ import {
 	type UmbPropertyTypePresetModel,
 	type UmbPropertyTypePresetModelTypeModel,
 } from '@umbraco-cms/backoffice/property';
+import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -145,6 +145,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	// TODO: fix type error
 	public readonly variantOptions;
 
+	#variantValidationContexts: Array<UmbValidationController> = [];
+	getVariantValidationContext(variantId: UmbVariantId): UmbValidationController | undefined {
+		return this.#variantValidationContexts.find((x) => x.getVariantId()?.compare(variantId));
+	}
+
 	#validateOnSubmit: boolean;
 	#serverValidation = new UmbServerModelValidatorContext(this);
 	#validationRepositoryClass?: ClassConstructor<UmbContentValidationRepository<DetailModelType>>;
@@ -163,6 +168,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		>,
 	) {
 		super(host, args);
+
+		this.#serverValidation.addPathTranslator(UmbContentDetailValidationPathTranslator);
 
 		this._data.setVariantScaffold(args.contentVariantScaffold);
 		this.#saveModalToken = args.saveModalToken;
@@ -209,8 +216,25 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			},
 		);
 
-		new UmbVariantValuesValidationPathTranslator(this);
-		new UmbVariantsValidationPathTranslator(this);
+		this.observe(
+			this.variantOptions,
+			(variantOptions) => {
+				variantOptions.forEach((variantOption) => {
+					const missingThis = this.#variantValidationContexts.filter((x) => {
+						const variantId = x.getVariantId();
+						if (!variantId) return;
+						return variantId.culture === variantOption.culture && variantId.segment === variantOption.segment;
+					});
+					if (missingThis) {
+						const context = new UmbValidationController(this);
+						context.inheritFrom(this.validationContext, '$');
+						context.setVariantId(UmbVariantId.Create(variantOption));
+						this.#variantValidationContexts.push(context);
+					}
+				});
+			},
+			null,
+		);
 
 		this.observe(
 			this.varies,
@@ -479,7 +503,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 
 		// Notice the order of the properties is important for our JSON String Compare function. [NL]
-		const entry = { editorAlias, alias, ...variantId.toObject(), value } as UmbElementValueModel;
+		const entry = { editorAlias, ...variantId.toObject(), alias, value } as UmbElementValueModel;
 
 		const currentData = this.getData();
 		if (currentData) {
@@ -684,8 +708,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				async () => {
 					return this.performCreateOrUpdate(variantIds, saveData);
 				},
-				async () => {
-					return this.invalidSubmit();
+				async (reason?: any) => {
+					return this.invalidSubmit(reason);
 				},
 			);
 		} else {

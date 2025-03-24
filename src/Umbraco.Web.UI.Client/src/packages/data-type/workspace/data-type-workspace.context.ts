@@ -227,14 +227,35 @@ export class UmbDataTypeWorkspaceContext
 		const data = this._data.getCurrent();
 		if (!data) return;
 
+		// We are going to transfer the default data from the schema and the UI (the UI can override the schema data).
+		// Let us figure out which editors are alike from the inherited data, so we can keep that data around and only transfer the data that is not
+		// inherited from the previous data type.
 		this.#settingsDefaultData = [
 			...this.#propertyEditorSchemaSettingsDefaultData,
 			...this.#propertyEditorUISettingsDefaultData,
 		] satisfies Array<UmbDataTypePropertyValueModel>;
-		// We check for satisfied type, because we will be directly transferring them to become value. Future note, if they are not satisfied, we need to transfer alias and value. [NL]
 
-		this._data.updatePersisted({ values: this.#settingsDefaultData });
-		this._data.updateCurrent({ values: this.#settingsDefaultData });
+		const values: Array<UmbDataTypePropertyValueModel> = [];
+
+		// We want to keep the existing data, if it is not in the default data, and if it is in the default data, then we want to keep the default data.
+		for (const defaultDataItem of this.#properties.getValue()) {
+			// We are matching on the alias, as we assume that the alias is unique for the data type.
+			// TODO: Consider if we should also match on the editorAlias just to be on the safe side [JOV]
+			const existingData = data.values?.find((x) => x.alias === defaultDataItem.alias);
+			if (existingData) {
+				values.push(existingData);
+				continue;
+			}
+
+			// If the data is not in the existing data, then we want to add the default data if it exists.
+			const existingDefaultData = this.#settingsDefaultData.find((x) => x.alias === defaultDataItem.alias);
+			if (existingDefaultData) {
+				values.push(existingDefaultData);
+			}
+		}
+
+		this._data.updatePersisted({ values });
+		this._data.updateCurrent({ values });
 	}
 
 	public getPropertyDefaultValue(alias: string) {

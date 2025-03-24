@@ -160,10 +160,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 		return html`
 			<div slot="header" class="drag-handle">
 				<div>
-					${when(
-						this.sortModeActive && this._hasOwnerContainer,
-						() => html`<uui-icon name="icon-navigation"></uui-icon>`,
-					)}
+					${when(this.sortModeActive && this._hasOwnerContainer, () => html`<uui-icon name="icon-grip"></uui-icon>`)}
 					<uui-input
 						id="group-name"
 						label=${this.localize.term('contentTypeEditor_group')}

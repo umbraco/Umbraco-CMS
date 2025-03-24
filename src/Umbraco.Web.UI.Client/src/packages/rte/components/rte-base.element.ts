@@ -4,7 +4,6 @@ import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBlockRteEntriesContext, UmbBlockRteManagerContext } from '@umbraco-cms/backoffice/block-rte';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
 import type {
@@ -16,7 +15,7 @@ import {
 	UmbFormControlMixin,
 	UmbValidationContext,
 } from '@umbraco-cms/backoffice/validation';
-import { UmbBlockElementDataValidationPathTranslator } from '@umbraco-cms/backoffice/block';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export abstract class UmbPropertyEditorUiRteElementBase
 	extends UmbFormControlMixin<UmbPropertyEditorRteValueType | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
@@ -111,8 +110,6 @@ export abstract class UmbPropertyEditorUiRteElementBase
 	readonly #entriesContext = new UmbBlockRteEntriesContext(this);
 
 	readonly #validationContext = new UmbValidationContext(this);
-	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
-	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 
 	constructor() {
 		super();
@@ -145,15 +142,9 @@ export abstract class UmbPropertyEditorUiRteElementBase
 		this.observe(
 			context.dataPath,
 			(dataPath) => {
-				// Translate paths for content/settings:
-				this.#contentDataPathTranslator?.destroy();
-				this.#settingsDataPathTranslator?.destroy();
 				if (dataPath) {
 					// Set the data path for the local validation context:
 					this.#validationContext.setDataPath(dataPath + '.blocks');
-
-					this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
-					this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
 				}
 			},
 			'observeDataPath',
@@ -228,6 +219,6 @@ export abstract class UmbPropertyEditorUiRteElementBase
 	}
 
 	protected _fireChangeEvent() {
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 }

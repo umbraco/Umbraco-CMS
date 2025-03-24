@@ -12,6 +12,7 @@ import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/b
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
+	UmbHasChildrenEntityContext,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
@@ -75,6 +76,8 @@ export abstract class UmbTreeItemContextBase<
 	#sectionSidebarContext?: typeof UMB_SECTION_SIDEBAR_CONTEXT.TYPE;
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
+	#hasChildrenContext = new UmbHasChildrenEntityContext(this);
+
 	// TODO: get this from the tree context
 	#paging = {
 		skip: 0,
@@ -128,7 +131,10 @@ export abstract class UmbTreeItemContextBase<
 		if (!treeItem.entityType) throw new Error('Could not create tree item context, tree item type is missing');
 		this.entityType = treeItem.entityType;
 
-		this.#hasChildren.setValue(treeItem.hasChildren || false);
+		const hasChildren = treeItem.hasChildren || false;
+		this.#hasChildren.setValue(hasChildren);
+		this.#hasChildrenContext.setHasChildren(hasChildren);
+
 		this._treeItem.setValue(treeItem);
 
 		// Update observers:
@@ -184,7 +190,10 @@ export abstract class UmbTreeItemContextBase<
 				this.#childItems.setValue(data.items);
 			}
 
-			this.#hasChildren.setValue(data.total > 0);
+			const hasChildren = data.total > 0;
+			this.#hasChildren.setValue(hasChildren);
+			this.#hasChildrenContext.setHasChildren(hasChildren);
+
 			this.pagination.setTotalItems(data.total);
 		}
 

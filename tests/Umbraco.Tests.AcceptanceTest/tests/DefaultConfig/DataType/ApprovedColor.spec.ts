@@ -34,7 +34,7 @@ test('can include label', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
   // Act
-  await umbracoUi.dataType.clickIncludeLabelsSlider();
+  await umbracoUi.dataType.clickIncludeLabelsToggle();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
