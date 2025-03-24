@@ -1,51 +1,47 @@
-import { UmbDropzoneManager } from '../dropzone-manager.class.js';
-import { UmbDropzoneSubmittedEvent } from '../dropzone-submitted.event.js';
-import type { UmbUploadableItem } from '../types.js';
-import { UmbFileDropzoneItemStatus } from '../constants.js';
-import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import {
+	UmbInputDropzoneElement,
+	UmbFileDropzoneItemStatus,
+	UmbDropzoneSubmittedEvent,
+	UmbDropzoneManager,
+	type UmbUploadableItem,
+} from '@umbraco-cms/backoffice/dropzone';
+import { css, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 
+/**
+ * A dropzone for uploading files and folders as media items. It is hidden by default and will be shown when dragging files over the window.
+ * @element umb-dropzone
+ * @fires ProgressEvent When the progress of the upload changes.
+ * @fires UmbDropzoneSubmittedEvent When the upload is submitted.
+ * @fires UmbDropzoneChangeEvent When any upload changes.
+ * @fires CustomEvent<'complete'> When all uploads are complete (deprecated: use {@link UmbDropzoneChangeEvent} instead).
+ * @slot - The default slot.
+ */
 @customElement('umb-dropzone')
-export class UmbDropzoneElement extends UmbLitElement {
+export class UmbDropzoneElement extends UmbInputDropzoneElement {
 	@property({ attribute: 'parent-unique' })
 	parentUnique: string | null = null;
 
+	/**
+	 * Determines if the dropzone should create temporary files or media items directly.
+	 * @deprecated Use the {@link UmbInputDropzoneElement} instead.
+	 */
 	@property({ type: Boolean, attribute: 'create-as-temporary' })
 	createAsTemporary: boolean = false;
 
-	@property({ type: String })
-	accept?: string;
-
-	@property({ type: Boolean, reflect: true })
-	multiple: boolean = false;
-
-	@property({ type: Boolean, reflect: true })
-	disabled = false;
-
-	@property({ type: Boolean, attribute: 'disable-folder-upload', reflect: true })
-	public set disableFolderUpload(isAllowed: boolean) {
-		this.#dropzoneManager.setIsFoldersAllowed(!isAllowed);
-	}
-	public get disableFolderUpload() {
-		return this._disableFolderUpload;
-	}
-	private readonly _disableFolderUpload = false;
-
-	@state()
-	private _progressItems: Array<UmbUploadableItem> = [];
-
-	#dropzoneManager: UmbDropzoneManager;
+	#dropzoneManager = new UmbDropzoneManager(this);
 
 	/**
 	 * @deprecated Please use `getItems()` instead; this method will be removed in Umbraco 17.
 	 * @returns {Array<UmbUploadableItem>} An array of uploadable items.
 	 */
-	public getFiles() {
-		return this.getItems();
-	}
+	public getFiles = this.getItems;
 
-	public getItems() {
+	/**
+	 * Gets the current value of the uploaded items.
+	 * @returns {Array<UmbUploadableItem>} An array of uploadable items.
+	 */
+	public getItems(): Array<UmbUploadableItem> {
 		return this._progressItems;
 	}
 
@@ -60,22 +56,14 @@ export class UmbDropzoneElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.#dropzoneManager = new UmbDropzoneManager(this);
+
 		document.addEventListener('dragenter', this.#handleDragEnter.bind(this));
 		document.addEventListener('dragleave', this.#handleDragLeave.bind(this));
 		document.addEventListener('drop', this.#handleDrop.bind(this));
 
 		this.observe(
-			this.#dropzoneManager.progress,
-			(progress) =>
-				this.dispatchEvent(new ProgressEvent('progress', { loaded: progress.completed, total: progress.total })),
-			'_observeProgress',
-		);
-
-		this.observe(
 			this.#dropzoneManager.progressItems,
 			(progressItems: Array<UmbUploadableItem>) => {
-				this._progressItems = progressItems;
 				const waiting = progressItems.find((item) => item.status === UmbFileDropzoneItemStatus.WAITING);
 				if (progressItems.length && !waiting) {
 					this.dispatchEvent(new CustomEvent('complete', { detail: progressItems }));
@@ -91,6 +79,19 @@ export class UmbDropzoneElement extends UmbLitElement {
 		document.removeEventListener('dragenter', this.#handleDragEnter.bind(this));
 		document.removeEventListener('dragleave', this.#handleDragLeave.bind(this));
 		document.removeEventListener('drop', this.#handleDrop.bind(this));
+	}
+
+	override async onUpload(event: UUIFileDropzoneEvent) {
+		if (this.disabled) return;
+		if (!event.detail.files.length && !event.detail.folders.length) return;
+
+		if (this.createAsTemporary) {
+			const uploadable = this.#dropzoneManager.createTemporaryFiles(event.detail.files);
+			this.dispatchEvent(new UmbDropzoneSubmittedEvent(await uploadable));
+		} else {
+			const uploadable = this.#dropzoneManager.createMediaItems(event.detail, this.parentUnique);
+			this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadable));
+		}
 	}
 
 	#handleDragEnter(e: DragEvent) {
@@ -113,30 +114,8 @@ export class UmbDropzoneElement extends UmbLitElement {
 		this.toggleAttribute('dragging', false);
 	}
 
-	async #onDropFiles(event: UUIFileDropzoneEvent) {
-		if (this.disabled) return;
-		if (!event.detail.files.length && !event.detail.folders.length) return;
-
-		if (this.createAsTemporary) {
-			const uploadable = this.#dropzoneManager.createTemporaryFiles(event.detail.files);
-			this.dispatchEvent(new UmbDropzoneSubmittedEvent(await uploadable));
-		} else {
-			const uploadable = this.#dropzoneManager.createMediaItems(event.detail, this.parentUnique);
-			this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadable));
-		}
-	}
-
-	override render() {
-		return html`<uui-file-dropzone
-			id="dropzone"
-			accept=${ifDefined(this.accept)}
-			?multiple=${this.multiple}
-			?disallowFolderUpload=${this.disableFolderUpload}
-			@change=${this.#onDropFiles}
-			label=${this.localize.term('media_dragAndDropYourFilesIntoTheArea')}></uui-file-dropzone>`;
-	}
-
 	static override styles = [
+		...UmbInputDropzoneElement.styles,
 		css`
 			:host(:not([disabled])[dragging]) #dropzone {
 				opacity: 1;
@@ -154,13 +133,11 @@ export class UmbDropzoneElement extends UmbLitElement {
 				align-items: center;
 				justify-content: center;
 				position: absolute;
-				inset: 0px;
 				z-index: 100;
-				backdrop-filter: opacity(1); /* Removes the built in blur effect */
 				border-radius: var(--uui-border-radius);
-				overflow: clip;
 				border: 1px solid var(--uui-color-focus);
 			}
+			/*
 			#dropzone:after {
 				content: '';
 				display: block;
@@ -169,7 +146,7 @@ export class UmbDropzoneElement extends UmbLitElement {
 				border-radius: var(--uui-border-radius);
 				background-color: var(--uui-color-focus);
 				opacity: 0.2;
-			}
+			}*/
 		`,
 	];
 }
