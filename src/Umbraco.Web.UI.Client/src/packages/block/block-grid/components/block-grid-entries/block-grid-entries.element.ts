@@ -1,4 +1,4 @@
-import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
+import type { UmbBlockGridEntryElement } from '../block-grid-entry/block-grid-entry.element.js';
 import type { UmbBlockGridLayoutModel } from '../../types.js';
 import { UmbBlockGridEntriesContext } from './block-grid-entries.context.js';
 import {
@@ -20,8 +20,6 @@ import {
 	type UmbFormControlValidatorConfig,
 } from '@umbraco-cms/backoffice/validation';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-
-import '../block-grid-entry/index.js';
 
 /**
  * Notice this utility method is not really shareable with others as it also takes areas into account. [NL]

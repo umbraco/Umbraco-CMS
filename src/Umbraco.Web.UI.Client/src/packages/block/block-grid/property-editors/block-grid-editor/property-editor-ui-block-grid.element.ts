@@ -22,8 +22,6 @@ import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
-import '../../components/block-grid-entries/index.js';
-
 /**
  * @element umb-property-editor-ui-block-grid
  */

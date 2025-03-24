@@ -21,9 +21,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
-import '../block-grid-areas-container/index.js';
-import '../ref-grid-block/index.js';
-
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
 };

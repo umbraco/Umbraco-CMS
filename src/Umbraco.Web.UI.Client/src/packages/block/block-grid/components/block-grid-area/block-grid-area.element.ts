@@ -1,5 +1,5 @@
 import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../block-grid-entries/constants.js';
-import { UmbBlockGridEntriesElement } from '../block-grid-entries/index.js';
+import { UmbBlockGridEntriesElement } from '../block-grid-entries/block-grid-entries.element.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
 /**
