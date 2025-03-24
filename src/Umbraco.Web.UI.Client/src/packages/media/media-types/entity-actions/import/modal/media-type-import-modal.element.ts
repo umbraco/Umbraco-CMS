@@ -131,7 +131,7 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 						</umb-localize>
 						<uui-button
 							look="primary"
-							label="${this.localize.term('media_Click to upload')}"
+							label="${this.localize.term('media_clickToUpload')}"
 							@click=${this.#onBrowse}></uui-button>
 						<umb-dropzone
 							id="dropzone"
