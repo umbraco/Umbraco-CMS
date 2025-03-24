@@ -17,16 +17,24 @@ describe('UmbValidationController', () => {
 		ctrl = new UmbValidationController(host);
 	});
 
+	afterEach(() => {
+		host.destroy();
+	});
+
 	describe('Basics', () => {
+		it('is invalid when holding messages', async () => {
+			ctrl.messages.addMessage('server', '$.test', 'test');
+
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
+		});
+
 		it('is valid when holding no messages', async () => {
 			await ctrl.validate().catch(() => undefined);
 			expect(ctrl.isValid).to.be.true;
 		});
 
-		it('is invalid when holding messages', async () => {
-			ctrl.messages.addMessage('server', '$.test', 'test');
-
-			await ctrl.validate().catch(() => undefined);
+		it('is not valid in its initial state', async () => {
 			expect(ctrl.isValid).to.be.false;
 		});
 	});
@@ -70,6 +78,15 @@ describe('UmbValidationController', () => {
 		beforeEach(() => {
 			child = new UmbValidationController(host);
 		});
+		afterEach(() => {
+			child.destroy();
+		});
+
+		it('is valid despite a child begin created', async () => {
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.true;
+			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+		});
 
 		it('is valid when not inherited a message', async () => {
 			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-other')].value.test", 'test');
@@ -78,6 +95,7 @@ describe('UmbValidationController', () => {
 			await Promise.resolve();
 
 			await ctrl.validate().catch(() => undefined);
+			await child.validate().catch(() => undefined);
 			expect(child.isValid).to.be.true;
 			expect(child.messages.getHasAnyMessages()).to.be.false;
 		});
@@ -89,10 +107,10 @@ describe('UmbValidationController', () => {
 			await ctrl.validate().catch(() => undefined);
 			expect(child.isValid).to.be.false;
 			expect(child.messages.getHasAnyMessages()).to.be.true;
-			expect(child.messages.getFilteredMessages()?.[0].body).to.be.equal('test-body');
+			expect(child.messages.getMessages()?.[0].body).to.be.equal('test-body');
 		});
 
-		it('is invalid bases on a message from a child', async () => {
+		it('is invalid bases on a message from a parent', async () => {
 			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-property')].value.test", 'test-body');
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
 			child.sync();
@@ -100,7 +118,80 @@ describe('UmbValidationController', () => {
 			await ctrl.validate().catch(() => undefined);
 			expect(ctrl.isValid).to.be.false;
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
-			expect(ctrl.messages.getFilteredMessages()?.[0].body).to.be.equal('test-body');
+			expect(ctrl.messages.getMessages()?.[0].body).to.be.equal('test-body');
+		});
+
+		it('is invalid based on a synced message from a child', async () => {
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.messages.addMessage('server', '$.test', 'test-body');
+			child.sync();
+
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			expect(ctrl.messages.getMessages()?.[0].body).to.be.equal('test-body');
+		});
+
+		it('is invalid based on a syncOnce message from a child', async () => {
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.messages.addMessage('server', '$.test', 'test-body');
+			child.syncOnce();
+
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			expect(ctrl.messages.getMessages()?.[0].body).to.be.equal('test-body');
+		});
+
+		it('is invalid based on a syncOnce message from a child who later got the message removed.', async () => {
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.messages.addMessage('server', '$.test', 'test-body', 'test-msg-key');
+			child.syncOnce();
+			child.messages.removeMessageByKey('test-msg-key');
+
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			expect(ctrl.messages.getMessages()?.[0].body).to.be.equal('test-body');
+		});
+
+		it('is valid based on a syncOnce message from a child who later got removed and syncOnce.', async () => {
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.messages.addMessage('server', '$.test', 'test-body', 'test-msg-key');
+			child.syncOnce();
+			child.messages.removeMessageByKey('test-msg-key');
+			child.syncOnce();
+
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.true;
+			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+		});
+
+		it('is valid despite child previously had a syncOnce executed', async () => {
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.syncOnce();
+			child.messages.addMessage('server', '$.test', 'test-body');
+
+			expect(child.isValid).to.be.false;
+			expect(child.messages.getHasAnyMessages()).to.be.true;
+			expect(child.messages.getNotFilteredMessages()?.[0].body).to.be.equal('test-body');
+
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.true;
+			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+		});
+
+		it('is still valid despite non-synchronizing child is invalid', async () => {
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.messages.addMessage('server', '$.test', 'test-body');
+
+			await ctrl.validate().catch(() => undefined);
+			await child.validate().catch(() => undefined);
+			expect(child.isValid).to.be.false;
+			expect(child.messages.getHasAnyMessages()).to.be.true;
+			expect(child.messages.getNotFilteredMessages()?.[0].body).to.be.equal('test-body');
+			expect(ctrl.isValid).to.be.true;
+			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
 		});
 
 		it('is valid when a message has been removed from a child context', async () => {
@@ -123,6 +214,19 @@ describe('UmbValidationController', () => {
 			expect(child.messages.getHasAnyMessages()).to.be.false;
 			expect(ctrl.isValid).to.be.true;
 			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+		});
+
+		it('is still invalid despite a message has been removed from a non-synchronizing child context', async () => {
+			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-property')].value.test", 'test-body');
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.messages.removeMessagesByPath('$.test');
+
+			// After the removal they are valid:
+			await child.validate().catch(() => undefined);
+			expect(child.isValid).to.be.true;
+			expect(child.messages.getHasAnyMessages()).to.be.false;
+			expect(ctrl.isValid).to.be.false;
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
 		});
 
 		describe('Inheritance + Variant Filter', () => {

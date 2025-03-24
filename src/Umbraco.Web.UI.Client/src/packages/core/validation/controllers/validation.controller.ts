@@ -60,6 +60,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	#isValid: boolean = false;
 
 	#parent?: UmbValidationController;
+	#sync?: boolean;
 	#parentMessages?: Array<UmbValidationMessage>;
 	#localMessages?: Array<UmbValidationMessage>;
 	#baseDataPath?: string;
@@ -193,7 +194,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			this.#parent.removeValidator(this);
 		}
 		this.#parent = parent;
-		parent.addValidator(this);
+		this.#readyToSync();
 
 		this.messages.clear();
 
@@ -249,14 +250,22 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		this.setTranslationData(undefined);
 	}
 
+	#readyToSync() {
+		if (this.#sync && this.#parent) {
+			this.#parent.addValidator(this);
+		}
+	}
+
 	/**
 	 * Continuously synchronize the messages from this context to the parent context.
 	 */
 	sync() {
-		this.observe(this.messages.messages, this.#syncHandler, 'observeLocalMessages');
+		this.#sync = true;
+		this.#readyToSync();
+		this.observe(this.messages.messages, this.#transferMessages, 'observeLocalMessages');
 	}
 
-	// Currently no need for this:
+	// no need for this method at this movement. [NL]
 	/*
 	#stopSync() {
 		this.removeUmbControllerByAlias('observeLocalMessages');
@@ -264,13 +273,13 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	*/
 
 	/**
-	 * Performe a one time transfer of the messages from this context to the parent context.
+	 * Perform a one time transfer of the messages from this context to the parent context.
 	 */
 	syncOnce(): void {
-		this.#syncHandler(this.messages.getMessages());
+		this.#transferMessages(this.messages.getNotFilteredMessages());
 	}
 
-	#syncHandler = (msgs: Array<UmbValidationMessage>) => {
+	#transferMessages = (msgs: Array<UmbValidationMessage>) => {
 		if (!this.#parent) return;
 
 		this.#parent!.messages.initiateChange();
@@ -300,9 +309,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 	override hostConnected(): void {
 		super.hostConnected();
-		if (this.#parent) {
-			this.#parent.addValidator(this);
-		}
+		this.#readyToSync();
 	}
 	override hostDisconnected(): void {
 		super.hostDisconnected();
@@ -349,7 +356,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			this.#validators.splice(index, 1);
 			// If we are in validation mode then we should re-validate to focus next invalid element:
 			if (this.#validationMode) {
-				this.validate();
+				this.validate().catch(() => undefined);
 			}
 		}
 	}
@@ -360,23 +367,26 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validation succeeded.
 	 */
 	async validate(): Promise<void> {
-		// TODO: clear server messages here?, well maybe only if we know we will get new server messages? Do the server messages hook into the system like another validator?
 		this.#validationMode = true;
 
-		const resultsStatus = await Promise.all(this.#validators.map((v) => v.validate())).then(
-			() => true,
-			() => false,
-		);
+		const resultsStatus =
+			this.#validators.length === 0
+				? true
+				: await Promise.all(this.#validators.map((v) => v.validate())).then(
+						() => true,
+						() => false,
+					);
 
 		if (this.#validators.length === 0 && resultsStatus === false) {
 			throw new Error('No validators to validate, but validation failed');
 		}
 
 		if (this.messages === undefined) {
-			// This Context has been destroyed while is was validating, so we should not continue.
+			// This Context has been destroyed while is was validating, so we should not continue. [NL]
 			return Promise.reject();
 		}
 
+		// We need to ask again for messages, as they might have been added during the validation process. [NL]
 		const hasMessages = this.messages.getHasAnyMessages();
 
 		// If we have any messages then we are not valid, otherwise lets check the validation results: [NL]
@@ -430,17 +440,18 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	}
 
 	override destroy(): void {
+		this.#validationMode = false;
 		if (this.#inUnprovidingState === true) {
 			return;
 		}
+		this.#destroyValidators();
 		this.unprovide();
+		this.messages?.destroy();
+		(this.messages as unknown) = undefined;
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
 		this.#parent = undefined;
-		this.#destroyValidators();
-		this.messages?.destroy();
-		(this.messages as unknown) = undefined;
 		super.destroy();
 	}
 }
