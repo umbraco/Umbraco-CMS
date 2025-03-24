@@ -10,5 +10,5 @@ export type UmbMediaPlaceholderEntityType = typeof UMB_MEDIA_PLACEHOLDER_ENTITY_
 export type UmbMediaEntityTypeUnion = UmbMediaEntityType | UmbMediaRootEntityType;
 
 // TODO: move this to a better location inside the media module
-export const UMB_MEDIA_PROPERTY_VALUE_ENTITY_TYPE = 'media-property-value';
+export const UMB_MEDIA_PROPERTY_VALUE_ENTITY_TYPE = `${UMB_MEDIA_ENTITY_TYPE}-property-value`;
 export type UmbMediaPropertyValueEntityType = typeof UMB_MEDIA_PROPERTY_VALUE_ENTITY_TYPE;
