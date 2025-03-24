@@ -108,6 +108,14 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		this.#manager.destroy();
 	}
 
+	/**
+	 * Opens the file browse dialog.
+	 */
+	public browse(): void {
+		if (this.disabled) return;
+		this._dropzone?.browse();
+	}
+
 	override render() {
 		return html`
 			<uui-file-dropzone

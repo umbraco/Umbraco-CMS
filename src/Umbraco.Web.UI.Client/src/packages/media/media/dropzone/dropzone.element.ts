@@ -6,7 +6,7 @@ import {
 	type UmbUploadableItem,
 } from '@umbraco-cms/backoffice/dropzone';
 import { css, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * A dropzone for uploading files and folders as media items. It is hidden by default and will be shown when dragging files over the window.
@@ -47,12 +47,6 @@ export class UmbDropzoneElement extends UmbInputDropzoneElement {
 
 	public progressItems = () => this.#dropzoneManager.progressItems;
 	public progress = () => this.#dropzoneManager.progress;
-
-	public browse() {
-		if (this.disabled) return;
-		const element = this.shadowRoot?.querySelector('#dropzone') as UUIFileDropzoneElement;
-		return element.browse();
-	}
 
 	constructor() {
 		super();
