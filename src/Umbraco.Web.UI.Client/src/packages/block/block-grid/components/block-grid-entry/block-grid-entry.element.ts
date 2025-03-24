@@ -1,4 +1,4 @@
-import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
+import { UmbBlockGridEntryContext } from './block-grid-entry.context.js';
 import type { UmbBlockGridLayoutModel } from '../../types.js';
 import { UMB_BLOCK_GRID } from '../../constants.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

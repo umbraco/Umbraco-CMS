@@ -1,4 +1,4 @@
-import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../../context/block-grid-entries.context-token.js';
+import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../block-grid-entries/constants.js';
 import { UmbBlockGridEntriesElement } from '../block-grid-entries/index.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
