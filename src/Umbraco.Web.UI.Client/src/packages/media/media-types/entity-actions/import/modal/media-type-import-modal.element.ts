@@ -3,7 +3,7 @@ import type { UmbMediaTypeImportModalData, UmbMediaTypeImportModalValue } from '
 import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbDropzoneChangeEvent, UmbDropzoneElement } from '@umbraco-cms/backoffice/media';
+import type { UmbDropzoneChangeEvent, UmbDropzoneMediaElement } from '@umbraco-cms/backoffice/media';
 
 interface UmbMediaTypePreview {
 	unique: string;
@@ -39,7 +39,7 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 
 	#onUploadCompleted(evt: UmbDropzoneChangeEvent) {
 		evt.preventDefault();
-		const target = evt.target as UmbDropzoneElement;
+		const target = evt.target as UmbDropzoneMediaElement;
 		const data = target.value;
 		if (!data?.length) return;
 
