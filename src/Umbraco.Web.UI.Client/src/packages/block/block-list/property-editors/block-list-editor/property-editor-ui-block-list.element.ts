@@ -195,7 +195,7 @@ export class UmbPropertyEditorUIBlockListElement
 
 						if (this._notSupportedVariantSetting) {
 							this.#validationContext.messages.addMessage(
-								'hey' as any,
+								'config',
 								'$',
 								'#blockEditor_blockVariantConfigurationNotSupported',
 								'blockConfigurationNotSupported',

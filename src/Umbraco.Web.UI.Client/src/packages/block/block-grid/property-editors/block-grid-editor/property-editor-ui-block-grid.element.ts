@@ -122,7 +122,7 @@ export class UmbPropertyEditorUIBlockGridElement
 
 						if (this._notSupportedVariantSetting) {
 							this.#validationContext.messages.addMessage(
-								'configuration',
+								'config',
 								'$',
 								'#blockEditor_blockVariantConfigurationNotSupported',
 							);

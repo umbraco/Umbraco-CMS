@@ -3,7 +3,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbArrayState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
-export type UmbValidationMessageType = 'client' | 'server' | 'configuration' | 'custom';
+export type UmbValidationMessageType = 'client' | 'server' | 'config' | string;
 export interface UmbValidationMessage {
 	type: UmbValidationMessageType;
 	key: string;
