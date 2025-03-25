@@ -5,7 +5,7 @@ import type { UmbPublicAccessModalData, UmbPublicAccessModalValue } from './publ
 import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
+import { UmbMemberDetailRepository, type UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
 import { UmbMemberGroupItemRepository, type UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
 import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -102,7 +102,6 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 			// Members
 			// user name is not part of the item model, so we need to look it up from the member detail repository
 			// be aware that the detail repository requires access to the member section.
-			const UmbMemberDetailRepository = (await import('@umbraco-cms/backoffice/member')).UmbMemberDetailRepository;
 			const repo = new UmbMemberDetailRepository(this);
 			const promises = this._selection.map((memberId) => repo.requestByUnique(memberId));
 			const responses = await Promise.all(promises);
