@@ -274,12 +274,19 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		this.loadLanguages();
+		this.#loadSegments();
 	}
 
 	public async loadLanguages() {
 		// TODO: If we don't end up having a Global Context for languages, then we should at least change this into using a asObservable which should be returned from the repository. [Nl]
 		const { data } = await this.#languageRepository.requestCollection({});
 		this.#languages.setValue(data?.items ?? []);
+	}
+
+	async #loadSegments() {
+		const { data } = await this.#segmentRepository.requestCollection({});
+		this.#segments.setValue(data?.items ?? []);
+		debugger;
 	}
 
 	protected override async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
