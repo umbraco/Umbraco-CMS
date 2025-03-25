@@ -41,6 +41,7 @@
 		"./document-blueprint": "./dist-cms/packages/documents/document-blueprints/index.js",
 		"./document-type": "./dist-cms/packages/documents/document-types/index.js",
 		"./document": "./dist-cms/packages/documents/documents/index.js",
+		"./dropzone": "./dist-cms/packages/media/dropzone/index.js",
 		"./entity-action": "./dist-cms/packages/core/entity-action/index.js",
 		"./entity-bulk-action": "./dist-cms/packages/core/entity-bulk-action/index.js",
 		"./entity-create-option-action": "./dist-cms/packages/core/entity-create-option-action/index.js",
@@ -282,7 +283,7 @@
 		"typescript": "^5.7.3",
 		"typescript-eslint": "^8.24.1",
 		"typescript-json-schema": "^0.65.1",
-		"vite": "^6.1.0",
+		"vite": "^6.2.2",
 		"vite-plugin-static-copy": "^2.2.0",
 		"vite-tsconfig-paths": "^5.1.4",
 		"web-component-analyzer": "^2.0.0"
