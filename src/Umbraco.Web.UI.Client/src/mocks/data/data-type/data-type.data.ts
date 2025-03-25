@@ -1080,7 +1080,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 					],
 				],
 			},
-			{ alias: 'statusbar', value: [[], ['Umb.Tiptap.Statusbar.WordCount']] },
+			{ alias: 'statusbar', value: [['Umb.Tiptap.Statusbar.ElementPath'], ['Umb.Tiptap.Statusbar.WordCount']] },
 			{ alias: 'stylesheets', value: ['/rte-styles.css'] },
 			{ alias: 'dimensions', value: { height: 500 } },
 			{ alias: 'maxImageSize', value: 500 },
