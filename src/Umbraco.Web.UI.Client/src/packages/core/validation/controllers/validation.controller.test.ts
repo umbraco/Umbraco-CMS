@@ -358,6 +358,49 @@ describe('UmbValidationController', () => {
 			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-property')].value.test2", 'test-body-2');
 			child1.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
 			child2.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child1.autoReport();
+			child2.autoReport();
+
+			await Promise.resolve();
+			// First they are invalid:
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			expect(child1.isValid).to.be.false;
+			expect(child1.messages.getHasAnyMessages()).to.be.true;
+			expect(child1.messages.getNotFilteredMessages()?.[0].body).to.be.equal('test-body-1');
+			expect(child1.messages.getNotFilteredMessages()?.[1].body).to.be.equal('test-body-2');
+			expect(child2.isValid).to.be.false;
+			expect(child2.messages.getHasAnyMessages()).to.be.true;
+			expect(child2.messages.getNotFilteredMessages()?.[0].body).to.be.equal('test-body-1');
+			expect(child2.messages.getNotFilteredMessages()?.[1].body).to.be.equal('test-body-2');
+
+			child1.messages.removeMessagesByPath('$.test1');
+
+			expect(ctrl.isValid).to.be.false;
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			expect(child1.isValid).to.be.false;
+			expect(child1.messages.getHasAnyMessages()).to.be.true;
+			expect(child1.messages.getNotFilteredMessages()?.[0].body).to.be.equal('test-body-2');
+			expect(child2.isValid).to.be.false;
+			expect(child2.messages.getHasAnyMessages()).to.be.true;
+			expect(child2.messages.getNotFilteredMessages()?.[0].body).to.be.equal('test-body-2');
+
+			child2.messages.removeMessagesByPath('$.test2');
+
+			// Only need to validate the root, because the other controllers are  auto reporting.
+			await ctrl.validate().catch(() => undefined);
+
+			expect(ctrl.isValid, 'root context is valid').to.be.true;
+			expect(child1.isValid, 'child1 context is valid').to.be.true;
+			expect(child2.isValid, 'child2 context is valid').to.be.true;
+		});
+
+		it('is reporting between two sub context', async () => {
+			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-property')].value.test1", 'test-body-1');
+			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-property')].value.test2", 'test-body-2');
+			child1.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child2.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
 
 			await Promise.resolve();
 			// First they are invalid:
