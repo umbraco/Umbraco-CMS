@@ -259,7 +259,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	/**
 	 * Continuously synchronize the messages from this context to the parent context.
 	 */
-	sync() {
+	autoReport() {
 		this.#sync = true;
 		this.#readyToSync();
 		this.observe(this.messages.messages, this.#transferMessages, 'observeLocalMessages');
@@ -275,7 +275,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	/**
 	 * Perform a one time transfer of the messages from this context to the parent context.
 	 */
-	syncOnce(): void {
+	report(): void {
+		if (this.#sync === false) {
+		}
 		this.#transferMessages(this.messages.getNotFilteredMessages());
 	}
 

@@ -113,7 +113,7 @@ describe('UmbValidationController', () => {
 		it('is invalid bases on a message from a parent', async () => {
 			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-property')].value.test", 'test-body');
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
-			child.sync();
+			child.autoReport();
 
 			await ctrl.validate().catch(() => undefined);
 			expect(ctrl.isValid).to.be.false;
@@ -124,7 +124,7 @@ describe('UmbValidationController', () => {
 		it('is invalid based on a synced message from a child', async () => {
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
 			child.messages.addMessage('server', '$.test', 'test-body');
-			child.sync();
+			child.autoReport();
 
 			await ctrl.validate().catch(() => undefined);
 			expect(ctrl.isValid).to.be.false;
@@ -135,7 +135,7 @@ describe('UmbValidationController', () => {
 		it('is invalid based on a syncOnce message from a child', async () => {
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
 			child.messages.addMessage('server', '$.test', 'test-body');
-			child.syncOnce();
+			child.report();
 
 			await ctrl.validate().catch(() => undefined);
 			expect(ctrl.isValid).to.be.false;
@@ -146,7 +146,7 @@ describe('UmbValidationController', () => {
 		it('is invalid based on a syncOnce message from a child who later got the message removed.', async () => {
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
 			child.messages.addMessage('server', '$.test', 'test-body', 'test-msg-key');
-			child.syncOnce();
+			child.report();
 			child.messages.removeMessageByKey('test-msg-key');
 
 			await ctrl.validate().catch(() => undefined);
@@ -158,9 +158,9 @@ describe('UmbValidationController', () => {
 		it('is valid based on a syncOnce message from a child who later got removed and syncOnce.', async () => {
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
 			child.messages.addMessage('server', '$.test', 'test-body', 'test-msg-key');
-			child.syncOnce();
+			child.report();
 			child.messages.removeMessageByKey('test-msg-key');
-			child.syncOnce();
+			child.report();
 
 			await ctrl.validate().catch(() => undefined);
 			expect(ctrl.isValid).to.be.true;
@@ -169,7 +169,7 @@ describe('UmbValidationController', () => {
 
 		it('is valid despite child previously had a syncOnce executed', async () => {
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
-			child.syncOnce();
+			child.report();
 			child.messages.addMessage('server', '$.test', 'test-body');
 
 			expect(child.isValid).to.be.false;
@@ -197,7 +197,7 @@ describe('UmbValidationController', () => {
 		it('is valid when a message has been removed from a child context', async () => {
 			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-property')].value.test", 'test-body');
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
-			child.sync();
+			child.autoReport();
 
 			// First they are invalid:
 			await ctrl.validate().catch(() => undefined);
@@ -236,7 +236,7 @@ describe('UmbValidationController', () => {
 					ctrl,
 					"$.values[?(@.alias == 'my-property' && @.culture == 'en-us' && @.segment == null)].value",
 				);
-				child.sync();
+				child.autoReport();
 
 				ctrl.messages.addMessage(
 					'server',
@@ -275,7 +275,7 @@ describe('UmbValidationController', () => {
 					'test-body',
 				);
 				child.inheritFrom(ctrl, '$');
-				child.sync();
+				child.autoReport();
 
 				// First they are invalid:
 				await ctrl.validate().catch(() => undefined);
