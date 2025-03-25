@@ -7,11 +7,11 @@ const propValueRegex = /@\.([a-zA-Z_$][\w$]*)\s*==\s*['"]([^'"]*)['"]/g;
  * @example
  * ```ts
  * const query = `?(@.culture == 'en-us' && @.segment == 'mySegment')`;
- * const props = ExtractJsonQueryProps(query);
+ * const props = extractJsonQueryProps(query);
  * console.log(props); // { culture: 'en-us', segment: 'mySegment' }
  * ```
  */
-export function ExtractJsonQueryProps(query: string): Record<string, string> {
+export function extractJsonQueryProps(query: string): Record<string, string> {
 	// Object to hold property-value pairs
 	const propsMap: Record<string, string> = {};
 	let match;

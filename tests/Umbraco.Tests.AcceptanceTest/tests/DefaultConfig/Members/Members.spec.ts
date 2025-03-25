@@ -192,7 +192,7 @@ test('can enable approved', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.member.clickMemberLinkByName(memberName);
-  await umbracoUi.member.clickApprovedSlider();
+  await umbracoUi.member.clickApprovedToggle();
   await umbracoUi.member.clickSaveButton();
 
   // Assert

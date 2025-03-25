@@ -68,6 +68,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_showContentEdit = false;
+
 	@state()
 	_hasSettings = false;
 
@@ -395,7 +396,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderBlock() {
-		return this.contentKey
+		return this.contentKey && (this._contentTypeAlias || this._unsupported)
 			? html`
 					<div class="umb-block-list__block">
 						<umb-extension-slot
@@ -426,7 +427,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 					look="secondary"
 					color=${this._contentInvalid ? 'danger' : ''}
 					href=${this._workspaceEditContentPath}>
-					<uui-icon name=${this._exposed === false ? 'icon-add' : 'icon-edit'}></uui-icon>
+					<uui-icon name=${this._exposed === false && this._isReadOnly === false ? 'icon-add' : 'icon-edit'}></uui-icon>
 					${this._contentInvalid
 						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
 						: nothing}

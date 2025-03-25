@@ -593,8 +593,8 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Install Playwright and dependencies
-          - pwsh: npx playwright install --with-deps
-            displayName: Install Playwright
+          - pwsh: npx playwright install chromium
+            displayName: Install Playwright only with Chromium browser
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
@@ -623,13 +623,24 @@ stages:
             displayName: Copy Playwright results
             condition: succeededOrFailed()
 
-          # Publish
+          # Publish test artifacts
           - task: PublishPipelineArtifact@1
             displayName: Publish test artifacts
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
+
+          # Publish test results
+          - task: PublishTestResults@2
+            displayName: "Publish test results"
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '*.xml'
+              searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
+              testRunTitle: "$(Agent.JobName)"
+
       - job:
         displayName: E2E Tests (SQL Server)
         variables:
@@ -749,8 +760,8 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Install Playwright and dependencies
-          - pwsh: npx playwright install --with-deps
-            displayName: Install Playwright
+          - pwsh: npx playwright install chromium
+            displayName: Install Playwright only with Chromium browser
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
@@ -788,13 +799,24 @@ stages:
             displayName: Copy Playwright results
             condition: succeededOrFailed()
 
-          # Publish
+          # Publish test artifacts
           - task: PublishPipelineArtifact@1
             displayName: Publish test artifacts
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
+
+          # Publish test results
+          - task: PublishTestResults@2
+            displayName: "Publish test results"
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '*.xml'
+              searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
+              testRunTitle: "$(Agent.JobName)"
+
   ###############################################
   ## Release
   ###############################################

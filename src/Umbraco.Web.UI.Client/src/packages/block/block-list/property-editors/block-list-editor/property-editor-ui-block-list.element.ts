@@ -14,15 +14,17 @@ import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import {
-	UmbBlockElementDataValidationPathTranslator,
-	type UmbBlockLayoutBaseModel,
-} from '@umbraco-cms/backoffice/block';
+import { type UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 
 import '../../components/block-list-entry/index.js';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { ExtractJsonQueryProps, UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import {
+	extractJsonQueryProps,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbFormControlMixin,
+	UmbValidationContext,
+} from '@umbraco-cms/backoffice/validation';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -51,8 +53,6 @@ export class UmbPropertyEditorUIBlockListElement
 	});
 
 	readonly #validationContext = new UmbValidationContext(this);
-	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
-	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 
 	#lastValue: UmbBlockListValueModel | undefined = undefined;
 
@@ -134,6 +134,12 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 	#readonly = false;
 
+	@property({ type: Boolean })
+	mandatory?: boolean;
+
+	@property({ type: String })
+	mandatoryMessage?: string | undefined;
+
 	@state()
 	private _limitMin?: number;
 	@state()
@@ -155,105 +161,37 @@ export class UmbPropertyEditorUIBlockListElement
 		super();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this.observe(
-				context.dataPath,
-				(dataPath) => {
-					// Translate paths for content/settings:
-					this.#contentDataPathTranslator?.destroy();
-					this.#settingsDataPathTranslator?.destroy();
-					if (dataPath) {
-						// Set the data path for the local validation context:
-						this.#validationContext.setDataPath(dataPath);
+			this.#gotPropertyContext(context);
+		});
 
-						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
-						this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
-					}
-				},
-				'observeDataPath',
-			);
-
-			this.observe(
-				context?.alias,
-				(alias) => {
-					this.#managerContext.setPropertyAlias(alias);
-				},
-				'observePropertyAlias',
-			);
-
-			// Observe Blocks and clean up validation messages for content/settings that are not in the block list anymore:
-			this.observe(this.#managerContext.layouts, (layouts) => {
+		// Observe Blocks and clean up validation messages for content/settings that are not in the block list anymore:
+		this.observe(
+			this.#managerContext.layouts,
+			(layouts) => {
+				const validationMessagesToRemove: string[] = [];
 				const contentKeys = layouts.map((x) => x.contentKey);
 				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.contentData').forEach((message) => {
 					// get the KEY from this string: $.contentData[?(@.key == 'KEY')]
-					const key = ExtractJsonQueryProps(message.path).key;
+					const key = extractJsonQueryProps(message.path).key;
 					if (key && contentKeys.indexOf(key) === -1) {
-						this.#validationContext.messages.removeMessageByKey(message.key);
+						validationMessagesToRemove.push(message.key);
 					}
 				});
 
 				const settingsKeys = layouts.map((x) => x.settingsKey).filter((x) => x !== undefined) as string[];
 				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.settingsData').forEach((message) => {
 					// get the key from this string: $.settingsData[?(@.key == 'KEY')]
-					const key = ExtractJsonQueryProps(message.path).key;
+					const key = extractJsonQueryProps(message.path).key;
 					if (key && settingsKeys.indexOf(key) === -1) {
-						this.#validationContext.messages.removeMessageByKey(message.key);
+						validationMessagesToRemove.push(message.key);
 					}
 				});
-			});
 
-			this.observe(
-				observeMultiple([
-					this.#managerContext.layouts,
-					this.#managerContext.contents,
-					this.#managerContext.settings,
-					this.#managerContext.exposes,
-				]).pipe(debounceTime(20)),
-				([layouts, contents, settings, exposes]) => {
-					if (layouts.length === 0) {
-						super.value = undefined;
-					} else {
-						super.value = {
-							...super.value,
-							layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
-							contentData: contents,
-							settingsData: settings,
-							expose: exposes,
-						};
-					}
-
-					// If we don't have a value set from the outside or an internal value, we don't want to set the value.
-					// This is added to prevent the block list from setting an empty value on startup.
-					if (this.#lastValue === undefined && super.value === undefined) {
-						return;
-					}
-
-					context.setValue(super.value);
-				},
-				'motherObserver',
-			);
-
-			// If the current property is readonly all inner block content should also be readonly.
-			this.observe(
-				observeMultiple([context.isReadOnly, context.variantId]),
-				([isReadOnly, variantId]) => {
-					const unique = 'UMB_PROPERTY_EDITOR_UI';
-					if (variantId === undefined) return;
-
-					if (isReadOnly) {
-						const state = {
-							unique,
-							variantId,
-							message: '',
-						};
-
-						this.#managerContext.readOnlyState.addState(state);
-					} else {
-						this.#managerContext.readOnlyState.removeState(unique);
-					}
-				},
-				'observeIsReadOnly',
-			);
-		});
+				// Remove the messages after the loop to prevent changing the array while iterating over it.
+				this.#validationContext.messages.removeMessageByKeys(validationMessagesToRemove);
+			},
+			null,
+		);
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#managerContext.setVariantId(context.getVariantId());
@@ -272,25 +210,123 @@ export class UmbPropertyEditorUIBlockListElement
 
 		this.addValidator(
 			'rangeOverflow',
-			() => this.localize.term('validation_entriesExceed', this._limitMax, this.#entriesContext.getLength() - (this._limitMax || 0)),
+			() =>
+				this.localize.term(
+					'validation_entriesExceed',
+					this._limitMax,
+					this.#entriesContext.getLength() - (this._limitMax || 0),
+				),
 			() => !!this._limitMax && this.#entriesContext.getLength() > this._limitMax,
 		);
 
-		this.observe(this.#entriesContext.layoutEntries, (layouts) => {
-			this._layouts = layouts;
-			// Update sorter.
-			this.#sorter.setModel(layouts);
-			// Update manager:
-			this.#managerContext.setLayouts(layouts);
-		});
+		this.addValidator(
+			'valueMissing',
+			() => this.mandatoryMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !!this.mandatory && this.#entriesContext.getLength() === 0,
+		);
 
-		this.observe(this.#managerContext.blockTypes, (blockTypes) => {
-			this._blocks = blockTypes;
-		});
+		this.observe(
+			this.#entriesContext.layoutEntries,
+			(layouts) => {
+				this._layouts = layouts;
+				// Update sorter.
+				this.#sorter.setModel(layouts);
+				// Update manager:
+				this.#managerContext.setLayouts(layouts);
+			},
+			null,
+		);
 
-		this.observe(this.#entriesContext.catalogueRouteBuilder, (routeBuilder) => {
-			this._catalogueRouteBuilder = routeBuilder;
-		});
+		this.observe(
+			this.#managerContext.blockTypes,
+			(blockTypes) => {
+				this._blocks = blockTypes;
+			},
+			null,
+		);
+
+		this.observe(
+			this.#entriesContext.catalogueRouteBuilder,
+			(routeBuilder) => {
+				this._catalogueRouteBuilder = routeBuilder;
+			},
+			null,
+		);
+	}
+
+	#gotPropertyContext(context: typeof UMB_PROPERTY_CONTEXT.TYPE) {
+		this.observe(
+			context.dataPath,
+			(dataPath) => {
+				if (dataPath) {
+					// Set the data path for the local validation context:
+					this.#validationContext.setDataPath(dataPath);
+					this.#validationContext.autoReport();
+				}
+			},
+			'observeDataPath',
+		);
+
+		this.observe(
+			context?.alias,
+			(alias) => {
+				this.#managerContext.setPropertyAlias(alias);
+			},
+			'observePropertyAlias',
+		);
+
+		this.observe(
+			observeMultiple([
+				this.#managerContext.layouts,
+				this.#managerContext.contents,
+				this.#managerContext.settings,
+				this.#managerContext.exposes,
+			]).pipe(debounceTime(20)),
+			([layouts, contents, settings, exposes]) => {
+				if (layouts.length === 0) {
+					super.value = undefined;
+				} else {
+					super.value = {
+						...super.value,
+						layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
+						contentData: contents,
+						settingsData: settings,
+						expose: exposes,
+					};
+				}
+
+				// If we don't have a value set from the outside or an internal value, we don't want to set the value.
+				// This is added to prevent the block list from setting an empty value on startup.
+				if (this.#lastValue === undefined && super.value === undefined) {
+					return;
+				}
+
+				context.setValue(super.value);
+			},
+			'motherObserver',
+		);
+
+		// If the current property is readonly all inner block content should also be readonly.
+		this.observe(
+			observeMultiple([context.isReadOnly, context.variantId]),
+			([isReadOnly, variantId]) => {
+				const unique = 'UMB_PROPERTY_EDITOR_UI';
+				if (variantId === undefined) return;
+
+				if (isReadOnly) {
+					const state = {
+						unique,
+						variantId,
+						message: '',
+					};
+
+					this.#managerContext.readOnlyState.addState(state);
+				} else {
+					this.#managerContext.readOnlyState.removeState(unique);
+				}
+			},
+			'observeIsReadOnly',
+		);
 	}
 
 	protected override getFormElement() {

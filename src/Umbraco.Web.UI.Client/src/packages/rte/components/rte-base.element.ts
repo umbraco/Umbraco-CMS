@@ -1,18 +1,26 @@
-import type { UmbPropertyEditorUiValueType } from '../types.js';
+import type { UmbPropertyEditorRteValueType } from '../types.js';
 import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../constants.js';
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBlockRteEntriesContext, UmbBlockRteManagerContext } from '@umbraco-cms/backoffice/block-rte';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbFormControlMixin,
+	UmbValidationContext,
+} from '@umbraco-cms/backoffice/validation';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement implements UmbPropertyEditorUiElement {
+export abstract class UmbPropertyEditorUiRteElementBase
+	extends UmbFormControlMixin<UmbPropertyEditorRteValueType | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
@@ -27,13 +35,13 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 	@property({
 		attribute: false,
 		type: Object,
-		hasChanged(value?: UmbPropertyEditorUiValueType, oldValue?: UmbPropertyEditorUiValueType) {
+		hasChanged(value?: UmbPropertyEditorRteValueType, oldValue?: UmbPropertyEditorRteValueType) {
 			return value?.markup !== oldValue?.markup;
 		},
 	})
-	public set value(value: UmbPropertyEditorUiValueType | undefined) {
+	public override set value(value: UmbPropertyEditorRteValueType | undefined) {
 		if (!value) {
-			this._value = undefined;
+			super.value = undefined;
 			this._markup = '';
 			this.#managerContext.setLayouts([]);
 			this.#managerContext.setContents([]);
@@ -42,18 +50,18 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 			return;
 		}
 
-		const buildUpValue: Partial<UmbPropertyEditorUiValueType> = value ? { ...value } : {};
+		const buildUpValue: Partial<UmbPropertyEditorRteValueType> = value ? { ...value } : {};
 		buildUpValue.markup ??= '';
 		buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [], expose: [] };
 		buildUpValue.blocks.layout ??= {};
 		buildUpValue.blocks.contentData ??= [];
 		buildUpValue.blocks.settingsData ??= [];
 		buildUpValue.blocks.expose ??= [];
-		this._value = buildUpValue as UmbPropertyEditorUiValueType;
+		super.value = buildUpValue as UmbPropertyEditorRteValueType;
 
 		// Only update the actual editor markup if it is not the same as the value.
-		if (this._markup !== this._value.markup) {
-			this._markup = this._value.markup;
+		if (this._markup !== super.value.markup) {
+			this._markup = super.value.markup;
 		}
 
 		this.#managerContext.setLayouts(buildUpValue.blocks.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
@@ -61,8 +69,8 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 		this.#managerContext.setSettings(buildUpValue.blocks.settingsData);
 		this.#managerContext.setExposes(buildUpValue.blocks.expose);
 	}
-	public get value() {
-		return this._value;
+	public override get value(): UmbPropertyEditorRteValueType | undefined {
+		return super.value;
 	}
 
 	/**
@@ -72,11 +80,25 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
+	@property({ type: Boolean })
+	mandatory?: boolean;
+
+	@property({ type: String })
+	mandatoryMessage?: string | undefined;
+
 	@state()
 	protected _config?: UmbPropertyEditorConfigCollection;
 
+	/**
+	 * @deprecated _value is depreacated, use `super.value` instead.
+	 */
 	@state()
-	protected _value?: UmbPropertyEditorUiValueType | undefined;
+	protected get _value(): UmbPropertyEditorRteValueType | undefined {
+		return super.value;
+	}
+	protected set _value(value: UmbPropertyEditorRteValueType | undefined) {
+		super.value = value;
+	}
 
 	/**
 	 * Separate state for markup, to avoid re-rendering/re-setting the value of the Tiptap editor when the value does not really change.
@@ -87,85 +109,100 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 	readonly #managerContext = new UmbBlockRteManagerContext(this);
 	readonly #entriesContext = new UmbBlockRteEntriesContext(this);
 
+	readonly #validationContext = new UmbValidationContext(this);
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			// TODO: Implement validation translation for RTE Blocks:
-			/*
-			this.observe(
-				context.dataPath,
-				(dataPath) => {
-					// Translate paths for content/settings:
-					this.#contentDataPathTranslator?.destroy();
-					this.#settingsDataPathTranslator?.destroy();
-					if (dataPath) {
-						// Set the data path for the local validation context:
-						this.#validationContext.setDataPath(dataPath);
-
-						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
-						this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
-					}
-				},
-				'observeDataPath',
-			);
-			*/
-
-			this.observe(
-				context?.alias,
-				(alias) => {
-					this.#managerContext.setPropertyAlias(alias);
-				},
-				'observePropertyAlias',
-			);
-
-			this.observe(this.#entriesContext.layoutEntries, (layouts) => {
-				// Update manager:
-				this.#managerContext.setLayouts(layouts);
-			});
-
-			this.observe(
-				observeMultiple([
-					this.#managerContext.layouts,
-					this.#managerContext.contents,
-					this.#managerContext.settings,
-					this.#managerContext.exposes,
-				]),
-				([layouts, contents, settings, exposes]) => {
-					if (layouts.length === 0) {
-						this._value = undefined;
-					} else {
-						this._value = {
-							markup: this._markup,
-							blocks: {
-								layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
-								contentData: contents,
-								settingsData: settings,
-								expose: exposes,
-							},
-						};
-					}
-
-					// If we don't have a value set from the outside or an internal value, we don't want to set the value.
-					// This is added to prevent the block list from setting an empty value on startup.
-					if (this._value?.markup === undefined) {
-						return;
-					}
-
-					context.setValue(this._value);
-				},
-				'motherObserver',
-			);
+			this.#gotPropertyContext(context);
 		});
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#managerContext.setVariantId(context.getVariantId());
 		});
 
-		this.observe(this.#entriesContext.layoutEntries, (layouts) => {
-			// Update manager:
-			this.#managerContext.setLayouts(layouts);
-		});
+		this.observe(
+			this.#entriesContext.layoutEntries,
+			(layouts) => {
+				// Update manager:
+				this.#managerContext.setLayouts(layouts);
+			},
+			null,
+		);
+
+		this.addValidator(
+			'valueMissing',
+			() => this.mandatoryMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !!this.mandatory && this.value === undefined,
+		);
+	}
+
+	#gotPropertyContext(context: typeof UMB_PROPERTY_CONTEXT.TYPE) {
+		this.observe(
+			context.dataPath,
+			(dataPath) => {
+				if (dataPath) {
+					// Set the data path for the local validation context:
+					this.#validationContext.setDataPath(dataPath + '.blocks');
+					this.#validationContext.autoReport();
+				}
+			},
+			'observeDataPath',
+		);
+
+		this.observe(
+			context?.alias,
+			(alias) => {
+				this.#managerContext.setPropertyAlias(alias);
+			},
+			'observePropertyAlias',
+		);
+
+		this.observe(
+			observeMultiple([
+				this.#managerContext.layouts,
+				this.#managerContext.contents,
+				this.#managerContext.settings,
+				this.#managerContext.exposes,
+			]),
+			([layouts, contents, settings, exposes]) => {
+				if (layouts.length === 0) {
+					if (super.value?.markup === undefined) {
+						super.value = undefined;
+					} else {
+						super.value = {
+							...super.value,
+							blocks: {
+								layout: {},
+								contentData: [],
+								settingsData: [],
+								expose: [],
+							},
+						};
+					}
+				} else {
+					super.value = {
+						markup: this._markup,
+						blocks: {
+							layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
+							contentData: contents,
+							settingsData: settings,
+							expose: exposes,
+						},
+					};
+				}
+
+				// If we don't have a value set from the outside or an internal value, we don't want to set the value.
+				// This is added to prevent the block list from setting an empty value on startup.
+				if (super.value?.markup === undefined) {
+					return;
+				}
+
+				context.setValue(super.value);
+			},
+			'motherObserver',
+		);
 	}
 
 	protected _filterUnusedBlocks(usedContentKeys: (string | null)[]) {
@@ -183,6 +220,6 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 	}
 
 	protected _fireChangeEvent() {
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 }

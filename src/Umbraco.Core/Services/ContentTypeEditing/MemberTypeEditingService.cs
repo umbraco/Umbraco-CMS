@@ -1,4 +1,6 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -10,7 +12,24 @@ internal sealed class MemberTypeEditingService : ContentTypeEditingServiceBase<I
 {
     private readonly IMemberTypeService _memberTypeService;
     private readonly IUserService _userService;
+    private readonly IReservedFieldNamesService _reservedFieldNamesService;
 
+    public MemberTypeEditingService(
+        IContentTypeService contentTypeService,
+        IMemberTypeService memberTypeService,
+        IDataTypeService dataTypeService,
+        IEntityService entityService,
+        IShortStringHelper shortStringHelper,
+        IUserService userService,
+        IReservedFieldNamesService reservedFieldNamesService)
+        : base(contentTypeService, memberTypeService, dataTypeService, entityService, shortStringHelper)
+    {
+        _memberTypeService = memberTypeService;
+        _userService = userService;
+        _reservedFieldNamesService = reservedFieldNamesService;
+    }
+
+    [Obsolete("Use the non obsolete constructor instead. Scheduled for removal in v16")]
     public MemberTypeEditingService(
         IContentTypeService contentTypeService,
         IMemberTypeService memberTypeService,
@@ -22,6 +41,7 @@ internal sealed class MemberTypeEditingService : ContentTypeEditingServiceBase<I
     {
         _memberTypeService = memberTypeService;
         _userService = userService;
+        _reservedFieldNamesService = StaticServiceProvider.Instance.GetRequiredService<IReservedFieldNamesService>();
     }
 
     public async Task<Attempt<IMemberType?, ContentTypeOperationStatus>> CreateAsync(MemberTypeCreateModel model, Guid userKey)
@@ -78,6 +98,8 @@ internal sealed class MemberTypeEditingService : ContentTypeEditingServiceBase<I
     protected override UmbracoObjectTypes ContentTypeObjectType => UmbracoObjectTypes.MemberType;
 
     protected override UmbracoObjectTypes ContainerObjectType => throw new NotSupportedException("Member type tree does not support containers");
+
+    protected override ISet<string> GetReservedFieldNames() => _reservedFieldNamesService.GetMemberReservedFieldNames();
 
     private void UpdatePropertyTypeVisibility(IMemberType memberType, MemberTypeModelBase model)
     {

@@ -23,7 +23,7 @@ export abstract class UmbContentTypeStructureRepositoryBase<ItemType>
 	 * @returns {*}
 	 * @memberof UmbContentTypeStructureRepositoryBase
 	 */
-	requestAllowedChildrenOf(unique: string | null) {
-		return this.#structureSource.getAllowedChildrenOf(unique);
+	requestAllowedChildrenOf(unique: string | null, parentContentUnique: string | null) {
+		return this.#structureSource.getAllowedChildrenOf(unique, parentContentUnique);
 	}
 }
