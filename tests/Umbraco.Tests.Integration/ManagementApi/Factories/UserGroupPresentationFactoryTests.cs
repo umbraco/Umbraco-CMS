@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Mapping.Permissions;
@@ -24,8 +24,11 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Factories;
 public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
 {
     public IUserGroupPresentationFactory UserGroupPresentationFactory => GetRequiredService<IUserGroupPresentationFactory>();
+
     public IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
+
     public ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
     public IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
 
     public IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
@@ -39,7 +42,6 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
         services.AddSingleton<IPermissionMapper, DocumentPropertyValuePermissionMapper>();
         services.AddSingleton<IPermissionPresentationMapper, DocumentPropertyValuePermissionMapper>();
     }
-
 
     [Test]
     public async Task Can_Map_Create_Model_And_Create()
@@ -138,7 +140,7 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Create_Usergroup_With_Empty_Granluar_Permissions_For_Document()
+    public async Task Can_Create_Usergroup_With_Empty_Granular_Permissions_For_Document()
     {
         var contentKey = await CreateContent();
 
@@ -177,7 +179,7 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Create_Usergroup_With_Granluar_Permissions_For_Document_PropertyValue()
+    public async Task Can_Create_Usergroup_With_Granular_Permissions_For_Document_PropertyValue()
     {
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
@@ -231,7 +233,7 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Create_Usergroup_With_Granluar_Permissions_For_Document_PropertyValue_Without_Verbs()
+    public async Task Can_Create_Usergroup_With_Granular_Permissions_For_Document_PropertyValue_Without_Verbs()
     {
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
@@ -284,7 +286,7 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Usergroup_Granluar_Permissions_For_Document_PropertyValue_Are_Cleaned_Up_When_DocumentType_Is_Deleted()
+    public async Task Usergroup_Granular_Permissions_For_Document_PropertyValue_Are_Cleaned_Up_When_DocumentType_Is_Deleted()
     {
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
