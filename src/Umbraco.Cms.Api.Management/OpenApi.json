@@ -37174,7 +37174,8 @@
         "required": [
           "$type",
           "documentType",
-          "id"
+          "id",
+          "variants"
         ],
         "type": "object",
         "properties": {
@@ -37199,6 +37200,16 @@
                 "$ref": "#/components/schemas/TrackedReferenceDocumentTypeModel"
               }
             ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false,

@@ -6,7 +6,7 @@ import type {
 import { css, html, customElement, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbDropzoneElement } from '@umbraco-cms/backoffice/media';
+import type { UmbDropzoneElement } from '@umbraco-cms/backoffice/dropzone';
 
 interface UmbDocumentTypePreview {
 	unique: string;
@@ -134,13 +134,18 @@ export class UmbDocumentTypeImportModalLayout extends UmbModalBaseElement<
 				() =>
 					/**TODO Add localizations */
 					html`<div id="wrapper">
-						Drag and drop your file here
-						<uui-button look="primary" label="or click here to choose a file" @click=${this.#onBrowse}></uui-button>
+						<umb-localize key="media_dragAndDropYourFilesIntoTheArea"
+							>Drag and drop your file(s) into the area
+						</umb-localize>
+						<uui-button
+							look="primary"
+							label="${this.localize.term('media_clickToUpload')}"
+							@click=${this.#onBrowse}></uui-button>
 						<umb-dropzone
 							id="dropzone"
 							accept=".udt"
-							@complete=${this.#onUploadComplete}
-							createAsTemporary></umb-dropzone>
+							create-as-temporary
+							@complete=${this.#onUploadComplete}></umb-dropzone>
 					</div>`,
 			)}
 		`;
