@@ -40,18 +40,23 @@ if (circular.length) {
 	}
 	console.error('\nPlease fix the circular dependencies before proceeding.\n');
 
+	/*
+	// Curently disabled as we don't have Graphviz installed on the CI servers neither do we use this visualization currently.
+	// Ideally its an opt in feature that is triggered by a environment variable.
 	try {
 		const imagePath = join(__dirname, '../../madge');
 		mkdirSync(imagePath, { recursive: true });
 		const image = await madgeSetup.image(join(imagePath, 'circular.svg'), true);
 		console.log('Circular dependencies graph generated:', image);
 	} catch { console.warn('No image generated. Make sure Graphviz is in your $PATH if you want a visualization'); }
+	*/
 
 	// TODO: Remove this check and set an exit with argument 1 when we have fixed all circular dependencies.
-	if (circular.length > 8)
-		process.exit(1)
-	else
-		process.exit(0)
+	if (circular.length > 8) {
+		process.exit(1);
+	} else {
+		process.exit(0);
+	}
 }
 
 console.log('\nNo circular dependencies detected.\n');
