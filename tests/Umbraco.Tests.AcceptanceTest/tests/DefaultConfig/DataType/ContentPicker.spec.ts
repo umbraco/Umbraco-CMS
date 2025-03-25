@@ -16,21 +16,6 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-// Remove fixme when the front-end is ready. Currently the "Show open button" setting is removed
-test.fixme('can show open button', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.dataType.createDefaultContentPickerDataType(customDataTypeName);
-  await umbracoUi.dataType.goToDataType(customDataTypeName);
-
-  // Act
-  await umbracoUi.dataType.clickShowOpenButtonToggle();
-  await umbracoUi.dataType.clickSaveButton();
-
-  // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'showOpenButton', true)).toBeTruthy();
-});
-
 test('can ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createDefaultContentPickerDataType(customDataTypeName);
@@ -97,8 +82,7 @@ test('can remove start node', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-// Remove fixme when the front-end is ready. Currently the "Show open button" setting is removed
-test.fixme('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
+test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.goToDataType(dataTypeName);
 

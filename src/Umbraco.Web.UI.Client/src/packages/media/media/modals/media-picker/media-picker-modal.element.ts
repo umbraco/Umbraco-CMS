@@ -1,12 +1,12 @@
 import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
-import type { UmbDropzoneElement } from '../../dropzone/dropzone.element.js';
 import type { UmbMediaTreeItemModel, UmbMediaSearchItemModel, UmbMediaItemModel } from '../../types.js';
 import { UmbMediaSearchProvider } from '../../search/index.js';
 import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
+import type { UmbDropzoneElement } from '@umbraco-cms/backoffice/dropzone';
 import {
 	css,
 	html,
@@ -436,9 +436,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 			#media-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-				grid-auto-rows: 150px;
 				gap: var(--uui-size-space-5);
+				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
+				grid-auto-rows: var(--umb-card-medium-min-width);
 				padding-bottom: 5px; /** The modal is a bit jumpy due to the img card focus/hover border. This fixes the issue. */
 			}
 
