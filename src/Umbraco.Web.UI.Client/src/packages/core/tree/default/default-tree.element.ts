@@ -5,6 +5,7 @@ import type {
 	UmbTreeSelectionConfiguration,
 	UmbTreeStartNode,
 } from '../types.js';
+import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
 import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -28,6 +29,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: false })
 	hideTreeRoot: boolean = false;
 
+	@property({ type: Boolean, attribute: false })
+	expandTreeRoot: boolean = false;
+
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
@@ -39,6 +43,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 	@property({ attribute: false })
 	filter: (item: UmbTreeItemModelBase) => boolean = () => true;
+
+	@property({ attribute: false })
+	expansion: UmbTreeExpansionModel = [];
 
 	@state()
 	private _rootItems: UmbTreeItemModel[] = [];
@@ -92,6 +99,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			this.#treeContext!.setHideTreeRoot(this.hideTreeRoot);
 		}
 
+		if (_changedProperties.has('expandTreeRoot')) {
+			this.#treeContext!.setExpandTreeRoot(this.expandTreeRoot);
+		}
+
 		if (_changedProperties.has('foldersOnly')) {
 			this.#treeContext!.setFoldersOnly(this.foldersOnly ?? false);
 		}
@@ -103,10 +114,18 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		if (_changedProperties.has('filter')) {
 			this.#treeContext!.filter = this.filter;
 		}
+
+		if (_changedProperties.has('expansion')) {
+			this.#treeContext!.setExpansion(this.expansion);
+		}
 	}
 
 	getSelection() {
 		return this.#treeContext?.selection.getSelection();
+	}
+
+	getExpansion() {
+		return this.#treeContext?.expansion.getExpansion();
 	}
 
 	override render() {

@@ -1,16 +1,17 @@
-import { UmbDropzoneManager } from './dropzone-manager.class.js';
-import { UmbDropzoneSubmittedEvent } from './dropzone-submitted.event.js';
-import { UmbFileDropzoneItemStatus, type UmbUploadableItem } from './types.js';
+import { UmbDropzoneManager } from '../dropzone-manager.class.js';
+import { UmbDropzoneSubmittedEvent } from '../dropzone-submitted.event.js';
+import type { UmbUploadableItem } from '../types.js';
+import { UmbFileDropzoneItemStatus } from '../constants.js';
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-dropzone')
 export class UmbDropzoneElement extends UmbLitElement {
-	@property({ attribute: false })
+	@property({ attribute: 'parent-unique' })
 	parentUnique: string | null = null;
 
-	@property({ type: Boolean })
+	@property({ type: Boolean, attribute: 'create-as-temporary' })
 	createAsTemporary: boolean = false;
 
 	@property({ type: String })
@@ -23,11 +24,11 @@ export class UmbDropzoneElement extends UmbLitElement {
 	disabled = false;
 
 	@property({ type: Boolean, attribute: 'disable-folder-upload', reflect: true })
-	public get disableFolderUpload() {
-		return this._disableFolderUpload;
-	}
 	public set disableFolderUpload(isAllowed: boolean) {
 		this.#dropzoneManager.setIsFoldersAllowed(!isAllowed);
+	}
+	public get disableFolderUpload() {
+		return this._disableFolderUpload;
 	}
 	private readonly _disableFolderUpload = false;
 
@@ -130,6 +131,7 @@ export class UmbDropzoneElement extends UmbLitElement {
 			id="dropzone"
 			accept=${ifDefined(this.accept)}
 			?multiple=${this.multiple}
+			?disallowFolderUpload=${this.disableFolderUpload}
 			@change=${this.#onDropFiles}
 			label=${this.localize.term('media_dragAndDropYourFilesIntoTheArea')}></uui-file-dropzone>`;
 	}
