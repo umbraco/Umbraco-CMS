@@ -1,6 +1,6 @@
 import { UmbDocumentPublicAccessRepository } from '../repository/public-access.repository.js';
-import { UmbDocumentItemRepository } from '../../../item/index.js';
-import type { UmbInputDocumentElement } from '../../../components/index.js';
+import { UmbDocumentItemRepository } from '../../../documents/documents/item/index.js';
+import type { UmbInputDocumentElement } from '../../../documents/documents/components/index.js';
 import type { UmbPublicAccessModalData, UmbPublicAccessModalValue } from './public-access-modal.token.js';
 import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
