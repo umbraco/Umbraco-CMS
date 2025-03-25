@@ -173,6 +173,17 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 			group: '#tiptap_extGroup_formatting',
 		},
 	},
+	{
+		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.WordCount',
+		name: 'Word Count Tiptap Extension',
+		api: () => import('./core/word-count.tiptap-api.js'),
+		meta: {
+			icon: 'icon-speed-gauge',
+			label: 'Word Count',
+			group: '#tiptap_extGroup_interactive',
+		},
+	},
 ];
 
 const toolbarExtensions: Array<UmbExtensionManifest> = [

@@ -1035,6 +1035,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 					'Umb.Tiptap.TextDirection',
 					'Umb.Tiptap.TextIndent',
 					'Umb.Tiptap.Underline',
+					'Umb.Tiptap.WordCount',
 				],
 			},
 			{
@@ -1079,7 +1080,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 					],
 				],
 			},
-			{ alias: 'statusbar', value: [[], []] },
+			{ alias: 'statusbar', value: [[], ['Umb.Tiptap.Statusbar.WordCount']] },
 			{ alias: 'stylesheets', value: ['/rte-styles.css'] },
 			{ alias: 'dimensions', value: { height: 500 } },
 			{ alias: 'maxImageSize', value: 500 },

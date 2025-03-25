@@ -8,6 +8,7 @@ export { TextStyle } from '@tiptap/extension-text-style';
 export { Blockquote } from '@tiptap/extension-blockquote';
 export { Bold } from '@tiptap/extension-bold';
 export { BulletList } from '@tiptap/extension-bullet-list';
+export { CharacterCount } from '@tiptap/extension-character-count';
 export { Code } from '@tiptap/extension-code';
 export { CodeBlock } from '@tiptap/extension-code-block';
 export { Heading } from '@tiptap/extension-heading';
