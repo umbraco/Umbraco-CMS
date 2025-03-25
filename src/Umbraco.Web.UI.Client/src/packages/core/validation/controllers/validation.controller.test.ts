@@ -297,4 +297,105 @@ describe('UmbValidationController', () => {
 			});
 		});
 	});
+
+	describe('Double inheritance', () => {
+		let child1: UmbValidationController;
+		let child2: UmbValidationController;
+
+		beforeEach(() => {
+			child1 = new UmbValidationController(host);
+			child2 = new UmbValidationController(host);
+		});
+		afterEach(() => {
+			child1.destroy();
+			child2.destroy();
+		});
+
+		it('is auto reporting from two sub contexts', async () => {
+			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-property-1')].value.test", 'test-body-1');
+			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-property-2')].value.test", 'test-body-2');
+			child1.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property-1')].value");
+			child2.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property-2')].value");
+			child1.autoReport();
+			child2.autoReport();
+
+			// First they are invalid:
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			expect(child1.isValid).to.be.false;
+			expect(child1.messages.getHasAnyMessages()).to.be.true;
+			expect(child1.messages.getNotFilteredMessages()?.[0].body).to.be.equal('test-body-1');
+			expect(child2.isValid).to.be.false;
+			expect(child2.messages.getHasAnyMessages()).to.be.true;
+			expect(child2.messages.getNotFilteredMessages()?.[0].body).to.be.equal('test-body-2');
+
+			child1.messages.removeMessagesByPath('$.test');
+			await child1.validate().catch(() => undefined);
+
+			expect(ctrl.isValid).to.be.false;
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			expect(child1.isValid).to.be.true;
+			expect(child1.messages.getHasAnyMessages()).to.be.false;
+			expect(child2.isValid).to.be.false;
+			expect(child2.messages.getHasAnyMessages()).to.be.true;
+
+			child2.messages.removeMessagesByPath('$.test');
+			await child2.validate().catch(() => undefined);
+
+			expect(child1.isValid).to.be.true;
+			expect(child1.messages.getHasAnyMessages()).to.be.false;
+			expect(child2.isValid).to.be.true;
+			expect(child2.messages.getHasAnyMessages()).to.be.false;
+
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid, 'root context to be valid').to.be.true;
+			expect(ctrl.messages.getHasAnyMessages(), 'root context have no messages').to.be.false;
+		});
+
+		it('is reporting between two sub context', async () => {
+			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-property')].value.test1", 'test-body-1');
+			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-property')].value.test2", 'test-body-2');
+			child1.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child2.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+
+			await Promise.resolve();
+			// First they are invalid:
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			expect(child1.isValid).to.be.false;
+			expect(child1.messages.getHasAnyMessages()).to.be.true;
+			expect(child1.messages.getNotFilteredMessages()?.[0].body).to.be.equal('test-body-1');
+			expect(child1.messages.getNotFilteredMessages()?.[1].body).to.be.equal('test-body-2');
+			expect(child2.isValid).to.be.false;
+			expect(child2.messages.getHasAnyMessages()).to.be.true;
+			expect(child2.messages.getNotFilteredMessages()?.[0].body).to.be.equal('test-body-1');
+			expect(child2.messages.getNotFilteredMessages()?.[1].body).to.be.equal('test-body-2');
+
+			child1.messages.removeMessagesByPath('$.test1');
+			child1.report();
+
+			expect(ctrl.isValid).to.be.false;
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			expect(child1.isValid).to.be.false;
+			expect(child1.messages.getHasAnyMessages()).to.be.true;
+			expect(child1.messages.getNotFilteredMessages()?.[0].body).to.be.equal('test-body-2');
+			expect(child2.isValid).to.be.false;
+			expect(child2.messages.getHasAnyMessages()).to.be.true;
+			expect(child2.messages.getNotFilteredMessages()?.[0].body).to.be.equal('test-body-2');
+
+			child2.messages.removeMessagesByPath('$.test2');
+			child2.report();
+
+			// We need to validate to the not auto reporting validation controllers updating their isValid state.
+			await ctrl.validate().catch(() => undefined);
+			await child1.validate().catch(() => undefined);
+			await child2.validate().catch(() => undefined);
+
+			expect(ctrl.isValid, 'root context is valid').to.be.true;
+			expect(child1.isValid, 'child1 context is valid').to.be.true;
+			expect(child2.isValid, 'child2 context is valid').to.be.true;
+		});
+	});
 });
