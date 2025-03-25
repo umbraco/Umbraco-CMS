@@ -1,1 +1,1 @@
-export * from './modal/types.js';
+export type * from './modal/types.js';
