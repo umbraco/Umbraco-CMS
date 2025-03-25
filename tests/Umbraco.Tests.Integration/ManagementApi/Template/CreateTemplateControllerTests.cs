@@ -44,7 +44,7 @@ public class CreateTemplateControllerTests : ManagementApiUserGroupTestBase<Crea
     {
         CreateTemplateRequestModel createTemplateModel = new()
         {
-            Name = "Test Template", Alias = "testTemplate", Content = "<h1>Test Template</h1>"
+            Name = Guid.NewGuid().ToString(), Alias = Guid.NewGuid().ToString(), Content = "<h1>Test Template</h1>"
         };
 
         return await Client.PostAsync(Url, JsonContent.Create(createTemplateModel));

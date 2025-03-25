@@ -19,7 +19,7 @@ public class ByKeyMediaTypeControllerTests : ManagementApiUserGroupTestBase<ByKe
     {
         _mediaTypeKey = Guid.NewGuid();
         _mediaTypeEditingService = GetRequiredService<IMediaTypeEditingService>();
-        MediaTypeCreateModel mediaTypeCreateModel = new() { Name = "Test", Alias = "test", Key = _mediaTypeKey };
+        MediaTypeCreateModel mediaTypeCreateModel = new() { Name = Guid.NewGuid().ToString(), Alias = Guid.NewGuid().ToString(), Key = _mediaTypeKey };
         await _mediaTypeEditingService.CreateAsync(mediaTypeCreateModel, Constants.Security.SuperUserKey);
     }
 

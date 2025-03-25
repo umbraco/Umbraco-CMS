@@ -18,7 +18,7 @@ public class ByKeyDocumentTypeControllerTests : ManagementApiUserGroupTestBase<B
     {
         _contentTypeEditingService = GetRequiredService<IContentTypeEditingService>();
         _key = Guid.NewGuid();
-        await _contentTypeEditingService.CreateAsync(new ContentTypeCreateModel { Key = _key, Name = "Test", Alias = "test" }, Constants.Security.SuperUserKey);
+        await _contentTypeEditingService.CreateAsync(new ContentTypeCreateModel { Key = _key, Name = Guid.NewGuid().ToString(), Alias = Guid.NewGuid().ToString()}, Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<ByKeyDocumentTypeController, object>> MethodSelector =>

@@ -13,17 +13,20 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 public class ByKeyDocumentControllerTests : ManagementApiUserGroupTestBase<ByKeyDocumentController>
 {
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
     private Guid _key;
 
     [SetUp]
     public async Task Setup()
     {
-        var template = TemplateBuilder.CreateTextPageTemplate();
+        var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
-        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
+        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
@@ -32,12 +35,12 @@ public class ByKeyDocumentControllerTests : ManagementApiUserGroupTestBase<ByKey
             ContentTypeKey = contentType.Key,
             TemplateKey = template.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create",
-            InvariantProperties = new[]
-            {
+            InvariantName = Guid.NewGuid().ToString(),
+            InvariantProperties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The title value" },
                 new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
-            }
+            ],
         };
         var response = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         _key = response.Result.Content.Key;
@@ -48,12 +51,12 @@ public class ByKeyDocumentControllerTests : ManagementApiUserGroupTestBase<ByKey
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -63,16 +66,16 @@ public class ByKeyDocumentControllerTests : ManagementApiUserGroupTestBase<ByKey
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Unauthorized
+        ExpectedStatusCode = HttpStatusCode.Unauthorized,
     };
 }
