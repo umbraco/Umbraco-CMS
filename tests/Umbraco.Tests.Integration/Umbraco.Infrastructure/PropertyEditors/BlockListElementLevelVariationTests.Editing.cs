@@ -845,6 +845,110 @@ internal partial class BlockListElementLevelVariationTests
         });
     }
 
+    /// <summary>
+    /// Tests whether the user can update the variant values of existing blocks inside an invariant blocklist
+    /// </summary>
+    /// <param name="updateWithLimitedUserAccess">true => danish only which is not the default. false => admin which is all languages</param>
+    [TestCase(true)]
+    [TestCase(false)]
+    // [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
+    public async Task Can_ClearBlocks_Limited_User_Access_To_Languages_Without_AllowEditInvariantFromNonDefault(bool updateWithLimitedUserAccess)
+    {
+        await LanguageService.CreateAsync(
+            new Language("de-DE", "German"), Constants.Security.SuperUserKey);
+        var userKey = updateWithLimitedUserAccess
+            ? (await CreateLimitedUser()).Key
+            : Constants.Security.SuperUserKey;
+
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var content = CreateContent(contentType, elementType, [], false);
+        content.SetCultureName("Home (de)", "de-DE");
+        ContentService.Save(content);
+
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#1: The first invariant content value" },
+                            new() { Alias = "variantText", Value = "#1: The first content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#1: The first content value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#1: The first content value in German", Culture = "de-DE" }
+                        },
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#1: The first invariant settings value" },
+                            new() { Alias = "variantText", Value = "#1: The first settings value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#1: The first settings value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#1: The first settings value in German", Culture = "de-DE" }
+                        },
+                        null,
+                        null
+                    )
+                ),
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#2: The first invariant content value" },
+                            new() { Alias = "variantText", Value = "#2: The first content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#2: The first content value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#2: The first content value in German", Culture = "de-DE" }
+                        },
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#2: The first invariant settings value" },
+                            new() { Alias = "variantText", Value = "#2: The first settings value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#2: The first settings value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#2: The first settings value in German", Culture = "de-DE" }
+                        },
+                        null,
+                        null
+                    )
+                )
+            ]
+        );
+
+        var serializedBlockListValue = JsonSerializer.Serialize(blockListValue);
+        content.Properties["blocks"]!.SetValue(serializedBlockListValue);
+        ContentService.Save(content);
+
+        var updateModel = new ContentUpdateModel
+        {
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "blocks", Value = null },
+            },
+            Variants = new[]
+            {
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US", Properties = [] },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK", Properties = [] },
+                new VariantModel { Name = content.GetCultureName("de-DE")!, Culture = "de-DE", Properties = [] },
+            },
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
+        Assert.IsTrue(result.Success);
+
+        content = ContentService.GetById(content.Key);
+        var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
+
+        // limited user access means English and German should not have been updated - changes should be rolled back to the initial block values
+        if (updateWithLimitedUserAccess)
+        {
+            Assert.NotNull(savedBlocksValue);
+            Assert.AreEqual(serializedBlockListValue, savedBlocksValue);
+        }
+        else
+        {
+            Assert.AreEqual("null", savedBlocksValue);
+        }
+    }
+
     [TestCase(true)]
     [TestCase(false)]
     [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]

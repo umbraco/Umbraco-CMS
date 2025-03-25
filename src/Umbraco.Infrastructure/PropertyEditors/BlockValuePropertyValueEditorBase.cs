@@ -292,6 +292,11 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         bool canUpdateInvariantData,
         HashSet<string> allowedCultures)
     {
+        if (canUpdateInvariantData is false && targetValue is null)
+        {
+            return sourceValue;
+        }
+
         BlockEditorData<TValue, TLayout>? source = BlockEditorValues.DeserializeAndClean(sourceValue);
         BlockEditorData<TValue, TLayout>? target = BlockEditorValues.DeserializeAndClean(targetValue);
 
