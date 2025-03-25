@@ -116,8 +116,8 @@ internal sealed class MemberEditingService : IMemberEditingService
             return IdentityMemberCreationFailed(createResult, status);
         }
 
-        IMember member = _memberService.GetByEmail(createModel.Email)
-                          ?? throw new InvalidOperationException("Member creation succeeded, but member could not be found by email.");
+        IMember member = _memberService.GetByUsername(createModel.Username)
+                          ?? throw new InvalidOperationException("Member creation succeeded, but member could not be found by username.");
 
         var updateRolesResult = await UpdateRoles(createModel.Roles, identityMember);
         if (updateRolesResult is false)
@@ -283,10 +283,13 @@ internal sealed class MemberEditingService : IMemberEditingService
             return MemberEditingOperationStatus.DuplicateUsername;
         }
 
-        IMember? byEmail = _memberService.GetByEmail(model.Email);
-        if (byEmail is not null && byEmail.Key != memberKey)
+        if (_securitySettings.MemberRequireUniqueEmail)
         {
-            return MemberEditingOperationStatus.DuplicateEmail;
+            IMember? byEmail = _memberService.GetByEmail(model.Email);
+            if (byEmail is not null && byEmail.Key != memberKey)
+            {
+                return MemberEditingOperationStatus.DuplicateEmail;
+            }
         }
 
         return MemberEditingOperationStatus.Success;
