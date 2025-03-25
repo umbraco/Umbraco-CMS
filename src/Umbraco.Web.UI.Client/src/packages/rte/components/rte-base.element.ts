@@ -143,11 +143,8 @@ export abstract class UmbPropertyEditorUiRteElementBase
 						const notSupportedVariantSetting = promises.filter((x) => x === true).length > 0;
 
 						if (notSupportedVariantSetting) {
-							this.#validationContext.messages.addMessage(
-								'configuration',
-								'$',
-								'#blockEditor_blockVariantConfigurationNotSupported',
-							);
+							this.setCustomValidity('#blockEditor_blockVariantConfigurationNotSupported');
+							this.checkValidity();
 						}
 					}
 				},
