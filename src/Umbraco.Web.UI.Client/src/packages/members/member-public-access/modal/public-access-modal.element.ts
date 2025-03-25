@@ -7,7 +7,7 @@ import { UmbMemberDetailRepository, type UmbInputMemberElement } from '@umbraco-
 import { UmbMemberGroupItemRepository, type UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
 import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbDocumentItemRepository, UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
+import { UmbDocumentItemRepository, type UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-public-access-modal')
 export class UmbPublicAccessModalElement extends UmbModalBaseElement<
