@@ -253,6 +253,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 			}
 
 			#dropzone {
+				width: 100%;
 				inset: 0;
 				backdrop-filter: opacity(1); /* Removes the built in blur effect */
 				overflow: clip;
