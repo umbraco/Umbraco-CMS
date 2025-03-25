@@ -498,7 +498,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (this._sortModeActive) {
 			return html`<div class="tab">
 				${ownedTab
-					? html`<uui-icon name="icon-grib" class="drag-${tab.id}"> </uui-icon>${tabName}
+					? html`<uui-icon name="icon-grip" class="drag-${tab.id}"> </uui-icon>${tabName}
 							<uui-input
 								label="sort order"
 								type="number"

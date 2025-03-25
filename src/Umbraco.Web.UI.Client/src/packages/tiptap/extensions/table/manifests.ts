@@ -1,6 +1,15 @@
-import type { ManifestTiptapExtension } from '../types.js';
+import { UMB_TIPTAP_TABLE_PROPERTIES_MODAL_ALIAS } from './components/constants.js';
 
-const coreExtensions: Array<ManifestTiptapExtension> = [
+const modals: Array<UmbExtensionManifest> = [
+	{
+		type: 'modal',
+		alias: UMB_TIPTAP_TABLE_PROPERTIES_MODAL_ALIAS,
+		name: 'Tiptap Table Properties Modal',
+		element: () => import('./components/table-properties-modal.element.js'),
+	},
+];
+
+const coreExtensions: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		kind: 'button',
@@ -58,10 +67,11 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 					],
 					separatorAfter: true,
 				},
+				{ label: 'Table properties', data: 'tableProperties' },
 				{ label: 'Delete table', icon: 'icon-trash', data: 'deleteTable' },
 			],
 		},
 	},
 ];
 
-export const manifests = [...coreExtensions, ...toolbarExtensions];
+export const manifests = [...modals, ...coreExtensions, ...toolbarExtensions];
