@@ -1,0 +1,102 @@
+services:
+  umb_database:
+    container_name: umbraco_image_database
+    build:
+      context: ./Database
+    environment:
+      SA_PASSWORD: ${DB_PASSWORD}
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "1433:1433"
+      - "1434:1434"
+    volumes:
+      - umb_database:/var/opt/mssql
+    networks:
+      - umbnet
+    healthcheck:
+      # This healthcheck is to make sure that the database is up and running before the umbraco container starts.
+      # It works by querying the database for the state of the umbracoDb database, ensuring it exists.
+      test: ./healthcheck.sh
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 15s # Bootstrap duration, for this duration failures does not count towards max retries.
+      start_interval: 5s # How long after the health check has started 4to run the healthcheck again.
+
+  umbraco_image1:
+    image: umbraco_image
+    environment:
+      - SA_PASSWORD=${DB_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__umbracoDbDSN=Server=umb_database;Database=umbracoDb;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=true;
+      - ConnectionStrings__umbracoDbDSN_ProviderName=Microsoft.Data.SqlClient
+      - UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL=${ADMIN_EMAIL}
+      - UMBRACO__CMS__UNATTENDED__INSTALLUNATTENDED=true
+      - UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERNAME=${ADMIN_EMAIL}
+      - UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD=${ADMIN_PASSWORD}
+      - UMBRACO__CMS__SECURITY__ALLOWCONCURRENTLOGINS=True
+      - UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONNAME=http://localhost:44371/
+    build:
+      context: .
+      dockerfile: ./DockerFile
+      args:
+        - BUILD_CONFIGURATION=Debug
+    restart: always
+    networks:
+      - umbnet
+    depends_on:
+      umb_database:
+        condition: service_healthy
+    ports:
+      - "44371:8080"
+    volumes:
+      - media:/app/wwwroot/media
+      - scripts:/app/wwwroot/scripts
+      - css:/app/wwwroot/css
+      - views:/app/Views
+      - logs:/app/umbraco/Logs
+      - data:/app/umbraco
+    healthcheck:
+      # This healthcheck is to make sure that the unattended install step has finished in the first umbraco_image.
+      test: ./healthcheck.sh
+      interval: 1m
+      timeout: 5s
+      retries: 5
+      start_period: 30s # Bootstrap duration, for this duration failures does not count towards max retries.
+      start_interval: 5s # How long after the health check has started to run the healthcheck again.
+
+  umbraco_image2:
+    depends_on:
+      umbraco_image1:
+        condition: service_healthy
+    image: umbraco_image
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__umbracoDbDSN=Server=umb_database;Database=umbracoDb;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=true;
+      - ConnectionStrings__umbracoDbDSN_ProviderName=Microsoft.Data.SqlClient
+      - UMBRACO__CMS__SECURITY__ALLOWCONCURRENTLOGINS=True
+      - UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONNAME=http://localhost:44372/
+    restart: always
+    networks:
+      - umbnet
+    ports:
+      - "44372:8080"
+    volumes:
+      - media:/app/wwwroot/media
+      - scripts:/app/wwwroot/scripts
+      - css:/app/wwwroot/css
+      - views:/app/Views
+      - logs:/app/umbraco/Logs
+      - data:/app/umbraco
+volumes:
+  umb_database:
+  media:
+  scripts:
+  css:
+  views:
+  logs:
+  data:
+
+networks:
+  umbnet:
+    driver: bridge

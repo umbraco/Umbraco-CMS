@@ -1,0 +1,50 @@
+# Base
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+USER $APP_UID
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
+
+# Build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY . .
+RUN dotnet restore "src/Umbraco.Web.UI/Umbraco.Web.UI.csproj"
+WORKDIR "src/Umbraco.Web.UI"
+RUN dotnet build "Umbraco.Web.UI.csproj" --no-restore -c $BUILD_CONFIGURATION -o /app/build
+
+# Publish
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "Umbraco.Web.UI.csproj" --no-build -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+# Final
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+# COPY healthcheck.sh /
+COPY healthcheck.sh .
+
+# We need to make sure that the user running the app has write access to the umbraco folder, in order to write logs and other files.
+# Since these are volumes they are created as root by the docker daemon.
+USER root
+
+RUN mkdir umbraco/Logs
+RUN mkdir wwwroot/media
+RUN mkdir wwwroot/css
+RUN mkdir wwwroot/Views
+RUN mkdir wwwroot/js
+# Gives the user permissions for these folder and their children
+RUN chown $APP_UID umbraco --recursive
+RUN chown $APP_UID wwwroot --recursive
+RUN chown $APP_UID Views --recursive
+
+# Install necessary tools
+RUN apt-get update && apt-get install -y \
+curl && apt-get install -y \
+jq
+CMD /bin/bash
+
+USER $APP_UID
+ENTRYPOINT ["dotnet", "Umbraco.Web.UI.dll"]
