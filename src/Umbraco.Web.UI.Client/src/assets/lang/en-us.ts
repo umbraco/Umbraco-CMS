@@ -469,18 +469,6 @@ export default {
 		visit: 'Visit',
 		welcome: 'Welcome',
 	},
-	prompt: {
-		stay: 'Stay',
-		discardChanges: 'Discard changes',
-		unsavedChanges: 'Discard unsaved changes',
-		unsavedChangesWarning: 'Are you sure you want to navigate away from this page? You have unsaved changes',
-		confirmListViewPublish: 'Publishing will make the selected items visible on the site.',
-		confirmListViewUnpublish:
-			'Unpublishing will remove the selected items and all their descendants from the\n      site.\n    ',
-		confirmUnpublish: 'Unpublishing will remove this page and all its descendants from the site.',
-		doctypeChangeWarning:
-			'You have unsaved changes. Making changes to the Document Type will discard the\n      changes.\n    ',
-	},
 	bulk: {
 		done: 'Done',
 		deletedItem: 'Deleted %0% item',
