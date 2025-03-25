@@ -15,6 +15,7 @@ export class UmbDocumentBlockPropertyValueUserPermissionWorkspaceContext extends
 			this.#blockWorkspaceContext = context;
 
 			// We only want to apply the permission logic if the block is in a document
+			// TODO: revisit this when getContext supports passContextAliasMatches
 			const documentWorkspaceContext = await this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, () => {})
 				.passContextAliasMatches()
 				.asPromise();
