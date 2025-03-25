@@ -153,8 +153,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	/**
 	 * Define a specific data path for this validation context.
 	 * This will turn this validation context into a sub-context of the parent validation context.
-	 * This means that a two-way binding for messages will be established between the parent and the sub-context.
-	 * And it will inherit the Translation Data from its parent.
+	 * This will make this context inherit the messages from the parent validation context.
+	 * @see {@link report} Call `report()` to propagate changes to the parent context.
+	 * @see {@link autoReport} Call `autoReport()` to continuously synchronize changes to the parent context.
 	 *
 	 * messages and data will be localizes accordingly to the given data path.
 	 * @param dataPath {string} - The data path to bind this validation context to.
@@ -197,6 +198,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		this.#readyToSync();
 
 		this.messages.clear();
+		this.#localMessages = undefined;
 
 		this.#baseDataPath = dataPath;
 
@@ -233,6 +235,8 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 						this.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
 				}
+
+				this.#localMessages = this.messages.getNotFilteredMessages();
 				this.messages.finishChange();
 			},
 			'observeParentMessages',
@@ -247,6 +251,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			this.#parent.removeValidator(this);
 		}
 		this.messages.clear();
+		this.#localMessages = undefined;
 		this.setTranslationData(undefined);
 	}
 
@@ -276,9 +281,11 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 * Perform a one time transfer of the messages from this context to the parent context.
 	 */
 	report(): void {
-		if (this.#sync === false) {
+		if (!this.#parent) return;
+
+		if (!this.#sync) {
+			this.#transferMessages(this.messages.getNotFilteredMessages());
 		}
-		this.#transferMessages(this.messages.getNotFilteredMessages());
 	}
 
 	#transferMessages = (msgs: Array<UmbValidationMessage>) => {
@@ -289,9 +296,10 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		if (this.#localMessages) {
 			// Remove the parent messages that does not exist locally anymore:
 			const toRemove = this.#localMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
+			console.log('remove messages', toRemove);
 			this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
 		}
-		this.#localMessages = msgs;
+
 		if (this.#baseDataPath === '$') {
 			this.#parent!.messages.addMessageObjects(msgs);
 		} else {
@@ -453,6 +461,8 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
+		this.#localMessages = undefined;
+		this.#parentMessages = undefined;
 		this.#parent = undefined;
 		super.destroy();
 	}
