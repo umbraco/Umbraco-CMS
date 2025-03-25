@@ -40,41 +40,46 @@ export class UmbPropertyValueUserPermissionWorkspaceContextBase extends UmbContr
 		property: UmbPropertyTypeModel;
 		variantIds: Array<UmbVariantId>;
 	}) {
-		createExtensionApiByAlias(this, UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_CONDITION_ALIAS, [
-			{
-				config: {
-					allOf: [args.verb],
-					match: {
-						propertyType: {
-							unique: args.property.unique,
+		// We can only apply states if the state manager is running
+		this.observe(args.stateManager.isRunning, (isRunning) => {
+			if (!isRunning) return;
+
+			createExtensionApiByAlias(this, UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_CONDITION_ALIAS, [
+				{
+					config: {
+						allOf: [args.verb],
+						match: {
+							propertyType: {
+								unique: args.property.unique,
+							},
 						},
 					},
-				},
-				onChange: (permitted: boolean) => {
-					// If the property is invariant we only need one state for the property
-					const isInvariant = args.property.variesByCulture === false && args.property.variesBySegment === false;
-					const variantIds = isInvariant ? [new UmbVariantId()] : args.variantIds;
+					onChange: (permitted: boolean) => {
+						// If the property is invariant we only need one state for the property
+						const isInvariant = args.property.variesByCulture === false && args.property.variesBySegment === false;
+						const variantIds = isInvariant ? [new UmbVariantId()] : args.variantIds;
 
-					const states: Array<UmbVariantPropertyWriteState> =
-						variantIds?.map((variantId) => {
-							return {
-								unique: 'UMB_PROPERTY_' + args.property.unique + '_' + variantId.toString(),
-								message: '',
-								propertyType: {
-									unique: args.property.unique,
-									variantId,
-								},
-							};
-						}) || [];
+						const states: Array<UmbVariantPropertyWriteState> =
+							variantIds?.map((variantId) => {
+								return {
+									unique: 'UMB_PROPERTY_' + args.property.unique + '_' + variantId.toString(),
+									message: '',
+									propertyType: {
+										unique: args.property.unique,
+										variantId,
+									},
+								};
+							}) || [];
 
-					if (permitted) {
-						args.stateManager.addStates(states);
-					} else {
-						args.stateManager.removeStates(states.map((state) => state.unique));
-					}
+						if (permitted) {
+							args.stateManager.addStates(states);
+						} else {
+							args.stateManager.removeStates(states.map((state) => state.unique));
+						}
+					},
 				},
-			},
-		]);
+			]);
+		});
 	}
 }
 
