@@ -1078,6 +1078,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 					],
 				],
 			},
+			{ alias: 'statusbar', value: [[], []] },
 			{ alias: 'stylesheets', value: ['/rte-styles.css'] },
 			{ alias: 'dimensions', value: { height: 500 } },
 			{ alias: 'maxImageSize', value: 500 },

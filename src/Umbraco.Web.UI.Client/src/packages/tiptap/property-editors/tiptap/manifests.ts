@@ -18,7 +18,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 						label: '#tiptap_config_extensions',
 						description: `Choose which Tiptap extensions to enable
 
-_Once enabled, the related actions will be available for the toolbar._`,
+_Once enabled, the related actions will be available for the toolbar and statusbar._`,
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Tiptap.ExtensionsConfiguration',
 						weight: 10,
 					},
@@ -30,6 +30,15 @@ _Once enabled, the related actions will be available for the toolbar._`,
 _Drag and drop the available actions onto the toolbar._`,
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Tiptap.ToolbarConfiguration',
 						weight: 15,
+					},
+					{
+						alias: 'statusbar',
+						label: '#tiptap_config_statusbar',
+						description: `Design the available statuses.
+
+_Drag and drop the available actions onto the statusbar areas._`,
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Tiptap.StatusbarConfiguration',
+						weight: 18,
 					},
 					{
 						alias: 'stylesheets',
@@ -87,6 +96,17 @@ _Drag and drop the available actions onto the toolbar._`,
 	},
 	{
 		type: 'propertyEditorUi',
+		alias: 'Umb.PropertyEditorUi.Tiptap.ExtensionsConfiguration',
+		name: 'Tiptap Extensions Property Editor UI',
+		element: () => import('./components/property-editor-ui-tiptap-extensions-configuration.element.js'),
+		meta: {
+			label: 'Tiptap Extensions Configuration',
+			icon: 'icon-autofill',
+			group: 'common',
+		},
+	},
+	{
+		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.Tiptap.ToolbarConfiguration',
 		name: 'Tiptap Toolbar Property Editor UI',
 		js: () => import('./components/property-editor-ui-tiptap-toolbar-configuration.element.js'),
@@ -98,11 +118,11 @@ _Drag and drop the available actions onto the toolbar._`,
 	},
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.Tiptap.ExtensionsConfiguration',
-		name: 'Tiptap Extensions Property Editor UI',
-		js: () => import('./components/property-editor-ui-tiptap-extensions-configuration.element.js'),
+		alias: 'Umb.PropertyEditorUi.Tiptap.StatusbarConfiguration',
+		name: 'Tiptap Statusbar Property Editor UI',
+		element: () => import('./components/property-editor-ui-tiptap-statusbar-configuration.element.js'),
 		meta: {
-			label: 'Tiptap Extensions Configuration',
+			label: 'Tiptap Statusbar Configuration',
 			icon: 'icon-autofill',
 			group: 'common',
 		},

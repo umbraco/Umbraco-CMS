@@ -1,6 +1,7 @@
 import { manifests as blockExtensions } from './block/manifests.js';
 import { manifests as styleSelectExtensions } from './style-select/manifests.js';
 import { manifests as tableExtensions } from './table/manifests.js';
+import { manifests as statusbarExtensions } from './statusbar/manifests.js';
 import type { ManifestTiptapExtension } from './tiptap.extension.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -648,6 +649,7 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 export const manifests = [
 	...kinds,
 	...coreExtensions,
+	...statusbarExtensions,
 	...toolbarExtensions,
 	...blockExtensions,
 	...styleSelectExtensions,
