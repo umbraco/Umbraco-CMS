@@ -139,7 +139,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                 serviceScope.ServiceProvider.GetRequiredService<IBackOfficeApplicationManager>() as
                     BackOfficeApplicationManager;
             backofficeOpenIddictApplicationDescriptor =
-                backOfficeApplicationManager.BackofficeOpenIddictApplicationDescriptor([client.BaseAddress]);
+                backOfficeApplicationManager.BackofficeOpenIddictApplicationDescriptor(client.BaseAddress);
             scope.Complete();
         }
 
