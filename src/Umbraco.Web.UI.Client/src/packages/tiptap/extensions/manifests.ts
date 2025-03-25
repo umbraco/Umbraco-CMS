@@ -168,7 +168,7 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 		name: 'Text Indent Tiptap Extension',
 		api: () => import('./core/text-indent.tiptap-api.js'),
 		meta: {
-			icon: 'icon-science',
+			icon: 'icon-indent',
 			label: 'Text Indent',
 			group: '#tiptap_extGroup_formatting',
 		},

@@ -16,7 +16,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 					{
 						alias: 'extensions',
 						label: '#tiptap_config_extensions',
-						description: `Choose which Tiptap extensions to enable
+						description: `Choose which Tiptap extensions to enable.
 
 _Once enabled, the related actions will be available for the toolbar and statusbar._`,
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Tiptap.ExtensionsConfiguration',
@@ -25,7 +25,7 @@ _Once enabled, the related actions will be available for the toolbar and statusb
 					{
 						alias: 'toolbar',
 						label: '#tiptap_config_toolbar',
-						description: `Design the available actions
+						description: `Design the available actions.
 
 _Drag and drop the available actions onto the toolbar._`,
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Tiptap.ToolbarConfiguration',
@@ -43,7 +43,7 @@ _Drag and drop the available actions onto the statusbar areas._`,
 					{
 						alias: 'stylesheets',
 						label: '#treeHeaders_stylesheets',
-						description: 'Pick the stylesheets whose editor styles should be available when editing!!!',
+						description: 'Pick the stylesheets whose editor styles should be available when editing.',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.StylesheetPicker',
 						weight: 20,
 					},
@@ -109,7 +109,7 @@ _Drag and drop the available actions onto the statusbar areas._`,
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.Tiptap.ToolbarConfiguration',
 		name: 'Tiptap Toolbar Property Editor UI',
-		js: () => import('./components/property-editor-ui-tiptap-toolbar-configuration.element.js'),
+		element: () => import('./components/property-editor-ui-tiptap-toolbar-configuration.element.js'),
 		meta: {
 			label: 'Tiptap Toolbar Configuration',
 			icon: 'icon-autofill',
