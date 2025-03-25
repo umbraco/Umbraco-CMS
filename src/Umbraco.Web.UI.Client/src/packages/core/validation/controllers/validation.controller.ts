@@ -296,7 +296,6 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		if (this.#localMessages) {
 			// Remove the parent messages that does not exist locally anymore:
 			const toRemove = this.#localMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
-			console.log('remove messages', toRemove);
 			this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
 		}
 
