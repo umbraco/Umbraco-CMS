@@ -27,11 +27,17 @@ export class UmbDocumentPropertyValueUserPermissionWorkspaceContext extends UmbC
 			this.#observeDocumentProperties();
 		});
 
-		// TODO: investigate if block workspace can provide a property structure context so we can use the same context for both block and document
-		// TODO: only apply to blocks within a document
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, async (context) => {
 			this.#blockWorkspaceContext = context;
-			this.#observeDocumentBlockProperties();
+
+			// We only want to apply the permission logic if the block is in a document
+			const documentWorkspaceContext = await this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, () => {})
+				.passContextAliasMatches()
+				.asPromise();
+
+			if (documentWorkspaceContext) {
+				this.#observeDocumentBlockProperties();
+			}
 		});
 	}
 
