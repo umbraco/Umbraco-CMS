@@ -20,7 +20,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		type: 'workspaceContext',
 		name: 'Document Property Value User Permission Block Workspace Context',
 		alias: 'Umb.WorkspaceContext.Block.DocumentPropertyValueUserPermission',
-		api: () => import('./document-property-value-user-permission.workspace-context.js'),
+		api: () => import('./document-block-property-value-user-permission.workspace-context.js'),
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
