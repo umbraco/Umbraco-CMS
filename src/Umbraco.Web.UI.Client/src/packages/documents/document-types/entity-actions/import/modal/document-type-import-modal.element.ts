@@ -132,13 +132,17 @@ export class UmbDocumentTypeImportModalLayout extends UmbModalBaseElement<
 					</uui-ref-node-document-type>`,
 				() =>
 					html`<div id="wrapper">
-						<umb-input-dropzone id="dropzone" accept=".udt" @change=${this.#onUploadComplete}></umb-input-dropzone>
+						<umb-input-dropzone id="dropzone" accept=".udt" @change=${this.#onUploadComplete}
+							><umb-localize slot="text" key="media_dragAndDropYourFilesIntoTheArea"
+								>Drag and drop your file(s) into the area
+							</umb-localize></umb-input-dropzone
+						>
 					</div>`,
 			)}
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			#wrapper {
@@ -151,6 +155,10 @@ export class UmbDocumentTypeImportModalLayout extends UmbModalBaseElement<
 				border: 2px dashed var(--uui-color-divider-standalone);
 				background-color: var(--uui-color-surface-alt);
 				padding: var(--uui-size-space-6);
+			}
+
+			#dropzone {
+				width: 100%;
 			}
 
 			#import {

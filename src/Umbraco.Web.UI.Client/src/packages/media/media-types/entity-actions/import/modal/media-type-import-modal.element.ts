@@ -37,7 +37,7 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 		};
 	}
 
-	#onUploadCompleted(evt: UmbDropzoneChangeEvent) {
+	#onUploadComplete(evt: UmbDropzoneChangeEvent) {
 		evt.preventDefault();
 		const target = evt.target as UmbDropzoneMediaElement;
 		const data = target.value;
@@ -125,7 +125,11 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 					</uui-ref-node>`,
 				() =>
 					html`<div id="wrapper">
-						<umb-input-dropzone id="dropzone" accept=".udt" @change=${this.#onUploadCompleted}></umb-input-dropzone>
+						<umb-input-dropzone id="dropzone" accept=".udt" @change=${this.#onUploadComplete}
+							><umb-localize slot="text" key="media_dragAndDropYourFilesIntoTheArea"
+								>Drag and drop your file(s) into the area
+							</umb-localize></umb-input-dropzone
+						>
 					</div>`,
 			)}
 		`;
@@ -144,6 +148,10 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 				border: 2px dashed var(--uui-color-divider-standalone);
 				background-color: var(--uui-color-surface-alt);
 				padding: var(--uui-size-space-6);
+			}
+
+			#dropzone {
+				width: 100%;
 			}
 
 			#import {
