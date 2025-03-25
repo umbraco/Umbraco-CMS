@@ -1,4 +1,5 @@
 import { manifests as auditLogManifests } from './audit-log/manifests.js';
+import { manifests as blockManifests } from './block/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
 import { manifests as entityBulkActionManifests } from './entity-bulk-actions/manifests.js';
@@ -23,6 +24,7 @@ import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	...auditLogManifests,
+	...blockManifests,
 	...collectionManifests,
 	...entityActionManifests,
 	...entityBulkActionManifests,
