@@ -1,7 +1,6 @@
 import { UmbDropzoneMediaElement } from './dropzone-media.element.js';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbInputDropzoneElement } from '@umbraco-cms/backoffice/dropzone';
 
 const DEPRECATION_MESSAGE = new UmbDeprecation({
 	deprecated: '<umb-dropzone />',
