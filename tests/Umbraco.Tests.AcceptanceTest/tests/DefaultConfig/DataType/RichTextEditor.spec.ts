@@ -51,6 +51,7 @@ const toolbarDefaultValue = [
     ]
   ]
 ];
+
 test('tiptap is the default property editor in rich text editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.goToBackOffice();

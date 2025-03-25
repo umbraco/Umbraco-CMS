@@ -23,7 +23,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('can change value type', async ({ umbracoApi, umbracoUi }) => {
+test('can change value type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createDefaultLabelDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
