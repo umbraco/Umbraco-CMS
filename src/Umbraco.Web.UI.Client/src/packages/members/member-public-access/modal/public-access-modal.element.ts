@@ -1,5 +1,5 @@
 import { UmbDocumentPublicAccessRepository } from '../repository/public-access.repository.js';
-import type { UmbPublicAccessModalData, UmbPublicAccessModalValue } from './public-access-modal.token.js';
+import type { UmbPublicAccessModalData, UmbPublicAccessModalValue } from './types.js';
 import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
