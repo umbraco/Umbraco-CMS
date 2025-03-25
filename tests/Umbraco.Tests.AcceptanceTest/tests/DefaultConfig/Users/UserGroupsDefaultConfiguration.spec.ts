@@ -40,8 +40,8 @@ test('the default configuration of Administrators is correct', async ({umbracoAp
   const hasAccessToAllLanguages = true;
   const documentRootAccess = true;
   const mediaRootAccess = true;
-  const uiPermissions = await umbracoApi.userGroup.covertApikPermissionToUiPermissions(fallbackPermissions);
-  const uiSections = await umbracoApi.userGroup.covertApiSectionsToUiSections(sections);
+  const uiPermissions = await umbracoApi.userGroup.convertApiPermissionsToUiPermissions(fallbackPermissions);
+  const uiSections = await umbracoApi.userGroup.convertApiSectionsToUiSections(sections);
 
   // Act 
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
@@ -91,8 +91,8 @@ test('the default configuration of Editors is correct', async ({umbracoApi, umbr
   const hasAccessToAllLanguages = true;
   const documentRootAccess = true;
   const mediaRootAccess = true;
-  const uiPermissions = await umbracoApi.userGroup.covertApikPermissionToUiPermissions(fallbackPermissions);
-  const uiSections = await umbracoApi.userGroup.covertApiSectionsToUiSections(sections);
+  const uiPermissions = await umbracoApi.userGroup.convertApiPermissionsToUiPermissions(fallbackPermissions);
+  const uiSections = await umbracoApi.userGroup.convertApiSectionsToUiSections(sections);
 
   // Act 
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
@@ -125,8 +125,8 @@ test('the default configuration of Sensitive data is correct', async ({umbracoAp
   const hasAccessToAllLanguages = false;
   const documentRootAccess = false;
   const mediaRootAccess = false;
-  const uiPermissions = await umbracoApi.userGroup.covertApikPermissionToUiPermissions(fallbackPermissions);
-  const uiSections = await umbracoApi.userGroup.covertApiSectionsToUiSections(sections);
+  const uiPermissions = await umbracoApi.userGroup.convertApiPermissionsToUiPermissions(fallbackPermissions);
+  const uiSections = await umbracoApi.userGroup.convertApiSectionsToUiSections(sections);
 
   // Act 
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
@@ -162,8 +162,8 @@ test('the default configuration of Translators data is correct', async ({umbraco
   const hasAccessToAllLanguages = true;
   const documentRootAccess = true;
   const mediaRootAccess = true;
-  const uiPermissions = await umbracoApi.userGroup.covertApikPermissionToUiPermissions(fallbackPermissions);
-  const uiSections = await umbracoApi.userGroup.covertApiSectionsToUiSections(sections);
+  const uiPermissions = await umbracoApi.userGroup.convertApiPermissionsToUiPermissions(fallbackPermissions);
+  const uiSections = await umbracoApi.userGroup.convertApiSectionsToUiSections(sections);
 
   // Act 
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
@@ -199,8 +199,8 @@ test('the default configuration of Writers data is correct', async ({umbracoApi,
   const hasAccessToAllLanguages = true;
   const documentRootAccess = true;
   const mediaRootAccess = true;
-  const uiPermissions = await umbracoApi.userGroup.covertApikPermissionToUiPermissions(fallbackPermissions);
-  const uiSections = await umbracoApi.userGroup.covertApiSectionsToUiSections(sections);
+  const uiPermissions = await umbracoApi.userGroup.convertApiPermissionsToUiPermissions(fallbackPermissions);
+  const uiSections = await umbracoApi.userGroup.convertApiSectionsToUiSections(sections);
 
   // Act 
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
