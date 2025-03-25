@@ -52,3 +52,7 @@ export const WithDefaultSlot: Story = {
 			<div>Custom slot</div>
 		</umb-input-dropzone>`,
 };
+
+export const WithTextSlot: Story = {
+	render: () => html`<umb-input-dropzone><div slot="text">Drop your files here</div></umb-input-dropzone>`,
+};

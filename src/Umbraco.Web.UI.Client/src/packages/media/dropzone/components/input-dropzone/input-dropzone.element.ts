@@ -29,6 +29,7 @@ import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
  * @fires UmbDropzoneChangeEvent When the upload is complete.
  * @fires UmbDropzoneSubmittedEvent When the upload is submitted.
  * @slot - The default slot.
+ * @slot text - A text shown above the dropzone graphic.
  */
 @customElement('umb-input-dropzone')
 export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableItem[], typeof UmbLitElement>(
@@ -118,6 +119,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 
 	override render() {
 		return html`
+			<slot name="text"></slot>
 			<uui-file-dropzone
 				id="dropzone"
 				label=${this.label}
@@ -237,6 +239,14 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	static override readonly styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				flex-wrap: wrap;
+				place-items: center;
+				cursor: pointer;
+			}
+
 			:host([disabled]) #dropzone {
 				opacity: 0.5;
 				pointer-events: none;
