@@ -132,7 +132,7 @@ export default {
 	prompt: {
 		stay: 'Stay',
 		discardChanges: 'Discard changes',
-		unsavedChanges: 'You have unsaved changes',
+		unsavedChanges: 'Discard unsaved changes',
 		unsavedChangesWarning: 'Are you sure you want to navigate away from this page? - you have unsaved changes',
 	},
 	bulk: {
