@@ -270,14 +270,11 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					</p>
 					${this.#renderCustomValidation()}
 				</div>
-				<hr />
 				${this.#renderVariationControls()}
-				<div class="container">
-					<b style="margin-bottom: var(--uui-size-space-3)">
-						<umb-localize key="contentTypeEditor_displaySettingsHeadline">Appearance</umb-localize>
-					</b>
-					<div id="appearances">${this.#renderAlignLeftIcon()} ${this.#renderAlignTopIcon()}</div>
-				</div>
+				<umb-property-layout label="#contentTypeEditor_displaySettingsHeadline" orientation="vertical">
+					<div id="appearances" slot="editor">${this.#renderAlignLeftIcon()} ${this.#renderAlignTopIcon()}</div>
+				</umb-property-layout>
+
 				${this.#renderMemberTypeOptions()}
 			</uui-box>
 		`;
@@ -552,10 +549,6 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 			form {
 				display: block;
 				height: 100%;
-			}
-
-			umb-property-layout {
-				padding-top: 0;
 			}
 		`,
 	];
