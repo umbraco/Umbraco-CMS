@@ -139,6 +139,7 @@ export class UmbPropertyEditorUIBlockGridElement
 					if (dataPath) {
 						// Set the data path for the local validation context:
 						this.#validationContext.setDataPath(dataPath);
+						this.#validationContext.autoReport();
 					}
 				},
 				'observeDataPath',

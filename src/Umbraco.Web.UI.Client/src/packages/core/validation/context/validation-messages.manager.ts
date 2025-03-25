@@ -32,7 +32,11 @@ export class UmbValidationMessagesManager {
 	messages = this.#messages.asObservable();
 	filteredMessages = this.#messages.asObservablePart((msgs) => (this.#filter ? msgs.filter(this.#filter) : msgs));
 
-	getFilteredMessages(): Array<UmbValidationMessage> {
+	getNotFilteredMessages(): Array<UmbValidationMessage> {
+		return this.#messages.getValue();
+	}
+
+	getMessages(): Array<UmbValidationMessage> {
 		const msgs = this.#messages.getValue();
 		return this.#filter ? msgs.filter(this.#filter) : msgs;
 	}
@@ -68,12 +72,12 @@ export class UmbValidationMessagesManager {
 	}
 
 	getHasAnyMessages(): boolean {
-		return this.getFilteredMessages().length !== 0;
+		return this.getMessages().length !== 0;
 	}
 
 	getMessagesOfPathAndDescendant(path: string): Array<UmbValidationMessage> {
 		//path = path.toLowerCase();
-		return this.getFilteredMessages().filter((x) => MatchPathOrDescendantPath(x.path, path));
+		return this.getMessages().filter((x) => MatchPathOrDescendantPath(x.path, path));
 	}
 
 	messagesOfPathAndDescendant(path: string): Observable<Array<UmbValidationMessage>> {
@@ -107,7 +111,7 @@ export class UmbValidationMessagesManager {
 	}
 	getHasMessagesOfPathAndDescendant(path: string): boolean {
 		//path = path.toLowerCase();
-		return this.getFilteredMessages().some(
+		return this.getMessages().some(
 			(x) =>
 				x.path.indexOf(path) === 0 &&
 				(x.path.length === path.length || x.path[path.length] === '.' || x.path[path.length] === '['),
