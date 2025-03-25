@@ -5,6 +5,7 @@ import type { UmbContentVariantPickerData, UmbContentVariantPickerValue } from '
 import type { UmbContentPropertyDatasetContext } from '../property-dataset-context/index.js';
 import type { UmbContentValidationRepository } from '../repository/content-validation-repository.interface.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
+import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbraco-cms/backoffice/repository';
 import {
@@ -51,7 +52,7 @@ import {
 	type UmbPropertyTypePresetModel,
 	type UmbPropertyTypePresetModelTypeModel,
 } from '@umbraco-cms/backoffice/property';
-import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
+import { UmbSegmentCollectionRepository, type UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -139,6 +140,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @description - Should not be used by external code.
 	 */
 	public readonly languages = this.#languages.asObservable();
+
+	#segmentRepository = new UmbSegmentCollectionRepository(this);
+	#segments = new UmbArrayState<UmbSegmentCollectionItemModel>([], (x) => x.unique);
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
