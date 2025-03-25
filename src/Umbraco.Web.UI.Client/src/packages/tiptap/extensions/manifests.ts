@@ -1,6 +1,7 @@
 import { manifests as blockExtensions } from './block/manifests.js';
 import { manifests as styleSelectExtensions } from './style-select/manifests.js';
 import { manifests as tableExtensions } from './table/manifests.js';
+import { manifests as statusbarExtensions } from './statusbar/manifests.js';
 import type { ManifestTiptapExtension } from './tiptap.extension.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -167,9 +168,20 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 		name: 'Text Indent Tiptap Extension',
 		api: () => import('./core/text-indent.tiptap-api.js'),
 		meta: {
-			icon: 'icon-science',
+			icon: 'icon-indent',
 			label: 'Text Indent',
 			group: '#tiptap_extGroup_formatting',
+		},
+	},
+	{
+		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.WordCount',
+		name: 'Word Count Tiptap Extension',
+		api: () => import('./core/word-count.tiptap-api.js'),
+		meta: {
+			icon: 'icon-speed-gauge',
+			label: 'Word Count',
+			group: '#tiptap_extGroup_interactive',
 		},
 	},
 ];
@@ -648,6 +660,7 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 export const manifests = [
 	...kinds,
 	...coreExtensions,
+	...statusbarExtensions,
 	...toolbarExtensions,
 	...blockExtensions,
 	...styleSelectExtensions,
