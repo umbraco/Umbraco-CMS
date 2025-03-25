@@ -7,9 +7,9 @@
 
 import madge from 'madge';
 import { join } from 'path';
-import { mkdirSync } from 'fs';
+//import { mkdirSync } from 'fs';
 
-const __dirname = import.meta.dirname;
+//const __dirname = import.meta.dirname;
 const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
 const IS_AZURE_PIPELINES = process.env.TF_BUILD === 'true';
 const baseDir = process.argv[2] || 'src';
