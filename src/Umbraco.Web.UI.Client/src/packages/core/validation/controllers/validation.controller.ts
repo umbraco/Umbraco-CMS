@@ -3,13 +3,13 @@ import type { UmbValidationMessageTranslator } from '../translators/index.js';
 import { GetValueByJsonPath } from '../utils/json-path.function.js';
 import { UMB_VALIDATION_CONTEXT } from '../context/validation.context-token.js';
 import { type UmbValidationMessage, UmbValidationMessagesManager } from '../context/validation-messages.manager.js';
+import { ReplaceStartOfPath } from '../utils/replace-start-of-path.function.js';
+import type { UmbVariantId } from '../../variant/variant-id.class.js';
+import { UmbDeprecation } from '../../utils/deprecation/deprecation.js';
 import type { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { ReplaceStartOfPath } from '../utils/replace-start-of-path.function.js';
-import type { UmbVariantId } from '../../variant/variant-id.class.js';
-import { UmbDeprecation } from '../../utils/deprecation/deprecation.js';
 
 const Regex = /@\.culture == ('[^']*'|null) *&& *@\.segment == ('[^']*'|null)/g;
 
@@ -31,12 +31,14 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	// Local version of the data send to the server, only use-case is for translation.
 	#translationData = new UmbObjectState<any>(undefined);
 	/**
+	 * @param path
 	 * @deprecated Use extension type 'propertyValidationPathTranslator' instead. Will be removed in v.17
 	 */
 	translationDataOf(path: string): any {
 		return this.#translationData.asObservablePart((data) => GetValueByJsonPath(data, path));
 	}
 	/**
+	 * @param data
 	 * @deprecated Use extension type 'propertyValidationPathTranslator' instead. Will be removed in v.17
 	 */
 	setTranslationData(data: any): void {

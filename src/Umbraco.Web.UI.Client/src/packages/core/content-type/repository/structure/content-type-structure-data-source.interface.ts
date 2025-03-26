@@ -6,5 +6,8 @@ export interface UmbContentTypeStructureDataSourceConstructor<ItemType> {
 }
 
 export interface UmbContentTypeStructureDataSource<ItemType> {
-	getAllowedChildrenOf(unique: string | null, parentContentUnique: string | null): Promise<UmbDataSourceResponse<UmbPagedModel<ItemType>>>;
+	getAllowedChildrenOf(
+		unique: string | null,
+		parentContentUnique: string | null,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<ItemType>>>;
 }
