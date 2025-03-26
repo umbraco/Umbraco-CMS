@@ -25,6 +25,7 @@ export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 	 * @param {string} id
 	 * @param {File} file
 	 * @param onProgress
+	 * @param abortSignal
 	 * @returns {*}
 	 * @memberof UmbTemporaryFileRepository
 	 */

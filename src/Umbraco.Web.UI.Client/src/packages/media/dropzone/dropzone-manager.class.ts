@@ -70,6 +70,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	}
 
 	/**
+	 * @param isAllowed
 	 * @deprecated Not used anymore; this method will be removed in Umbraco 17.
 	 */
 	public setIsFoldersAllowed(isAllowed: boolean) {
