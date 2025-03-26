@@ -11,7 +11,6 @@ export default defineConfig({
 	...getDefaultConfig({
 		dist,
 		entry: {
-			'entry-point': 'entry-point.ts',
 			'dropzone/index': 'dropzone/index.ts',
 		},
 	}),
