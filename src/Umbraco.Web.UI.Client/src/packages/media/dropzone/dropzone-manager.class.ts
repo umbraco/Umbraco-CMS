@@ -35,6 +35,9 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
  */
 export class UmbDropzoneManager extends UmbControllerBase {
 	readonly #host: UmbControllerHost;
+	/**
+	 * @deprecated Not used anymore; this method will be removed in Umbraco 17.
+	 */
 	#isFoldersAllowed = true;
 
 	#mediaTypeStructure = new UmbMediaTypeStructureRepository(this);
@@ -66,10 +69,16 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		});
 	}
 
+	/**
+	 * @deprecated Not used anymore; this method will be removed in Umbraco 17.
+	 */
 	public setIsFoldersAllowed(isAllowed: boolean) {
 		this.#isFoldersAllowed = isAllowed;
 	}
 
+	/**
+	 * @deprecated Not used anymore; this method will be removed in Umbraco 17.
+	 */
 	public getIsFoldersAllowed(): boolean {
 		return this.#isFoldersAllowed;
 	}
@@ -80,7 +89,6 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	/**
 	 * Uploads files and folders to the server and creates the media items with corresponding media type.\
 	 * Allows the user to pick a media type option if multiple types are allowed.
-	 * @deprecated Use the {@link UmbDropzoneMediaManager} class instead. This will be removed in Umbraco 18.
 	 * @param {UmbFileDropzoneDroppedItems} items - The files and folders to upload.
 	 * @param {string | null} parentUnique - Where the items should be uploaded.
 	 * @returns {Array<UmbUploadableItem>} - The items about to be uploaded.

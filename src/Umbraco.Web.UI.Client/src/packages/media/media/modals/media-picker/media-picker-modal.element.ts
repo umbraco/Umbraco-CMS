@@ -6,6 +6,7 @@ import { UmbMediaSearchProvider } from '../../search/index.js';
 import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
+import type { UmbDropzoneChangeEvent, UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbDropzoneMediaElement } from '@umbraco-cms/backoffice/media';
 import {
 	css,
@@ -116,7 +117,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		this.#loadChildrenOfCurrentMediaItem();
 	}
 
-	async #loadChildrenOfCurrentMediaItem() {
+	async #loadChildrenOfCurrentMediaItem(selectedItems?: Array<UmbUploadableItem>) {
 		const key = this._currentMediaEntity.entityType + this._currentMediaEntity.unique;
 		let paginationManager = this.#pagingMap.get(key);
 
@@ -143,6 +144,18 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		paginationManager.setTotalItems(data?.total ?? 0);
 		this._currentPage = paginationManager.getCurrentPageNumber();
 		this._currentTotalPages = paginationManager.getTotalPages();
+
+		if (selectedItems?.length) {
+			const selectedItem = this._currentChildren.find((x) => x.unique == selectedItems[0].unique);
+			if (selectedItem) {
+				this.#onSelected(selectedItem);
+			}
+		}
+	}
+
+	#onDropzoneChange(evt: UmbDropzoneChangeEvent) {
+		const target = evt.target as UmbDropzoneMediaElement;
+		this.#loadChildrenOfCurrentMediaItem(target.value);
 	}
 
 	#onOpen(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
@@ -290,7 +303,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			<umb-dropzone-media
 				id="dropzone"
 				multiple
-				@complete=${this.#loadChildrenOfCurrentMediaItem}
+				@change=${this.#onDropzoneChange}
 				.parentUnique=${this._currentMediaEntity.unique}></umb-dropzone-media>
 			${this._searchQuery ? this.#renderSearchResult() : this.#renderCurrentChildren()} `;
 	}
