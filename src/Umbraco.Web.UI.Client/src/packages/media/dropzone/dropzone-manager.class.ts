@@ -35,6 +35,9 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
  */
 export class UmbDropzoneManager extends UmbControllerBase {
 	readonly #host: UmbControllerHost;
+	/**
+	 * @deprecated Not used anymore; this method will be removed in Umbraco 17.
+	 */
 	#isFoldersAllowed = true;
 
 	#mediaTypeStructure = new UmbMediaTypeStructureRepository(this);
@@ -66,10 +69,16 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		});
 	}
 
+	/**
+	 * @deprecated Not used anymore; this method will be removed in Umbraco 17.
+	 */
 	public setIsFoldersAllowed(isAllowed: boolean) {
 		this.#isFoldersAllowed = isAllowed;
 	}
 
+	/**
+	 * @deprecated Not used anymore; this method will be removed in Umbraco 17.
+	 */
 	public getIsFoldersAllowed(): boolean {
 		return this.#isFoldersAllowed;
 	}

@@ -44,14 +44,8 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	/**
 	 * Disable folder uploads.
 	 */
-	@property({ type: Boolean, attribute: 'disable-folder-upload', reflect: true })
-	public set disableFolderUpload(isAllowed: boolean) {
-		this._manager.setIsFoldersAllowed(!isAllowed);
-	}
-	public get disableFolderUpload() {
-		return this._disableFolderUpload;
-	}
-	private readonly _disableFolderUpload = false;
+	@property({ type: Boolean, attribute: 'disable-folder-upload' })
+	disableFolderUpload: boolean = false;
 
 	/**
 	 * Disables the dropzone.
