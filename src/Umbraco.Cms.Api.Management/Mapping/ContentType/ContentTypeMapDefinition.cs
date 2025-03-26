@@ -83,24 +83,10 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeModel,
             ? CompositionType.Inheritance
             : CompositionType.Composition;
 
-    protected static IEnumerable<T> MapNestedCompositions<T>(IEnumerable<IContentTypeComposition> directCompositions, int contentTypeParentId, Func<ReferenceByIdModel, CompositionType, T> contentTypeCompositionFactory)
-    {
-        var allCompositions = new List<T>();
-
-        foreach (var composition in directCompositions)
-        {
-            CompositionType compositionType = CalculateCompositionType(contentTypeParentId, composition);
-            T contentTypeComposition = contentTypeCompositionFactory(new ReferenceByIdModel(composition.Key), compositionType);
-            allCompositions.Add(contentTypeComposition);
-
-            // When we have composition inheritance, we have to find all ancestor compositions recursively
-            if (compositionType == CompositionType.Inheritance && composition.ContentTypeComposition.Any())
-            {
-                var nestedCompositions = MapNestedCompositions(composition.ContentTypeComposition, composition.ParentId, contentTypeCompositionFactory);
-                allCompositions.AddRange(nestedCompositions);
-            }
-        }
-
-        return allCompositions;
-    }
+    protected static IEnumerable<T> MapCompositions<T>(IEnumerable<IContentTypeComposition> directCompositions, int contentTypeParentId, Func<ReferenceByIdModel, CompositionType, T> contentTypeCompositionFactory)
+        => directCompositions
+            .Select(composition => contentTypeCompositionFactory(
+                new ReferenceByIdModel(composition.Key),
+                CalculateCompositionType(contentTypeParentId, composition)))
+            .ToArray();
 }
