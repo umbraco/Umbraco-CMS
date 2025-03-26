@@ -2,28 +2,35 @@ import type {
 	UmbCheckboxListItem,
 	UmbInputCheckboxListElement,
 } from './components/input-checkbox-list/input-checkbox-list.element.js';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 
 import './components/input-checkbox-list/input-checkbox-list.element.js';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-checkbox-list
  */
 @customElement('umb-property-editor-ui-checkbox-list')
-export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUICheckboxListElement
+	extends UmbFormControlMixin<Array<string> | string | undefined, typeof UmbLitElement, undefined>(
+		UmbLitElement,
+		undefined,
+	)
+	implements UmbPropertyEditorUiElement
+{
 	#selection: Array<string> = [];
 
 	@property({ type: Array })
-	public set value(value: Array<string> | string | undefined) {
+	public override set value(value: Array<string> | string | undefined) {
 		this.#selection = Array.isArray(value) ? value : value ? [value] : [];
 	}
-	public get value(): Array<string> | undefined {
+	public override get value(): Array<string> | undefined {
 		return this.#selection;
 	}
 
@@ -60,8 +67,22 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
+	/**
+	 * Sets the input to mandatory, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	mandatory?: boolean;
+
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
+
 	@state()
 	private _list: Array<UmbCheckboxListItem> = [];
+
+	protected override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-checkbox-list')!);
+	}
 
 	#onChange(event: CustomEvent & { target: UmbInputCheckboxListElement }) {
 		this.value = event.target.selection;
@@ -72,9 +93,12 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 		return html`
 			<umb-input-checkbox-list
 				.list=${this._list}
+				.required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
 				.selection=${this.#selection}
 				?readonly=${this.readonly}
-				@change=${this.#onChange}></umb-input-checkbox-list>
+				@change=${this.#onChange}>
+			</umb-input-checkbox-list>
 		`;
 	}
 }

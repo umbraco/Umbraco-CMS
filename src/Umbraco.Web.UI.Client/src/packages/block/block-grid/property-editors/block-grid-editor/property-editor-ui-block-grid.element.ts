@@ -1,4 +1,4 @@
-import { UmbBlockGridManagerContext } from '../../context/block-grid-manager.context.js';
+import { UmbBlockGridManagerContext } from '../../block-grid-manager/index.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
@@ -20,10 +20,10 @@ import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms
 import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
-import { UmbBlockElementDataValidationPathTranslator } from '@umbraco-cms/backoffice/block';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
-import '../../components/block-grid-entries/index.js';
+// TODO: consider moving the components to the property editor folder as they are only used here
+import '../../local-components.js';
 
 /**
  * @element umb-property-editor-ui-block-grid
@@ -34,8 +34,6 @@ export class UmbPropertyEditorUIBlockGridElement
 	implements UmbPropertyEditorUiElement
 {
 	#validationContext = new UmbValidationContext(this);
-	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
-	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 	#managerContext = new UmbBlockGridManagerContext(this);
 	//
 
@@ -94,15 +92,10 @@ export class UmbPropertyEditorUIBlockGridElement
 			this.observe(
 				context.dataPath,
 				(dataPath) => {
-					// Translate paths for content/settings:
-					this.#contentDataPathTranslator?.destroy();
-					this.#settingsDataPathTranslator?.destroy();
 					if (dataPath) {
 						// Set the data path for the local validation context:
 						this.#validationContext.setDataPath(dataPath);
-
-						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
-						this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
+						this.#validationContext.autoReport();
 					}
 				},
 				'observeDataPath',

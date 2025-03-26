@@ -1,18 +1,18 @@
 import type { UmbImageCropperPropertyEditorValue } from './types.js';
 import type { UmbInputImageCropperFieldElement } from './image-cropper-field.element.js';
-import { html, customElement, property, query, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, query, state, css, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
 import { assignToFrozenObject } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 import './image-cropper.element.js';
 import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
 import './image-cropper-field.element.js';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 const DefaultFocalPoint = { left: 0.5, top: 0.5 };
 const DefaultValue = {
@@ -50,11 +50,16 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	@state()
 	fileUnique?: string;
 
-	#manager?: UmbTemporaryFileManager;
+	@state()
+	private _accept?: string;
+
+	@state()
+	private _loading = true;
+
+	#manager = new UmbTemporaryFileManager(this);
 
 	constructor() {
 		super();
-		this.#manager = new UmbTemporaryFileManager(this);
 
 		this.addValidator(
 			'valueMissing',
@@ -67,6 +72,19 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 
 	protected override firstUpdated(): void {
 		this.#mergeCrops();
+		this.#observeAcceptedFileTypes();
+	}
+
+	async #observeAcceptedFileTypes() {
+		const config = await this.#manager.getConfiguration();
+		this.observe(
+			config.part('imageFileTypes'),
+			(imageFileTypes) => {
+				this._accept = imageFileTypes.join(',');
+				this._loading = false;
+			},
+			'_observeFileTypes',
+		);
 	}
 
 	#onUpload(e: UUIFileDropzoneEvent) {
@@ -122,6 +140,10 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	}
 
 	override render() {
+		if (this._loading) {
+			return html`<div id="loader"><uui-loader></uui-loader></div>`;
+		}
+
 		if (this.value?.src || this.file) {
 			return this.#renderImageCropper();
 		}
@@ -131,7 +153,12 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 
 	#renderDropzone() {
 		return html`
-			<uui-file-dropzone id="dropzone" label="dropzone" @change="${this.#onUpload}" @click=${this.#onBrowse}>
+			<uui-file-dropzone
+				id="dropzone"
+				label="dropzone"
+				accept=${ifDefined(this._accept)}
+				@change="${this.#onUpload}"
+				@click=${this.#onBrowse}>
 				<uui-button label=${this.localize.term('media_clickToUpload')} @click="${this.#onBrowse}"></uui-button>
 			</uui-file-dropzone>
 		`;
@@ -166,6 +193,11 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 
 	static override styles = [
 		css`
+			#loader {
+				display: flex;
+				justify-content: center;
+			}
+
 			uui-file-dropzone {
 				position: relative;
 				display: block;

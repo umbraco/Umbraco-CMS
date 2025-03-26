@@ -271,10 +271,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: false,
 			},
 			{
-				alias: 'showOpenButton',
-				value: true,
-			},
-			{
 				alias: 'filter',
 				value: '',
 			},
@@ -1037,7 +1033,9 @@ export const data: Array<UmbMockDataTypeModel> = [
 					'Umb.Tiptap.Table',
 					'Umb.Tiptap.TextAlign',
 					'Umb.Tiptap.TextDirection',
+					'Umb.Tiptap.TextIndent',
 					'Umb.Tiptap.Underline',
+					'Umb.Tiptap.WordCount',
 				],
 			},
 			{
@@ -1064,11 +1062,13 @@ export const data: Array<UmbMockDataTypeModel> = [
 							'Umb.Tiptap.Toolbar.TextAlignRight',
 						],
 						['Umb.Tiptap.Toolbar.Subscript', 'Umb.Tiptap.Toolbar.Superscript'],
+						['Umb.Tiptap.Toolbar.CodeBlock'],
 						[
 							'Umb.Tiptap.Toolbar.CharacterMap',
 							'Umb.Tiptap.Toolbar.TextDirectionRtl',
 							'Umb.Tiptap.Toolbar.TextDirectionLtr',
 						],
+						['Umb.Tiptap.Toolbar.TextIndent', 'Umb.Tiptap.Toolbar.TextOutdent'],
 						[
 							'Umb.Tiptap.Toolbar.BulletList',
 							'Umb.Tiptap.Toolbar.OrderedList',
@@ -1080,6 +1080,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 					],
 				],
 			},
+			{ alias: 'statusbar', value: [['Umb.Tiptap.Statusbar.ElementPath'], ['Umb.Tiptap.Statusbar.WordCount']] },
 			{ alias: 'stylesheets', value: ['/rte-styles.css'] },
 			{ alias: 'dimensions', value: { height: 500 } },
 			{ alias: 'maxImageSize', value: 500 },
