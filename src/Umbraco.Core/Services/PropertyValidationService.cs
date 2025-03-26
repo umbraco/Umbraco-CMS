@@ -1,5 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Validation;
@@ -15,19 +19,43 @@ public class PropertyValidationService : IPropertyValidationService
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IValueEditorCache _valueEditorCache;
     private readonly ICultureDictionary _cultureDictionary;
+    private readonly ILanguageService _languageService;
+    private readonly ContentSettings _contentSettings;
 
+    [Obsolete("Use the constructor that accepts ILanguageService and ContentSettings options. Will be removed in V17.")]
     public PropertyValidationService(
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,
         ILocalizedTextService textService,
         IValueEditorCache valueEditorCache,
         ICultureDictionary cultureDictionary)
+        : this(
+            propertyEditors,
+            dataTypeService,
+            textService,
+            valueEditorCache,
+            cultureDictionary,
+            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>())
+    {
+    }
+
+    public PropertyValidationService(
+        PropertyEditorCollection propertyEditors,
+        IDataTypeService dataTypeService,
+        ILocalizedTextService textService,
+        IValueEditorCache valueEditorCache,
+        ICultureDictionary cultureDictionary,
+        ILanguageService languageService,
+        IOptions<ContentSettings> contentSettings)
     {
         _propertyEditors = propertyEditors;
         _dataTypeService = dataTypeService;
         _textService = textService;
         _valueEditorCache = valueEditorCache;
         _cultureDictionary = cultureDictionary;
+        _languageService = languageService;
+        _contentSettings = contentSettings.Value;
     }
 
     /// <inheritdoc />
@@ -52,6 +80,19 @@ public class PropertyValidationService : IPropertyValidationService
         {
             throw new InvalidOperationException("No property editor found by alias " +
                                                 propertyType.PropertyEditorAlias);
+        }
+
+        // only validate culture invariant properties if
+        // - AllowEditInvariantFromNonDefault is true, or
+        // - the default language is being validated, or
+        // - the underlying data editor supports partial property value merging (e.g. block level variance)
+        var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        if (propertyType.VariesByCulture() is false
+            && _contentSettings.AllowEditInvariantFromNonDefault is false
+            && validationContext.CulturesBeingValidated.InvariantContains(defaultCulture) is false
+            && dataEditor.CanMergePartialPropertyValues(propertyType) is false)
+        {
+            return [];
         }
 
         return ValidatePropertyValue(dataEditor, dataType, postedValue, propertyType.Mandatory, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage, validationContext);

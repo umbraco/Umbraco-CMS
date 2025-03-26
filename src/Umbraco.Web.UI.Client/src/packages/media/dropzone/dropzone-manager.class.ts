@@ -1,6 +1,6 @@
-import { UmbMediaDetailRepository } from '../repository/index.js';
-import type { UmbMediaDetailModel, UmbMediaValueModel } from '../types.js';
-import { UmbFileDropzoneItemStatus } from './types.js';
+import { UmbMediaDetailRepository } from '../media/repository/index.js';
+import type { UmbMediaDetailModel, UmbMediaValueModel } from '../media/types.js';
+import { UmbFileDropzoneItemStatus } from './constants.js';
 import { UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL } from './modals/index.js';
 import type {
 	UmbUploadableFile,
@@ -11,7 +11,11 @@ import type {
 	UmbAllowedMediaTypesOfExtension,
 	UmbAllowedChildrenOfMediaType,
 } from './types.js';
-import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
+import {
+	TemporaryFileStatus,
+	UmbTemporaryFileManager,
+	type UmbTemporaryFileModel,
+} from '@umbraco-cms/backoffice/temporary-file';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -76,6 +80,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	/**
 	 * Uploads files and folders to the server and creates the media items with corresponding media type.\
 	 * Allows the user to pick a media type option if multiple types are allowed.
+	 * @deprecated Use the {@link UmbDropzoneMediaManager} class instead. This will be removed in Umbraco 18.
 	 * @param {UmbFileDropzoneDroppedItems} items - The files and folders to upload.
 	 * @param {string | null} parentUnique - Where the items should be uploaded.
 	 * @returns {Array<UmbUploadableItem>} - The items about to be uploaded.
@@ -111,11 +116,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 		for (const item of uploadableItems) {
 			// Upload as temp file
-			const uploaded = await this.#tempFileManager.uploadOne({
-				temporaryUnique: item.temporaryFile.temporaryUnique,
-				file: item.temporaryFile.file,
-				onProgress: (progress) => this.#updateProgress(item, progress),
-			});
+			const uploaded = await this.#tempFileManager.uploadOne(item.temporaryFile);
 
 			// Update progress
 			if (uploaded.status === TemporaryFileStatus.SUCCESS) {
@@ -129,6 +130,35 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		}
 
 		return uploadedItems;
+	}
+
+	public removeOne(item: UmbUploadableItem) {
+		item.temporaryFile?.abortController?.abort();
+		this.#progressItems.removeOne(item.unique);
+		if (item.temporaryFile) {
+			this.#tempFileManager.removeOne(item.temporaryFile.temporaryUnique);
+		}
+	}
+
+	public remove(items: Array<UmbUploadableItem>) {
+		const uniques: string[] = [];
+		for (const item of items) {
+			item.temporaryFile?.abortController?.abort();
+			if (item.temporaryFile) {
+				uniques.push(item.temporaryFile.temporaryUnique);
+			}
+		}
+		this.#progressItems.remove(uniques);
+		const temporaryUniques = items.map((x) => x.temporaryFile?.temporaryUnique).filter((x): x is string => !!x);
+		this.#tempFileManager.remove(temporaryUniques);
+	}
+
+	public removeAll() {
+		for (const item of this.#progressItems.getValue()) {
+			item.temporaryFile?.abortController?.abort();
+		}
+		this.#progressItems.setValue([]);
+		this.#tempFileManager.removeAll();
 	}
 
 	async #showDialogMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>) {
@@ -188,6 +218,10 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	async #handleFile(item: UmbUploadableFile, mediaTypeUnique: string) {
 		// Upload the file as a temporary file and update progress.
 		const temporaryFile = await this.#uploadAsTemporaryFile(item);
+		if (temporaryFile.status === TemporaryFileStatus.CANCELLED) {
+			this.#updateStatus(item, UmbFileDropzoneItemStatus.CANCELLED);
+			return;
+		}
 		if (temporaryFile.status !== TemporaryFileStatus.SUCCESS) {
 			this.#updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
 			return;
@@ -215,11 +249,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	}
 
 	#uploadAsTemporaryFile(item: UmbUploadableFile) {
-		return this.#tempFileManager.uploadOne({
-			temporaryUnique: item.temporaryFile.temporaryUnique,
-			file: item.temporaryFile.file,
-			onProgress: (progress) => this.#updateProgress(item, progress),
-		});
+		return this.#tempFileManager.uploadOne(item.temporaryFile);
 	}
 
 	// Media types
@@ -322,13 +352,26 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		const items: Array<UmbUploadableItem> = [];
 
 		for (const file of files) {
-			items.push({
+			const temporaryFile: UmbTemporaryFileModel = {
+				file,
+				temporaryUnique: UmbId.new(),
+				abortController: new AbortController(),
+				onProgress: (progress) => this.#updateProgress(uploadableItem, progress),
+			};
+
+			const uploadableItem: UmbUploadableFile = {
 				unique: UmbId.new(),
 				parentUnique,
 				status: UmbFileDropzoneItemStatus.WAITING,
 				progress: 0,
-				temporaryFile: { file, temporaryUnique: UmbId.new() },
+				temporaryFile,
+			};
+
+			temporaryFile.abortController?.signal.addEventListener('abort', () => {
+				this.#updateStatus(uploadableItem, UmbFileDropzoneItemStatus.CANCELLED);
 			});
+
+			items.push(uploadableItem);
 		}
 
 		for (const subfolder of folders) {
