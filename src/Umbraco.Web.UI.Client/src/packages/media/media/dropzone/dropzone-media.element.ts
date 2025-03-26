@@ -20,8 +20,6 @@ import type { UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui'
  */
 @customElement('umb-dropzone-media')
 export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
-	protected override _manager = new UmbDropzoneMediaManager(this);
-
 	/**
 	 * Gets the current value of the uploaded items.
 	 * @returns {Array<UmbUploadableItem>} An array of uploadable items.
@@ -33,6 +31,8 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 	public progressItems = () => this._manager.progressItems;
 	public progress = () => this._manager.progress;
 
+	#mediaManager = new UmbDropzoneMediaManager(this);
+
 	constructor() {
 		super();
 
@@ -42,19 +42,18 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 
 		this.observe(
 			this._manager.progressItems,
-			(progressItems: Array<UmbUploadableItem>) => {
+			(progressItems) => {
 				const waiting = progressItems.find((item) => item.status === UmbFileDropzoneItemStatus.WAITING);
 				if (progressItems.length && !waiting) {
 					this.dispatchEvent(new CustomEvent('complete', { detail: progressItems }));
 				}
 			},
-			'_observeProgressItems',
+			'_observeProgressItemsComplete',
 		);
 	}
 
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
-		this._manager.destroy();
 		document.removeEventListener('dragenter', this.#handleDragEnter.bind(this));
 		document.removeEventListener('dragleave', this.#handleDragLeave.bind(this));
 		document.removeEventListener('drop', this.#handleDrop.bind(this));
@@ -71,8 +70,9 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 			folders: event.detail.folders,
 		};
 
-		const uploadable = this._manager.createMediaItems(droppedItems, this.parentUnique);
-		this.dispatchEvent(new UmbDropzoneSubmittedEvent(await uploadable));
+		const uploadableItems = await this._manager.createTemporaryFiles(droppedItems, this.parentUnique);
+		const uploadables = this.#mediaManager.createMediaItems(uploadableItems);
+		this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadables));
 	}
 
 	#handleDragEnter(e: DragEvent) {

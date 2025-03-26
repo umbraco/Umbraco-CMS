@@ -3,57 +3,49 @@ import { UmbMediaDetailRepository } from '../repository/detail/index.js';
 import type { UmbMediaDetailModel, UmbMediaValueModel } from '../types.js';
 
 import {
-	UmbDropzoneManager,
 	UmbFileDropzoneItemStatus,
 	type UmbAllowedChildrenOfMediaType,
 	type UmbAllowedMediaTypesOfExtension,
-	type UmbFileDropzoneDroppedItems,
 	type UmbUploadableFile,
 	type UmbUploadableFolder,
 	type UmbUploadableItem,
 } from '@umbraco-cms/backoffice/dropzone';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbMediaTypeStructureRepository, type UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbDropzoneMediaManager extends UmbDropzoneManager {
-	#mediaTypeStructure = new UmbMediaTypeStructureRepository(this);
-	#mediaDetailRepository = new UmbMediaDetailRepository(this);
-
+export class UmbDropzoneMediaManager extends UmbControllerBase {
 	// The available media types for a file extension.
 	readonly #availableMediaTypesOf = new UmbArrayState<UmbAllowedMediaTypesOfExtension>([], (x) => x.extension);
 
 	// The media types that the parent will allow to be created under it.
 	readonly #allowedChildrenOf = new UmbArrayState<UmbAllowedChildrenOfMediaType>([], (x) => x.mediaTypeUnique);
 
+	readonly #mediaTypeStructure = new UmbMediaTypeStructureRepository(this);
+	readonly #mediaDetailRepository = new UmbMediaDetailRepository(this);
 	readonly #localization = new UmbLocalizationController(this);
 
 	/**
 	 * Uploads files and folders to the server and creates the media items with corresponding media type.\
 	 * Allows the user to pick a media type option if multiple types are allowed.
-	 * @param {UmbFileDropzoneDroppedItems} items - The files and folders to upload.
-	 * @param {string | null} parentUnique - The parent unique.
+	 * @param {Array<UmbUploadableItem>} uploadableItems - The files and folders to upload.
 	 * @returns {Array<UmbUploadableItem>} - The items about to be uploaded.
 	 */
-	public async createMediaItems(
-		items: UmbFileDropzoneDroppedItems,
-		parentUnique: string | null,
-	): Promise<Array<UmbUploadableItem>> {
-		const uploadableItems = await this.createTemporaryFiles(items, parentUnique);
-		const completedItems = uploadableItems.filter((x) => x.status === UmbFileDropzoneItemStatus.COMPLETE);
-		if (!completedItems.length) return [];
+	public createMediaItems(uploadableItems: Array<UmbUploadableItem>): Array<UmbUploadableItem> {
+		if (!uploadableItems.length) return [];
 
-		if (completedItems.length === 1) {
+		if (uploadableItems.length === 1) {
 			// When there is only one item being uploaded, allow the user to pick the media type, if more than one is allowed.
-			this.#createOneMediaItem(completedItems[0]);
+			this.#createOneMediaItem(uploadableItems[0]);
 		} else {
 			// When there are multiple items being uploaded, automatically pick the media types for each item. We probably want to allow the user to pick the media type in the future.
-			this.#createMediaItems(completedItems);
+			this.#createMediaItems(uploadableItems);
 		}
 
-		return completedItems;
+		return uploadableItems;
 	}
 
 	async #showDialogMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>) {
@@ -72,13 +64,17 @@ export class UmbDropzoneMediaManager extends UmbDropzoneManager {
 					message: `${this.#localization.term('media_disallowedFileType')}: ${item.temporaryFile?.file.name}.`,
 				},
 			});
-			return this._updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED);
+			item.status = UmbFileDropzoneItemStatus.NOT_ALLOWED;
+			//this._updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED);
+			return;
 		}
 
 		const mediaTypeUnique = options.length > 1 ? await this.#showDialogMediaTypePicker(options) : options[0].unique;
 
 		if (!mediaTypeUnique) {
-			return this._updateStatus(item, UmbFileDropzoneItemStatus.CANCELLED);
+			item.status = UmbFileDropzoneItemStatus.CANCELLED;
+			//this._updateStatus(item, UmbFileDropzoneItemStatus.CANCELLED);
+			return;
 		}
 
 		if (item.temporaryFile) {
@@ -92,7 +88,8 @@ export class UmbDropzoneMediaManager extends UmbDropzoneManager {
 		for (const item of uploadableItems) {
 			const options = await this.#getMediaTypeOptions(item);
 			if (!options.length) {
-				this._updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED);
+				item.status = UmbFileDropzoneItemStatus.NOT_ALLOWED;
+				//this._updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED);
 				continue;
 			}
 
@@ -114,22 +111,21 @@ export class UmbDropzoneMediaManager extends UmbDropzoneManager {
 	async #handleFile(item: UmbUploadableFile, mediaTypeUnique: string) {
 		// Create the media item.
 		const scaffold = await this.#getItemScaffold(item, mediaTypeUnique);
-		const { data } = await this.#mediaDetailRepository.create(scaffold, item.parentUnique);
+		const { error } = await this.#mediaDetailRepository.create(scaffold, item.parentUnique);
 
-		if (data) {
-			this._updateStatus(item, UmbFileDropzoneItemStatus.COMPLETE);
-		} else {
-			this._updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
+		if (error) {
+			item.status = UmbFileDropzoneItemStatus.ERROR;
+			//this._updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
 		}
 	}
 
 	async #handleFolder(item: UmbUploadableFolder, mediaTypeUnique: string) {
 		const scaffold = await this.#getItemScaffold(item, mediaTypeUnique);
-		const { data } = await this.#mediaDetailRepository.create(scaffold, item.parentUnique);
-		if (data) {
-			this._updateStatus(item, UmbFileDropzoneItemStatus.COMPLETE);
-		} else {
-			this._updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
+		const { error } = await this.#mediaDetailRepository.create(scaffold, item.parentUnique);
+
+		if (error) {
+			item.status = UmbFileDropzoneItemStatus.ERROR;
+			//this._updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
 		}
 	}
 

@@ -99,7 +99,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		this.observe(
 			this._manager.progressItems,
 			(progressItems) => {
-				this._progressItems = [...progressItems];
+				this._progressItems = progressItems;
 				const waiting = this._progressItems.find((item) => item.status === UmbFileDropzoneItemStatus.WAITING);
 				if (this._progressItems.length && !waiting) {
 					this.value = [...this._progressItems];

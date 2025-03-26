@@ -24,14 +24,14 @@ import {
  * @property {UmbArrayState<UmbUploadableItem>} progressItems - Emits the items with their current status.
  */
 export class UmbDropzoneManager extends UmbControllerBase {
-	#isFoldersAllowed = true;
-
-	#tempFileManager = new UmbTemporaryFileManager(this);
 	readonly #progress = new UmbObjectState<UmbFileDropzoneProgress>({ total: 0, completed: 0 });
 	public readonly progress = this.#progress.asObservable();
 
 	readonly #progressItems = new UmbArrayState<UmbUploadableItem>([], (x) => x.unique);
 	public readonly progressItems = this.#progressItems.asObservable();
+
+	#isFoldersAllowed = true;
+	#tempFileManager = new UmbTemporaryFileManager(this);
 
 	public setIsFoldersAllowed(isAllowed: boolean) {
 		this.#isFoldersAllowed = isAllowed;
@@ -108,12 +108,21 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	// Progress handling
 	#setupProgress(items: UmbFileDropzoneDroppedItems, parent: string | null) {
 		const current = this.#progress.getValue();
-		const currentItems = this.#progressItems.getValue();
 
-		const uploadableItems = this.#prepareItemsAsUploadable({ folders: items.folders, files: items.files }, parent);
+		const uploadableItems = this.#prepareItemsAsUploadable(items, parent);
 
-		this.#progressItems.setValue([...currentItems, ...uploadableItems]);
-		this.#progress.setValue({ total: current.total + uploadableItems.length, completed: current.completed });
+		this.#progressItems.append(uploadableItems);
+		console.log(
+			'trying to append',
+			uploadableItems,
+			'to',
+			this.#progressItems,
+			'which now has the value of',
+			this.#progressItems.getValue(),
+		);
+		this.#progress.update({
+			total: current.total + uploadableItems.length,
+		});
 
 		return uploadableItems;
 	}
