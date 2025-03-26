@@ -1,4 +1,3 @@
-import type { ActiveVariant } from '../../controllers/index.js';
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT } from './workspace-split-view.context.js';
 import { css, customElement, html, ifDefined, nothing, query, ref, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -27,10 +26,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	private _readOnlyStates: Array<UmbVariantState> = [];
 
 	@state()
-	_activeVariants: Array<ActiveVariant> = [];
-
-	@state()
-	_activeVariantsCultures: string[] = [];
+	_activeVariants: Array<UmbVariantId> = [];
 
 	#splitViewContext?: typeof UMB_WORKSPACE_SPLIT_VIEW_CONTEXT.TYPE;
 	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
@@ -105,8 +101,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			workspaceContext.splitView.activeVariantsInfo,
 			(activeVariants) => {
 				if (activeVariants) {
-					this._activeVariants = activeVariants;
-					this._activeVariantsCultures = this._activeVariants.map((el) => el.culture ?? '') ?? [];
+					this._activeVariants = activeVariants.map((variant) => UmbVariantId.Create(variant));
 				}
 			},
 			'_observeActiveVariants',
@@ -167,12 +162,13 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		this.#splitViewContext?.closeSplitView();
 	}
 
-	#isVariantActive(culture: string | null) {
-		return culture !== null ? this._activeVariantsCultures.includes(culture) : true;
+	#isVariantActive(variantId: UmbVariantId) {
+		return this._activeVariants.find((activeVariantId) => activeVariantId.equal(variantId)) !== undefined;
 	}
 
 	#isCreateMode(variantOption: VariantOptionModelType) {
-		return !variantOption.variant && !this.#isVariantActive(variantOption.culture);
+		const variantId = new UmbVariantId(variantOption.culture, variantOption.segment);
+		return !variantOption.variant && !this.#isVariantActive(variantId);
 	}
 
 	#hasVariants() {
@@ -276,17 +272,18 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	}
 
 	#renderListItem(variantOption: VariantOptionModelType) {
+		const variantId = UmbVariantId.Create(variantOption);
 		return html`
-			<li class="${this.#isVariantActive(variantOption.culture) ? 'selected' : ''}">
+			<li class="${this.#isVariantActive(variantId) ? 'selected' : ''}">
 				<button
 					class="variant-selector-switch-button ${this.#isCreateMode(variantOption)
 						? 'add-mode'
-						: ''} ${this.#isReadOnly(variantOption.culture) ? 'readonly-mode' : ''}"
+						: ''} ${this.#isReadOnly(variantId.culture) ? 'readonly-mode' : ''}"
 					@click=${() => this.#switchVariant(variantOption)}>
 					${this.#isCreateMode(variantOption) ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
 						<div class="variant-name">
-							${this.#getVariantName(variantOption)}${this.#renderReadOnlyTag(variantOption.culture)}
+							${this.#getVariantName(variantOption)}${this.#renderReadOnlyTag(variantId.culture)}
 						</div>
 						<div class="variant-details">
 							<span>${this._renderVariantDetails(variantOption)}</span>
@@ -341,8 +338,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	}
 
 	#renderSplitViewButton(variant: VariantOptionModelType) {
+		const variantId = UmbVariantId.Create(variant);
 		return html`
-			${this.#isVariantActive(variant.culture)
+			${this.#isVariantActive(variantId)
 				? nothing
 				: html`
 						<uui-button
