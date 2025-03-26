@@ -41,7 +41,7 @@
 		"./document-blueprint": "./dist-cms/packages/documents/document-blueprints/index.js",
 		"./document-type": "./dist-cms/packages/documents/document-types/index.js",
 		"./document": "./dist-cms/packages/documents/documents/index.js",
-		"./dropzone": "./dist-cms/packages/dropzone/index.js",
+		"./dropzone": "./dist-cms/packages/dropzone/dropzone/index.js",
 		"./entity-action": "./dist-cms/packages/core/entity-action/index.js",
 		"./entity-bulk-action": "./dist-cms/packages/core/entity-bulk-action/index.js",
 		"./entity-create-option-action": "./dist-cms/packages/core/entity-create-option-action/index.js",

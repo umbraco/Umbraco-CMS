@@ -6,7 +6,7 @@ import { UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE } from '../../../entity.js';
 import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
+import { UmbFileDropzoneItemStatus } from 'src/packages/dropzone/dropzone/index.js';
 
 import '@umbraco-cms/backoffice/imaging';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';

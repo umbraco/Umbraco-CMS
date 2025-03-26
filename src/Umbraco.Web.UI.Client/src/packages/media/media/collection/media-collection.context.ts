@@ -1,7 +1,7 @@
 import { UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEDIA_GRID_COLLECTION_VIEW_ALIAS } from './views/constants.js';
 import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from './types.js';
-import type { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
+import type { UmbFileDropzoneItemStatus } from 'src/packages/dropzone/dropzone/index.js';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
