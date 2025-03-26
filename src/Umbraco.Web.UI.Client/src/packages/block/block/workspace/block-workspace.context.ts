@@ -486,6 +486,13 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.#expose(layoutData.contentKey);
 		this.setIsNew(false);
+
+		this.#reportValidation();
+	}
+
+	#reportValidation() {
+		this.content.validation.report();
+		this.settings.validation.report();
 	}
 
 	expose() {

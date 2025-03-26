@@ -145,6 +145,7 @@ export abstract class UmbPropertyEditorUiRteElementBase
 				if (dataPath) {
 					// Set the data path for the local validation context:
 					this.#validationContext.setDataPath(dataPath + '.blocks');
+					this.#validationContext.autoReport();
 				}
 			},
 			'observeDataPath',

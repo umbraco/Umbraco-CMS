@@ -1,6 +1,6 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
 import type { UmbBlockGridWorkspaceOriginData } from '../index.js';
-import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET } from './constants.js';
+import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET } from '../context/constants.js';
 import {
 	appendToFrozenArray,
 	pushAtToUniqueArray,

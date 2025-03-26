@@ -1,8 +1,8 @@
 using System.Globalization;
 using Examine;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
@@ -15,7 +15,7 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
     private const string PathKey = "path";
     private static readonly IEnumerable<string> ValidCategories = new[] { IndexTypes.Content, IndexTypes.Media };
     private readonly IPublicAccessService? _publicAccessService;
-    private readonly Scoping.IScopeProvider? _scopeProvider;
+    private readonly IScopeProvider? _scopeProvider;
 
     // used for tests
     internal ContentValueSetValidator(bool publishedValuesOnly, int? parentId = null, IEnumerable<string>? includeItemTypes = null, IEnumerable<string>? excludeItemTypes = null)
@@ -27,11 +27,13 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         bool publishedValuesOnly,
         bool supportProtectedContent,
         IPublicAccessService? publicAccessService,
-        Scoping.IScopeProvider? scopeProvider,
-        int? parentId,
-        IEnumerable<string>? includeItemTypes,
-        IEnumerable<string>? excludeItemTypes)
-        : base(includeItemTypes, excludeItemTypes, null, null)
+        IScopeProvider? scopeProvider,
+        int? parentId = null,
+        IEnumerable<string>? includeItemTypes = null,
+        IEnumerable<string>? excludeItemTypes = null,
+        IEnumerable<string>? includeFields = null,
+        IEnumerable<string>? excludeFields = null)
+        : base(includeItemTypes, excludeItemTypes, includeFields, excludeFields)
     {
         PublishedValuesOnly = publishedValuesOnly;
         SupportProtectedContent = supportProtectedContent;

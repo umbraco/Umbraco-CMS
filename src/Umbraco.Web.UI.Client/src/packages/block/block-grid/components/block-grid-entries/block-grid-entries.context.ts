@@ -1,22 +1,19 @@
-import type { UmbBlockDataModel } from '../../block/index.js';
-import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
-import {
-	UMB_BLOCK_GRID_ENTRY_CONTEXT,
-	UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
-	UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
-	UMB_BLOCK_GRID_WORKSPACE_MODAL,
-	type UmbBlockGridWorkspaceOriginData,
-} from '../index.js';
 import type {
 	UmbBlockGridLayoutModel,
 	UmbBlockGridTypeAreaType,
 	UmbBlockGridTypeModel,
 	UmbBlockGridValueModel,
-} from '../types.js';
-import { forEachBlockLayoutEntryOf } from '../utils/index.js';
-import type { UmbBlockGridPropertyEditorConfig } from '../property-editors/block-grid-editor/types.js';
-import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context-token.js';
-import type { UmbBlockGridScalableContainerContext } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
+} from '../../types.js';
+import { forEachBlockLayoutEntryOf } from '../../utils/index.js';
+import type { UmbBlockGridPropertyEditorConfig } from '../../property-editors/block-grid-editor/types.js';
+import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../../block-grid-manager/constants.js';
+import { UMB_BLOCK_GRID_WORKSPACE_MODAL, type UmbBlockGridWorkspaceOriginData } from '../../workspace/index.js';
+import type { UmbBlockGridScalableContainerContext } from '../../context/block-grid-scale-manager/block-grid-scale-manager.controller.js';
+import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../block-grid-entry/constants.js';
+import {
+	UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
+	UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
+} from '../../property-editors/block-grid-editor/constants.js';
 import {
 	UmbArrayState,
 	UmbBooleanState,
@@ -32,6 +29,11 @@ import {
 	UmbClipboardPastePropertyValueTranslatorValueResolver,
 } from '@umbraco-cms/backoffice/clipboard';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import {
+	UMB_BLOCK_CATALOGUE_MODAL,
+	UmbBlockEntriesContext,
+	type UmbBlockDataModel,
+} from '@umbraco-cms/backoffice/block';
 
 interface UmbBlockGridAreaTypeInvalidRuleType {
 	groupKey?: string;
