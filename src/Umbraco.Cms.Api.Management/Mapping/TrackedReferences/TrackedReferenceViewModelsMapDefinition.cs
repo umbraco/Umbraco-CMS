@@ -16,7 +16,7 @@ public class TrackedReferenceViewModelsMapDefinition : IMapDefinition
         mapper.Define<Guid, ReferenceByIdModel>((source, context) => new ReferenceByIdModel(), Map);
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Variants
     private void Map(RelationItemModel source, DocumentReferenceResponseModel target, MapperContext context)
     {
         target.Id = source.NodeKey;

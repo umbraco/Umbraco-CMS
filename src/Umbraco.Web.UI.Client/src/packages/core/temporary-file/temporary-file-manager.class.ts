@@ -11,6 +11,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { formatBytes } from '@umbraco-cms/backoffice/utils';
+import { isCancelError } from '@umbraco-cms/backoffice/resources';
 
 export class UmbTemporaryFileManager<
 	UploadableItem extends UmbTemporaryFileModel = UmbTemporaryFileModel,
@@ -60,6 +61,10 @@ export class UmbTemporaryFileManager<
 
 	remove(uniques: Array<string>) {
 		this.#queue.remove(uniques);
+	}
+
+	removeAll() {
+		this.#queue.setValue([]);
 	}
 
 	async #handleQueue(options?: UmbUploadOptions<UploadableItem>): Promise<Array<UploadableItem>> {
@@ -152,9 +157,15 @@ export class UmbTemporaryFileManager<
 				// Update progress in percent if a callback is provided
 				if (item.onProgress) item.onProgress((evt.loaded / evt.total) * 100);
 			},
-			item.abortSignal,
+			item.abortController?.signal ?? item.abortSignal,
 		);
-		const status = error ? TemporaryFileStatus.ERROR : TemporaryFileStatus.SUCCESS;
+		let status = TemporaryFileStatus.SUCCESS;
+		if (error) {
+			status = TemporaryFileStatus.ERROR;
+			if (isCancelError(error)) {
+				status = TemporaryFileStatus.CANCELLED;
+			}
+		}
 
 		this.#queue.updateOne(item.temporaryUnique, { ...item, status });
 		return { ...item, status };
