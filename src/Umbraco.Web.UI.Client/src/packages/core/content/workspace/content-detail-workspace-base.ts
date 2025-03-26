@@ -143,6 +143,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	#segmentRepository = new UmbSegmentCollectionRepository(this);
 	#segments = new UmbArrayState<UmbSegmentCollectionItemModel>([], (x) => x.unique);
+	protected readonly _segments = this.#segments.asObservable();
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
@@ -190,32 +191,62 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		this.variantOptions = mergeObservables(
-			[this.varies, this.variants, this.languages],
-			([varies, variants, languages]) => {
-				// TODO: When including segments, when be aware about the case of segment varying when not culture varying. [NL]
-				if (varies === true) {
-					return languages.map((language) => {
-						return {
-							variant: variants.find((x) => x.culture === language.unique),
-							language,
-							// TODO: When including segments, this object should be updated to include a object for the segment. [NL]
-							// TODO: When including segments, the unique should be updated to include the segment as well. [NL]
-							unique: language.unique, // This must be a variantId string!
-							culture: language.unique,
-							segment: null,
-						} as VariantOptionModelType;
-					});
-				} else if (varies === false) {
+			[this.varies, this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments],
+			([varies, variesByCulture, variesBySegment, variants, languages, segments]) => {
+				// No variation
+				if (!varies) {
 					return [
 						{
 							variant: variants.find((x) => x.culture === null),
 							language: languages.find((x) => x.isDefault),
 							culture: null,
 							segment: null,
-							unique: UMB_INVARIANT_CULTURE, // This must be a variantId string!
+							unique: new UmbVariantId().toString(),
 						} as VariantOptionModelType,
 					];
 				}
+
+				// Only culture variation
+				if (variesByCulture && !variesBySegment) {
+					return languages.map((language) => {
+						return {
+							variant: variants.find((x) => x.culture === language.unique),
+							language,
+							culture: language.unique,
+							segment: null,
+							unique: new UmbVariantId(language.unique).toString(),
+						} as VariantOptionModelType;
+					});
+				}
+
+				// Only segment variation
+				if (!variesByCulture && variesBySegment) {
+					return segments.map((segment) => {
+						return {
+							variant: variants.find((x) => x.segment === segment.unique),
+							language: languages.find((x) => x.isDefault),
+							culture: null,
+							segment: segment.unique,
+							unique: new UmbVariantId(null, segment.unique).toString(),
+						} as VariantOptionModelType;
+					});
+				}
+
+				// Culture and segment variation
+				if (variesByCulture && variesBySegment) {
+					return languages.flatMap((language) => {
+						return segments.map((segment) => {
+							return {
+								variant: variants.find((x) => x.culture === language.unique && x.segment === segment.unique),
+								language,
+								culture: language.unique,
+								segment: segment.unique,
+								unique: new UmbVariantId(language.unique, segment.unique).toString(),
+							} as VariantOptionModelType;
+						});
+					});
+				}
+
 				return [] as Array<VariantOptionModelType>;
 			},
 		);
@@ -286,7 +317,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	async #loadSegments() {
 		const { data } = await this.#segmentRepository.requestCollection({});
 		this.#segments.setValue(data?.items ?? []);
-		debugger;
 	}
 
 	protected override async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
