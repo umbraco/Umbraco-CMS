@@ -227,7 +227,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 						culture: null,
 						segment: null,
 						unique: new UmbVariantId().toString(),
-					};
+					} as VariantOptionModelType;
 
 					const segmentsForInvariantCulture = segments.map((segment) => {
 						return {
@@ -240,7 +240,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 						} as VariantOptionModelType;
 					});
 
-					return [invariantCulture, ...segmentsForInvariantCulture];
+					return [invariantCulture, ...segmentsForInvariantCulture] as Array<VariantOptionModelType>;
 				}
 
 				// Culture and segment variation
@@ -252,7 +252,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 							culture: language.unique,
 							segment: null,
 							unique: new UmbVariantId(language.unique).toString(),
-						};
+						} as VariantOptionModelType;
 
 						const segmentsForCulture = segments.map((segment) => {
 							return {
@@ -265,7 +265,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 							} as VariantOptionModelType;
 						});
 
-						return [culture, ...segmentsForCulture];
+						return [culture, ...segmentsForCulture] as Array<VariantOptionModelType>;
 					});
 				}
 
