@@ -63,9 +63,9 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 				// Update progress
 				if (uploaded.status === TemporaryFileStatus.SUCCESS) {
-					this._updateStatus(item, UmbFileDropzoneItemStatus.COMPLETE);
+					this.updateStatus(item, UmbFileDropzoneItemStatus.COMPLETE);
 				} else {
-					this._updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
+					this.updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
 				}
 			}
 
@@ -127,7 +127,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		return uploadableItems;
 	}
 
-	protected _updateStatus(item: UmbUploadableItem, status: UmbFileDropzoneItemStatus) {
+	updateStatus(item: UmbUploadableItem, status: UmbFileDropzoneItemStatus) {
 		this.#progressItems.updateOne(item.unique, { status });
 		const progress = this.#progress.getValue();
 		this.#progress.update({ completed: progress.completed + 1 });
@@ -164,7 +164,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			};
 
 			temporaryFile.abortController?.signal.addEventListener('abort', () => {
-				this._updateStatus(uploadableItem, UmbFileDropzoneItemStatus.CANCELLED);
+				this.updateStatus(uploadableItem, UmbFileDropzoneItemStatus.CANCELLED);
 			});
 
 			items.push(uploadableItem);

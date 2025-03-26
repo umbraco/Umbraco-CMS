@@ -1,7 +1,8 @@
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL, UMB_MEDIA_PICKER_MODAL } from '../../modals/index.js';
 import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValueEntry } from '../../types.js';
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
-import type { UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
+import type { UmbDropzoneMediaElement } from '../../dropzone/dropzone-media.element.js';
+import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -178,8 +179,17 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	constructor() {
 		super();
 
-		this.observe(this.#itemManager.items, () => {
-			this.#populateCards();
+		this.observe(
+			this.#itemManager.items,
+			(items) => {
+				console.log('items', items);
+				this.#populateCards();
+			},
+			'_observeItems',
+		);
+
+		this.observe(this.#itemManager.uniques, (uniques) => {
+			console.log('[Debug] did we get new uniques?', uniques);
 		});
 
 		new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
@@ -338,10 +348,13 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	async #onUploadCompleted(e: CustomEvent) {
-		const completed = e.detail as Array<UmbUploadableItem>;
-		const uploaded = completed.map((file) => file.unique);
-		this.#addItems(uploaded);
+	async #onUpload(e: UmbDropzoneChangeEvent) {
+		const target = e.target as UmbDropzoneMediaElement;
+		const completed = target.value;
+		const uploaded = completed?.map((file) => file.unique);
+		if (uploaded?.length) {
+			this.#addItems(uploaded);
+		}
 	}
 
 	override render() {
@@ -352,11 +365,8 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	}
 
 	#renderDropzone() {
-		if (this.readonly) return nothing;
-		if (this._cards && this._cards.length >= this.max) return;
-		return html`<umb-dropzone-media
-			?multiple=${this.max > 1}
-			@complete=${this.#onUploadCompleted}></umb-dropzone-media>`;
+		if (this.readonly || this._cards?.length >= this.max) return nothing;
+		return html`<umb-dropzone-media ?multiple=${this.max > 1} @change=${this.#onUpload}></umb-dropzone-media>`;
 	}
 
 	#renderItems() {

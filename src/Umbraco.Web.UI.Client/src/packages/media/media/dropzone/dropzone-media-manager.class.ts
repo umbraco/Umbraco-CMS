@@ -4,6 +4,7 @@ import type { UmbMediaDetailModel, UmbMediaValueModel } from '../types.js';
 
 import {
 	UmbFileDropzoneItemStatus,
+	type UmbDropzoneManager,
 	type UmbAllowedChildrenOfMediaType,
 	type UmbAllowedMediaTypesOfExtension,
 	type UmbUploadableFile,
@@ -16,6 +17,7 @@ import { UmbMediaTypeStructureRepository, type UmbAllowedMediaTypeModel } from '
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDropzoneMediaManager extends UmbControllerBase {
 	// The available media types for a file extension.
@@ -27,6 +29,12 @@ export class UmbDropzoneMediaManager extends UmbControllerBase {
 	readonly #mediaTypeStructure = new UmbMediaTypeStructureRepository(this);
 	readonly #mediaDetailRepository = new UmbMediaDetailRepository(this);
 	readonly #localization = new UmbLocalizationController(this);
+	readonly #dropzoneManager;
+
+	constructor(host: UmbControllerHost, dropzoneManager: UmbDropzoneManager) {
+		super(host);
+		this.#dropzoneManager = dropzoneManager;
+	}
 
 	/**
 	 * Uploads files and folders to the server and creates the media items with corresponding media type.\
@@ -64,16 +72,14 @@ export class UmbDropzoneMediaManager extends UmbControllerBase {
 					message: `${this.#localization.term('media_disallowedFileType')}: ${item.temporaryFile?.file.name}.`,
 				},
 			});
-			item.status = UmbFileDropzoneItemStatus.NOT_ALLOWED;
-			//this._updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED);
+			this.#dropzoneManager.updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED);
 			return;
 		}
 
 		const mediaTypeUnique = options.length > 1 ? await this.#showDialogMediaTypePicker(options) : options[0].unique;
 
 		if (!mediaTypeUnique) {
-			item.status = UmbFileDropzoneItemStatus.CANCELLED;
-			//this._updateStatus(item, UmbFileDropzoneItemStatus.CANCELLED);
+			this.#dropzoneManager.updateStatus(item, UmbFileDropzoneItemStatus.CANCELLED);
 			return;
 		}
 
@@ -88,8 +94,7 @@ export class UmbDropzoneMediaManager extends UmbControllerBase {
 		for (const item of uploadableItems) {
 			const options = await this.#getMediaTypeOptions(item);
 			if (!options.length) {
-				item.status = UmbFileDropzoneItemStatus.NOT_ALLOWED;
-				//this._updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED);
+				this.#dropzoneManager.updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED);
 				continue;
 			}
 
@@ -113,20 +118,20 @@ export class UmbDropzoneMediaManager extends UmbControllerBase {
 		const scaffold = await this.#getItemScaffold(item, mediaTypeUnique);
 		const { error } = await this.#mediaDetailRepository.create(scaffold, item.parentUnique);
 
-		if (error) {
-			item.status = UmbFileDropzoneItemStatus.ERROR;
-			//this._updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
-		}
+		this.#dropzoneManager.updateStatus(
+			item,
+			error ? UmbFileDropzoneItemStatus.ERROR : UmbFileDropzoneItemStatus.COMPLETE,
+		);
 	}
 
 	async #handleFolder(item: UmbUploadableFolder, mediaTypeUnique: string) {
 		const scaffold = await this.#getItemScaffold(item, mediaTypeUnique);
 		const { error } = await this.#mediaDetailRepository.create(scaffold, item.parentUnique);
 
-		if (error) {
-			item.status = UmbFileDropzoneItemStatus.ERROR;
-			//this._updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
-		}
+		this.#dropzoneManager.updateStatus(
+			item,
+			error ? UmbFileDropzoneItemStatus.ERROR : UmbFileDropzoneItemStatus.COMPLETE,
+		);
 	}
 
 	// Media types

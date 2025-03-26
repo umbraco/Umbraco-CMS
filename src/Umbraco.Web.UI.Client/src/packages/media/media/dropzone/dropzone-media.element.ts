@@ -31,7 +31,7 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 	public progressItems = () => this._manager.progressItems;
 	public progress = () => this._manager.progress;
 
-	#mediaManager = new UmbDropzoneMediaManager(this);
+	#mediaManager = new UmbDropzoneMediaManager(this, this._manager);
 
 	constructor() {
 		super();
