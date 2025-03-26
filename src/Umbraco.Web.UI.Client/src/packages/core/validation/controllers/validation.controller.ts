@@ -9,6 +9,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { ReplaceStartOfPath } from '../utils/replace-start-of-path.function.js';
 import type { UmbVariantId } from '../../variant/variant-id.class.js';
+import { UmbDeprecation } from '../../utils/deprecation/deprecation.js';
 
 const Regex = /@\.culture == ('[^']*'|null) *&& *@\.segment == ('[^']*'|null)/g;
 
@@ -26,15 +27,31 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	>;
 	#inUnprovidingState: boolean = false;
 
+	// @reprecated - Will be removed in v.17
 	// Local version of the data send to the server, only use-case is for translation.
 	#translationData = new UmbObjectState<any>(undefined);
+	/**
+	 * @deprecated Use extension type 'propertyValidationPathTranslator' instead. Will be removed in v.17
+	 */
 	translationDataOf(path: string): any {
 		return this.#translationData.asObservablePart((data) => GetValueByJsonPath(data, path));
 	}
+	/**
+	 * @deprecated Use extension type 'propertyValidationPathTranslator' instead. Will be removed in v.17
+	 */
 	setTranslationData(data: any): void {
 		this.#translationData.setValue(data);
 	}
+	/**
+	 * @deprecated Use extension type 'propertyValidationPathTranslator' instead. Will be removed in v.17
+	 */
 	getTranslationData(): any {
+		new UmbDeprecation({
+			removeInVersion: '17',
+			deprecated: 'getTranslationData',
+			solution: 'getTranslationData is deprecated.',
+		}).warn();
+
 		return this.#translationData.getValue();
 	}
 
@@ -43,6 +60,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	#isValid: boolean = false;
 
 	#parent?: UmbValidationController;
+	#sync?: boolean;
 	#parentMessages?: Array<UmbValidationMessage>;
 	#localMessages?: Array<UmbValidationMessage>;
 	#baseDataPath?: string;
@@ -135,8 +153,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	/**
 	 * Define a specific data path for this validation context.
 	 * This will turn this validation context into a sub-context of the parent validation context.
-	 * This means that a two-way binding for messages will be established between the parent and the sub-context.
-	 * And it will inherit the Translation Data from its parent.
+	 * This will make this context inherit the messages from the parent validation context.
+	 * @see {@link report} Call `report()` to propagate changes to the parent context.
+	 * @see {@link autoReport} Call `autoReport()` to continuously synchronize changes to the parent context.
 	 *
 	 * messages and data will be localizes accordingly to the given data path.
 	 * @param dataPath {string} - The data path to bind this validation context to.
@@ -176,12 +195,14 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			this.#parent.removeValidator(this);
 		}
 		this.#parent = parent;
-		parent.addValidator(this);
+		this.#readyToSync();
 
 		this.messages.clear();
+		this.#localMessages = undefined;
 
 		this.#baseDataPath = dataPath;
 
+		// @deprecated - Will be removed in v.17
 		this.observe(
 			parent.translationDataOf(dataPath),
 			(data) => {
@@ -214,63 +235,90 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 						this.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
 				}
+
+				this.#localMessages = this.messages.getNotFilteredMessages();
 				this.messages.finishChange();
 			},
 			'observeParentMessages',
 		);
-
-		this.observe(
-			this.messages.messages,
-			(msgs) => {
-				if (!this.#parent) return;
-
-				this.#parent!.messages.initiateChange();
-
-				if (this.#localMessages) {
-					// Remove the parent messages that does not exist locally anymore:
-					const toRemove = this.#localMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
-					this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
-				}
-				this.#localMessages = msgs;
-				if (this.#baseDataPath === '$') {
-					this.#parent!.messages.addMessageObjects(msgs);
-				} else {
-					msgs.forEach((msg) => {
-						// replace this.#baseDataPath (if it starts with it) with $ in the path, so it becomes relative to the parent context
-						const path = ReplaceStartOfPath(msg.path, '$', this.#baseDataPath!);
-						if (path === undefined) {
-							throw new Error(
-								'Path was not transformed correctly and can therefor not be synced with parent messages.',
-							);
-						}
-						// Notice, the parent message uses the same key. [NL]
-						this.#parent!.messages.addMessage(msg.type, path, msg.body, msg.key);
-					});
-				}
-
-				this.#parent!.messages.finishChange();
-			},
-			'observeLocalMessages',
-		);
 	}
 
 	#stopInheritance(): void {
+		this.removeUmbControllerByAlias('observeTranslationData');
+		this.removeUmbControllerByAlias('observeParentMessages');
+
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
 		this.messages.clear();
+		this.#localMessages = undefined;
 		this.setTranslationData(undefined);
+	}
 
-		this.removeUmbControllerByAlias('observeTranslationData');
-		this.removeUmbControllerByAlias('observeParentMessages');
+	#readyToSync() {
+		if (this.#sync && this.#parent) {
+			this.#parent.addValidator(this);
+		}
+	}
+
+	/**
+	 * Continuously synchronize the messages from this context to the parent context.
+	 */
+	autoReport() {
+		this.#sync = true;
+		this.#readyToSync();
+		this.observe(this.messages.messages, this.#transferMessages, 'observeLocalMessages');
+	}
+
+	// no need for this method at this movement. [NL]
+	/*
+	#stopSync() {
 		this.removeUmbControllerByAlias('observeLocalMessages');
 	}
+	*/
+
+	/**
+	 * Perform a one time transfer of the messages from this context to the parent context.
+	 */
+	report(): void {
+		if (!this.#parent) return;
+
+		if (!this.#sync) {
+			this.#transferMessages(this.messages.getNotFilteredMessages());
+		}
+	}
+
+	#transferMessages = (msgs: Array<UmbValidationMessage>) => {
+		if (!this.#parent) return;
+
+		this.#parent!.messages.initiateChange();
+
+		if (this.#localMessages) {
+			// Remove the parent messages that does not exist locally anymore:
+			const toRemove = this.#localMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
+			this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
+		}
+
+		if (this.#baseDataPath === '$') {
+			this.#parent!.messages.addMessageObjects(msgs);
+		} else {
+			msgs.forEach((msg) => {
+				// replace this.#baseDataPath (if it starts with it) with $ in the path, so it becomes relative to the parent context
+				const path = ReplaceStartOfPath(msg.path, '$', this.#baseDataPath!);
+				if (path === undefined) {
+					throw new Error('Path was not transformed correctly and can therefor not be synced with parent messages.');
+				}
+				// Notice, the parent message uses the same key. [NL]
+				this.#parent!.messages.addMessage(msg.type, path, msg.body, msg.key);
+			});
+		}
+
+		this.#parent!.messages.finishChange();
+	};
 
 	override hostConnected(): void {
 		super.hostConnected();
-		if (this.#parent) {
-			this.#parent.addValidator(this);
-		}
+		this.#readyToSync();
 	}
 	override hostDisconnected(): void {
 		super.hostDisconnected();
@@ -317,7 +365,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			this.#validators.splice(index, 1);
 			// If we are in validation mode then we should re-validate to focus next invalid element:
 			if (this.#validationMode) {
-				this.validate();
+				this.validate().catch(() => undefined);
 			}
 		}
 	}
@@ -328,23 +376,26 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validation succeeded.
 	 */
 	async validate(): Promise<void> {
-		// TODO: clear server messages here?, well maybe only if we know we will get new server messages? Do the server messages hook into the system like another validator?
 		this.#validationMode = true;
 
-		const resultsStatus = await Promise.all(this.#validators.map((v) => v.validate())).then(
-			() => true,
-			() => false,
-		);
+		const resultsStatus =
+			this.#validators.length === 0
+				? true
+				: await Promise.all(this.#validators.map((v) => v.validate())).then(
+						() => true,
+						() => false,
+					);
 
 		if (this.#validators.length === 0 && resultsStatus === false) {
 			throw new Error('No validators to validate, but validation failed');
 		}
 
 		if (this.messages === undefined) {
-			// This Context has been destroyed while is was validating, so we should not continue.
+			// This Context has been destroyed while is was validating, so we should not continue. [NL]
 			return Promise.reject();
 		}
 
+		// We need to ask again for messages, as they might have been added during the validation process. [NL]
 		const hasMessages = this.messages.getHasAnyMessages();
 
 		// If we have any messages then we are not valid, otherwise lets check the validation results: [NL]
@@ -398,17 +449,20 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	}
 
 	override destroy(): void {
+		this.#validationMode = false;
 		if (this.#inUnprovidingState === true) {
 			return;
 		}
+		this.#destroyValidators();
 		this.unprovide();
+		this.messages?.destroy();
+		(this.messages as unknown) = undefined;
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
+		this.#localMessages = undefined;
+		this.#parentMessages = undefined;
 		this.#parent = undefined;
-		this.#destroyValidators();
-		this.messages?.destroy();
-		(this.messages as unknown) = undefined;
 		super.destroy();
 	}
 }
