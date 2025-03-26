@@ -1,3 +1,4 @@
+import { UmbDataPathPropertyTypeQuery } from '../utils/index.js';
 import { UmbPropertyTypeWorkspaceEditorElement } from './property-type-workspace-editor.element.js';
 import type { UmbPropertyTypeWorkspaceData } from './property-type-workspace.modal-token.js';
 import type { UmbPropertyDatasetContext, UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
@@ -20,7 +21,6 @@ import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/cont
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
-import { UmbDataPathPropertyTypeQuery } from '../utils/index.js';
 
 export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropertyTypeModel = UmbPropertyTypeModel>
 	extends UmbSubmittableWorkspaceContextBase<PropertyTypeData>

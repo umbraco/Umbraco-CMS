@@ -20,6 +20,7 @@ export abstract class UmbContentTypeStructureRepositoryBase<ItemType>
 	/**
 	 * Returns a promise with the allowed children of a content type
 	 * @param {string} unique
+	 * @param parentContentUnique
 	 * @returns {*}
 	 * @memberof UmbContentTypeStructureRepositoryBase
 	 */
