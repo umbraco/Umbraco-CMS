@@ -354,7 +354,9 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	#renderDropzone() {
 		if (this.readonly) return nothing;
 		if (this._cards && this._cards.length >= this.max) return;
-		return html`<umb-dropzone ?multiple=${this.max > 1} @complete=${this.#onUploadCompleted}></umb-dropzone>`;
+		return html`<umb-dropzone-media
+			?multiple=${this.max > 1}
+			@complete=${this.#onUploadCompleted}></umb-dropzone-media>`;
 	}
 
 	#renderItems() {
