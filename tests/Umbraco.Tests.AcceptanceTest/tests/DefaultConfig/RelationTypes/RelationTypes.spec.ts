@@ -73,7 +73,7 @@ test.skip('can update isDependency value of a relation type', async ({umbracoApi
 
   // Act
   await umbracoUi.relationType.openRelationTypeByNameAtRoot(relationTypeName);
-  await umbracoUi.relationType.clickIsDependencySlider();
+  await umbracoUi.relationType.clickIsDependencyToggle();
   await umbracoUi.relationType.clickSaveButton();
 
   // Assert

@@ -1,12 +1,12 @@
 import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
-import type { UmbDropzoneElement } from '../../dropzone/dropzone.element.js';
 import type { UmbMediaTreeItemModel, UmbMediaSearchItemModel, UmbMediaItemModel } from '../../types.js';
 import { UmbMediaSearchProvider } from '../../search/index.js';
 import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
+import type { UmbDropzoneMediaElement } from '@umbraco-cms/backoffice/media';
 import {
 	css,
 	html,
@@ -18,10 +18,10 @@ import {
 	type PropertyValues,
 	nothing,
 } from '@umbraco-cms/backoffice/external/lit';
-import { debounce } from '@umbraco-cms/backoffice/utils';
+import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONTENT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
-import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputEvent, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
@@ -45,6 +45,12 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	private _currentChildren: Array<UmbMediaTreeItemModel> = [];
 
 	@state()
+	private _currentPage = 1;
+
+	@state()
+	private _currentTotalPages = 0;
+
+	@state()
 	private _searchResult: Array<UmbMediaSearchItemModel> = [];
 
 	@state()
@@ -66,7 +72,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	_searching: boolean = false;
 
 	@query('#dropzone')
-	private _dropzone!: UmbDropzoneElement;
+	private _dropzone!: UmbDropzoneMediaElement;
+
+	#pagingMap = new Map<string, UmbPaginationManager>();
 
 	constructor() {
 		super();
@@ -109,17 +117,32 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	}
 
 	async #loadChildrenOfCurrentMediaItem() {
+		const key = this._currentMediaEntity.entityType + this._currentMediaEntity.unique;
+		let paginationManager = this.#pagingMap.get(key);
+
+		if (!paginationManager) {
+			paginationManager = new UmbPaginationManager();
+			paginationManager.setPageSize(100);
+			this.#pagingMap.set(key, paginationManager);
+		}
+
+		const skip = paginationManager.getSkip();
+		const take = paginationManager.getPageSize();
+
 		const { data } = await this.#mediaTreeRepository.requestTreeItemsOf({
 			parent: {
 				unique: this._currentMediaEntity.unique,
 				entityType: this._currentMediaEntity.entityType,
 			},
 			dataType: this.#dataType,
-			skip: 0,
-			take: 100,
+			skip,
+			take,
 		});
 
 		this._currentChildren = data?.items ?? [];
+		paginationManager.setTotalItems(data?.total ?? 0);
+		this._currentPage = paginationManager.getCurrentPageNumber();
+		this._currentTotalPages = paginationManager.getTotalPages();
 	}
 
 	#onOpen(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
@@ -216,6 +239,22 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		this.#loadChildrenOfCurrentMediaItem();
 	}
 
+	#onPageChange(event: UUIPaginationEvent) {
+		event.stopPropagation();
+		const key = this._currentMediaEntity.entityType + this._currentMediaEntity.unique;
+
+		const paginationManager = this.#pagingMap.get(key);
+
+		if (!paginationManager) {
+			throw new Error('Pagination manager not found');
+		}
+
+		paginationManager.setCurrentPageNumber(event.target.current);
+		this.#pagingMap.set(key, paginationManager);
+
+		this.#loadChildrenOfCurrentMediaItem();
+	}
+
 	#allowNavigateToMedia(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel): boolean {
 		return isUmbracoFolder(item.mediaType.unique) || item.hasChildren;
 	}
@@ -248,11 +287,11 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 	#renderBody() {
 		return html`${this.#renderToolbar()}
-			<umb-dropzone
+			<umb-dropzone-media
 				id="dropzone"
 				multiple
-				@complete=${() => this.#loadChildrenOfCurrentMediaItem()}
-				.parentUnique=${this._currentMediaEntity.unique}></umb-dropzone>
+				@complete=${this.#loadChildrenOfCurrentMediaItem}
+				.parentUnique=${this._currentMediaEntity.unique}></umb-dropzone-media>
 			${this._searchQuery ? this.#renderSearchResult() : this.#renderCurrentChildren()} `;
 	}
 
@@ -275,12 +314,18 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			${!this._currentChildren.length
 				? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
 				: html`<div id="media-grid">
-						${repeat(
-							this._currentChildren,
-							(item) => item.unique,
-							(item) => this.#renderCard(item),
-						)}
-					</div>`}
+							${repeat(
+								this._currentChildren,
+								(item) => item.unique,
+								(item) => this.#renderCard(item),
+							)}
+						</div>
+						${this._currentTotalPages > 1
+							? html`<uui-pagination
+									.current=${this._currentPage}
+									.total=${this._currentTotalPages}
+									@change=${this.#onPageChange}></uui-pagination>`
+							: nothing}`}
 		`;
 	}
 
@@ -379,6 +424,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				width: 100%;
 				margin-bottom: var(--uui-size-3);
 			}
+			#search uui-input [slot='prepend'] {
+				display: flex;
+				align-items: center;
+			}
 
 			#searching-indicator {
 				margin-left: 7px;
@@ -387,9 +436,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 			#media-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-				grid-auto-rows: 150px;
 				gap: var(--uui-size-space-5);
+				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
+				grid-auto-rows: var(--umb-card-medium-min-width);
 				padding-bottom: 5px; /** The modal is a bit jumpy due to the img card focus/hover border. This fixes the issue. */
 			}
 
@@ -415,6 +464,11 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			.not-allowed {
 				cursor: not-allowed;
 				opacity: 0.5;
+			}
+
+			uui-pagination {
+				display: block;
+				margin-top: var(--uui-size-layout-1);
 			}
 		`,
 	];

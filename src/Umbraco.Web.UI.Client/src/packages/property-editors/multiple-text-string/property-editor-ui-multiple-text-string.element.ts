@@ -1,22 +1,22 @@
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { umbBindToValidation, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputMultipleTextStringElement } from '@umbraco-cms/backoffice/components';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 /**
  * @element umb-property-editor-ui-multiple-text-string
  */
 @customElement('umb-property-editor-ui-multiple-text-string')
-export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property({ type: Array })
-	value?: Array<string>;
-
+export class UmbPropertyEditorUIMultipleTextStringElement
+	extends UmbFormControlMixin<Array<string>, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
@@ -62,6 +62,7 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 
 	constructor() {
 		super();
+
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this._label = context.getLabel();
 		});
@@ -74,13 +75,14 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 				this,
 			);
 		}
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-multiple-text-string')!);
 	}
 
 	#onChange(event: UmbChangeEvent) {
 		event.stopPropagation();
 		const target = event.currentTarget as UmbInputMultipleTextStringElement;
 		this.value = target.items;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
@@ -92,7 +94,8 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 				?disabled=${this.disabled}
 				?readonly=${this.readonly}
 				?required=${this.required}
-				@change=${this.#onChange}>
+				@change=${this.#onChange}
+				${umbBindToValidation(this)}>
 			</umb-input-multiple-text-string>
 		`;
 	}

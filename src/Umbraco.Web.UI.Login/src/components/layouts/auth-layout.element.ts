@@ -1,5 +1,6 @@
+import { css, customElement, html, nothing, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, CSSResultGroup, html, nothing, PropertyValueMap, customElement, property, when } from '@umbraco-cms/backoffice/external/lit';
+import type { CSSResultGroup, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  * The auth layout component.
@@ -24,200 +25,208 @@ import { css, CSSResultGroup, html, nothing, PropertyValueMap, customElement, pr
  * @cssprop --umb-login-button-border-radius - The border-radius of the buttons (default: 45px)
  * @cssprop --umb-login-curves-color - The color of the curves (default: #f5c1bc)
  * @cssprop --umb-login-curves-display - The display of the curves (default: inline)
+ * @cssprop --umb-logo-width - The width of the logo (default: auto)
+ * @cssprop --umb-logo-height - The height of the logo (default: 55px)
+ * @cssprop --umb-logo-top - The top position of the logo (default: 24px)
+ * @cssprop --umb-logo-left - The left position of the logo (default: 24px)
+ * @cssprop --umb-logo-display - The display of the logo (default: block)
  */
 @customElement('umb-auth-layout')
 export class UmbAuthLayoutElement extends UmbLitElement {
-  @property({ attribute: 'background-image' })
-  backgroundImage?: string;
+	@property({ attribute: 'background-image' })
+	backgroundImage?: string;
 
-  @property({ attribute: 'logo-image' })
-  logoImage?: string;
+	@property({ attribute: 'logo-image' })
+	logoImage?: string;
 
-  @property({ attribute: 'logo-image-alternative' })
-  logoImageAlternative?: string;
+	@property({ attribute: 'logo-image-alternative' })
+	logoImageAlternative?: string;
 
-  protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-    super.updated(_changedProperties);
+	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.updated(_changedProperties);
 
-    if (_changedProperties.has<keyof this>('backgroundImage')) {
-      this.style.setProperty('--logo-alternative-display', this.backgroundImage ? 'none' : 'unset');
-      this.style.setProperty('--image', `url('${this.backgroundImage}') no-repeat center center/cover`);
-    }
-  }
+		if (_changedProperties.has<keyof this>('backgroundImage')) {
+			this.style.setProperty('--logo-alternative-display', this.backgroundImage ? 'none' : 'unset');
+			this.style.setProperty('--image', `url('${this.backgroundImage}') no-repeat center center/cover`);
+		}
+	}
 
-  #renderImageContainer() {
-    if (!this.backgroundImage) return nothing;
+	#renderImageContainer() {
+		if (!this.backgroundImage) return nothing;
 
-    return html`
-      <div id="image-container">
-        <div id="image">
-          <svg
-            id="curve-top"
-            width="1746"
-            height="1374"
-            viewBox="0 0 1746 1374"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 1C61.5 722.5 206.5 1366.5 1745.5 1366.5" stroke="currentColor" stroke-width="15"/>
-          </svg>
-          <svg
-            id="curve-bottom"
-            width="1364"
-            height="552"
-            viewBox="0 0 1364 552"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <path d="M1 8C387 24 1109 11 1357 548" stroke="currentColor" stroke-width="15"/>
-          </svg>
+		return html`
+			<div id="image-container">
+				<div id="image">
+					<svg
+						id="curve-top"
+						width="1746"
+						height="1374"
+						viewBox="0 0 1746 1374"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg">
+						<path d="M8 1C61.5 722.5 206.5 1366.5 1745.5 1366.5" stroke="currentColor" stroke-width="15" />
+					</svg>
+					<svg
+						id="curve-bottom"
+						width="1364"
+						height="552"
+						viewBox="0 0 1364 552"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg">
+						<path d="M1 8C387 24 1109 11 1357 548" stroke="currentColor" stroke-width="15" />
+					</svg>
 
-          ${when(
-            this.logoImage,
-            () => html`<img id="logo-on-image" src=${this.logoImage} alt="logo" aria-hidden="true"/>`
-          )}
-        </div>
-      </div>
-    `;
-  }
+					${when(
+						this.logoImage,
+						(logoImage) => html`<img id="logo-on-image" src=${logoImage} alt="logo" aria-hidden="true" />`
+					)}
+				</div>
+			</div>
+		`;
+	}
 
-  #renderContent() {
-    return html`
-      <div id="content-container">
-        <div id="content">
-          <slot></slot>
-        </div>
-      </div>
-    `;
-  }
+	#renderContent() {
+		return html`
+			<div id="content-container">
+				<div id="content">
+					<slot></slot>
+				</div>
+			</div>
+		`;
+	}
 
-  render() {
-    return html`
-      <div id=${this.backgroundImage ? 'main' : 'main-no-image'}>
-        ${this.#renderImageContainer()} ${this.#renderContent()}
-      </div>
-      ${when(
-        this.logoImageAlternative,
-        () => html`<img id="logo-on-background" src=${this.logoImageAlternative!} alt="logo" aria-hidden="true"/>`
-      )}
-    `;
-  }
+	render() {
+		return html`
+			<div id=${this.backgroundImage ? 'main' : 'main-no-image'}>
+				${this.#renderImageContainer()} ${this.#renderContent()}
+			</div>
+			${when(
+				this.logoImageAlternative,
+				(logoImageAlternative) =>
+					html`<img id="logo-on-background" src=${logoImageAlternative} alt="logo" aria-hidden="true" />`
+			)}
+		`;
+	}
 
-  static styles: CSSResultGroup = [
-    css`
-      :host {
-        --uui-color-interactive: var(--umb-login-primary-color, #283a97);
-        --uui-button-border-radius: var(--umb-login-button-border-radius, 45px);
-        --uui-color-default: var(--uui-color-interactive);
-        --uui-button-height: 42px;
-        --uui-select-height: 38px;
+	static styles: CSSResultGroup = [
+		css`
+			:host {
+				--uui-color-interactive: var(--umb-login-primary-color, #283a97);
+				--uui-button-border-radius: var(--umb-login-button-border-radius, 45px);
+				--uui-color-default: var(--uui-color-interactive);
+				--uui-button-height: 42px;
+				--uui-select-height: 38px;
 
-        --input-height: 40px;
-        --header-font-size: var(--umb-login-header-font-size, 3rem);
-        --header-secondary-font-size: var(--umb-login-header-secondary-font-size, 2.4rem);
-        --curves-color: var(--umb-login-curves-color, #f5c1bc);
-        --curves-display: var(--umb-login-curves-display, inline);
+				--input-height: 40px;
+				--header-font-size: var(--umb-login-header-font-size, 3rem);
+				--header-secondary-font-size: var(--umb-login-header-secondary-font-size, 2.4rem);
+				--curves-color: var(--umb-login-curves-color, #f5c1bc);
+				--curves-display: var(--umb-login-curves-display, inline);
 
-        display: block;
-        background: var(--umb-login-background, #f4f4f4);
-        color: var(--umb-login-text-color, #000);
-      }
+				display: block;
+				background: var(--umb-login-background, #f4f4f4);
+				color: var(--umb-login-text-color, #000);
+			}
 
-      #main-no-image,
-      #main {
-        max-width: 1920px;
-        display: flex;
-        justify-content: center;
-        height: 100vh;
-        padding: 8px;
-        box-sizing: border-box;
-        margin: 0 auto;
-      }
+			#main-no-image,
+			#main {
+				max-width: 1920px;
+				display: flex;
+				justify-content: center;
+				height: 100vh;
+				padding: 8px;
+				box-sizing: border-box;
+				margin: 0 auto;
+			}
 
-      #image-container {
-        display: var(--umb-login-image-display, none);
-        width: 100%;
-      }
+			#image-container {
+				display: var(--umb-login-image-display, none);
+				width: 100%;
+			}
 
-      #content-container {
-        background: var(--umb-login-content-background, none);
-        display: var(--umb-login-content-display, flex);
-        width: var(--umb-login-content-width, 100%);
-        height: var(--umb-login-content-height, 100%);
-        box-sizing: border-box;
-        overflow: auto;
-        border-radius: var(--umb-login-content-border-radius, 0);
-      }
+			#content-container {
+				background: var(--umb-login-content-background, none);
+				display: var(--umb-login-content-display, flex);
+				width: var(--umb-login-content-width, 100%);
+				height: var(--umb-login-content-height, 100%);
+				box-sizing: border-box;
+				overflow: auto;
+				border-radius: var(--umb-login-content-border-radius, 0);
+			}
 
-      #content {
-        max-width: 360px;
-        margin: auto;
-        width: 100%;
-      }
+			#content {
+				max-width: 360px;
+				margin: auto;
+				width: 100%;
+			}
 
-      #image {
-        background: var(--umb-login-image, var(--image));
-        width: 100%;
-        height: 100%;
-        border-radius: var(--umb-login-image-border-radius, 38px);
-        position: relative;
-        overflow: hidden;
-        color: var(--curves-color);
-      }
+			#image {
+				background: var(--umb-login-image, var(--image));
+				width: 100%;
+				height: 100%;
+				border-radius: var(--umb-login-image-border-radius, 38px);
+				position: relative;
+				overflow: hidden;
+				color: var(--curves-color);
+			}
 
-      #image svg {
-        position: absolute;
-        width: 45%;
-        height: fit-content;
-        display: var(--curves-display);
-      }
+			#image svg {
+				position: absolute;
+				width: 45%;
+				height: fit-content;
+				display: var(--curves-display);
+			}
 
-      #curve-top {
-        top: 0;
-        right: 0;
-      }
+			#curve-top {
+				top: 0;
+				right: 0;
+			}
 
-      #curve-bottom {
-        bottom: 0;
-        left: 0;
-      }
+			#curve-bottom {
+				bottom: 0;
+				left: 0;
+			}
 
-      #logo-on-image,
-      #logo-on-background {
-        position: absolute;
-        top: 24px;
-        left: 24px;
-        height: 55px;
-      }
+			#logo-on-image,
+			#logo-on-background {
+				position: absolute;
+				display: var(--umb-logo-display, block);
+				top: var(--umb-logo-top, 24px);
+				left: var(--umb-logo-left, 24px);
+				width: var(--umb-logo-width, auto);
+				height: var(--umb-logo-height, 55px);
+			}
 
-      @media only screen and (min-width: 900px) {
-        :host {
-          --header-font-size: var(--umb-login-header-font-size-large, 4rem);
-        }
+			@media only screen and (min-width: 900px) {
+				:host {
+					--header-font-size: var(--umb-login-header-font-size-large, 4rem);
+				}
 
-        #main {
-          padding: 32px;
-          padding-right: 0;
-          align-items: var(--umb-login-align-items, unset);
-        }
+				#main {
+					padding: 32px;
+					padding-right: 0;
+					align-items: var(--umb-login-align-items, unset);
+				}
 
-        #image-container {
-          display: var(--umb-login-image-display, block);
-        }
+				#image-container {
+					display: var(--umb-login-image-display, block);
+				}
 
-        #content-container {
-          display: var(--umb-login-content-display, flex);
-          padding: 16px;
-        }
+				#content-container {
+					display: var(--umb-login-content-display, flex);
+					padding: 16px;
+				}
 
-        #logo-on-background {
-          display: var(--logo-alternative-display);
-        }
-      }
-    `,
-  ];
+				#logo-on-background {
+					display: var(--logo-alternative-display);
+				}
+			}
+		`,
+	];
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    'umb-auth-layout': UmbAuthLayoutElement;
-  }
+	interface HTMLElementTagNameMap {
+		'umb-auth-layout': UmbAuthLayoutElement;
+	}
 }

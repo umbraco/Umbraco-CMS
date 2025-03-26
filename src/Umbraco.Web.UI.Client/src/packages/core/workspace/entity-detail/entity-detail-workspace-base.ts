@@ -85,10 +85,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	constructor(host: UmbControllerHost, args: UmbEntityDetailWorkspaceContextArgs) {
 		super(host, args.workspaceAlias);
+		this.addValidationContext(this.validationContext);
 		this.#entityContext.setEntityType(args.entityType);
 		window.addEventListener('willchangestate', this.#onWillNavigate);
 		this.#observeRepository(args.detailRepositoryAlias);
-		this.addValidationContext(this.validationContext);
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
 			this.#eventContext = context;
@@ -167,6 +167,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	async load(unique: string) {
+		if (unique === this.getUnique() && this._getDataPromise) {
+			return (await this._getDataPromise) as GetDataType;
+		}
 		this.resetState();
 		this.#entityContext.setUnique(unique);
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
@@ -236,12 +239,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		let { data } = await request;
 
 		if (data) {
-			this.#entityContext.setUnique(data.unique);
+			data = await this._scaffoldProcessData(data);
 
 			if (this.modalContext) {
+				// Notice if the preset comes with values, they will overwrite the scaffolded values... [NL]
 				data = { ...data, ...this.modalContext.data.preset };
 			}
 
+			this.#entityContext.setUnique(data.unique);
 			this.setIsNew(true);
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
@@ -249,6 +254,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 		this.loading.removeState(LOADING_STATE_UNIQUE);
 
+		return data;
+	}
+
+	protected async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
 		return data;
 	}
 
@@ -352,6 +361,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 		/* TODO: temp removal of discard changes in workspace modals.
 		 The modal closes before the discard changes dialog is resolved.*/
+		// TODO: I think this can go away now???
 		if (newUrl.includes('/modal/umb-modal-workspace/')) {
 			return true;
 		}
@@ -389,8 +399,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	override resetState() {
 		super.resetState();
+		this.loading.clear();
 		this._data.clear();
 		this.#allowNavigateAway = false;
+		this._getDataPromise = undefined;
 	}
 
 	#checkIfInitialized() {
@@ -407,7 +419,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			this,
 			umbExtensionsRegistry,
 			repositoryAlias,
-			[this._host],
+			[],
 			(permitted, ctrl) => {
 				this._detailRepository = permitted ? ctrl.api : undefined;
 				this.#checkIfInitialized();
@@ -447,6 +459,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		);
 		this._detailRepository?.destroy();
 		this.#entityContext.destroy();
+		this._getDataPromise = undefined;
 		super.destroy();
 	}
 }

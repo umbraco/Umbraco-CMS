@@ -140,7 +140,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
 			this.#tabsStructureHelper.setStructureManager(workspaceContext.structure);
-			new UmbContentTypeMoveRootGroupsIntoFirstTabHelper(this, workspaceContext.structure);
 
 			this.#observeRootGroups();
 		});
@@ -281,11 +280,19 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			return;
 		}
 
+		if (!this.#workspaceContext) {
+			throw new Error('Workspace context has not been found');
+		}
+
 		if (!this._tabs) return;
 
 		const len = this._tabs.length;
 		const sortOrder = len === 0 ? 0 : this._tabs[len - 1].sortOrder + 1;
-		const tab = await this.#workspaceContext?.structure.createContainer(null, null, 'Tab', sortOrder);
+		const tab = await this.#workspaceContext.structure.createContainer(null, null, 'Tab', sortOrder);
+		// If length was 0 before, then we need to move the root groups into the first tab: [NL]
+		if (len === 0) {
+			new UmbContentTypeMoveRootGroupsIntoFirstTabHelper(this, this.#workspaceContext.structure);
+		}
 		if (tab) {
 			const path = this._routerPath + '/tab/' + encodeFolderName(tab.name && tab.name !== '' ? tab.name : '-');
 			window.history.replaceState(null, '', path);
@@ -426,7 +433,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 						`
 					: ''}
 				<uui-button look="outline" label=${sortButtonText} compact @click=${this.#toggleSortMode}>
-					<uui-icon name="icon-navigation"></uui-icon>
+					<uui-icon name="icon-height"></uui-icon>
 					${sortButtonText}
 				</uui-button>
 			</div>
@@ -491,7 +498,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (this._sortModeActive) {
 			return html`<div class="tab">
 				${ownedTab
-					? html`<uui-icon name="icon-navigation" class="drag-${tab.id}"> </uui-icon>${tabName}
+					? html`<uui-icon name="icon-grip" class="drag-${tab.id}"> </uui-icon>${tabName}
 							<uui-input
 								label="sort order"
 								type="number"

@@ -893,6 +893,11 @@
 			"file": "grid-3x3.svg"
 		},
 		{
+			"name": "icon-grip",
+			"file": "grip-vertical.svg",
+			"internal": true
+		},
+		{
 			"name": "icon-hammer",
 			"file": "hammer.svg"
 		},
@@ -1386,6 +1391,10 @@
 			"name": "icon-old-phone",
 			"file": "phone.svg",
 			"legacy": true
+		},
+		{
+			"name": "icon-omega",
+			"file": "omega.svg"
 		},
 		{
 			"name": "icon-operator",
@@ -2076,6 +2085,14 @@
 		{
 			"name": "icon-text-align-right",
 			"file": "align-right.svg"
+		},
+		{
+			"name": "icon-text-direction-ltr",
+			"file": "pilcrow-right.svg"
+		},
+		{
+			"name": "icon-text-direction-rtl",
+			"file": "pilcrow-left.svg"
 		},
 		{
 			"name": "icon-theater",

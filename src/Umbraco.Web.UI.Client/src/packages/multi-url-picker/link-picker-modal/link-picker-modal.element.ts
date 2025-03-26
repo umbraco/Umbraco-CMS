@@ -69,7 +69,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	async #getMediaTypes() {
 		// Get all the media types, excluding the folders, so that files are selectable media items.
 		const mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(this);
-		const { data: mediaTypes } = await mediaTypeStructureRepository.requestAllowedChildrenOf(null);
+		const { data: mediaTypes } = await mediaTypeStructureRepository.requestAllowedChildrenOf(null, null);
 		this._allowedMediaTypeUniques =
 			(mediaTypes?.items.map((x) => x.unique).filter((x) => x && !isUmbracoFolder(x)) as Array<string>) ?? [];
 	}
@@ -242,7 +242,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				<uui-button
 					data-mark="action:document"
 					look="placeholder"
-					label=${this.localize.term('general_document')}
+					label=${this.localize.term('general_content')}
 					@click=${this.#triggerDocumentPicker}></uui-button>
 				<uui-button
 					data-mark="action:media"
@@ -263,7 +263,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			<umb-input-document
 				?hidden=${!this.value.link.unique || this.value.link.type !== 'document'}
 				.max=${1}
-				.showOpenButton=${true}
 				.value=${this.value.link.unique && this.value.link.type === 'document' ? this.value.link.unique : ''}
 				@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'document')}>
 			</umb-input-document>

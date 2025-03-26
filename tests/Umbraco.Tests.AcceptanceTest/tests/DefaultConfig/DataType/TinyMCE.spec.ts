@@ -23,7 +23,7 @@ test('can create a rich text editor with tinyMCE', {tag: '@smoke'}, async ({umbr
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
   await umbracoUi.dataType.clickActionsMenuCreateButton();
-  await umbracoUi.dataType.clickNewDataTypeButton();
+  await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(tinyMCEName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor(tinyMCELocatorName, tinyMCEFilterKeyword);
@@ -234,7 +234,7 @@ test('can enable hide label', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
   // Act
-  await umbracoUi.dataType.clickHideLabelSlider();
+  await umbracoUi.dataType.clickHideLabelToggle();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
@@ -278,7 +278,7 @@ test('can enable ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
   // Act
-  await umbracoUi.dataType.clickIgnoreUserStartNodesSlider();
+  await umbracoUi.dataType.clickIgnoreUserStartNodesToggle();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
