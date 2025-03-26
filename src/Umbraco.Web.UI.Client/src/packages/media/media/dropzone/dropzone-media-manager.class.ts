@@ -17,7 +17,6 @@ import { UmbMediaTypeStructureRepository, type UmbAllowedMediaTypeModel } from '
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { TemporaryFileStatus } from '@umbraco-cms/backoffice/temporary-file';
 
 export class UmbDropzoneMediaManager extends UmbDropzoneManager {
 	#mediaTypeStructure = new UmbMediaTypeStructureRepository(this);
@@ -35,23 +34,26 @@ export class UmbDropzoneMediaManager extends UmbDropzoneManager {
 	 * Uploads files and folders to the server and creates the media items with corresponding media type.\
 	 * Allows the user to pick a media type option if multiple types are allowed.
 	 * @param {UmbFileDropzoneDroppedItems} items - The files and folders to upload.
-	 * @param {string | null} parentUnique - Where the items should be uploaded.
+	 * @param {string | null} parentUnique - The parent unique.
 	 * @returns {Array<UmbUploadableItem>} - The items about to be uploaded.
 	 */
-	public createMediaItems(items: UmbFileDropzoneDroppedItems, parentUnique: string | null): Array<UmbUploadableItem> {
-		const uploadableItems = this._setupProgress(items, parentUnique);
+	public async createMediaItems(
+		items: UmbFileDropzoneDroppedItems,
+		parentUnique: string | null,
+	): Promise<Array<UmbUploadableItem>> {
+		const uploadableItems = await this.createTemporaryFiles(items, parentUnique);
+		const completedItems = uploadableItems.filter((x) => x.status === UmbFileDropzoneItemStatus.COMPLETE);
+		if (!completedItems.length) return [];
 
-		if (!uploadableItems.length) return [];
-
-		if (uploadableItems.length === 1) {
+		if (completedItems.length === 1) {
 			// When there is only one item being uploaded, allow the user to pick the media type, if more than one is allowed.
-			this.#createOneMediaItem(uploadableItems[0]);
+			this.#createOneMediaItem(completedItems[0]);
 		} else {
 			// When there are multiple items being uploaded, automatically pick the media types for each item. We probably want to allow the user to pick the media type in the future.
-			this.#createMediaItems(uploadableItems);
+			this.#createMediaItems(completedItems);
 		}
 
-		return uploadableItems;
+		return completedItems;
 	}
 
 	async #showDialogMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>) {
@@ -110,17 +112,6 @@ export class UmbDropzoneMediaManager extends UmbDropzoneManager {
 	}
 
 	async #handleFile(item: UmbUploadableFile, mediaTypeUnique: string) {
-		// Upload the file as a temporary file and update progress.
-		const temporaryFile = await this.#uploadAsTemporaryFile(item);
-		if (temporaryFile.status === TemporaryFileStatus.CANCELLED) {
-			this._updateStatus(item, UmbFileDropzoneItemStatus.CANCELLED);
-			return;
-		}
-		if (temporaryFile.status !== TemporaryFileStatus.SUCCESS) {
-			this._updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
-			return;
-		}
-
 		// Create the media item.
 		const scaffold = await this.#getItemScaffold(item, mediaTypeUnique);
 		const { data } = await this.#mediaDetailRepository.create(scaffold, item.parentUnique);
@@ -140,10 +131,6 @@ export class UmbDropzoneMediaManager extends UmbDropzoneManager {
 		} else {
 			this._updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
 		}
-	}
-
-	#uploadAsTemporaryFile(item: UmbUploadableFile) {
-		return this.#tempFileManager.uploadOne(item.temporaryFile);
 	}
 
 	// Media types

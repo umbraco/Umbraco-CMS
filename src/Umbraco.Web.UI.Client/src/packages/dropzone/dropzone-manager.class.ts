@@ -43,23 +43,30 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 	/**
 	 * Uploads the files as temporary files and returns the data.
-	 * @param { File[] } files - The files to upload.
+	 * @param {UmbFileDropzoneDroppedItems} items - The items to upload.
+	 * @param {string | null} parentUnique - The parent unique.
 	 * @returns {Promise<Array<UmbUploadableItem>>} - Files as temporary files.
 	 */
-	public async createTemporaryFiles(files: Array<File>): Promise<Array<UmbUploadableItem>> {
-		const uploadableItems = this._setupProgress({ files, folders: [] }, null) as Array<UmbUploadableFile>;
+	public async createTemporaryFiles(
+		items: UmbFileDropzoneDroppedItems,
+		parentUnique?: string | null,
+	): Promise<Array<UmbUploadableItem>> {
+		const uploadableItems = this.#setupProgress(items, parentUnique ?? null);
 
 		const uploadedItems: Array<UmbUploadableItem> = [];
 
 		for (const item of uploadableItems) {
-			// Upload as temp file
-			const uploaded = await this.#tempFileManager.uploadOne(item.temporaryFile);
+			// Check if the item is a file
+			if (this.#isUploadableFile(item)) {
+				// Upload as temp file
+				const uploaded = await this.#tempFileManager.uploadOne(item.temporaryFile);
 
-			// Update progress
-			if (uploaded.status === TemporaryFileStatus.SUCCESS) {
-				this._updateStatus(item, UmbFileDropzoneItemStatus.COMPLETE);
-			} else {
-				this._updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
+				// Update progress
+				if (uploaded.status === TemporaryFileStatus.SUCCESS) {
+					this._updateStatus(item, UmbFileDropzoneItemStatus.COMPLETE);
+				} else {
+					this._updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
+				}
 			}
 
 			// Add to return value
@@ -99,7 +106,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	}
 
 	// Progress handling
-	protected _setupProgress(items: UmbFileDropzoneDroppedItems, parent: string | null) {
+	#setupProgress(items: UmbFileDropzoneDroppedItems, parent: string | null) {
 		const current = this.#progress.getValue();
 		const currentItems = this.#progressItems.getValue();
 
@@ -117,11 +124,15 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		this.#progress.update({ completed: progress.completed + 1 });
 	}
 
-	protected _updateProgress(item: UmbUploadableItem, progress: number) {
+	#isUploadableFile(item: UmbUploadableItem): item is UmbUploadableFile {
+		return 'temporaryFile' in item && item.temporaryFile !== undefined;
+	}
+
+	#updateProgress(item: UmbUploadableItem, progress: number) {
 		this.#progressItems.updateOne(item.unique, { progress });
 	}
 
-	readonly #prepareItemsAsUploadable = (
+	#prepareItemsAsUploadable = (
 		{ folders, files }: UmbFileDropzoneDroppedItems,
 		parentUnique: string | null,
 	): Array<UmbUploadableItem> => {
@@ -132,7 +143,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 				file,
 				temporaryUnique: UmbId.new(),
 				abortController: new AbortController(),
-				onProgress: (progress) => this._updateProgress(uploadableItem, progress),
+				onProgress: (progress) => this.#updateProgress(uploadableItem, progress),
 			};
 
 			const uploadableItem: UmbUploadableFile = {
@@ -148,6 +159,10 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			});
 
 			items.push(uploadableItem);
+		}
+
+		if (!this.getIsFoldersAllowed()) {
+			return items;
 		}
 
 		for (const subfolder of folders) {

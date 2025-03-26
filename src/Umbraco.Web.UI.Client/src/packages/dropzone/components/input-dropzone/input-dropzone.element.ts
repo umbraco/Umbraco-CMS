@@ -1,4 +1,4 @@
-import type { UmbUploadableItem } from '../../types.js';
+import type { UmbFileDropzoneDroppedItems, UmbUploadableItem } from '../../types.js';
 import { UmbFileDropzoneItemStatus } from '../../constants.js';
 import { UmbDropzoneManager } from '../../dropzone-manager.class.js';
 import { UmbDropzoneChangeEvent } from '../../dropzone-change.event.js';
@@ -52,7 +52,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	 */
 	@property({ type: Boolean, attribute: 'disable-folder-upload', reflect: true })
 	public set disableFolderUpload(isAllowed: boolean) {
-		this.#manager.setIsFoldersAllowed(!isAllowed);
+		this._manager.setIsFoldersAllowed(!isAllowed);
 	}
 	public get disableFolderUpload() {
 		return this._disableFolderUpload;
@@ -84,20 +84,20 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	@state()
 	protected _progressItems: Array<UmbUploadableItem> = [];
 
-	#manager = new UmbDropzoneManager(this);
+	protected _manager = new UmbDropzoneManager(this);
 
 	constructor() {
 		super();
 
 		this.observe(
-			this.#manager.progress,
+			this._manager.progress,
 			(progress) =>
 				this.dispatchEvent(new ProgressEvent('progress', { loaded: progress.completed, total: progress.total })),
 			'_observeProgress',
 		);
 
 		this.observe(
-			this.#manager.progressItems,
+			this._manager.progressItems,
 			(progressItems) => {
 				this._progressItems = [...progressItems];
 				const waiting = this._progressItems.find((item) => item.status === UmbFileDropzoneItemStatus.WAITING);
@@ -112,7 +112,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
-		this.#manager.destroy();
+		this._manager.destroy();
 	}
 
 	/**
@@ -224,7 +224,12 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		if (this.disabled) return;
 		if (!e.detail.files.length && !e.detail.folders.length) return;
 
-		const uploadables = this.#manager.createTemporaryFiles(e.detail.files);
+		const droppedItems: UmbFileDropzoneDroppedItems = {
+			files: e.detail.files,
+			folders: e.detail.folders,
+		};
+
+		const uploadables = this._manager.createTemporaryFiles(droppedItems, this.parentUnique);
 		this.dispatchEvent(new UmbDropzoneSubmittedEvent(await uploadables));
 	}
 
@@ -239,7 +244,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	}
 
 	#handleRemove() {
-		this.#manager.removeAll();
+		this._manager.removeAll();
 	}
 
 	static override readonly styles = [

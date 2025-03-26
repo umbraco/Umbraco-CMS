@@ -4,8 +4,9 @@ import {
 	UmbFileDropzoneItemStatus,
 	UmbDropzoneSubmittedEvent,
 	type UmbUploadableItem,
+	type UmbFileDropzoneDroppedItems,
 } from '@umbraco-cms/backoffice/dropzone';
-import { css, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
@@ -29,8 +30,8 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		return this._progressItems;
 	}
 
-	public progressItems = () => this.#dropzoneManager.progressItems;
-	public progress = () => this.#dropzoneManager.progress;
+	public progressItems = () => this._manager.progressItems;
+	public progress = () => this._manager.progress;
 
 	constructor() {
 		super();
@@ -40,7 +41,7 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		document.addEventListener('drop', this.#handleDrop.bind(this));
 
 		this.observe(
-			this.#dropzoneManager.progressItems,
+			this._manager.progressItems,
 			(progressItems: Array<UmbUploadableItem>) => {
 				const waiting = progressItems.find((item) => item.status === UmbFileDropzoneItemStatus.WAITING);
 				if (progressItems.length && !waiting) {
@@ -53,23 +54,25 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
-		this.#dropzoneManager.destroy();
+		this._manager.destroy();
 		document.removeEventListener('dragenter', this.#handleDragEnter.bind(this));
 		document.removeEventListener('dragleave', this.#handleDragLeave.bind(this));
 		document.removeEventListener('drop', this.#handleDrop.bind(this));
 	}
 
 	override async onUpload(event: UUIFileDropzoneEvent) {
+		event.stopImmediatePropagation();
+
 		if (this.disabled) return;
 		if (!event.detail.files.length && !event.detail.folders.length) return;
 
-		if (this.createAsTemporary) {
-			const uploadable = this.#dropzoneManager.createTemporaryFiles(event.detail.files);
-			this.dispatchEvent(new UmbDropzoneSubmittedEvent(await uploadable));
-		} else {
-			const uploadable = this.#dropzoneManager.createMediaItems(event.detail, this.parentUnique);
-			this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadable));
-		}
+		const droppedItems: UmbFileDropzoneDroppedItems = {
+			files: event.detail.files,
+			folders: event.detail.folders,
+		};
+
+		const uploadable = this._manager.createMediaItems(droppedItems, this.parentUnique);
+		this.dispatchEvent(new UmbDropzoneSubmittedEvent(await uploadable));
 	}
 
 	#handleDragEnter(e: DragEvent) {
