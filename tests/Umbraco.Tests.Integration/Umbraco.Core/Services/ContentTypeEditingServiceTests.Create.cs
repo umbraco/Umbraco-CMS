@@ -545,6 +545,35 @@ internal sealed partial class ContentTypeEditingServiceTests
     }
 
     [Test]
+    public async Task Can_Create_Child_To_Content_Type_With_Composition()
+    {
+        var compositionContentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Composition"), Constants.Security.SuperUserKey)).Result!;
+        var parentContentType = (await ContentTypeEditingService.CreateAsync(
+                ContentTypeCreateModel(
+                    "Parent",
+                    compositions: [new Composition { CompositionType = CompositionType.Composition, Key = compositionContentType.Key }]),
+                Constants.Security.SuperUserKey)).Result!;
+        var result = await ContentTypeEditingService.CreateAsync(
+                ContentTypeCreateModel(
+                    "Child",
+                    compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parentContentType.Key }]),
+                Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+
+        // Ensure it's actually persisted
+        var childContentType = await ContentTypeService.GetAsync(result.Result!.Key);
+
+        Assert.IsNotNull(childContentType);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Child", childContentType.Name);
+            Assert.AreEqual(1, childContentType.ContentTypeComposition.Count());
+            Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
+        });
+    }
+
+    [Test]
     public async Task Cannot_Be_Both_Parent_And_Composition()
     {
         var compositionBase = ContentTypeCreateModel("CompositionBase");

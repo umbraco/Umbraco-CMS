@@ -601,6 +601,91 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(567, contentType.HistoryCleanup.KeepLatestVersionPerDayForDays);
     }
 
+    [Test]
+    public async Task Can_Reapply_Compositions_For_Content_Type_With_Children()
+    {
+        var compositionContentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Composition"), Constants.Security.SuperUserKey)).Result!;
+        var parentContentType = (await ContentTypeEditingService.CreateAsync(
+                ContentTypeCreateModel(
+                    "Parent",
+                    compositions: [new Composition { CompositionType = CompositionType.Composition, Key = compositionContentType.Key }]),
+                Constants.Security.SuperUserKey)).Result!;
+        var childContentType = (await ContentTypeEditingService.CreateAsync(
+                ContentTypeCreateModel(
+                    "Child",
+                    compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parentContentType.Key }]),
+                Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = ContentTypeUpdateModel(
+            "Parent Updated",
+            compositions: [new() { CompositionType = CompositionType.Composition, Key = compositionContentType.Key }]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(parentContentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        // Ensure it's actually persisted
+        parentContentType = await ContentTypeService.GetAsync(parentContentType.Key);
+
+        Assert.IsNotNull(parentContentType);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Parent Updated", parentContentType.Name);
+            Assert.AreEqual(1, parentContentType.ContentTypeComposition.Count());
+            Assert.AreEqual(compositionContentType.Key, parentContentType.ContentTypeComposition.Single().Key);
+        });
+
+        childContentType = await ContentTypeService.GetAsync(childContentType.Key);
+
+        Assert.IsNotNull(childContentType);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Child", childContentType.Name);
+            Assert.AreEqual(1, childContentType.ContentTypeComposition.Count());
+            Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
+        });
+    }
+
+    [Test]
+    public async Task Can_Remove_Compositions_For_Content_Type_With_Children()
+    {
+        var compositionContentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Composition"), Constants.Security.SuperUserKey)).Result!;
+        var parentContentType = (await ContentTypeEditingService.CreateAsync(
+                ContentTypeCreateModel(
+                    "Parent",
+                    compositions: [new Composition { CompositionType = CompositionType.Composition, Key = compositionContentType.Key }]),
+                Constants.Security.SuperUserKey)).Result!;
+        var childContentType = (await ContentTypeEditingService.CreateAsync(
+                ContentTypeCreateModel(
+                    "Child",
+                    compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parentContentType.Key }]),
+                Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = ContentTypeUpdateModel("Parent Updated", compositions: []);
+
+        var result = await ContentTypeEditingService.UpdateAsync(parentContentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        // Ensure it's actually persisted
+        parentContentType = await ContentTypeService.GetAsync(parentContentType.Key);
+
+        Assert.IsNotNull(parentContentType);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Parent Updated", parentContentType.Name);
+            Assert.IsEmpty(parentContentType.ContentTypeComposition);
+        });
+
+        childContentType = await ContentTypeService.GetAsync(childContentType.Key);
+
+        Assert.IsNotNull(childContentType);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Child", childContentType.Name);
+            Assert.AreEqual(1, childContentType.ContentTypeComposition.Count());
+            Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
+        });
+    }
+
     [TestCase(false)]
     [TestCase(true)]
     public async Task Cannot_Move_Properties_To_Non_Existing_Containers(bool isElement)
@@ -825,5 +910,44 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidContainerType, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Add_Compositions_For_Content_Type_With_Children()
+    {
+        var compositionContentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Composition"), Constants.Security.SuperUserKey)).Result!;
+        var parentContentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
+        var childContentType = (await ContentTypeEditingService.CreateAsync(
+                ContentTypeCreateModel(
+                    "Child",
+                    compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parentContentType.Key }]),
+                Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = ContentTypeUpdateModel(
+            "Parent Updated",
+            compositions: [new() { CompositionType = CompositionType.Composition, Key = compositionContentType.Key }]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(parentContentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+
+        // Ensure nothing was persisted
+        parentContentType = await ContentTypeService.GetAsync(parentContentType.Key);
+
+        Assert.IsNotNull(parentContentType);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Parent", parentContentType.Name);
+            Assert.AreEqual(0, parentContentType.ContentTypeComposition.Count());
+        });
+
+        childContentType = await ContentTypeService.GetAsync(childContentType.Key);
+
+        Assert.IsNotNull(childContentType);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Child", childContentType.Name);
+            Assert.AreEqual(1, childContentType.ContentTypeComposition.Count());
+            Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
+        });
     }
 }

@@ -322,6 +322,15 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         // get the content type keys we want to use for compositions
         Guid[] compositionKeys = KeysForCompositionTypes(model, CompositionType.Composition);
 
+        // if the content type keys are already set as compositions, don't perform any additional validation
+        // - this covers an edge case where compositions are configured for a content type before child content types are created
+        if (contentType is not null && contentType.ContentTypeComposition
+                .Select(c => c.Key)
+                .ContainsAll(compositionKeys))
+        {
+            return ContentTypeOperationStatus.Success;
+        }
+
         // verify that all compositions keys are allowed
         Guid[] allowedCompositionKeys = _contentTypeService.GetAvailableCompositeContentTypes(contentType, allContentTypeCompositions, isElement: model.IsElement)
             .Results
