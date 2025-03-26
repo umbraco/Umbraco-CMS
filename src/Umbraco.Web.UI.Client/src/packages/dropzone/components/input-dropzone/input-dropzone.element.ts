@@ -36,6 +36,12 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	UmbLitElement,
 ) {
 	/**
+	 * The parent of the uploaded items once they are moved from the temporary folder.
+	 */
+	@property({ attribute: 'parent-unique' })
+	parentUnique: string | null = null;
+
+	/**
 	 * Comma-separated list of accepted mime types or file extensions.
 	 */
 	@property({ type: String })

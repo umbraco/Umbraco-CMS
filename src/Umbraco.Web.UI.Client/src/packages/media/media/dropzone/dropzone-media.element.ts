@@ -19,23 +19,7 @@ import type { UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui'
  */
 @customElement('umb-dropzone-media')
 export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
-	@property({ attribute: 'parent-unique' })
-	parentUnique: string | null = null;
-
-	/**
-	 * Determines if the dropzone should create temporary files or media items directly.
-	 * @deprecated Use the {@link UmbInputDropzoneElement} instead.
-	 */
-	@property({ type: Boolean, attribute: 'create-as-temporary' })
-	createAsTemporary: boolean = false;
-
-	#dropzoneManager = new UmbDropzoneMediaManager(this);
-
-	/**
-	 * @deprecated Please use `getItems()` instead; this method will be removed in Umbraco 17.
-	 * @returns {Array<UmbUploadableItem>} An array of uploadable items.
-	 */
-	public getFiles = this.getItems;
+	protected override _manager = new UmbDropzoneMediaManager(this);
 
 	/**
 	 * Gets the current value of the uploaded items.
