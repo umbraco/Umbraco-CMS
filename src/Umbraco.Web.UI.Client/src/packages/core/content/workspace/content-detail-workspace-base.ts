@@ -202,7 +202,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 							culture: null,
 							segment: null,
 							unique: new UmbVariantId().toString(),
-						},
+						} as VariantOptionModelType,
 					];
 				}
 
