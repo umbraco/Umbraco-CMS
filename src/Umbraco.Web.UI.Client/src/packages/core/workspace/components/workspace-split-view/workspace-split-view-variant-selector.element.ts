@@ -287,11 +287,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 						</div>
 						<div class="variant-details">
 							<span>${this._renderVariantDetails(variantOption)}</span>
-							<span
-								>${variantOption.language.isDefault
-									? html`<span> - ${this.localize.term('general_default')}</span>`
-									: nothing}</span
-							>
+							<span>${this.#renderDefaultLanguageTag(variantOption)}</span>
 						</div>
 					</div>
 					<div class="specs-info">${this.#getVariantSpecInfo(variantOption)}</div>
@@ -328,6 +324,12 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	#isReadOnly(culture: string | null) {
 		return this._readOnlyCultures.includes(culture);
+	}
+
+	#renderDefaultLanguageTag(variantOption: VariantOptionModelType) {
+		return variantOption.segment === null && variantOption.language.isDefault
+			? html`<span> - ${this.localize.term('general_default')}</span>`
+			: nothing;
 	}
 
 	#renderReadOnlyTag(culture?: string | null) {
