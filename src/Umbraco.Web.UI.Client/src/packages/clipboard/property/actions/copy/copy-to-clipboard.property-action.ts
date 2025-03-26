@@ -18,19 +18,19 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 		this.#init = Promise.all([
 			this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 				this.#propertyDatasetContext = context;
-			}).asPromise(),
+			}).asPromise({ preventTimeout: true }),
 
 			this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 				this.#propertyContext = context;
-			}).asPromise(),
+			}).asPromise({ preventTimeout: true }),
 
 			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
 				this.#notificationContext = context;
-			}).asPromise(),
+			}).asPromise({ preventTimeout: true }),
 
 			this.consumeContext(UMB_CLIPBOARD_PROPERTY_CONTEXT, (context) => {
 				this.#clipboardContext = context;
-			}).asPromise(),
+			}).asPromise({ preventTimeout: true }),
 		]);
 	}
 
