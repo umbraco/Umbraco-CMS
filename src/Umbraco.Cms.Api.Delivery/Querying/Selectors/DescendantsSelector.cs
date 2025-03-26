@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
@@ -16,8 +17,8 @@ public sealed class DescendantsSelector : QueryOptionBase, ISelectorHandler
         : this(
             requestRoutingService,
             StaticServiceProvider.Instance.GetRequiredService<IRequestPreviewService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IRequestCultureService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>())
+            StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>())
     {
     }
 
@@ -26,18 +27,18 @@ public sealed class DescendantsSelector : QueryOptionBase, ISelectorHandler
         IPublishedContentCache publishedContentCache,
         IRequestRoutingService requestRoutingService,
         IRequestPreviewService requestPreviewService,
-        IRequestCultureService requestCultureService,
-        IApiDocumentUrlService apiDocumentUrlService)
-        : this(requestRoutingService, requestPreviewService, requestCultureService, apiDocumentUrlService)
+        IApiDocumentUrlService apiDocumentUrlService,
+        IVariationContextAccessor variationContextAccessor)
+        : this(requestRoutingService, requestPreviewService, apiDocumentUrlService, variationContextAccessor)
     {
     }
 
     public DescendantsSelector(
         IRequestRoutingService requestRoutingService,
         IRequestPreviewService requestPreviewService,
-        IRequestCultureService requestCultureService,
-        IApiDocumentUrlService apiDocumentUrlService)
-        : base(requestRoutingService, requestPreviewService, requestCultureService, apiDocumentUrlService)
+        IApiDocumentUrlService apiDocumentUrlService,
+        IVariationContextAccessor variationContextAccessor)
+        : base(requestRoutingService, requestPreviewService, apiDocumentUrlService, variationContextAccessor)
     {
     }
 

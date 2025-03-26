@@ -18,7 +18,7 @@ test.afterEach(async ({umbracoApi}) => {
   }
 });
 
-test('can update initial state', async ({umbracoApi, umbracoUi}) => {
+test('can update preset value state', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedDataTypeValues = {
     "alias": "default",
@@ -26,7 +26,7 @@ test('can update initial state', async ({umbracoApi, umbracoUi}) => {
   };
 
   // Act
-  await umbracoUi.dataType.clickInitialStateSlider();
+  await umbracoUi.dataType.clickPresetValueToggle();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
@@ -42,7 +42,7 @@ test('can update show toggle labels', async ({umbracoApi, umbracoUi}) => {
   };
 
   // Act
-  await umbracoUi.dataType.clickShowToggleLabelsSlider();
+  await umbracoUi.dataType.clickShowToggleLabelsToggle();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert

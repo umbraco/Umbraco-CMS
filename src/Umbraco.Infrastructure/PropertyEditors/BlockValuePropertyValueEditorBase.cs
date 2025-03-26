@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -296,6 +295,18 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         BlockEditorData<TValue, TLayout>? source = BlockEditorValues.DeserializeAndClean(sourceValue);
         BlockEditorData<TValue, TLayout>? target = BlockEditorValues.DeserializeAndClean(targetValue);
 
+        TValue? mergedBlockValue =
+            MergeVariantInvariantPropertyValueTyped(source, target, canUpdateInvariantData, allowedCultures);
+
+        return _jsonSerializer.Serialize(mergedBlockValue);
+    }
+
+    internal virtual TValue? MergeVariantInvariantPropertyValueTyped(
+        BlockEditorData<TValue, TLayout>? source,
+        BlockEditorData<TValue, TLayout>? target,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
         source = UpdateSourceInvariantData(source, target, canUpdateInvariantData);
 
         if (source is null && target is null)
@@ -320,15 +331,15 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
         // remove all the blocks that are no longer part of the layout
         target.BlockValue.ContentData.RemoveAll(contentBlock =>
-            target.Layout!.Any(layoutItem => layoutItem.ContentKey == contentBlock.Key) is false);
+            target.Layout!.Any(layoutItem => layoutItem.ReferencesContent(contentBlock.Key)) is false);
 
         target.BlockValue.SettingsData.RemoveAll(settingsBlock =>
-            target.Layout!.Any(layoutItem => layoutItem.SettingsKey == settingsBlock.Key) is false);
+            target.Layout!.Any(layoutItem => layoutItem.ReferencesSetting(settingsBlock.Key)) is false);
 
         CleanupVariantValues(source.BlockValue.ContentData, target.BlockValue.ContentData, canUpdateInvariantData, allowedCultures);
         CleanupVariantValues(source.BlockValue.SettingsData, target.BlockValue.SettingsData, canUpdateInvariantData, allowedCultures);
 
-        return _jsonSerializer.Serialize(target.BlockValue);
+        return target.BlockValue;
     }
 
     private void CleanupVariantValues(
@@ -346,8 +357,8 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
             foreach (BlockPropertyValue targetBlockPropertyValue in targetBlockItem.Values)
             {
-                BlockPropertyValue? sourceBlockPropertyValue =
-                    sourceBlockItem?.Values.FirstOrDefault(v => v.Culture == targetBlockPropertyValue.Culture);
+                BlockPropertyValue? sourceBlockPropertyValue = sourceBlockItem?.Values.FirstOrDefault(v
+                    => v.Alias == targetBlockPropertyValue.Alias && v.Culture == targetBlockPropertyValue.Culture);
 
                 // todo double check if this path can have an invariant value, but it shouldn't right???
                 // => it can be a null culture, but we shouldn't do anything? as the invariant section should have done it already

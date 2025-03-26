@@ -11,6 +11,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { formatBytes } from '@umbraco-cms/backoffice/utils';
+import { isCancelError } from '@umbraco-cms/backoffice/resources';
 
 export class UmbTemporaryFileManager<
 	UploadableItem extends UmbTemporaryFileModel = UmbTemporaryFileModel,
@@ -21,6 +22,15 @@ export class UmbTemporaryFileManager<
 
 	readonly #queue = new UmbArrayState<UploadableItem>([], (item) => item.temporaryUnique);
 	public readonly queue = this.#queue.asObservable();
+
+	/**
+	 * Gets the temporary file configuration.
+	 * @returns {Promise<UmbTemporaryFileConfigRepository>} The temporary file configuration.
+	 */
+	async getConfiguration(): Promise<UmbTemporaryFileConfigRepository> {
+		await this.#temporaryFileConfigRepository.initialized;
+		return this.#temporaryFileConfigRepository;
+	}
 
 	async uploadOne(uploadableItem: UploadableItem, options?: UmbUploadOptions<UploadableItem>): Promise<UploadableItem> {
 		this.#queue.setValue([]);
@@ -53,6 +63,10 @@ export class UmbTemporaryFileManager<
 		this.#queue.remove(uniques);
 	}
 
+	removeAll() {
+		this.#queue.setValue([]);
+	}
+
 	async #handleQueue(options?: UmbUploadOptions<UploadableItem>): Promise<Array<UploadableItem>> {
 		const filesCompleted: Array<UploadableItem> = [];
 		const queue = this.#queue.getValue();
@@ -78,7 +92,8 @@ export class UmbTemporaryFileManager<
 	}
 
 	async #validateItem(item: UploadableItem): Promise<boolean> {
-		let maxFileSize = await this.observe(this.#temporaryFileConfigRepository.part('maxFileSize')).asPromise();
+		const config = await this.getConfiguration();
+		let maxFileSize = await this.observe(config.part('maxFileSize')).asPromise();
 		if (maxFileSize) {
 			// Convert from kilobytes to bytes
 			maxFileSize *= 1024;
@@ -89,10 +104,9 @@ export class UmbTemporaryFileManager<
 						headline: 'Upload',
 						message: `
 	${this.#localization.term('media_invalidFileSize')}: ${item.file.name} (${formatBytes(item.file.size)}).
-	
+
 	${this.#localization.term('media_maxFileSize')} ${formatBytes(maxFileSize)}.
 						`,
-						whitespace: 'pre-line',
 					},
 				});
 				return false;
@@ -129,15 +143,29 @@ export class UmbTemporaryFileManager<
 
 		const isValid = await this.#validateItem(item);
 		if (!isValid) {
-			this.#queue.updateOne(item.temporaryUnique, { ...item, status: TemporaryFileStatus.ERROR });
+			this.#queue.updateOne(item.temporaryUnique, {
+				...item,
+				status: TemporaryFileStatus.ERROR,
+			});
 			return { ...item, status: TemporaryFileStatus.ERROR };
 		}
 
-		const { error } = await this.#temporaryFileRepository.upload(item.temporaryUnique, item.file, (evt) => {
-			// Update progress in percent if a callback is provided
-			if (item.onProgress) item.onProgress((evt.loaded / evt.total) * 100);
-		});
-		const status = error ? TemporaryFileStatus.ERROR : TemporaryFileStatus.SUCCESS;
+		const { error } = await this.#temporaryFileRepository.upload(
+			item.temporaryUnique,
+			item.file,
+			(evt) => {
+				// Update progress in percent if a callback is provided
+				if (item.onProgress) item.onProgress((evt.loaded / evt.total) * 100);
+			},
+			item.abortController?.signal ?? item.abortSignal,
+		);
+		let status = TemporaryFileStatus.SUCCESS;
+		if (error) {
+			status = TemporaryFileStatus.ERROR;
+			if (isCancelError(error)) {
+				status = TemporaryFileStatus.CANCELLED;
+			}
+		}
 
 		this.#queue.updateOne(item.temporaryUnique, { ...item, status });
 		return { ...item, status };

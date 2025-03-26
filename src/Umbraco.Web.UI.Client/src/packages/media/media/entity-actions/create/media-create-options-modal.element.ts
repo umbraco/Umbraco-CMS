@@ -26,15 +26,15 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 		const mediaUnique = this.data?.parent.unique;
 		const mediaTypeUnique = this.data?.mediaType?.unique || null;
 
-		this.#retrieveAllowedMediaTypesOf(mediaTypeUnique);
+		this.#retrieveAllowedMediaTypesOf(mediaTypeUnique, mediaUnique || null);
 
 		if (mediaUnique) {
 			this.#retrieveHeadline(mediaUnique);
 		}
 	}
 
-	async #retrieveAllowedMediaTypesOf(unique: string | null) {
-		const { data } = await this.#mediaTypeStructureRepository.requestAllowedChildrenOf(unique);
+	async #retrieveAllowedMediaTypesOf(unique: string | null, parentContentUnique: string | null) {
+		const { data } = await this.#mediaTypeStructureRepository.requestAllowedChildrenOf(unique, parentContentUnique);
 
 		if (data) {
 			// TODO: implement pagination, or get 1000?

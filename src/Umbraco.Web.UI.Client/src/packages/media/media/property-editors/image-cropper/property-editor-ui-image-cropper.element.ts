@@ -2,13 +2,13 @@ import type { UmbImageCropperPropertyEditorValue, UmbInputImageCropperElement } 
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	type UmbPropertyEditorUiElement,
-	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 import '../../components/input-image-cropper/input-image-cropper.element.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-image-cropper
@@ -47,7 +47,7 @@ export class UmbPropertyEditorUIImageCropperElement
 
 	#onChange(e: Event) {
 		this.value = (e.target as UmbInputImageCropperElement).value;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

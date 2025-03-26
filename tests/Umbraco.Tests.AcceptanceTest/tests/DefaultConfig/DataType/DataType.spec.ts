@@ -17,7 +17,7 @@ test('can create a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) 
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
   await umbracoUi.dataType.clickActionsMenuCreateButton();
-  await umbracoUi.dataType.clickNewDataTypeButton();
+  await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor('Text Box');
@@ -65,8 +65,9 @@ test('can change property editor in a data type', {tag: '@smoke'}, async ({umbra
   const updatedEditorName = 'Text Area';
   const updatedEditorAlias = 'Umbraco.TextArea';
   const updatedEditorUiAlias = 'Umb.PropertyEditorUi.TextArea';
+  const maxChars = 999;
 
-  await umbracoApi.dataType.createTextstringDataType(dataTypeName);
+  await umbracoApi.dataType.createTextstringDataType(dataTypeName, maxChars);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
 
   // Act
@@ -81,13 +82,16 @@ test('can change property editor in a data type', {tag: '@smoke'}, async ({umbra
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.editorAlias).toBe(updatedEditorAlias);
   expect(dataTypeData.editorUiAlias).toBe(updatedEditorUiAlias);
+
+  const maxCharsSetting = dataTypeData.values.find((x: {alias: string, value: unknown}) => x.alias === 'maxChars');
+  expect(maxCharsSetting.value, 'Stored configuration should be transferred').toBe(maxChars);
 });
 
 test('cannot create a data type without selecting the property editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
   await umbracoUi.dataType.clickActionsMenuCreateButton();
-  await umbracoUi.dataType.clickNewDataTypeButton();
+  await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSaveButton();
 

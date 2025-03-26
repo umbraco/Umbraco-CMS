@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Api.Delivery.Querying.Selectors;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 
@@ -47,8 +48,8 @@ public class AncestorsSelectorTests
         var subject = new AncestorsSelector(
             requestRoutingServiceMock.Object,
             Mock.Of<IRequestPreviewService>(),
-            Mock.Of<IRequestCultureService>(),
             new ApiDocumentUrlService(documentUrlServiceMock.Object),
+            Mock.Of<IVariationContextAccessor>(),
             _documentNavigationQueryService);
 
         var result = subject.BuildSelectorOption("ancestors:/some/where");
@@ -63,8 +64,8 @@ public class AncestorsSelectorTests
         var subject = new AncestorsSelector(
             Mock.Of<IRequestRoutingService>(),
             Mock.Of<IRequestPreviewService>(),
-            Mock.Of<IRequestCultureService>(),
             Mock.Of<IApiDocumentUrlService>(),
+            Mock.Of<IVariationContextAccessor>(),
             _documentNavigationQueryService);
 
         var result = subject.BuildSelectorOption($"ancestors:{_documentKey:D}");

@@ -479,7 +479,7 @@ export default {
 		anchorLinkPicker: 'Lokalt link / querystreng',
 		anchorInsert: 'Navn på lokalt link',
 		closeThisWindow: 'Luk denne dialog',
-		confirmdelete: 'Er du sikker på at du vil slette',
+		confirmdelete: (name: string) => `Er du sikker på at du vil slette${name ? ` <strong>${name}</strong>` : ''}?`,
 		confirmdisable: 'Er du sikker på du vil deaktivere',
 		confirmremove: 'Er du sikker på at du vil fjerne',
 		confirmremoveusageof: 'Er du sikker på du vil fjerne brugen af <strong>%0%</strong>',
@@ -584,6 +584,8 @@ export default {
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
+		seeErrorAction: 'Se fejlen',
+		seeErrorDialogHeadline: 'Fejl detaljer',
 	},
 	dictionary: {
 		noItems: 'Der er ingen ordbogselementer.',
@@ -873,6 +875,7 @@ export default {
 		unknown: 'Ukendt',
 		unknownUser: 'Ukendt bruger',
 		under: 'under',
+		unnamed: 'Unavngivet',
 		up: 'Op',
 		update: 'Opdatér',
 		upgrade: 'Opdatér',
@@ -908,22 +911,27 @@ export default {
 		videos: 'Videoer',
 		avatar: 'Avatar til',
 		header: 'Overskrift',
+		selectAll: 'Vælg alle',
 		systemField: 'system felt',
 		readOnly: 'Skrivebeskyttet',
 		restore: 'Genskab',
-		generic: 'Generic',
+		generic: 'Generisk',
 		media: 'Media',
-		nodeName: 'Node Name',
-		revert: 'Revert',
+		nodeName: 'Node navn',
+		revert: 'Fortryd',
 		umbracoInfo: 'Umbraco info',
-		shared: 'Shared',
-		success: 'Success',
-		typeName: 'Type Name',
-		validate: 'Validate',
-		lastUpdated: 'Last Updated',
-		skipToMenu: 'Skip to menu',
-		skipToContent: 'Skip to content',
+		shared: 'Delt',
+		success: 'Succes',
+		typeName: 'Type navn',
+		validate: 'Valider',
+		lastUpdated: 'Sidst opdateret',
+		skipToMenu: 'Spring til menu',
+		skipToContent: 'Spring til indhold',
 		newVersionAvailable: 'Ny version tilgængelig',
+		duration: (duration: string, date: Date | string, now: Date | string) => {
+			if (new Date(date).getTime() < new Date(now).getTime()) return `for ${duration} siden`;
+			return `om ${duration}`;
+		},
 	},
 	colors: {
 		blue: 'Blå',
@@ -1208,6 +1216,12 @@ export default {
 	},
 	colorpicker: {
 		noColors: 'Du har ikke konfigureret nogen godkendte farver',
+	},
+	colorPickerConfigurations: {
+		colorsTitle: 'Farver',
+		colorsDescription: 'Tilføj, fjern eller sorter farver',
+		showLabelTitle: 'Inkluder label?',
+		showLabelDescription: 'Gemmer farver som et Json-objekt, der både indeholder farvens hex streng og label, i stedet for kun at gemme hex strengen.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'Du kan kun vælge følgende type(r) dokumenter: %0%',
@@ -1689,14 +1703,14 @@ export default {
 		convertToTab: 'Convert to tab',
 		tabDirectPropertiesDropZone: 'Drag properties here to place directly on the tab',
 		usingEditor: 'using this editor will get updated with the new settings.',
-		historyCleanupHeading: 'History cleanup',
-		historyCleanupDescription: 'Allow overriding the global history cleanup settings.',
-		historyCleanupKeepAllVersionsNewerThanDays: 'Keep all versions newer than days',
-		historyCleanupKeepLatestVersionPerDayForDays: 'Keep latest version per day for days',
-		historyCleanupPreventCleanup: 'Prevent cleanup',
-		historyCleanupEnableCleanup: 'Enable cleanup',
+		historyCleanupHeading: 'Historikoprydning',
+		historyCleanupDescription: 'Tillad tilsidesættelse af de globale indstillinger for historikoprydning.',
+		historyCleanupKeepAllVersionsNewerThanDays: 'Behold alle versioner nyere end antal dage',
+		historyCleanupKeepLatestVersionPerDayForDays: 'Behold den seneste version pr. dag i antal dage',
+		historyCleanupPreventCleanup: 'Forhindre oprydning',
+		historyCleanupEnableCleanup: 'Aktivér oprydning',
 		historyCleanupGloballyDisabled:
-			'<strong>NOTE!</strong> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.',
+			'<strong>NOTE!</strong> Oprydning af historiske indholdsversioner er deaktiveret globalt. Disse indstillinger træder først i kraft, når den aktiveres.',
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collection: 'Samling',
@@ -2043,6 +2057,7 @@ export default {
 		invalidEmail: 'Ugyldig e-mail',
 		invalidNull: 'Værdien kan ikke være tom',
 		invalidEmpty: 'Værdien kan ikke være tom',
+		invalidFalse: 'Dette felt skal være slået til',
 		invalidPattern: 'Værdien er ugyldig, som ikke matcher det korrekte format',
 		customValidation: 'Selvvalgt validering',
 		entriesShort: 'Minimum %0% element(er), tilføj <strong>%1%</strong> mere.',
@@ -2260,6 +2275,8 @@ export default {
 		labelForRemoveAllEntries: 'Fjern alle elementer',
 		labelForClearClipboard: 'Ryd udklipsholder',
 		labelForCopyToClipboard: 'Kopier til udklipsholder',
+		confirmDeleteHeadline: 'Slet fra udklipsholderen',
+		confirmDeleteDescription: 'Er du sikker på at du vil slette <strong>{0}</strong> fra udklipsholderen?',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Åben egenskabshandlinger',
@@ -2391,6 +2408,9 @@ export default {
 		labelInlineMode: 'Indsæt på linje med tekst',
 		notExposedLabel: 'ikke oprettet',
 		notExposedDescription: 'Denne Block er endnu ikke oprettet for denne variant',
+		unsupportedBlockName: 'Ugyldigt indhold',
+		unsupportedBlockDescription:
+			'Dette indhold er ikke længere understøttet. Hvis du mangler dette indhold bør du kontakte din administrator. Ellers bør du slette dette indhold.',
 	},
 	contentTemplatesDashboard: {
 		whatHeadline: 'Hvad er Indholdsskabeloner?',
@@ -2430,8 +2450,8 @@ export default {
 		searchResults: 'resultater',
 	},
 	propertyEditorPicker: {
-		title: 'Select Property Editor',
-		openPropertyEditorPicker: 'Select Property Editor',
+		title: 'Vælg Property Editor',
+		openPropertyEditorPicker: 'Vælg Property Editor',
 	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",
@@ -2607,5 +2627,9 @@ export default {
 		toolbar_removeGroup: 'Fjern gruppe',
 		toolbar_removeItem: 'Fjern handling',
 		toolbar_emptyGroup: 'Tom',
+	},
+	collection: {
+		noItemsTitle: 'Intet indhold',
+		addCollectionConfiguration: 'Tilføj samling',
 	},
 } as UmbLocalizationDictionary;

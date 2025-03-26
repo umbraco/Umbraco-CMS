@@ -65,12 +65,12 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 	}
 
 	// Prevent valid events from bubbling outside the message element
-	#onValid(event: any) {
+	#onValid(event: Event) {
 		event.stopPropagation();
 	}
 
 	// Prevent invalid events from bubbling outside the message element
-	#onInvalid(event: any) {
+	#onInvalid(event: Event) {
 		event.stopPropagation();
 	}
 
@@ -85,7 +85,7 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 
 	override render() {
 		return html`
-			${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-navigation" class="handle"></uui-icon>`}
+			${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-grip" class="handle"></uui-icon>`}
 
 			<umb-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
 				<uui-input
@@ -136,7 +136,11 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 			}
 
 			.handle {
-				cursor: move;
+				cursor: grab;
+			}
+
+			.handle:active {
+				cursor: grabbing;
 			}
 		`,
 	];

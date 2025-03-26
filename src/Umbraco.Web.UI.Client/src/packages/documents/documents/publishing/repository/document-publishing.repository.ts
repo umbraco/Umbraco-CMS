@@ -8,6 +8,10 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	#init!: Promise<unknown>;
 	#publishingDataSource: UmbDocumentPublishingServerDataSource;
+
+	/**
+	 * @deprecated The calling workspace context should be used instead to show notifications
+	 */
 	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHost) {
@@ -36,14 +40,7 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 		if (!variants.length) throw new Error('variant IDs are missing');
 		await this.#init;
 
-		const { error } = await this.#publishingDataSource.publish(unique, variants);
-
-		if (!error) {
-			const notification = { data: { message: `Document published` } };
-			this.#notificationContext?.peek('positive', notification);
-		}
-
-		return { error };
+		return this.#publishingDataSource.publish(unique, variants);
 	}
 
 	/**
@@ -62,6 +59,7 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 
 		if (!error) {
 			const notification = { data: { message: `Document unpublished` } };
+			// TODO: Move this to the calling workspace context [JOV]
 			this.#notificationContext?.peek('positive', notification);
 		}
 
@@ -75,7 +73,11 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 * @param includeUnpublishedDescendants
 	 * @memberof UmbDocumentPublishingRepository
 	 */
-	async publishWithDescendants(id: string, variantIds: Array<UmbVariantId>, includeUnpublishedDescendants: boolean) {
+	async publishWithDescendants(
+		id: string,
+		variantIds: Array<UmbVariantId>,
+		includeUnpublishedDescendants: boolean,
+	) {
 		if (!id) throw new Error('id is missing');
 		if (!variantIds) throw new Error('variant IDs are missing');
 		await this.#init;
@@ -88,6 +90,7 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 
 		if (!error) {
 			const notification = { data: { message: `Document published with descendants` } };
+			// TODO: Move this to the calling workspace context [JOV]
 			this.#notificationContext?.peek('positive', notification);
 		}
 

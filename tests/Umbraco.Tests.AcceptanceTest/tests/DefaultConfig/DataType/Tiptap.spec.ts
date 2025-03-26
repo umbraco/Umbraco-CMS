@@ -22,7 +22,7 @@ test('can create a rich text editor with tiptap', {tag: '@smoke'}, async ({umbra
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
   await umbracoUi.dataType.clickActionsMenuCreateButton();
-  await umbracoUi.dataType.clickNewDataTypeButton();
+  await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(tipTapName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor(tipTapLocatorName);
@@ -195,7 +195,7 @@ test('can enable ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(tipTapName);
 
   // Act
-  await umbracoUi.dataType.clickIgnoreUserStartNodesSlider();
+  await umbracoUi.dataType.clickIgnoreUserStartNodesToggle();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert

@@ -1,3 +1,4 @@
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
 import {
 	UMB_MEDIA_RECYCLE_BIN_TREE_ALIAS,
@@ -30,10 +31,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'treeItem',
-		kind: 'default',
+		kind: 'recycleBin',
 		alias: 'Umb.TreeItem.Media.RecycleBin',
 		name: 'Media Recycle Bin Tree Item',
 		forEntityTypes: [UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE],
+		meta: {
+			supportedEntityTypes: [UMB_MEDIA_ENTITY_TYPE],
+		},
 	},
 	{
 		type: 'workspace',

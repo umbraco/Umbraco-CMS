@@ -39,7 +39,7 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Arrange
-  await umbracoUi.media.clickLabelWithName(wrongMediaFileName, true);
+  await umbracoUi.media.goToMediaWithName(wrongMediaFileName);
   await umbracoUi.media.enterMediaItemName(mediaFileName);
   await umbracoUi.media.clickSaveButton();
 
@@ -50,12 +50,12 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
 });
 
 const mediaFileTypes = [
-  {fileName: 'Article', filePath: 'Article.pdf'},
-  {fileName: 'Audio', filePath: 'Audio.mp3'},
-  {fileName: 'File', filePath: 'File.txt'},
-  {fileName: 'Image', filePath: 'Umbraco.png'},
-  {fileName: 'Vector Graphics (SVG)', filePath: 'VectorGraphics.svg'},
-  {fileName: 'Video', filePath: 'Video.mp4'}
+  {fileName: 'Article', filePath: 'Article.pdf', thumbnail: 'icon-article'},
+  {fileName: 'Audio', filePath: 'Audio.mp3', thumbnail: 'icon-audio-lines'},
+  {fileName: 'File', filePath: 'File.txt', thumbnail: 'icon-document'},
+  {fileName: 'Image', filePath: 'Umbraco.png', thumbnail: 'image'},
+  {fileName: 'Vector Graphics (SVG)', filePath: 'VectorGraphics.svg', thumbnail: 'image'},
+  {fileName: 'Video', filePath: 'Video.mp4', thumbnail: 'icon-video'}
 ];
 
 for (const mediaFileType of mediaFileTypes) {
@@ -72,7 +72,8 @@ for (const mediaFileType of mediaFileTypes) {
 
     // Assert
     await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-    await umbracoUi.media.reloadMediaTree();
+    const mediaData = await umbracoApi.media.getByName(mediaFileType.fileName);
+    await umbracoUi.media.doesMediaHaveThumbnail(mediaData.id, mediaFileType.thumbnail, mediaData.urls[0].url);
     await umbracoUi.media.isMediaTreeItemVisible(mediaFileType.fileName);
     expect(await umbracoApi.media.doesNameExist(mediaFileType.fileName)).toBeTruthy();
 
@@ -198,7 +199,7 @@ test('can restore a media item from the recycle bin', async ({umbracoApi, umbrac
 
   // Assert
   await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.restored);
-  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false, false);
   await umbracoUi.media.reloadMediaTree();
   await umbracoUi.media.isMediaTreeItemVisible(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeTruthy();
@@ -221,7 +222,7 @@ test('can delete a media item from the recycle bin', async ({umbracoApi, umbraco
 
   // Assert
   await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
-  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false, false);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
 });
@@ -239,7 +240,7 @@ test('can empty the recycle bin', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickConfirmEmptyRecycleBinButton();
 
   // Assert
-  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false, false);
   await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.emptiedRecycleBin);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();

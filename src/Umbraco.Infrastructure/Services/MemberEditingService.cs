@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -19,7 +23,9 @@ internal sealed class MemberEditingService : IMemberEditingService
     private readonly IPasswordChanger<MemberIdentityUser> _passwordChanger;
     private readonly ILogger<MemberEditingService> _logger;
     private readonly IMemberGroupService _memberGroupService;
+    private readonly SecuritySettings _securitySettings;
 
+    [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V16.")]
     public MemberEditingService(
         IMemberService memberService,
         IMemberTypeService memberTypeService,
@@ -29,6 +35,29 @@ internal sealed class MemberEditingService : IMemberEditingService
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         ILogger<MemberEditingService> logger,
         IMemberGroupService memberGroupService)
+        : this(
+              memberService,
+              memberTypeService,
+              memberContentEditingService,
+              memberManager,
+              twoFactorLoginService,
+              passwordChanger,
+              logger,
+              memberGroupService,
+              StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+    {
+    }
+
+    public MemberEditingService(
+        IMemberService memberService,
+        IMemberTypeService memberTypeService,
+        IMemberContentEditingService memberContentEditingService,
+        IMemberManager memberManager,
+        ITwoFactorLoginService twoFactorLoginService,
+        IPasswordChanger<MemberIdentityUser> passwordChanger,
+        ILogger<MemberEditingService> logger,
+        IMemberGroupService memberGroupService,
+        IOptions<SecuritySettings> securitySettings)
     {
         _memberService = memberService;
         _memberTypeService = memberTypeService;
@@ -38,6 +67,7 @@ internal sealed class MemberEditingService : IMemberEditingService
         _passwordChanger = passwordChanger;
         _logger = logger;
         _memberGroupService = memberGroupService;
+        _securitySettings = securitySettings.Value;
     }
 
     public async Task<IMember?> GetAsync(Guid key)
@@ -86,8 +116,8 @@ internal sealed class MemberEditingService : IMemberEditingService
             return IdentityMemberCreationFailed(createResult, status);
         }
 
-        IMember member = _memberService.GetByEmail(createModel.Email)
-                          ?? throw new InvalidOperationException("Member creation succeeded, but member could not be found by email.");
+        IMember member = _memberService.GetByUsername(createModel.Username)
+                          ?? throw new InvalidOperationException("Member creation succeeded, but member could not be found by username.");
 
         var updateRolesResult = await UpdateRoles(createModel.Roles, identityMember);
         if (updateRolesResult is false)
@@ -225,6 +255,14 @@ internal sealed class MemberEditingService : IMemberEditingService
             return MemberEditingOperationStatus.InvalidUsername;
         }
 
+        // User names can only contain the configured allowed characters. This is validated by ASP.NET Identity on create
+        // as the setting is applied to the BackOfficeIdentityOptions, but we need to check ourselves for updates.
+        var allowedUserNameCharacters = _securitySettings.AllowedUserNameCharacters;
+        if (model.Username.Any(c => allowedUserNameCharacters.Contains(c) == false))
+        {
+            return MemberEditingOperationStatus.InvalidUsername;
+        }
+
         if (model.Email.IsEmail() is false)
         {
             return MemberEditingOperationStatus.InvalidEmail;
@@ -245,10 +283,13 @@ internal sealed class MemberEditingService : IMemberEditingService
             return MemberEditingOperationStatus.DuplicateUsername;
         }
 
-        IMember? byEmail = _memberService.GetByEmail(model.Email);
-        if (byEmail is not null && byEmail.Key != memberKey)
+        if (_securitySettings.MemberRequireUniqueEmail)
         {
-            return MemberEditingOperationStatus.DuplicateEmail;
+            IMember? byEmail = _memberService.GetByEmail(model.Email);
+            if (byEmail is not null && byEmail.Key != memberKey)
+            {
+                return MemberEditingOperationStatus.DuplicateEmail;
+            }
         }
 
         return MemberEditingOperationStatus.Success;

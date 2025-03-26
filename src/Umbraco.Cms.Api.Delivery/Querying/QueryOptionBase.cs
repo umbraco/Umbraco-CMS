@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
@@ -10,8 +11,8 @@ public abstract class QueryOptionBase
 {
     private readonly IRequestRoutingService _requestRoutingService;
     private readonly IRequestPreviewService _requestPreviewService;
-    private readonly IRequestCultureService _requestCultureService;
     private readonly IApiDocumentUrlService _apiDocumentUrlService;
+    private readonly IVariationContextAccessor _variationContextAccessor;
 
     [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
     public QueryOptionBase(
@@ -20,8 +21,8 @@ public abstract class QueryOptionBase
         : this(
             requestRoutingService,
             StaticServiceProvider.Instance.GetRequiredService<IRequestPreviewService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IRequestCultureService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>())
+            StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>())
     {
     }
 
@@ -31,21 +32,22 @@ public abstract class QueryOptionBase
         IRequestRoutingService requestRoutingService,
         IRequestPreviewService requestPreviewService,
         IRequestCultureService requestCultureService,
-        IApiDocumentUrlService apiDocumentUrlService)
-        : this(requestRoutingService, requestPreviewService, requestCultureService, apiDocumentUrlService)
+        IApiDocumentUrlService apiDocumentUrlService,
+        IVariationContextAccessor variationContextAccessor)
+        : this(requestRoutingService, requestPreviewService, apiDocumentUrlService, variationContextAccessor)
     {
     }
 
     public QueryOptionBase(
         IRequestRoutingService requestRoutingService,
         IRequestPreviewService requestPreviewService,
-        IRequestCultureService requestCultureService,
-        IApiDocumentUrlService apiDocumentUrlService)
+        IApiDocumentUrlService apiDocumentUrlService,
+        IVariationContextAccessor variationContextAccessor)
     {
         _requestRoutingService = requestRoutingService;
         _requestPreviewService = requestPreviewService;
-        _requestCultureService = requestCultureService;
         _apiDocumentUrlService = apiDocumentUrlService;
+        _variationContextAccessor = variationContextAccessor;
     }
 
     protected Guid? GetGuidFromQuery(string queryStringValue)
@@ -64,7 +66,7 @@ public abstract class QueryOptionBase
         var contentRoute = _requestRoutingService.GetContentRoute(queryStringValue);
         return _apiDocumentUrlService.GetDocumentKeyByRoute(
             contentRoute,
-            _requestCultureService.GetRequestedCulture(),
+            _variationContextAccessor.VariationContext?.Culture,
             _requestPreviewService.IsPreview());
     }
 }

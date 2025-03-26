@@ -148,9 +148,9 @@ internal partial class BlockListElementLevelVariationTests : BlockEditorElementV
         return GetPublishedContent(content.Key);
     }
 
-    private IContentType CreateElementTypeWithValidation()
+    private IContentType CreateElementTypeWithValidation(ContentVariation contentVariation = ContentVariation.Culture)
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = CreateElementType(contentVariation);
         foreach (var propertyType in elementType.PropertyTypes)
         {
             propertyType.Mandatory = true;

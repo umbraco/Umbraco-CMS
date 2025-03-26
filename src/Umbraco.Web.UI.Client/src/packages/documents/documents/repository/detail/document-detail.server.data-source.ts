@@ -94,9 +94,9 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			values: data.values.map((value) => {
 				return {
 					editorAlias: value.editorAlias,
-					alias: value.alias,
 					culture: value.culture || null,
 					segment: value.segment || null,
+					alias: value.alias,
 					value: value.value,
 				};
 			}),
@@ -109,6 +109,8 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 					publishDate: variant.publishDate || null,
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
+					scheduledPublishDate: variant.scheduledPublishDate || null,
+					scheduledUnpublishDate: variant.scheduledUnpublishDate || null,
 				};
 			}),
 			urls: data.urls.map((url) => {
