@@ -236,7 +236,15 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				// Culture and segment variation
 				if (variesByCulture && variesBySegment) {
 					return languages.flatMap((language) => {
-						return segments.map((segment) => {
+						const culture = {
+							variant: variants.find((x) => x.culture === language.unique),
+							language,
+							culture: language.unique,
+							segment: null,
+							unique: new UmbVariantId(language.unique).toString(),
+						};
+
+						const segmentsForCulture = segments.map((segment) => {
 							return {
 								variant: variants.find((x) => x.culture === language.unique && x.segment === segment.unique),
 								language,
@@ -246,6 +254,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 								unique: new UmbVariantId(language.unique, segment.unique).toString(),
 							} as VariantOptionModelType;
 						});
+
+						return [culture, ...segmentsForCulture];
 					});
 				}
 
