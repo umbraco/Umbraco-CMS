@@ -19,6 +19,8 @@ import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type'
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import { UmbDataPathPropertyTypeQuery } from '../utils/index.js';
 
 export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropertyTypeModel = UmbPropertyTypeModel>
 	extends UmbSubmittableWorkspaceContextBase<PropertyTypeData>
@@ -31,6 +33,8 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 	#contentTypeContext?: typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	#entityType: string;
+
+	validationgContext: UmbValidationContext;
 
 	// #persistedData
 	// #currentData
@@ -52,6 +56,15 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 
 		const manifest = args.manifest;
 		this.#entityType = manifest.meta?.entityType;
+
+		this.validationgContext = new UmbValidationContext(this);
+		this.addValidationContext(this.validationgContext);
+
+		this.observe(this.unique, (unique) => {
+			if (unique) {
+				this.validationgContext.setDataPath(UmbDataPathPropertyTypeQuery({ id: unique }));
+			}
+		});
 
 		this.#init = this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
 			this.#contentTypeContext = context;
@@ -217,6 +230,7 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 
 		await this.#init;
 		if (this.#contentTypeContext) {
+			this.validationgContext.report();
 			await this.#contentTypeContext.structure.insertProperty(contentTypeUnique, data);
 
 			this.setIsNew(false);
