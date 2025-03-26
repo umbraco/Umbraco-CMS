@@ -221,9 +221,17 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 				// Only segment variation
 				if (!variesByCulture && variesBySegment) {
-					return segments.map((segment) => {
+					const invariantCulture = {
+						variant: variants.find((x) => x.culture === null),
+						language: languages.find((x) => x.isDefault),
+						culture: null,
+						segment: null,
+						unique: new UmbVariantId().toString(),
+					};
+
+					const segmentsForInvariantCulture = segments.map((segment) => {
 						return {
-							variant: variants.find((x) => x.segment === segment.unique),
+							variant: variants.find((x) => x.culture === null && x.segment === segment.unique),
 							language: languages.find((x) => x.isDefault),
 							segmentInfo: segment,
 							culture: null,
@@ -231,6 +239,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 							unique: new UmbVariantId(null, segment.unique).toString(),
 						} as VariantOptionModelType;
 					});
+
+					return [invariantCulture, ...segmentsForInvariantCulture];
 				}
 
 				// Culture and segment variation
