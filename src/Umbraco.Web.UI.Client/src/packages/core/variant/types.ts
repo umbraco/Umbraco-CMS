@@ -1,4 +1,5 @@
 import type { UmbVariantId } from './variant-id.class.js';
+// TODO: Remove import of language module. Core can not depend on a package
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { ScheduleRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
@@ -30,6 +31,12 @@ export interface UmbVariantModel extends UmbEntityVariantModel {}
 export interface UmbEntityVariantOptionModel<VariantType extends UmbEntityVariantModel = UmbEntityVariantModel> {
 	variant?: VariantType;
 	language: UmbLanguageDetailModel;
+	// TODO: Rename this before merge
+	segmentInfo?: {
+		unique: string;
+		entityType: string;
+		alias: string;
+	};
 	/**
 	 * The unique identifier is a VariantId string.
 	 */

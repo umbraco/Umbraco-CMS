@@ -202,7 +202,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 							culture: null,
 							segment: null,
 							unique: new UmbVariantId().toString(),
-						} as VariantOptionModelType,
+						},
 					];
 				}
 
@@ -225,6 +225,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 						return {
 							variant: variants.find((x) => x.segment === segment.unique),
 							language: languages.find((x) => x.isDefault),
+							segmentInfo: segment,
 							culture: null,
 							segment: segment.unique,
 							unique: new UmbVariantId(null, segment.unique).toString(),
@@ -239,6 +240,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 							return {
 								variant: variants.find((x) => x.culture === language.unique && x.segment === segment.unique),
 								language,
+								segmentInfo: segment,
 								culture: language.unique,
 								segment: segment.unique,
 								unique: new UmbVariantId(language.unique, segment.unique).toString(),

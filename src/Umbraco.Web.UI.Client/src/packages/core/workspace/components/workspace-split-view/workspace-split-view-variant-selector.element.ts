@@ -82,6 +82,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			workspaceContext.variantOptions,
 			(variantOptions) => {
 				this._variantOptions = (variantOptions as Array<VariantOptionModelType>).sort(this._variantSorter);
+				console.log(variantOptions);
 				this.#setReadOnlyCultures();
 			},
 			'_observeVariantOptions',
@@ -285,8 +286,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					${this.#isCreateMode(variantOption) ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
 						<div class="variant-name">
-							${variantOption.variant?.name ?? variantOption.language.name}
-							${this.#renderReadOnlyTag(variantOption.culture)}
+							${this.#getVariantName(variantOption)}${this.#renderReadOnlyTag(variantOption.culture)}
 						</div>
 						<div class="variant-details">
 							<span>${this._renderVariantDetails(variantOption)}</span>
@@ -302,6 +302,18 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				${this.#renderSplitViewButton(variantOption)}
 			</li>
 		`;
+	}
+
+	#getVariantName(variantOption: VariantOptionModelType) {
+		if (variantOption.variant?.name) {
+			return variantOption.variant?.name;
+		}
+
+		if (variantOption.segmentInfo) {
+			return `${variantOption.segmentInfo.alias}`;
+		}
+
+		return variantOption.language.name;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
