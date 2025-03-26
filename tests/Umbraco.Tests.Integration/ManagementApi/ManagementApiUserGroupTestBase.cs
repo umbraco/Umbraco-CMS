@@ -8,7 +8,7 @@ using Umbraco.Cms.Tests.Common.Testing;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture, Boot = true)]
 public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     where T : ManagementApiControllerBase
 {
