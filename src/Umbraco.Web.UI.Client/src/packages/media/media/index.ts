@@ -14,4 +14,4 @@ export type * from './types.js';
 /**
  * @deprecated Please import directly from the `@umbraco-cms/backoffice/dropzone` package instead. This package will be removed in Umbraco 18.
  */
-export * from 'src/packages/dropzone/dropzone/index.js';
+export * from '@umbraco-cms/backoffice/dropzone';
