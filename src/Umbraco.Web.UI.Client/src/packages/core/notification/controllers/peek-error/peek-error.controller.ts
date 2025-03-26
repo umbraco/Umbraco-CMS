@@ -1,7 +1,7 @@
 import { UMB_NOTIFICATION_CONTEXT } from '../../notification.context.js';
+import type { UmbPeekErrorArgs } from '../../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbPeekErrorArgs } from '../../types.js';
 
 import './peek-error-notification.element.js';
 
