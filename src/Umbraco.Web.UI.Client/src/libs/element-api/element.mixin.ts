@@ -81,17 +81,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 			options?: UmbContextConsumerAsPromiseOptionsType,
 		): Promise<ResultType | undefined> {
 			const controller = new UmbContextConsumerController(this, contextAlias);
-			const promise = controller
-				.asPromise(options)
-				.then((result) => {
-					controller.destroy();
-					return result;
-				})
-				.catch(() => {
-					controller.destroy();
-					return undefined;
-				});
-			return promise;
+			return controller.asPromise(options);
 		}
 	}
 
