@@ -297,7 +297,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 							>
 						</div>
 					</div>
-					<div class="specs-info">${variantOption.language.name}</div>
+					<div class="specs-info">${this.#getVariantSpecInfo(variantOption)}</div>
 				</button>
 				${this.#renderSplitViewButton(variantOption)}
 			</li>
@@ -311,6 +311,14 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 		if (variantOption.segmentInfo) {
 			return `${variantOption.segmentInfo.alias}`;
+		}
+
+		return variantOption.language.name;
+	}
+
+	#getVariantSpecInfo(variantOption: VariantOptionModelType) {
+		if (variantOption.segmentInfo) {
+			return `${variantOption.language.name} - ${variantOption.segmentInfo.alias}`;
 		}
 
 		return variantOption.language.name;
