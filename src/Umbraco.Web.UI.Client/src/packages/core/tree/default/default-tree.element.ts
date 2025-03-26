@@ -98,7 +98,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		}
 
 		if (_changedProperties.has('expandTreeRoot')) {
-			this.#treeContext!.setExpandTreeRoot(this.expandTreeRoot);
+			this._treeContext!.setExpandTreeRoot(this.expandTreeRoot);
 		}
 
 		if (_changedProperties.has('foldersOnly')) {
@@ -114,7 +114,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		}
 
 		if (_changedProperties.has('expansion')) {
-			this.#treeContext!.setExpansion(this.expansion);
+			this._treeContext!.setExpansion(this.expansion);
 		}
 	}
 
@@ -123,7 +123,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	}
 
 	getExpansion() {
-		return this.#treeContext?.expansion.getExpansion();
+		return this._treeContext?.expansion.getExpansion();
 	}
 
 	override render() {
