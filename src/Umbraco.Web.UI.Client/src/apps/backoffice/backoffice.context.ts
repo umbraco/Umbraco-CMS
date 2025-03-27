@@ -9,7 +9,10 @@ import type { ManifestSection } from '@umbraco-cms/backoffice/section';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import {
+	UMB_CURRENT_USER_CONTEXT,
+	UMB_CURRENT_USER_GROUP_ID_CONDITION_ALIAS,
+} from '@umbraco-cms/backoffice/current-user';
 import { UmbSysinfoRepository } from '@umbraco-cms/backoffice/sysinfo';
 
 export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
@@ -34,29 +37,37 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 			});
 		});
 
-		this.#init();
-	}
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (userContext) => {
+			this.observe(
+				userContext.allowedSections,
+				(allowedSections) => {
+					if (!allowedSections) return;
+					// TODO: Please be aware that we re-initialize this initializer based on user permissions. I suggest we should solve this specific case should be improved by the ability to change the filter [NL]
+					new UmbExtensionsManifestInitializer(
+						this,
+						umbExtensionsRegistry,
+						'section',
+						(manifest) => allowedSections.includes(manifest.alias),
+						async (sections) => {
+							console.log('updated sections', sections);
+							this.#allowedSections.setValue(sections);
+						},
+						'umbAllowedSectionsManifestInitializer',
+					);
+				},
+				'umbAllowedSectionsObserver',
+			);
+		});
 
-	async #init() {
-		const userContext = await this.getContext(UMB_CURRENT_USER_CONTEXT);
-		this.observe(
-			userContext.allowedSections,
-			(allowedSections) => {
-				if (!allowedSections) return;
-				// TODO: Please be aware that we re-initialize this initializer based on user permissions. I suggest we should solve this specific case should be improved by the ability to change the filter [NL]
-				new UmbExtensionsManifestInitializer(
-					this,
-					umbExtensionsRegistry,
-					'section',
-					(manifest) => allowedSections.includes(manifest.alias),
-					async (sections) => {
-						this.#allowedSections.setValue([...sections]);
-					},
-					'umbAllowedSectionsManifestInitializer',
-				);
-			},
-			'umbAllowedSectionsObserver',
-		);
+		// Timeout to simulate some delay for reproducibility
+		setTimeout(() => {
+			umbExtensionsRegistry.appendCondition('Umb.Section.Content', {
+				alias: UMB_CURRENT_USER_GROUP_ID_CONDITION_ALIAS,
+				noneOf: ['<GUID>'],
+			});
+
+			console.log('Condition appended');
+		}, 5000);
 	}
 
 	async #getVersion() {

@@ -1,7 +1,7 @@
 import type { UmbBackofficeContext } from '../backoffice.context.js';
 import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbSectionContext, UMB_SECTION_CONTEXT, UMB_SECTION_PATH_PATTERN } from '@umbraco-cms/backoffice/section';
+import { UmbSectionContext, UMB_SECTION_PATH_PATTERN } from '@umbraco-cms/backoffice/section';
 import type { PageComponent, UmbRoute, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { ManifestSection, UmbSectionElement } from '@umbraco-cms/backoffice/section';
 import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -82,24 +82,23 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 
 	private _onRouteChange = async (event: UmbRouterSlotChangeEvent) => {
 		const currentPath = event.target.localActiveViewPath || '';
-		const section = this._sections.find(
+		const initializer = this._sections.find(
 			(s) => UMB_SECTION_PATH_PATTERN.generateLocal({ sectionName: s.manifest!.meta.pathname }) === currentPath,
 		);
-		if (!section) return;
-		await section.asPromise();
-		if (section.manifest) {
-			this._backofficeContext?.setActiveSectionAlias(section.alias);
-			this._provideSectionContext(section.manifest);
+		if (!initializer) return;
+		await initializer.asPromise();
+		if (initializer.manifest) {
+			this._backofficeContext?.setActiveSectionAlias(initializer.alias);
+			this._provideSectionContext(initializer.manifest);
 		}
 	};
 
 	private _provideSectionContext(sectionManifest: ManifestSection) {
 		if (!this._sectionContext) {
-			this._sectionContext = new UmbSectionContext(sectionManifest);
-			this.provideContext(UMB_SECTION_CONTEXT, this._sectionContext);
-		} else {
-			this._sectionContext.setManifest(sectionManifest);
+			this._sectionContext = new UmbSectionContext(this);
 		}
+
+		this._sectionContext.setManifest(sectionManifest);
 	}
 
 	override render() {
