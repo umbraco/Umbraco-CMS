@@ -4325,12 +4325,36 @@ export type PutMemberByIdData = {
 
 export type PutMemberByIdResponse = (string);
 
+export type GetMemberByIdReferencedByData = {
+    id: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetMemberByIdReferencedByResponse = ((PagedIReferenceResponseModel));
+
+export type GetMemberByIdReferencedDescendantsData = {
+    id: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetMemberByIdReferencedDescendantsResponse = ((PagedReferenceByIdModel));
+
 export type PutMemberByIdValidateData = {
     id: string;
     requestBody?: (UpdateMemberRequestModel);
 };
 
 export type PutMemberByIdValidateResponse = (string);
+
+export type GetMemberAreReferencedData = {
+    id?: Array<(string)>;
+    skip?: number;
+    take?: number;
+};
+
+export type GetMemberAreReferencedResponse = ((PagedReferenceByIdModel));
 
 export type GetMemberConfigurationResponse = ((MemberConfigurationResponseModel));
 

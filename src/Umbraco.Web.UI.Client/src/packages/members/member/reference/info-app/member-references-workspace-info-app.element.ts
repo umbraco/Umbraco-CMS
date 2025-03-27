@@ -1,5 +1,5 @@
-import { UmbMediaReferenceRepository } from '../repository/index.js';
-import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
+import { UmbMemberReferenceRepository } from '../repository/index.js';
+import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -7,8 +7,8 @@ import type { UmbReferenceItemModel } from '@umbraco-cms/backoffice/relations';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
-@customElement('umb-media-references-workspace-info-app')
-export class UmbMediaReferencesWorkspaceInfoAppElement extends UmbLitElement {
+@customElement('umb-member-references-workspace-info-app')
+export class UmbMemberReferencesWorkspaceInfoAppElement extends UmbLitElement {
 	#itemsPerPage = 10;
 
 	#referenceRepository;
@@ -25,34 +25,34 @@ export class UmbMediaReferencesWorkspaceInfoAppElement extends UmbLitElement {
 	@state()
 	private _loading = true;
 
-	#workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
-	#mediaUnique?: UmbEntityUnique;
+	#workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
+	#memberUnique?: UmbEntityUnique;
 
 	constructor() {
 		super();
-		this.#referenceRepository = new UmbMediaReferenceRepository(this);
+		this.#referenceRepository = new UmbMemberReferenceRepository(this);
 
-		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
+		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this.#observeMediaUnique();
+			this.#observeMemberUnique();
 		});
 	}
 
-	#observeMediaUnique() {
+	#observeMemberUnique() {
 		this.observe(
 			this.#workspaceContext?.unique,
 			(unique) => {
 				if (!unique) {
-					this.#mediaUnique = undefined;
+					this.#memberUnique = undefined;
 					this._items = [];
 					return;
 				}
 
-				if (this.#mediaUnique === unique) {
+				if (this.#memberUnique === unique) {
 					return;
 				}
 
-				this.#mediaUnique = unique;
+				this.#memberUnique = unique;
 				this.#getReferences();
 			},
 			'umbReferencesDocumentUniqueObserver',
@@ -60,14 +60,14 @@ export class UmbMediaReferencesWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	async #getReferences() {
-		if (!this.#mediaUnique) {
-			throw new Error('Media unique is required');
+		if (!this.#memberUnique) {
+			throw new Error('Member unique is required');
 		}
 
 		this._loading = true;
 
 		const { data } = await this.#referenceRepository.requestReferencedBy(
-			this.#mediaUnique,
+			this.#memberUnique,
 			(this._currentPage - 1) * this.#itemsPerPage,
 			this.#itemsPerPage,
 		);
@@ -152,10 +152,10 @@ export class UmbMediaReferencesWorkspaceInfoAppElement extends UmbLitElement {
 	];
 }
 
-export default UmbMediaReferencesWorkspaceInfoAppElement;
+export default UmbMemberReferencesWorkspaceInfoAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-media-references-workspace-info-app': UmbMediaReferencesWorkspaceInfoAppElement;
+		'umb-member-references-workspace-info-app': UmbMemberReferencesWorkspaceInfoAppElement;
 	}
 }
