@@ -18,15 +18,10 @@ export interface UmbContentWorkspaceContext<
 		UmbVariantDatasetWorkspaceContext<VariantModelType>,
 		UmbPropertyStructureWorkspaceContext<ContentTypeModel> {
 	readonly IS_CONTENT_WORKSPACE_CONTEXT: true;
-	//readonly values: Observable<ContentModel['values'] | undefined>;
-	//getValues(): ContentModel['values'] | undefined;
-
-	// Data:
 	getData(): ContentModel | undefined;
-
 	isLoaded(): Promise<unknown> | undefined;
 	variantById(variantId: UmbVariantId): Observable<VariantModelType | undefined>;
-
-	//initiatePropertyValueChange(): void;
-	//finishPropertyValueChange(): void;
+	varies: Observable<boolean>;
+	variesByCulture: Observable<boolean>;
+	variesBySegment: Observable<boolean>;
 }
