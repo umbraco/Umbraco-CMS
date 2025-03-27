@@ -2948,7 +2948,6 @@ public class ContentService : RepositoryService, IContentService
                 new ContentTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
             foreach (Tuple<IContent, IContent> x in CollectionsMarshal.AsSpan(copies))
             {
-                // FIXME: Pass parent key in constructor too when proper Copy method is implemented
                 scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, parentId, parentKey, relateToOriginal, eventMessages));
             }
 
