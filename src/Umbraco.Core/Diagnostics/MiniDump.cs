@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Umbraco.Cms.Core.Hosting;
+using Microsoft.Extensions.Hosting;
+using Umbraco.Cms.Core.Extensions;
 
 namespace Umbraco.Cms.Core.Diagnostics;
 
@@ -37,7 +38,7 @@ public static class MiniDump
         ValidTypeFlags = 0x0003ffff,
     }
 
-    public static bool Dump(IMarchal marchal, IHostingEnvironment hostingEnvironment, Option options = Option.WithFullMemory, bool withException = false)
+    public static bool Dump(IMarchal marchal, IHostEnvironment hostEnvironment, Option options = Option.WithFullMemory, bool withException = false)
     {
         lock (LockO)
         {
@@ -47,7 +48,7 @@ public static class MiniDump
             // filter everywhere in our code = not!
             var stacktrace = withException ? Environment.StackTrace : string.Empty;
 
-            var directory = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data + "/MiniDump");
+            var directory = hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data + "/MiniDump");
 
             if (Directory.Exists(directory) == false)
             {
@@ -127,11 +128,11 @@ public static class MiniDump
         }
     }
 
-    public static bool OkToDump(IHostingEnvironment hostingEnvironment)
+    public static bool OkToDump(IHostEnvironment hostEnvironment)
     {
         lock (LockO)
         {
-            var directory = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data + "/MiniDump");
+            var directory = hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data + "/MiniDump");
             if (Directory.Exists(directory) == false)
             {
                 return true;
