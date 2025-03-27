@@ -101,7 +101,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			workspaceContext.variantOptions,
 			(variantOptions) => {
 				this._variantOptions = (variantOptions as Array<VariantOptionModelType>).sort(this._variantSorter);
-				console.log(variantOptions);
 				this.#setReadOnlyCultures();
 			},
 			'_observeVariantOptions',
