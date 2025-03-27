@@ -1,10 +1,10 @@
 using System.Reflection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Serilog.Core;
 using Serilog.Events;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Diagnostics;
-using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 
@@ -13,17 +13,18 @@ namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 /// </summary>
 public class ThreadAbortExceptionEnricher : ILogEventEnricher
 {
-    private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IMarchal _marchal;
+    private readonly IHostEnvironment _hostEnvironment;
     private CoreDebugSettings _coreDebugSettings;
 
     public ThreadAbortExceptionEnricher(
         IOptionsMonitor<CoreDebugSettings> coreDebugSettings,
-        IHostingEnvironment hostingEnvironment, IMarchal marchal)
+        IHostEnvironment hostEnvironment,
+        IMarchal marchal)
     {
         _coreDebugSettings = coreDebugSettings.CurrentValue;
-        _hostingEnvironment = hostingEnvironment;
         _marchal = marchal;
+        _hostEnvironment = hostEnvironment;
         coreDebugSettings.OnChange(x => _coreDebugSettings = x);
     }
 
@@ -79,7 +80,7 @@ public class ThreadAbortExceptionEnricher : ILogEventEnricher
                    IsMonitorEnterThreadAbortException(logEvent.Exception!);
 
         // dump if it is ok to dump (might have a cap on number of dump...)
-        dump &= MiniDump.OkToDump(_hostingEnvironment);
+        dump &= MiniDump.OkToDump(_hostEnvironment);
 
         if (!dump)
         {
@@ -90,7 +91,7 @@ public class ThreadAbortExceptionEnricher : ILogEventEnricher
         {
             try
             {
-                var dumped = MiniDump.Dump(_marchal, _hostingEnvironment, withException: true);
+                var dumped = MiniDump.Dump(_marchal, _hostEnvironment, withException: true);
                 message += dumped
                     ? ". A minidump was created in App_Data/MiniDump."
                     : ". Failed to create a minidump.";
