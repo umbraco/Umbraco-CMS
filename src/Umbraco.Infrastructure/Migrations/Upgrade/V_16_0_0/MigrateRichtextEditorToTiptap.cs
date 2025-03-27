@@ -1,6 +1,7 @@
-﻿using Umbraco.Cms.Core;
+﻿using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -9,14 +10,21 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_0_0;
 public class MigrateRichtextEditorToTiptap : AsyncMigrationBase
 {
     private readonly IDataTypeService _dataTypeService;
+    private readonly TipTapMigrationSettings _options;
 
-    public MigrateRichtextEditorToTiptap(IMigrationContext context, IDataTypeService dataTypeService) : base(context)
+    public MigrateRichtextEditorToTiptap(IMigrationContext context, IDataTypeService dataTypeService, IOptions<TipTapMigrationSettings> options) : base(context)
     {
         _dataTypeService = dataTypeService;
+        _options = options.Value;
     }
 
     protected override async Task MigrateAsync()
     {
+        if (_options.DisableMigration)
+        {
+            return;
+        }
+
         IEnumerable<IDataType> dataTypes = await _dataTypeService.GetByEditorUiAlias("Umb.PropertyEditorUi.TinyMCE");
 
         foreach (IDataType dataType in dataTypes)

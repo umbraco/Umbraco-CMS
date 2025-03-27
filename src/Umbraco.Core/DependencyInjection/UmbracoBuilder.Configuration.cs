@@ -102,6 +102,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.Configure<InstallDefaultDataSettings>(
             Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
             builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes}"));
+        builder.Services.AddOptions<TipTapMigrationSettings>();
 
         return builder;
     }
