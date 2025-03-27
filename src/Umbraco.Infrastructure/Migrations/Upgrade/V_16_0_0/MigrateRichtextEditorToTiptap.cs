@@ -30,16 +30,14 @@ public class MigrateRichtextEditorToTiptap : AsyncMigrationBase
     private void MigrateToTipTap(IDataType dataType)
     {
         dataType.EditorUiAlias = "Umb.PropertyEditorUi.Tiptap";
-        IDictionary<string, object> dataTypeConfigurationData = dataType.ConfigurationData;
 
-        if (!dataTypeConfigurationData.TryGetValue("toolbar", out var toolbar) || toolbar is not string toolbarString)
+        if (!dataType.ConfigurationData.TryGetValue("toolbar", out var toolbar) || toolbar is not List<string> toolBarList)
         {
             return;
         }
 
-        var toolbarArray = toolbarString.Split(" ").Select(x => x.Trim()).ToArray();
-        var newToolbar = toolbarArray.Select(MapToolbarItem).WhereNotNull().ToList();
-        dataTypeConfigurationData["toolbar"] = new List<List<List<string>>> { new() {newToolbar} };
+        var newToolbar = toolBarList.Select(MapToolbarItem).WhereNotNull().ToList();
+        dataType.ConfigurationData["toolbar"] = new List<List<List<string>>> { new() {newToolbar} };
     }
 
     private string? MapToolbarItem(string item)
