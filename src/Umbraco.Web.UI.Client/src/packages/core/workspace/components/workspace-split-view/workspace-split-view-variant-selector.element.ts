@@ -46,6 +46,15 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	@state()
 	private _readOnlyCultures: Array<string | null> = [];
 
+	@state()
+	private _variesByCulture = false;
+
+	@state()
+	private _variesBySegment = false;
+
+	@state()
+	private _labelDefault = '';
+
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected _variantSorter = (a: VariantOptionModelType, b: VariantOptionModelType) => {
 		return 0;
@@ -53,6 +62,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	constructor() {
 		super();
+
+		this._labelDefault = this.localize.term('general_default');
 
 		this.consumeContext(UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, (instance) => {
 			this.#splitViewContext = instance;
@@ -64,6 +75,18 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			this.#observeActiveVariants(workspaceContext);
 			this.#observeReadOnlyStates(workspaceContext);
 			this.#observeCurrentVariant();
+
+			this.observe(
+				workspaceContext.variesBySegment,
+				(value) => (this._variesBySegment = value),
+				'umbObserveVariesBySegment',
+			);
+
+			this.observe(
+				workspaceContext.variesByCulture,
+				(value) => (this._variesByCulture = value),
+				'umbObserveVariesByCulture',
+			);
 		});
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (instance) => {
@@ -317,8 +340,16 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			return '';
 		}
 
-		if (variantOption.segmentInfo) {
-			return `${variantOption.language.name} - ${variantOption.segmentInfo.name}`;
+		// If we vary by culture and segment, we show both
+		if (this._variesByCulture && this._variesBySegment) {
+			return variantOption.segmentInfo
+				? `${variantOption.language.name} - ${variantOption.segmentInfo.name}`
+				: this._labelDefault;
+		}
+
+		// If we vary by segment only, we only show the segment and show "Default" for the language
+		if (!this._variesByCulture && this._variesBySegment) {
+			return variantOption.segmentInfo ? `${variantOption.segmentInfo.name}` : this._labelDefault;
 		}
 
 		return variantOption.language.name;
