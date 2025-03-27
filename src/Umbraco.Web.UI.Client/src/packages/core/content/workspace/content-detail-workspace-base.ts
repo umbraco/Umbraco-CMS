@@ -193,9 +193,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.variantOptions = mergeObservables(
 			[this.varies, this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments],
 			([varies, variesByCulture, variesBySegment, variants, languages, segments]) => {
-				if (varies === undefined) return;
-				if (variesByCulture === undefined) return;
-				if (variesBySegment === undefined) return;
+				if ((varies || variesByCulture || variesBySegment) === undefined) {
+					return [];
+				}
 
 				// No variation
 				if (!varies) {
