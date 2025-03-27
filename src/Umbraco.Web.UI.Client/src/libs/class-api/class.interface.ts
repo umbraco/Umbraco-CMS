@@ -9,6 +9,11 @@ import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoff
 import type { ObserverCallback, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
+export interface UmbClassGetContextOptions extends UmbContextConsumerAsPromiseOptionsType {
+	skipHost?: boolean;
+	passContextAliasMatches?: boolean;
+}
+
 export interface UmbClassInterface extends UmbControllerHost {
 	/**
 	 * @description Observe an Observable. An Observable is a declared source of data that can be observed. An observables is declared from a UmbState.
@@ -65,6 +70,6 @@ export interface UmbClassInterface extends UmbControllerHost {
 	 */
 	getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 		alias: string | UmbContextToken<BaseType, ResultType>,
-		options?: UmbContextConsumerAsPromiseOptionsType,
+		options?: UmbClassGetContextOptions,
 	): Promise<ResultType | undefined>;
 }

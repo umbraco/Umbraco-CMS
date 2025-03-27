@@ -3,14 +3,11 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
 import { type UmbControllerAlias, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import type {
-	UmbContextToken,
-	UmbContextCallback,
-	UmbContextConsumerAsPromiseOptionsType,
-} from '@umbraco-cms/backoffice/context-api';
+import type { UmbContextToken, UmbContextCallback } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { ObserverCallback } from '@umbraco-cms/backoffice/observable-api';
 import { UmbObserverController, simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbClassGetContextOptions } from '@umbraco-cms/backoffice/class-api';
 
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbElementMixinClass extends UmbControllerHostElementMixin(superClass) implements UmbElement {
@@ -78,9 +75,17 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 
 		async getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
-			options?: UmbContextConsumerAsPromiseOptionsType,
+			options?: UmbClassGetContextOptions,
 		): Promise<ResultType | undefined> {
 			const controller = new UmbContextConsumerController(this, contextAlias);
+			if (options) {
+				if (options.passContextAliasMatches) {
+					controller.passContextAliasMatches();
+				}
+				if (options.skipHost) {
+					controller.skipHost();
+				}
+			}
 			return controller.asPromise(options);
 		}
 	}
