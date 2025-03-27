@@ -4,9 +4,8 @@ import { UMB_CREATE_USER_SUCCESS_MODAL } from './create-user-success-modal.token
 import type { UmbCreateUserModalData } from './create-user-modal.token.js';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-create-user-modal')
