@@ -1,3 +1,5 @@
+import type { UmbImageCropChangeEvent } from './crop-change.event.js';
+import type { UmbFocalPointChangeEvent } from './focalpoint-change.event.js';
 import type { UmbImageCropperElement } from './image-cropper.element.js';
 import type {
 	UmbImageCropperCrop,
@@ -5,15 +7,15 @@ import type {
 	UmbImageCropperFocalPoint,
 	UmbImageCropperPropertyEditorValue,
 } from './types.js';
-import type { UmbImageCropChangeEvent } from './crop-change.event.js';
-import type { UmbFocalPointChangeEvent } from './focalpoint-change.event.js';
-import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-import './image-cropper.element.js';
 import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
+import './image-cropper.element.js';
 
 @customElement('umb-image-cropper-field')
 export class UmbInputImageCropperFieldElement extends UmbLitElement {
@@ -46,7 +48,19 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	currentCrop?: UmbImageCropperCrop;
 
 	@property({ attribute: false })
-	file?: File;
+	set file(file: File | undefined) {
+		this.#file = file;
+		if (file) {
+			const blob = new Blob([file]);
+			this.fileDataUrl = URL.createObjectURL(blob);
+		} else {
+			this.fileDataUrl = undefined;
+		}
+	}
+	get file() {
+		return this.#file;
+	}
+	#file?: File;
 
 	@property()
 	fileDataUrl?: string;
@@ -60,26 +74,23 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	@state()
 	src = '';
 
-	get source() {
-		if (this.fileDataUrl) return this.fileDataUrl;
-		if (this.src) return this.src;
-		return '';
+	@state()
+	private _serverUrl = '';
+
+	get source(): string {
+		if (this.src) {
+			return `${this._serverUrl}${this.src}`;
+		}
+
+		return this.fileDataUrl ?? '';
 	}
 
-	override updated(changedProperties: Map<string | number | symbol, unknown>) {
-		super.updated(changedProperties);
+	constructor() {
+		super();
 
-		if (changedProperties.has('file')) {
-			if (this.file) {
-				const reader = new FileReader();
-				reader.onload = (event) => {
-					this.fileDataUrl = event.target?.result as string;
-				};
-				reader.readAsDataURL(this.file);
-			} else {
-				this.fileDataUrl = undefined;
-			}
-		}
+		this.consumeContext(UMB_APP_CONTEXT, (context) => {
+			this._serverUrl = context.getServerUrl();
+		});
 	}
 
 	protected onCropClick(crop: any) {
