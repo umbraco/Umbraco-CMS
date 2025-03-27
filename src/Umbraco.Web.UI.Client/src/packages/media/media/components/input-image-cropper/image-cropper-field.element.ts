@@ -52,7 +52,8 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		this.#file = file;
 		if (file) {
 			this.fileDataUrl = URL.createObjectURL(file);
-		} else {
+		} else if (this.fileDataUrl) {
+			URL.revokeObjectURL(this.fileDataUrl);
 			this.fileDataUrl = undefined;
 		}
 	}
