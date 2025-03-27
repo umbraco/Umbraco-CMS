@@ -1,5 +1,4 @@
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 
@@ -9,22 +8,20 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
 {
     private const string ShadowFsPath = "ShadowFs";
 
-    private readonly IIOHelper _ioHelper;
     private readonly IHostingEnvironment _hostingEnvironment;
-    private readonly ILoggerFactory _loggerFactory;
+    private readonly IFileSystemFactory _fileSystemFactory;
     private readonly string _shadowPath;
     private readonly Func<bool?>? _isScoped;
 
     private string? _shadowDir;
     private ShadowFileSystem? _shadowFileSystem;
 
-    public ShadowWrapper(IFileSystem innerFileSystem, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory, string shadowPath, Func<bool?>? isScoped = null)
+    public ShadowWrapper(IFileSystem innerFileSystem, IHostingEnvironment hostingEnvironment, IFileSystemFactory fileSystemFactory, string shadowPath, Func<bool?>? isScoped = null)
     {
         InnerFileSystem = innerFileSystem;
 
-        _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
-        _loggerFactory = loggerFactory;
+        _fileSystemFactory = fileSystemFactory;
         _shadowPath = shadowPath;
         _isScoped = isScoped;
     }
@@ -132,7 +129,7 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
         var rootUrl = Path.Combine(ShadowFsPath, id, _shadowPath);
         _shadowDir = Path.Combine(_hostingEnvironment.LocalTempPath, rootUrl);
         Directory.CreateDirectory(_shadowDir);
-        var tempfs = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _loggerFactory.CreateLogger<PhysicalFileSystem>(), _shadowDir, rootUrl);
+        var tempfs = _fileSystemFactory.CreateFileSystem(_shadowDir, rootUrl);
         _shadowFileSystem = new ShadowFileSystem(InnerFileSystem, tempfs);
     }
 

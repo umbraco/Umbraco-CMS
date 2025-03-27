@@ -44,16 +44,8 @@ public static partial class UmbracoBuilderExtensions
 
         builder.SetMediaFileSystem(factory =>
         {
-            IIOHelper ioHelper = factory.GetRequiredService<IIOHelper>();
-            IHostingEnvironment hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
-            ILogger<PhysicalFileSystem> logger = factory.GetRequiredService<ILogger<PhysicalFileSystem>>();
-            GlobalSettings globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
-
-            var rootPath = Path.IsPathRooted(globalSettings.UmbracoMediaPhysicalRootPath)
-                ? globalSettings.UmbracoMediaPhysicalRootPath
-                : hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPhysicalRootPath);
-            var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);
-            return new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
+            IFileSystemFactory fileSystemFactory = factory.GetRequiredService<IFileSystemFactory>();
+            return fileSystemFactory.CreateMediaFileSystem();
         });
 
         return builder;

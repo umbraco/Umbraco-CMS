@@ -88,9 +88,8 @@ public abstract class TestHelperBase
             var loggerFactory = NullLoggerFactory.Instance;
             var fileSystems = new FileSystems(
                 loggerFactory,
-                Mock.Of<IIOHelper>(),
-                Mock.Of<IOptions<GlobalSettings>>(),
-                Mock.Of<IHostingEnvironment>());
+                Mock.Of<IHostingEnvironment>(),
+                Mock.Of<IFileSystemFactory>());
             var mediaFileManager = new MediaFileManager(
                 Mock.Of<IFileSystem>(),
                 Mock.Of<IMediaPathScheme>(),

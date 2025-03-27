@@ -1,6 +1,7 @@
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO
@@ -26,7 +27,7 @@ namespace Umbraco.Cms.Core.IO
         // eg "" or "/Views" or "/Media" or "/<vpath>/Media" in case of a virtual path
         private readonly string _rootUrl;
 
-        public PhysicalFileSystem(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger<PhysicalFileSystem> logger, string rootPath, string rootUrl)
+        public PhysicalFileSystem(IIOHelper ioHelper, IHostEnvironment hostEnvironment, ILogger<PhysicalFileSystem> logger, string rootPath, string rootUrl)
         {
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -60,7 +61,7 @@ namespace Umbraco.Cms.Core.IO
             if (Path.IsPathRooted(rootPath) == false)
             {
                 // but the test suite App.config cannot really "root" anything so we have to do it here
-                var localRoot = hostingEnvironment.MapPathContentRoot("~");
+                var localRoot = hostEnvironment.MapPathContentRoot("~");
                 rootPath = Path.Combine(localRoot, rootPath);
             }
 

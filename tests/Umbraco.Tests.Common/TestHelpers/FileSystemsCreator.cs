@@ -19,15 +19,15 @@ public static class FileSystemsCreator
     /// <param name="stylesheetFileSystem"></param>
     /// <param name="scriptsFileSystem"></param>
     /// <param name="mvcViewFileSystem"></param>
+    /// <param name="fileSystemFactory"></param>
     /// <returns></returns>
     public static FileSystems CreateTestFileSystems(
         ILoggerFactory loggerFactory,
-        IIOHelper ioHelper,
-        IOptions<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment,
         IFileSystem partialViewsFileSystem,
         IFileSystem stylesheetFileSystem,
         IFileSystem scriptsFileSystem,
-        IFileSystem mvcViewFileSystem) =>
-        new(loggerFactory, ioHelper, globalSettings, hostingEnvironment, partialViewsFileSystem, stylesheetFileSystem, scriptsFileSystem, mvcViewFileSystem);
+        IFileSystem mvcViewFileSystem,
+        IFileSystemFactory fileSystemFactory) =>
+        new(loggerFactory, hostingEnvironment, partialViewsFileSystem, stylesheetFileSystem, scriptsFileSystem, mvcViewFileSystem, fileSystemFactory);
 }

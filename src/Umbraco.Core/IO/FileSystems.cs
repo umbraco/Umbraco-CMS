@@ -1,8 +1,6 @@
 using System.ComponentModel;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Core.IO
 {
@@ -13,9 +11,8 @@ namespace Umbraco.Cms.Core.IO
     {
         private readonly ILogger<FileSystems> _logger;
         private readonly ILoggerFactory _loggerFactory;
-        private readonly IIOHelper _ioHelper;
-        private GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IFileSystemFactory _fileSystemFactory;
 
 
         // wrappers for shadow support
@@ -38,27 +35,25 @@ namespace Umbraco.Cms.Core.IO
         // DI wants a public ctor
         public FileSystems(
             ILoggerFactory loggerFactory,
-            IIOHelper ioHelper,
-            IOptions<GlobalSettings> globalSettings,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            IFileSystemFactory fileSystemFactory)
         {
             _logger = loggerFactory.CreateLogger<FileSystems>();
             _loggerFactory = loggerFactory;
-            _ioHelper = ioHelper;
-            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
+            _fileSystemFactory = fileSystemFactory;
         }
 
         // Ctor for tests, allows you to set the various filesystems
         internal FileSystems(
             ILoggerFactory loggerFactory,
-            IIOHelper ioHelper,
-            IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             IFileSystem partialViewsFileSystem,
             IFileSystem stylesheetFileSystem,
             IFileSystem scriptsFileSystem,
-            IFileSystem mvcViewFileSystem) : this(loggerFactory, ioHelper, globalSettings, hostingEnvironment)
+            IFileSystem mvcViewFileSystem,
+            IFileSystemFactory fileSystemFactory)
+            : this(loggerFactory, hostingEnvironment, fileSystemFactory)
         {
             _partialViewsFileSystem = CreateShadowWrapperInternal(partialViewsFileSystem, "partials");
             _stylesheetsFileSystem = CreateShadowWrapperInternal(stylesheetFileSystem, "css");
@@ -66,7 +61,6 @@ namespace Umbraco.Cms.Core.IO
             _mvcViewsFileSystem = CreateShadowWrapperInternal(mvcViewFileSystem, "view");
             // Set initialized to true so the filesystems doesn't get overwritten.
             _wkfsInitialized = true;
-
         }
 
         /// <summary>
@@ -194,25 +188,19 @@ namespace Umbraco.Cms.Core.IO
         {
             ILogger<PhysicalFileSystem> logger = _loggerFactory.CreateLogger<PhysicalFileSystem>();
 
-            //TODO this is fucked, why do PhysicalFileSystem has a root url? Mvc views cannot be accessed by url!
-            var partialViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.PartialViews), _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.PartialViews));
-            var scriptsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger,  _hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoScriptsPath), _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoScriptsPath));
-            var mvcViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MvcViews), _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.MvcViews));
+            var partialViewsFileSystem = _fileSystemFactory.CreatePartialViewFileSystem();
+            var scriptsFileSystem = _fileSystemFactory.CreateScriptsFileSystem();
+            var mvcViewsFileSystem = _fileSystemFactory.CreateMvcViewsFileSystem();
 
-            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "partials", IsScoped);
-            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "scripts", IsScoped);
-            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "views", IsScoped);
+            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, _hostingEnvironment, _fileSystemFactory, "partials", IsScoped);
+            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, _hostingEnvironment, _fileSystemFactory, "scripts", IsScoped);
+            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, _hostingEnvironment, _fileSystemFactory, "views", IsScoped);
 
             if (_stylesheetsFileSystem == null)
             {
-                var stylesheetsFileSystem = new PhysicalFileSystem(
-                    _ioHelper,
-                    _hostingEnvironment,
-                    logger,
-                    _hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoCssPath),
-                    _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoCssPath));
+                var stylesheetsFileSystem = _fileSystemFactory.CreateStylesheetFileSystem();
 
-                _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "css", IsScoped);
+                _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, _hostingEnvironment, _fileSystemFactory, "css", IsScoped);
 
                 _shadowWrappers.Add(_stylesheetsFileSystem);
             }
@@ -328,7 +316,7 @@ namespace Umbraco.Cms.Core.IO
         {
             lock (_shadowLocker)
             {
-                var wrapper = new ShadowWrapper(filesystem, _ioHelper, _hostingEnvironment, _loggerFactory, shadowPath,() => IsScoped?.Invoke());
+                var wrapper = new ShadowWrapper(filesystem, _hostingEnvironment, _fileSystemFactory, shadowPath, () => IsScoped?.Invoke());
                 if (_shadowCurrentId != null)
                 {
                     wrapper.Shadow(_shadowCurrentId);
