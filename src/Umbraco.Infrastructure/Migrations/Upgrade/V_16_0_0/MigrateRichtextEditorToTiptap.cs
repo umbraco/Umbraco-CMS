@@ -21,23 +21,25 @@ public class MigrateRichtextEditorToTiptap : AsyncMigrationBase
 
         foreach (IDataType dataType in dataTypes)
         {
-            MigrateToTipTap(dataType.ConfigurationData);
+            MigrateToTipTap(dataType);
             await _dataTypeService.UpdateAsync(dataType, Constants.Security.SuperUserKey);
         }
 
     }
 
-    private void MigrateToTipTap(IDictionary<string, object> configurationObject)
+    private void MigrateToTipTap(IDataType dataType)
     {
+        dataType.EditorUiAlias = "Umb.PropertyEditorUi.Tiptap";
+        IDictionary<string, object> dataTypeConfigurationData = dataType.ConfigurationData;
 
-        if (!configurationObject.TryGetValue("toolbar", out var toolbar) || toolbar is not string toolbarString)
+        if (!dataTypeConfigurationData.TryGetValue("toolbar", out var toolbar) || toolbar is not string toolbarString)
         {
             return;
         }
 
         var toolbarArray = toolbarString.Split(" ").Select(x => x.Trim()).ToArray();
         var newToolbar = toolbarArray.Select(MapToolbarItem).WhereNotNull().ToList();
-        configurationObject["toolbar"] = new List<List<List<string>>> { new() {newToolbar} };
+        dataTypeConfigurationData["toolbar"] = new List<List<List<string>>> { new() {newToolbar} };
     }
 
     private string? MapToolbarItem(string item)
