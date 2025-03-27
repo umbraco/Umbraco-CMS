@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -2621,8 +2622,8 @@ public class ContentService : RepositoryService, IContentService
                 throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
             }
 
-            // FIXME: Use MoveEventInfo that also takes a parent key when implementing move with parentKey.
-            var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentId);
+            TryGetParentKey(parentId, out Guid? parentKey);
+            var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentId, parentKey);
 
             var movingNotification = new ContentMovingNotification(moveEventInfo, eventMessages);
             if (scope.Notifications.PublishCancelable(movingNotification))
@@ -2652,9 +2653,12 @@ public class ContentService : RepositoryService, IContentService
                 new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
 
             // changes
-            // FIXME: Use MoveEventInfo that also takes a parent key when implementing move with parentKey.
             MoveEventInfo<IContent>[] moveInfo = moves
-                .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
+                .Select(x =>
+                {
+                    TryGetParentKey(x.Item1.ParentId, out Guid? itemParentKey);
+                    return new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId, itemParentKey);
+                })
                 .ToArray();
 
             scope.Notifications.Publish(
@@ -2834,8 +2838,8 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            // FIXME: Pass parent key in constructor too when proper Copy method is implemented
-            if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentId, eventMessages)))
+            TryGetParentKey(parentId, out Guid? parentKey);
+            if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentId, parentKey, eventMessages)))
             {
                 scope.Complete();
                 return null;
@@ -2907,8 +2911,7 @@ public class ContentService : RepositoryService, IContentService
                         IContent descendantCopy = descendant.DeepCloneWithResetIdentities();
                         descendantCopy.ParentId = parentId;
 
-                        // FIXME: Pass parent key in constructor too when proper Copy method is implemented
-                        if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(descendant, descendantCopy, parentId, eventMessages)))
+                        if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(descendant, descendantCopy, parentId, parentKey, eventMessages)))
                         {
                             continue;
                         }
@@ -2946,7 +2949,7 @@ public class ContentService : RepositoryService, IContentService
             foreach (Tuple<IContent, IContent> x in CollectionsMarshal.AsSpan(copies))
             {
                 // FIXME: Pass parent key in constructor too when proper Copy method is implemented
-                scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, parentId, relateToOriginal, eventMessages));
+                scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, parentId, parentKey, relateToOriginal, eventMessages));
             }
 
             Audit(AuditType.Copy, userId, content.Id);
@@ -2955,6 +2958,13 @@ public class ContentService : RepositoryService, IContentService
         }
 
         return copy;
+    }
+
+    private bool TryGetParentKey(int parentId, [NotNullWhen(true)] out Guid? parentKey)
+    {
+        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(parentId, UmbracoObjectTypes.Document);
+        parentKey = parentKeyAttempt.Success ? parentKeyAttempt.Result : null;
+        return parentKeyAttempt.Success;
     }
 
     /// <summary>
