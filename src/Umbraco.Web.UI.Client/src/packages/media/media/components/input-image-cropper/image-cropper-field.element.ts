@@ -93,6 +93,13 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		});
 	}
 
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		if (this.fileDataUrl) {
+			URL.revokeObjectURL(this.fileDataUrl);
+		}
+	}
+
 	protected onCropClick(crop: any) {
 		const index = this.crops.findIndex((c) => c.alias === crop.alias);
 
