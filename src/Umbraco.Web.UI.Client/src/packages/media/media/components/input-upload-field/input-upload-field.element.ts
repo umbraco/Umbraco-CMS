@@ -1,23 +1,21 @@
 import type { MediaValueType } from '../../property-editors/upload-field/types.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.extension.js';
 import { getMimeTypeFromExtension } from './utils.js';
-
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import {
-	UmbFileDropzoneItemStatus,
-	UmbInputDropzoneDashedStyles,
-	type UmbDropzoneChangeEvent,
-	type UmbInputDropzoneElement,
-	type UmbUploadableFile,
-} from '@umbraco-cms/backoffice/dropzone';
+import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbFileDropzoneItemStatus, UmbInputDropzoneDashedStyles } from '@umbraco-cms/backoffice/dropzone';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import type {
+	UmbDropzoneChangeEvent,
+	UmbInputDropzoneElement,
+	UmbUploadableFile,
+} from '@umbraco-cms/backoffice/dropzone';
 import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
-import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends UmbLitElement {
