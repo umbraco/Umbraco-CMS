@@ -1,13 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.DependencyInjection;
-using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 using Umbraco.Cms.Web.Common.Hosting;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions;
 
@@ -46,11 +47,12 @@ public static partial class UmbracoBuilderExtensions
         {
             var path = "~/";
             IHostingEnvironment hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
+            IHostEnvironment hostEnvironment = factory.GetRequiredService<IHostEnvironment>();
             return new PhysicalFileSystem(
                 factory.GetRequiredService<IIOHelper>(),
-                hostingEnvironment,
+                hostEnvironment,
                 factory.GetRequiredService<ILogger<PhysicalFileSystem>>(),
-                hostingEnvironment.MapPathContentRoot(path),
+                hostEnvironment.MapPathContentRoot(path),
                 hostingEnvironment.ToAbsolute(path));
         });
 
