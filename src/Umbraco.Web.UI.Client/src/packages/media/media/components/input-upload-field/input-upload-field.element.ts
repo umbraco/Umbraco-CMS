@@ -9,6 +9,7 @@ import {
 	type UmbInputDropzoneElement,
 	type UmbUploadableFile,
 } from '@umbraco-cms/backoffice/dropzone';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -58,7 +59,18 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	@state()
 	private _previewAlias?: string;
 
+	@state()
+	private _serverUrl = '';
+
 	#manifests: Array<ManifestFileUploadPreview> = [];
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_APP_CONTEXT, (context) => {
+			this._serverUrl = context.getServerUrl();
+		});
+	}
 
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
@@ -171,6 +183,10 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	#renderFile(src: string) {
+		if (!src.startsWith('blob:')) {
+			src = this._serverUrl + src;
+		}
+
 		return html`
 			<div id="wrapper">
 				<div id="wrapperInner">
@@ -206,7 +222,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	 * If there is a former File, revoke the object URL.
 	 */
 	#clearObjectUrl(): void {
-		if (this.value.src && this.value.src.startsWith('blob:')) {
+		if (this.value?.src?.startsWith('blob:')) {
 			URL.revokeObjectURL(this.value.src);
 		}
 	}
