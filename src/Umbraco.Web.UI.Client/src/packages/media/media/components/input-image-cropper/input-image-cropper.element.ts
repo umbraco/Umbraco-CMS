@@ -1,21 +1,28 @@
-import type { UmbImageCropperPropertyEditorValue } from './types.js';
 import type { UmbInputImageCropperFieldElement } from './image-cropper-field.element.js';
-import { html, customElement, property, query, state, css, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbId } from '@umbraco-cms/backoffice/id';
+import type { UmbImageCropperPropertyEditorValue } from './types.js';
+
+import {
+	type UmbDropzoneChangeEvent,
+	type UmbInputDropzoneElement,
+	type UmbUploadableItem,
+	UmbFileDropzoneItemStatus,
+	UmbInputDropzoneDashedStyles,
+} from '@umbraco-cms/backoffice/dropzone';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
 import { assignToFrozenObject } from '@umbraco-cms/backoffice/observable-api';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
-import './image-cropper.element.js';
+import './image-cropper-field.element.js';
 import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
-import './image-cropper-field.element.js';
+import './image-cropper.element.js';
 
 const DefaultFocalPoint = { left: 0.5, top: 0.5 };
-const DefaultValue = {
+const DefaultValue: UmbImageCropperPropertyEditorValue = {
 	temporaryFileId: null,
 	src: '',
 	crops: [],
@@ -28,9 +35,6 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	typeof UmbLitElement,
 	undefined
 >(UmbLitElement, undefined) {
-	@query('#dropzone')
-	private _dropzone?: UUIFileDropzoneElement;
-
 	/**
 	 * Sets the input to required, meaning validation will fail if the value is empty.
 	 * @type {boolean}
@@ -45,10 +49,7 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	crops: UmbImageCropperPropertyEditorValue['crops'] = [];
 
 	@state()
-	file?: File;
-
-	@state()
-	fileUnique?: string;
+	private _file?: UmbUploadableItem;
 
 	@state()
 	private _accept?: string;
@@ -56,7 +57,7 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	@state()
 	private _loading = true;
 
-	#manager = new UmbTemporaryFileManager(this);
+	#config = new UmbTemporaryFileConfigRepository(this);
 
 	constructor() {
 		super();
@@ -76,9 +77,9 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	}
 
 	async #observeAcceptedFileTypes() {
-		const config = await this.#manager.getConfiguration();
+		await this.#config.initialized;
 		this.observe(
-			config.part('imageFileTypes'),
+			this.#config.part('imageFileTypes'),
 			(imageFileTypes) => {
 				this._accept = imageFileTypes.join(',');
 				this._loading = false;
@@ -87,34 +88,27 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 		);
 	}
 
-	#onUpload(e: UUIFileDropzoneEvent) {
-		const file = e.detail.files[0];
-		if (!file) return;
-		const unique = UmbId.new();
+	#onUpload(e: UmbDropzoneChangeEvent) {
+		e.stopImmediatePropagation();
 
-		this.file = file;
-		this.fileUnique = unique;
+		const target = e.target as UmbInputDropzoneElement;
+		const file = target.value?.[0];
 
-		this.value = assignToFrozenObject(this.value ?? DefaultValue, { temporaryFileId: unique });
+		if (file?.status !== UmbFileDropzoneItemStatus.COMPLETE) return;
 
-		this.#manager?.uploadOne({ temporaryUnique: unique, file });
+		this._file = file;
+
+		this.value = assignToFrozenObject(this.value ?? DefaultValue, {
+			temporaryFileId: file.temporaryFile?.temporaryUnique,
+		});
 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#onBrowse(e: Event) {
-		if (!this._dropzone) return;
-		e.stopImmediatePropagation();
-		this._dropzone.browse();
-	}
-
 	#onRemove = () => {
 		this.value = undefined;
-		if (this.fileUnique) {
-			this.#manager?.removeOne(this.fileUnique);
-		}
-		this.fileUnique = undefined;
-		this.file = undefined;
+		this._file?.temporaryFile?.abortController?.abort();
+		this._file = undefined;
 
 		this.dispatchEvent(new UmbChangeEvent());
 	};
@@ -144,7 +138,7 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 			return html`<div id="loader"><uui-loader></uui-loader></div>`;
 		}
 
-		if (this.value?.src || this.file) {
+		if (this.value?.src || this._file) {
 			return this.#renderImageCropper();
 		}
 
@@ -153,14 +147,11 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 
 	#renderDropzone() {
 		return html`
-			<uui-file-dropzone
+			<umb-input-dropzone
 				id="dropzone"
-				label="dropzone"
 				accept=${ifDefined(this._accept)}
-				@change="${this.#onUpload}"
-				@click=${this.#onBrowse}>
-				<uui-button label=${this.localize.term('media_clickToUpload')} @click="${this.#onBrowse}"></uui-button>
-			</uui-file-dropzone>
+				disable-folder-upload
+				@change="${this.#onUpload}"></umb-input-dropzone>
 		`;
 	}
 
@@ -184,30 +175,23 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	}
 
 	#renderImageCropper() {
-		return html`<umb-image-cropper-field .value=${this.value} .file=${this.file as File} @change=${this.#onChange}>
+		return html`<umb-image-cropper-field
+			.value=${this.value}
+			.file=${this._file?.temporaryFile?.file}
+			@change=${this.#onChange}>
 			<uui-button slot="actions" @click=${this.#onRemove} label=${this.localize.term('content_uploadClear')}>
 				<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
 			</uui-button>
 		</umb-image-cropper-field> `;
 	}
 
-	static override styles = [
+	static override readonly styles = [
+		UmbTextStyles,
+		UmbInputDropzoneDashedStyles,
 		css`
 			#loader {
 				display: flex;
 				justify-content: center;
-			}
-
-			uui-file-dropzone {
-				position: relative;
-				display: block;
-			}
-			uui-file-dropzone::after {
-				content: '';
-				position: absolute;
-				inset: 0;
-				cursor: pointer;
-				border: 1px dashed var(--uui-color-divider-emphasis);
 			}
 		`,
 	];
