@@ -5,11 +5,11 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -17,6 +17,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories;
 
@@ -28,17 +29,16 @@ internal sealed class StylesheetRepositoryTest : UmbracoIntegrationTest
     public void SetUpFileSystem()
     {
         var path = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoCssPath);
-        _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), path, "/css");
+        _fileSystem = new PhysicalFileSystem(IOHelper, HostEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), path, "/css");
 
         _fileSystems = FileSystemsCreator.CreateTestFileSystems(
             LoggerFactory,
-            IOHelper,
-            GetRequiredService<IOptions<GlobalSettings>>(),
             HostingEnvironment,
             null,
             _fileSystem,
             null,
-            null);
+            null,
+            GetRequiredService<IFileSystemFactory>());
 
         var stream = CreateStream("body {background:#EE7600; color:#FFF;}");
         _fileSystem.AddFile("styles.css", stream);
@@ -56,6 +56,7 @@ internal sealed class StylesheetRepositoryTest : UmbracoIntegrationTest
     private IFileSystem _fileSystem;
 
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
+    private IHostEnvironment HostEnvironment => GetRequiredService<IHostEnvironment>();
 
     private IStylesheetRepository CreateRepository()
     {

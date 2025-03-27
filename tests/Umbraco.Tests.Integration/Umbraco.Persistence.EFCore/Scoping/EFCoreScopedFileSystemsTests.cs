@@ -1,14 +1,15 @@
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 
@@ -25,6 +26,7 @@ internal sealed class EFCoreScopedFileSystemsTests : UmbracoIntegrationTest
     private MediaFileManager MediaFileManager => GetRequiredService<MediaFileManager>();
 
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
+    private IHostEnvironment HostEnvironment => GetRequiredService<IHostEnvironment>();
 
     private IEFCoreScopeProvider<TestUmbracoDbContext> EfCoreScopeProvider => GetRequiredService<IEFCoreScopeProvider<TestUmbracoDbContext>>();
     private IEFCoreScopeAccessor<TestUmbracoDbContext> EfCoreScopeAccessor => GetRequiredService<IEFCoreScopeAccessor<TestUmbracoDbContext>>();
@@ -41,7 +43,7 @@ internal sealed class EFCoreScopedFileSystemsTests : UmbracoIntegrationTest
     {
         var rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPhysicalRootPath);
         var rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
-        var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
+        var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
         var mediaFileManager = MediaFileManager;
 
         Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
@@ -67,7 +69,7 @@ internal sealed class EFCoreScopedFileSystemsTests : UmbracoIntegrationTest
     {
         var rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPhysicalRootPath);
         var rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
-        var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
+        var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
         var mediaFileManager = MediaFileManager;
 
         Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
@@ -98,7 +100,7 @@ internal sealed class EFCoreScopedFileSystemsTests : UmbracoIntegrationTest
     {
         var rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPhysicalRootPath);
         var rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
-        var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
+        var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
         var mediaFileManager = MediaFileManager;
         var taskHelper = new TaskHelper(Mock.Of<ILogger<TaskHelper>>());
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -13,7 +14,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -27,6 +27,7 @@ using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories;
 
@@ -42,7 +43,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         // Delete all files
         var fsViews = new PhysicalFileSystem(
             IOHelper,
-            HostingEnvironment,
+            HostEnvironment,
             LoggerFactory.CreateLogger<PhysicalFileSystem>(),
             HostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MvcViews),
             HostingEnvironment.ToAbsolute(Constants.SystemDirectories.MvcViews));
@@ -54,6 +55,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     }
 
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
+    private IHostEnvironment HostEnvironment => GetRequiredService<IHostEnvironment>();
 
     private FileSystems FileSystems => GetRequiredService<FileSystems>();
 

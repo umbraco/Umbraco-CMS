@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -310,6 +311,8 @@ public static class TestHelper
 
     public static IHostingEnvironment GetHostingEnvironment() => s_testHelperInternal.GetHostingEnvironment();
 
+    public static IHostEnvironment GetHostEnvironment() => s_testHelperInternal.GetHostEnvironment();
+
     public static ILoggingConfiguration GetLoggingConfiguration(IHostingEnvironment hostingEnv) =>
         s_testHelperInternal.GetLoggingConfiguration(hostingEnv);
 
@@ -343,6 +346,12 @@ public static class TestHelper
                     x =>
                         x.WebRootPath == "/" &&
                         x.ContentRootPath == testPath));
+        }
+
+        public IHostEnvironment GetHostEnvironment()
+        {
+            var testPath = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
+            return new TestHostEnvironment() { ContentRootPath = testPath };
         }
 
         public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime()

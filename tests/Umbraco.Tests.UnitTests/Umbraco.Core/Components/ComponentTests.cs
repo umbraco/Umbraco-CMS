@@ -67,9 +67,8 @@ public class ComponentTests
 
         var fs = new FileSystems(
             loggerFactory,
-            IOHelper,
-            Options.Create(globalSettings),
-            Mock.Of<IHostingEnvironment>());
+            Mock.Of<IHostingEnvironment>(),
+            Mock.Of<IFileSystemFactory>());
         var coreDebug = new CoreDebugSettings();
         var mediaFileManager = new MediaFileManager(
             Mock.Of<IFileSystem>(),

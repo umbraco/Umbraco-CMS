@@ -1,19 +1,20 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO;
 
@@ -32,7 +33,9 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
     // SetUp does not start before the previous TearDown returns
 
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
+    private IHostEnvironment HostEnvironment => GetRequiredService<IHostEnvironment>();
     private ILogger<PhysicalFileSystem> Logger => GetRequiredService<ILogger<PhysicalFileSystem>>();
+    private IFileSystemFactory FileSystemFactory => GetRequiredService<IFileSystemFactory>();
 
     private void ClearFiles(IHostingEnvironment hostingEnvironment)
     {
@@ -52,8 +55,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         Directory.CreateDirectory(path + "/ShadowTests/d1");
@@ -86,8 +89,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         Directory.CreateDirectory(path + "/ShadowTests/sub");
@@ -135,8 +138,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         File.WriteAllText(path + "/ShadowTests/f1.txt", "foo");
@@ -175,8 +178,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         Directory.CreateDirectory(path + "/ShadowTests/sub");
@@ -230,8 +233,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         Assert.Throws<UnauthorizedAccessException>(() =>
@@ -251,8 +254,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
@@ -294,8 +297,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -338,8 +341,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -362,8 +365,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         Directory.CreateDirectory(path + "/ShadowTests/sub/sub");
@@ -399,11 +402,11 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         var scopedFileSystems = false;
 
-        var phy = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path, "ignore");
+        var phy = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path, "ignore");
 
         var globalSettings = Options.Create(new GlobalSettings());
         var fileSystems =
-            new FileSystems(loggerFactory, IOHelper, globalSettings, HostingEnvironment)
+            new FileSystems(loggerFactory, HostingEnvironment, FileSystemFactory)
             {
                 IsScoped = () => scopedFileSystems
             };
@@ -515,11 +518,11 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         var scopedFileSystems = false;
 
-        var phy = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path, "ignore");
+        var phy = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path, "ignore");
 
         var globalSettings = Options.Create(new GlobalSettings());
         var fileSystems =
-            new FileSystems(NullLoggerFactory.Instance, IOHelper, globalSettings, HostingEnvironment)
+            new FileSystems(NullLoggerFactory.Instance, HostingEnvironment, FileSystemFactory)
             {
                 IsScoped = () => scopedFileSystems
             };
@@ -584,11 +587,11 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         var scopedFileSystems = false;
 
-        var phy = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path, "ignore");
+        var phy = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path, "ignore");
 
         var globalSettings = Options.Create(new GlobalSettings());
         var fileSystems =
-            new FileSystems(NullLoggerFactory.Instance, IOHelper, globalSettings, HostingEnvironment)
+            new FileSystems(NullLoggerFactory.Instance, HostingEnvironment, FileSystemFactory)
             {
                 IsScoped = () => scopedFileSystems
             };
@@ -710,8 +713,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         // Act
@@ -744,8 +747,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         // Act
@@ -778,8 +781,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         // Act
@@ -812,8 +815,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         // Act
@@ -852,8 +855,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         // Act
@@ -907,8 +910,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         // Act
@@ -943,8 +946,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "ignore");
         var ss = new ShadowFileSystem(fs, sfs);
 
         // Act
@@ -984,8 +987,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests");
         Directory.CreateDirectory(path + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "rootUrl");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "rootUrl");
+        var fs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowTests/", "rootUrl");
+        var sfs = new PhysicalFileSystem(IOHelper, HostEnvironment, Logger, path + "/ShadowSystem/", "rootUrl");
         var ss = new ShadowFileSystem(fs, sfs);
 
         // Act

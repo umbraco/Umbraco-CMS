@@ -1,18 +1,19 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories;
 
@@ -24,7 +25,7 @@ internal sealed class PartialViewRepositoryTests : UmbracoIntegrationTest
     public void SetUp() =>
         _fileSystem = new PhysicalFileSystem(
             IOHelper,
-            HostingEnvironment,
+            HostEnvironment,
             LoggerFactory.CreateLogger<PhysicalFileSystem>(),
             HostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.PartialViews),
             HostingEnvironment.ToAbsolute(Constants.SystemDirectories.PartialViews));
@@ -38,6 +39,7 @@ internal sealed class PartialViewRepositoryTests : UmbracoIntegrationTest
     }
 
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
+    private IHostEnvironment HostEnvironment => GetRequiredService<IHostEnvironment>();
 
     private IFileSystem _fileSystem;
 
@@ -47,13 +49,12 @@ internal sealed class PartialViewRepositoryTests : UmbracoIntegrationTest
         // unless noted otherwise, no changes / 7.2.8
         var fileSystems = FileSystemsCreator.CreateTestFileSystems(
             LoggerFactory,
-            IOHelper,
-            GetRequiredService<IOptions<GlobalSettings>>(),
             HostingEnvironment,
             _fileSystem,
             null,
             null,
-            null);
+            null,
+            GetRequiredService<IFileSystemFactory>());
 
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())

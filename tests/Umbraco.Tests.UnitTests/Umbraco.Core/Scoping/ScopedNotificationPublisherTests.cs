@@ -75,9 +75,8 @@ public class ScopedNotificationPublisherTests
 
         var fileSystems = new FileSystems(
             loggerFactory,
-            Mock.Of<IIOHelper>(),
-            Options.Create(new GlobalSettings()),
-            Mock.Of<IHostingEnvironment>());
+            Mock.Of<IHostingEnvironment>(),
+            Mock.Of<IFileSystemFactory>());
 
         var mediaFileManager = new MediaFileManager(
             Mock.Of<IFileSystem>(),
