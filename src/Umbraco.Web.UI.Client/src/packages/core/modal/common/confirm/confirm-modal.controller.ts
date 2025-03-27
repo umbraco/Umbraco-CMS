@@ -10,6 +10,7 @@ export interface UmbConfirmModalArgs extends UmbConfirmModalData {}
  *
  * @param host {UmbControllerHost} - The host controller
  * @param args {UmbConfirmModalData} - The data to pass to the modal
+ * @param data
  * @returns {UmbOpenModalController} The modal controller instance
  */
 export function umbConfirmModal(host: UmbControllerHost, data: UmbConfirmModalData) {
