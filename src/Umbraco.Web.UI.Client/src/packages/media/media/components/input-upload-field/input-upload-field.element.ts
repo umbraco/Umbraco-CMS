@@ -2,6 +2,7 @@ import type { MediaValueType } from '../../property-editors/upload-field/types.j
 import type { ManifestFileUploadPreview } from './file-upload-preview.extension.js';
 import { getMimeTypeFromExtension } from './utils.js';
 
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import {
 	UmbFileDropzoneItemStatus,
 	UmbInputDropzoneDashedStyles,
@@ -9,13 +10,13 @@ import {
 	type UmbInputDropzoneElement,
 	type UmbUploadableFile,
 } from '@umbraco-cms/backoffice/dropzone';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-upload-field')
@@ -28,7 +29,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	get value(): MediaValueType {
 		return {
 			src: this.#src,
-			temporaryFileId: this._file?.temporaryFile.temporaryUnique,
+			temporaryFileId: this.temporaryFile?.temporaryUnique,
 		};
 	}
 	#src = '';
@@ -51,7 +52,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	allowedFileExtensions?: Array<string>;
 
 	@state()
-	private _file?: UmbUploadableFile;
+	public temporaryFile?: UmbTemporaryFileModel;
 
 	@state()
 	private _extensions?: string[];
@@ -99,8 +100,8 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		)?.alias;
 
 		let mimeType: string | null = null;
-		if (this._file?.temporaryFile.file) {
-			mimeType = this._file.temporaryFile.file.type;
+		if (this.temporaryFile?.file) {
+			mimeType = this.temporaryFile.file.type;
 		} else {
 			mimeType = this.#getMimeTypeFromPath(this.value.src);
 		}
@@ -150,18 +151,18 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 		if (file?.status !== UmbFileDropzoneItemStatus.COMPLETE) return;
 
-		this._file = file as UmbUploadableFile;
+		this.temporaryFile = (file as UmbUploadableFile).temporaryFile;
 
 		this.#clearObjectUrl();
 
-		const blobUrl = URL.createObjectURL(this._file.temporaryFile.file);
+		const blobUrl = URL.createObjectURL(this.temporaryFile.file);
 		this.value = { src: blobUrl };
 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
-		if (!this._file && !this.value.src) {
+		if (!this.temporaryFile && !this.value.src) {
 			return this.#renderDropzone();
 		}
 
@@ -192,7 +193,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 				<div id="wrapperInner">
 					<umb-extension-slot
 						type="fileUploadPreview"
-						.props=${{ path: src, file: this._file?.temporaryFile.file }}
+						.props=${{ path: src, file: this.temporaryFile?.file }}
 						.filter=${(manifest: ManifestFileUploadPreview) => manifest.alias === this._previewAlias}>
 					</umb-extension-slot>
 				</div>
@@ -211,10 +212,12 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	#handleRemove() {
 		// If the upload promise happens to be in progress, cancel it.
-		this._file?.temporaryFile.abortController?.abort();
+		this.temporaryFile?.abortController?.abort();
+
+		this.#clearObjectUrl();
 
 		this.value = { src: undefined };
-		this._file = undefined;
+		this.temporaryFile = undefined;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
