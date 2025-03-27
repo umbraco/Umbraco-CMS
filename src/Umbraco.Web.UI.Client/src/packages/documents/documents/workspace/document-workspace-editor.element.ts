@@ -6,6 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 // TODO: This seem fully identical with Media Workspace Editor, so we can refactor this to a generic component. [NL]
 @customElement('umb-document-workspace-editor')
@@ -101,8 +102,17 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 					const route = routes.find((route) => route.path === this.#appCulture);
 
 					if (!route) {
+						const firstVariantPath = routes.find((route) => route.path === this.#variants?.[0].unique)?.path;
+
+						if (firstVariantPath) {
+							history.replaceState({}, '', `${this.#workspaceRoute}/${firstVariantPath}`);
+							return;
+						}
+
 						// TODO: Notice: here is a specific index used for fallback, this could be made more solid [NL]
-						history.replaceState({}, '', `${this.#workspaceRoute}/${routes[routes.length - 3].path}`);
+						const path = `${this.#workspaceRoute}/${routes[routes.length - 3].path}`;
+
+						history.replaceState({}, '', path);
 						return;
 					}
 
