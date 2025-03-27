@@ -1,4 +1,3 @@
-import { UmbDropzoneMediaManager } from './dropzone-media-manager.class.js';
 import {
 	UmbInputDropzoneElement,
 	UmbFileDropzoneItemStatus,
@@ -29,8 +28,6 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 	@property({ type: Boolean, attribute: 'create-as-temporary' })
 	createAsTemporary: boolean = false;
 
-	#dropzoneManager = new UmbDropzoneMediaManager(this);
-
 	/**
 	 * @deprecated Please use `getItems()` instead; this method will be removed in Umbraco 17.
 	 * @returns {Array<UmbUploadableItem>} An array of uploadable items.
@@ -45,8 +42,8 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		return this._progressItems;
 	}
 
-	public progressItems = () => this.#dropzoneManager.progressItems;
-	public progress = () => this.#dropzoneManager.progress;
+	public progressItems = () => this._manager.progressItems;
+	public progress = () => this._manager.progress;
 
 	constructor() {
 		super();
@@ -56,20 +53,19 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		document.addEventListener('drop', this.#handleDrop.bind(this));
 
 		this.observe(
-			this.#dropzoneManager.progressItems,
+			this._manager.progressItems,
 			(progressItems: Array<UmbUploadableItem>) => {
 				const waiting = progressItems.find((item) => item.status === UmbFileDropzoneItemStatus.WAITING);
 				if (progressItems.length && !waiting) {
 					this.dispatchEvent(new CustomEvent('complete', { detail: progressItems }));
 				}
 			},
-			'_observeProgressItems',
+			'_observeProgressItemsComplete',
 		);
 	}
 
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
-		this.#dropzoneManager.destroy();
 		document.removeEventListener('dragenter', this.#handleDragEnter.bind(this));
 		document.removeEventListener('dragleave', this.#handleDragLeave.bind(this));
 		document.removeEventListener('drop', this.#handleDrop.bind(this));
@@ -80,10 +76,10 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		if (!event.detail.files.length && !event.detail.folders.length) return;
 
 		if (this.createAsTemporary) {
-			const uploadable = this.#dropzoneManager.createTemporaryFiles(event.detail.files);
+			const uploadable = this._manager.createTemporaryFiles(event.detail.files);
 			this.dispatchEvent(new UmbDropzoneSubmittedEvent(await uploadable));
 		} else {
-			const uploadable = this.#dropzoneManager.createMediaItems(event.detail, this.parentUnique);
+			const uploadable = this._manager.createMediaItems(event.detail, this.parentUnique);
 			this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadable));
 		}
 	}
