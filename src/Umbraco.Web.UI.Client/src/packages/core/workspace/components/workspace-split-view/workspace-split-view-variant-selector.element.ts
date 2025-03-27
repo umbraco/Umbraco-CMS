@@ -129,10 +129,12 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		this.observe(
 			workspaceContext.variantOptions,
 			(options) => {
-				const option = options.find((option) => option.language.unique === this._variantId?.culture);
+				const option = options.find(
+					(option) => option.culture === this._variantId?.culture && option.segment === this._variantId?.segment,
+				);
 				this._activeVariant = option as VariantOptionModelType;
 			},
-			'_currentLanguage',
+			'umbObserveActiveVariant',
 		);
 	}
 
@@ -236,9 +238,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 								compact
 								slot="append"
 								popovertarget="variant-selector-popover"
-								title=${ifDefined(this._activeVariant?.language.name)}
+								title=${this.#getVariantSpecInfo(this._activeVariant)}
 								label="Select a variant">
-								${this._activeVariant?.language.name} ${this.#renderReadOnlyTag(this._activeVariant?.culture)}
+								${this.#getVariantSpecInfo(this._activeVariant)}
+								${this.#renderReadOnlyTag(this._activeVariant?.culture)}
 								<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
 							</uui-button>
 							${this._activeVariants.length > 1
@@ -309,9 +312,13 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		return variantOption.language.name;
 	}
 
-	#getVariantSpecInfo(variantOption: VariantOptionModelType) {
+	#getVariantSpecInfo(variantOption: VariantOptionModelType | undefined) {
+		if (!variantOption) {
+			return '';
+		}
+
 		if (variantOption.segmentInfo) {
-			return `${variantOption.language.name} - ${variantOption.segmentInfo.alias}`;
+			return `${variantOption.language.name} - ${variantOption.segmentInfo.name}`;
 		}
 
 		return variantOption.language.name;
