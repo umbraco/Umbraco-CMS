@@ -1,20 +1,18 @@
-import type { UmbInputImageCropperFieldElement } from './image-cropper-field.element.js';
 import type { UmbImageCropperPropertyEditorValue } from './types.js';
-
-import {
-	type UmbDropzoneChangeEvent,
-	type UmbInputDropzoneElement,
-	type UmbUploadableItem,
-	UmbFileDropzoneItemStatus,
-	UmbInputDropzoneDashedStyles,
-} from '@umbraco-cms/backoffice/dropzone';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbInputImageCropperFieldElement } from './image-cropper-field.element.js';
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { assignToFrozenObject } from '@umbraco-cms/backoffice/observable-api';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbFileDropzoneItemStatus, UmbInputDropzoneDashedStyles } from '@umbraco-cms/backoffice/dropzone';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import type {
+	UmbDropzoneChangeEvent,
+	UmbInputDropzoneElement,
+	UmbUploadableItem,
+} from '@umbraco-cms/backoffice/dropzone';
 
 import './image-cropper-field.element.js';
 import './image-cropper-focus-setter.element.js';

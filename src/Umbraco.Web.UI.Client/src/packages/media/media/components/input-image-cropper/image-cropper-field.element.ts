@@ -7,11 +7,10 @@ import type {
 	UmbImageCropperFocalPoint,
 	UmbImageCropperPropertyEditorValue,
 } from './types.js';
-
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
 import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
