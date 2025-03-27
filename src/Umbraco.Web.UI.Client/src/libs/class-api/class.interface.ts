@@ -60,7 +60,7 @@ export interface UmbClassInterface extends UmbControllerHost {
 	/**
 	 * @description Retrieve a context. Notice this is a one time retrieving of a context, meaning if you expect this to be up to date with reality you should instead use the consumeContext method.
 	 * @param {string} alias
-	 * @returns {Promise<ContextType>} A Promise with the reference to the Context Api Instance
+	 * @returns {Promise<unknown>} A Promise with the reference to the Context Api Instance
 	 * @memberof UmbClassInterface
 	 */
 	getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
