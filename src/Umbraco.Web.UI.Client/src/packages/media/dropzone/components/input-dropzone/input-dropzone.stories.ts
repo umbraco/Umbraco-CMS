@@ -11,7 +11,6 @@ const meta: Meta<UmbInputDropzoneElement> = {
 	args: {
 		disabled: false,
 		accept: '',
-		createAsTemporary: true,
 	},
 	decorators: [(Story) => html`<div style="width: 300px">${Story()}</div>`],
 	parameters: {
@@ -52,4 +51,8 @@ export const WithDefaultSlot: Story = {
 		html`<umb-input-dropzone>
 			<div>Custom slot</div>
 		</umb-input-dropzone>`,
+};
+
+export const WithTextSlot: Story = {
+	render: () => html`<umb-input-dropzone><div slot="text">Drop your files here</div></umb-input-dropzone>`,
 };
