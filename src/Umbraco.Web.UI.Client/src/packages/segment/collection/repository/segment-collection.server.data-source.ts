@@ -27,9 +27,10 @@ export class UmbSegmentCollectionServerDataSource
 		if (data) {
 			const items = data.items.map((item) => {
 				const model: UmbSegmentCollectionItemModel = {
-					entityType: UMB_SEGMENT_ENTITY_TYPE,
-					unique: item.alias,
 					alias: item.alias,
+					entityType: UMB_SEGMENT_ENTITY_TYPE,
+					name: item.name,
+					unique: item.alias,
 				};
 
 				return model;

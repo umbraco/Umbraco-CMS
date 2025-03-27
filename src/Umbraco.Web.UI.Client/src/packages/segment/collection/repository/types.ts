@@ -10,4 +10,5 @@ export interface UmbSegmentCollectionItemModel {
 	entityType: string;
 	unique: string;
 	alias: string;
+	name: string;
 }

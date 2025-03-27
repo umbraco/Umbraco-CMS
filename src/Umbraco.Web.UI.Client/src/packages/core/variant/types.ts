@@ -33,9 +33,10 @@ export interface UmbEntityVariantOptionModel<VariantType extends UmbEntityVarian
 	language: UmbLanguageDetailModel;
 	// TODO: Rename this before merge
 	segmentInfo?: {
-		unique: string;
-		entityType: string;
 		alias: string;
+		entityType: string;
+		name: string;
+		unique: string;
 	};
 	/**
 	 * The unique identifier is a VariantId string.
