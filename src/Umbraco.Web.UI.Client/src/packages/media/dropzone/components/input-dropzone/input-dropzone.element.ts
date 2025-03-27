@@ -74,6 +74,16 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 
 	protected _manager = new UmbDropzoneManager(this);
 
+	/**
+	 * Determines if the dropzone should be disabled.
+	 * If the dropzone is disabled, it will not accept any uploads.
+	 * It is considered disabled if the `disabled` property is set or if `multiple` is set to `false` and there is already an upload in progress.
+	 * @returns {boolean} True if the dropzone should not accept uploads, otherwise false.
+	 */
+	get #isDisabled(): boolean {
+		return this.disabled || (!this.multiple && this._progressItems.length > 0);
+	}
+
 	constructor() {
 		super();
 
@@ -107,7 +117,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	 * Opens the file browse dialog.
 	 */
 	public browse(): void {
-		if (this.disabled) return;
+		if (this.#isDisabled) return;
 		this._dropzone?.browse();
 	}
 
@@ -119,7 +129,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				label=${this.label}
 				accept=${ifDefined(this.accept)}
 				?multiple=${this.multiple}
-				?disabled=${this.disabled}
+				?disabled=${this.#isDisabled}
 				?disallowFolderUpload=${this.disableFolderUpload}
 				@change=${this.onUpload}
 				@click=${this.#handleBrowse}>
@@ -132,7 +142,6 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	}
 
 	protected renderUploader() {
-		if (this.disabled) return nothing;
 		if (!this._progressItems?.length) return nothing;
 
 		return html`
@@ -209,7 +218,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	protected async onUpload(e: UUIFileDropzoneEvent) {
 		e.stopImmediatePropagation();
 
-		if (this.disabled) return;
+		if (this.#isDisabled) return;
 		if (!e.detail.files.length && !e.detail.folders.length) return;
 
 		const uploadables = this._manager.createTemporaryFiles(e.detail.files);
@@ -250,6 +259,11 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				width: 100%;
 				inset: 0;
 				backdrop-filter: opacity(1); /* Removes the built in blur effect */
+
+				&[disabled] {
+					opacity: 0.5;
+					pointer-events: none;
+				}
 			}
 
 			#uploader {
