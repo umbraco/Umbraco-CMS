@@ -311,7 +311,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	#getVariantSpecInfo(variantOption: VariantOptionModelType) {
 		if (variantOption.segmentInfo) {
-			return `${variantOption.language.name} - ${variantOption.segmentInfo.name}`;
+			return `${variantOption.language.name} - ${variantOption.segmentInfo.alias}`;
 		}
 
 		return variantOption.language.name;
