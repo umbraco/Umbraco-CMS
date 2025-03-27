@@ -327,8 +327,14 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			return variantOption.variant?.name;
 		}
 
-		if (variantOption.segmentInfo) {
-			return `${variantOption.segmentInfo.name}`;
+		// If we vary by segment only, we show the segment and show "Default" for the language
+		if (this._variesByCulture && this._variesBySegment) {
+			return variantOption?.segmentInfo?.name ?? variantOption.language.name;
+		}
+
+		// If we vary by segment only, we show the segment and show "Default" for the language
+		if (!this._variesByCulture && this._variesBySegment) {
+			return variantOption?.segmentInfo?.name ?? this._labelDefault;
 		}
 
 		return variantOption.language.name;
@@ -343,12 +349,12 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		if (this._variesByCulture && this._variesBySegment) {
 			return variantOption.segmentInfo
 				? `${variantOption.language.name} - ${variantOption.segmentInfo.name}`
-				: this._labelDefault;
+				: variantOption.language.name || this._labelDefault;
 		}
 
 		// If we vary by segment only, we only show the segment and show "Default" for the language
 		if (!this._variesByCulture && this._variesBySegment) {
-			return variantOption.segmentInfo ? `${variantOption.segmentInfo.name}` : this._labelDefault;
+			return variantOption?.segmentInfo?.name ?? this._labelDefault;
 		}
 
 		return variantOption.language.name;
