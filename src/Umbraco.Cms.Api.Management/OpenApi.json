@@ -6246,6 +6246,13 @@
             }
           },
           {
+            "name": "isElement",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "skip",
             "in": "query",
             "schema": {
@@ -10067,6 +10074,13 @@
             "in": "query",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "trashed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
             }
           },
           {
@@ -15764,6 +15778,13 @@
             "in": "query",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "trashed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
             }
           },
           {
@@ -40095,6 +40116,41 @@
         ],
         "type": "string"
       },
+      "MemberReferenceResponseModel": {
+        "required": [
+          "$type",
+          "id",
+          "memberType"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "memberType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TrackedReferenceMemberTypeModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "MemberReferenceResponseModel": "#/components/schemas/MemberReferenceResponseModel"
+          }
+        }
+      },
       "MemberResponseModel": {
         "required": [
           "email",
@@ -41505,6 +41561,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/MediaReferenceResponseModel"
+                },
+                {
+                  "$ref": "#/components/schemas/MemberReferenceResponseModel"
                 }
               ]
             }
@@ -44160,6 +44219,24 @@
         "additionalProperties": false
       },
       "TrackedReferenceMediaTypeModel": {
+        "type": "object",
+        "properties": {
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TrackedReferenceMemberTypeModel": {
         "type": "object",
         "properties": {
           "icon": {
