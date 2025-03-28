@@ -32,9 +32,8 @@ export class UmbBlockRteManagerContext<
 		// This property is used by some implementations, but not used in this. Do not remove. [NL]
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		_originData?: UmbBlockRteWorkspaceOriginData,
-	) {
+	): never {
 		throw new Error('Method deparecated use createWithPresets');
-		return {} as UmbBlockDataObjectModel<BlockLayoutType>;
 	}
 	async createWithPresets(
 		contentElementTypeKey: string,
