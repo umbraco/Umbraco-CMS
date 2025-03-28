@@ -778,9 +778,9 @@ describe('Add Conditions', () => {
 					expect(extensions?.[0]?.alias).to.be.equal('Umb.Test.Section.2');
 					expect(extensions?.[0]?.conditions).to.not.be.undefined;
 					expect(extensions?.[0]?.conditions.length).to.be.equal(1);
+					subscription.unsubscribe();
 					done();
 				}
-			})
-			.unsubscribe();
+			});
 	});
 });
