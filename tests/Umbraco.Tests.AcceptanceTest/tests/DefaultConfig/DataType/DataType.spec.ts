@@ -103,10 +103,6 @@ test('cannot create a data type without selecting the property editor', {tag: '@
 test('can change settings', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const maxCharsValue = 126;
-  const expectedDataTypeValues = {
-    "alias": "maxChars",
-    "value": maxCharsValue
-  };
   await umbracoApi.dataType.createTextstringDataType(dataTypeName);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
 
@@ -117,6 +113,5 @@ test('can change settings', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'maxChars', maxCharsValue)).toBeTruthy();
 });
