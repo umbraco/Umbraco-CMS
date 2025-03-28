@@ -350,7 +350,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		await this.structure.loadType((data as any)[this.#contentTypePropertyName].unique);
 
 		// Set culture and segment for all values:
-		const cutlures = this.#languages.getValue().map((x) => x.unique);
+		const cultures = this.#languages.getValue().map((x) => x.unique);
 
 		if (this.structure.variesBySegment) {
 			console.warn('Segments are not yet implemented for preset');
@@ -386,7 +386,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		const controller = new UmbPropertyValuePresetVariantBuilderController(this);
-		controller.setCultures(cutlures);
+		controller.setCultures(cultures);
 		if (segments) {
 			controller.setSegments(segments);
 		}
