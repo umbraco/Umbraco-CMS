@@ -11,7 +11,6 @@ export class UmbMemberReferenceResponseManagementApiDataMapping
 	async map(data: MemberReferenceResponseModel): Promise<UmbMemberReferenceModel> {
 		return {
 			entityType: UMB_MEMBER_ENTITY_TYPE,
-			id: data.id,
 			memberType: {
 				alias: data.memberType.alias,
 				icon: data.memberType.icon,
