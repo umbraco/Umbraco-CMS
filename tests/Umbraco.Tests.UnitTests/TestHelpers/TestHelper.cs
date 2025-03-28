@@ -348,10 +348,10 @@ public static class TestHelper
                         x.ContentRootPath == testPath));
         }
 
-        public IHostEnvironment GetHostEnvironment()
+        public override IHostEnvironment GetHostEnvironment()
         {
             var testPath = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
-            return new TestHostEnvironment() { ContentRootPath = testPath };
+            return new TestHostEnvironment { ContentRootPath = testPath };
         }
 
         public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime()

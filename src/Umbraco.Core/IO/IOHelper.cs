@@ -1,17 +1,26 @@
 using System.Globalization;
 using System.Reflection;
-using Umbraco.Cms.Core.Hosting;
+using Microsoft.Extensions.Hosting;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Core.IO;
 
 public abstract class IOHelper : IIOHelper
 {
     private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly IHostEnvironment _hostEnvironment;
 
-    public IOHelper(IHostingEnvironment hostingEnvironment) => _hostingEnvironment =
-        hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+    public IOHelper(
+        IHostingEnvironment hostingEnvironment,
+        IHostEnvironment hostEnvironment)
+    {
+        _hostingEnvironment =
+            hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+        _hostEnvironment = hostEnvironment;
+    }
 
     // static compiled regex for faster performance
     // private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
@@ -178,7 +187,7 @@ public abstract class IOHelper : IIOHelper
     {
         var tempFolderPaths = new[]
         {
-            _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads),
+            _hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads),
         };
 
         foreach (var tempFolderPath in tempFolderPaths)

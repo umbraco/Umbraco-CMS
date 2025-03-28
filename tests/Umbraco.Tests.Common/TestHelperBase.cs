@@ -3,6 +3,7 @@
 
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -150,18 +151,19 @@ public abstract class TestHelperBase
             if (_ioHelper == null)
             {
                 var hostingEnvironment = GetHostingEnvironment();
+                var hostEnvironment = GetHostEnvironment();
 
                 if (TestEnvironment.IsWindows)
                 {
-                    _ioHelper = new IOHelperWindows(hostingEnvironment);
+                    _ioHelper = new IOHelperWindows(hostingEnvironment, hostEnvironment);
                 }
                 else if (TestEnvironment.IsLinux)
                 {
-                    _ioHelper = new IOHelperLinux(hostingEnvironment);
+                    _ioHelper = new IOHelperLinux(hostingEnvironment, hostEnvironment);
                 }
                 else if (TestEnvironment.IsOSX)
                 {
-                    _ioHelper = new IOHelperOSX(hostingEnvironment);
+                    _ioHelper = new IOHelperOSX(hostingEnvironment, hostEnvironment);
                 }
                 else
                 {
@@ -216,6 +218,8 @@ public abstract class TestHelperBase
     public IServiceCollection GetRegister() => new ServiceCollection();
 
     public abstract IHostingEnvironment GetHostingEnvironment();
+
+    public abstract IHostEnvironment GetHostEnvironment();
 
     public abstract IApplicationShutdownRegistry GetHostingEnvironmentLifetime();
 

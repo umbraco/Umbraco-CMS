@@ -1,11 +1,14 @@
-using Umbraco.Cms.Core.Hosting;
+using Microsoft.Extensions.Hosting;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Core.IO;
 
 public class IOHelperOSX : IOHelper
 {
-    public IOHelperOSX(IHostingEnvironment hostingEnvironment)
-        : base(hostingEnvironment)
+    public IOHelperOSX(
+        IHostingEnvironment hostingEnvironment,
+        IHostEnvironment hostEnvironment)
+        : base(hostingEnvironment , hostEnvironment)
     {
     }
 

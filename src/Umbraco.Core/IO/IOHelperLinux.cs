@@ -1,11 +1,14 @@
-using Umbraco.Cms.Core.Hosting;
+using Microsoft.Extensions.Hosting;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Core.IO;
 
 public class IOHelperLinux : IOHelper
 {
-    public IOHelperLinux(IHostingEnvironment hostingEnvironment)
-        : base(hostingEnvironment)
+    public IOHelperLinux(
+        IHostingEnvironment hostingEnvironment,
+        IHostEnvironment hostEnvironment)
+        : base(hostingEnvironment, hostEnvironment)
     {
     }
 

@@ -110,6 +110,8 @@ public class TestHelper : TestHelperBase
             GetIOptionsMonitorOfWebRoutingSettings(),
             _hostEnvironment);
 
+    public override IHostEnvironment GetHostEnvironment() => new TestHostEnvironment();
+
     private IOptionsMonitor<HostingSettings> GetIOptionsMonitorOfHostingSettings()
     {
         var hostingSettings = new HostingSettings();

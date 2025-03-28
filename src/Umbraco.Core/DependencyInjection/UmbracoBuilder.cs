@@ -4,6 +4,7 @@
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -48,6 +49,7 @@ using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {
@@ -162,18 +164,19 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IIOHelper>(factory =>
             {
                 IHostingEnvironment hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
+                IHostEnvironment hostEnvironment = factory.GetRequiredService<IHostEnvironment>();
 
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 {
-                    return new IOHelperLinux(hostingEnvironment);
+                    return new IOHelperLinux(hostingEnvironment, hostEnvironment);
                 }
 
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
-                    return new IOHelperOSX(hostingEnvironment);
+                    return new IOHelperOSX(hostingEnvironment, hostEnvironment);
                 }
 
-                return new IOHelperWindows(hostingEnvironment);
+                return new IOHelperWindows(hostingEnvironment, hostEnvironment);
             });
 
             Services.AddUnique(factory => factory.GetRequiredService<AppCaches>().RuntimeCache);
