@@ -226,7 +226,7 @@ public class NewDefaultUrlProvider : IUrlProvider
     {
         if (string.IsNullOrWhiteSpace(route) || route.Equals("#"))
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
             {
                 _logger.LogDebug(
                 "Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.",
@@ -248,8 +248,16 @@ public class NewDefaultUrlProvider : IUrlProvider
                 current,
                 culture);
 
-        var url = AssembleUrl(domainUri, path, current, mode).ToString();
-        return UrlInfo.Url(url, culture);
+        var defaultCulture = _localizationService.GetDefaultLanguageIsoCode();
+        if (domainUri is not null ||
+            string.IsNullOrEmpty(culture) ||
+            culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
+        {
+            var url = AssembleUrl(domainUri, path, current, mode).ToString();
+            return UrlInfo.Url(url, culture);
+        }
+
+        return null;
     }
 
     #endregion
