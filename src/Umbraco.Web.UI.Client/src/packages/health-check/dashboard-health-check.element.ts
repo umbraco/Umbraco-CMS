@@ -1,7 +1,7 @@
 import type { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element.js';
 import { UmbHealthCheckDashboardContext, UMB_HEALTHCHECK_DASHBOARD_CONTEXT } from './health-check-dashboard.context.js';
 import type { ManifestHealthCheck } from './health-check.extension.js';
-import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { HealthCheckGroupResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthCheckService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
@@ -35,14 +35,14 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.provideContext(UMB_HEALTHCHECK_DASHBOARD_CONTEXT, this._healthCheckDashboardContext);
 
 		this.observe(umbExtensionsRegistry.byType('healthCheck'), (healthCheckManifests) => {
 			this._healthCheckDashboardContext.manifests = healthCheckManifests;
 		});
 	}
 
-	protected override firstUpdated() {
+	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
+		super.firstUpdated(_changedProperties);
 		this.#registerHealthChecks();
 	}
 
