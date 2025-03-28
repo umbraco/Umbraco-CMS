@@ -6,6 +6,7 @@ import {
 	type UmbReferenceModel,
 	isDocumentReference,
 	isMediaReference,
+	isMemberReference,
 	isDefaultReference,
 } from '@umbraco-cms/backoffice/relations';
 
@@ -60,6 +61,9 @@ export class UmbDocumentReferenceTableElement extends UmbLitElement {
 		}
 		if (isMediaReference(item)) {
 			return item.mediaType.icon ?? 'icon-picture';
+		}
+		if (isMemberReference(item)) {
+			return item.memberType.icon ?? 'icon-user';
 		}
 		if (isDefaultReference(item)) {
 			return item.icon ?? 'icon-document';

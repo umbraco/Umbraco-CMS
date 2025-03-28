@@ -7,22 +7,22 @@ using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Document.References;
+namespace Umbraco.Cms.Api.Management.Controllers.Member.References;
 
 [ApiVersion("1.0")]
-public class ReferencedByDocumentController : DocumentControllerBase
+public class ReferencedByMemberController : MemberControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
 
-    public ReferencedByDocumentController(ITrackedReferencesService trackedReferencesService, IRelationTypePresentationFactory relationTypePresentationFactory)
+    public ReferencedByMemberController(ITrackedReferencesService trackedReferencesService, IRelationTypePresentationFactory relationTypePresentationFactory)
     {
         _trackedReferencesService = trackedReferencesService;
         _relationTypePresentationFactory = relationTypePresentationFactory;
     }
 
     /// <summary>
-    ///     Gets a paged list of tracked references for the current item, so you can see where an item is being used.
+    ///     Gets a page list of tracked references for the current item, so you can see where an item is being used.
     /// </summary>
     /// <remarks>
     ///     Used by info tabs on content, media etc. and for the delete and unpublish of single items.

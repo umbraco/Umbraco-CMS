@@ -7,22 +7,22 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Document.References;
+namespace Umbraco.Cms.Api.Management.Controllers.Member.References;
 
 [ApiVersion("1.0")]
-public class ReferencedDescendantsDocumentController : DocumentControllerBase
+public class ReferencedDescendantsMemberController : MemberControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesSkipTakeService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public ReferencedDescendantsDocumentController(ITrackedReferencesService trackedReferencesSkipTakeService, IUmbracoMapper umbracoMapper)
+    public ReferencedDescendantsMemberController(ITrackedReferencesService trackedReferencesSkipTakeService, IUmbracoMapper umbracoMapper)
     {
         _trackedReferencesSkipTakeService = trackedReferencesSkipTakeService;
         _umbracoMapper = umbracoMapper;
     }
 
     /// <summary>
-    ///     Gets a paged list of the descendant nodes of the current item used in any kind of relation.
+    ///     Gets a page list of the child nodes of the current item used in any kind of relation.
     /// </summary>
     /// <remarks>
     ///     Used when deleting and unpublishing a single item to check if this item has any descending items that are in any
