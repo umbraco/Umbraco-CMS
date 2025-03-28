@@ -103,7 +103,7 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 		// Note we are not removing the event listener in the hostDisconnected, therefor we do it here [NL].
 		this.#eventTarget?.removeEventListener(UMB_CONTEXT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
 		this.#eventTarget?.removeEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this.#handleDebugContextRequest);
-		// We do not want to call a destroy method on the instance, cause maybe it should be re-provided later on. [NL]
+		// We do not want to call a destroy method on the instance, because maybe it should be re-provided later on. [NL]
 		this.#instance = undefined;
 		(this.#eventTarget as unknown) = undefined;
 	}
