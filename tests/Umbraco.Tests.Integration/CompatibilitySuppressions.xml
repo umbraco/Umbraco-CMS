@@ -80,6 +80,13 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.UserServiceCrudTests.Cannot_Request_Disabled_If_Hidden(Umbraco.Cms.Core.Models.Membership.UserState)</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentPublishingServiceTests.Publish_Branch_Does_Not_Publish_Unpublished_Children_Unless_Explicitly_Instructed_To(System.Boolean)</Target>
     <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>

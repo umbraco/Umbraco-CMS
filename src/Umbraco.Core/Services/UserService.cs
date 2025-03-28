@@ -1288,7 +1288,6 @@ internal partial class UserService : RepositoryService, IUserService
             includedUserGroupAliases = userGroupKeyConversionAttempt.Result.ToArray();
         }
 
-
         if (mergedFilter.NameFilters is not null)
         {
             foreach (var nameFilter in mergedFilter.NameFilters)
@@ -1307,16 +1306,18 @@ internal partial class UserService : RepositoryService, IUserService
         }
         else
         {
-            includeUserStates = new HashSet<UserState>(filter.IncludeUserStates!);
-            includeUserStates.IntersectWith(baseFilter.IncludeUserStates);
+            includeUserStates = new HashSet<UserState>(baseFilter.IncludeUserStates);
+            if (filter.IncludeUserStates is not null && filter.IncludeUserStates.Contains(UserState.All) is false)
+            {
+                includeUserStates.IntersectWith(filter.IncludeUserStates);
+            }
 
             // This means that we've only chosen to include a user state that is not allowed, so we'll return an empty result
-            if(includeUserStates.Count == 0)
+            if (includeUserStates.Count == 0)
             {
                 return Attempt.SucceedWithStatus(UserOperationStatus.Success, new PagedModel<IUser>());
             }
         }
-
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize);
         Expression<Func<IUser, object?>> orderByExpression = GetOrderByExpression(orderBy);
