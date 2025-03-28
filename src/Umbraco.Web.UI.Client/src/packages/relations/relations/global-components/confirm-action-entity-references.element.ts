@@ -1,4 +1,4 @@
-import type { UmbEntityReferenceRepository, UmbReferenceItemModel } from '../../reference/types.js';
+import type { UmbEntityReferenceRepository, UmbReferenceItemModel } from '../reference/types.js';
 import {
 	html,
 	customElement,
@@ -162,8 +162,6 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 		`,
 	];
 }
-
-export { UmbConfirmActionModalEntityReferencesElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

@@ -15,9 +15,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
-// import of local component
-import '../../local-components/confirm-bulk-action-entity-references.element.js';
-
 @customElement('umb-bulk-delete-with-relation-confirm-modal')
 export class UmbBulkDeleteWithRelationConfirmModalElement extends UmbModalBaseElement<
 	UmbBulkDeleteWithRelationConfirmModalData,

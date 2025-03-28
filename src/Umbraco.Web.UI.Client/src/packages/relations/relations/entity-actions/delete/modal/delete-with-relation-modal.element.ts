@@ -17,8 +17,6 @@ import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
-import '../../local-components/confirm-action-entity-references.element.js';
-
 @customElement('umb-delete-with-relation-confirm-modal')
 export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElement<
 	UmbDeleteWithRelationConfirmModalData,
