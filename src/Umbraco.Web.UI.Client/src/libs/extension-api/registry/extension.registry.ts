@@ -139,6 +139,7 @@ export class UmbExtensionRegistry<
 	#appendAdditionalConditions(manifest: ManifestTypes) {
 		const newConditions = this.#additionalConditions.get(manifest.alias);
 		if (newConditions) {
+			manifest = { ...manifest };
 			// Append the condition to the extensions conditions array
 			if ((manifest as ManifestWithDynamicConditions).conditions) {
 				for (const condition of newConditions) {
@@ -608,7 +609,7 @@ export class UmbExtensionRegistry<
 			existingConditionsToBeAdded ? [...existingConditionsToBeAdded, ...newConditions] : newConditions,
 		);
 
-		const allExtensions = this._extensions.getValue();
+		const allExtensions = [...this._extensions.getValue()];
 		for (const extension of allExtensions) {
 			if (extension.alias === alias) {
 				// Replace the existing extension with the updated one
