@@ -1,6 +1,9 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
-import { UmbDocumentReferenceRepository } from '../../../reference/index.js';
-import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../../global-contexts/index.js';
+import {
+	UMB_DOCUMENT_ENTITY_TYPE,
+	UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
+	UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
+} from '../../../constants.js';
 import type {
 	UmbDocumentUnpublishModalData,
 	UmbDocumentUnpublishModalValue,
@@ -30,16 +33,12 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	UmbDocumentUnpublishModalValue
 > {
 	protected readonly _selectionManager = new UmbSelectionManager<string>(this);
-	#referencesRepository = new UmbDocumentReferenceRepository(this);
 
 	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
 
 	@state()
 	_selection: Array<string> = [];
-
-	@state()
-	_hasReferences = false;
 
 	@state()
 	_hasUnpublishPermission = true;
@@ -50,6 +49,9 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	@state()
 	_isInvariant = false;
 
+	@state()
+	_referencesConfig?: any;
+
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
 		if (!option.variant) {
 			return false;
@@ -58,7 +60,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	};
 
 	override firstUpdated() {
-		this.#getReferences();
+		this.#configureReferences();
 
 		// If invariant, don't display the variant selection component.
 		if (this.data?.options.length === 1 && this.data.options[0].unique === 'invariant') {
@@ -68,6 +70,17 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		}
 
 		this.#configureSelectionManager();
+	}
+
+	#configureReferences() {
+		if (!this.data) return;
+
+		this._referencesConfig = {
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
+			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
+			referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
+			unique: this.data.documentUnique,
+		};
 	}
 
 	async #configureSelectionManager() {
@@ -101,28 +114,6 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 			},
 			'observeSelection',
 		);
-	}
-
-	async #getReferences() {
-		if (!this.data?.documentUnique) return;
-
-		const { data, error } = await this.#referencesRepository.requestReferencedBy(this.data?.documentUnique, 0, 1);
-
-		if (error) {
-			console.error(error);
-			return;
-		}
-
-		if (!data) return;
-
-		this._hasReferences = data.total > 0;
-
-		// If there are references, we also want to check if we are allowed to unpublish the document:
-		if (this._hasReferences) {
-			const documentConfigurationContext = await this.getContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT);
-			this._hasUnpublishPermission =
-				(await documentConfigurationContext.getDocumentConfiguration())?.disableUnpublishWhenReferenced === false;
-		}
 	}
 
 	#submit() {
@@ -166,20 +157,11 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 				</umb-localize>
 			</p>
 
-			${this.data?.documentUnique
-				? html`
-						<umb-document-reference-table
-							id="references"
-							unique=${this.data?.documentUnique}></umb-document-reference-table>
-					`
-				: nothing}
-			${this._hasReferences
-				? html`<uui-box id="references-warning">
-						<umb-localize key="references_unpublishWarning">
-							This item or its descendants is being referenced. Unpublishing can lead to broken links on your website.
-							Please take the appropriate actions.
-						</umb-localize>
-					</uui-box>`
+			${this._referencesConfig
+				? html`<uui-box
+						><umb-confirm-action-modal-entity-references
+							.config=${this._referencesConfig}></umb-confirm-action-modal-entity-references
+					></uui-box>`
 				: nothing}
 
 			<div slot="actions">
