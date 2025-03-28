@@ -39,7 +39,7 @@ public class AreReferencedMemberController : MemberControllerBase
         int skip = 0,
         int take = 20)
     {
-        PagedModel<Guid> distinctByKeyItemsWithReferencedRelations = await _trackedReferencesSkipTakeService.GetPagedKeysWithDependentReferencesAsync(ids, Constants.ObjectTypes.Media, skip, take);
+        PagedModel<Guid> distinctByKeyItemsWithReferencedRelations = await _trackedReferencesSkipTakeService.GetPagedKeysWithDependentReferencesAsync(ids, Constants.ObjectTypes.Member, skip, take);
         var pagedViewModel = new PagedViewModel<ReferenceByIdModel>
         {
             Total = distinctByKeyItemsWithReferencedRelations.Total,
