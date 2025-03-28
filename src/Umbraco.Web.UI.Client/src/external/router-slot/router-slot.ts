@@ -205,8 +205,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 
 		if (navigate === undefined) {
 			if (this.isConnected) {
-				// If navigate is not determined, then we will check if we have a route match. If not then we will re-render. [NL]
-				//navigate = this._routeMatch === null;
+				// If navigate is not determined, then we will check if we have a route match, and if the new match is different from current. [NL]
 				const newMatch = this.getRouteMatch();
 				if (newMatch) {
 					if (this._routeMatch?.route.path !== newMatch.route.path) {
