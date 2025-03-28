@@ -1,14 +1,17 @@
+import { umbQueryMapperForJsonPaths } from '../../utils/query-mapper-json-paths.function.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '@umbraco-cms/backoffice/property';
-import { umbQueryMapperForJsonPaths } from '../../utils/query-mapper-json-paths.function.js';
 
 // Write interface that can be handed to the API for the Host, so each path Translator can communicate back to the host here. For translating inner values.
 export class UmbValidationPropertyPathTranslationController extends UmbControllerBase {
 	/**
 	 * translates the property data.
 	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} property - The property data.
+	 * @param paths
+	 * @param data
+	 * @param queryConstructor
 	 * @returns {Promise<UmbPropertyValueDataPotentiallyWithEditorAlias>} - A promise that resolves to the cloned property data.
 	 */
 	async translateProperties(
