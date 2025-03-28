@@ -186,7 +186,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IEntryAssemblyMetadata, EntryAssemblyMetadata>();
 
             this.AddAllCoreCollectionBuilders();
-            this.AddNotificationHandler<UmbracoApplicationStartingNotification, EssentialDirectoryCreator>();
 
             Services.AddSingleton<UmbracoRequestPaths>();
 

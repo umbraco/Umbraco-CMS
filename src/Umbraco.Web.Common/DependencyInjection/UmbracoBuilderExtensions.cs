@@ -59,6 +59,7 @@ using Umbraco.Cms.Web.Common.Mvc;
 using Umbraco.Cms.Web.Common.Preview;
 using Umbraco.Cms.Web.Common.Profiler;
 using Umbraco.Cms.Web.Common.Repositories;
+using Umbraco.Cms.Web.Common.Runtime;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
@@ -171,6 +172,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IPreviewTokenGenerator, UserBasedPreviewTokenGenerator>();
 
         builder.Services.AddSingleton<IFileSystemFactory, FileSystemFactory>();
+        builder.AddNotificationHandler<UmbracoApplicationStartingNotification, EssentialDirectoryCreator>();
 
         return builder;
     }
