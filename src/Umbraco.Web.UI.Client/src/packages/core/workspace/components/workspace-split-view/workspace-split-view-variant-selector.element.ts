@@ -1,5 +1,5 @@
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT } from './workspace-split-view.context.js';
-import { css, customElement, html, ifDefined, nothing, query, ref, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, query, ref, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -78,13 +78,13 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 			this.observe(
 				workspaceContext.variesBySegment,
-				(value) => (this._variesBySegment = value),
+				(value) => (this._variesBySegment = value ?? false),
 				'umbObserveVariesBySegment',
 			);
 
 			this.observe(
 				workspaceContext.variesByCulture,
-				(value) => (this._variesByCulture = value),
+				(value) => (this._variesByCulture = value ?? false),
 				'umbObserveVariesByCulture',
 			);
 		});

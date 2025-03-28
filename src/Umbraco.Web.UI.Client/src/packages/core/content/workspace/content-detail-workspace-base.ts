@@ -20,7 +20,6 @@ import {
 	type UmbPropertyTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
 import {
-	UMB_INVARIANT_CULTURE,
 	UmbVariantId,
 	type UmbEntityVariantModel,
 	type UmbEntityVariantOptionModel,
@@ -112,9 +111,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/* Content Type (Structure) Data */
 	public readonly structure;
-	public readonly variesByCulture;
-	public readonly variesBySegment;
-	public readonly varies;
+	public readonly variesByCulture: Observable<boolean | undefined>;
+	public readonly variesBySegment: Observable<boolean | undefined>;
+	public readonly varies: Observable<boolean | undefined>;
 
 	abstract readonly contentTypeUnique: Observable<string | undefined>;
 
