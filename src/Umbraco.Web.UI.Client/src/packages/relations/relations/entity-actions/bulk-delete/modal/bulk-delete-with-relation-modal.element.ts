@@ -1,3 +1,4 @@
+import type { UmbConfirmBulkActionModalEntityReferencesConfig } from '../../../global-components/types.js';
 import type {
 	UmbBulkDeleteWithRelationConfirmModalData,
 	UmbBulkDeleteWithRelationConfirmModalValue,
@@ -21,7 +22,7 @@ export class UmbBulkDeleteWithRelationConfirmModalElement extends UmbModalBaseEl
 	UmbBulkDeleteWithRelationConfirmModalValue
 > {
 	@state()
-	_referencesConfig?: any;
+	_referencesConfig?: UmbConfirmBulkActionModalEntityReferencesConfig;
 
 	protected override firstUpdated(_changedProperties: PropertyValues): void {
 		super.firstUpdated(_changedProperties);

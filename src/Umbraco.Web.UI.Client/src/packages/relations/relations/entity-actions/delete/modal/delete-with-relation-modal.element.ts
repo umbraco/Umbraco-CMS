@@ -1,3 +1,4 @@
+import type { UmbConfirmActionModalEntityReferencesConfig } from '../../../global-components/types.js';
 import type {
 	UmbDeleteWithRelationConfirmModalData,
 	UmbDeleteWithRelationConfirmModalValue,
@@ -26,7 +27,7 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElemen
 	_name?: string;
 
 	@state()
-	_referencesConfig?: any;
+	_referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
 
 	#itemRepository?: UmbItemRepository<any>;
 

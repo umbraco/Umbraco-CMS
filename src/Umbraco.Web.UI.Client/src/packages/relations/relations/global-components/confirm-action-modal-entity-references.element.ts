@@ -13,15 +13,16 @@ import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
+export interface UmbConfirmActionModalEntityReferencesConfig {
+	itemRepositoryAlias: string;
+	referenceRepositoryAlias: string;
+	unique: string;
+}
+
 @customElement('umb-confirm-action-modal-entity-references')
 export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
-	config?: {
-		itemRepositoryAlias: string;
-		referenceRepositoryAlias: string;
-		entityType: string;
-		unique: string;
-	};
+	config?: UmbConfirmActionModalEntityReferencesConfig;
 
 	@state()
 	_referencedByItems: Array<UmbReferenceItemModel> = [];
