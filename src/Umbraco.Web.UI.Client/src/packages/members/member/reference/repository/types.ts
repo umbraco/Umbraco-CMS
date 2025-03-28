@@ -1,4 +1,4 @@
-import type { UmbMemberItemVariantModel } from '../../repository/item/types.js';
+import type { UmbMemberItemVariantModel } from '../../item/types.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { TrackedReferenceMemberTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
