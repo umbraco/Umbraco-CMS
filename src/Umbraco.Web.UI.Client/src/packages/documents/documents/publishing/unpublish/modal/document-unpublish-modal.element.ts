@@ -1,9 +1,5 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
-import {
-	UMB_DOCUMENT_ENTITY_TYPE,
-	UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
-	UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
-} from '../../../constants.js';
+import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS } from '../../../constants.js';
 import type {
 	UmbDocumentUnpublishModalData,
 	UmbDocumentUnpublishModalValue,
@@ -12,6 +8,7 @@ import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffic
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbConfirmActionModalEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
 
 import '../../../modals/shared/document-variant-language-picker.element.js';
 
@@ -50,7 +47,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	_isInvariant = false;
 
 	@state()
-	_referencesConfig?: any;
+	_referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
 
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
 		if (!option.variant) {
@@ -73,10 +70,9 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	}
 
 	#configureReferences() {
-		if (!this.data) return;
+		if (!this.data?.documentUnique) return;
 
 		this._referencesConfig = {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
 			referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
 			unique: this.data.documentUnique,
