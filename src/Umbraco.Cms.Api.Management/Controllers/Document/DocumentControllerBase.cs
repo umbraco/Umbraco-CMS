@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Umbraco.Cms.Api.Management.Controllers.Content;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
@@ -17,6 +18,13 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public abstract class DocumentControllerBase : ContentControllerBase
 {
+    private readonly IHubContext<DocumentHub> _hubContext;
+
+    protected DocumentControllerBase(IHubContext<DocumentHub> hubContext)
+    {
+        _hubContext = hubContext;
+    }
+
     protected IActionResult DocumentNotFound()
         => OperationStatusResult(ContentEditingOperationStatus.NotFound, problemDetailsBuilder
             => NotFound(problemDetailsBuilder
@@ -186,4 +194,14 @@ public abstract class DocumentControllerBase : ContentControllerBase
                 .WithTitle("Unknown content query status.")
                 .Build()),
         });
+
+    protected async Task TrackUserVisitAsync(Guid documentId, string userId)
+    {
+        await _hubContext.Clients.Group(documentId.ToString()).SendAsync("UserVisited", userId);
+    }
+
+    protected async Task TrackUserNavigationAsync(Guid documentId, string userId)
+    {
+        await _hubContext.Clients.Group(documentId.ToString()).SendAsync("UserNavigated", userId);
+    }
 }

@@ -11,6 +11,7 @@ import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/ex
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UmbSysinfoRepository } from '@umbraco-cms/backoffice/sysinfo';
+import * as signalR from '@microsoft/signalr';
 
 export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 	#activeSectionAlias = new UmbStringState(undefined);
@@ -22,6 +23,8 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 
 	readonly #version = new UmbStringState(undefined);
 	public readonly version = this.#version.asObservable();
+
+	private hubConnection: signalR.HubConnection;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BACKOFFICE_CONTEXT);
@@ -35,6 +38,12 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 		});
 
 		this.#init();
+
+		this.hubConnection = new signalR.HubConnectionBuilder()
+			.withUrl("/hubs/document")
+			.build();
+
+		this.hubConnection.start().catch(err => console.error(err));
 	}
 
 	async #init() {
@@ -83,6 +92,14 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 		const version = await this.observe(this.version).asPromise();
 		const repository = new UmbSysinfoRepository(this);
 		return repository.serverUpgradeCheck(version);
+	}
+
+	public async trackUserVisit(documentId: string, userId: string) {
+		await this.hubConnection.invoke("TrackUserVisit", documentId, userId);
+	}
+
+	public async trackUserNavigation(documentId: string, userId: string) {
+		await this.hubConnection.invoke("TrackUserNavigation", documentId, userId);
 	}
 }
 
