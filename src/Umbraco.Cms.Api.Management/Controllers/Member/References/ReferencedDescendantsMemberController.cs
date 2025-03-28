@@ -45,6 +45,6 @@ public class ReferencedDescendantsMemberController : MemberControllerBase
             Items = _umbracoMapper.MapEnumerable<RelationItemModel, ReferenceByIdModel>(relationItems.Items),
         };
 
-        return await Task.FromResult(pagedViewModel);
+        return pagedViewModel;
     }
 }

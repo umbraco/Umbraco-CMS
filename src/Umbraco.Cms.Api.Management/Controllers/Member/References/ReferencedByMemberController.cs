@@ -45,6 +45,6 @@ public class ReferencedByMemberController : MemberControllerBase
             Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItems.Items),
         };
 
-        return await Task.FromResult(pagedViewModel);
+        return pagedViewModel;
     }
 }
