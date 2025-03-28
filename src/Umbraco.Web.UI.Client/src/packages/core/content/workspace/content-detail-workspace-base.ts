@@ -201,7 +201,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				if (!varies) {
 					return [
 						{
-							variant: variants.find((x) => x.culture === null && x.segment === null),
+							variant: variants.find((x) => new UmbVariantId(x.culture, x.segment).isInvariant()),
 							language: languages.find((x) => x.isDefault),
 							culture: null,
 							segment: null,
@@ -226,7 +226,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				// Only segment variation
 				if (!variesByCulture && variesBySegment) {
 					const invariantCulture = {
-						variant: variants.find((x) => x.culture === null && x.segment === null),
+						variant: variants.find((x) => new UmbVariantId(x.culture, x.segment).isInvariant()),
 						language: languages.find((x) => x.isDefault),
 						culture: null,
 						segment: null,
