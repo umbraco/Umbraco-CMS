@@ -17,8 +17,8 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 	implements UmbWorkspaceDataManager<ModelType>
 {
 	protected _varies?: boolean;
-	//#variesByCulture?: boolean;
-	//#variesBySegment?: boolean;
+	protected _variesByCulture?: boolean;
+	protected _variesBySegment?: boolean;
 
 	protected override _sortCurrentData<GivenType extends Partial<ModelType> = Partial<ModelType>>(
 		persistedData: Partial<ModelType>,
@@ -60,14 +60,14 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 		}
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	setVariesByCulture(vary: boolean | undefined) {
-		//this.#variesByCulture = vary;
+		this._variesByCulture = vary;
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 	setVariesBySegment(vary: boolean | undefined) {
-		//this.#variesBySegment = vary;
+		this._variesBySegment = vary;
 	}
+
 	setVaries(vary: boolean | undefined) {
 		this._varies = vary;
 	}

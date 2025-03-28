@@ -54,41 +54,71 @@ export class UmbContentWorkspaceDataManager<
 	}
 
 	updateVariantData(variantId: UmbVariantId, update?: Partial<ModelVariantType>) {
+		if (!this.#variantScaffold) throw new Error('Variant scaffold data is missing');
+
+		if (this._variesByCulture === true) {
+			// If variant Id is invariant, we don't to have the variant appended to our data.
+			if (variantId.isInvariant()) {
+				return;
+			}
+
+			this.#updateVariantData(variantId, update);
+			return;
+		}
+
+		if (this._variesBySegment === true) {
+			// When varying by segment we need to handle the "unsegmented" variant as invariant.
+			// The rest of the segmented variants will be handled as normal variant data.
+			if (variantId.isInvariant()) {
+				this.#updateInvariantData(update);
+			} else {
+				this.#updateVariantData(variantId, update);
+			}
+			return;
+		}
+
+		if (this._varies === false) {
+			this.#updateInvariantData(update);
+			return;
+		}
+
+		throw new Error('Varies by culture is missing');
+	}
+
+	#updateVariantData(variantId: UmbVariantId, update?: Partial<ModelVariantType>) {
 		const currentData = this.getCurrent();
 		if (!currentData) throw new Error('Data is missing');
-		if (!this.#variantScaffold) throw new Error('Variant scaffold data is missing');
-		if (this._varies === true) {
-			// If variant Id is invariant, we don't to have the variant appended to our data.
-			if (variantId.isInvariant()) return;
-			const variant = currentData.variants.find((x) => variantId.compare(x));
-			const newVariants = appendToFrozenArray(
-				currentData.variants,
-				{
-					...this.#variantScaffold,
-					...variantId.toObject(),
-					...variant,
-					...update,
-				} as ModelVariantType,
-				(x) => variantId.compare(x),
-			) as Array<ModelVariantType>;
-			this.updateCurrent({ variants: newVariants } as unknown as ModelType);
-		} else if (this._varies === false) {
-			// TODO: Beware about segments, in this case we need to also consider segments, if its allowed to vary by segments.
-			const invariantVariantId = UmbVariantId.CreateInvariant();
-			const variant = currentData.variants.find((x) => invariantVariantId.compare(x));
-			// Cause we are invariant, we will just overwrite all variants with this one:
-			const newVariants = [
-				{
-					...this.#variantScaffold,
-					...invariantVariantId.toObject(),
-					...variant,
-					...update,
-				} as ModelVariantType,
-			];
-			this.updateCurrent({ variants: newVariants } as unknown as ModelType);
-		} else {
-			throw new Error('Varies by culture is missing');
-		}
+
+		const variant = currentData.variants.find((x) => variantId.compare(x));
+		const newVariants = appendToFrozenArray(
+			currentData.variants,
+			{
+				...this.#variantScaffold,
+				...variantId.toObject(),
+				...variant,
+				...update,
+			} as ModelVariantType,
+			(x) => variantId.compare(x),
+		) as Array<ModelVariantType>;
+		this.updateCurrent({ variants: newVariants } as unknown as ModelType);
+	}
+
+	#updateInvariantData(update?: Partial<ModelVariantType>) {
+		const currentData = this.getCurrent();
+		if (!currentData) throw new Error('Data is missing');
+
+		const invariantVariantId = UmbVariantId.CreateInvariant();
+		const variant = currentData.variants.find((x) => invariantVariantId.compare(x));
+		// Cause we are invariant, we will just overwrite all variants with this one:
+		const newVariants = [
+			{
+				...this.#variantScaffold,
+				...invariantVariantId.toObject(),
+				...variant,
+				...update,
+			} as ModelVariantType,
+		];
+		this.updateCurrent({ variants: newVariants } as unknown as ModelType);
 	}
 
 	getChangedVariants() {
