@@ -22,6 +22,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 
 	constructor(host: UmbControllerHost, args: UmbMenuTreeStructureWorkspaceContextBaseArgs) {
 		// TODO: set up context token
+		// TODO: Use UmbWorkspaceContext as Context Alias and then an additional Api Alias. (aim to do this for v.16) [NL]
 		super(host, 'UmbMenuStructureWorkspaceContext');
 		this.#args = args;
 
