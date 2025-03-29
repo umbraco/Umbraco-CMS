@@ -62,6 +62,31 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	}
 
 	/**
+	 * @function has
+	 * @param {unknown} unique - The unique value to remove.
+	 * @returns {boolean} true if an entry with the given unique exists.
+	 * @description - Test if a entry with the given unique exists in this Subject.
+	 * @example <caption>Example test for entry with id '2' and '3'</caption>
+	 * const data = [
+	 * 	{ id: 1, value: 'foo'},
+	 * 	{ id: 2, value: 'bar'}
+	 * ];
+	 * const myState = new UmbArrayState(data, (x) => x.id);
+	 * myState.has(2);// true
+	 * myState.has(3);// false
+	 */
+	has(unique: unknown): boolean {
+		if (this.getUniqueMethod) {
+			const current = this.getValue();
+			if (!current) return false;
+			return current.some((x) => {
+				return this.getUniqueMethod(x) === unique;
+			});
+		}
+		return false;
+	}
+
+	/**
 	 * @function remove
 	 * @param {unknown[]} uniques - The unique values to remove.
 	 * @returns {UmbArrayState<T>} Reference to it self.

@@ -44,6 +44,13 @@ describe('ArrayState', () => {
 		});
 	});
 
+	it('has method, return true when key exists', () => {
+		expect(subject.has('2')).to.be.true;
+	});
+	it('has method, return false when key does not exists', () => {
+		expect(subject.has('1337')).to.be.true;
+	});
+
 	it('filter method, removes anything that is not true of the given predicate method', (done) => {
 		const expectedData = [initialData[0], initialData[2]];
 
