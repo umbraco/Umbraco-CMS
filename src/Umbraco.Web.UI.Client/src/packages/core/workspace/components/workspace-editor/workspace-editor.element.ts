@@ -11,13 +11,12 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 /**
  * @element umb-workspace-editor
  * @description
- * @slot icon - Slot for icon
  * @slot header - Slot for workspace header
- * @slot name - Slot for name
- * @slot footer - Slot for workspace footer
+ * @slot action-menu - Slot for workspace header
+ * @slot footer-info - Slot for workspace footer
  * @slot actions - Slot for workspace footer actions
  * @slot - slot for main content
- * @class UmbWorkspaceEditor
+ * @class UmbWorkspaceEditorElement
  * @augments {UmbLitElement}
  */
 @customElement('umb-workspace-editor')
