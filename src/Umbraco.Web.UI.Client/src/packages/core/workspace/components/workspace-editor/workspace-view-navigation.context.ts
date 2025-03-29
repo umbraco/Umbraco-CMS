@@ -11,13 +11,14 @@ export class UmbWorkspaceViewNavigationContext extends UmbContextBase<
 	typeof UMB_WORKSPACE_VIEW_NAVIGATION_CONTEXT
 > {
 	//
+	#init: Promise<void>;
 	#views = new UmbBasicState(<Array<UmbWorkspaceViewContext>>[]);
 	public readonly views = this.#views.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_WORKSPACE_VIEW_NAVIGATION_CONTEXT);
 
-		new UmbExtensionsManifestInitializer(
+		this.#init = new UmbExtensionsManifestInitializer(
 			this,
 			umbExtensionsRegistry,
 			'workspaceView',
@@ -30,17 +31,27 @@ export class UmbWorkspaceViewNavigationContext extends UmbContextBase<
 					(view) => !workspaceViews.some((x) => x.manifest.alias === view.manifest.alias),
 				);
 
+				let hasDif = newViews.length !== oldViews.length;
+
 				// Add ones that are new:
 				workspaceViews
 					.filter((view) => !newViews.some((x) => x.manifest.alias === view.manifest.alias))
 					.forEach((view) => {
 						newViews.push(new UmbWorkspaceViewContext(this, view.manifest));
+						hasDif = true;
 					});
 
-				this.#views.setValue(newViews);
+				if (hasDif) {
+					this.#views.setValue(newViews);
+				}
 			},
 			'initViewApis',
 			{},
-		);
+		).asPromise();
+	}
+
+	async getViewContext(alias: string): Promise<UmbWorkspaceViewContext | undefined> {
+		await this.#init;
+		return this.#views.getValue().find((view) => view.manifest.alias === alias);
 	}
 }

@@ -5,7 +5,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import { UmbWorkspaceViewNavigationContext } from './workspace-view-navigation.context.js';
-import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
+import type { UmbWorkspaceViewNavigationState, UmbWorkspaceViewContext } from './workspace-view.context.js';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * @element umb-workspace-editor
@@ -22,7 +23,9 @@ import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
 @customElement('umb-workspace-editor')
 export class UmbWorkspaceEditorElement extends UmbLitElement {
 	//
+	// TODO: Concider making the NavigationContext host on Workspace level instead, but that would be breaking as well.
 	#navigationContext = new UmbWorkspaceViewNavigationContext(this);
+	#workspaceViewStateObservers: Array<UmbObserverController> = [];
 
 	@property()
 	public headline = '';
@@ -43,6 +46,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	private _workspaceViews: Array<UmbWorkspaceViewContext> = [];
 
 	@state()
+	private _hintMap: Map<string, UmbWorkspaceViewNavigationState> = new Map();
+
+	@state()
 	private _routes?: UmbRoute[];
 
 	@state()
@@ -57,7 +63,19 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		this.observe(
 			this.#navigationContext.views,
 			(views) => {
+				this.#workspaceViewStateObservers.forEach((observer) => observer.destroy());
+				this._hintMap = new Map();
 				this._workspaceViews = views;
+				this.#workspaceViewStateObservers = views.map((view, index) =>
+					this.observe(
+						view.hint,
+						(state) => {
+							this._hintMap.set(view.manifest.alias, state);
+							this.requestUpdate('_states');
+						},
+						'umbObserveState_' + index,
+					),
+				);
 				this._createRoutes();
 			},
 			'observeWorkspaceViews',
@@ -127,15 +145,22 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 								(view, index) => {
 									const manifest = view.manifest;
 									const displayName = manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
+									const hint = this._hintMap.get(manifest.alias);
 									// Notice how we use index 0 to determine which workspace that is active with empty path. [NL]
-									html`
+									return html`
 										<uui-tab
 											href="${this._routerPath}/view/${manifest.meta.pathname}"
-											.label="${displayName}"
+											.label=${displayName}
 											?active=${'view/' + manifest.meta.pathname === this._activePath ||
 											(index === 0 && this._activePath === '')}
 											data-mark="workspace:view-link:${manifest.alias}">
-											<umb-icon slot="icon" name=${manifest.meta.icon}></umb-icon>
+											<div slot="icon">
+												<umb-icon name=${manifest.meta.icon}></umb-icon> ${hint
+													? html`<uui-badge .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+															>${hint.text}</uui-badge
+														>`
+													: nothing}
+											</div>
 											${displayName}
 										</uui-tab>
 									`;
@@ -205,6 +230,18 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				--uui-tab-divider: var(--uui-color-border);
 				border-left: 1px solid var(--uui-color-border);
 				border-right: 1px solid var(--uui-color-border);
+			}
+
+			div[slot='icon'] {
+				position: relative;
+			}
+
+			uui-badge {
+				position: absolute;
+				font-size: var(--uui-type-small-size);
+				top: -0.5em;
+				right: auto;
+				left: calc(50% + 0.8em);
 			}
 
 			umb-extension-slot[slot='actions'] {
