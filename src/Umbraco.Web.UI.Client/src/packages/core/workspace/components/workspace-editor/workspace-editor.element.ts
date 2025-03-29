@@ -1,11 +1,11 @@
-import type { ManifestWorkspaceView } from '../../extensions/types.js';
 import { UMB_WORKSPACE_VIEW_PATH_PATTERN } from '../../paths.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { createExtensionElement, UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
+import { UmbWorkspaceViewNavigationContext } from './workspace-view-navigation.context.js';
+import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
 
 /**
  * @element umb-workspace-editor
@@ -21,6 +21,9 @@ import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from 
  */
 @customElement('umb-workspace-editor')
 export class UmbWorkspaceEditorElement extends UmbLitElement {
+	//
+	#navigationContext = new UmbWorkspaceViewNavigationContext(this);
+
 	@property()
 	public headline = '';
 
@@ -37,7 +40,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	public loading = false;
 
 	@state()
-	private _workspaceViews: Array<ManifestWorkspaceView> = [];
+	private _workspaceViews: Array<UmbWorkspaceViewContext> = [];
 
 	@state()
 	private _routes?: UmbRoute[];
@@ -51,23 +54,29 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'workspaceView', null, (workspaceViews) => {
-			this._workspaceViews = workspaceViews.map((view) => view.manifest);
-			this._createRoutes();
-		});
+		this.observe(
+			this.#navigationContext.views,
+			(views) => {
+				this._workspaceViews = views;
+				this._createRoutes();
+			},
+			'observeWorkspaceViews',
+		);
 	}
 
 	private _createRoutes() {
 		let newRoutes: UmbRoute[] = [];
 
 		if (this._workspaceViews.length > 0) {
-			newRoutes = this._workspaceViews.map((manifest) => {
+			newRoutes = this._workspaceViews.map((context) => {
+				const manifest = context.manifest;
 				return {
 					path: UMB_WORKSPACE_VIEW_PATH_PATTERN.generateLocal({ viewPathname: manifest.meta.pathname }),
 					component: () => createExtensionElement(manifest),
-					setup: (component) => {
+					setup: (component: any) => {
 						if (component) {
-							(component as any).manifest = manifest;
+							component.manifest = manifest;
+							context.provideAt(component);
 						}
 					},
 				} as UmbRoute;
@@ -114,20 +123,23 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 						<uui-tab-group slot="navigation" data-mark="workspace:view-links">
 							${repeat(
 								this._workspaceViews,
-								(view) => view.alias,
-								(view, index) =>
+								(view) => view.manifest.alias,
+								(view, index) => {
+									const manifest = view.manifest;
+									const displayName = manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
 									// Notice how we use index 0 to determine which workspace that is active with empty path. [NL]
 									html`
 										<uui-tab
-											href="${this._routerPath}/view/${view.meta.pathname}"
-											.label="${view.meta.label ? this.localize.string(view.meta.label) : view.name}"
-											?active=${'view/' + view.meta.pathname === this._activePath ||
+											href="${this._routerPath}/view/${manifest.meta.pathname}"
+											.label="${displayName}"
+											?active=${'view/' + manifest.meta.pathname === this._activePath ||
 											(index === 0 && this._activePath === '')}
-											data-mark="workspace:view-link:${view.alias}">
-											<umb-icon slot="icon" name=${view.meta.icon}></umb-icon>
-											${view.meta.label ? this.localize.string(view.meta.label) : view.name}
+											data-mark="workspace:view-link:${manifest.alias}">
+											<umb-icon slot="icon" name=${manifest.meta.icon}></umb-icon>
+											${displayName}
 										</uui-tab>
-									`,
+									`;
+								},
 							)}
 						</uui-tab-group>
 					`
