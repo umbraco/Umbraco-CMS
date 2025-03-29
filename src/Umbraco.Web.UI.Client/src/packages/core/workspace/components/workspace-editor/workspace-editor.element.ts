@@ -27,7 +27,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	// TODO: Or make another broader context for the Workspace that can host hints across cultures. — Cause if you like an Extension Type Context that is for each culture, then such would be able to host hints for each culture.
 	// But then again Hints should be able to be replicated when opening a Document, meaning the responsible for them is a Workspace Context. This will then set hints, and in this case it should be able to append a culture or segment, or make it wider than such.
 	// Then these should been observe here in the workspace-editor(here), for the current culture and segment? and also for the invariant culture. (not invariant/default segment)
-	// This would mean that the WorkspaceEditor would have a WorkspaceNavigationContext, and that would be able to host hints for each culture and segment. And then this one should not have a WorkspaceViewNavigationContext, the WorkspaceViewContext should also go away but a WorkspaceViewNavigationContext should exist and this should support begin provided at multiple elements cause we need to think about Split View.
+	// This would mean that the Workspace would have a WorkspaceNavigationContext, and that would be able to host hints for each culture and segment. And then this one should not have a WorkspaceViewNavigationContext, the WorkspaceViewContext should also go away but a WorkspaceViewNavigationContext should exist and this should support begin provided at multiple elements cause we need to think about Split View.
 	#navigationContext = new UmbWorkspaceViewNavigationContext(this);
 	#workspaceViewStateObservers: Array<UmbObserverController> = [];
 
