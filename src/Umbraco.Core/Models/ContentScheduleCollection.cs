@@ -64,7 +64,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     public static ContentScheduleCollection CreateWithEntry(DateTime? release, DateTime? expire)
     {
         var schedule = new ContentScheduleCollection();
-        schedule.Add(Constants.System.InvariantCulture, release, expire);
+        schedule.Add(string.Empty, release, expire);
         return schedule;
     }
 
@@ -98,7 +98,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// </summary>
     /// <param name="releaseDate"></param>
     /// <param name="expireDate"></param>
-    public bool Add(DateTime? releaseDate, DateTime? expireDate) => Add(Constants.System.InvariantCulture, releaseDate, expireDate);
+    public bool Add(DateTime? releaseDate, DateTime? expireDate) => Add(string.Empty, releaseDate, expireDate);
 
     /// <summary>
     ///     Adds a new schedule for a culture
@@ -170,11 +170,10 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
         }
     }
 
-    public void RemoveIfExists(string culture, ContentScheduleAction action)
+    internal void RemoveIfExists(string culture, ContentScheduleAction action)
     {
-        ContentSchedule? changeToRemove = FullSchedule.FirstOrDefault(change =>
-            change.Culture == culture
-            && change.Action == action);
+        ContentSchedule? changeToRemove = FullSchedule.FirstOrDefault(schedule =>
+            MatchingScheduleTakingIntoAccountDifferentInvariantNotations(schedule, culture, action));
         if (changeToRemove is not null)
         {
             Remove(changeToRemove);
@@ -184,9 +183,8 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     public void AddOrUpdate(string culture, DateTime dateTime, ContentScheduleAction action)
     {
         // we need to remove the old one as ContentSchedule.Date is immutable
-        ContentSchedule? changeToRemove = FullSchedule.FirstOrDefault(change =>
-            change.Culture == culture
-            && change.Action == action);
+        ContentSchedule? changeToRemove = FullSchedule.FirstOrDefault(schedule =>
+            MatchingScheduleTakingIntoAccountDifferentInvariantNotations(schedule, culture, action));
 
         if (changeToRemove is not null)
         {
@@ -196,13 +194,29 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
         Add(new ContentSchedule(culture, dateTime, action));
     }
 
+    private bool MatchingScheduleTakingIntoAccountDifferentInvariantNotations(ContentSchedule change, string culture,
+        ContentScheduleAction action)
+    {
+        if (change.Action != action)
+        {
+            return false;
+        }
+
+        if (culture is "" or "*")
+        {
+            return change.Culture is "" or "*";
+        }
+
+        return change.Culture == culture;
+    }
+
     /// <summary>
     ///     Clear all of the scheduled change type for invariant content
     /// </summary>
     /// <param name="action"></param>
     /// <param name="changeDate">If specified, will clear all entries with dates less than or equal to the value</param>
     public void Clear(ContentScheduleAction action, DateTime? changeDate = null) =>
-        Clear(Constants.System.InvariantCulture, action, changeDate);
+        Clear(string.Empty, action, changeDate);
 
     /// <summary>
     ///     Clear all of the scheduled change type for the culture
@@ -252,7 +266,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// </summary>
     /// <returns></returns>
     public IEnumerable<ContentSchedule> GetSchedule(ContentScheduleAction? action = null) =>
-        GetSchedule(Constants.System.InvariantCulture, action);
+        GetSchedule(string.Empty, action);
 
     /// <summary>
     ///     Gets the schedule for a culture

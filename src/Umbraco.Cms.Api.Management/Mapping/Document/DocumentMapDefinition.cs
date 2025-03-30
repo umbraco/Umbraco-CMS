@@ -140,5 +140,5 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         }
     }
 
-    private static bool IsInvariant(string? culture) => culture.IsNullOrWhiteSpace() || culture == Core.Constants.System.InvariantCulture;
+    private static bool IsInvariant(string? culture) => culture.IsNullOrWhiteSpace() || culture == string.Empty;
 }

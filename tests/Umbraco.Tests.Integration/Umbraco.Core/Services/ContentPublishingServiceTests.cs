@@ -122,7 +122,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
 
         var publishAttempt = await ContentPublishingService.PublishAsync(
             setupData.Key,
-            new List<CulturePublishScheduleModel> { new() { Culture = Constants.System.InvariantCulture } },
+            new List<CulturePublishScheduleModel> { new() { Culture = null } },
             Constants.Security.SuperUserKey);
 
         Assert.IsFalse(publishAttempt.Success);
@@ -140,7 +140,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
 
         var publishAttempt = await ContentPublishingService.PublishAsync(
             setupData.Key,
-            new List<CulturePublishScheduleModel> { new() { Culture = Constants.System.InvariantCulture } },
+            new List<CulturePublishScheduleModel> { new() { Culture = null} },
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(publishAttempt.Success);
@@ -233,7 +233,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             {
                 new()
                 {
-                    Culture = Constants.System.InvariantCulture,
+                    Culture = null,
                     Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
             },
@@ -250,7 +250,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             Assert.IsNull(content!.PublishDate);
             Assert.AreEqual(
                 _schedulePublishDate,
-                schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Release).Single().Date);
+                schedules.GetSchedule(string.Empty, ContentScheduleAction.Release).Single().Date);
             Assert.AreEqual(1, schedules.FullSchedule.Count);
         });
     }
@@ -451,7 +451,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             {
                 new()
                 {
-                    Culture = Constants.System.InvariantCulture,
+                    Culture = null,
                     Schedule = new ContentScheduleModel { UnpublishDate = _scheduleUnPublishDate },
                 },
             },
@@ -468,7 +468,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             Assert.IsNull(content!.PublishDate);
             Assert.AreEqual(
                 _scheduleUnPublishDate,
-                schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Expire).Single().Date);
+                schedules.GetSchedule(string.Empty, ContentScheduleAction.Expire).Single().Date);
             Assert.AreEqual(1, schedules.FullSchedule.Count);
         });
     }
@@ -677,7 +677,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             {
                 new()
                 {
-                    Culture = Constants.System.InvariantCulture,
+                    Culture = null,
                     Schedule = new ContentScheduleModel { UnpublishDate = _scheduleUnPublishDate },
                 },
             },
@@ -692,8 +692,8 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
         {
             Assert.AreEqual(0, content!.PublishedCultures.Count());
             Assert.IsNull(content!.PublishDate);
-            Assert.IsFalse(schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Release).Any());
-            Assert.IsTrue(schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Expire).Any());
+            Assert.IsFalse(schedules.GetSchedule(string.Empty, ContentScheduleAction.Release).Any());
+            Assert.IsTrue(schedules.GetSchedule(string.Empty, ContentScheduleAction.Expire).Any());
             Assert.AreEqual(1, schedules.FullSchedule.Count);
         });
     }
@@ -922,7 +922,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             {
                 new()
                 {
-                    Culture = Constants.System.InvariantCulture,
+                    Culture = null,
                     Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
             },
@@ -937,8 +937,8 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
         {
             Assert.AreEqual(0, content!.PublishedCultures.Count());
             Assert.IsNull(content!.PublishDate);
-            Assert.IsFalse(schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Expire).Any());
-            Assert.IsTrue(schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Release).Any());
+            Assert.IsFalse(schedules.GetSchedule(string.Empty, ContentScheduleAction.Expire).Any());
+            Assert.IsTrue(schedules.GetSchedule(string.Empty, ContentScheduleAction.Release).Any());
             Assert.AreEqual(1, schedules.FullSchedule.Count);
         });
     }
@@ -1166,7 +1166,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             {
                 new()
                 {
-                    Culture = Constants.System.InvariantCulture,
+                    Culture = null,
                     Schedule = new ContentScheduleModel(),
                 },
             },
@@ -1544,7 +1544,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             {
                 new()
                 {
-                    Culture = Constants.System.InvariantCulture,
+                    Culture = null,
                     Schedule =
                         new ContentScheduleModel
                         {

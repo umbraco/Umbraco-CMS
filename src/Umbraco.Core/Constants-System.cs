@@ -89,7 +89,5 @@ public static partial class Constants
         /// The DataDirectory placeholder.
         /// </summary>
         public const string DataDirectoryPlaceholder = "|DataDirectory|";
-
-        public const string InvariantCulture = "*";
     }
 }
