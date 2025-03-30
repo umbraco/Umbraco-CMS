@@ -157,7 +157,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<umb-body-layout headline=${this.localize.term('general_scheduledPublishing')}>
+		return html`<uui-dialog-layout headline=${this.localize.term('general_scheduledPublishing')}>
 			<p id="subtitle">
 				${when(
 					this._options.length > 1,
@@ -184,7 +184,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 					?disabled=${!this._selection.length || this._hasNotSelectedMandatory}
 					@click=${this.#submit}></uui-button>
 			</div>
-		</umb-body-layout> `;
+		</uui-dialog-layout> `;
 	}
 
 	#renderOptions() {

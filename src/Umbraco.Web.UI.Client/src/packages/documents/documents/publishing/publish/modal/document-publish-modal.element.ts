@@ -88,7 +88,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<umb-body-layout headline=${this.localize.term('content_readyToPublish')}>
+		return html`<uui-dialog-layout headline=${this.localize.term('content_readyToPublish')}>
 			<p id="subtitle">
 				<umb-localize key="content_variantsToPublish">Which variants would you like to publish?</umb-localize>
 			</p>
@@ -107,7 +107,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 					?disabled=${this._hasNotSelectedMandatory}
 					@click=${this.#submit}></uui-button>
 			</div>
-		</umb-body-layout>`;
+		</uui-dialog-layout>`;
 	}
 
 	static override styles = [
