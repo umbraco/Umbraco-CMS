@@ -20,7 +20,7 @@ public partial class ContentEditingServiceTests
     [TestCase(false)]
     public async Task Can_Move_To_Recycle_Bin(bool variant)
     {
-        var content = await (variant ? CreateVariantContent() : CreateInvariantContent());
+        var content = await (variant ? CreateCultureVariantContent() : CreateInvariantContent());
         var result = await ContentEditingService.MoveToRecycleBinAsync(content.Key, Constants.Security.SuperUserKey);
 
         Assert.IsTrue(result.Success);
@@ -59,7 +59,7 @@ public partial class ContentEditingServiceTests
     [TestCase(false)]
     public async Task Cannot_Move_To_Recycle_Bin_If_Already_In_Recycle_Bin(bool variant)
     {
-        var content = await (variant ? CreateVariantContent() : CreateInvariantContent());
+        var content = await (variant ? CreateCultureVariantContent() : CreateInvariantContent());
         await ContentEditingService.MoveToRecycleBinAsync(content.Key, Constants.Security.SuperUserKey);
         var result = await ContentEditingService.MoveToRecycleBinAsync(content.Key, Constants.Security.SuperUserKey);
 

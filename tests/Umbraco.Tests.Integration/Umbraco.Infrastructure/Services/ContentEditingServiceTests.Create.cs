@@ -465,6 +465,179 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
+    public async Task Can_Create_Segment_Variant()
+    {
+        var contentType = await CreateVariantContentType(ContentVariation.Segment);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantProperties =
+            [
+                new () { Alias = "invariantTitle", Value = "The Invariant Title" }
+            ],
+            Variants =
+            [
+                new ()
+                {
+                    Segment = null,
+                    Name = "The Name",
+                    Properties =
+                    [
+                        new () { Alias = "variantTitle", Value = "The Default Title" }
+                    ]
+                },
+                new ()
+                {
+                    Segment = "seg-1",
+                    Name = "The Name",
+                    Properties =
+                    [
+                        new () { Alias = "variantTitle", Value = "The Seg-1 Title" }
+                    ]
+                },
+                new ()
+                {
+                    Segment = "seg-2",
+                    Name = "The Name",
+                    Properties =
+                    [
+                        new () { Alias = "variantTitle", Value = "The Seg-2 Title" }
+                    ]
+                }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.IsNotNull(result.Result.Content);
+        VerifyCreate(result.Result.Content);
+
+        // re-get and re-test
+        VerifyCreate(await ContentEditingService.GetAsync(result.Result.Content.Key));
+
+        void VerifyCreate(IContent? createdContent)
+        {
+            Assert.IsNotNull(createdContent);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual("The Name", createdContent.Name);
+                Assert.AreEqual("The Invariant Title", createdContent.GetValue<string>("invariantTitle"));
+                Assert.AreEqual("The Default Title", createdContent.GetValue<string>("variantTitle", segment: null));
+                Assert.AreEqual("The Seg-1 Title", createdContent.GetValue<string>("variantTitle", segment: "seg-1"));
+                Assert.AreEqual("The Seg-2 Title", createdContent.GetValue<string>("variantTitle", segment: "seg-2"));
+            });
+        }
+    }
+
+    [Test]
+    public async Task Can_Create_Culture_And_Segment_Variant()
+    {
+        var contentType = await CreateVariantContentType(ContentVariation.CultureAndSegment);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantProperties =
+            [
+                new () { Alias = "invariantTitle", Value = "The Invariant Title" }
+            ],
+            Variants =
+            [
+                new ()
+                {
+                    Name = "The English Name",
+                    Culture = "en-US",
+                    Segment = null,
+                    Properties =
+                    [
+                        new () { Alias = "variantTitle", Value = "The Default Title in English" }
+                    ]
+                },
+                new ()
+                {
+                    Name = "The English Name",
+                    Culture = "en-US",
+                    Segment = "seg-1",
+                    Properties =
+                    [
+                        new () { Alias = "variantTitle", Value = "The Seg-1 Title in English" }
+                    ]
+                },
+                new ()
+                {
+                    Name = "The English Name",
+                    Culture = "en-US",
+                    Segment = "seg-2",
+                    Properties =
+                    [
+                        new () { Alias = "variantTitle", Value = "The Seg-2 Title in English" }
+                    ]
+                },
+                new ()
+                {
+                    Name = "The Danish Name",
+                    Culture = "da-DK",
+                    Segment = null,
+                    Properties =
+                    [
+                        new () { Alias = "variantTitle", Value = "The Default Title in Danish" }
+                    ]
+                },
+                new ()
+                {
+                    Name = "The Danish Name",
+                    Culture = "da-DK",
+                    Segment = "seg-1",
+                    Properties =
+                    [
+                        new () { Alias = "variantTitle", Value = "The Seg-1 Title in Danish" }
+                    ]
+                },
+                new ()
+                {
+                    Name = "The Danish Name",
+                    Culture = "da-DK",
+                    Segment = "seg-2",
+                    Properties =
+                    [
+                        new () { Alias = "variantTitle", Value = "The Seg-2 Title in Danish" }
+                    ]
+                }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.IsNotNull(result.Result.Content);
+        VerifyCreate(result.Result.Content);
+
+        // re-get and re-test
+        VerifyCreate(await ContentEditingService.GetAsync(result.Result.Content.Key));
+
+        void VerifyCreate(IContent? createdContent)
+        {
+            Assert.IsNotNull(createdContent);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual("The English Name", createdContent.GetCultureName("en-US"));
+                Assert.AreEqual("The Danish Name", createdContent.GetCultureName("da-DK"));
+                Assert.AreEqual("The Invariant Title", createdContent.GetValue<string>("invariantTitle"));
+                Assert.AreEqual("The Default Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: null));
+                Assert.AreEqual("The Seg-1 Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"));
+                Assert.AreEqual("The Seg-2 Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"));
+                Assert.AreEqual("The Default Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: null));
+                Assert.AreEqual("The Seg-1 Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"));
+                Assert.AreEqual("The Seg-2 Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
+            });
+        }
+    }
+
+    [Test]
     public async Task Can_Create_With_Explicit_Key()
     {
         var contentType = ContentTypeBuilder.CreateContentMetaContentType();
@@ -512,6 +685,38 @@ public partial class ContentEditingServiceTests
                 new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" },
                 new PropertyValueModel { Alias = "variantTitle", Value = "The Variant Title" }
             }
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
+    [Test]
+    public async Task Cannot_Create_With_Segment_Variant_Property_Value_For_Culture_Variant_Content()
+    {
+        var contentType = await CreateVariantContentType(ContentVariation.Culture);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantProperties = [
+                new () { Alias = "invariantTitle", Value = "The Invariant Title" },
+            ],
+            Variants = [
+                new ()
+                {
+                    Name = "The name",
+                    Culture = "en-US",
+                    Segment = "segment",
+                    Properties = [
+                        new () { Alias = "variantTitle", Value = "The Variant Title" }
+                    ]
+                }
+            ]
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -593,6 +798,47 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Create_Segment_Variant_Without_Default_Segment()
+    {
+        var contentType = await CreateVariantContentType(ContentVariation.Segment);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" }
+            },
+            Variants =
+            [
+                new ()
+                {
+                    Segment = "seg-1",
+                    Name = "The Name",
+                    Properties =
+                    [
+                        new () { Alias = "variantTitle", Value = "The Seg-1 Title" }
+                    ]
+                },
+                new ()
+                {
+                    Segment = "seg-2",
+                    Name = "The Name",
+                    Properties =
+                    [
+                        new () { Alias = "variantTitle", Value = "The Seg-2 Title" }
+                    ]
+                }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch, result.Status);
     }
 
     private void AssertBodyTextEquals(string expected, IContent content)

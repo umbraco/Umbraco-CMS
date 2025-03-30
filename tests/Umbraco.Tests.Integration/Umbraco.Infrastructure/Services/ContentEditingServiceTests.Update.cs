@@ -43,9 +43,9 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
-    public async Task Can_Update_Variant()
+    public async Task Can_Update_Culture_Variant()
     {
-        var content = await CreateVariantContent();
+        var content = await CreateCultureVariantContent();
 
         var updateModel = new ContentUpdateModel
         {
@@ -92,6 +92,71 @@ public partial class ContentEditingServiceTests
             Assert.AreEqual("The updated invariant title", updatedContent.GetValue<string>("invariantTitle"));
             Assert.AreEqual("The updated English title", updatedContent.GetValue<string>("variantTitle", "en-US"));
             Assert.AreEqual("The updated Danish title", updatedContent.GetValue<string>("variantTitle", "da-DK"));
+        }
+    }
+
+    [Test]
+    public async Task Can_Update_Segment_Variant()
+    {
+        var content = await CreateSegmentVariantContent();
+
+        var updateModel = new ContentUpdateModel
+        {
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }
+            },
+            Variants = new []
+            {
+                new VariantModel
+                {
+                    Segment = null,
+                    Name = "The Updated Name",
+                    Properties = new []
+                    {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated default title" }
+                    }
+                },
+                new VariantModel
+                {
+                    Segment = "seg-1",
+                    Name = "The Updated Name",
+                    Properties = new []
+                    {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-1 title" }
+                    }
+                },
+                new VariantModel
+                {
+                    Segment = "seg-2",
+                    Name = "The Updated Name",
+                    Properties = new []
+                    {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-2 title" }
+                    }
+                },
+            }
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        VerifyUpdate(result.Result.Content);
+
+        // re-get and re-test
+        VerifyUpdate(await ContentEditingService.GetAsync(content.Key));
+
+        void VerifyUpdate(IContent? updatedContent)
+        {
+            Assert.IsNotNull(updatedContent);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual("The Updated Name", updatedContent.Name);
+                Assert.AreEqual("The updated invariant title", updatedContent.GetValue<string>("invariantTitle"));
+                Assert.AreEqual("The updated default title", updatedContent.GetValue<string>("variantTitle", segment: null));
+                Assert.AreEqual("The updated seg-1 title", updatedContent.GetValue<string>("variantTitle", segment: "seg-1"));
+                Assert.AreEqual("The updated seg-2 title", updatedContent.GetValue<string>("variantTitle", segment: "seg-2"));
+            });
         }
     }
 
@@ -269,7 +334,7 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Cannot_Update_With_Invariant_Property_Value_For_Variant_Content()
     {
-        var content = await CreateVariantContent();
+        var content = await CreateCultureVariantContent();
 
         var updateModel = new ContentUpdateModel
         {
@@ -298,7 +363,7 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Cannot_Update_Variant_With_Incorrect_Culture_Casing()
     {
-        var content = await CreateVariantContent();
+        var content = await CreateCultureVariantContent();
 
         var updateModel = new ContentUpdateModel
         {
@@ -371,7 +436,7 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Cannot_Update_Variant_Readonly_Property_Value()
     {
-        var content = await CreateVariantContent();
+        var content = await CreateCultureVariantContent();
         content.SetValue("variantLabel", "The initial English label value", "en-US");
         content.SetValue("variantLabel", "The initial Danish label value", "da-DK");
         ContentService.Save(content);

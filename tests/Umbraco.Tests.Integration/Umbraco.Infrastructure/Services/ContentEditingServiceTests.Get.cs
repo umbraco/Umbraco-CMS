@@ -8,7 +8,7 @@ public partial class ContentEditingServiceTests
     [TestCase(false)]
     public async Task Can_Get(bool variant)
     {
-        var content = await (variant ? CreateVariantContent() : CreateInvariantContent());
+        var content = await (variant ? CreateCultureVariantContent() : CreateInvariantContent());
 
         var result = await ContentEditingService.GetAsync(content.Key);
         Assert.IsNotNull(result);

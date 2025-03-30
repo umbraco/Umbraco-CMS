@@ -318,13 +318,25 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return null;
         }
 
-        if (contentType.VariesByCulture() == false)
+        if (contentType.VariesByNothing() && (contentEditingModelBase.InvariantName.IsNullOrWhiteSpace() || contentEditingModelBase.Variants.Any()))
         {
-            if (contentEditingModelBase.InvariantName.IsNullOrWhiteSpace() || contentEditingModelBase.Variants.Any())
-            {
-                operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
-                return null;
-            }
+            // either missing the invariant name or has one more variants = invalid
+            operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
+            return null;
+        }
+
+        if (contentType.VariesByCulture() && contentEditingModelBase.Variants.Any(v => v.Culture is null))
+        {
+            // varies by culture with one or more variants not bound to a culture = invalid
+            operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
+            return null;
+        }
+
+        if (contentType.VariesBySegment() && contentEditingModelBase.Variants.Any(v => v.Segment is null) is false)
+        {
+            // varies by segment with no default segment variants = invalid
+            operationStatus = ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch;
+            return null;
         }
 
         var propertyTypesByAlias = contentType.CompositionPropertyTypes.ToDictionary(pt => pt.Alias);
@@ -342,7 +354,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
                     .Properties
                     .Select(vpv => new
                     {
-                        VariesByCulture = true,
+                        VariesByCulture = contentType.VariesByCulture(),
                         VariesBySegment = v.Segment.IsNullOrWhiteSpace() == false,
                         PropertyValue = vpv
                     })))
@@ -359,7 +371,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         if (propertyValuesAndVariance.Any(pv =>
             {
                 IPropertyType propertyType = propertyTypesByAlias[pv.PropertyValue.Alias];
-                return propertyType.VariesByCulture() != pv.VariesByCulture || propertyType.VariesBySegment() != pv.VariesBySegment;
+                return (propertyType.VariesByCulture() != pv.VariesByCulture)
+                       || (propertyType.VariesBySegment() is false && pv.VariesBySegment);
             }))
         {
             operationStatus = ContentEditingOperationStatus.PropertyTypeNotFound;
@@ -424,6 +437,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
                 content.SetCultureName(name, culture);
             }
         }
+        else if (contentType.VariesBySegment())
+        {
+            // this should be validated already so it's OK to throw an exception here
+            content.Name = contentEditingModelBase.Variants.FirstOrDefault(v => v.Segment is null)?.Name
+                           ?? throw new ArgumentException("Could not find the default segment variant", nameof(contentEditingModelBase));
+        }
         else
         {
             // this should be validated already so it's OK to throw an exception here
@@ -456,7 +475,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             // the following checks should already have been validated by now, so it's OK to throw exceptions here
             if(propertyTypesByAlias.TryGetValue(propertyValue.Alias, out IPropertyType? propertyType) == false
                || (propertyType.VariesByCulture() && propertyValue.Culture.IsNullOrWhiteSpace())
-               || (propertyType.VariesBySegment() && propertyValue.Segment.IsNullOrWhiteSpace()))
+               || (propertyType.VariesBySegment() is false && propertyValue.Segment.IsNullOrWhiteSpace() is false))
             {
                 throw new ArgumentException($"Culture or segment variance mismatch for property: {propertyValue.Alias}", nameof(contentEditingModelBase));
             }
