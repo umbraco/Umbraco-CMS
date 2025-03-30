@@ -1,5 +1,6 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS } from '../../../constants.js';
+import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../../global-contexts/index.js';
 import type {
 	UmbDocumentUnpublishModalData,
 	UmbDocumentUnpublishModalValue,
@@ -8,7 +9,11 @@ import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffic
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import type { UmbConfirmActionModalEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
+import type {
+	UmbConfirmActionModalEntityReferencesConfig,
+	UmbConfirmActionModalEntityReferencesElement,
+} from '@umbraco-cms/backoffice/relations';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 import '../../../modals/shared/document-variant-language-picker.element.js';
 
@@ -38,7 +43,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	_selection: Array<string> = [];
 
 	@state()
-	_hasUnpublishPermission = true;
+	_canUnpublish = true;
 
 	@state()
 	_hasInvalidSelection = true;
@@ -113,7 +118,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	}
 
 	#submit() {
-		if (this._hasUnpublishPermission) {
+		if (this._canUnpublish) {
 			const selection = this._isInvariant ? ['invariant'] : this._selection;
 			this.value = { selection };
 			this.modalContext?.submit();
@@ -124,6 +129,19 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 
 	#close() {
 		this.modalContext?.reject();
+	}
+
+	async #onReferencesChange(event: UmbChangeEvent) {
+		event.stopPropagation();
+		const target = event.target as UmbConfirmActionModalEntityReferencesElement;
+		const getReferencedByTotal = target.getTotalReferencedBy();
+		const descendantsWithReferencesTotal = target.getTotalDescendantsWithReferences();
+		const total = getReferencedByTotal + descendantsWithReferencesTotal;
+
+		if (total > 0) {
+			const context = await this.getContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT);
+			this._canUnpublish = (await context.getDocumentConfiguration())?.disableUnpublishWhenReferenced === false;
+		}
 	}
 
 	private _requiredFilter = (variantOption: UmbDocumentVariantOptionModel): boolean => {
@@ -154,10 +172,9 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 			</p>
 
 			${this._referencesConfig
-				? html`<uui-box
-						><umb-confirm-action-modal-entity-references
-							.config=${this._referencesConfig}></umb-confirm-action-modal-entity-references
-					></uui-box>`
+				? html`<umb-confirm-action-modal-entity-references
+						.config=${this._referencesConfig}
+						@change=${this.#onReferencesChange}></umb-confirm-action-modal-entity-references>`
 				: nothing}
 
 			<div slot="actions">
@@ -165,7 +182,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 				<uui-button
 					label="${this.localize.term('actions_unpublish')}"
 					?disabled=${this._hasInvalidSelection ||
-					!this._hasUnpublishPermission ||
+					!this._canUnpublish ||
 					(!this._isInvariant && this._selection.length === 0)}
 					look="primary"
 					color="warning"
