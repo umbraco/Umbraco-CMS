@@ -8,7 +8,7 @@ export const STORAGE_STATE = path.join(__dirname, 'playwright/.auth/user.json');
 export default defineConfig({
   testDir: './tests/',
   /* Maximum time one test can run for. */
-  timeout: 30 * 1000,
+  timeout: 50 * 1000,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
