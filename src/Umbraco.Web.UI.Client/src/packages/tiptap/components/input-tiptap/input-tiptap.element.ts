@@ -19,7 +19,6 @@ const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
 	@property({ type: String })
 	override set value(value: string) {
-		if (value === this.#value) return;
 		this.#value = value;
 
 		// Try to set the value to the editor if it is ready.
