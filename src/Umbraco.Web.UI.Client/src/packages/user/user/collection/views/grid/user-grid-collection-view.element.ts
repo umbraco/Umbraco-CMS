@@ -136,10 +136,10 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 				${when(
 					user.lastLoginDate,
 					(lastLoginDate) => html`
-						<umb-localize key="user_lastLogin"></umb-localize>
+						<umb-localize key="user_lastLogin">Last login</umb-localize>
 						<span>${this.localize.date(lastLoginDate, TimeFormatOptions)}</span>
 					`,
-					() => html`${this.localize.term('user_noLogin')}`,
+					() => html`<umb-localize key="user_noLogin">has not logged in yet</umb-localize>`,
 				)}
 			</div>
 		`;
