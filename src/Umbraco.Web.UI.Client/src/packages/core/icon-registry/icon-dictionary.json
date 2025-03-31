@@ -494,11 +494,11 @@
 		},
 		{
 			"name": "icon-grid-2",
-			"file": "grid-2.svg"
+			"file": "grid-2x2.svg"
 		},
 		{
 			"name": "icon-grid-3",
-			"file": "grid-3.svg"
+			"file": "grid-3x3.svg"
 		},
 		{
 			"name": "icon-combination-lock-open",

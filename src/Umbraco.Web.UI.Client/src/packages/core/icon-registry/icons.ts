@@ -375,6 +375,12 @@ path: () => import("./icons/icon-rows-3.js"),
 name: "icon-rows-4",
 path: () => import("./icons/icon-rows-4.js"),
 },{
+name: "icon-grid-2",
+path: () => import("./icons/icon-grid-2.js"),
+},{
+name: "icon-grid-3",
+path: () => import("./icons/icon-grid-3.js"),
+},{
 name: "icon-combination-lock-open",
 path: () => import("./icons/icon-combination-lock-open.js"),
 },{
