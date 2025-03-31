@@ -95,7 +95,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 
 	private _provideSectionContext(sectionManifest: ManifestSection) {
 		if (!this._sectionContext) {
-			this._sectionContext = new UmbSectionContext(sectionManifest);
+			this._sectionContext = new UmbSectionContext(this, sectionManifest);
 			this.provideContext(UMB_SECTION_CONTEXT, this._sectionContext);
 		} else {
 			this._sectionContext.setManifest(sectionManifest);

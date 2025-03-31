@@ -5,6 +5,7 @@ import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './installer-error.element.js';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 const error = {
 	type: 'validation',
@@ -20,14 +21,17 @@ const error = {
 	},
 };
 
-const installerContext = new UmbInstallerContext();
-installerContext.setInstallStatus(error);
+const installerContextMethod = (host: UmbControllerHostElement) => {
+	const installerContext = new UmbInstallerContext(host);
+	installerContext.setInstallStatus(error);
+	return installerContext;
+};
 
 export default {
 	title: 'Apps/Installer/Steps',
 	component: 'umb-installer-error',
 	id: 'umb-installer-error',
-	decorators: [(story) => installerContextProvider(story, installerContext)],
+	decorators: [(story) => installerContextProvider(story, installerContextMethod)],
 } as Meta;
 
 export const Step5Error: StoryFn<UmbInstallerErrorElement> = () => html`<umb-installer-error></umb-installer-error>`;
