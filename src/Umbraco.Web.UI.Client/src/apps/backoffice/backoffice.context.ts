@@ -9,10 +9,7 @@ import type { ManifestSection } from '@umbraco-cms/backoffice/section';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
-import {
-	UMB_CURRENT_USER_CONTEXT,
-	UMB_CURRENT_USER_GROUP_ID_CONDITION_ALIAS,
-} from '@umbraco-cms/backoffice/current-user';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UmbSysinfoRepository } from '@umbraco-cms/backoffice/sysinfo';
 
 export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
