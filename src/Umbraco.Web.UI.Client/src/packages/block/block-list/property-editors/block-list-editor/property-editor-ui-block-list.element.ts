@@ -14,10 +14,7 @@ import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import {
-	UmbBlockElementDataValidationPathTranslator,
-	type UmbBlockLayoutBaseModel,
-} from '@umbraco-cms/backoffice/block';
+import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 
 import '../../components/block-list-entry/index.js';
@@ -56,8 +53,6 @@ export class UmbPropertyEditorUIBlockListElement
 	});
 
 	readonly #validationContext = new UmbValidationContext(this);
-	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
-	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 
 	#lastValue: UmbBlockListValueModel | undefined = undefined;
 
@@ -173,12 +168,13 @@ export class UmbPropertyEditorUIBlockListElement
 		this.observe(
 			this.#managerContext.layouts,
 			(layouts) => {
+				const validationMessagesToRemove: string[] = [];
 				const contentKeys = layouts.map((x) => x.contentKey);
 				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.contentData').forEach((message) => {
 					// get the KEY from this string: $.contentData[?(@.key == 'KEY')]
 					const key = extractJsonQueryProps(message.path).key;
 					if (key && contentKeys.indexOf(key) === -1) {
-						this.#validationContext.messages.removeMessageByKey(message.key);
+						validationMessagesToRemove.push(message.key);
 					}
 				});
 
@@ -187,9 +183,12 @@ export class UmbPropertyEditorUIBlockListElement
 					// get the key from this string: $.settingsData[?(@.key == 'KEY')]
 					const key = extractJsonQueryProps(message.path).key;
 					if (key && settingsKeys.indexOf(key) === -1) {
-						this.#validationContext.messages.removeMessageByKey(message.key);
+						validationMessagesToRemove.push(message.key);
 					}
 				});
+
+				// Remove the messages after the loop to prevent changing the array while iterating over it.
+				this.#validationContext.messages.removeMessageByKeys(validationMessagesToRemove);
 			},
 			null,
 		);
@@ -259,15 +258,10 @@ export class UmbPropertyEditorUIBlockListElement
 		this.observe(
 			context.dataPath,
 			(dataPath) => {
-				// Translate paths for content/settings:
-				this.#contentDataPathTranslator?.destroy();
-				this.#settingsDataPathTranslator?.destroy();
 				if (dataPath) {
 					// Set the data path for the local validation context:
 					this.#validationContext.setDataPath(dataPath);
-
-					this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
-					this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
+					this.#validationContext.autoReport();
 				}
 			},
 			'observeDataPath',

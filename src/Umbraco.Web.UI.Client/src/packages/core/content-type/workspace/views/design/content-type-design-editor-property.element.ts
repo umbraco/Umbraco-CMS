@@ -260,7 +260,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		if (!this.property) return;
 		return html`
 			<div class="sortable">
-				<uui-icon name="icon-navigation"></uui-icon>
+				<uui-icon name="icon-grip"></uui-icon>
 				<span>${this.property.name}</span>
 				<span style="color: var(--uui-color-disabled-contrast)">(${this.property.alias})</span>
 			</div>
@@ -297,6 +297,11 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					${this.property.variesByCulture
 						? html`<uui-tag look="default">
 								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureVariantLabel')}
+							</uui-tag>`
+						: nothing}
+					${this.property.variesBySegment
+						? html`<uui-tag look="default">
+								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_segmentVariantLabel')}
 							</uui-tag>`
 						: nothing}
 					${this.property.appearance?.labelOnTop == true

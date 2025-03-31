@@ -22,6 +22,9 @@ export class UmbBlockListManagerContext<
 	}
 
 	/**
+	 * @param contentElementTypeKey
+	 * @param partialLayoutEntry
+	 * @param _originData
 	 * @deprecated Use createWithPresets instead. Will be removed in v.17.
 	 */
 	create(
@@ -32,9 +35,8 @@ export class UmbBlockListManagerContext<
 		// This property is used by some implementations, but not used in this. Do not remove. [NL]
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		_originData?: UmbBlockListWorkspaceOriginData,
-	) {
+	): never {
 		throw new Error('Method deparecated use createWithPresets');
-		return {} as UmbBlockDataObjectModel<BlockLayoutType>;
 	}
 	async createWithPresets(
 		contentElementTypeKey: string,

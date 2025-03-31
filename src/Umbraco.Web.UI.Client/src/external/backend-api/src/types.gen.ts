@@ -694,6 +694,7 @@ export type DocumentReferenceResponseModel = {
     name?: (string) | null;
     published?: (boolean) | null;
     documentType: (TrackedReferenceDocumentTypeModel);
+    variants: Array<(DocumentVariantItemResponseModel)>;
 };
 
 export type DocumentResponseModel = {
@@ -1406,6 +1407,13 @@ export enum MemberKindModel {
     API = 'Api'
 }
 
+export type MemberReferenceResponseModel = {
+    $type: string;
+    id: string;
+    name?: (string) | null;
+    memberType: (TrackedReferenceMemberTypeModel);
+};
+
 export type MemberResponseModel = {
     values: Array<(MemberValueResponseModel)>;
     variants: Array<(MemberVariantResponseModel)>;
@@ -1751,7 +1759,7 @@ export type PagedIndexResponseModel = {
 
 export type PagedIReferenceResponseModel = {
     total: number;
-    items: Array<(DefaultReferenceResponseModel | DocumentReferenceResponseModel | MediaReferenceResponseModel)>;
+    items: Array<(DefaultReferenceResponseModel | DocumentReferenceResponseModel | MediaReferenceResponseModel | MemberReferenceResponseModel)>;
 };
 
 export type PagedLanguageResponseModel = {
@@ -2402,6 +2410,12 @@ export type TrackedReferenceDocumentTypeModel = {
 };
 
 export type TrackedReferenceMediaTypeModel = {
+    icon?: (string) | null;
+    alias?: (string) | null;
+    name?: (string) | null;
+};
+
+export type TrackedReferenceMemberTypeModel = {
     icon?: (string) | null;
     alias?: (string) | null;
     name?: (string) | null;
@@ -3357,6 +3371,7 @@ export type GetItemDocumentSearchData = {
     query?: string;
     skip?: number;
     take?: number;
+    trashed?: boolean;
 };
 
 export type GetItemDocumentSearchResponse = ((PagedModelDocumentItemResponseModel));
@@ -3640,6 +3655,7 @@ export type GetItemDocumentTypeData = {
 export type GetItemDocumentTypeResponse = (Array<(DocumentTypeItemResponseModel)>);
 
 export type GetItemDocumentTypeSearchData = {
+    isElement?: boolean;
     query?: string;
     skip?: number;
     take?: number;
@@ -3927,6 +3943,7 @@ export type GetItemMediaSearchData = {
     query?: string;
     skip?: number;
     take?: number;
+    trashed?: boolean;
 };
 
 export type GetItemMediaSearchResponse = ((PagedModelMediaItemResponseModel));
@@ -4308,12 +4325,36 @@ export type PutMemberByIdData = {
 
 export type PutMemberByIdResponse = (string);
 
+export type GetMemberByIdReferencedByData = {
+    id: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetMemberByIdReferencedByResponse = ((PagedIReferenceResponseModel));
+
+export type GetMemberByIdReferencedDescendantsData = {
+    id: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetMemberByIdReferencedDescendantsResponse = ((PagedReferenceByIdModel));
+
 export type PutMemberByIdValidateData = {
     id: string;
     requestBody?: (UpdateMemberRequestModel);
 };
 
 export type PutMemberByIdValidateResponse = (string);
+
+export type GetMemberAreReferencedData = {
+    id?: Array<(string)>;
+    skip?: number;
+    take?: number;
+};
+
+export type GetMemberAreReferencedResponse = ((PagedReferenceByIdModel));
 
 export type GetMemberConfigurationResponse = ((MemberConfigurationResponseModel));
 

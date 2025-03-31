@@ -17,7 +17,6 @@ export default class UmbTiptapTableExtensionApi extends UmbTiptapExtensionApiBas
 				border-radius: 0.25rem;
 				border-spacing: 0;
 				box-sizing: border-box;
-				width: 100%;
 				max-width: 100%;
 
 				td,
@@ -45,7 +44,6 @@ export default class UmbTiptapTableExtensionApi extends UmbTiptapExtensionApiBas
 				}
 
 				th {
-					background-color: var(--uui-color-background);
 					font-weight: bold;
 				}
 
@@ -71,7 +69,7 @@ export default class UmbTiptapTableExtensionApi extends UmbTiptapExtensionApiBas
 				}
 
 				.selectedCell {
-					background-color: var(--uui-color-surface-emphasis);
+					background-color: color-mix(in srgb, var(--uui-color-surface-emphasis) 50%, transparent);
 					border-color: var(--uui-color-selected);
 				}
 
