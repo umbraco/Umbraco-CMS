@@ -48,7 +48,7 @@ public class ConfigureUmbracoMemberAuthenticationDeliveryApiSwaggerGenOptions : 
                                 Id = AuthSchemeName,
                             }
                         },
-                        new string[] { }
+                        []
                     }
                 }
             };
