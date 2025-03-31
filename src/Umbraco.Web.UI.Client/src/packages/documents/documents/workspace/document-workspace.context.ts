@@ -127,6 +127,20 @@ export class UmbDocumentWorkspaceContext
 			},
 		]);
 
+		this.observe(this.variants, () => {
+			this.#setReadOnlyStateForUserPermission(
+				UMB_USER_PERMISSION_DOCUMENT_CREATE,
+				this.#userCanCreate,
+				'You do not have permission to create documents.',
+			);
+
+			this.#setReadOnlyStateForUserPermission(
+				UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+				this.#userCanUpdate,
+				'You do not have permission to update documents.',
+			);
+		});
+
 		this.routes.setRoutes([
 			{
 				path: UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN.toString(),
