@@ -72,6 +72,8 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				//Getting not published mandatory options — the options that are mandatory and not currently published.
 				const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
 				this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
+
+				this.requestUpdate();
 			},
 			'_selection',
 		);
