@@ -318,9 +318,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return null;
         }
 
-        if (contentType.VariesByNothing() && (contentEditingModelBase.InvariantName.IsNullOrWhiteSpace() || contentEditingModelBase.Variants.Any()))
+        if (contentType.VariesByNothing() && contentEditingModelBase.InvariantName.IsNullOrWhiteSpace())
         {
-            // either missing the invariant name or has one more variants = invalid
+            // does not vary by anything and is missing the invariant name = invalid
             operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
             return null;
         }

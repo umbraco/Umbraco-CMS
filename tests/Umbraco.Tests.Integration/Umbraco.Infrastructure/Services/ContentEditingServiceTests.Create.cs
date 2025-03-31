@@ -370,8 +370,9 @@ public partial class ContentEditingServiceTests
         Assert.IsNull(result.Result.Content);
     }
 
-    [Test]
-    public async Task Cannot_Create_With_Variant_Property_Value_For_Invariant_Content()
+    [TestCase(ContentVariation.Culture)]
+    [TestCase(ContentVariation.Segment)]
+    public async Task Cannot_Create_With_Variant_Property_Value_For_Invariant_Content(ContentVariation contentVariation)
     {
         var contentType = ContentTypeBuilder.CreateContentMetaContentType();
         contentType.AllowedTemplates = null;
@@ -391,7 +392,8 @@ public partial class ContentEditingServiceTests
             {
                 new VariantModel
                 {
-                    Culture = "en-US",
+                    Culture = contentVariation is ContentVariation.Culture ? "en-US" : null,
+                    Segment = contentVariation is ContentVariation.Segment ? "segment" : null,
                     Name = "The English Name",
                     Properties = new []
                     {
@@ -403,7 +405,7 @@ public partial class ContentEditingServiceTests
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status);
+        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
         Assert.IsNotNull(result.Result);
         Assert.IsNull(result.Result.Content);
     }
