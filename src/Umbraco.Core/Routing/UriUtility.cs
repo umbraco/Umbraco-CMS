@@ -144,7 +144,7 @@ public sealed class UriUtility
         var idxOfScheme = relativeUrl.IndexOf(@"://", StringComparison.Ordinal);
         if (idxOfScheme != -1)
         {
-            var idxOfQM = relativeUrl.IndexOf('?');
+            var idxOfQM = relativeUrl.IndexOf('?',StringComparison.Ordinal);
             if (idxOfQM == -1 || idxOfQM > idxOfScheme)
             {
                 return relativeUrl;
@@ -226,7 +226,7 @@ public sealed class UriUtility
             throw new ArgumentNullException(nameof(absolutePath));
         }
 
-        if (!absolutePath.StartsWith("/"))
+        if (!absolutePath.StartsWith("/", StringComparison.Ordinal))
         {
             throw new FormatException("The absolutePath specified does not start with a '/'");
         }

@@ -388,7 +388,7 @@ namespace Umbraco.Cms.Core.Routing
         public static Uri ParseUriFromDomainName(string domainName, Uri currentUri)
         {
             // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
-            var name = domainName.StartsWith("/") && currentUri != null
+            var name = domainName.StartsWith("/",StringComparison.Ordinal) && currentUri != null
                 ? currentUri.GetLeftPart(UriPartial.Authority) + domainName
                 : domainName;
             var scheme = currentUri?.Scheme ?? Uri.UriSchemeHttp;
