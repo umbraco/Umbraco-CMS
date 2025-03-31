@@ -90,7 +90,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	#renderUserCard(user: UmbUserDetailModel) {
 		return html`
 			<uui-card-user
-				.name=${user.name ?? 'Unnamed user'}
+				.name=${user.name ?? this.localize.term('general_unnamed')}
 				href="${UMB_USER_WORKSPACE_PATH}/edit/${user.unique}"
 				selectable
 				?select-only=${this._selection.length > 0}

@@ -10,7 +10,7 @@ import {
 import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import type { UmbBlockDataModel, UmbBlockDataObjectModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
