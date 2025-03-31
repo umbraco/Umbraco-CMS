@@ -44,8 +44,27 @@ public class MigrateRichtextEditorToTiptap : AsyncMigrationBase
             return;
         }
 
+        dataType.ConfigurationData.Remove("mode");
+        dataType.ConfigurationData.Remove("hideLabel");
+
         var newToolbar = toolBarList.Select(MapToolbarItem).WhereNotNull().ToList();
         dataType.ConfigurationData["toolbar"] = new List<List<List<string>>> { new() {newToolbar} };
+        dataType.ConfigurationData["extensions"] = new[]
+        {
+            "Umb.Tiptap.RichTextEssentials",
+            "Umb.Tiptap.Embed",
+            "Umb.Tiptap.Figure",
+            "Umb.Tiptap.Image",
+            "Umb.Tiptap.Link",
+            "Umb.Tiptap.MediaUpload",
+            "Umb.Tiptap.Subscript",
+            "Umb.Tiptap.Superscript",
+            "Umb.Tiptap.Table",
+            "Umb.Tiptap.TextAlign",
+            "Umb.Tiptap.TextDirection",
+            "Umb.Tiptap.TextIndent",
+            "Umb.Tiptap.Underline"
+        };
     }
 
     private string? MapToolbarItem(string item)
