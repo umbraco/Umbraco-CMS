@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -26,15 +26,15 @@ public partial class ContentEditingServiceTests
         RelationService.Save(relation);
     }
 
-
     [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferenced))]
-    public async Task Cannot_Delete_Referenced_Content()
+    public async Task Cannot_Delete_When_Content_Is_Related_As_A_Child_And_Configured_To_Disable_When_Related()
     {
         var moveAttempt = await ContentEditingService.MoveToRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(moveAttempt.Success);
 
-        Relate(Subpage, Subpage2);
+        // Setup a relation where the page being deleted is related to another page as a child (e.g. the other page has a picker and has selected this page).
+        Relate(Subpage2, Subpage);
         var result = await ContentEditingService.DeleteFromRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.CannotDeleteWhenReferenced, result.Status);
@@ -42,6 +42,24 @@ public partial class ContentEditingServiceTests
         // re-get and verify not deleted
         var subpage = await ContentEditingService.GetAsync(Subpage.Key);
         Assert.IsNotNull(subpage);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferenced))]
+    public async Task Can_Delete_When_Content_Is_Related_As_A_Parent_And_Configured_To_Disable_When_Related()
+    {
+        var moveAttempt = await ContentEditingService.MoveToRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveAttempt.Success);
+
+        // Setup a relation where the page being deleted is related to another page as a child (e.g. the other page has a picker and has selected this page).
+        Relate(Subpage, Subpage2);
+        var result = await ContentEditingService.DeleteFromRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+
+        // re-get and verify deleted
+        var subpage = await ContentEditingService.GetAsync(Subpage.Key);
+        Assert.IsNull(subpage);
     }
 
     [TestCase(true)]

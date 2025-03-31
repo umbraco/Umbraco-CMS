@@ -499,11 +499,28 @@ public class RelationService : RepositoryService, IRelationService
     }
 
     /// <inheritdoc />
-    public bool IsRelated(int id)
+    public bool IsRelated(int id) => IsRelated(id, RelationDirectionFilter.Any);
+
+    /// <inheritdoc />
+    public bool IsRelated(int id, RelationDirectionFilter directionFilter)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IQuery<IRelation> query = Query<IRelation>().Where(x => x.ParentId == id || x.ChildId == id);
+            IQuery<IRelation> query = Query<IRelation>();
+
+            if (directionFilter == RelationDirectionFilter.Parent)
+            {
+                query = query.Where(x => x.ParentId == id);
+            }
+            else if (directionFilter == RelationDirectionFilter.Child)
+            {
+                query = query.Where(x => x.ChildId == id);
+            }
+            else
+            {
+                query = query.Where(x => x.ParentId == id || x.ChildId == id);
+            }
+
             return _relationRepository.Get(query).Any();
         }
     }

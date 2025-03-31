@@ -4,6 +4,17 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Definition of relation directions used as a filter when requesting if a given item has relations.
+/// </summary>
+[Flags]
+public enum RelationDirectionFilter
+{
+    Parent = 1,
+    Child = 2,
+    Any = Parent | Child
+}
+
 public interface IRelationService : IService
 {
     /// <summary>
@@ -297,7 +308,19 @@ public interface IRelationService : IService
     /// </summary>
     /// <param name="id">Id of an object to check relations for</param>
     /// <returns>Returns <c>True</c> if any relations exists with the given Id, otherwise <c>False</c></returns>
+    [Obsolete("Please use the overload taking a RelationDirectionFilter parameter. Scheduled for removal in Umbraco 17.")]
     bool IsRelated(int id);
+
+    /// <summary>
+    ///     Checks whether any relations exists for the passed in Id and direction.
+    /// </summary>
+    /// <param name="id">Id of an object to check relations for</param>
+    /// <param name="directionFilter">Indicates whether to check for relations as parent, child or in either direction.</param>
+    /// <returns>Returns <c>True</c> if any relations exists with the given Id, otherwise <c>False</c></returns>
+    bool IsRelated(int id, RelationDirectionFilter directionFilter)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => IsRelated(id);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Checks whether two items are related
