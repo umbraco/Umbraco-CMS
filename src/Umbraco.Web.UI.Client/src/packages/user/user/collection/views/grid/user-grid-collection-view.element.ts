@@ -114,7 +114,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 
 		const statusLook = user.state ? getDisplayStateFromUserStatus(user.state) : undefined;
 		return html`
-			<uui-tag slot="tag" size="s" look=${ifDefined(statusLook?.look)} color=${ifDefined(statusLook?.color)}>
+			<uui-tag slot="tag" look=${ifDefined(statusLook?.look)} color=${ifDefined(statusLook?.color)}>
 				<umb-localize key=${'user_' + statusLook?.key}></umb-localize>
 			</uui-tag>
 		`;
