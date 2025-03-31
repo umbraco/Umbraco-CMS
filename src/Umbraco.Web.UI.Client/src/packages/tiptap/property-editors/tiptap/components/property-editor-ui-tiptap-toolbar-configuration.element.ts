@@ -246,7 +246,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				<div class="items">
 					${when(
 						group?.data.length === 0,
-						() => html`<em><umb-localize key="toolbar_emptyGroup">Empty</umb-localize></em>`,
+						() => html`<em><umb-localize key="tiptap_toolbar_emptyGroup">Empty</umb-localize></em>`,
 						() => html`${group!.data.map((alias, idx) => this.#renderItem(alias, rowIndex, groupIndex, idx))}`,
 					)}
 				</div>
