@@ -20,8 +20,8 @@
     "typescript": "^4.8.3"
   },
   "dependencies": {
-    "@umbraco/json-models-builders": "^2.0.29",
-    "@umbraco/playwright-testhelpers": "^15.0.38",
+    "@umbraco/json-models-builders": "^2.0.31",
+    "@umbraco/playwright-testhelpers": "^15.0.40",
     "camelize": "^1.0.0",
     "dotenv": "^16.3.1",
     "node-fetch": "^2.6.7"

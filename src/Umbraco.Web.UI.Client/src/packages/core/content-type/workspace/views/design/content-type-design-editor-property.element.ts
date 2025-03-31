@@ -299,6 +299,11 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureVariantLabel')}
 							</uui-tag>`
 						: nothing}
+					${this.property.variesBySegment
+						? html`<uui-tag look="default">
+								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_segmentVariantLabel')}
+							</uui-tag>`
+						: nothing}
 					${this.property.appearance?.labelOnTop == true
 						? html`<uui-tag look="default">
 								<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>

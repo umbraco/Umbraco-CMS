@@ -1,6 +1,8 @@
 import type { UmbUploadableItem } from '../../types.js';
 import { UmbFileDropzoneItemStatus } from '../../constants.js';
 import { UmbDropzoneManager } from '../../dropzone-manager.class.js';
+import { UmbDropzoneChangeEvent } from '../../dropzone-change.event.js';
+import { UmbDropzoneSubmittedEvent } from '../../dropzone-submitted.event.js';
 import {
 	css,
 	customElement,
@@ -18,15 +20,16 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { formatBytes } from '@umbraco-cms/backoffice/utils';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UmbDropzoneChangeEvent } from '../../dropzone-change.event.js';
-import { UmbDropzoneSubmittedEvent } from '../../dropzone-submitted.event.js';
 
 /**
+ * A dropzone for uploading files and folders.
+ * The files will be uploaded to the server as temporary files and can be used in the backoffice.
  * @element umb-input-dropzone
  * @fires ProgressEvent When the progress of the upload changes.
  * @fires UmbDropzoneChangeEvent When the upload is complete.
  * @fires UmbDropzoneSubmittedEvent When the upload is submitted.
  * @slot - The default slot.
+ * @slot text - A text shown above the dropzone graphic.
  */
 @customElement('umb-input-dropzone')
 export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableItem[], typeof UmbLitElement>(
@@ -39,29 +42,10 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	accept?: string;
 
 	/**
-	 * Determines if the dropzone should create temporary files or media items directly.
-	 */
-	@property({ type: Boolean, attribute: 'create-as-temporary' })
-	createAsTemporary: boolean = false;
-
-	/**
 	 * Disable folder uploads.
 	 */
-	@property({ type: Boolean, attribute: 'disable-folder-upload', reflect: true })
-	public set disableFolderUpload(isAllowed: boolean) {
-		this.#manager.setIsFoldersAllowed(!isAllowed);
-	}
-	public get disableFolderUpload() {
-		return this._disableFolderUpload;
-	}
-	private readonly _disableFolderUpload = false;
-
-	/**
-	 * Create the media item below this parent.
-	 * @description This is only used when `createAsTemporary` is `false`.
-	 */
-	@property({ type: String, attribute: 'parent-unique' })
-	parentUnique: string | null = null;
+	@property({ type: Boolean, attribute: 'disable-folder-upload' })
+	disableFolderUpload: boolean = false;
 
 	/**
 	 * Disables the dropzone.
@@ -83,25 +67,35 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	label = 'dropzone';
 
 	@query('#dropzone', true)
-	private _dropzone?: UUIFileDropzoneElement;
+	protected _dropzone?: UUIFileDropzoneElement;
 
 	@state()
-	private _progressItems?: Array<UmbUploadableItem>;
+	protected _progressItems: Array<UmbUploadableItem> = [];
 
-	#manager = new UmbDropzoneManager(this);
+	protected _manager = new UmbDropzoneManager(this);
+
+	/**
+	 * Determines if the dropzone should be disabled.
+	 * If the dropzone is disabled, it will not accept any uploads.
+	 * It is considered disabled if the `disabled` property is set or if `multiple` is set to `false` and there is already an upload in progress.
+	 * @returns {boolean} True if the dropzone should not accept uploads, otherwise false.
+	 */
+	get #isDisabled(): boolean {
+		return this.disabled || (!this.multiple && this._progressItems.length > 0);
+	}
 
 	constructor() {
 		super();
 
 		this.observe(
-			this.#manager.progress,
+			this._manager.progress,
 			(progress) =>
 				this.dispatchEvent(new ProgressEvent('progress', { loaded: progress.completed, total: progress.total })),
 			'_observeProgress',
 		);
 
 		this.observe(
-			this.#manager.progressItems,
+			this._manager.progressItems,
 			(progressItems) => {
 				this._progressItems = [...progressItems];
 				const waiting = this._progressItems.find((item) => item.status === UmbFileDropzoneItemStatus.WAITING);
@@ -114,27 +108,40 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		);
 	}
 
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this._manager.destroy();
+	}
+
+	/**
+	 * Opens the file browse dialog.
+	 */
+	public browse(): void {
+		if (this.#isDisabled) return;
+		this._dropzone?.browse();
+	}
+
 	override render() {
 		return html`
+			<slot name="text"></slot>
 			<uui-file-dropzone
 				id="dropzone"
 				label=${this.label}
 				accept=${ifDefined(this.accept)}
 				?multiple=${this.multiple}
-				?disabled=${this.disabled}
+				?disabled=${this.#isDisabled}
 				?disallowFolderUpload=${this.disableFolderUpload}
-				@change=${this.#onUpload}
+				@change=${this.onUpload}
 				@click=${this.#handleBrowse}>
 				<slot>
 					<uui-button label=${this.localize.term('media_clickToUpload')} @click=${this.#handleBrowse}></uui-button>
 				</slot>
 			</uui-file-dropzone>
-			${this.#renderUploader()}
+			${this.renderUploader()}
 		`;
 	}
 
-	#renderUploader() {
-		if (this.disabled) return nothing;
+	protected renderUploader() {
 		if (!this._progressItems?.length) return nothing;
 
 		return html`
@@ -142,7 +149,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				${repeat(
 					this._progressItems,
 					(item) => item.unique,
-					(item) => this.#renderPlaceholder(item),
+					(item) => this.renderPlaceholder(item),
 				)}
 				<uui-button
 					id="uploader-clear"
@@ -155,7 +162,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		`;
 	}
 
-	#renderPlaceholder(item: UmbUploadableItem) {
+	protected renderPlaceholder(item: UmbUploadableItem) {
 		const file = item.temporaryFile?.file;
 		return html`
 			<div class="placeholder">
@@ -208,6 +215,16 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		`;
 	}
 
+	protected async onUpload(e: UUIFileDropzoneEvent) {
+		e.stopImmediatePropagation();
+
+		if (this.#isDisabled) return;
+		if (!e.detail.files.length && !e.detail.folders.length) return;
+
+		const uploadables = this._manager.createTemporaryFiles(e.detail.files);
+		this.dispatchEvent(new UmbDropzoneSubmittedEvent(await uploadables));
+	}
+
 	#handleBrowse(e: Event) {
 		if (!this._dropzone) return;
 		e.stopImmediatePropagation();
@@ -219,36 +236,34 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	}
 
 	#handleRemove() {
-		this.#manager.removeAll();
-	}
-
-	async #onUpload(e: UUIFileDropzoneEvent) {
-		e.stopImmediatePropagation();
-
-		if (this.disabled) return;
-		if (!e.detail.files.length && !e.detail.folders.length) return;
-
-		if (this.createAsTemporary) {
-			const uploadables = this.#manager.createTemporaryFiles(e.detail.files);
-			this.dispatchEvent(new UmbDropzoneSubmittedEvent(await uploadables));
-		} else {
-			const uploadables = this.#manager.createMediaItems(e.detail, null);
-			this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadables));
-		}
+		this._manager.removeAll();
 	}
 
 	static override readonly styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				flex-wrap: wrap;
+				place-items: center;
+				cursor: pointer;
+			}
+
 			:host([disabled]) #dropzone {
 				opacity: 0.5;
 				pointer-events: none;
 			}
 
 			#dropzone {
+				width: 100%;
 				inset: 0;
 				backdrop-filter: opacity(1); /* Removes the built in blur effect */
-				overflow: clip;
+
+				&[disabled] {
+					opacity: 0.5;
+					pointer-events: none;
+				}
 			}
 
 			#uploader {

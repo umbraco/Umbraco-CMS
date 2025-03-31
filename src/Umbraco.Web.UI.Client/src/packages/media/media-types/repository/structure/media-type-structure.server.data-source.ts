@@ -29,7 +29,10 @@ export class UmbMediaTypeStructureServerDataSource extends UmbContentTypeStructu
 const getAllowedChildrenOf = (unique: string | null, parentContentUnique: string | null) => {
 	if (unique) {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return MediaTypeService.getMediaTypeByIdAllowedChildren({ id: unique, parentContentKey: parentContentUnique ?? undefined });
+		return MediaTypeService.getMediaTypeByIdAllowedChildren({
+			id: unique,
+			parentContentKey: parentContentUnique ?? undefined,
+		});
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return MediaTypeService.getMediaTypeAllowedAtRoot({});

@@ -67,10 +67,10 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 		return html`
 			<umb-input-tiptap
 				.configuration=${this._config}
+				.requiredMessage=${this.mandatoryMessage}
 				.value=${this._markup}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}
-				?required-message=${this.mandatoryMessage}
 				@change=${this.#onChange}></umb-input-tiptap>
 		`;
 	}

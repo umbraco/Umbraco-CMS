@@ -5,6 +5,7 @@ import type { UmbContentVariantPickerData, UmbContentVariantPickerValue } from '
 import type { UmbContentPropertyDatasetContext } from '../property-dataset-context/index.js';
 import type { UmbContentValidationRepository } from '../repository/content-validation-repository.interface.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
+import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbraco-cms/backoffice/repository';
 import {
@@ -51,7 +52,6 @@ import {
 	type UmbPropertyTypePresetModel,
 	type UmbPropertyTypePresetModelTypeModel,
 } from '@umbraco-cms/backoffice/property';
-import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -228,6 +228,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 					if (missingThis) {
 						const context = new UmbValidationController(this);
 						context.inheritFrom(this.validationContext, '$');
+						context.autoReport();
 						context.setVariantId(UmbVariantId.Create(variantOption));
 						this.#variantValidationContexts.push(context);
 					}

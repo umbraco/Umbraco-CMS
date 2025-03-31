@@ -1,6 +1,6 @@
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputDocumentElement } from '../../components/input-document/input-document.element.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';

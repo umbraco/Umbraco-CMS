@@ -136,7 +136,7 @@ test('can add a section to a user group', async ({umbracoApi, umbracoUi}) => {
   // Assert
   await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.userGroup.clickUserGroupsButton();
-  await umbracoUi.userGroup.doesUserGroupHaveSection(userGroupName, 'Content');
+  await umbracoUi.userGroup.doesUserGroupTableHaveSection(userGroupName, 'Content');
 })
 
 test('can add multiple sections to a user group', async ({umbracoApi, umbracoUi}) => {
@@ -152,8 +152,8 @@ test('can add multiple sections to a user group', async ({umbracoApi, umbracoUi}
   // Assert
   await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.userGroup.clickUserGroupsButton();
-  await umbracoUi.userGroup.doesUserGroupHaveSection(userGroupName, 'Content');
-  await umbracoUi.userGroup.doesUserGroupHaveSection(userGroupName, 'Media');
+  await umbracoUi.userGroup.doesUserGroupTableHaveSection(userGroupName, 'Content');
+  await umbracoUi.userGroup.doesUserGroupTableHaveSection(userGroupName, 'Media');
 });
 
 test('can remove a section from a user group', async ({umbracoApi, umbracoUi}) => {
@@ -170,7 +170,7 @@ test('can remove a section from a user group', async ({umbracoApi, umbracoUi}) =
   // Assert
   await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.userGroup.clickUserGroupsButton();
-  await umbracoUi.userGroup.doesUserGroupHaveSection(userGroupName, 'Content', false);
+  await umbracoUi.userGroup.doesUserGroupTableHaveSection(userGroupName, 'Content', false);
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
   expect(userGroupData.sections).toEqual([]);
 });
