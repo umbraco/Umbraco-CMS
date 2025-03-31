@@ -99,7 +99,13 @@ export class UmbDocumentWorkspaceContext
 					allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE],
 				},
 				onChange: (permitted: boolean) => {
+					if (permitted === this.#userCanCreate) return;
 					this.#userCanCreate = permitted;
+					this.#setReadOnlyStateForUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_CREATE,
+						this.#userCanCreate,
+						'You do not have permission to create documents.',
+					);
 				},
 			},
 		]);
@@ -110,7 +116,13 @@ export class UmbDocumentWorkspaceContext
 					allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE],
 				},
 				onChange: (permitted: boolean) => {
+					if (permitted === this.#userCanUpdate) return;
 					this.#userCanUpdate = permitted;
+					this.#setReadOnlyStateForUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+						this.#userCanUpdate,
+						'You do not have permission to update documents.',
+					);
 				},
 			},
 		]);
@@ -147,13 +159,6 @@ export class UmbDocumentWorkspaceContext
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const documentTypeUnique = info.match.params.documentTypeUnique;
 					await this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
-
-					this.#setReadOnlyStateForUserPermission(
-						UMB_USER_PERMISSION_DOCUMENT_CREATE,
-						this.#userCanCreate,
-						'You do not have permission to create documents.',
-					);
-
 					new UmbWorkspaceIsNewRedirectController(
 						this,
 						this,
@@ -168,11 +173,6 @@ export class UmbDocumentWorkspaceContext
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
 					await this.load(unique);
-					this.#setReadOnlyStateForUserPermission(
-						UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-						this.#userCanUpdate,
-						'You do not have permission to update documents.',
-					);
 				},
 			},
 		]);
