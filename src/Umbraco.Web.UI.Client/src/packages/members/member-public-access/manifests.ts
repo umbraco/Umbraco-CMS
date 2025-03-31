@@ -1,7 +1,7 @@
+import { UMB_MEMBER_MANAGEMENT_SECTION_ALIAS } from '../section/constants.js';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_USER_PERMISSION_DOCUMENT_PUBLIC_ACCESS } from '@umbraco-cms/backoffice/document';
-import { UMB_MEMBER_MANAGEMENT_SECTION_ALIAS } from '../section/constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

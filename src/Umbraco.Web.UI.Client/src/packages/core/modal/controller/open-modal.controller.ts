@@ -29,6 +29,7 @@ export class UmbOpenModalController extends UmbControllerBase {
 /**
  *
  * @param host {UmbControllerHost} - The host controller
+ * @param modalAlias
  * @param args {UmbConfirmModalArgs} - The data to pass to the modal
  * @returns {UmbConfirmModalController} The modal controller instance
  */

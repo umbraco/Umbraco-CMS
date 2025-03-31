@@ -92,6 +92,9 @@ export class UmbBlockGridManagerContext<
 		}).asPromise({ preventTimeout: true });
 	}
 	/**
+	 * @param contentElementTypeKey
+	 * @param partialLayoutEntry
+	 * @param _originData
 	 * @deprecated Use createWithPresets instead. Will be removed in v.17.
 	 */
 	create(

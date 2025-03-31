@@ -8,7 +8,6 @@ namespace Umbraco.Cms.Core.Exceptions;
 ///     The exception that is thrown when a composition is invalid.
 /// </summary>
 /// <seealso cref="System.Exception" />
-[Serializable]
 public class InvalidCompositionException : Exception
 {
     /// <summary>
@@ -78,26 +77,6 @@ public class InvalidCompositionException : Exception
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="InvalidCompositionException" /> class.
-    /// </summary>
-    /// <param name="info">
-    ///     The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object
-    ///     data about the exception being thrown.
-    /// </param>
-    /// <param name="context">
-    ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
-    ///     information about the source or destination.
-    /// </param>
-    protected InvalidCompositionException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-        ContentTypeAlias = info.GetString(nameof(ContentTypeAlias));
-        AddedCompositionAlias = info.GetString(nameof(AddedCompositionAlias));
-        PropertyTypeAliases = (string[]?)info.GetValue(nameof(PropertyTypeAliases), typeof(string[]));
-        PropertyGroupAliases = (string[]?)info.GetValue(nameof(PropertyGroupAliases), typeof(string[]));
-    }
-
-    /// <summary>
     ///     Gets the content type alias.
     /// </summary>
     /// <value>
@@ -128,34 +107,6 @@ public class InvalidCompositionException : Exception
     ///     The property group aliases.
     /// </value>
     public string[]? PropertyGroupAliases { get; }
-
-    /// <summary>
-    ///     When overridden in a derived class, sets the <see cref="T:System.Runtime.Serialization.SerializationInfo" /> with
-    ///     information about the exception.
-    /// </summary>
-    /// <param name="info">
-    ///     The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object
-    ///     data about the exception being thrown.
-    /// </param>
-    /// <param name="context">
-    ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
-    ///     information about the source or destination.
-    /// </param>
-    /// <exception cref="ArgumentNullException">info</exception>
-    public override void GetObjectData(SerializationInfo info, StreamingContext context)
-    {
-        if (info == null)
-        {
-            throw new ArgumentNullException(nameof(info));
-        }
-
-        info.AddValue(nameof(ContentTypeAlias), ContentTypeAlias);
-        info.AddValue(nameof(AddedCompositionAlias), AddedCompositionAlias);
-        info.AddValue(nameof(PropertyTypeAliases), PropertyTypeAliases);
-        info.AddValue(nameof(PropertyGroupAliases), PropertyGroupAliases);
-
-        base.GetObjectData(info, context);
-    }
 
     private static string FormatMessage(string contentTypeAlias, string? addedCompositionAlias, string[] propertyTypeAliases, string[] propertyGroupAliases)
     {

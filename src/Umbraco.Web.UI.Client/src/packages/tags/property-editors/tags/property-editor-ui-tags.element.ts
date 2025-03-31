@@ -1,9 +1,9 @@
 import type { UmbTagsInputElement } from '../../components/tags-input/tags-input.element.js';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import {
-	type UmbPropertyEditorUiElement,
-	type UmbPropertyEditorConfigCollection,
+import type {
+	UmbPropertyEditorUiElement,
+	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
