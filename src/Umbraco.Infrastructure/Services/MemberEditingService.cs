@@ -149,12 +149,11 @@ internal sealed class MemberEditingService : IMemberEditingService
 
         if (user.HasAccessToSensitiveData() is false)
         {
-            // handle sensitive data. certain member properties (IsApproved, IsLockedOut) are subject to "sensitive data" rules.
-            if (member.IsLockedOut != updateModel.IsLockedOut || member.IsApproved != updateModel.IsApproved)
-            {
-                status.ContentEditingOperationStatus = ContentEditingOperationStatus.NotAllowed;
-                return Attempt.FailWithStatus(status, new MemberUpdateResult());
-            }
+            // Handle sensitive data. Certain member properties (IsApproved, IsLockedOut) are subject to "sensitive data" rules.
+            // The client won't have received these, so will always be false.
+            // We should reset them back to their original values before proceeding with the update.
+            updateModel.IsApproved = member.IsApproved;
+            updateModel.IsLockedOut = member.IsLockedOut;
         }
 
         MemberIdentityUser? identityMember = await _memberManager.FindByIdAsync(member.Id.ToString());
