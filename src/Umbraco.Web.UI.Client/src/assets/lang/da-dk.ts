@@ -1673,7 +1673,7 @@ export default {
 		variantsHeading: 'Tillad variationer',
 		cultureVariantHeading: 'Tillad sprogvariation',
 		segmentVariantHeading: 'Tillad segmentering',
-		cultureInvariantLabel: 'Delt påtværs af sprog',
+		cultureInvariantLabel: 'Delt på tværs af sprog',
 		segmentInvariantLabel: 'Delt påtværs af segmenteringer',
 		cultureVariantLabel: 'Sprog varierende',
 		segmentVariantLabel: 'Segment varierende',
