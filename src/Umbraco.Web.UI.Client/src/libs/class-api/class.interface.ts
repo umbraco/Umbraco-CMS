@@ -9,6 +9,11 @@ import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoff
 import type { ObserverCallback, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
+export interface UmbClassGetContextOptions extends UmbContextConsumerAsPromiseOptionsType {
+	skipHost?: boolean;
+	passContextAliasMatches?: boolean;
+}
+
 export interface UmbClassInterface extends UmbControllerHost {
 	/**
 	 * @description Observe an Observable. An Observable is a declared source of data that can be observed. An observables is declared from a UmbState.
@@ -60,11 +65,11 @@ export interface UmbClassInterface extends UmbControllerHost {
 	/**
 	 * @description Retrieve a context. Notice this is a one time retrieving of a context, meaning if you expect this to be up to date with reality you should instead use the consumeContext method.
 	 * @param {string} alias
-	 * @returns {Promise<ContextType>} A Promise with the reference to the Context Api Instance
+	 * @returns {Promise<unknown>} A Promise with the reference to the Context Api Instance
 	 * @memberof UmbClassInterface
 	 */
 	getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 		alias: string | UmbContextToken<BaseType, ResultType>,
-		options?: UmbContextConsumerAsPromiseOptionsType,
+		options?: UmbClassGetContextOptions,
 	): Promise<ResultType | undefined>;
 }
