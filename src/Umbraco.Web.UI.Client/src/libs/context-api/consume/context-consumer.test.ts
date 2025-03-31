@@ -100,6 +100,23 @@ describe('UmbContextConsumer', () => {
 			provider.hostConnected();
 		});
 
+		it('auto destroys when no callback provided', async () => {
+			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(element, testContextAlias);
+			expect((localConsumer as any)._retrieveHost).to.not.be.undefined;
+			localConsumer.hostConnected();
+			provider.hostConnected();
+			const instance = await localConsumer.asPromise().catch(() => {
+				expect.fail('Promise should not reject');
+			});
+			expect(instance?.prop).to.eq('value from provider');
+			provider.hostDisconnected();
+
+			await Promise.resolve();
+			expect((localConsumer as any)._retrieveHost).to.be.undefined;
+		});
+
 		it('gets rejected when using asPromise that does not resolve', (done) => {
 			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(element, testContextAlias);
 
@@ -116,29 +133,31 @@ describe('UmbContextConsumer', () => {
 			localConsumer.hostConnected();
 		});
 
-		it('never gets rejected when using asPromise that is set not to timeout and never will resolve', (done) => {
+		it('never gets rejected when using asPromise that is set to prevent timeout and never will resolve', (done) => {
 			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(element, testContextAlias);
 			localConsumer.hostConnected();
 
-			const timeout = setTimeout(() => {
-				localConsumer.hostDisconnected();
-				done();
-			}, 200);
+			let acceptedRejection = false;
 
-			try {
-				localConsumer
-					.asPromise({ preventTimeout: true })
-					.then((instance) => {
-						clearTimeout(timeout);
-						expect.fail('Promise should not resolve');
-					})
-					.catch(() => {
-						clearTimeout(timeout);
+			const timeout = setTimeout(() => {
+				acceptedRejection = true;
+				localConsumer.hostDisconnected();
+			}, 100);
+
+			localConsumer
+				.asPromise({ preventTimeout: true })
+				.then((instance) => {
+					clearTimeout(timeout);
+					expect.fail('Promise should not resolve');
+				})
+				.catch((e) => {
+					clearTimeout(timeout);
+					if (acceptedRejection === true) {
+						done();
+					} else {
 						expect.fail('Promise should not reject');
-					});
-			} catch (e) {
-				console.log('e', e);
-			}
+					}
+				});
 		});
 
 		it('works with host as a method', (done) => {
@@ -375,7 +394,7 @@ describe('UmbContextConsumer', () => {
 			});
 		});
 
-		it('context api of same context alias will NOT prevent request from propagating when set to exactMatch', (done) => {
+		it('context api of same context alias will NOT prevent request from propagating when set to passContextAliasMatches', (done) => {
 			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
 			provider.hostConnected();
 

@@ -23,6 +23,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	#stopAtContextMatch = true;
 	#callback?: UmbContextCallback<ResultType>;
 	#promise?: Promise<ResultType | undefined>;
+	#promiseOptions?: UmbContextConsumerAsPromiseOptionsType;
 	#promiseResolver?: (instance: ResultType) => void;
 	#promiseRejecter?: (reason: string) => void;
 
@@ -115,8 +116,12 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		if (this.#promiseResolver && this.#instance !== undefined) {
 			this.#promiseResolver(this.#instance);
 			this.#promise = undefined;
+			this.#promiseOptions = undefined;
 			this.#promiseResolver = undefined;
 			this.#promiseRejecter = undefined;
+		}
+		if (!this.#callback) {
+			this.destroy();
 		}
 	}
 
@@ -128,8 +133,12 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 				`Context could not be found. (Context Alias: ${this.#contextAlias} with API Alias: ${this.#apiAlias}). Controller is hosted on ${hostElement?.parentNode?.nodeName ?? 'Not attached node'} > ${hostElement?.nodeName}`,
 			);
 			this.#promise = undefined;
+			this.#promiseOptions = undefined;
 			this.#promiseResolver = undefined;
 			this.#promiseRejecter = undefined;
+		}
+		if (!this.#callback) {
+			this.destroy();
 		}
 	}
 
@@ -145,12 +154,14 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 			this.#promise ??
 			(this.#promise = new Promise<ResultType | undefined>((resolve, reject) => {
 				if (this.#instance) {
+					this.#promiseOptions = undefined;
 					this.#promiseResolver = undefined;
 					this.#promiseRejecter = undefined;
 					resolve(this.#instance);
 				} else {
+					this.#promiseOptions = options;
 					this.#promiseResolver = resolve;
-					this.#promiseRejecter = options?.preventTimeout ? undefined : reject;
+					this.#promiseRejecter = reject;
 				}
 			}))
 		);
@@ -181,11 +192,13 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		}
 		*/
 
-		this.#raf = requestAnimationFrame(() => {
-			// For unproviding, then setInstance to undefined here. [NL]
-			this.#rejectPromise();
-			this.#raf = undefined;
-		});
+		if (this.#promiseResolver && this.#promiseOptions?.preventTimeout !== true) {
+			this.#raf = requestAnimationFrame(() => {
+				// For unproviding, then setInstance to undefined here. [NL]
+				this.#rejectPromise();
+				this.#raf = undefined;
+			});
+		}
 	}
 
 	public hostConnected(): void {
@@ -199,11 +212,14 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		if (this.#raf !== undefined) {
 			cancelAnimationFrame(this.#raf);
 			this.#raf = undefined;
-			this.#promiseRejecter?.('Context request was cancelled, host was disconnected.');
-			this.#promiseResolver = undefined;
-			this.#promiseRejecter = undefined;
-			this.#promise = undefined;
 		}
+
+		this.#promiseRejecter?.('Context request was cancelled, host was disconnected.');
+		this.#promise = undefined;
+		this.#promiseOptions = undefined;
+		this.#promiseResolver = undefined;
+		this.#promiseRejecter = undefined;
+
 		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
 		window.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#handleNewProvider);
 		//window.removeEventListener(umbContextUnprovidedEventType, this.#handleRemovedProvider);
@@ -242,6 +258,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		this._retrieveHost = undefined as any;
 		this.#callback = undefined;
 		this.#promise = undefined;
+		this.#promiseOptions = undefined;
 		this.#promiseResolver = undefined;
 		this.#promiseRejecter = undefined;
 		this.#instance = undefined;

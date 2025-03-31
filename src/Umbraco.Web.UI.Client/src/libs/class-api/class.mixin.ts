@@ -1,4 +1,5 @@
 import type { UmbClassMixinInterface } from './class-mixin.interface.js';
+import type { UmbClassGetContextOptions } from './class.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import {
@@ -11,7 +12,6 @@ import {
 	type UmbContextCallback,
 	UmbContextConsumerController,
 	UmbContextProviderController,
-	type UmbContextConsumerAsPromiseOptionsType,
 } from '@umbraco-cms/backoffice/context-api';
 import { type ObserverCallback, UmbObserverController, simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 
@@ -99,20 +99,18 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 
 		async getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
-			options?: UmbContextConsumerAsPromiseOptionsType,
+			options?: UmbClassGetContextOptions,
 		): Promise<ResultType | undefined> {
 			const controller = new UmbContextConsumerController(this, contextAlias);
-			const promise = controller
-				.asPromise(options)
-				.then((result) => {
-					controller.destroy();
-					return result;
-				})
-				.catch(() => {
-					controller.destroy();
-					return undefined;
-				});
-			return promise;
+			if (options) {
+				if (options.passContextAliasMatches) {
+					controller.passContextAliasMatches();
+				}
+				if (options.skipHost) {
+					controller.skipHost();
+				}
+			}
+			return controller.asPromise(options);
 		}
 
 		public override destroy(): void {
