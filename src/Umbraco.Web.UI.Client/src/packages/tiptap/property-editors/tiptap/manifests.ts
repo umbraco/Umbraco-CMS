@@ -51,7 +51,7 @@ _Drag and drop the available actions onto the statusbar areas._`,
 						alias: 'dimensions',
 						label: '#general_dimensions',
 						description: '{#tiptap_config_dimensions_description}',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.DimensionsConfiguration',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUI.Dimensions',
 						weight: 30,
 					},
 					{

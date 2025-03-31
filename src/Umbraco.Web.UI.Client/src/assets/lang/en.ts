@@ -879,6 +879,7 @@ export default {
 		orderBy: 'Order by',
 		password: 'Password',
 		path: 'Path',
+		pixels: 'pixels',
 		pleasewait: 'One moment please...',
 		previous: 'Previous',
 		properties: 'Properties',
