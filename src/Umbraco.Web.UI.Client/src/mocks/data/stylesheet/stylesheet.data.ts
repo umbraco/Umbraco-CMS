@@ -18,7 +18,7 @@ export const data: Array<UmbMockStylesheetModel> = [
 		content: `
 /** RTE Stylesheet */
 
-#editor, #tinymce {
+#editor {
 	background-color: pink;
 	font-size: 1.5rem;
 }

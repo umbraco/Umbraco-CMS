@@ -34,7 +34,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	set value(value: UmbTiptapToolbarValue | undefined) {
 		if (!value) value = [[[]]];
 		if (value === this.#value) return;
-		this.#value = this.#context.migrateTinyMceToolbar(value);
+		this.#value = this.#context.isValidToolbarValue(value) ? value : [[[]]];
 	}
 	get value(): UmbTiptapToolbarValue | undefined {
 		return this.#context.cloneToolbarValue(this.#value);

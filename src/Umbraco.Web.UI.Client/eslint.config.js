@@ -69,7 +69,7 @@ export default [
 			'local-rules/exported-string-constant-naming': [
 				'error',
 				{
-					excludedFileNames: ['umbraco-package', 'input-tiny-mce.defaults'], // TODO: what to do about the tiny mce defaults?
+					excludedFileNames: ['umbraco-package'],
 				},
 			],
 			'@typescript-eslint/no-non-null-assertion': 'off',
