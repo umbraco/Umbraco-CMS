@@ -392,6 +392,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Two factor providers
             Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
             Services.AddUnique<IUserTwoFactorLoginService, UserTwoFactorLoginService>();
+            Services.AddUnique<IMemberTwoFactorLoginService, MemberTwoFactorLoginService>();
 
             // Add Query services
             Services.AddUnique<IDocumentRecycleBinQueryService, DocumentRecycleBinQueryService>();

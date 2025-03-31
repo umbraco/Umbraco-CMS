@@ -9,7 +9,7 @@ import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
 import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-default-tree')
@@ -169,8 +169,14 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			return nothing;
 		}
 
-		return html` <uui-button @click=${this.#onLoadMoreClick} label="Load more"></uui-button> `;
+		return html` <uui-button id="load-more" @click=${this.#onLoadMoreClick} label="Load more"></uui-button> `;
 	}
+
+	static override styles = css`
+		#load-more {
+			width: 100%;
+		}
+	`;
 }
 
 export default UmbDefaultTreeElement;
