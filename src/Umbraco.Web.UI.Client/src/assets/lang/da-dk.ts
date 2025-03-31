@@ -1674,7 +1674,7 @@ export default {
 		cultureVariantHeading: 'Tillad sprogvariation',
 		segmentVariantHeading: 'Tillad segmentering',
 		cultureInvariantLabel: 'Delt på tværs af sprog',
-		segmentInvariantLabel: 'Delt påtværs af segmenteringer',
+		segmentInvariantLabel: 'Delt på tværs af segmenteringer',
 		cultureVariantLabel: 'Sprog varierende',
 		segmentVariantLabel: 'Segment varierende',
 		variantsDescription: 'Tillad at redaktører kan oprette indhold af denne type på flere sprog.',
