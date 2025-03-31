@@ -27,7 +27,7 @@ public class ReferencedByDocumentRecycleBinController : DocumentRecycleBinContro
     }
 
     /// <summary>
-    ///     Gets a paged list of tracked references for all items in the doucmnt recycle bin, so you can see where an item is being used.
+    ///     Gets a paged list of tracked references for all items in the document recycle bin, so you can see where an item is being used.
     /// </summary>
     [HttpGet("referenced-by")]
     [MapToApiVersion("1.0")]
