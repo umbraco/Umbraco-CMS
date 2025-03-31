@@ -1,4 +1,4 @@
-import type { UmbEntityReferenceRepository, UmbReferenceItemModel } from '../../reference/types.js';
+import type { UmbEntityReferenceRepository, UmbReferenceItemModel } from '../reference/types.js';
 import {
 	html,
 	customElement,
@@ -12,16 +12,18 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+
+export interface UmbConfirmActionModalEntityReferencesConfig {
+	itemRepositoryAlias: string;
+	referenceRepositoryAlias: string;
+	unique: string;
+}
 
 @customElement('umb-confirm-action-modal-entity-references')
 export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
-	config?: {
-		itemRepositoryAlias: string;
-		referenceRepositoryAlias: string;
-		entityType: string;
-		unique: string;
-	};
+	config?: UmbConfirmActionModalEntityReferencesConfig;
 
 	@state()
 	_referencedByItems: Array<UmbReferenceItemModel> = [];
@@ -39,6 +41,14 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 	#referenceRepository?: UmbEntityReferenceRepository;
 
 	#limitItems = 3;
+
+	getTotalReferencedBy() {
+		return this._totalReferencedByItems;
+	}
+
+	getTotalDescendantsWithReferences() {
+		return this._totalDescendantsWithReferences;
+	}
 
 	protected override firstUpdated(_changedProperties: PropertyValues): void {
 		super.firstUpdated(_changedProperties);
@@ -88,6 +98,7 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 		if (data) {
 			this._referencedByItems = [...data.items];
 			this._totalReferencedByItems = data.total;
+			this.dispatchEvent(new UmbChangeEvent());
 		}
 	}
 
@@ -118,6 +129,7 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 			const uniques = data.items.map((item) => item.unique).filter((unique) => unique) as Array<string>;
 			const { data: items } = await this.#itemRepository.requestItems(uniques);
 			this._descendantsWithReferences = items ?? [];
+			this.dispatchEvent(new UmbChangeEvent());
 		}
 	}
 
@@ -162,8 +174,6 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 		`,
 	];
 }
-
-export { UmbConfirmActionModalEntityReferencesElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

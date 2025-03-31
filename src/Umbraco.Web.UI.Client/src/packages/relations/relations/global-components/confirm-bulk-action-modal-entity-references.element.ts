@@ -1,4 +1,4 @@
-import type { UmbEntityReferenceRepository } from '../../reference/types.js';
+import type { UmbEntityReferenceRepository } from '../reference/types.js';
 import {
 	html,
 	customElement,
@@ -12,6 +12,12 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+
+export interface UmbConfirmBulkActionModalEntityReferencesConfig {
+	uniques: Array<string>;
+	itemRepositoryAlias: string;
+	referenceRepositoryAlias: string;
+}
 
 @customElement('umb-confirm-bulk-action-modal-entity-references')
 export class UmbConfirmBulkActionModalEntityReferencesElement extends UmbLitElement {
@@ -124,8 +130,6 @@ export class UmbConfirmBulkActionModalEntityReferencesElement extends UmbLitElem
 		`,
 	];
 }
-
-export { UmbConfirmBulkActionModalEntityReferencesElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

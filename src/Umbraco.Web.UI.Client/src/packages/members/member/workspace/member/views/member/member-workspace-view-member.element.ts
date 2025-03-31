@@ -198,6 +198,10 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						</uui-toggle>
 					</umb-property-layout>
 				</uui-box>
+
+				<div class="container">
+					<umb-extension-slot id="workspace-info-apps" type="workspaceInfoApp"></umb-extension-slot>
+				</div>
 			</div>
 		`;
 	}
@@ -269,6 +273,9 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 			#left-column {
 				/* Is there a way to make the wrapped right column grow only when wrapped? */
 				flex: 9999 1 500px;
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
 			}
 			#right-column {
 				flex: 1 1 350px;

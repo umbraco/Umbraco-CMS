@@ -1735,11 +1735,11 @@ export default {
 		compositionUsageHeading: 'Where is this composition used?',
 		compositionUsageSpecification:
 			'This composition is currently used in the composition of the following\n      Content Types:\n    ',
-		variantsHeading: 'Allow variations',
+		variantsHeading: 'Variation',
 		cultureVariantHeading: 'Allow vary by culture',
 		segmentVariantHeading: 'Allow segmentation',
 		cultureVariantLabel: 'Vary by culture',
-		segmentVariantLabel: 'Vary by segments',
+		segmentVariantLabel: 'Vary by segment',
 		variantsDescription: 'Allow editors to create content of this type in different languages.',
 		cultureVariantDescription: 'Allow editors to create content of different languages.',
 		segmentVariantDescription: 'Allow editors to create segments of this content.',
