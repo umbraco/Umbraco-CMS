@@ -7,7 +7,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		name: 'Rich Text Editor [Tiptap] Property Editor UI',
 		element: () => import('./property-editor-ui-tiptap.element.js'),
 		meta: {
-			label: 'Rich Text Editor [Tiptap]',
+			label: 'Rich Text Editor',
 			propertyEditorSchemaAlias: 'Umbraco.RichText',
 			icon: 'icon-browser-window',
 			group: 'richContent',
