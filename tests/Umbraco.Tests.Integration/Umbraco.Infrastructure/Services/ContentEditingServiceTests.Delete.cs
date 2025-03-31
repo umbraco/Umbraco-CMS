@@ -2,7 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Integration.Attributes;
@@ -12,19 +11,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 public partial class ContentEditingServiceTests
 {
     protected IRelationService RelationService => GetRequiredService<IRelationService>();
+
     public static void ConfigureDisableDeleteWhenReferenced(IUmbracoBuilder builder)
-    {
-        builder.Services.Configure<ContentSettings>(config =>
+        => builder.Services.Configure<ContentSettings>(config =>
             config.DisableDeleteWhenReferenced = true);
-    }
-
-    public void Relate(IContent parent, IContent child)
-    {
-        var relatedContentRelType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
-
-        var relation = RelationService.Relate(parent.Id, child.Id, relatedContentRelType);
-        RelationService.Save(relation);
-    }
 
     [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferenced))]
