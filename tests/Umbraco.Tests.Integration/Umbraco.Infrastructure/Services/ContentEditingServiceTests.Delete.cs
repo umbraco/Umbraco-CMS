@@ -18,11 +18,11 @@ public partial class ContentEditingServiceTests
             config.DisableDeleteWhenReferenced = true);
     }
 
-    public void Relate(IContent child, IContent parent)
+    public void Relate(IContent parent, IContent child)
     {
         var relatedContentRelType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
 
-        var relation = RelationService.Relate(child.Id, parent.Id, relatedContentRelType);
+        var relation = RelationService.Relate(parent.Id, child.Id, relatedContentRelType);
         RelationService.Save(relation);
     }
 
