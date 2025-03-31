@@ -152,14 +152,16 @@ public static class StringExtensions
 
     public static string ReplaceNonAlphanumericChars(this string input, char replacement)
     {
-        var inputArray = input.ToCharArray();
-        var outputArray = new char[input.Length];
-        for (var i = 0; i < inputArray.Length; i++)
+        var chars = input.ToCharArray();
+        for (var i = 0; i < chars.Length; i++)
         {
-            outputArray[i] = char.IsLetterOrDigit(inputArray[i]) ? inputArray[i] : replacement;
+            if (!char.IsLetterOrDigit(chars[i]))
+            {
+                chars[i] = replacement;
+            }
         }
 
-        return new string(outputArray);
+        return new string(chars);
     }
 
     /// <summary>
@@ -209,7 +211,7 @@ public static class StringExtensions
 
         var nonEmpty = queryStrings.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
 
-        if (url.Contains("?"))
+        if (url.Contains('?'))
         {
             return url + string.Join("&", nonEmpty).EnsureStartsWith('&');
         }
@@ -692,7 +694,7 @@ public static class StringExtensions
 
         if (input.Length == 0)
         {
-            return Array.Empty<byte>();
+            return [];
         }
 
         // calc array size - must be groups of 4
@@ -807,7 +809,7 @@ public static class StringExtensions
         }
 
         // replace chars that would cause problems in URLs
-        var chArray = new char[pos];
+        Span<char> chArray = pos <= 1024 ? stackalloc char[pos] : new char[pos];
         for (var i = 0; i < pos; i++)
         {
             var ch = str[i];
@@ -1293,8 +1295,7 @@ public static class StringExtensions
         }
 
         // most bytes from the hash are copied straight to the bytes of the new GUID (steps 5-7, 9, 11-12)
-        var newGuid = new byte[16];
-        Array.Copy(hash, 0, newGuid, 0, 16);
+        Span<byte> newGuid = hash.AsSpan()[..16];
 
         // set the four most significant bits (bits 12 through 15) of the time_hi_and_version field to the appropriate 4-bit version number from Section 4.1.3 (step 8)
         newGuid[6] = (byte)((newGuid[6] & 0x0F) | (version << 4));
@@ -1308,7 +1309,7 @@ public static class StringExtensions
     }
 
     // Converts a GUID (expressed as a byte array) to/from network order (MSB-first).
-    internal static void SwapByteOrder(byte[] guid)
+    internal static void SwapByteOrder(Span<byte> guid)
     {
         SwapBytes(guid, 0, 3);
         SwapBytes(guid, 1, 2);
@@ -1316,12 +1317,7 @@ public static class StringExtensions
         SwapBytes(guid, 6, 7);
     }
 
-    private static void SwapBytes(byte[] guid, int left, int right)
-    {
-        var temp = guid[left];
-        guid[left] = guid[right];
-        guid[right] = temp;
-    }
+    private static void SwapBytes(Span<byte> guid, int left, int right) => (guid[left], guid[right]) = (guid[right], guid[left]);
 
     /// <summary>
     ///     Checks if a given path is a full path including drive letter
