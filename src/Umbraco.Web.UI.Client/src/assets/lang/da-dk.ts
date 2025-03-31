@@ -428,7 +428,6 @@ export default {
 		newPartialViewMacroFromSnippet: 'Ny partial view makro fra snippet',
 		newPartialViewMacroNoMacro: 'Ny partial view makro (uden makro)',
 		newStyleSheetFile: 'Ny stylesheet-fil',
-		newRteStyleSheetFile: 'Ny Rich Text Editor stylesheet-fil',
 	},
 	dashboard: {
 		browser: 'Til dit website',
