@@ -38,14 +38,19 @@ export class UmbPropertyEditorUITinyMceElement extends UmbPropertyEditorUiRteEle
 			blockElement.getAttribute(UMB_BLOCK_RTE_DATA_CONTENT_KEY),
 		);
 
-		if (super.value) {
-			super.value = {
-				...super.value,
-				markup: markup,
+		// Then get the content of the editor and update the value.
+		// maybe in this way doc.body.innerHTML;
+
+		this._latestMarkup = markup;
+
+		if (this.value) {
+			this.value = {
+				...this.value,
+				markup: this._latestMarkup,
 			};
 		} else {
 			this.value = {
-				markup: markup,
+				markup: this._latestMarkup,
 				blocks: {
 					layout: {},
 					contentData: [],
