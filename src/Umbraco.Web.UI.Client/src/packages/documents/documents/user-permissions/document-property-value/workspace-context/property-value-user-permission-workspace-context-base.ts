@@ -63,7 +63,6 @@ export class UmbPropertyValueUserPermissionWorkspaceContextBase extends UmbContr
 							variantIds?.map((variantId) => {
 								return {
 									unique: 'UMB_PROPERTY_' + args.property.unique + '_' + variantId.toString(),
-									message: '',
 									propertyType: {
 										unique: args.property.unique,
 										variantId,

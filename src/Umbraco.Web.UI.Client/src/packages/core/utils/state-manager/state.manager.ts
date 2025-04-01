@@ -4,6 +4,7 @@ import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observab
 export interface UmbState {
 	unique: string;
 	message: string;
+	message?: string;
 }
 
 export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbControllerBase {

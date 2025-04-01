@@ -197,7 +197,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					const state = {
 						unique,
 						variantId,
-						message: '',
 					};
 
 					this.readOnlyState?.addState(state);

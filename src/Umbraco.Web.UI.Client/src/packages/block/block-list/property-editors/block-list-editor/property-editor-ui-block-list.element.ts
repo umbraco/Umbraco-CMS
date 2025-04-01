@@ -363,7 +363,6 @@ export class UmbPropertyEditorUIBlockListElement
 					const state = {
 						unique,
 						variantId,
-						message: '',
 					};
 
 					this.#managerContext.readOnlyState.addState(state);

@@ -155,7 +155,6 @@ export class UmbPropertyElement extends UmbLitElement {
 		if (this._readonly) {
 			this.#propertyContext.readonlyState.addState({
 				unique,
-				message: '',
 			});
 		} else {
 			this.#propertyContext.readonlyState.removeState(unique);

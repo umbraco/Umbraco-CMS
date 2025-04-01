@@ -198,7 +198,6 @@ export class UmbPropertyEditorUIBlockGridElement
 						const state = {
 							unique,
 							variantId,
-							message: '',
 						};
 
 						this.#managerContext.readOnlyState.addState(state);
