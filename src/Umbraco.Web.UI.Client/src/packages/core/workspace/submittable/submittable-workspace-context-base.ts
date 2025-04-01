@@ -103,7 +103,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 				// TODO: Implement developer-mode logging here. [NL]
 				console.warn(
 					'Validation failed because of these validation messages still begin present: ',
-					this.#validationContexts.flatMap((x) => x.messages.getFilteredMessages()),
+					this.#validationContexts.flatMap((x) => x.messages.getMessages()),
 				);
 				onInvalid(error).then(this.#resolveSubmit, this.#rejectSubmit);
 			},

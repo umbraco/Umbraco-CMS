@@ -12,7 +12,7 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	 * @memberof UmbStateManager
 	 */
 	protected _states = new UmbArrayState<StateType>([], (x) => x.unique);
-	public states = this._states.asObservable();
+	public readonly states = this._states.asObservable();
 
 	protected _isRunning = new UmbBooleanState(true);
 	public readonly isRunning = this._isRunning.asObservable();
@@ -21,13 +21,13 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	 * Observable that emits true if there are any states in the state manager
 	 * @memberof UmbStateManager
 	 */
-	public isOn = this._states.asObservablePart((x) => x.length > 0);
+	public readonly isOn = this._states.asObservablePart((x) => x.length > 0);
 
 	/**
 	 * Observable that emits true if there are no states in the state manager
 	 * @memberof UmbStateManager
 	 */
-	public isOff = this._states.asObservablePart((x) => x.length === 0);
+	public readonly isOff = this._states.asObservablePart((x) => x.length === 0);
 
 	/**
 	 * Start the state - this will allow the state to be used.
