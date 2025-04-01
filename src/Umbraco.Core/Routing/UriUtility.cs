@@ -144,7 +144,7 @@ public sealed class UriUtility
         var idxOfScheme = relativeUrl.IndexOf(@"://", StringComparison.Ordinal);
         if (idxOfScheme != -1)
         {
-            var idxOfQM = relativeUrl.IndexOf('?',StringComparison.Ordinal);
+            var idxOfQM = relativeUrl.IndexOf('?', StringComparison.Ordinal);
             if (idxOfQM == -1 || idxOfQM > idxOfScheme)
             {
                 return relativeUrl;

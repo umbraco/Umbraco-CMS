@@ -17,7 +17,7 @@ public class StringIndexOfBenchmarks
     [Benchmark()]
     public bool IndexOf_Ordinal()
     {
-        return _domainName.IndexOf("://",StringComparison.Ordinal) > -1;
+        return _domainName.IndexOf("://", StringComparison.Ordinal) > -1;
     }
 
     [Benchmark()]
@@ -41,7 +41,7 @@ public class StringIndexOfBenchmarks
     [Benchmark()]
     public bool Contains_Ordinal()
     {
-        return _domainName.Contains("://",StringComparison.Ordinal);
+        return _domainName.Contains("://", StringComparison.Ordinal);
     }
 
     [Benchmark()]
@@ -73,7 +73,7 @@ public class StringIndexOfBenchmarks
     public bool Span_Index_Of_Ordinal()
     {
         var uri = "https://www.lorem-ipsum.com".AsSpan();
-        return uri.IndexOf("#".AsSpan(),StringComparison.Ordinal) > -1;
+        return uri.IndexOf("#".AsSpan(), StringComparison.Ordinal) > -1;
     }
 
     /*
@@ -91,5 +91,4 @@ public class StringIndexOfBenchmarks
        | Span_Index_Of           |   1.741 ns |  0.9093 ns | 0.0498 ns |         - |
        | Span_Index_Of_Ordinal   |   1.809 ns |  0.3703 ns | 0.0203 ns |         - |
      */
-
 }

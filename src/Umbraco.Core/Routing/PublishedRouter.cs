@@ -440,7 +440,7 @@ public class PublishedRouter : IPublishedRouter
             return false;
         }
 
-        var pos = alias.IndexOf('/',StringComparison.Ordinal);
+        var pos = alias.IndexOf('/', StringComparison.Ordinal);
         if (pos > 0)
         {
             // recurse
