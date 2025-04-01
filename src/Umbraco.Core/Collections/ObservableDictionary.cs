@@ -160,7 +160,7 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
 
         if (index != Count)
         {
-            foreach (KeyValuePair<TKey, int> largerOrEqualToIndex in Indecies.Where(kvp => kvp.Value >= index).ToList())
+            foreach (KeyValuePair<TKey, int> largerOrEqualToIndex in Indecies.Where(kvp => kvp.Value >= index))
             {
                 Indecies[largerOrEqualToIndex.Key] = largerOrEqualToIndex.Value + 1;
             }
@@ -185,7 +185,7 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
 
         Indecies.Remove(key);
 
-        foreach (KeyValuePair<TKey, int> largerThanIndex in Indecies.Where(kvp => kvp.Value > index).ToList())
+        foreach (KeyValuePair<TKey, int> largerThanIndex in Indecies.Where(kvp => kvp.Value > index))
         {
             Indecies[largerThanIndex.Key] = largerThanIndex.Value - 1;
         }
