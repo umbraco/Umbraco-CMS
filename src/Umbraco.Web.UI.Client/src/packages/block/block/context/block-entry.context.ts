@@ -573,6 +573,8 @@ export abstract class UmbBlockEntryContext<
 	#observeReadOnlyState() {
 		if (!this._manager) return;
 
+		// TODO: Here is a potential future issue. This is parsing on the read only state of the variant that this is opened from, that is problematic when we enable switching variant within a Block. [NL]
+		// TODO: This could benefit from a more dynamic approach, where we inherit all non-variant and variant scoped states. [NL]
 		this.observe(
 			observeMultiple([this._manager.readOnlyState.isReadOnly, this._manager.variantId]),
 			([isReadOnly, variantId]) => {
