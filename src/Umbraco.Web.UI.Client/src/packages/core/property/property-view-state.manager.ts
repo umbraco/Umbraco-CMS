@@ -1,8 +1,8 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import { UmbStateManager, type UmbState } from '@umbraco-cms/backoffice/utils';
+import { UmbStateManager, type UmbStateEntry } from '@umbraco-cms/backoffice/utils';
 
-export interface UmbPropertyViewState extends UmbState {
+export interface UmbPropertyViewState extends UmbStateEntry {
 	propertyType: UmbReferenceByUnique;
 }
 
