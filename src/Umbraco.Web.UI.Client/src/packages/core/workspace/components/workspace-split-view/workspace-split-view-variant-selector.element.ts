@@ -234,6 +234,17 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		const host = this.getBoundingClientRect();
 		// TODO: Ideally this is kept updated while open, but for now we just set it once:
 		this._popoverElement.style.width = `${host.width}px`;
+
+		// If the active variant is a segment then we expend the culture variant when the selector is opened.
+		if (this.#isSegmentVariantOption(this._activeVariant)) {
+			const culture = this._cultureVariants.find((variant) => {
+				return variant.culture === this._activeVariant?.culture && variant.segment === null;
+			});
+
+			if (!culture) return;
+			const variantId = UmbVariantId.Create(culture);
+			this.#expandVariant(variantId);
+		}
 	}
 
 	/**
@@ -258,14 +269,23 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		return variantOption?.segment !== null;
 	}
 
-	#toggleExpansion(event: PointerEvent, variantId: UmbVariantId) {
+	#onVariantExpandClick(event: PointerEvent, variantId: UmbVariantId) {
 		event.stopPropagation();
-		this._expandedVariants = this.#isExpanded(variantId)
+		this.#toggleVariantExpansion(variantId);
+	}
+
+	#expandVariant(variantId: UmbVariantId) {
+		if (this.#isVariantExpanded(variantId)) return;
+		this._expandedVariants = [...this._expandedVariants, variantId];
+	}
+
+	#toggleVariantExpansion(variantId: UmbVariantId) {
+		this._expandedVariants = this.#isVariantExpanded(variantId)
 			? this._expandedVariants.filter((expandedVariant) => expandedVariant.equal(variantId) === false)
 			: [...this._expandedVariants, variantId];
 	}
 
-	#isExpanded(variantId: UmbVariantId) {
+	#isVariantExpanded(variantId: UmbVariantId) {
 		return this._expandedVariants.find((expandedVariant) => expandedVariant.equal(variantId)) !== undefined;
 	}
 
@@ -358,7 +378,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					<div class="specs-info">${this.#getVariantSpecInfo(variantOption)}</div>
 				</button>
 				${this.#renderSplitViewButton(variantOption)}
-				${this.#isExpanded(variantId)
+				${this.#isVariantExpanded(variantId)
 					? html`
 							<ul class="children-area">
 								${this.#getSegmentVariantOptionsForCulture(variantOption, variantId).map((option) =>
@@ -375,8 +395,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		if (!variantOption.variant?.state) return nothing;
 
 		return html`
-			<uui-button @click=${(event: PointerEvent) => this.#toggleExpansion(event, variantId)} compact>
-				<uui-symbol-expand .open=${this.#isExpanded(variantId)}></uui-symbol-expand>
+			<uui-button @click=${(event: PointerEvent) => this.#onVariantExpandClick(event, variantId)} compact>
+				<uui-symbol-expand .open=${this.#isVariantExpanded(variantId)}></uui-symbol-expand>
 			</uui-button>
 		`;
 	}
