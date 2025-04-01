@@ -12,7 +12,12 @@ import type { UUIInputElement, UUIInputEvent, UUITabElement } from '@umbraco-cms
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import type {
+	IComponentRoute,
+	UmbRoute,
+	UmbRouterSlotChangeEvent,
+	UmbRouterSlotInitEvent,
+} from '@umbraco-cms/backoffice/router';
 import type {
 	ManifestWorkspaceViewContentTypeDesignEditorKind,
 	UmbWorkspaceViewElement,
@@ -78,6 +83,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	#workspaceContext?: (typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT)['TYPE'];
 	#designContext = new UmbContentTypeDesignEditorContext(this);
 	#tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
+	#currentTabComponent?: UmbContentTypeDesignEditorTabElement;
+	#processingTabId?: string;
 
 	set manifest(value: ManifestWorkspaceViewContentTypeDesignEditorKind) {
 		this._compositionRepositoryAlias = value.meta.compositionRepositoryAlias;
@@ -94,15 +101,13 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	private _routes: UmbRoute[] = [];
 
 	@state()
-	_tabs?: Array<UmbPropertyTypeContainerModel>;
+	private _tabs?: Array<UmbPropertyTypeContainerModel>;
 
 	@state()
 	private _routerPath?: string;
 
 	@state()
 	private _activePath = '';
-
-	private _activeTabId?: string;
 
 	@state()
 	private _sortModeActive?: boolean;
@@ -132,7 +137,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		this.observe(this.#tabsStructureHelper.mergedContainers, (tabs) => {
 			this._tabs = tabs;
 			this.#sorter.setModel(tabs);
-			this._createRoutes();
+			this.#createRoutes();
 		});
 
 		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
@@ -156,13 +161,13 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			await this.#workspaceContext.structure.hasRootContainers('Group'),
 			(hasRootGroups) => {
 				this._hasRootGroups = hasRootGroups;
-				this._createRoutes();
+				this.#createRoutes();
 			},
 			'_observeGroups',
 		);
 	}
 
-	private _createRoutes() {
+	#createRoutes() {
 		// TODO: How about storing a set of elements based on tab ids? to prevent re-initializing the element when renaming..[NL]
 		if (!this.#workspaceContext || !this._tabs || this._hasRootGroups === undefined) return;
 		const routes: UmbRoute[] = [];
@@ -173,14 +178,15 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name && tab.name !== '' ? tab.name : '-';
-				if (tab.id === this._activeTabId) {
+				if (tab.id === this.#processingTabId) {
 					activeTabName = tabName;
 				}
 				routes.push({
 					path: `tab/${encodeFolderName(tabName)}`,
 					component: () => import('./content-type-design-editor-tab.element.js'),
 					setup: (component) => {
-						(component as UmbContentTypeDesignEditorTabElement).containerId = tab.id;
+						this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
+						this.#currentTabComponent.containerId = tab.id;
 					},
 				});
 			});
@@ -191,19 +197,20 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				path: 'root',
 				component: () => import('./content-type-design-editor-tab.element.js'),
 				setup: (component) => {
-					(component as UmbContentTypeDesignEditorTabElement).containerId = null;
+					this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
+					this.#currentTabComponent.containerId = null;
 				},
 			});
 			routes.push({
 				path: '',
 				redirectTo: 'root',
-				guards: [() => this._activeTabId === undefined],
+				guards: [() => this.#processingTabId === undefined],
 			});
 		} else {
 			routes.push({
 				path: '',
 				redirectTo: routes[0]?.path,
-				guards: [() => this._activeTabId === undefined],
+				guards: [() => this.#processingTabId === undefined],
 			});
 		}
 
@@ -211,8 +218,29 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			routes.push({
 				path: `**`,
 				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-				guards: [() => this._activeTabId === undefined],
+				guards: [() => this.#processingTabId === undefined],
+				setup: () => {
+					this.#currentTabComponent = undefined;
+				},
 			});
+		}
+
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			setup: () => {
+				this.#currentTabComponent = undefined;
+			},
+		});
+
+		this._routes = routes;
+
+		// If we have a active tab, then we want to make sure its up to date with latest tab id, as an already active route is not getting its setup method triggered again [NL]
+		if (this._activePath && this.#currentTabComponent) {
+			const route = routes.find((x) => this._routerPath + '/' + x.path === this._activePath) as
+				| IComponentRoute
+				| undefined;
+			route?.setup?.(this.#currentTabComponent, undefined as any);
 		}
 
 		// If we have an active tab name, then we might have a active tab name re-name, then we will redirect to the new name if it has been changed: [NL]
@@ -225,18 +253,12 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					this._activePath = this._routerPath + newPath;
 					// Update the current URL, so we are still on this specific tab: [NL]
 					window.history.replaceState(null, '', this._activePath);
+
 					// TODO: We have some flickering when renaming, this could potentially be fixed if we cache the view and re-use it if the same is requested [NL]
 					// Or maybe its just about we just send the updated tabName to the view, and let it handle the update itself [NL]
 				}
 			}
 		}
-
-		routes.push({
-			path: `**`,
-			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-		});
-
-		this._routes = routes;
 	}
 
 	async #requestDeleteTab(tab: UmbPropertyTypeContainerModel | undefined) {
@@ -267,8 +289,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	#deleteTab(tabId?: string) {
 		if (!tabId) return;
 		this.#workspaceContext?.structure.removeContainer(null, tabId);
-		if (this._activeTabId === tabId) {
-			this._activeTabId = undefined;
+		if (this.#processingTabId === tabId) {
+			this.#processingTabId = undefined;
 		}
 	}
 	async #addTab() {
@@ -307,7 +329,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	async #tabNameChanged(event: InputEvent, tab: UmbPropertyTypeContainerModel) {
-		this._activeTabId = tab.id;
+		this.#processingTabId = tab.id;
 		let newName = (event.target as HTMLInputElement).value;
 
 		const changedName = this.#workspaceContext?.structure.makeContainerNameUniqueForOwnerContentType(
@@ -329,10 +351,10 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	async #tabNameBlur(event: FocusEvent, tab: UmbPropertyTypeContainerModel) {
-		if (!this._activeTabId) return;
+		if (!this.#processingTabId) return;
 		const newName = (event.target as HTMLInputElement | undefined)?.value;
 		if (newName === '') {
-			const changedName = this.#workspaceContext!.structure.makeEmptyContainerName(this._activeTabId, 'Tab');
+			const changedName = this.#workspaceContext!.structure.makeEmptyContainerName(this.#processingTabId, 'Tab');
 
 			(event.target as HTMLInputElement).value = changedName;
 
@@ -341,7 +363,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			});
 		}
 
-		this._activeTabId = undefined;
+		this.#processingTabId = undefined;
 	}
 
 	async #openCompositionModal() {
@@ -386,8 +408,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		return html`
 			<umb-body-layout header-fit-height>
 				<div id="header" slot="header">
-					<div id="container-list">${this.renderTabsNavigation()} ${this.renderAddButton()}</div>
-					${this.renderActions()}
+					<div id="container-list">${this.renderTabsNavigation()} ${this.#renderAddButton()}</div>
+					${this.#renderActions()}
 				</div>
 				<umb-router-slot
 					.routes=${this._routes}
@@ -402,7 +424,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		`;
 	}
 
-	renderAddButton() {
+	#renderAddButton() {
 		// TODO: Localize this:
 		if (this._sortModeActive) return;
 		return html`
@@ -413,7 +435,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		`;
 	}
 
-	renderActions() {
+	#renderActions() {
 		const sortButtonText = this._sortModeActive
 			? this.localize.term('general_reorderDone')
 			: this.localize.term('general_reorder');
@@ -467,6 +489,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		return html`
 			<uui-tab
 				id="root-tab"
+				data-mark="root-tab"
 				class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
 				label=${this.localize.term('general_generic')}
 				.active=${rootTabActive}
@@ -486,6 +509,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			.active=${tabActive}
 			href=${path}
 			data-umb-tab-id=${ifDefined(tab.id)}
+			data-mark="tab:${tab.name}"
 			?sortable=${ownedTab}>
 			${this.renderTabInner(tab, tabActive, ownedTab)}
 		</uui-tab>`;
@@ -557,6 +581,11 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			compact>
 			<uui-icon name="icon-trash"></uui-icon>
 		</uui-button>`;
+	}
+
+	override destroy(): void {
+		this.#currentTabComponent = undefined;
+		super.destroy();
 	}
 
 	static override styles = [

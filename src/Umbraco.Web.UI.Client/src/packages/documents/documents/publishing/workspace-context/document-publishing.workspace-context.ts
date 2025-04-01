@@ -177,6 +177,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	 * Convert a date string to a server time string in ISO format, example: 2021-01-01T12:00:00.000+00:00.
 	 * The input must be a valid date string, otherwise it will return null.
 	 * The output matches the DateTimeOffset format in C#.
+	 * @param dateString
 	 */
 	#convertToDateTimeOffset(dateString: string | null | undefined) {
 		if (!dateString || dateString.length === 0) {

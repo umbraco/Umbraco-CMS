@@ -1,10 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -44,7 +46,14 @@ public class PropertyValidationServiceTests
 
         var propEditors = new PropertyEditorCollection(new DataEditorCollection(() => new[] { dataEditor }));
 
-        validationService = new PropertyValidationService(propEditors, dataTypeService.Object, Mock.Of<ILocalizedTextService>(),new ValueEditorCache(), Mock.Of<ICultureDictionary>());
+        validationService = new PropertyValidationService(
+            propEditors,
+            dataTypeService.Object,
+            Mock.Of<ILocalizedTextService>(),
+            new ValueEditorCache(),
+            Mock.Of<ICultureDictionary>(),
+            Mock.Of<ILanguageService>(),
+            Mock.Of<IOptions<ContentSettings>>());
     }
 
     [Test]

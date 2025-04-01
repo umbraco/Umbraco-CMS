@@ -11,36 +11,50 @@ import { map, distinctUntilChanged, combineLatest, of, switchMap } from '@umbrac
 
 /**
  *
- * @param {Array<ManifestBase>} previousValue - previous value
- * @param {Array<ManifestBase>} currentValue - current value
+ * @param {Array<ManifestBase>} previousValues - previous value
+ * @param {Array<ManifestBase>} currentValues - current value
  * @returns {boolean} - true if value is assumed to be the same as previous value.
  */
 function extensionArrayMemoization<T extends Pick<ManifestBase, 'alias'>>(
-	previousValue: Array<T>,
-	currentValue: Array<T>,
+	previousValues: Array<T>,
+	currentValues: Array<T>,
 ): boolean {
 	// If length is different, data is different:
-	if (previousValue.length !== currentValue.length) {
+	if (previousValues.length !== currentValues.length) {
 		return false;
 	}
-	// previousValue has an alias that is not present in currentValue:
-	if (previousValue.find((p) => !currentValue.find((c) => c.alias === p.alias))) {
+
+	// is there some properties that differs?:
+	if (
+		previousValues.some((p) => {
+			const n = currentValues.find((c) => c.alias === p.alias);
+			if (!n) {
+				return true;
+			}
+
+			if ((p as any).conditions?.length !== (n as any).conditions?.length) {
+				return true;
+			}
+			return !(p === n);
+		})
+	) {
 		return false;
 	}
+
 	return true;
 }
 
 /**
  *
- * @param {Array<ManifestBase>} previousValue - previous value
- * @param {Array<ManifestBase>} currentValue - current value
+ * @param {Array<ManifestBase>} previousValues - previous value
+ * @param {Array<ManifestBase>} currentValues - current value
  * @returns {boolean} - true if value is assumed to be the same as previous value.
  */
 function extensionAndKindMatchArrayMemoization<
 	T extends Pick<ManifestBase, 'alias'> & { __isMatchedWithKind?: boolean },
->(previousValue: Array<T>, currentValue: Array<T>): boolean {
+>(previousValues: Array<T>, currentValues: Array<T>): boolean {
 	// If length is different, data is different:
-	if (previousValue.length !== currentValue.length) {
+	if (previousValues.length !== currentValues.length) {
 		return false;
 	}
 	// previousValue has an alias that is not present in currentValue:
@@ -50,11 +64,17 @@ function extensionAndKindMatchArrayMemoization<
 	}*/
 	// if previousValue has different meta values:
 	if (
-		currentValue.find((newValue: T) => {
-			const oldValue = previousValue.find((c) => c.alias === newValue.alias);
+		currentValues.some((currentValue: T) => {
+			const previousValue = previousValues.find((c) => c.alias === currentValue.alias);
 			// First check if we found a previous value, matching this alias.
 			// Then checking __isMatchedWithKind, as this is much more performant than checking the whole object. (I assume the only change happening to an extension is the match with a kind, we do not want to watch for other changes)
-			return oldValue === undefined || newValue.__isMatchedWithKind !== oldValue.__isMatchedWithKind;
+			return (
+				previousValue === undefined ||
+				previousValue !== currentValue ||
+				previousValue.alias !== currentValue.alias ||
+				previousValue.__isMatchedWithKind !== currentValue.__isMatchedWithKind ||
+				(previousValue as any).conditions?.length !== (currentValue as any).conditions?.length
+			);
 		})
 	) {
 		return false;
@@ -72,10 +92,12 @@ function extensionSingleMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	previousValue: T | undefined,
 	currentValue: T | undefined,
 ): boolean {
-	if (previousValue && currentValue) {
-		return previousValue.alias === currentValue.alias;
-	}
-	return previousValue === currentValue;
+	return !(
+		previousValue === undefined ||
+		previousValue !== currentValue ||
+		previousValue.alias !== currentValue.alias ||
+		(previousValue as any).conditions?.length !== (currentValue as any).conditions?.length
+	);
 }
 
 /**
@@ -87,13 +109,13 @@ function extensionSingleMemoization<T extends Pick<ManifestBase, 'alias'>>(
 function extensionAndKindMatchSingleMemoization<
 	T extends Pick<ManifestBase, 'alias'> & { __isMatchedWithKind?: boolean },
 >(previousValue: T | undefined, currentValue: T | undefined): boolean {
-	if (previousValue && currentValue) {
-		return (
-			previousValue.alias === currentValue.alias &&
-			previousValue.__isMatchedWithKind === currentValue.__isMatchedWithKind
-		);
-	}
-	return previousValue === currentValue;
+	return !(
+		previousValue === undefined ||
+		previousValue !== currentValue ||
+		previousValue.alias !== currentValue.alias ||
+		previousValue.__isMatchedWithKind !== currentValue.__isMatchedWithKind ||
+		(previousValue as any).conditions?.length !== (currentValue as any).conditions?.length
+	);
 }
 
 const sortExtensions = (a: ManifestBase, b: ManifestBase): number => (b.weight || 0) - (a.weight || 0);
@@ -117,6 +139,7 @@ export class UmbExtensionRegistry<
 	#appendAdditionalConditions(manifest: ManifestTypes) {
 		const newConditions = this.#additionalConditions.get(manifest.alias);
 		if (newConditions) {
+			manifest = { ...manifest };
 			// Append the condition to the extensions conditions array
 			if ((manifest as ManifestWithDynamicConditions).conditions) {
 				for (const condition of newConditions) {
@@ -586,7 +609,7 @@ export class UmbExtensionRegistry<
 			existingConditionsToBeAdded ? [...existingConditionsToBeAdded, ...newConditions] : newConditions,
 		);
 
-		const allExtensions = this._extensions.getValue();
+		const allExtensions = [...this._extensions.getValue()];
 		for (const extension of allExtensions) {
 			if (extension.alias === alias) {
 				// Replace the existing extension with the updated one
