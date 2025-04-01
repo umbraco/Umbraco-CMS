@@ -584,7 +584,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				margin-bottom: 1px;
 			}
 
-			li:hover .split-view {
+			li:hover > .split-view {
 				display: flex;
 			}
 
