@@ -469,6 +469,38 @@
 			"file": "tally-3.svg"
 		},
 		{
+			"name": "icon-columns-2",
+			"file": "columns-2.svg"
+		},
+		{
+			"name": "icon-columns-3",
+			"file": "columns-3.svg"
+		},
+		{
+			"name": "icon-columns-4",
+			"file": "columns-4.svg"
+		},
+		{
+			"name": "icon-rows-2",
+			"file": "rows-2.svg"
+		},
+		{
+			"name": "icon-rows-3",
+			"file": "rows-3.svg"
+		},
+		{
+			"name": "icon-rows-4",
+			"file": "rows-4.svg"
+		},
+		{
+			"name": "icon-grid-2",
+			"file": "grid-2x2.svg"
+		},
+		{
+			"name": "icon-grid-3",
+			"file": "grid-3x3.svg"
+		},
+		{
 			"name": "icon-combination-lock-open",
 			"file": "lock-keyhole-open.svg"
 		},
@@ -2452,6 +2484,82 @@
 		{
 			"name": "icon-document-play",
 			"file": "file-video.svg"
+		},
+		{
+			"name": "icon-shared-value",
+			"file": "repeat-2.svg"
+		},
+		{
+			"name": "icon-layout-masonry",
+			"file": "layout-dashboard.svg"
+		},
+		{
+			"name": "icon-layout-grid",
+			"file": "layout-grid.svg"
+		},
+		{
+			"name": "icon-layout-list",
+			"file": "layout-list.svg"
+		},
+		{
+			"name": "icon-layout-panel-left",
+			"file": "layout-panel-left.svg"
+		},
+		{
+			"name": "icon-spray-can",
+			"file": "spray-can.svg"
+		},
+		{
+			"name": "icon-swatch-book",
+			"file": "swatch-book.svg"
+		},
+		{
+			"name": "icon-shape-cylinder",
+			"file": "cylinder.svg"
+		},
+		{
+			"name": "icon-shape-triangle-right",
+			"file": "triangle-right.svg"
+		},
+		{
+			"name": "icon-shape-triangle",
+			"file": "triangle.svg"
+		},
+		{
+			"name": "icon-shape-circle",
+			"file": "circle.svg"
+		},
+		{
+			"name": "icon-shape-square",
+			"file": "square.svg"
+		},
+		{
+			"name": "icon-shape-hexagon",
+			"file": "hexagon.svg"
+		},
+		{
+			"name": "icon-shape-rectangle-horizontal",
+			"file": "rectangle-horizontal.svg"
+		},
+		{
+			"name": "icon-shape-rectangle-vertical",
+			"file": "rectangle-vertical.svg"
+		},
+		{
+			"name": "icon-shapes",
+			"file": "shapes.svg"
+		},
+		{
+			"name": "icon-layout-dislocated",
+			"file": "ungroup.svg"
+		},
+		{
+			"name": "icon-blend",
+			"file": "blend.svg"
+		},
+		{
+			"name": "icon-land-plot",
+			"file": "land-plot.svg"
 		}
 	],
 	"simpleIcons": [
