@@ -256,8 +256,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 			#wrapperInner {
 				position: relative;
 				display: flex;
-				width: fit-content;
-				max-width: 100%;
+				width: 100%;
 			}
 		`,
 	];
