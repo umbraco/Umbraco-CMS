@@ -165,7 +165,6 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 			if (value) {
 				this.readonlyState.addState({
 					unique,
-					message: '',
 				});
 			} else {
 				this.readonlyState.removeState(unique);

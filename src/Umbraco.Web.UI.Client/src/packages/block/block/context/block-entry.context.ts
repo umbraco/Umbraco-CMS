@@ -583,7 +583,6 @@ export abstract class UmbBlockEntryContext<
 					const state = {
 						unique,
 						variantId,
-						message: '',
 					};
 
 					this.readOnlyState?.addState(state);
