@@ -160,12 +160,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<RichTextBlockPropertyValueConstructorCache>();
         builder.Services.AddSingleton<BlockEditorVarianceHandler>();
 
-        // both SimpleTinyMceValueConverter (in Core) and RteBlockRenderingValueConverter (in Infrastructure) will be
-        // discovered when CoreBootManager configures the converters. We will remove the basic one defined
-        // in core so that the more enhanced version is active.
-        builder.PropertyValueConverters()
-            .Remove<SimpleTinyMceValueConverter>();
-
         // register *all* checks, except those marked [HideFromTypeFinder] of course
         builder.Services.AddSingleton<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
 
