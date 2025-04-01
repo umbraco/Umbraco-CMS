@@ -245,6 +245,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 				grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 				gap: var(--uui-size-space-4);
 				box-sizing: border-box;
+				margin-bottom: var(--uui-size-space-3);
 			}
 
 			#wrapper:has(umb-input-upload-field-file) {
