@@ -40,45 +40,42 @@ export class UmbPropertyValueUserPermissionWorkspaceContextBase extends UmbContr
 		property: UmbPropertyTypeModel;
 		variantIds: Array<UmbVariantId>;
 	}) {
-		// We can only apply states if the state manager is running
-		this.observe(args.stateManager.isRunning, (isRunning) => {
-			if (!isRunning) return;
-
-			createExtensionApiByAlias(this, UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_CONDITION_ALIAS, [
-				{
-					config: {
-						allOf: [args.verb],
-						match: {
-							propertyType: {
-								unique: args.property.unique,
-							},
+		// TODO: Oh, this results in quite a few Context Consumptions. Lets try not to use a condition in this case. [NL]
+		createExtensionApiByAlias(this, UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					allOf: [args.verb],
+					match: {
+						propertyType: {
+							unique: args.property.unique,
 						},
 					},
-					onChange: (permitted: boolean) => {
-						// If the property is invariant we only need one state for the property
-						const isInvariant = args.property.variesByCulture === false && args.property.variesBySegment === false;
-						const variantIds = isInvariant ? [new UmbVariantId()] : args.variantIds;
-
-						const states: Array<UmbVariantPropertyWriteState> =
-							variantIds?.map((variantId) => {
-								return {
-									unique: 'UMB_PROPERTY_' + args.property.unique + '_' + variantId.toString(),
-									propertyType: {
-										unique: args.property.unique,
-										variantId,
-									},
-								};
-							}) || [];
-
-						if (permitted) {
-							args.stateManager.addStates(states);
-						} else {
-							args.stateManager.removeStates(states.map((state) => state.unique));
-						}
-					},
 				},
-			]);
-		});
+				onChange: (permitted: boolean) => {
+					// If the property is invariant we only need one state for the property
+					const isInvariant = args.property.variesByCulture === false && args.property.variesBySegment === false;
+					const variantIds = isInvariant ? [new UmbVariantId()] : args.variantIds;
+
+					const states: Array<UmbVariantPropertyWriteState> =
+						variantIds?.map((variantId) => {
+							return {
+								state: true,
+								unique: 'UMB_PROPERTY_' + args.property.unique + '_' + variantId.toString(),
+								propertyType: {
+									unique: args.property.unique,
+								},
+								variantId,
+							};
+						}) || [];
+
+					if (permitted) {
+						args.stateManager.addStates(states);
+					} else {
+						args.stateManager.removeStates(states.map((state) => state.unique));
+					}
+				},
+			},
+		]);
 	}
 }
 

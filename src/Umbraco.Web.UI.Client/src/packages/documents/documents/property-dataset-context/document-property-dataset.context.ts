@@ -4,8 +4,9 @@ import { UmbContentPropertyDatasetContext } from '@umbraco-cms/backoffice/conten
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { UmbVariantId, type UmbVariantPropertyReadOnlyState } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { DocumentConfigurationResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbVariantPropertyReadOnlyState } from '@umbraco-cms/backoffice/property';
 
 export class UmbDocumentPropertyDatasetContext extends UmbContentPropertyDatasetContext<
 	UmbDocumentDetailModel,
@@ -49,11 +50,12 @@ export class UmbDocumentPropertyDatasetContext extends UmbContentPropertyDataset
 					if (!property.variesByCulture && !isDefaultLanguage) {
 						const state: UmbVariantPropertyReadOnlyState = {
 							unique,
+							state: true,
 							message: 'Shared properties can only be edited in the default language',
 							propertyType: {
 								unique: property.unique,
-								variantId: new UmbVariantId(),
 							},
+							variantId: new UmbVariantId(),
 						};
 
 						this._dataOwner.structure.propertyReadOnlyState.addState(state);

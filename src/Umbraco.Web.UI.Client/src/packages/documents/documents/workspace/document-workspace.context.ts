@@ -89,8 +89,8 @@ export class UmbDocumentWorkspaceContext
 
 		/* Start the property view and write states for the document workspace. This means that the properties are not viewable or writable by default
 		 but requires an entry in the state to be able to view or write to the properties. */
-		this.structure.propertyViewState.start();
-		this.structure.propertyWriteState.start();
+		this.structure.propertyViewState.fallbackToOff();
+		this.structure.propertyWriteState.fallbackToOff();
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
 
