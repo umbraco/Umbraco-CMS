@@ -289,7 +289,7 @@ internal sealed class BlockEditorBackwardsCompatibilityTests : UmbracoIntegratio
                          "markup": "<p>huh?</p>",
                          "blocks": {
                              "layout": {
-                                 "{{Constants.PropertyEditors.Aliases.TinyMce}}": [
+                                 "Umbraco.TinyMCE": [
                                      {
                                          "contentUdi": "umb://element/1304e1ddac87439684fe8a399231cb3d",
                                          "settingsUdi": "umb://element/1f613e26ce274898908a561437af5100"

@@ -27,5 +27,5 @@ public class RichTextBlockValue : BlockValue<RichTextBlockLayoutItem>
     // RTE block layouts uses "Umbraco.TinyMCE" in V14 and below, but should use "Umbraco.RichText" for V15+
     [Obsolete("Will be removed in V18.")]
     public override bool SupportsBlockLayoutAlias(string alias)
-        => base.SupportsBlockLayoutAlias(alias) || alias.Equals(Constants.PropertyEditors.Aliases.TinyMce);
+        => base.SupportsBlockLayoutAlias(alias) || alias.Equals("Umbraco.TinyMCE");
 }
