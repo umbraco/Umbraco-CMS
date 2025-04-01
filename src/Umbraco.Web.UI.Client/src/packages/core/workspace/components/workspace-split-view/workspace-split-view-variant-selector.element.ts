@@ -16,7 +16,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	VariantOptionModelType extends
 		UmbEntityVariantOptionModel<UmbEntityVariantModel> = UmbEntityVariantOptionModel<UmbEntityVariantModel>,
 > extends UmbLitElement {
-	@query('#variant-selector-popover')
+	@query('#popover')
 	private _popoverElement?: UUIPopoverContainerElement;
 
 	@state()
@@ -51,6 +51,12 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	@state()
 	private _variesBySegment = false;
+
+	@state()
+	private _expandedVariants: Array<UmbVariantId> = [];
+
+	@state()
+	private _cultureVariants: Array<VariantOptionModelType> = [];
 
 	@state()
 	private _labelDefault = '';
@@ -101,6 +107,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			workspaceContext.variantOptions,
 			(variantOptions) => {
 				this._variantOptions = (variantOptions as Array<VariantOptionModelType>).sort(this._variantSorter);
+				this._cultureVariants = this._variantOptions.filter((variant) => variant.segment === null);
 				this.#setReadOnlyCultures();
 			},
 			'_observeVariantOptions',
@@ -238,6 +245,25 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		}, 200);
 	}
 
+	#isReadOnly(culture: string | null) {
+		return this._readOnlyCultures.includes(culture);
+	}
+
+	#toggleExpansion(event: PointerEvent, variantId: UmbVariantId) {
+		event.stopPropagation();
+		this._expandedVariants = this.#isExpanded(variantId)
+			? this._expandedVariants.filter((expandedVariant) => expandedVariant.equal(variantId) === false)
+			: [...this._expandedVariants, variantId];
+	}
+
+	#isExpanded(variantId: UmbVariantId) {
+		return this._expandedVariants.find((expandedVariant) => expandedVariant.equal(variantId)) !== undefined;
+	}
+
+	#getSegmentVariantOptionsForCulture(variantId: UmbVariantId): Array<VariantOptionModelType> {
+		return this._variantOptions.filter((variant) => variant.culture === variantId.culture && variant.segment !== null);
+	}
+
 	override render() {
 		if (!this._variantId) return nothing;
 
@@ -256,10 +282,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				${this.#hasVariants()
 					? html`
 							<uui-button
-								id="variant-selector-toggle"
+								id="toggle"
 								compact
 								slot="append"
-								popovertarget="variant-selector-popover"
+								popovertarget="popover"
 								title=${this.#getVariantSpecInfo(this._activeVariant)}
 								label="Select a variant">
 								${this.#getVariantSpecInfo(this._activeVariant)}
@@ -279,14 +305,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 			${this.#hasVariants()
 				? html`
-						<uui-popover-container
-							id="variant-selector-popover"
-							@beforetoggle=${this.#onPopoverToggle}
-							placement="bottom-end">
-							<div id="variant-selector-dropdown">
+						<uui-popover-container id="popover" @beforetoggle=${this.#onPopoverToggle} placement="bottom-end">
+							<div id="dropdown">
 								<uui-scroll-container>
-									<ul>
-										${this._variantOptions.map((variant) => this.#renderListItem(variant))}
+									<ul class="variant-list">
+										${this._cultureVariants.map((variant) => this.#renderCultureVariantOption(variant))}
 									</ul>
 								</uui-scroll-container>
 							</div>
@@ -296,14 +319,60 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		`;
 	}
 
-	#renderListItem(variantOption: VariantOptionModelType) {
+	#renderCultureVariantOption(variantOption: VariantOptionModelType) {
 		const variantId = UmbVariantId.Create(variantOption);
 		return html`
-			<li class="${this.#isVariantActive(variantId) ? 'selected' : ''}">
+			<li class="variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
+				<uui-button
+					class="expand-area"
+					@click=${(event: PointerEvent) => this.#toggleExpansion(event, variantId)}
+					compact>
+					<uui-symbol-expand .open=${this.#isExpanded(variantId)}></uui-symbol-expand>
+				</uui-button>
 				<button
-					class="variant-selector-switch-button ${this.#isCreateMode(variantOption)
-						? 'add-mode'
-						: ''} ${this.#isReadOnly(variantId.culture) ? 'readonly-mode' : ''}"
+					class="variant-area switch-button ${this.#isCreateMode(variantOption) ? 'add-mode' : ''} ${this.#isReadOnly(
+						variantId.culture,
+					)
+						? 'readonly-mode'
+						: ''}"
+					@click=${() => this.#switchVariant(variantOption)}>
+					${this.#isCreateMode(variantOption) ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
+					<div class="variant-info">
+						<div class="variant-name">
+							${this.#getVariantName(variantOption)}${this.#renderReadOnlyTag(variantId.culture)}
+						</div>
+						<div class="variant-details">
+							<span>${this._renderVariantDetails(variantOption)}</span>
+						</div>
+					</div>
+					<div class="specs-info">${this.#getVariantSpecInfo(variantOption)}</div>
+				</button>
+				${this.#renderSplitViewButton(variantOption)}
+				${this.#isExpanded(variantId)
+					? html`
+							<ul class="children-area">
+								${this.#getSegmentVariantOptionsForCulture(variantId).map((option) =>
+									this.#renderSegmentVariantOption(option),
+								)}
+							</ul>
+						`
+					: nothing}
+			</li>
+		`;
+	}
+
+	#renderSegmentVariantOption(variantOption: VariantOptionModelType) {
+		const variantId = UmbVariantId.Create(variantOption);
+
+		return html`
+			<li class="variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
+				<div class="expand-area"></div>
+				<button
+					class="switch-button ${this.#isCreateMode(variantOption) ? 'add-mode' : ''} ${this.#isReadOnly(
+						variantId.culture,
+					)
+						? 'readonly-mode'
+						: ''}"
 					@click=${() => this.#switchVariant(variantOption)}>
 					${this.#isCreateMode(variantOption) ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
@@ -364,10 +433,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		return html``;
 	}
 
-	#isReadOnly(culture: string | null) {
-		return this._readOnlyCultures.includes(culture);
-	}
-
 	#renderReadOnlyTag(culture?: string | null) {
 		if (culture === undefined) return nothing;
 		return this.#isReadOnly(culture)
@@ -384,7 +449,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 						<uui-button
 							style="background-color: var(--uui-color-surface)"
 							label="Open Split view for ${variant.language.name}"
-							class="variant-selector-split-view"
+							class="split-view"
 							@click=${() => this.#openSplitView(variant)}>
 							Open in Split view
 						</uui-button>
@@ -399,15 +464,15 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				width: 100%;
 			}
 
-			#variant-selector-toggle {
+			#toggle {
 				white-space: nowrap;
 			}
 
-			#variant-selector-popover {
+			#popover {
 				translate: 1px; /* Fixes tiny alignment issue caused by border */
 			}
 
-			#variant-selector-dropdown {
+			#dropdown {
 				overflow: hidden;
 				z-index: -1;
 				background-color: var(--uui-combobox-popover-background-color, var(--uui-color-surface));
@@ -440,12 +505,42 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				margin: 0;
 			}
 
+			.variant-list {
+				> li.variant {
+					display: grid;
+					grid-column-gap: 0px;
+					grid-row-gap: 0px;
+					grid-template-columns: var(--uui-size-10) 1fr;
+					grid-template-areas:
+						'expand variant'
+						'children children';
+					border-bottom: 1px solid var(--uui-color-divider-standalone);
+				}
+
+				.expand-area {
+					grid-area: expand;
+				}
+
+				.variant-area {
+					grid-area: variant;
+				}
+
+				.children-area {
+					grid-area: children;
+					list-style: none;
+				}
+			}
+
+			uui-symbol-expand {
+				background: none;
+			}
+
 			li {
 				position: relative;
 				margin-bottom: 1px;
 			}
 
-			li:hover .variant-selector-split-view {
+			li:hover .split-view {
 				display: flex;
 			}
 
@@ -453,7 +548,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				margin-bottom: 0;
 			}
 
-			li.selected:before {
+			li.selected .expand-area:before {
 				background-color: var(--uui-color-current);
 				border-radius: 0 4px 4px 0;
 				bottom: 8px;
@@ -466,7 +561,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				z-index: 1;
 			}
 
-			.variant-selector-switch-button {
+			.switch-button {
 				display: flex;
 				align-items: center;
 				border: none;
@@ -478,50 +573,49 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				text-align: left;
 				font-size: 14px;
 				cursor: pointer;
-				border-bottom: 1px solid var(--uui-color-divider-standalone);
 			}
 
-			.variant-selector-switch-button:hover {
+			.switch-button:hover {
 				background: var(--uui-palette-sand);
 				color: var(--uui-palette-space-cadet-light);
 			}
-			.variant-selector-switch-button .variant-info {
+			.switch-button .variant-info {
 				flex-grow: 1;
 			}
 
-			.variant-selector-switch-button .variant-details {
+			.switch-button .variant-details {
 				color: var(--uui-color-text-alt);
 				font-size: 12px;
 				font-weight: normal;
 			}
-			.variant-selector-switch-button .variant-details {
+			.switch-button .variant-details {
 				color: var(--uui-color-text-alt);
 				font-size: 12px;
 				font-weight: normal;
 			}
-			.variant-selector-switch-button.add-mode .variant-details {
+			.switch-button.add-mode .variant-details {
 				color: var(--uui-palette-dusty-grey-dark);
 			}
 
-			.variant-selector-switch-button .specs-info {
+			.switch-button .specs-info {
 				color: var(--uui-color-text-alt);
 				font-size: 12px;
 				font-weight: normal;
 			}
-			.variant-selector-switch-button.add-mode .specs-info {
+			.switch-button.add-mode .specs-info {
 				color: var(--uui-palette-dusty-grey-dark);
 			}
 
-			.variant-selector-switch-button i {
+			.switch-button i {
 				font-weight: normal;
 			}
 
-			.variant-selector-switch-button.add-mode {
+			.switch-button.add-mode {
 				position: relative;
 				color: var(--uui-palette-dusty-grey-dark);
 			}
 
-			.variant-selector-switch-button.add-mode:after {
+			.switch-button.add-mode:after {
 				border: 2px dashed var(--uui-color-divider-standalone);
 				bottom: 0;
 				content: '';
@@ -534,11 +628,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				z-index: 1;
 			}
 
-			.variant-selector-switch-button .variant-name {
+			.switch-button .variant-name {
 				margin-bottom: var(--uui-size-space-1);
 			}
 
-			.variant-selector-switch-button.readonly-mode .variant-name {
+			.switch-button.readonly-mode .variant-name {
 				margin-bottom: calc(var(--uui-size-space-1) * -1);
 			}
 
@@ -547,7 +641,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				margin-right: 12px;
 			}
 
-			.variant-selector-split-view {
+			.split-view {
 				position: absolute;
 				top: 0;
 				right: 0;
