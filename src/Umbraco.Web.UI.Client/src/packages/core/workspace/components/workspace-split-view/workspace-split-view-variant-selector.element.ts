@@ -250,7 +250,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		}, 200);
 	}
 
-	#isReadOnly(culture: string | null) {
+	#isReadOnlyCulture(culture: string | null) {
 		return this._readOnlyCultures.includes(culture);
 	}
 
@@ -287,7 +287,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				.value=${this._name ?? ''}
 				@input=${this.#handleInput}
 				required
-				?readonly=${this.#isReadOnly(this._activeVariant?.culture ?? null)}
+				?readonly=${this.#isReadOnlyCulture(this._activeVariant?.culture ?? null)}
 				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantQuery(this._variantId)}].name`, this._name ?? '')}
 				${ref(this.#focusInput)}>
 				${this.#selectorIsEnabled()
@@ -337,11 +337,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				<div class="expand-area">${this.#renderExpandToggle(variantOption, variantId)}</div>
 
 				<button
-					class="variant-area switch-button ${this.#isCreateMode(variantOption) ? 'add-mode' : ''} ${this.#isReadOnly(
-						variantId.culture,
-					)
-						? 'readonly-mode'
-						: ''}"
+					class="variant-area switch-button ${this.#isCreateMode(variantOption)
+						? 'add-mode'
+						: ''} ${this.#isReadOnlyCulture(variantId.culture) ? 'readonly-mode' : ''}"
 					@click=${() => this.#switchVariant(variantOption)}>
 					${this.#isCreateMode(variantOption) ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
@@ -385,7 +383,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			<li class="variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
 				<div class="expand-area"></div>
 				<button
-					class="switch-button ${this.#isCreateMode(variantOption) ? 'add-mode' : ''} ${this.#isReadOnly(
+					class="switch-button ${this.#isCreateMode(variantOption) ? 'add-mode' : ''} ${this.#isReadOnlyCulture(
 						variantId.culture,
 					)
 						? 'readonly-mode'
@@ -452,7 +450,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	#renderReadOnlyTag(culture?: string | null) {
 		if (culture === undefined) return nothing;
-		return this.#isReadOnly(culture)
+		return this.#isReadOnlyCulture(culture)
 			? html`<uui-tag look="secondary">${this.localize.term('general_readOnly')}</uui-tag>`
 			: nothing;
 	}
