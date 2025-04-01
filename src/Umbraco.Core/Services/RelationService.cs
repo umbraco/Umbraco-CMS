@@ -504,20 +504,18 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public bool IsRelated(int id, RelationDirectionFilter directionFilter)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IRelation> query = Query<IRelation>();
+
+        query = directionFilter switch
         {
-            IQuery<IRelation> query = Query<IRelation>();
+            RelationDirectionFilter.Parent => query.Where(x => x.ParentId == id),
+            RelationDirectionFilter.Child => query.Where(x => x.ChildId == id),
+            RelationDirectionFilter.Any => query.Where(x => x.ParentId == id || x.ChildId == id),
+            _ => throw new ArgumentOutOfRangeException(nameof(directionFilter)),
+        };
 
-            query = directionFilter switch
-            {
-                RelationDirectionFilter.Parent => query.Where(x => x.ParentId == id),
-                RelationDirectionFilter.Child => query.Where(x => x.ChildId == id),
-                RelationDirectionFilter.Any => query.Where(x => x.ParentId == id || x.ChildId == id),
-                _ => throw new ArgumentOutOfRangeException(nameof(directionFilter)),
-            };
-
-            return _relationRepository.Get(query).Any();
-        }
+        return _relationRepository.Get(query).Any();
     }
 
     /// <inheritdoc />
