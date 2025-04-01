@@ -3,7 +3,7 @@ namespace Umbraco.Cms.Core;
 public static partial class Constants
 {
     /// <summary>
-    ///     Defines reference tyoes.
+    ///     Defines reference types.
     /// </summary>
     /// <remarks>
     ///     Reference types are used to identify the type of entity that is being referenced when exposing references
