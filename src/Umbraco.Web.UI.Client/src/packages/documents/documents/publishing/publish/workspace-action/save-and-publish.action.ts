@@ -35,7 +35,8 @@ export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction
 	async hasAdditionalOptions() {
 		const workspaceContext = await this.getContext(UMB_DOCUMENT_WORKSPACE_CONTEXT);
 		const variantOptions = await this.observe(workspaceContext.variantOptions).asPromise();
-		return variantOptions?.length > 1;
+		const cultureVariantOptions = variantOptions?.filter((option) => option.segment === null);
+		return cultureVariantOptions?.length > 1;
 	}
 
 	override async execute() {

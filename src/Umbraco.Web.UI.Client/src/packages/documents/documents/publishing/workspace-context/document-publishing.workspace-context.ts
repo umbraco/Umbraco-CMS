@@ -377,7 +377,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		await this.#init;
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
-		const options = await firstValueFrom(this.#documentWorkspaceContext.variantOptions);
+		const allOptions = await firstValueFrom(this.#documentWorkspaceContext.variantOptions);
+		const options = allOptions.filter((option) => option.segment === null);
 
 		// TODO: this is a temporary copy of the content-detail workspace context method.
 		// we need to implement custom selection that makes sense for each the publishing modal.
