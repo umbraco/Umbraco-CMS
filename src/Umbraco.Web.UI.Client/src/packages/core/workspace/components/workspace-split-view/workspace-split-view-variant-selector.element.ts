@@ -288,7 +288,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				data-mark="input:entity-name"
 				placeholder=${this.localize.term('placeholders_entername')}
 				label=${this.localize.term('placeholders_entername')}
-				.value=${this._name ?? ''}
+				.value=${this.#getNameValue()}
 				@input=${this.#handleInput}
 				required
 				?readonly=${this.#isReadOnlyCulture(this._activeVariant?.culture ?? null) ||
@@ -408,6 +408,12 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				${this.#renderSplitViewButton(variantOption)}
 			</li>
 		`;
+	}
+
+	#getNameValue() {
+		// It is currently not possible to edit the name of a segment variant option. We render the name of the segment instead and set the input to readonly.
+		const segmentName = this.#isSegmentVariantOption(this._activeVariant) ? this._activeVariant?.segmentInfo?.name : '';
+		return segmentName ?? this._name ?? '';
 	}
 
 	#getVariantName(variantOption: VariantOptionModelType) {
