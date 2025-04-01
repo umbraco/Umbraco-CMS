@@ -20,6 +20,23 @@ public interface IUserStartNodeEntitiesService
     IEnumerable<UserAccessEntity> RootUserAccessEntities(UmbracoObjectTypes umbracoObjectType, int[] userStartNodeIds);
 
     /// <summary>
+    /// Calculates the applicable child entities for a given object type for users without root access.
+    /// </summary>
+    /// <param name="umbracoObjectType">The object type.</param>
+    /// <param name="userStartNodePaths">The calculated start node paths for the user.</param>
+    /// <param name="parentKey">The key of the parent.</param>
+    /// <param name="skip">The number of applicable children to skip.</param>
+    /// <param name="take">The number of applicable children to take.</param>
+    /// <param name="ordering">The ordering to apply when fetching and paginating the children.</param>
+    /// <param name="totalItems">The total number of applicable children available.</param>
+    /// <returns>A list of child entities applicable for the user.</returns>
+    /// <remarks>
+    /// The returned entities may include entities that outside of the user start node scope, but are needed to
+    /// for browsing to the actual user start nodes. These entities will be marked as "no access" entities.
+    /// </remarks>
+    IEnumerable<UserAccessEntity> ChildUserAccessEntities(UmbracoObjectTypes umbracoObjectType, string[] userStartNodePaths, Guid parentKey, int skip, int take, Ordering ordering, out long totalItems);
+
+    /// <summary>
     /// Calculates the applicable child entities from a list of candidate child entities for users without root access.
     /// </summary>
     /// <param name="candidateChildren">The candidate child entities to filter (i.e. entities fetched with <see cref="EntityService.GetPagedChildren"/>).</param>
