@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             IAuditRepository auditRepository,
             IContentTypeRepository contentTypeRepository,
             IMediaTypeRepository mediaTypeRepository,
-            IMemberTypeRepository memberTypeRepositor,
+            IMemberTypeRepository memberTypeRepository,
             IIOHelper ioHelper,
             Lazy<IIdKeyMap> idKeyMap)
             : base(provider, loggerFactory, eventMessagesFactory)
@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             _auditRepository = auditRepository;
             _contentTypeRepository = contentTypeRepository;
             _mediaTypeRepository = mediaTypeRepository;
-            _memberTypeRepository = memberTypeRepositor;
+            _memberTypeRepository = memberTypeRepository;
             _ioHelper = ioHelper;
             _idKeyMap = idKeyMap;
 

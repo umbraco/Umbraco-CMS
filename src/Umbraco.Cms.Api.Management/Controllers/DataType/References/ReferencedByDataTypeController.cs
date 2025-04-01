@@ -8,7 +8,7 @@ using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.DateType.References;
+namespace Umbraco.Cms.Api.Management.Controllers.DataType.References;
 
 [ApiVersion("1.0")]
 public class ReferencedByDataTypeController : DataTypeControllerBase
