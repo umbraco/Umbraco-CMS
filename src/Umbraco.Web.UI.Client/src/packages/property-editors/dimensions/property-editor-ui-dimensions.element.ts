@@ -1,14 +1,14 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
- * @element umb-property-editor-ui-tiny-mce-dimensions-configuration
+ * @element umb-property-editor-ui-dimensions
  */
-@customElement('umb-property-editor-ui-tiny-mce-dimensions-configuration')
-export class UmbPropertyEditorUITinyMceDimensionsConfigurationElement extends UmbLitElement {
+@customElement('umb-property-editor-ui-dimensions')
+export class UmbPropertyEditorUIDimensionsElement extends UmbLitElement {
 	@property({ type: Object })
 	value: { width?: number; height?: number } = {};
 
@@ -22,29 +22,33 @@ export class UmbPropertyEditorUITinyMceDimensionsConfigurationElement extends Um
 	}
 
 	override render() {
-		return html`<uui-input
+		return html`
+			<uui-input
 				type="number"
 				label=${this.localize.term('general_width')}
 				placeholder=${this.localize.term('general_width')}
 				@change=${this.#onChangeWidth}
-				.value=${this.value?.width}></uui-input>
-			x
+				.value=${this.value?.width?.toString() ?? ''}>
+			</uui-input>
+			<span>&times;</span>
 			<uui-input
 				type="number"
 				label=${this.localize.term('general_height')}
 				placeholder=${this.localize.term('general_height')}
 				@change=${this.#onChangeHeight}
-				.value=${this.value?.height}></uui-input>
-			pixels`;
+				.value=${this.value?.height?.toString() ?? ''}>
+			</uui-input>
+			<umb-localize key="general_pixels">pixels</umb-localize>
+		`;
 	}
 
 	static override readonly styles = [UmbTextStyles];
 }
 
-export default UmbPropertyEditorUITinyMceDimensionsConfigurationElement;
+export { UmbPropertyEditorUIDimensionsElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-tiny-mce-dimensions-configuration': UmbPropertyEditorUITinyMceDimensionsConfigurationElement;
+		'umb-property-editor-ui-dimensions': UmbPropertyEditorUIDimensionsElement;
 	}
 }
