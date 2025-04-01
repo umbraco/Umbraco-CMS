@@ -13,8 +13,10 @@ export default class UmbInputUploadFieldSvgElement extends UmbLitElement {
 	override render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
 
-		return html`<uui-card-media id="card" .name=${this.#label} href="${this.path}" target="_blank">
-			<img id="image" src=${this.path} alt="svg" />
+		const label = this.#label;
+
+		return html`<uui-card-media id="card" .name=${label} href="${this.path}" target="_blank">
+			<img id="image" src=${this.path} alt="${label}" loading="lazy" />
 		</uui-card-media>`;
 	}
 
