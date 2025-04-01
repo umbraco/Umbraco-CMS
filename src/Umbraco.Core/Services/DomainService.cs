@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
@@ -159,23 +158,23 @@ public class DomainService : RepositoryService, IDomainService
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(Guid contentKey, bool includeWildcards)
+    public Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(Guid contentKey, bool includeWildcards)
     {
         IContent? content = _contentService.GetById(contentKey);
         if (content == null)
         {
-            return await Task.FromResult(Enumerable.Empty<IDomain>());
+            return Task.FromResult(Enumerable.Empty<IDomain>());
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return _domainRepository.GetAssignedDomains(content.Id, includeWildcards);
+        return Task.FromResult(_domainRepository.GetAssignedDomains(content.Id, includeWildcards));
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<IDomain>> GetAllAsync(bool includeWildcards)
+    public Task<IEnumerable<IDomain>> GetAllAsync(bool includeWildcards)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return await Task.FromResult(_domainRepository.GetAll(includeWildcards));
+        return Task.FromResult(_domainRepository.GetAll(includeWildcards));
     }
 
     /// <inheritdoc />
@@ -263,7 +262,7 @@ public class DomainService : RepositoryService, IDomainService
     /// <summary>
     /// Tests if any of the ISO codes in the update model are invalid
     /// </summary>
-    private bool HasInvalidIsoCode(DomainsUpdateModel updateModel, IEnumerable<string> allIsoCodes)
+    private static bool HasInvalidIsoCode(DomainsUpdateModel updateModel, IEnumerable<string> allIsoCodes)
         => new[] { updateModel.DefaultIsoCode }
             .Union(updateModel.Domains.Select(domainModel => domainModel.IsoCode))
             .WhereNotNull()
@@ -273,7 +272,7 @@ public class DomainService : RepositoryService, IDomainService
     /// <summary>
     /// Returns any current domain assignments in conflict with the updateModel domain names
     /// </summary>
-    private IDomain[] GetDomainNameConflicts(int contentId, DomainsUpdateModel updateModel, IEnumerable<IDomain> allDomains)
+    private static IDomain[] GetDomainNameConflicts(int contentId, DomainsUpdateModel updateModel, IEnumerable<IDomain> allDomains)
     {
         IDomain[] domainsAssignedToOtherContent = allDomains
             .Where(domain => domain.IsWildcard == false && domain.RootContentId != contentId)
@@ -289,7 +288,7 @@ public class DomainService : RepositoryService, IDomainService
     /// <summary>
     /// Calculates the new domain assignment incl. wildcard domains
     /// </summary>
-    private IDomain[] CalculateNewAssignedDomains(int contentId, DomainsUpdateModel updateModel, IDomain[] currentlyAssignedDomains, IDictionary<string, int> languageIdByIsoCode)
+    private static IDomain[] CalculateNewAssignedDomains(int contentId, DomainsUpdateModel updateModel, IDomain[] currentlyAssignedDomains, Dictionary<string, int> languageIdByIsoCode)
     {
         // calculate the assigned domains as they should be after updating (including wildcard domains)
         var newAssignedDomains = new List<IDomain>();

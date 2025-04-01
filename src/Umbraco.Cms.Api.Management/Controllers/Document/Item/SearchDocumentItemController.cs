@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Asp.Versioning;
+﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -47,7 +46,7 @@ public class SearchDocumentItemController : DocumentItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchWithTrashed(
+    public Task<IActionResult> SearchWithTrashed(
         CancellationToken cancellationToken,
         string query,
         bool? trashed = null,
@@ -63,6 +62,6 @@ public class SearchDocumentItemController : DocumentItemControllerBase
             Total = searchResult.Total,
         };
 
-        return await Task.FromResult(Ok(result));
+        return Task.FromResult<IActionResult>(Ok(result));
     }
 }

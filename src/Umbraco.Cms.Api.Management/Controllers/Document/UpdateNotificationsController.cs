@@ -35,6 +35,6 @@ public class UpdateNotificationsController : DocumentControllerBase
         }
 
         _notificationService.SetNotifications(_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, content, updateModel.SubscribedActionIds);
-        return await Task.FromResult(Ok());
+        return Ok();
     }
 }

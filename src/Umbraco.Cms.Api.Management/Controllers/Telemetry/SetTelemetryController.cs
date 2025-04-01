@@ -34,6 +34,6 @@ public class SetTelemetryController : TelemetryControllerBase
         }
 
         await _metricsConsentService.SetConsentLevelAsync(telemetryRepresentationBase.TelemetryLevel);
-        return await Task.FromResult(Ok());
+        return Ok();
     }
 }

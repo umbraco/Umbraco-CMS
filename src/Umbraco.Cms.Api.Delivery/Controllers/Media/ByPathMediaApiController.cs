@@ -27,8 +27,8 @@ public class ByPathMediaApiController : MediaApiControllerBase
     [ProducesResponseType(typeof(IApiMediaWithCropsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Obsolete("Please use version 2 of this API. Will be removed in V15.")]
-    public async Task<IActionResult> ByPath(string path)
-        => await HandleRequest(path);
+    public Task<IActionResult> ByPath(string path)
+        => Task.FromResult(HandleRequest(path));
 
     /// <summary>
     ///     Gets a media item by its path.
@@ -39,17 +39,17 @@ public class ByPathMediaApiController : MediaApiControllerBase
     [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(IApiMediaWithCropsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByPathV20(string path)
-        => await HandleRequest(path);
+    public Task<IActionResult> ByPathV20(string path)
+        => Task.FromResult(HandleRequest(path));
 
-    private async Task<IActionResult> HandleRequest(string path)
+    private IActionResult HandleRequest(string path)
     {
         path = DecodePath(path);
 
         IPublishedContent? media = _apiMediaQueryService.GetByPath(path);
         if (media is null)
         {
-            return await Task.FromResult(NotFound());
+            return NotFound();
         }
 
         return Ok(BuildApiMediaWithCrops(media));

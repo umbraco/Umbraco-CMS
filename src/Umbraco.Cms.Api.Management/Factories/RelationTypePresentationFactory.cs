@@ -40,7 +40,7 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
         _scopeProvider = scopeProvider;
     }
 
-    public async Task<IEnumerable<IReferenceResponseModel>> CreateReferenceResponseModelsAsync(
+    public Task<IEnumerable<IReferenceResponseModel>> CreateReferenceResponseModelsAsync(
         IEnumerable<RelationItemModel> relationItemModels)
     {
         IReadOnlyCollection<RelationItemModel> relationItemModelsCollection = relationItemModels.ToArray();
@@ -62,7 +62,7 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
                 _ => _umbracoMapper.Map<DefaultReferenceResponseModel>(relationItemModel),
             }).WhereNotNull().ToArray();
 
-        return await Task.FromResult(result);
+        return Task.FromResult<IEnumerable<IReferenceResponseModel>>(result);
     }
 
     private IReferenceResponseModel? MapDocumentReference(RelationItemModel relationItemModel,

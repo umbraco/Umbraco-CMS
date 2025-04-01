@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -25,13 +24,13 @@ public class ItemMemberItemController : MemberItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MemberItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item(
+    public Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         if (ids.Count is 0)
         {
-            return Ok(Enumerable.Empty<MemberItemResponseModel>());
+            return Task.FromResult<IActionResult>(Ok(Enumerable.Empty<MemberItemResponseModel>()));
         }
 
         IEnumerable<IMemberEntitySlim> members = _entityService
@@ -39,6 +38,6 @@ public class ItemMemberItemController : MemberItemControllerBase
             .OfType<IMemberEntitySlim>();
 
         IEnumerable<MemberItemResponseModel> responseModels = members.Select(_memberPresentationFactory.CreateItemResponseModel);
-        return await Task.FromResult(Ok(responseModels));
+        return Task.FromResult<IActionResult>(Ok(responseModels));
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Asp.Versioning;
 using Examine;
 using Examine.Lucene.Search;
-using Examine.Search;
 using Lucene.Net.QueryParsers.Classic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +22,7 @@ public class QuerySearcherController : SearcherControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SearchResultResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<PagedViewModel<SearchResultResponseModel>>> Query(
+    public Task<ActionResult<PagedViewModel<SearchResultResponseModel>>> Query(
         CancellationToken cancellationToken,
         string searcherName,
         string? term,
@@ -34,7 +33,7 @@ public class QuerySearcherController : SearcherControllerBase
 
         if (term.IsNullOrWhiteSpace())
         {
-            return new PagedViewModel<SearchResultResponseModel>();
+            return Task.FromResult<ActionResult<PagedViewModel<SearchResultResponseModel>>>(new PagedViewModel<SearchResultResponseModel>());
         }
 
         if (!_examineManagerService.TryFindSearcher(searcherName, out ISearcher searcher))
@@ -47,7 +46,7 @@ public class QuerySearcherController : SearcherControllerBase
                 Type = "Error",
             };
 
-            return NotFound(invalidModelProblem);
+            return Task.FromResult<ActionResult<PagedViewModel<SearchResultResponseModel>>>(NotFound(invalidModelProblem));
         }
 
         ISearchResults results;
@@ -71,10 +70,10 @@ public class QuerySearcherController : SearcherControllerBase
                 Type = "Error",
             };
 
-            return BadRequest(invalidModelProblem);
+            return Task.FromResult<ActionResult<PagedViewModel<SearchResultResponseModel>>>(BadRequest(invalidModelProblem));
         }
 
-        return await Task.FromResult(new PagedViewModel<SearchResultResponseModel>
+        return Task.FromResult<ActionResult<PagedViewModel<SearchResultResponseModel>>>(new PagedViewModel<SearchResultResponseModel>
         {
             Total = results.TotalItemCount,
             Items = results.Select(x => new SearchResultResponseModel

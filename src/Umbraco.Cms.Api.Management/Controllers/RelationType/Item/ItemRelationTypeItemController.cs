@@ -23,13 +23,13 @@ public class ItemRelationTypeItemController : RelationTypeItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<RelationTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item(
+    public Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         if (ids.Count is 0)
         {
-            return Ok(Enumerable.Empty<RelationTypeItemResponseModel>());
+            return Task.FromResult<IActionResult>(Ok(Enumerable.Empty<RelationTypeItemResponseModel>()));
         }
 
         // relation service does not allow fetching a collection of relation types by their ids; instead it relies
@@ -40,6 +40,6 @@ public class ItemRelationTypeItemController : RelationTypeItemControllerBase
 
         List<RelationTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IRelationType, RelationTypeItemResponseModel>(relationTypes);
 
-        return await Task.FromResult(Ok(responseModels));
+        return Task.FromResult<IActionResult>(Ok(responseModels));
     }
 }

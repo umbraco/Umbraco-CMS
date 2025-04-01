@@ -17,11 +17,11 @@ public class AllowedObjectTypesController : ObjectTypesControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ObjectTypeResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Allowed(CancellationToken cancellationToken, int skip = 0, int take = 100)
+    public Task<IActionResult> Allowed(CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         ObjectTypeResponseModel[] objectTypes = _objectTypePresentationFactory.Create().ToArray();
 
-        return await Task.FromResult(Ok(new PagedViewModel<ObjectTypeResponseModel>
+        return Task.FromResult<IActionResult>(Ok(new PagedViewModel<ObjectTypeResponseModel>
         {
             Total = objectTypes.Length,
             Items = objectTypes.Skip(skip).Take(take),

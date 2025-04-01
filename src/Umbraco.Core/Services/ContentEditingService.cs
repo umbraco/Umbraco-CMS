@@ -58,10 +58,10 @@ internal sealed class ContentEditingService
         _languageService = languageService;
     }
 
-    public async Task<IContent?> GetAsync(Guid key)
+    public Task<IContent?> GetAsync(Guid key)
     {
         IContent? content = ContentService.GetById(key);
-        return await Task.FromResult(content);
+        return Task.FromResult(content);
     }
 
     [Obsolete("Please use the validate update method that is not obsoleted. Will be removed in V16.")]

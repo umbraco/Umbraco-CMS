@@ -83,13 +83,13 @@ public class TrackedReferencesService : ITrackedReferencesService
         return pagedModel;
     }
 
-    public async Task<PagedModel<RelationItemModel>> GetPagedRelationsForItemAsync(Guid key, long skip, long take, bool filterMustBeIsDependency)
+    public Task<PagedModel<RelationItemModel>> GetPagedRelationsForItemAsync(Guid key, long skip, long take, bool filterMustBeIsDependency)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         IEnumerable<RelationItemModel> items = _trackedReferencesRepository.GetPagedRelationsForItem(key, skip, take, filterMustBeIsDependency, out var totalItems);
         var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
 
-        return await Task.FromResult(pagedModel);
+        return Task.FromResult(pagedModel);
     }
 
     [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
@@ -108,7 +108,7 @@ public class TrackedReferencesService : ITrackedReferencesService
         return pagedModel;
     }
 
-    public async Task<PagedModel<RelationItemModel>> GetPagedDescendantsInReferencesAsync(Guid parentKey, long skip, long take, bool filterMustBeIsDependency)
+    public Task<PagedModel<RelationItemModel>> GetPagedDescendantsInReferencesAsync(Guid parentKey, long skip, long take, bool filterMustBeIsDependency)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
@@ -120,7 +120,7 @@ public class TrackedReferencesService : ITrackedReferencesService
             out var totalItems);
         var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
 
-        return await Task.FromResult(pagedModel);
+        return Task.FromResult(pagedModel);
     }
 
     [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
@@ -133,13 +133,13 @@ public class TrackedReferencesService : ITrackedReferencesService
         return pagedModel;
     }
 
-    public async Task<PagedModel<RelationItemModel>> GetPagedItemsWithRelationsAsync(ISet<Guid> keys, long skip, long take, bool filterMustBeIsDependency)
+    public Task<PagedModel<RelationItemModel>> GetPagedItemsWithRelationsAsync(ISet<Guid> keys, long skip, long take, bool filterMustBeIsDependency)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         IEnumerable<RelationItemModel> items = _trackedReferencesRepository.GetPagedItemsWithRelations(keys, skip, take, filterMustBeIsDependency, out var totalItems);
         var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
 
-        return await Task.FromResult(pagedModel);
+        return Task.FromResult(pagedModel);
     }
 
     public async Task<PagedModel<Guid>> GetPagedKeysWithDependentReferencesAsync(ISet<Guid> keys, Guid objectTypeId, long skip, long take)

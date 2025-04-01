@@ -62,7 +62,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
         => new PartialView(path) { Content = content };
 
     /// <inheritdoc />
-    public async Task<PagedModel<PartialViewSnippetSlim>> GetSnippetsAsync(int skip, int take)
+    public Task<PagedModel<PartialViewSnippetSlim>> GetSnippetsAsync(int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         var result = new PagedModel<PartialViewSnippetSlim>(
@@ -72,15 +72,15 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
                 .Take(take)
                 .Select(snippet => new PartialViewSnippetSlim(snippet.Id, snippet.Name))
                 .ToArray());
-        return await Task.FromResult(result);
+        return Task.FromResult(result);
     }
 
     /// <inheritdoc />
-    public async Task<PartialViewSnippet?> GetSnippetAsync(string id)
+    public Task<PartialViewSnippet?> GetSnippetAsync(string id)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         PartialViewSnippet? snippet = _snippetCollection.FirstOrDefault(s => s.Id == id);
-        return await Task.FromResult(snippet);
+        return Task.FromResult(snippet);
     }
 
     /// <inheritdoc />

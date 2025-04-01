@@ -36,7 +36,7 @@ public class ByIdsMediaApiController : MediaApiControllerBase
     public async Task<IActionResult> ItemsV20([FromQuery(Name = "id")] HashSet<Guid> ids)
         => await HandleRequest(ids);
 
-    private async Task<IActionResult> HandleRequest(HashSet<Guid> ids)
+    private Task<IActionResult> HandleRequest(HashSet<Guid> ids)
     {
         IPublishedContent[] mediaItems = ids
             .Select(PublishedMediaCache.GetById)
@@ -47,6 +47,6 @@ public class ByIdsMediaApiController : MediaApiControllerBase
             .Select(BuildApiMediaWithCrops)
             .ToArray();
 
-        return await Task.FromResult(Ok(apiMediaItems));
+        return Task.FromResult<IActionResult>(Ok(apiMediaItems));
     }
 }

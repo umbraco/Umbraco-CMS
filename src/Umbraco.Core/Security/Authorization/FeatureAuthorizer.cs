@@ -10,6 +10,6 @@ internal sealed class FeatureAuthorizer : IFeatureAuthorizer
     public FeatureAuthorizer(UmbracoFeatures umbracoFeatures) => _umbracoFeatures = umbracoFeatures;
 
     /// <inheritdoc />
-    public async Task<bool> IsDeniedAsync(Type type) =>
-        await Task.FromResult(_umbracoFeatures.IsControllerEnabled(type) is false);
+    public Task<bool> IsDeniedAsync(Type type) =>
+        Task.FromResult(_umbracoFeatures.IsControllerEnabled(type) is false);
 }

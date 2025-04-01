@@ -34,6 +34,6 @@ public class ByKeyMediaTypeController : MediaTypeControllerBase
         }
 
         MediaTypeResponseModel model = _umbracoMapper.Map<MediaTypeResponseModel>(mediaType)!;
-        return await Task.FromResult(Ok(model));
+        return Ok(model);
     }
 }

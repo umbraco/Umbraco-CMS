@@ -225,7 +225,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         if (userId < Constants.Security.SuperUserId)
         {
             totalRecords = 0;
-            return Enumerable.Empty<IAuditItem>();
+            return [];
         }
 
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -236,7 +236,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         }
     }
 
-    public async Task<PagedModel<IAuditItem>> GetItemsByKeyAsync(
+    public Task<PagedModel<IAuditItem>> GetItemsByKeyAsync(
         Guid entityKey,
         UmbracoObjectTypes entityType,
         int skip,
@@ -258,7 +258,7 @@ public sealed class AuditService : RepositoryService, IAuditService
             Attempt<int> keyToIdAttempt = _entityService.GetId(entityKey, entityType);
             if (keyToIdAttempt.Success is false)
             {
-                return await Task.FromResult(new PagedModel<IAuditItem> { Items = Enumerable.Empty<IAuditItem>(), Total = 0 });
+                return Task.FromResult(new PagedModel<IAuditItem> { Items = Enumerable.Empty<IAuditItem>(), Total = 0 });
             }
 
             using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -268,7 +268,7 @@ public sealed class AuditService : RepositoryService, IAuditService
                 PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
                 IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out var totalRecords, orderDirection, auditTypeFilter, customFilter);
-                return new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords };
+                return Task.FromResult(new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords });
             }
         }
 
@@ -294,7 +294,7 @@ public sealed class AuditService : RepositoryService, IAuditService
 
         if (user is null)
         {
-            return await Task.FromResult(new PagedModel<IAuditItem>());
+            return new PagedModel<IAuditItem>();
         }
 
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -304,7 +304,7 @@ public sealed class AuditService : RepositoryService, IAuditService
             PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
             IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out var totalRecords, orderDirection, auditTypeFilter, customFilter);
-            return await Task.FromResult(new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords });
+            return new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords };
         }
     }
 
@@ -386,7 +386,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     {
         if (_isAvailable.Value == false)
         {
-            return Enumerable.Empty<IAuditEntry>();
+            return [];
         }
 
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -401,7 +401,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         if (_isAvailable.Value == false)
         {
             records = 0;
-            return Enumerable.Empty<IAuditEntry>();
+            return [];
         }
 
         using (ScopeProvider.CreateCoreScope(autoComplete: true))

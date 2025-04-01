@@ -24,13 +24,13 @@ public class ItemDocumentItemController : DocumentItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item(
+    public Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         if (ids.Count is 0)
         {
-            return Ok(Enumerable.Empty<DocumentItemResponseModel>());
+            return Task.FromResult<IActionResult>(Ok(Enumerable.Empty<DocumentItemResponseModel>()));
         }
 
         IEnumerable<IDocumentEntitySlim> documents = _entityService
@@ -38,6 +38,6 @@ public class ItemDocumentItemController : DocumentItemControllerBase
             .OfType<IDocumentEntitySlim>();
 
         IEnumerable<DocumentItemResponseModel> documentItemResponseModels = documents.Select(_documentPresentationFactory.CreateItemResponseModel);
-        return await Task.FromResult(Ok(documentItemResponseModels));
+        return Task.FromResult<IActionResult>(Ok(documentItemResponseModels));
     }
 }

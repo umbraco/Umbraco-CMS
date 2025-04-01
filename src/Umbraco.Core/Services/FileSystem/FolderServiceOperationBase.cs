@@ -32,7 +32,7 @@ internal abstract class FolderServiceOperationBase<TRepository, TFolderModel, TO
 
     protected abstract TOperationStatus InvalidName { get; }
 
-    protected async Task<Attempt<TFolderModel?, TOperationStatus>> HandleCreateAsync(string name, string? parentPath)
+    protected Task<Attempt<TFolderModel?, TOperationStatus>> HandleCreateAsync(string name, string? parentPath)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
@@ -40,7 +40,7 @@ internal abstract class FolderServiceOperationBase<TRepository, TFolderModel, TO
         TOperationStatus validateResult = ValidateCreate(name, path, parentPath);
         if (Success.Equals(validateResult) is false)
         {
-            return Attempt.FailWithStatus<TFolderModel?, TOperationStatus>(validateResult, null);
+            return Task.FromResult(Attempt.FailWithStatus<TFolderModel?, TOperationStatus>(validateResult, null));
         }
 
         _repository.AddFolder(path);
@@ -53,34 +53,34 @@ internal abstract class FolderServiceOperationBase<TRepository, TFolderModel, TO
             Path = path,
             ParentPath = GetParentFolderPath(path)
         };
-        return await Task.FromResult(Attempt.SucceedWithStatus<TFolderModel?, TOperationStatus>(Success, result));
+        return Task.FromResult(Attempt.SucceedWithStatus<TFolderModel?, TOperationStatus>(Success, result));
     }
 
-    protected async Task<TOperationStatus> HandleDeleteAsync(string path)
+    protected Task<TOperationStatus> HandleDeleteAsync(string path)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         TOperationStatus validateResult = ValidateDelete(path);
         if (Success.Equals(validateResult) is false)
         {
-            return await Task.FromResult(validateResult);
+            return Task.FromResult(validateResult);
         }
 
         _repository.DeleteFolder(path);
 
         scope.Complete();
 
-        return Success;
+        return Task.FromResult(Success);
     }
 
-    protected async Task<TFolderModel?> HandleGetAsync(string path)
+    protected Task<TFolderModel?> HandleGetAsync(string path)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         // There's not much we can actually get when it's a folder, so it more a matter of ensuring the folder exists and returning a model.
         if (_repository.FolderExists(path) is false)
         {
-            return await Task.FromResult<TFolderModel?>(null);
+            return Task.FromResult<TFolderModel?>(null);
         }
 
         var result = new TFolderModel
@@ -91,7 +91,7 @@ internal abstract class FolderServiceOperationBase<TRepository, TFolderModel, TO
         };
 
         scope.Complete();
-        return result;
+        return Task.FromResult<TFolderModel?>(result);
     }
 
     private TOperationStatus ValidateCreate(string name, string path, string? parentPath)
@@ -129,12 +129,12 @@ internal abstract class FolderServiceOperationBase<TRepository, TFolderModel, TO
         return Success;
     }
 
-    private string GetFolderPath(string folderName, string? parentPath)
+    private static string GetFolderPath(string folderName, string? parentPath)
         => Path.Join(parentPath, folderName);
 
-    private string GetFolderName(string path)
+    private static string GetFolderName(string path)
         => Path.GetFileName(path);
 
-    private string? GetParentFolderPath(string path)
+    private static string? GetParentFolderPath(string path)
         => Path.GetDirectoryName(path);
 }

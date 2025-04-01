@@ -42,6 +42,6 @@ public class ByQueryTagController : TagControllerBase
             Total = responseModels.Count,
         };
 
-        return await Task.FromResult(Ok(pagedViewModel));
+        return Ok(pagedViewModel);
     }
 }

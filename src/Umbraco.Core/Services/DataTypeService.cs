@@ -323,13 +323,13 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias)
+        public Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IQuery<IDataType> query = Query<IDataType>().Where(x => propertyEditorAlias.Contains(x.EditorAlias));
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
             ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
-            return await Task.FromResult(dataTypes);
+            return Task.FromResult(dataTypes);
         }
 
         /// <inheritdoc />
@@ -690,17 +690,17 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public async Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id)
+        public Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
             IDataType? dataType = GetDataTypeFromRepository(id);
             if (dataType == null)
             {
-                return Attempt.FailWithStatus<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>(DataTypeOperationStatus.NotFound, new Dictionary<Udi, IEnumerable<string>>());
+                return Task.FromResult(Attempt.FailWithStatus<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>(DataTypeOperationStatus.NotFound, new Dictionary<Udi, IEnumerable<string>>()));
             }
 
             IReadOnlyDictionary<Udi, IEnumerable<string>> usages = _dataTypeRepository.FindUsages(dataType.Id);
-            return await Task.FromResult(Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, usages));
+            return Task.FromResult(Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, usages));
         }
 
         public IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id)

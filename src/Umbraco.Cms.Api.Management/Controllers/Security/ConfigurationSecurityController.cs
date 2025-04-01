@@ -20,13 +20,13 @@ public class ConfigurationSecurityController : SecurityControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(SecurityConfigurationResponseModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Configuration(CancellationToken cancellationToken)
+    public Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         var viewModel = new SecurityConfigurationResponseModel
         {
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
         };
 
-        return await Task.FromResult(Ok(viewModel));
+        return Task.FromResult<IActionResult>(Ok(viewModel));
     }
 }

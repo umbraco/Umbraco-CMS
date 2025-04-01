@@ -40,10 +40,10 @@ internal sealed class MediaEditingService
             relationService)
         => _logger = logger;
 
-    public async Task<IMedia?> GetAsync(Guid key)
+    public Task<IMedia?> GetAsync(Guid key)
     {
         IMedia? media = ContentService.GetById(key);
-        return await Task.FromResult(media);
+        return Task.FromResult(media);
     }
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, MediaUpdateModel updateModel)

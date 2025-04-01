@@ -18,17 +18,17 @@ public class ItemStylesheetItemController : StylesheetItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<StylesheetItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item(
+    public Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "path")] HashSet<string> paths)
     {
         if (paths.Count is 0)
         {
-            return Ok(Enumerable.Empty<StylesheetItemResponseModel>());
+            return Task.FromResult<IActionResult>(Ok(Enumerable.Empty<StylesheetItemResponseModel>()));
         }
 
         paths = paths.Select(path => path.VirtualPathToSystemPath()).ToHashSet();
         IEnumerable<StylesheetItemResponseModel> responseModels = _fileItemPresentationFactory.CreateStylesheetItemResponseModels(paths);
-        return await Task.FromResult(Ok(responseModels));
+        return Task.FromResult<IActionResult>(Ok(responseModels));
     }
 }

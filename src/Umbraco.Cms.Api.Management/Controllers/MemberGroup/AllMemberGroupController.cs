@@ -36,6 +36,6 @@ public class AllMemberGroupController : MemberGroupControllerBase
             Items = _mapper.MapEnumerable<IMemberGroup, MemberGroupResponseModel>(memberGroups.Skip(skip).Take(take)),
         };
 
-        return await Task.FromResult(Ok(viewModel));
+        return Ok(viewModel);
     }
 }
