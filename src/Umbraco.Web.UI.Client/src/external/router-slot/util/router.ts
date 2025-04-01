@@ -160,7 +160,7 @@ export async function resolvePageComponent(route: IComponentRoute, info: IRoutin
 
 	// Setup the component using the callback.
 	if (route.setup != null) {
-		route.setup(component, info);
+		await route.setup(component, info);
 	}
 
 	return component;

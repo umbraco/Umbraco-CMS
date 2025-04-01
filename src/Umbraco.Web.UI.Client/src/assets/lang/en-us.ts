@@ -1705,16 +1705,6 @@ export default {
 		compositionUsageHeading: 'Where is this composition used?',
 		compositionUsageSpecification:
 			'This composition is currently used in the composition of the following\n      Content Types:\n    ',
-		variantsHeading: 'Allow variations',
-		cultureVariantHeading: 'Allow vary by culture',
-		segmentVariantHeading: 'Allow segmentation',
-		cultureVariantLabel: 'Vary by culture',
-		segmentVariantLabel: 'Vary by segments',
-		variantsDescription: 'Allow editors to create content of this type in different languages.',
-		cultureVariantDescription: 'Allow editors to create content of different languages.',
-		segmentVariantDescription: 'Allow editors to create segments of this content.',
-		allowVaryByCulture: 'Allow varying by culture',
-		allowVaryBySegment: 'Allow segmentation',
 		elementType: 'Element Type',
 		elementHeading: 'Is an Element Type',
 		elementDescription:
@@ -2610,7 +2600,7 @@ export default {
 		consentForAnalytics: 'Consent for telemetry data',
 		analyticsLevelSavedSuccess: 'Telemetry level saved!',
 		analyticsDescription:
-			'\n      In order to improve Umbraco and add new functionality based on as relevant information as possible,\n          <br>we would like to collect system- and usage information from your installation.\n          <br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n          <br>Hopefully, you will help us collect some valuable data.\n          <br>\n          <br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.\n       ',
+		'In order to improve Umbraco and add new functionality based on as relevant information as possible, we would like to collect system- and usage information from your installation.\n<br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n<br>Hopefully, you will help us collect some valuable data.\n<br>\n<br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.',
 		minimalLevelDescription: 'We will only send an anonymized site ID to let us know that the site exists.',
 		basicLevelDescription: 'We will send an anonymized site ID, Umbraco version, and packages installed',
 		detailedLevelDescription:

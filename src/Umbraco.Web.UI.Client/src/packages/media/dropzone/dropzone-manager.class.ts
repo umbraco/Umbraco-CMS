@@ -39,6 +39,9 @@ import {
  */
 export class UmbDropzoneManager extends UmbControllerBase {
 	readonly #host: UmbControllerHost;
+	/**
+	 * @deprecated Not used anymore; this method will be removed in Umbraco 17.
+	 */
 	#isFoldersAllowed = true;
 
 	#mediaTypeStructure = new UmbMediaTypeStructureRepository(this);
@@ -70,10 +73,16 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		});
 	}
 
+	/**
+	 * @deprecated Not used anymore; this method will be removed in Umbraco 17.
+	 */
 	public setIsFoldersAllowed(isAllowed: boolean) {
 		this.#isFoldersAllowed = isAllowed;
 	}
 
+	/**
+	 * @deprecated Not used anymore; this method will be removed in Umbraco 17.
+	 */
 	public getIsFoldersAllowed(): boolean {
 		return this.#isFoldersAllowed;
 	}
@@ -84,7 +93,6 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	/**
 	 * Uploads files and folders to the server and creates the media items with corresponding media type.\
 	 * Allows the user to pick a media type option if multiple types are allowed.
-	 * @deprecated Use the {@link UmbDropzoneMediaManager} class instead. This will be removed in Umbraco 18.
 	 * @param {UmbFileDropzoneDroppedItems} items - The files and folders to upload.
 	 * @param {string | null} parentUnique - Where the items should be uploaded.
 	 * @returns {Array<UmbUploadableItem>} - The items about to be uploaded.
@@ -123,7 +131,9 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			const uploaded = await this.#tempFileManager.uploadOne(item.temporaryFile);
 
 			// Update progress
-			if (uploaded.status === TemporaryFileStatus.SUCCESS) {
+			if (uploaded.status === TemporaryFileStatus.CANCELLED) {
+				this.#updateStatus(item, UmbFileDropzoneItemStatus.CANCELLED);
+			} else if (uploaded.status === TemporaryFileStatus.SUCCESS) {
 				this.#updateStatus(item, UmbFileDropzoneItemStatus.COMPLETE);
 			} else {
 				this.#updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
@@ -221,7 +231,8 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 	async #handleFile(item: UmbUploadableFile, mediaTypeUnique: string) {
 		// Upload the file as a temporary file and update progress.
-		const temporaryFile = await this.#uploadAsTemporaryFile(item);
+		const temporaryFile = await this.#tempFileManager.uploadOne(item.temporaryFile);
+
 		if (temporaryFile.status === TemporaryFileStatus.CANCELLED) {
 			this.#updateStatus(item, UmbFileDropzoneItemStatus.CANCELLED);
 			return;
@@ -250,10 +261,6 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		} else {
 			this.#updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
 		}
-	}
-
-	#uploadAsTemporaryFile(item: UmbUploadableFile) {
-		return this.#tempFileManager.uploadOne(item.temporaryFile);
 	}
 
 	// Media types
