@@ -202,8 +202,13 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		return !variantOption.variant && !this.#isVariantActive(variantId);
 	}
 
-	#hasVariants() {
-		return this._variantOptions?.length > 1;
+	#selectorIsEnabled() {
+		// only varies by segment
+		if (!this._variesByCulture && this._variesBySegment) {
+			return this._cultureVariants.length > 1 || this._variantOptions[0].variant?.state;
+		}
+
+		return this._variantOptions.length > 1;
 	}
 
 	#setReadOnlyCultures() {
@@ -285,7 +290,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				?readonly=${this.#isReadOnly(this._activeVariant?.culture ?? null)}
 				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantQuery(this._variantId)}].name`, this._name ?? '')}
 				${ref(this.#focusInput)}>
-				${this.#hasVariants()
+				${this.#selectorIsEnabled()
 					? html`
 							<uui-button
 								id="toggle"
@@ -309,7 +314,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					: html`<span id="read-only-tag" slot="append"> ${this.#renderReadOnlyTag(null)} </span>`}
 			</uui-input>
 
-			${this.#hasVariants()
+			${this.#selectorIsEnabled()
 				? html`
 						<uui-popover-container id="popover" @beforetoggle=${this.#onPopoverToggle} placement="bottom-end">
 							<div id="dropdown">
@@ -531,6 +536,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 				.expand-area {
 					grid-area: expand;
+					display: flex;
+					align-items: center;
+					justify-content: center;
 				}
 
 				.variant-area {
