@@ -23,8 +23,8 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
 {
     private const string UnknownCulture = "ke-Ke";
 
-    private readonly DateTime _schedulePublishDate = DateTime.UtcNow.AddDays(1);
-    private readonly DateTime _scheduleUnPublishDate = DateTime.UtcNow.AddDays(2);
+    private readonly DateTime _schedulePublishDate = DateTime.UtcNow.AddDays(1).Date;
+    private readonly DateTime _scheduleUnPublishDate = DateTime.UtcNow.AddDays(2).Date;
 
     [SetUp]
     public new void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
