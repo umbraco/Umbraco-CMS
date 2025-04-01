@@ -508,18 +508,13 @@ public class RelationService : RepositoryService, IRelationService
         {
             IQuery<IRelation> query = Query<IRelation>();
 
-            if (directionFilter == RelationDirectionFilter.Parent)
+            query = directionFilter switch
             {
-                query = query.Where(x => x.ParentId == id);
-            }
-            else if (directionFilter == RelationDirectionFilter.Child)
-            {
-                query = query.Where(x => x.ChildId == id);
-            }
-            else
-            {
-                query = query.Where(x => x.ParentId == id || x.ChildId == id);
-            }
+                RelationDirectionFilter.Parent => query.Where(x => x.ParentId == id),
+                RelationDirectionFilter.Child => query.Where(x => x.ChildId == id),
+                RelationDirectionFilter.Any => query.Where(x => x.ParentId == id || x.ChildId == id),
+                _ => throw new ArgumentOutOfRangeException(nameof(directionFilter)),
+            };
 
             return _relationRepository.Get(query).Any();
         }
