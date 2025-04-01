@@ -18,10 +18,14 @@ export class UmbDocumentBlockPropertyValueUserPermissionWorkspaceContext extends
 			// TODO: revisit this when getContext supports passContextAliasMatches
 			const documentWorkspaceContext = await this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, () => {})
 				.passContextAliasMatches()
-				.asPromise();
+				.asPromise()
+				.catch(() => undefined);
 
 			if (documentWorkspaceContext) {
 				this.#observeDocumentBlockProperties();
+			} else {
+				// TODO: Revisit if we really want to limit the rules to Documents. [NL]
+				// Silently ignore if the block is not in a document
 			}
 		});
 	}
