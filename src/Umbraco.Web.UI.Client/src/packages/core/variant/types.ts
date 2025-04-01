@@ -22,6 +22,7 @@ export interface UmbEntityVariantModel {
 	segment: string | null;
 	createDate: string | null;
 	updateDate: string | null;
+	state?: string | null;
 }
 
 /** @deprecated use `UmbEntityVariantModel` instead */

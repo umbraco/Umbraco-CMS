@@ -260,8 +260,14 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		return this._expandedVariants.find((expandedVariant) => expandedVariant.equal(variantId)) !== undefined;
 	}
 
-	#getSegmentVariantOptionsForCulture(variantId: UmbVariantId): Array<VariantOptionModelType> {
-		return this._variantOptions.filter((variant) => variant.culture === variantId.culture && variant.segment !== null);
+	#getSegmentVariantOptionsForCulture(
+		variantOption: VariantOptionModelType,
+		variantId: UmbVariantId,
+	): Array<VariantOptionModelType> {
+		const segmentVariants = this._variantOptions.filter(
+			(variant) => variant.culture === variantId.culture && variant.segment !== null,
+		);
+		return variantOption.variant ? segmentVariants : [];
 	}
 
 	override render() {
@@ -323,12 +329,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		const variantId = UmbVariantId.Create(variantOption);
 		return html`
 			<li class="variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
-				<uui-button
-					class="expand-area"
-					@click=${(event: PointerEvent) => this.#toggleExpansion(event, variantId)}
-					compact>
-					<uui-symbol-expand .open=${this.#isExpanded(variantId)}></uui-symbol-expand>
-				</uui-button>
+				<div class="expand-area">${this.#renderExpandToggle(variantOption, variantId)}</div>
+
 				<button
 					class="variant-area switch-button ${this.#isCreateMode(variantOption) ? 'add-mode' : ''} ${this.#isReadOnly(
 						variantId.culture,
@@ -351,13 +353,23 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				${this.#isExpanded(variantId)
 					? html`
 							<ul class="children-area">
-								${this.#getSegmentVariantOptionsForCulture(variantId).map((option) =>
+								${this.#getSegmentVariantOptionsForCulture(variantOption, variantId).map((option) =>
 									this.#renderSegmentVariantOption(option),
 								)}
 							</ul>
 						`
 					: nothing}
 			</li>
+		`;
+	}
+
+	#renderExpandToggle(variantOption: VariantOptionModelType, variantId: UmbVariantId) {
+		if (!variantOption.variant?.state) return nothing;
+
+		return html`
+			<uui-button @click=${(event: PointerEvent) => this.#toggleExpansion(event, variantId)} compact>
+				<uui-symbol-expand .open=${this.#isExpanded(variantId)}></uui-symbol-expand>
+			</uui-button>
 		`;
 	}
 
