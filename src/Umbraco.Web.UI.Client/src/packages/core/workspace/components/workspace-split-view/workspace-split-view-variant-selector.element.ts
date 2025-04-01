@@ -349,7 +349,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					${this.#isCreateMode(variantOption) ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
 						<div class="variant-name">
-							${this.#getVariantName(variantOption)}${this.#renderReadOnlyTag(variantId.culture)}
+							${this.#getVariantDisplayName(variantOption)}${this.#renderReadOnlyTag(variantId.culture)}
 						</div>
 						<div class="variant-details">
 							<span>${this._renderVariantDetails(variantOption)}</span>
@@ -397,7 +397,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					${this.#isCreateMode(variantOption) ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
 						<div class="variant-name">
-							${this.#getVariantName(variantOption)}${this.#renderReadOnlyTag(variantId.culture)}
+							${this.#getVariantDisplayName(variantOption)}${this.#renderReadOnlyTag(variantId.culture)}
 						</div>
 						<div class="variant-details">
 							<span>${this._renderVariantDetails(variantOption)}</span>
@@ -412,26 +412,19 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	#getNameValue() {
 		// It is currently not possible to edit the name of a segment variant option. We render the name of the segment instead and set the input to readonly.
-		const segmentName = this.#isSegmentVariantOption(this._activeVariant) ? this._activeVariant?.segmentInfo?.name : '';
-		return segmentName ?? this._name ?? '';
+		const segmentName =
+			this.#isSegmentVariantOption(this._activeVariant) && this._activeVariant?.segmentInfo?.name
+				? this._activeVariant.segmentInfo.name
+				: '';
+		return segmentName !== '' ? segmentName : (this._name ?? '');
 	}
 
-	#getVariantName(variantOption: VariantOptionModelType) {
-		if (variantOption.variant?.name) {
-			return variantOption.variant?.name;
-		}
-
-		// If we vary by segment only, we show the segment and show "Default" for the language
-		if (this._variesByCulture && this._variesBySegment) {
-			return variantOption?.segmentInfo?.name ?? variantOption.language.name;
-		}
-
-		// If we vary by segment only, we show the segment and show "Default" for the language
-		if (!this._variesByCulture && this._variesBySegment) {
+	#getVariantDisplayName(variantOption: VariantOptionModelType) {
+		if (this.#isSegmentVariantOption(variantOption)) {
 			return variantOption?.segmentInfo?.name ?? this._labelDefault;
 		}
 
-		return variantOption.language.name;
+		return variantOption.variant?.name ?? variantOption.language.name;
 	}
 
 	#getVariantSpecInfo(variantOption: VariantOptionModelType | undefined) {
