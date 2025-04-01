@@ -1,8 +1,8 @@
 import { html, customElement, property, state, query } from '@umbraco-cms/backoffice/external/lit';
 import type { UUISelectElement, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import {
-	type UmbPropertyEditorUiElement,
-	type UmbPropertyEditorConfigCollection,
+import type {
+	UmbPropertyEditorUiElement,
+	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';

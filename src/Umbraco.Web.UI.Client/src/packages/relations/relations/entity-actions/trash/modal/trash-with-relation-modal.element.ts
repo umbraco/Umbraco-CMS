@@ -1,3 +1,4 @@
+import type { UmbConfirmActionModalEntityReferencesConfig } from '../../../global-components/types.js';
 import type {
 	UmbTrashWithRelationConfirmModalData,
 	UmbTrashWithRelationConfirmModalValue,
@@ -17,9 +18,6 @@ import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
-// import of local component
-import '../../local-components/confirm-action-entity-references.element.js';
-
 @customElement('umb-trash-with-relation-confirm-modal')
 export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement<
 	UmbTrashWithRelationConfirmModalData,
@@ -29,7 +27,7 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 	_name?: string;
 
 	@state()
-	_referencesConfig?: any;
+	_referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
 
 	#itemRepository?: UmbItemRepository<any>;
 
