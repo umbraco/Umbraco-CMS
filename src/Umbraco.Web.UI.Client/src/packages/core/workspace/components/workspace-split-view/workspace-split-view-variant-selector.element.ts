@@ -254,6 +254,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		return this._readOnlyCultures.includes(culture);
 	}
 
+	#isSegmentVariantOption(variantOption: VariantOptionModelType | undefined) {
+		return variantOption?.segment !== null;
+	}
+
 	#toggleExpansion(event: PointerEvent, variantId: UmbVariantId) {
 		event.stopPropagation();
 		this._expandedVariants = this.#isExpanded(variantId)
@@ -287,7 +291,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				.value=${this._name ?? ''}
 				@input=${this.#handleInput}
 				required
-				?readonly=${this.#isReadOnlyCulture(this._activeVariant?.culture ?? null)}
+				?readonly=${this.#isReadOnlyCulture(this._activeVariant?.culture ?? null) ||
+				this.#isSegmentVariantOption(this._activeVariant)}
 				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantQuery(this._variantId)}].name`, this._name ?? '')}
 				${ref(this.#focusInput)}>
 				${this.#selectorIsEnabled()
