@@ -758,7 +758,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             // We don't really need true paging here, as the number of data type relations will be small compared to what there could
             // potentially by for concrete Umbraco relations based on documents, media and members.
             // So we'll retrieve all usages for the data type and construct a paged response.
-            // This allows us to re-use the existing repository methods used for GetReferencesAsync and GetListViewReferences.
+            // This allows us to re-use the existing repository methods used for FindUsages and FindListViewUsages.
             IReadOnlyDictionary<Udi, IEnumerable<string>> usages = _dataTypeRepository.FindUsages(dataType.Id);
             IReadOnlyDictionary<Udi, IEnumerable<string>> listViewUsages = _dataTypeRepository.FindListViewUsages(dataType.Id);
 
@@ -779,19 +779,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             // Get the content types for the UDIs referenced in the page of items to construct the response from.
             // They could be document, media or member types.
-            IEnumerable<IContentTypeComposition> documentTypes = GetContentTypes(
-                pagedUsages,
-                Constants.UdiEntityType.DocumentType,
-                _contentTypeRepository);
-            IEnumerable<IContentTypeComposition> mediaTypes = GetContentTypes(
-                pagedUsages,
-                Constants.UdiEntityType.MediaType,
-                _mediaTypeRepository);
-            IEnumerable<IContentTypeComposition> memberTypes = GetContentTypes(
-                pagedUsages,
-                Constants.UdiEntityType.MemberType,
-                _memberTypeRepository);
-            var contentTypes = documentTypes.Concat(mediaTypes).Concat(memberTypes).ToList();
+            IList<IContentTypeComposition> contentTypes = GetReferencedContentTypes(pagedUsages);
 
             IEnumerable<RelationItemModel> relations = pagedUsages
                 .Select(x =>
@@ -823,6 +811,23 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             var pagedModel = new PagedModel<RelationItemModel>(totalItems, relations);
             return Task.FromResult(pagedModel);
+        }
+
+        private IList<IContentTypeComposition> GetReferencedContentTypes(IEnumerable<(string PropertyAlias, Udi Udi)> pagedUsages)
+        {
+            IEnumerable<IContentTypeComposition> documentTypes = GetContentTypes(
+                pagedUsages,
+                Constants.UdiEntityType.DocumentType,
+                _contentTypeRepository);
+            IEnumerable<IContentTypeComposition> mediaTypes = GetContentTypes(
+                pagedUsages,
+                Constants.UdiEntityType.MediaType,
+                _mediaTypeRepository);
+            IEnumerable<IContentTypeComposition> memberTypes = GetContentTypes(
+                pagedUsages,
+                Constants.UdiEntityType.MemberType,
+                _memberTypeRepository);
+            return documentTypes.Concat(mediaTypes).Concat(memberTypes).ToList();
         }
 
         private static IEnumerable<T> GetContentTypes<T>(
