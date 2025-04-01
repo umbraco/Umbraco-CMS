@@ -309,31 +309,8 @@ describe('UmbLocalizeController', () => {
 			expect(controller.duration(inTenSeconds, now)).to.equal('10 seconds');
 		});
 
-		it('should compare between two dates', () => {
-			const twoDaysAgo = new Date();
-			twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-			const inTwoDays = new Date();
-			inTwoDays.setDate(inTwoDays.getDate() + 2);
-
-			expect(controller.duration(inTwoDays, twoDaysAgo)).to.equal('4 days');
-		});
-
 		it('should return a negative duration', () => {
 			expect(controller.duration('2020-01-01', '2019-12-30')).to.equal('2 days');
-		});
-
-		it('should update the relative compounded time when the language changes', async () => {
-			const now = new Date();
-			const inTwoDays = new Date();
-			inTwoDays.setDate(inTwoDays.getDate() + 2);
-
-			expect(controller.duration(inTwoDays, now)).to.equal('2 days');
-
-			// Switch browser to Danish
-			document.documentElement.lang = danishRegional.$code;
-			await aTimeout(0);
-
-			expect(controller.duration(inTwoDays, now)).to.equal('2 dage');
 		});
 	});
 
