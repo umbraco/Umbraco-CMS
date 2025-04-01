@@ -47,6 +47,8 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implement
 	override render() {
 		return html`
 			<div class="container">
+				<umb-extension-slot id="workspace-info-apps" type="workspaceInfoApp"></umb-extension-slot>
+
 				<umb-data-type-workspace-view-info-reference
 					.dataTypeUnique=${this._unique}></umb-data-type-workspace-view-info-reference>
 			</div>
