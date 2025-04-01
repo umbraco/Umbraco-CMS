@@ -38,17 +38,17 @@ public static class DateTimeExtensions
     {
         if (truncateTo == DateTruncate.Year)
         {
-            return new DateTime(dt.Year, 1, 1);
+            return new DateTime(dt.Year, 1, 1, 0, 0, 0, dt.Kind);
         }
 
         if (truncateTo == DateTruncate.Month)
         {
-            return new DateTime(dt.Year, dt.Month, 1);
+            return new DateTime(dt.Year, dt.Month, 1, 0, 0, 0, dt.Kind);
         }
 
         if (truncateTo == DateTruncate.Day)
         {
-            return new DateTime(dt.Year, dt.Month, dt.Day);
+            return new DateTime(dt.Year, dt.Month, dt.Day, 0, 0, 0, dt.Kind);
         }
 
         if (truncateTo == DateTruncate.Hour)
