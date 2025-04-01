@@ -78,7 +78,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 
 		return html`
 			<uui-card-user
-				.name=${user.name ?? 'Unnamed user'}
+				.name=${user.name ?? this.localize.term('general_unnamed')}
 				href=${href}
 				selectable
 				?select-only=${this._selection.length > 0}

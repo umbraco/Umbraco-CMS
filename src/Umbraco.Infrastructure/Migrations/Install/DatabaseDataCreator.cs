@@ -2307,6 +2307,9 @@ internal class DatabaseDataCreator
             Constants.Conventions.RelationTypes.RelatedMediaName, null, null, false, true);
         CreateRelationTypeData(5, Constants.Conventions.RelationTypes.RelatedDocumentAlias,
             Constants.Conventions.RelationTypes.RelatedDocumentName, null, null, false, true);
+        CreateRelationTypeData(6, Constants.Conventions.RelationTypes.RelatedMemberAlias,
+            Constants.Conventions.RelationTypes.RelatedMemberName, null, null, false, true);
+
     }
 
     private void CreateRelationTypeData(int id, string alias, string name, Guid? parentObjectType,

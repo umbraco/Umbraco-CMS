@@ -91,7 +91,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
         // implementation of GetReferences in IDataValueReference.
         // Allows developers to add support for references by a
         // package /property editor that did not implement IDataValueReference themselves
-                foreach (IDataValueReferenceFactory dataValueReferenceFactory in this)
+        foreach (IDataValueReferenceFactory dataValueReferenceFactory in this)
         {
             // Check if this value reference is for this datatype/editor
             // Then call it's GetReferences method - to see if the value stored
