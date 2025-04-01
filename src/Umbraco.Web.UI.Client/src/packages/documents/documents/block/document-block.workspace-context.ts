@@ -18,9 +18,13 @@ export class UmbDocumentBlockWorkspaceContext extends UmbControllerBase {
 			// TODO: revisit this when getContext supports passContextAliasMatches
 			const documentWorkspaceContext = await this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, () => {})
 				.passContextAliasMatches()
-				.asPromise();
+				.asPromise()
+				.catch(() => {
+					throw new Error('Could not find document workspace context');
+				});
 
 			if (context && documentWorkspaceContext) {
+				documentWorkspaceContext.destroy();
 				// Start the states for blocks inside documents to allow for property value permissions
 				context.content.structure.propertyViewState.start();
 				context.content.structure.propertyWriteState.start();
