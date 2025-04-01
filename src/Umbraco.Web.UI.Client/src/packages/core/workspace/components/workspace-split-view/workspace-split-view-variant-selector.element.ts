@@ -380,11 +380,13 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				${this.#renderSplitViewButton(variantOption)}
 				${this.#isVariantExpanded(variantId)
 					? html`
-							<ul class="children-area">
-								${this.#getSegmentVariantOptionsForCulture(variantOption, variantId).map((option) =>
-									this.#renderSegmentVariantOption(option),
-								)}
-							</ul>
+							<div class="segments-area">
+								<ul class="variant-list">
+									${this.#getSegmentVariantOptionsForCulture(variantOption, variantId).map((option) =>
+										this.#renderSegmentVariantOption(option),
+									)}
+								</ul>
+							</div>
 						`
 					: nothing}
 			</li>
@@ -552,7 +554,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					grid-template-columns: var(--uui-size-10) 1fr;
 					grid-template-areas:
 						'expand variant'
-						'children children';
+						'segments segments';
 					border-bottom: 1px solid var(--uui-color-divider-standalone);
 				}
 
@@ -567,8 +569,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					grid-area: variant;
 				}
 
-				.children-area {
-					grid-area: children;
+				.segments-area {
+					grid-area: segments;
 					list-style: none;
 				}
 			}
