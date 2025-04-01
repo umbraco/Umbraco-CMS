@@ -20,6 +20,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import {
+	UmbVariantPropertyReadOnlyStateManager,
 	UmbVariantPropertyViewStateManager,
 	UmbVariantPropertyWriteStateManager,
 } from '@umbraco-cms/backoffice/property';
@@ -104,6 +105,7 @@ export class UmbContentTypeStructureManager<
 
 	public readonly propertyViewState = new UmbVariantPropertyViewStateManager(this);
 	public readonly propertyWriteState = new UmbVariantPropertyWriteStateManager(this);
+	public readonly propertyReadOnlyState = new UmbVariantPropertyReadOnlyStateManager(this);
 
 	#containers: UmbArrayState<UmbPropertyTypeContainerModel> = new UmbArrayState<UmbPropertyTypeContainerModel>(
 		[],
@@ -818,6 +820,7 @@ export class UmbContentTypeStructureManager<
 		this.#containers.destroy();
 		this.propertyViewState.destroy();
 		this.propertyWriteState.destroy();
+		this.propertyReadOnlyState.destroy();
 		super.destroy();
 	}
 }

@@ -45,6 +45,9 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	@state()
 	_propertyWriteStates: Array<UmbVariantPropertyWriteState> = [];
 
+	@state()
+	_propertyReadOnlyStates: Array<UmbVariantPropertyReadState> = [];
+
 	constructor() {
 		super();
 
@@ -75,6 +78,12 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 					this._propertyWriteStateIsRunning = isEnabled;
 					this._propertyWriteStates = states;
 				},
+				'umbObservePropertyWriteStates',
+			);
+
+			this.observe(
+				workspaceContext.structure.propertyReadOnlyState.states,
+				(states) => (this._propertyReadOnlyStates = states),
 				'umbObservePropertyWriteStates',
 			);
 		});
@@ -129,9 +138,20 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 		}
 
 		const propertyVariantId = this.#getPropertyVariantId(property);
-		return this._propertyWriteStates.some(
+
+		// Check if the property is writable
+		const isWriteAllowed = this._propertyWriteStates.some(
 			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(propertyVariantId),
 		);
+
+		// Check if the property is read only
+		const isReadOnly = this._propertyReadOnlyStates.some(
+			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(propertyVariantId),
+		);
+
+		// If the property has a read only state it will override the write state
+		// and the property will always be read only
+		return isWriteAllowed && !isReadOnly;
 	}
 
 	#getPropertyVariantId(property: UmbPropertyTypeModel) {
