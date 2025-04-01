@@ -56,9 +56,12 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
         IReferenceResponseModel[] result = relationItemModelsCollection.Select(relationItemModel =>
             relationItemModel.NodeType switch
             {
-                Constants.UdiEntityType.Document => MapDocumentReference(relationItemModel, slimEntities),
-                Constants.UdiEntityType.Media => _umbracoMapper.Map<MediaReferenceResponseModel>(relationItemModel),
-                Constants.UdiEntityType.Member => _umbracoMapper.Map<MemberReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.Document => MapDocumentReference(relationItemModel, slimEntities),
+                Constants.ReferenceType.Media => _umbracoMapper.Map<MediaReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.Member => _umbracoMapper.Map<MemberReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.DocumentTypeProperty => _umbracoMapper.Map<DocumentTypePropertyReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.MediaTypeProperty => _umbracoMapper.Map<MediaTypePropertyReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.MemberTypeProperty => _umbracoMapper.Map<MemberTypePropertyReferenceResponseModel>(relationItemModel),
                 _ => _umbracoMapper.Map<DefaultReferenceResponseModel>(relationItemModel),
             }).WhereNotNull().ToArray();
 

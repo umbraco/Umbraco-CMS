@@ -25,12 +25,15 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IDataTypeRepository _dataTypeRepository;
         private readonly IDataTypeContainerRepository _dataTypeContainerRepository;
         private readonly IContentTypeRepository _contentTypeRepository;
+        private readonly IMediaTypeRepository _mediaTypeRepository;
+        private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IIOHelper _ioHelper;
         private readonly IDataTypeContainerService _dataTypeContainerService;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
         private readonly Lazy<IIdKeyMap> _idKeyMap;
 
+        [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
         public DataTypeService(
             ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
@@ -41,12 +44,41 @@ namespace Umbraco.Cms.Core.Services.Implement
             IContentTypeRepository contentTypeRepository,
             IIOHelper ioHelper,
             Lazy<IIdKeyMap> idKeyMap)
+            : this(
+                  provider,
+                  loggerFactory,
+                  eventMessagesFactory,
+                  dataTypeRepository,
+                  dataValueEditorFactory,
+                  auditRepository,
+                  contentTypeRepository,
+                  StaticServiceProvider.Instance.GetRequiredService<IMediaTypeRepository>(),
+                  StaticServiceProvider.Instance.GetRequiredService<IMemberTypeRepository>(),
+                  ioHelper,
+                  idKeyMap)
+        {
+        }
+
+        public DataTypeService(
+            ICoreScopeProvider provider,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IDataTypeRepository dataTypeRepository,
+            IDataValueEditorFactory dataValueEditorFactory,
+            IAuditRepository auditRepository,
+            IContentTypeRepository contentTypeRepository,
+            IMediaTypeRepository mediaTypeRepository,
+            IMemberTypeRepository memberTypeRepositor,
+            IIOHelper ioHelper,
+            Lazy<IIdKeyMap> idKeyMap)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _dataTypeRepository = dataTypeRepository;
             _auditRepository = auditRepository;
             _contentTypeRepository = contentTypeRepository;
+            _mediaTypeRepository = mediaTypeRepository;
+            _memberTypeRepository = memberTypeRepositor;
             _ioHelper = ioHelper;
             _idKeyMap = idKeyMap;
 
@@ -703,10 +735,110 @@ namespace Umbraco.Cms.Core.Services.Implement
             return await Task.FromResult(Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, usages));
         }
 
+        /// <inheritdoc />
         public IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             return _dataTypeRepository.FindListViewUsages(id);
+        }
+
+        /// <inheritdoc />
+        public Task<PagedModel<RelationItemModel>> GetPagedRelationsAsync(Guid key, int skip, int take)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+            IDataType? dataType = GetDataTypeFromRepository(key);
+            if (dataType == null)
+            {
+                // Is an unexpected response, but returning an empty collection aligns with how we handle retrieval of concrete Umbraco
+                // relations based on documents, media and members.
+                return Task.FromResult(new PagedModel<RelationItemModel>());
+            }
+
+            // We don't really need true paging here, as the number of data type relations will be small compared to what there could
+            // potentially by for concrete Umbraco relations based on documents, media and members.
+            // So we'll retrieve all usages for the data type and construct a paged response.
+            // This allows us to re-use the existing repository methods used for GetReferencesAsync and GetListViewReferences.
+            IReadOnlyDictionary<Udi, IEnumerable<string>> usages = _dataTypeRepository.FindUsages(dataType.Id);
+            IReadOnlyDictionary<Udi, IEnumerable<string>> listViewUsages = _dataTypeRepository.FindListViewUsages(dataType.Id);
+
+            // Combine the property and list view usages into a single collection of property aliases and content type UDIs.
+            IList<(string PropertyAlias, Udi Udi)> combinedUsages = usages
+                .SelectMany(kvp => kvp.Value.Select(value => (value, kvp.Key)))
+                .Concat(listViewUsages.SelectMany(kvp => kvp.Value.Select(value => (value, kvp.Key))))
+                .ToList();
+
+            var totalItems = combinedUsages.Count;
+
+            // Create the page of items.
+            IEnumerable<(string PropertyAlias, Udi Udi)> pagedUsages = combinedUsages
+                .OrderBy(x => x.Udi.EntityType) // Document types first, then media types, then member types.
+                .ThenBy(x => x.PropertyAlias)
+                .Skip(skip)
+                .Take(take);
+
+            // Get the content types for the UDIs referenced in the page of items to construct the response from.
+            // They could be document, media or member types.
+            IEnumerable<IContentTypeComposition> documentTypes = GetContentTypes(
+                pagedUsages,
+                Constants.UdiEntityType.DocumentType,
+                _contentTypeRepository);
+            IEnumerable<IContentTypeComposition> mediaTypes = GetContentTypes(
+                pagedUsages,
+                Constants.UdiEntityType.MediaType,
+                _mediaTypeRepository);
+            IEnumerable<IContentTypeComposition> memberTypes = GetContentTypes(
+                pagedUsages,
+                Constants.UdiEntityType.MemberType,
+                _memberTypeRepository);
+            var contentTypes = documentTypes.Concat(mediaTypes).Concat(memberTypes).ToList();
+
+            IEnumerable<RelationItemModel> relations = pagedUsages
+                .Select(x =>
+                {
+                    // Get the matching content type so we can populate the content type and property details.
+                    IContentTypeComposition contentType = contentTypes.Single(y => y.Key == ((GuidUdi)x.Udi).Guid);
+
+                    string nodeType = x.Udi.EntityType switch
+                    {
+                        Constants.UdiEntityType.DocumentType => Constants.ReferenceType.DocumentTypeProperty,
+                        Constants.UdiEntityType.MediaType => Constants.ReferenceType.MediaTypeProperty,
+                        Constants.UdiEntityType.MemberType => Constants.ReferenceType.MemberTypeProperty,
+                        _ => throw new ArgumentOutOfRangeException(nameof(x.Udi.EntityType)),
+                    };
+
+                    // Look-up the property details from the property alias. This will be null for a list view reference.
+                    IPropertyType? propertyType = contentType.PropertyTypes.SingleOrDefault(y => y.Alias == x.PropertyAlias);
+                    return new RelationItemModel
+                    {
+                        ContentTypeAlias = contentType.Alias,
+                        ContentTypeIcon = contentType.Icon,
+                        ContentTypeName = contentType.Name,
+                        NodeType = nodeType,
+                        NodeName = propertyType?.Name ?? x.PropertyAlias,
+                        NodeAlias = x.PropertyAlias,
+                        NodeKey = propertyType?.Key ?? Guid.Empty,
+                    };
+                });
+
+            var pagedModel = new PagedModel<RelationItemModel>(totalItems, relations);
+            return Task.FromResult(pagedModel);
+        }
+
+        private static IEnumerable<T> GetContentTypes<T>(
+            IEnumerable<(string PropertyAlias, Udi Udi)> dataTypeUsages,
+            string entityType,
+            IContentTypeRepositoryBase<T> repository)
+            where T : IContentTypeComposition
+        {
+            Guid[] contentTypeKeys = dataTypeUsages
+                .Where(x => x.Udi is GuidUdi && x.Udi.EntityType == entityType)
+                .Select(x => ((GuidUdi)x.Udi).Guid)
+                .Distinct()
+                .ToArray();
+            return contentTypeKeys.Length > 0
+                ? repository.GetMany(contentTypeKeys)
+                : [];
         }
 
         /// <inheritdoc />
