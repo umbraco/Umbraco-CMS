@@ -46,7 +46,7 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 						'section',
 						(manifest) => allowedSections.includes(manifest.alias),
 						async (sections) => {
-							this.#allowedSections.setValue([...sections]);
+							this.#allowedSections.setValue(sections);
 						},
 						'umbAllowedSectionsManifestInitializer',
 					);
