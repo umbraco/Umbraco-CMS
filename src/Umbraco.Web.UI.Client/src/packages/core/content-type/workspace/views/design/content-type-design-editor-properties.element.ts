@@ -135,6 +135,9 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	private _ownerContentTypeUnique?: string;
 
 	@state()
+	private _ownerContentTypeVariesByCulture?: boolean;
+
+	@state()
 	private _newPropertyPath?: string;
 
 	@state()
@@ -168,6 +171,14 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 
 			this._ownerContentTypeUnique = workspaceContext.structure.getOwnerContentTypeUnique();
 			this.createPropertyTypeWorkspaceRoutes();
+
+			this.observe(
+				workspaceContext.variesByCulture,
+				(variesByCulture) => {
+					this._ownerContentTypeVariesByCulture = variesByCulture;
+				},
+				'observeOwnerVariesByCulture',
+			);
 		});
 		this.observe(this.#propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._properties = propertyStructure;
@@ -251,11 +262,13 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 								return html`
 									<umb-content-type-design-editor-property
 										data-umb-property-id=${property.id}
+										data-mark="property-type:${property.name}"
 										.editContentTypePath=${this.editContentTypePath}
 										.editPropertyTypePath=${this._editPropertyTypePath}
 										?sort-mode-active=${this._sortModeActive}
 										.propertyStructureHelper=${this.#propertyStructureHelper}
-										.property=${property}>
+										.property=${property}
+										.ownerVariesByCulture=${this._ownerContentTypeVariesByCulture}>
 									</umb-content-type-design-editor-property>
 								`;
 							},
