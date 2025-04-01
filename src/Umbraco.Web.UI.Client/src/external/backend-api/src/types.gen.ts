@@ -769,6 +769,14 @@ export type DocumentTypeItemResponseModel = {
     description?: (string) | null;
 };
 
+export type DocumentTypePropertyReferenceResponseModel = {
+    $type: string;
+    id: string;
+    name?: (string) | null;
+    alias?: (string) | null;
+    documentType: (TrackedReferenceDocumentTypeModel);
+};
+
 export type DocumentTypePropertyTypeContainerResponseModel = {
     id: string;
     parent?: ((ReferenceByIdModel) | null);
@@ -1277,6 +1285,14 @@ export type MediaTypeItemResponseModel = {
     icon?: (string) | null;
 };
 
+export type MediaTypePropertyReferenceResponseModel = {
+    $type: string;
+    id: string;
+    name?: (string) | null;
+    alias?: (string) | null;
+    mediaType: (TrackedReferenceMediaTypeModel);
+};
+
 export type MediaTypePropertyTypeContainerResponseModel = {
     id: string;
     parent?: ((ReferenceByIdModel) | null);
@@ -1457,6 +1473,14 @@ export type MemberTypeItemResponseModel = {
     id: string;
     name: string;
     icon?: (string) | null;
+};
+
+export type MemberTypePropertyReferenceResponseModel = {
+    $type: string;
+    id: string;
+    name?: (string) | null;
+    alias?: (string) | null;
+    memberType: (TrackedReferenceMemberTypeModel);
 };
 
 export type MemberTypePropertyTypeContainerResponseModel = {
@@ -1759,7 +1783,7 @@ export type PagedIndexResponseModel = {
 
 export type PagedIReferenceResponseModel = {
     total: number;
-    items: Array<(DefaultReferenceResponseModel | DocumentReferenceResponseModel | MediaReferenceResponseModel | MemberReferenceResponseModel)>;
+    items: Array<(DefaultReferenceResponseModel | DocumentReferenceResponseModel | DocumentTypePropertyReferenceResponseModel | MediaReferenceResponseModel | MediaTypePropertyReferenceResponseModel | MemberReferenceResponseModel | MemberTypePropertyReferenceResponseModel)>;
 };
 
 export type PagedLanguageResponseModel = {
@@ -2993,6 +3017,14 @@ export type PutDataTypeByIdMoveData = {
 };
 
 export type PutDataTypeByIdMoveResponse = (string);
+
+export type GetDataTypeByIdReferencedByData = {
+    id: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetDataTypeByIdReferencedByResponse = ((PagedIReferenceResponseModel));
 
 export type GetDataTypeByIdReferencesData = {
     id: string;
