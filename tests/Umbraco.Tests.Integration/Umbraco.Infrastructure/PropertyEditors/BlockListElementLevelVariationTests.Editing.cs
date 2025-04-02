@@ -619,6 +619,9 @@ internal partial class BlockListElementLevelVariationTests
         var firstContentElementKey = Guid.NewGuid();
         var firstSettingsElementKey = Guid.NewGuid();
 
+        var secondContentElementKey = Guid.NewGuid();
+        var secondSettingsElementKey = Guid.NewGuid();
+
         var blockListValue = BlockListPropertyValue(
             elementType,
             [
@@ -641,8 +644,8 @@ internal partial class BlockListElementLevelVariationTests
                         null,
                         null)),
                 (
-                    Guid.NewGuid(),
-                    Guid.NewGuid(),
+                    secondContentElementKey,
+                    secondSettingsElementKey,
                     new BlockProperty(
                         new List<BlockPropertyValue> {
                             new() { Alias = "invariantText", Value = "#2: The first invariant content value" },
@@ -708,18 +711,45 @@ internal partial class BlockListElementLevelVariationTests
         {
             Assert.Multiple(() =>
             {
+                // new one can't be added
                 Assert.AreEqual(0, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == newContentElementKey));
+                Assert.AreEqual(0, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)));
+                Assert.AreEqual(0, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)));
+
+                // can't remove first
                 Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey));
                 Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey));
-                Assert.AreEqual(0, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)));
+                Assert.AreEqual(4, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
+                Assert.AreEqual(4, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
+
+                // second wasn't touched
+                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == secondSettingsElementKey));
+                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == secondContentElementKey));
+                Assert.AreEqual(4, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
+                Assert.AreEqual(4, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
             });
         }
         else
         {
-            Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == newContentElementKey));
-            Assert.AreEqual(0, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey));
-            Assert.AreEqual(0, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey));
-            Assert.AreEqual(4, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)));
+            Assert.Multiple(() =>
+            {
+                // add new one, did not add settings
+                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == newContentElementKey));
+                Assert.AreEqual(4, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)));
+                Assert.AreEqual(0, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)));
+
+                // first one removed
+                Assert.AreEqual(0, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey));
+                Assert.AreEqual(0, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey));
+                Assert.AreEqual(0, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
+                Assert.AreEqual(0, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
+
+                // second wasn't touched
+                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == secondSettingsElementKey));
+                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == secondContentElementKey));
+                Assert.AreEqual(4, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
+                Assert.AreEqual(4, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
+            });
         }
     }
 
@@ -946,6 +976,152 @@ internal partial class BlockListElementLevelVariationTests
         else
         {
             Assert.AreEqual("null", savedBlocksValue);
+        }
+    }
+
+    /// <summary>
+    /// Tests whether the user can add/remove a value for a given culture
+    /// </summary>
+    /// <param name="updateWithLimitedUserAccess">true => danish only which is not the default. false => admin which is all languages</param>
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Handle_ValueRemoval_For_Limited_Users(
+            bool updateWithLimitedUserAccess)
+    {
+        await LanguageService.CreateAsync(
+            new Language("de-DE", "German"), Constants.Security.SuperUserKey);
+        var userKey = updateWithLimitedUserAccess
+            ? (await CreateLimitedUser()).Key
+            : Constants.Security.SuperUserKey;
+
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var content = CreateContent(contentType, elementType, [], false);
+        content.SetCultureName("Home (de)", "de-DE");
+        ContentService.Save(content);
+
+        var firstContentElementKey = Guid.NewGuid();
+        var firstSettingsElementKey = Guid.NewGuid();
+
+        var secondContentElementKey = Guid.NewGuid();
+        var secondSettingsElementKey = Guid.NewGuid();
+
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    firstContentElementKey,
+                    firstSettingsElementKey,
+                    new BlockProperty(
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#1: The first invariant content value" },
+                            new() { Alias = "variantText", Value = "#1: The first content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#1: The first content value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#1: The first content value in German", Culture = "de-DE" },
+                        },
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#1: The first invariant settings value" },
+                            new() { Alias = "variantText", Value = "#1: The first settings value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#1: The first settings value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#1: The first settings value in German", Culture = "de-DE" },
+                        },
+                        null,
+                        null)),
+                (
+                    secondContentElementKey,
+                    secondSettingsElementKey,
+                    new BlockProperty(
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#2: The first invariant content value" },
+                            new() { Alias = "variantText", Value = "#2: The first content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#2: The first content value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#2: The first content value in German", Culture = "de-DE" },
+                        },
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#2: The first invariant settings value" },
+                            new() { Alias = "variantText", Value = "#2: The first settings value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "#2: The first settings value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "#2: The first settings value in German", Culture = "de-DE" },
+                        },
+                        null,
+                        null))
+            ]);
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        // remove a value the limited user can remove
+        blockListValue.ContentData.First().Values.RemoveAll(value => value.Culture == "da-DK");
+        blockListValue.SettingsData.First().Values.RemoveAll(value => value.Culture == "da-DK");
+        // remove a value the admin user can remove
+        blockListValue.ContentData.First().Values.RemoveAll(value => value.Culture == "en-US");
+        blockListValue.SettingsData.First().Values.RemoveAll(value => value.Culture == "en-US");
+
+        var updateModel = new ContentUpdateModel
+        {
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
+            },
+            Variants = new[]
+            {
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US", Properties = [] },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK", Properties = [] },
+                new VariantModel { Name = content.GetCultureName("de-DE")!, Culture = "de-DE", Properties = [] }
+            },
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
+        Assert.IsTrue(result.Success);
+
+        content = ContentService.GetById(content.Key);
+        var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
+        Assert.NotNull(savedBlocksValue);
+        blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
+
+        if (updateWithLimitedUserAccess)
+        {
+            Assert.Multiple(() =>
+            {
+
+                // Should only have remove the danish value
+                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey));
+                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey));
+                Assert.AreEqual(3, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
+                Assert.AreEqual(3, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
+                Assert.AreEqual(0, blockListValue.ContentData.First().Values.Count(value => value.Culture == "da-DK"));
+                Assert.AreEqual(1, blockListValue.ContentData.First().Values.Count(value => value.Culture == "en-US"));
+                Assert.AreEqual(0, blockListValue.SettingsData.First().Values.Count(value => value.Culture == "da-DK"));
+                Assert.AreEqual(1, blockListValue.SettingsData.First().Values.Count(value => value.Culture == "en-US"));
+
+                // second wasn't touched
+                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == secondSettingsElementKey));
+                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == secondContentElementKey));
+                Assert.AreEqual(4, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
+                Assert.AreEqual(4, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
+            });
+        }
+        else
+        {
+            Assert.Multiple(() =>
+            {
+                // 2 values are removed
+                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey));
+                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey));
+                Assert.AreEqual(2, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
+                Assert.AreEqual(2, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
+                Assert.AreEqual(0, blockListValue.ContentData.First().Values.Count(value => value.Culture == "da-DK"));
+                Assert.AreEqual(0, blockListValue.ContentData.First().Values.Count(value => value.Culture == "en-US"));
+                Assert.AreEqual(0, blockListValue.SettingsData.First().Values.Count(value => value.Culture == "da-DK"));
+                Assert.AreEqual(0, blockListValue.SettingsData.First().Values.Count(value => value.Culture == "en-US"));
+
+                // second wasn't touched
+                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == secondSettingsElementKey));
+                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == secondContentElementKey));
+                Assert.AreEqual(4, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
+                Assert.AreEqual(4, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
+            });
         }
     }
 

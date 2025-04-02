@@ -340,7 +340,61 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         CleanupVariantValues(source.BlockValue.ContentData, target.BlockValue.ContentData, canUpdateInvariantData, allowedCultures);
         CleanupVariantValues(source.BlockValue.SettingsData, target.BlockValue.SettingsData, canUpdateInvariantData, allowedCultures);
 
+        // every source block value for a culture that is not allowed to be edited should be present on the target
+        RestoreMissingValues(
+            source.BlockValue.ContentData,
+            target.BlockValue.ContentData,
+            mergedInvariant.Layout!,
+            (layoutItem, itemData) => layoutItem.ContentKey == itemData.Key,
+            canUpdateInvariantData,
+            allowedCultures);
+        RestoreMissingValues(
+            source.BlockValue.SettingsData,
+            target.BlockValue.SettingsData,
+            mergedInvariant.Layout!,
+            (layoutItem, itemData) => layoutItem.SettingsKey == itemData.Key,
+            canUpdateInvariantData,
+            allowedCultures);
+
         return target.BlockValue;
+    }
+
+    private void RestoreMissingValues(
+        List<BlockItemData> sourceBlockItemData,
+        List<BlockItemData> targetBlockItemData,
+        IEnumerable<TLayout> mergedLayout,
+        Func<TLayout, BlockItemData, bool> relevantBlockItemMatcher,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
+        IEnumerable<BlockItemData> blockItemsToCheck = sourceBlockItemData.Where(itemData =>
+            mergedLayout.Any(layoutItem => relevantBlockItemMatcher(layoutItem, itemData)));
+        foreach (BlockItemData blockItemData in blockItemsToCheck)
+        {
+            var relevantValues = blockItemData.Values.Where(value =>
+                (value.Culture is null && canUpdateInvariantData is false)
+                || (value.Culture is not null && allowedCultures.Contains(value.Culture) is false)).ToList();
+            if (relevantValues.Count < 1)
+            {
+                continue;
+            }
+
+            BlockItemData targetBlockData =
+                targetBlockItemData.FirstOrDefault(itemData => itemData.Key == blockItemData.Key)
+                ?? new BlockItemData(blockItemData.Key, blockItemData.ContentTypeKey, blockItemData.ContentTypeAlias);
+            foreach (BlockPropertyValue missingValue in relevantValues.Where(value => targetBlockData.Values.Any(targetValue =>
+                         targetValue.Alias == value.Alias
+                         && targetValue.Culture == value.Culture
+                         && targetValue.Segment == value.Segment) is false))
+            {
+                targetBlockData.Values.Add(missingValue);
+            }
+
+            if (targetBlockItemData.Any(existingBlockItemData => existingBlockItemData.Key == targetBlockData.Key) is false)
+            {
+                targetBlockItemData.Add(blockItemData);
+            }
+        }
     }
 
     private void CleanupVariantValues(
@@ -349,7 +403,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         bool canUpdateInvariantData,
         HashSet<string> allowedCultures)
     {
-        // merge the source values into the target values for culture
+        // merge the source values into the target values per culture
         foreach (BlockItemData targetBlockItem in targetBlockItems)
         {
             BlockItemData? sourceBlockItem = sourceBlockItems.FirstOrDefault(i => i.Key == targetBlockItem.Key);
