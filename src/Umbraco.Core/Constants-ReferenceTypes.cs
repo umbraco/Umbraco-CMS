@@ -18,8 +18,8 @@ public static partial class Constants
         public const string Document = UdiEntityType.Document;
         public const string Media = UdiEntityType.Media;
         public const string Member = UdiEntityType.Member;
-        public const string DocumentTypeProperty = "document-type-property";
-        public const string MediaTypeProperty = "media-type-property";
-        public const string MemberTypeProperty = "member-type-property";
+        public const string DocumentTypePropertyType = "document-type-property-type";
+        public const string MediaTypePropertyType = "media-type-property-type";
+        public const string MemberTypePropertyType = "member-type-property-type";
     }
 }
