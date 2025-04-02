@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -49,7 +50,8 @@ public class MigrateRichtextEditorToTiptap : AsyncMigrationBase
 
         var newToolbar = toolBarList.Select(MapToolbarItem).WhereNotNull().ToList();
         dataType.ConfigurationData["toolbar"] = new List<List<List<string>>> { new() {newToolbar} };
-        dataType.ConfigurationData["extensions"] = new[]
+
+        var extensions = new List<string>
         {
             "Umb.Tiptap.RichTextEssentials",
             "Umb.Tiptap.Embed",
@@ -65,6 +67,17 @@ public class MigrateRichtextEditorToTiptap : AsyncMigrationBase
             "Umb.Tiptap.TextIndent",
             "Umb.Tiptap.Underline"
         };
+
+        // If the rich text has block enabled, we also need to add the block extension
+        if (dataType.ConfigurationObject is RichTextConfiguration richTextConfiguration)
+        {
+            if (richTextConfiguration.Blocks?.Any() ?? false)
+            {
+                extensions.Add("Umb.Tiptap.Block");
+            }
+        }
+
+        dataType.ConfigurationData["extensions"] = extensions.ToArray();
     }
 
     private string? MapToolbarItem(string item)
