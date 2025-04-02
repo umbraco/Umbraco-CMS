@@ -93,10 +93,10 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 		}
 
 		return {
-			icon: item.icon,
+			icon: item.appearance?.icon ?? item.icon,
 			items,
 			label: item.label,
-			style: item.style,
+			style: item.appearance?.style ?? item.style,
 			separatorAfter: item.separatorAfter,
 			element,
 			execute: () => this.api?.execute(this.editor, item),

@@ -592,11 +592,11 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 		name: 'Font Family Tiptap Extension',
 		api: () => import('./toolbar/font-family.tiptap-toolbar-api.js'),
 		items: [
-			{ label: 'Sans serif', style: 'font-family: sans-serif;', data: 'sans-serif' },
-			{ label: 'Serif', style: 'font-family: serif;', data: 'serif' },
-			{ label: 'Monospace', style: 'font-family: monospace;', data: 'monospace' },
-			{ label: 'Cursive', style: 'font-family: cursive;', data: 'cursive' },
-			{ label: 'Fantasy', style: 'font-family: fantasy;', data: 'fantasy' },
+			{ label: 'Sans serif', appearance: { style: 'font-family: sans-serif;' }, data: 'sans-serif' },
+			{ label: 'Serif', appearance: { style: 'font-family: serif;' }, data: 'serif' },
+			{ label: 'Monospace', appearance: { style: 'font-family: monospace;' }, data: 'monospace' },
+			{ label: 'Cursive', appearance: { style: 'font-family: cursive;' }, data: 'cursive' },
+			{ label: 'Fantasy', appearance: { style: 'font-family: fantasy;' }, data: 'fantasy' },
 		],
 		meta: {
 			alias: 'umbFontFamily',
