@@ -331,7 +331,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const dataValues = [...data.values];
 		for (let index = 0; index < presetValues.length; index++) {
 			const presetValue = presetValues[index];
-			const matchingDataValueIndex = dataValues.findIndex(v => v.alias === presetValue.alias);
+			const variantId = UmbVariantId.Create(presetValue);
+			const matchingDataValueIndex = dataValues.findIndex((v) => v.alias === presetValue.alias && variantId.compare(v));
 			if (matchingDataValueIndex > -1) {
 				dataValues[matchingDataValueIndex] = presetValue;
 			} else {
