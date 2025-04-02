@@ -28,6 +28,7 @@ public class TrackedReferenceViewModelsMapDefinition : IMapDefinition
         target.Published = source.NodePublished;
         target.DocumentType = new TrackedReferenceDocumentType
         {
+            Id = source.ContentTypeKey,
             Alias = source.ContentTypeAlias,
             Icon = source.ContentTypeIcon,
             Name = source.ContentTypeName,
@@ -41,6 +42,7 @@ public class TrackedReferenceViewModelsMapDefinition : IMapDefinition
         target.Name = source.NodeName;
         target.MediaType = new TrackedReferenceMediaType
         {
+            Id = source.ContentTypeKey,
             Alias = source.ContentTypeAlias,
             Icon = source.ContentTypeIcon,
             Name = source.ContentTypeName,
@@ -54,6 +56,7 @@ public class TrackedReferenceViewModelsMapDefinition : IMapDefinition
         target.Name = source.NodeName;
         target.MemberType = new TrackedReferenceMemberType
         {
+            Id = source.ContentTypeKey,
             Alias = source.ContentTypeAlias,
             Icon = source.ContentTypeIcon,
             Name = source.ContentTypeName,
@@ -68,6 +71,7 @@ public class TrackedReferenceViewModelsMapDefinition : IMapDefinition
         target.Alias = source.NodeAlias;
         target.DocumentType = new TrackedReferenceDocumentType
         {
+            Id = source.ContentTypeKey,
             Alias = source.ContentTypeAlias,
             Icon = source.ContentTypeIcon,
             Name = source.ContentTypeName,
@@ -82,6 +86,7 @@ public class TrackedReferenceViewModelsMapDefinition : IMapDefinition
         target.Alias = source.NodeAlias;
         target.MediaType = new TrackedReferenceMediaType
         {
+            Id = source.ContentTypeKey,
             Alias = source.ContentTypeAlias,
             Icon = source.ContentTypeIcon,
             Name = source.ContentTypeName,
@@ -96,6 +101,7 @@ public class TrackedReferenceViewModelsMapDefinition : IMapDefinition
         target.Alias = source.NodeAlias;
         target.MemberType = new TrackedReferenceMemberType
         {
+            Id = source.ContentTypeKey,
             Alias = source.ContentTypeAlias,
             Icon = source.ContentTypeIcon,
             Name = source.ContentTypeName,

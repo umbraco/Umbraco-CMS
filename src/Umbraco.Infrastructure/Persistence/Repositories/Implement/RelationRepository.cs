@@ -475,6 +475,9 @@ internal class RelationItemDto
     [Column(Name = "nodeObjectType")]
     public Guid ChildNodeObjectType { get; set; }
 
+    [Column(Name = "contentTypeKey")]
+    public Guid ChildContentTypeKey { get; set; }
+
     [Column(Name = "contentTypeIcon")]
     public string? ChildContentTypeIcon { get; set; }
 

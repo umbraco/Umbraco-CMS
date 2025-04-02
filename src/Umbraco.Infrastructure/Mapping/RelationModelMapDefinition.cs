@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
@@ -19,6 +19,7 @@ public class RelationModelMapDefinition : IMapDefinition
         target.RelationTypeName = source.RelationTypeName;
         target.RelationTypeIsBidirectional = source.RelationTypeIsBidirectional;
         target.RelationTypeIsDependency = source.RelationTypeIsDependency;
+        target.ContentTypeKey = source.ChildContentTypeKey;
         target.ContentTypeAlias = source.ChildContentTypeAlias;
         target.ContentTypeIcon = source.ChildContentTypeIcon;
         target.ContentTypeName = source.ChildContentTypeName;
