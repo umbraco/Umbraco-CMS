@@ -447,7 +447,7 @@ export default {
 		newPartialViewFromSnippet: 'New partial view from snippet',
 		newPartialViewMacroFromSnippet: 'New partial view macro from snippet',
 		newPartialViewMacroNoMacro: 'New partial view macro (without macro)',
-		newStyleSheetFile: 'New style sheet file',
+		newStyleSheetFile: 'New Stylesheet',
 		newRteStyleSheetFile: 'New Rich Text Editor style sheet file',
 	},
 	dashboard: {
