@@ -23,6 +23,10 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
 
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
+    private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
+
+    private IMemberService MemberService => GetRequiredService<IMemberService>();
+
     private IRelationService RelationService => GetRequiredService<IRelationService>();
 
     // protected override void CustomTestSetup(IUmbracoBuilder builder)
@@ -41,6 +45,11 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         var m2 = MediaBuilder.CreateSimpleMedia(mt, "hello 1", -1);
         MediaService.Save(m1);
         MediaService.Save(m2);
+
+        var memberType = MemberTypeBuilder.CreateSimpleMemberType("testMemberType", "Test Member Type");
+        MemberTypeService.Save(memberType);
+        var member = MemberBuilder.CreateSimpleMember(memberType, "Test Member", "test@test.com", "xxxxxxxx", "testMember");
+        MemberService.Save(member);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -62,17 +71,24 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
 </p>
 <p>
     <a href=""{locallink:umb://document/" + c1.Key.ToString("N") + @"}"">hello</a>
+</p>
+<p>
+    <!-- A test reference to a member that will be picked up in the RTE reference extraction -->
+    <div data-udi='umb://member/" + member.Key.ToString("N") + @"'></div>
 </p>");
 
         ContentService.Save(c2);
 
         var relations = RelationService.GetByParentId(c2.Id).ToList();
-        Assert.AreEqual(3, relations.Count);
+        Assert.AreEqual(4, relations.Count);
         Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedMediaAlias, relations[0].RelationType.Alias);
         Assert.AreEqual(m1.Id, relations[0].ChildId);
         Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedMediaAlias, relations[1].RelationType.Alias);
         Assert.AreEqual(m2.Id, relations[1].ChildId);
         Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedDocumentAlias, relations[2].RelationType.Alias);
         Assert.AreEqual(c1.Id, relations[2].ChildId);
+        Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedMemberAlias, relations[3].RelationType.Alias);
+        Assert.AreEqual(member.Id, relations[3].ChildId);
+
     }
 }

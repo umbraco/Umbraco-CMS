@@ -341,7 +341,6 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         {
             Email = "test-updated@test.com",
             Username = "test-updated",
-            IsApproved = member.IsApproved,
             InvariantName = "T. Est Updated",
             InvariantProperties = new[]
             {
@@ -363,67 +362,9 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("test-updated@test.com", member.Email);
         Assert.AreEqual("test-updated", member.Username);
         Assert.AreEqual("T. Est Updated", member.Name);
-    }
 
-    [Test]
-    public async Task Cannot_Change_IsApproved_Without_Access()
-    {
-        // this user does NOT have access to sensitive data
-        var user = UserBuilder.CreateUser();
-        UserService.Save(user);
-
-        var member = await CreateMemberAsync();
-
-        var updateModel = new MemberUpdateModel
-        {
-            Email = member.Email,
-            Username = member.Username,
-            IsApproved = false,
-            InvariantName = member.Name,
-            InvariantProperties = member.Properties.Select(property => new PropertyValueModel
-            {
-                Alias = property.Alias,
-                Value = property.GetValue()
-            })
-        };
-
-        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, user);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status.ContentEditingOperationStatus);
-
-        member = await MemberEditingService.GetAsync(member.Key);
-        Assert.IsNotNull(member);
+        // IsApproved and IsLockedOut are always sensitive properties.
         Assert.IsTrue(member.IsApproved);
-    }
-
-    [Test]
-    public async Task Cannot_Change_IsLockedOut_Without_Access()
-    {
-        // this user does NOT have access to sensitive data
-        var user = UserBuilder.CreateUser();
-        UserService.Save(user);
-
-        var member = await CreateMemberAsync();
-
-        var updateModel = new MemberUpdateModel
-        {
-            Email = member.Email,
-            Username = member.Username,
-            IsLockedOut = true,
-            InvariantName = member.Name,
-            InvariantProperties = member.Properties.Select(property => new PropertyValueModel
-            {
-                Alias = property.Alias,
-                Value = property.GetValue()
-            })
-        };
-
-        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, user);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status.ContentEditingOperationStatus);
-
-        member = await MemberEditingService.GetAsync(member.Key);
-        Assert.IsNotNull(member);
         Assert.IsFalse(member.IsLockedOut);
     }
 

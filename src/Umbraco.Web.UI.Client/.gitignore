@@ -51,7 +51,6 @@ custom-elements.json
 # https://github.com/runem/web-component-analyzer#vscode
 # https://github.com/microsoft/vscode-custom-data
 vscode-html-custom-data.json
-public/tinymce/*
 
 # Vite runtime files
 vite.config.ts.timestamp-*.mjs

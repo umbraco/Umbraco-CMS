@@ -879,6 +879,7 @@ export default {
 		orderBy: 'Order by',
 		password: 'Password',
 		path: 'Path',
+		pixels: 'pixels',
 		pleasewait: 'One moment please...',
 		previous: 'Previous',
 		properties: 'Properties',
@@ -1735,6 +1736,8 @@ export default {
 		variantsHeading: 'Variation',
 		cultureVariantHeading: 'Allow vary by culture',
 		segmentVariantHeading: 'Allow segmentation',
+		cultureInvariantLabel: 'Shared across cultures',
+		segmentInvariantLabel: 'Shared across segments',
 		cultureVariantLabel: 'Vary by culture',
 		segmentVariantLabel: 'Vary by segment',
 		variantsDescription: 'Allow editors to create content of this type in different languages.',
@@ -2698,7 +2701,7 @@ export default {
 		consentForAnalytics: 'Consent for telemetry data',
 		analyticsLevelSavedSuccess: 'Telemetry level saved!',
 		analyticsDescription:
-			'In order to improve Umbraco and add new functionality based on as relevant information as possible,\n<br>we would like to collect system- and usage information from your installation.\n<br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n<br>Hopefully, you will help us collect some valuable data.\n<br>\n<br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.',
+			'In order to improve Umbraco and add new functionality based on as relevant information as possible, we would like to collect system- and usage information from your installation.\n<br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n<br>Hopefully, you will help us collect some valuable data.\n<br>\n<br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.',
 		minimalLevelDescription: 'We will only send an anonymized site ID to let us know that the site exists.',
 		basicLevelDescription: 'We will send an anonymized site ID, Umbraco version, and packages installed',
 		detailedLevelDescription:

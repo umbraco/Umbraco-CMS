@@ -1,4 +1,3 @@
-using Bogus.DataSets;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -23,8 +22,8 @@ internal sealed class ContentPublishingServiceTests : UmbracoIntegrationTestWith
 {
     private const string UnknownCulture = "ke-Ke";
 
-    private readonly DateTime _schedulePublishDate = DateTime.UtcNow.AddDays(1);
-    private readonly DateTime _scheduleUnPublishDate = DateTime.UtcNow.AddDays(2);
+    private readonly DateTime _schedulePublishDate = DateTime.UtcNow.AddDays(1).TruncateTo(DateTimeExtensions.DateTruncate.Second);
+    private readonly DateTime _scheduleUnPublishDate = DateTime.UtcNow.AddDays(2).TruncateTo(DateTimeExtensions.DateTruncate.Second);
 
     [SetUp]
     public new void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
