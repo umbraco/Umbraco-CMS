@@ -33,7 +33,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IDocumentPresentationFactory documentPresentationFactory)
-        : base(entityService, userStartNodeEntitiesService, dataTypeService)
+    : base(entityService, userStartNodeEntitiesService, dataTypeService)
     {
         _publicAccessService = publicAccessService;
         _appCaches = appCaches;
@@ -52,6 +52,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         if (entity is IDocumentEntitySlim documentEntitySlim)
         {
             responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
+            responseModel.AncestorIds = EntityService.GetPathKeys(entity, omitSelf: true);
             responseModel.IsTrashed = entity.Trashed;
             responseModel.Id = entity.Key;
             responseModel.CreateDate = entity.CreateDate;

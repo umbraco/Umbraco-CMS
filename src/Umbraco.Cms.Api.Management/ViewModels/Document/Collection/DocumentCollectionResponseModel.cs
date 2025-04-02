@@ -11,5 +11,7 @@ public class DocumentCollectionResponseModel : ContentCollectionResponseModelBas
 
     public bool IsProtected { get; set; }
 
+    public Guid[] AncestorIds { get; set; } = [];
+
     public string? Updater { get; set; }
 }

@@ -37088,6 +37088,7 @@
       },
       "DocumentCollectionResponseModel": {
         "required": [
+          "ancestorIds",
           "documentType",
           "id",
           "isProtected",
@@ -37142,6 +37143,13 @@
           },
           "isProtected": {
             "type": "boolean"
+          },
+          "ancestorIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           "updater": {
             "type": "string",
@@ -37456,6 +37464,7 @@
       },
       "DocumentTreeItemResponseModel": {
         "required": [
+          "ancestorIds",
           "createDate",
           "documentType",
           "hasChildren",
@@ -37494,6 +37503,13 @@
           },
           "isProtected": {
             "type": "boolean"
+          },
+          "ancestorIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           "documentType": {
             "oneOf": [
