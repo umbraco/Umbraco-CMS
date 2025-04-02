@@ -1,14 +1,25 @@
-import { UmbDataTypeReferenceRepository } from '../repository/index.js';
-import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbEntityReferenceRepository, UmbReferenceItemModel } from '../types.js';
+import type { ManifestWorkspaceInfoAppEntityReferencesKind } from './types.js';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbReferenceItemModel } from '@umbraco-cms/backoffice/relations';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-entity-references-workspace-info-app')
 export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
+	@property({ type: Object })
+	private _manifest?: ManifestWorkspaceInfoAppEntityReferencesKind | undefined;
+	public get manifest(): ManifestWorkspaceInfoAppEntityReferencesKind | undefined {
+		return this._manifest;
+	}
+	public set manifest(value: ManifestWorkspaceInfoAppEntityReferencesKind | undefined) {
+		this._manifest = value;
+		this.#init();
+	}
+
 	@state()
 	private _currentPage = 1;
 
@@ -19,7 +30,7 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 	private _items?: Array<UmbReferenceItemModel> = [];
 
 	#itemsPerPage = 10;
-	#referenceRepository = new UmbDataTypeReferenceRepository(this);
+	#referenceRepository?: UmbEntityReferenceRepository;
 	#unique?: UmbEntityUnique;
 	#workspaceContext?: typeof UMB_ENTITY_WORKSPACE_CONTEXT.TYPE;
 
@@ -30,6 +41,22 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 			this.#workspaceContext = context;
 			this.#observeUnique();
 		});
+	}
+
+	async #init() {
+		if (!this._manifest) return;
+		const referenceRepositoryAlias = this._manifest.meta.referenceRepositoryAlias;
+
+		if (!referenceRepositoryAlias) {
+			throw new Error('Reference repository alias is required');
+		}
+
+		this.#referenceRepository = await createExtensionApiByAlias<UmbEntityReferenceRepository>(
+			this,
+			referenceRepositoryAlias,
+		);
+
+		this.#getReferences();
 	}
 
 	#observeUnique() {
@@ -54,9 +81,8 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	async #getReferences() {
-		if (!this.#unique) {
-			throw new Error('Data Type unique is required');
-		}
+		if (!this.#unique) return;
+		if (!this.#referenceRepository) return;
 
 		const { data } = await this.#referenceRepository.requestReferencedBy(
 			this.#unique,
@@ -105,7 +131,7 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 		if (totalPages <= 1) return nothing;
 
 		return html`
-			<div class="pagination">
+			<div class="pagination-container">
 				<uui-pagination .total=${totalPages} @change="${this.#onPageChange}"></uui-pagination>
 			</div>
 		`;
@@ -118,15 +144,15 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 				display: contents;
 			}
 
-			uui-pagination {
-				flex: 1;
-				display: inline-block;
-			}
-
-			.pagination {
+			.pagination-container {
 				display: flex;
 				justify-content: center;
 				margin-top: var(--uui-size-space-4);
+			}
+
+			uui-pagination {
+				flex: 1;
+				display: inline-block;
 			}
 		`,
 	];
