@@ -33,6 +33,16 @@ const kinds: Array<UmbExtensionManifestKind> = [
 			element: () => import('../components/toolbar/tiptap-toolbar-menu.element.js'),
 		},
 	},
+	{
+		type: 'kind',
+		alias: 'Umb.Kind.TiptapToolbar.StyleMenu',
+		matchKind: 'styleMenu',
+		matchType: 'tiptapToolbarExtension',
+		manifest: {
+			api: () => import('../components/toolbar/style-menu.tiptap-toolbar-api.js'),
+			element: () => import('../components/toolbar/tiptap-toolbar-menu.element.js'),
+		},
+	},
 ];
 
 const coreExtensions: Array<ManifestTiptapExtension> = [
@@ -581,17 +591,17 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 		alias: 'Umb.Tiptap.Toolbar.FontFamily',
 		name: 'Font Family Tiptap Extension',
 		api: () => import('./toolbar/font-family.tiptap-toolbar-api.js'),
+		items: [
+			{ label: 'Sans serif', style: 'font-family: sans-serif;', data: 'sans-serif' },
+			{ label: 'Serif', style: 'font-family: serif;', data: 'serif' },
+			{ label: 'Monospace', style: 'font-family: monospace;', data: 'monospace' },
+			{ label: 'Cursive', style: 'font-family: cursive;', data: 'cursive' },
+			{ label: 'Fantasy', style: 'font-family: fantasy;', data: 'fantasy' },
+		],
 		meta: {
 			alias: 'umbFontFamily',
 			icon: 'icon-ruler-alt',
 			label: 'Font family',
-			items: [
-				{ label: 'Sans serif', style: 'font-family: sans-serif;', data: 'sans-serif' },
-				{ label: 'Serif', style: 'font-family: serif;', data: 'serif' },
-				{ label: 'Monospace', style: 'font-family: monospace;', data: 'monospace' },
-				{ label: 'Cursive', style: 'font-family: cursive;', data: 'cursive' },
-				{ label: 'Fantasy', style: 'font-family: fantasy;', data: 'fantasy' },
-			],
 		},
 	},
 	{
@@ -600,21 +610,21 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 		alias: 'Umb.Tiptap.Toolbar.FontSize',
 		name: 'Font Size Tiptap Extension',
 		api: () => import('./toolbar/font-size.tiptap-toolbar-api.js'),
+		items: [
+			{ label: '8pt', data: '8pt;' },
+			{ label: '10pt', data: '10pt;' },
+			{ label: '12pt', data: '12pt;' },
+			{ label: '14pt', data: '14pt;' },
+			{ label: '16pt', data: '16pt;' },
+			{ label: '18pt', data: '18pt;' },
+			{ label: '24pt', data: '24pt;' },
+			{ label: '26pt', data: '26pt;' },
+			{ label: '48pt', data: '48pt;' },
+		],
 		meta: {
 			alias: 'umbFontSize',
 			icon: 'icon-ruler',
 			label: 'Font size',
-			items: [
-				{ label: '8pt', data: '8pt;' },
-				{ label: '10pt', data: '10pt;' },
-				{ label: '12pt', data: '12pt;' },
-				{ label: '14pt', data: '14pt;' },
-				{ label: '16pt', data: '16pt;' },
-				{ label: '18pt', data: '18pt;' },
-				{ label: '24pt', data: '24pt;' },
-				{ label: '26pt', data: '26pt;' },
-				{ label: '48pt', data: '48pt;' },
-			],
 		},
 	},
 	{
