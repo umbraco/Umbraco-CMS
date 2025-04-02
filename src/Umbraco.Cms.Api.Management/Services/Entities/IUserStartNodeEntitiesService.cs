@@ -34,7 +34,18 @@ public interface IUserStartNodeEntitiesService
     /// The returned entities may include entities that outside of the user start node scope, but are needed to
     /// for browsing to the actual user start nodes. These entities will be marked as "no access" entities.
     /// </remarks>
-    IEnumerable<UserAccessEntity> ChildUserAccessEntities(UmbracoObjectTypes umbracoObjectType, string[] userStartNodePaths, Guid parentKey, int skip, int take, Ordering ordering, out long totalItems);
+    IEnumerable<UserAccessEntity> ChildUserAccessEntities(
+        UmbracoObjectTypes umbracoObjectType,
+        string[] userStartNodePaths,
+        Guid parentKey,
+        int skip,
+        int take,
+        Ordering ordering,
+        out long totalItems)
+    {
+        totalItems = 0;
+        return [];
+    }
 
     /// <summary>
     /// Calculates the applicable child entities from a list of candidate child entities for users without root access.
