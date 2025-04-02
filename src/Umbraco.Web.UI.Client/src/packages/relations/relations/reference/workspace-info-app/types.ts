@@ -1,12 +1,11 @@
-import type { ManifestEntityAction, MetaEntityActionDeleteKind } from '@umbraco-cms/backoffice/entity-action';
+import type { ManifestWorkspaceInfoApp } from '@umbraco-cms/backoffice/workspace';
 
-export interface ManifestWorkspaceInfoAppEntityReferencesKind
-	extends ManifestEntityAction<MetaWorkspaceInfoAppEntityReferencesKind> {
-	type: 'entityAction';
+export interface ManifestWorkspaceInfoAppEntityReferencesKind extends ManifestWorkspaceInfoApp {
+	type: 'workspaceInfoApp';
 	kind: 'entityReferences';
 }
 
-export interface MetaWorkspaceInfoAppEntityReferencesKind extends MetaEntityActionDeleteKind {
+export interface MetaWorkspaceInfoAppEntityReferencesKind {
 	referenceRepositoryAlias: string;
 }
 
