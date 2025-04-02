@@ -2428,18 +2428,21 @@ export type TemporaryFileResponseModel = {
 };
 
 export type TrackedReferenceDocumentTypeModel = {
+    id: string;
     icon?: (string) | null;
     alias?: (string) | null;
     name?: (string) | null;
 };
 
 export type TrackedReferenceMediaTypeModel = {
+    id: string;
     icon?: (string) | null;
     alias?: (string) | null;
     name?: (string) | null;
 };
 
 export type TrackedReferenceMemberTypeModel = {
+    id: string;
     icon?: (string) | null;
     alias?: (string) | null;
     name?: (string) | null;
