@@ -4,7 +4,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'styleMenu',
 		alias: 'Umb.Tiptap.Toolbar.StyleSelect',
 		name: 'Style Select Tiptap Extension',
-		api: () => import('./style-select.tiptap-toolbar-api.js'),
 		items: [
 			{
 				label: 'Headers',
