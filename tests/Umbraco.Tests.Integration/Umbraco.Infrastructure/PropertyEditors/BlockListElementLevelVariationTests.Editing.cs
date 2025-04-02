@@ -1084,7 +1084,7 @@ internal partial class BlockListElementLevelVariationTests
             Assert.Multiple(() =>
             {
 
-                // Should only have remove the danish value
+                // Should only have removed the danish value
                 Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey));
                 Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey));
                 Assert.AreEqual(3, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
@@ -1105,7 +1105,7 @@ internal partial class BlockListElementLevelVariationTests
         {
             Assert.Multiple(() =>
             {
-                // 2 values are removed
+                // both danish and english should be removed
                 Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey));
                 Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey));
                 Assert.AreEqual(2, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
