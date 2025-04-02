@@ -40,11 +40,13 @@ export class UmbDocumentTypePropertyTypeItemRefElement extends UmbLitElement {
 	}
 
 	#getName() {
-		return this.item?.documentType.name ?? 'Unknown Document Type';
+		const documentTypeName = this.item?.documentType.name ?? 'Unknown';
+		return `Document Type: ${documentTypeName}`;
 	}
 
 	#getDetail() {
-		return this.item?.name + ' (' + this.item?.alias + ')';
+		const propertyTypeDetails = this.item?.name ? this.item.name + ' (' + this.item.alias + ')' : 'Unknown';
+		return `Property Type: ${propertyTypeDetails}`;
 	}
 
 	override render() {
