@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 
-public class MediaTypePropertyReferenceResponseModel : ContentTypePropertyReferenceResponseModel
+public class MediaTypePropertyTypeReferenceResponseModel : ContentTypePropertyTypeReferenceResponseModel
 {
     public TrackedReferenceMediaType MediaType { get; set; } = new();
 }

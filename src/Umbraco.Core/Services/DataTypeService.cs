@@ -789,9 +789,9 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                     string nodeType = x.Udi.EntityType switch
                     {
-                        Constants.UdiEntityType.DocumentType => Constants.ReferenceType.DocumentTypeProperty,
-                        Constants.UdiEntityType.MediaType => Constants.ReferenceType.MediaTypeProperty,
-                        Constants.UdiEntityType.MemberType => Constants.ReferenceType.MemberTypeProperty,
+                        Constants.UdiEntityType.DocumentType => Constants.ReferenceType.DocumentTypePropertyType,
+                        Constants.UdiEntityType.MediaType => Constants.ReferenceType.MediaTypePropertyType,
+                        Constants.UdiEntityType.MemberType => Constants.ReferenceType.MemberTypePropertyType,
                         _ => throw new ArgumentOutOfRangeException(nameof(x.Udi.EntityType)),
                     };
 

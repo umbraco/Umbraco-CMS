@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 
-public class MemberTypePropertyReferenceResponseModel : ContentTypePropertyReferenceResponseModel
+public class MemberTypePropertyTypeReferenceResponseModel : ContentTypePropertyTypeReferenceResponseModel
 {
     public TrackedReferenceMemberType MemberType { get; set; } = new();
 }
