@@ -15,6 +15,7 @@ export class UmbMemberTypePropertyTypeReferenceResponseManagementApiDataMapping
 				alias: data.memberType.alias!,
 				icon: data.memberType.icon!,
 				name: data.memberType.name!,
+				unique: data.memberType.id,
 			},
 			entityType: UMB_MEMBER_TYPE_PROPERTY_TYPE_ENTITY_TYPE,
 			name: data.name!,

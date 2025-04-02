@@ -15,6 +15,7 @@ export class UmbMediaTypePropertyTypeReferenceResponseManagementApiDataMapping
 				alias: data.mediaType.alias!,
 				icon: data.mediaType.icon!,
 				name: data.mediaType.name!,
+				unique: data.mediaType.id,
 			},
 			entityType: UMB_MEDIA_TYPE_PROPERTY_TYPE_ENTITY_TYPE,
 			name: data.name!,

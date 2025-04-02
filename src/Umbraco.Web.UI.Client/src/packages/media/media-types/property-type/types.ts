@@ -6,6 +6,7 @@ export interface UmbMediaTypePropertyTypeReferenceModel extends UmbEntityModel {
 		alias: string;
 		icon: string;
 		name: string;
+		unique: string;
 	};
 	name: string;
 }

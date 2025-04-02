@@ -6,6 +6,7 @@ export interface UmbDocumentTypePropertyTypeReferenceModel extends UmbEntityMode
 		alias: string;
 		icon: string;
 		name: string;
+		unique: string;
 	};
 	name: string;
 }

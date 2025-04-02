@@ -12,9 +12,10 @@ export class UmbMemberReferenceResponseManagementApiDataMapping
 		return {
 			entityType: UMB_MEMBER_ENTITY_TYPE,
 			memberType: {
-				alias: data.memberType.alias,
-				icon: data.memberType.icon,
-				name: data.memberType.name,
+				alias: data.memberType.alias!,
+				icon: data.memberType.icon!,
+				name: data.memberType.name!,
+				unique: data.memberType.id,
 			},
 			name: data.name,
 			// TODO: this is a hardcoded array until the server can return the correct variants array

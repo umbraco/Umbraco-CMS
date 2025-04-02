@@ -16,6 +16,7 @@ export class UmbDocumentTypePropertyTypeReferenceResponseManagementApiDataMappin
 				alias: data.documentType.alias!,
 				icon: data.documentType.icon!,
 				name: data.documentType.name!,
+				unique: data.documentType.id,
 			},
 			entityType: UMB_DOCUMENT_TYPE_PROPERTY_TYPE_ENTITY_TYPE,
 			name: data.name!,

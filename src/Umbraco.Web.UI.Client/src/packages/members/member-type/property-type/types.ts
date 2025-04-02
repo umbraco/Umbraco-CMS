@@ -6,6 +6,7 @@ export interface UmbMemberTypePropertyTypeReferenceModel extends UmbEntityModel 
 		alias: string;
 		icon: string;
 		name: string;
+		unique: string;
 	};
 	name: string;
 }
