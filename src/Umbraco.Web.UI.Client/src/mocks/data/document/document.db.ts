@@ -152,6 +152,7 @@ const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionRespon
 		updater: null,
 		values: model.values,
 		variants: model.variants,
+		ancestorIds: model.ancestorIds,
 	};
 };
 
