@@ -761,17 +761,24 @@ public class EntityService : RepositoryService, IEntityService
     }
 
     /// <inheritdoc/>>
-    public Guid[] GetPathKeys(IEntitySlim entity)
+    public Guid[] GetPathKeys(ITreeEntity entity, bool omitSelf = false)
     {
-        var ids = entity.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
+        IEnumerable<int> ids = entity.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
             .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var val) ? val : -1)
-            .Where(x => x != -1)
-            .ToList();
+            .Where(x => x != -1);
 
-        return ids
+        Guid[] keys = ids
             .Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.Document))
             .Where(x => x.Success)
             .Select(x => x.Result)
             .ToArray();
+
+        if (omitSelf)
+        {
+            // Omit the last path key as that will be for the item itself.
+            return keys.Take(keys.Length - 1).ToArray();
+        }
+
+        return keys;
     }
 }

@@ -883,11 +883,12 @@ public class EntityServiceTests : UmbracoIntegrationTest
         var grandChild = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), child);
         ContentService.Save(grandChild);
 
-        var grandChildEntity = EntityService.Get(grandChild.Key);
-        Assert.IsNotNull(grandChildEntity);
-
-        var result = EntityService.GetPathKeys(grandChildEntity);
+        var result = EntityService.GetPathKeys(grandChild);
         Assert.AreEqual($"{root.Key},{child.Key},{grandChild.Key}", string.Join(",", result));
+
+        var result2 = EntityService.GetPathKeys(grandChild, omitSelf: true);
+        Assert.AreEqual($"{root.Key},{child.Key}", string.Join(",", result2));
+
     }
 
     private static bool _isSetup;

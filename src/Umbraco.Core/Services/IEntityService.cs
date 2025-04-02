@@ -387,6 +387,7 @@ public interface IEntityService
     /// Gets the GUID keys for an entity's path (provided as a comma separated list of integer Ids).
     /// </summary>
     /// <param name="entity">The entity.</param>
+    /// <param name="omitSelf">A value indicating whether to omit the entity's own key from the result.</param>
     /// <returns>The path with each ID converted to a GUID.</returns>
-    Guid[] GetPathKeys(IEntitySlim entity) => [];
+    Guid[] GetPathKeys(ITreeEntity entity, bool omitSelf = false) => [];
 }

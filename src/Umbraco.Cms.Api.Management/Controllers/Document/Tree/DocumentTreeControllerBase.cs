@@ -52,7 +52,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         if (entity is IDocumentEntitySlim documentEntitySlim)
         {
             responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
-            responseModel.AncestorIds = GetAncestorIds(EntityService.GetPathKeys(entity));
+            responseModel.AncestorIds = EntityService.GetPathKeys(entity, omitSelf: true);
             responseModel.IsTrashed = entity.Trashed;
             responseModel.Id = entity.Key;
             responseModel.CreateDate = entity.CreateDate;
@@ -63,10 +63,6 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
 
         return responseModel;
     }
-
-    private Guid[] GetAncestorIds(Guid[] keys) =>
-        // Omit the last path key as that will be for the item itself.
-        keys.Take(keys.Length - 1).ToArray();
 
     protected override int[] GetUserStartNodeIds()
         => _backofficeSecurityAccessor
