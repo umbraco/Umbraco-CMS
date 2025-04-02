@@ -44587,8 +44587,15 @@
         "additionalProperties": false
       },
       "TrackedReferenceDocumentTypeModel": {
+        "required": [
+          "id"
+        ],
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
           "icon": {
             "type": "string",
             "nullable": true
@@ -44605,8 +44612,15 @@
         "additionalProperties": false
       },
       "TrackedReferenceMediaTypeModel": {
+        "required": [
+          "id"
+        ],
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
           "icon": {
             "type": "string",
             "nullable": true
@@ -44623,8 +44637,15 @@
         "additionalProperties": false
       },
       "TrackedReferenceMemberTypeModel": {
+        "required": [
+          "id"
+        ],
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
           "icon": {
             "type": "string",
             "nullable": true
