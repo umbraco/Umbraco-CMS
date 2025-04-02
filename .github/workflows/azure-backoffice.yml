@@ -8,6 +8,7 @@ on:
       - v*/dev
     paths:
       - src/Umbraco.Web.UI.Client/src/**
+      - .github/workflows/azure-backoffice.yml
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
