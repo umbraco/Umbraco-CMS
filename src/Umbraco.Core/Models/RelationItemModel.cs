@@ -12,6 +12,8 @@ public class RelationItemModel
 
     public bool? NodePublished { get; set; }
 
+    public Guid ContentTypeKey { get; set; }
+
     public string? ContentTypeIcon { get; set; }
 
     public string? ContentTypeAlias { get; set; }

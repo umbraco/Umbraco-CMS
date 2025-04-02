@@ -799,6 +799,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     IPropertyType? propertyType = contentType.PropertyTypes.SingleOrDefault(y => y.Alias == x.PropertyAlias);
                     return new RelationItemModel
                     {
+                        ContentTypeKey = contentType.Key,
                         ContentTypeAlias = contentType.Alias,
                         ContentTypeIcon = contentType.Icon,
                         ContentTypeName = contentType.Name,
