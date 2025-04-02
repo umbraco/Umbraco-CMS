@@ -71,6 +71,8 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 			element.setAttribute('popovertarget', popoverId);
 		}
 
+		const label = this.localize.string(item.label);
+
 		return html`
 			<div
 				@mouseenter=${() => this.#onMouseEnter(item, popoverId)}
@@ -81,11 +83,12 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 					() => html`
 						<uui-menu-item
 							class=${item.separatorAfter ? 'separator' : ''}
+							label=${label}
 							popovertarget=${popoverId}
 							@click-label=${() => this.#onClick(item, popoverId)}>
 							${when(item.icon, (icon) => html`<uui-icon slot="icon" name=${icon}></uui-icon>`)}
 							<div slot="label" class="menu-item">
-								<span style=${ifDefined(item.style)}>${this.localize.string(item.label)}</span>
+								<span style=${ifDefined(item.style)}>${label}</span>
 								${when(item.items, () => html`<uui-symbol-expand></uui-symbol-expand>`)}
 							</div>
 						</uui-menu-item>
