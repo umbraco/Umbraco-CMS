@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
@@ -758,5 +759,19 @@ public class EntityService : RepositoryService, IEntityService
             return _entityRepository.GetPagedResultsByQuery(query, objectTypeGuids, pageNumber, pageSize, out totalRecords, filter, ordering);
         }
     }
-}
 
+    /// <inheritdoc/>>
+    public Guid[] GetPathKeys(IEntitySlim entity)
+    {
+        var ids = entity.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var val) ? val : -1)
+            .Where(x => x != -1)
+            .ToList();
+
+        return ids
+            .Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.Document))
+            .Where(x => x.Success)
+            .Select(x => x.Result)
+            .ToArray();
+    }
+}

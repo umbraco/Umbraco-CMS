@@ -870,6 +870,26 @@ public class EntityServiceTests : UmbracoIntegrationTest
         Assert.IsFalse(EntityService.GetId(Guid.NewGuid(), UmbracoObjectTypes.DocumentType).Success);
     }
 
+    [Test]
+    public void EntityService_GetPathKeys_ReturnsExpectedKeys()
+    {
+        var contentType = ContentTypeService.Get("umbTextpage");
+
+        var root = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(root);
+
+        var child = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
+        ContentService.Save(child);
+        var grandChild = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), child);
+        ContentService.Save(grandChild);
+
+        var grandChildEntity = EntityService.Get(grandChild.Key);
+        Assert.IsNotNull(grandChildEntity);
+
+        var result = EntityService.GetPathKeys(grandChildEntity);
+        Assert.AreEqual($"{root.Key},{child.Key},{grandChild.Key}", string.Join(",", result));
+    }
+
     private static bool _isSetup;
 
     private int _folderId;
