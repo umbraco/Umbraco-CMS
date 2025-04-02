@@ -22,6 +22,10 @@ export const plugins: PluginOption[] = [
 				dest: 'umbraco/backoffice/assets',
 			},
 			{
+				src: 'src/mocks/handlers/backoffice/assets/*',
+				dest: 'umbraco/backoffice/assets',
+			},
+			{
 				src: 'node_modules/msw/lib/iife/**/*',
 				dest: 'umbraco/backoffice/msw',
 			},
