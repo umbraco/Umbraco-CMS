@@ -67,7 +67,6 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 
 		this._total = data.total;
 		this._items = data.items;
-		debugger;
 	}
 
 	#onPageChange(event: UUIPaginationEvent) {
