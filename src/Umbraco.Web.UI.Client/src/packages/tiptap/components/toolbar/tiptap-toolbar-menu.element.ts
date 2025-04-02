@@ -49,8 +49,9 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 	}
 
 	async #setMenu() {
-		if (!this.#manifest?.meta.items) return;
-		this.#menu = await this.#getMenuItems(this.#manifest.meta.items);
+		const items = this.#manifest?.items ?? this.#manifest?.meta.items;
+		if (!items) return;
+		this.#menu = await this.#getMenuItems(items);
 	}
 
 	async #getMenuItems(items: Array<MetaTiptapToolbarMenuItem>): Promise<Array<UmbCascadingMenuItem>> {
