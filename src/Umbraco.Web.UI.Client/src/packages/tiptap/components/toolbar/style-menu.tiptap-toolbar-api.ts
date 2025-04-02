@@ -26,8 +26,9 @@ export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElemen
 
 	override execute(editor?: Editor, item?: MetaTiptapToolbarStyleMenuItem) {
 		if (!editor || !item?.data) return;
+		const { tag, id, class: className } = item.data;
 		const focus = editor.chain().focus();
-		const ext = item.data.tag ? this.#commands[item.data.tag] : null;
-		(ext?.command?.(focus) ?? focus).setId(item.data.id, ext?.type).setClassName(item.data.class, ext?.type).run();
+		const ext = tag ? this.#commands[tag] : null;
+		(ext?.command?.(focus) ?? focus).setId(id, ext?.type).setClassName(className, ext?.type).run();
 	}
 }
