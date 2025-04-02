@@ -1,15 +1,15 @@
 import type { UmbDocumentTypePropertyTypeReferenceModel } from './types.js';
 import { UMB_DOCUMENT_TYPE_PROPERTY_TYPE_ENTITY_TYPE } from './entity.js';
-import type { DocumentTypePropertyReferenceResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { DocumentTypePropertyTypeReferenceResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbDataSourceDataMapping } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDocumentTypePropertyTypeReferenceResponseManagementApiDataMapping
 	extends UmbControllerBase
 	implements
-		UmbDataSourceDataMapping<DocumentTypePropertyReferenceResponseModel, UmbDocumentTypePropertyTypeReferenceModel>
+		UmbDataSourceDataMapping<DocumentTypePropertyTypeReferenceResponseModel, UmbDocumentTypePropertyTypeReferenceModel>
 {
-	async map(data: DocumentTypePropertyReferenceResponseModel): Promise<UmbDocumentTypePropertyTypeReferenceModel> {
+	async map(data: DocumentTypePropertyTypeReferenceResponseModel): Promise<UmbDocumentTypePropertyTypeReferenceModel> {
 		return {
 			alias: data.alias!,
 			documentType: {

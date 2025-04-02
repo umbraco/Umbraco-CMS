@@ -1,14 +1,15 @@
 import type { UmbMemberTypePropertyTypeReferenceModel } from './types.js';
 import { UMB_MEMBER_TYPE_PROPERTY_TYPE_ENTITY_TYPE } from './entity.js';
-import type { MemberTypePropertyReferenceResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { MemberTypePropertyTypeReferenceResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbDataSourceDataMapping } from '@umbraco-cms/backoffice/repository';
 
 export class UmbMemberTypePropertyTypeReferenceResponseManagementApiDataMapping
 	extends UmbControllerBase
-	implements UmbDataSourceDataMapping<MemberTypePropertyReferenceResponseModel, UmbMemberTypePropertyTypeReferenceModel>
+	implements
+		UmbDataSourceDataMapping<MemberTypePropertyTypeReferenceResponseModel, UmbMemberTypePropertyTypeReferenceModel>
 {
-	async map(data: MemberTypePropertyReferenceResponseModel): Promise<UmbMemberTypePropertyTypeReferenceModel> {
+	async map(data: MemberTypePropertyTypeReferenceResponseModel): Promise<UmbMemberTypePropertyTypeReferenceModel> {
 		return {
 			alias: data.alias!,
 			memberType: {

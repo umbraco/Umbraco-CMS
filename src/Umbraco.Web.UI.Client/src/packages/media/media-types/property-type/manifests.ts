@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Media Type Property Type Reference Response Management Api Data Mapping',
 		api: () => import('./media-type-property-type-reference-response.management-api.mapping.js'),
 		forDataSource: UMB_MANAGEMENT_API_DATA_SOURCE_ALIAS,
-		forDataModel: 'MediaTypePropertyReferenceResponseModel',
+		forDataModel: 'MediaTypePropertyTypeReferenceResponseModel',
 	},
 	{
 		type: 'entityItemRef',
