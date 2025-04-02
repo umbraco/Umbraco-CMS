@@ -368,7 +368,6 @@ export default {
 		newPartialViewMacroFromSnippet: "Nouvelle macro pour vue partielle à partir d'un snippet",
 		newPartialViewMacroNoMacro: 'Nouvelle macro pour vue partielle (sans macro)',
 		newStyleSheetFile: 'Nouveau fichier de feuille de style',
-		newRteStyleSheetFile: "Nouveau fichier de feuille de style pour l'éditeur de texte",
 	},
 	dashboard: {
 		browser: 'Parcourir votre site',
