@@ -1,11 +1,12 @@
-import type { ManifestWorkspaceInfoApp } from '@umbraco-cms/backoffice/workspace';
+import type { ManifestWorkspaceInfoApp, MetaWorkspaceInfoApp } from '@umbraco-cms/backoffice/workspace';
 
-export interface ManifestWorkspaceInfoAppEntityReferencesKind extends ManifestWorkspaceInfoApp {
+export interface ManifestWorkspaceInfoAppEntityReferencesKind
+	extends ManifestWorkspaceInfoApp<MetaWorkspaceInfoAppEntityReferencesKind> {
 	type: 'workspaceInfoApp';
 	kind: 'entityReferences';
 }
 
-export interface MetaWorkspaceInfoAppEntityReferencesKind {
+export interface MetaWorkspaceInfoAppEntityReferencesKind extends MetaWorkspaceInfoApp {
 	referenceRepositoryAlias: string;
 }
 
