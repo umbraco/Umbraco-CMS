@@ -259,5 +259,11 @@
     <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceTests.RootUserAccessEntities.cs">
       <DependentUpon>UserStartNodeEntitiesServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceMediaTests.childUserAccessEntities.cs">
+      <DependentUpon>UserStartNodeEntitiesServiceMediaTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceMediaTests.RootUserAccessEntities.cs">
+      <DependentUpon>UserStartNodeEntitiesServiceMediaTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
