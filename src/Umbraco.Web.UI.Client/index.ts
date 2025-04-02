@@ -1,3 +1,4 @@
+import { startMockServiceWorker } from './src/mocks/index.js';
 import { UmbAppElement } from '@umbraco-cms/backoffice/app';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -6,7 +7,6 @@ appElement.backofficePath = '/';
 
 //#region Vite Mock Setup
 if (import.meta.env.VITE_UMBRACO_USE_MSW === 'on') {
-	const { startMockServiceWorker } = await import(/* @vite-ignore */ './src/mocks/index.js');
 	appElement.bypassAuth = true;
 	startMockServiceWorker();
 } else {
