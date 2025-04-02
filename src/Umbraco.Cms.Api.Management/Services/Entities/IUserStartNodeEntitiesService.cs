@@ -16,6 +16,10 @@ public interface IUserStartNodeEntitiesService
     /// <remarks>
     /// The returned entities may include entities that outside of the user start node scope, but are needed to
     /// for browsing to the actual user start nodes. These entities will be marked as "no access" entities.
+    ///
+    /// This method does not support pagination, because it must load all entities explicitly in order to calculate
+    /// the correct result, given that user start nodes can be descendants of root nodes. Consumers need to apply
+    /// pagination to the result if applicable.
     /// </remarks>
     IEnumerable<UserAccessEntity> RootUserAccessEntities(UmbracoObjectTypes umbracoObjectType, int[] userStartNodeIds);
 

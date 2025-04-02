@@ -65,7 +65,7 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
 
     public IEnumerable<UserAccessEntity> ChildUserAccessEntities(UmbracoObjectTypes umbracoObjectType, string[] userStartNodePaths, Guid parentKey, int skip, int take, Ordering ordering, out long totalItems)
     {
-        Attempt<int> parentIdAttempt = _idKeyMap.GetIdForKey(parentKey, UmbracoObjectTypes.Document);
+        Attempt<int> parentIdAttempt = _idKeyMap.GetIdForKey(parentKey, umbracoObjectType);
         if (parentIdAttempt.Success is false)
         {
             totalItems = 0;
@@ -90,8 +90,8 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
 
         // if one or more of the user start nodes are descendants of the requested parent, find the "next child IDs" in those user start node paths
         // - e.g. given the user start node path "-1,2,3,4,5", if the requested parent ID is 3, the "next child ID" is 4.
-        var userStarNodePathIds = userStartNodePaths.Select(path => path.Split(Constants.CharArrays.Comma).Select(int.Parse).ToArray()).ToArray();
-        var allowedChildIds = userStarNodePathIds
+        var userStartNodePathIds = userStartNodePaths.Select(path => path.Split(Constants.CharArrays.Comma).Select(int.Parse).ToArray()).ToArray();
+        var allowedChildIds = userStartNodePathIds
             .Where(ids => ids.Contains(parentId))
             // given the previous checks, the parent ID can never be the last in the user start node path, so this is safe
             .Select(ids => ids[ids.IndexOf(parentId) + 1])
