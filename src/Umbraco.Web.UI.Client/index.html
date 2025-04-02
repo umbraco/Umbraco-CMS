@@ -6,17 +6,47 @@
 		<link rel="icon" type="image/svg+xml" href="umbraco/backoffice/assets/favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Umbraco</title>
-		<script type="importmap">
-			{
-				"imports": {
-					"@umbraco-cms/backoffice/block-rte": "/src/packages/block/block-rte/index.ts"
-				}
-			}
-		</script>
-		<script src="node_modules/msw/lib/iife/index.js"></script>
 		<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css" />
 		<link rel="stylesheet" href="src/css/umb-css.css" />
-		<script type="module" src="index.ts"></script>
+		<script src="node_modules/msw/lib/iife/index.js"></script>
+		<script type="module">
+			import { UmbAppElement } from './src/apps/app/index.js';
+
+			const appElement = new UmbAppElement();
+			appElement.backofficePath = '/';
+
+			//#region Vite Mock Setup
+			if (import.meta.env.VITE_UMBRACO_USE_MSW === 'on') {
+				const { startMockServiceWorker } = await import(/* @vite-ignore */ './src/mocks/index.js');
+				appElement.bypassAuth = true;
+				startMockServiceWorker();
+			} else {
+				appElement.serverUrl = import.meta.env.VITE_UMBRACO_API_URL;
+			}
+
+			// Example injector:
+			if (import.meta.env.VITE_EXAMPLE_PATH) {
+				const { umbExtensionsRegistry } = await import(
+					/* @vite-ignore */ './src/packages/core/extension-registry/index.js'
+				);
+				import(/* @vite-ignore */ './' + import.meta.env.VITE_EXAMPLE_PATH + '/index.ts').then((js) => {
+					if (js) {
+						Object.keys(js).forEach((key) => {
+							const value = js[key];
+
+							if (Array.isArray(value)) {
+								umbExtensionsRegistry.registerMany(value);
+							} else if (typeof value === 'object') {
+								umbExtensionsRegistry.register(value);
+							}
+						});
+					}
+				});
+			}
+			//#endregion
+
+			document.body.append(appElement);
+		</script>
 	</head>
 
 	<body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden"></body>
