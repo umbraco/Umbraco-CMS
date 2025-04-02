@@ -354,6 +354,7 @@ export class UmbPropertyEditorUIBlockListElement
 
 		// If the current property is readonly all inner block content should also be readonly.
 		this.observe(
+			// TODO: Instead transfer all variant states.
 			observeMultiple([context.isReadOnly, context.variantId]),
 			([isReadOnly, variantId]) => {
 				const unique = 'UMB_PROPERTY_EDITOR_UI';

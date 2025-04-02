@@ -9,8 +9,9 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 
 describe('UmbSelectionManager', () => {
 	let manager: UmbStateManager;
-	const state1 = { unique: '1', message: 'State 1' };
-	const state2 = { unique: '2', message: 'State 2' };
+	const state1 = { unique: '1', message: 'State 1', state: true };
+	const state2 = { unique: '2', message: 'State 2', state: true };
+	const stateFalse = { unique: '-1', message: 'State -1', state: false };
 
 	beforeEach(() => {
 		const hostElement = new UmbTestControllerHostElement();
@@ -33,12 +34,12 @@ describe('UmbSelectionManager', () => {
 		});
 
 		describe('methods', () => {
-			it('has a start method', () => {
-				expect(manager).to.have.property('start').that.is.a('function');
+			it('has a fallbackToOff method', () => {
+				expect(manager).to.have.property('fallbackToOff').that.is.a('function');
 			});
 
-			it('has a stop method', () => {
-				expect(manager).to.have.property('stop').that.is.a('function');
+			it('has a fallbackToOn method', () => {
+				expect(manager).to.have.property('fallbackToOn').that.is.a('function');
 			});
 
 			it('has a addState method', () => {
@@ -92,15 +93,15 @@ describe('UmbSelectionManager', () => {
 
 			manager.states
 				.subscribe((value) => {
-					expect(value[0]).to.equal(state1);
+					expect(value[0]).to.deep.equal(state1);
 					done();
 				})
 				.unsubscribe();
 		});
 
-		it('throws an error if the state manager is not running', () => {
-			manager.stop();
-			expect(() => manager.addState(state1)).to.throw();
+		it('sort negative states first', () => {
+			manager.addStates([state1, stateFalse, state2]);
+			expect(manager.getAllStates()).to.deep.equal([stateFalse, state1, state2]);
 		});
 	});
 
@@ -179,21 +180,6 @@ describe('UmbSelectionManager', () => {
 		it('returns false if there are states', () => {
 			manager.addState(state1);
 			expect(manager.getIsOff()).to.be.false;
-		});
-	});
-
-	describe('start', () => {
-		it('starts the state manager', () => {
-			manager.stop();
-			manager.start();
-			expect(manager.getIsRunning()).to.be.true;
-		});
-	});
-
-	describe('stop', () => {
-		it('stops the state manager', () => {
-			manager.stop();
-			expect(manager.getIsRunning()).to.be.false;
 		});
 	});
 });

@@ -578,10 +578,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const changedVariantIds = this._data.getChangedVariants();
 		const selectedVariantIds = activeVariantIds.concat(changedVariantIds);
 
+		const writableSelectedVariantIds = selectedVariantIds.filter(
+			(x) => this.readOnlyState.getIsOnForVariant(x) === false,
+		);
+
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
-		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
-		let selected = selectedVariantIds.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
-		selected = selected.filter((x) => readOnlyCultures.includes(x) === false);
+		let selected = writableSelectedVariantIds.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
 
 		return {
 			options,
@@ -590,8 +592,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected _saveableVariantsFilter = (option: VariantOptionModelType) => {
-		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
-		return readOnlyCultures.includes(option.culture) === false;
+		return this.readOnlyState.getIsOnForVariant(UmbVariantId.Create(option)) === false;
 	};
 
 	/* validation */

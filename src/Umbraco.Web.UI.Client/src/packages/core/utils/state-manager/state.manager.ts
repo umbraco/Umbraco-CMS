@@ -1,58 +1,60 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbPartialSome } from '../type';
 
 export interface UmbState {
-	unique: string;
-	message: string;
+	unique: string | symbol;
+	state?: boolean;
 	message?: string;
 }
 
-export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbControllerBase {
-	/**
-	 * Observable that emits all states in the state manager
-	 * @memberof UmbStateManager
-	 */
-	protected _states = new UmbArrayState<StateType>([], (x) => x.unique);
-	public readonly states = this._states.asObservable();
+export interface UmbStateEntry {
+	unique: string | symbol;
+	state: boolean;
+	message?: string;
+}
 
-	protected _isRunning = new UmbBooleanState(true);
-	public readonly isRunning = this._isRunning.asObservable();
+const DefaultStateUnique = Symbol();
+
+export class UmbStateManager<
+	StateType extends UmbStateEntry = UmbStateEntry,
+	IncomingStateType extends UmbState = UmbPartialSome<StateType, 'state'>,
+> extends UmbControllerBase {
+	//
+	protected readonly _states = new UmbArrayState<StateType>([], (x) => x.unique).sortBy((a, b) =>
+		a.state === b.state ? 0 : a.state ? 1 : -1,
+	);
+	protected readonly _statesObservable = this._states.asObservable();
+
+	// only on states for compatibility.
+	// TODO: Describe new methods:
+	/**
+	 * @obsolete stop using states directly, use the new methods.
+	 */
+	public readonly states = this._states.asObservablePart((x) => x.filter((x) => x.state === true));
+
+	//public readonly hasAnyStates = this._states.asObservablePart((x) => x.length > 0);
 
 	/**
 	 * Observable that emits true if there are any states in the state manager
 	 * @memberof UmbStateManager
+	 * @obsolete stop using isOn, use the new methods.
 	 */
-	public readonly isOn = this._states.asObservablePart((x) => x.length > 0);
+	public readonly isOn = createObservablePart(this.states, (x) => x.length > 0);
 
 	/**
 	 * Observable that emits true if there are no states in the state manager
 	 * @memberof UmbStateManager
+	 * @obsolete stop using isOff, use the new methods.
 	 */
-	public readonly isOff = this._states.asObservablePart((x) => x.length === 0);
+	public readonly isOff = createObservablePart(this.states, (x) => x.length === 0);
 
-	/**
-	 * Start the state - this will allow the state to be used.
-	 */
-	public start() {
-		this._states.unmute();
-		this._isRunning.setValue(true);
+	public fallbackToOff() {
+		this._states.appendOne({ unique: DefaultStateUnique, state: false } as StateType);
 	}
 
-	/**
-	 * Stop the state - this will prevent the state from being used
-	 */
-	public stop() {
-		this._states.mute();
-		this._isRunning.setValue(false);
-	}
-
-	/**
-	 * Get whether the state is running
-	 * @returns {boolean} True if the state is running
-	 * @memberof UmbStateManager
-	 */
-	public getIsRunning(): boolean {
-		return this._isRunning.getValue();
+	public fallbackToOn() {
+		this._states.appendOne({ unique: DefaultStateUnique, state: true } as StateType);
 	}
 
 	/**
@@ -60,16 +62,10 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	 * @param {StateType} state
 	 * @memberof UmbStateManager
 	 */
-	addState(state: StateType) {
-		if (this.getIsRunning() === false) {
-			throw new Error('State manager is not running. Call start() before adding states');
-		}
+	addState(state: IncomingStateType) {
 		if (!state) throw new Error('State must be defined');
 		if (!state.unique) throw new Error('State must have a unique property');
-		if (this._states.getValue().find((x) => x.unique === state.unique)) {
-			throw new Error('State with unique already exists');
-		}
-		this._states.setValue([...this._states.getValue(), state]);
+		this._states.appendOne({ state: true, ...state } as unknown as StateType);
 	}
 
 	/**
@@ -77,12 +73,10 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	 * @param {StateType[]} states
 	 * @memberof UmbStateManager
 	 */
-	addStates(states: StateType[]) {
-		if (this.getIsRunning() === false) {
-			throw new Error('State manager is not running. Call start() before adding states');
-		}
-
+	addStates(states: IncomingStateType[]) {
+		this._states.mute();
 		states.forEach((state) => this.addState(state));
+		this._states.unmute();
 	}
 
 	/**
@@ -91,7 +85,7 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	 * @memberof UmbStateManager
 	 */
 	removeState(unique: StateType['unique']) {
-		this._states.setValue(this._states.getValue().filter((x) => x.unique !== unique));
+		this._states.removeOne(unique);
 	}
 
 	/**
@@ -100,15 +94,20 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	 * @memberof UmbStateManager
 	 */
 	removeStates(uniques: StateType['unique'][]) {
-		this._states.setValue(this._states.getValue().filter((x) => !uniques.includes(x.unique)));
+		this._states.remove(uniques);
 	}
 
+	// TODO: Describe new methods:
 	/**
+	 * @obsolete stop using states directly, use the new methods.
 	 * Get all states from the state manager
 	 * @returns {StateType[]} {StateType[]} All states in the state manager
 	 * @memberof UmbStateManager
 	 */
-	getStates() {
+	getStates(): Array<StateType> {
+		return this._states.getValue().filter((x) => x.state === true);
+	}
+	getAllStates(): Array<StateType> {
 		return this._states.getValue();
 	}
 
@@ -116,7 +115,7 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	 * Clear all states from the state manager
 	 * @memberof UmbStateManager
 	 */
-	clear() {
+	clear(): void {
 		this._states.setValue([]);
 	}
 
@@ -140,7 +139,6 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 
 	override destroy() {
 		this._states.destroy();
-		this._isRunning.destroy();
 		super.destroy();
 	}
 }
