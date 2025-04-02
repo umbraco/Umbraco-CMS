@@ -328,7 +328,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		// Don't just set the values, as we could have some already populated from a blueprint.
 		// If we have a value from both a blueprint and a preset, use the latter as priority.
-		const dataValues = data.values;
+		const dataValues = [...data.values];
 		for (let index = 0; index < presetValues.length; index++) {
 			const presetValue = presetValues[index];
 			const matchingDataValueIndex = dataValues.findIndex(v => v.alias === presetValue.alias);
