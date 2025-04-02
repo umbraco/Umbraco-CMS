@@ -7,12 +7,9 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbVariantPropertyViewState, UmbVariantPropertyWriteState } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-content-workspace-view-edit-properties')
 export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -25,100 +22,37 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	}
 
 	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
-	#variantId?: UmbVariantId;
+
+	@state()
+	_variantId?: UmbVariantId;
 
 	@state()
 	_propertyStructure?: Array<UmbPropertyTypeModel>;
 
-	@state()
-	_dataPaths?: Array<string>;
-
-	@state()
-	_propertyViewStateIsRunning = true;
-
-	@state()
-	_propertyViewStates: Array<UmbVariantPropertyViewState> = [];
-
-	@state()
-	_propertyWriteStateIsRunning = true;
-
-	@state()
-	_propertyWriteStates: Array<UmbVariantPropertyWriteState> = [];
-
-	@state()
-	_propertyReadOnlyStates: Array<UmbVariantPropertyReadState> = [];
-
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (datasetContext) => {
+			this._variantId = datasetContext.getVariantId();
+		});
 
 		this.consumeContext(UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#propertyStructureHelper.setStructureManager(
 				// Assuming its the same content model type that we are working with here... [NL]
 				workspaceContext.structure as unknown as UmbContentTypeStructureManager<UmbContentTypeModel>,
 			);
-
-			this.observe(
-				observeMultiple([
-					workspaceContext.structure.propertyViewState.isRunning,
-					workspaceContext.structure.propertyViewState.states,
-				]),
-				([isRunning, states]) => {
-					this._propertyViewStateIsRunning = isRunning;
-					this._propertyViewStates = states;
-				},
-				'umbObservePropertyViewStates',
-			);
-
-			this.observe(
-				observeMultiple([
-					workspaceContext.structure.propertyWriteState.isRunning,
-					workspaceContext.structure.propertyWriteState.states,
-				]),
-				([isEnabled, states]) => {
-					this._propertyWriteStateIsRunning = isEnabled;
-					this._propertyWriteStates = states;
-				},
-				'umbObservePropertyWriteStates',
-			);
-
-			this.observe(
-				workspaceContext.structure.propertyReadOnlyState.states,
-				(states) => (this._propertyReadOnlyStates = states),
-				'umbObservePropertyWriteStates',
-			);
-		});
-
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (datasetContext) => {
-			this.#variantId = datasetContext.getVariantId();
-			this.#generatePropertyDataPath();
 		});
 
 		this.observe(
 			this.#propertyStructureHelper.propertyStructure,
 			(propertyStructure) => {
 				this._propertyStructure = propertyStructure;
-				this.#generatePropertyDataPath();
 			},
 			null,
 		);
 	}
 
-	#generatePropertyDataPath() {
-		if (!this.#variantId || !this._propertyStructure) return;
-		this._dataPaths = this._propertyStructure.map(
-			(property) =>
-				`$.values[${UmbDataPathPropertyValueQuery({
-					alias: property.alias,
-					culture: property.variesByCulture ? this.#variantId!.culture : null,
-					segment: property.variesBySegment ? this.#variantId!.segment : null,
-				})}].value`,
-		);
-	}
-
-	#getVisibleProperties() {
-		return this._propertyStructure?.filter((property) => this.#isViewablePropertyType(property)) || [];
-	}
-
+	/*
 	#isViewablePropertyType(property: UmbPropertyTypeModel) {
 		// The state is not running, so the property is viewable by default.
 		if (this._propertyViewStateIsRunning === false) {
@@ -160,18 +94,18 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 			property.variesBySegment ? this.#variantId!.segment : null,
 		);
 	}
+		*/
 
 	override render() {
-		return this._propertyStructure && this._dataPaths
+		return this._variantId && this._propertyStructure
 			? repeat(
-					this.#getVisibleProperties(),
+					this._propertyStructure,
 					(property) => property.alias,
-					(property, index) =>
-						html`<umb-property-type-based-property
+					(property) =>
+						html`<umb-content-workspace-view-edit-property
 							class="property"
-							data-path=${this._dataPaths![index]}
-							.property=${property}
-							?readonly=${!this.#isWritablePropertyType(property)}></umb-property-type-based-property>`,
+							.variantId=${this._variantId}
+							.property=${property}></umb-content-workspace-view-edit-property>`,
 				)
 			: '';
 	}

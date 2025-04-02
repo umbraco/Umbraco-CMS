@@ -70,9 +70,8 @@ export abstract class UmbElementPropertyDatasetContext<
 		});
 
 		this.observe(
-			this._dataOwner.readOnlyState.states,
-			(states) => {
-				const isReadOnly = states.some((state) => state.variantId.equal(this.#variantId));
+			this._dataOwner.readOnlyState.isOnForVariant(this.#variantId),
+			(isReadOnly) => {
 				this._readOnly.setValue(isReadOnly);
 			},
 			null,

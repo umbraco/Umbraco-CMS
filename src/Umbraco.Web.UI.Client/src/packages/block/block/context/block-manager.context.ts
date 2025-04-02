@@ -77,6 +77,7 @@ export abstract class UmbBlockManagerContext<
 	readonly #settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly settings = this.#settings.asObservable();
 
+	// TODO: This is a bad seperation of concerns, this should be self initializing, not defined from the outside. [NL]
 	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
 	readonly #exposes = new UmbArrayState(
