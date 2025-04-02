@@ -475,6 +475,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("umbTextpage", firstResult.ContentTypeAlias);
         Assert.AreEqual("Text Page", firstResult.ContentTypeName);
         Assert.AreEqual("icon-document", firstResult.ContentTypeIcon);
+        Assert.AreEqual(documentType.Key, firstResult.ContentTypeKey);
         Assert.AreEqual("bodyText", firstResult.NodeAlias);
         Assert.AreEqual("Body text", firstResult.NodeName);
 
@@ -482,6 +483,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("umbMediaItem", secondResult.ContentTypeAlias);
         Assert.AreEqual("Media Item", secondResult.ContentTypeName);
         Assert.AreEqual("icon-picture", secondResult.ContentTypeIcon);
+        Assert.AreEqual(mediaType.Key, secondResult.ContentTypeKey);
         Assert.AreEqual("bodyText", secondResult.NodeAlias);
         Assert.AreEqual("Body text", secondResult.NodeName);
     }
