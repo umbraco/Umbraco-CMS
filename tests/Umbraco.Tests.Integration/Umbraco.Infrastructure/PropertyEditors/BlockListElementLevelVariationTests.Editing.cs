@@ -881,7 +881,6 @@ internal partial class BlockListElementLevelVariationTests
     /// <param name="updateWithLimitedUserAccess">true => danish only which is not the default. false => admin which is all languages</param>
     [TestCase(true)]
     [TestCase(false)]
-    // [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_ClearBlocks_Limited_User_Access_To_Languages_Without_AllowEditInvariantFromNonDefault(bool updateWithLimitedUserAccess)
     {
         await LanguageService.CreateAsync(
