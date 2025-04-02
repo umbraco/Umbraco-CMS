@@ -265,7 +265,7 @@ public partial class UserStartNodeEntitiesServiceTests
         //       permissions additive (which in this case would mean ignoring the descendant rather than the ancestor).
 
         var contentStartNodePaths = await CreateUserAndGetStartNodePaths(_contentByName["3-3"].Id, _contentByName["3-3-1"].Id, _contentByName["3-3-5"].Id);
-        Assert.AreEqual(2, contentStartNodePaths);
+        Assert.AreEqual(2, contentStartNodePaths.Length);
 
         var children = UserStartNodeEntitiesService
             .ChildUserAccessEntities(
