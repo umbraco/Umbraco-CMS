@@ -769,20 +769,20 @@ export type DocumentTypeItemResponseModel = {
     description?: (string) | null;
 };
 
-export type DocumentTypePropertyReferenceResponseModel = {
-    $type: string;
-    id: string;
-    name?: (string) | null;
-    alias?: (string) | null;
-    documentType: (TrackedReferenceDocumentTypeModel);
-};
-
 export type DocumentTypePropertyTypeContainerResponseModel = {
     id: string;
     parent?: ((ReferenceByIdModel) | null);
     name?: (string) | null;
     type: string;
     sortOrder: number;
+};
+
+export type DocumentTypePropertyTypeReferenceResponseModel = {
+    $type: string;
+    id: string;
+    name?: (string) | null;
+    alias?: (string) | null;
+    documentType: (TrackedReferenceDocumentTypeModel);
 };
 
 export type DocumentTypePropertyTypeResponseModel = {
@@ -1285,20 +1285,20 @@ export type MediaTypeItemResponseModel = {
     icon?: (string) | null;
 };
 
-export type MediaTypePropertyReferenceResponseModel = {
-    $type: string;
-    id: string;
-    name?: (string) | null;
-    alias?: (string) | null;
-    mediaType: (TrackedReferenceMediaTypeModel);
-};
-
 export type MediaTypePropertyTypeContainerResponseModel = {
     id: string;
     parent?: ((ReferenceByIdModel) | null);
     name?: (string) | null;
     type: string;
     sortOrder: number;
+};
+
+export type MediaTypePropertyTypeReferenceResponseModel = {
+    $type: string;
+    id: string;
+    name?: (string) | null;
+    alias?: (string) | null;
+    mediaType: (TrackedReferenceMediaTypeModel);
 };
 
 export type MediaTypePropertyTypeResponseModel = {
@@ -1475,20 +1475,20 @@ export type MemberTypeItemResponseModel = {
     icon?: (string) | null;
 };
 
-export type MemberTypePropertyReferenceResponseModel = {
-    $type: string;
-    id: string;
-    name?: (string) | null;
-    alias?: (string) | null;
-    memberType: (TrackedReferenceMemberTypeModel);
-};
-
 export type MemberTypePropertyTypeContainerResponseModel = {
     id: string;
     parent?: ((ReferenceByIdModel) | null);
     name?: (string) | null;
     type: string;
     sortOrder: number;
+};
+
+export type MemberTypePropertyTypeReferenceResponseModel = {
+    $type: string;
+    id: string;
+    name?: (string) | null;
+    alias?: (string) | null;
+    memberType: (TrackedReferenceMemberTypeModel);
 };
 
 export type MemberTypePropertyTypeResponseModel = {
@@ -1783,7 +1783,7 @@ export type PagedIndexResponseModel = {
 
 export type PagedIReferenceResponseModel = {
     total: number;
-    items: Array<(DefaultReferenceResponseModel | DocumentReferenceResponseModel | DocumentTypePropertyReferenceResponseModel | MediaReferenceResponseModel | MediaTypePropertyReferenceResponseModel | MemberReferenceResponseModel | MemberTypePropertyReferenceResponseModel)>;
+    items: Array<(DefaultReferenceResponseModel | DocumentReferenceResponseModel | DocumentTypePropertyTypeReferenceResponseModel | MediaReferenceResponseModel | MediaTypePropertyTypeReferenceResponseModel | MemberReferenceResponseModel | MemberTypePropertyTypeReferenceResponseModel)>;
 };
 
 export type PagedLanguageResponseModel = {
