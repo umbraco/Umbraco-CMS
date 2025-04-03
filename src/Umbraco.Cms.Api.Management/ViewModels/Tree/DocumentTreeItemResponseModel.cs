@@ -7,7 +7,7 @@ public class DocumentTreeItemResponseModel : ContentTreeItemResponseModel
 {
     public bool IsProtected { get; set; }
 
-    public Guid[] AncestorIds { get; set; } = [];
+    public IEnumerable<ReferenceByIdModel> Ancestors { get; set; } = [];
 
     public DocumentTypeReferenceResponseModel DocumentType { get; set; } = new();
 

@@ -4,6 +4,7 @@ using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Entities;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -52,7 +53,8 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         if (entity is IDocumentEntitySlim documentEntitySlim)
         {
             responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
-            responseModel.AncestorIds = EntityService.GetPathKeys(entity, omitSelf: true);
+            responseModel.Ancestors = EntityService.GetPathKeys(entity, omitSelf: true)
+                .Select(x => new ReferenceByIdModel(x));
             responseModel.IsTrashed = entity.Trashed;
             responseModel.Id = entity.Key;
             responseModel.CreateDate = entity.CreateDate;

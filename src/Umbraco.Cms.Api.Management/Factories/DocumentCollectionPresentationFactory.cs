@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -41,7 +42,8 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
             }
 
             item.IsProtected = _publicAccessService.IsProtected(matchingContentItem).Success;
-            item.AncestorIds = _entityService.GetPathKeys(matchingContentItem, omitSelf: true);
+            item.Ancestors = _entityService.GetPathKeys(matchingContentItem, omitSelf: true)
+                .Select(x => new ReferenceByIdModel(x));
         }
 
         return Task.CompletedTask;
