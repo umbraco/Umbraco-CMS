@@ -393,7 +393,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * Check if there are unpersisted changes.
 	 * @returns { boolean } true if there are unpersisted changes.
 	 */
-	protected _getHasUnpersistedChanges(): boolean {
+	public getHasUnpersistedChanges(): boolean {
 		return this._data.getHasUnpersistedChanges();
 	}
 
