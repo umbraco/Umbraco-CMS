@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - contrib
-      - release/*
       - v*/dev
     paths:
       - src/Umbraco.Web.UI.Client/package.json
@@ -15,7 +14,6 @@ on:
     types: [opened, synchronize, reopened, closed]
     branches:
       - contrib
-      - release/*
       - v*/dev
 
 jobs:
