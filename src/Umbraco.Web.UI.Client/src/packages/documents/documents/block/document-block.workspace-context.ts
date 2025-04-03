@@ -26,8 +26,8 @@ export class UmbDocumentBlockWorkspaceContext extends UmbControllerBase {
 			if (context && documentWorkspaceContext) {
 				documentWorkspaceContext.destroy();
 				// Start the states for blocks inside documents to allow for property value permissions
-				context.content.structure.propertyViewState.fallbackToOff();
-				context.content.structure.propertyWriteState.fallbackToOff();
+				context.content.structure.propertyViewGuard.fallbackToDisallowed();
+				context.content.structure.propertyWriteGuard.fallbackToDisallowed();
 			}
 		});
 	}

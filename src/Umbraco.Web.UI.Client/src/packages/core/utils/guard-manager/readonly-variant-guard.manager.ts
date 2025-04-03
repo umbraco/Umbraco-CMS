@@ -3,11 +3,11 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { mergeObservables, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbGuardRule } from './guard.manager.base.js';
 
-export interface UmbVariantState extends UmbGuardRule {
+export interface UmbVariantGuardRule extends UmbGuardRule {
 	variantId?: UmbVariantId;
 }
 
-function CompareStateAndVariantId(rules: Array<UmbVariantState>, variantId: UmbVariantId): boolean {
+function CompareStateAndVariantId(rules: Array<UmbVariantGuardRule>, variantId: UmbVariantId): boolean {
 	// any specific states for the variant?
 	const variantState = rules.find((s) => s.variantId?.compare(variantId));
 	if (variantState) {
@@ -23,7 +23,7 @@ function CompareStateAndVariantId(rules: Array<UmbVariantState>, variantId: UmbV
 	return false;
 }
 
-export class UmbReadonlyVariantGuardManager extends UmbReadonlyGuardManager<UmbVariantState> {
+export class UmbReadonlyVariantGuardManager extends UmbReadonlyGuardManager<UmbVariantGuardRule> {
 	//
 	permittedForVariant(variantId: UmbVariantId): Observable<boolean> {
 		return this._rules.asObservablePart((states) => {

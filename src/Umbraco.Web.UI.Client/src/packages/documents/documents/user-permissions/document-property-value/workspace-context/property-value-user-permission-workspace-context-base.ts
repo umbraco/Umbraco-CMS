@@ -5,40 +5,34 @@ import {
 } from '../constants.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbVariantPropertyViewState, UmbVariantPropertyWriteState } from '@umbraco-cms/backoffice/property';
+import type { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
-import type { UmbStateManager } from '@umbraco-cms/backoffice/utils';
 
 export class UmbPropertyValueUserPermissionWorkspaceContextBase extends UmbControllerBase {
 	protected _setPermissions(
 		properties: Array<UmbPropertyTypeModel>,
-		variantIds: Array<UmbVariantId>,
-		propertyVisibilityState: UmbStateManager<UmbVariantPropertyViewState>,
-		propertyWriteState: UmbStateManager<UmbVariantPropertyWriteState>,
+		propertyVisibilityState: UmbVariantPropertyGuardManager,
+		propertyWriteState: UmbVariantPropertyGuardManager,
 	) {
 		properties.forEach((property) => {
 			this.#setPermissionForProperty({
 				verb: UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ,
 				stateManager: propertyVisibilityState,
 				property,
-				variantIds,
 			});
 
 			this.#setPermissionForProperty({
 				verb: UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE,
 				stateManager: propertyWriteState,
 				property,
-				variantIds,
 			});
 		});
 	}
 
 	#setPermissionForProperty(args: {
 		verb: string;
-		stateManager: UmbStateManager<UmbVariantPropertyViewState | UmbVariantPropertyWriteState>;
+		stateManager: UmbVariantPropertyGuardManager;
 		property: UmbPropertyTypeModel;
-		variantIds: Array<UmbVariantId>;
 	}) {
 		// TODO: Oh, this results in quite a few Context Consumptions. Lets try not to use a condition in this case. [NL]
 		createExtensionApiByAlias(this, UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_CONDITION_ALIAS, [
@@ -52,26 +46,17 @@ export class UmbPropertyValueUserPermissionWorkspaceContextBase extends UmbContr
 					},
 				},
 				onChange: (permitted: boolean) => {
-					// If the property is invariant we only need one state for the property
-					const isInvariant = args.property.variesByCulture === false && args.property.variesBySegment === false;
-					const variantIds = isInvariant ? [new UmbVariantId()] : args.variantIds;
-
-					const states: Array<UmbVariantPropertyWriteState> =
-						variantIds?.map((variantId) => {
-							return {
-								state: true,
-								unique: 'UMB_PROPERTY_' + args.property.unique + '_' + variantId.toString(),
-								propertyType: {
-									unique: args.property.unique,
-								},
-								variantId,
-							};
-						}) || [];
+					const unique = 'UMB_PROPERTY_' + args.property.unique;
 
 					if (permitted) {
-						args.stateManager.addStates(states);
+						args.stateManager.addRule({
+							unique,
+							propertyType: {
+								unique: args.property.unique,
+							},
+						});
 					} else {
-						args.stateManager.removeStates(states.map((state) => state.unique));
+						args.stateManager.removeRule(unique);
 					}
 				},
 			},

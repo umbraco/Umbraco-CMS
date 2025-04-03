@@ -6,7 +6,7 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { DocumentConfigurationResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbVariantPropertyReadOnlyState } from '@umbraco-cms/backoffice/property';
+import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
 
 export class UmbDocumentPropertyDatasetContext extends UmbContentPropertyDatasetContext<
 	UmbDocumentDetailModel,
@@ -45,12 +45,12 @@ export class UmbDocumentPropertyDatasetContext extends UmbContentPropertyDataset
 				properties.forEach((property) => {
 					const unique = 'UMB_PREVENT_EDIT_INVARIANT_FROM_NON_DEFAULT_' + property.unique;
 
-					this._dataOwner.structure.propertyReadOnlyState.removeState(unique);
+					this._dataOwner.structure.propertyReadonlyGuard.removeRule(unique);
 
 					if (!property.variesByCulture && !isDefaultLanguage) {
-						const state: UmbVariantPropertyReadOnlyState = {
+						const rule: UmbVariantPropertyGuardRule = {
 							unique,
-							state: true,
+							permitted: true,
 							message: 'Shared properties can only be edited in the default language',
 							propertyType: {
 								unique: property.unique,
@@ -58,7 +58,7 @@ export class UmbDocumentPropertyDatasetContext extends UmbContentPropertyDataset
 							variantId: new UmbVariantId(),
 						};
 
-						this._dataOwner.structure.propertyReadOnlyState.addState(state);
+						this._dataOwner.structure.propertyReadonlyGuard.addRule(rule);
 					}
 				});
 			},

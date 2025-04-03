@@ -52,50 +52,6 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 		);
 	}
 
-	/*
-	#isViewablePropertyType(property: UmbPropertyTypeModel) {
-		// The state is not running, so the property is viewable by default.
-		if (this._propertyViewStateIsRunning === false) {
-			return true;
-		}
-
-		const propertyVariantId = this.#getPropertyVariantId(property);
-		return this._propertyViewStates.some(
-			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(propertyVariantId),
-		);
-	}
-
-	#isWritablePropertyType(property: UmbPropertyTypeModel) {
-		// The state is not running, so the property is writable by default.
-		if (this._propertyWriteStateIsRunning === false) {
-			return true;
-		}
-
-		const propertyVariantId = this.#getPropertyVariantId(property);
-
-		// Check if the property is writable
-		const isWriteAllowed = this._propertyWriteStates.some(
-			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(propertyVariantId),
-		);
-
-		// Check if the property is read only
-		const isReadOnly = this._propertyReadOnlyStates.some(
-			(state) => state.propertyType.unique === property.unique && state.propertyType.variantId.equal(propertyVariantId),
-		);
-
-		// If the property has a read only state it will override the write state
-		// and the property will always be read only
-		return isWriteAllowed && !isReadOnly;
-	}
-
-	#getPropertyVariantId(property: UmbPropertyTypeModel) {
-		return new UmbVariantId(
-			property.variesByCulture ? this.#variantId!.culture : null,
-			property.variesBySegment ? this.#variantId!.segment : null,
-		);
-	}
-		*/
-
 	override render() {
 		return this._variantId && this._propertyStructure
 			? repeat(

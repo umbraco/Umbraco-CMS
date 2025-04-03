@@ -9,7 +9,7 @@ import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
-import type { UmbVariantState } from '@umbraco-cms/backoffice/utils';
+import type { UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-workspace-split-view-variant-selector')
@@ -24,7 +24,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	private _variantOptions: Array<VariantOptionModelType> = [];
 
 	@state()
-	private _readOnlyStates: Array<UmbVariantState> = [];
+	private _readOnlyStates: Array<UmbVariantGuardRule> = [];
 
 	@state()
 	_activeVariants: Array<ActiveVariant> = [];
@@ -168,7 +168,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	#setReadOnlyCultures(workspaceContext: UmbContentWorkspaceContext) {
 		this._readOnlyCultures = this._variantOptions
-			.filter((variant) => workspaceContext.readOnlyState.getIsOnForVariant(UmbVariantId.Create(variant)))
+			.filter((variant) => workspaceContext.readonlyGuard.getPermittedForVariant(UmbVariantId.Create(variant)))
 			.map((variant) => variant.culture);
 	}
 

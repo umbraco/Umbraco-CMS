@@ -1,8 +1,6 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../workspace/constants.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyValueUserPermissionWorkspaceContextBase } from './property-value-user-permission-workspace-context-base.js';
 
 export class UmbDocumentBlockPropertyValueUserPermissionWorkspaceContext extends UmbPropertyValueUserPermissionWorkspaceContextBase {
@@ -32,25 +30,19 @@ export class UmbDocumentBlockPropertyValueUserPermissionWorkspaceContext extends
 
 	async #observeDocumentBlockProperties() {
 		if (!this.#blockWorkspaceContext) return;
-		const datasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
-		if (!datasetContext) return;
+
+		// TODO: why get the dataset context here? [NL]
+		//const datasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
+		//if (!datasetContext) return;
 
 		const structureManager = this.#blockWorkspaceContext.content.structure;
 
-		this.observe(
-			observeMultiple([structureManager.contentTypeProperties, this.#blockWorkspaceContext.variantId]),
-			([properties, variantId]) => {
-				if (properties.length === 0) return;
-				if (!variantId) return;
+		this.observe(structureManager.contentTypeProperties, (properties) => {
+			// TODO: If zero properties I guess we should then clear the state? [NL]
+			if (properties.length === 0) return;
 
-				this._setPermissions(
-					properties,
-					[variantId],
-					structureManager.propertyViewState,
-					structureManager.propertyWriteState,
-				);
-			},
-		);
+			this._setPermissions(properties, structureManager.propertyViewGuard, structureManager.propertyWriteGuard);
+		});
 	}
 }
 
