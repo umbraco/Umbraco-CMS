@@ -266,7 +266,10 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#propertyContext.isReadOnly,
 			(value) => {
 				this._isReadOnly = value;
-				this._element?.toggleAttribute('readonly', value);
+				if (this._element) {
+					this._element.readOnly = value;
+					this._element.toggleAttribute('readonly', value);
+				}
 			},
 			null,
 		);
@@ -379,7 +382,9 @@ export class UmbPropertyElement extends UmbLitElement {
 					}
 				}
 
+				this._element.readOnly = this._isReadOnly;
 				this._element.toggleAttribute('readonly', this._isReadOnly);
+
 				this.#createController(manifest);
 			}
 
