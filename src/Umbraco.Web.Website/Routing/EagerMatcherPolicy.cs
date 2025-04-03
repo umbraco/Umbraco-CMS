@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
@@ -126,8 +126,20 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
                 return;
             }
 
+            // If it's an attribute routed IVirtualPageController with a Host attribute we should ignore if the host doesn't match the current request.
+            // Maybe we would expect that it wouldn't be in the provided CandidateSet, but it will be included just based on the Route.
+            // See: https://github.com/umbraco/Umbraco-CMS/issues/16816
+            if (controllerTypeInfo is not null && controllerTypeInfo.IsType<IVirtualPageController>())
+            {
+                HostAttribute? hostAttribute = controllerTypeInfo.GetCustomAttribute<HostAttribute>();
+                if (hostAttribute is not null && hostAttribute.Hosts.InvariantContains(httpContext.Request.Host.Value) is false)
+                {
+                    continue;
+                }
+            }
+
             // If it's an UmbracoPageController we need to do some domain routing.
-            // We need to do this in oder to handle cultures for our Dictionary.
+            // We need to do this in order to handle cultures for our Dictionary.
             // This is because UmbracoPublishedContentCultureProvider is ued to set the Thread.CurrentThread.CurrentUICulture
             // The CultureProvider is run before the actual routing, this means that our UmbracoVirtualPageFilterAttribute is hit AFTER the culture is set.
             // Meaning we have to route the domain part already now, this is not pretty, but it beats having to look for content we know doesn't exist.
