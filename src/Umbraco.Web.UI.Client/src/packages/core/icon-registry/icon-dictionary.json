@@ -987,6 +987,10 @@
 			"file": "heading-3.svg"
 		},
 		{
+			"name": "icon-heading-4",
+			"file": "heading-4.svg"
+		},
+		{
 			"name": "icon-headphones",
 			"file": "headphones.svg"
 		},
@@ -1506,6 +1510,10 @@
 		{
 			"name": "icon-partly-cloudy",
 			"file": "cloud-sun.svg"
+		},
+		{
+			"name": "icon-paragraph",
+			"file": "pilcrow.svg"
 		},
 		{
 			"name": "icon-paste-in",
