@@ -123,7 +123,7 @@ public class MigrateTinyMceToTiptap : AsyncMigrationBase
             "umbmediapicker" => "Umb.Tiptap.Toolbar.MediaPicker",
             "umbembeddialog" => "Umb.Tiptap.Toolbar.EmbeddedMedia",
             "umbblockpicker" => "Umb.Tiptap.Toolbar.BlockPicker",
-            _ => item
+            _ => null
         };
     }
 }
