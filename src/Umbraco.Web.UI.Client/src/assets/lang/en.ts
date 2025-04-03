@@ -1592,7 +1592,7 @@ export default {
 			'\n            If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is shown.\n    ',
 		queryBuilder: 'Query builder',
 		itemsReturned: 'items returned, in',
-		publishedItemsReturned: '%0% published items returned, in %1% ms',
+		publishedItemsReturned: 'Currently %0% published items returned, in %1% ms',
 		iWant: 'I want',
 		allContent: 'all content',
 		contentOfType: 'content of type "%0%"',
