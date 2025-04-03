@@ -59,7 +59,7 @@ export class UmbResourceController extends UmbControllerBase {
 	 * @param {boolean} shouldNotify Whether to show a notification or not. Default is false.
 	 * @returns {UmbDataSourceResponse<T>} The response object with the error.
 	 * @template T The type of the data returned from the API.
-	 * @see {@link UmbResourceController.handleUmbErrors}
+	 * @see {@link UmbResourceController.handleUmbErrors<T>}
 	 */
 	async handleUmbApiError<T>(error: UmbApiError, shouldNotify: boolean = false): Promise<UmbDataSourceResponse<T>> {
 		console.groupCollapsed('UmbError caught in UmbResourceController');
