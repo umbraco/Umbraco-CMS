@@ -16,6 +16,7 @@ import {
 	UmbValidationContext,
 } from '@umbraco-cms/backoffice/validation';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 export abstract class UmbPropertyEditorUiRteElementBase
 	extends UmbFormControlMixin<UmbPropertyEditorRteValueType | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
@@ -114,6 +115,42 @@ export abstract class UmbPropertyEditorUiRteElementBase
 	constructor() {
 		super();
 
+		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (context) => {
+			this.observe(
+				observeMultiple([
+					this.#managerContext.blockTypes,
+					context.structure.variesByCulture,
+					context.structure.variesBySegment,
+				]),
+				async ([blockTypes, variesByCulture, variesBySegment]) => {
+					if (blockTypes.length > 0 && (variesByCulture === false || variesBySegment === false)) {
+						// check if any of the Blocks varyByCulture or Segment and then display a warning.
+						const promises = await Promise.all(
+							blockTypes.map(async (blockType) => {
+								const elementType = blockType.contentElementTypeKey;
+								await this.#managerContext.contentTypesLoaded;
+								const structure = await this.#managerContext.getStructure(elementType);
+								if (variesByCulture === false && structure?.getVariesByCulture() === true) {
+									// If block varies by culture but document does not.
+									return true;
+								} else if (variesBySegment === false && structure?.getVariesBySegment() === true) {
+									// If block varies by segment but document does not.
+									return true;
+								}
+								return false;
+							}),
+						);
+						const notSupportedVariantSetting = promises.filter((x) => x === true).length > 0;
+
+						if (notSupportedVariantSetting) {
+							this.setCustomValidity('#blockEditor_blockVariantConfigurationNotSupported');
+							this.checkValidity();
+						}
+					}
+				},
+			);
+		}).passContextAliasMatches();
+
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.#gotPropertyContext(context);
 		});
@@ -145,6 +182,7 @@ export abstract class UmbPropertyEditorUiRteElementBase
 				if (dataPath) {
 					// Set the data path for the local validation context:
 					this.#validationContext.setDataPath(dataPath + '.blocks');
+					this.#validationContext.autoReport();
 				}
 			},
 			'observeDataPath',
