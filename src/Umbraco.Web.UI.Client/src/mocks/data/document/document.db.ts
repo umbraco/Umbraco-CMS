@@ -78,10 +78,22 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 	const documentType = umbDocumentTypeMockDb.read(request.documentType.id);
 	if (!documentType) throw new Error(`Document type with id ${request.documentType.id} not found`);
 
+	const isRoot = request.parent === null || request.parent === undefined;
+	let ancestorIds: Array<string> = [];
+
+	if (!isRoot) {
+		const parentId = request.parent!.id;
+
+		const parentAncestors = umbDocumentMockDb.tree
+			.getAncestorsOf({ descendantId: parentId })
+			.map((ancestor) => ancestor.id);
+		ancestorIds = [...parentAncestors, parentId];
+	}
+
 	const now = new Date().toString();
 
 	return {
-		ancestorIds: [],
+		ancestorIds,
 		documentType: {
 			id: documentType.id,
 			icon: documentType.icon,
