@@ -9,9 +9,8 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 
 describe('UmbSelectionManager', () => {
 	let manager: UmbStateManager;
-	const state1 = { unique: '1', message: 'State 1', state: true };
-	const state2 = { unique: '2', message: 'State 2', state: true };
-	const stateFalse = { unique: '-1', message: 'State -1', state: false };
+	const state1 = { unique: '1', message: 'State 1' };
+	const state2 = { unique: '2', message: 'State 2' };
 
 	beforeEach(() => {
 		const hostElement = new UmbTestControllerHostElement();
@@ -34,14 +33,6 @@ describe('UmbSelectionManager', () => {
 		});
 
 		describe('methods', () => {
-			it('has a fallbackToOff method', () => {
-				expect(manager).to.have.property('fallbackToOff').that.is.a('function');
-			});
-
-			it('has a fallbackToOn method', () => {
-				expect(manager).to.have.property('fallbackToOn').that.is.a('function');
-			});
-
 			it('has a addState method', () => {
 				expect(manager).to.have.property('addState').that.is.a('function');
 			});
@@ -60,14 +51,6 @@ describe('UmbSelectionManager', () => {
 
 			it('has a clear method', () => {
 				expect(manager).to.have.property('clear').that.is.a('function');
-			});
-
-			it('has a getIsOn method', () => {
-				expect(manager).to.have.property('getIsOn').that.is.a('function');
-			});
-
-			it('has a getIsOff method', () => {
-				expect(manager).to.have.property('getIsOff').that.is.a('function');
 			});
 		});
 	});
@@ -93,15 +76,10 @@ describe('UmbSelectionManager', () => {
 
 			manager.states
 				.subscribe((value) => {
-					expect(value[0]).to.deep.equal(state1);
+					expect(value[0]).to.equal(state1);
 					done();
 				})
 				.unsubscribe();
-		});
-
-		it('sort negative states first', () => {
-			manager.addStates([state1, stateFalse, state2]);
-			expect(manager.getAllStates()).to.deep.equal([stateFalse, state1, state2]);
 		});
 	});
 
@@ -158,28 +136,6 @@ describe('UmbSelectionManager', () => {
 					done();
 				})
 				.unsubscribe();
-		});
-	});
-
-	describe('getIsOn', () => {
-		it('returns true if there are states', () => {
-			manager.addState(state1);
-			expect(manager.getIsOn()).to.be.true;
-		});
-
-		it('returns false if there are no states', () => {
-			expect(manager.getIsOn()).to.be.false;
-		});
-	});
-
-	describe('getIsOff', () => {
-		it('returns true if there are no states', () => {
-			expect(manager.getIsOff()).to.be.true;
-		});
-
-		it('returns false if there are states', () => {
-			manager.addState(state1);
-			expect(manager.getIsOff()).to.be.false;
 		});
 	});
 });
