@@ -75,6 +75,33 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                 return (user, password);
             });
 
+    protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, Guid userGroupKey) =>
+        await AuthenticateClientAsync(client,
+            async userService =>
+            {
+                IUser user;
+                if (userGroupKey == Constants.Security.AdminGroupKey)
+                {
+                    user = await userService.GetRequiredUserAsync(Constants.Security.SuperUserKey);
+                    user.Username = user.Email = username;
+                    userService.Save(user);
+                }
+                else
+                {
+                    user = (await userService.CreateAsync(
+                        Constants.Security.SuperUserKey,
+                        new UserCreateModel
+                        {
+                            Email = username,
+                            Name = username,
+                            UserName = username,
+                            UserGroupKeys = new HashSet<Guid>(new[] { userGroupKey }),
+                        },
+                        true)).Result.CreatedUser;
+                }
+
+                return (user, password);
+            });
 
     protected async Task AuthenticateClientAsync(HttpClient client, Func<IUserService, Task<(IUser user, string Password)>> createUser)
     {
@@ -98,7 +125,6 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
             var token = await userManager.GeneratePasswordResetTokenAsync(userCreationResult.user);
 
-
             var changePasswordAttempt = await userService.ChangePasswordAsync(userKey,
                 new ChangeUserPasswordModel
                 {
@@ -114,7 +140,6 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                     BackOfficeApplicationManager;
             backofficeOpenIddictApplicationDescriptor =
                 backOfficeApplicationManager.BackofficeOpenIddictApplicationDescriptor([client.BaseAddress]);
-
             scope.Complete();
         }
 
@@ -127,11 +152,11 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         Assert.AreEqual(HttpStatusCode.OK, loginResponse.StatusCode, await loginResponse.Content.ReadAsStringAsync());
 
         var codeVerifier = "12345"; // Just a dummy value we use in tests
-        var codeChallange = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)))
+        var codeChallenge = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)))
             .TrimEnd("=");
 
         var authorizationUrl = GetManagementApiUrl<BackOfficeController>(x => x.Authorize(CancellationToken.None)) +
-                  $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallange}";
+                  $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallenge}";
         var authorizeResponse = await client.GetAsync(authorizationUrl);
 
         Assert.AreEqual(HttpStatusCode.Found, authorizeResponse.StatusCode, await authorizeResponse.Content.ReadAsStringAsync());
@@ -156,5 +181,4 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     {
         [JsonPropertyName("access_token")] public string AccessToken { get; set; }
     }
-
 }

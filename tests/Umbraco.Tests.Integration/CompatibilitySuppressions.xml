@@ -17,6 +17,27 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Tests.Integration.ManagementApi.Policies.AllCultureControllerTests</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Tests.Integration.ManagementApi.Preview.EndPreviewTests</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Tests.Integration.ManagementApi.Preview.EnterPreviewTests</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
     <Target>T:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors.BlockEditorBackwardsCompatibilityTests</Target>
     <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
