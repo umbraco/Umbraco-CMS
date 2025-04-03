@@ -5,7 +5,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbVariantPropertyViewState, UmbVariantPropertyWriteState } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
@@ -42,6 +41,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	@state()
 	private _ownerEntityType?: string;
 
+	// TODO: Get rid of these and implement a property element... [NL]
 	@state()
 	_propertyViewStates: Array<UmbVariantPropertyViewState> = [];
 
@@ -84,7 +84,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 		);
 
 		this.observe(
-			structureManager.propertyViewState.states,
+			structureManager.propertyViewGuard.rules,
 			(states) => {
 				this._propertyViewStates = states;
 			},
@@ -92,7 +92,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 		);
 
 		this.observe(
-			structureManager.propertyWriteState.states,
+			structureManager.propertyWriteGuard.rules,
 			(states) => {
 				this._propertyWriteStates = states;
 			},

@@ -17,7 +17,7 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { decodeFilePath, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { decodeFilePath, UmbReadonlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import {
 	UMB_BLOCK_ENTRIES_CONTEXT,
 	UMB_BLOCK_MANAGER_CONTEXT,
@@ -74,7 +74,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#exposed = new UmbBooleanState<undefined>(undefined);
 	readonly exposed = this.#exposed.asObservable();
 
-	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	public readonly readOnlyGuard = new UmbReadonlyVariantGuardManager(this);
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
@@ -187,20 +187,19 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.observe(
 			// TODO: Again we need to parse on all variants....
-			observeMultiple([manager.readOnlyState.isReadOnly, this.variantId]),
-			([isReadOnly, variantId]) => {
+			manager.readOnlyState.permittedForVariantObservable(this.variantId),
+			(isReadOnly) => {
 				const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
-				if (variantId === undefined) return;
 
 				if (isReadOnly) {
-					const state = {
+					const rule = {
 						unique,
-						variantId,
+						variantId: this.#variantId.getValue(),
 					};
 
-					this.readOnlyState?.addState(state);
+					this.readOnlyGuard?.addRule(rule);
 				} else {
-					this.readOnlyState?.removeState(unique);
+					this.readOnlyGuard?.removeRule(unique);
 				}
 			},
 			'observeIsReadOnly',

@@ -89,8 +89,8 @@ export class UmbDocumentWorkspaceContext
 
 		/* Start the property view and write states for the document workspace. This means that the properties are not viewable or writable by default
 		 but requires an entry in the state to be able to view or write to the properties. */
-		this.structure.propertyViewState.fallbackToOff();
-		this.structure.propertyWriteState.fallbackToOff();
+		this.structure.propertyViewGuard.fallbackToDisallowed();
+		this.structure.propertyWriteGuard.fallbackToDisallowed();
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
 
@@ -187,9 +187,10 @@ export class UmbDocumentWorkspaceContext
 	override resetState(): void {
 		super.resetState();
 		this.#isTrashedContext.setIsTrashed(false);
-		this.structure.propertyViewState.clear();
-		this.structure.propertyWriteState.clear();
-		this.structure.propertyReadOnlyState.clear();
+		// TODO: Bad in terms of seperation of concern, this should not be managed here. [NL]
+		this.structure.propertyViewGuard.clear();
+		this.structure.propertyWriteGuard.clear();
+		this.structure.propertyReadonlyGuard.clear();
 	}
 
 	override async load(unique: string) {
@@ -384,27 +385,15 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async #setReadOnlyStateForUserPermission(identifier: string, permitted: boolean, message: string) {
-		const variants = this.getVariants();
-		const uniques = variants?.map((variant) => identifier + variant.culture) || [];
-
 		if (permitted) {
-			this.readOnlyState?.removeStates(uniques);
+			this.readonlyGuard?.removeRule(identifier);
 			return;
 		}
 
-		const variantIds = variants?.map((variant) => new UmbVariantId(variant.culture, variant.segment)) || [];
-
-		const readOnlyStates = variantIds.map((variantId) => {
-			return {
-				unique: identifier + variantId.culture,
-				variantId,
-				message,
-			};
+		this.readonlyGuard?.addRule({
+			unique: identifier,
+			message,
 		});
-
-		this.readOnlyState?.removeStates(uniques);
-
-		this.readOnlyState?.addStates(readOnlyStates);
 	}
 }
 

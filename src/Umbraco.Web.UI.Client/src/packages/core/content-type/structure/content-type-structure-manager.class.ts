@@ -19,11 +19,7 @@ import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UmbVariantPropertyReadOnlyStateManager,
-	UmbVariantPropertyViewStateManager,
-	UmbVariantPropertyWriteStateManager,
-} from '@umbraco-cms/backoffice/property';
+import { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
 
 type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
 
@@ -103,9 +99,9 @@ export class UmbContentTypeStructureManager<
 	readonly variesByCulture = createObservablePart(this.ownerContentType, (x) => x?.variesByCulture);
 	readonly variesBySegment = createObservablePart(this.ownerContentType, (x) => x?.variesBySegment);
 
-	public readonly propertyViewState = new UmbVariantPropertyViewStateManager(this);
-	public readonly propertyWriteState = new UmbVariantPropertyWriteStateManager(this);
-	public readonly propertyReadOnlyState = new UmbVariantPropertyReadOnlyStateManager(this);
+	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
+	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
+	public readonly propertyReadonlyGuard = new UmbVariantPropertyGuardManager(this);
 
 	#containers: UmbArrayState<UmbPropertyTypeContainerModel> = new UmbArrayState<UmbPropertyTypeContainerModel>(
 		[],
@@ -818,9 +814,9 @@ export class UmbContentTypeStructureManager<
 	public override destroy() {
 		this.#contentTypes.destroy();
 		this.#containers.destroy();
-		this.propertyViewState.destroy();
-		this.propertyWriteState.destroy();
-		this.propertyReadOnlyState.destroy();
+		this.propertyViewGuard.destroy();
+		this.propertyWriteGuard.destroy();
+		this.propertyReadonlyGuard.destroy();
 		super.destroy();
 	}
 }

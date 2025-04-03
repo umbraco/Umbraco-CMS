@@ -25,7 +25,7 @@ import {
 	type UmbEntityVariantModel,
 	type UmbEntityVariantOptionModel,
 } from '@umbraco-cms/backoffice/variant';
-import { UmbDeprecation, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbReadonlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeDetailRepository, UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
@@ -99,7 +99,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
-	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	public readonly readonlyGuard = new UmbReadonlyVariantGuardManager(this);
 
 	/* Content Data */
 	protected override readonly _data = new UmbContentWorkspaceDataManager<DetailModelType, VariantModelType>(this);
@@ -579,7 +579,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const selectedVariantIds = activeVariantIds.concat(changedVariantIds);
 
 		const writableSelectedVariantIds = selectedVariantIds.filter(
-			(x) => this.readOnlyState.getIsOnForVariant(x) === false,
+			(x) => this.readonlyGuard.getPermittedForVariant(x) === false,
 		);
 
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
@@ -592,7 +592,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected _saveableVariantsFilter = (option: VariantOptionModelType) => {
-		return this.readOnlyState.getIsOnForVariant(UmbVariantId.Create(option)) === false;
+		return this.readonlyGuard.getPermittedForVariant(UmbVariantId.Create(option)) === false;
 	};
 
 	/* validation */
@@ -864,7 +864,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	override resetState() {
 		super.resetState();
-		this.readOnlyState.clear();
+		this.readonlyGuard.clear();
 	}
 
 	abstract getContentTypeUnique(): string | undefined;
