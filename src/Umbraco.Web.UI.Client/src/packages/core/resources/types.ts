@@ -9,3 +9,14 @@ export interface XhrRequestOptions {
 	onProgress?: (event: ProgressEvent) => void;
 	abortSignal?: AbortSignal;
 }
+
+export interface UmbProblemDetails {
+	type: string;
+	title: string;
+	status: number;
+	detail?: string;
+	instance?: string;
+	operationStatus?: string;
+	extensions?: Record<string, unknown>;
+	errors?: Record<string, string[]>;
+}

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { UMB_AUTH_CONTEXT } from '../auth/index.js';
 import { UmbDeprecation } from '../utils/deprecation/deprecation.js';
+import { UmbApiError, UmbCancelError, type UmbError } from './umb-error.js';
 import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
 import type { XhrRequestOptions } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -23,17 +24,149 @@ export class UmbResourceController extends UmbControllerBase {
 		this.#promise = promise;
 	}
 
+	/**
+	 * Handle errors
+	 * @internal
+	 * @param {any} error The error to handle.
+	 * @returns {UmbDataSourceResponse<T>} The response object with the error.
+	 * @template T The type of the data returned from the API.
+	 */
+	async handleUmbErrors<T>(error: UmbError | UmbApiError | UmbCancelError | Error): Promise<UmbDataSourceResponse<T>> {
+		if (!error) return {};
+
+		/**
+		 * Determine if we want to show a notification or just log the error to the console.
+		 * If the error is not a recognizable system error (i.e. a HttpError), then we will show a notification
+		 * with the error details using the default notification options.
+		 */
+		if (UmbCancelError.isUmbCancelError(error)) {
+			// Cancelled - do nothing
+			return { error };
+		} else if (UmbApiError.isUmbApiError(error)) {
+			// UmbApiError - handle it
+			return this.handleUmbApiError(error);
+		} else {
+			// UmbError or unknown error - log it to the console
+			console.error('Error occured', error);
+			return { error };
+		}
+	}
+
+	/**
+	 * Handle errors from the API and show a notification if needed.
+	 * @internal
+	 * @param {UmbApiError} error The error to handle.
+	 * @param {boolean} shouldNotify Whether to show a notification or not. Default is false.
+	 * @returns {UmbDataSourceResponse<T>} The response object with the error.
+	 * @template T The type of the data returned from the API.
+	 * @see {@link UmbResourceController.handleUmbErrors}
+	 */
+	async handleUmbApiError<T>(error: UmbApiError, shouldNotify: boolean = false): Promise<UmbDataSourceResponse<T>> {
+		console.groupCollapsed('UmbError caught in UmbResourceController');
+		console.error('Request failed', error.request);
+		console.error('Error', error);
+		console.groupEnd();
+
+		/**
+		 * Check if the operation status ends with `ByNotification` and if so, don't show a notification
+		 * This is a special case where the operation was cancelled by the server and the client gets a notification header instead.
+		 */
+		if (
+			error.problemDetails.operationStatus &&
+			typeof error.problemDetails.operationStatus === 'string' &&
+			error.problemDetails.operationStatus.endsWith('ByNotification')
+		) {
+			shouldNotify = false;
+		}
+
+		// Go through the error status codes and act accordingly
+		switch (error.status ?? 0) {
+			case 401: {
+				// See if we can get the UmbAuthContext and let it know the user is timed out
+				const authContext = await this.getContext(UMB_AUTH_CONTEXT, { preventTimeout: true });
+				if (!authContext) {
+					throw new Error('Could not get the auth context');
+				}
+				authContext.timeOut();
+				break;
+			}
+			case 500:
+				// Server Error
+
+				if (shouldNotify) {
+					let headline = error.problemDetails.title ?? error.name ?? 'Server Error';
+					let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
+
+					// Special handling for ObjectCacheAppCache corruption errors, which we are investigating
+					if (
+						error.problemDetails.detail?.includes('ObjectCacheAppCache') ||
+						error.problemDetails.detail?.includes('Umbraco.Cms.Infrastructure.Scoping.Scope.DisposeLastScope()')
+					) {
+						headline = 'Please restart the server';
+						message =
+							'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
+					}
+
+					this.#peekError(headline, message, error.problemDetails.errors ?? error.problemDetails.detail);
+				}
+				break;
+			default:
+				// Other errors
+				if (shouldNotify) {
+					const headline = error.problemDetails.title ?? error.name ?? 'Server Error';
+					this.#peekError('', headline, error.problemDetails.errors ?? error.problemDetails.detail);
+				}
+		}
+
+		return { error };
+	}
+
+	async #peekError(headline: string, message: string, details: unknown) {
+		// This late importing is done to avoid circular reference [NL]
+		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(this, {
+			headline,
+			message,
+			details,
+		});
+	}
+
+	/**
+	 * Cancel all resources that are currently being executed by this controller if they are cancelable.
+	 *
+	 * This works by checking if the promise is a CancelablePromise and if so, it will call the cancel method.
+	 *
+	 * This is useful when the controller is being disconnected from the DOM.
+	 * @see CancelablePromise
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController
+	 */
+	cancel(): void {
+		if (isCancelablePromise(this.#promise)) {
+			this.#promise.cancel();
+		}
+	}
+
 	override hostDisconnected(): void {
 		super.hostDisconnected();
 		this.cancel();
 	}
 
+	override destroy(): void {
+		super.destroy();
+		this.cancel();
+	}
+
 	/**
 	 * Base execute function with a try/catch block and return a tuple with the result and the error.
+	 * @deprecated This method is deprecated and will be removed in Umbraco 18. Use the {UmbTryExecuteController} instead.
 	 * @param promise
 	 */
 	static async tryExecute<T>(promise: Promise<T>): Promise<UmbDataSourceResponse<T>> {
-		// TODO: tryExecute should not take a promise as argument, but should utilize the class property `#promise` instead. (In this way the promise can be cancelled when disconnected)
+		new UmbDeprecation({
+			deprecated: 'UmbResourceController.tryExecute',
+			removeInVersion: '18.0.0',
+			solution: 'Use the UmbTryExecuteController instead.',
+		});
 		try {
 			return { data: await promise };
 		} catch (error) {
@@ -49,11 +182,17 @@ export class UmbResourceController extends UmbControllerBase {
 	/**
 	 * Wrap the {tryExecute} function in a try/catch block and return the result.
 	 * If the executor function throws an error, then show the details in a notification.
-	 * @param _options
+	 * @deprecated This method is deprecated and will be removed in Umbraco 18. Use the {UmbTryExecuteAndNotifyController} instead.
 	 * @param options
 	 */
 
 	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions): Promise<UmbDataSourceResponse<T>> {
+		new UmbDeprecation({
+			deprecated: 'UmbResourceController.tryExecuteAndNotify',
+			removeInVersion: '18.0.0',
+			solution: 'Use the UmbTryExecuteAndNotifyController instead.',
+		});
+
 		const { data, error } = await UmbResourceController.tryExecute<T>(this.#promise);
 
 		if (options) {
@@ -72,8 +211,8 @@ export class UmbResourceController extends UmbControllerBase {
 			 */
 			if (isCancelError(error)) {
 				// Cancelled - do nothing
-				return { error };
-			} else {
+				return { error: new UmbCancelError(error.message) };
+			} else if (isApiError(error)) {
 				console.groupCollapsed('ApiError caught in UmbResourceController');
 				console.error('Request failed', error.request);
 				console.error('Request body', error.body);
@@ -132,38 +271,20 @@ export class UmbResourceController extends UmbControllerBase {
 									'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
 							}
 
-							// This late importing is done to avoid circular reference [NL]
-							(await import('@umbraco-cms/backoffice/notification')).umbPeekError(this, {
-								headline: headline,
-								message: message,
-								details: problemDetails?.errors ?? problemDetails?.detail,
-							});
+							this.#peekError(headline, message, problemDetails?.errors ?? problemDetails?.detail);
 						}
 						break;
 					default:
 						// Other errors
 						if (!isCancelledByNotification) {
-							/*
-							const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-							notificationContext.peek('danger', {
-								data: {
-									headline: problemDetails?.title ?? error.name ?? 'Server Error',
-									message: problemDetails?.detail ?? error.message ?? 'Something went wrong',
-									structuredList: problemDetails?.errors
-										? (problemDetails.errors as Record<string, Array<unknown>>)
-										: undefined,
-								},
-								...options,
-							});
-							*/
 							const headline = problemDetails?.title ?? error.name ?? 'Server Error';
-							// This late importing is done to avoid circular reference [NL]
-							(await import('@umbraco-cms/backoffice/notification')).umbPeekError(this, {
-								message: headline,
-								details: problemDetails?.errors ?? problemDetails?.detail,
-							});
+							this.#peekError('', headline, problemDetails?.errors ?? problemDetails?.detail);
 						}
 				}
+			} else {
+				// UmbError or unknown error - log it to the console
+				console.error('Unknown error', error);
+				this.#peekError('Error', error.message ?? 'Unknown error', []);
 			}
 		}
 
@@ -172,10 +293,17 @@ export class UmbResourceController extends UmbControllerBase {
 
 	/**
 	 * Make an XHR request.
+	 * @deprecated This method is deprecated and will be removed in Umbraco 18. Use the {UmbXhrRequestController} instead.
 	 * @param host The controller host for this controller to be appended to.
 	 * @param options The options for the XHR request.
 	 */
 	static xhrRequest<T>(options: XhrRequestOptions): CancelablePromise<T> {
+		new UmbDeprecation({
+			deprecated: 'UmbResourceController.xhrRequest',
+			removeInVersion: '18.0.0',
+			solution: 'Use the UmbXhrRequestController instead.',
+		});
+
 		const baseUrl = options.baseUrl || '/umbraco';
 
 		const promise = new CancelablePromise<T>(async (resolve, reject, onCancel) => {
@@ -285,26 +413,5 @@ export class UmbResourceController extends UmbControllerBase {
 		}
 
 		return promise;
-	}
-
-	/**
-	 * Cancel all resources that are currently being executed by this controller if they are cancelable.
-	 *
-	 * This works by checking if the promise is a CancelablePromise and if so, it will call the cancel method.
-	 *
-	 * This is useful when the controller is being disconnected from the DOM.
-	 * @see CancelablePromise
-	 * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal
-	 * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController
-	 */
-	cancel(): void {
-		if (isCancelablePromise(this.#promise)) {
-			this.#promise.cancel();
-		}
-	}
-
-	override destroy(): void {
-		super.destroy();
-		this.cancel();
 	}
 }
