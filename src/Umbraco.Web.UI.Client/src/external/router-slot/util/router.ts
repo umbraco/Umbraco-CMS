@@ -127,6 +127,7 @@ export function matchRoutes<D = any>(routes: IRoute<D>[], path: string | PathFra
  * @param info
  */
 export async function resolvePageComponent(route: IComponentRoute, info: IRoutingInfo): Promise<PageComponent> {
+	console.log('resolvePageComponent');
 	// Figure out if the component were given as an import or class.
 	let cmp = route.component;
 	if (cmp instanceof Function) {
@@ -301,7 +302,7 @@ export function shouldNavigate<D>(currentMatch: IRouteMatch<D> | null, newMatch:
 	const { route: currentRoute, fragments: currentFragments } = currentMatch;
 	const { route: newRoute, fragments: newFragments } = newMatch;
 
-	const isSameRoute = currentRoute == newRoute;
+	const isSameRoute = currentRoute.path == newRoute.path;
 	const isSameFragments = currentFragments.consumed == newFragments.consumed;
 	const isSameBasedOnUnique = currentRoute.unique === newRoute.unique;
 
