@@ -8,10 +8,10 @@ import type { UmbMockDocumentBlueprintModel } from './document-blueprint.data.js
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
-	CreateDocumentRequestModel,
-	DocumentItemResponseModel,
-	DocumentResponseModel,
-	DocumentTreeItemResponseModel,
+	CreateDocumentBlueprintRequestModel,
+	DocumentBlueprintItemResponseModel,
+	DocumentBlueprintResponseModel,
+	DocumentBlueprintTreeItemResponseModel,
 	DocumentValueResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
@@ -29,7 +29,7 @@ export class UmbDocumentBlueprintMockDB extends UmbEntityMockDbBase<UmbMockDocum
 	}
 }
 
-const treeItemMapper = (model: UmbMockDocumentBlueprintModel): Omit<DocumentTreeItemResponseModel, 'type'> => {
+const treeItemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprintTreeItemResponseModel => {
 	const documentType = umbDocumentTypeMockDb.read(model.documentType.id);
 	if (!documentType) throw new Error(`Document type with id ${model.documentType.id} not found`);
 
@@ -40,16 +40,15 @@ const treeItemMapper = (model: UmbMockDocumentBlueprintModel): Omit<DocumentTree
 		},
 		hasChildren: model.hasChildren,
 		id: model.id,
-		isProtected: model.isProtected,
-		isTrashed: model.isTrashed,
-		noAccess: model.noAccess,
+		isFolder: model.isFolder,
+		name: model.name,
 		parent: model.parent,
-		variants: model.variants,
-		createDate: model.createDate,
 	};
 };
 
-const createMockDocumentBlueprintMapper = (request: CreateDocumentRequestModel): UmbMockDocumentBlueprintModel => {
+const createMockDocumentBlueprintMapper = (
+	request: CreateDocumentBlueprintRequestModel,
+): UmbMockDocumentBlueprintModel => {
 	const documentType = umbDocumentTypeMockDb.read(request.documentType.id);
 	if (!documentType) throw new Error(`Document type with id ${request.documentType.id} not found`);
 
@@ -63,10 +62,8 @@ const createMockDocumentBlueprintMapper = (request: CreateDocumentRequestModel):
 		},
 		hasChildren: false,
 		id: request.id ? request.id : UmbId.new(),
-		createDate: now,
-		isProtected: false,
-		isTrashed: false,
-		noAccess: false,
+		isFolder: false,
+		name: request.variants[0].name,
 		parent: request.parent,
 		values: request.values as DocumentValueResponseModel[],
 		variants: request.variants.map((variantRequest) => {
@@ -80,35 +77,27 @@ const createMockDocumentBlueprintMapper = (request: CreateDocumentRequestModel):
 				publishDate: null,
 			};
 		}),
-		urls: [],
 	};
 };
 
-const detailResponseMapper = (model: UmbMockDocumentBlueprintModel): DocumentResponseModel => {
+const detailResponseMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprintResponseModel => {
 	return {
 		documentType: model.documentType,
 		id: model.id,
-		isTrashed: model.isTrashed,
-		template: model.template,
-		urls: model.urls,
 		values: model.values,
 		variants: model.variants,
 	};
 };
 
-const itemMapper = (model: UmbMockDocumentBlueprintModel): DocumentItemResponseModel => {
+const itemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprintItemResponseModel => {
 	return {
 		documentType: {
 			collection: model.documentType.collection,
 			icon: model.documentType.icon,
 			id: model.documentType.id,
 		},
-		hasChildren: model.hasChildren,
 		id: model.id,
-		isProtected: model.isProtected,
-		isTrashed: model.isTrashed,
-		parent: model.parent,
-		variants: model.variants,
+		name: model.name,
 	};
 };
 
