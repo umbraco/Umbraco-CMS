@@ -1,4 +1,4 @@
-﻿function publishedSnapshotCacheController($scope, $http, umbRequestHelper, localizationService, overlayService) {
+function publishedSnapshotCacheController($scope, $http, umbRequestHelper, localizationService, overlayService) {
 
     var vm = this;
 
@@ -94,12 +94,23 @@
         vm.working = true;
 
         umbRequestHelper.resourcePromise(
-            $http.post(umbRequestHelper.getApiUrl("publishedSnapshotCacheStatusBaseUrl", "RebuildDbCache")),
-            'Failed to rebuild the cache.')
-            .then(function (result) {
-                vm.working = false;
-                vm.status = result;
-            });
+            $http.post(umbRequestHelper.getApiUrl("publishedSnapshotCacheStatusBaseUrl", "RebuildDbCacheInBackground")), "Failed to queue the rebuild task.")
+                .then(function () {
+                    const interval = setInterval(function () {
+                        $http.get(umbRequestHelper.getApiUrl("publishedSnapshotCacheStatusBaseUrl", "GetStatus"))
+                            .then(function (result) {
+                                if (!result.data.toString().startsWith("Rebuild in progress")) {
+                                    vm.working = false;
+                                    vm.status = result.data;
+                                    clearInterval(interval);
+                                }
+                            }, function () {
+                                vm.working = false;
+                                vm.status = "Could not retrieve rebuild cache status";
+                            });
+
+                        }, 2000);
+                });
     }
 
     function init() {

@@ -29,6 +29,11 @@ internal class PublishedSnapshotStatus : IPublishedSnapshotStatus
                 $"The current {typeof(IPublishedSnapshotService)} is not the default type. A status cannot be determined.";
         }
 
+        if (_service.IsRebuilding())
+        {
+            return "Rebuild in progress. Please wait.";
+        }
+
         // TODO: This should be private
         _service.EnsureCaches();
 
