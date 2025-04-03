@@ -1,0 +1,55 @@
+name: Backoffice Static Web Apps CI/CD
+
+on:
+  push:
+    branches:
+      - contrib
+      - v*/dev
+    paths:
+      - src/Umbraco.Web.UI.Client/package.json
+      - src/Umbraco.Web.UI.Client/package-lock.json
+      - src/Umbraco.Web.UI.Client/src/**
+      - .github/workflows/azure-backoffice.yml
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - contrib
+      - v*/dev
+
+jobs:
+  build_and_deploy_job:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed' && (contains(github.event.pull_request.labels.*.name, 'preview/backoffice')))
+    runs-on: ubuntu-latest
+    name: Build and Deploy Job
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          production_branch: contrib
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_GROUND_017B08103 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          action: "upload"
+          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
+          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
+          app_location: "src/Umbraco.Web.UI.Client" # App source code path
+          app_build_command: "npm run build:for:static"
+          output_location: "dist" # Built app content directory - optional
+          skip_api_build: true # Set to true if you do not have an Azure Functions API in your repo
+          ###### End of Repository/Build Configurations ######
+
+  close_pull_request_job:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    name: Close Pull Request Job
+    steps:
+      - name: Close Pull Request
+        id: closepullrequest
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          app_location: "src/Umbraco.Web.UI.Client"
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_GROUND_017B08103 }}
+          action: "close"

@@ -4,6 +4,7 @@ import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 18. [LK] */
 @customElement('umb-stylesheet-create-options-modal')
 export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
 	UmbStylesheetCreateOptionsModalData,
@@ -53,23 +54,23 @@ export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
 			<umb-body-layout headline="Create Stylesheet">
 				<uui-box>
 					<!-- TODO: construct url -->
-					<uui-menu-item href=${`${this.#getCreateHref()}/view/code`} label="New Stylesheet" @click=${this.#onNavigate}>
-						<uui-icon slot="icon" name="icon-palette"></uui-icon>}
-					</uui-menu-item>
-
 					<uui-menu-item
-						href=${`${this.#getCreateHref()}/view/rich-text-editor`}
-						label="New Rich Text Editor Stylesheet"
+						href=${`${this.#getCreateHref()}/view/code`}
+						label=${this.localize.term('create_newStyleSheetFile')}
 						@click=${this.#onNavigate}>
-						<uui-icon slot="icon" name="icon-palette"></uui-icon>}
+						<uui-icon slot="icon" name="icon-palette"></uui-icon>
 					</uui-menu-item>
 
-					<uui-menu-item @click=${this.#onCreateFolderClick} label="New Folder...">
-						<uui-icon slot="icon" name="icon-folder"></uui-icon>}
+					<uui-menu-item @click=${this.#onCreateFolderClick} label="${this.localize.term('create_newFolder')}...">
+						<uui-icon slot="icon" name="icon-folder"></uui-icon>
 					</uui-menu-item>
 				</uui-box>
 
-				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}"></uui-button>
+				<uui-button
+					slot="actions"
+					id="cancel"
+					label=${this.localize.term('general_cancel')}
+					@click=${this._rejectModal}></uui-button>
 			</umb-body-layout>
 		`;
 	}

@@ -23,19 +23,16 @@ export const data: Array<UmbMockStylesheetModel> = [
 	font-size: 1.5rem;
 }
 
-/**umb_name:Page header*/
 h2 {
 	color: red;
 	font-size: 2rem;
 }
 
-/**umb_name:Section header*/
 h3 {
 	color: blue;
 	font-size: 1.75rem;
 }
 
-/**umb_name:Paragraph header*/
 h4 {
 	color: green;
 	font-size: 1.5rem;
@@ -54,17 +51,14 @@ body {
 	font-family: cursive;
 }
 
-/**umb_name:Red*/
 span {
 	color: red;
 }
 
-/**umb_name:Blue*/
 span {
 	color: blue;
 }
 
-/**umb_name:Green*/
 span {
 	color: green;
 }`,
