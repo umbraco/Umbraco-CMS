@@ -366,7 +366,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			return true;
 		}
 
-		if (this._checkWillNavigateAway(newUrl) && this._getHasUnpersistedChanges()) {
+		if (this._checkWillNavigateAway(newUrl) && this.getHasUnpersistedChanges()) {
 			/* Since ours modals are async while events are synchronous, we need to prevent the default behavior of the event, even if the modal hasn’t been resolved yet.
 			Once the modal is resolved (the user accepted to discard the changes and navigate away from the route), we will push a new history state.
 			This push will make the "willchangestate" event happen again and due to this somewhat "backward" behavior,
