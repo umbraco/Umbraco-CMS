@@ -127,7 +127,6 @@ export function matchRoutes<D = any>(routes: IRoute<D>[], path: string | PathFra
  * @param info
  */
 export async function resolvePageComponent(route: IComponentRoute, info: IRoutingInfo): Promise<PageComponent> {
-	console.log('resolvePageComponent');
 	// Figure out if the component were given as an import or class.
 	let cmp = route.component;
 	if (cmp instanceof Function) {
