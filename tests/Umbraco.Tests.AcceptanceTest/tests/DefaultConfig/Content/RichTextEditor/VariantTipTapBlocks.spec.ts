@@ -75,7 +75,7 @@ test('unsupport invariant document type with invariant tiptap RTE with variant b
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.unsupportInvariantContentItemWithVariantBlocks);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.unsupportInvariantContentItemWithVariantBlocks);
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
@@ -94,7 +94,7 @@ test('unsupport invariant document type with invariant tiptap RTE with variant b
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.unsupportInvariantContentItemWithVariantBlocks);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.unsupportInvariantContentItemWithVariantBlocks);
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
