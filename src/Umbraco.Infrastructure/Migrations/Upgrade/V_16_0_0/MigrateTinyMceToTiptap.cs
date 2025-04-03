@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -8,12 +8,12 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_0_0;
 
-public class MigrateRichtextEditorToTiptap : AsyncMigrationBase
+public class MigrateTinyMceToTiptap : AsyncMigrationBase
 {
     private readonly IDataTypeService _dataTypeService;
-    private readonly TipTapMigrationSettings _options;
+    private readonly TinyMceToTiptapMigrationSettings _options;
 
-    public MigrateRichtextEditorToTiptap(IMigrationContext context, IDataTypeService dataTypeService, IOptions<TipTapMigrationSettings> options) : base(context)
+    public MigrateTinyMceToTiptap(IMigrationContext context, IDataTypeService dataTypeService, IOptions<TinyMceToTiptapMigrationSettings> options) : base(context)
     {
         _dataTypeService = dataTypeService;
         _options = options.Value;
@@ -33,7 +33,6 @@ public class MigrateRichtextEditorToTiptap : AsyncMigrationBase
             MigrateToTipTap(dataType);
             await _dataTypeService.UpdateAsync(dataType, Constants.Security.SuperUserKey);
         }
-
     }
 
     private void MigrateToTipTap(IDataType dataType)
@@ -49,7 +48,7 @@ public class MigrateRichtextEditorToTiptap : AsyncMigrationBase
         dataType.ConfigurationData.Remove("hideLabel");
 
         var newToolbar = toolBarList.Select(MapToolbarItem).WhereNotNull().ToList();
-        dataType.ConfigurationData["toolbar"] = new List<List<List<string>>> { new() {newToolbar} };
+        dataType.ConfigurationData["toolbar"] = new List<List<List<string>>> { new() { newToolbar } };
 
         var extensions = new List<string>
         {
