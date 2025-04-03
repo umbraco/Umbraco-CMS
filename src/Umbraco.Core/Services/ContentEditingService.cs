@@ -188,9 +188,9 @@ internal sealed class ContentEditingService
         {
             foreach (var culture in disallowedCultures)
             {
-                    var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias)
-                        .GetValue(culture, null, false);
-                    property.SetValue(currentValue, culture, null);
+                var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias)
+                    .GetValue(culture, null, false);
+                property.SetValue(currentValue, culture, null);
             }
         }
 
@@ -279,10 +279,10 @@ internal sealed class ContentEditingService
         => await HandleMoveToRecycleBinAsync(key, userKey);
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey)
-        => await HandleDeleteAsync(key, userKey,true);
+        => await HandleDeleteAsync(key, userKey, true);
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
-        => await HandleDeleteAsync(key, userKey,false);
+        => await HandleDeleteAsync(key, userKey, false);
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);
