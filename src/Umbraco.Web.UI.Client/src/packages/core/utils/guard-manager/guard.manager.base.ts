@@ -20,10 +20,13 @@ export class UmbGuardManagerBase<
 	IncomingRuleType extends UmbGuardIncomingRuleBase = UmbPartialSome<RuleType, 'unique' | 'permitted'>,
 > extends UmbControllerBase {
 	//
-	protected readonly _rules = new UmbArrayState<RuleType>([], (x) => x.unique).sortBy((a, b) =>
-		// If default then it should be last, if not then sort by permitted
-		a.unique === DefaultRuleUnique ? 1 : a.permitted === b.permitted ? 0 : a.permitted ? 1 : -1,
-	);
+	protected readonly _rules = new UmbArrayState<RuleType>([], (x) => x.unique).sortBy((a, b) => {
+		// Ensure DefaultRuleUnique always comes last:
+		if (a.unique === DefaultRuleUnique) return 1;
+		if (b.unique === DefaultRuleUnique) return -1;
+		// Otherwise disallowed first and permitted last:
+		return a.permitted === b.permitted ? 0 : a.permitted ? 1 : -1;
+	});
 	public readonly rules = this._rules.asObservable();
 	public readonly hasRules = this._rules.asObservablePart((x) => x.length > 0);
 
