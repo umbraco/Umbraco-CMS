@@ -60,6 +60,7 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 	#generateRoute(modalRegistration: UmbModalRouteRegistration): UmbRoutePlusModalKey {
 		return {
 			__modalKey: modalRegistration.key,
+			unique: 'umbModalKey_' + modalRegistration.key,
 			path: '/' + modalRegistration.generateModalPath(),
 			component: EmptyDiv,
 			setup: async (component, info) => {
@@ -112,6 +113,7 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 		// Add an empty route, so there is a route for the router to react on when no modals are open.
 		this.#modalRoutes.push({
 			__modalKey: '_empty_',
+			unique: 'umbEmptyModal',
 			path: '',
 			component: EmptyDiv,
 		});
