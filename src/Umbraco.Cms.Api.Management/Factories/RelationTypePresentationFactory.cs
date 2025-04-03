@@ -58,6 +58,7 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
             {
                 Constants.UdiEntityType.Document => MapDocumentReference(relationItemModel, slimEntities),
                 Constants.UdiEntityType.Media => _umbracoMapper.Map<MediaReferenceResponseModel>(relationItemModel),
+                Constants.UdiEntityType.Member => _umbracoMapper.Map<MemberReferenceResponseModel>(relationItemModel),
                 _ => _umbracoMapper.Map<DefaultReferenceResponseModel>(relationItemModel),
             }).WhereNotNull().ToArray();
 

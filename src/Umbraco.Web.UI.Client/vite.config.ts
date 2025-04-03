@@ -22,14 +22,6 @@ export const plugins: PluginOption[] = [
 				dest: 'umbraco/backoffice/assets',
 			},
 			{
-				src: 'node_modules/tinymce/**/*',
-				dest: 'umbraco/backoffice/tinymce',
-			},
-			{
-				src: 'node_modules/tinymce-i18n/langs6/**/*',
-				dest: 'umbraco/backoffice/tinymce/langs',
-			},
-			{
 				src: 'node_modules/msw/lib/iife/**/*',
 				dest: 'umbraco/backoffice/msw',
 			},

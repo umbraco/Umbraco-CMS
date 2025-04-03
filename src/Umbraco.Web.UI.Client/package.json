@@ -100,7 +100,6 @@
 		"./template": "./dist-cms/packages/templating/templates/index.js",
 		"./temporary-file": "./dist-cms/packages/core/temporary-file/index.js",
 		"./themes": "./dist-cms/packages/core/themes/index.js",
-		"./tiny-mce": "./dist-cms/packages/tiny-mce/index.js",
 		"./tiptap": "./dist-cms/packages/tiptap/index.js",
 		"./translation": "./dist-cms/packages/translation/index.js",
 		"./tree": "./dist-cms/packages/core/tree/index.js",
@@ -124,7 +123,6 @@
 		"./external/openid": "./dist-cms/external/openid/index.js",
 		"./external/router-slot": "./dist-cms/external/router-slot/index.js",
 		"./external/rxjs": "./dist-cms/external/rxjs/index.js",
-		"./external/tinymce": "./dist-cms/external/tinymce/index.js",
 		"./external/tiptap": "./dist-cms/external/tiptap/index.js",
 		"./external/uui": "./dist-cms/external/uui/index.js",
 		"./external/uuid": "./dist-cms/external/uuid/index.js"
@@ -218,8 +216,8 @@
 		"@tiptap/pm": "2.11.5",
 		"@tiptap/starter-kit": "2.11.5",
 		"@types/diff": "^7.0.1",
-		"@umbraco-ui/uui": "1.13.0-rc.2",
-		"@umbraco-ui/uui-css": "1.13.0-rc.2",
+		"@umbraco-ui/uui": "^1.13.0",
+		"@umbraco-ui/uui-css": "^1.13.0",
 		"diff": "^7.0.0",
 		"dompurify": "^3.2.4",
 		"element-internals-polyfill": "^1.3.13",
@@ -227,8 +225,6 @@
 		"marked": "^15.0.7",
 		"monaco-editor": "^0.52.2",
 		"rxjs": "^7.8.1",
-		"tinymce": "^6.8.5",
-		"tinymce-i18n": "^24.12.30",
 		"uuid": "^11.0.5"
 	},
 	"devDependencies": {
@@ -284,7 +280,7 @@
 		"typescript": "^5.7.3",
 		"typescript-eslint": "^8.24.1",
 		"typescript-json-schema": "^0.65.1",
-		"vite": "^6.2.2",
+		"vite": "^6.2.3",
 		"vite-plugin-static-copy": "^2.2.0",
 		"vite-tsconfig-paths": "^5.1.4",
 		"web-component-analyzer": "^2.0.0"

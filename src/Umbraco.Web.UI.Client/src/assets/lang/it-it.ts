@@ -421,7 +421,6 @@ export default {
 		newPartialViewMacroFromSnippet: 'Nuova partial view macro da snippet',
 		newPartialViewMacroNoMacro: 'Nuova partial view macro (senza macro)',
 		newStyleSheetFile: 'Nuovo foglio di stile',
-		newRteStyleSheetFile: 'Nuovo foglio di stile per Rich Text Editor',
 	},
 	dashboard: {
 		browser: 'Naviga il tuo sito web',

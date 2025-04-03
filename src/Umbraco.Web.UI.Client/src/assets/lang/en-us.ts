@@ -449,7 +449,6 @@ export default {
 			"Defines a re-usable set of properties that can be included in the definition of\n      multiple other Document Types. For example, a set of 'Common Page Settings'.\n    ",
 		folder: 'Folder',
 		folderDescription: 'Used to organize items and other folders. Keep items structured and easy to access.',
-		newFolder: 'Folder',
 		newDataType: 'Data Type',
 		newJavascriptFile: 'New JavaScript file',
 		newEmptyPartialView: 'New empty partial view',
@@ -457,8 +456,6 @@ export default {
 		newPartialViewFromSnippet: 'New partial view from snippet',
 		newPartialViewMacroFromSnippet: 'New partial view macro from snippet',
 		newPartialViewMacroNoMacro: 'New partial view macro (without macro)',
-		newStyleSheetFile: 'New style sheet file',
-		newRteStyleSheetFile: 'New Rich Text Editor style sheet file',
 	},
 	dashboard: {
 		browser: 'Browse your website',
@@ -2591,7 +2588,7 @@ export default {
 		consentForAnalytics: 'Consent for telemetry data',
 		analyticsLevelSavedSuccess: 'Telemetry level saved!',
 		analyticsDescription:
-			'\n      In order to improve Umbraco and add new functionality based on as relevant information as possible,\n          <br>we would like to collect system- and usage information from your installation.\n          <br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n          <br>Hopefully, you will help us collect some valuable data.\n          <br>\n          <br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.\n       ',
+		'In order to improve Umbraco and add new functionality based on as relevant information as possible, we would like to collect system- and usage information from your installation.\n<br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n<br>Hopefully, you will help us collect some valuable data.\n<br>\n<br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.',
 		minimalLevelDescription: 'We will only send an anonymized site ID to let us know that the site exists.',
 		basicLevelDescription: 'We will send an anonymized site ID, Umbraco version, and packages installed',
 		detailedLevelDescription:
