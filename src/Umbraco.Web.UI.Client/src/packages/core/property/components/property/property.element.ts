@@ -189,10 +189,10 @@ export class UmbPropertyElement extends UmbLitElement {
 	private _mandatory?: boolean;
 
 	@state()
-	private _supportsReadOnly: boolean = false;
+	private _supportsReadonly: boolean = false;
 
 	@state()
-	private _isReadOnly = false;
+	private _isReadonly = false;
 
 	#propertyContext = new UmbPropertyContext(this);
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
@@ -265,9 +265,9 @@ export class UmbPropertyElement extends UmbLitElement {
 		this.observe(
 			this.#propertyContext.isReadOnly,
 			(value) => {
-				this._isReadOnly = value;
+				this._isReadonly = value;
 				if (this._element) {
-					this._element.readOnly = value;
+					this._element.readonly = value;
 					this._element.toggleAttribute('readonly', value);
 				}
 			},
@@ -312,7 +312,7 @@ export class UmbPropertyElement extends UmbLitElement {
 		}
 
 		const el = await createExtensionElement(manifest);
-		this._supportsReadOnly = manifest.meta.supportsReadOnly || false;
+		this._supportsReadonly = manifest.meta.supportsReadOnly || false;
 
 		if (el) {
 			const oldElement = this._element;
@@ -382,8 +382,8 @@ export class UmbPropertyElement extends UmbLitElement {
 					}
 				}
 
-				this._element.readOnly = this._isReadOnly;
-				this._element.toggleAttribute('readonly', this._isReadOnly);
+				this._element.readonly = this._isReadonly;
+				this._element.toggleAttribute('readonly', this._isReadonly);
 
 				this.#createController(manifest);
 			}
@@ -441,7 +441,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	#renderPropertyEditor() {
 		return html`
 			<div id="editor" slot="editor">
-				${this._isReadOnly && this._supportsReadOnly === false ? html`<div id="overlay"></div>` : nothing}
+				${this._isReadonly && this._supportsReadonly === false ? html`<div id="overlay"></div>` : nothing}
 				${this._element}
 			</div>
 		`;
