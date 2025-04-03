@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core;
 
 public static class UriUtilityCore
 {
-    public static bool HasScheme(string uri) => uri.IndexOf("://", StringComparison.InvariantCulture) > 0;
+    public static bool HasScheme(string uri) => uri.IndexOf("://", StringComparison.Ordinal) > 0;
 
     public static string StartWithScheme(string uri) => StartWithScheme(uri, null);
 
