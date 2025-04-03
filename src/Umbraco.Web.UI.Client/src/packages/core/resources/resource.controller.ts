@@ -62,10 +62,7 @@ export class UmbResourceController extends UmbControllerBase {
 	 * @see {@link UmbResourceController.handleUmbErrors<T>}
 	 */
 	async handleUmbApiError<T>(error: UmbApiError, shouldNotify: boolean = false): Promise<UmbDataSourceResponse<T>> {
-		console.groupCollapsed('UmbError caught in UmbResourceController');
-		console.error('Request failed', error.request);
-		console.error('Error', error);
-		console.groupEnd();
+		console.error('UmbError caught in UmbResourceController', error);
 
 		/**
 		 * Check if the operation status ends with `ByNotification` and if so, don't show a notification
