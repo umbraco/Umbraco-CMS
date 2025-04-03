@@ -104,7 +104,10 @@ function publishedSnapshotCacheController($scope, $http, umbRequestHelper, local
                                     vm.status = result.data;
                                     clearInterval(interval);
                                 }
-                          });
+                            }, function () {
+                                vm.working = false;
+                                vm.status = "Could not retrieve rebuild cache status";
+                            });
 
                         }, 2000);
                 });
