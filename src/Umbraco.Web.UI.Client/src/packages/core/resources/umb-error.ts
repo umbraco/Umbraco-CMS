@@ -1,3 +1,4 @@
+import type { ApiError, CancelError } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbProblemDetails } from './types.js';
 
 export class UmbError extends Error {
@@ -14,6 +15,13 @@ export class UmbCancelError extends UmbError {
 	public static isUmbCancelError(error: unknown): error is UmbCancelError {
 		return error instanceof UmbCancelError || (error as UmbCancelError).name === 'UmbCancelError';
 	}
+
+	/**
+	 * @deprecated Use `UmbCancelError.isUmbCancelError` instead and map your object to `UmbCancelError` if needed.
+	 */
+	public static fromLegacyCancelError(error: CancelError): UmbCancelError {
+		return new UmbCancelError(error.message);
+	}
 }
 
 /**
@@ -22,25 +30,38 @@ export class UmbCancelError extends UmbError {
 export class UmbApiError extends UmbError {
 	public override name = 'UmbApiError';
 	public status: number;
-	public response: unknown;
 	public request: unknown;
 	public problemDetails: UmbProblemDetails;
 
-	public constructor(
-		message: string,
-		status: number,
-		response: unknown,
-		request: unknown,
-		problemDetails: UmbProblemDetails,
-	) {
+	public constructor(message: string, status: number, request: unknown, problemDetails: UmbProblemDetails) {
 		super(message);
 		this.status = status;
-		this.response = response;
 		this.request = request;
 		this.problemDetails = problemDetails;
 	}
 
 	public static isUmbApiError(error: unknown): error is UmbApiError {
 		return error instanceof UmbApiError || (error as UmbApiError).name === 'UmbApiError';
+	}
+
+	/**
+	 * @deprecated Use `UmbCancelError.isUmbApiError` instead and map your object to `UmbApiError` if needed.
+	 */
+	public static fromLegacyApiError(error: ApiError): UmbApiError {
+		// ApiError - body could hold a ProblemDetails from the server
+		let problemDetails: UmbProblemDetails | null = null;
+		if (typeof error.body !== 'undefined' && !!error.body) {
+			try {
+				problemDetails = typeof error.body === 'string' ? JSON.parse(error.body) : error.body;
+			} catch (e) {
+				console.error('Error parsing error body (expected JSON)', e);
+			}
+		}
+		return new UmbApiError(
+			error.message,
+			error.status,
+			error.request,
+			problemDetails ?? { title: error.message, type: 'ApiError', status: error.status },
+		);
 	}
 }

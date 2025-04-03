@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { UMB_AUTH_CONTEXT } from '../auth/index.js';
 import { UmbDeprecation } from '../utils/deprecation/deprecation.js';
-import { UmbApiError, UmbCancelError, type UmbError } from './umb-error.js';
+import { UmbApiError, UmbCancelError, UmbError } from './umb-error.js';
 import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
 import type { XhrRequestOptions } from './types.js';
+import type { UmbCancelablePromise } from './cancelable-promise.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
@@ -16,22 +17,27 @@ import {
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbResourceController extends UmbControllerBase {
-	#promise: Promise<any>;
+	/**
+	 * The promise that is being executed.
+	 * @protected
+	 */
+	protected _promise: UmbCancelablePromise<any> | CancelablePromise<any> | Promise<any>;
 
-	constructor(host: UmbControllerHost, promise: Promise<any>, alias?: string) {
+	constructor(host: UmbControllerHost, promise: Promise<unknown>, alias?: string) {
 		super(host, alias);
 
-		this.#promise = promise;
+		this._promise = promise;
 	}
 
 	/**
 	 * Handle errors
 	 * @internal
 	 * @param {any} error The error to handle.
+	 * @param {boolean} shouldNotify Whether to show a notification or not. Default is false.
 	 * @returns {UmbDataSourceResponse<T>} The response object with the error.
 	 * @template T The type of the data returned from the API.
 	 */
-	async handleUmbErrors<T>(error: UmbError | UmbApiError | UmbCancelError | Error): Promise<UmbDataSourceResponse<T>> {
+	async handleUmbErrors<T>(error: unknown, shouldNotify: boolean = false): Promise<UmbDataSourceResponse<T>> {
 		if (!error) return {};
 
 		/**
@@ -44,11 +50,21 @@ export class UmbResourceController extends UmbControllerBase {
 			return { error };
 		} else if (UmbApiError.isUmbApiError(error)) {
 			// UmbApiError - handle it
-			return this.handleUmbApiError(error);
-		} else {
+			return this.handleUmbApiError(error, shouldNotify);
+		} else if (error instanceof Error) {
 			// UmbError or unknown error - log it to the console
 			console.error('Error occured', error);
+			if (shouldNotify) {
+				this.#peekError('Error', error.message ?? 'Unknown error', []);
+			}
 			return { error };
+		} else {
+			// Unknown error - log it to the console
+			console.error('Unknown error', error);
+			if (shouldNotify) {
+				this.#peekError('Error', 'Unknown error', []);
+			}
+			return { error: new UmbError('Unknown error') };
 		}
 	}
 
@@ -138,8 +154,8 @@ export class UmbResourceController extends UmbControllerBase {
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController
 	 */
 	cancel(): void {
-		if (isCancelablePromise(this.#promise)) {
-			this.#promise.cancel();
+		if (isCancelablePromise(this._promise)) {
+			this._promise.cancel();
 		}
 	}
 
@@ -190,7 +206,7 @@ export class UmbResourceController extends UmbControllerBase {
 			solution: 'Use the UmbTryExecuteAndNotifyController instead.',
 		});
 
-		const { data, error } = await UmbResourceController.tryExecute<T>(this.#promise);
+		const { data, error } = await UmbResourceController.tryExecute<T>(this._promise);
 
 		if (options) {
 			new UmbDeprecation({

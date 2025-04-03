@@ -1,0 +1,115 @@
+import { isApiError, isCancelError } from './apiTypeValidators.function.js';
+import { UmbCancelablePromise } from './cancelable-promise.js';
+import { UmbResourceController } from './resource.controller.js';
+import type { XhrRequestOptions } from './types.js';
+import { UmbApiError, UmbCancelError } from './umb-error.js';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
+
+export class UmbTryXhrRequestController extends UmbResourceController {
+	#abortSignal?: AbortSignal;
+
+	async tryXhrRequest<T>(abortSignal?: AbortSignal): Promise<UmbDataSourceResponse<T>> {
+		try {
+			if (abortSignal) {
+				this.#abortSignal = abortSignal;
+				this.#abortSignal.addEventListener('abort', this.cancel, { once: true });
+			}
+			return { data: await this._promise };
+		} catch (error) {
+			// Error might be a legacy error, so we need to check if it is an UmbError
+			let umbError = isApiError(error) ? UmbApiError.fromLegacyApiError(error) : error;
+			umbError = isCancelError(umbError) ? UmbCancelError.fromLegacyCancelError(umbError) : umbError;
+			return this.handleUmbErrors(umbError);
+		}
+	}
+
+	static createXhrRequest<T>(options: XhrRequestOptions): UmbCancelablePromise<T> {
+		const baseUrl = options.baseUrl || '/umbraco';
+
+		return new UmbCancelablePromise<T>(async (resolve, reject, onCancel) => {
+			const xhr = new XMLHttpRequest();
+			xhr.open(options.method, `${baseUrl}${options.url}`, true);
+
+			// Set default headers
+			if (options.token) {
+				const token = typeof options.token === 'function' ? await options.token() : options.token;
+				if (token) {
+					xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+				}
+			}
+
+			// Infer Content-Type header based on body type
+			if (options.body instanceof FormData) {
+				// Note: 'multipart/form-data' is automatically set by the browser for FormData
+			} else {
+				xhr.setRequestHeader('Content-Type', 'application/json');
+			}
+
+			// Set custom headers
+			if (options.headers) {
+				for (const [key, value] of Object.entries(options.headers)) {
+					xhr.setRequestHeader(key, value);
+				}
+			}
+
+			xhr.upload.onprogress = (event) => {
+				if (options.onProgress) {
+					options.onProgress(event);
+				}
+			};
+
+			xhr.onload = () => {
+				try {
+					if (xhr.status >= 200 && xhr.status < 300) {
+						if (options.responseHeader) {
+							const response = xhr.getResponseHeader(options.responseHeader);
+							resolve(response as T);
+						} else {
+							resolve(JSON.parse(xhr.responseText));
+						}
+					} else {
+						const error = new UmbApiError(xhr.statusText, xhr.status, xhr, {
+							title: xhr.statusText,
+							type: 'ApiError',
+							status: xhr.status,
+						});
+						reject(error);
+					}
+				} catch {
+					// This most likely happens when the response is not JSON
+					reject(new Error(`Failed to make request: ${xhr.statusText}`));
+				}
+			};
+
+			xhr.onerror = () => {
+				const error = new UmbApiError(xhr.statusText, xhr.status, xhr, {
+					title: xhr.statusText,
+					type: 'ApiError',
+					status: xhr.status,
+				});
+				reject(error);
+			};
+
+			if (!onCancel.isCancelled) {
+				// Handle body based on Content-Type
+				if (options.body instanceof FormData) {
+					xhr.send(options.body);
+				} else {
+					xhr.send(JSON.stringify(options.body));
+				}
+			}
+
+			onCancel(() => {
+				xhr.abort();
+			});
+		});
+	}
+
+	public override destroy(): void {
+		super.destroy();
+		if (this.#abortSignal) {
+			this.#abortSignal.removeEventListener('abort', this.cancel);
+		}
+		this.#abortSignal = undefined;
+	}
+}

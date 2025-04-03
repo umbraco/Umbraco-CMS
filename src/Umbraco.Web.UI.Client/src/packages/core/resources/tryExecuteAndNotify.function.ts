@@ -1,6 +1,5 @@
-import { UmbResourceController } from './resource.controller.js';
+import { UmbTryExecuteAndNotifyController } from './try-execute-and-notify.controller.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
@@ -9,10 +8,12 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
  * @param resource
  * @param options
  */
-export function tryExecuteAndNotify<T>(
+export async function tryExecuteAndNotify<T>(
 	host: UmbControllerHost,
 	resource: Promise<T>,
-	options?: UmbNotificationOptions,
 ): Promise<UmbDataSourceResponse<T>> {
-	return new UmbResourceController(host, resource).tryExecuteAndNotify<T>(options);
+	const controller = new UmbTryExecuteAndNotifyController(host, resource);
+	const response = await controller.tryExecuteAndNotify();
+	controller.destroy();
+	return response as UmbDataSourceResponse<T>;
 }
