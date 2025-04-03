@@ -1,5 +1,5 @@
 import type { ApiError, CancelError } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbDeprecation } from '../utils';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Checks if the given error is an instance of ApiError.
