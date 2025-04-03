@@ -237,7 +237,6 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 
 			pre {
 				border-left: 4px solid #d42054;
-				color: #303033;
 				display: block;
 				font-family:
 					Lato,

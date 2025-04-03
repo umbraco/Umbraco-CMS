@@ -1,5 +1,5 @@
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputDocumentTypeElement } from '../../components/input-document-type/input-document-type.element.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
@@ -21,7 +21,6 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 		this.max = minMax?.max ?? Infinity;
 
 		this.onlyElementTypes = config.getValueByAlias('onlyPickElementTypes') ?? false;
-		this.showOpenButton = config?.getValueByAlias('showOpenButton') ?? false;
 	}
 
 	@state()
@@ -29,9 +28,6 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 
 	@state()
 	max = Infinity;
-
-	@state()
-	showOpenButton?: boolean;
 
 	@state()
 	onlyElementTypes?: boolean;
@@ -48,7 +44,6 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 				.max=${this.max}
 				.value=${this.value}
 				.elementTypesOnly=${this.onlyElementTypes ?? false}
-				?showOpenButton=${this.showOpenButton}
 				@change=${this.#onChange}>
 			</umb-input-document-type>
 		`;

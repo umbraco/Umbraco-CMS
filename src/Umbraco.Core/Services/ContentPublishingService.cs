@@ -404,7 +404,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             return Attempt.Fail(ContentPublishingOperationStatus.ContentNotFound);
         }
 
-        if (_contentSettings.DisableUnpublishWhenReferenced && _relationService.IsRelated(content.Id))
+        if (_contentSettings.DisableUnpublishWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child))
         {
             scope.Complete();
             return Attempt<ContentPublishingOperationStatus>.Fail(ContentPublishingOperationStatus.CannotUnpublishWhenReferenced);

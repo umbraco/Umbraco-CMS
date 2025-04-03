@@ -10,7 +10,6 @@ import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-property-editor-ui-tiptap-toolbar-configuration')
 export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
@@ -165,6 +164,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 			<uui-button
 				compact
 				class=${forbidden ? 'forbidden' : ''}
+				data-mark="tiptap-toolbar-item:${item.alias}"
 				draggable="true"
 				look=${forbidden ? 'placeholder' : 'outline'}
 				?disabled=${forbidden || inUse}
@@ -303,6 +303,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 					<uui-button
 						compact
 						class=${forbidden ? 'forbidden' : ''}
+						data-mark="tiptap-toolbar-item:${item.alias}"
 						draggable="true"
 						look=${forbidden ? 'placeholder' : 'outline'}
 						title=${this.localize.string(item.label)}
@@ -323,7 +324,6 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	}
 
 	static override readonly styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				display: flex;
@@ -351,13 +351,13 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				border: 1px solid var(--uui-color-border);
 			}
 
-			uui-box.minimal {
-				--uui-box-header-padding: 0;
-				--uui-box-default-padding: var(--uui-size-2) 0;
-				--uui-box-box-shadow: none;
-
+			uui-box {
 				[slot='header-actions'] {
 					margin-bottom: var(--uui-size-2);
+
+					uui-input {
+						align-items: baseline;
+					}
 
 					uui-icon {
 						color: var(--uui-color-border);

@@ -74,11 +74,6 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
             publishBranchFilter |= PublishBranchFilter.IncludeUnpublished;
         }
 
-        if (requestModel.ForceRepublish)
-        {
-            publishBranchFilter |= PublishBranchFilter.ForceRepublish;
-        }
-
         return publishBranchFilter;
     }
 }

@@ -6246,6 +6246,13 @@
             }
           },
           {
+            "name": "isElement",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "skip",
             "in": "query",
             "schema": {
@@ -10161,6 +10168,13 @@
             "in": "query",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "trashed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
             }
           },
           {
@@ -15861,6 +15875,13 @@
             }
           },
           {
+            "name": "trashed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "skip",
             "in": "query",
             "schema": {
@@ -20264,6 +20285,134 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/member/{id}/referenced-by": {
+      "get": {
+        "tags": [
+          "Member"
+        ],
+        "operationId": "GetMemberByIdReferencedBy",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedIReferenceResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/member/{id}/referenced-descendants": {
+      "get": {
+        "tags": [
+          "Member"
+        ],
+        "operationId": "GetMemberByIdReferencedDescendants",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/member/{id}/validate": {
       "put": {
         "tags": [
@@ -20397,6 +20546,73 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/member/are-referenced": {
+      "get": {
+        "tags": [
+          "Member"
+        ],
+        "operationId": "GetMemberAreReferenced",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -37220,7 +37436,8 @@
         "required": [
           "$type",
           "documentType",
-          "id"
+          "id",
+          "variants"
         ],
         "type": "object",
         "properties": {
@@ -37245,6 +37462,16 @@
                 "$ref": "#/components/schemas/TrackedReferenceDocumentTypeModel"
               }
             ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false,
@@ -40178,6 +40405,41 @@
         ],
         "type": "string"
       },
+      "MemberReferenceResponseModel": {
+        "required": [
+          "$type",
+          "id",
+          "memberType"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "memberType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TrackedReferenceMemberTypeModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "MemberReferenceResponseModel": "#/components/schemas/MemberReferenceResponseModel"
+          }
+        }
+      },
       "MemberResponseModel": {
         "required": [
           "email",
@@ -41588,6 +41850,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/MediaReferenceResponseModel"
+                },
+                {
+                  "$ref": "#/components/schemas/MemberReferenceResponseModel"
                 }
               ]
             }
@@ -42945,15 +43210,11 @@
       "PublishDocumentWithDescendantsRequestModel": {
         "required": [
           "cultures",
-          "forceRepublish",
           "includeUnpublishedDescendants"
         ],
         "type": "object",
         "properties": {
           "includeUnpublishedDescendants": {
-            "type": "boolean"
-          },
-          "forceRepublish": {
             "type": "boolean"
           },
           "cultures": {
@@ -44264,6 +44525,24 @@
         "additionalProperties": false
       },
       "TrackedReferenceMediaTypeModel": {
+        "type": "object",
+        "properties": {
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TrackedReferenceMemberTypeModel": {
         "type": "object",
         "properties": {
           "icon": {

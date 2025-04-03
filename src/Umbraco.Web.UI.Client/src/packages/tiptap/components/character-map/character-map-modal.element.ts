@@ -431,6 +431,10 @@ export class UmbCharacterMapModalElement extends UmbModalBaseElement<
 				gap: var(--uui-size-space-4);
 			}
 
+			uui-input {
+				align-items: baseline;
+			}
+
 			uui-scroll-container {
 				height: 300px;
 				width: calc(450px + var(--uui-size-layout-1));

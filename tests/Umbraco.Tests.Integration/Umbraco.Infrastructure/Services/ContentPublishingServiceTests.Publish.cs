@@ -2,8 +2,11 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -323,6 +326,82 @@ public partial class ContentPublishingServiceTests
 
         content = ContentService.GetById(content.Key)!;
         Assert.AreEqual(2, content.PublishedCultures.Count());
+    }
+
+    [TestCase(true, "da-DK")]
+    [TestCase(false, "en-US")]
+    [TestCase(false, "en-US", "da-DK")]
+    public async Task Publish_Invalid_Invariant_Property_WithoutAllowEditInvariantFromNonDefault(bool expectedSuccess, params string[] culturesToRepublish)
+        => await Publish_Invalid_Invariant_Property(expectedSuccess, culturesToRepublish);
+
+    [TestCase(false, "da-DK")]
+    [TestCase(false, "en-US")]
+    [TestCase(false, "en-US", "da-DK")]
+    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
+    public async Task Publish_Invalid_Invariant_Property_WithAllowEditInvariantFromNonDefault(bool expectedSuccess, params string[] culturesToRepublish)
+        => await Publish_Invalid_Invariant_Property(expectedSuccess, culturesToRepublish);
+
+    private async Task Publish_Invalid_Invariant_Property(bool expectedSuccess, params string[] culturesToRepublish)
+    {
+        var contentType = await SetupVariantInvariantTest();
+
+        IContent content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "EN")
+            .WithCultureName("da-DK", "DA")
+            .Build();
+        content.SetValue("variantValue", "EN value", culture: "en-US");
+        content.SetValue("variantValue", "DA value", culture: "da-DK");
+        content.SetValue("invariantValue", "Invariant value");
+        ContentService.Save(content);
+
+        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string> { "en-US", "da-DK" }), Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        content = ContentService.GetById(content.Key)!;
+        content.SetValue("variantValue", "EN value updated", culture: "en-US");
+        content.SetValue("variantValue", "DA value updated", culture: "da-DK");
+        content.SetValue("invariantValue", null);
+        ContentService.Save(content);
+
+        result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>(culturesToRepublish)), Constants.Security.SuperUserKey);
+
+        content = ContentService.GetById(content.Key)!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(null, content.GetValue("invariantValue", published: false));
+            Assert.AreEqual("EN value updated", content.GetValue("variantValue", culture: "en-US", published: false));
+            Assert.AreEqual("DA value updated", content.GetValue("variantValue", culture: "da-DK", published: false));
+
+            Assert.AreEqual("Invariant value", content.GetValue("invariantValue", published: true));
+        });
+
+        if (expectedSuccess)
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(result.Success);
+
+                var expectedPublishedEnglishValue = culturesToRepublish.Contains("en-US")
+                    ? "EN value updated"
+                    : "EN value";
+                var expectedPublishedDanishValue = culturesToRepublish.Contains("da-DK")
+                    ? "DA value updated"
+                    : "DA value";
+                Assert.AreEqual(expectedPublishedEnglishValue, content.GetValue("variantValue", culture: "en-US", published: true));
+                Assert.AreEqual(expectedPublishedDanishValue, content.GetValue("variantValue", culture: "da-DK", published: true));
+            });
+        }
+        else
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(result.Success);
+                Assert.AreEqual("EN value", content.GetValue("variantValue", culture: "en-US", published: true));
+                Assert.AreEqual("DA value", content.GetValue("variantValue", culture: "da-DK", published: true));
+            });
+        }
     }
 
     [Test]

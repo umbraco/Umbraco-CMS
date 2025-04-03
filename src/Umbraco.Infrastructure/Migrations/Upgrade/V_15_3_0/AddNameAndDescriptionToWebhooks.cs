@@ -28,7 +28,7 @@ public class AddNameAndDescriptionToWebhooks : MigrationBase
         }
         else
         {
-            Logger.LogWarning($"Table {Constants.DatabaseSchema.Tables.Webhook} does not exist so the addition of the name and description by columnss in migration {nameof(AddNameAndDescriptionToWebhooks)} cannot be completed.");
+            Logger.LogWarning($"Table {Constants.DatabaseSchema.Tables.Webhook} does not exist so the addition of the name and description by columns in migration {nameof(AddNameAndDescriptionToWebhooks)} cannot be completed.");
         }
     }
 
