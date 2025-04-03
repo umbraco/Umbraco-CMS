@@ -32,6 +32,12 @@ public interface IPublishedSnapshotService : IDisposable
     IPublishedSnapshot CreatePublishedSnapshot(string? previewToken);
 
     /// <summary>
+    /// Indicates if the database cache is in the process of being rebuilt.
+    /// </summary>
+    /// <returns></returns>
+    bool IsRebuilding() => false;
+
+    /// <summary>
     ///     Rebuilds internal database caches (but does not reload).
     /// </summary>
     /// <param name="contentTypeIds">
@@ -61,6 +67,38 @@ public interface IPublishedSnapshotService : IDisposable
         IReadOnlyCollection<int>? mediaTypeIds = null,
         IReadOnlyCollection<int>? memberTypeIds = null);
 
+    /// <summary>
+    ///     Rebuilds internal database caches (but does not reload).
+    /// </summary>
+    /// <param name="contentTypeIds">
+    ///     If not null will process content for the matching content types, if empty will process all
+    ///     content
+    /// </param>
+    /// <param name="mediaTypeIds">
+    ///     If not null will process content for the matching media types, if empty will process all
+    ///     media
+    /// </param>
+    /// <param name="memberTypeIds">
+    ///     If not null will process content for the matching members types, if empty will process all
+    ///     members
+    /// </param>
+    /// <param name="useBackgroundThread">Flag indicating whether to use a background thread for the operation and immediately return to the caller.</param>
+    /// <remarks>
+    ///     <para>
+    ///         Forces the snapshot service to rebuild its internal database caches. For instance, some caches
+    ///         may rely on a database table to store pre-serialized version of documents.
+    ///     </para>
+    ///     <para>
+    ///         This does *not* reload the caches. Caches need to be reloaded, for instance via
+    ///         <see cref="DistributedCache" /> RefreshAllPublishedSnapshot method.
+    ///     </para>
+    /// </remarks>
+    void Rebuild(
+        bool useBackgroundThread,
+        IReadOnlyCollection<int>? contentTypeIds = null,
+        IReadOnlyCollection<int>? mediaTypeIds = null,
+        IReadOnlyCollection<int>? memberTypeIds = null) => Rebuild(contentTypeIds, mediaTypeIds, memberTypeIds);
+
 
     /// <summary>
     ///     Rebuilds all internal database caches (but does not reload).
@@ -76,6 +114,22 @@ public interface IPublishedSnapshotService : IDisposable
     ///     </para>
     /// </remarks>
     void RebuildAll() => Rebuild(Array.Empty<int>(), Array.Empty<int>(), Array.Empty<int>());
+
+    /// <summary>
+    ///     Rebuilds all internal database caches (but does not reload).
+    /// </summary>
+    /// <param name="useBackgroundThread">Flag indicating whether to use a background thread for the operation and immediately return to the caller.</param>
+    /// <remarks>
+    ///     <para>
+    ///         Forces the snapshot service to rebuild its internal database caches. For instance, some caches
+    ///         may rely on a database table to store pre-serialized version of documents.
+    ///     </para>
+    ///     <para>
+    ///         This does *not* reload the caches. Caches need to be reloaded, for instance via
+    ///         <see cref="DistributedCache" /> RefreshAllPublishedSnapshot method.
+    ///     </para>
+    /// </remarks>
+    void RebuildAll(bool useBackgroundThread) => Rebuild(useBackgroundThread, Array.Empty<int>(), Array.Empty<int>(), Array.Empty<int>());
 
     /* An IPublishedCachesService implementation can rely on transaction-level events to update
      * its internal, database-level data, as these events are purely internal. However, it cannot
