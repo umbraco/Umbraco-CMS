@@ -303,7 +303,8 @@ export function shouldNavigate<D>(currentMatch: IRouteMatch<D> | null, newMatch:
 
 	const isSameRoute = currentRoute == newRoute;
 	const isSameFragments = currentFragments.consumed == newFragments.consumed;
+	const isSameBasedOnUnique = currentRoute.unique === newRoute.unique;
 
 	// Only navigate if the URL consumption is new or if the two routes are no longer the same.
-	return !isSameFragments || !isSameRoute;
+	return !isSameFragments || !isSameRoute || !isSameBasedOnUnique;
 }
