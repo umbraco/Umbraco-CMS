@@ -23,10 +23,6 @@ export class UmbDocumentBlueprintMockDB extends UmbEntityMockDbBase<UmbMockDocum
 		createMockDocumentBlueprintMapper,
 		detailResponseMapper,
 	);
-
-	constructor(data: Array<UmbMockDocumentBlueprintModel>) {
-		super(data);
-	}
 }
 
 const treeItemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprintTreeItemResponseModel => {
