@@ -1,14 +1,14 @@
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { UmbReadOnlyVariantGuardManager } from './read-only-variant-guard.manager.js';
+import { UmbReadonlyVariantGuardManager } from './readonly-variant-guard.manager.js';
 import { UmbVariantId } from '../../variant/variant-id.class.js';
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-describe('UmbReadOnlyVariantStateManager', () => {
-	let manager: UmbReadOnlyVariantGuardManager;
+describe('UmbReadonlyVariantStateManager', () => {
+	let manager: UmbReadonlyVariantGuardManager;
 	const invariantVariant = UmbVariantId.CreateInvariant();
 	const englishVariant = UmbVariantId.Create({ culture: 'en', segment: null });
 	const ruleInv = { unique: '1', message: 'State 1', state: true, variantId: invariantVariant };
@@ -20,7 +20,7 @@ describe('UmbReadOnlyVariantStateManager', () => {
 
 	beforeEach(() => {
 		const hostElement = new UmbTestControllerHostElement();
-		manager = new UmbReadOnlyVariantGuardManager(hostElement);
+		manager = new UmbReadonlyVariantGuardManager(hostElement);
 	});
 
 	describe('VariantIds based states', () => {
@@ -35,7 +35,7 @@ describe('UmbReadOnlyVariantStateManager', () => {
 
 		it('is not on for a variant when no states', (done) => {
 			manager
-				.isOnForVariant(invariantVariant)
+				.permittedForVariant(invariantVariant)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -47,7 +47,7 @@ describe('UmbReadOnlyVariantStateManager', () => {
 			manager.addRule(ruleEn);
 
 			manager
-				.isOnForVariant(englishVariant)
+				.permittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.true;
 					done();
@@ -59,7 +59,7 @@ describe('UmbReadOnlyVariantStateManager', () => {
 			manager.addRule(ruleInv);
 
 			manager
-				.isOnForVariant(englishVariant)
+				.permittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -71,7 +71,7 @@ describe('UmbReadOnlyVariantStateManager', () => {
 			manager.addRule(rulePlain);
 
 			manager
-				.isOnForVariant(englishVariant)
+				.permittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.true;
 					done();
@@ -84,7 +84,7 @@ describe('UmbReadOnlyVariantStateManager', () => {
 			manager.addRule(ruleNoEn);
 
 			manager
-				.isOnForVariant(englishVariant)
+				.permittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -96,7 +96,7 @@ describe('UmbReadOnlyVariantStateManager', () => {
 			manager.addRule(ruleNoPlain);
 
 			manager
-				.isOnForVariant(englishVariant)
+				.permittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -109,7 +109,7 @@ describe('UmbReadOnlyVariantStateManager', () => {
 			manager.addRule(ruleEn);
 
 			manager
-				.isOnForVariant(englishVariant)
+				.permittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.true;
 					done();
@@ -123,7 +123,7 @@ describe('UmbReadOnlyVariantStateManager', () => {
 			manager.addRule(ruleNoEn);
 
 			manager
-				.isOnForVariant(englishVariant)
+				.permittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -136,7 +136,7 @@ describe('UmbReadOnlyVariantStateManager', () => {
 			manager.addRule(rulePlain);
 
 			manager
-				.isOnForVariant(englishVariant)
+				.permittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();

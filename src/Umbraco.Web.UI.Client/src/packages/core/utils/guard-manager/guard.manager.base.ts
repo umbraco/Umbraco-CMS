@@ -8,7 +8,7 @@ export interface UmbGuardIncomingRuleBase {
 	message?: string;
 }
 
-export interface UmbGuardRuleEntry extends UmbGuardIncomingRuleBase {
+export interface UmbGuardRule extends UmbGuardIncomingRuleBase {
 	unique: string | symbol;
 	permitted: boolean;
 }
@@ -16,12 +16,13 @@ export interface UmbGuardRuleEntry extends UmbGuardIncomingRuleBase {
 const DefaultRuleUnique = Symbol();
 
 export class UmbGuardManagerBase<
-	RuleType extends UmbGuardRuleEntry = UmbGuardRuleEntry,
+	RuleType extends UmbGuardRule = UmbGuardRule,
 	IncomingRuleType extends UmbGuardIncomingRuleBase = UmbPartialSome<RuleType, 'unique' | 'permitted'>,
 > extends UmbControllerBase {
 	//
 	protected readonly _rules = new UmbArrayState<RuleType>([], (x) => x.unique).sortBy((a, b) =>
-		a.permitted === b.permitted ? 0 : a.permitted ? 1 : -1,
+		// If default then it should be last, if not then sort by permitted
+		a.unique === DefaultRuleUnique ? 1 : a.permitted === b.permitted ? 0 : a.permitted ? 1 : -1,
 	);
 	public readonly rules = this._rules.asObservable();
 	public readonly hasRules = this._rules.asObservablePart((x) => x.length > 0);

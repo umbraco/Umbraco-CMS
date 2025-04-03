@@ -1,9 +1,9 @@
-import { UmbReadOnlyGuardManager } from './read-only-guard.manager.js';
+import { UmbReadonlyGuardManager } from './readonly-guard.manager.js';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { mergeObservables, type Observable } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbGuardRuleEntry } from './guard.manager.base.js';
+import type { UmbGuardRule } from './guard.manager.base.js';
 
-export interface UmbVariantState extends UmbGuardRuleEntry {
+export interface UmbVariantState extends UmbGuardRule {
 	variantId?: UmbVariantId;
 }
 
@@ -23,15 +23,15 @@ function CompareStateAndVariantId(rules: Array<UmbVariantState>, variantId: UmbV
 	return false;
 }
 
-export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbVariantState> {
+export class UmbReadonlyVariantGuardManager extends UmbReadonlyGuardManager<UmbVariantState> {
 	//
-	isOnForVariant(variantId: UmbVariantId): Observable<boolean> {
+	permittedForVariant(variantId: UmbVariantId): Observable<boolean> {
 		return this._rules.asObservablePart((states) => {
 			return CompareStateAndVariantId(states, variantId);
 		});
 	}
 
-	isOnForVariantObservable(variantId: Observable<UmbVariantId | undefined>): Observable<boolean> {
+	permittedForVariantObservable(variantId: Observable<UmbVariantId | undefined>): Observable<boolean> {
 		return mergeObservables([this.rules, variantId], ([states, variantId]) => {
 			if (!variantId) {
 				// Or should we know about the fallback state here? [NL]
@@ -41,7 +41,7 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 		});
 	}
 
-	getIsOnForVariant(variantId: UmbVariantId): boolean {
+	getPermittedForVariant(variantId: UmbVariantId): boolean {
 		return CompareStateAndVariantId(this.getRules(), variantId);
 	}
 }
