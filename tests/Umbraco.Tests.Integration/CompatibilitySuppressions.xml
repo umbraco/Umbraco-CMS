@@ -129,6 +129,13 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.EntityServiceTests.CreateTestData</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.TemplateServiceTests.Deleting_Master_Template_Also_Deletes_Children</Target>
     <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
