@@ -94,7 +94,7 @@ function publishedSnapshotCacheController($scope, $http, umbRequestHelper, local
         vm.working = true;
 
         umbRequestHelper.resourcePromise(
-            $http.post(umbRequestHelper.getApiUrl("publishedSnapshotCacheStatusBaseUrl", "RebuildDbCacheInBackground")), "Failed to rebuild the cache.")
+            $http.post(umbRequestHelper.getApiUrl("publishedSnapshotCacheStatusBaseUrl", "RebuildDbCacheInBackground")), "Failed to queue the rebuild task.")
                 .then(function () {
                     const interval = setInterval(function () {
                         $http.get(umbRequestHelper.getApiUrl("publishedSnapshotCacheStatusBaseUrl", "GetStatus"))
