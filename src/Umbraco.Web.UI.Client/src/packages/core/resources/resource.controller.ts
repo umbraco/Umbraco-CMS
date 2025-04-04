@@ -79,7 +79,7 @@ export class UmbResourceController extends UmbControllerBase {
 
 	/**
 	 * Base execute function with a try/catch block and return a tuple with the result and the error.
-	 * @deprecated This method is deprecated and will be removed in Umbraco 18. Use the {UmbTryExecuteController} instead.
+	 * @deprecated This method is deprecated and will be removed in Umbraco 18. Use the {@link UmbTryExecuteController} instead.
 	 * @param promise
 	 */
 	static async tryExecute<T>(promise: Promise<T>): Promise<UmbDataSourceResponse<T>> {
@@ -87,7 +87,7 @@ export class UmbResourceController extends UmbControllerBase {
 			deprecated: 'UmbResourceController.tryExecute',
 			removeInVersion: '18.0.0',
 			solution: 'Use the UmbTryExecuteController instead.',
-		});
+		}).warn();
 		try {
 			return { data: await promise };
 		} catch (error) {
@@ -103,7 +103,7 @@ export class UmbResourceController extends UmbControllerBase {
 	/**
 	 * Wrap the {tryExecute} function in a try/catch block and return the result.
 	 * If the executor function throws an error, then show the details in a notification.
-	 * @deprecated This method is deprecated and will be removed in Umbraco 18. Use the {UmbTryExecuteAndNotifyController} instead.
+	 * @deprecated This method is deprecated and will be removed in Umbraco 18. Use the {@link UmbTryExecuteAndNotifyController} instead.
 	 * @param options
 	 */
 
@@ -112,7 +112,7 @@ export class UmbResourceController extends UmbControllerBase {
 			deprecated: 'UmbResourceController.tryExecuteAndNotify',
 			removeInVersion: '18.0.0',
 			solution: 'Use the UmbTryExecuteController instead.',
-		});
+		}).warn();
 
 		const { data, error } = await UmbResourceController.tryExecute<T>(this._promise);
 
@@ -214,7 +214,7 @@ export class UmbResourceController extends UmbControllerBase {
 
 	/**
 	 * Make an XHR request.
-	 * @deprecated This method is deprecated and will be removed in Umbraco 18. Use the {UmbXhrRequestController} instead.
+	 * @deprecated This method is deprecated and will be removed in Umbraco 18. Use the {@link UmbXhrRequestController} instead.
 	 * @param host The controller host for this controller to be appended to.
 	 * @param options The options for the XHR request.
 	 */
