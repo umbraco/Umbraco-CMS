@@ -208,10 +208,8 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 				// If navigate is not determined, then we will check if we have a route match, and if the new match is different from current. [NL]
 				const newMatch = this.getRouteMatch();
 				if (newMatch) {
-					if (this._routeMatch?.route.path !== newMatch.route.path) {
-						// Check if this match matches the current match (aka. If the path has changed), if so we should navigate. [NL]
-						navigate = shouldNavigate(this.match, newMatch);
-					}
+					// Check if this match matches the current match (aka. If the path has changed), if so we should navigate. [NL]
+					navigate = shouldNavigate(this.match, newMatch);
 				}
 			}
 		}

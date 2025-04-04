@@ -359,13 +359,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			return true;
 		}
 
-		/* TODO: temp removal of discard changes in workspace modals.
-		 The modal closes before the discard changes dialog is resolved.*/
-		// TODO: I think this can go away now???
-		if (newUrl.includes('/modal/umb-modal-workspace/')) {
-			return true;
-		}
-
 		if (this._checkWillNavigateAway(newUrl) && this.getHasUnpersistedChanges()) {
 			/* Since ours modals are async while events are synchronous, we need to prevent the default behavior of the event, even if the modal hasn’t been resolved yet.
 			Once the modal is resolved (the user accepted to discard the changes and navigate away from the route), we will push a new history state.
