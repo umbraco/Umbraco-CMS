@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 public class MemberRepository : ContentRepositoryBase<int, IMember, MemberRepository>, IMemberRepository
 {
     private readonly IJsonSerializer _jsonSerializer;
-    private readonly IRepositoryCachePolicy<IMember, string> _memberByUsernameCachePolicy;
+    private readonly MemberRepositoryUsernameCachePolicy _memberByUsernameCachePolicy;
     private readonly IMemberGroupRepository _memberGroupRepository;
     private readonly IMemberTypeRepository _memberTypeRepository;
     private readonly MemberPasswordConfigurationSettings _passwordConfiguration;
@@ -67,7 +67,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         _memberGroupRepository = memberGroupRepository;
         _passwordConfiguration = passwordConfiguration.Value;
         _memberByUsernameCachePolicy =
-            new DefaultRepositoryCachePolicy<IMember, string>(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
+            new MemberRepositoryUsernameCachePolicy(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
     }
 
     /// <summary>
@@ -235,7 +235,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     }
 
     public IMember? GetByUsername(string? username) =>
-        _memberByUsernameCachePolicy.Get(username, PerformGetByUsername, PerformGetAllByUsername);
+        _memberByUsernameCachePolicy.GetByUserName("uRepo_userNameKey+", username, PerformGetByUsername, PerformGetAllByUsername);
 
     public int[] GetMemberIds(string[] usernames)
     {
