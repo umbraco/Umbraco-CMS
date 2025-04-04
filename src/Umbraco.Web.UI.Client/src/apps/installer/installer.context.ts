@@ -121,7 +121,7 @@ export class UmbInstallerContext extends UmbContextBase<UmbInstallerContext, typ
 	 * @memberof UmbInstallerContext
 	 */
 	private async _loadInstallerSettings() {
-		const { data, error: _error } = await tryExecute(InstallService.getInstallSettings());
+		const { data, error: _error } = await tryExecute(this, InstallService.getInstallSettings());
 		const error: any = _error;
 		if (data) {
 			this._settings.setValue(data);

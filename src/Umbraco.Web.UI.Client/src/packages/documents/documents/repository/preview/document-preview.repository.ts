@@ -14,7 +14,7 @@ export class UmbDocumentPreviewRepository extends UmbRepositoryBase {
 	 * @memberof UmbDocumentPreviewRepository
 	 */
 	async enter(): Promise<void> {
-		await tryExecute(PreviewService.postPreview());
+		await tryExecute(this, PreviewService.postPreview());
 		return;
 	}
 
@@ -24,7 +24,7 @@ export class UmbDocumentPreviewRepository extends UmbRepositoryBase {
 	 * @memberof UmbDocumentPreviewRepository
 	 */
 	async exit(): Promise<void> {
-		await tryExecute(PreviewService.deletePreview());
+		await tryExecute(this, PreviewService.deletePreview());
 		return;
 	}
 }

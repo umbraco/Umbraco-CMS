@@ -43,7 +43,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 		if (!unique) throw new Error('unique is missing');
 		// NOTE: The entity will not be present, when fetching Public Access for a descendant of a protected Document.
 		//       This is a perfectly valid scenario, which is handled in the view. In other words, just use tryExecute here.
-		return tryExecute(DocumentService.getDocumentByIdPublicAccess({ id: unique }));
+		return tryExecute(this.#host, DocumentService.getDocumentByIdPublicAccess({ id: unique }));
 	}
 
 	/**

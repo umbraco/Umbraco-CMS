@@ -45,6 +45,7 @@ export class UmbUserMfaServerDataSource {
 		if (!providerName) throw new Error('Provider is missing');
 
 		return tryExecute(
+			this.#host,
 			UserService.deleteUserById2FaByProviderName({
 				id: unique,
 				providerName,

@@ -108,7 +108,7 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 		currentVersion: string,
 	): Promise<UmbServerUpgradeCheck | null> {
 		// Check the server for an upgrade because we have no stored check or the stored check is invalid
-		const { data } = await tryExecute(ServerService.getServerUpgradeCheck());
+		const { data } = await tryExecute(this, ServerService.getServerUpgradeCheck());
 
 		if (data) {
 			// Save the last check date including the data received

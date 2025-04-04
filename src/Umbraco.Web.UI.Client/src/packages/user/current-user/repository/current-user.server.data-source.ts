@@ -92,6 +92,7 @@ export class UmbCurrentUserServerDataSource {
 	 */
 	async enableMfaProvider(providerName: string, code: string, secret: string) {
 		const { error } = await tryExecute(
+			this.#host,
 			UserService.postUserCurrent2FaByProviderName({ providerName, requestBody: { code, secret } }),
 		);
 
@@ -108,7 +109,10 @@ export class UmbCurrentUserServerDataSource {
 	 * @param code
 	 */
 	async disableMfaProvider(providerName: string, code: string) {
-		const { error } = await tryExecute(UserService.deleteUserCurrent2FaByProviderName({ providerName, code }));
+		const { error } = await tryExecute(
+			this.#host,
+			UserService.deleteUserCurrent2FaByProviderName({ providerName, code }),
+		);
 
 		if (error) {
 			return { error };

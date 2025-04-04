@@ -165,6 +165,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				};
 
 				const { error } = await tryExecute(
+					this,
 					InstallService.postInstallValidateDatabase({ requestBody: databaseDetails }),
 				);
 
@@ -196,6 +197,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		this._installerContext.nextStep();
 
 		const { error: _error } = await tryExecute(
+			this,
 			InstallService.postInstallSetup({ requestBody: this._installerContext.getData() }),
 		);
 		const error = _error as ProblemDetails | undefined;

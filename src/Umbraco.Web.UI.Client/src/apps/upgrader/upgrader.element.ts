@@ -43,7 +43,7 @@ export class UmbUpgraderElement extends UmbLitElement {
 	private async _setup() {
 		this.fetching = true;
 
-		const { data, error } = await tryExecute(UpgradeService.getUpgradeSettings());
+		const { data, error } = await tryExecute(this, UpgradeService.getUpgradeSettings());
 
 		if (data) {
 			this.upgradeSettings = data;
@@ -59,7 +59,7 @@ export class UmbUpgraderElement extends UmbLitElement {
 		this.errorMessage = '';
 		this.upgrading = true;
 
-		const { error } = await tryExecute(UpgradeService.postUpgradeAuthorize());
+		const { error } = await tryExecute(this, UpgradeService.postUpgradeAuthorize());
 
 		if (error) {
 			this.errorMessage =
