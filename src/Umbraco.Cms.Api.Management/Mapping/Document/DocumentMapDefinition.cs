@@ -67,7 +67,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.IsTrashed = source.Trashed;
     }
 
-    // Umbraco.Code.MapAll -IsProtected
+    // Umbraco.Code.MapAll -IsProtected -Ancestors
     private void Map(IContent source, DocumentCollectionResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
