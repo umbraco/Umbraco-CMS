@@ -37832,6 +37832,45 @@
         },
         "additionalProperties": false
       },
+      "DocumentTypePropertyReferenceResponseModel": {
+        "required": [
+          "$type",
+          "documentType",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TrackedReferenceDocumentTypeModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentTypePropertyReferenceResponseModel": "#/components/schemas/DocumentTypePropertyReferenceResponseModel"
+          }
+        }
+      },
       "DocumentTypePropertyTypeContainerResponseModel": {
         "required": [
           "id",
@@ -39926,6 +39965,45 @@
         },
         "additionalProperties": false
       },
+      "MediaTypePropertyReferenceResponseModel": {
+        "required": [
+          "$type",
+          "id",
+          "mediaType"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "mediaType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TrackedReferenceMediaTypeModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "MediaTypePropertyReferenceResponseModel": "#/components/schemas/MediaTypePropertyReferenceResponseModel"
+          }
+        }
+      },
       "MediaTypePropertyTypeContainerResponseModel": {
         "required": [
           "id",
@@ -40729,6 +40807,45 @@
           }
         },
         "additionalProperties": false
+      },
+      "MemberTypePropertyReferenceResponseModel": {
+        "required": [
+          "$type",
+          "id",
+          "memberType"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "memberType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TrackedReferenceMemberTypeModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "MemberTypePropertyReferenceResponseModel": "#/components/schemas/MemberTypePropertyReferenceResponseModel"
+          }
+        }
       },
       "MemberTypePropertyTypeContainerResponseModel": {
         "required": [
