@@ -40,9 +40,11 @@ export class UmbResourceController extends UmbControllerBase {
 			return UmbApiError.fromLegacyApiError(error);
 		} else if (isCancelError(error)) {
 			return UmbCancelError.fromLegacyCancelError(error);
-		} else if (error instanceof UmbApiError) {
+		} else if (UmbCancelError.isUmbCancelError(error)) {
 			return error;
-		} else if (error instanceof UmbCancelError) {
+		} else if (UmbApiError.isUmbApiError(error)) {
+			return error;
+		} else if (UmbError.isUmbError(error)) {
 			return error;
 		}
 		// If the error is not an UmbError, we will just return it as is
@@ -109,7 +111,7 @@ export class UmbResourceController extends UmbControllerBase {
 		new UmbDeprecation({
 			deprecated: 'UmbResourceController.tryExecuteAndNotify',
 			removeInVersion: '18.0.0',
-			solution: 'Use the UmbTryExecuteAndNotifyController instead.',
+			solution: 'Use the UmbTryExecuteController instead.',
 		});
 
 		const { data, error } = await UmbResourceController.tryExecute<T>(this._promise);
@@ -220,7 +222,7 @@ export class UmbResourceController extends UmbControllerBase {
 		new UmbDeprecation({
 			deprecated: 'UmbResourceController.xhrRequest',
 			removeInVersion: '18.0.0',
-			solution: 'Use the UmbXhrRequestController instead.',
+			solution: 'Use the UmbTryXhrRequestController instead.',
 		});
 
 		const baseUrl = options.baseUrl || '/umbraco';
