@@ -30,117 +30,23 @@ export class UmbResourceController extends UmbControllerBase {
 	}
 
 	/**
-	 * Handle errors
+	 * Maps any error to an UmbError.
 	 * @internal
-	 * @param {any} error The error to handle.
-	 * @param {boolean} shouldNotify Whether to show a notification or not. Default is false.
-	 * @returns {UmbDataSourceResponse<T>} The response object with the error.
-	 * @template T The type of the data returned from the API.
+	 * @param {*} error The error to map
+	 * @returns {*} The mapped error
 	 */
-	async handleUmbErrors<T>(error: unknown, shouldNotify: boolean = false): Promise<UmbDataSourceResponse<T>> {
-		if (!error) return {};
-
-		/**
-		 * Determine if we want to show a notification or just log the error to the console.
-		 * If the error is not a recognizable system error (i.e. a HttpError), then we will show a notification
-		 * with the error details using the default notification options.
-		 */
-		if (UmbCancelError.isUmbCancelError(error)) {
-			// Cancelled - do nothing
-			return { error };
-		} else if (UmbApiError.isUmbApiError(error)) {
-			// UmbApiError - handle it
-			return this.handleUmbApiError(error, shouldNotify);
-		} else if (error instanceof Error) {
-			// UmbError or unknown error - log it to the console
-			console.error('Error occured', error);
-			if (shouldNotify) {
-				this.#peekError('Error', error.message ?? 'Unknown error', []);
-			}
-			return { error };
-		} else {
-			// Unknown error - log it to the console
-			console.error('Unknown error', error);
-			if (shouldNotify) {
-				this.#peekError('Error', 'Unknown error', []);
-			}
-			return { error: new UmbError('Unknown error') };
+	mapToUmbError(error: unknown): UmbApiError | UmbCancelError | UmbError {
+		if (isApiError(error)) {
+			return UmbApiError.fromLegacyApiError(error);
+		} else if (isCancelError(error)) {
+			return UmbCancelError.fromLegacyCancelError(error);
+		} else if (error instanceof UmbApiError) {
+			return error;
+		} else if (error instanceof UmbCancelError) {
+			return error;
 		}
-	}
-
-	/**
-	 * Handle errors from the API and show a notification if needed.
-	 * @internal
-	 * @param {UmbApiError} error The error to handle.
-	 * @param {boolean} shouldNotify Whether to show a notification or not. Default is false.
-	 * @returns {UmbDataSourceResponse<T>} The response object with the error.
-	 * @template T The type of the data returned from the API.
-	 * @see {@link UmbResourceController.handleUmbErrors<T>}
-	 */
-	async handleUmbApiError<T>(error: UmbApiError, shouldNotify: boolean = false): Promise<UmbDataSourceResponse<T>> {
-		console.error('UmbError caught in UmbResourceController', error);
-
-		/**
-		 * Check if the operation status ends with `ByNotification` and if so, don't show a notification
-		 * This is a special case where the operation was cancelled by the server and the client gets a notification header instead.
-		 */
-		if (
-			error.problemDetails.operationStatus &&
-			typeof error.problemDetails.operationStatus === 'string' &&
-			error.problemDetails.operationStatus.endsWith('ByNotification')
-		) {
-			shouldNotify = false;
-		}
-
-		// Go through the error status codes and act accordingly
-		switch (error.status ?? 0) {
-			case 401: {
-				// See if we can get the UmbAuthContext and let it know the user is timed out
-				const authContext = await this.getContext(UMB_AUTH_CONTEXT, { preventTimeout: true });
-				if (!authContext) {
-					throw new Error('Could not get the auth context');
-				}
-				authContext.timeOut();
-				break;
-			}
-			case 500:
-				// Server Error
-
-				if (shouldNotify) {
-					let headline = error.problemDetails.title ?? error.name ?? 'Server Error';
-					let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
-
-					// Special handling for ObjectCacheAppCache corruption errors, which we are investigating
-					if (
-						error.problemDetails.detail?.includes('ObjectCacheAppCache') ||
-						error.problemDetails.detail?.includes('Umbraco.Cms.Infrastructure.Scoping.Scope.DisposeLastScope()')
-					) {
-						headline = 'Please restart the server';
-						message =
-							'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
-					}
-
-					this.#peekError(headline, message, error.problemDetails.errors ?? error.problemDetails.detail);
-				}
-				break;
-			default:
-				// Other errors
-				if (shouldNotify) {
-					const headline = error.problemDetails.title ?? error.name ?? 'Server Error';
-					this.#peekError('', headline, error.problemDetails.errors ?? error.problemDetails.detail);
-				}
-		}
-
-		return { error };
-	}
-
-	async #peekError(headline: string, message: string, details: unknown) {
-		// This late importing is done to avoid circular reference [NL]
-		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(this, {
-			headline,
-			message,
-			details,
-		});
+		// If the error is not an UmbError, we will just return it as is
+		return new UmbError(error instanceof Error ? error.message : 'Unknown error');
 	}
 
 	/**
@@ -426,5 +332,14 @@ export class UmbResourceController extends UmbControllerBase {
 		}
 
 		return promise;
+	}
+
+	async #peekError(headline: string, message: string, details: unknown) {
+		// This late importing is done to avoid circular reference [NL]
+		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(this, {
+			headline,
+			message,
+			details,
+		});
 	}
 }

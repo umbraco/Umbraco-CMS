@@ -5,4 +5,5 @@ export * from './tryExecuteAndNotify.function.js';
 export * from './tryXhrRequest.function.js';
 export * from './extractUmbColorVariable.function.js';
 export * from './apiTypeValidators.function.js';
+export * from './umb-error.js';
 export type * from './types.js';
