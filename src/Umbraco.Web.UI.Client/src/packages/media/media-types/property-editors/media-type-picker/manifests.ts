@@ -9,15 +9,5 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Media Type Picker',
 		icon: 'icon-media-dashed-line',
 		group: 'advanced',
-		settings: {
-			properties: [
-				{
-					alias: 'showOpenButton',
-					label: 'Show open button',
-					description: 'Opens the node in a dialog',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-				},
-			],
-		},
 	},
 };

@@ -65,6 +65,10 @@ describe('UmbExtensionRegistry', () => {
 		manifests.forEach((manifest) => extensionRegistry.register(manifest));
 	});
 
+	afterEach(() => {
+		extensionRegistry.clear();
+	});
+
 	it('should register an extension', () => {
 		const registeredExtensions = extensionRegistry['_extensions'].getValue();
 		expect(registeredExtensions).to.have.lengthOf(4);
@@ -241,6 +245,26 @@ describe('UmbExtensionRegistry', () => {
 				.unsubscribe();
 		});
 	});
+
+	describe('getByType', () => {
+		it('should get all extensions of the given type', async () => {
+			const extensions = extensionRegistry.getByType('section');
+
+			expect(extensions).to.have.lengthOf(3);
+			expect(extensions?.[0]?.type).to.eq('section');
+			expect(extensions?.[1]?.type).to.eq('section');
+			expect(extensions?.[2]?.type).to.eq('section');
+		});
+
+		it('should return extensions ordered by weight', () => {
+			const extensions = extensionRegistry.getByType('section');
+
+			expect(extensions).to.have.lengthOf(3);
+			expect(extensions[0]?.weight).to.eq(200);
+			expect(extensions[1]?.weight).to.eq(25);
+			expect(extensions[2]?.weight).to.eq(1);
+		});
+	});
 });
 
 describe('UmbExtensionRegistry with kinds', () => {
@@ -308,6 +332,9 @@ describe('UmbExtensionRegistry with kinds', () => {
 		];
 
 		manifests.forEach((manifest) => extensionRegistry.register(manifest));
+	});
+	afterEach(() => {
+		extensionRegistry.clear();
 	});
 
 	it('should say that an extension kind is registered', () => {
@@ -497,6 +524,10 @@ describe('Add Conditions', () => {
 		});
 	});
 
+	afterEach(() => {
+		extensionRegistry.clear();
+	});
+
 	it('should have the extensions registered', () => {
 		expect(extensionRegistry.isRegistered('Umb.Test.Section.1')).to.be.true;
 		expect(extensionRegistry.isRegistered('Umb.Test.Section.2')).to.be.true;
@@ -519,7 +550,7 @@ describe('Add Conditions', () => {
 		const conditionToAdd: UmbConditionConfigBase = {
 			alias: 'Umb.Test.Condition.Valid',
 		};
-		await extensionRegistry.appendCondition('Umb.Test.Section.1', conditionToAdd);
+		extensionRegistry.appendCondition('Umb.Test.Section.1', conditionToAdd);
 
 		// Check new condition is registered
 		expect(extensionRegistry.isRegistered('Umb.Test.Condition.Valid')).to.be.true;
@@ -540,7 +571,7 @@ describe('Add Conditions', () => {
 			match: 'Umb.Workspace.Document',
 		};
 
-		await extensionRegistry.appendCondition('Umb.Test.Section.2', workspaceCondition);
+		extensionRegistry.appendCondition('Umb.Test.Section.2', workspaceCondition);
 
 		const updatedWorkspaceExt = extensionRegistry.getByAlias('Umb.Test.Section.2') as ManifestWithDynamicConditions;
 		expect(updatedWorkspaceExt.conditions?.length).to.equal(1);
@@ -561,7 +592,7 @@ describe('Add Conditions', () => {
 			} as WorkspaceAliasConditionConfig,
 		];
 
-		await extensionRegistry.appendConditions('Umb.Test.Section.1', conditions);
+		extensionRegistry.appendConditions('Umb.Test.Section.1', conditions);
 
 		const extUpdated = extensionRegistry.getByAlias('Umb.Test.Section.1') as ManifestWithDynamicConditions;
 		expect(extUpdated.conditions?.length).to.equal(3);
@@ -680,5 +711,76 @@ describe('Add Conditions', () => {
 
 		expect(extUpdateSecondTime.conditions?.length).to.equal(1);
 		expect(extUpdateSecondTime.conditions?.[0]?.alias).to.equal('Umb.Test.Condition.Valid');
+	});
+
+	it('should only update extensions when adding new conditions to one that matters', (done) => {
+		let amountOfTimesTriggered = -1;
+
+		let subscription: any = undefined;
+		subscription = extensionRegistry
+			.byTypeAndAliases('section', ['Umb.Test.Section.1'])
+			.subscribe(async (extensions) => {
+				amountOfTimesTriggered++;
+				expect(extensions).to.have.lengthOf(1);
+
+				if (amountOfTimesTriggered === 0) {
+					expect(extensions?.[0]?.alias).to.be.equal('Umb.Test.Section.1');
+					expect(extensions?.[0]?.conditions.length).to.be.equal(1);
+					// Add a condition with a specific config to Section2
+
+					const workspaceCondition1 = {
+						alias: 'Umb.Test.Condition.Invalid',
+					};
+
+					const workspaceCondition2 = {
+						alias: 'Umb.Test.Condition.Valid',
+					};
+
+					await Promise.resolve();
+
+					extensionRegistry.appendCondition('Umb.Test.Section.2', workspaceCondition1);
+
+					await Promise.resolve();
+
+					extensionRegistry.appendCondition('Umb.Test.Section.1', workspaceCondition2);
+				} else if (amountOfTimesTriggered === 1) {
+					expect(extensions?.[0]?.alias).to.be.equal('Umb.Test.Section.1');
+					expect(extensions?.[0]?.conditions.length).to.be.equal(2);
+					expect(extensions?.[0]?.conditions[1].alias).to.be.equal('Umb.Test.Condition.Valid');
+
+					subscription.unsubscribe();
+					done();
+				}
+			});
+	});
+	it('should update extensions when adding new conditions', (done) => {
+		let amountOfTimesTriggered = -1;
+
+		extensionRegistry
+			.byType('section')
+			.subscribe(async (extensions) => {
+				amountOfTimesTriggered++;
+				expect(extensions).to.have.lengthOf(2);
+
+				if (amountOfTimesTriggered === 0) {
+					expect(extensions?.[1]?.alias).to.be.equal('Umb.Test.Section.1');
+					expect(extensions?.[1]?.conditions.length).to.be.equal(1);
+					expect(extensions?.[0]?.alias).to.be.equal('Umb.Test.Section.2');
+					expect(extensions?.[0]?.conditions).to.be.undefined;
+					// Add a condition with a specific config to Section2
+					const workspaceCondition: WorkspaceAliasConditionConfig = {
+						alias: UMB_WORKSPACE_CONDITION_ALIAS,
+						match: 'Umb.Workspace.Document',
+					};
+
+					extensionRegistry.appendCondition('Umb.Test.Section.2', workspaceCondition);
+				} else if (amountOfTimesTriggered === 1) {
+					expect(extensions?.[0]?.alias).to.be.equal('Umb.Test.Section.2');
+					expect(extensions?.[0]?.conditions).to.not.be.undefined;
+					expect(extensions?.[0]?.conditions.length).to.be.equal(1);
+					done();
+				}
+			})
+			.unsubscribe();
 	});
 });

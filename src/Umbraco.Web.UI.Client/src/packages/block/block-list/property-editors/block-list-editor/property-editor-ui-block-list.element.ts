@@ -14,10 +14,7 @@ import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import {
-	UmbBlockElementDataValidationPathTranslator,
-	type UmbBlockLayoutBaseModel,
-} from '@umbraco-cms/backoffice/block';
+import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 
 import '../../components/block-list-entry/index.js';
@@ -30,6 +27,7 @@ import {
 } from '@umbraco-cms/backoffice/validation';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
@@ -56,8 +54,6 @@ export class UmbPropertyEditorUIBlockListElement
 	});
 
 	readonly #validationContext = new UmbValidationContext(this);
-	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
-	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 
 	#lastValue: UmbBlockListValueModel | undefined = undefined;
 
@@ -115,6 +111,8 @@ export class UmbPropertyEditorUIBlockListElement
 			this.#managerContext.contentTypesLoaded.then(() => {
 				const firstContentTypeName = this.#managerContext.getContentTypeNameOf(blocks[0].contentElementTypeKey);
 				this._createButtonLabel = this.localize.term('blockEditor_addThis', this.localize.string(firstContentTypeName));
+
+				// If we are in a invariant context:
 			});
 		}
 	}
@@ -162,8 +160,51 @@ export class UmbPropertyEditorUIBlockListElement
 	readonly #managerContext = new UmbBlockListManagerContext(this);
 	readonly #entriesContext = new UmbBlockListEntriesContext(this);
 
+	@state()
+	_notSupportedVariantSetting?: boolean;
+
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (context) => {
+			this.observe(
+				observeMultiple([
+					this.#managerContext.blockTypes,
+					context.structure.variesByCulture,
+					context.structure.variesBySegment,
+				]),
+				async ([blockTypes, variesByCulture, variesBySegment]) => {
+					if (blockTypes.length > 0 && (variesByCulture === false || variesBySegment === false)) {
+						// check if any of the Blocks varyByCulture or Segment and then display a warning.
+						const promises = await Promise.all(
+							blockTypes.map(async (blockType) => {
+								const elementType = blockType.contentElementTypeKey;
+								await this.#managerContext.contentTypesLoaded;
+								const structure = await this.#managerContext.getStructure(elementType);
+								if (variesByCulture === false && structure?.getVariesByCulture() === true) {
+									// If block varies by culture but document does not.
+									return true;
+								} else if (variesBySegment === false && structure?.getVariesBySegment() === true) {
+									// If block varies by segment but document does not.
+									return true;
+								}
+								return false;
+							}),
+						);
+						this._notSupportedVariantSetting = promises.filter((x) => x === true).length > 0;
+
+						if (this._notSupportedVariantSetting) {
+							this.#validationContext.messages.addMessage(
+								'config',
+								'$',
+								'#blockEditor_blockVariantConfigurationNotSupported',
+								'blockConfigurationNotSupported',
+							);
+						}
+					}
+				},
+			);
+		}).passContextAliasMatches();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.#gotPropertyContext(context);
@@ -173,12 +214,13 @@ export class UmbPropertyEditorUIBlockListElement
 		this.observe(
 			this.#managerContext.layouts,
 			(layouts) => {
+				const validationMessagesToRemove: string[] = [];
 				const contentKeys = layouts.map((x) => x.contentKey);
 				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.contentData').forEach((message) => {
 					// get the KEY from this string: $.contentData[?(@.key == 'KEY')]
 					const key = extractJsonQueryProps(message.path).key;
 					if (key && contentKeys.indexOf(key) === -1) {
-						this.#validationContext.messages.removeMessageByKey(message.key);
+						validationMessagesToRemove.push(message.key);
 					}
 				});
 
@@ -187,14 +229,17 @@ export class UmbPropertyEditorUIBlockListElement
 					// get the key from this string: $.settingsData[?(@.key == 'KEY')]
 					const key = extractJsonQueryProps(message.path).key;
 					if (key && settingsKeys.indexOf(key) === -1) {
-						this.#validationContext.messages.removeMessageByKey(message.key);
+						validationMessagesToRemove.push(message.key);
 					}
 				});
+
+				// Remove the messages after the loop to prevent changing the array while iterating over it.
+				this.#validationContext.messages.removeMessageByKeys(validationMessagesToRemove);
 			},
 			null,
 		);
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.#managerContext.setVariantId(context.getVariantId());
 		});
 
@@ -259,15 +304,10 @@ export class UmbPropertyEditorUIBlockListElement
 		this.observe(
 			context.dataPath,
 			(dataPath) => {
-				// Translate paths for content/settings:
-				this.#contentDataPathTranslator?.destroy();
-				this.#settingsDataPathTranslator?.destroy();
 				if (dataPath) {
 					// Set the data path for the local validation context:
 					this.#validationContext.setDataPath(dataPath);
-
-					this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
-					this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
+					this.#validationContext.autoReport();
 				}
 			},
 			'observeDataPath',
@@ -340,6 +380,9 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	override render() {
+		if (this._notSupportedVariantSetting) {
+			return nothing;
+		}
 		return html`
 			${repeat(
 				this._layouts,

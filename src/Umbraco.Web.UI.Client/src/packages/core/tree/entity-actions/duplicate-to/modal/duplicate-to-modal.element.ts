@@ -32,6 +32,7 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 						alias=${this.data.treeAlias}
 						.props=${{
 							foldersOnly: this.data?.foldersOnly,
+							expandTreeRoot: true,
 						}}
 						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>
