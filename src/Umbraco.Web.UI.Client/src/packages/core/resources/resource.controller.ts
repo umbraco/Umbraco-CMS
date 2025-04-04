@@ -88,6 +88,7 @@ export class UmbResourceController extends UmbControllerBase {
 			removeInVersion: '18.0.0',
 			solution: 'Use the UmbTryExecuteController instead.',
 		}).warn();
+
 		try {
 			return { data: await promise };
 		} catch (error) {
@@ -223,7 +224,7 @@ export class UmbResourceController extends UmbControllerBase {
 			deprecated: 'UmbResourceController.xhrRequest',
 			removeInVersion: '18.0.0',
 			solution: 'Use the UmbTryXhrRequestController instead.',
-		});
+		}).warn();
 
 		const baseUrl = options.baseUrl || '/umbraco';
 
