@@ -62,6 +62,9 @@ export interface IRouteBase<D = any> {
 	// - If "full" router-slot will try to match the entire path.
 	// - If "fuzzy" router-slot will try to match an arbitrary part of the path.
 	pathMatch?: PathMatch;
+
+	// A unique identifier for the route, used to identify the route so we can avoid re-rendering it.
+	unique?: string | Symbol;
 }
 
 /**

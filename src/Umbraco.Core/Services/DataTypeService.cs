@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
-            using (ScopeProvider.CreateCoreScope(autoComplete:true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 try
                 {
@@ -161,7 +161,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
-            using (ScopeProvider.CreateCoreScope(autoComplete:true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var isNew = container.Id == 0;
                 Guid? parentKey = isNew && container.ParentId > 0 ? _dataTypeContainerRepository.Get(container.ParentId)?.Key : null;
@@ -187,7 +187,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
-            using (ScopeProvider.CreateCoreScope(autoComplete:true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 EntityContainer? container = _dataTypeContainerRepository.Get(containerId);
                 if (container == null)
@@ -212,7 +212,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
-            using (ScopeProvider.CreateCoreScope(autoComplete:true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 try
                 {
@@ -511,7 +511,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 DataTypeOperationStatus.Success => OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs, result.Result),
                 DataTypeOperationStatus.CancelledByNotification => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs, result.Result),
                 DataTypeOperationStatus.ParentNotFound => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedParentNotFound, evtMsgs, result.Result),
-                _ =>  OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs, result.Result, new InvalidOperationException($"Invalid operation status: {result.Status}")),
+                _ => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs, result.Result, new InvalidOperationException($"Invalid operation status: {result.Status}")),
             };
         }
 
@@ -724,7 +724,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public async Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IDataType? dataType = GetDataTypeFromRepository(id);
             if (dataType == null)
             {
@@ -771,11 +771,12 @@ namespace Umbraco.Cms.Core.Services.Implement
             var totalItems = combinedUsages.Count;
 
             // Create the page of items.
-            IEnumerable<(string PropertyAlias, Udi Udi)> pagedUsages = combinedUsages
+            IList<(string PropertyAlias, Udi Udi)> pagedUsages = combinedUsages
                 .OrderBy(x => x.Udi.EntityType) // Document types first, then media types, then member types.
                 .ThenBy(x => x.PropertyAlias)
                 .Skip(skip)
-                .Take(take);
+                .Take(take)
+                .ToList();
 
             // Get the content types for the UDIs referenced in the page of items to construct the response from.
             // They could be document, media or member types.
@@ -814,7 +815,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             return Task.FromResult(pagedModel);
         }
 
-        private IList<IContentTypeComposition> GetReferencedContentTypes(IEnumerable<(string PropertyAlias, Udi Udi)> pagedUsages)
+        private IList<IContentTypeComposition> GetReferencedContentTypes(IList<(string PropertyAlias, Udi Udi)> pagedUsages)
         {
             IEnumerable<IContentTypeComposition> documentTypes = GetContentTypes(
                 pagedUsages,
