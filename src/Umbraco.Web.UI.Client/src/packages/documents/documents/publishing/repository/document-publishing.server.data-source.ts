@@ -125,7 +125,8 @@ export class UmbDocumentPublishingServerDataSource {
 			isFirstPoll = false;
 			const { data, error } = await tryExecute(
 				this.#host,
-				DocumentService.getDocumentByIdPublishWithDescendantsResultByTaskId({ id: unique, taskId }));
+				DocumentService.getDocumentByIdPublishWithDescendantsResultByTaskId({ id: unique, taskId }),
+			);
 			if (error || !data) {
 				return { error };
 			}
@@ -133,7 +134,6 @@ export class UmbDocumentPublishingServerDataSource {
 			if (data.isComplete) {
 				return { error: null };
 			}
-
 		}
 	}
 
@@ -146,10 +146,7 @@ export class UmbDocumentPublishingServerDataSource {
 	async published(unique: string): Promise<UmbDataSourceResponse<UmbDocumentDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(
-			this.#host,
-			DocumentService.getDocumentByIdPublished({ id: unique }),
-		);
+		const { data, error } = await tryExecute(this.#host, DocumentService.getDocumentByIdPublished({ id: unique }));
 
 		if (error || !data) {
 			return { error };
