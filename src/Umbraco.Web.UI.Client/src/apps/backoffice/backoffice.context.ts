@@ -57,7 +57,7 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 	}
 
 	async #getVersion() {
-		const { data } = await tryExecute(ServerService.getServerInformation());
+		const { data } = await tryExecute(this, ServerService.getServerInformation());
 		if (!data) return;
 
 		// A quick semver parser (to remove the unwanted bits) [LK]
