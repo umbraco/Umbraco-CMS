@@ -643,7 +643,7 @@ export type DocumentCollectionResponseModel = {
     documentType: (DocumentTypeCollectionReferenceResponseModel);
     isTrashed: boolean;
     isProtected: boolean;
-    ancestorIds: Array<(string)>;
+    ancestors: Array<(ReferenceByIdModel)>;
     updater?: (string) | null;
 };
 
@@ -716,7 +716,7 @@ export type DocumentTreeItemResponseModel = {
     id: string;
     createDate: string;
     isProtected: boolean;
-    ancestorIds: Array<(string)>;
+    ancestors: Array<(ReferenceByIdModel)>;
     documentType: (DocumentTypeReferenceResponseModel);
     variants: Array<(DocumentVariantItemResponseModel)>;
 };
