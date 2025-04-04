@@ -176,7 +176,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
-    public async Task Can_NOT_Schedule_Unpublish_Unknown_Culture()
+    public async Task Cannot_Schedule_Unpublish_Unknown_Culture()
     {
         var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
         var setupData = await CreateVariantContentAsync(

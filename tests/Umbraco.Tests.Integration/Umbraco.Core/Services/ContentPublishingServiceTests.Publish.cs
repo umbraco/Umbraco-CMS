@@ -65,7 +65,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
-    public async Task Can_NOT_Publish_Invariant_In_Variant_Setup()
+    public async Task Cannot_Publish_Invariant_In_Variant_Setup()
     {
         var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
         var setupData = await CreateVariantContentAsync(
@@ -106,7 +106,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     //todo update schedule date
 
     [Test]
-    public async Task Can_NOT_Publish_Unknown_Culture()
+    public async Task Cannot_Publish_Unknown_Culture()
     {
         var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
         var setupData = await CreateVariantContentAsync(
@@ -132,7 +132,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
-    public async Task Can_NOT_Publish_Scheduled_Culture()
+    public async Task Cannot_Publish_Scheduled_Culture()
     {
         var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
         var setupData = await CreateVariantContentAsync(
