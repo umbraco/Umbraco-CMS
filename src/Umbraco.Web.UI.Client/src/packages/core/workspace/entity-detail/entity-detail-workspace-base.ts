@@ -397,7 +397,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return this._data.getHasUnpersistedChanges();
 	}
 	// @deprecated use getHasUnpersistedChanges instead, will be removed in v17.0
-	protected _getHasUnpersistedChanges() {
+	protected _getHasUnpersistedChanges(): boolean {
 		new UmbDeprecation({
 			removeInVersion: '17',
 			deprecated: '_getHasUnpersistedChanges',
