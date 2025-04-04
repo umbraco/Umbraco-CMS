@@ -1,12 +1,9 @@
+import { extractUmbNotificationColor } from './extractUmbNotificationColor.function.js';
+import { isUmbNotifications, UMB_NOTIFICATION_HEADER } from './isUmbNotifications.function.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { OpenAPIConfig } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
-import {
-	extractUmbNotificationColor,
-	isUmbNotifications,
-	UMB_NOTIFICATION_HEADER,
-	type UmbNotificationColor,
-} from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
 
 export class UmbApiInterceptorController extends UmbControllerBase {
 	public bindDefaultInterceptors(client: OpenAPIConfig) {

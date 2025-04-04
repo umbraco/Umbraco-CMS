@@ -1,9 +1,8 @@
-import type { UmbNotificationColor } from './types.js';
+import type { UmbNotificationColor } from '../notification/types.js';
 import { EventMessageTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
- *
- * @param type
+ * @deprecated Import from `@umbraco-cms/backoffice/resources` instead.
  */
 export function extractUmbNotificationColor(type: EventMessageTypeModel): UmbNotificationColor {
 	switch (type) {
