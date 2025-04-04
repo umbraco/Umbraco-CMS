@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -333,6 +334,8 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         // remove all the blocks that are no longer part of the layout
         target.BlockValue.ContentData.RemoveAll(contentBlock =>
             target.Layout!.Any(layoutItem => layoutItem.ReferencesContent(contentBlock.Key)) is false);
+        // remove any exposes that no longer have content assigned to them
+        target.BlockValue.Expose.RemoveAll(expose => target.BlockValue.ContentData.Any(data => data.Key == expose.ContentKey) is false);
 
         target.BlockValue.SettingsData.RemoveAll(settingsBlock =>
             target.Layout!.Any(layoutItem => layoutItem.ReferencesSetting(settingsBlock.Key)) is false);
@@ -355,6 +358,16 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             (layoutItem, itemData) => layoutItem.SettingsKey == itemData.Key,
             canUpdateInvariantData,
             allowedCultures);
+
+        // update the expose list from source for any blocks that were restored
+        var missingSourceExposes =
+            source.BlockValue.Expose.Where(sourceExpose =>
+                target.BlockValue.Expose.Any(targetExpose => targetExpose.ContentKey == sourceExpose.ContentKey) is false
+                && target.BlockValue.ContentData.Any(data => data.Key == sourceExpose.ContentKey)).ToList();
+        foreach (BlockItemVariation missingSourceExpose in missingSourceExposes)
+        {
+            target.BlockValue.Expose.Add(missingSourceExpose);
+        }
 
         return target.BlockValue;
     }
