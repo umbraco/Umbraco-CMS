@@ -9,13 +9,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 public partial class DocumentNavigationServiceTests
 {
-    [Test]
-    public async Task Structure_Can_Rebuild() => await Perform_Structure_Can_Rebuild();
-
-    [Test]
-    public async Task Structure_Can_Rebuild_Multiple_Times() => await Perform_Structure_Can_Rebuild(2);
-
-    private async Task Perform_Structure_Can_Rebuild(int numberOfRebuilds = 1)
+    [TestCase(1, TestName = "Structure_Can_Rebuild")]
+    [TestCase(2, TestName = "Structure_Can_Rebuild_MultipleTimes")]
+    public async Task Structure_Can_Rebuild(int numberOfRebuilds)
     {
         // Arrange
         Guid nodeKey = Root.Key;
@@ -67,13 +63,9 @@ public partial class DocumentNavigationServiceTests
         });
     }
 
-    [Test]
-    public async Task Bin_Structure_Can_Rebuild() => await Perform_Bin_Structure_Can_Rebuild();
-
-    [Test]
-    public async Task Bin_Structure_Can_Rebuild_Multiple_Times() => await Perform_Bin_Structure_Can_Rebuild(2);
-
-    private async Task Perform_Bin_Structure_Can_Rebuild(int numberOfRebuilds = 1)
+    [TestCase(1, TestName = "Bin_Structure_Can_Rebuild")]
+    [TestCase(2, TestName = "Bin_Structure_Can_Rebuild_MultipleTimes")]
+    public async Task Bin_Structure_Can_Rebuild(int numberOfRebuilds)
     {
         // Arrange
         Guid nodeKey = Root.Key;
