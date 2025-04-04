@@ -1,8 +1,7 @@
-import { isApiError, isCancelError } from './apiTypeValidators.function.js';
 import { UmbCancelablePromise } from './cancelable-promise.js';
 import { UmbResourceController } from './resource.controller.js';
 import type { XhrRequestOptions } from './types.js';
-import { UmbApiError, UmbCancelError } from './umb-error.js';
+import { UmbApiError } from './umb-error.js';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export class UmbTryXhrRequestController extends UmbResourceController {
@@ -17,9 +16,9 @@ export class UmbTryXhrRequestController extends UmbResourceController {
 			return { data: await this._promise };
 		} catch (error) {
 			// Error might be a legacy error, so we need to check if it is an UmbError
-			let umbError = isApiError(error) ? UmbApiError.fromLegacyApiError(error) : error;
-			umbError = isCancelError(umbError) ? UmbCancelError.fromLegacyCancelError(umbError) : umbError;
-			return this.handleUmbErrors(umbError);
+			return {
+				error: this.mapToUmbError(error),
+			};
 		}
 	}
 
@@ -77,7 +76,13 @@ export class UmbTryXhrRequestController extends UmbResourceController {
 					}
 				} catch {
 					// This most likely happens when the response is not JSON
-					reject(new Error(`Failed to make request: ${xhr.statusText}`));
+					reject(
+						new UmbApiError(`Failed to make request: ${xhr.statusText}`, xhr.status, xhr, {
+							title: xhr.statusText,
+							type: 'ApiError',
+							status: xhr.status,
+						}),
+					);
 				}
 			};
 
