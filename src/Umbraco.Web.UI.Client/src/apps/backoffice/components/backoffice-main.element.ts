@@ -1,8 +1,8 @@
 import type { UmbBackofficeContext } from '../backoffice.context.js';
 import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbSectionContext, UMB_SECTION_CONTEXT, UMB_SECTION_PATH_PATTERN } from '@umbraco-cms/backoffice/section';
-import type { PageComponent, UmbRoute, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
+import { UmbSectionContext, UMB_SECTION_PATH_PATTERN } from '@umbraco-cms/backoffice/section';
+import type { PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { ManifestSection, UmbSectionElement } from '@umbraco-cms/backoffice/section';
 import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
@@ -33,7 +33,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 			this.observe(
 				this._backofficeContext.allowedSections,
 				(sections) => {
-					this._sections = sections;
+					this._sections = sections.filter((x) => x.manifest);
 					this._createRoutes();
 				},
 				'observeAllowedSections',
@@ -45,67 +45,47 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 		if (!this._sections) return;
 
 		// TODO: Refactor this for re-use across the app where the routes are re-generated at any time.
-		const newRoutes = this._sections
-			.filter((x) => x.manifest)
-			.map((section) => {
-				const existingRoute = this._routes.find(
-					(r) => r.path === UMB_SECTION_PATH_PATTERN.generateLocal({ sectionName: section.manifest!.meta.pathname }),
-				);
-				if (existingRoute) {
-					return existingRoute;
-				} else {
-					return {
-						//alias: section.alias,
-						path: UMB_SECTION_PATH_PATTERN.generateLocal({ sectionName: section.manifest!.meta.pathname }),
-						component: () => createExtensionElement(section.manifest!, 'umb-section-default'),
-						setup: (component: PageComponent) => {
-							(component as UmbSectionElement).manifest = section.manifest;
-						},
-					};
-				}
-			});
+		const newRoutes: Array<UmbRoute> = this._sections.map((section) => {
+			return {
+				path: UMB_SECTION_PATH_PATTERN.generateLocal({ sectionName: section.manifest!.meta.pathname }),
+				component: () => createExtensionElement(section.manifest!, 'umb-section-default'),
+				setup: (component: PageComponent) => {
+					const manifest = section.manifest;
+					if (manifest) {
+						(component as UmbSectionElement).manifest = section.manifest;
+
+						this._backofficeContext?.setActiveSectionAlias(manifest.alias);
+						this._provideSectionContext(manifest);
+					}
+				},
+			};
+		});
 
 		if (newRoutes.length > 0) {
 			newRoutes.push({
-				...newRoutes[0],
-				path: ``,
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
 			});
 
 			newRoutes.push({
-				path: `**`,
-				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+				redirectTo: newRoutes[0].path,
+				path: ``,
 			});
 		}
 
 		this._routes = newRoutes;
 	}
 
-	private _onRouteChange = async (event: UmbRouterSlotChangeEvent) => {
-		const currentPath = event.target.localActiveViewPath || '';
-		const section = this._sections.find(
-			(s) => UMB_SECTION_PATH_PATTERN.generateLocal({ sectionName: s.manifest!.meta.pathname }) === currentPath,
-		);
-		if (!section) return;
-		await section.asPromise();
-		if (section.manifest) {
-			this._backofficeContext?.setActiveSectionAlias(section.alias);
-			this._provideSectionContext(section.manifest);
-		}
-	};
-
 	private _provideSectionContext(sectionManifest: ManifestSection) {
 		if (!this._sectionContext) {
-			this._sectionContext = new UmbSectionContext(this, sectionManifest);
-			this.provideContext(UMB_SECTION_CONTEXT, this._sectionContext);
-		} else {
-			this._sectionContext.setManifest(sectionManifest);
+			this._sectionContext = new UmbSectionContext(this);
 		}
+
+		this._sectionContext.setManifest(sectionManifest);
 	}
 
 	override render() {
-		return this._routes.length > 0
-			? html`<umb-router-slot .routes=${this._routes} @change=${this._onRouteChange}></umb-router-slot>`
-			: nothing;
+		return this._routes.length > 0 ? html`<umb-router-slot .routes=${this._routes}></umb-router-slot>` : nothing;
 	}
 
 	static override styles = [
