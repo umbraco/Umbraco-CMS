@@ -37088,6 +37088,7 @@
       },
       "DocumentCollectionResponseModel": {
         "required": [
+          "ancestors",
           "documentType",
           "id",
           "isProtected",
@@ -37142,6 +37143,16 @@
           },
           "isProtected": {
             "type": "boolean"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
+            }
           },
           "updater": {
             "type": "string",
@@ -37456,6 +37467,7 @@
       },
       "DocumentTreeItemResponseModel": {
         "required": [
+          "ancestors",
           "createDate",
           "documentType",
           "hasChildren",
@@ -37494,6 +37506,16 @@
           },
           "isProtected": {
             "type": "boolean"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
+            }
           },
           "documentType": {
             "oneOf": [
