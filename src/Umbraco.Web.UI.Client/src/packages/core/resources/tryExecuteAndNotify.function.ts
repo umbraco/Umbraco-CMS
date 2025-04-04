@@ -3,10 +3,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
- *
- * @param host
- * @param resource
- * @param options
+ * @deprecated Use the {tryExecute} function instead and handle the error in the caller.
+ * This function is kept for backwards compatibility and will be removed in a future version.
  */
 export async function tryExecuteAndNotify<T>(
 	host: UmbControllerHost,
