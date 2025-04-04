@@ -59,10 +59,6 @@ export class UmbMediaReferencesWorkspaceInfoAppElement extends UmbLitElement {
 		);
 	}
 
-	protected override firstUpdated(): void {
-		this.#getReferences();
-	}
-
 	async #getReferences() {
 		if (!this.#mediaUnique) {
 			throw new Error('Media unique is required');

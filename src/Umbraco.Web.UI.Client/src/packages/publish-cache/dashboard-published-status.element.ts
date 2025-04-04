@@ -39,7 +39,6 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 
 	// Rebuild
 	private async _rebuildDatabaseCache() {
-
 		this._buttonStateRebuild = 'waiting';
 		const { error } = await tryExecuteAndNotify(this, PublishedCacheService.postPublishedCacheRebuild());
 		if (error) {

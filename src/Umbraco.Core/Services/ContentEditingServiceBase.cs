@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -198,7 +198,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return await Task.FromResult(Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(status, content));
         }
 
-        if (disabledWhenReferenced && _relationService.IsRelated(content.Id))
+        if (disabledWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child))
         {
             return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(referenceFailStatus, content);
         }

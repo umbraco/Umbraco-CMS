@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
@@ -172,7 +173,15 @@ internal partial class BlockListElementLevelVariationTests
     }
 
     [Test]
-    public async Task Can_Validate_Invalid_Properties_Specific_Culture_Only()
+    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
+    public async Task Can_Validate_Invalid_Properties_Specific_Culture_Only_With_AllowEditInvariantFromNonDefault()
+        => await Can_Validate_Invalid_Properties_Specific_Culture_Only();
+
+    [Test]
+    public async Task Can_Validate_Invalid_Properties_Specific_Culture_Only_Without_AllowEditInvariantFromNonDefault()
+        => await Can_Validate_Invalid_Properties_Specific_Culture_Only();
+
+    private async Task Can_Validate_Invalid_Properties_Specific_Culture_Only()
     {
         var elementType = CreateElementTypeWithValidation();
         var blockListDataType = await CreateBlockListDataType(elementType);
@@ -214,6 +223,8 @@ internal partial class BlockListElementLevelVariationTests
             contentType,
             new[] { "en-US" });
 
+        // NOTE: since the default culture is being validated, we expect the same result regardless
+        //       of the AllowEditInvariantFromNonDefault configuration
         var errors = result.ValidationErrors.ToArray();
         Assert.Multiple(() =>
         {
@@ -338,7 +349,15 @@ internal partial class BlockListElementLevelVariationTests
     }
 
     [Test]
-    public async Task Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only()
+    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
+    public async Task Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only_With_AllowEditInvariantFromNonDefault()
+        => Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only(true);
+
+    [Test]
+    public async Task Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only_Without_AllowEditInvariantFromNonDefault()
+        => Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only(false);
+
+    private async Task Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only(bool expectedInvariantValidationErrors)
     {
         var (rootElementType, nestedElementType) = await CreateElementTypeWithValidationAndNestedBlocksAsync();
         var rootBlockListDataType = await CreateBlockListDataType(rootElementType);
@@ -448,19 +467,39 @@ internal partial class BlockListElementLevelVariationTests
             new[] { "da-DK" });
 
         var errors = result.ValidationErrors.ToArray();
-        Assert.Multiple(() =>
+
+        // NOTE: since the default culture is not being validated, we expect different results depending
+        //       on the AllowEditInvariantFromNonDefault configuration
+
+        if (expectedInvariantValidationErrors)
         {
-            Assert.AreEqual(6, errors.Length);
-            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(6, errors.Length);
+                Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
 
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
 
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
-        });
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
+            });
+        }
+        else
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(3, errors.Length);
+                Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
+
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+            });
+        }
     }
 
     [Test]

@@ -3,7 +3,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbArrayState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
-export type UmbValidationMessageType = 'client' | 'server';
+export type UmbValidationMessageType = 'client' | 'server' | 'config' | string;
 export interface UmbValidationMessage {
 	type: UmbValidationMessageType;
 	key: string;
@@ -32,7 +32,11 @@ export class UmbValidationMessagesManager {
 	messages = this.#messages.asObservable();
 	filteredMessages = this.#messages.asObservablePart((msgs) => (this.#filter ? msgs.filter(this.#filter) : msgs));
 
-	getFilteredMessages(): Array<UmbValidationMessage> {
+	getNotFilteredMessages(): Array<UmbValidationMessage> {
+		return this.#messages.getValue();
+	}
+
+	getMessages(): Array<UmbValidationMessage> {
 		const msgs = this.#messages.getValue();
 		return this.#filter ? msgs.filter(this.#filter) : msgs;
 	}
@@ -68,12 +72,12 @@ export class UmbValidationMessagesManager {
 	}
 
 	getHasAnyMessages(): boolean {
-		return this.getFilteredMessages().length !== 0;
+		return this.getMessages().length !== 0;
 	}
 
 	getMessagesOfPathAndDescendant(path: string): Array<UmbValidationMessage> {
 		//path = path.toLowerCase();
-		return this.getFilteredMessages().filter((x) => MatchPathOrDescendantPath(x.path, path));
+		return this.getMessages().filter((x) => MatchPathOrDescendantPath(x.path, path));
 	}
 
 	messagesOfPathAndDescendant(path: string): Observable<Array<UmbValidationMessage>> {
@@ -91,6 +95,14 @@ export class UmbValidationMessagesManager {
 		);
 	}
 
+	messagesOfNotTypeAndPath(type: UmbValidationMessageType, path: string): Observable<Array<UmbValidationMessage>> {
+		//path = path.toLowerCase();
+		// Find messages that matches the given type and path.
+		return createObservablePart(this.filteredMessages, (msgs) =>
+			msgs.filter((x) => x.type !== type && x.path === path),
+		);
+	}
+
 	hasMessagesOfPathAndDescendant(path: string): Observable<boolean> {
 		//path = path.toLowerCase();
 		return createObservablePart(this.filteredMessages, (msgs) =>
@@ -99,7 +111,7 @@ export class UmbValidationMessagesManager {
 	}
 	getHasMessagesOfPathAndDescendant(path: string): boolean {
 		//path = path.toLowerCase();
-		return this.getFilteredMessages().some(
+		return this.getMessages().some(
 			(x) =>
 				x.path.indexOf(path) === 0 &&
 				(x.path.length === path.length || x.path[path.length] === '.' || x.path[path.length] === '['),

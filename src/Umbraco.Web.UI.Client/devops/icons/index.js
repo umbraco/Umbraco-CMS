@@ -186,10 +186,11 @@ const generateJS = (icons) => {
 
 	const iconDescriptors = icons.map((icon) => {
 		// remove legacy for v.17 (Deprecated)
+		// Notice how legacy also makes an icon hidden. Legacy will be removed in v.17, but still used in the dictionary for legacy icons. But outward they are both hidden. [NL]
 		return `{
 			name: "${icon.name}",
 			${icon.legacy ? 'legacy: true,' : ''}
-			${icon.hidden ? 'hidden: true,' : ''}
+			${icon.hidden || icon.legacy ? 'hidden: true,' : ''}
 			path: () => import("./icons/${icon.fileName}.js"),
 		}`.replace(/\t/g, '').replace(/^\s*[\r\n]/gm, ''); // Regex removes white space [NL] // + regex that removes empty lines. [NL]
 	});

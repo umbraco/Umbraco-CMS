@@ -1,7 +1,7 @@
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { type ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbValidationMessage } from '../../context/validation-messages.manager.js';
 import type { UmbValidationPathTranslator } from './types.js';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type UmbValidationTranslationControllerArgs = {
