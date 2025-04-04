@@ -1,5 +1,4 @@
 import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
-import {expect} from "@playwright/test";
 
 // Content Name
 const contentName = 'ContentName';
@@ -21,6 +20,7 @@ const elementGroupName = 'ElementGroup';
 // Property Editor
 const propertyEditorName = 'ProperyEditorInBlockName';
 let propertyEditorId = null;
+const optionValues = ['testOption1', 'testOption2'];
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
@@ -31,7 +31,6 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('block grid with a mandatory radiobox ', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const optionValues = ['testOption1', 'testOption2'];
   propertyEditorId = await umbracoApi.dataType.createRadioboxDataType(propertyEditorName, optionValues);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
   blockGridId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridName, elementTypeId, true);
@@ -54,13 +53,13 @@ test('block grid with a mandatory radiobox ', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
 
+  // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 });
 
 test('block grid with a mandatory checkbox list', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const optionValues = ['testOption1', 'testOption2'];
   propertyEditorId = await umbracoApi.dataType.createCheckboxListDataType(propertyEditorName, optionValues);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
   blockGridId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridName, elementTypeId, true);
@@ -83,13 +82,13 @@ test('block grid with a mandatory checkbox list', async ({umbracoApi, umbracoUi}
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
 
+  // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 });
 
 test('block grid with a mandatory dropdown', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const optionValues = ['testOption1', 'testOption2'];
   propertyEditorId = await umbracoApi.dataType.createDropdownDataType(propertyEditorName, false, optionValues);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
   blockGridId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridName, elementTypeId, true);
@@ -112,6 +111,7 @@ test('block grid with a mandatory dropdown', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
 
+  // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 });

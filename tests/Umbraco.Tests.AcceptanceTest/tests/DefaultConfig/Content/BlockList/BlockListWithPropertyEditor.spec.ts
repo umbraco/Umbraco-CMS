@@ -20,6 +20,7 @@ const elementGroupName = 'ElementGroup';
 // Property Editor
 const propertyEditorName = 'ProperyEditorInBlockName';
 let propertyEditorId = null;
+const optionValues = ['testOption1', 'testOption2'];
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
@@ -30,7 +31,6 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('block list with an mandatory radiobox', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const optionValues = ['testOption1', 'testOption2'];
   propertyEditorId = await umbracoApi.dataType.createRadioboxDataType(propertyEditorName, optionValues);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
   blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
@@ -53,13 +53,13 @@ test('block list with an mandatory radiobox', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
 
+  // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 });
 
 test('block list with an mandatory checkbox list', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const optionValues = ['testOption1', 'testOption2'];
   propertyEditorId = await umbracoApi.dataType.createCheckboxListDataType(propertyEditorName, optionValues);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
   blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
@@ -82,13 +82,13 @@ test('block list with an mandatory checkbox list', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
 
+  // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 });
 
 test('block list with an mandatory dropdown ', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const optionValues = ['testOption1', 'testOption2'];
   propertyEditorId = await umbracoApi.dataType.createDropdownDataType(propertyEditorName, false, optionValues);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
   blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
@@ -111,6 +111,7 @@ test('block list with an mandatory dropdown ', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
 
+  // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 });
