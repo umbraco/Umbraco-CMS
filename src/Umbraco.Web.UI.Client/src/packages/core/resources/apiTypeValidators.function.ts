@@ -1,16 +1,10 @@
 import type { ApiError, CancelError } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Checks if the given error is an instance of ApiError.
  * @deprecated Use {UmbApiError.isUmbApiError} instead and map your object to {UmbApiError} if needed.
  */
 export function isApiError(error: unknown): error is ApiError {
-	new UmbDeprecation({
-		deprecated: 'isApiError',
-		removeInVersion: '18.0.0',
-		solution: 'Use UmbApiError.isUmbApiError instead',
-	});
 	return (error as ApiError).name === 'ApiError';
 }
 
@@ -19,11 +13,6 @@ export function isApiError(error: unknown): error is ApiError {
  * @deprecated Use {UmbApiCancelError.isUmbApiCancelError}` instead and map your object to {UmbApiCancelError} if needed.
  */
 export function isCancelError(error: unknown): error is CancelError {
-	new UmbDeprecation({
-		deprecated: 'isCancelError',
-		removeInVersion: '18.0.0',
-		solution: 'Use UmbApiCancelError.isUmbApiCancelError instead',
-	});
 	return (error as CancelError).name === 'CancelError';
 }
 
