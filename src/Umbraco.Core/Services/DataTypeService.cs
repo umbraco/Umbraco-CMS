@@ -771,11 +771,12 @@ namespace Umbraco.Cms.Core.Services.Implement
             var totalItems = combinedUsages.Count;
 
             // Create the page of items.
-            IEnumerable<(string PropertyAlias, Udi Udi)> pagedUsages = combinedUsages
+            IList<(string PropertyAlias, Udi Udi)> pagedUsages = combinedUsages
                 .OrderBy(x => x.Udi.EntityType) // Document types first, then media types, then member types.
                 .ThenBy(x => x.PropertyAlias)
                 .Skip(skip)
-                .Take(take);
+                .Take(take)
+                .ToList();
 
             // Get the content types for the UDIs referenced in the page of items to construct the response from.
             // They could be document, media or member types.
@@ -814,7 +815,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             return Task.FromResult(pagedModel);
         }
 
-        private IList<IContentTypeComposition> GetReferencedContentTypes(IEnumerable<(string PropertyAlias, Udi Udi)> pagedUsages)
+        private IList<IContentTypeComposition> GetReferencedContentTypes(IList<(string PropertyAlias, Udi Udi)> pagedUsages)
         {
             IEnumerable<IContentTypeComposition> documentTypes = GetContentTypes(
                 pagedUsages,
