@@ -283,7 +283,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		await this.structure.loadType((data as any)[this.#contentTypePropertyName].unique);
 
 		// Set culture and segment for all values:
-		const cutlures = this.#languages.getValue().map((x) => x.unique);
+		const cultures = this.#languages.getValue().map((x) => x.unique);
 
 		if (this.structure.variesBySegment) {
 			console.warn('Segments are not yet implemented for preset');
@@ -319,11 +319,28 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		const controller = new UmbPropertyValuePresetVariantBuilderController(this);
-		controller.setCultures(cutlures);
+		controller.setCultures(cultures);
 		if (segments) {
 			controller.setSegments(segments);
 		}
-		data.values = await controller.create(valueDefinitions);
+
+		const presetValues = await controller.create(valueDefinitions);
+
+		// Don't just set the values, as we could have some already populated from a blueprint.
+		// If we have a value from both a blueprint and a preset, use the latter as priority.
+		const dataValues = [...data.values];
+		for (let index = 0; index < presetValues.length; index++) {
+			const presetValue = presetValues[index];
+			const variantId = UmbVariantId.Create(presetValue);
+			const matchingDataValueIndex = dataValues.findIndex((v) => v.alias === presetValue.alias && variantId.compare(v));
+			if (matchingDataValueIndex > -1) {
+				dataValues[matchingDataValueIndex] = presetValue;
+			} else {
+				dataValues.push(presetValue);
+			}
+		}
+
+		data.values = dataValues;
 
 		return data;
 	}

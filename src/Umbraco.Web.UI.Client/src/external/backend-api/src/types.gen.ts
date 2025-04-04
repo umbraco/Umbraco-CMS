@@ -2071,6 +2071,11 @@ export type PublishedDocumentResponseModel = {
     isTrashed: boolean;
 };
 
+export type PublishWithDescendantsResultModel = {
+    taskId: string;
+    isComplete: boolean;
+};
+
 export type RebuildStatusModel = {
     isRebuilding: boolean;
 };
@@ -3286,7 +3291,14 @@ export type PutDocumentByIdPublishWithDescendantsData = {
     requestBody?: (PublishDocumentWithDescendantsRequestModel);
 };
 
-export type PutDocumentByIdPublishWithDescendantsResponse = (string);
+export type PutDocumentByIdPublishWithDescendantsResponse = ((PublishWithDescendantsResultModel));
+
+export type GetDocumentByIdPublishWithDescendantsResultByTaskIdData = {
+    id: string;
+    taskId: string;
+};
+
+export type GetDocumentByIdPublishWithDescendantsResultByTaskIdResponse = ((PublishWithDescendantsResultModel));
 
 export type GetDocumentByIdPublishedData = {
     id: string;

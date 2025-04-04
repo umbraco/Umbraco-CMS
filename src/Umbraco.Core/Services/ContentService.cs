@@ -2767,7 +2767,7 @@ public class ContentService : RepositoryService, IContentService
             {
                 foreach (IContent content in contents)
                 {
-                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id))
+                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child))
                     {
                         continue;
                     }
@@ -3377,7 +3377,7 @@ public class ContentService : RepositoryService, IContentService
                             content.Name,
                             content.Id,
                             culture,
-                            "document is culture awaiting release");
+                            "document has culture awaiting release");
                     }
 
                     return new PublishResult(

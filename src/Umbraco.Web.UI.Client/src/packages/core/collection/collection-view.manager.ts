@@ -94,6 +94,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 
 			if (routes.length > 0) {
 				routes.push({
+					unique: fallbackView.alias,
 					path: '',
 					component: () => createExtensionElement(fallbackView),
 					setup: () => {
