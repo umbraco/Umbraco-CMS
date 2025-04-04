@@ -12,7 +12,7 @@ export class UmbPeekErrorController extends UmbControllerBase {
 			throw new Error('Could not get notification context');
 		}
 
-		context.peek('danger', {
+		context.peek(args.color ?? 'danger', {
 			elementName: 'umb-peek-error-notification',
 			data: args,
 		});

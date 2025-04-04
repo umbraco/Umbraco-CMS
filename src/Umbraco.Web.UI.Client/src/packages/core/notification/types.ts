@@ -26,5 +26,6 @@ export interface UmbNotificationOptions<UmbNotificationData = UmbNotificationDef
 export type UmbNotificationColor = '' | 'default' | 'positive' | 'warning' | 'danger';
 
 export interface UmbPeekErrorArgs extends UmbNotificationDefaultData {
-	details?: any;
+	details?: unknown;
+	color?: UmbNotificationColor;
 }
