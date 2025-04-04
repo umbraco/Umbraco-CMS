@@ -165,6 +165,9 @@ public class MultipleTextStringPropertyValueEditorTests
         else
         {
             Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual($"validation_outOfRangeSingleItemMinimum", validationResult.ErrorMessage);
         }
     }
 

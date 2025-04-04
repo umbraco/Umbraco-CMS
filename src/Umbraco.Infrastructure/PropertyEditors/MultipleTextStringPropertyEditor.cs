@@ -169,12 +169,13 @@ public class MultipleTextStringPropertyEditor : DataEditor
                 yield break;
             }
 
-            // If we have a null value, treat as an empty collection for minimum number validation.
+            // Handle both a newline delimited string and an IEnumerable<string> as the value (see: https://github.com/umbraco/Umbraco-CMS/pull/18936).
+            // If we have a null value, treat as a string count of zero for minimum number validation.
             var stringCount = value is string stringValue
-                    ? MultipleTextStringPropertyValueEditor.SplitPropertyValue(stringValue).Length
-                    : value is IEnumerable<string> strings
-                        ? strings.Count()
-                        : 0;
+                ? MultipleTextStringPropertyValueEditor.SplitPropertyValue(stringValue).Length
+                : value is IEnumerable<string> strings
+                    ? strings.Count()
+                    : 0;
 
             if (stringCount < multipleTextStringConfiguration.Min)
             {
