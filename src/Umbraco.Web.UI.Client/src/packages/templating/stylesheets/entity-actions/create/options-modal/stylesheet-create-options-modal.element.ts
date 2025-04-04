@@ -4,6 +4,7 @@ import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 18. [LK] */
 @customElement('umb-stylesheet-create-options-modal')
 export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
 	UmbStylesheetCreateOptionsModalData,

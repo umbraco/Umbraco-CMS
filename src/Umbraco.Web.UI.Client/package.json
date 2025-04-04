@@ -152,7 +152,7 @@
 		"build-storybook": "npm run wc-analyze && storybook build",
 		"build:for:cms": "npm run build && npm run build:workspaces && npm run generate:manifest && npm run package:validate && node ./devops/build/copy-to-cms.js",
 		"build:for:npm": "npm run build -- --declaration && npm run generate:manifest && npm run package:validate",
-		"build:for:static": "vite build",
+		"build:for:static": "cross-env VITE_UMBRACO_USE_MSW=on vite build",
 		"build:vite": "tsc && vite build --mode staging",
 		"build:workspaces": "npm run build -ws --if-present",
 		"build": "tsc --project ./src/tsconfig.build.json",

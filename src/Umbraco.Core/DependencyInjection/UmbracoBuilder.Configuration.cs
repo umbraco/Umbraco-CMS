@@ -103,6 +103,8 @@ public static partial class UmbracoBuilderExtensions
             Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
             builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes}"));
 
+        builder.Services.AddOptions<TinyMceToTiptapMigrationSettings>();
+
         return builder;
     }
 }
