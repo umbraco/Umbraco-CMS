@@ -358,5 +358,5 @@ test('can not copy a block from a block grid to root without allowed in root', a
   await umbracoUi.content.doesClipboardContainCopiedBlocksCount(0);
 
   // Clean
-  await umbracoApi.documentType.ensureNameNotExists(secondElementTypeId);
+  await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
 });
