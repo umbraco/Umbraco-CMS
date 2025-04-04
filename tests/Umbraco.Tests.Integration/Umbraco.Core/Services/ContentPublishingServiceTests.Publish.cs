@@ -165,4 +165,124 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         content = ContentService.GetById(content.Key);
         Assert.AreEqual(0, content!.PublishedCultures.Count());
     }
+
+    [Test]
+    public async Task Cannot_Publish_With_Unpublished_Parent()
+    {
+        var doctype = await SetupInvariantDoctypeAsync();
+        var parentContent = await CreateInvariantContentAsync(doctype);
+        var childContent = await CreateInvariantContentAsync(doctype, parentContent.Key);
+
+        var publishAttempt = await ContentPublishingService.PublishAsync(
+            childContent.Key,
+            [new() { Culture = Constants.System.InvariantCulture }],
+            Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(publishAttempt.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.PathNotPublished, publishAttempt.Status);
+
+        // Now publish the parent and re-try publishing the child.
+        publishAttempt = await ContentPublishingService.PublishAsync(
+            parentContent.Key,
+            [new() { Culture = Constants.System.InvariantCulture }],
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishAttempt.Success);
+
+        publishAttempt = await ContentPublishingService.PublishAsync(
+            childContent.Key,
+            [new() { Culture = Constants.System.InvariantCulture }],
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishAttempt.Success);
+    }
+
+    [Test]
+    public async Task Cannot_Publish_Culture_With_Unpublished_Parent()
+    {
+        var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
+        var parentContent = await CreateVariantContentAsync(
+            langEn,
+            langDa,
+            langBe,
+            contentType);
+        var childContent = await CreateVariantContentAsync(
+            langEn,
+            langDa,
+            langBe,
+            contentType,
+            parentContent.Key);
+
+        // Publish child in English, should not succeed.
+        var publishAttempt = await ContentPublishingService.PublishAsync(
+            childContent.Key,
+            [new() { Culture = langEn.IsoCode }],
+            Constants.Security.SuperUserKey);
+        Assert.IsFalse(publishAttempt.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.PathNotPublished, publishAttempt.Status);
+
+        // Now publish the parent and re-try publishing the child.
+        publishAttempt = await ContentPublishingService.PublishAsync(
+            parentContent.Key,
+            [new() { Culture = langEn.IsoCode }],
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishAttempt.Success);
+
+        publishAttempt = await ContentPublishingService.PublishAsync(
+            childContent.Key,
+            [new() { Culture = langEn.IsoCode }],
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishAttempt.Success);
+    }
+
+    [Test]
+    public async Task Cannot_Publish_Culture_With_Unpublished_Parent_Culture()
+    {
+        var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
+        var parentContent = await CreateVariantContentAsync(
+            langEn,
+            langDa,
+            langBe,
+            contentType);
+        var childContent = await CreateVariantContentAsync(
+            langEn,
+            langDa,
+            langBe,
+            contentType,
+            parentContent.Key);
+
+        // Publish parent in English.
+        var publishAttempt = await ContentPublishingService.PublishAsync(
+            parentContent.Key,
+            [new() { Culture = langEn.IsoCode }],
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishAttempt.Success);
+
+        // Publish child in English, should succeed.
+        publishAttempt = await ContentPublishingService.PublishAsync(
+            childContent.Key,
+            [new() { Culture = langEn.IsoCode }],
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishAttempt.Success);
+
+        // Publish child in Danish, should not succeed.
+        publishAttempt = await ContentPublishingService.PublishAsync(
+            childContent.Key,
+            [new() { Culture = langDa.IsoCode }],
+            Constants.Security.SuperUserKey);
+        Assert.IsFalse(publishAttempt.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.PathNotPublished, publishAttempt.Status);
+
+        // Publish parent in Danish.
+        publishAttempt = await ContentPublishingService.PublishAsync(
+            parentContent.Key,
+            [new() { Culture = langDa.IsoCode }],
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishAttempt.Success);
+
+        // Publish child in Danish, now should succeed.
+        publishAttempt = await ContentPublishingService.PublishAsync(
+            childContent.Key,
+            [new() { Culture = langDa.IsoCode }],
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishAttempt.Success);
+    }
 }

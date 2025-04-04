@@ -39,8 +39,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
 
-    private async Task<(ILanguage LangEn, ILanguage LangDa, ILanguage LangBe, IContentType contentType)>
-        SetupVariantDoctypeAsync()
+    private async Task<(ILanguage LangEn, ILanguage LangDa, ILanguage LangBe, IContentType contentType)> SetupVariantDoctypeAsync()
     {
         var langEn = (await LanguageService.GetAsync("en-US"))!;
         var langDa = new LanguageBuilder()
@@ -73,10 +72,17 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             throw new Exception("Something unexpected went wrong setting up the test data structure");
         }
 
+        contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 1, contentType.Alias)];
+        var updateAttempt = await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+        if (updateAttempt.Success is false)
+        {
+            throw new Exception("Something unexpected went wrong setting up the test data structure");
+        }
+
         return (langEn, langDa, langBe, contentType);
     }
 
-    private async Task<IContent> CreateVariantContentAsync(ILanguage langEn, ILanguage langDa, ILanguage langBe, IContentType contentType)
+    private async Task<IContent> CreateVariantContentAsync(ILanguage langEn, ILanguage langDa, ILanguage langBe, IContentType contentType, Guid? parentKey = null)
     {
         var documentKey = Guid.NewGuid();
 
@@ -84,6 +90,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         {
             Key = documentKey,
             ContentTypeKey = contentType.Key,
+            ParentKey = parentKey,
             Variants =
             [
                 new VariantModel
@@ -124,6 +131,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         var contentType = new ContentTypeBuilder()
             .WithAlias("invariantContent")
             .WithName("Invariant Content")
+            .WithAllowAsRoot(true)
             .AddPropertyGroup()
                 .WithAlias("content")
                 .WithName("Content")
@@ -131,9 +139,15 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
                 .Done()
             .Build();
 
-        contentType.AllowedAsRoot = true;
         var createAttempt = await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         if (createAttempt.Success is false)
+        {
+            throw new Exception("Something unexpected went wrong setting up the test data structure");
+        }
+
+        contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 1, contentType.Alias)];
+        var updateAttempt = await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+        if (updateAttempt.Success is false)
         {
             throw new Exception("Something unexpected went wrong setting up the test data structure");
         }
@@ -141,19 +155,22 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         return contentType;
     }
 
-    private async Task<IContent> CreateInvariantContentAsync(IContentType contentType)
+    private async Task<IContent> CreateInvariantContentAsync(IContentType contentType, Guid? parentKey = null)
     {
         var documentKey = Guid.NewGuid();
 
         var createModel = new ContentCreateModel
         {
-            Key = documentKey, ContentTypeKey = contentType.Key, InvariantName = "Test",
+            Key = documentKey,
+            ContentTypeKey = contentType.Key,
+            InvariantName = "Test",
+            ParentKey = parentKey,
         };
 
         var createAttempt = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         if (createAttempt.Success is false)
         {
-            throw new Exception("Something unexpected went wrong setting up the test data");
+            throw new Exception($"Something unexpected went wrong setting up the test data. Status: {createAttempt.Status}");
         }
 
         return createAttempt.Result.Content!;
