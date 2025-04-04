@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using NUnit.Framework;
@@ -17,7 +15,6 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -302,57 +299,109 @@ public class UserServiceTests : UmbracoIntegrationTest
     [Test]
     public void Calculate_Permissions_For_User_For_Path()
     {
-        // see: http://issues.umbraco.org/issue/U4-10075#comment=67-40085
-        // for an overview of what this is testing
+        // Details of what this is testing were originally at http://issues.umbraco.org/issue/U4-10075#comment=67-40085 (and available
+        // now at https://web.archive.org/web/20211021021851/http://issues.umbraco.org/issue/U4-10075).
+        // Here is the same information copied and reformatted:
+
+        // Here's a mockup of how user group permissions will work with inheritance.
+        // User (UserX), belongs to these groups which have the following default permission characters applied:
+
+        // | Groups | Defaults |
+        // |--------|----------|
+        // | G1     | sdf      |
+        // | G2     | sdgk     |
+        // | G3     | fg       |
+
+        // Thus the aggregate defaults for UserX is "sdfgk"
+
+        // As an example node structure, here is the node tree and where any explicit permissions are assigned.
+        // It shows you the resulting permissions for each node that the user has:
+
+        // | Nodes       | G1   | G2   | G3   | Result                                    |
+        // |-------------|------|------|------|-------------------------------------------|
+        // | - A         |      |      |      | sdfgk (Defaults)                          |
+        // | - - B       |      |  fr  |      | sdfgr (Defaults + Explicit)               |
+        // | - - - C     |      |      | qz   | sdfrqz (Defaults + Explicit + Inherited)  |
+        // | - - - - D   |      |      |      | sdfrqz (Inherited)                        |
+        // | - - - - - E |      |      |      | sdfrqz (Inherited)                        |
+
+        // Notice that 'k' is no longer in the result for node B and below.
+        // Notice that 'g' is no longer in the result for node C and below.
+
         const string path = "-1,1,2,3,4";
         var pathIds = path.GetIdsFromPathReversed();
 
+        // Setup: 3 groups with different default permissions.
+        // - Group A has permissions S, D, F.
+        // - Group B has permissions S, D, G, K.
+        // - Group C has permissions F, G.
         const int groupA = 7;
         const int groupB = 8;
         const int groupC = 9;
-
         var userGroups = new Dictionary<int, ISet<string>>
         {
-            {groupA, new[] {"S", "D", "F"}.ToHashSet()}, {groupB, new[] {"S", "D", "G", "K"}.ToHashSet()}, {groupC, new[] {"F", "G"}.ToHashSet()}
+            { groupA, new[] {"S", "D", "F"}.ToHashSet() },
+            { groupB, new[] {"S", "D", "G", "K"}.ToHashSet() },
+            { groupC, new[] {"F", "G"}.ToHashSet() }
         };
 
+        // Setup: combination of default and specific permissions for each group and document.
         EntityPermission[] permissions =
         {
-            new(groupA, 1, userGroups[groupA], true), new(groupA, 2, userGroups[groupA], true),
-            new(groupA, 3, userGroups[groupA], true), new(groupA, 4, userGroups[groupA], true),
-            new(groupB, 1, userGroups[groupB], true), new(groupB, 2, new[] {"F", "R"}.ToHashSet(), false),
-            new(groupB, 3, userGroups[groupB], true), new(groupB, 4, userGroups[groupB], true),
-            new(groupC, 1, userGroups[groupC], true), new(groupC, 2, userGroups[groupC], true),
-            new(groupC, 3, new[] {"Q", "Z"}.ToHashSet(), false), new(groupC, 4, userGroups[groupC], true)
+            new(groupA, 1, userGroups[groupA], true),                   // Comes from the default permission on group A.
+            new(groupA, 2, userGroups[groupA], true),                   // Comes from the default permission on group A.
+            new(groupA, 3, userGroups[groupA], true),                   // Comes from the default permission on group A.
+            new(groupA, 4, userGroups[groupA], true),                   // Comes from the default permission on group A.
+            new(groupB, 1, userGroups[groupB], true),                   // Comes from the default permission on group B.
+            new(groupB, 2, new[] {"F", "R"}.ToHashSet(), false),        // Group B has a specific permission on document 2 of of F, R.
+            new(groupB, 3, userGroups[groupB], true),                   // Comes from the default permission on group B.
+            new(groupB, 4, userGroups[groupB], true),                   // Comes from the default permission on group B.
+            new(groupC, 1, userGroups[groupC], true),                   // Comes from the default permission on group C.
+            new(groupC, 2, userGroups[groupC], true),                   // Comes from the default permission on group C.
+            new(groupC, 3, new[] {"Q", "Z"}.ToHashSet(), false),        // Group C has a specific permission on document 3 of of Q, Z.
+            new(groupC, 4, userGroups[groupC], true)                    // Comes from the default permission on group C.
         };
 
-        // Permissions for Id 4
+        // Permissions for document 4
         var result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds);
         Assert.AreEqual(4, result.EntityId);
         var allPermissions = result.GetAllPermissions().ToArray();
         Assert.AreEqual(6, allPermissions.Length, string.Join(",", allPermissions));
-        Assert.IsTrue(allPermissions.ContainsAll(new[] { "S", "D", "F", "R", "Q", "Z" }));
 
-        // Permissions for Id 3
+        // - has S, D, F from group A, R from group B (specific permission on document 2), Q, Z from group C (specific permission on document 3).
+        // - doesn't have K or G due to specific permissions set on group B, document 2.
+        Assert.IsTrue(allPermissions.ContainsAll(["S", "D", "F", "R", "Q", "Z"]));
+
+        // Permissions for document 3
         result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds.Skip(1).ToArray());
         Assert.AreEqual(3, result.EntityId);
         allPermissions = result.GetAllPermissions().ToArray();
         Assert.AreEqual(6, allPermissions.Length, string.Join(",", allPermissions));
-        Assert.IsTrue(allPermissions.ContainsAll(new[] { "S", "D", "F", "R", "Q", "Z" }));
 
-        // Permissions for Id 2
+        // - has S, D, F from group A, R from group B (specific permission on document 2), Q, Z from group C (specific permission on document 3).
+        // - doesn't have K or G due to specific permissions set on group B, document 2.
+        Assert.IsTrue(allPermissions.ContainsAll(["S", "D", "F", "R", "Q", "Z"]));
+
+        // Permissions for document 2
         result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds.Skip(2).ToArray());
         Assert.AreEqual(2, result.EntityId);
         allPermissions = result.GetAllPermissions().ToArray();
         Assert.AreEqual(5, allPermissions.Length, string.Join(",", allPermissions));
-        Assert.IsTrue(allPermissions.ContainsAll(new[] { "S", "D", "F", "G", "R" }));
 
-        // Permissions for Id 1
+        // - has S, D, F from group A, G from group C, R from group B (specific permission on document 2).
+        // - doesn't have K due to specific permissions set on group B, document 2.
+        // - this would remove G too, but it's there as it's also defined in group C that doesn't have a specific permission override.
+        // - doesn't have Q, Z as these specific permissions are added to a document further down the path.
+        Assert.IsTrue(allPermissions.ContainsAll(["S", "D", "F", "G", "R"]));
+
+        // Permissions for document 1
         result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds.Skip(3).ToArray());
         Assert.AreEqual(1, result.EntityId);
         allPermissions = result.GetAllPermissions().ToArray();
         Assert.AreEqual(5, allPermissions.Length, string.Join(",", allPermissions));
-        Assert.IsTrue(allPermissions.ContainsAll(new[] { "S", "D", "F", "G", "K" }));
+
+        // - has S, D, F from group A, G, K from group B (also G from group C)
+        Assert.IsTrue(allPermissions.ContainsAll(["S", "D", "F", "G", "K"]));
     }
 
     [Test]

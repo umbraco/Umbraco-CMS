@@ -5,6 +5,7 @@ import type { UmbContentVariantPickerData, UmbContentVariantPickerValue } from '
 import type { UmbContentPropertyDatasetContext } from '../property-dataset-context/index.js';
 import type { UmbContentValidationRepository } from '../repository/content-validation-repository.interface.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
+import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbraco-cms/backoffice/repository';
 import {
@@ -35,8 +36,7 @@ import {
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbDataPathVariantQuery,
 	UmbServerModelValidatorContext,
-	UmbVariantsValidationPathTranslator,
-	UmbVariantValuesValidationPathTranslator,
+	UmbValidationController,
 } from '@umbraco-cms/backoffice/validation';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -145,6 +145,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	// TODO: fix type error
 	public readonly variantOptions;
 
+	#variantValidationContexts: Array<UmbValidationController> = [];
+	getVariantValidationContext(variantId: UmbVariantId): UmbValidationController | undefined {
+		return this.#variantValidationContexts.find((x) => x.getVariantId()?.compare(variantId));
+	}
+
 	#validateOnSubmit: boolean;
 	#serverValidation = new UmbServerModelValidatorContext(this);
 	#validationRepositoryClass?: ClassConstructor<UmbContentValidationRepository<DetailModelType>>;
@@ -163,6 +168,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		>,
 	) {
 		super(host, args);
+
+		this.#serverValidation.addPathTranslator(UmbContentDetailValidationPathTranslator);
 
 		this._data.setVariantScaffold(args.contentVariantScaffold);
 		this.#saveModalToken = args.saveModalToken;
@@ -209,8 +216,26 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			},
 		);
 
-		new UmbVariantValuesValidationPathTranslator(this);
-		new UmbVariantsValidationPathTranslator(this);
+		this.observe(
+			this.variantOptions,
+			(variantOptions) => {
+				variantOptions.forEach((variantOption) => {
+					const missingThis = this.#variantValidationContexts.filter((x) => {
+						const variantId = x.getVariantId();
+						if (!variantId) return;
+						return variantId.culture === variantOption.culture && variantId.segment === variantOption.segment;
+					});
+					if (missingThis) {
+						const context = new UmbValidationController(this);
+						context.inheritFrom(this.validationContext, '$');
+						context.autoReport();
+						context.setVariantId(UmbVariantId.Create(variantOption));
+						this.#variantValidationContexts.push(context);
+					}
+				});
+			},
+			null,
+		);
 
 		this.observe(
 			this.varies,
@@ -258,7 +283,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		await this.structure.loadType((data as any)[this.#contentTypePropertyName].unique);
 
 		// Set culture and segment for all values:
-		const cutlures = this.#languages.getValue().map((x) => x.unique);
+		const cultures = this.#languages.getValue().map((x) => x.unique);
 
 		if (this.structure.variesBySegment) {
 			console.warn('Segments are not yet implemented for preset');
@@ -294,11 +319,28 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		const controller = new UmbPropertyValuePresetVariantBuilderController(this);
-		controller.setCultures(cutlures);
+		controller.setCultures(cultures);
 		if (segments) {
 			controller.setSegments(segments);
 		}
-		data.values = await controller.create(valueDefinitions);
+
+		const presetValues = await controller.create(valueDefinitions);
+
+		// Don't just set the values, as we could have some already populated from a blueprint.
+		// If we have a value from both a blueprint and a preset, use the latter as priority.
+		const dataValues = [...data.values];
+		for (let index = 0; index < presetValues.length; index++) {
+			const presetValue = presetValues[index];
+			const variantId = UmbVariantId.Create(presetValue);
+			const matchingDataValueIndex = dataValues.findIndex((v) => v.alias === presetValue.alias && variantId.compare(v));
+			if (matchingDataValueIndex > -1) {
+				dataValues[matchingDataValueIndex] = presetValue;
+			} else {
+				dataValues.push(presetValue);
+			}
+		}
+
+		data.values = dataValues;
 
 		return data;
 	}
@@ -684,8 +726,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				async () => {
 					return this.performCreateOrUpdate(variantIds, saveData);
 				},
-				async () => {
-					return this.invalidSubmit();
+				async (reason?: any) => {
+					return this.invalidSubmit(reason);
 				},
 			);
 		} else {

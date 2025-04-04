@@ -1,14 +1,16 @@
 import { UmbInstallerContext } from '../installer.context.js';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { html, type TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 
 export const installerContextProvider = (
 	story: () => Node | string | TemplateResult,
-	installerContext = new UmbInstallerContext(),
+	createContextMethod = (host: UmbControllerHostElement) => {
+		return new UmbInstallerContext(host);
+	},
 ) => html`
-	<umb-context-provider
+	<umb-controller-host-provider
 		style="display: block;margin: 2rem 25%;padding: 1rem;border: 1px solid #ddd;"
-		key="umbInstallerContext"
-		.value=${installerContext}>
+		.create=${createContextMethod}>
 		${story()}
-	</umb-context-provider>
+	</umb-controller-host-provider>
 `;

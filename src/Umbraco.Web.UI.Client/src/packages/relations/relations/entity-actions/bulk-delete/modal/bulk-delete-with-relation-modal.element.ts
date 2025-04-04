@@ -1,3 +1,4 @@
+import type { UmbConfirmBulkActionModalEntityReferencesConfig } from '../../../global-components/types.js';
 import type {
 	UmbBulkDeleteWithRelationConfirmModalData,
 	UmbBulkDeleteWithRelationConfirmModalValue,
@@ -15,16 +16,13 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
-// import of local component
-import '../../local-components/confirm-bulk-action-entity-references.element.js';
-
 @customElement('umb-bulk-delete-with-relation-confirm-modal')
 export class UmbBulkDeleteWithRelationConfirmModalElement extends UmbModalBaseElement<
 	UmbBulkDeleteWithRelationConfirmModalData,
 	UmbBulkDeleteWithRelationConfirmModalValue
 > {
 	@state()
-	_referencesConfig?: any;
+	_referencesConfig?: UmbConfirmBulkActionModalEntityReferencesConfig;
 
 	protected override firstUpdated(_changedProperties: PropertyValues): void {
 		super.firstUpdated(_changedProperties);

@@ -49,8 +49,9 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 	}
 
 	async #setMenu() {
-		if (!this.#manifest?.meta.items) return;
-		this.#menu = await this.#getMenuItems(this.#manifest.meta.items);
+		const items = this.#manifest?.items ?? this.#manifest?.meta.items;
+		if (!items) return;
+		this.#menu = await this.#getMenuItems(items);
 	}
 
 	async #getMenuItems(items: Array<MetaTiptapToolbarMenuItem>): Promise<Array<UmbCascadingMenuItem>> {
@@ -92,10 +93,10 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 		}
 
 		return {
-			icon: item.icon,
+			icon: item.appearance?.icon ?? item.icon,
 			items,
 			label: item.label,
-			style: item.style,
+			style: item.appearance?.style ?? item.style,
 			separatorAfter: item.separatorAfter,
 			element,
 			execute: () => this.api?.execute(this.editor, item),
@@ -123,7 +124,7 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 						${when(
 							this.manifest?.meta.icon,
 							(icon) => html`<umb-icon name=${icon}></umb-icon>`,
-							() => html`<span>${this.manifest?.meta.label}</span>`,
+							() => html`<span>${label}</span>`,
 						)}
 						<uui-symbol-expand slot="extra" open></uui-symbol-expand>
 					</uui-button>
@@ -135,6 +136,12 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 					</uui-button>
 				`,
 			)}
+			${this.renderMenu()}
+		`;
+	}
+
+	protected renderMenu() {
+		return html`
 			<umb-cascading-menu-popover id="popover-menu" placement="bottom-start" .items=${this.#menu}>
 			</umb-cascading-menu-popover>
 		`;
