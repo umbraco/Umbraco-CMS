@@ -2,7 +2,7 @@ import type { UmbMockDocumentModel } from '../document.data.js';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 const permissionsTestDocument = {
-	ancestorIds: [],
+	ancestors: [],
 	urls: [
 		{
 			culture: null,
@@ -39,7 +39,7 @@ export const data: Array<UmbMockDocumentModel> = [
 	permissionsTestDocument,
 	{
 		...permissionsTestDocument,
-		ancestorIds: ['permissions-document-id'],
+		ancestors: [{ id: 'permissions-document-id' }],
 		hasChildren: false,
 		id: 'permissions-1-document-id',
 		parent: { id: 'permissions-document-id' },
@@ -56,7 +56,7 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		...permissionsTestDocument,
-		ancestorIds: ['permissions-document-id'],
+		ancestors: [{ id: 'permissions-document-id' }],
 		hasChildren: true,
 		id: 'permissions-2-document-id',
 		parent: { id: 'permissions-document-id' },
@@ -73,7 +73,7 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		...permissionsTestDocument,
-		ancestorIds: ['permissions-document-id', 'permissions-2-document-id'],
+		ancestors: [{ id: 'permissions-document-id' }, { id: 'permissions-2-document-id' }],
 		hasChildren: true,
 		id: 'permission-2-1-document-id',
 		parent: { id: 'permissions-2-document-id' },
@@ -90,7 +90,7 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		...permissionsTestDocument,
-		ancestorIds: ['permissions-document-id', 'permissions-2-document-id'],
+		ancestors: [{ id: 'permissions-document-id' }, { id: 'permissions-2-document-id' }],
 		hasChildren: false,
 		id: 'permissions-2-2-document-id',
 		parent: { id: 'permissions-2-document-id' },
@@ -107,7 +107,11 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		...permissionsTestDocument,
-		ancestorIds: ['permissions-document-id', 'permissions-2-document-id', 'permissions-2-2-document-id'],
+		ancestors: [
+			{ id: 'permissions-document-id' },
+			{ id: 'permissions-2-document-id' },
+			{ id: 'permissions-2-2-document-id' },
+		],
 		hasChildren: false,
 		id: 'permission-2-2-1-document-id',
 		parent: { id: 'permissions-2-2-document-id' },

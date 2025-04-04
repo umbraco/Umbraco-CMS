@@ -58,7 +58,7 @@ const treeItemMapper = (model: UmbMockDocumentModel): DocumentTreeItemResponseMo
 	if (!documentType) throw new Error(`Document type with id ${model.documentType.id} not found`);
 
 	return {
-		ancestorIds: model.ancestorIds,
+		ancestors: model.ancestors,
 		documentType: {
 			icon: documentType.icon,
 			id: documentType.id,
@@ -79,21 +79,23 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 	if (!documentType) throw new Error(`Document type with id ${request.documentType.id} not found`);
 
 	const isRoot = request.parent === null || request.parent === undefined;
-	let ancestorIds: Array<string> = [];
+	let ancestors: Array<{ id: string }> = [];
 
 	if (!isRoot) {
 		const parentId = request.parent!.id;
 
-		const parentAncestors = umbDocumentMockDb.tree
-			.getAncestorsOf({ descendantId: parentId })
-			.map((ancestor) => ancestor.id);
-		ancestorIds = [...parentAncestors, parentId];
+		const parentAncestors = umbDocumentMockDb.tree.getAncestorsOf({ descendantId: parentId }).map((ancestor) => {
+			return {
+				id: ancestor.id,
+			};
+		});
+		ancestors = [...parentAncestors, { id: parentId }];
 	}
 
 	const now = new Date().toString();
 
 	return {
-		ancestorIds,
+		ancestors,
 		documentType: {
 			id: documentType.id,
 			icon: documentType.icon,
@@ -166,7 +168,7 @@ const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionRespon
 		updater: null,
 		values: model.values,
 		variants: model.variants,
-		ancestorIds: model.ancestorIds,
+		ancestors: model.ancestors,
 	};
 };
 

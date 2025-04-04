@@ -37,9 +37,9 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 				const variant = item.variants[0];
 
 				const model: UmbDocumentCollectionItemModel = {
-					ancestors: item.ancestorIds.map((id) => {
+					ancestors: item.ancestors.map((ancestor) => {
 						return {
-							unique: id,
+							unique: ancestor.id,
 							entityType: UMB_DOCUMENT_ENTITY_TYPE,
 						};
 					}),
