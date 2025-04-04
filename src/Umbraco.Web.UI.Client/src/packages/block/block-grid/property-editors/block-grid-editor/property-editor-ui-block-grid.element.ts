@@ -1,4 +1,4 @@
-import { UmbBlockGridManagerContext } from '../../context/block-grid-manager.context.js';
+import { UmbBlockGridManagerContext } from '../../block-grid-manager/index.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
@@ -9,6 +9,7 @@ import {
 	css,
 	type PropertyValueMap,
 	ref,
+	nothing,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
@@ -22,7 +23,9 @@ import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
-import '../../components/block-grid-entries/index.js';
+// TODO: consider moving the components to the property editor folder as they are only used here
+import '../../local-components.js';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 /**
  * @element umb-property-editor-ui-block-grid
@@ -84,8 +87,50 @@ export class UmbPropertyEditorUIBlockGridElement
 		return super.value;
 	}
 
+	@state()
+	_notSupportedVariantSetting?: boolean;
+
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (context) => {
+			this.observe(
+				observeMultiple([
+					this.#managerContext.blockTypes,
+					context.structure.variesByCulture,
+					context.structure.variesBySegment,
+				]),
+				async ([blockTypes, variesByCulture, variesBySegment]) => {
+					if (blockTypes.length > 0 && (variesByCulture === false || variesBySegment === false)) {
+						// check if any of the Blocks varyByCulture or Segment and then display a warning.
+						const promises = await Promise.all(
+							blockTypes.map(async (blockType) => {
+								const elementType = blockType.contentElementTypeKey;
+								await this.#managerContext.contentTypesLoaded;
+								const structure = await this.#managerContext.getStructure(elementType);
+								if (variesByCulture === false && structure?.getVariesByCulture() === true) {
+									// If block varies by culture but document does not.
+									return true;
+								} else if (variesBySegment === false && structure?.getVariesBySegment() === true) {
+									// If block varies by segment but document does not.
+									return true;
+								}
+								return false;
+							}),
+						);
+						this._notSupportedVariantSetting = promises.filter((x) => x === true).length > 0;
+
+						if (this._notSupportedVariantSetting) {
+							this.#validationContext.messages.addMessage(
+								'config',
+								'$',
+								'#blockEditor_blockVariantConfigurationNotSupported',
+							);
+						}
+					}
+				},
+			);
+		}).passContextAliasMatches();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(
@@ -94,6 +139,7 @@ export class UmbPropertyEditorUIBlockGridElement
 					if (dataPath) {
 						// Set the data path for the local validation context:
 						this.#validationContext.setDataPath(dataPath);
+						this.#validationContext.autoReport();
 					}
 				},
 				'observeDataPath',
@@ -193,6 +239,9 @@ export class UmbPropertyEditorUIBlockGridElement
 	}
 
 	override render() {
+		if (this._notSupportedVariantSetting) {
+			return nothing;
+		}
 		return html` <umb-block-grid-entries
 			${ref(this.#gotRootEntriesElement)}
 			.areaKey=${null}

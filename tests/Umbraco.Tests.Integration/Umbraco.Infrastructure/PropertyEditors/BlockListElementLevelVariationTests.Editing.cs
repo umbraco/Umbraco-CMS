@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -740,6 +739,185 @@ internal partial class BlockListElementLevelVariationTests
                 Assert.AreEqual("The second nested settings value in German", nestedBlockListValue.SettingsData[0].Values[3].Value);
             });
         }
+    }
+
+    [Test]
+    public async Task Can_Align_Culture_Variance_For_Variant_Element_Types()
+    {
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Value = "The invariant content value" },
+                new() { Alias = "variantText", Value = "Another invariant content value" }
+            },
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Value = "The invariant settings value" },
+                new() { Alias = "variantText", Value = "Another invariant settings value" }
+            },
+            false);
+
+        contentType.Variations = ContentVariation.Culture;
+        ContentTypeService.Save(contentType);
+
+        // re-fetch content
+        content = ContentService.GetById(content.Key);
+
+        var valueEditor = (BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor)blockListDataType.Editor!.GetValueEditor();
+
+        var blockListValue = valueEditor.ToEditor(content!.Properties["blocks"]!) as BlockListValue;
+        Assert.IsNotNull(blockListValue);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.ContentData.Count);
+            Assert.AreEqual(2, blockListValue.ContentData.First().Values.Count);
+            var invariantValue = blockListValue.ContentData.First().Values.First(value => value.Alias == "invariantText");
+            var variantValue = blockListValue.ContentData.First().Values.First(value => value.Alias == "variantText");
+            Assert.IsNull(invariantValue.Culture);
+            Assert.AreEqual("en-US", variantValue.Culture);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.SettingsData.Count);
+            Assert.AreEqual(2, blockListValue.SettingsData.First().Values.Count);
+            var invariantValue = blockListValue.SettingsData.First().Values.First(value => value.Alias == "invariantText");
+            var variantValue = blockListValue.SettingsData.First().Values.First(value => value.Alias == "variantText");
+            Assert.IsNull(invariantValue.Culture);
+            Assert.AreEqual("en-US", variantValue.Culture);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.Expose.Count);
+            Assert.AreEqual("en-US", blockListValue.Expose.First().Culture);
+        });
+    }
+
+    [TestCase(ContentVariation.Culture)]
+    [TestCase(ContentVariation.Nothing)]
+    public async Task Can_Turn_Invariant_Element_Variant(ContentVariation contentTypeVariation)
+    {
+        var elementType = CreateElementType(ContentVariation.Nothing);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(contentTypeVariation, blockListDataType);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Value = "The invariant content value" },
+                new() { Alias = "variantText", Value = "Another invariant content value" }
+            },
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Value = "The invariant settings value" },
+                new() { Alias = "variantText", Value = "Another invariant settings value" }
+            },
+            false);
+
+        elementType.Variations = ContentVariation.Culture;
+        elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Culture;
+        ContentTypeService.Save(elementType);
+
+        // re-fetch content
+        content = ContentService.GetById(content.Key);
+
+        var valueEditor = (BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor)blockListDataType.Editor!.GetValueEditor();
+
+        var blockListValue = valueEditor.ToEditor(content!.Properties["blocks"]!) as BlockListValue;
+        Assert.IsNotNull(blockListValue);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.ContentData.Count);
+            Assert.AreEqual(2, blockListValue.ContentData.First().Values.Count);
+            var invariantValue = blockListValue.ContentData.First().Values.First(value => value.Alias == "invariantText");
+            var variantValue = blockListValue.ContentData.First().Values.First(value => value.Alias == "variantText");
+            Assert.IsNull(invariantValue.Culture);
+            Assert.AreEqual("en-US", variantValue.Culture);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.SettingsData.Count);
+            Assert.AreEqual(2, blockListValue.SettingsData.First().Values.Count);
+            var invariantValue = blockListValue.SettingsData.First().Values.First(value => value.Alias == "invariantText");
+            var variantValue = blockListValue.SettingsData.First().Values.First(value => value.Alias == "variantText");
+            Assert.IsNull(invariantValue.Culture);
+            Assert.AreEqual("en-US", variantValue.Culture);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.Expose.Count);
+            Assert.AreEqual("en-US", blockListValue.Expose.First().Culture);
+        });
+    }
+
+    [TestCase(ContentVariation.Nothing)]
+    [TestCase(ContentVariation.Culture)]
+    public async Task Can_Turn_Variant_Element_Invariant(ContentVariation contentTypeVariation)
+    {
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(contentTypeVariation, blockListDataType);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Value = "The invariant content value" },
+                new() { Alias = "variantText", Value = "Variant content in English", Culture = "en-US" },
+                new() { Alias = "variantText", Value = "Variant content in Danish", Culture = "da-DK" }
+            },
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Value = "The invariant settings value" },
+                new() { Alias = "variantText", Value = "Variant settings in English", Culture = "en-US" },
+                new() { Alias = "variantText", Value = "Variant settings in Danish", Culture = "da-DK" }
+            },
+            false);
+
+        elementType.Variations = ContentVariation.Nothing;
+        elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Nothing;
+        ContentTypeService.Save(elementType);
+
+        // re-fetch content
+        content = ContentService.GetById(content.Key);
+
+        var valueEditor = (BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor)blockListDataType.Editor!.GetValueEditor();
+
+        var blockListValue = valueEditor.ToEditor(content!.Properties["blocks"]!) as BlockListValue;
+        Assert.IsNotNull(blockListValue);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.ContentData.Count);
+            Assert.AreEqual(2, blockListValue.ContentData.First().Values.Count);
+            var invariantValue = blockListValue.ContentData.First().Values.First(value => value.Alias == "invariantText");
+            var variantValue = blockListValue.ContentData.First().Values.First(value => value.Alias == "variantText");
+            Assert.IsNull(invariantValue.Culture);
+            Assert.IsNull(variantValue.Culture);
+            Assert.AreEqual("Variant content in English", variantValue.Value);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.SettingsData.Count);
+            Assert.AreEqual(2, blockListValue.SettingsData.First().Values.Count);
+            var invariantValue = blockListValue.SettingsData.First().Values.First(value => value.Alias == "invariantText");
+            var variantValue = blockListValue.SettingsData.First().Values.First(value => value.Alias == "variantText");
+            Assert.IsNull(invariantValue.Culture);
+            Assert.IsNull(variantValue.Culture);
+            Assert.AreEqual("Variant settings in English", variantValue.Value);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.Expose.Count);
+            Assert.IsNull(blockListValue.Expose.First().Culture);
+        });
     }
 
     private async Task<IUser> CreateLimitedUser()

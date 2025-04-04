@@ -425,6 +425,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	/**
+	 * Check if there are unpersisted changes.
+	 * @returns { boolean } true if there are unpersisted changes.
+	 */
+	public getHasUnpersistedChanges(): boolean {
+		return this.content.getHasUnpersistedChanges() || this.settings.getHasUnpersistedChanges();
+	}
+
+	/**
 	 * @function propertyValueByAlias
 	 * @param {string} propertyAlias - The alias of the property to get the value of.
 	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} - The value of the property.
@@ -486,6 +494,13 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.#expose(layoutData.contentKey);
 		this.setIsNew(false);
+
+		this.#reportValidation();
+	}
+
+	#reportValidation() {
+		this.content.validation.report();
+		this.settings.validation.report();
 	}
 
 	expose() {

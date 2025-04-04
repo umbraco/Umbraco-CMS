@@ -185,10 +185,7 @@ public class ContentBuilder
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            if (_cultureNames.TryGetValue(culture, out _))
-            {
-                _cultureNames.Remove(culture);
-            }
+            _cultureNames.Remove(culture);
         }
         else
         {
