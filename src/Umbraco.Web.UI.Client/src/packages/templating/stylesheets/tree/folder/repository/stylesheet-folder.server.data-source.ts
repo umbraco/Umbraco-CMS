@@ -4,7 +4,7 @@ import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 import type { CreateStylesheetFolderRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { StylesheetService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 
@@ -49,7 +49,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Cannot read stylesheet folder without a path');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			StylesheetService.getStylesheetFolderByPath({
 				path: encodeURIComponent(path),
@@ -88,7 +88,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 			name: model.name,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			StylesheetService.postStylesheetFolder({
 				requestBody,
@@ -116,7 +116,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Cannot delete stylesheet folder without a path');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			StylesheetService.deleteStylesheetFolderByPath({
 				path: encodeURIComponent(path),

@@ -3,7 +3,7 @@ import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import type { TelemetryResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { TelemetryLevelModel, TelemetryService, ApiError } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-dashboard-telemetry')
@@ -26,10 +26,10 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 	}
 
 	private async _setup() {
-		const telemetryLevels = await tryExecuteAndNotify(this, TelemetryService.getTelemetry({ skip: 0, take: 3 }));
+		const telemetryLevels = await tryExecute(this, TelemetryService.getTelemetry({ skip: 0, take: 3 }));
 		this._telemetryLevels = telemetryLevels.data?.items ?? [];
 
-		const telemetryLevel = await tryExecuteAndNotify(this, TelemetryService.getTelemetryLevel());
+		const telemetryLevel = await tryExecute(this, TelemetryService.getTelemetryLevel());
 		this._telemetryFormData = telemetryLevel.data?.telemetryLevel ?? TelemetryLevelModel.BASIC;
 	}
 
@@ -38,7 +38,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 
 		this._buttonState = 'waiting';
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this,
 			TelemetryService.postTelemetryLevel({
 				requestBody: { telemetryLevel: this._telemetryFormData },

@@ -28,10 +28,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 */
 	async create(unique: string, data: PublicAccessRequestModel) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecuteAndNotify(
-			this.#host,
-			DocumentService.postDocumentByIdPublicAccess({ id: unique, requestBody: data }),
-		);
+		return tryExecute(this.#host, DocumentService.postDocumentByIdPublicAccess({ id: unique, requestBody: data }));
 	}
 
 	/**
@@ -55,7 +52,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 */
 	async update(unique: string, requestBody: PublicAccessRequestModel) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdPublicAccess({ id: unique, requestBody }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdPublicAccess({ id: unique, requestBody }));
 	}
 
 	/**
@@ -65,6 +62,6 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentService.deleteDocumentByIdPublicAccess({ id: unique }));
+		return tryExecute(this.#host, DocumentService.deleteDocumentByIdPublicAccess({ id: unique }));
 	}
 }

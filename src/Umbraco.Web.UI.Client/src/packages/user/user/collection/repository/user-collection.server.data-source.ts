@@ -10,7 +10,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source that fetches the user collection data from the server.
@@ -36,7 +36,7 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 	 * @memberof UmbUserCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbUserCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			UserService.getFilterUser({
 				filter: filter.filter,

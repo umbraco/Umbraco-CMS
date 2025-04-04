@@ -1,7 +1,7 @@
 import type { UmbDataSourceResponse } from '../repository/index.js';
 import { TemporaryFileService, type PostTemporaryFileResponse } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify, tryXhrRequest } from '@umbraco-cms/backoffice/resources';
+import { tryExecute, tryXhrRequest } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source to upload temporary files to the server
@@ -55,7 +55,7 @@ export class UmbTemporaryFileServerDataSource {
 	 */
 	read(id: string) {
 		if (!id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, TemporaryFileService.getTemporaryFileById({ id }));
+		return tryExecute(this.#host, TemporaryFileService.getTemporaryFileById({ id }));
 	}
 
 	/**
@@ -66,6 +66,6 @@ export class UmbTemporaryFileServerDataSource {
 	 */
 	delete(id: string) {
 		if (!id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, TemporaryFileService.deleteTemporaryFileById({ id }));
+		return tryExecute(this.#host, TemporaryFileService.deleteTemporaryFileById({ id }));
 	}
 }

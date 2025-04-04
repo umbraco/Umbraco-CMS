@@ -8,7 +8,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document that fetches data from the server
@@ -77,7 +77,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentBlueprintService.getDocumentBlueprintById({ id: unique }),
 		);
@@ -139,7 +139,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 			variants: model.variants,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentBlueprintService.postDocumentBlueprint({
 				requestBody,
@@ -169,7 +169,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 			variants: model.variants,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			DocumentBlueprintService.putDocumentBlueprintById({
 				id: model.unique,
@@ -194,6 +194,6 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		if (!unique) throw new Error('Unique is missing');
 
 		// TODO: update to delete when implemented
-		return tryExecuteAndNotify(this.#host, DocumentBlueprintService.deleteDocumentBlueprintById({ id: unique }));
+		return tryExecute(this.#host, DocumentBlueprintService.deleteDocumentBlueprintById({ id: unique }));
 	}
 }

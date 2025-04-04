@@ -26,7 +26,7 @@ export class UmbUserMfaServerDataSource {
 	requestMfaProviders(unique: string) {
 		if (!unique) throw new Error('User id is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			UserService.getUserById2Fa({
 				id: unique,

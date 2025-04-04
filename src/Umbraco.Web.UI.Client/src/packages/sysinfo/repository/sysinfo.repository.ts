@@ -11,12 +11,12 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 	}
 
 	async requestTroubleShooting() {
-		const { data } = await tryExecuteAndNotify(this, ServerService.getServerTroubleshooting());
+		const { data } = await tryExecute(this, ServerService.getServerTroubleshooting());
 		return data;
 	}
 
 	async requestServerInformation() {
-		const { data } = await tryExecuteAndNotify(this, ServerService.getServerInformation());
+		const { data } = await tryExecute(this, ServerService.getServerInformation());
 		return data;
 	}
 

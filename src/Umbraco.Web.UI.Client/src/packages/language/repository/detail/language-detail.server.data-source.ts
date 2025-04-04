@@ -7,7 +7,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { LanguageService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Language that fetches data from the server
@@ -55,10 +55,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
-			this.#host,
-			LanguageService.getLanguageByIsoCode({ isoCode: unique }),
-		);
+		const { data, error } = await tryExecute(this.#host, LanguageService.getLanguageByIsoCode({ isoCode: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -95,7 +92,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 			name: model.name,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			LanguageService.postLanguage({
 				requestBody,
@@ -127,7 +124,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 			name: model.name,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			LanguageService.putLanguageByIsoCode({
 				isoCode: model.unique,
@@ -151,7 +148,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			LanguageService.deleteLanguageByIsoCode({
 				isoCode: unique,

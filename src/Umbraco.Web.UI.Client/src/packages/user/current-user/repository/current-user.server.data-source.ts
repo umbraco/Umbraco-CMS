@@ -25,7 +25,7 @@ export class UmbCurrentUserServerDataSource {
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getCurrentUser() {
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserService.getUserCurrent());
+		const { data, error } = await tryExecute(this.#host, UserService.getUserCurrent());
 
 		if (data) {
 			const user: UmbCurrentUserModel = {
@@ -67,7 +67,7 @@ export class UmbCurrentUserServerDataSource {
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getExternalLoginProviders() {
-		return tryExecuteAndNotify(this.#host, UserService.getUserCurrentLoginProviders());
+		return tryExecute(this.#host, UserService.getUserCurrentLoginProviders());
 	}
 
 	/**
@@ -75,7 +75,7 @@ export class UmbCurrentUserServerDataSource {
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getMfaLoginProviders() {
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserService.getUserCurrent2Fa());
+		const { data, error } = await tryExecute(this.#host, UserService.getUserCurrent2Fa());
 
 		if (data) {
 			return { data };
@@ -130,7 +130,7 @@ export class UmbCurrentUserServerDataSource {
 	 * @returns
 	 */
 	async changePassword(newPassword: string, oldPassword: string) {
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			UserService.postUserCurrentChangePassword({
 				requestBody: {

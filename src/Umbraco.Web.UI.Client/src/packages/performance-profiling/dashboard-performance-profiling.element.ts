@@ -2,7 +2,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, query, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { ProfilingService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-performance-profiling')
 export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
@@ -26,14 +26,14 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 	}
 
 	private async _getProfilingStatus() {
-		const { data } = await tryExecuteAndNotify(this, ProfilingService.getProfilingStatus());
+		const { data } = await tryExecute(this, ProfilingService.getProfilingStatus());
 
 		if (!data) return;
 		this._profilingStatus = data.enabled ?? false;
 	}
 
 	private async _changeProfilingStatus() {
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this,
 			ProfilingService.putProfilingStatus({ requestBody: { enabled: !this._profilingStatus } }),
 		);
