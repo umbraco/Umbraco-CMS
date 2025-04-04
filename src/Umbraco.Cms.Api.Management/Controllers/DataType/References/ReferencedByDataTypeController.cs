@@ -2,7 +2,6 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Controllers.DataType;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 using Umbraco.Cms.Core.Models;
@@ -23,7 +22,7 @@ public class ReferencedByDataTypeController : DataTypeControllerBase
     }
 
     /// <summary>
-    ///     Gets a paged list of references for the current data type, so you can see where is is being used.
+    ///     Gets a paged list of references for the current data type, so you can see where it is being used.
     /// </summary>
     [HttpGet("{id:guid}/referenced-by")]
     [MapToApiVersion("1.0")]
