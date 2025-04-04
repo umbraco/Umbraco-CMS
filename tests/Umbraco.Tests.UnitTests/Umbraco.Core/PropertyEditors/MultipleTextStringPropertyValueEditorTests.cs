@@ -150,6 +150,24 @@ public class MultipleTextStringPropertyValueEditorTests
         }
     }
 
+    [TestCase("", false)]
+    [TestCase("one", false)]
+    [TestCase("one\ntwo", true)]
+    [TestCase("one\ntwo\nthree", true)]
+    public void Validates_Number_Of_Items_Is_Greater_Than_Or_Equal_To_Configured_Min_Raw_Property_Value(string value, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor();
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+        }
+    }
+
     [TestCase(3, true)]
     [TestCase(4, true)]
     [TestCase(5, false)]
@@ -169,6 +187,36 @@ public class MultipleTextStringPropertyValueEditorTests
             var validationResult = result.First();
             Assert.AreEqual("validation_outOfRangeMultipleItemsMaximum", validationResult.ErrorMessage);
         }
+    }
+
+    [TestCase("one\ntwo\nthree", true)]
+    [TestCase("one\ntwo\nthree\nfour", true)]
+    [TestCase("one\ntwo\nthree\nfour\nfive", false)]
+    public void Validates_Number_Of_Items_Is_Less_Than_Or_Equal_To_Configured_Max_Raw_Property_Value(string value, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor();
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual("validation_outOfRangeMultipleItemsMaximum", validationResult.ErrorMessage);
+        }
+    }
+
+    [TestCase("one\ntwo\nthree")]
+    [TestCase("one\rtwo\rthree")]
+    [TestCase("one\r\ntwo\r\nthree")]
+    public void Can_Parse_Supported_Property_Value_Delimiters(string value)
+    {
+        var editor = CreateValueEditor();
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        Assert.IsEmpty(result);
     }
 
     [Test]

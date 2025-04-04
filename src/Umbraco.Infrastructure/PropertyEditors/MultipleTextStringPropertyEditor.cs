@@ -114,9 +114,12 @@ public class MultipleTextStringPropertyEditor : DataEditor
 
             // The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
             return value is string stringValue
-                ? stringValue.Split(_newLineDelimiters, StringSplitOptions.None)
+                ? SplitPropertyValue(stringValue)
                 : Array.Empty<string>();
         }
+
+        internal static string[] SplitPropertyValue(string propertyValue)
+            => propertyValue.Split(_newLineDelimiters, StringSplitOptions.None);
     }
 
     /// <summary>
@@ -167,12 +170,11 @@ public class MultipleTextStringPropertyEditor : DataEditor
             }
 
             // If we have a null value, treat as an empty collection for minimum number validation.
-            if (value is not IEnumerable<string> stringValues)
-            {
-                stringValues = [];
-            }
-
-            var stringCount = stringValues.Count();
+            var stringCount = value is string stringValue
+                    ? MultipleTextStringPropertyValueEditor.SplitPropertyValue(stringValue).Length
+                    : value is IEnumerable<string> strings
+                        ? strings.Count()
+                        : 0;
 
             if (stringCount < multipleTextStringConfiguration.Min)
             {
