@@ -27,7 +27,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	>;
 	#inUnprovidingState: boolean = false;
 
-	// @reprecated - Will be removed in v.17
+	// @deprecated - Will be removed in v.17
 	// Local version of the data send to the server, only use-case is for translation.
 	#translationData = new UmbObjectState<any>(undefined);
 	/**
@@ -234,13 +234,14 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 							// Notice, the local message uses the same key. [NL]
 							this.messages.addMessage(msg.type, path, msg.body, msg.key);
 						});
-				}
+					}
 
-				this.#localMessages = this.messages.getNotFilteredMessages();
-				this.messages.finishChange();
-			},
-			'observeParentMessages',
-		);
+					this.#localMessages = this.messages.getNotFilteredMessages();
+					this.messages.finishChange();
+				},
+				'observeParentMessages',
+			);
+		}
 	}
 
 	#stopInheritance(): void {
