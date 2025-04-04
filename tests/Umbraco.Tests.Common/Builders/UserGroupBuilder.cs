@@ -3,6 +3,7 @@
 
 using Moq;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
@@ -27,6 +28,8 @@ public class UserGroupBuilder<TParent>
 {
     private string _alias;
     private IEnumerable<string> _allowedSections = Enumerable.Empty<string>();
+    private IEnumerable<int> _allowedLanguages = Enumerable.Empty<int>();
+    private IEnumerable<IGranularPermission> _granularPermissions = Enumerable.Empty<IGranularPermission>();
     private string _icon;
     private int? _id;
     private Guid? _key;
@@ -95,10 +98,21 @@ public class UserGroupBuilder<TParent>
         return this;
     }
 
-
     public UserGroupBuilder<TParent> WithAllowedSections(IList<string> allowedSections)
     {
         _allowedSections = allowedSections;
+        return this;
+    }
+
+    public UserGroupBuilder<TParent> WithAllowedLanguages(IList<int> allowedLanguages)
+    {
+        _allowedLanguages = allowedLanguages;
+        return this;
+    }
+
+    public UserGroupBuilder<TParent> WithGranularPermissions(IList<IGranularPermission> granularPermissions)
+    {
+        _granularPermissions = granularPermissions;
         return this;
     }
 
@@ -144,17 +158,40 @@ public class UserGroupBuilder<TParent>
             Id = id,
             Key = key,
             StartContentId = startContentId,
-            StartMediaId = startMediaId
+            StartMediaId = startMediaId,
+            Permissions = _permissions
         };
 
-        userGroup.Permissions = _permissions;
+        BuildAllowedSections(userGroup);
+        BuildAllowedLanguages(userGroup);
+        BuildGranularPermissions(userGroup);
 
+        return userGroup;
+    }
+
+
+    private void BuildAllowedSections(UserGroup userGroup)
+    {
         foreach (var section in _allowedSections)
         {
             userGroup.AddAllowedSection(section);
         }
+    }
 
-        return userGroup;
+    private void BuildAllowedLanguages(UserGroup userGroup)
+    {
+        foreach (var language in _allowedLanguages)
+        {
+            userGroup.AddAllowedLanguage(language);
+        }
+    }
+
+    private void BuildGranularPermissions(UserGroup userGroup)
+    {
+        foreach (var permission in _granularPermissions)
+        {
+            userGroup.GranularPermissions.Add(permission);
+        }
     }
 
     public static UserGroup CreateUserGroup(
