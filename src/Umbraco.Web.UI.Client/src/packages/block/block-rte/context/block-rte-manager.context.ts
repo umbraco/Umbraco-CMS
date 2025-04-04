@@ -1,7 +1,7 @@
 import type { UmbBlockRteWorkspaceOriginData } from '../workspace/block-rte-workspace.modal-token.js';
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
 import type { UmbBlockDataModel } from '../../block/types.js';
-import { UmbBlockManagerContext, type UmbBlockDataObjectModel } from '@umbraco-cms/backoffice/block';
+import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 
 import '../components/block-rte-entry/index.js';
 

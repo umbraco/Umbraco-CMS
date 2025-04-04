@@ -12,9 +12,8 @@ export class UmbSectionContext extends UmbContextBase<UmbSectionContext, typeof 
 	public readonly pathname = this.#manifestPathname.asObservable();
 	public readonly label = this.#manifestLabel.asObservable();
 
-	constructor(host: UmbControllerHost, manifest: ManifestSection) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_SECTION_CONTEXT);
-		this.setManifest(manifest);
 	}
 
 	public setManifest(manifest?: ManifestSection) {
