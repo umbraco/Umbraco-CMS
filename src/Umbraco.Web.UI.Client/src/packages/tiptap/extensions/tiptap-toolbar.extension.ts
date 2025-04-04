@@ -30,27 +30,40 @@ export interface ManifestTiptapToolbarExtensionColorPickerButtonKind<
 	kind: 'colorPickerButton';
 }
 
-export interface MetaTiptapToolbarMenuItem {
-	data?: unknown;
+export interface MetaTiptapToolbarMenuItem<ItemDataType = unknown> {
+	appearance?: { icon?: string; style?: string };
+	data?: ItemDataType;
 	element?: ElementLoaderProperty<HTMLElement>;
 	elementName?: string;
+	/** @deprecated No longer used, please use `appearance: { icon }`. This will be removed in Umbraco 17. [LK] */
 	icon?: string;
-	items?: Array<MetaTiptapToolbarMenuItem>;
+	items?: Array<MetaTiptapToolbarMenuItem<ItemDataType>>;
 	label: string;
 	separatorAfter?: boolean;
+	/** @deprecated No longer used, please use `appearance: { style }`. This will be removed in Umbraco 17. [LK] */
 	style?: string;
 }
 
 export interface MetaTiptapToolbarMenuExtension extends MetaTiptapToolbarExtension {
 	look?: 'icon' | 'text';
-	items: Array<MetaTiptapToolbarMenuItem>;
+	/** @deprecated No longer used, please use `items` at the root manifest. This will be removed in Umbraco 17. [LK] */
+	items?: Array<MetaTiptapToolbarMenuItem>;
 }
 
-export interface ManifestTiptapToolbarExtensionMenuKind<
-	MetaType extends MetaTiptapToolbarMenuExtension = MetaTiptapToolbarMenuExtension,
-> extends ManifestTiptapToolbarExtension<MetaType> {
+export interface ManifestTiptapToolbarExtensionMenuKind
+	extends ManifestTiptapToolbarExtension<MetaTiptapToolbarMenuExtension> {
 	type: 'tiptapToolbarExtension';
 	kind: 'menu';
+	items?: Array<MetaTiptapToolbarMenuItem>;
+}
+
+export type MetaTiptapToolbarStyleMenuItem = MetaTiptapToolbarMenuItem<{ tag?: string; class?: string; id?: string }>;
+
+export interface ManifestTiptapToolbarExtensionStyleMenuKind
+	extends ManifestTiptapToolbarExtension<MetaTiptapToolbarMenuExtension> {
+	type: 'tiptapToolbarExtension';
+	kind: 'styleMenu';
+	items: Array<MetaTiptapToolbarStyleMenuItem>;
 }
 
 declare global {
@@ -59,6 +72,7 @@ declare global {
 			| ManifestTiptapToolbarExtension
 			| ManifestTiptapToolbarExtensionButtonKind
 			| ManifestTiptapToolbarExtensionColorPickerButtonKind
-			| ManifestTiptapToolbarExtensionMenuKind;
+			| ManifestTiptapToolbarExtensionMenuKind
+			| ManifestTiptapToolbarExtensionStyleMenuKind;
 	}
 }
