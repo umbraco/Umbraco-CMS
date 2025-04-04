@@ -13,10 +13,10 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     public async Task Can_Clear_Schedule_Invariant()
     {
         var doctype = await SetupInvariantDoctypeAsync();
-        var setupData = await CreateInvariantContentAsync(doctype);
+        var content = await CreateInvariantContentAsync(doctype);
 
         var scheduleSetupAttempt =
-            await SchedulePublishAndUnPublishInvariantAsync(setupData);
+            await SchedulePublishAndUnPublishInvariantAsync(content);
 
         if (scheduleSetupAttempt.Success is false)
         {
@@ -24,7 +24,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         }
 
         var clearScheduleAttempt = await ContentPublishingService.PublishAsync(
-            setupData.Key,
+            content.Key,
             [
                 new()
                 {
@@ -36,8 +36,8 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         Assert.IsTrue(clearScheduleAttempt.Success);
 
-        var schedules = ContentService.GetContentScheduleByContentId(setupData.Id);
-        var content = ContentService.GetById(setupData.Key);
+        var schedules = ContentService.GetContentScheduleByContentId(content.Id);
+        content = ContentService.GetById(content.Key);
 
         Assert.Multiple(() =>
         {
@@ -51,14 +51,14 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     public async Task Can_Clear_Schedule_Single_Culture()
     {
         var setupInfo = await SetupVariantDoctypeAsync();
-        var setupData = await CreateVariantContentAsync(
+        var content = await CreateVariantContentAsync(
             setupInfo.LangEn,
             setupInfo.LangDa,
             setupInfo.LangBe,
             setupInfo.contentType);
 
         var scheduleSetupAttempt =
-            await SchedulePublishAndUnPublishForAllCulturesAsync(setupData, setupInfo);
+            await SchedulePublishAndUnPublishForAllCulturesAsync(content, setupInfo);
 
         if (scheduleSetupAttempt.Success is false)
         {
@@ -66,7 +66,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         }
 
         var scheduleAttempt = await ContentPublishingService.PublishAsync(
-            setupData.Key,
+            content.Key,
             [
                 new()
                 {
@@ -78,8 +78,8 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         Assert.IsTrue(scheduleAttempt.Success);
 
-        var schedules = ContentService.GetContentScheduleByContentId(setupData.Id);
-        var content = ContentService.GetById(setupData.Key);
+        var schedules = ContentService.GetContentScheduleByContentId(content.Id);
+        content = ContentService.GetById(content.Key);
 
         Assert.Multiple(() =>
         {
@@ -94,14 +94,14 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     public async Task Can_Clear_Schedule_Some_Cultures()
     {
         var setupInfo = await SetupVariantDoctypeAsync();
-        var setupData = await CreateVariantContentAsync(
+        var content = await CreateVariantContentAsync(
             setupInfo.LangEn,
             setupInfo.LangDa,
             setupInfo.LangBe,
             setupInfo.contentType);
 
         var scheduleSetupAttempt =
-            await SchedulePublishAndUnPublishForAllCulturesAsync(setupData, setupInfo);
+            await SchedulePublishAndUnPublishForAllCulturesAsync(content, setupInfo);
 
         if (scheduleSetupAttempt.Success is false)
         {
@@ -109,7 +109,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         }
 
         var scheduleAttempt = await ContentPublishingService.PublishAsync(
-            setupData.Key,
+            content.Key,
             [
                 new()
                 {
@@ -126,8 +126,8 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         Assert.IsTrue(scheduleAttempt.Success);
 
-        var schedules = ContentService.GetContentScheduleByContentId(setupData.Id);
-        var content = ContentService.GetById(setupData.Key);
+        var schedules = ContentService.GetContentScheduleByContentId(content.Id);
+        content = ContentService.GetById(content.Key);
 
         Assert.Multiple(() =>
         {
@@ -144,14 +144,14 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     public async Task Can_Clear_Schedule_All_Cultures()
     {
         var setupInfo = await SetupVariantDoctypeAsync();
-        var setupData = await CreateVariantContentAsync(
+        var content = await CreateVariantContentAsync(
             setupInfo.LangEn,
             setupInfo.LangDa,
             setupInfo.LangBe,
             setupInfo.contentType);
 
         var scheduleSetupAttempt =
-            await SchedulePublishAndUnPublishForAllCulturesAsync(setupData, setupInfo);
+            await SchedulePublishAndUnPublishForAllCulturesAsync(content, setupInfo);
 
         if (scheduleSetupAttempt.Success is false)
         {
@@ -159,7 +159,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         }
 
         var scheduleAttempt = await ContentPublishingService.PublishAsync(
-            setupData.Key,
+            content.Key,
             [
                 new()
                 {
@@ -181,8 +181,8 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         Assert.IsTrue(scheduleAttempt.Success);
 
-        var schedules = ContentService.GetContentScheduleByContentId(setupData.Id);
-        var content = ContentService.GetById(setupData.Key);
+        var schedules = ContentService.GetContentScheduleByContentId(content.Id);
+        content = ContentService.GetById(content.Key);
 
         Assert.Multiple(() =>
         {

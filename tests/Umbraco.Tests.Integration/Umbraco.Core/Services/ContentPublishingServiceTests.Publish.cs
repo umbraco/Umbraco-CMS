@@ -29,17 +29,17 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     public async Task Can_Publish_Some_Cultures()
     {
         var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
-        var setupData = await CreateVariantContentAsync(langEn, langDa, langBe, contentType);
+        var content = await CreateVariantContentAsync(langEn, langDa, langBe, contentType);
 
         var publishAttempt = await ContentPublishingService.PublishAsync(
-            setupData.Key,
+            content.Key,
             [
                 new() { Culture = langEn.IsoCode }, new() { Culture = langDa.IsoCode },
             ],
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(publishAttempt.Success);
-        var content = ContentService.GetById(setupData.Key);
+        content = ContentService.GetById(content.Key);
         Assert.AreEqual(2, content!.PublishedCultures.Count());
     }
 
@@ -47,11 +47,10 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     public async Task Can_Publish_All_Cultures()
     {
         var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
-        var setupData = await CreateVariantContentAsync(langEn, langDa, langBe, contentType);
-
+        var content = await CreateVariantContentAsync(langEn, langDa, langBe, contentType);
 
         var publishAttempt = await ContentPublishingService.PublishAsync(
-            setupData.Key,
+            content.Key,
             [
                 new() { Culture = langEn.IsoCode },
                 new() { Culture = langDa.IsoCode },
@@ -60,7 +59,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(publishAttempt.Success);
-        var content = ContentService.GetById(setupData.Key);
+        content = ContentService.GetById(content.Key);
         Assert.AreEqual(3, content!.PublishedCultures.Count());
     }
 
@@ -68,21 +67,21 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     public async Task Cannot_Publish_Invariant_In_Variant_Setup()
     {
         var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
-        var setupData = await CreateVariantContentAsync(
+        var content = await CreateVariantContentAsync(
             langEn,
             langDa,
             langBe,
             contentType);
 
         var publishAttempt = await ContentPublishingService.PublishAsync(
-            setupData.Key,
+            content.Key,
             [new() { Culture = Constants.System.InvariantCulture }],
             Constants.Security.SuperUserKey);
 
         Assert.IsFalse(publishAttempt.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant, publishAttempt.Status);
 
-        var content = ContentService.GetById(setupData.Key);
+        content = ContentService.GetById(content.Key);
         Assert.AreEqual(0, content!.PublishedCultures.Count());
     }
 
@@ -90,33 +89,31 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     public async Task Can_Publish_Invariant_In_Invariant_Setup()
     {
         var doctype = await SetupInvariantDoctypeAsync();
-        var setupData = await CreateInvariantContentAsync(doctype);
+        var content = await CreateInvariantContentAsync(doctype);
 
         var publishAttempt = await ContentPublishingService.PublishAsync(
-            setupData.Key,
+            content.Key,
             [new() { Culture = Constants.System.InvariantCulture }],
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(publishAttempt.Success);
 
-        var content = ContentService.GetById(setupData.Key);
+        content = ContentService.GetById(content.Key);
         Assert.NotNull(content!.PublishDate);
     }
-    //todo more tests for invariant
-    //todo update schedule date
 
     [Test]
     public async Task Cannot_Publish_Unknown_Culture()
     {
         var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
-        var setupData = await CreateVariantContentAsync(
+        var content = await CreateVariantContentAsync(
             langEn,
             langDa,
             langBe,
             contentType);
 
         var publishAttempt = await ContentPublishingService.PublishAsync(
-            setupData.Key,
+            content.Key,
             [
                 new() { Culture = langEn.IsoCode },
                 new() { Culture = langDa.IsoCode },
@@ -127,7 +124,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         Assert.IsFalse(publishAttempt.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, publishAttempt.Status);
 
-        var content = ContentService.GetById(setupData.Key);
+        content = ContentService.GetById(content.Key);
         Assert.AreEqual(0, content!.PublishedCultures.Count());
     }
 
@@ -135,14 +132,14 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     public async Task Cannot_Publish_Scheduled_Culture()
     {
         var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
-        var setupData = await CreateVariantContentAsync(
+        var content = await CreateVariantContentAsync(
             langEn,
             langDa,
             langBe,
             contentType);
 
         var scheduleAttempt = await ContentPublishingService.PublishAsync(
-            setupData.Key,
+            content.Key,
             [
                 new()
                 {
@@ -158,14 +155,14 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         }
 
         var publishAttempt = await ContentPublishingService.PublishAsync(
-            setupData.Key,
+            content.Key,
             [new() { Culture = langEn.IsoCode }],
             Constants.Security.SuperUserKey);
 
         Assert.IsFalse(publishAttempt.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.CultureAwaitingRelease, publishAttempt.Status);
 
-        var content = ContentService.GetById(setupData.Key);
+        content = ContentService.GetById(content.Key);
         Assert.AreEqual(0, content!.PublishedCultures.Count());
     }
 }
