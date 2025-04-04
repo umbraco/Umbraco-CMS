@@ -93,9 +93,6 @@ public interface ITrackedReferencesRepository
         return [];
     }
 
-    Task<PagedModel<RelationItemModel>> GetPagedRelationsForRecycleBinAsync(UmbracoObjectTypes objectType, long skip, long take, bool filterMustBeIsDependency)
-        => Task.FromResult(new PagedModel<RelationItemModel>(0, []));
-
     [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
     IEnumerable<RelationItemModel> GetPagedRelationsForItem(
         int id,
