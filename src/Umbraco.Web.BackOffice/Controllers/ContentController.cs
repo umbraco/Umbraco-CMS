@@ -256,6 +256,7 @@ public class ContentController : ContentControllerBase
     ///     Permission check is done for letter 'R' which is for <see cref="ActionRights" /> which the user must have access to
     ///     update
     /// </remarks>
+    [HttpPost]
     public async Task<ActionResult<IEnumerable<AssignedUserGroupPermissions?>?>> PostSaveUserGroupPermissions(
         UserGroupPermissionsSave saveModel)
     {
@@ -902,6 +903,7 @@ public class ContentController : ContentControllerBase
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     [FileUploadCleanupFilter]
     [ContentSaveValidation(skipUserAccessValidation:true)] // skip user access validation because we "only" require Settings access to create new blueprints from scratch
+    [HttpPost]
     public async Task<ActionResult<ContentItemDisplay<ContentVariantDisplay>?>?> PostSaveBlueprint(
         [ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
     {
@@ -939,6 +941,7 @@ public class ContentController : ContentControllerBase
     [FileUploadCleanupFilter]
     [ContentSaveValidation]
     [OutgoingEditorModelEvent]
+    [HttpPost]
     public async Task<ActionResult<ContentItemDisplay<ContentVariantScheduleDisplay>?>> PostSave(
         [ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
     {
@@ -1004,24 +1007,14 @@ public class ContentController : ContentControllerBase
                 {
                     case ContentSaveAction.Publish:
                     case ContentSaveAction.PublishWithDescendants:
-#pragma warning disable CS0618 // Type or member is obsolete
                     case ContentSaveAction.PublishWithDescendantsForce:
-#pragma warning restore CS0618 // Type or member is obsolete
-                    case ContentSaveAction.PublishWithDescendantsIncludeUnpublished:
-                    case ContentSaveAction.PublishWithDescendantsForceRepublish:
-                    case ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublish:
                     case ContentSaveAction.SendPublish:
                     case ContentSaveAction.Schedule:
                         contentItem.Action = ContentSaveAction.Save;
                         break;
                     case ContentSaveAction.PublishNew:
                     case ContentSaveAction.PublishWithDescendantsNew:
-#pragma warning disable CS0618 // Type or member is obsolete
                     case ContentSaveAction.PublishWithDescendantsForceNew:
-#pragma warning restore CS0618 // Type or member is obsolete
-                    case ContentSaveAction.PublishWithDescendantsIncludeUnpublishedNew:
-                    case ContentSaveAction.PublishWithDescendantsForceRepublishNew:
-                    case ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublishNew:
                     case ContentSaveAction.SendPublishNew:
                     case ContentSaveAction.ScheduleNew:
                         contentItem.Action = ContentSaveAction.SaveNew;
@@ -1155,16 +1148,8 @@ public class ContentController : ContentControllerBase
                 break;
             case ContentSaveAction.PublishWithDescendants:
             case ContentSaveAction.PublishWithDescendantsNew:
-#pragma warning disable CS0618 // Type or member is obsolete
             case ContentSaveAction.PublishWithDescendantsForce:
             case ContentSaveAction.PublishWithDescendantsForceNew:
-#pragma warning restore CS0618 // Type or member is obsolete
-            case ContentSaveAction.PublishWithDescendantsIncludeUnpublished:
-            case ContentSaveAction.PublishWithDescendantsIncludeUnpublishedNew:
-            case ContentSaveAction.PublishWithDescendantsForceRepublish:
-            case ContentSaveAction.PublishWithDescendantsForceRepublishNew:
-            case ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublish:
-            case ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublishNew:
             {
                 if (!await ValidatePublishBranchPermissionsAsync(contentItem))
                 {
@@ -1235,24 +1220,13 @@ public class ContentController : ContentControllerBase
 
     private static PublishBranchFilter BuildPublishBranchFilter(ContentSaveAction contentSaveAction)
     {
-        var includeUnpublished = contentSaveAction == ContentSaveAction.PublishWithDescendantsIncludeUnpublished
-                               || contentSaveAction == ContentSaveAction.PublishWithDescendantsIncludeUnpublishedNew
-                               || contentSaveAction == ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublish
-                               || contentSaveAction == ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublishNew;
-        var forceRepublish = contentSaveAction == ContentSaveAction.PublishWithDescendantsForceRepublish
-                               || contentSaveAction == ContentSaveAction.PublishWithDescendantsForceRepublishNew
-                               || contentSaveAction == ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublish
-                               || contentSaveAction == ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublishNew;
+        var includeUnpublished = contentSaveAction == ContentSaveAction.PublishWithDescendantsForce
+                               || contentSaveAction == ContentSaveAction.PublishWithDescendantsForceNew;
 
         PublishBranchFilter publishBranchFilter = PublishBranchFilter.Default;
         if (includeUnpublished)
         {
             publishBranchFilter |= PublishBranchFilter.IncludeUnpublished;
-        }
-
-        if (forceRepublish)
-        {
-            publishBranchFilter |= PublishBranchFilter.ForceRepublish;
         }
 
         return publishBranchFilter;
@@ -2124,6 +2098,7 @@ public class ContentController : ContentControllerBase
     ///     does not have Publish access to this node.
     /// </remarks>
     [Authorize(Policy = AuthorizationPolicies.ContentPermissionPublishById)]
+    [HttpPost]
     public IActionResult PostPublishById(int id)
     {
         IContent? foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
@@ -2155,6 +2130,7 @@ public class ContentController : ContentControllerBase
     ///     does not have Publish access to this node.
     /// </remarks>
     [Authorize(Policy = AuthorizationPolicies.ContentPermissionPublishById)]
+    [HttpPost]
     public IActionResult PostPublishByIdAndCulture(PublishContent model)
     {
         var languageCount = _allLangs.Value.Count();
@@ -2278,6 +2254,7 @@ public class ContentController : ContentControllerBase
     /// </summary>
     /// <param name="sorted"></param>
     /// <returns></returns>
+    [HttpPost]
     public async Task<IActionResult> PostSort(ContentSortOrder sorted)
     {
         if (sorted == null)
@@ -2329,6 +2306,7 @@ public class ContentController : ContentControllerBase
     /// </summary>
     /// <param name="move"></param>
     /// <returns></returns>
+    [HttpPost]
     public async Task<IActionResult?> PostMove(MoveOrCopy move)
     {
         // Authorize...
@@ -2368,6 +2346,7 @@ public class ContentController : ContentControllerBase
     /// </summary>
     /// <param name="copy"></param>
     /// <returns></returns>
+    [HttpPost]
     public async Task<ActionResult<IContent>?> PostCopy(MoveOrCopy copy)
     {
         // Authorize...
@@ -2407,6 +2386,7 @@ public class ContentController : ContentControllerBase
     /// <param name="model">The content and variants to unpublish</param>
     /// <returns></returns>
     [OutgoingEditorModelEvent]
+    [HttpPost]
     public async Task<ActionResult<ContentItemDisplayWithSchedule?>> PostUnpublish(UnpublishContent model)
     {
         IContent? foundContent = _contentService.GetById(model.Id);
@@ -3131,6 +3111,7 @@ public class ContentController : ContentControllerBase
         return notifications;
     }
 
+    [HttpPost]
     public IActionResult PostNotificationOptions(
         int contentId,
         [FromQuery(Name = "notifyOptions[]")] string[] notifyOptions)

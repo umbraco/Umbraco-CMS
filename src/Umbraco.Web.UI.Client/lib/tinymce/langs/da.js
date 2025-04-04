@@ -15,7 +15,7 @@ tinymce.addI18n('da',{
 "Strikethrough": "Gennemstreg",
 "Superscript": "H\u00e6vet",
 "Subscript": "S\u00e6nket",
-"Clear formatting": "Nulstil formattering",
+"Clear formatting": "Nulstil formatering",
 "Align left": "Venstrejusteret",
 "Align center": "Centreret",
 "Align right": "H\u00f8jrejusteret",

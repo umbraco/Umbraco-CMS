@@ -1003,18 +1003,14 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         * @returns {Promise} resourcePromise object containing the saved content item.
         *
         */
-        publishWithDescendants: function (content, isNew, includeUnpublished, forceRepublish, files, showNotifications) {
+        publishWithDescendants: function (content, isNew, includeUnpublished, files, showNotifications) {
             var endpoint = umbRequestHelper.getApiUrl(
                 "contentApiBaseUrl",
                 "PostSave");
 
             var action = "publishWithDescendants";
-            if (includeUnpublished === true && forceRepublish === true) {
-                action += "IncludeUnpublishedAndForceRepublish";
-            } else if (includeUnpublished === true) {
-                action += "IncludeUnpublished";
-            } else if (forceRepublish === true) {
-                action += "ForceRepublish";
+            if (includeUnpublished === true) {
+                action += "Force";
             }
 
             return saveContentItem(content, action + (isNew ? "New" : ""), files, endpoint, showNotifications);

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
@@ -22,6 +23,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -280,7 +282,9 @@ public class PublishedSnapshotServiceTestBase
             PublishedModelFactory,
             TestHelper.GetHostingEnvironment(),
             Options.Create(nuCacheSettings),
-            new ContentDataSerializer(new DictionaryOfPropertyDataSerializer()));
+            new ContentDataSerializer(new DictionaryOfPropertyDataSerializer()),
+            Mock.Of<IBackgroundTaskQueue>(),
+            AppCaches.NoCache);
 
         // invariant is the current default
         VariationContextAccessor.VariationContext = new VariationContext();
