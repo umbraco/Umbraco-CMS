@@ -52,15 +52,6 @@
       <SubType>Designer</SubType>
       <LastGenOutput>TestFiles.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests - Copy.Publish.cs">
-      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests - Copy.SchedulePublish.cs">
-      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests - Copy.UnscheduleUnpublish.cs">
-      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
-    </Compile>
     <Compile Update="Umbraco.Examine.Lucene\UmbracoExamine\TestFiles.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
