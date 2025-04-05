@@ -243,7 +243,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		if (!version) return;
 
 		version.preventCleanup = preventCleanup;
-		this.requestUpdate('versions');
+		this.requestUpdate('_versions');
 	}
 
 	#onChangeCulture(event: UUISelectEvent) {
