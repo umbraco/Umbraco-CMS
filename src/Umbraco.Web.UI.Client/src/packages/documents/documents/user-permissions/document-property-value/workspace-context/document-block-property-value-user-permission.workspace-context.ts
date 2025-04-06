@@ -2,6 +2,8 @@ import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../workspace/constants.js'
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
 import { UmbPropertyValueUserPermissionWorkspaceContextBase } from './property-value-user-permission-workspace-context-base.js';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
 
 export class UmbDocumentBlockPropertyValueUserPermissionWorkspaceContext extends UmbPropertyValueUserPermissionWorkspaceContextBase {
 	#blockWorkspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
@@ -14,16 +16,15 @@ export class UmbDocumentBlockPropertyValueUserPermissionWorkspaceContext extends
 
 			// We only want to apply the permission logic if the block is in a document
 			// TODO: revisit this when getContext supports passContextAliasMatches
-			const documentWorkspaceContext = await this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, () => {})
+			const contentWorkspaceContext = await this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, () => {})
 				.passContextAliasMatches()
 				.asPromise()
 				.catch(() => undefined);
 
-			if (documentWorkspaceContext) {
+			if (contentWorkspaceContext?.getEntityType() === UMB_DOCUMENT_ENTITY_TYPE) {
+				this.#blockWorkspaceContext.content.propertyViewGuard.fallbackToDisallowed();
+				this.#blockWorkspaceContext.content.propertyWriteGuard.fallbackToDisallowed();
 				this.#observeDocumentBlockProperties();
-			} else {
-				// TODO: Revisit if we really want to limit the rules to Documents. [NL]
-				// Silently ignore if the block is not in a document
 			}
 		});
 	}
@@ -31,17 +32,22 @@ export class UmbDocumentBlockPropertyValueUserPermissionWorkspaceContext extends
 	async #observeDocumentBlockProperties() {
 		if (!this.#blockWorkspaceContext) return;
 
-		// TODO: why get the dataset context here? [NL]
-		//const datasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
-		//if (!datasetContext) return;
+		const owner = this.#blockWorkspaceContext.content;
 
-		const structureManager = this.#blockWorkspaceContext.content.structure;
-
-		this.observe(structureManager.contentTypeProperties, (properties) => {
+		this.observe(owner.structure.contentTypeProperties, (properties) => {
 			// TODO: If zero properties I guess we should then clear the state? [NL]
 			if (properties.length === 0) return;
 
-			this._setPermissions(properties, structureManager.propertyViewGuard, structureManager.propertyWriteGuard);
+			this._setPermissions(properties, owner.propertyViewGuard, owner.propertyWriteGuard);
+		});
+
+		const ownerSettings = this.#blockWorkspaceContext.settings;
+
+		this.observe(ownerSettings.structure.contentTypeProperties, (properties) => {
+			// TODO: If zero properties I guess we should then clear the state? [NL]
+			if (properties.length === 0) return;
+
+			this._setPermissions(properties, ownerSettings.propertyViewGuard, ownerSettings.propertyWriteGuard);
 		});
 	}
 }

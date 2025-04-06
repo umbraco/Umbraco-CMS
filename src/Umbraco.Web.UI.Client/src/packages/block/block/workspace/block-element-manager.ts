@@ -71,6 +71,9 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		this.name = host.name;
 		this.getName = host.getName;
 
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
+
 		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
 		this.observe(this.unique, (key) => {
 			if (key) {

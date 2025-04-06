@@ -175,6 +175,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	) {
 		super(host, args);
 
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
+
 		this.#serverValidation.addPathTranslator(UmbContentDetailValidationPathTranslator);
 
 		this._data.setVariantScaffold(args.contentVariantScaffold);
