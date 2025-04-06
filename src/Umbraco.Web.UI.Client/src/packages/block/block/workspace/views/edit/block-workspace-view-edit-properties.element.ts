@@ -1,13 +1,12 @@
 import type { UmbBlockWorkspaceElementManagerNames } from '../../block-workspace.context.js';
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
-import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import './block-editor-property.element.js';
 
 @customElement('umb-block-workspace-view-edit-properties')
 export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -33,22 +32,13 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	}
 
 	@state()
+	_variantId?: UmbVariantId;
+
+	@state()
 	_propertyStructure: Array<UmbPropertyTypeModel> = [];
 
 	@state()
-	_dataPaths?: Array<string>;
-
-	@state()
 	private _ownerEntityType?: string;
-
-	// TODO: Get rid of these and implement a property element... [NL]
-	@state()
-	_propertyViewStates: Array<UmbVariantPropertyViewState> = [];
-
-	@state()
-	_propertyWriteStates: Array<UmbVariantPropertyWriteState> = [];
-
-	#variantId?: UmbVariantId;
 
 	constructor() {
 		super();
@@ -59,8 +49,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 			this.observe(
 				workspaceContext.variantId,
 				(variantId) => {
-					this.#variantId = variantId;
-					this.#generatePropertyDataPath();
+					this._variantId = variantId;
 				},
 				'observeVariantId',
 			);
@@ -78,85 +67,24 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 			this.#propertyStructureHelper.propertyStructure,
 			(propertyStructure) => {
 				this._propertyStructure = propertyStructure;
-				this.#generatePropertyDataPath();
 			},
 			'observePropertyStructure',
-		);
-
-		this.observe(
-			structureManager.propertyViewGuard.rules,
-			(states) => {
-				this._propertyViewStates = states;
-			},
-			'umbObservePropertyViewStates',
-		);
-
-		this.observe(
-			structureManager.propertyWriteGuard.rules,
-			(states) => {
-				this._propertyWriteStates = states;
-			},
-			'umbObservePropertyWriteStates',
-		);
-	}
-
-	/*
-	#generatePropertyDataPath() {
-		if (!this._propertyStructure) return;
-		this._dataPaths = this._propertyStructure.map((property) => `$.${property.alias}`);
-	}
-		*/
-
-	#generatePropertyDataPath() {
-		if (!this.#variantId || !this._propertyStructure) return;
-		this._dataPaths = this._propertyStructure.map(
-			(property) =>
-				`$.values[${UmbDataPathPropertyValueQuery({
-					alias: property.alias,
-					culture: property.variesByCulture ? this.#variantId!.culture : null,
-					segment: property.variesBySegment ? this.#variantId!.segment : null,
-				})}].value`,
-		);
-	}
-
-	#getVisibleProperties() {
-		return this._propertyStructure?.filter((property) => this.#isViewablePropertyType(property)) || [];
-	}
-
-	#isViewablePropertyType(property: UmbPropertyTypeModel) {
-		const propertyVariantId = this.#getPropertyVariantId(property);
-		return this._propertyViewStates.some(
-			(state) => state.propertyType.unique === property.unique && state.variantId.equal(propertyVariantId),
-		);
-	}
-
-	#isWritablePropertyType(property: UmbPropertyTypeModel) {
-		const propertyVariantId = this.#getPropertyVariantId(property);
-		return this._propertyWriteStates.some(
-			(state) => state.propertyType.unique === property.unique && state.variantId.equal(propertyVariantId),
-		);
-	}
-
-	#getPropertyVariantId(property: UmbPropertyTypeModel) {
-		return new UmbVariantId(
-			property.variesByCulture ? this.#variantId!.culture : null,
-			property.variesBySegment ? this.#variantId!.segment : null,
 		);
 	}
 
 	override render() {
-		return repeat(
-			this.#getVisibleProperties(),
-			(property) => property.alias,
-			(property, index) =>
-				html`<umb-property-type-based-property
-					class="property"
-					data-path=${this._dataPaths![index]}
-					.ownerEntityType=${this._ownerEntityType}
-					.property=${property}
-					?readonly=${!this.#isWritablePropertyType(property)}
-					${umbDestroyOnDisconnect()}></umb-property-type-based-property>`,
-		);
+		return this._variantId && this._propertyStructure
+			? repeat(
+					this._propertyStructure,
+					(property) => property.alias,
+					(property) =>
+						html`<umb-block-workspace-view-edit-property
+							class="property"
+							.ownerEntityType=${this._ownerEntityType}
+							.variantId=${this._variantId}
+							.property=${property}></umb-block-workspace-view-edit-property>`,
+				)
+			: nothing;
 	}
 
 	static override styles = [

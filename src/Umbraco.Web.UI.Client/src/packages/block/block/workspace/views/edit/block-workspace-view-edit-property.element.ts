@@ -5,8 +5,8 @@ import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validatio
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
-@customElement('umb-content-workspace-view-edit-property')
-export class UmbContentWorkspaceViewEditPropertyElement extends UmbLitElement {
+@customElement('umb-block-workspace-view-edit-property')
+export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {
 	//
 	@property({ attribute: false })
 	variantId?: UmbVariantId;
@@ -72,10 +72,10 @@ export class UmbContentWorkspaceViewEditPropertyElement extends UmbLitElement {
 	}
 }
 
-export default UmbContentWorkspaceViewEditPropertyElement;
+export default UmbBlockWorkspaceViewEditPropertyElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-content-workspace-view-edit-property': UmbContentWorkspaceViewEditPropertyElement;
+		'umb-block-workspace-view-edit-property': UmbBlockWorkspaceViewEditPropertyElement;
 	}
 }
