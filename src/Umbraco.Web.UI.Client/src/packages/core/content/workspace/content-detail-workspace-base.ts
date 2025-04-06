@@ -49,6 +49,7 @@ import {
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import {
 	UmbPropertyValuePresetVariantBuilderController,
+	UmbVariantPropertyGuardManager,
 	type UmbPropertyTypePresetModel,
 	type UmbPropertyTypePresetModelTypeModel,
 } from '@umbraco-cms/backoffice/property';
@@ -101,6 +102,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	public readonly readonlyGuard = new UmbReadonlyVariantGuardManager(this);
 
+	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
+	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
+	public readonly propertyReadonlyGuard = new UmbVariantPropertyGuardManager(this);
+
 	/* Content Data */
 	protected override readonly _data = new UmbContentWorkspaceDataManager<DetailModelType, VariantModelType>(this);
 
@@ -137,6 +142,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	/**
 	 * @private
 	 * @description - Should not be used by external code.
+	 * @internal
 	 */
 	public readonly languages = this.#languages.asObservable();
 
@@ -865,6 +871,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	override resetState() {
 		super.resetState();
 		this.readonlyGuard.clear();
+		this.propertyViewGuard.clear();
+		this.propertyWriteGuard.clear();
+		this.propertyReadonlyGuard.clear();
 	}
 
 	abstract getContentTypeUnique(): string | undefined;

@@ -4,6 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 @customElement('umb-content-workspace-view-edit-property')
 export class UmbContentWorkspaceViewEditPropertyElement extends UmbLitElement {
@@ -21,13 +22,12 @@ export class UmbContentWorkspaceViewEditPropertyElement extends UmbLitElement {
 	_writeable?: boolean;
 
 	@state()
-	_context?: any;
+	_context?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
-		// TODO: Use right context here... [NL]
-		this.consumeContext('property-dataset', (context) => {
+		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (context) => {
 			this._context = context;
 		});
 	}
@@ -49,11 +49,11 @@ export class UmbContentWorkspaceViewEditPropertyElement extends UmbLitElement {
 				// observe property and variantId for read-only state
 				this.observe(
 					observeMultiple([
-						this._context.readOnly.isOnForPropertyTypeAndVariantId(this.type, propertyVariantId),
-						this._context.write.isOnForPropertyTypeAndVariantId(this.type, propertyVariantId),
+						this._context.propertyReadonlyGuard.permittedForVariantAndProperty(propertyVariantId, this.type),
+						this._context.propertyWriteGuard.permittedForVariantAndProperty(propertyVariantId, this.type),
 					]),
-					([readOnly, write]) => {
-						this._writeable = write && !readOnly;
+					([readonly, write]) => {
+						this._writeable = write && !readonly;
 					},
 					'observeView',
 				);

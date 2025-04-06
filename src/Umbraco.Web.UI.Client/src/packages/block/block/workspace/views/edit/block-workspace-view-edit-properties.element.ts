@@ -7,6 +7,8 @@ import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/c
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import './block-editor-property.element.js';
+import type { UmbElementPropertyDataOwner } from '@umbraco-cms/backoffice/content';
+import type { UmbBlockDataModel } from '../../../types.js';
 
 @customElement('umb-block-workspace-view-edit-properties')
 export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -30,6 +32,9 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	public set containerId(value: string | null | undefined) {
 		this.#propertyStructureHelper.setContainerId(value);
 	}
+
+	@state()
+	_dataOwner?: UmbElementPropertyDataOwner<UmbBlockDataModel, UmbContentTypeModel>;
 
 	@state()
 	_variantId?: UmbVariantId;
@@ -60,7 +65,8 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	#setStructureManager() {
 		if (!this.#blockWorkspace || !this.#managerName) return;
 
-		const structureManager = this.#blockWorkspace[this.#managerName].structure;
+		this._dataOwner = this.#blockWorkspace[this.#managerName];
+		const structureManager = this._dataOwner.structure;
 
 		this.#propertyStructureHelper.setStructureManager(structureManager);
 		this.observe(
@@ -80,6 +86,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 					(property) =>
 						html`<umb-block-workspace-view-edit-property
 							class="property"
+							.ownerContext=${this._dataOwner}
 							.ownerEntityType=${this._ownerEntityType}
 							.variantId=${this._variantId}
 							.property=${property}></umb-block-workspace-view-edit-property>`,

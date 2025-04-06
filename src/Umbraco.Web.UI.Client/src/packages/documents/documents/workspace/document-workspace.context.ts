@@ -87,11 +87,6 @@ export class UmbDocumentWorkspaceContext
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
 		});
 
-		/* Start the property view and write states for the document workspace. This means that the properties are not viewable or writable by default
-		 but requires an entry in the state to be able to view or write to the properties. */
-		this.structure.propertyViewGuard.fallbackToDisallowed();
-		this.structure.propertyWriteGuard.fallbackToDisallowed();
-
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
 
 		// TODO: Remove this in v17 as we have moved the publishing methods to the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.
@@ -187,10 +182,6 @@ export class UmbDocumentWorkspaceContext
 	override resetState(): void {
 		super.resetState();
 		this.#isTrashedContext.setIsTrashed(false);
-		// TODO: Bad in terms of seperation of concern, this should not be managed here. [NL]
-		this.structure.propertyViewGuard.clear();
-		this.structure.propertyWriteGuard.clear();
-		this.structure.propertyReadonlyGuard.clear();
 	}
 
 	override async load(unique: string) {
