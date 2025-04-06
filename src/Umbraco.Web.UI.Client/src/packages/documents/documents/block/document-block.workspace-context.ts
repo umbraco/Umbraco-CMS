@@ -16,19 +16,12 @@ export class UmbDocumentBlockWorkspaceContext extends UmbControllerBase {
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, async (context) => {
 			// TODO: revisit this when getContext supports passContextAliasMatches
-			const documentWorkspaceContext = await this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, () => {})
-				.passContextAliasMatches()
-				.asPromise()
-				.catch(() => {
-					throw new Error('Could not find document workspace context');
-				});
+			const consumer = await this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, () => {}).passContextAliasMatches();
+			const documentWorkspaceContext = consumer.asPromise().catch(() => {
+				throw new Error('Could not find document workspace context');
+			});
 
-			if (context && documentWorkspaceContext) {
-				documentWorkspaceContext.destroy();
-				// Start the states for blocks inside documents to allow for property value permissions
-				context.content.structure.propertyViewGuard.fallbackToDisallowed();
-				context.content.structure.propertyWriteGuard.fallbackToDisallowed();
-			}
+			// TODO: Revist this code, is there a need to hook in here to set fallbackToDisallowed? [NL]
 		});
 	}
 }
