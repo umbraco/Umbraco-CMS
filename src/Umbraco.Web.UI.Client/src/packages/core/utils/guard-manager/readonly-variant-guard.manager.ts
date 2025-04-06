@@ -23,6 +23,7 @@ function CompareStateAndVariantId(rules: Array<UmbVariantGuardRule>, variantId: 
 	return false;
 }
 
+// TODO: Check the need for this one.
 export class UmbReadonlyVariantGuardManager extends UmbReadonlyGuardManager<UmbVariantGuardRule> {
 	//
 	permittedForVariant(variantId: UmbVariantId): Observable<boolean> {
