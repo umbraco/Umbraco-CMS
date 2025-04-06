@@ -1,4 +1,4 @@
-import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	UmbContentTypeModel,
@@ -10,9 +10,12 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import './content-editor-property.element.js';
 
 @customElement('umb-content-workspace-view-edit-properties')
 export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement {
+	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
+
 	@property({ type: String, attribute: 'container-id', reflect: false })
 	public get containerId(): string | null | undefined {
 		return this.#propertyStructureHelper.getContainerId();
@@ -20,8 +23,6 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	public set containerId(value: string | null | undefined) {
 		this.#propertyStructureHelper.setContainerId(value);
 	}
-
-	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
 
 	@state()
 	_variantId?: UmbVariantId;
@@ -63,7 +64,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 							.variantId=${this._variantId}
 							.property=${property}></umb-content-workspace-view-edit-property>`,
 				)
-			: '';
+			: nothing;
 	}
 
 	static override styles = [
