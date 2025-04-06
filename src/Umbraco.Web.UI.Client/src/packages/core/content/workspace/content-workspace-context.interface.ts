@@ -8,6 +8,7 @@ import type {
 	UmbRoutableWorkspaceContext,
 	UmbVariantDatasetWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
+import type { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
 
 export interface UmbContentWorkspaceContext<
 	ContentModel extends UmbContentDetailModel = UmbContentDetailModel,
@@ -26,6 +27,10 @@ export interface UmbContentWorkspaceContext<
 
 	isLoaded(): Promise<unknown> | undefined;
 	variantById(variantId: UmbVariantId): Observable<VariantModelType | undefined>;
+
+	readonly propertyViewGuard: UmbVariantPropertyGuardManager;
+	readonly propertyWriteGuard: UmbVariantPropertyGuardManager;
+	readonly propertyReadonlyGuard: UmbVariantPropertyGuardManager;
 
 	//initiatePropertyValueChange(): void;
 	//finishPropertyValueChange(): void;

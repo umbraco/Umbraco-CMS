@@ -18,6 +18,7 @@ import { UmbElementWorkspaceDataManager, type UmbElementPropertyDataOwner } from
 import { UmbReadonlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
+import { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
 
 export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
 	extends UmbControllerBase
@@ -56,6 +57,10 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		this,
 		new UmbDocumentTypeDetailRepository(this),
 	);
+
+	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
+	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
+	public readonly propertyReadonlyGuard = new UmbVariantPropertyGuardManager(this);
 
 	readonly validation = new UmbValidationController(this);
 
@@ -100,6 +105,9 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 
 	resetState() {
 		this.#data.clear();
+		this.propertyViewGuard.clear();
+		this.propertyWriteGuard.clear();
+		this.propertyReadonlyGuard.clear();
 	}
 
 	setVariantId(variantId: UmbVariantId | undefined) {

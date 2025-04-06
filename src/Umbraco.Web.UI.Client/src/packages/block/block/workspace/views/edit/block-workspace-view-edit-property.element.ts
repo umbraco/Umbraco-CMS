@@ -4,6 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import type UmbBlockElementManager from '../../block-element-manager';
 
 @customElement('umb-block-workspace-view-edit-property')
 export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {
@@ -20,22 +21,13 @@ export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {
 	@state()
 	_writeable?: boolean;
 
-	@state()
-	_context?: any;
-
-	constructor() {
-		super();
-
-		// TODO: Use right context here... [NL]
-		this.consumeContext('property-dataset', (context) => {
-			this._context = context;
-		});
-	}
+	@property({ attribute: false })
+	ownerContext?: UmbBlockElementManager;
 
 	override willUpdate(changedProperties: Map<string, any>) {
 		super.willUpdate(changedProperties);
-		if (changedProperties.has('type') || changedProperties.has('variantId') || changedProperties.has('_context')) {
-			if (this.variantId && this.type && this._context) {
+		if (changedProperties.has('type') || changedProperties.has('variantId') || changedProperties.has('ownerContext')) {
+			if (this.variantId && this.type && this.ownerContext) {
 				const propertyVariantId = new UmbVariantId(
 					this.type.variesByCulture ? this.variantId.culture : null,
 					this.type.variesBySegment ? this.variantId.segment : null,
@@ -49,11 +41,11 @@ export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {
 				// observe property and variantId for read-only state
 				this.observe(
 					observeMultiple([
-						this._context.readOnly.isOnForPropertyTypeAndVariantId(this.type, propertyVariantId),
-						this._context.write.isOnForPropertyTypeAndVariantId(this.type, propertyVariantId),
+						this.ownerContext.propertyReadonlyGuard.permittedForVariantAndProperty(propertyVariantId, this.type),
+						this.ownerContext.propertyWriteGuard.permittedForVariantAndProperty(propertyVariantId, this.type),
 					]),
-					([readOnly, write]) => {
-						this._writeable = write && !readOnly;
+					([readonly, write]) => {
+						this._writeable = write && !readonly;
 					},
 					'observeView',
 				);
