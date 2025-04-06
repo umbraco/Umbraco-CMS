@@ -17,7 +17,6 @@ import {
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, UmbDocumentPublishingRepository } from '../publishing/index.js';
 import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
-import {} from '../user-permissions/document-property-value/constants.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -38,10 +37,12 @@ import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/language';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
-
 export class UmbDocumentWorkspaceContext
 	extends UmbContentDetailWorkspaceContextBase<
 		ContentModel,
@@ -85,6 +86,17 @@ export class UmbDocumentWorkspaceContext
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			contentTypePropertyName: 'documentType',
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
+		});
+
+		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
+			const documentConfiguration = (await context?.getDocumentConfiguration()) ?? undefined;
+
+			if (documentConfiguration) {
+				if (documentConfiguration.allowEditInvariantFromNonDefault !== true) {
+					this.#preventEditInvariantFromNonDefault();
+				} else {
+				}
+			}
 		});
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
@@ -177,6 +189,38 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	#preventEditInvariantFromNonDefault() {
+		this.observe(observeMultiple([this.structure.contentTypeProperties, this.languages]), ([properties, languages]) => {
+			if (properties.length === 0) return;
+			if (languages.length === 0) return;
+
+			const defaultLanguageUnique = languages.find((x) => x.isDefault)?.unique;
+
+			createExtensionApiByAlias(this, UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS, [
+				{
+					config: {
+						match: defaultLanguageUnique,
+					},
+					onChange: (permitted: boolean) => {
+						const unique = 'UMB_preventEditInvariantFromNonDefault';
+
+						if (permitted) {
+							this.propertyReadonlyGuard.removeRule(unique);
+						} else {
+							const rule = {
+								unique,
+								permitted: false,
+								message: 'Shared properties can only be edited in the default language',
+								variantId: new UmbVariantId(),
+							};
+							this.propertyReadonlyGuard.addRule(rule);
+						}
+					},
+				},
+			]);
+		});
 	}
 
 	override resetState(): void {
