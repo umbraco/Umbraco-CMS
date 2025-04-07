@@ -4,14 +4,13 @@ import type { UmbCancelablePromise } from './cancelable-promise.js';
 import { UmbApiError, UmbCancelError, UmbError } from './umb-error.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { CancelablePromise } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbResourceController extends UmbControllerBase {
 	/**
 	 * The promise that is being executed.
 	 * @protected
 	 */
-	protected _promise: UmbCancelablePromise<any> | CancelablePromise<any> | Promise<any>;
+	protected _promise: UmbCancelablePromise<any> | Promise<any>;
 
 	constructor(host: UmbControllerHost, promise: Promise<unknown>, alias?: string) {
 		super(host, alias);
