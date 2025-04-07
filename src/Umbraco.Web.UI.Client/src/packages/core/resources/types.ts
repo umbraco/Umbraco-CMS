@@ -13,6 +13,7 @@ export interface UmbProblemDetails {
 	type: string;
 	title: string;
 	status: number;
+	stack?: unknown;
 	detail?: string;
 	instance?: string;
 	operationStatus?: string;

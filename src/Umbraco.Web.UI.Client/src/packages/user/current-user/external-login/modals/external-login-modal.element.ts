@@ -8,7 +8,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbApiError } from '@umbraco-cms/backoffice/resources';
 
 type UmbExternalLoginProviderOption = UmbCurrentUserExternalLoginProviderModel & {
 	displayName: string;
@@ -204,10 +204,10 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 			await authContext.unlinkLogin(item.providerSchemeName, item.providerKey);
 		} catch (error) {
 			let message = this.localize.term('errors_receivedErrorFromServer');
-			if (error instanceof Error) {
+			if (UmbApiError.isUmbApiError(error)) {
+				message = error.problemDetails.detail ?? message;
+			} else if (error instanceof Error) {
 				message = error.message;
-			} else if (typeof error === 'object' && (error as ProblemDetails).title) {
-				message = (error as ProblemDetails).title ?? message;
 			}
 			console.error('[External Login] Error unlinking provider: ', error);
 			this.#notificationContext?.peek('danger', {

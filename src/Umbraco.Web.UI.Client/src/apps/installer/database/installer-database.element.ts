@@ -7,11 +7,10 @@ import { css, html, nothing, customElement, property, query, state } from '@umbr
 import type {
 	DatabaseInstallRequestModel,
 	DatabaseSettingsPresentationModel,
-	ProblemDetails,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { ApiError, InstallService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { tryExecute, UmbApiError, type UmbProblemDetails } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabaseElement extends UmbLitElement {
@@ -167,6 +166,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				const { error } = await tryExecute(
 					this,
 					InstallService.postInstallValidateDatabase({ requestBody: databaseDetails }),
+					{ disableNotifications: true },
 				);
 
 				if (error) {
@@ -196,13 +196,13 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 
 		this._installerContext.nextStep();
 
-		const { error: _error } = await tryExecute(
+		const { error } = await tryExecute(
 			this,
 			InstallService.postInstallSetup({ requestBody: this._installerContext.getData() }),
+			{ disableNotifications: true },
 		);
-		const error = _error as ProblemDetails | undefined;
 		if (error) {
-			this._handleRejected(error);
+			if (UmbApiError.isUmbApiError(error)) this._handleRejected(error.problemDetails);
 		} else {
 			this._handleFulfilled();
 		}
@@ -215,7 +215,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		history.replaceState(null, '', 'section/content');
 	}
 
-	private _handleRejected(e: ProblemDetails) {
+	private _handleRejected(e: UmbProblemDetails) {
 		this._installerContext?.setInstallStatus(e);
 	}
 
