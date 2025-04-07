@@ -180,7 +180,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const contentTypeDetailRepository = new args.contentTypeDetailRepository(this);
 		this.#validationRepositoryClass = args.contentValidationRepository;
 		this.#validateOnSubmit = args.skipValidationOnSubmit ? !args.skipValidationOnSubmit : true;
-		this.#ignoreValidationOnSubmit = args.ignoreValidationOnSubmit ? !args.ignoreValidationOnSubmit : true;
+		this.#ignoreValidationOnSubmit = args.ignoreValidationOnSubmit ?? false;
 		this.structure = new UmbContentTypeStructureManager<ContentTypeDetailModelType>(this, contentTypeDetailRepository);
 		this.variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
 		this.variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
