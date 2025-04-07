@@ -433,8 +433,8 @@ stages:
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
           - powershell: |
-              while (!docker stats mssql --no-stream)
-              { Start-Sleep -Seconds 5
+              while (-not (docker stats mssql --no-stream)) {
+                Start-Sleep -Seconds 5
                 Write-Host "Waiting for SQL Server to be ready..."
               }
               Write-Host "SQL Server is ready"
