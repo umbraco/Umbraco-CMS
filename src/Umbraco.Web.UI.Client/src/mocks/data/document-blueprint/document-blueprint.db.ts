@@ -30,6 +30,7 @@ const treeItemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprint
 	if (!documentType) throw new Error(`Document type with id ${model.documentType.id} not found`);
 
 	return {
+		ancestors: model.ancestors,
 		documentType: {
 			icon: documentType.icon,
 			id: documentType.id,
@@ -51,6 +52,7 @@ const createMockDocumentBlueprintMapper = (
 	const now = new Date().toString();
 
 	return {
+		ancestors: [],
 		documentType: {
 			id: documentType.id,
 			icon: documentType.icon,

@@ -155,6 +155,7 @@ const itemMapper = (model: UmbMockDocumentModel): DocumentItemResponseModel => {
 
 const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionResponseModel => {
 	return {
+		ancestors: model.ancestors,
 		creator: null,
 		documentType: {
 			id: model.documentType.id,
@@ -168,7 +169,6 @@ const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionRespon
 		updater: null,
 		values: model.values,
 		variants: model.variants,
-		ancestors: model.ancestors,
 	};
 };
 

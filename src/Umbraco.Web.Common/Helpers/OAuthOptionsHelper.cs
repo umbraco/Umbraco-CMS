@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Extensions;
 
@@ -14,7 +15,7 @@ public class OAuthOptionsHelper
 {
     // https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1
     // we omit "state" and "error_uri" here as it hold no value in determining the message to display to the user
-    private static readonly IReadOnlyCollection<string> _oathCallbackErrorParams = new string[] { "error", "error_description" };
+    private static readonly string[] _oathCallbackErrorParams = ["error", "error_description"];
 
     private readonly IOptions<SecuritySettings> _securitySettings;
 
@@ -43,7 +44,7 @@ public class OAuthOptionsHelper
         SetUmbracoRedirectWithFilteredParams(context, providerFriendlyName, eventName)
             .HandleResponse();
 
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 
     /// <summary>
@@ -60,9 +61,9 @@ public class OAuthOptionsHelper
 
         foreach (var oathCallbackErrorParam in _oathCallbackErrorParams)
         {
-            if (context.Request.Query.ContainsKey(oathCallbackErrorParam))
+            if (context.Request.Query.TryGetValue(oathCallbackErrorParam, out StringValues paramValue))
             {
-                callbackPath = callbackPath.AppendQueryStringToUrl($"{oathCallbackErrorParam}={context.Request.Query[oathCallbackErrorParam]}");
+                callbackPath = callbackPath.AppendQueryStringToUrl($"{oathCallbackErrorParam}={paramValue}");
             }
         }
 

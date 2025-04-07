@@ -243,9 +243,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 						</div>
 						<div class="row query-results">
 							<span id="results-count">
-								${this._templateQuery?.resultCount ?? 0}
-								<umb-localize key="template_itemsReturned">items returned, in</umb-localize>
-								${this._templateQuery?.executionTime ?? 0} ms
+								<umb-localize key="template_publishedItemsReturned" .args=${[this._templateQuery?.resultCount ?? 0, this._templateQuery?.executionTime ?? 0]}>items returned, in</umb-localize>
 							</span>
 							${this._templateQuery?.sampleResults.map(
 								(sample) => html`<span><umb-icon name=${sample.icon}></umb-icon>${sample.name}</span>`,
