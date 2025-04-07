@@ -45,8 +45,6 @@ export class UmbContentWorkspaceViewEditPropertyElement extends UmbLitElement {
 					culture: propertyVariantId.culture,
 					segment: propertyVariantId.segment,
 				})}].value`;
-				// consume ? context
-				// observe property and variantId for read-only state
 
 				this.observe(
 					observeMultiple([
@@ -66,7 +64,6 @@ export class UmbContentWorkspaceViewEditPropertyElement extends UmbLitElement {
 		if (!this._dataPath || this._writeable === undefined) return nothing;
 
 		return html`<umb-property-type-based-property
-			class="property"
 			data-path=${this._dataPath}
 			.property=${this.property}
 			?readonly=${!this._writeable}></umb-property-type-based-property>`;
