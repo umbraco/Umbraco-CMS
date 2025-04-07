@@ -2617,7 +2617,7 @@ internal partial class UserService : RepositoryService, IUserService
     {
         if (pathIds.Length == 0)
         {
-            return new EntityPermissionCollection(Enumerable.Empty<EntityPermission>());
+            return new EntityPermissionCollection([]);
         }
 
         // get permissions for all nodes in the path by group
