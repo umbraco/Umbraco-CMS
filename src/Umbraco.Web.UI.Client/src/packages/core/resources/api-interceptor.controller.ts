@@ -36,7 +36,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		client.interceptors.response.use(async (response) => {
 			if (response.ok) return response;
 
-			const error = await response.json();
+			// Clones the response to read the body
+			const origResponse = response.clone();
+			const error = await origResponse.json();
 			if (!error) return response;
 
 			// If the error is not an UmbError, we check if it is a problem details object
@@ -47,7 +49,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			}
 
 			// Handle 500 errors - we need to show a notification
-			if (response.status === 500) {
+			if (origResponse.status === 500) {
 				let headline = error.title ?? error.name ?? 'Server Error';
 				let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
 
@@ -64,7 +66,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				this.#peekError(headline, message, error.errors ?? error.detail);
 			}
 
-			// Create a new response with the error
+			// Return original response
 			return response;
 		});
 	}
