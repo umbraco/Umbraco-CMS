@@ -777,6 +777,14 @@ export type DocumentTypePropertyTypeContainerResponseModel = {
     sortOrder: number;
 };
 
+export type DocumentTypePropertyTypeReferenceResponseModel = {
+    $type: string;
+    id: string;
+    name?: (string) | null;
+    alias?: (string) | null;
+    documentType: (TrackedReferenceDocumentTypeModel);
+};
+
 export type DocumentTypePropertyTypeResponseModel = {
     id: string;
     container?: ((ReferenceByIdModel) | null);
@@ -1285,6 +1293,14 @@ export type MediaTypePropertyTypeContainerResponseModel = {
     sortOrder: number;
 };
 
+export type MediaTypePropertyTypeReferenceResponseModel = {
+    $type: string;
+    id: string;
+    name?: (string) | null;
+    alias?: (string) | null;
+    mediaType: (TrackedReferenceMediaTypeModel);
+};
+
 export type MediaTypePropertyTypeResponseModel = {
     id: string;
     container?: ((ReferenceByIdModel) | null);
@@ -1465,6 +1481,14 @@ export type MemberTypePropertyTypeContainerResponseModel = {
     name?: (string) | null;
     type: string;
     sortOrder: number;
+};
+
+export type MemberTypePropertyTypeReferenceResponseModel = {
+    $type: string;
+    id: string;
+    name?: (string) | null;
+    alias?: (string) | null;
+    memberType: (TrackedReferenceMemberTypeModel);
 };
 
 export type MemberTypePropertyTypeResponseModel = {
@@ -1759,7 +1783,7 @@ export type PagedIndexResponseModel = {
 
 export type PagedIReferenceResponseModel = {
     total: number;
-    items: Array<(DefaultReferenceResponseModel | DocumentReferenceResponseModel | MediaReferenceResponseModel | MemberReferenceResponseModel)>;
+    items: Array<(DefaultReferenceResponseModel | DocumentReferenceResponseModel | DocumentTypePropertyTypeReferenceResponseModel | MediaReferenceResponseModel | MediaTypePropertyTypeReferenceResponseModel | MemberReferenceResponseModel | MemberTypePropertyTypeReferenceResponseModel)>;
 };
 
 export type PagedLanguageResponseModel = {
@@ -2069,6 +2093,11 @@ export type PublishedDocumentResponseModel = {
     urls: Array<(DocumentUrlInfoModel)>;
     template?: ((ReferenceByIdModel) | null);
     isTrashed: boolean;
+};
+
+export type PublishWithDescendantsResultModel = {
+    taskId: string;
+    isComplete: boolean;
 };
 
 export type RebuildStatusModel = {
@@ -2404,18 +2433,21 @@ export type TemporaryFileResponseModel = {
 };
 
 export type TrackedReferenceDocumentTypeModel = {
+    id: string;
     icon?: (string) | null;
     alias?: (string) | null;
     name?: (string) | null;
 };
 
 export type TrackedReferenceMediaTypeModel = {
+    id: string;
     icon?: (string) | null;
     alias?: (string) | null;
     name?: (string) | null;
 };
 
 export type TrackedReferenceMemberTypeModel = {
+    id: string;
     icon?: (string) | null;
     alias?: (string) | null;
     name?: (string) | null;
@@ -2994,6 +3026,14 @@ export type PutDataTypeByIdMoveData = {
 
 export type PutDataTypeByIdMoveResponse = (string);
 
+export type GetDataTypeByIdReferencedByData = {
+    id: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetDataTypeByIdReferencedByResponse = ((PagedIReferenceResponseModel));
+
 export type GetDataTypeByIdReferencesData = {
     id: string;
 };
@@ -3286,7 +3326,14 @@ export type PutDocumentByIdPublishWithDescendantsData = {
     requestBody?: (PublishDocumentWithDescendantsRequestModel);
 };
 
-export type PutDocumentByIdPublishWithDescendantsResponse = (string);
+export type PutDocumentByIdPublishWithDescendantsResponse = ((PublishWithDescendantsResultModel));
+
+export type GetDocumentByIdPublishWithDescendantsResultByTaskIdData = {
+    id: string;
+    taskId: string;
+};
+
+export type GetDocumentByIdPublishWithDescendantsResultByTaskIdResponse = ((PublishWithDescendantsResultModel));
 
 export type GetDocumentByIdPublishedData = {
     id: string;
