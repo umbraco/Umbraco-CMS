@@ -1,4 +1,3 @@
-import { UMB_ROUTE_CONTEXT, UMB_ROUTE_PATH_ADDENDUM_CONTEXT } from '../index.js';
 import { encodeFolderName } from '../encode-folder-name.function.js';
 import type { UmbModalRouteRegistration } from './modal-route-registration.interface.js';
 import type {
@@ -13,6 +12,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 import type { IRouterSlot, Params } from '@umbraco-cms/backoffice/external/router-slot';
+import type { UMB_ROUTE_CONTEXT } from '../components/router-slot/index.js';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
