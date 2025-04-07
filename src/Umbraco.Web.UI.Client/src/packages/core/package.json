@@ -4,5 +4,8 @@
 	"type": "module",
 	"scripts": {
 		"build": "vite build"
+	},
+	"dependencies": {
+		"uuid": "^11.0.5"
 	}
 }
