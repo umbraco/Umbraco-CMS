@@ -1,4 +1,4 @@
-import { UmbTryExecuteAndNotifyController } from './try-execute-and-notify.controller.js';
+import { UmbTryExecuteController } from './try-execute.controller.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
@@ -14,10 +14,10 @@ export async function tryExecuteAndNotify<T>(
 	new UmbDeprecation({
 		deprecated: 'The tryExecuteAndNotify function is deprecated.',
 		removeInVersion: '18.0.0',
-		solution: 'Use the tryExecute function instead.',
+		solution: 'Use the tryExecute function with options instead.',
 	}).warn();
-	const controller = new UmbTryExecuteAndNotifyController(host, resource);
-	const response = await controller.tryExecuteAndNotify();
+	const controller = new UmbTryExecuteController(host, resource);
+	const response = await controller.tryExecute({ disableNotifications: false });
 	controller.destroy();
 	return response as UmbDataSourceResponse<T>;
 }
