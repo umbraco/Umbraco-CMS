@@ -46,6 +46,9 @@ export class UmbDocumentValidationServerDataSource {
 			DocumentService.postDocumentValidate({
 				requestBody,
 			}),
+			{
+				disableNotifications: true,
+			},
 		);
 	}
 
@@ -75,6 +78,9 @@ export class UmbDocumentValidationServerDataSource {
 				id: model.unique,
 				requestBody,
 			}),
+			{
+				disableNotifications: true,
+			},
 		);
 	}
 }
