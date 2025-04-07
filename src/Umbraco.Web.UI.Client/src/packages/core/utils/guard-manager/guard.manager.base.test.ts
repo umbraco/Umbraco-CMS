@@ -1,6 +1,5 @@
-import { UmbGuardManagerBase, type UmbGuardRule } from './guard.manager.base.js';
+import { UmbGuardManagerBase, type UmbGuardIncomingRuleBase } from './guard.manager.base.js';
 import { expect } from '@open-wc/testing';
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
@@ -9,9 +8,9 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 
 describe('UmbPermissionGuardManager', () => {
 	let manager: UmbGuardManagerBase;
-	const rule1: UmbGuardRule = { unique: '1', message: 'Rule 1', permitted: true };
-	const rule2: UmbGuardRule = { unique: '2', message: 'Rule 2', permitted: true };
-	const ruleFalse: UmbGuardRule = { unique: '-1', message: 'Rule -1', permitted: false };
+	const rule1: UmbGuardIncomingRuleBase = { unique: '1', message: 'Rule 1' };
+	const rule2: UmbGuardIncomingRuleBase = { unique: '2', message: 'Rule 2' };
+	const ruleFalse: UmbGuardIncomingRuleBase = { unique: '-1', message: 'Rule -1', permitted: false };
 
 	beforeEach(() => {
 		const hostElement = new UmbTestControllerHostElement();
