@@ -1,21 +1,18 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -1969,6 +1966,145 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(ContentVariation.Culture,
             test.CompositionPropertyGroups.Last().PropertyTypes.First(x => x.Alias.InvariantEquals("title"))
                 .Variations);
+    }
+
+    [Test]
+    public async Task Can_Add_Inheritance_To_Content_Type()
+    {
+        // Arrange
+        (IContentType? contentType1, IContentType? contentType2, _) =
+            CreateContentTypesForInheritanceTests();
+
+        // Act
+        var inheritAttempt = await ContentTypeService.InheritAsync(contentType2.Key, contentType1.Key, Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.IsTrue(inheritAttempt.Success);
+
+        contentType2 = await ContentTypeService.GetAsync(contentType2.Key);
+        Assert.IsNotNull(contentType2);
+        Assert.AreEqual(contentType1.Id, contentType2.ParentId);
+    }
+
+    [Test]
+    public async Task Cannot_Add_Inheritance_To_Non_Existing_Content_Type()
+    {
+        // Arrange
+        (IContentType? contentType1, IContentType? contentType2, _) =
+            CreateContentTypesForInheritanceTests();
+
+        // Act
+        var inheritAttempt = await ContentTypeService.InheritAsync(Guid.NewGuid(), contentType1.Key, Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.IsFalse(inheritAttempt.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.NotFound, inheritAttempt.Result);
+    }
+
+    [Test]
+    public async Task Cannot_Add_Inheritance_From_Non_Existing_Parent_Content_Type()
+    {
+        // Arrange
+        (IContentType? contentType1, IContentType? contentType2, _) =
+            CreateContentTypesForInheritanceTests();
+
+        // Act
+        var inheritAttempt = await ContentTypeService.InheritAsync(contentType2.Key, Guid.NewGuid(), Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.IsFalse(inheritAttempt.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.NotFound, inheritAttempt.Result);
+    }
+
+    [Test]
+    public async Task Can_Clear_Inheritance_From_Parent_In_Root()
+    {
+        // Arrange
+        (IContentType? contentType1, IContentType? contentType2, _) =
+            CreateContentTypesForInheritanceTests(withInheritance: true);
+
+        // Act
+        var inheritAttempt = await ContentTypeService.InheritAsync(contentType2.Key, null, Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.IsTrue(inheritAttempt.Success);
+
+        contentType2 = await ContentTypeService.GetAsync(contentType2.Key);
+        Assert.IsNotNull(contentType2);
+        Assert.AreEqual(Constants.System.Root, contentType2.ParentId);
+    }
+
+    [Test]
+    public async Task Can_Clear_Inheritance_From_Parent_In_Container()
+    {
+        // Arrange
+        (IContentType? contentType1, IContentType? contentType2, _) =
+            CreateContentTypesForInheritanceTests(withInheritance: true);
+
+        var container = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container1" };
+        ContentTypeService.SaveContainer(container);
+        await ContentTypeService.MoveAsync(contentType1.Key, container.Key);
+        contentType1 = await ContentTypeService.GetAsync(contentType1.Key);
+        Assert.AreEqual(container.Id, contentType1.ParentId);
+
+        // Act
+        var inheritAttempt = await ContentTypeService.InheritAsync(contentType2.Key, null, Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.IsTrue(inheritAttempt.Success);
+
+        contentType2 = await ContentTypeService.GetAsync(contentType2.Key);
+        Assert.IsNotNull(contentType2);
+        Assert.AreEqual(container.Id, contentType2.ParentId);
+    }
+
+    [Test]
+    public async Task Can_Clear_Multi_Level_Inheritance_From_Parent_In_Container()
+    {
+        // Arrange
+        (IContentType? contentType1, IContentType? contentType2, IContentType? contentType3) =
+            CreateContentTypesForInheritanceTests(withInheritance: true);
+
+        var container = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container1" };
+        ContentTypeService.SaveContainer(container);
+        await ContentTypeService.MoveAsync(contentType1.Key, container.Key);
+        contentType1 = await ContentTypeService.GetAsync(contentType1.Key);
+        Assert.AreEqual(container.Id, contentType1.ParentId);
+
+        // Act
+        var inheritAttempt = await ContentTypeService.InheritAsync(contentType3.Key, null, Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.IsTrue(inheritAttempt.Success);
+
+        contentType3 = await ContentTypeService.GetAsync(contentType3.Key);
+        Assert.IsNotNull(contentType3);
+        Assert.AreEqual(container.Id, contentType3.ParentId);
+    }
+
+    private (IContentType? ContentType1, IContentType? ContentType2, IContentType? ContentType3)
+        CreateContentTypesForInheritanceTests(bool withInheritance = false)
+    {
+        IContentType? contentType1 = ContentTypeBuilder.CreateSimpleContentType("testType1", "Test Type 1");
+        ContentTypeService.Save(contentType1);
+        IContentType? contentType2 = ContentTypeBuilder.CreateSimpleContentType("testType2", "Test Type 2", randomizeAliases: true, parent: withInheritance ? contentType1 : null);
+        ContentTypeService.Save(contentType2);
+        IContentType? contentType3 = ContentTypeBuilder.CreateSimpleContentType("testType3", "Test Type 3", randomizeAliases: true, parent: withInheritance ? contentType2 : null);
+        ContentTypeService.Save(contentType3);
+
+        Assert.AreEqual(Constants.System.Root, contentType1.ParentId);
+        if (withInheritance)
+        {
+            Assert.AreEqual(contentType1.Id, contentType2.ParentId);
+            Assert.AreEqual(contentType2.Id, contentType3.ParentId);
+        }
+        else
+        {
+            Assert.AreEqual(Constants.System.Root, contentType2.ParentId);
+            Assert.AreEqual(Constants.System.Root, contentType3.ParentId);
+        }
+
+        return (contentType1, contentType2, contentType3);
     }
 
     private ContentType CreateComponent()

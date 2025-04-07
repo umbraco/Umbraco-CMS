@@ -1156,6 +1156,72 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #endregion
 
+    #region Inheritance
+
+    /// <inheritdoc/>
+    public async Task<Attempt<ContentTypeOperationStatus>> InheritAsync(Guid key, Guid? parentKey, Guid performingUserKey)
+    {
+        TItem? toUpdateInheritance = await GetAsync(key);
+        if (toUpdateInheritance is null)
+        {
+            return Attempt.Fail(ContentTypeOperationStatus.NotFound);
+        }
+
+        // Inheritance is defined by a content type existing as a child of another content type.
+        if (parentKey.HasValue)
+        {
+            // To set an inheritance relationship we move the content type to the requested parent content type.
+            TItem? toInheritFrom = await GetAsync(parentKey.Value);
+            if (toInheritFrom is null)
+            {
+                return Attempt.Fail(ContentTypeOperationStatus.NotFound);
+            }
+
+            // Moving to inherit from provided parent content type.
+            toUpdateInheritance.ParentId = toInheritFrom.Id;
+        }
+        else
+        {
+            // Removing inheritance is done by moving the content type from it's existing parent content type
+            // to nearest ancestor container (or the root if no containers are found).
+            var parentId = toUpdateInheritance.ParentId;
+            var foundContainer = false;
+            while (parentId > Constants.System.Root)
+            {
+                EntityContainer? parentContainer = GetContainer(parentId);
+                if (parentContainer is not null)
+                {
+                    toUpdateInheritance.ParentId = parentContainer.Id;
+                    foundContainer = true;
+                    break;
+                }
+
+                // Didn't find a container, so must be still under a content type.
+                TItem? parentContentType = Get(parentId);
+                if (parentContentType is null)
+                {
+                    // Unexpected: we should have found a container or a content type as the parent.
+                    throw new InvalidOperationException($"Could not resolve parent Id {parentId} as a container, content type or root.");
+                }
+                else
+                {
+                    // Move up the tree to find the next parent.
+                    parentId = parentContentType.ParentId;
+                }
+            }
+
+            // Moving to root.
+            if (foundContainer is false)
+            {
+                toUpdateInheritance.ParentId = Constants.System.Root;
+            }
+        }
+
+        return await UpdateAsync(toUpdateInheritance, performingUserKey);
+    }
+
+    #endregion
+
     #region Allowed types
 
     /// <inheritdoc />

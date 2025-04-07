@@ -157,6 +157,16 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> MoveAsync(Guid key, Guid? containerKey);
 
     /// <summary>
+    /// Applies inheritance to a content type.
+    /// </summary>
+    /// <param name="key">The content type key.</param>
+    /// <param name="parentKey">The intended parent to inherit from's key, or null if inheritance is being cleared.</param>
+    /// <param name="performingUserKey">The key of the performing user.</param>
+    /// <returns>Status of operation result.</returns>
+    Task<Attempt<ContentTypeOperationStatus>> InheritAsync(Guid key, Guid? parentKey, Guid performingUserKey)
+        => throw new NotSupportedException();
+
+    /// <summary>
     /// Returns all the content type allowed as root.
     /// </summary>
     Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take);
