@@ -643,6 +643,7 @@ export type DocumentCollectionResponseModel = {
     documentType: (DocumentTypeCollectionReferenceResponseModel);
     isTrashed: boolean;
     isProtected: boolean;
+    ancestors: Array<(ReferenceByIdModel)>;
     updater?: (string) | null;
 };
 
@@ -715,6 +716,7 @@ export type DocumentTreeItemResponseModel = {
     id: string;
     createDate: string;
     isProtected: boolean;
+    ancestors: Array<(ReferenceByIdModel)>;
     documentType: (DocumentTypeReferenceResponseModel);
     variants: Array<(DocumentVariantItemResponseModel)>;
 };
@@ -3452,6 +3454,13 @@ export type GetRecycleBinDocumentChildrenData = {
 
 export type GetRecycleBinDocumentChildrenResponse = ((PagedDocumentRecycleBinItemResponseModel));
 
+export type GetRecycleBinDocumentReferencedByData = {
+    skip?: number;
+    take?: number;
+};
+
+export type GetRecycleBinDocumentReferencedByResponse = ((PagedIReferenceResponseModel));
+
 export type GetRecycleBinDocumentRootData = {
     skip?: number;
     take?: number;
@@ -4122,6 +4131,13 @@ export type GetRecycleBinMediaChildrenData = {
 };
 
 export type GetRecycleBinMediaChildrenResponse = ((PagedMediaRecycleBinItemResponseModel));
+
+export type GetRecycleBinMediaReferencedByData = {
+    skip?: number;
+    take?: number;
+};
+
+export type GetRecycleBinMediaReferencedByResponse = ((PagedIReferenceResponseModel));
 
 export type GetRecycleBinMediaRootData = {
     skip?: number;
