@@ -11,16 +11,13 @@ export class UmbRollbackDocumentEntityAction extends UmbEntityActionBase<never> 
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManagerContext.open(this, UMB_ROLLBACK_MODAL, {});
 
-		await modalContext.onSubmit().then(
-			async () => {
-				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-				notificationContext.peek('positive', {
-					data: { message: this.#localize.term('rollback_documentRolledBack') },
-				});
-			},
-			() => undefined,
-		);
+		const data = await modalContext.onSubmit().catch(() => undefined);
+		if (!data) return;
 
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		notificationContext.peek('positive', {
+			data: { message: this.#localize.term('rollback_documentRolledBack') },
+		});
 	}
 }
 
