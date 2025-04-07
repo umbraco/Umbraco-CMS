@@ -1,4 +1,3 @@
-import type { ApiError, CancelError } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbProblemDetails } from './types.js';
 
 export class UmbError extends Error {
@@ -17,9 +16,12 @@ export class UmbCancelError extends UmbError {
 	}
 
 	/**
+	 * Transforms a CancelError into an UmbCancelError.
+	 * @param {*} error The CancelError to transform.
+	 * @returns {UmbCancelError} The transformed UmbCancelError.
 	 * @deprecated Use `UmbCancelError.isUmbCancelError` instead and map your object to `UmbCancelError` if needed.
 	 */
-	public static fromLegacyCancelError(error: CancelError): UmbCancelError {
+	public static fromLegacyCancelError(error: Error): UmbCancelError {
 		return new UmbCancelError(error.message);
 	}
 }
@@ -45,9 +47,12 @@ export class UmbApiError extends UmbError {
 	}
 
 	/**
+	 * Transforms an ApiError into an UmbApiError.
+	 * @param {*} error The ApiError to transform.
+	 * @returns {UmbApiError} The transformed UmbApiError.
 	 * @deprecated Use `UmbCancelError.isUmbApiError` instead and map your object to `UmbApiError` if needed.
 	 */
-	public static fromLegacyApiError(error: ApiError): UmbApiError {
+	public static fromLegacyApiError(error: Error & { body?: string; status?: number; request?: unknown }): UmbApiError {
 		// ApiError - body could hold a ProblemDetails from the server
 		let problemDetails: UmbProblemDetails | null = null;
 		if (typeof error.body !== 'undefined' && !!error.body) {
@@ -59,9 +64,9 @@ export class UmbApiError extends UmbError {
 		}
 		return new UmbApiError(
 			error.message,
-			error.status,
+			error.status ?? 0,
 			error.request,
-			problemDetails ?? { title: error.message, type: 'ApiError', status: error.status },
+			problemDetails ?? { title: error.message, type: 'ApiError', status: error.status ?? 0 },
 		);
 	}
 }

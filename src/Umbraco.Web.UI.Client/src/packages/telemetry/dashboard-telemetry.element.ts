@@ -1,9 +1,9 @@
 import { css, html, customElement, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import type { TelemetryResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { TelemetryLevelModel, TelemetryService, ApiError } from '@umbraco-cms/backoffice/external/backend-api';
+import { TelemetryLevelModel, TelemetryService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { tryExecute, UmbApiError } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-dashboard-telemetry')
@@ -47,7 +47,8 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 
 		if (error) {
 			this._buttonState = 'failed';
-			this._errorMessage = error instanceof ApiError ? (error.body as any).detail : error.message;
+			this._errorMessage =
+				(UmbApiError.isUmbApiError(error) ? error.problemDetails.detail : error.message) ?? 'Unknown error';
 			return;
 		}
 
