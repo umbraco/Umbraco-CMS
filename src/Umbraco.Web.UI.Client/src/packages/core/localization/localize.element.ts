@@ -1,3 +1,4 @@
+import { escapeHTML } from '../utils/index.js';
 import { css, customElement, html, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -34,7 +35,11 @@ export class UmbLocalizeElement extends UmbLitElement {
 
 	@state()
 	protected get text(): string {
-		const localizedValue = this.localize.term(this.key, ...(this.args ?? []));
+		// As translated texts can contain HTML, we will need to render with unsafeHTML.
+		// But arguments can come from user input, so they should be escaped.
+		const escapedArgs = (this.args ?? []).map((a) => escapeHTML(a));
+
+		const localizedValue = this.localize.term(this.key, ...escapedArgs);
 
 		// If the value is the same as the key, it means the key was not found.
 		if (localizedValue === this.key) {
