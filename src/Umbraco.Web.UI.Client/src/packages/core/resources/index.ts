@@ -1,5 +1,7 @@
 export * from './api-interceptor.controller.js';
 export * from './resource.controller.js';
+export * from './try-execute.controller.js';
+export * from './try-xhr-request.controller.js';
 export * from './tryExecute.function.js';
 export * from './tryExecuteAndNotify.function.js';
 export * from './tryXhrRequest.function.js';
