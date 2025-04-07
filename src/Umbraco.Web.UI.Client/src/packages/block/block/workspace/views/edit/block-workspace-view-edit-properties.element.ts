@@ -13,8 +13,10 @@ import type UmbBlockElementManager from '../../block-element-manager.js';
 @customElement('umb-block-workspace-view-edit-properties')
 export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	#managerName?: UmbBlockWorkspaceElementManagerNames;
-	#blockWorkspace?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
+	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
+	#properties?: Array<UmbPropertyTypeModel>;
+	#visiblePropertiesUniques: Array<string> = [];
 
 	@property({ attribute: false })
 	public get managerName(): UmbBlockWorkspaceElementManagerNames | undefined {
@@ -40,7 +42,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	_variantId?: UmbVariantId;
 
 	@state()
-	_propertyStructure: Array<UmbPropertyTypeModel> = [];
+	_visibleProperties?: Array<UmbPropertyTypeModel>;
 
 	@state()
 	private _ownerEntityType?: string;
@@ -49,12 +51,13 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#blockWorkspace = workspaceContext;
-			this._ownerEntityType = this.#blockWorkspace.getEntityType();
+			this.#workspaceContext = workspaceContext;
+			this._ownerEntityType = this.#workspaceContext.getEntityType();
 			this.observe(
 				workspaceContext.variantId,
 				(variantId) => {
 					this._variantId = variantId;
+					this.#processPropertyStructure();
 				},
 				'observeVariantId',
 			);
@@ -63,25 +66,56 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	}
 
 	#setStructureManager() {
-		if (!this.#blockWorkspace || !this.#managerName) return;
+		if (!this.#workspaceContext || !this.#managerName) return;
 
-		this._dataOwner = this.#blockWorkspace[this.#managerName];
+		this._dataOwner = this.#workspaceContext[this.#managerName];
 		const structureManager = this._dataOwner.structure;
 
 		this.#propertyStructureHelper.setStructureManager(structureManager);
 		this.observe(
 			this.#propertyStructureHelper.propertyStructure,
-			(propertyStructure) => {
-				this._propertyStructure = propertyStructure;
+			(properties) => {
+				this.#properties = properties;
+				this.#processPropertyStructure();
 			},
 			'observePropertyStructure',
 		);
 	}
 
+	#processPropertyStructure() {
+		if (!this._dataOwner || !this.#properties || !this.#propertyStructureHelper) {
+			return;
+		}
+
+		const propertyViewGuard = this._dataOwner.propertyViewGuard;
+
+		this.#properties.forEach((property) => {
+			const propertyVariantId = new UmbVariantId(this._variantId?.culture, this._variantId?.segment);
+			this.observe(propertyViewGuard.permittedForVariantAndProperty(propertyVariantId, property), (permitted) => {
+				if (permitted) {
+					this.#visiblePropertiesUniques.push(property.unique);
+					this.#calculateVisaibleProperties();
+				} else {
+					const index = this.#visiblePropertiesUniques.indexOf(property.unique);
+					if (index !== -1) {
+						this.#visiblePropertiesUniques.splice(index, 1);
+						this.#calculateVisaibleProperties();
+					}
+				}
+			});
+		});
+	}
+
+	#calculateVisaibleProperties() {
+		this._visibleProperties = this.#properties!.filter((property) =>
+			this.#visiblePropertiesUniques.includes(property.unique),
+		);
+	}
+
 	override render() {
-		return this._variantId && this._propertyStructure
+		return this._variantId && this._visibleProperties
 			? repeat(
-					this._propertyStructure,
+					this._visibleProperties,
 					(property) => property.alias,
 					(property) =>
 						html`<umb-block-workspace-view-edit-property
