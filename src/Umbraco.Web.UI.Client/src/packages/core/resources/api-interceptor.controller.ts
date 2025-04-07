@@ -87,38 +87,30 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 */
 	addUmbNotificationsInterceptor(client: OpenAPIConfig) {
 		client.interceptors.response.use((response) => {
+			// Check if the response has the umb-notifications header
+			// If not, we just return the response
 			const umbNotifications = response.headers.get(UMB_NOTIFICATION_HEADER);
 			if (!umbNotifications) return response;
 
-			const notifications = JSON.parse(umbNotifications);
-			if (!isUmbNotifications(notifications)) return response;
+			// Parse the notifications from the header
+			// If the header is not a valid JSON, we just return the response
+			try {
+				const notifications = JSON.parse(umbNotifications);
+				if (!isUmbNotifications(notifications)) return response;
 
-			for (const notification of notifications) {
-				this.#peekError(
-					notification.category,
-					notification.message,
-					null,
-					extractUmbNotificationColor(notification.type),
-				);
+				for (const notification of notifications) {
+					this.#peekError(
+						notification.category,
+						notification.message,
+						null,
+						extractUmbNotificationColor(notification.type),
+					);
+				}
+			} catch {
+				// Ignore JSON parse errors
 			}
 
-			const newHeader = new Headers();
-			for (const header of response.headers.entries()) {
-				const [key, value] = header;
-				if (key !== UMB_NOTIFICATION_HEADER) newHeader.set(key, value);
-			}
-
-			const newResponse = response.clone();
-			newResponse.headers.delete(UMB_NOTIFICATION_HEADER);
-			return newResponse;
-
-			/*const newResponse = new Response(response.body, {
-				headers: newHeader,
-				status: response.status,
-				statusText: response.statusText,
-			});
-
-			return newResponse;*/
+			return response;
 		});
 	}
 
