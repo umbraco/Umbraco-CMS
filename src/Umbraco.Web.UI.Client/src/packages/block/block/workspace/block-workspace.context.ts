@@ -228,12 +228,15 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#allowNavigateAway = false;
 	#onWillNavigate = async (e: CustomEvent) => {
 		const newUrl = e.detail.url;
+		if (!this._checkWillNavigateAway(newUrl)) {
+			return true;
+		}
 
 		if (this.#allowNavigateAway) {
 			return true;
 		}
 
-		if (this._checkWillNavigateAway(newUrl) && this.getHasUnpersistedChanges()) {
+		if (this.getHasUnpersistedChanges()) {
 			/* Since ours modals are async while events are synchronous, we need to prevent the default behavior of the event, even if the modal hasn’t been resolved yet.
 			Once the modal is resolved (the user accepted to discard the changes and navigate away from the route), we will push a new history state.
 			This push will make the "willchangestate" event happen again and due to this somewhat "backward" behavior,
@@ -283,6 +286,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#initialSettings = undefined;
 		this.content.resetState();
 		this.settings.resetState();
+		this.#allowNavigateAway = false;
 		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 	}
 
@@ -518,6 +522,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 
 		const settingsData = this.settings.getData();
+		this.content.setPersistedData(contentData);
+		if (settingsData) {
+			this.settings.setPersistedData(settingsData);
+		}
 
 		if (!this.#liveEditingMode) {
 			if (this.getIsNew() === true) {
