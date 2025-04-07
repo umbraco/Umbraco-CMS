@@ -13,7 +13,7 @@ export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {
 	variantId?: UmbVariantId;
 
 	@property({ attribute: false })
-	type?: UmbPropertyTypeModel;
+	property?: UmbPropertyTypeModel;
 
 	@state()
 	_dataPath?: string;
@@ -27,25 +27,24 @@ export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {
 	override willUpdate(changedProperties: Map<string, any>) {
 		super.willUpdate(changedProperties);
 		if (changedProperties.has('type') || changedProperties.has('variantId') || changedProperties.has('ownerContext')) {
-			if (this.variantId && this.type && this.ownerContext) {
+			if (this.variantId && this.property && this.ownerContext) {
 				const propertyVariantId = new UmbVariantId(
-					this.type.variesByCulture ? this.variantId.culture : null,
-					this.type.variesBySegment ? this.variantId.segment : null,
+					this.property.variesByCulture ? this.variantId.culture : null,
+					this.property.variesBySegment ? this.variantId.segment : null,
 				);
 				this._dataPath = `$.values[${UmbDataPathPropertyValueQuery({
-					alias: this.type.alias,
+					alias: this.property.alias,
 					culture: propertyVariantId.culture,
 					segment: propertyVariantId.segment,
 				})}].value`;
-				// consume ? context
-				// observe property and variantId for read-only state
+
 				this.observe(
 					observeMultiple([
-						this.ownerContext.propertyReadonlyGuard.permittedForVariantAndProperty(propertyVariantId, this.type),
-						this.ownerContext.propertyWriteGuard.permittedForVariantAndProperty(propertyVariantId, this.type),
+						this.ownerContext.propertyReadonlyGuard.permittedForVariantAndProperty(propertyVariantId, this.property),
+						this.ownerContext.propertyWriteGuard.permittedForVariantAndProperty(propertyVariantId, this.property),
 					]),
 					([readonly, write]) => {
-						this._writeable = write && !readonly;
+						this._writeable = !readonly && write;
 					},
 					'observeView',
 				);
@@ -57,9 +56,8 @@ export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {
 		if (!this._dataPath || this._writeable === undefined) return nothing;
 
 		return html`<umb-property-type-based-property
-			class="property"
 			data-path=${this._dataPath}
-			.property=${this.type}
+			.property=${this.property}
 			?readonly=${!this._writeable}></umb-property-type-based-property>`;
 	}
 }
