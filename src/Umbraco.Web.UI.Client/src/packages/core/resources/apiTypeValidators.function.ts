@@ -15,7 +15,7 @@ export function isApiError(error: unknown): error is { body?: string; status?: n
  * @deprecated Use {UmbApiCancelError.isUmbApiCancelError}` instead and map your object to {UmbApiCancelError} if needed.
  */
 export function isCancelError(error: unknown): error is Error {
-	return error instanceof Error && 'name' in error && error.name === 'CancelError';
+	return error instanceof Error && (error.name === 'CancelError' || (error as Error).message === 'Request aborted');
 }
 
 /**

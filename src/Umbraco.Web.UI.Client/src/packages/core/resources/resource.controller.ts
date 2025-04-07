@@ -27,7 +27,7 @@ export class UmbResourceController extends UmbControllerBase {
 	 */
 	mapToUmbError(error: unknown): UmbApiError | UmbCancelError | UmbError {
 		if (isApiError(error)) {
-			return UmbApiError.fromLegacyApiError(error);
+			return UmbApiError.fromLegacyApiError(error as any);
 		} else if (isCancelError(error)) {
 			return UmbCancelError.fromLegacyCancelError(error);
 		} else if (UmbCancelError.isUmbCancelError(error)) {
