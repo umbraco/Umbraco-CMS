@@ -395,21 +395,21 @@ stages:
               vmImage: "ubuntu-latest"
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
-              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True;Encrypt=False"
               # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
             LinuxPart2Of3:
               vmImage: "ubuntu-latest"
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
-              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True;Encrypt=False"
               # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
             LinuxPart3Of3:
               vmImage: "ubuntu-latest"
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
-              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True;Encrypt=False"
               # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
               testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
         pool:
@@ -430,6 +430,16 @@ stages:
           # Start SQL Server
           - powershell: docker run --name mssql -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=$(SA_PASSWORD)" mcr.microsoft.com/mssql/server:2022-latest
             displayName: Start SQL Server Docker image (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
+          - powershell: |
+              while (!docker stats mssql --no-stream)
+              { Start-Sleep -Seconds 5
+                Write-Host "Waiting for SQL Server to be ready..."
+              }
+              Write-Host "SQL Server is ready"
+              docker ps -a
+            displayName: Wait for SQL Server to be ready (Linux)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
           - pwsh: SqlLocalDB start MSSQLLocalDB
