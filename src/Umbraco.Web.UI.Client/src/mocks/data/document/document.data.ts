@@ -878,6 +878,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -975,6 +976,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
