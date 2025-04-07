@@ -8,8 +8,8 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 
 describe('UmbPermissionGuardManager', () => {
 	let manager: UmbGuardManagerBase;
-	const rule1: UmbGuardIncomingRuleBase = { unique: '1', message: 'Rule 1' };
-	const rule2: UmbGuardIncomingRuleBase = { unique: '2', message: 'Rule 2' };
+	const rule1: UmbGuardIncomingRuleBase = { unique: '1', message: 'Rule 1', permitted: true };
+	const rule2: UmbGuardIncomingRuleBase = { unique: '2', message: 'Rule 2', permitted: true };
 	const ruleFalse: UmbGuardIncomingRuleBase = { unique: '-1', message: 'Rule -1', permitted: false };
 
 	beforeEach(() => {
@@ -48,6 +48,11 @@ describe('UmbPermissionGuardManager', () => {
 	describe('Add Rule', () => {
 		it('adds a single state to the states array', () => {
 			manager.addRule(rule1);
+			expect(manager.getRules()).to.deep.equal([rule1]);
+		});
+
+		it('adding a rule without permitted defined will default to true', () => {
+			manager.addRule({ ...rule1, permitted: undefined });
 			expect(manager.getRules()).to.deep.equal([rule1]);
 		});
 

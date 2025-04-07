@@ -7,24 +7,24 @@ import { UmbVariantId } from '../../variant/variant-id.class.js';
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-describe('UmbReadonlyVariantStateManager', () => {
+describe('UmbReadonlyVariantGuardManager', () => {
 	let manager: UmbReadonlyVariantGuardManager;
 	const invariantVariant = UmbVariantId.CreateInvariant();
 	const englishVariant = UmbVariantId.Create({ culture: 'en', segment: null });
-	const ruleInv = { unique: '1', message: 'State 1', state: true, variantId: invariantVariant };
-	const ruleEn = { unique: '2', message: 'State 2', state: true, variantId: englishVariant };
-	const rulePlain = { unique: '3', message: 'State 3', state: true };
-	const ruleNoInv = { unique: '01', message: 'State 01', state: false, variantId: invariantVariant };
-	const ruleNoEn = { unique: '02', message: 'State 02', state: false, variantId: englishVariant };
-	const ruleNoPlain = { unique: '03', message: 'State 03', state: false };
+	const ruleInv = { unique: '1', message: 'State 1', permitted: true, variantId: invariantVariant };
+	const ruleEn = { unique: '2', message: 'State 2', permitted: true, variantId: englishVariant };
+	const rulePlain = { unique: '3', message: 'State 3', permitted: true };
+	const ruleNoInv = { unique: '01', message: 'State 01', permitted: false, variantId: invariantVariant };
+	const ruleNoEn = { unique: '02', message: 'State 02', permitted: false, variantId: englishVariant };
+	const ruleNoPlain = { unique: '03', message: 'State 03', permitted: false };
 
 	beforeEach(() => {
 		const hostElement = new UmbTestControllerHostElement();
 		manager = new UmbReadonlyVariantGuardManager(hostElement);
 	});
 
-	describe('VariantIds based states', () => {
-		it('works with variantIds class instances in the state data.', () => {
+	describe('VariantIds based rules', () => {
+		it('works with variantIds class instances in the rule data.', () => {
 			manager.addRule(ruleInv);
 			manager.addRule(ruleEn);
 			expect(manager.getRules()[0].variantId?.compare(invariantVariant)).to.be.true;
@@ -33,7 +33,7 @@ describe('UmbReadonlyVariantStateManager', () => {
 			expect(manager.getRules()[1].variantId?.compare(invariantVariant)).to.be.false;
 		});
 
-		it('is not on for a variant when no states', (done) => {
+		it('is not on for a variant when no rules', (done) => {
 			manager
 				.permittedForVariant(invariantVariant)
 				.subscribe((value) => {
@@ -67,7 +67,7 @@ describe('UmbReadonlyVariantStateManager', () => {
 				.unsubscribe();
 		});
 
-		it('is on by generic state', (done) => {
+		it('is on by generic rule', (done) => {
 			manager.addRule(rulePlain);
 
 			manager
@@ -79,7 +79,7 @@ describe('UmbReadonlyVariantStateManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on when specific state states false', (done) => {
+		it('is not on when specific permitted does not permit', (done) => {
 			manager.addRule(rulePlain);
 			manager.addRule(ruleNoEn);
 
@@ -92,7 +92,7 @@ describe('UmbReadonlyVariantStateManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on when generic state states false', (done) => {
+		it('is not on when generic permitted does not permit', (done) => {
 			manager.addRule(ruleNoPlain);
 
 			manager
@@ -104,7 +104,7 @@ describe('UmbReadonlyVariantStateManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on when specific state states true', (done) => {
+		it('is not on when specific rule permits', (done) => {
 			manager.addRule(ruleNoPlain);
 			manager.addRule(ruleEn);
 
@@ -117,7 +117,7 @@ describe('UmbReadonlyVariantStateManager', () => {
 				.unsubscribe();
 		});
 
-		it('a negative specific state wins', (done) => {
+		it('a negative specific rule wins', (done) => {
 			manager.addRule(ruleNoPlain);
 			manager.addRule(ruleEn);
 			manager.addRule(ruleNoEn);
@@ -131,7 +131,7 @@ describe('UmbReadonlyVariantStateManager', () => {
 				.unsubscribe();
 		});
 
-		it('a negative general state wins', (done) => {
+		it('a negative general rule wins', (done) => {
 			manager.addRule(ruleNoPlain);
 			manager.addRule(rulePlain);
 
