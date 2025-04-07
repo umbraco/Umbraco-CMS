@@ -4,6 +4,13 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
+ * Make a request and notify the user of any errors.
+ * This function is a wrapper around the {@link tryExecute} function and will notify the user of any errors.
+ * It is useful for making requests where you want to handle errors in a consistent way.
+ * @param {UmbControllerHost} host The host to use for the request.
+ * @param {Promise<T>} resource The resource to request.
+ * @returns {Promise<UmbDataSourceResponse<T>>} A promise that resolves with the response data or rejects with an error.
+ * @template T The type of the response data.
  * @deprecated Use the {@link tryExecute} function instead and handle the error in the caller.
  * This function is kept for backwards compatibility and will be removed in a future version.
  */

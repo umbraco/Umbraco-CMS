@@ -1,17 +1,23 @@
 import { UmbTryExecuteController } from './try-execute.controller.js';
 import { UmbCancelablePromise } from './cancelable-promise.js';
 import { UmbApiError } from './umb-error.js';
-import type { UmbTryExecuteOptions, XhrRequestOptions } from './types.js';
+import type { XhrRequestOptions } from './types.js';
 import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Make an XHR request.
+ * This function is a wrapper around XMLHttpRequest to provide a consistent API for making requests.
+ * It supports cancelable promises, progress events, and custom headers.
+ * @param {UmbControllerHost} host The host to use for the request.
+ * @param {XhrRequestOptions} options The options for the request.
+ * @returns {Promise<UmbDataSourceResponse<T>>} A promise that resolves with the response data or rejects with an error.
+ * @template T The type of the response data.
  */
 export async function tryXhrRequest<T>(
 	host: UmbControllerHost,
-	options: XhrRequestOptions & UmbTryExecuteOptions,
+	options: XhrRequestOptions,
 ): Promise<UmbDataSourceResponse<T>> {
 	const promise = createXhrRequest({
 		...options,
@@ -24,6 +30,13 @@ export async function tryXhrRequest<T>(
 	return response as UmbDataSourceResponse<T>;
 }
 
+/**
+ * Create an XHR request.
+ * @param {XhrRequestOptions} options The options for the request.
+ * @returns {UmbCancelablePromise<T>} A cancelable promise that resolves with the response data or rejects with an error.
+ * @template T The type of the response data.
+ * @internal
+ */
 function createXhrRequest<T>(options: XhrRequestOptions): UmbCancelablePromise<T> {
 	const baseUrl = options.baseUrl || '/umbraco';
 
