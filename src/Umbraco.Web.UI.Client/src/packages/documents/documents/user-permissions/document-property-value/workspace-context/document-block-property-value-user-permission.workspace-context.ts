@@ -22,8 +22,6 @@ export class UmbDocumentBlockPropertyValueUserPermissionWorkspaceContext extends
 				.catch(() => undefined);
 
 			if (contentWorkspaceContext?.getEntityType() === UMB_DOCUMENT_ENTITY_TYPE) {
-				this.#blockWorkspaceContext.content.propertyViewGuard.fallbackToDisallowed();
-				this.#blockWorkspaceContext.content.propertyWriteGuard.fallbackToDisallowed();
 				this.#observeDocumentBlockProperties();
 			}
 		});
@@ -32,13 +30,15 @@ export class UmbDocumentBlockPropertyValueUserPermissionWorkspaceContext extends
 	async #observeDocumentBlockProperties() {
 		if (!this.#blockWorkspaceContext) return;
 
-		const owner = this.#blockWorkspaceContext.content;
+		const ownerContent = this.#blockWorkspaceContext.content;
 
-		this.observe(owner.structure.contentTypeProperties, (properties) => {
+		this.observe(ownerContent.structure.contentTypeProperties, (properties) => {
 			// TODO: If zero properties I guess we should then clear the state? [NL]
 			if (properties.length === 0) return;
 
-			this._setPermissions(properties, owner.propertyViewGuard, owner.propertyWriteGuard);
+			ownerContent.propertyViewGuard.fallbackToDisallowed();
+			ownerContent.propertyWriteGuard.fallbackToDisallowed();
+			this._setPermissions(properties, ownerContent.propertyViewGuard, ownerContent.propertyWriteGuard);
 		});
 
 		const ownerSettings = this.#blockWorkspaceContext.settings;
@@ -47,6 +47,8 @@ export class UmbDocumentBlockPropertyValueUserPermissionWorkspaceContext extends
 			// TODO: If zero properties I guess we should then clear the state? [NL]
 			if (properties.length === 0) return;
 
+			ownerSettings.propertyViewGuard.fallbackToDisallowed();
+			ownerSettings.propertyWriteGuard.fallbackToDisallowed();
 			this._setPermissions(properties, ownerSettings.propertyViewGuard, ownerSettings.propertyWriteGuard);
 		});
 	}

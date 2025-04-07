@@ -882,6 +882,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.propertyViewGuard.clear();
 		this.propertyWriteGuard.clear();
 		this.propertyReadonlyGuard.clear();
+		// default:
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
 	}
 
 	abstract getContentTypeUnique(): string | undefined;
