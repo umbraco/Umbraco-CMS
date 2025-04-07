@@ -83,6 +83,20 @@ public class MultipleTextStringPropertyValueEditorTests
     }
 
     [Test]
+    public void Can_Parse_More_Items_Than_Allowed_From_Editor()
+    {
+        var valueEditor = CreateValueEditor();
+        var fromEditor = valueEditor.FromEditor(new ContentPropertyData(new[] { "One", "Two", "Three", "Four", "Five" }, new MultipleTextStringConfiguration { Max = 4 }), null) as string;
+        Assert.AreEqual("One\nTwo\nThree\nFour\nFive", fromEditor);
+
+        var validationResults = valueEditor.Validate(fromEditor, false, null, PropertyValidationContext.Empty());
+        Assert.AreEqual(1, validationResults.Count());
+
+        var validationResult = validationResults.First();
+        Assert.AreEqual($"validation_outOfRangeMultipleItemsMaximum", validationResult.ErrorMessage);
+    }
+
+    [Test]
     public void Can_Parse_Single_Value_To_Editor()
     {
         var toEditor = ToEditor("The Value") as IEnumerable<string>;

@@ -89,21 +89,6 @@ public class MultipleTextStringPropertyEditor : DataEditor
                 return null;
             }
 
-            if (!(editorValue.DataTypeConfiguration is MultipleTextStringConfiguration config))
-            {
-                throw new PanicException(
-                    $"editorValue.DataTypeConfiguration is {editorValue.DataTypeConfiguration?.GetType()} but must be {typeof(MultipleTextStringConfiguration)}");
-            }
-
-            var max = config.Max;
-
-            // The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
-            // only allow the max if over 0
-            if (max > 0)
-            {
-                return string.Join(_newLine, value.Take(max));
-            }
-
             return string.Join(_newLine, value);
         }
 
