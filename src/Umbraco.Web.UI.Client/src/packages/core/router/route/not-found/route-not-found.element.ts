@@ -5,7 +5,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 /**
  * A fallback view to be used in Workspace Views, maybe this can be upgraded at a later point.
  */
-// TODO: Rename and move this file to a more generic place.
 @customElement('umb-route-not-found')
 export class UmbRouteNotFoundElement extends UmbLitElement {
 	override render() {
