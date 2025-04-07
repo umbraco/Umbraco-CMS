@@ -44,9 +44,9 @@ export class UmbGuardManagerBase<
 	 */
 	addRule(rule: IncomingRuleType) {
 		const newRule = { ...rule } as unknown as RuleType;
-		rule.unique ??= Symbol();
-		if (rule.permitted === undefined) {
-			rule.permitted = true;
+		newRule.unique ??= Symbol();
+		if (newRule.permitted === undefined) {
+			newRule.permitted = true;
 		}
 		this._rules.appendOne(newRule);
 		return rule.unique;

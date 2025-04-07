@@ -11,8 +11,6 @@ export class UmbDocumentPropertyValueUserPermissionWorkspaceContext extends UmbP
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
 			this.#documentWorkspaceContext = context;
 
-			this.#documentWorkspaceContext.propertyViewGuard.fallbackToDisallowed();
-			this.#documentWorkspaceContext.propertyWriteGuard.fallbackToDisallowed();
 			this.#observeDocumentProperties();
 		});
 	}
@@ -26,6 +24,8 @@ export class UmbDocumentPropertyValueUserPermissionWorkspaceContext extends UmbP
 			// TODO: If zero properties I guess we should then clear the state? [NL]
 			if (properties.length === 0) return;
 
+			this.#documentWorkspaceContext!.propertyViewGuard.fallbackToDisallowed();
+			this.#documentWorkspaceContext!.propertyWriteGuard.fallbackToDisallowed();
 			this._setPermissions(properties, owner.propertyViewGuard, owner.propertyWriteGuard);
 		});
 	}
