@@ -11,19 +11,19 @@ import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type'
 export class UmbPropertyValueUserPermissionWorkspaceContextBase extends UmbControllerBase {
 	protected _setPermissions(
 		properties: Array<UmbPropertyTypeModel>,
-		propertyVisibilityState: UmbVariantPropertyGuardManager,
-		propertyWriteState: UmbVariantPropertyGuardManager,
+		propertyViewGuard: UmbVariantPropertyGuardManager,
+		propertyWriteGuard: UmbVariantPropertyGuardManager,
 	) {
 		properties.forEach((property) => {
 			this.#setPermissionForProperty({
 				verb: UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ,
-				stateManager: propertyVisibilityState,
+				stateManager: propertyViewGuard,
 				property,
 			});
 
 			this.#setPermissionForProperty({
 				verb: UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE,
-				stateManager: propertyWriteState,
+				stateManager: propertyWriteGuard,
 				property,
 			});
 		});
