@@ -338,8 +338,11 @@ export class UmbResourceController extends UmbControllerBase {
 	}
 
 	protected async _peekError(headline: string, message: string, details: unknown) {
-		// This late importing is done to avoid circular reference [NL]
-		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(this, {
+		// Store the host for usage in the following async context
+		const host = this._host;
+
+		// This late importing is done to avoid circular reference
+		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(host, {
 			headline,
 			message,
 			details,
