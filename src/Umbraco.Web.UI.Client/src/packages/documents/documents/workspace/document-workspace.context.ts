@@ -81,7 +81,7 @@ export class UmbDocumentWorkspaceContext
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
 			contentValidationRepository: UmbDocumentValidationRepository,
 			skipValidationOnSubmit: false,
-			ignorerValidationOnSubmit: true,
+			ignoreValidationOnSubmit: true,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			contentTypePropertyName: 'documentType',
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
