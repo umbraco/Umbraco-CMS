@@ -193,20 +193,20 @@ export class UmbResourceController extends UmbControllerBase {
 									'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
 							}
 
-							this.#peekError(headline, message, problemDetails?.errors ?? problemDetails?.detail);
+							this._peekError(headline, message, problemDetails?.errors ?? problemDetails?.detail);
 						}
 						break;
 					default:
 						// Other errors
 						if (!isCancelledByNotification) {
 							const headline = problemDetails?.title ?? error.name ?? 'Server Error';
-							this.#peekError('', headline, problemDetails?.errors ?? problemDetails?.detail);
+							this._peekError('', headline, problemDetails?.errors ?? problemDetails?.detail);
 						}
 				}
 			} else {
 				// UmbError or unknown error - log it to the console
 				console.error('Unknown error', error);
-				this.#peekError('Error', error.message ?? 'Unknown error', []);
+				this._peekError('Error', error.message ?? 'Unknown error', []);
 			}
 		}
 
@@ -337,7 +337,7 @@ export class UmbResourceController extends UmbControllerBase {
 		return promise;
 	}
 
-	async #peekError(headline: string, message: string, details: unknown) {
+	protected async _peekError(headline: string, message: string, details: unknown) {
 		// This late importing is done to avoid circular reference [NL]
 		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(this, {
 			headline,
