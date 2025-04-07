@@ -10,12 +10,12 @@ describe('UmbPropertyGuardManager', () => {
 	let manager: UmbPropertyGuardManager;
 	const propA = { unique: 'propA' };
 	const propB = { unique: 'propB' };
-	const rulePropA = { unique: '1', message: 'State 1', state: true, propertyType: propA };
-	const rulePropB = { unique: '2', message: 'State 2', state: true, propertyType: propB };
-	const rulePlain = { unique: '3', message: 'State 3', state: true };
-	const ruleNoPropA = { unique: '01', message: 'State 01', state: false, propertyType: propA };
-	const ruleNoPropB = { unique: '02', message: 'State 02', state: false, propertyType: propB };
-	const ruleNoPlain = { unique: '03', message: 'State 03', state: false };
+	const rulePropA = { unique: '1', message: 'State 1', permitted: true, propertyType: propA };
+	const rulePropB = { unique: '2', message: 'State 2', permitted: true, propertyType: propB };
+	const rulePlain = { unique: '3', message: 'State 3', permitted: true };
+	const ruleNoPropA = { unique: '01', message: 'State 01', permitted: false, propertyType: propA };
+	const ruleNoPropB = { unique: '02', message: 'State 02', permitted: false, propertyType: propB };
+	const ruleNoPlain = { unique: '03', message: 'State 03', permitted: false };
 
 	beforeEach(() => {
 		const hostElement = new UmbTestControllerHostElement();
