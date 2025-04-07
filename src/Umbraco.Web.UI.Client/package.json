@@ -121,7 +121,6 @@
 		"./external/marked": "./dist-cms/external/marked/index.js",
 		"./external/monaco-editor": "./dist-cms/external/monaco-editor/index.js",
 		"./external/openid": "./dist-cms/external/openid/index.js",
-		"./external/router-slot": "./dist-cms/external/router-slot/index.js",
 		"./external/rxjs": "./dist-cms/external/rxjs/index.js",
 		"./external/tiptap": "./dist-cms/external/tiptap/index.js",
 		"./external/uui": "./dist-cms/external/uui/index.js",
