@@ -6,6 +6,11 @@ import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
 
 export class UmbApiInterceptorController extends UmbControllerBase {
+	/**
+	 * Binds the default interceptors to the client.
+	 * This includes the auth response interceptor, the error interceptor and the umb-notifications interceptor.
+	 * @param {OpenAPIConfig} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
+	 */
 	public bindDefaultInterceptors(client: OpenAPIConfig) {
 		this.addAuthResponseInterceptor(client);
 		this.addUmbNotificationsInterceptor(client);
@@ -13,6 +18,8 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
+	 * Interceptor which checks responses for 401 errors and lets the UmbAuthContext know the user is timed out.
+	 * @param {OpenAPIConfig} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
 	 * @internal
 	 */
 	addAuthResponseInterceptor(client: OpenAPIConfig) {
@@ -30,6 +37,8 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
+	 * Interceptor which checks responses for 500 errors and displays them as a notification if any.
+	 * @param {OpenAPIConfig} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
 	 * @internal
 	 */
 	addErrorInterceptor(client: OpenAPIConfig) {
@@ -73,6 +82,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 	/**
 	 * Interceptor which checks responses for the umb-notifications header and displays them as a notification if any. Removes the umb-notifications from the headers.
+	 * @param {OpenAPIConfig} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
 	 * @internal
 	 */
 	addUmbNotificationsInterceptor(client: OpenAPIConfig) {
@@ -113,8 +123,11 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	async #peekError(headline: string, message: string, details: unknown, color?: UmbNotificationColor) {
+		// Store the host for usage in the following async context
+		const host = this._host;
+
 		// This late importing is done to avoid circular reference [NL]
-		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(this, {
+		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(host, {
 			headline,
 			message,
 			details,
