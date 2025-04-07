@@ -14,7 +14,7 @@ import {
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
@@ -388,6 +388,15 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 */
 	public getHasUnpersistedChanges(): boolean {
 		return this._data.getHasUnpersistedChanges();
+	}
+	// @deprecated use getHasUnpersistedChanges instead, will be removed in v17.0
+	protected _getHasUnpersistedChanges(): boolean {
+		new UmbDeprecation({
+			removeInVersion: '17',
+			deprecated: '_getHasUnpersistedChanges',
+			solution: 'use public getHasUnpersistedChanges instead.',
+		}).warn();
+		return this.getHasUnpersistedChanges();
 	}
 
 	override resetState() {
