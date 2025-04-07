@@ -132,9 +132,16 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 			}
 			/*}*/
 
+			:host {
+				/* TODO: Temp solution to not get a yellow asterisk when invalid. */
+				--umb-temp-uui-color-invalid: var(--uui-color-invalid);
+			}
+
 			#label {
 				position: relative;
 				word-break: break-word;
+				/* TODO: Temp solution to not get a yellow asterisk when invalid. */
+				--uui-color-invalid: var(--uui-color-danger);
 			}
 			#invalid-badge {
 				display: inline-block;
@@ -144,7 +151,8 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 				margin-right: 6px;
 			}
 			uui-badge {
-				background-color: var(--uui-color-invalid);
+				//height: var(--uui-color-invalid);
+				background-color: var(--umb-temp-uui-color-invalid);
 				color: var(--uui-color-invalid-contrast);
 			}
 
