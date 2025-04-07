@@ -29,7 +29,7 @@ public class InheritDocumentTypeController : DocumentTypeControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Move(
+    public async Task<IActionResult> Inherit(
         CancellationToken cancellationToken,
         Guid id,
         InheritDocumentTypeRequestModel inheritDocumentTypeRequestModel)
