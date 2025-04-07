@@ -1217,6 +1217,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             }
         }
 
+        // Call update to save the changes to the parent.
         return await UpdateAsync(toUpdateInheritance, performingUserKey);
     }
 
