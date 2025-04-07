@@ -1,4 +1,4 @@
-import type { XhrRequestOptions } from './types.js';
+import type { UmbTryExecuteOptions, XhrRequestOptions } from './types.js';
 import { UmbTryXhrRequestController } from './try-xhr-request.controller.js';
 import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -9,7 +9,7 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
  */
 export async function tryXhrRequest<T>(
 	host: UmbControllerHost,
-	options: XhrRequestOptions,
+	options: XhrRequestOptions & UmbTryExecuteOptions,
 ): Promise<UmbDataSourceResponse<T>> {
 	const promise = UmbTryXhrRequestController.createXhrRequest({
 		...options,
@@ -17,7 +17,7 @@ export async function tryXhrRequest<T>(
 		token: OpenAPI.TOKEN as never,
 	});
 	const controller = new UmbTryXhrRequestController(host, promise);
-	const response = await controller.tryXhrRequest(options.abortSignal);
+	const response = await controller.tryExecute(options);
 	controller.destroy();
 	return response as UmbDataSourceResponse<T>;
 }

@@ -1,27 +1,9 @@
 import { UmbCancelablePromise } from './cancelable-promise.js';
-import { UmbResourceController } from './resource.controller.js';
+import { UmbTryExecuteController } from './try-execute.controller.js';
 import type { XhrRequestOptions } from './types.js';
 import { UmbApiError } from './umb-error.js';
-import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
-export class UmbTryXhrRequestController extends UmbResourceController {
-	#abortSignal?: AbortSignal;
-
-	async tryXhrRequest<T>(abortSignal?: AbortSignal): Promise<UmbDataSourceResponse<T>> {
-		try {
-			if (abortSignal) {
-				this.#abortSignal = abortSignal;
-				this.#abortSignal.addEventListener('abort', this.cancel, { once: true });
-			}
-			return { data: await this._promise };
-		} catch (error) {
-			// Error might be a legacy error, so we need to check if it is an UmbError
-			return {
-				error: this.mapToUmbError(error),
-			};
-		}
-	}
-
+export class UmbTryXhrRequestController extends UmbTryExecuteController {
 	static createXhrRequest<T>(options: XhrRequestOptions): UmbCancelablePromise<T> {
 		const baseUrl = options.baseUrl || '/umbraco';
 
@@ -108,13 +90,5 @@ export class UmbTryXhrRequestController extends UmbResourceController {
 				xhr.abort();
 			});
 		});
-	}
-
-	public override destroy(): void {
-		super.destroy();
-		if (this.#abortSignal) {
-			this.#abortSignal.removeEventListener('abort', this.cancel);
-		}
-		this.#abortSignal = undefined;
 	}
 }
