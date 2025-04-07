@@ -64,7 +64,9 @@ export class UmbServerConnection extends UmbControllerBase {
 	}
 
 	async #setStatus() {
-		const { data, error } = await tryExecute(this, ServerService.getServerStatus());
+		const { data, error } = await tryExecute(this._host, ServerService.getServerStatus(), {
+			disableNotifications: true,
+		});
 		if (error) {
 			throw error;
 		}
@@ -74,7 +76,9 @@ export class UmbServerConnection extends UmbControllerBase {
 	}
 
 	async #setServerConfiguration() {
-		const { data, error } = await tryExecute(this, ServerService.getServerConfiguration());
+		const { data, error } = await tryExecute(this._host, ServerService.getServerConfiguration(), {
+			disableNotifications: true,
+		});
 		if (error) {
 			throw error;
 		}
