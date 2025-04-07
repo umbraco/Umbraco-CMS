@@ -161,12 +161,6 @@ export class UmbDocumentWorkspaceContext
 					const documentTypeUnique = info.match.params.documentTypeUnique;
 					await this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
 
-					this.#setReadOnlyStateForUserPermission(
-						UMB_USER_PERMISSION_DOCUMENT_CREATE,
-						this.#userCanCreate,
-						'You do not have permission to create documents.',
-					);
-
 					new UmbWorkspaceIsNewRedirectController(
 						this,
 						this,
@@ -181,11 +175,6 @@ export class UmbDocumentWorkspaceContext
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
 					await this.load(unique);
-					this.#setReadOnlyStateForUserPermission(
-						UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-						this.#userCanUpdate,
-						'You do not have permission to update documents.',
-					);
 				},
 			},
 		]);
@@ -235,25 +224,38 @@ export class UmbDocumentWorkspaceContext
 			this.#isTrashedContext.setIsTrashed(response.data.isTrashed);
 		}
 
+		this.#setReadOnlyStateForUserPermission(
+			UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+			this.#userCanUpdate,
+			'You do not have permission to update documents.',
+		);
+
 		return response;
 	}
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
+		let preset: Partial<UmbDocumentDetailModel> = {
+			documentType: {
+				unique: documentTypeUnique,
+				collection: null,
+			},
+		};
 		if (blueprintUnique) {
 			const blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
 			const { data } = await blueprintRepository.requestByUnique(blueprintUnique);
 
-			return this.createScaffold({
-				parent,
-				preset: {
-					documentType: data?.documentType,
-					values: data?.values,
-					variants: data?.variants as Array<UmbDocumentVariantModel>,
-				},
-			});
+			if (!data) {
+				throw new Error(`Blueprint with unique ${blueprintUnique} not found`);
+			}
+
+			preset = {
+				documentType: data.documentType,
+				values: data.values,
+				variants: data.variants as Array<UmbDocumentVariantModel>,
+			};
 		}
 
-		return this.createScaffold({
+		const scaffold = this.createScaffold({
 			parent,
 			preset: {
 				documentType: {
@@ -262,6 +264,14 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		});
+
+		this.#setReadOnlyStateForUserPermission(
+			UMB_USER_PERMISSION_DOCUMENT_CREATE,
+			this.#userCanCreate,
+			'You do not have permission to create documents.',
+		);
+
+		return scaffold;
 	}
 
 	getCollectionAlias() {
