@@ -111,6 +111,9 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		this.propertyViewGuard.clear();
 		this.propertyWriteGuard.clear();
 		this.propertyReadonlyGuard.clear();
+		// default:
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
 	}
 
 	setVariantId(variantId: UmbVariantId | undefined) {
