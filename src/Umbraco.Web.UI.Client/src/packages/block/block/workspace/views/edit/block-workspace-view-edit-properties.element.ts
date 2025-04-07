@@ -6,10 +6,9 @@ import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/bac
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbElementPropertyDataOwner } from '@umbraco-cms/backoffice/content';
-import type { UmbBlockDataModel } from '../../../types.js';
 
 import './block-workspace-view-edit-property.element.js';
+import type UmbBlockElementManager from '../../block-element-manager.js';
 
 @customElement('umb-block-workspace-view-edit-properties')
 export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -35,7 +34,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	}
 
 	@state()
-	_dataOwner?: UmbElementPropertyDataOwner<UmbBlockDataModel, UmbContentTypeModel>;
+	_dataOwner?: UmbBlockElementManager;
 
 	@state()
 	_variantId?: UmbVariantId;
