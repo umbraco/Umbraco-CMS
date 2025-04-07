@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -8,12 +8,24 @@ public interface IContentEditingService
 {
     Task<IContent?> GetAsync(Guid key);
 
+    [Obsolete("Please use the validate create method that is not obsoleted. Scheduled for removal in Umbraco 17.")]
     Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel);
 
-    [Obsolete("Please use the validate update method that is not obsoleted. Will be removed in V16.")]
+    Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel, Guid userKey)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => ValidateCreateAsync(createModel);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    [Obsolete("Please use the validate update method that is not obsoleted. Scheduled for removal in Umbraco 16.")]
     Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ContentUpdateModel updateModel);
 
+    [Obsolete("Please use the validate update method that is not obsoleted. Scheduled for removal in Umbraco 17.")]
     Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateContentUpdateModel updateModel);
+
+    Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateContentUpdateModel updateModel, Guid userKey)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => ValidateUpdateAsync(key, updateModel);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey);
 
