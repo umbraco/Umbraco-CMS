@@ -8,7 +8,7 @@ import type { CreateScriptRequestModel, UpdateScriptRequestModel } from '@umbrac
 import { ScriptService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbScriptDetailModel> {
 	#host: UmbControllerHost;
@@ -43,7 +43,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 			content: model.content,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			ScriptService.postScript({
 				requestBody,
@@ -65,7 +65,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			ScriptService.getScriptByPath({ path: encodeURIComponent(path) }),
 		);
@@ -94,7 +94,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 			content: model.content,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			ScriptService.putScriptByPath({
 				path: encodeURIComponent(path),
@@ -115,7 +115,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			ScriptService.deleteScriptByPath({
 				path: encodeURIComponent(path),

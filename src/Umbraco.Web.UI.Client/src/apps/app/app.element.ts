@@ -3,7 +3,6 @@ import type { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAppContext } from './app.context.js';
 import { UmbServerConnection } from './server-connection.js';
 import { UmbAppAuthController } from './app-auth.controller.js';
-import { UmbApiInterceptorController } from './api-interceptor.controller.js';
 import type { UmbAppOauthElement } from './app-oauth.element.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
@@ -21,6 +20,7 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasOwnOpener, retrieveStoredPath } from '@umbraco-cms/backoffice/utils';
+import { UmbApiInterceptorController } from '@umbraco-cms/backoffice/resources';
 
 import './app-oauth.element.js';
 
@@ -139,13 +139,14 @@ export class UmbAppElement extends UmbLitElement {
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#serverConnection?: UmbServerConnection;
 	#authController = new UmbAppAuthController(this);
+	#apiInterceptorController = new UmbApiInterceptorController(this);
 
 	constructor() {
 		super();
 
 		OpenAPI.BASE = window.location.origin;
 
-		new UmbApiInterceptorController(this);
+		this.#apiInterceptorController.bindDefaultInterceptors(OpenAPI);
 
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
 
@@ -160,7 +161,7 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	async #setup() {
-		this.#serverConnection = await new UmbServerConnection(this.serverUrl).connect();
+		this.#serverConnection = await new UmbServerConnection(this, this.serverUrl).connect();
 
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, this.backofficePath, this.bypassAuth);
 		new UmbAppContext(this, {

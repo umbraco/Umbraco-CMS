@@ -1,7 +1,7 @@
 import { html, css, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { PackageService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -99,10 +99,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 		});
 
 		this._migrationButtonState = 'waiting';
-		const { error } = await tryExecuteAndNotify(
-			this,
-			PackageService.postPackageByNameRunMigration({ name: this.name }),
-		);
+		const { error } = await tryExecute(this, PackageService.postPackageByNameRunMigration({ name: this.name }));
 
 		if (error) return;
 

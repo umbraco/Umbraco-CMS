@@ -4,7 +4,7 @@ import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 import type { CreatePartialViewFolderRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 
@@ -55,7 +55,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Cannot read partial view folder without a path');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			PartialViewService.getPartialViewFolderByPath({
 				path: encodeURIComponent(path),
@@ -94,7 +94,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 			name: model.name,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			PartialViewService.postPartialViewFolder({
 				requestBody,
@@ -122,7 +122,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Cannot delete partial view folder without a path');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			PartialViewService.deletePartialViewFolderByPath({
 				path: encodeURIComponent(path),

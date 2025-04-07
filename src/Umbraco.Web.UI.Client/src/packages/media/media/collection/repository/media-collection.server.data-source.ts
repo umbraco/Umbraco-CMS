@@ -1,7 +1,7 @@
 import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from '../types.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { DirectionModel, MediaService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { MediaCollectionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -24,7 +24,7 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 			take: query.take ?? 100,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, MediaService.getCollectionMedia(params));
+		const { data, error } = await tryExecute(this.#host, MediaService.getCollectionMedia(params));
 
 		if (data) {
 			const items = data.items.map((item: MediaCollectionResponseModel) => {

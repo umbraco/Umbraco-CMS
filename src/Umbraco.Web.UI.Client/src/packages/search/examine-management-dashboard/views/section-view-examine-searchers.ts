@@ -7,7 +7,7 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import type { SearchResultResponseModel, FieldPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { SearcherService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 interface ExposedSearchResultField {
 	name: string;
@@ -58,7 +58,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		if (!this._searchInput.value.length) return;
 		this._searchLoading = true;
 
-		const { data } = await tryExecuteAndNotify(
+		const { data } = await tryExecute(
 			this,
 			SearcherService.getSearcherBySearcherNameQuery({
 				searcherName: this.searcherName,

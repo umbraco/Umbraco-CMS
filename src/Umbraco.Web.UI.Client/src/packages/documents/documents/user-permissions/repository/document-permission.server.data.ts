@@ -1,5 +1,5 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * @class UmbUserGroupCollectionServerDataSource
@@ -18,7 +18,7 @@ export class UmbDocumentPermissionServerDataSource {
 	}
 
 	requestPermissions(id: string) {
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			fetch(`/umbraco/management/api/v1/document/${id}/permissions`, {
 				method: 'GET',

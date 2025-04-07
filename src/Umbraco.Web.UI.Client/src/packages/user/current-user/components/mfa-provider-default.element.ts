@@ -2,7 +2,7 @@ import type { UmbMfaProviderConfigurationCallback, UmbMfaProviderConfigurationEl
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import { css, customElement, html, property, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { isApiError, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute, UmbApiError } from '@umbraco-cms/backoffice/resources';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
@@ -61,7 +61,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 			this.peek('Provider name is required', 'danger');
 			throw new Error('Provider name is required');
 		}
-		const { data: _data } = await tryExecuteAndNotify(
+		const { data: _data } = await tryExecute(
 			this,
 			UserService.getUserCurrent2FaByProviderName({ providerName: this.providerName }),
 		);
@@ -184,8 +184,8 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 			this.close();
 		} else {
 			this._buttonState = 'failed';
-			if (isApiError(error)) {
-				if ((error.body as any).operationStatus === 'InvalidCode') {
+			if (UmbApiError.isUmbApiError(error)) {
+				if (error.problemDetails.operationStatus === 'InvalidCode') {
 					this.codeField?.setCustomValidity(this.localize.term('user_2faInvalidCode'));
 					this.codeField?.focus();
 				} else {
