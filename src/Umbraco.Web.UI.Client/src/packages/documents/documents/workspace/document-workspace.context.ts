@@ -265,6 +265,7 @@ export class UmbDocumentWorkspaceContext
 			},
 		});
 
+		// TODO: how can we be sure that this.#userCanCreate is set at this point?
 		this.#setReadOnlyStateForUserPermission(
 			UMB_USER_PERMISSION_DOCUMENT_CREATE,
 			this.#userCanCreate,
