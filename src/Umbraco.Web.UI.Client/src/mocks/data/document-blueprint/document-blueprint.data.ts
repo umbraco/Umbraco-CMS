@@ -6,6 +6,7 @@ export interface UmbMockDocumentBlueprintModel extends UmbMockDocumentModel {}
 
 export const data: Array<UmbMockDocumentBlueprintModel> = [
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
