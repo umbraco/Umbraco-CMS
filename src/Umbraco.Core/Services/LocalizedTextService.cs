@@ -361,10 +361,7 @@ public class LocalizedTextService : ILocalizedTextService
                 result.TryAdd(dictionaryKey, key.Value);
             }
 
-            if (!overallResult.ContainsKey(areaAlias))
-            {
-                overallResult.Add(areaAlias, result);
-            }
+            overallResult.TryAdd(areaAlias, result);
         }
 
         // Merge English Dictionary
