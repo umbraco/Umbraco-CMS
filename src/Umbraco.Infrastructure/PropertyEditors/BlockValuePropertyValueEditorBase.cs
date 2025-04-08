@@ -246,21 +246,9 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                 BlockPropertyValue? editedValue = valueMapping.Edited;
                 BlockPropertyValue? currentValue = valueMapping.Current;
 
-                IPropertyType? propertyType = null;
-
-                if (editedValue != null)
-                {
-                    propertyType = editedValue.PropertyType;
-                }
-                else if (currentValue != null)
-                {
-                    propertyType = currentValue.PropertyType;
-                }
-
-                if (propertyType == null)
-                {
-                    throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them from editor.", nameof(editedItems));
-                }
+                IPropertyType propertyType = editedValue?.PropertyType
+                    ?? currentValue?.PropertyType
+                    ?? throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them from editor.", nameof(editedItems));
 
                 // Lookup the property editor
                 IDataEditor? propertyEditor = _propertyEditors[propertyType.PropertyEditorAlias];
