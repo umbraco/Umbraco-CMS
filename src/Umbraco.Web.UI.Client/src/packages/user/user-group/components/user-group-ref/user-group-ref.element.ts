@@ -1,9 +1,8 @@
 import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
-import { UmbMediaItemRepository } from '@umbraco-cms/backoffice/media';
+import { createExtensionApiByAlias, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 /**
  *  @element umb-user-group-ref
@@ -12,8 +11,8 @@ import { UmbMediaItemRepository } from '@umbraco-cms/backoffice/media';
  */
 @customElement('umb-user-group-ref')
 export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
-	#documentItemRepository?: UmbDocumentItemRepository;
-	#mediaItemRepository?: UmbMediaItemRepository;
+	#documentItemRepository?: UmbItemRepository<any>;
+	#mediaItemRepository?: UmbItemRepository<any>;
 
 	@property({ type: Boolean })
 	documentRootAccess: boolean = false;
@@ -65,20 +64,43 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 	@state()
 	private _userPermissionLabels: Array<string> = [];
 
+	constructor() {
+		super();
+		this.#initRepositories();
+	}
+
+	async #initRepositories() {
+		if (this.#documentItemRepository && this.#mediaItemRepository) return;
+
+		// TODO: get back to this when documents have been decoupled from users.
+		// The repository alias is hardcoded on purpose to avoid a document import in the user module.
+		this.#documentItemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(
+			this,
+			'Umb.Repository.DocumentItem',
+		);
+
+		// TODO: get back to this when media have been decoupled from users.
+		// The repository alias is hardcoded on purpose to avoid a media import in the user module.
+		this.#mediaItemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(
+			this,
+			'Umb.Repository.MediaItem',
+		);
+	}
+
 	async #observeDocumentStartNode(unique: string | null | undefined) {
 		if (this.documentRootAccess) return;
 		if (!unique) return;
 
 		if (!this.#documentItemRepository) {
-			this.#documentItemRepository = new UmbDocumentItemRepository(this);
+			throw new Error('Document item repository is not initialized.');
 		}
 
 		const { error, asObservable } = await this.#documentItemRepository.requestItems([unique]);
 		if (error) return;
 
 		this.observe(
-			asObservable(),
-			(data) => (this._documentLabel = data[0].variants?.[0].name ?? unique),
+			asObservable?.(),
+			(data) => (this._documentLabel = data?.[0].variants?.[0].name ?? unique),
 			'_observeDocumentStartNode',
 		);
 	}
@@ -88,15 +110,15 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 		if (!unique) return;
 
 		if (!this.#mediaItemRepository) {
-			this.#mediaItemRepository = new UmbMediaItemRepository(this);
+			throw new Error('Document item repository is not initialized.');
 		}
 
 		const { error, asObservable } = await this.#mediaItemRepository.requestItems([unique]);
 		if (error) return;
 
 		this.observe(
-			asObservable(),
-			(data) => (this._mediaLabel = data[0].variants?.[0].name ?? unique),
+			asObservable?.(),
+			(data) => (this._mediaLabel = data?.[0].variants?.[0].name ?? unique),
 			'_observeMediaStartNode',
 		);
 	}
