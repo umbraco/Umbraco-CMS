@@ -12,10 +12,6 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
-import './image-cropper-focus-setter.element.js';
-import './image-cropper-preview.element.js';
-import './image-cropper.element.js';
-
 @customElement('umb-image-cropper-field')
 export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	@property({ attribute: false })
