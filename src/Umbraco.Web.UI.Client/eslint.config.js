@@ -63,7 +63,7 @@ export default [
 			'local-rules/enforce-umbraco-external-imports': [
 				'error',
 				{
-					exceptions: ['@umbraco-cms', '@open-wc/testing', '@storybook', 'msw', '.', 'vite'],
+					exceptions: ['@umbraco-cms', '@open-wc/testing', '@storybook', 'msw', '.', 'vite', 'uuid'],
 				},
 			],
 			'local-rules/exported-string-constant-naming': [
