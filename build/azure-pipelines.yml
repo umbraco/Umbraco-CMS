@@ -1,10 +1,10 @@
 name: $(TeamProject)_$(Build.DefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 
 parameters:
-#  - name: sqlServerIntegrationTests
-#    displayName: Run SQL Server Integration Tests
-#    type: boolean
-#    default: false
+  #  - name: sqlServerIntegrationTests
+  #    displayName: Run SQL Server Integration Tests
+  #    type: boolean
+  #    default: false
   - name: sqlServerLinuxAcceptanceTests
     displayName: Run SQL Server Linux Acceptance Tests
     type: boolean
@@ -433,12 +433,29 @@ stages:
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
           - powershell: |
-              while (-not (docker stats mssql --no-stream)) {
-                Start-Sleep -Seconds 5
-                Write-Host "Waiting for SQL Server to be ready..."
+              $maxAttempts = 12
+              $attempt = 0
+              $status = ""
+
+              while (($status -ne 'running') -and ($attempt -lt $maxAttempts)) {
+              # We use the docker inspect command to check the status of the container. If the container is not running, we wait 5 seconds and try again. And if reaches 12 attempts, we fail the build.
+                $status = docker inspect -f '{{.State.Status}}' mssql
+
+                if ($status -ne 'running') {
+                  Write-Host "Waiting for SQL Server to be ready... Attempt $($attempt + 1)"
+                  Start-Sleep -Seconds 5
+                  $attempt++
+                }
               }
-              Write-Host "SQL Server is ready"
-              docker ps -a
+
+              if ($status -eq 'running') {
+                Write-Host "SQL Server container is running"
+                docker ps -a
+              } else {
+                Write-Host "SQL Server did not become ready in time. Last known status: $status"
+                docker logs mssql
+                exit 1
+              }
             displayName: Wait for SQL Server to be ready (Linux)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
