@@ -1,5 +1,5 @@
-import { escapeHTML } from '../utils/index.js';
 import { css, customElement, html, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
