@@ -89,7 +89,10 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         // no change?
         if (editorModelValue?.TemporaryFileId.HasValue is not true && string.IsNullOrEmpty(editorModelValue?.Src) is false)
         {
-            return currentValue;
+            // since current value can be json string, we have to parse value
+            var currentModelValue = ParseFileUploadValue(currentValue);
+
+            return currentModelValue?.Src;
         }
 
         // the current editor value (if any) is the path to the file
