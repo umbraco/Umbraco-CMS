@@ -22,8 +22,8 @@ export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
 			},
-			onChange: () => {
-				if (condition.permitted) {
+			onChange: (permitted) => {
+				if (permitted) {
 					this.enable();
 				} else {
 					this.disable();
