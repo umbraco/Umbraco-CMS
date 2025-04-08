@@ -45,7 +45,6 @@ internal sealed class TemporaryFileService : ITemporaryFileService
             return Attempt.FailWithStatus<TemporaryFileModel?, TemporaryFileOperationStatus>(TemporaryFileOperationStatus.KeyAlreadyUsed, null);
         }
 
-
         await using Stream dataStream = createModel.OpenReadStream();
         dataStream.Seek(0, SeekOrigin.Begin);
         if (_fileStreamSecurityValidator.IsConsideredSafe(dataStream) is false)
@@ -53,13 +52,12 @@ internal sealed class TemporaryFileService : ITemporaryFileService
             return Attempt.FailWithStatus<TemporaryFileModel?, TemporaryFileOperationStatus>(TemporaryFileOperationStatus.UploadBlocked, null);
         }
 
-
         temporaryFileModel = new TemporaryFileModel
         {
             Key = createModel.Key,
             FileName = createModel.FileName,
             OpenReadStream = createModel.OpenReadStream,
-            AvailableUntil = DateTime.Now.Add(_runtimeSettings.TemporaryFileLifeTime)
+            AvailableUntil = DateTime.Now.Add(_runtimeSettings.TemporaryFileLifeTime),
         };
 
         await _temporaryFileRepository.SaveAsync(temporaryFileModel);
@@ -68,16 +66,28 @@ internal sealed class TemporaryFileService : ITemporaryFileService
     }
 
     private TemporaryFileOperationStatus Validate(TemporaryFileModelBase temporaryFileModel)
-        => IsAllowedFileExtension(temporaryFileModel) == false
-            ? TemporaryFileOperationStatus.FileExtensionNotAllowed
-            : TemporaryFileOperationStatus.Success;
-
-    private bool IsAllowedFileExtension(TemporaryFileModelBase temporaryFileModel)
     {
-        var extension = Path.GetExtension(temporaryFileModel.FileName)[1..];
+        if (IsAllowedFileExtension(temporaryFileModel.FileName) == false)
+        {
+            return TemporaryFileOperationStatus.FileExtensionNotAllowed;
+        }
 
+        if (IsValidFileName(temporaryFileModel.FileName) == false)
+        {
+            return TemporaryFileOperationStatus.InvalidFileName;
+        }
+
+        return TemporaryFileOperationStatus.Success;
+    }
+
+    private bool IsAllowedFileExtension(string fileName)
+    {
+        var extension = Path.GetExtension(fileName)[1..];
         return _contentSettings.IsFileAllowedForUpload(extension);
     }
+
+    private static bool IsValidFileName(string fileName) =>
+        !string.IsNullOrEmpty(fileName) && fileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
 
     public async Task<Attempt<TemporaryFileModel?, TemporaryFileOperationStatus>> DeleteAsync(Guid key)
     {
