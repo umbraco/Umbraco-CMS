@@ -88,6 +88,7 @@
 		"./script": "./dist-cms/packages/templating/scripts/index.js",
 		"./search": "./dist-cms/packages/search/index.js",
 		"./section": "./dist-cms/packages/core/section/index.js",
+		"./server": "./dist-cms/packages/core/server/index.js",
 		"./server-file-system": "./dist-cms/packages/core/server-file-system/index.js",
 		"./settings": "./dist-cms/packages/settings/index.js",
 		"./sorter": "./dist-cms/packages/core/sorter/index.js",

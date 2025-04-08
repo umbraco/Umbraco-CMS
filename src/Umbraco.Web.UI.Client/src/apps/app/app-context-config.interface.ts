@@ -1,4 +1,4 @@
-import type { UmbServerConnection } from './server-connection.js';
+import type { UmbServerConnection } from '../../packages/core/server/server-connection.js';
 
 /**
  * Configuration interface for the Umbraco App Context
