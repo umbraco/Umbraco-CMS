@@ -9,12 +9,12 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 /**
  * A implementation of the Block Manager specifically for the Block Grid Editor.
@@ -87,8 +87,8 @@ export class UmbBlockGridManagerContext<
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.#initAppUrl = this.consumeContext(UMB_APP_CONTEXT, (appContext) => {
-			this.#serverUrl = appContext.getServerUrl();
+		this.#initAppUrl = this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance.getServerUrl();
 		}).asPromise({ preventTimeout: true });
 	}
 	/**

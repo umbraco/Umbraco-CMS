@@ -52,7 +52,8 @@ if (circular.length) {
 	*/
 
 	// TODO: Remove this check and set an exit with argument 1 when we have fixed all circular dependencies.
-	const MAX_CIRCULAR_DEPENDENCIES = 6;
+	// The current threshold for circular dependencies is set to 5. Adjust this number as needed.
+	const MAX_CIRCULAR_DEPENDENCIES = 5;
 	if (circular.length > MAX_CIRCULAR_DEPENDENCIES) {
 		process.exit(1);
 	} else if (circular.length < MAX_CIRCULAR_DEPENDENCIES) {
