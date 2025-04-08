@@ -1,7 +1,7 @@
 import type { UmbDataTypeCollectionFilterModel } from '../types.js';
 import type { UmbDataTypeItemModel } from '../../repository/index.js';
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -40,7 +40,7 @@ export class UmbDataTypeCollectionServerDataSource implements UmbCollectionDataS
 	 * @DataTypeof UmbDataTypeCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbDataTypeCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, DataTypeService.getFilterDataType(filter));
+		const { data, error } = await tryExecute(this.#host, DataTypeService.getFilterDataType(filter));
 
 		if (error) {
 			return { error };

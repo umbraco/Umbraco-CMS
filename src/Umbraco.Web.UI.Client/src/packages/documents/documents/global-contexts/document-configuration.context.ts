@@ -3,7 +3,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { DocumentService, type DocumentConfigurationResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 // TODO: Turn this into a Repository with a Store that holds the cache [NL]
 /**
@@ -36,7 +36,7 @@ export class UmbDocumentConfigurationContext
 	 * @returns A promise that resolves to the document configuration, or null if the configuration could not be fetched.
 	 */
 	async fetchDocumentConfiguration() {
-		const { data } = await tryExecuteAndNotify(this, DocumentService.getDocumentConfiguration());
+		const { data } = await tryExecute(this, DocumentService.getDocumentConfiguration());
 
 		return data ?? null;
 	}

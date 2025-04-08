@@ -1,6 +1,6 @@
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbSortChildrenOfArgs, UmbSortChildrenOfDataSource } from '@umbraco-cms/backoffice/tree';
 
 /**
@@ -30,7 +30,7 @@ export class UmbSortChildrenOfMediaServerDataSource implements UmbSortChildrenOf
 
 		const sortingMapping = args.sorting.map((item) => ({ id: item.unique, sortOrder: item.sortOrder }));
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			MediaService.putMediaSort({
 				requestBody: {

@@ -1,7 +1,7 @@
 import type { UmbCreatePartialViewFromSnippetModalData } from './index.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { PartialViewSnippetItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 
@@ -25,7 +25,7 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 	}
 
 	protected override async firstUpdated() {
-		const { data } = await tryExecuteAndNotify(this, PartialViewService.getPartialViewSnippet({ take: 10000 }));
+		const { data } = await tryExecute(this, PartialViewService.getPartialViewSnippet({ take: 10000 }));
 
 		if (data) {
 			this._snippets = data.items.map((snippet) => {

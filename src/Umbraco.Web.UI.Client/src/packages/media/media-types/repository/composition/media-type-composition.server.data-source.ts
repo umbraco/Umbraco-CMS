@@ -5,7 +5,7 @@ import type {
 } from '../../types.js';
 import { type MediaTypeCompositionRequestModel, MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbContentTypeCompositionDataSource } from '@umbraco-cms/backoffice/content-type';
 
 /**
@@ -37,7 +37,7 @@ export class UmbMediaTypeCompositionServerDataSource
 	 * @memberof UmbMediaTypeCompositionServerDataSource
 	 */
 	async getReferences(unique: string) {
-		const response = await tryExecuteAndNotify(
+		const response = await tryExecute(
 			this.#host,
 			MediaTypeService.getMediaTypeByIdCompositionReferences({ id: unique }),
 		);
@@ -66,10 +66,7 @@ export class UmbMediaTypeCompositionServerDataSource
 			currentPropertyAliases: args.currentPropertyAliases,
 		};
 
-		const response = await tryExecuteAndNotify(
-			this.#host,
-			MediaTypeService.postMediaTypeAvailableCompositions({ requestBody }),
-		);
+		const response = await tryExecute(this.#host, MediaTypeService.postMediaTypeAvailableCompositions({ requestBody }));
 		const error = response.error;
 		const data: Array<UmbMediaTypeCompositionCompatibleModel> | undefined = response.data?.map((composition) => {
 			return {

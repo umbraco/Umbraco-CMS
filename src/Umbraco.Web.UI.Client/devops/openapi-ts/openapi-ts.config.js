@@ -1,7 +1,6 @@
 import { defineConfig } from '@hey-api/openapi-ts';
 
 export default defineConfig({
-	client: 'legacy/fetch',
 	debug: true,
 	input: '../Umbraco.Cms.Api.Management/OpenApi.json',
 	output: {
@@ -10,6 +9,7 @@ export default defineConfig({
 		lint: 'eslint',
 	},
 	plugins: [
+		'legacy/fetch',
 		{
 			name: '@hey-api/typescript',
 			enums: 'typescript'

@@ -1,9 +1,9 @@
 import type { UmbServerUpgradeCheck } from '../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import { tryExecute, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ServerService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 export class UmbSysinfoRepository extends UmbRepositoryBase {
 	constructor(host: UmbControllerHost) {
@@ -11,12 +11,12 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 	}
 
 	async requestTroubleShooting() {
-		const { data } = await tryExecuteAndNotify(this, ServerService.getServerTroubleshooting());
+		const { data } = await tryExecute(this, ServerService.getServerTroubleshooting(), { disableNotifications: true });
 		return data;
 	}
 
 	async requestServerInformation() {
-		const { data } = await tryExecuteAndNotify(this, ServerService.getServerInformation());
+		const { data } = await tryExecute(this, ServerService.getServerInformation(), { disableNotifications: true });
 		return data;
 	}
 
@@ -29,12 +29,12 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 	 */
 	async serverUpgradeCheck(currentVersion: string): Promise<UmbServerUpgradeCheck | null> {
 		// Check if we are allowed to check again
-		const appContext = await this.getContext(UMB_APP_CONTEXT);
-		if (!appContext) {
-			throw new Error('Could not get the app context.');
+		const serverContext = await this.getContext(UMB_SERVER_CONTEXT);
+		if (!serverContext) {
+			throw new Error('Could not get the server context.');
 		}
 		// TODO: Provide a get method, so we do not need to observe in this case:
-		const versionCheckPeriod = await this.observe(appContext.getServerConnection().versionCheckPeriod).asPromise();
+		const versionCheckPeriod = await this.observe(serverContext.getServerConnection().versionCheckPeriod).asPromise();
 
 		if (versionCheckPeriod <= 0) {
 			// We do not need to check the server for an upgrade
@@ -108,7 +108,7 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 		currentVersion: string,
 	): Promise<UmbServerUpgradeCheck | null> {
 		// Check the server for an upgrade because we have no stored check or the stored check is invalid
-		const { data } = await tryExecute(ServerService.getServerUpgradeCheck());
+		const { data } = await tryExecute(this, ServerService.getServerUpgradeCheck(), { disableNotifications: true });
 
 		if (data) {
 			// Save the last check date including the data received

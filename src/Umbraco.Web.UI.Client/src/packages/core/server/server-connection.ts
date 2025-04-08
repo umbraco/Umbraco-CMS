@@ -1,8 +1,10 @@
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { RuntimeLevelModel, ServerService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbBooleanState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
-export class UmbServerConnection {
+export class UmbServerConnection extends UmbControllerBase {
 	#url: string;
 	#status: RuntimeLevelModel = RuntimeLevelModel.UNKNOWN;
 
@@ -18,7 +20,8 @@ export class UmbServerConnection {
 	#allowPasswordReset = new UmbBooleanState(false);
 	allowPasswordReset = this.#allowPasswordReset.asObservable();
 
-	constructor(serverUrl: string) {
+	constructor(host: UmbControllerHost, serverUrl: string) {
+		super(host);
 		this.#url = serverUrl;
 	}
 
@@ -61,7 +64,9 @@ export class UmbServerConnection {
 	}
 
 	async #setStatus() {
-		const { data, error } = await tryExecute(ServerService.getServerStatus());
+		const { data, error } = await tryExecute(this._host, ServerService.getServerStatus(), {
+			disableNotifications: true,
+		});
 		if (error) {
 			throw error;
 		}
@@ -71,7 +76,9 @@ export class UmbServerConnection {
 	}
 
 	async #setServerConfiguration() {
-		const { data, error } = await tryExecute(ServerService.getServerConfiguration());
+		const { data, error } = await tryExecute(this._host, ServerService.getServerConfiguration(), {
+			disableNotifications: true,
+		});
 		if (error) {
 			throw error;
 		}

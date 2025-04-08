@@ -11,7 +11,7 @@ import type {
 import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource<UmbPartialViewDetailModel> {
 	#host: UmbControllerHost;
@@ -46,7 +46,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 			content: model.content,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			PartialViewService.postPartialView({
 				requestBody,
@@ -68,7 +68,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			PartialViewService.getPartialViewByPath({ path: encodeURIComponent(path) }),
 		);
@@ -97,7 +97,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 			content: model.content,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			PartialViewService.putPartialViewByPath({
 				path: encodeURIComponent(path),
@@ -118,7 +118,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			PartialViewService.deletePartialViewByPath({
 				path: encodeURIComponent(path),

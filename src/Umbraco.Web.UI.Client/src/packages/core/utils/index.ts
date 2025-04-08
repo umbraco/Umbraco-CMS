@@ -1,5 +1,7 @@
 export * from './bytes/bytes.function.js';
 export * from './debounce/debounce.function.js';
+export * from './deprecation/index.js';
+export * from './diff/index.js';
 export * from './direction/index.js';
 export * from './download/blob-download.function.js';
 export * from './get-guid-from-udi.function.js';
@@ -25,5 +27,4 @@ export * from './sanitize/sanitize-html.function.js';
 export * from './selection-manager/selection.manager.js';
 export * from './state-manager/index.js';
 export * from './string/index.js';
-export * from './deprecation/index.js';
 export type * from './type/index.js';
