@@ -50,6 +50,7 @@ export default defineConfig({
 			'resources/index': './resources/index.ts',
 			'router/index': './router/index.ts',
 			'section/index': './section/index.ts',
+			server: './server/index.ts',
 			'server-file-system/index': './server-file-system/index.ts',
 			'sorter/index': './sorter/index.ts',
 			'store/index': './store/index.ts',
