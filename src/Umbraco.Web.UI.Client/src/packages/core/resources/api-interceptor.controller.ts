@@ -45,20 +45,21 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		client.interceptors.response.use(async (response) => {
 			if (response.ok) return response;
 
-			// Clones the response to read the body
-			const origResponse = response.clone();
-			const error = await origResponse.json();
-			if (!error) return response;
-
-			// If the error is not an UmbError, we check if it is a problem details object
-			// Check if the error is a problem details object
-			if (!('type' in error) || !('title' in error) || !('status' in error)) {
-				// If not, we just return the response
-				return response;
-			}
-
 			// Handle 500 errors - we need to show a notification
-			if (origResponse.status === 500) {
+			if (response.status === 500) {
+				// Clones the response to read the body
+				const origResponse = response.clone();
+				const error = await origResponse.json();
+
+				if (!error) return response;
+
+				// If the error is not an UmbError, we check if it is a problem details object
+				// Check if the error is a problem details object
+				if (!('type' in error) || !('title' in error) || !('status' in error)) {
+					// If not, we just return the response
+					return response;
+				}
+
 				let headline = error.title ?? error.name ?? 'Server Error';
 				let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
 
