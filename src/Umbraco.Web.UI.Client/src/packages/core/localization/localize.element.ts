@@ -49,12 +49,13 @@ export class UmbLocalizeElement extends UmbLitElement {
 
 		(this.getHostElement() as HTMLElement).removeAttribute('data-localize-missing');
 
-		return localizedValue;
+		return localizedValue.trim();
 	}
 
 	override render() {
-		return this.text.trim()
-			? html`${unsafeHTML(this.text)}`
+		const text = this.text;
+		return text
+			? unsafeHTML(text)
 			: this.debug
 				? html`<span style="color:red">${this.key}</span>`
 				: html`<slot></slot>`;
