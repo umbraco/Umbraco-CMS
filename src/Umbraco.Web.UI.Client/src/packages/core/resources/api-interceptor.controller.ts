@@ -47,33 +47,38 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 			// Handle 500 errors - we need to show a notification
 			if (response.status === 500) {
-				// Clones the response to read the body
-				const origResponse = response.clone();
-				const error = await origResponse.json();
+				try {
+					// Clones the response to read the body
+					const origResponse = response.clone();
+					const error = await origResponse.json();
 
-				if (!error) return response;
+					if (!error) return response;
 
-				// If the error is not an UmbError, we check if it is a problem details object
-				// Check if the error is a problem details object
-				if (!('type' in error) || !('title' in error) || !('status' in error)) {
-					// If not, we just return the response
-					return response;
+					// If the error is not an UmbError, we check if it is a problem details object
+					// Check if the error is a problem details object
+					if (!('type' in error) || !('title' in error) || !('status' in error)) {
+						// If not, we just return the response
+						return response;
+					}
+
+					let headline = error.title ?? error.name ?? 'Server Error';
+					let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
+
+					// Special handling for ObjectCacheAppCache corruption errors, which we are investigating
+					if (
+						error.detail?.includes('ObjectCacheAppCache') ||
+						error.detail?.includes('Umbraco.Cms.Infrastructure.Scoping.Scope.DisposeLastScope()')
+					) {
+						headline = 'Please restart the server';
+						message =
+							'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
+					}
+
+					this.#peekError(headline, message, error.errors ?? error.detail);
+				} catch (e) {
+					// Ignore JSON parse error
+					console.error('[Interceptor] Caught a 500 Error, but failed parsing error body (expected JSON)', e);
 				}
-
-				let headline = error.title ?? error.name ?? 'Server Error';
-				let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
-
-				// Special handling for ObjectCacheAppCache corruption errors, which we are investigating
-				if (
-					error.detail?.includes('ObjectCacheAppCache') ||
-					error.detail?.includes('Umbraco.Cms.Infrastructure.Scoping.Scope.DisposeLastScope()')
-				) {
-					headline = 'Please restart the server';
-					message =
-						'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
-				}
-
-				this.#peekError(headline, message, error.errors ?? error.detail);
 			}
 
 			// Return original response
