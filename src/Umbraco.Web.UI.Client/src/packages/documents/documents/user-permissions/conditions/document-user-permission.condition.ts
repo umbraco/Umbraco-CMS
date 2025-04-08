@@ -57,10 +57,14 @@ export class UmbDocumentUserPermissionCondition extends UmbControllerBase implem
 		});
 
 		this.consumeContext(UMB_ANCESTORS_ENTITY_CONTEXT, (instance) => {
-			this.observe(instance?.ancestors, (ancestors) => {
-				this.#ancestors = ancestors.map((item) => item.unique);
-				this.#checkPermissions();
-			});
+			this.observe(
+				instance?.ancestors,
+				(ancestors) => {
+					this.#ancestors = ancestors.map((item) => item.unique);
+					this.#checkPermissions();
+				},
+				'observeAncestors',
+			);
 		});
 	}
 
