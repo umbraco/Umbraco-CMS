@@ -74,6 +74,214 @@ stages:
               targetPath: $(Build.SourcesDirectory)
               artifactName: build_output
 
+  - stage: Integration
+    displayName: Integration Tests
+    dependsOn: Build
+    variables:
+      releaseTestFilter: eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True')
+    jobs:
+      # Integration Tests (SQLite)
+      - job:
+        timeoutInMinutes: 180
+        displayName: Integration Tests (SQLite)
+        strategy:
+          matrix:
+            # We split the tests into 3 parts for each OS to reduce the time it takes to run them on the pipeline
+            WindowsPart1Of3:
+              vmImage: "windows-latest"
+              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
+            WindowsPart2Of3:
+              vmImage: "windows-latest"
+              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
+            WindowsPart3Of3:
+              vmImage: "windows-latest"
+              # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
+            LinuxPart1Of3:
+              vmImage: "ubuntu-latest"
+              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
+            LinuxPart2Of3:
+              vmImage: "ubuntu-latest"
+              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
+            LinuxPart3Of3:
+              vmImage: "ubuntu-latest"
+              # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
+            macOSPart1Of3:
+              vmImage: "macOS-latest"
+              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
+            macOSPart2Of3:
+              vmImage: "macOS-latest"
+              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
+            macOSPart3Of3:
+              vmImage: "macOS-latest"
+              # Filter tests that are not part of the Umbraco.Infrastructure namespace.
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
+        pool:
+          vmImage: $(vmImage)
+        variables:
+          Tests__Database__DatabaseType: "Sqlite"
+        steps:
+          - checkout: self
+            submodules: false
+            lfs: false,
+            fetchDepth: 1
+            fetchFilter: tree:0
+          # Setup test environment
+          - task: DownloadPipelineArtifact@2
+            displayName: Download build artifacts
+            inputs:
+              artifact: build_output
+              path: $(Build.SourcesDirectory)
+
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
+
+          # Test
+          - task: DotNetCoreCLI@2
+            displayName: Run dotnet test
+            inputs:
+              command: test
+              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
+              testRunTitle: Integration Tests SQLite - $(Agent.OS)
+              ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
+              ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
+              ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
+              ${{ else }}:
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
+      # Integration Tests (SQL Server)
+      - job:
+        timeoutInMinutes: 180
+        displayName: Integration Tests (SQL Server)
+        strategy:
+          matrix:
+            # We split the tests into 3 parts for each OS to reduce the time it takes to run them on the pipeline
+            WindowsPart1Of3:
+              vmImage: "windows-latest"
+              Tests__Database__DatabaseType: LocalDb
+              Tests__Database__SQLServerMasterConnectionString: N/A
+              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
+            WindowsPart2Of3:
+              vmImage: "windows-latest"
+              Tests__Database__DatabaseType: LocalDb
+              Tests__Database__SQLServerMasterConnectionString: N/A
+              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
+            WindowsPart3Of3:
+              vmImage: "windows-latest"
+              Tests__Database__DatabaseType: LocalDb
+              Tests__Database__SQLServerMasterConnectionString: N/A
+              # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
+            LinuxPart1Of3:
+              vmImage: "ubuntu-latest"
+              SA_PASSWORD: UmbracoIntegration123!
+              Tests__Database__DatabaseType: SqlServer
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
+            LinuxPart2Of3:
+              vmImage: "ubuntu-latest"
+              SA_PASSWORD: UmbracoIntegration123!
+              Tests__Database__DatabaseType: SqlServer
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
+            LinuxPart3Of3:
+              vmImage: "ubuntu-latest"
+              SA_PASSWORD: UmbracoIntegration123!
+              Tests__Database__DatabaseType: SqlServer
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+              # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          # Setup test environment
+          - task: DownloadPipelineArtifact@2
+            displayName: Download build artifacts
+            inputs:
+              artifact: build_output
+              path: $(Build.SourcesDirectory)
+
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
+
+          # Start SQL Server
+          - powershell: docker run --name mssql -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=$(SA_PASSWORD)" mcr.microsoft.com/mssql/server:2022-latest
+            displayName: Start SQL Server Docker image (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
+          - powershell: |
+              $maxAttempts = 12
+              $attempt = 0
+              $status = ""
+
+              while (($status -ne 'running') -and ($attempt -lt $maxAttempts)) {
+              # We use the docker inspect command to check the status of the container. If the container is not running, we wait 5 seconds and try again. And if reaches 12 attempts, we fail the build.
+                $status = docker inspect -f '{{.State.Status}}' mssql
+
+                if ($status -ne 'running') {
+                  Write-Host "Waiting for SQL Server to be ready... Attempt $($attempt + 1)"
+                  Start-Sleep -Seconds 5
+                  $attempt++
+                }
+              }
+
+              if ($status -eq 'running') {
+                Write-Host "SQL Server container is running"
+                docker ps -a
+              } else {
+                Write-Host "SQL Server did not become ready in time. Last known status: $status"
+                docker logs mssql
+                exit 1
+              }
+            displayName: Wait for SQL Server to be ready (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
+          - pwsh: SqlLocalDB start MSSQLLocalDB
+            displayName: Start SQL Server LocalDB (Windows)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+
+          # Test
+          - task: DotNetCoreCLI@2
+            displayName: Run dotnet test
+            inputs:
+              command: test
+              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
+              testRunTitle: Integration Tests SQL Server - $(Agent.OS)
+              ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
+              ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
+              ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
+              ${{ else }}:
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
+
+          # Stop SQL Server
+          - pwsh: docker stop mssql
+            displayName: Stop SQL Server Docker image (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
+          - pwsh: SqlLocalDB stop MSSQLLocalDB
+            displayName: Stop SQL Server LocalDB (Windows)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+
   - stage: E2E
     displayName: E2E Tests
     dependsOn: Build
@@ -428,7 +636,7 @@ stages:
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
-          
+
           # Publish test results
           - task: PublishTestResults@2
             displayName: "Publish test results"
