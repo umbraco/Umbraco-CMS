@@ -18,6 +18,7 @@ export type IRoutingInfo<D = any, P = any> = {
 	match: IRouteMatch<D>;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type CustomResolver<D = any, P = any> = (
 	info: IRoutingInfo<D>,
 ) => boolean | void | Promise<boolean> | Promise<void>;
