@@ -19,6 +19,6 @@ export class UmbEntityActionsTableColumnViewElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-entity-actions-table-column-view']: UmbEntityActionsTableColumnViewElement;
+		'umb-entity-actions-table-column-view': UmbEntityActionsTableColumnViewElement;
 	}
 }
