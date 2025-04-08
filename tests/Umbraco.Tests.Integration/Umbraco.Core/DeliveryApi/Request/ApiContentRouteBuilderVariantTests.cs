@@ -17,6 +17,9 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
     public static void ConfigureIncludeTopLevelNodeInPath(IUmbracoBuilder builder)
         => builder.Services.Configure<GlobalSettings>(config => config.HideTopLevelNodeFromPath = false);
 
+    public static void ConfigureOmitTrailingSlash(IUmbracoBuilder builder)
+        => builder.Services.Configure<RequestHandlerSettings>(config => config.AddTrailingSlash = false);
+
     [SetUp]
     public async Task SetUpTest()
     {
@@ -229,6 +232,54 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
         Assert.Multiple(() =>
         {
             Assert.AreEqual("/", route.Path);
+            Assert.AreEqual($"root-{root}-{culture.ToLowerInvariant()}", route.StartItem.Path);
+            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+        });
+    }
+
+    [TestCase(1, "en-US", "/")]
+    [TestCase(1, "da-DK", "/")]
+    [TestCase(2, "en-US", "/root-2-en-us")]
+    [TestCase(2, "da-DK", "/root-2-da-dk")]
+    [TestCase(3, "en-US", "/root-3-en-us")]
+    [TestCase(3, "da-DK", "/root-3-da-dk")]
+    [ConfigureBuilder(ActionName = nameof(ConfigureOmitTrailingSlash))]
+    public void Root_Without_Trailing_Slash(int root, string culture, string expectedPath)
+    {
+        SetVariationContext(culture);
+        var publishedContent = GetPublishedContent(_contentByName[$"Root {root}"].Key);
+        var route = ApiContentRouteBuilder.Build(publishedContent);
+        Assert.IsNotNull(route);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(expectedPath, route.Path);
+            Assert.AreEqual($"root-{root}-{culture.ToLowerInvariant()}", route.StartItem.Path);
+            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+        });
+    }
+
+    [TestCase(1, 1, "en-US")]
+    [TestCase(1, 1, "da-DK")]
+    [TestCase(2, 2, "en-US")]
+    [TestCase(2, 2, "da-DK")]
+    [TestCase(3, 3, "en-US")]
+    [TestCase(3, 3, "da-DK")]
+    [TestCase(1, 2, "en-US")]
+    [TestCase(1, 2, "da-DK")]
+    [TestCase(2, 3, "en-US")]
+    [TestCase(2, 3, "da-DK")]
+    [TestCase(3, 1, "en-US")]
+    [TestCase(3, 1, "da-DK")]
+    [ConfigureBuilder(ActionName = nameof(ConfigureOmitTrailingSlash))]
+    public void Child_Without_Trailing_Slash(int root, int child, string culture)
+    {
+        SetVariationContext(culture);
+        var publishedContent = GetPublishedContent(_contentByName[$"Root {root}/Child {child}"].Key);
+        var route = ApiContentRouteBuilder.Build(publishedContent);
+        Assert.IsNotNull(route);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual($"/child-{child}-{culture.ToLowerInvariant()}", route.Path);
             Assert.AreEqual($"root-{root}-{culture.ToLowerInvariant()}", route.StartItem.Path);
             Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
         });

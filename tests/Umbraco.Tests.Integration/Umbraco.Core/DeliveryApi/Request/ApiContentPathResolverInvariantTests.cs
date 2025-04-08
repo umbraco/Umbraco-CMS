@@ -231,4 +231,28 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentByName[$"Root {root}"].Key, content.Key);
     }
+
+    [TestCase("/a", 1)]
+    [TestCase("/123", 2)]
+    [TestCase("/no-such-child", 3)]
+    [TestCase("/a/b", 1)]
+    [TestCase("/123/456", 2)]
+    [TestCase("/no-such-child/no-such-grandchild", 3)]
+    public void Non_Existant_Descendant_By_Path_With_StartItem(string path, int root)
+    {
+        SetRequestStartItem($"root-{root}");
+
+        var content = ApiContentPathResolver.ResolveContentPath(path);
+        Assert.IsNull(content);
+    }
+
+    [TestCase("/a")]
+    [TestCase("/123")]
+    [TestCase("/a/b")]
+    [TestCase("/123/456")]
+    public void Non_Existant_Descendant_By_Path_Without_StartItem(string path)
+    {
+        var content = ApiContentPathResolver.ResolveContentPath(path);
+        Assert.IsNull(content);
+    }
 }

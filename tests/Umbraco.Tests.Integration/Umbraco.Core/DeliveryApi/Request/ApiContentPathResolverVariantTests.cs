@@ -293,4 +293,34 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentByName[$"Root {root}"].Key, content.Key);
     }
+
+    [TestCase("/a", 1, "en-US")]
+    [TestCase("/b", 1, "da-DK")]
+    [TestCase("/123", 2, "en-US")]
+    [TestCase("/456", 2, "da-DK")]
+    [TestCase("/no-such-child", 3, "en-US")]
+    [TestCase("/not-at-all", 3, "da-DK")]
+    [TestCase("/a/b", 1, "en-US")]
+    [TestCase("/c/d", 1, "da-DK")]
+    [TestCase("/123/456", 2, "en-US")]
+    [TestCase("/789/012", 2, "da-DK")]
+    [TestCase("/no-such-child/no-such-grandchild", 3, "en-US")]
+    [TestCase("/not-at-all/aint-no-way", 3, "da-DK")]
+    public void Non_Existant_Descendant_By_Path_With_StartItem(string path, int root, string culture)
+    {
+        SetRequestStartItem($"root-{root}-{culture.ToLowerInvariant()}");
+
+        var content = ApiContentPathResolver.ResolveContentPath(path);
+        Assert.IsNull(content);
+    }
+
+    [TestCase("/a")]
+    [TestCase("/123")]
+    [TestCase("/a/b")]
+    [TestCase("/123/456")]
+    public void Non_Existant_Descendant_By_Path_Without_StartItem(string path)
+    {
+        var content = ApiContentPathResolver.ResolveContentPath(path);
+        Assert.IsNull(content);
+    }
 }

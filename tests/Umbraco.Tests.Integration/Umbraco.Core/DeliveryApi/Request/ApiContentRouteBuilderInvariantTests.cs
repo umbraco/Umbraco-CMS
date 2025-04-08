@@ -16,6 +16,9 @@ public class ApiContentRouteBuilderInvariantTests : ApiContentRouteBuilderTestBa
     public static void ConfigureIncludeTopLevelNodeInPath(IUmbracoBuilder builder)
         => builder.Services.Configure<GlobalSettings>(config => config.HideTopLevelNodeFromPath = false);
 
+    public static void ConfigureOmitTrailingSlash(IUmbracoBuilder builder)
+        => builder.Services.Configure<RequestHandlerSettings>(config => config.AddTrailingSlash = false);
+
     [SetUp]
     public async Task SetUpTest()
     {
@@ -195,6 +198,43 @@ public class ApiContentRouteBuilderInvariantTests : ApiContentRouteBuilderTestBa
         Assert.Multiple(() =>
         {
             Assert.AreEqual("/", route.Path);
+            Assert.AreEqual($"root-{root}", route.StartItem.Path);
+            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+        });
+    }
+
+    [TestCase(1, "/")]
+    [TestCase(2, "/root-2")]
+    [TestCase(3, "/root-3")]
+    [ConfigureBuilder(ActionName = nameof(ConfigureOmitTrailingSlash))]
+    public void Root_Without_Trailing_Slash(int root, string expectedPath)
+    {
+        var publishedContent = GetPublishedContent(_contentByName[$"Root {root}"].Key);
+        var route = ApiContentRouteBuilder.Build(publishedContent);
+        Assert.IsNotNull(route);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(expectedPath, route.Path);
+            Assert.AreEqual($"root-{root}", route.StartItem.Path);
+            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+        });
+    }
+
+    [TestCase(1, 1)]
+    [TestCase(2, 2)]
+    [TestCase(3, 3)]
+    [TestCase(1, 2)]
+    [TestCase(2, 3)]
+    [TestCase(3, 1)]
+    [ConfigureBuilder(ActionName = nameof(ConfigureOmitTrailingSlash))]
+    public void Child_Without_Trailing_Slash(int root, int child)
+    {
+        var publishedContent = GetPublishedContent(_contentByName[$"Root {root}/Child {child}"].Key);
+        var route = ApiContentRouteBuilder.Build(publishedContent);
+        Assert.IsNotNull(route);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual($"/child-{child}", route.Path);
             Assert.AreEqual($"root-{root}", route.StartItem.Path);
             Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
         });

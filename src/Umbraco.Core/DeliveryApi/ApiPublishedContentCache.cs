@@ -89,17 +89,31 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
         // in multi-root settings, we've historically resolved all but the first root by their ID + URL segment,
         // e.g. "1234/second-root-url-segment". in V15+, IDocumentUrlService won't resolve this anymore; it will
         // however resolve "1234/" correctly, so to remain backwards compatible, we need to perform this extra step.
+        var verifyUrlSegment = false;
         if (documentKey is null && route.TrimEnd('/').CountOccurrences("/") is 1)
         {
             documentKey = _apiDocumentUrlService.GetDocumentKeyByRoute(
                 route[..(route.IndexOf('/') + 1)],
                 _variationContextAccessor.VariationContext?.Culture,
                 _requestPreviewService.IsPreview());
+            verifyUrlSegment = true;
         }
 
         IPublishedContent? content = documentKey.HasValue
             ? _publishedContentCache.GetById(isPreviewMode, documentKey.Value)
             : null;
+
+        // the additional look-up above can result in false positives; if attempting to request a non-existing child to
+        // the currently contextualized request root (either by start item or by domain), the root content key might
+        // get resolved. to counter for this, we compare the requested URL segment with the resolved content URL segment.
+        if (content is not null && verifyUrlSegment)
+        {
+            var expectedUrlSegment = route[(route.IndexOf('/') + 1)..];
+            if (content.UrlSegment != expectedUrlSegment)
+            {
+                content = null;
+            }
+        }
 
         return ContentOrNullIfDisallowed(content);
     }
