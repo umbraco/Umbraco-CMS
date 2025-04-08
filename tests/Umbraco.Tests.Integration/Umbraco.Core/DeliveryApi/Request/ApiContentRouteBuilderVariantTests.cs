@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.DeliveryApi.Request;
 
 public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
 {
-    private Dictionary<string, IContent> _contentByName = new ();
+    private readonly Dictionary<string, IContent> _contentByName = new ();
 
     public static void ConfigureIncludeTopLevelNodeInPath(IUmbracoBuilder builder)
         => builder.Services.Configure<GlobalSettings>(config => config.HideTopLevelNodeFromPath = false);
@@ -221,9 +221,9 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
     [TestCase(2, "da-DK")]
     [TestCase(3, "en-US")]
     [TestCase(3, "da-DK")]
-    public void Root_With_Domain_Bindings(int root, string culture)
+    public async Task Root_With_Domain_Bindings(int root, string culture)
     {
-        SetContentHost(_contentByName[$"Root {root}"], "some.host", culture);
+        await SetContentHost(_contentByName[$"Root {root}"], "some.host", culture);
         SetRequestHost("some.host");
         SetVariationContext(culture);
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}"].Key);

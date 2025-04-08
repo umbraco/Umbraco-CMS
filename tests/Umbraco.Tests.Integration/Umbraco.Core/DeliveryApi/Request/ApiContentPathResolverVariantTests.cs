@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.DeliveryApi.Request;
 
 public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
 {
-    private Dictionary<string, IContent> _contentByName = new ();
+    private readonly Dictionary<string, IContent> _contentByName = new ();
 
     public static void ConfigureIncludeTopLevelNodeInPath(IUmbracoBuilder builder)
         => builder.Services.Configure<GlobalSettings>(config => config.HideTopLevelNodeFromPath = false);
@@ -283,9 +283,9 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
     [TestCase(1, "da-DK")]
     [TestCase(2, "da-DK")]
     [TestCase(3, "da-DK")]
-    public void Root_With_Domain_Bindings(int root, string culture)
+    public async Task Root_With_Domain_Bindings(int root, string culture)
     {
-        SetContentHost(_contentByName[$"Root {root}"], "some.host", "en-US");
+        await SetContentHost(_contentByName[$"Root {root}"], "some.host", "en-US");
         SetRequestHost("some.host");
         SetVariationContext(culture);
 

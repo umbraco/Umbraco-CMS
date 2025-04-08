@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -222,9 +222,9 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
     [TestCase(1)]
     [TestCase(2)]
     [TestCase(3)]
-    public void Root_With_Domain_Bindings(int root)
+    public async Task Root_With_Domain_Bindings(int root)
     {
-        SetContentHost(_contentByName[$"Root {root}"], "some.host", "en-US");
+        await SetContentHost(_contentByName[$"Root {root}"], "some.host", "en-US");
         SetRequestHost("some.host");
 
         var content = ApiContentPathResolver.ResolveContentPath("/");
