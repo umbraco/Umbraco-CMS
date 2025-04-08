@@ -156,10 +156,17 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         return result;
     }
 
-    protected void MapBlockValueFromEditor(TValue blockValue)
+    protected void MapBlockValueFromEditor(TValue? editedBlockValue, TValue? currentBlockValue, ContentPropertyData contentPropertyData)
     {
-        MapBlockItemDataFromEditor(blockValue.ContentData);
-        MapBlockItemDataFromEditor(blockValue.SettingsData);
+        MapBlockItemDataFromEditor(
+            editedBlockValue?.ContentData ?? new List<BlockItemData>(),
+            currentBlockValue?.ContentData ?? new List<BlockItemData>(),
+            contentPropertyData);
+
+        MapBlockItemDataFromEditor(
+            editedBlockValue?.SettingsData ?? new List<BlockItemData>(),
+            currentBlockValue?.SettingsData ?? new List<BlockItemData>(),
+            contentPropertyData);
     }
 
     protected void MapBlockValueToEditor(IProperty property, TValue blockValue, string? culture, string? segment)
@@ -224,16 +231,35 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         }
     }
 
-    private void MapBlockItemDataFromEditor(List<BlockItemData> items)
+    private void MapBlockItemDataFromEditor(List<BlockItemData> editedItems, List<BlockItemData> currentItems, ContentPropertyData contentPropertyData)
     {
-        foreach (BlockItemData item in items)
+        // creating mapping between edited and current block items
+        IReadOnlyList<BlockStateMapping<BlockItemData>> itemsMapping = GetBlockStatesMapping(editedItems, currentItems, (mapping, current) => mapping.Edited?.Key == current.Key);
+
+        foreach (BlockStateMapping<BlockItemData> itemMapping in itemsMapping)
         {
-            foreach (BlockPropertyValue blockPropertyValue in item.Values)
+            // creating mapping between edited and current block item values
+            IReadOnlyList<BlockStateMapping<BlockPropertyValue>> valuesMapping = GetBlockStatesMapping(itemMapping.Edited?.Values, itemMapping.Current?.Values, (mapping, current) => mapping.Edited?.Alias == current.Alias);
+
+            foreach (BlockStateMapping<BlockPropertyValue> valueMapping in valuesMapping)
             {
-                IPropertyType? propertyType = blockPropertyValue.PropertyType;
-                if (propertyType is null)
+                BlockPropertyValue? editedValue = valueMapping.Edited;
+                BlockPropertyValue? currentValue = valueMapping.Current;
+
+                IPropertyType? propertyType = null;
+
+                if (editedValue != null)
                 {
-                    throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them from editor.", nameof(items));
+                    propertyType = editedValue.PropertyType;
+                }
+                else if (currentValue != null)
+                {
+                    propertyType = currentValue.PropertyType;
+                }
+
+                if (propertyType == null)
+                {
+                    throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them from editor.", nameof(editedItems));
                 }
 
                 // Lookup the property editor
@@ -246,16 +272,69 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                 // Fetch the property types prevalue
                 var configuration = _dataTypeConfigurationCache.GetConfiguration(propertyType.DataTypeKey);
 
-                // Create a fake content property data object
-                var propertyData = new ContentPropertyData(blockPropertyValue.Value, configuration);
+                // Create a real content property data object
+                var propertyData = new ContentPropertyData(editedValue?.Value, configuration)
+                {
+                    ContentKey = contentPropertyData.ContentKey,
+                    PropertyTypeKey = propertyType.Key
+                };
 
                 // Get the property editor to do it's conversion
-                var newValue = propertyEditor.GetValueEditor().FromEditor(propertyData, blockPropertyValue.Value);
+                IDataValueEditor valueEditor = propertyEditor.GetValueEditor();
+                var newValue = valueEditor.FromEditor(propertyData, currentValue?.Value);
 
                 // update the raw value since this is what will get serialized out
-                blockPropertyValue.Value = newValue;
+                if (editedValue != null)
+                {
+                    editedValue.Value = newValue;
+                }
             }
         }
+    }
+
+    // TODO: maybe there is more suitable class for this purpose
+    // TODO: place this class to more suitable place
+    private sealed class BlockStateMapping<T>
+    {
+        public T? Edited { get; set; }
+        public T? Current { get; set; }
+    }
+
+    // TODO: there is should be more efficient way to map states
+    private static IReadOnlyList<BlockStateMapping<T>> GetBlockStatesMapping<T>(IList<T>? editedItems, IList<T>? currentItems, Func<BlockStateMapping<T>, T, bool> condition)
+    {
+        // filling with edited items first
+        List<BlockStateMapping<T>> mapping = editedItems?
+            .Select(editedItem => new BlockStateMapping<T>
+            {
+                Current = default,
+                Edited = editedItem,
+            })
+            .ToList()
+            ?? new List<BlockStateMapping<T>>();
+
+        currentItems ??= new List<T>();
+
+        // then adding current items
+        foreach (T currentItem in currentItems)
+        {
+            BlockStateMapping<T>? mappingItem = mapping.FirstOrDefault(x => condition(x, currentItem));
+
+            if (mappingItem == null) // if there is no edited item, then adding just current
+            {
+                mapping.Add(new BlockStateMapping<T>
+                {
+                    Current = currentItem,
+                    Edited = default,
+                });
+            }
+            else
+            {
+                mappingItem.Current = currentItem;
+            }
+        }
+
+        return mapping;
     }
 
     /// <summary>
