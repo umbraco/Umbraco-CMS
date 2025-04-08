@@ -185,7 +185,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
     }
 
 
-    private Attempt<PagedModel<Guid>, ApiMediaQueryOperationStatus> PagedResult(IEnumerable<IPublishedContent> children, int skip, int take)
+    private static Attempt<PagedModel<Guid>, ApiMediaQueryOperationStatus> PagedResult(IEnumerable<IPublishedContent> children, int skip, int take)
     {
         IPublishedContent[] childrenAsArray = children as IPublishedContent[] ?? children.ToArray();
         var result = new PagedModel<Guid>

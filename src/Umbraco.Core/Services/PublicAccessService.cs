@@ -14,7 +14,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-internal class PublicAccessService : RepositoryService, IPublicAccessService
+internal sealed class PublicAccessService : RepositoryService, IPublicAccessService
 {
     private readonly IPublicAccessRepository _publicAccessRepository;
     private readonly IEntityService _entityService;
