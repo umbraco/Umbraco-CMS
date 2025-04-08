@@ -34,9 +34,9 @@ import {
 } from '@umbraco-cms/backoffice/content';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -287,13 +287,13 @@ export class UmbDocumentWorkspaceContext
 		// Tell the server that we're entering preview mode.
 		await new UmbDocumentPreviewRepository(this).enter();
 
-		const appContext = await this.getContext(UMB_APP_CONTEXT);
-		if (!appContext) {
-			throw new Error('App context is missing');
+		const serverContext = await this.getContext(UMB_SERVER_CONTEXT);
+		if (!serverContext) {
+			throw new Error('Server context is missing');
 		}
 
-		const backofficePath = appContext.getBackofficePath();
-		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', appContext.getServerUrl());
+		const backofficePath = serverContext.getBackofficePath();
+		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', serverContext.getServerUrl());
 		previewUrl.searchParams.set('id', unique);
 
 		if (culture && culture !== UMB_INVARIANT_CULTURE) {

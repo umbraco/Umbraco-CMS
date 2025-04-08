@@ -5,7 +5,7 @@ import { UMB_AUTH_CONTEXT } from '../auth.context.token.js';
 import type { UmbAuthProviderDefaultProps } from '../types.js';
 import type { UmbModalAppAuthConfig, UmbModalAppAuthValue } from './umb-app-auth-modal.token.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 @customElement('umb-app-auth-modal')
 export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthConfig, UmbModalAppAuthValue> {
@@ -45,7 +45,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 	}
 
 	override firstUpdated(): void {
-		this.consumeContext(UMB_APP_CONTEXT, (context) => {
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
 			this._serverUrl = context.getServerUrl();
 			this.style.setProperty(
 				'--image',

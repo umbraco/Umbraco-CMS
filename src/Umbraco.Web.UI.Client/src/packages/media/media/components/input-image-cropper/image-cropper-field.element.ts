@@ -10,7 +10,7 @@ import type {
 import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 @customElement('umb-image-cropper-field')
 export class UmbInputImageCropperFieldElement extends UmbLitElement {
@@ -83,7 +83,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_APP_CONTEXT, (context) => {
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
 			this._serverUrl = context.getServerUrl();
 		});
 	}
