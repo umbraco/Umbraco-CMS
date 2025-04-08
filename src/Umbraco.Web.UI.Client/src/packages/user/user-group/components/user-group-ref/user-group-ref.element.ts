@@ -64,35 +64,17 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 	@state()
 	private _userPermissionLabels: Array<string> = [];
 
-	constructor() {
-		super();
-		this.#initRepositories();
-	}
-
-	async #initRepositories() {
-		if (this.#documentItemRepository && this.#mediaItemRepository) return;
-
-		// TODO: get back to this when documents have been decoupled from users.
-		// The repository alias is hardcoded on purpose to avoid a document import in the user module.
-		this.#documentItemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(
-			this,
-			'Umb.Repository.DocumentItem',
-		);
-
-		// TODO: get back to this when media have been decoupled from users.
-		// The repository alias is hardcoded on purpose to avoid a media import in the user module.
-		this.#mediaItemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(
-			this,
-			'Umb.Repository.MediaItem',
-		);
-	}
-
 	async #observeDocumentStartNode(unique: string | null | undefined) {
 		if (this.documentRootAccess) return;
 		if (!unique) return;
 
+		// TODO: get back to this when documents have been decoupled from users.
+		// The repository alias is hardcoded on purpose to avoid a document import in the user module.
 		if (!this.#documentItemRepository) {
-			throw new Error('Document item repository is not initialized.');
+			this.#documentItemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(
+				this,
+				'Umb.Repository.DocumentItem',
+			);
 		}
 
 		const { error, asObservable } = await this.#documentItemRepository.requestItems([unique]);
@@ -109,8 +91,13 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 		if (this.mediaRootAccess) return;
 		if (!unique) return;
 
+		// TODO: get back to this when media have been decoupled from users.
+		// The repository alias is hardcoded on purpose to avoid a media import in the user module.
 		if (!this.#mediaItemRepository) {
-			throw new Error('Document item repository is not initialized.');
+			this.#mediaItemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(
+				this,
+				'Umb.Repository.MediaItem',
+			);
 		}
 
 		const { error, asObservable } = await this.#mediaItemRepository.requestItems([unique]);
