@@ -1,4 +1,4 @@
-import type { UmbPagedModel } from '../../../repository/types.js';
+import type { UmbPagedModel } from '../../../../core/repository/types.js';
 import type { UmbContentTypeStructureDataSource } from './content-type-structure-data-source.interface.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
