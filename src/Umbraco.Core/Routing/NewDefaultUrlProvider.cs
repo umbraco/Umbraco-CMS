@@ -249,7 +249,8 @@ public class NewDefaultUrlProvider : IUrlProvider
                 culture);
 
         var defaultCulture = _localizationService.GetDefaultLanguageIsoCode();
-        if (domainUri is not null || string.IsNullOrEmpty(culture) ||
+        if (domainUri is not null ||
+            string.IsNullOrEmpty(culture) ||
             culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
         {
             var url = AssembleUrl(domainUri, path, current, mode).ToString();
