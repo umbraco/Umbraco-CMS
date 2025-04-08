@@ -1,11 +1,10 @@
 import { onInit } from '../../packages/core/entry-point.js';
 import type { UmbAppErrorElement } from './app-error.element.js';
-import { UmbAppContext } from './app.context.js';
-import { UmbServerConnection } from './server-connection.js';
 import { UmbAppAuthController } from './app-auth.controller.js';
 import type { UmbAppOauthElement } from './app-oauth.element.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
+import { UmbServerConnection, UmbServerContext } from '@umbraco-cms/backoffice/server';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -164,7 +163,7 @@ export class UmbAppElement extends UmbLitElement {
 		this.#serverConnection = await new UmbServerConnection(this, this.serverUrl).connect();
 
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, this.backofficePath, this.bypassAuth);
-		new UmbAppContext(this, {
+		new UmbServerContext(this, {
 			backofficePath: this.backofficePath,
 			serverUrl: this.serverUrl,
 			serverConnection: this.#serverConnection,

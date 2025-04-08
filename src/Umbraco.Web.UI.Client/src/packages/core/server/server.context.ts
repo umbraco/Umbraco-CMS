@@ -1,16 +1,16 @@
-import type { UmbAppContextConfig } from './app-context-config.interface.js';
+import { UMB_SERVER_CONTEXT } from './server.context-token.js';
 import { UmbNetworkConnectionStatusManager } from './network-connection-status.manager.js';
+import type { UmbServerContextConfig } from './types.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-export class UmbAppContext extends UmbContextBase<UmbAppContext> {
+export class UmbServerContext extends UmbContextBase<UmbServerContext> {
 	#serverUrl: string;
 	#backofficePath: string;
 	#serverConnection;
 
-	constructor(host: UmbControllerHost, config: UmbAppContextConfig) {
-		super(host, UMB_APP_CONTEXT);
+	constructor(host: UmbControllerHost, config: UmbServerContextConfig) {
+		super(host, UMB_SERVER_CONTEXT.toString());
 		this.#serverUrl = config.serverUrl;
 		this.#backofficePath = config.backofficePath;
 		this.#serverConnection = config.serverConnection;
@@ -30,5 +30,3 @@ export class UmbAppContext extends UmbContextBase<UmbAppContext> {
 		return this.#serverConnection;
 	}
 }
-
-export const UMB_APP_CONTEXT = new UmbContextToken<UmbAppContext>('UmbAppContext');

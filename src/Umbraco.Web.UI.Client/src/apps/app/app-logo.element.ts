@@ -1,6 +1,6 @@
-import { UMB_APP_CONTEXT } from './app.context.js';
 import { customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
 
 @customElement('umb-app-logo')
@@ -42,7 +42,7 @@ export class UmbAppLogoElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
+		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
 			this._serverUrl = instance.getServerUrl();
 		});
 

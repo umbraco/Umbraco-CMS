@@ -9,13 +9,13 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbFileDropzoneItemStatus, UmbInputDropzoneDashedStyles } from '@umbraco-cms/backoffice/dropzone';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import type {
 	UmbDropzoneChangeEvent,
 	UmbInputDropzoneElement,
 	UmbUploadableFile,
 } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends UmbLitElement {
@@ -66,7 +66,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_APP_CONTEXT, (context) => {
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
 			this._serverUrl = context.getServerUrl();
 		});
 	}

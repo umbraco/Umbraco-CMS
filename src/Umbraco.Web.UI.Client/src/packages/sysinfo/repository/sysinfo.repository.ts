@@ -3,7 +3,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ServerService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 export class UmbSysinfoRepository extends UmbRepositoryBase {
 	constructor(host: UmbControllerHost) {
@@ -29,12 +29,12 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 	 */
 	async serverUpgradeCheck(currentVersion: string): Promise<UmbServerUpgradeCheck | null> {
 		// Check if we are allowed to check again
-		const appContext = await this.getContext(UMB_APP_CONTEXT);
-		if (!appContext) {
-			throw new Error('Could not get the app context.');
+		const serverContext = await this.getContext(UMB_SERVER_CONTEXT);
+		if (!serverContext) {
+			throw new Error('Could not get the server context.');
 		}
 		// TODO: Provide a get method, so we do not need to observe in this case:
-		const versionCheckPeriod = await this.observe(appContext.getServerConnection().versionCheckPeriod).asPromise();
+		const versionCheckPeriod = await this.observe(serverContext.getServerConnection().versionCheckPeriod).asPromise();
 
 		if (versionCheckPeriod <= 0) {
 			// We do not need to check the server for an upgrade

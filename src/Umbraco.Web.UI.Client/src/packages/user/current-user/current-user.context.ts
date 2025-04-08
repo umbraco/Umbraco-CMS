@@ -1,5 +1,5 @@
 import type { UmbCurrentUserModel } from './types.js';
-import { UmbCurrentUserRepository } from './repository/index.js';
+import { UmbCurrentUserRepository } from './repository/current-user.repository.js';
 import { UMB_CURRENT_USER_CONTEXT } from './current-user.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -9,9 +9,9 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_SECTION_PATH_PATTERN } from '@umbraco-cms/backoffice/section';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext> {
 	#currentUser = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
@@ -232,11 +232,11 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 	async #redirectToFirstAllowedSectionIfNeeded() {
 		const url = new URL(window.location.href);
 
-		const appContext = await this.getContext(UMB_APP_CONTEXT);
-		if (!appContext) {
-			throw new Error('App context not available');
+		const serverContext = await this.getContext(UMB_SERVER_CONTEXT);
+		if (!serverContext) {
+			throw new Error('Server context not available');
 		}
-		const backofficePath = appContext.getBackofficePath();
+		const backofficePath = serverContext.getBackofficePath();
 
 		if (url.pathname === backofficePath || url.pathname === ensurePathEndsWithSlash(backofficePath)) {
 			const sectionManifest = await this.#firstAllowedSection();
