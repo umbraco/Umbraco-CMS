@@ -358,7 +358,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
 				width: 100%;
-				height: 100%;
+				height: auto;
 				box-sizing: border-box;
 				box-shadow: var(--uui-shadow-depth-3);
 			}

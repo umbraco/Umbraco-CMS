@@ -190,6 +190,24 @@
     <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Validation.cs">
       <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests.Publish.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests.SchedulePublish.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests.ScheduleUnpublish.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests.UnschedulePublish.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests.UnscheduleUnpublish.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests.ClearSchedule.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Copy.cs">
       <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
     </Compile>

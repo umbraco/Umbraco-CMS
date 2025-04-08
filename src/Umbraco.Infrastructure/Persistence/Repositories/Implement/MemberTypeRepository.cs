@@ -228,19 +228,11 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
             ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
         foreach (IPropertyType propertyType in memberType.PropertyTypes)
         {
-            if (builtinProperties.ContainsKey(propertyType.Alias))
+            // this reset's its current data type reference which will be re-assigned based on the property editor assigned on the next line
+            if (builtinProperties.TryGetValue(propertyType.Alias, out PropertyType? propDefinition))
             {
-                // this reset's its current data type reference which will be re-assigned based on the property editor assigned on the next line
-                if (builtinProperties.TryGetValue(propertyType.Alias, out PropertyType? propDefinition))
-                {
-                    propertyType.DataTypeId = propDefinition.DataTypeId;
-                    propertyType.DataTypeKey = propDefinition.DataTypeKey;
-                }
-                else
-                {
-                    propertyType.DataTypeId = 0;
-                    propertyType.DataTypeKey = default;
-                }
+                propertyType.DataTypeId = propDefinition.DataTypeId;
+                propertyType.DataTypeKey = propDefinition.DataTypeKey;
             }
         }
     }
