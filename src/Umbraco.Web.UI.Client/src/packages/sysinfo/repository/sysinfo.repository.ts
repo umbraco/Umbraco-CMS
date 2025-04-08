@@ -1,7 +1,7 @@
 import type { UmbServerUpgradeCheck } from '../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import { tryExecute, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ServerService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
@@ -11,12 +11,12 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 	}
 
 	async requestTroubleShooting() {
-		const { data } = await tryExecuteAndNotify(this, ServerService.getServerTroubleshooting());
+		const { data } = await tryExecute(this, ServerService.getServerTroubleshooting(), { disableNotifications: true });
 		return data;
 	}
 
 	async requestServerInformation() {
-		const { data } = await tryExecuteAndNotify(this, ServerService.getServerInformation());
+		const { data } = await tryExecute(this, ServerService.getServerInformation(), { disableNotifications: true });
 		return data;
 	}
 
@@ -108,7 +108,7 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 		currentVersion: string,
 	): Promise<UmbServerUpgradeCheck | null> {
 		// Check the server for an upgrade because we have no stored check or the stored check is invalid
-		const { data } = await tryExecute(ServerService.getServerUpgradeCheck());
+		const { data } = await tryExecute(this, ServerService.getServerUpgradeCheck(), { disableNotifications: true });
 
 		if (data) {
 			// Save the last check date including the data received

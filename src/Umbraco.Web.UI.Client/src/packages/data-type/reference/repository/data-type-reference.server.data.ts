@@ -1,4 +1,4 @@
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -25,6 +25,6 @@ export class UmbDataTypeReferenceServerDataSource {
 	 * @memberof UmbDataTypeReferenceServerDataSource
 	 */
 	async getReferencedBy(id: string) {
-		return await tryExecuteAndNotify(this.#host, DataTypeService.getDataTypeByIdReferences({ id }));
+		return await tryExecute(this.#host, DataTypeService.getDataTypeByIdReferences({ id }));
 	}
 }

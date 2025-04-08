@@ -6,7 +6,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { LogViewerService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the log saved searches
@@ -32,7 +32,7 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async getAllSavedSearches({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
-		return await tryExecuteAndNotify(this.#host, LogViewerService.getLogViewerSavedSearch({ skip, take }));
+		return await tryExecute(this.#host, LogViewerService.getLogViewerSavedSearch({ skip, take }));
 	}
 	/**
 	 * Get a log viewer saved search by name from the server
@@ -41,7 +41,7 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async getSavedSearchByName({ name }: { name: string }) {
-		return await tryExecuteAndNotify(this.#host, LogViewerService.getLogViewerSavedSearchByName({ name }));
+		return await tryExecute(this.#host, LogViewerService.getLogViewerSavedSearchByName({ name }));
 	}
 
 	/**
@@ -51,10 +51,7 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async postLogViewerSavedSearch({ name, query }: SavedLogSearchResponseModel) {
-		return await tryExecuteAndNotify(
-			this.#host,
-			LogViewerService.postLogViewerSavedSearch({ requestBody: { name, query } }),
-		);
+		return await tryExecute(this.#host, LogViewerService.postLogViewerSavedSearch({ requestBody: { name, query } }));
 	}
 	/**
 	 * Remove a log viewer saved search by name from the server
@@ -63,7 +60,7 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async deleteSavedSearchByName({ name }: { name: string }) {
-		return await tryExecuteAndNotify(this.#host, LogViewerService.deleteLogViewerSavedSearchByName({ name }));
+		return await tryExecute(this.#host, LogViewerService.deleteLogViewerSavedSearchByName({ name }));
 	}
 }
 /**
@@ -90,7 +87,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerLevel({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
-		return await tryExecuteAndNotify(this.#host, LogViewerService.getLogViewerLevel({ skip, take }));
+		return await tryExecute(this.#host, LogViewerService.getLogViewerLevel({ skip, take }));
 	}
 
 	/**
@@ -100,7 +97,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerLevelCount({ startDate, endDate }: { startDate?: string; endDate?: string }) {
-		return await tryExecuteAndNotify(
+		return await tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerLevelCount({
 				startDate,
@@ -147,7 +144,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 		startDate?: string;
 		endDate?: string;
 	}) {
-		return await tryExecuteAndNotify(
+		return await tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerLog({
 				skip,
@@ -187,7 +184,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 		startDate?: string;
 		endDate?: string;
 	}) {
-		return await tryExecuteAndNotify(
+		return await tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerMessageTemplate({
 				skip,
@@ -199,7 +196,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 	}
 
 	async getLogViewerValidateLogsSize({ startDate, endDate }: { startDate?: string; endDate?: string }) {
-		return await tryExecuteAndNotify(
+		return await tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerValidateLogsSize({
 				startDate,

@@ -13,12 +13,10 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
  * A server data source for Member Validation
  */
 export class UmbMemberValidationServerDataSource {
-	//#host: UmbControllerHost;
+	#host: UmbControllerHost;
 
-	// TODO: [v15]: ignoring unused var here here to prevent a breaking change
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	constructor(host: UmbControllerHost) {
-		//this.#host = host;
+		this.#host = host;
 	}
 
 	/**
@@ -47,7 +45,7 @@ export class UmbMemberValidationServerDataSource {
 
 		// Maybe use: tryExecuteAndNotify
 		return tryExecute(
-			//this.#host,
+			this.#host,
 			MemberService.postMemberValidate({
 				requestBody,
 			}),
@@ -79,7 +77,7 @@ export class UmbMemberValidationServerDataSource {
 
 		// Maybe use: tryExecuteAndNotify
 		return tryExecute(
-			//this.#host,
+			this.#host,
 			MemberService.putMemberByIdValidate({
 				id: model.unique,
 				requestBody,

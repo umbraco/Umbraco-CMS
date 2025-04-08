@@ -2,7 +2,7 @@ import type { UmbImagingResizeModel } from './types.js';
 import { ImagingService, type MediaUrlInfoResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbMediaUrlModel } from '@umbraco-cms/backoffice/media';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Imaging Service that resizes a media item from the server
@@ -31,7 +31,7 @@ export class UmbImagingServerDataSource {
 	async getItems(uniques: Array<string>, imagingModel?: UmbImagingResizeModel) {
 		if (!uniques.length) throw new Error('Uniques are missing');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			ImagingService.getImagingResizeUrls({ id: uniques, ...imagingModel }),
 		);

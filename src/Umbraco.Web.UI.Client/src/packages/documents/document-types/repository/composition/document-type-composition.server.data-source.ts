@@ -8,7 +8,7 @@ import {
 	DocumentTypeService,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbContentTypeCompositionDataSource } from '@umbraco-cms/backoffice/content-type';
 
 /**
@@ -40,7 +40,7 @@ export class UmbDocumentTypeCompositionServerDataSource
 	 * @memberof UmbDocumentTypeCompositionServerDataSource
 	 */
 	async getReferences(unique: string) {
-		const response = await tryExecuteAndNotify(
+		const response = await tryExecute(
 			this.#host,
 			DocumentTypeService.getDocumentTypeByIdCompositionReferences({ id: unique }),
 		);
@@ -70,7 +70,7 @@ export class UmbDocumentTypeCompositionServerDataSource
 			currentPropertyAliases: args.currentPropertyAliases,
 		};
 
-		const response = await tryExecuteAndNotify(
+		const response = await tryExecute(
 			this.#host,
 			DocumentTypeService.postDocumentTypeAvailableCompositions({ requestBody }),
 		);

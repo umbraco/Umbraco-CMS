@@ -13,12 +13,10 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
  * A server data source for Media Validation
  */
 export class UmbMediaValidationServerDataSource {
-	//#host: UmbControllerHost;
+	#host: UmbControllerHost;
 
-	// TODO: [v15]: ignoring unused var here here to prevent a breaking change
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	constructor(host: UmbControllerHost) {
-		//this.#host = host;
+		this.#host = host;
 	}
 
 	/**
@@ -43,7 +41,7 @@ export class UmbMediaValidationServerDataSource {
 
 		// Maybe use: tryExecuteAndNotify
 		return tryExecute(
-			//this.#host,
+			this.#host,
 			MediaService.postMediaValidate({
 				requestBody,
 			}),
@@ -70,7 +68,7 @@ export class UmbMediaValidationServerDataSource {
 
 		// Maybe use: tryExecuteAndNotify
 		return tryExecute(
-			//this.#host,
+			this.#host,
 			MediaService.putMediaByIdValidate({
 				id: model.unique,
 				requestBody,

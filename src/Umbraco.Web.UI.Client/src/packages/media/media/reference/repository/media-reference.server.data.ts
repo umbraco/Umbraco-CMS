@@ -1,7 +1,7 @@
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbEntityReferenceDataSource, UmbReferenceItemModel } from '@umbraco-cms/backoffice/relations';
@@ -27,10 +27,7 @@ export class UmbMediaReferenceServerDataSource extends UmbControllerBase impleme
 		skip: number = 0,
 		take: number = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>> {
-		const { data, error } = await tryExecuteAndNotify(
-			this,
-			MediaService.getMediaByIdReferencedBy({ id: unique, skip, take }),
-		);
+		const { data, error } = await tryExecute(this, MediaService.getMediaByIdReferencedBy({ id: unique, skip, take }));
 
 		if (data) {
 			const promises = data.items.map(async (item) => {
@@ -68,10 +65,7 @@ export class UmbMediaReferenceServerDataSource extends UmbControllerBase impleme
 		skip: number = 0,
 		take: number = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>> {
-		const { data, error } = await tryExecuteAndNotify(
-			this,
-			MediaService.getMediaAreReferenced({ id: uniques, skip, take }),
-		);
+		const { data, error } = await tryExecute(this, MediaService.getMediaAreReferenced({ id: uniques, skip, take }));
 
 		if (data) {
 			const items: Array<UmbEntityModel> = data.items.map((item) => {
@@ -100,7 +94,7 @@ export class UmbMediaReferenceServerDataSource extends UmbControllerBase impleme
 		skip: number = 0,
 		take: number = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>> {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this,
 			MediaService.getMediaByIdReferencedDescendants({ id: unique, skip, take }),
 		);

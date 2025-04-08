@@ -3,7 +3,7 @@ import type { UmbMemberGroupDetailModel } from '../../types.js';
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { MemberGroupResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MemberGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 
@@ -31,7 +31,7 @@ export class UmbMemberGroupCollectionServerDataSource implements UmbCollectionDa
 	 * @memberof UmbMemberGroupCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbMemberGroupCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, MemberGroupService.getMemberGroup(filter));
+		const { data, error } = await tryExecute(this.#host, MemberGroupService.getMemberGroup(filter));
 
 		if (error) {
 			return { error };

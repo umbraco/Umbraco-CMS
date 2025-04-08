@@ -1,11 +1,7 @@
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type {
-	InstallSettingsResponseModel,
-	ProblemDetails,
-	InstallRequestModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
+import type { InstallSettingsResponseModel, InstallRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { InstallService, TelemetryLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { tryExecute, UmbApiError, type UmbProblemDetails } from '@umbraco-cms/backoffice/resources';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbObjectState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -29,7 +25,7 @@ export class UmbInstallerContext extends UmbContextBase<UmbInstallerContext, typ
 	private _settings = new UmbObjectState<InstallSettingsResponseModel | undefined>(undefined);
 	public readonly settings = this._settings.asObservable();
 
-	private _installStatus = new UmbObjectState<ProblemDetails | null>(null);
+	private _installStatus = new UmbObjectState<UmbProblemDetails | null>(null);
 	public readonly installStatus = this._installStatus.asObservable();
 
 	constructor(host: UmbControllerHost) {
@@ -50,10 +46,10 @@ export class UmbInstallerContext extends UmbContextBase<UmbInstallerContext, typ
 	/**
 	 * Observable method to get the install status in the installation process
 	 * @public
-	 * @returns {*}  {(Observable<ProblemDetails | null>)}
+	 * @returns {*}  {(Observable<UmbProblemDetails | null>)}
 	 * @memberof UmbInstallerContext
 	 */
-	public installStatusChanges(): Observable<ProblemDetails | null> {
+	public installStatusChanges(): Observable<UmbProblemDetails | null> {
 		return this.installStatus;
 	}
 
@@ -108,10 +104,10 @@ export class UmbInstallerContext extends UmbContextBase<UmbInstallerContext, typ
 	/**
 	 * Set the install status
 	 * @public
-	 * @param {(ProblemDetails | null)} status
+	 * @param {(UmbProblemDetails | null)} status The status to set
 	 * @memberof UmbInstallerContext
 	 */
-	public setInstallStatus(status: ProblemDetails | null): void {
+	public setInstallStatus(status: UmbProblemDetails | null): void {
 		this._installStatus.setValue(status);
 	}
 
@@ -121,12 +117,13 @@ export class UmbInstallerContext extends UmbContextBase<UmbInstallerContext, typ
 	 * @memberof UmbInstallerContext
 	 */
 	private async _loadInstallerSettings() {
-		const { data, error: _error } = await tryExecute(InstallService.getInstallSettings());
-		const error: any = _error;
+		const { data, error } = await tryExecute(this, InstallService.getInstallSettings(), {
+			disableNotifications: true,
+		});
 		if (data) {
 			this._settings.setValue(data);
-		} else if (error) {
-			this._installStatus.setValue(error);
+		} else if (UmbApiError.isUmbApiError(error)) {
+			this._installStatus.setValue(error.problemDetails);
 		}
 	}
 }

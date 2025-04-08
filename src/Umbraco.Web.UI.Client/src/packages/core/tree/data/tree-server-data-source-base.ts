@@ -5,7 +5,7 @@ import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
@@ -77,7 +77,7 @@ export abstract class UmbTreeServerDataSourceBase<
 	 * @memberof UmbTreeServerDataSourceBase
 	 */
 	async getRootItems(args: TreeRootItemsRequestArgsType) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getRootItems(args));
+		const { data, error } = await tryExecute(this.#host, this.#getRootItems(args));
 
 		if (data) {
 			const items = data?.items.map((item) => this.#mapper(item));
@@ -96,7 +96,7 @@ export abstract class UmbTreeServerDataSourceBase<
 	async getChildrenOf(args: TreeChildrenOfRequestArgsType) {
 		if (args.parent.unique === undefined) throw new Error('Parent unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getChildrenOf(args));
+		const { data, error } = await tryExecute(this.#host, this.#getChildrenOf(args));
 
 		if (data) {
 			const items = data?.items.map((item: ServerTreeItemType) => this.#mapper(item));
@@ -115,7 +115,7 @@ export abstract class UmbTreeServerDataSourceBase<
 	async getAncestorsOf(args: TreeAncestorsOfRequestArgsType) {
 		if (!args.treeItem.entityType) throw new Error('Parent unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getAncestorsOf(args));
+		const { data, error } = await tryExecute(this.#host, this.#getAncestorsOf(args));
 
 		if (data) {
 			const items = data?.map((item: ServerTreeItemType) => this.#mapper(item));

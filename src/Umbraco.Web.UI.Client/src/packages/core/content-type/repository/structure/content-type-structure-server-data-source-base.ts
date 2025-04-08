@@ -2,7 +2,7 @@ import type { UmbPagedModel } from '../../../repository/types.js';
 import type { UmbContentTypeStructureDataSource } from './content-type-structure-data-source.interface.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 // Keep this type internal
 type AllowedContentTypeBaseModel = {
@@ -55,10 +55,7 @@ export abstract class UmbContentTypeStructureServerDataSourceBase<
 	 * @memberof UmbContentTypeStructureServerDataSourceBase
 	 */
 	async getAllowedChildrenOf(unique: string | null, parentContentUnique: string | null) {
-		const { data, error } = await tryExecuteAndNotify(
-			this.#host,
-			this.#getAllowedChildrenOf(unique, parentContentUnique),
-		);
+		const { data, error } = await tryExecute(this.#host, this.#getAllowedChildrenOf(unique, parentContentUnique));
 
 		if (data) {
 			const items = data.items.map((item) => this.#mapper(item));

@@ -1,7 +1,7 @@
 import type { UmbCurrentUserModel } from '../types.js';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecute, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the current user that fetches data from the server
@@ -25,7 +25,7 @@ export class UmbCurrentUserServerDataSource {
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getCurrentUser() {
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserService.getUserCurrent());
+		const { data, error } = await tryExecute(this.#host, UserService.getUserCurrent());
 
 		if (data) {
 			const user: UmbCurrentUserModel = {
@@ -67,7 +67,7 @@ export class UmbCurrentUserServerDataSource {
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getExternalLoginProviders() {
-		return tryExecuteAndNotify(this.#host, UserService.getUserCurrentLoginProviders());
+		return tryExecute(this.#host, UserService.getUserCurrentLoginProviders());
 	}
 
 	/**
@@ -75,7 +75,7 @@ export class UmbCurrentUserServerDataSource {
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getMfaLoginProviders() {
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserService.getUserCurrent2Fa());
+		const { data, error } = await tryExecute(this.#host, UserService.getUserCurrent2Fa());
 
 		if (data) {
 			return { data };
@@ -92,6 +92,7 @@ export class UmbCurrentUserServerDataSource {
 	 */
 	async enableMfaProvider(providerName: string, code: string, secret: string) {
 		const { error } = await tryExecute(
+			this.#host,
 			UserService.postUserCurrent2FaByProviderName({ providerName, requestBody: { code, secret } }),
 		);
 
@@ -108,7 +109,10 @@ export class UmbCurrentUserServerDataSource {
 	 * @param code
 	 */
 	async disableMfaProvider(providerName: string, code: string) {
-		const { error } = await tryExecute(UserService.deleteUserCurrent2FaByProviderName({ providerName, code }));
+		const { error } = await tryExecute(
+			this.#host,
+			UserService.deleteUserCurrent2FaByProviderName({ providerName, code }),
+		);
 
 		if (error) {
 			return { error };
@@ -126,7 +130,7 @@ export class UmbCurrentUserServerDataSource {
 	 * @returns
 	 */
 	async changePassword(newPassword: string, oldPassword: string) {
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			UserService.postUserCurrentChangePassword({
 				requestBody: {

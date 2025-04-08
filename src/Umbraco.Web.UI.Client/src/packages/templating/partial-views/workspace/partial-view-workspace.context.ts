@@ -14,7 +14,7 @@ import {
 	UmbEntityNamedDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import { UmbServerFileRenameWorkspaceRedirectController } from '@umbraco-cms/backoffice/server-file-system';
@@ -112,7 +112,7 @@ export class UmbPartialViewWorkspaceContext
 	}
 
 	#getSnippet(unique: string) {
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this,
 			PartialViewService.getPartialViewSnippetById({
 				id: unique,

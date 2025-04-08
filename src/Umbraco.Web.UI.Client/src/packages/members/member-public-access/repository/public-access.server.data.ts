@@ -1,7 +1,7 @@
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecute, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document Public Access that fetches data from the server
@@ -28,10 +28,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 */
 	async create(unique: string, data: PublicAccessRequestModel) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecuteAndNotify(
-			this.#host,
-			DocumentService.postDocumentByIdPublicAccess({ id: unique, requestBody: data }),
-		);
+		return tryExecute(this.#host, DocumentService.postDocumentByIdPublicAccess({ id: unique, requestBody: data }));
 	}
 
 	/**
@@ -43,7 +40,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 		if (!unique) throw new Error('unique is missing');
 		// NOTE: The entity will not be present, when fetching Public Access for a descendant of a protected Document.
 		//       This is a perfectly valid scenario, which is handled in the view. In other words, just use tryExecute here.
-		return tryExecute(DocumentService.getDocumentByIdPublicAccess({ id: unique }));
+		return tryExecute(this.#host, DocumentService.getDocumentByIdPublicAccess({ id: unique }));
 	}
 
 	/**
@@ -55,7 +52,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 */
 	async update(unique: string, requestBody: PublicAccessRequestModel) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdPublicAccess({ id: unique, requestBody }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdPublicAccess({ id: unique, requestBody }));
 	}
 
 	/**
@@ -65,6 +62,6 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentService.deleteDocumentByIdPublicAccess({ id: unique }));
+		return tryExecute(this.#host, DocumentService.deleteDocumentByIdPublicAccess({ id: unique }));
 	}
 }

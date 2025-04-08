@@ -4,7 +4,7 @@ import { OpenAPI, ManifestService, type ManifestResponseModel } from '@umbraco-c
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 // TODO: consider if this can be replaced by the new extension controllers
 export class UmbServerExtensionRegistrator extends UmbControllerBase {
@@ -22,7 +22,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	 * @remark Users must have the BACKOFFICE_ACCESS permission to access this method.
 	 */
 	public async registerAllExtensions() {
-		const { data: packages } = await tryExecuteAndNotify(this, ManifestService.getManifestManifest());
+		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifest());
 		if (packages) {
 			await this.#loadServerPackages(packages);
 		}
@@ -34,7 +34,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	 * @remark Users must have the BACKOFFICE_ACCESS permission to access this method.
 	 */
 	public async registerPrivateExtensions() {
-		const { data: packages } = await tryExecuteAndNotify(this, ManifestService.getManifestManifestPrivate());
+		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifestPrivate());
 		if (packages) {
 			await this.#loadServerPackages(packages);
 		}
@@ -46,7 +46,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	 * @remark Any user can access this method without any permissions.
 	 */
 	public async registerPublicExtensions() {
-		const { data: packages } = await tryExecuteAndNotify(this, ManifestService.getManifestManifestPublic());
+		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifestPublic());
 		if (packages) {
 			await this.#loadServerPackages(packages);
 		}

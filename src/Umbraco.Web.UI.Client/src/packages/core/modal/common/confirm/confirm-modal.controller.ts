@@ -1,4 +1,4 @@
-import { UmbOpenModalController } from '../../index.js';
+import { UmbOpenModalController } from '../../controller/open-modal.controller.js';
 import { UMB_CONFIRM_MODAL, type UmbConfirmModalData } from './confirm-modal.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 

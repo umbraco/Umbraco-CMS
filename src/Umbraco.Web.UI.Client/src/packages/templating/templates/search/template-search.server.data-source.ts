@@ -3,7 +3,7 @@ import type { UmbTemplateSearchItemModel } from './template.search-provider.js';
 import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { TemplateService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Rollback that fetches data from the server
@@ -29,7 +29,7 @@ export class UmbTemplateSearchServerDataSource implements UmbSearchDataSource<Um
 	 * @memberof UmbTemplateSearchServerDataSource
 	 */
 	async search(args: UmbSearchRequestArgs) {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			TemplateService.getItemTemplateSearch({
 				query: args.query,
