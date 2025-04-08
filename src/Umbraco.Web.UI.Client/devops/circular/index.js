@@ -52,7 +52,7 @@ if (circular.length) {
 	*/
 
 	// TODO: Remove this check and set an exit with argument 1 when we have fixed all circular dependencies.
-	if (circular.length > 9) {
+	if (circular.length > 7) {
 		process.exit(1);
 	} else {
 		process.exit(0);
