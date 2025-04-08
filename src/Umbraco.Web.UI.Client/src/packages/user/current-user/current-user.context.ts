@@ -1,5 +1,5 @@
 import type { UmbCurrentUserModel } from './types.js';
-import { UmbCurrentUserRepository } from './repository/index.js';
+import { UmbCurrentUserRepository } from './repository/current-user.repository.js';
 import { UMB_CURRENT_USER_CONTEXT } from './current-user.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
