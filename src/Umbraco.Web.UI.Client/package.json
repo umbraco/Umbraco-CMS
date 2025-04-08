@@ -115,7 +115,6 @@
 		"./webhook": "./dist-cms/packages/webhook/index.js",
 		"./workspace": "./dist-cms/packages/core/workspace/index.js",
 		"./external/backend-api": "./dist-cms/external/backend-api/index.js",
-		"./external/base64-js": "./dist-cms/external/base64-js/index.js",
 		"./external/dompurify": "./dist-cms/external/dompurify/index.js",
 		"./external/lit": "./dist-cms/external/lit/index.js",
 		"./external/marked": "./dist-cms/external/marked/index.js",
