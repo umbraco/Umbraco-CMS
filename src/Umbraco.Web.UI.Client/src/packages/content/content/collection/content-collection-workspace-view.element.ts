@@ -1,4 +1,4 @@
-import type { UmbCollectionConfiguration } from '../../collection/types.js';
+import type { UmbCollectionConfiguration } from '../../../core/collection/types.js';
 import { UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT } from './content-collection-workspace.context-token.js';
 import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

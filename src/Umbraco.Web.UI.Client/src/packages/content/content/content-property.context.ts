@@ -1,4 +1,4 @@
-import type { UmbPropertyTypeModel } from '../content-type/types.js';
+import type { UmbPropertyTypeModel } from '../../core/content-type/types.js';
 import { UMB_CONTENT_PROPERTY_CONTEXT } from './content-property.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';

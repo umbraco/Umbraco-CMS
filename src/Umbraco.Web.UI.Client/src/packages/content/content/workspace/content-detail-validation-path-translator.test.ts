@@ -7,7 +7,7 @@ import {
 	UmbValidationPathTranslationController,
 } from '@umbraco-cms/backoffice/validation';
 import type { UmbDocumentDetailModel } from '@umbraco-cms/backoffice/document';
-import type { UmbValidationMessage } from '../../validation/context/validation-messages.manager';
+import type { UmbValidationMessage } from '../../../core/validation/context/validation-messages.manager.js';
 
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
