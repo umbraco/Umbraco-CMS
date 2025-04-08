@@ -4,6 +4,7 @@ import type {
 	DefaultReferenceResponseModel,
 	DocumentReferenceResponseModel,
 	MediaReferenceResponseModel,
+	MemberReferenceResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDataSourceResponse, UmbPagedModel, UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
@@ -13,7 +14,8 @@ export interface UmbReferenceItemModel extends UmbEntityModel {}
 export type UmbReferenceModel =
 	| DefaultReferenceResponseModel
 	| DocumentReferenceResponseModel
-	| MediaReferenceResponseModel;
+	| MediaReferenceResponseModel
+	| MemberReferenceResponseModel;
 
 export interface UmbEntityReferenceRepository extends UmbApi {
 	requestReferencedBy(

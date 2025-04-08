@@ -1,5 +1,5 @@
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbSliderPropertyEditorUiValue } from './types.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputSliderElement } from '@umbraco-cms/backoffice/components';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

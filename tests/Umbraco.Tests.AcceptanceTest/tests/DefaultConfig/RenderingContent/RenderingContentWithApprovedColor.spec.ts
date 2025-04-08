@@ -9,7 +9,7 @@ const colorValue = {label: "Test Label", value: "038c33"};
 let dataTypeId = null;
 
 test.beforeEach(async ({umbracoApi}) => {
-  dataTypeId = await umbracoApi.dataType.createApprovedColorDataTypeWithOneItem(customDataTypeName, colorValue.label, colorValue.value);
+  dataTypeId = await umbracoApi.dataType.createDefaultApprovedColorDataTypeWithOneItem(customDataTypeName, colorValue.label, colorValue.value);
 });
 
 test.afterEach(async ({umbracoApi}) => {

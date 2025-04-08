@@ -1,4 +1,5 @@
 import { css, customElement, html, ifDefined, property, repeat, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
 export type UmbCascadingMenuItem = {
@@ -12,7 +13,7 @@ export type UmbCascadingMenuItem = {
 };
 
 @customElement('umb-cascading-menu-popover')
-export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
+export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverContainerElement) {
 	@property({ type: Array })
 	items?: Array<UmbCascadingMenuItem>;
 
@@ -55,7 +56,7 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 			<uui-scroll-container>
 				${when(
 					this.items?.length,
-					() => html` ${repeat(this.items!, (item, index) => this.#renderItem(item, index))} ${super.render()} `,
+					() => html`${repeat(this.items!, (item, index) => this.#renderItem(item, index))} ${super.render()}`,
 					() => super.render(),
 				)}
 			</uui-scroll-container>
@@ -63,11 +64,15 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 	}
 
 	#renderItem(item: UmbCascadingMenuItem, index: number) {
-		const element = item.element;
 		const popoverId = `item-${index}`;
+
+		const element = item.element;
 		if (element) {
 			element.setAttribute('popovertarget', popoverId);
 		}
+
+		const label = this.localize.string(item.label);
+
 		return html`
 			<div
 				@mouseenter=${() => this.#onMouseEnter(item, popoverId)}
@@ -78,11 +83,12 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 					() => html`
 						<uui-menu-item
 							class=${item.separatorAfter ? 'separator' : ''}
+							label=${label}
 							popovertarget=${popoverId}
 							@click-label=${() => this.#onClick(item, popoverId)}>
 							${when(item.icon, (icon) => html`<uui-icon slot="icon" name=${icon}></uui-icon>`)}
 							<div slot="label" class="menu-item">
-								<span style=${ifDefined(item.style)}>${item.label}</span>
+								<span style=${ifDefined(item.style)}>${label}</span>
 								${when(item.items, () => html`<uui-symbol-expand></uui-symbol-expand>`)}
 							</div>
 						</uui-menu-item>
@@ -100,7 +106,7 @@ export class UmbCascadingMenuPopoverElement extends UUIPopoverContainerElement {
 			:host {
 				--uui-menu-item-flat-structure: 1;
 
-				background: var(--uui-color-surface);
+				background-color: var(--uui-color-surface);
 				border-radius: var(--uui-border-radius);
 				box-shadow: var(--uui-shadow-depth-3);
 				padding: var(--uui-size-space-1);
