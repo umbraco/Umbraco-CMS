@@ -112,7 +112,6 @@ export class UmbInstallerContext extends UmbContextBase<UmbInstallerContext, typ
 		}
 
 		// TODO: The post install will probably return a user in the future, so we have to set that context somewhere to let the client know that it is authenticated
-		console.warn('TODO: Set up real authentication');
 		history.replaceState(null, '', 'section/content');
 
 		return true;
