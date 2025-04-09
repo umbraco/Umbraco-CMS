@@ -438,12 +438,12 @@ stages:
               $status = ""
 
               while (($status -ne 'running') -and ($attempt -lt $maxAttempts)) {
-              # We use the docker inspect command to check the status of the container. If the container is not running, we wait 5 seconds and try again. And if reaches 12 attempts, we fail the build.
+                Start-Sleep -Seconds 5
+                # We use the docker inspect command to check the status of the container. If the container is not running, we wait 5 seconds and try again. And if reaches 12 attempts, we fail the build.
                 $status = docker inspect -f '{{.State.Status}}' mssql
 
                 if ($status -ne 'running') {
                   Write-Host "Waiting for SQL Server to be ready... Attempt $($attempt + 1)"
-                  Start-Sleep -Seconds 5
                   $attempt++
                 }
               }
