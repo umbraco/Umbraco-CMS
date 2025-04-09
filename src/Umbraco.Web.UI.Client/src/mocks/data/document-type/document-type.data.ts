@@ -82,7 +82,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		isFolder: false,
 		properties: [
 			{
-				id: '1',
+				id: '1_tipTap',
 				container: {
 					id: 'all-properties-group-key',
 				},
@@ -92,7 +92,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataType: {
 					id: 'dt-richTextEditorTiptap',
 				},
-				variesByCulture: false,
+				variesByCulture: true,
 				variesBySegment: false,
 				sortOrder: 0,
 				validation: {
