@@ -1,5 +1,5 @@
 import { GLOBAL_ROUTER_EVENTS_TARGET } from '../config.js';
-import type { EventListenerSubscription, GlobalRouterEvent, IRoute, IRoutingInfo } from '../model.js';
+import type { EventListenerSubscription, GlobalRouterEvent, IRoutingInfo } from '../model.js';
 
 /**
  * Dispatches a did change route event.

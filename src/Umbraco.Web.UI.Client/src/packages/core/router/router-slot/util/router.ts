@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import { CATCH_ALL_WILDCARD, DEFAULT_PATH_MATCH, PARAM_IDENTIFIER, TRAVERSE_FLAG } from '../config.js';
 import type {
 	IComponentRoute,
@@ -131,6 +132,7 @@ export async function resolvePageComponent(route: IComponentRoute, info: IRoutin
 	let cmp = route.component;
 	if (cmp instanceof Function) {
 		try {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 			cmp = (cmp as Function)();
 		} catch (err) {
 			// The invocation most likely failed because the function is a class.
@@ -188,7 +190,7 @@ export function isResolverRoute(route: IRoute): route is IResolverRoute {
  */
 export function traverseRouterTree(slot: IRouterSlot): { tree: RouterTree; depth: number } {
 	// Find the nodes from the route up to the root route
-	let routes: IRouterSlot[] = [slot];
+	const routes: IRouterSlot[] = [slot];
 	while (slot.parent != null) {
 		slot = slot.parent;
 		routes.push(slot);

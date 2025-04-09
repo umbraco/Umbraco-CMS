@@ -44,6 +44,7 @@ ensureAnchorHistory();
  * @slot - Default content.
  * @event changestate - Dispatched when the router slot state changes.
  */
+// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name, local-rules/umb-class-prefix
 export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouterSlot<D, P> {
 	/**
 	 * Method to cancel navigation if changed.
