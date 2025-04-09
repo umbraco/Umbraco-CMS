@@ -1,5 +1,8 @@
 import fs from 'fs';
 import path from 'path';
+import { createImportMap } from '../importmap/index.js';
+
+const modulePrefix = '@umbraco-cms/backoffice/';
 
 // Regex patterns to match import and require statements
 const importRegex = /import\s+(?:[^'"]+\s+from\s+)?['"]([^'"]+)['"]/g;
@@ -70,17 +73,37 @@ function getAllImportsFromFolder(startPath) {
 	return imports;
 }
 
-// Change the path below to the folder you want to scan
-if (!process.env.FOLDER) {
-	throw new Error('Please set the FOLDER environment variable to the folder you want to scan.');
+function getFolderPathFromModuleName(moduleName) {
+	const importMap = createImportMap({
+		rootDir: './src',
+	});
+	const importMapEntries = Object.entries(importMap.imports);
+	const importMapEntry = importMapEntries.find(([key]) => key === modulePrefix + moduleName);
+	if (!importMapEntry) {
+		throw new Error(`Module not found: ${moduleName}`);
+	}
+
+	// remove everything after the last /
+	const lastSlashIndex = importMapEntry[1].lastIndexOf('/');
+	const modulePath = importMapEntry[1].substring(0, lastSlashIndex);
+
+	return modulePath;
 }
 
+// Change the path below to the folder you want to scan
+if (!process.env.MODULE_NAME) {
+	throw new Error('Please set the MODULE_NAME environment variable to the alias you want to scan.');
+}
+
+const modulePath = getFolderPathFromModuleName(process.env.MODULE_NAME);
 const clientProjectRoot = path.resolve(import.meta.dirname, '../../');
-const targetFolder = path.resolve(clientProjectRoot, process.env.FOLDER);
+const targetFolder = path.resolve(clientProjectRoot, modulePath);
 const imports = getAllImportsFromFolder(targetFolder);
 const importValues = imports.map((imp) => imp.value);
 const uniqueImports = [...new Set(importValues)];
 const umbracoModuleImports = uniqueImports
-	.filter((imp) => imp.startsWith('@umbraco'))
+	.filter((imp) => imp.startsWith(modulePrefix))
 	.sort((a, b) => a.localeCompare(b));
+
+console.log(`\n\n📦 Imports found in ${modulePrefix + process.env.MODULE_NAME}:\n`);
 console.log(umbracoModuleImports);
