@@ -24,9 +24,9 @@ const madgeSetup = await madge(specificPaths, {
 	detectiveOptions: {
 		ts: {
 			skipTypeImports: true,
-			skipAsyncImports: true
-		}
-	}
+			skipAsyncImports: true,
+		},
+	},
 });
 
 console.log('-'.repeat(80));
@@ -52,13 +52,17 @@ if (circular.length) {
 	*/
 
 	// TODO: Remove this check and set an exit with argument 1 when we have fixed all circular dependencies.
-	// The current threshold for circular dependencies is set to 5. Adjust this number as needed.
-	const MAX_CIRCULAR_DEPENDENCIES = 5;
+	// The current threshold for circular dependencies is set to 3. Adjust this number as needed.
+	const MAX_CIRCULAR_DEPENDENCIES = 3;
 	if (circular.length > MAX_CIRCULAR_DEPENDENCIES) {
 		process.exit(1);
 	} else if (circular.length < MAX_CIRCULAR_DEPENDENCIES) {
-		console.error(`\nYou have fewer circular dependencies (${circular.length}) than anticipated (${MAX_CIRCULAR_DEPENDENCIES}). That is great!\n`);
-		console.error(`(Now please adjust the number in MAX_CIRCULAR_DEPENDENCIES to ${circular.length} in devops/circular/index.js).\n`);
+		console.error(
+			`\nYou have fewer circular dependencies (${circular.length}) than anticipated (${MAX_CIRCULAR_DEPENDENCIES}). That is great!\n`,
+		);
+		console.error(
+			`(Now please adjust the number in MAX_CIRCULAR_DEPENDENCIES to ${circular.length} in devops/circular/index.js).\n`,
+		);
 		process.exit(1);
 	} else {
 		process.exit(0);
@@ -74,16 +78,18 @@ process.exit(0);
  * @param {number} idx The index of the circular dependency.
  */
 function printCircularDependency(circular, idx) {
-	circular = circular.map(file => `${baseDir}/${file}`);
+	circular = circular.map((file) => `${baseDir}/${file}`);
 	const circularPath = circular.join(' -> ');
 
 	if (IS_GITHUB_ACTIONS) {
-		console.error(`::error file=${circular[0]},title=Circular dependency::Circular dependencies detected: ${circularPath}`);
-	}
-	else if (IS_AZURE_PIPELINES) {
-		console.error(`##vso[task.logissue type=error;sourcepath=${circular[0]};]Circular dependencies detected: ${circularPath}`);
+		console.error(
+			`::error file=${circular[0]},title=Circular dependency::Circular dependencies detected: ${circularPath}`,
+		);
+	} else if (IS_AZURE_PIPELINES) {
+		console.error(
+			`##vso[task.logissue type=error;sourcepath=${circular[0]};]Circular dependencies detected: ${circularPath}`,
+		);
 	} else {
 		console.error(idx, '=', circularPath, '\n');
 	}
-
 }
