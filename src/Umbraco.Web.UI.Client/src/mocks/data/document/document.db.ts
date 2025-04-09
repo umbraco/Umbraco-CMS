@@ -57,6 +57,7 @@ const treeItemMapper = (model: UmbMockDocumentModel): DocumentTreeItemResponseMo
 	if (!documentType) throw new Error(`Document type with id ${model.documentType.id} not found`);
 
 	return {
+		ancestors: model.ancestors,
 		documentType: {
 			icon: documentType.icon,
 			id: documentType.id,
@@ -79,6 +80,7 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 	const now = new Date().toString();
 
 	return {
+		ancestors: [],
 		documentType: {
 			id: documentType.id,
 			icon: documentType.icon,
@@ -138,6 +140,7 @@ const itemMapper = (model: UmbMockDocumentModel): DocumentItemResponseModel => {
 
 const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionResponseModel => {
 	return {
+		ancestors: model.ancestors,
 		creator: null,
 		documentType: {
 			id: model.documentType.id,

@@ -1,10 +1,10 @@
-import { UMB_APP_CONTEXT } from '../app/app.context.js';
 import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbDocumentPreviewRepository } from '@umbraco-cms/backoffice/document';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 const UMB_LOCALSTORAGE_SESSION_KEY = 'umb:previewSessions';
 
@@ -25,8 +25,8 @@ export class UmbPreviewContext extends UmbContextBase<UmbPreviewContext> {
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_PREVIEW_CONTEXT);
 
-		this.consumeContext(UMB_APP_CONTEXT, (appContext) => {
-			this.#serverUrl = appContext.getServerUrl();
+		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance.getServerUrl();
 
 			const params = new URLSearchParams(window.location.search);
 
