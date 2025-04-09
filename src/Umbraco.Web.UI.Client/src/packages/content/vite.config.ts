@@ -8,5 +8,13 @@ const dist = '../../../dist-cms/packages/content';
 rmSync(dist, { recursive: true, force: true });
 
 export default defineConfig({
-	...getDefaultConfig({ dist }),
+	...getDefaultConfig({
+		dist,
+		entry: {
+			'content-type/index': './content-type/index.ts',
+			'content/index': './content/index.ts',
+			'umbraco-package': 'umbraco-package.ts',
+			manifests: 'manifests.ts',
+		},
+	}),
 });
