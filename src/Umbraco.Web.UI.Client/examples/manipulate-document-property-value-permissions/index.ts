@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 1000,
 		api: () => import('./manipulate-property-write-permissions-action.js'),
 		meta: {
-			label: 'Toggle write richTextEditor',
+			label: 'Toggle write RTE',
 			look: 'primary',
 			color: 'danger',
 		},
@@ -28,7 +28,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 1000,
 		api: () => import('./manipulate-property-readonly-permissions-action.js'),
 		meta: {
-			label: 'Toggle readonly richTextEditor',
+			label: 'Toggle readonly RTE',
 			look: 'primary',
 			color: 'danger',
 		},
@@ -47,7 +47,26 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 1000,
 		api: () => import('./manipulate-property-view-permissions-action.js'),
 		meta: {
-			label: 'Toggle view richTextEditor',
+			label: 'Toggle view RTE',
+			look: 'primary',
+			color: 'danger',
+		},
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: 'Umb.Workspace.Document',
+			},
+		],
+	},
+	{
+		type: 'workspaceAction',
+		kind: 'default',
+		name: 'Example Manipulate Document Property Value Write Complex Permissions Workspace Action',
+		alias: 'example.workspaceAction.manipulate.writeComplex',
+		weight: 1000,
+		api: () => import('./manipulate-property-write-complex-permissions-action.js'),
+		meta: {
+			label: 'Toggle composed write RTE',
 			look: 'primary',
 			color: 'danger',
 		},

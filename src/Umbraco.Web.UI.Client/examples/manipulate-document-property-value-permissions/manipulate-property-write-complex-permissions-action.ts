@@ -3,7 +3,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbWorkspaceActionBase, type UmbWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 // The Example Incrementor Workspace Action Controller:
-export class ExampleWorkspaceActionManipulateWritePermission
+export class ExampleWorkspaceActionManipulateWriteComplexPermission
 	extends UmbWorkspaceActionBase
 	implements UmbWorkspaceAction
 {
@@ -14,6 +14,7 @@ export class ExampleWorkspaceActionManipulateWritePermission
 		const context = await this.getContext(UMB_CONTENT_WORKSPACE_CONTEXT);
 		if (this.#isOn) {
 			context.propertyWriteGuard.removeRule('exampleRule');
+			context.propertyWriteGuard.removeRule('exampleRule2');
 		} else {
 			context.propertyWriteGuard.addRule({
 				unique: 'exampleRule',
@@ -34,4 +35,4 @@ export class ExampleWorkspaceActionManipulateWritePermission
 }
 
 // Declare a api export, so Extension Registry can initialize this class:
-export const api = ExampleWorkspaceActionManipulateWritePermission;
+export const api = ExampleWorkspaceActionManipulateWriteComplexPermission;
