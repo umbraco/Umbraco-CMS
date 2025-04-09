@@ -240,7 +240,6 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	 * const defaultOpenApi = authContext.getOpenApiConfiguration();
 	 * client.setConfig({
 	 *   base: defaultOpenApi.base,
-	 *   credentials: defaultOpenApi.credentials,
 	 *   auth: defaultOpenApi.token,
 	 * });
 	 * ```
