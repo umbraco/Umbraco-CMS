@@ -1,15 +1,11 @@
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const elementName = 'umb-entity-actions-table-column-view';
-@customElement(elementName)
+@customElement('umb-entity-actions-table-column-view')
 export class UmbEntityActionsTableColumnViewElement extends UmbLitElement {
 	@property({ attribute: false })
 	value?: UmbEntityModel;
-
-	@state()
-	_isOpen = false;
 
 	override render() {
 		if (!this.value) return nothing;
@@ -23,6 +19,6 @@ export class UmbEntityActionsTableColumnViewElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbEntityActionsTableColumnViewElement;
+		'umb-entity-actions-table-column-view': UmbEntityActionsTableColumnViewElement;
 	}
 }

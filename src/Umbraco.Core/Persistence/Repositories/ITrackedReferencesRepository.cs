@@ -41,11 +41,8 @@ public interface ITrackedReferencesRepository
         long skip,
         long take,
         bool filterMustBeIsDependency,
-        out long totalRecords)
-    {
-        totalRecords = 0;
-        return [];
-    }
+        out long totalRecords);
+
 
     /// <summary>
     ///     Gets a page of items used in any kind of relation from selected integer ids.
