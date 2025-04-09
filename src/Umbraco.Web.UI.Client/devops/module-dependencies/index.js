@@ -76,5 +76,7 @@ const targetFolder = path.resolve(import.meta.dirname, '../../src/packages/ufm')
 const imports = getAllImportsFromFolder(targetFolder);
 const importValues = imports.map((imp) => imp.value);
 const uniqueImports = [...new Set(importValues)];
-const umbracoModuleImports = uniqueImports.filter((imp) => imp.startsWith('@umbraco'));
+const umbracoModuleImports = uniqueImports
+	.filter((imp) => imp.startsWith('@umbraco'))
+	.sort((a, b) => a.localeCompare(b));
 console.log(umbracoModuleImports);
