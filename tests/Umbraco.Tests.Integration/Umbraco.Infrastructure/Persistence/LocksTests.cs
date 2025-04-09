@@ -527,7 +527,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
         }
     }
 
-    [Retry(3)] // TODO make this test non-flaky.
+    [NUnit.Framework.Ignore("This test is very flaky, and is stopping our nightlys")]
     [Test]
     public void Read_Lock_Waits_For_Write_Lock()
     {

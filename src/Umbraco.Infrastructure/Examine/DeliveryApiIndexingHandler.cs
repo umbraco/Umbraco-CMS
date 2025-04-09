@@ -4,11 +4,11 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.Examine.Deferred;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Search;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
@@ -30,7 +30,7 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
     private readonly IDeliveryApiContentIndexHelper _deliveryApiContentIndexHelper;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
     private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
-    
+
 
     public DeliveryApiIndexingHandler(
         ExamineIndexingMainDomHandler mainDomHandler,

@@ -2,10 +2,10 @@ using System.Globalization;
 using Examine;
 using Examine.Search;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Extensions;
 
