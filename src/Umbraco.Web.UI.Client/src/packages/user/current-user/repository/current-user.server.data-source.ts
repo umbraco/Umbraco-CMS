@@ -93,7 +93,7 @@ export class UmbCurrentUserServerDataSource {
 	async enableMfaProvider(providerName: string, code: string, secret: string) {
 		const { error } = await tryExecute(
 			this.#host,
-			UserService.postUserCurrent2FaByProviderName({ providerName, requestBody: { code, secret } }),
+			UserService.postUserCurrent2FaByProviderName({ path: { providerName }, body: { code, secret } }),
 		);
 
 		if (error) {
@@ -111,7 +111,7 @@ export class UmbCurrentUserServerDataSource {
 	async disableMfaProvider(providerName: string, code: string) {
 		const { error } = await tryExecute(
 			this.#host,
-			UserService.deleteUserCurrent2FaByProviderName({ providerName, code }),
+			UserService.deleteUserCurrent2FaByProviderName({ path: { providerName }, query: { code } }),
 		);
 
 		if (error) {
@@ -133,7 +133,7 @@ export class UmbCurrentUserServerDataSource {
 		return tryExecute(
 			this.#host,
 			UserService.postUserCurrentChangePassword({
-				requestBody: {
+				body: {
 					newPassword,
 					oldPassword,
 				},

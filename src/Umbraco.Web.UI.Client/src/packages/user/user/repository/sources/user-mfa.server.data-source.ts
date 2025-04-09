@@ -29,7 +29,7 @@ export class UmbUserMfaServerDataSource {
 		return tryExecute(
 			this.#host,
 			UserService.getUserById2Fa({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}
@@ -47,8 +47,7 @@ export class UmbUserMfaServerDataSource {
 		return tryExecute(
 			this.#host,
 			UserService.deleteUserById2FaByProviderName({
-				id: unique,
-				providerName,
+				path: { id: unique, providerName },
 			}),
 		);
 	}

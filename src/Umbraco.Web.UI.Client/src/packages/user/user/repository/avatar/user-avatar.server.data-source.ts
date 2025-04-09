@@ -19,13 +19,13 @@ export class UmbUserAvatarServerDataSource {
 	 * @memberof UmbUserServerDataSource
 	 */
 	createAvatar(unique: string, fileUnique: string): Promise<UmbDataSourceErrorResponse> {
-		const requestBody: SetAvatarRequestModel = {
+		const body: SetAvatarRequestModel = {
 			file: {
 				id: fileUnique,
 			},
 		};
 
-		return tryExecute(this.#host, UserService.postUserAvatarById({ id: unique, requestBody }));
+		return tryExecute(this.#host, UserService.postUserAvatarById({ path: { id: unique }, body }));
 	}
 
 	/**
@@ -35,6 +35,6 @@ export class UmbUserAvatarServerDataSource {
 	 * @memberof UmbUserServerDataSource
 	 */
 	deleteAvatar(unique: string): Promise<UmbDataSourceErrorResponse> {
-		return tryExecute(this.#host, UserService.deleteUserAvatarById({ id: unique }));
+		return tryExecute(this.#host, UserService.deleteUserAvatarById({ path: { id: unique } }));
 	}
 }

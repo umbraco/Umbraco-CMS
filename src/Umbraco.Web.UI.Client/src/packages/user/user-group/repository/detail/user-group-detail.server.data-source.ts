@@ -65,7 +65,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, UserGroupService.getUserGroupById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, UserGroupService.getUserGroupById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -104,7 +104,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 		if (!model) throw new Error('User Group is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateUserGroupRequestModel = {
+		const body: CreateUserGroupRequestModel = {
 			alias: model.alias,
 			documentRootAccess: model.documentRootAccess,
 			documentStartNode: model.documentStartNode ? { id: model.documentStartNode.unique } : null,
@@ -122,12 +122,12 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 		const { data, error } = await tryExecute(
 			this.#host,
 			UserGroupService.postUserGroup({
-				requestBody,
+				body,
 			}),
 		);
 
 		if (data) {
-			return this.read(data);
+			return this.read(data as never);
 		}
 
 		return { error };
@@ -144,7 +144,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateUserGroupRequestModel = {
+		const body: UpdateUserGroupRequestModel = {
 			alias: model.alias,
 			documentRootAccess: model.documentRootAccess,
 			documentStartNode: model.documentStartNode ? { id: model.documentStartNode.unique } : null,
@@ -162,8 +162,8 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 		const { error } = await tryExecute(
 			this.#host,
 			UserGroupService.putUserGroupById({
-				id: model.unique,
-				requestBody,
+				path: { id: model.unique },
+				body,
 			}),
 		);
 
@@ -186,7 +186,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 		return tryExecute(
 			this.#host,
 			UserGroupService.deleteUserGroupById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}
