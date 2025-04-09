@@ -36984,7 +36984,6 @@
             "type": "string"
           },
           "translation": {
-            "minLength": 1,
             "type": "string"
           }
         },
