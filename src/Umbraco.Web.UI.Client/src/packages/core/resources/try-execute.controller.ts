@@ -12,15 +12,7 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 				this.#abortSignal.addEventListener('abort', () => this.cancel(), { once: true });
 			}
 
-			const response = await this._promise;
-
-			if (response && typeof response === 'object' && 'data' in response) {
-				return { ...response } as UmbApiResponse<T>;
-			}
-
-			return {
-				data: response,
-			} as UmbApiResponse<T>;
+			return (await this._promise) as UmbApiResponse<T>;
 		} catch (error) {
 			// Error might be a legacy error, so we need to check if it is an UmbError
 			const umbError = this.mapToUmbError(error);

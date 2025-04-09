@@ -36,12 +36,8 @@ export interface UmbTryExecuteOptions {
 	abortSignal?: AbortSignal;
 }
 
-export type UmbApiWithDataResponse<T = unknown> = {
-	data?: T;
-};
-
 export type UmbApiWithErrorResponse = {
-	error: UmbError | UmbApiError | UmbCancelError | Error;
+	error?: UmbError | UmbApiError | UmbCancelError | Error;
 };
 
 /**
@@ -51,4 +47,4 @@ export type UmbApiWithErrorResponse = {
  * @property {T} data The data returned from the API.
  * @property {UmbError | UmbApiError | UmbCancelError | Error} error The error returned from the API.
  */
-export type UmbApiResponse<T = unknown> = T & UmbApiWithDataResponse<T> & UmbApiWithErrorResponse;
+export type UmbApiResponse<T = unknown> = T & UmbApiWithErrorResponse;
