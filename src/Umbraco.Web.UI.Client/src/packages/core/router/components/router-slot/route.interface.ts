@@ -1,1 +1,1 @@
-export type { IRoute as UmbRoute } from '@umbraco-cms/backoffice/external/router-slot';
+export type { IRoute as UmbRoute } from '../../router-slot/index.js';

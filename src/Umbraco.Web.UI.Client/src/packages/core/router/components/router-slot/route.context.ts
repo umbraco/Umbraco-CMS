@@ -1,12 +1,12 @@
 import { umbGenerateRoutePathBuilder } from '../../generate-route-path-builder.function.js';
 import type { UmbModalRouteRegistration } from '../../modal-registration/modal-route-registration.interface.js';
 import type { UmbRoute } from './route.interface.js';
-import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbStringState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import type { IRouterSlot } from '../../router-slot/index.js';
 
 const EmptyDiv = document.createElement('div');
 
