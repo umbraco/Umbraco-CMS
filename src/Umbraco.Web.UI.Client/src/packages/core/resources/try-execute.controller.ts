@@ -1,12 +1,11 @@
 import { UmbResourceController } from './resource.controller.js';
-import type { UmbTryExecuteOptions } from './types.js';
+import type { UmbApiResponse, UmbTryExecuteOptions } from './types.js';
 import { UmbApiError, UmbCancelError } from './umb-error.js';
-import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 	#abortSignal?: AbortSignal;
 
-	async tryExecute(opts?: UmbTryExecuteOptions): Promise<UmbDataSourceResponse<T>> {
+	async tryExecute(opts?: UmbTryExecuteOptions): Promise<UmbApiResponse<T>> {
 		try {
 			if (opts?.abortSignal) {
 				this.#abortSignal = opts.abortSignal;
@@ -16,12 +15,12 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 			const response = await this._promise;
 
 			if (response && typeof response === 'object' && 'data' in response) {
-				return { ...response } as UmbDataSourceResponse<T>;
+				return { ...response } as UmbApiResponse<T>;
 			}
 
 			return {
 				data: response,
-			} as UmbDataSourceResponse<T>;
+			} as UmbApiResponse<T>;
 		} catch (error) {
 			// Error might be a legacy error, so we need to check if it is an UmbError
 			const umbError = this.mapToUmbError(error);
@@ -32,7 +31,7 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 
 			return {
 				error: umbError,
-			} as UmbDataSourceResponse<T>;
+			} as UmbApiResponse<T>;
 		}
 	}
 

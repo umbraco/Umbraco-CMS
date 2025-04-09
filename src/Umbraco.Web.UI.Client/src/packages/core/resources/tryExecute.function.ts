@@ -1,6 +1,5 @@
 import { UmbTryExecuteController } from './try-execute.controller.js';
-import type { UmbTryExecuteOptions } from './types.js';
-import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbApiResponse, UmbTryExecuteOptions } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -8,7 +7,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @param {UmbControllerHost} host The host to use for the request and where notifications will be shown.
  * @param {Promise<T>} promise The promise to execute.
  * @param {UmbTryExecuteOptions} opts Options for the request.
- * @returns {Promise<UmbDataSourceResponse<T>>} A promise that resolves with the response data or rejects with an error.
+ * @returns {Promise<UmbApiResponse<T>>} A promise that resolves with the response data or rejects with an error.
  * @template T The type of the response data.
  * @example
  * const { data, error } = await tryExecute(this, myPromise, {
@@ -23,7 +22,7 @@ export async function tryExecute<T>(
 	host: UmbControllerHost,
 	promise: Promise<T>,
 	opts?: UmbTryExecuteOptions,
-): Promise<UmbDataSourceResponse<T>> {
+): Promise<UmbApiResponse<T>> {
 	const controller = new UmbTryExecuteController(host, promise);
 	const response = await controller.tryExecute(opts);
 	controller.destroy();

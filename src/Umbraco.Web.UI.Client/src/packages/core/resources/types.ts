@@ -1,3 +1,5 @@
+import type { UmbApiError, UmbCancelError, UmbError } from './umb-error.js';
+
 export interface XhrRequestOptions extends UmbTryExecuteOptions {
 	baseUrl?: string;
 	method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
@@ -33,3 +35,13 @@ export interface UmbTryExecuteOptions {
 	 */
 	abortSignal?: AbortSignal;
 }
+
+export type UmbApiWithDataResponse<T = unknown> = {
+	data?: T;
+};
+
+export type UmbApiWithErrorResponse = {
+	error: UmbError | UmbApiError | UmbCancelError | Error;
+};
+
+export type UmbApiResponse<T = unknown> = T & UmbApiWithDataResponse & UmbApiWithErrorResponse;
