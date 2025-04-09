@@ -81,7 +81,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, DocumentService.getDocumentById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, DocumentService.getDocumentById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -155,12 +155,12 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentService.postDocument({
-				requestBody,
+				body: requestBody,
 			}),
 		);
 
 		if (data) {
-			return this.read(data);
+			return this.read(data as any);
 		}
 
 		return { error };
@@ -185,8 +185,8 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		const { error } = await tryExecute(
 			this.#host,
 			DocumentService.putDocumentById({
-				id: model.unique,
-				requestBody,
+				path: { id: model.unique },
+				body: requestBody,
 			}),
 		);
 
@@ -205,6 +205,6 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecute(this.#host, DocumentService.deleteDocumentById({ id: unique }));
+		return tryExecute(this.#host, DocumentService.deleteDocumentById({ path: { id: unique } }));
 	}
 }

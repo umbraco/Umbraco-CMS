@@ -54,7 +54,7 @@ export class UmbDocumentPublishingServerDataSource {
 			publishSchedules,
 		};
 
-		return tryExecute(this.#host, DocumentService.putDocumentByIdPublish({ id: unique, requestBody }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdPublish({ path: { id: unique }, body: requestBody }));
 	}
 
 	/**
@@ -77,14 +77,20 @@ export class UmbDocumentPublishingServerDataSource {
 				cultures: null,
 			};
 
-			return tryExecute(this.#host, DocumentService.putDocumentByIdUnpublish({ id: unique, requestBody }));
+			return tryExecute(
+				this.#host,
+				DocumentService.putDocumentByIdUnpublish({ path: { id: unique }, body: requestBody }),
+			);
 		}
 
 		const requestBody: UnpublishDocumentRequestModel = {
 			cultures: variantIds.map((variant) => variant.toCultureString()),
 		};
 
-		return tryExecute(this.#host, DocumentService.putDocumentByIdUnpublish({ id: unique, requestBody }));
+		return tryExecute(
+			this.#host,
+			DocumentService.putDocumentByIdUnpublish({ path: { id: unique }, body: requestBody }),
+		);
 	}
 
 	/**
@@ -109,7 +115,7 @@ export class UmbDocumentPublishingServerDataSource {
 		// Initiate the publish descendants task and get back a task Id.
 		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentService.putDocumentByIdPublishWithDescendants({ id: unique, requestBody }),
+			DocumentService.putDocumentByIdPublishWithDescendants({ path: { id: unique }, body: requestBody }),
 		);
 
 		if (error || !data) {
@@ -125,7 +131,8 @@ export class UmbDocumentPublishingServerDataSource {
 			isFirstPoll = false;
 			const { data, error } = await tryExecute(
 				this.#host,
-				DocumentService.getDocumentByIdPublishWithDescendantsResultByTaskId({ id: unique, taskId }));
+				DocumentService.getDocumentByIdPublishWithDescendantsResultByTaskId({ path: { id: unique, taskId } }),
+			);
 			if (error || !data) {
 				return { error };
 			}
@@ -133,7 +140,6 @@ export class UmbDocumentPublishingServerDataSource {
 			if (data.isComplete) {
 				return { error: null };
 			}
-
 		}
 	}
 
@@ -148,7 +154,7 @@ export class UmbDocumentPublishingServerDataSource {
 
 		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentService.getDocumentByIdPublished({ id: unique }),
+			DocumentService.getDocumentByIdPublished({ path: { id: unique } }),
 		);
 
 		if (error || !data) {
