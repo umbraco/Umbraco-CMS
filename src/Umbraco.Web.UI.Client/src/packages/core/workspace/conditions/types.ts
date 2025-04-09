@@ -1,8 +1,4 @@
-import type {
-	UMB_WORKSPACE_CONDITION_ALIAS,
-	UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
-	UMB_WORKSPACE_HAS_COLLECTION_CONDITION_ALIAS,
-} from './const.js';
+import type { UMB_WORKSPACE_CONDITION_ALIAS, UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS } from './const.js';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 
 export interface WorkspaceAliasConditionConfig extends UmbConditionConfigBase<typeof UMB_WORKSPACE_CONDITION_ALIAS> {
@@ -53,14 +49,6 @@ export type UmbWorkspaceEntityTypeConditionConfig = UmbConditionConfigBase<'Umb.
  */
 export type WorkspaceEntityTypeConditionConfig = UmbWorkspaceEntityTypeConditionConfig;
 
-export type UmbWorkspaceHasCollectionConditionConfig = UmbConditionConfigBase<
-	typeof UMB_WORKSPACE_HAS_COLLECTION_CONDITION_ALIAS
->;
-/**
- * @deprecated Use `UmbWorkspaceHasCollectionConditionConfig` instead. This will be removed in Umbraco 17.
- */
-export type WorkspaceHasCollectionConditionConfig = UmbWorkspaceHasCollectionConditionConfig;
-
 export interface UmbWorkspaceEntityIsNewConditionConfig
 	extends UmbConditionConfigBase<typeof UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS> {
 	match: boolean;
@@ -78,6 +66,5 @@ declare global {
 		umbWorkspaceContentTypeAlias: UmbWorkspaceContentTypeAliasConditionConfig;
 		umbWorkspaceEntityIsNewConditionConfig: UmbWorkspaceEntityIsNewConditionConfig;
 		umbWorkspaceEntityType: UmbWorkspaceEntityTypeConditionConfig;
-		umbWorkspaceHasCollection: UmbWorkspaceHasCollectionConditionConfig;
 	}
 }

@@ -1,6 +1,7 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as workspaceHasContentCollectionManifests } from './workspace-has-content-collection/manifests.js';
 
-export const manifests: Array<UmbExtensionManifestKind> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'kind',
 		alias: 'Umb.Kind.WorkspaceView.Content.Collection',
@@ -18,4 +19,5 @@ export const manifests: Array<UmbExtensionManifestKind> = [
 			},
 		},
 	},
+	...workspaceHasContentCollectionManifests,
 ];
