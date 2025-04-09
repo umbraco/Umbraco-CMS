@@ -35,9 +35,7 @@ public static partial class UmbracoBuilderExtensions
         .AddRecurringBackgroundJobs()
         .AddUmbracoHybridCache()
         .AddDistributedCache()
-        .AddCoreNotifications()
-        .AddExamine()
-        .AddExamineIndexes();
+        .AddCoreNotifications();
 
     public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
     {
