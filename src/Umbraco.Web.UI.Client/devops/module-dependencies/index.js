@@ -2,10 +2,24 @@ import fs from 'fs';
 import path from 'path';
 import { createImportMap } from '../importmap/index.js';
 
+const clientProjectRoot = path.resolve(import.meta.dirname, '../../');
 const modulePrefix = '@umbraco-cms/backoffice/';
 
 // Regex patterns to match import and require statements
 const importRegex = /import\s+(?:[^'"]+\s+from\s+)?['"]([^'"]+)['"]/g;
+
+const importMap = createImportMap({
+	rootDir: './src',
+});
+
+const importMapEntries = Object.entries(importMap.imports);
+const coreModules = importMapEntries.filter(([key, value]) => value.includes('/packages/core/'));
+const coreModuleAliases = coreModules.map(([key]) => key);
+
+const packageModules = importMapEntries.filter(
+	([key, value]) => value.includes('/packages/') && !value.includes('/packages/core/'),
+);
+const packageModuleAliases = packageModules.map(([key]) => key);
 
 /**
  * Recursively walk through a directory and return all file paths
@@ -42,15 +56,6 @@ function getImportsInFile(filePath) {
 		imports.push({ type: 'import', value: match[1] });
 	}
 
-	/*
-	if (imports.length > 0) {
-		console.log(`\n📁 File: ${filePath}`);
-		imports.forEach((imp) => {
-			console.log(`  → ${imp.type.toUpperCase()}: ${imp.value}`);
-		});
-	}
-	*/
-
 	return imports;
 }
 
@@ -73,14 +78,10 @@ function getAllImportsFromFolder(startPath) {
 	return imports;
 }
 
-function getFolderPathFromModuleName(moduleName) {
-	const importMap = createImportMap({
-		rootDir: './src',
-	});
-	const importMapEntries = Object.entries(importMap.imports);
-	const importMapEntry = importMapEntries.find(([key]) => key === modulePrefix + moduleName);
+function getFolderPathFromModuleAlias(moduleAlias) {
+	const importMapEntry = importMapEntries.find(([key]) => key === moduleAlias);
 	if (!importMapEntry) {
-		throw new Error(`Module not found: ${moduleName}`);
+		throw new Error(`Module not found: ${moduleAlias}`);
 	}
 
 	// remove everything after the last /
@@ -90,20 +91,44 @@ function getFolderPathFromModuleName(moduleName) {
 	return modulePath;
 }
 
+function getUmbracoModuleImportsInModule(moduleAlias) {
+	const modulePath = getFolderPathFromModuleAlias(moduleAlias);
+	const targetFolder = path.resolve(clientProjectRoot, modulePath);
+	const imports = getAllImportsFromFolder(targetFolder);
+	const importValues = imports.map((imp) => imp.value);
+	const uniqueImports = [...new Set(importValues)];
+	const umbracoModuleImports = uniqueImports
+		.filter((imp) => imp.startsWith(modulePrefix))
+		.sort((a, b) => a.localeCompare(b));
+	return umbracoModuleImports;
+}
+
+function reportIllegalImportsFromCore() {
+	let numberOfModulesWithIllegalImports = 0;
+	// Check if any of the core modules import one of the package modules
+	// Run through all core modules and find the imports
+	coreModules.forEach(([alias, path]) => {
+		const modules = getUmbracoModuleImportsInModule(alias);
+		const illegalImports = modules.filter((imp) => packageModuleAliases.includes(imp));
+		if (illegalImports.length === 0) return;
+		console.error(`🚨 ${alias}: Illegal imports found:`);
+		illegalImports.forEach((imp) => {
+			console.error(`  → ${imp}`);
+		});
+		console.log(`\n`);
+		numberOfModulesWithIllegalImports++;
+	});
+
+	if (numberOfModulesWithIllegalImports === 0) {
+		console.log(`✅ No illegal imports found in core modules.`);
+	} else {
+		throw new Error(`Illegal imports found in ${numberOfModulesWithIllegalImports} core modules.`);
+	}
+}
+
 // Change the path below to the folder you want to scan
 if (!process.env.MODULE_NAME) {
 	throw new Error('Please set the MODULE_NAME environment variable to the alias you want to scan.');
 }
 
-const modulePath = getFolderPathFromModuleName(process.env.MODULE_NAME);
-const clientProjectRoot = path.resolve(import.meta.dirname, '../../');
-const targetFolder = path.resolve(clientProjectRoot, modulePath);
-const imports = getAllImportsFromFolder(targetFolder);
-const importValues = imports.map((imp) => imp.value);
-const uniqueImports = [...new Set(importValues)];
-const umbracoModuleImports = uniqueImports
-	.filter((imp) => imp.startsWith(modulePrefix))
-	.sort((a, b) => a.localeCompare(b));
-
-console.log(`\n\n📦 Imports found in ${modulePrefix + process.env.MODULE_NAME}:\n`);
-console.log(umbracoModuleImports);
+reportIllegalImportsFromCore();
