@@ -3,12 +3,12 @@ import { UMB_AUTH_CONTEXT } from './auth.context.token.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import type { ManifestAuthProvider } from './auth-provider.extension.js';
 import { UMB_STORAGE_TOKEN_RESPONSE_NAME } from './constants.js';
-import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { ReplaySubject, Subject, firstValueFrom, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 
 export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
@@ -247,13 +247,10 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	 * @returns {UmbOpenApiConfiguration} The default OpenAPI configuration
 	 */
 	getOpenApiConfiguration(): UmbOpenApiConfiguration {
+		const config = umbHttpClient.getConfig();
 		return {
-			base: OpenAPI.BASE,
-			version: OpenAPI.VERSION,
-			withCredentials: OpenAPI.WITH_CREDENTIALS,
-			credentials: OpenAPI.CREDENTIALS,
-			token: () => this.getLatestToken(),
-			encodePath: OpenAPI.ENCODE_PATH,
+			base: config.baseUrl,
+			token: this.getLatestToken,
 		};
 	}
 

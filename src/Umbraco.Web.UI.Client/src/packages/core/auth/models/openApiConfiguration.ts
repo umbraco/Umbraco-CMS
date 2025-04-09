@@ -7,32 +7,11 @@ export interface UmbOpenApiConfiguration {
 	/**
 	 * The base URL of the OpenAPI (Umbraco) server.
 	 */
-	readonly base: string;
-
-	/**
-	 * The configured version of the Management API to use.
-	 */
-	readonly version: string;
-
-	/**
-	 * The `withCredentials` option for the Fetch API.
-	 */
-	readonly withCredentials: boolean;
-
-	/**
-	 * The `credentials` option for the Fetch API.
-	 */
-	readonly credentials: 'include' | 'omit' | 'same-origin';
+	readonly base?: string;
 
 	/**
 	 * The token to use for the Authorization header.
 	 * @returns A resolver for the token to use for the Authorization header.
 	 */
-	readonly token: () => Promise<string>;
-
-	/**
-	 * The encoder to use for the request URLs.
-	 * @returns A resolver for the encoder to use for the request URLs.
-	 */
-	readonly encodePath?: (value: string) => string;
+	readonly token: () => Promise<string | undefined>;
 }
