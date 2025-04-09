@@ -3,7 +3,7 @@ export interface XhrRequestOptions extends UmbTryExecuteOptions {
 	method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
 	url: string;
 	body?: unknown;
-	token?: string | (() => string | Promise<string>);
+	token?: string | (() => undefined | string | Promise<string | undefined>);
 	headers?: Record<string, string>;
 	responseHeader?: string;
 	onProgress?: (event: ProgressEvent) => void;
