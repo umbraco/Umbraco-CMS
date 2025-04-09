@@ -4,7 +4,7 @@ export default defineConfig({
 	debug: true,
 	input: '../../../../Umbraco.Cms.Api.Management/OpenApi.json',
 	output: {
-		path: 'backend-api',
+		path: './backend-api',
 	},
 	plugins: [
 		{
