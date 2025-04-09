@@ -1,8 +1,8 @@
 name: $(TeamProject)_$(Build.DefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 
 parameters:
-  - name: sqlServerIntegrationTests
-    displayName: Run SQL Server Integration Tests
+  - name: sqlServerLinuxIntegrationTests
+    displayName: Run SQL Server Linux Integration Tests
     type: boolean
     default: false
   - name: sqlServerLinuxAcceptanceTests
@@ -367,8 +367,8 @@ stages:
       # Integration Tests (SQL Server)
       - job:
         timeoutInMinutes: 180
-        # condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerIntegrationTests}}) # Outcommented due to timeouts
-        condition: eq(${{parameters.sqlServerIntegrationTests}}, True)
+        # condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerLinuxIntegrationTests}}) # Outcommented due to timeouts
+        # condition: eq(${{parameters.sqlServerLinuxIntegrationTests}}, True)
         displayName: Integration Tests (SQL Server)
         strategy:
           matrix:
@@ -393,6 +393,7 @@ stages:
               testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
+              condition: eq(${{parameters.sqlServerLinuxIntegrationTests}}, True)
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
@@ -400,6 +401,7 @@ stages:
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
             LinuxPart2Of3:
               vmImage: "ubuntu-latest"
+              condition: eq(${{parameters.sqlServerLinuxIntegrationTests}}, True)
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
@@ -407,6 +409,7 @@ stages:
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
             LinuxPart3Of3:
               vmImage: "ubuntu-latest"
+              condition: eq(${{parameters.sqlServerLinuxIntegrationTests}}, True)
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
