@@ -72,6 +72,11 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	 * @memberof UmbDocumentPublishingWorkspaceContext
 	 */
 	public async saveAndPublish(): Promise<void> {
+		const elementStyle = (this.getHostElement() as HTMLElement).style;
+		elementStyle.removeProperty('--uui-color-invalid');
+		elementStyle.removeProperty('--uui-color-invalid-emphasis');
+		elementStyle.removeProperty('--uui-color-invalid-standalone');
+		elementStyle.removeProperty('--uui-color-invalid-contrast');
 		return this.#handleSaveAndPublish();
 	}
 

@@ -82,7 +82,8 @@ export class UmbDocumentWorkspaceContext
 			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
 			contentValidationRepository: UmbDocumentValidationRepository,
-			skipValidationOnSubmit: true,
+			skipValidationOnSubmit: false,
+			ignoreValidationResultOnSubmit: true,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			contentTypePropertyName: 'documentType',
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
@@ -337,11 +338,11 @@ export class UmbDocumentWorkspaceContext
 	 * @returns {Promise<void>} a promise which resolves once it has been completed.
 	 */
 	public override requestSubmit() {
-		return this._handleSubmit();
-	}
-
-	// Because we do not make validation prevent submission this also submits the workspace. [NL]
-	public override invalidSubmit() {
+		const elementStyle = (this.getHostElement() as HTMLElement).style;
+		elementStyle.setProperty('--uui-color-invalid', 'var(--uui-color-warning)');
+		elementStyle.setProperty('--uui-color-invalid-emphasis', 'var(--uui-color-warning-emphasis)');
+		elementStyle.setProperty('--uui-color-invalid-standalone', 'var(--uui-color-warning-standalone)');
+		elementStyle.setProperty('--uui-color-invalid-contrast', 'var(--uui-color-warning-contrast)');
 		return this._handleSubmit();
 	}
 

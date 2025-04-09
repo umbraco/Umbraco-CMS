@@ -180,7 +180,7 @@ export class UmbPropertyEditorUIDropdownElement
 			}
 
 			.error {
-				color: var(--uui-color-danger);
+				color: var(--uui-color-invalid);
 				font-size: var(--uui-font-size-small);
 			}
 		`,
