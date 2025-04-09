@@ -46,18 +46,18 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Map_Create_Model_And_Create()
     {
-        var updateModel = new CreateUserGroupRequestModel()
+        var createModel = new CreateUserGroupRequestModel()
         {
             Alias = "testAlias",
             FallbackPermissions = new HashSet<string>(),
             HasAccessToAllLanguages = true,
             Languages = new List<string>(),
             Name = "Test Name",
-            Sections = new [] {"Umb.Section.Content"},
+            Sections = new[] { "Umb.Section.Content" },
             Permissions = new HashSet<IPermissionPresentationModel>()
         };
 
-        var attempt = await UserGroupPresentationFactory.CreateAsync(updateModel);
+        var attempt = await UserGroupPresentationFactory.CreateAsync(createModel);
         Assert.IsTrue(attempt.Success);
 
         var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
@@ -75,14 +75,14 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     [Test]
     public async Task Cannot_Create_UserGroup_With_Unexisting_Document_Reference()
     {
-        var updateModel = new CreateUserGroupRequestModel()
+        var createModel = new CreateUserGroupRequestModel()
         {
             Alias = "testAlias",
             FallbackPermissions = new HashSet<string>(),
             HasAccessToAllLanguages = true,
             Languages = new List<string>(),
             Name = "Test Name",
-            Sections = new [] {"Umb.Section.Content"},
+            Sections = new[] { "Umb.Section.Content" },
             Permissions = new HashSet<IPermissionPresentationModel>()
             {
                 new DocumentPermissionPresentationModel()
@@ -93,7 +93,7 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
             }
         };
 
-        var attempt = await UserGroupPresentationFactory.CreateAsync(updateModel);
+        var attempt = await UserGroupPresentationFactory.CreateAsync(createModel);
         Assert.IsTrue(attempt.Success);
 
         var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
@@ -115,7 +115,7 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
             HasAccessToAllLanguages = true,
             Languages = new List<string>(),
             Name = "Test Name",
-            Sections = new [] {"Umb.Section.Content"},
+            Sections = new[] { "Umb.Section.Content" },
             Permissions = new HashSet<IPermissionPresentationModel>()
             {
                 new DocumentPropertyValuePermissionPresentationModel()
@@ -144,14 +144,14 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     {
         var contentKey = await CreateContent();
 
-        var updateModel = new CreateUserGroupRequestModel()
+        var createModel = new CreateUserGroupRequestModel()
         {
             Alias = "testAlias",
             FallbackPermissions = new HashSet<string>(),
             HasAccessToAllLanguages = true,
             Languages = new List<string>(),
             Name = "Test Name",
-            Sections = new [] {"Umb.Section.Content"},
+            Sections = new[] { "Umb.Section.Content" },
             Permissions = new HashSet<IPermissionPresentationModel>
             {
                 new DocumentPermissionPresentationModel()
@@ -162,7 +162,7 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
             }
         };
 
-        var attempt = await UserGroupPresentationFactory.CreateAsync(updateModel);
+        var attempt = await UserGroupPresentationFactory.CreateAsync(createModel);
         Assert.IsTrue(attempt.Success);
 
         var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
@@ -197,7 +197,7 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
             HasAccessToAllLanguages = true,
             Languages = new List<string>(),
             Name = "Test Name",
-            Sections = new [] {"Umb.Section.Content"},
+            Sections = new[] { "Umb.Section.Content" },
             Permissions = new HashSet<IPermissionPresentationModel>
             {
                 new DocumentPropertyValuePermissionPresentationModel
@@ -251,7 +251,7 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
             HasAccessToAllLanguages = true,
             Languages = new List<string>(),
             Name = "Test Name",
-            Sections = new [] {"Umb.Section.Content"},
+            Sections = new[] { "Umb.Section.Content" },
             Permissions = new HashSet<IPermissionPresentationModel>
             {
                 new DocumentPropertyValuePermissionPresentationModel
@@ -309,7 +309,7 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
             HasAccessToAllLanguages = true,
             Languages = new List<string>(),
             Name = "Test Name",
-            Sections = new [] {"Umb.Section.Content"},
+            Sections = new[] { "Umb.Section.Content" },
             Permissions = new HashSet<IPermissionPresentationModel>
             {
                 new DocumentPropertyValuePermissionPresentationModel
@@ -353,7 +353,8 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
         Assert.IsTrue(contentTypeAttempt.Success);
 
         var contentTypeResult = contentTypeAttempt.Result;
-        var contentTypeUpdateModel = ContentTypeUpdateHelper.CreateContentTypeUpdateModel(contentTypeResult); contentTypeUpdateModel.AllowedContentTypes = new[]
+        var contentTypeUpdateModel = ContentTypeUpdateHelper.CreateContentTypeUpdateModel(contentTypeResult);
+        contentTypeUpdateModel.AllowedContentTypes = new[]
         {
             new ContentTypeSort(contentTypeResult.Key, 0, contentTypeCreateModel.Alias),
         };
