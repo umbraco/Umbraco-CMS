@@ -1,8 +1,8 @@
-import { UmbTiptapToolbarElementApiBase } from '@umbraco-cms/backoffice/tiptap';
 import { UMB_BLOCK_RTE_MANAGER_CONTEXT, UMB_BLOCK_RTE_ENTRIES_CONTEXT } from '@umbraco-cms/backoffice/block-rte';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbTiptapToolbarElementApiBase } from '../base.js';
 
 export default class UmbTiptapBlockPickerToolbarExtension extends UmbTiptapToolbarElementApiBase {
 	#blocks?: Array<UmbBlockTypeBaseModel>;
