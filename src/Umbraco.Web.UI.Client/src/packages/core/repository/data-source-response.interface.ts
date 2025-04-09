@@ -1,12 +1,10 @@
 import type { UmbApiError, UmbCancelError, UmbError } from '../resources/umb-error.js';
 
-export type UmbDataSourceResponse<T> = T & UmbDataSourceResponseWithData & UmbDataSourceErrorResponse;
-
-export interface UmbDataSourceResponseWithData {
+export interface UmbDataSourceResponse<T> extends UmbDataSourceErrorResponse {
 	/**
 	 * The data returned from the data source.
 	 */
-	data?: unknown;
+	data?: T;
 }
 
 export interface UmbDataSourceErrorResponse {
