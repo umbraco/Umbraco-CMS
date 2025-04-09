@@ -2,14 +2,17 @@ import { defineConfig } from '@hey-api/openapi-ts';
 
 export default defineConfig({
 	debug: true,
-	input: '../Umbraco.Cms.Api.Management/OpenApi.json',
+	input: '../../../../Umbraco.Cms.Api.Management/OpenApi.json',
 	output: {
-		path: 'src/external/backend-api/src',
-		format: 'prettier',
-		lint: 'eslint',
+		path: 'backend-api',
 	},
 	plugins: [
-		'legacy/fetch',
+		{
+			name: '@hey-api/client-fetch',
+			bundle: false,
+			exportFromIndex: true,
+			throwOnError: true,
+		},
 		{
 			name: '@hey-api/typescript',
 			enums: 'typescript'
