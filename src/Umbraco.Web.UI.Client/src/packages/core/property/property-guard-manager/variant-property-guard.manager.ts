@@ -14,11 +14,11 @@ function CompareVariantAndPropertyWithStates(
 	propertyType: UmbReferenceByUnique,
 ) {
 	// any specific states for the variant and propertyType?
-	const variantEndPropertyState = rules.find(
+	const variantAndPropertyState = rules.find(
 		(s) => s.variantId?.compare(variantId) && s.propertyType?.unique === propertyType.unique,
 	);
-	if (variantEndPropertyState) {
-		return variantEndPropertyState.permitted;
+	if (variantAndPropertyState) {
+		return variantAndPropertyState.permitted;
 	}
 
 	// any specific states for the propertyType?
