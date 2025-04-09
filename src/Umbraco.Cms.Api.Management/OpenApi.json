@@ -37187,7 +37187,6 @@
             "type": "string"
           },
           "translation": {
-            "minLength": 1,
             "type": "string"
           }
         },
@@ -38044,45 +38043,6 @@
         },
         "additionalProperties": false
       },
-      "DocumentTypePropertyReferenceResponseModel": {
-        "required": [
-          "$type",
-          "documentType",
-          "id"
-        ],
-        "type": "object",
-        "properties": {
-          "$type": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "alias": {
-            "type": "string",
-            "nullable": true
-          },
-          "documentType": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/TrackedReferenceDocumentTypeModel"
-              }
-            ]
-          }
-        },
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "DocumentTypePropertyReferenceResponseModel": "#/components/schemas/DocumentTypePropertyReferenceResponseModel"
-          }
-        }
-      },
       "DocumentTypePropertyTypeContainerResponseModel": {
         "required": [
           "id",
@@ -38117,6 +38077,45 @@
           }
         },
         "additionalProperties": false
+      },
+      "DocumentTypePropertyTypeReferenceResponseModel": {
+        "required": [
+          "$type",
+          "documentType",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TrackedReferenceDocumentTypeModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentTypePropertyTypeReferenceResponseModel": "#/components/schemas/DocumentTypePropertyTypeReferenceResponseModel"
+          }
+        }
       },
       "DocumentTypePropertyTypeResponseModel": {
         "required": [
@@ -40147,45 +40146,6 @@
         },
         "additionalProperties": false
       },
-      "MediaTypePropertyReferenceResponseModel": {
-        "required": [
-          "$type",
-          "id",
-          "mediaType"
-        ],
-        "type": "object",
-        "properties": {
-          "$type": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "alias": {
-            "type": "string",
-            "nullable": true
-          },
-          "mediaType": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/TrackedReferenceMediaTypeModel"
-              }
-            ]
-          }
-        },
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "MediaTypePropertyReferenceResponseModel": "#/components/schemas/MediaTypePropertyReferenceResponseModel"
-          }
-        }
-      },
       "MediaTypePropertyTypeContainerResponseModel": {
         "required": [
           "id",
@@ -40220,6 +40180,45 @@
           }
         },
         "additionalProperties": false
+      },
+      "MediaTypePropertyTypeReferenceResponseModel": {
+        "required": [
+          "$type",
+          "id",
+          "mediaType"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "mediaType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TrackedReferenceMediaTypeModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "MediaTypePropertyTypeReferenceResponseModel": "#/components/schemas/MediaTypePropertyTypeReferenceResponseModel"
+          }
+        }
       },
       "MediaTypePropertyTypeResponseModel": {
         "required": [
@@ -40964,45 +40963,6 @@
         },
         "additionalProperties": false
       },
-      "MemberTypePropertyReferenceResponseModel": {
-        "required": [
-          "$type",
-          "id",
-          "memberType"
-        ],
-        "type": "object",
-        "properties": {
-          "$type": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "alias": {
-            "type": "string",
-            "nullable": true
-          },
-          "memberType": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/TrackedReferenceMemberTypeModel"
-              }
-            ]
-          }
-        },
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "MemberTypePropertyReferenceResponseModel": "#/components/schemas/MemberTypePropertyReferenceResponseModel"
-          }
-        }
-      },
       "MemberTypePropertyTypeContainerResponseModel": {
         "required": [
           "id",
@@ -41037,6 +40997,45 @@
           }
         },
         "additionalProperties": false
+      },
+      "MemberTypePropertyTypeReferenceResponseModel": {
+        "required": [
+          "$type",
+          "id",
+          "memberType"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "memberType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TrackedReferenceMemberTypeModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "MemberTypePropertyTypeReferenceResponseModel": "#/components/schemas/MemberTypePropertyTypeReferenceResponseModel"
+          }
+        }
       },
       "MemberTypePropertyTypeResponseModel": {
         "required": [
@@ -42211,19 +42210,19 @@
                   "$ref": "#/components/schemas/DocumentReferenceResponseModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTypePropertyReferenceResponseModel"
+                  "$ref": "#/components/schemas/DocumentTypePropertyTypeReferenceResponseModel"
                 },
                 {
                   "$ref": "#/components/schemas/MediaReferenceResponseModel"
                 },
                 {
-                  "$ref": "#/components/schemas/MediaTypePropertyReferenceResponseModel"
+                  "$ref": "#/components/schemas/MediaTypePropertyTypeReferenceResponseModel"
                 },
                 {
                   "$ref": "#/components/schemas/MemberReferenceResponseModel"
                 },
                 {
-                  "$ref": "#/components/schemas/MemberTypePropertyReferenceResponseModel"
+                  "$ref": "#/components/schemas/MemberTypePropertyTypeReferenceResponseModel"
                 }
               ]
             }

@@ -27,8 +27,8 @@ public static class IntExtensions
     /// </returns>
     public static Guid ToGuid(this int value)
     {
-        var bytes = new byte[16];
-        BitConverter.GetBytes(value).CopyTo(bytes, 0);
+        Span<byte> bytes = stackalloc byte[16];
+        BitConverter.GetBytes(value).CopyTo(bytes);
         return new Guid(bytes);
     }
 }

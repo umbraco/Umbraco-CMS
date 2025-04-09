@@ -26,7 +26,29 @@ export const data: Array<UmbMockUserGroupModel> = [
 			'Umb.Document.PublicAccess',
 			'Umb.Document.Rollback',
 		],
-		permissions: [],
+		permissions: [
+			{
+				$type: 'DocumentPermissionPresentationModel',
+				document: {
+					id: 'permissions-document-id',
+				},
+				verbs: ['Umb.Document.Read'],
+			},
+			{
+				$type: 'DocumentPermissionPresentationModel',
+				document: {
+					id: 'permissions-2-document-id',
+				},
+				verbs: ['Umb.Document.Create', 'Umb.Document.Read'],
+			},
+			{
+				$type: 'DocumentPermissionPresentationModel',
+				document: {
+					id: 'permissions-2-2-document-id',
+				},
+				verbs: ['Umb.Document.Delete', 'Umb.Document.Read'],
+			},
+		],
 		sections: [
 			UMB_CONTENT_SECTION_ALIAS,
 			'Umb.Section.Media',
