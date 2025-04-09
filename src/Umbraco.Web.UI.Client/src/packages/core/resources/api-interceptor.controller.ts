@@ -1,17 +1,17 @@
 import { extractUmbNotificationColor } from './extractUmbNotificationColor.function.js';
 import { isUmbNotifications, UMB_NOTIFICATION_HEADER } from './isUmbNotifications.function.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { OpenAPIConfig } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
+import type { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 
 export class UmbApiInterceptorController extends UmbControllerBase {
 	/**
 	 * Binds the default interceptors to the client.
 	 * This includes the auth response interceptor, the error interceptor and the umb-notifications interceptor.
-	 * @param {OpenAPIConfig} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
+	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
 	 */
-	public bindDefaultInterceptors(client: OpenAPIConfig) {
+	public bindDefaultInterceptors(client: typeof umbHttpClient) {
 		this.addAuthResponseInterceptor(client);
 		this.addUmbNotificationsInterceptor(client);
 		this.addErrorInterceptor(client);
@@ -19,11 +19,11 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 	/**
 	 * Interceptor which checks responses for 401 errors and lets the UmbAuthContext know the user is timed out.
-	 * @param {OpenAPIConfig} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
+	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
 	 * @internal
 	 */
-	addAuthResponseInterceptor(client: OpenAPIConfig) {
-		client.interceptors.response.use(async (response) => {
+	addAuthResponseInterceptor(client: typeof umbHttpClient) {
+		client.interceptors.response.use(async (response: Response) => {
 			if (response.status === 401) {
 				// See if we can get the UmbAuthContext and let it know the user is timed out
 				const authContext = await this.getContext(UMB_AUTH_CONTEXT, { preventTimeout: true });
@@ -38,10 +38,10 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 	/**
 	 * Interceptor which checks responses for 500 errors and displays them as a notification if any.
-	 * @param {OpenAPIConfig} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
+	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
 	 * @internal
 	 */
-	addErrorInterceptor(client: OpenAPIConfig) {
+	addErrorInterceptor(client: typeof umbHttpClient) {
 		client.interceptors.response.use(async (response) => {
 			if (response.ok) return response;
 
@@ -88,10 +88,10 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 	/**
 	 * Interceptor which checks responses for the umb-notifications header and displays them as a notification if any. Removes the umb-notifications from the headers.
-	 * @param {OpenAPIConfig} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
+	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
 	 * @internal
 	 */
-	addUmbNotificationsInterceptor(client: OpenAPIConfig) {
+	addUmbNotificationsInterceptor(client: typeof umbHttpClient) {
 		client.interceptors.response.use((response) => {
 			// Check if the response has the umb-notifications header
 			// If not, we just return the response
