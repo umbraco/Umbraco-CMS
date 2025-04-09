@@ -184,6 +184,12 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
         foreach (BlockItemData item in items)
         {
+            // if changes were made to the element type variations, we need those changes reflected in the block property values.
+            // for regular content this happens when a content type is saved (copies of property values are created in the DB),
+            // but for local block level properties we don't have that kind of handling, so we to do it manually.
+            // to be friendly we'll map "formerly invariant properties" to the default language ISO code instead of performing a
+            // hard reset of the property values (which would likely be the most correct thing to do from a data point of view).
+            item.Values = _blockEditorVarianceHandler.AlignPropertyVarianceAsync(item.Values, culture).GetAwaiter().GetResult();
             foreach (BlockPropertyValue blockPropertyValue in item.Values)
             {
                 IPropertyType? propertyType = blockPropertyValue.PropertyType;
@@ -198,13 +204,6 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     // leave the current block property value as-is - will be used to render a fallback output in the client
                     continue;
                 }
-
-                // if changes were made to the element type variation, we need those changes reflected in the block property values.
-                // for regular content this happens when a content type is saved (copies of property values are created in the DB),
-                // but for local block level properties we don't have that kind of handling, so we to do it manually.
-                // to be friendly we'll map "formerly invariant properties" to the default language ISO code instead of performing a
-                // hard reset of the property values (which would likely be the most correct thing to do from a data point of view).
-                _blockEditorVarianceHandler.AlignPropertyVarianceAsync(blockPropertyValue, propertyType, culture).GetAwaiter().GetResult();
 
                 if (!valueEditorsByKey.TryGetValue(propertyType.DataTypeKey, out IDataValueEditor? valueEditor))
                 {
@@ -297,6 +296,10 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
         TValue? mergedBlockValue =
             MergeVariantInvariantPropertyValueTyped(source, target, canUpdateInvariantData, allowedCultures);
+        if (mergedBlockValue is null)
+        {
+            return null;
+        }
 
         return _jsonSerializer.Serialize(mergedBlockValue);
     }

@@ -1,3 +1,4 @@
+import { data as permissionsTestData } from './data/permissions-test.data.js';
 import type {
 	DocumentItemResponseModel,
 	DocumentResponseModel,
@@ -9,6 +10,7 @@ export type UmbMockDocumentModel = DocumentResponseModel & DocumentTreeItemRespo
 
 export const data: Array<UmbMockDocumentModel> = [
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -49,6 +51,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -602,6 +605,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -741,6 +745,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [],
 		template: null,
 		id: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
@@ -825,6 +830,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -873,6 +879,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -970,6 +977,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -1233,4 +1241,5 @@ export const data: Array<UmbMockDocumentModel> = [
 			},
 		],
 	},
+	...permissionsTestData,
 ];

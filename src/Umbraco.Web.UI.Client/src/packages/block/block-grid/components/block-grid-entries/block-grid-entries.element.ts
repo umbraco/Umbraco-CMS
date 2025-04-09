@@ -1,6 +1,6 @@
-import { UmbBlockGridEntriesContext } from '../../context/block-grid-entries.context.js';
-import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
+import type { UmbBlockGridEntryElement } from '../block-grid-entry/block-grid-entry.element.js';
 import type { UmbBlockGridLayoutModel } from '../../types.js';
+import { UmbBlockGridEntriesContext } from './block-grid-entries.context.js';
 import {
 	getAccumulatedValueOfIndex,
 	getInterpolatedIndexOfPositionInWeightMap,
@@ -9,7 +9,6 @@ import {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, state, repeat, css, property, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import '../block-grid-entry/index.js';
 import {
 	UmbSorterController,
 	type UmbSorterConfig,
@@ -428,6 +427,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		return html`
 			<uui-button
 				look="placeholder"
+				color=${this.pristine === false && this.validity.valid === false ? 'invalid' : 'default'}
 				label=${this._configCreateLabel ?? this._createLabel ?? ''}
 				href=${this.#context.getPathForCreateBlock(-1) ?? ''}
 				?disabled=${this._isReadOnly}></uui-button>
@@ -492,13 +492,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			:host([area-key]) #createButton {
 				--umb-block-grid--create-button--is-dragging--variable: var(--umb-block-grid--is-dragging) none;
 				display: var(--umb-block-grid--create-button--is-dragging--variable, grid);
-			}
-			:host(:not([pristine]):invalid) #createButton {
-				--uui-button-contrast: var(--uui-color-danger);
-				--uui-button-contrast-hover: var(--uui-color-danger);
-				--uui-color-default-emphasis: var(--uui-color-danger);
-				--uui-button-border-color: var(--uui-color-danger);
-				--uui-button-border-color-hover: var(--uui-color-danger);
 			}
 
 			.umb-block-grid__layout-container[data-area-length='0'] {
