@@ -26,5 +26,5 @@ export async function tryExecuteAndNotify<T>(
 	const controller = new UmbTryExecuteController(host, resource);
 	const response = await controller.tryExecute({ disableNotifications: false });
 	controller.destroy();
-	return response as UmbDataSourceResponse<T>;
+	return response;
 }

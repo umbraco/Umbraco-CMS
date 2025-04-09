@@ -27,5 +27,5 @@ export async function tryExecute<T>(
 	const controller = new UmbTryExecuteController(host, promise);
 	const response = await controller.tryExecute(opts);
 	controller.destroy();
-	return response as UmbDataSourceResponse<T>;
+	return response;
 }

@@ -2,9 +2,9 @@ import { UmbTryExecuteController } from './try-execute.controller.js';
 import { UmbCancelablePromise } from './cancelable-promise.js';
 import { UmbApiError } from './umb-error.js';
 import type { XhrRequestOptions } from './types.js';
-import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 
 /**
  * Make an XHR request.
@@ -19,15 +19,16 @@ export async function tryXhrRequest<T>(
 	host: UmbControllerHost,
 	options: XhrRequestOptions,
 ): Promise<UmbDataSourceResponse<T>> {
-	const promise = createXhrRequest({
+	const config = umbHttpClient.getConfig();
+	const promise = createXhrRequest<T>({
 		...options,
-		baseUrl: OpenAPI.BASE,
-		token: OpenAPI.TOKEN as never,
+		baseUrl: config.baseUrl,
+		token: () => (typeof config.auth === 'function' ? config.auth({ type: 'http', scheme: 'bearer' }) : config.auth),
 	});
 	const controller = new UmbTryExecuteController(host, promise);
 	const response = await controller.tryExecute(options);
 	controller.destroy();
-	return response as UmbDataSourceResponse<T>;
+	return response;
 }
 
 /**
