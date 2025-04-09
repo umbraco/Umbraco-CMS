@@ -33,7 +33,7 @@ export class UmbDuplicateDocumentTypeServerDataSource implements UmbDuplicateToD
 			this.#host,
 			DocumentTypeService.postDocumentTypeByIdCopy({
 				id: args.unique,
-				requestBody: {
+				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},
 			}),

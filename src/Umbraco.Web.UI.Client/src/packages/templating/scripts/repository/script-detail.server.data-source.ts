@@ -37,7 +37,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(parentUnique);
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateScriptRequestModel = {
+		const body: CreateScriptRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
 			name: appendFileExtensionIfNeeded(model.name, '.js'),
 			content: model.content,
@@ -46,7 +46,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const { data, error } = await tryExecute(
 			this.#host,
 			ScriptService.postScript({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -90,7 +90,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(model.unique);
 		if (!path) throw new Error('Path is missing');
 
-		const requestBody: UpdateScriptRequestModel = {
+		const body: UpdateScriptRequestModel = {
 			content: model.content,
 		};
 
@@ -98,7 +98,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 			this.#host,
 			ScriptService.putScriptByPath({
 				path: encodeURIComponent(path),
-				requestBody,
+				body,
 			}),
 		);
 

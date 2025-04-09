@@ -111,7 +111,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 		if (!model.unique) throw new Error('Media unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateMediaRequestModel = {
+		const body: CreateMediaRequestModel = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			mediaType: { id: model.mediaType.unique },
@@ -126,7 +126,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 		const { data, error } = await tryExecute(
 			this.#host,
 			MediaService.postMedia({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -148,7 +148,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateMediaRequestModel = {
+		const body: UpdateMediaRequestModel = {
 			values: model.values,
 			variants: model.variants,
 		};
@@ -157,7 +157,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 			this.#host,
 			MediaService.putMediaById({
 				id: model.unique,
-				requestBody,
+				body,
 			}),
 		);
 

@@ -35,7 +35,7 @@ export class UmbMoveDocumentTypeServerDataSource implements UmbMoveDataSource {
 			this.#host,
 			DocumentTypeService.putDocumentTypeByIdMove({
 				id: args.unique,
-				requestBody: {
+				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},
 			}),

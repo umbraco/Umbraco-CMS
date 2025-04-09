@@ -33,7 +33,7 @@ export class UmbSortChildrenOfMediaServerDataSource implements UmbSortChildrenOf
 		return tryExecute(
 			this.#host,
 			MediaService.putMediaSort({
-				requestBody: {
+				body: {
 					parent: args.unique ? { id: args.unique } : null,
 					sorting: sortingMapping,
 				},

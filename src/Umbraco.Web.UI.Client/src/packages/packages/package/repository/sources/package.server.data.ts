@@ -53,11 +53,11 @@ export class UmbPackageServerDataSource {
 		return tryExecute(this.host, PackageService.getPackageMigrationStatus({ skip: 0, take: 9999 }));
 	}
 
-	async saveCreatedPackage(requestBody: CreatePackageRequestModel) {
-		return await tryExecute(this.host, PackageService.postPackageCreated({ requestBody }));
+	async saveCreatedPackage(body: CreatePackageRequestModel) {
+		return await tryExecute(this.host, PackageService.postPackageCreated({ body }));
 	}
 
-	async updateCreatedPackage(id: string, requestBody: UpdatePackageRequestModel) {
-		return await tryExecute(this.host, PackageService.putPackageCreatedById({ id, requestBody }));
+	async updateCreatedPackage(id: string, body: UpdatePackageRequestModel) {
+		return await tryExecute(this.host, PackageService.putPackageCreatedById({ id, body }));
 	}
 }

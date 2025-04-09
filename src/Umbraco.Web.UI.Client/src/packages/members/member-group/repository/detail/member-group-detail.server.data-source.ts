@@ -73,7 +73,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	async create(model: UmbMemberGroupDetailModel) {
 		if (!model) throw new Error('Member Group is missing');
 
-		const requestBody: CreateMemberGroupRequestModel = {
+		const body: CreateMemberGroupRequestModel = {
 			name: model.name,
 			id: model.unique,
 		};
@@ -81,7 +81,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 		const { data, error } = await tryExecute(
 			this.#host,
 			MemberGroupService.postMemberGroup({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -104,7 +104,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 		// TODO: make data mapper to prevent errors
 		// TODO:  add type UpdateMemberGroupRequestModel
-		const requestBody: any = {
+		const body: any = {
 			name: model.name,
 		};
 
@@ -112,7 +112,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 			this.#host,
 			MemberGroupService.putMemberGroupById({
 				id: model.unique,
-				requestBody,
+				body,
 			}),
 		);
 

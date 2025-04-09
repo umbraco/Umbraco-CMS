@@ -28,10 +28,10 @@ export class UmbMediaTypeImportServerDataSource {
 	async import(temporaryUnique: string) {
 		if (!temporaryUnique) throw new Error('Unique is missing');
 
-		const requestBody: PostMediaTypeImportData = {
-			requestBody: { file: { id: temporaryUnique } },
+		const body: PostMediaTypeImportData = {
+			body: { file: { id: temporaryUnique } },
 		};
 
-		return tryExecute(this.#host, MediaTypeService.postMediaTypeImport(requestBody));
+		return tryExecute(this.#host, MediaTypeService.postMediaTypeImport(body));
 	}
 }

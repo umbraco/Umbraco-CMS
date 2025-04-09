@@ -88,7 +88,7 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 
 		const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(parentUnique);
 
-		const requestBody: CreateScriptFolderRequestModel = {
+		const body: CreateScriptFolderRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
 			name: model.name,
 		};
@@ -96,7 +96,7 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 		const { data, error } = await tryExecute(
 			this.#host,
 			ScriptService.postScriptFolder({
-				requestBody,
+				body,
 			}),
 		);
 

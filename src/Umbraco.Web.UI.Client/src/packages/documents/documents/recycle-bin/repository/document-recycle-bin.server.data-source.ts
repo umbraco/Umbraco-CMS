@@ -24,7 +24,7 @@ export class UmbDocumentRecycleBinServerDataSource implements UmbRecycleBinDataS
 			this.#host,
 			DocumentService.putRecycleBinDocumentByIdRestore({
 				id: args.unique,
-				requestBody: {
+				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},
 			}),

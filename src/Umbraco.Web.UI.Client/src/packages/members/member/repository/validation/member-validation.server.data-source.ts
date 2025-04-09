@@ -32,7 +32,7 @@ export class UmbMemberValidationServerDataSource {
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateMemberRequestModel = {
+		const body: CreateMemberRequestModel = {
 			email: model.email,
 			username: model.username,
 			password: model.newPassword,
@@ -47,7 +47,7 @@ export class UmbMemberValidationServerDataSource {
 		return tryExecute(
 			this.#host,
 			MemberService.postMemberValidate({
-				requestBody,
+				body,
 			}),
 		);
 	}
@@ -65,7 +65,7 @@ export class UmbMemberValidationServerDataSource {
 		//const cultures = variantIds.map((id) => id.culture).filter((culture) => culture !== null) as Array<string>;
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateMemberRequestModel = {
+		const body: UpdateMemberRequestModel = {
 			email: model.email,
 			username: model.username,
 			isApproved: model.isApproved,
@@ -80,7 +80,7 @@ export class UmbMemberValidationServerDataSource {
 			this.#host,
 			MemberService.putMemberByIdValidate({
 				id: model.unique,
-				requestBody,
+				body,
 			}),
 		);
 	}

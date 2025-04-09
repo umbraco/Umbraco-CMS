@@ -32,7 +32,7 @@ export class UmbRenameScriptServerDataSource {
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
-		const requestBody: RenameStylesheetRequestModel = {
+		const body: RenameStylesheetRequestModel = {
 			name: appendFileExtensionIfNeeded(name, '.js'),
 		};
 
@@ -40,7 +40,7 @@ export class UmbRenameScriptServerDataSource {
 			this.#host,
 			ScriptService.putScriptByPathRename({
 				path: encodeURIComponent(path),
-				requestBody,
+				body,
 			}),
 		);
 

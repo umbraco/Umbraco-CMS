@@ -50,11 +50,11 @@ export class UmbDocumentPublishingServerDataSource {
 		);
 
 		// TODO: THIS DOES NOT TAKE SEGMENTS INTO ACCOUNT!!!!!!
-		const requestBody: PublishDocumentRequestModel = {
+		const body: PublishDocumentRequestModel = {
 			publishSchedules,
 		};
 
-		return tryExecute(this.#host, DocumentService.putDocumentByIdPublish({ path: { id: unique }, body: requestBody }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdPublish({ path: { id: unique }, body: body }));
 	}
 
 	/**
@@ -73,24 +73,18 @@ export class UmbDocumentPublishingServerDataSource {
 		const hasInvariant = variantIds.some((variant) => variant.isCultureInvariant());
 
 		if (hasInvariant) {
-			const requestBody: UnpublishDocumentRequestModel = {
+			const body: UnpublishDocumentRequestModel = {
 				cultures: null,
 			};
 
-			return tryExecute(
-				this.#host,
-				DocumentService.putDocumentByIdUnpublish({ path: { id: unique }, body: requestBody }),
-			);
+			return tryExecute(this.#host, DocumentService.putDocumentByIdUnpublish({ path: { id: unique }, body: body }));
 		}
 
-		const requestBody: UnpublishDocumentRequestModel = {
+		const body: UnpublishDocumentRequestModel = {
 			cultures: variantIds.map((variant) => variant.toCultureString()),
 		};
 
-		return tryExecute(
-			this.#host,
-			DocumentService.putDocumentByIdUnpublish({ path: { id: unique }, body: requestBody }),
-		);
+		return tryExecute(this.#host, DocumentService.putDocumentByIdUnpublish({ path: { id: unique }, body: body }));
 	}
 
 	/**
@@ -107,7 +101,7 @@ export class UmbDocumentPublishingServerDataSource {
 	) {
 		if (!unique) throw new Error('Id is missing');
 
-		const requestBody: PublishDocumentWithDescendantsRequestModel = {
+		const body: PublishDocumentWithDescendantsRequestModel = {
 			cultures: variantIds.map((variant) => variant.toCultureString()),
 			includeUnpublishedDescendants,
 		};
@@ -115,7 +109,7 @@ export class UmbDocumentPublishingServerDataSource {
 		// Initiate the publish descendants task and get back a task Id.
 		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentService.putDocumentByIdPublishWithDescendants({ path: { id: unique }, body: requestBody }),
+			DocumentService.putDocumentByIdPublishWithDescendants({ path: { id: unique }, body: body }),
 		);
 
 		if (error || !data) {

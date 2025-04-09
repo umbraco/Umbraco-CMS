@@ -131,7 +131,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		if (!model.unique) throw new Error('Document unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateDocumentBlueprintRequestModel = {
+		const body: CreateDocumentBlueprintRequestModel = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			documentType: { id: model.documentType.unique },
@@ -142,7 +142,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentBlueprintService.postDocumentBlueprint({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -164,7 +164,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateDocumentBlueprintRequestModel = {
+		const body: UpdateDocumentBlueprintRequestModel = {
 			values: model.values,
 			variants: model.variants,
 		};
@@ -173,7 +173,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 			this.#host,
 			DocumentBlueprintService.putDocumentBlueprintById({
 				id: model.unique,
-				requestBody,
+				body,
 			}),
 		);
 

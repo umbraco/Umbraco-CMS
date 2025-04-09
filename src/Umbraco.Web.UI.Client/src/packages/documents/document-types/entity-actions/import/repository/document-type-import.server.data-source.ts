@@ -28,10 +28,10 @@ export class UmbDocumentTypeImportServerDataSource {
 	async import(temporaryUnique: string) {
 		if (!temporaryUnique) throw new Error('Unique is missing');
 
-		const requestBody: PostDocumentTypeImportData = {
-			requestBody: { file: { id: temporaryUnique } },
+		const body: PostDocumentTypeImportData = {
+			body: { file: { id: temporaryUnique } },
 		};
 
-		return tryExecute(this.#host, DocumentTypeService.postDocumentTypeImport(requestBody));
+		return tryExecute(this.#host, DocumentTypeService.postDocumentTypeImport(body));
 	}
 }

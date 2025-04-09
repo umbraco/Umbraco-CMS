@@ -46,12 +46,12 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 
 	/**
 	 *	Post a new log viewer saved search to the server
-	 * @param {{ requestBody?: SavedLogSearch }} { requestBody }
+	 * @param {{ body?: SavedLogSearch }} { body }
 	 * @returns {*}
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async postLogViewerSavedSearch({ name, query }: SavedLogSearchResponseModel) {
-		return await tryExecute(this.#host, LogViewerService.postLogViewerSavedSearch({ requestBody: { name, query } }));
+		return await tryExecute(this.#host, LogViewerService.postLogViewerSavedSearch({ body: { name, query } }));
 	}
 	/**
 	 * Remove a log viewer saved search by name from the server

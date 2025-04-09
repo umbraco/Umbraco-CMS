@@ -40,7 +40,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(parentUnique);
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreatePartialViewRequestModel = {
+		const body: CreatePartialViewRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
 			name: appendFileExtensionIfNeeded(model.name, '.cshtml'),
 			content: model.content,
@@ -49,7 +49,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		const { data, error } = await tryExecute(
 			this.#host,
 			PartialViewService.postPartialView({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -93,7 +93,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(model.unique);
 		if (!path) throw new Error('Path is missing');
 
-		const requestBody: UpdatePartialViewRequestModel = {
+		const body: UpdatePartialViewRequestModel = {
 			content: model.content,
 		};
 
@@ -101,7 +101,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 			this.#host,
 			PartialViewService.putPartialViewByPath({
 				path: encodeURIComponent(path),
-				requestBody,
+				body,
 			}),
 		);
 

@@ -80,7 +80,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 		if (!model) throw new Error('Dictionary is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateDictionaryItemRequestModel = {
+		const body: CreateDictionaryItemRequestModel = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			name: model.name,
@@ -90,7 +90,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 		const { data, error } = await tryExecute(
 			this.#host,
 			DictionaryService.postDictionary({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -112,7 +112,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateDictionaryItemRequestModel = {
+		const body: UpdateDictionaryItemRequestModel = {
 			name: model.name,
 			translations: model.translations,
 		};
@@ -121,7 +121,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 			this.#host,
 			DictionaryService.putDictionaryById({
 				id: model.unique,
-				requestBody,
+				body,
 			}),
 		);
 

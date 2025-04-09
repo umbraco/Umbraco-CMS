@@ -31,7 +31,7 @@ export class UmbDocumentValidationServerDataSource {
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateDocumentRequestModel = {
+		const body: CreateDocumentRequestModel = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			documentType: { id: model.documentType.unique },
@@ -44,7 +44,7 @@ export class UmbDocumentValidationServerDataSource {
 		return tryExecute(
 			this.#host,
 			DocumentService.postDocumentValidate({
-				requestBody,
+				body,
 			}),
 			{
 				disableNotifications: true,
@@ -64,7 +64,7 @@ export class UmbDocumentValidationServerDataSource {
 		const cultures = variantIds.map((id) => id.culture).filter((culture) => culture !== null) as Array<string>;
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: ValidateUpdateDocumentRequestModel = {
+		const body: ValidateUpdateDocumentRequestModel = {
 			template: model.template ? { id: model.template.unique } : null,
 			values: model.values,
 			variants: model.variants,
@@ -76,7 +76,7 @@ export class UmbDocumentValidationServerDataSource {
 			this.#host,
 			DocumentService.putUmbracoManagementApiV11DocumentByIdValidate11({
 				id: model.unique,
-				requestBody,
+				body,
 			}),
 			{
 				disableNotifications: true,

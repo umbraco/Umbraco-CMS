@@ -35,7 +35,7 @@ export class UmbMoveMediaTypeServerDataSource implements UmbMoveDataSource {
 			this.#host,
 			MediaTypeService.putMediaTypeByIdMove({
 				id: args.unique,
-				requestBody: {
+				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},
 			}),

@@ -31,7 +31,7 @@ export class UmbMediaValidationServerDataSource {
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateMediaRequestModel = {
+		const body: CreateMediaRequestModel = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			mediaType: { id: model.mediaType.unique },
@@ -43,7 +43,7 @@ export class UmbMediaValidationServerDataSource {
 		return tryExecute(
 			this.#host,
 			MediaService.postMediaValidate({
-				requestBody,
+				body,
 			}),
 		);
 	}
@@ -61,7 +61,7 @@ export class UmbMediaValidationServerDataSource {
 		//const cultures = variantIds.map((id) => id.culture).filter((culture) => culture !== null) as Array<string>;
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateMediaRequestModel = {
+		const body: UpdateMediaRequestModel = {
 			values: model.values,
 			variants: model.variants,
 		};
@@ -71,7 +71,7 @@ export class UmbMediaValidationServerDataSource {
 			this.#host,
 			MediaService.putMediaByIdValidate({
 				id: model.unique,
-				requestBody,
+				body,
 			}),
 		);
 	}

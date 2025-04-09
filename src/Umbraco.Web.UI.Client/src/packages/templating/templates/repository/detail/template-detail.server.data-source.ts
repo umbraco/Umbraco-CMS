@@ -88,7 +88,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 		if (!model) throw new Error('Template is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateTemplateRequestModel = {
+		const body: CreateTemplateRequestModel = {
 			id: model.unique,
 			name: model.name,
 			content: model.content,
@@ -98,7 +98,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 		const { data, error } = await tryExecute(
 			this.#host,
 			TemplateService.postTemplate({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -120,7 +120,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateTemplateRequestModel = {
+		const body: UpdateTemplateRequestModel = {
 			name: model.name,
 			content: model.content,
 			alias: model.alias,
@@ -130,7 +130,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 			this.#host,
 			TemplateService.putTemplateById({
 				id: model.unique,
-				requestBody,
+				body,
 			}),
 		);
 

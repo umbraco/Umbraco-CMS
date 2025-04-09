@@ -80,7 +80,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.name) throw new Error('Name is missing');
 
-		const requestBody = {
+		const body = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			name: model.name,
@@ -89,7 +89,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 		const { error } = await tryExecute(
 			this.#host,
 			DocumentTypeService.postDocumentTypeFolder({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -114,7 +114,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 			this.#host,
 			DocumentTypeService.putDocumentTypeFolderById({
 				id: model.unique,
-				requestBody: { name: model.name },
+				body: { name: model.name },
 			}),
 		);
 

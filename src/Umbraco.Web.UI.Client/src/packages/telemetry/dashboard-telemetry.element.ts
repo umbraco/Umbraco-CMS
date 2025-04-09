@@ -41,7 +41,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 		const { error } = await tryExecute(
 			this,
 			TelemetryService.postTelemetryLevel({
-				requestBody: { telemetryLevel: this._telemetryFormData },
+				body: { telemetryLevel: this._telemetryFormData },
 			}),
 		);
 

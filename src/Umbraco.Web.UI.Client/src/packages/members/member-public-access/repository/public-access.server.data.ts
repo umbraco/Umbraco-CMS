@@ -28,7 +28,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 */
 	async create(unique: string, data: PublicAccessRequestModel) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecute(this.#host, DocumentService.postDocumentByIdPublicAccess({ id: unique, requestBody: data }));
+		return tryExecute(this.#host, DocumentService.postDocumentByIdPublicAccess({ id: unique, body: data }));
 	}
 
 	/**
@@ -47,12 +47,12 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 * Updates Public Access for the given Document unique
 	 * @param {string} unique
 	 * @param {PublicAccessRequestModel} data
-	 * @param requestBody
+	 * @param body
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
-	async update(unique: string, requestBody: PublicAccessRequestModel) {
+	async update(unique: string, body: PublicAccessRequestModel) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecute(this.#host, DocumentService.putDocumentByIdPublicAccess({ id: unique, requestBody }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdPublicAccess({ id: unique, body }));
 	}
 
 	/**

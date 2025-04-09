@@ -89,7 +89,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 
 		const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(parentUnique);
 
-		const requestBody: CreatePartialViewFolderRequestModel = {
+		const body: CreatePartialViewFolderRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
 			name: model.name,
 		};
@@ -97,7 +97,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 		const { data, error } = await tryExecute(
 			this.#host,
 			PartialViewService.postPartialViewFolder({
-				requestBody,
+				body,
 			}),
 		);
 

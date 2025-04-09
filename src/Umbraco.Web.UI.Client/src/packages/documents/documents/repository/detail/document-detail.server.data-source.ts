@@ -143,7 +143,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		if (!model.unique) throw new Error('Document unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateDocumentRequestModel = {
+		const body: CreateDocumentRequestModel = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			documentType: { id: model.documentType.unique },
@@ -155,7 +155,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentService.postDocument({
-				body: requestBody,
+				body: body,
 			}),
 		);
 
@@ -176,7 +176,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateDocumentRequestModel = {
+		const body: UpdateDocumentRequestModel = {
 			template: model.template ? { id: model.template.unique } : null,
 			values: model.values,
 			variants: model.variants,
@@ -186,7 +186,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			this.#host,
 			DocumentService.putDocumentById({
 				path: { id: model.unique },
-				body: requestBody,
+				body: body,
 			}),
 		);
 

@@ -84,7 +84,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 		if (!model) throw new Error('Language is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateLanguageRequestModel = {
+		const body: CreateLanguageRequestModel = {
 			fallbackIsoCode: model.fallbackIsoCode,
 			isDefault: model.isDefault,
 			isMandatory: model.isMandatory,
@@ -95,7 +95,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 		const { data, error } = await tryExecute(
 			this.#host,
 			LanguageService.postLanguage({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -117,7 +117,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateLanguageRequestModel = {
+		const body: UpdateLanguageRequestModel = {
 			fallbackIsoCode: model.fallbackIsoCode,
 			isDefault: model.isDefault,
 			isMandatory: model.isMandatory,
@@ -128,7 +128,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 			this.#host,
 			LanguageService.putLanguageByIsoCode({
 				isoCode: model.unique,
-				requestBody,
+				body,
 			}),
 		);
 

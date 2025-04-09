@@ -133,7 +133,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 		if (!model) throw new Error('Member Type is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateMemberTypeRequestModel = {
+		const body: CreateMemberTypeRequestModel = {
 			alias: model.alias,
 			name: model.name,
 			description: model.description,
@@ -172,7 +172,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 		const { data, error } = await tryExecute(
 			this.#host,
 			MemberTypeService.postMemberType({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -194,7 +194,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateMemberTypeRequestModel = {
+		const body: UpdateMemberTypeRequestModel = {
 			alias: model.alias,
 			name: model.name,
 			description: model.description,
@@ -233,7 +233,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			this.#host,
 			MemberTypeService.putMemberTypeById({
 				id: model.unique,
-				requestBody,
+				body,
 			}),
 		);
 

@@ -138,7 +138,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 		if (!model.unique) throw new Error('Media Type unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateMediaTypeRequestModel = {
+		const body: CreateMediaTypeRequestModel = {
 			alias: model.alias,
 			name: model.name,
 			description: model.description,
@@ -183,7 +183,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 		const { data, error } = await tryExecute(
 			this.#host,
 			MediaTypeService.postMediaType({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -205,7 +205,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateMediaTypeRequestModel = {
+		const body: UpdateMediaTypeRequestModel = {
 			alias: model.alias,
 			name: model.name,
 			description: model.description,
@@ -249,7 +249,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			this.#host,
 			MediaTypeService.putMediaTypeById({
 				id: model.unique,
-				requestBody,
+				body,
 			}),
 		);
 

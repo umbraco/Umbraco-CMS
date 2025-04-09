@@ -32,7 +32,7 @@ export class UmbRenamePartialViewServerDataSource {
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
-		const requestBody: RenameStylesheetRequestModel = {
+		const body: RenameStylesheetRequestModel = {
 			name: appendFileExtensionIfNeeded(name, '.cshtml'),
 		};
 
@@ -40,7 +40,7 @@ export class UmbRenamePartialViewServerDataSource {
 			this.#host,
 			PartialViewService.putPartialViewByPathRename({
 				path: encodeURIComponent(path),
-				requestBody,
+				body,
 			}),
 		);
 

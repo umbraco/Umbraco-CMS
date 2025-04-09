@@ -24,7 +24,7 @@ export class UmbMediaRecycleBinServerDataSource implements UmbRecycleBinDataSour
 			this.#host,
 			MediaService.putRecycleBinMediaByIdRestore({
 				id: args.unique,
-				requestBody: {
+				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},
 			}),

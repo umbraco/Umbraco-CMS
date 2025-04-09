@@ -35,7 +35,7 @@ export class UmbMoveDataTypeServerDataSource implements UmbMoveDataSource {
 			this.#host,
 			DataTypeService.putDataTypeByIdMove({
 				id: args.unique,
-				requestBody: {
+				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},
 			}),

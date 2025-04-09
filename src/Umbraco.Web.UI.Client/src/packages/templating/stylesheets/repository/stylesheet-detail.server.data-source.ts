@@ -40,7 +40,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(parentUnique);
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateStylesheetRequestModel = {
+		const body: CreateStylesheetRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
 			name: appendFileExtensionIfNeeded(model.name, '.css'),
 			content: model.content,
@@ -49,7 +49,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const { data, error } = await tryExecute(
 			this.#host,
 			StylesheetService.postStylesheet({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -93,7 +93,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(model.unique);
 		if (!path) throw new Error('Path is missing');
 
-		const requestBody: UpdateStylesheetRequestModel = {
+		const body: UpdateStylesheetRequestModel = {
 			content: model.content,
 		};
 
@@ -101,7 +101,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 			this.#host,
 			StylesheetService.putStylesheetByPath({
 				path: encodeURIComponent(path),
-				requestBody,
+				body,
 			}),
 		);
 

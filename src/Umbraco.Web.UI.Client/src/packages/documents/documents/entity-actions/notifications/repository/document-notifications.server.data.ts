@@ -37,6 +37,6 @@ export class UmbDocumentNotificationsServerDataSource {
 	 */
 	async update(unique: string, data: UpdateDocumentNotificationsRequestModel) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecute(this.#host, DocumentService.putDocumentByIdNotifications({ id: unique, requestBody: data }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdNotifications({ id: unique, body: data }));
 	}
 }

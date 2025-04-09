@@ -32,7 +32,7 @@ export class UmbRenameStylesheetServerDataSource {
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
-		const requestBody: RenameStylesheetRequestModel = {
+		const body: RenameStylesheetRequestModel = {
 			name: appendFileExtensionIfNeeded(name, '.css'),
 		};
 
@@ -40,7 +40,7 @@ export class UmbRenameStylesheetServerDataSource {
 			this.#host,
 			StylesheetService.putStylesheetByPathRename({
 				path: encodeURIComponent(path),
-				requestBody,
+				body,
 			}),
 		);
 

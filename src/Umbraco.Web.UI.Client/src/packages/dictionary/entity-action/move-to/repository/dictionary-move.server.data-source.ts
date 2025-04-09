@@ -35,7 +35,7 @@ export class UmbMoveDictionaryServerDataSource implements UmbMoveDataSource {
 			this.#host,
 			DictionaryService.putDictionaryByIdMove({
 				id: args.unique,
-				requestBody: {
+				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},
 			}),

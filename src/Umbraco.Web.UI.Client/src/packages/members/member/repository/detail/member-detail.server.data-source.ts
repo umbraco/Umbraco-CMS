@@ -133,7 +133,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 		if (!model) throw new Error('Member is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateMemberRequestModel = {
+		const body: CreateMemberRequestModel = {
 			id: model.unique,
 			email: model.email,
 			username: model.username,
@@ -148,7 +148,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 		const { data, error } = await tryExecute(
 			this.#host,
 			MemberService.postMember({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -170,7 +170,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateMemberRequestModel = {
+		const body: UpdateMemberRequestModel = {
 			email: model.email,
 			groups: model.groups,
 			isApproved: model.isApproved,
@@ -187,7 +187,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			this.#host,
 			MemberService.putMemberById({
 				id: model.unique,
-				requestBody,
+				body,
 			}),
 		);
 

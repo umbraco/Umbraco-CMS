@@ -33,7 +33,7 @@ export class UmbDuplicateMediaTypeServerDataSource implements UmbDuplicateToData
 			this.#host,
 			MediaTypeService.postMediaTypeByIdCopy({
 				id: args.unique,
-				requestBody: {
+				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},
 			}),

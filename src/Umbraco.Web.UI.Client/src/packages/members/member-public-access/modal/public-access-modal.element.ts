@@ -90,7 +90,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 
 		// TODO: [v15] Currently the Management API doesn't support passing the member/group ids, only the userNames/names.
 		// This is a temporary solution where we have to look them up until the API is updated to support this.
-		const requestBody: PublicAccessRequestModel = {
+		const body: PublicAccessRequestModel = {
 			memberGroupNames: [],
 			memberUserNames: [],
 			loginDocument: { id: this._loginDocumentId },
@@ -108,7 +108,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 				.filter((response) => response.data)
 				.map((response) => response.data?.username) as string[];
 
-			requestBody.memberUserNames = memberUserNames;
+			body.memberUserNames = memberUserNames;
 		} else {
 			// Groups
 			const repo = new UmbMemberGroupItemRepository(this);
@@ -119,13 +119,13 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 				.filter((groupItem) => this._selection.includes(groupItem.unique))
 				.map((groupItem) => groupItem.name);
 
-			requestBody.memberGroupNames = groupNames;
+			body.memberGroupNames = groupNames;
 		}
 
 		if (this.#isNew) {
-			await this.#publicAccessRepository.create(this.#unique, requestBody);
+			await this.#publicAccessRepository.create(this.#unique, body);
 		} else {
-			await this.#publicAccessRepository.update(this.#unique, requestBody);
+			await this.#publicAccessRepository.update(this.#unique, body);
 		}
 
 		this.modalContext?.submit();

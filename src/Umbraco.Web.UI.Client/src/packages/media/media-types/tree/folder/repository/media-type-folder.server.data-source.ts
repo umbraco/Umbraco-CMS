@@ -80,7 +80,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.name) throw new Error('Name is missing');
 
-		const requestBody = {
+		const body = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			name: model.name,
@@ -89,7 +89,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 		const { error } = await tryExecute(
 			this.#host,
 			MediaTypeService.postMediaTypeFolder({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -115,7 +115,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 			this.#host,
 			MediaTypeService.putMediaTypeFolderById({
 				id: model.unique,
-				requestBody: { name: model.name },
+				body: { name: model.name },
 			}),
 		);
 

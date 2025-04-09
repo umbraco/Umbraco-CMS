@@ -83,7 +83,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 
 		const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(parentUnique);
 
-		const requestBody: CreateStylesheetFolderRequestModel = {
+		const body: CreateStylesheetFolderRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
 			name: model.name,
 		};
@@ -91,7 +91,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 		const { data, error } = await tryExecute(
 			this.#host,
 			StylesheetService.postStylesheetFolder({
-				requestBody,
+				body,
 			}),
 		);
 
