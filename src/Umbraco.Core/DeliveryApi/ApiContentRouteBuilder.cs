@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
@@ -19,6 +20,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     private readonly IPublishedContentCache _contentCache;
     private readonly IDocumentNavigationQueryService _navigationQueryService;
     private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDocumentUrlService _documentUrlService;
     private RequestHandlerSettings _requestSettings;
 
     public ApiContentRouteBuilder(
@@ -29,7 +31,8 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         IOptionsMonitor<RequestHandlerSettings> requestSettings,
         IPublishedContentCache contentCache,
         IDocumentNavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService)
+        IPublishStatusQueryService publishStatusQueryService,
+        IDocumentUrlService documentUrlService)
     {
         _apiContentPathProvider = apiContentPathProvider;
         _variationContextAccessor = variationContextAccessor;
@@ -37,9 +40,33 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         _contentCache = contentCache;
         _navigationQueryService = navigationQueryService;
         _publishStatusQueryService = publishStatusQueryService;
+        _documentUrlService = documentUrlService;
         _globalSettings = globalSettings.Value;
         _requestSettings = requestSettings.CurrentValue;
         requestSettings.OnChange(settings => _requestSettings = settings);
+    }
+
+    [Obsolete("Use the non-obsolete constructor, scheduled for removal in v17")]
+    public ApiContentRouteBuilder(
+        IApiContentPathProvider apiContentPathProvider,
+        IOptions<GlobalSettings> globalSettings,
+        IVariationContextAccessor variationContextAccessor,
+        IRequestPreviewService requestPreviewService,
+        IOptionsMonitor<RequestHandlerSettings> requestSettings,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishStatusQueryService publishStatusQueryService)
+        : this(
+        apiContentPathProvider,
+        globalSettings,
+        variationContextAccessor,
+        requestPreviewService,
+        requestSettings,
+        contentCache,
+        navigationQueryService,
+        publishStatusQueryService,
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
+    {
     }
 
     [Obsolete("Use the non-obsolete constructor, scheduled for removal in v17")]
@@ -59,7 +86,8 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         requestSettings,
         contentCache,
         navigationQueryService,
-        StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>())
+        StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
     {
     }
 
@@ -113,7 +141,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         // we can perform fallback to the content route.
         if (IsInvalidContentPath(contentPath))
         {
-            contentPath = _contentCache.GetRouteById(content.Id, culture) ?? contentPath;
+            contentPath = _documentUrlService.GetLegacyRouteFormat(content.Key, culture ?? _variationContextAccessor.VariationContext?.Culture, isPreview);
         }
 
         // if the content path has still not been resolved as a valid path, the content is un-routable in this culture
@@ -125,7 +153,9 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
                 : null;
         }
 
-        return contentPath;
+        return _requestSettings.AddTrailingSlash
+            ? contentPath?.EnsureEndsWith('/')
+            : contentPath?.TrimEnd('/');
     }
 
     private string ContentPreviewPath(IPublishedContent content) => $"{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{content.Key:D}{(_requestSettings.AddTrailingSlash ? "/" : string.Empty)}";

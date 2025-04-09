@@ -14,9 +14,10 @@ export class UmbDocumentReferenceResponseManagementApiDataMapping
 	async map(data: DocumentReferenceResponseModel): Promise<UmbDocumentReferenceModel> {
 		return {
 			documentType: {
-				alias: data.documentType.alias,
-				icon: data.documentType.icon,
-				name: data.documentType.name,
+				alias: data.documentType.alias!,
+				icon: data.documentType.icon!,
+				name: data.documentType.name!,
+				unique: data.documentType.id,
 			},
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			id: data.id,

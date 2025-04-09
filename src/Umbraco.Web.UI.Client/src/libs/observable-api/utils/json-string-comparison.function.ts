@@ -8,5 +8,5 @@
  * Meaning no class instances can take part in this data.
  */
 export function jsonStringComparison(a: unknown, b: unknown): boolean {
-	return JSON.stringify(a) === JSON.stringify(b);
+	return (a === undefined && b === undefined) || JSON.stringify(a) === JSON.stringify(b);
 }
