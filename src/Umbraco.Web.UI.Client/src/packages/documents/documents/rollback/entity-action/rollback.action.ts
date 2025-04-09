@@ -8,7 +8,12 @@ export class UmbRollbackDocumentEntityAction extends UmbEntityActionBase<never> 
 	#localize = new UmbLocalizationController(this);
 
 	override async execute() {
-		await umbOpenModal(this, UMB_ROLLBACK_MODAL, {});
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManagerContext.open(this, UMB_ROLLBACK_MODAL, {});
+
+		const data = await modalContext.onSubmit().catch(() => undefined);
+		if (!data) return;
+
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		if (!notificationContext) {
 			throw new Error('Notification context not found');
