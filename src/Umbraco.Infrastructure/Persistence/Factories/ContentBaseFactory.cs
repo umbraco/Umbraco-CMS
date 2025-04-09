@@ -74,7 +74,7 @@ internal class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds an Media item from a dto and content type.
+    ///     Builds a Media item from a dto and content type.
     /// </summary>
     public static Core.Models.Media BuildEntity(ContentDto dto, IMediaType? contentType)
     {
@@ -114,7 +114,7 @@ internal class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds an Member item from a dto and member type.
+    ///     Builds a Member item from a dto and member type.
     /// </summary>
     public static Member BuildEntity(MemberDto dto, IMemberType? contentType)
     {
