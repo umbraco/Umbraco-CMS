@@ -86,19 +86,9 @@ stages:
         displayName: Integration Tests (SQLite)
         strategy:
           matrix:
+            #            Windows:
+            #              vmImage: 'windows-latest'
             # We split the tests into 3 parts for each OS to reduce the time it takes to run them on the pipeline
-            WindowsPart1Of3:
-              vmImage: "windows-latest"
-              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
-              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
-            WindowsPart2Of3:
-              vmImage: "windows-latest"
-              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
-              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
-            WindowsPart3Of3:
-              vmImage: "windows-latest"
-              # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
               # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
@@ -226,12 +216,12 @@ stages:
               $status = ""
 
               while (($status -ne 'running') -and ($attempt -lt $maxAttempts)) {
-              # We use the docker inspect command to check the status of the container. If the container is not running, we wait 5 seconds and try again. And if reaches 12 attempts, we fail the build.
+                Start-Sleep -Seconds 5
+                # We use the docker inspect command to check the status of the container. If the container is not running, we wait 5 seconds and try again. And if reaches 12 attempts, we fail the build.
                 $status = docker inspect -f '{{.State.Status}}' mssql
 
                 if ($status -ne 'running') {
                   Write-Host "Waiting for SQL Server to be ready... Attempt $($attempt + 1)"
-                  Start-Sleep -Seconds 5
                   $attempt++
                 }
               }
