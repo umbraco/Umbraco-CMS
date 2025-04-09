@@ -157,6 +157,7 @@
 		"check": "npm run lint:errors && npm run compile && npm run build-storybook && npm run generate:jsonschema:dist",
 		"check:paths": "node ./devops/build/check-path-length.js dist-cms 120",
 		"check:circular": "node ./devops/circular/index.js src",
+		"check:module-dependencies": "node ./devops/module-dependencies/index.js",
 		"compile": "tsc",
 		"dev": "vite",
 		"dev:server": "cross-env VITE_UMBRACO_USE_MSW=off vite",
