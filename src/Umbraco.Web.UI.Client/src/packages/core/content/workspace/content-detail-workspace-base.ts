@@ -64,7 +64,7 @@ export interface UmbContentDetailWorkspaceContextArgs<
 	contentTypeDetailRepository: UmbDetailRepositoryConstructor<ContentTypeDetailModelType>;
 	contentValidationRepository?: ClassConstructor<UmbContentValidationRepository<DetailModelType>>;
 	skipValidationOnSubmit?: boolean;
-	ignoreValidationOnSubmit?: boolean;
+	ignoreValidationResultOnSubmit?: boolean;
 	contentVariantScaffold: VariantModelType;
 	contentTypePropertyName: string;
 	saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
@@ -152,7 +152,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	#validateOnSubmit: boolean;
-	#ignoreValidationOnSubmit: boolean;
+	#ignoreValidationResultOnSubmit: boolean;
 	#serverValidation = new UmbServerModelValidatorContext(this);
 	#validationRepositoryClass?: ClassConstructor<UmbContentValidationRepository<DetailModelType>>;
 	#validationRepository?: UmbContentValidationRepository<DetailModelType>;
@@ -180,7 +180,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const contentTypeDetailRepository = new args.contentTypeDetailRepository(this);
 		this.#validationRepositoryClass = args.contentValidationRepository;
 		this.#validateOnSubmit = args.skipValidationOnSubmit ? !args.skipValidationOnSubmit : true;
-		this.#ignoreValidationOnSubmit = args.ignoreValidationOnSubmit ?? false;
+		this.#ignoreValidationResultOnSubmit = args.ignoreValidationResultOnSubmit ?? false;
 		this.structure = new UmbContentTypeStructureManager<ContentTypeDetailModelType>(this, contentTypeDetailRepository);
 		this.variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
 		this.variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
@@ -730,7 +730,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 					return this.performCreateOrUpdate(variantIds, saveData);
 				},
 				async (reason?: any) => {
-					if (this.#ignoreValidationOnSubmit) {
+					if (this.#ignoreValidationResultOnSubmit) {
 						return this.performCreateOrUpdate(variantIds, saveData);
 					} else {
 						return this.invalidSubmit(reason);
