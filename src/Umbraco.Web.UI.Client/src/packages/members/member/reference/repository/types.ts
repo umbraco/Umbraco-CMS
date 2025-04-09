@@ -1,6 +1,5 @@
 import type { UmbMemberItemVariantModel } from '../../item/types.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { TrackedReferenceMemberTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export interface UmbMemberReferenceModel extends UmbEntityModel {
 	/**
@@ -9,6 +8,11 @@ export interface UmbMemberReferenceModel extends UmbEntityModel {
 	 * @memberof UmbMemberReferenceModel
 	 */
 	name?: string | null;
-	memberType: TrackedReferenceMemberTypeModel;
+	memberType: {
+		alias: string;
+		icon: string;
+		name: string;
+		unique: string;
+	};
 	variants: Array<UmbMemberItemVariantModel>;
 }

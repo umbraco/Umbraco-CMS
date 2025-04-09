@@ -80,12 +80,30 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Does_not_return_references_if_item_is_not_referenced()
+    public async Task Does_Not_Return_References_If_Item_Is_Not_Referenced()
     {
         var sut = GetRequiredService<ITrackedReferencesService>();
 
         var actual = await sut.GetPagedRelationsForItemAsync(Root2.Key, 0, 10, true);
 
         Assert.AreEqual(0, actual.Total);
+    }
+
+    [Test]
+    public async Task Get_Pages_That_Reference_Recycle_Bin_Contents()
+    {
+        ContentService.MoveToRecycleBin(Root1);
+
+        var sut = GetRequiredService<ITrackedReferencesService>();
+
+        var actual = await sut.GetPagedRelationsForRecycleBinAsync(UmbracoObjectTypes.Document, 0, 10, true);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, actual.Total);
+            var item = actual.Items.FirstOrDefault();
+            Assert.AreEqual(Root2.ContentType.Alias, item?.ContentTypeAlias);
+            Assert.AreEqual(Root2.Key, item?.NodeKey);
+        });
     }
 }

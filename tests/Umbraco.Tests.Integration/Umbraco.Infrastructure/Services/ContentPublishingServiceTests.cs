@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -19,6 +19,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
 {
     private IContentPublishingService ContentPublishingService => GetRequiredService<IContentPublishingService>();
+
+    private IRelationService RelationService => GetRequiredService<IRelationService>();
 
     private static readonly ISet<string> _allCultures = new HashSet<string>(){ "*" };
 

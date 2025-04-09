@@ -775,6 +775,9 @@ path: () => import("./icons/icon-heading-2.js"),
 name: "icon-heading-3",
 path: () => import("./icons/icon-heading-3.js"),
 },{
+name: "icon-heading-4",
+path: () => import("./icons/icon-heading-4.js"),
+},{
 name: "icon-headphones",
 path: () => import("./icons/icon-headphones.js"),
 },{
@@ -1216,6 +1219,9 @@ path: () => import("./icons/icon-paper-plane.js"),
 },{
 name: "icon-partly-cloudy",
 path: () => import("./icons/icon-partly-cloudy.js"),
+},{
+name: "icon-paragraph",
+path: () => import("./icons/icon-paragraph.js"),
 },{
 name: "icon-paste-in",
 legacy: true,

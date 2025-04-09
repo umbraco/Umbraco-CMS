@@ -1,5 +1,6 @@
-import { UMB_ROUTE_CONTEXT, UMB_ROUTE_PATH_ADDENDUM_CONTEXT } from '../index.js';
 import type { IRouterSlot, Params } from '../router-slot/index.js';
+import { UMB_ROUTE_PATH_ADDENDUM_CONTEXT } from '../contexts/route-path-addendum.context-token.js';
+import { UMB_ROUTE_CONTEXT } from '../route/route.context.js';
 import { encodeFolderName } from '../encode-folder-name.function.js';
 import type { UmbModalRouteRegistration } from './modal-route-registration.interface.js';
 import type {
