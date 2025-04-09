@@ -33,7 +33,7 @@ export class UmbRouteNotFoundElement extends UmbLitElement {
 				align-items: center;
 				height: 100%;
 				opacity: 0;
-				animation: fadeIn 6s 0.2s forwards;
+				animation: fadeIn 5s 5s forwards;
 			}
 
 			@keyframes fadeIn {
