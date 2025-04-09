@@ -44,4 +44,11 @@ export type UmbApiWithErrorResponse = {
 	error: UmbError | UmbApiError | UmbCancelError | Error;
 };
 
-export type UmbApiResponse<T = unknown> = T & UmbApiWithDataResponse & UmbApiWithErrorResponse;
+/**
+ * UmbApiResponse is a type that represents the response from an API call.
+ * It can either be a successful response with data or an error response.
+ * @template T The type of the response data.
+ * @property {T} data The data returned from the API.
+ * @property {UmbError | UmbApiError | UmbCancelError | Error} error The error returned from the API.
+ */
+export type UmbApiResponse<T = unknown> = T & UmbApiWithDataResponse<T> & UmbApiWithErrorResponse;
