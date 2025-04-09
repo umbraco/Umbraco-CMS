@@ -1180,7 +1180,21 @@ internal partial class UserService : RepositoryService, IUserService
         return keys;
     }
 
-       public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(IUser performingUser, ChangeUserPasswordModel model)
+    /// <inheritdoc/>
+    public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeUserPasswordModel model)
+    {
+        IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+        IUser? performingUser = await userStore.GetAsync(performingUserKey);
+        if (performingUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new PasswordChangedModel());
+        }
+
+        return await ChangePasswordAsync(performingUser, model);
+    }
+
+    private async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(IUser performingUser, ChangeUserPasswordModel model)
     {
         IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -1220,12 +1234,13 @@ internal partial class UserService : RepositoryService, IUserService
         IBackOfficePasswordChanger passwordChanger = serviceScope.ServiceProvider.GetRequiredService<IBackOfficePasswordChanger>();
         Attempt<PasswordChangedModel?> result = await passwordChanger.ChangeBackOfficePassword(
             new ChangeBackOfficeUserPasswordModel
-        {
-            NewPassword = model.NewPassword,
-            OldPassword = model.OldPassword,
-            User = user,
-            ResetPasswordToken = model.ResetPasswordToken,
-        }, performingUser);
+            {
+                NewPassword = model.NewPassword,
+                OldPassword = model.OldPassword,
+                User = user,
+                ResetPasswordToken = model.ResetPasswordToken,
+            },
+            performingUser);
 
         if (result.Success is false)
         {
@@ -1234,21 +1249,6 @@ internal partial class UserService : RepositoryService, IUserService
 
         scope.Complete();
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, result.Result ?? new PasswordChangedModel());
-    }
-
-
-
-    public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeUserPasswordModel model)
-    {
-        IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-        IUser? performingUser = await userStore.GetAsync(performingUserKey);
-        if (performingUser is null)
-        {
-            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new PasswordChangedModel());
-        }
-
-        return await ChangePasswordAsync(performingUser, model);
     }
 
     public async Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(Guid performingUserKey, int skip, int take)
@@ -2212,7 +2212,7 @@ internal partial class UserService : RepositoryService, IUserService
         }
 
         Attempt<PasswordChangedModel, UserOperationStatus> changePasswordAttempt =
-            await ChangePasswordAsync(userKey, new ChangeUserPasswordModel
+            await ChangePasswordAsync(user, new ChangeUserPasswordModel
             {
                 NewPassword = password,
                 UserKey = userKey,
