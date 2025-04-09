@@ -14,7 +14,6 @@ const importMap = createImportMap({
 
 const importMapEntries = Object.entries(importMap.imports);
 const coreModules = importMapEntries.filter(([key, value]) => value.includes('/packages/core/'));
-const coreModuleAliases = coreModules.map(([key]) => key);
 
 const packageModules = importMapEntries.filter(
 	([key, value]) => value.includes('/packages/') && !value.includes('/packages/core/'),
@@ -109,8 +108,16 @@ function reportIllegalImportsFromCore() {
 	// Run through all core modules and find the imports
 	coreModules.forEach(([alias, path]) => {
 		const modules = getUmbracoModuleImportsInModule(alias);
+
+		// Check if any of the imports are in the package modules
 		const illegalImports = modules.filter((imp) => packageModuleAliases.includes(imp));
-		if (illegalImports.length === 0) return;
+
+		// If there are no illegal imports, skip
+		if (illegalImports.length === 0) {
+			return;
+		}
+
+		// If there are illegal imports, log them
 		console.error(`🚨 ${alias}: Illegal imports found:`);
 		illegalImports.forEach((imp) => {
 			console.error(`  → ${imp}`);
@@ -124,11 +131,6 @@ function reportIllegalImportsFromCore() {
 	} else {
 		throw new Error(`Illegal imports found in ${numberOfModulesWithIllegalImports} core modules.`);
 	}
-}
-
-// Change the path below to the folder you want to scan
-if (!process.env.MODULE_NAME) {
-	throw new Error('Please set the MODULE_NAME environment variable to the alias you want to scan.');
 }
 
 reportIllegalImportsFromCore();
