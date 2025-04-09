@@ -3,7 +3,6 @@ import path from 'path';
 
 // Regex patterns to match import and require statements
 const importRegex = /import\s+(?:[^'"]+\s+from\s+)?['"]([^'"]+)['"]/g;
-const requireRegex = /require\(\s*['"]([^'"]+)['"]\s*\)/g;
 
 /**
  * Recursively walk through a directory and return all file paths
@@ -72,7 +71,12 @@ function getAllImportsFromFolder(startPath) {
 }
 
 // Change the path below to the folder you want to scan
-const targetFolder = path.resolve(import.meta.dirname, '../../src/packages/ufm');
+if (!process.env.FOLDER) {
+	throw new Error('Please set the FOLDER environment variable to the folder you want to scan.');
+}
+
+const clientProjectRoot = path.resolve(import.meta.dirname, '../../');
+const targetFolder = path.resolve(clientProjectRoot, process.env.FOLDER);
 const imports = getAllImportsFromFolder(targetFolder);
 const importValues = imports.map((imp) => imp.value);
 const uniqueImports = [...new Set(importValues)];
