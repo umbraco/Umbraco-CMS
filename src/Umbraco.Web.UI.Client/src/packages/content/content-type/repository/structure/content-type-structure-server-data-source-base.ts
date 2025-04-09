@@ -1,8 +1,8 @@
-import type { UmbPagedModel } from '../../../../core/repository/types.js';
 import type { UmbContentTypeStructureDataSource } from './content-type-structure-data-source.interface.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 // Keep this type internal
 type AllowedContentTypeBaseModel = {
