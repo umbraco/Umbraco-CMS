@@ -98,7 +98,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
                 Blocks = JsonSerializer.Deserialize<RichTextBlockValue>($$"""
                                                                   {
                                                                   	"layout": {
-                                                                  		"Umbraco.TinyMCE": [{
+                                                                  		"{{Constants.PropertyEditors.Aliases.RichText}}": [{
                                                                   				"contentKey": "{{elementId:D}}"
                                                                   			}
                                                                   		]
@@ -151,7 +151,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
                 Blocks = JsonSerializer.Deserialize<RichTextBlockValue>($$"""
                                                                   {
                                                                   	"layout": {
-                                                                  		"Umbraco.TinyMCE": [{
+                                                                  		"{{Constants.PropertyEditors.Aliases.RichText}}": [{
                                                                   				"contentKey": "{{elementId:D}}"
                                                                   			}
                                                                   		]
