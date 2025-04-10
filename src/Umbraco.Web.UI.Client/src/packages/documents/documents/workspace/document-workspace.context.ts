@@ -222,7 +222,7 @@ export class UmbDocumentWorkspaceContext
 						const unique = 'UMB_preventEditInvariantFromNonDefault';
 
 						if (permitted) {
-							this.propertyReadonlyGuard.removeRule(unique);
+							this.propertyReadOnlyGuard.removeRule(unique);
 						} else {
 							const rule = {
 								unique,
@@ -230,7 +230,7 @@ export class UmbDocumentWorkspaceContext
 								message: 'Shared properties can only be edited in the default language',
 								variantId: new UmbVariantId(),
 							};
-							this.propertyReadonlyGuard.addRule(rule);
+							this.propertyReadOnlyGuard.addRule(rule);
 						}
 					},
 				},

@@ -60,7 +60,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 
 	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
 	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
-	public readonly propertyReadonlyGuard = new UmbVariantPropertyGuardManager(this);
+	public readonly propertyReadOnlyGuard = new UmbVariantPropertyGuardManager(this);
 
 	readonly validation = new UmbValidationController(this);
 
@@ -110,7 +110,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		this.#data.clear();
 		this.propertyViewGuard.clear();
 		this.propertyWriteGuard.clear();
-		this.propertyReadonlyGuard.clear();
+		this.propertyReadOnlyGuard.clear();
 		// default:
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();

@@ -40,7 +40,7 @@ export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {
 
 				this.observe(
 					observeMultiple([
-						this.ownerContext.propertyReadonlyGuard.permittedForVariantAndProperty(propertyVariantId, this.property),
+						this.ownerContext.propertyReadOnlyGuard.permittedForVariantAndProperty(propertyVariantId, this.property),
 						this.ownerContext.propertyWriteGuard.permittedForVariantAndProperty(propertyVariantId, this.property),
 					]),
 					([readonly, write]) => {

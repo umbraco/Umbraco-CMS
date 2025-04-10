@@ -13,9 +13,9 @@ export class ExampleWorkspaceActionManipulateReadonlyPermission
 	override async execute() {
 		const context = await this.getContext(UMB_CONTENT_WORKSPACE_CONTEXT);
 		if (this.#isOn) {
-			context.propertyReadonlyGuard.removeRule('exampleRule');
+			context.propertyReadOnlyGuard.removeRule('exampleRule');
 		} else {
-			context.propertyReadonlyGuard.addRule({
+			context.propertyReadOnlyGuard.addRule({
 				unique: 'exampleRule',
 				propertyType: { unique: '1_tipTap' }, // Notice ID is very short here as this is the mock data. Real Property type IDs are GUIDs.
 				//variantId: UmbVariantId.Create({ culture: 'en-US', segment: null }),
