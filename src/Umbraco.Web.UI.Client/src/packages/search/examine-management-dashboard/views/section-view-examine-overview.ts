@@ -28,14 +28,14 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 
 	private async _getIndexers() {
 		this._loadingIndexers = true;
-		const { data } = await tryExecute(this, IndexerService.getIndexer({ take: 9999, skip: 0 }));
+		const { data } = await tryExecute(this, IndexerService.getIndexer({ query: { take: 9999, skip: 0 } }));
 		this._indexers = data?.items ?? [];
 		this._loadingIndexers = false;
 	}
 
 	private async _getSearchers() {
 		this._loadingSearchers = true;
-		const { data } = await tryExecute(this, SearcherService.getSearcher({ take: 9999, skip: 0 }));
+		const { data } = await tryExecute(this, SearcherService.getSearcher({ query: { take: 9999, skip: 0 } }));
 		this._searchers = data?.items ?? [];
 		this._loadingSearchers = false;
 	}
