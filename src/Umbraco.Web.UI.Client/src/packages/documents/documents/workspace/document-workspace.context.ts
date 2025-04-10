@@ -250,12 +250,6 @@ export class UmbDocumentWorkspaceContext
 			this.#isTrashedContext.setIsTrashed(response.data.isTrashed);
 		}
 
-		await this.#setReadOnlyStateForUserPermission(
-			UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-			this.#userCanUpdate,
-			'You do not have permission to update documents.',
-		);
-
 		return response;
 	}
 
@@ -290,13 +284,6 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		});
-
-		// TODO: how can we be sure that this.#userCanCreate is set at this point?
-		await this.#setReadOnlyStateForUserPermission(
-			UMB_USER_PERMISSION_DOCUMENT_CREATE,
-			this.#userCanCreate,
-			'You do not have permission to create documents.',
-		);
 
 		return scaffold;
 	}
