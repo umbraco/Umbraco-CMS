@@ -13,6 +13,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 */
 	public bindDefaultInterceptors(client: typeof umbHttpClient) {
 		this.addAuthResponseInterceptor(client);
+		this.addUmbGeneratedResourceInterceptor(client);
 		this.addUmbNotificationsInterceptor(client);
 		this.addErrorInterceptor(client);
 	}
@@ -33,6 +34,31 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				authContext.timeOut();
 			}
 			return response;
+		});
+	}
+
+	/**
+	 * Interceptor which checks responses for the Umb-Generated-Resource header and replaces the value into the response body.
+	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
+	 * @internal
+	 */
+	addUmbGeneratedResourceInterceptor(client: typeof umbHttpClient) {
+		client.interceptors.response.use(async (response: Response) => {
+			if (!response.headers.has('Umb-Generated-Resource')) {
+				return response;
+			}
+
+			const generatedResource = response.headers.get('Umb-Generated-Resource');
+			if (generatedResource === null) {
+				return response;
+			}
+
+			// Generate new response body with the generated resource, which is a guid
+			const newResponse = new Response(generatedResource, {
+				...response,
+			});
+
+			return newResponse;
 		});
 	}
 
