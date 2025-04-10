@@ -7,7 +7,7 @@ export interface UmbVariantGuardRule extends UmbGuardRule {
 	variantId?: UmbVariantId;
 }
 
-function CompareStateAndVariantId(rules: Array<UmbVariantGuardRule>, variantId: UmbVariantId): boolean {
+function compareStateAndVariantId(rules: Array<UmbVariantGuardRule>, variantId: UmbVariantId): boolean {
 	// any specific states for the variant?
 	const variantState = rules.find((s) => s.variantId?.compare(variantId));
 	if (variantState) {
@@ -28,7 +28,7 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 	//
 	permittedForVariant(variantId: UmbVariantId): Observable<boolean> {
 		return this._rules.asObservablePart((states) => {
-			return CompareStateAndVariantId(states, variantId);
+			return compareStateAndVariantId(states, variantId);
 		});
 	}
 
@@ -38,11 +38,11 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 				// Or should we know about the fallback state here? [NL]
 				return false;
 			}
-			return CompareStateAndVariantId(states, variantId);
+			return compareStateAndVariantId(states, variantId);
 		});
 	}
 
 	getPermittedForVariant(variantId: UmbVariantId): boolean {
-		return CompareStateAndVariantId(this.getRules(), variantId);
+		return compareStateAndVariantId(this.getRules(), variantId);
 	}
 }
