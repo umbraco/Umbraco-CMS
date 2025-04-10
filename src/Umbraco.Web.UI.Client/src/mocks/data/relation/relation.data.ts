@@ -1,6 +1,9 @@
-import type { RelationResponseModel, RelationReferenceModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	RelationResponseModelReadable,
+	RelationReferenceModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 
-export type UmbMockRelationModel = RelationResponseModel;
+export type UmbMockRelationModel = RelationResponseModelReadable;
 export type UmbMockRelationReferenceModel = RelationReferenceModel;
 
 export const data: Array<UmbMockRelationModel> = [
