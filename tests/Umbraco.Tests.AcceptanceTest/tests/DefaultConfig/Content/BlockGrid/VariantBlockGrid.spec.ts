@@ -64,7 +64,7 @@ test('invariant document type with invariant block grid with invariant block wit
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);
 });
 
-test('unsupport invariant document type with invariant block grid with variant block with an invariant textString', async ({umbracoApi, umbracoUi}) => {
+test('can not create unsupported invariant document type with invariant block grid with variant block with an invariant textString', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   elementTypeId = await umbracoApi.documentType.createDefaultElementTypeWithVaryByCulture(blockName, elementGroupName, textStringName, textStringDataTypeId, true, false);
   blockGridId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridName, elementTypeId, true);
