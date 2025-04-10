@@ -3,7 +3,7 @@ import type { UmbMemberSearchItemModel, UmbMemberSearchRequestArgs } from './typ
 import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Rollback that fetches data from the server
@@ -31,7 +31,7 @@ export class UmbMemberSearchServerDataSource
 	 * @memberof UmbMemberSearchServerDataSource
 	 */
 	async search(args: UmbMemberSearchRequestArgs) {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			MemberService.getItemMemberSearch({
 				query: args.query,

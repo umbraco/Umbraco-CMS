@@ -75,7 +75,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 					this._submitModal();
 					return;
 				} catch {
-					//console.error(error);
+					return;
 				}
 
 				break;

@@ -10,7 +10,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
@@ -31,9 +31,11 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 		if (!documentData) throw new Error('The document was not found');
 
 		const appLanguageContext = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+		if (!appLanguageContext) throw new Error('The app language context is missing');
 		const appCulture = appLanguageContext.getAppCulture();
 
 		const currentUserContext = await this.getContext(UMB_CURRENT_USER_CONTEXT);
+		if (!currentUserContext) throw new Error('The current user context is missing');
 		const currentUserAllowedLanguages = currentUserContext.getLanguages();
 		const currentUserHasAccessToAllLanguages = currentUserContext.getHasAccessToAllLanguages();
 
@@ -69,22 +71,18 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 			selection.push(options[0].unique);
 		}
 
-		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const result = await modalManagerContext
-			.open(this, UMB_DOCUMENT_UNPUBLISH_MODAL, {
-				data: {
-					documentUnique: this.args.unique,
-					options,
-					pickableFilter: (option) => {
-						if (!option.culture) return false;
-						if (currentUserHasAccessToAllLanguages) return true;
-						return currentUserAllowedLanguages.includes(option.culture);
-					},
+		const result = await umbOpenModal(this, UMB_DOCUMENT_UNPUBLISH_MODAL, {
+			data: {
+				documentUnique: this.args.unique,
+				options,
+				pickableFilter: (option) => {
+					if (!option.culture) return false;
+					if (currentUserHasAccessToAllLanguages) return true;
+					return currentUserAllowedLanguages.includes(option.culture);
 				},
-				value: { selection },
-			})
-			.onSubmit()
-			.catch(() => undefined);
+			},
+			value: { selection },
+		}).catch(() => undefined);
 
 		if (!result?.selection.length) return;
 
@@ -96,6 +94,7 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 
 			if (!error) {
 				const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+				if (!actionEventContext) throw new Error('The action event context is missing');
 				const event = new UmbRequestReloadStructureForEntityEvent({
 					unique: this.args.unique,
 					entityType: this.args.entityType,

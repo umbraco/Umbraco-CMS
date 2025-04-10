@@ -167,12 +167,18 @@ export class UmbBlockGridEntriesContext
 				// Idea: Maybe on setup should be async, so it can retrieve the values when needed? [NL]
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
 				const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+				if (!clipboardContext) {
+					throw new Error('Clipboard context not available');
+				}
 				const pasteTranslatorManifests = clipboardContext.getPasteTranslatorManifests(
 					UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 				);
 
 				// TODO: consider moving some of this logic to the clipboard property context
 				const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+				if (!propertyContext) {
+					throw new Error('Property context not available');
+				}
 				const config = propertyContext.getConfig() as UmbBlockGridPropertyEditorConfig;
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
@@ -236,7 +242,9 @@ export class UmbBlockGridEntriesContext
 					}
 				} else if (value?.clipboard && value.clipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
-
+					if (!clipboardContext) {
+						throw new Error('Clipboard context not available');
+					}
 					const propertyValues = await clipboardContext.readMultiple<UmbBlockGridValueModel>(
 						value.clipboard.selection,
 						UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,

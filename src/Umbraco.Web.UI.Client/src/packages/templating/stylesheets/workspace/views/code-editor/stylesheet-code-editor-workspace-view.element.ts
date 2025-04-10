@@ -62,11 +62,11 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 			}
 
 			umb-code-editor {
-				--editor-height: calc(100dvh - 300px);
+				--editor-height: calc(100dvh - 260px);
 			}
 
 			uui-box {
-				min-height: calc(100dvh - 360px);
+				min-height: calc(100dvh - 260px);
 				margin: var(--uui-size-layout-1);
 				--uui-box-default-padding: 0;
 				/* remove header border bottom as code editor looks better in this box */

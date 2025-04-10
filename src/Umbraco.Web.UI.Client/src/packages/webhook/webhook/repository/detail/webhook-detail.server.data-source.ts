@@ -8,7 +8,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Webhook that fetches data from the server
@@ -59,7 +59,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookService.getWebhookById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, WebhookService.getWebhookById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -102,7 +102,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 			contentTypeKeys: model.contentTypes,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			WebhookService.postWebhook({
 				requestBody,
@@ -137,7 +137,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 			contentTypeKeys: model.contentTypes,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			WebhookService.putWebhookById({
 				id: model.unique,
@@ -161,7 +161,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			WebhookService.deleteWebhookById({
 				id: unique,

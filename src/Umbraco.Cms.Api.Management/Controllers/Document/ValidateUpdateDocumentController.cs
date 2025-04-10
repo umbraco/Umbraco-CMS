@@ -14,7 +14,6 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
-[ApiVersion("1.0")]
 [ApiVersion("1.1")]
 public class ValidateUpdateDocumentController : UpdateDocumentControllerBase
 {
@@ -47,31 +46,6 @@ public class ValidateUpdateDocumentController : UpdateDocumentControllerBase
         _documentEditingPresentationFactory = documentEditingPresentationFactory;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
-
-    [HttpPut("{id:guid}/validate")]
-    [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [Obsolete("Please use version 1.1 of this API. Will be removed in V16.")]
-    public async Task<IActionResult> Validate(CancellationToken cancellationToken, Guid id, UpdateDocumentRequestModel requestModel)
-        => await HandleRequest(id, requestModel, async () =>
-        {
-            var validateUpdateDocumentRequestModel = new ValidateUpdateDocumentRequestModel
-            {
-                Values = requestModel.Values,
-                Variants = requestModel.Variants,
-                Template = requestModel.Template,
-                Cultures = null
-            };
-
-            ValidateContentUpdateModel model = _documentEditingPresentationFactory.MapValidateUpdateModel(validateUpdateDocumentRequestModel);
-            Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await _contentEditingService.ValidateUpdateAsync(id, model);
-
-            return result.Success
-                ? Ok()
-                : DocumentEditingOperationStatusResult(result.Status, requestModel, result.Result);
-        });
 
     [HttpPut("{id:guid}/validate")]
     [MapToApiVersion("1.1")]

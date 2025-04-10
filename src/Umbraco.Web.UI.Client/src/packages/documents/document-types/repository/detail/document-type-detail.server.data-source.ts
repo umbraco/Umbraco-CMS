@@ -8,7 +8,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 
 /**
@@ -74,10 +74,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
-			this.#host,
-			DocumentTypeService.getDocumentTypeById({ id: unique }),
-		);
+		const { data, error } = await tryExecute(this.#host, DocumentTypeService.getDocumentTypeById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -190,7 +187,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentTypeService.postDocumentType({
 				requestBody,
@@ -266,7 +263,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			DocumentTypeService.putDocumentTypeById({
 				id: model.unique,
@@ -290,7 +287,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			DocumentTypeService.deleteDocumentTypeById({
 				id: unique,

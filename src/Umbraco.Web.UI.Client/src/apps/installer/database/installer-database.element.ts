@@ -7,11 +7,10 @@ import { css, html, nothing, customElement, property, query, state } from '@umbr
 import type {
 	DatabaseInstallRequestModel,
 	DatabaseSettingsPresentationModel,
-	ProblemDetails,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { ApiError, InstallService } from '@umbraco-cms/backoffice/external/backend-api';
+import { InstallService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { tryExecute, UmbApiError } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabaseElement extends UmbLitElement {
@@ -165,12 +164,14 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				};
 
 				const { error } = await tryExecute(
+					this,
 					InstallService.postInstallValidateDatabase({ requestBody: databaseDetails }),
+					{ disableNotifications: true },
 				);
 
 				if (error) {
 					this._validationErrorMessage = `The server could not validate the database connection. Details: ${
-						error instanceof ApiError ? (error.body as any).detail : error.message
+						UmbApiError.isUmbApiError(error) ? error.problemDetails.detail : error.message
 					}`;
 					this._installButton.state = 'failed';
 					return;
@@ -195,27 +196,8 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 
 		this._installerContext.nextStep();
 
-		const { error: _error } = await tryExecute(
-			InstallService.postInstallSetup({ requestBody: this._installerContext.getData() }),
-		);
-		const error = _error as ProblemDetails | undefined;
-		if (error) {
-			this._handleRejected(error);
-		} else {
-			this._handleFulfilled();
-		}
+		this._installerContext.postInstallSetup();
 	};
-
-	private _handleFulfilled() {
-		// TODO: The post install will probably return a user in the future, so we have to set that context somewhere to let the client know that it is authenticated
-		console.warn('TODO: Set up real authentication');
-		sessionStorage.setItem('is-authenticated', 'true');
-		history.replaceState(null, '', 'section/content');
-	}
-
-	private _handleRejected(e: ProblemDetails) {
-		this._installerContext?.setInstallStatus(e);
-	}
 
 	private _onBack() {
 		this._installerContext?.prevStep();

@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Factories;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
+internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
 {
     public IUserGroupPresentationFactory UserGroupPresentationFactory => GetRequiredService<IUserGroupPresentationFactory>();
 

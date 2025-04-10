@@ -19,11 +19,9 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 
 		this.#publishingDataSource = new UmbDocumentPublishingServerDataSource(this);
 
-		this.#init = Promise.all([
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
-				this.#notificationContext = instance;
-			}).asPromise(),
-		]);
+		this.#init = this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
+			this.#notificationContext = instance;
+		}).asPromise({ preventTimeout: true });
 	}
 
 	/**

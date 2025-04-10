@@ -1,8 +1,8 @@
 import type { UmbCurrentUserModel } from '../types.js';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecute, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the current user that fetches data from the server
@@ -17,7 +17,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getCurrentUser() {
-		const { data, error } = await tryExecuteAndNotify(this, UserService.getUserCurrent());
+		const { data, error } = await tryExecute(this, UserService.getUserCurrent());
 
 		if (data) {
 			const permissionDataPromises = data.permissions.map(async (item) => {
@@ -74,7 +74,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getExternalLoginProviders() {
-		return tryExecuteAndNotify(this, UserService.getUserCurrentLoginProviders());
+		return tryExecute(this, UserService.getUserCurrentLoginProviders());
 	}
 
 	/**
@@ -82,7 +82,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getMfaLoginProviders() {
-		const { data, error } = await tryExecuteAndNotify(this, UserService.getUserCurrent2Fa());
+		const { data, error } = await tryExecute(this, UserService.getUserCurrent2Fa());
 
 		if (data) {
 			return { data };
@@ -99,6 +99,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	 */
 	async enableMfaProvider(providerName: string, code: string, secret: string) {
 		const { error } = await tryExecute(
+			this.#host,
 			UserService.postUserCurrent2FaByProviderName({ providerName, requestBody: { code, secret } }),
 		);
 
@@ -115,7 +116,10 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	 * @param code
 	 */
 	async disableMfaProvider(providerName: string, code: string) {
-		const { error } = await tryExecute(UserService.deleteUserCurrent2FaByProviderName({ providerName, code }));
+		const { error } = await tryExecute(
+			this.#host,
+			UserService.deleteUserCurrent2FaByProviderName({ providerName, code }),
+		);
 
 		if (error) {
 			return { error };
@@ -133,7 +137,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	 * @returns
 	 */
 	async changePassword(newPassword: string, oldPassword: string) {
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this,
 			UserService.postUserCurrentChangePassword({
 				requestBody: {

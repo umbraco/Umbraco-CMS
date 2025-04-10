@@ -8,7 +8,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DictionaryService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Dictionary that fetches data from the server
@@ -52,7 +52,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, DictionaryService.getDictionaryById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, DictionaryService.getDictionaryById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -87,7 +87,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 			translations: model.translations,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			DictionaryService.postDictionary({
 				requestBody,
@@ -117,7 +117,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 			translations: model.translations,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			DictionaryService.putDictionaryById({
 				id: model.unique,
@@ -141,7 +141,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			DictionaryService.deleteDictionaryById({
 				id: unique,

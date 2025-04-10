@@ -122,14 +122,6 @@ public static class ViewDataExtensions
         this ViewDataDictionary viewData,
         BackOfficeExternalLoginProviderErrors errors) => viewData[TokenExternalSignInError] = errors;
 
-    [Obsolete("This is deprecated and will be removed in V15")]
-    public static string? GetPasswordResetCode(this ViewDataDictionary viewData) =>
-        (string?)viewData[TokenPasswordResetCode];
-
-    [Obsolete("This is deprecated and will be removed in V15")]
-    public static void SetPasswordResetCode(this ViewDataDictionary viewData, string value) =>
-        viewData[TokenPasswordResetCode] = value;
-
     public static void SetTwoFactorProviderNames(this ViewDataDictionary viewData, IEnumerable<string> providerNames) =>
         viewData[TokenTwoFactorRequired] = providerNames;
 

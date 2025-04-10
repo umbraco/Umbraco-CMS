@@ -11,7 +11,7 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
-public class ContentListViewServiceTests : ContentListViewServiceTestsBase
+internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsBase
 {
     private static readonly Guid CustomListViewKey = new("AD8E2AAF-6801-408A-8CCF-EFAC0312729B");
 

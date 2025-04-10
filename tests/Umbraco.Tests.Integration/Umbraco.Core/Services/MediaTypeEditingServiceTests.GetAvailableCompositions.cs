@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 
@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 ///     even though those share a base implementation.
 ///     For a more detailed test suite on compositions, check <see cref="ContentTypeEditingServiceTests" />.
 /// </summary>
-public partial class MediaTypeEditingServiceTests
+internal sealed partial class MediaTypeEditingServiceTests
 {
     [Test]
     public async Task Can_Get_Available_Compositions_Only_From_Media_Type_Key()

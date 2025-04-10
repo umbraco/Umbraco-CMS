@@ -10,6 +10,10 @@ import { join } from 'path';
 //import { mkdirSync } from 'fs';
 
 //const __dirname = import.meta.dirname;
+
+// Adjust this number as needed.
+const MAX_CIRCULAR_DEPENDENCIES = 4;
+
 const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
 const IS_AZURE_PIPELINES = process.env.TF_BUILD === 'true';
 const baseDir = process.argv[2] || 'src';
@@ -52,7 +56,11 @@ if (circular.length) {
 	*/
 
 	// TODO: Remove this check and set an exit with argument 1 when we have fixed all circular dependencies.
-	if (circular.length > 9) {
+	if (circular.length > MAX_CIRCULAR_DEPENDENCIES) {
+		process.exit(1);
+	} else if (circular.length < MAX_CIRCULAR_DEPENDENCIES) {
+		console.error(`\nYou have fewer circular dependencies (${circular.length}) than anticipated (${MAX_CIRCULAR_DEPENDENCIES}). That is great!\n`);
+		console.error(`(Now please adjust the number in MAX_CIRCULAR_DEPENDENCIES to ${circular.length} in devops/circular/index.js).\n`);
 		process.exit(1);
 	} else {
 		process.exit(0);

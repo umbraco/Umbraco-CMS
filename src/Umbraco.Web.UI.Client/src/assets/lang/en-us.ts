@@ -449,7 +449,6 @@ export default {
 			"Defines a re-usable set of properties that can be included in the definition of\n      multiple other Document Types. For example, a set of 'Common Page Settings'.\n    ",
 		folder: 'Folder',
 		folderDescription: 'Used to organize items and other folders. Keep items structured and easy to access.',
-		newFolder: 'Folder',
 		newDataType: 'Data Type',
 		newJavascriptFile: 'New JavaScript file',
 		newEmptyPartialView: 'New empty partial view',
@@ -457,8 +456,6 @@ export default {
 		newPartialViewFromSnippet: 'New partial view from snippet',
 		newPartialViewMacroFromSnippet: 'New partial view macro from snippet',
 		newPartialViewMacroNoMacro: 'New partial view macro (without macro)',
-		newStyleSheetFile: 'New style sheet file',
-		newRteStyleSheetFile: 'New Rich Text Editor style sheet file',
 	},
 	dashboard: {
 		browser: 'Browse your website',
@@ -468,18 +465,6 @@ export default {
 		restart: 'Restart',
 		visit: 'Visit',
 		welcome: 'Welcome',
-	},
-	prompt: {
-		stay: 'Stay',
-		discardChanges: 'Discard changes',
-		unsavedChanges: 'You have unsaved changes',
-		unsavedChangesWarning: 'Are you sure you want to navigate away from this page? You have unsaved changes',
-		confirmListViewPublish: 'Publishing will make the selected items visible on the site.',
-		confirmListViewUnpublish:
-			'Unpublishing will remove the selected items and all their descendants from the\n      site.\n    ',
-		confirmUnpublish: 'Unpublishing will remove this page and all its descendants from the site.',
-		doctypeChangeWarning:
-			'You have unsaved changes. Making changes to the Document Type will discard the\n      changes.\n    ',
 	},
 	bulk: {
 		done: 'Done',

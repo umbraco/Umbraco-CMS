@@ -955,25 +955,6 @@ export const data: Array<UmbMockDocumentModel> = [
 					`,
 				},
 			},
-			{
-				alias: 'tinymce',
-				editorAlias: 'Umb.PropertyEditorUi.TinyMCE',
-				culture: null,
-				segment: null,
-				value: {
-					blocks: undefined,
-					markup: `
-						<p>
-							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
-						</p>
-						<div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
-						<p>
-							<img width="384" height="228" loading="lazy" alt="Installer illustration" src="/umbraco/backoffice/assets/installer-illustration.svg" />
-						</p>
-						<p>End of test content</p>
-					`,
-				},
-			},
 		],
 	},
 	{

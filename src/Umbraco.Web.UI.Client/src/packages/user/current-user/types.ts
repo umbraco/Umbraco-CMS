@@ -1,10 +1,9 @@
 import type {
-	ApiError,
-	CancelError,
 	UserExternalLoginProviderModel,
 	UserTwoFactorProviderModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import type { UmbApiError, UmbCancelError } from '@umbraco-cms/backoffice/resources';
 
 export type * from './user-profile-app.extension.js';
 export type * from './current-user-action.extension.js';
@@ -35,7 +34,7 @@ export type UmbCurrentUserExternalLoginProviderModel = UserExternalLoginProvider
 
 export type UmbCurrentUserMfaProviderModel = UserTwoFactorProviderModel;
 
-export type UmbMfaProviderConfigurationCallback = Promise<{ error?: ApiError | CancelError }>;
+export type UmbMfaProviderConfigurationCallback = Promise<{ error?: UmbApiError | UmbCancelError }>;
 
 export interface UmbMfaProviderConfigurationElementProps {
 	/**

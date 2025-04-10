@@ -7,8 +7,8 @@ import type {
 import { UserGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbManagementApiDataMapper, type UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the User Group that fetches data from the server
@@ -59,7 +59,7 @@ export class UmbUserGroupServerDataSource
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this, UserGroupService.getUserGroupById({ id: unique }));
+		const { data, error } = await tryExecute(this, UserGroupService.getUserGroupById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -138,7 +138,7 @@ export class UmbUserGroupServerDataSource
 			sections: model.sections,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this,
 			UserGroupService.postUserGroup({
 				requestBody,
@@ -188,7 +188,7 @@ export class UmbUserGroupServerDataSource
 			sections: model.sections,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this,
 			UserGroupService.putUserGroupById({
 				id: model.unique,
@@ -212,7 +212,7 @@ export class UmbUserGroupServerDataSource
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this,
 			UserGroupService.deleteUserGroupById({
 				id: unique,

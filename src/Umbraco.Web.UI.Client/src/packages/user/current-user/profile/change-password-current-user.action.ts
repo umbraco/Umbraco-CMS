@@ -3,7 +3,7 @@ import { UmbCurrentUserRepository } from '../repository/index.js';
 import type { UmbCurrentUserAction, UmbCurrentUserActionArgs } from '../current-user-action.extension.js';
 import { UmbActionBase } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/user-change-password';
 export class UmbChangePasswordCurrentUserAction<ArgsMetaType = never>
 	extends UmbActionBase<UmbCurrentUserActionArgs<ArgsMetaType>>
@@ -32,8 +32,7 @@ export class UmbChangePasswordCurrentUserAction<ArgsMetaType = never>
 	async execute() {
 		if (!this.#unique) return;
 
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_CHANGE_PASSWORD_MODAL, {
+		const data = await umbOpenModal(this, UMB_CHANGE_PASSWORD_MODAL, {
 			data: {
 				user: {
 					unique: this.#unique,
@@ -41,7 +40,6 @@ export class UmbChangePasswordCurrentUserAction<ArgsMetaType = never>
 			},
 		});
 
-		const data = await modalContext.onSubmit();
 		const repository = new UmbCurrentUserRepository(this);
 		await repository.changePassword(data.newPassword, data.oldPassword);
 	}

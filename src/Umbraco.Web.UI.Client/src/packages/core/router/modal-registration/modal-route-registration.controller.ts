@@ -1,3 +1,6 @@
+import type { IRouterSlot, Params } from '../router-slot/index.js';
+import { UMB_ROUTE_PATH_ADDENDUM_CONTEXT } from '../contexts/route-path-addendum.context-token.js';
+import { UMB_ROUTE_CONTEXT } from '../route/route.context.js';
 import { encodeFolderName } from '../encode-folder-name.function.js';
 import type { UmbModalRouteRegistration } from './modal-route-registration.interface.js';
 import type {
@@ -11,9 +14,6 @@ import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoff
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
-import type { IRouterSlot, Params } from '@umbraco-cms/backoffice/external/router-slot';
-import { UMB_ROUTE_PATH_ADDENDUM_CONTEXT } from '../contexts/route-path-addendum.context-token.js';
-import { UMB_ROUTE_CONTEXT } from '../route/route.context.js';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
@@ -49,7 +49,6 @@ export class UmbModalRouteRegistrationController<
 {
 	//
 	#init;
-	#contextConsumer;
 
 	#addendum?: string;
 	#additionalPath?: string;
@@ -102,11 +101,10 @@ export class UmbModalRouteRegistrationController<
 			);
 		});
 
-		this.#contextConsumer = this.consumeContext(UMB_ROUTE_CONTEXT, (_routeContext) => {
+		this.#init = this.consumeContext(UMB_ROUTE_CONTEXT, (_routeContext) => {
 			this.#routeContext = _routeContext;
 			this.#registerModal();
-		});
-		this.#init = this.#contextConsumer.asPromise();
+		}).asPromise({ preventTimeout: true });
 	}
 
 	/**
@@ -350,7 +348,6 @@ export class UmbModalRouteRegistrationController<
 
 	public override destroy(): void {
 		super.destroy();
-		this.#contextConsumer.destroy();
 		this.#modalRegistrationContext = undefined;
 		this.#uniquePaths = undefined as any;
 		this.#routeContext = undefined;

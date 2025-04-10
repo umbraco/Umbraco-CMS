@@ -444,6 +444,13 @@ export type CultureReponseModel = {
     englishName: string;
 };
 
+export type CurrentUserConfigurationResponseModel = {
+    keepUserLoggedIn: boolean;
+    passwordConfiguration: (PasswordConfigurationResponseModel);
+    allowChangePassword: boolean;
+    allowTwoFactor: boolean;
+};
+
 export type CurrentUserResponseModel = {
     email: string;
     userName: string;
@@ -463,17 +470,6 @@ export type CurrentUserResponseModel = {
     permissions: Array<(DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
     allowedSections: Array<(string)>;
     isAdmin: boolean;
-};
-
-export type CurrenUserConfigurationResponseModel = {
-    keepUserLoggedIn: boolean;
-    /**
-     * @deprecated
-     */
-    usernameIsEmail: boolean;
-    passwordConfiguration: (PasswordConfigurationResponseModel);
-    allowChangePassword: boolean;
-    allowTwoFactor: boolean;
 };
 
 export type DatabaseInstallRequestModel = {
@@ -652,10 +648,6 @@ export type DocumentConfigurationResponseModel = {
     disableUnpublishWhenReferenced: boolean;
     allowEditInvariantFromNonDefault: boolean;
     allowNonExistingSegmentsCreation: boolean;
-    /**
-     * @deprecated
-     */
-    reservedFieldNames: Array<(string)>;
 };
 
 export type DocumentItemResponseModel = {
@@ -1210,10 +1202,6 @@ export type MediaCollectionResponseModel = {
 export type MediaConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
-    /**
-     * @deprecated
-     */
-    reservedFieldNames: Array<(string)>;
 };
 
 export type MediaItemResponseModel = {
@@ -1404,10 +1392,7 @@ export type MediaVariantResponseModel = {
 };
 
 export type MemberConfigurationResponseModel = {
-    /**
-     * @deprecated
-     */
-    reservedFieldNames: Array<(string)>;
+    [key: string]: unknown;
 };
 
 export type MemberGroupItemResponseModel = {
@@ -3373,13 +3358,6 @@ export type PutDocumentByIdUnpublishData = {
 
 export type PutDocumentByIdUnpublishResponse = (string);
 
-export type PutDocumentByIdValidateData = {
-    id: string;
-    requestBody?: (UpdateDocumentRequestModel);
-};
-
-export type PutDocumentByIdValidateResponse = (string);
-
 export type PutUmbracoManagementApiV11DocumentByIdValidate11Data = {
     id: string;
     requestBody?: (ValidateUpdateDocumentRequestModel);
@@ -5306,7 +5284,7 @@ export type PostUserCurrentChangePasswordData = {
 
 export type PostUserCurrentChangePasswordResponse = (string);
 
-export type GetUserCurrentConfigurationResponse = ((CurrenUserConfigurationResponseModel));
+export type GetUserCurrentConfigurationResponse = ((CurrentUserConfigurationResponseModel));
 
 export type GetUserCurrentLoginProvidersResponse = (Array<(UserExternalLoginProviderModel)>);
 

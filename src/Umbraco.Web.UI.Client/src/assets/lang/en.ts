@@ -447,8 +447,7 @@ export default {
 		newPartialViewFromSnippet: 'New partial view from snippet',
 		newPartialViewMacroFromSnippet: 'New partial view macro from snippet',
 		newPartialViewMacroNoMacro: 'New partial view macro (without macro)',
-		newStyleSheetFile: 'New style sheet file',
-		newRteStyleSheetFile: 'New Rich Text Editor style sheet file',
+		newStyleSheetFile: 'New Stylesheet',
 	},
 	dashboard: {
 		browser: 'Browse your website',
@@ -462,15 +461,12 @@ export default {
 	prompt: {
 		stay: 'Stay',
 		discardChanges: 'Discard changes',
-		unsavedChanges: 'You have unsaved changes',
-		unsavedChangesWarning:
-			'Are you sure you want to navigate away from this page? - you have unsaved\n      changes\n    ',
+		unsavedChanges: 'Discard unsaved changes',
+		unsavedChangesWarning: 'Are you sure you want to navigate away from this page? You have unsaved changes',
 		confirmListViewPublish: 'Publishing will make the selected items visible on the site.',
-		confirmListViewUnpublish:
-			'Unpublishing will remove the selected items and all their descendants from the\n      site.\n    ',
+		confirmListViewUnpublish: 'Unpublishing will remove the selected items and all their descendants from the site.',
 		confirmUnpublish: 'Unpublishing will remove this page and all its descendants from the site.',
-		doctypeChangeWarning:
-			'You have unsaved changes. Making changes to the Document Type will discard the\n      changes.\n    ',
+		doctypeChangeWarning: 'You have unsaved changes. Making changes to the Document Type will discard the changes.',
 	},
 	bulk: {
 		done: 'Done',
@@ -882,6 +878,7 @@ export default {
 		orderBy: 'Order by',
 		password: 'Password',
 		path: 'Path',
+		pixels: 'pixels',
 		pleasewait: 'One moment please...',
 		previous: 'Previous',
 		properties: 'Properties',

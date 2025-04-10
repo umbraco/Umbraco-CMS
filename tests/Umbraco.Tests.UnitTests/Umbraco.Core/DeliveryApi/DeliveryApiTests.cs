@@ -73,7 +73,7 @@ public class DeliveryApiTests
     {
         var mockPublishedContentTypeFactory = new Mock<IPublishedContentTypeFactory>();
         mockPublishedContentTypeFactory.Setup(x => x.GetDataType(It.IsAny<int>()))
-            .Returns(new PublishedDataType(123, editorAlias, new Lazy<object>(() => dataTypeConfiguration)));
+            .Returns(new PublishedDataType(123, editorAlias, editorAlias, new Lazy<object>(() => dataTypeConfiguration)));
 
         var publishedPropType = new PublishedPropertyType(
             propertyTypeAlias,

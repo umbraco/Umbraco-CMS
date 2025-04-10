@@ -1,6 +1,6 @@
 import { UMB_RESTORE_FROM_RECYCLE_BIN_MODAL } from './modal/restore-from-recycle-bin-modal.token.js';
 import type { MetaEntityActionRestoreFromRecycleBinKind } from './types.js';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
@@ -17,8 +17,7 @@ export class UmbRestoreFromRecycleBinEntityAction extends UmbEntityActionBase<Me
 	override async execute() {
 		if (!this.args.unique) throw new Error('Cannot restore an item without a unique identifier.');
 
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modal = modalManager.open(this, UMB_RESTORE_FROM_RECYCLE_BIN_MODAL, {
+		const { destination } = await umbOpenModal(this, UMB_RESTORE_FROM_RECYCLE_BIN_MODAL, {
 			data: {
 				unique: this.args.unique,
 				entityType: this.args.entityType,
@@ -28,10 +27,12 @@ export class UmbRestoreFromRecycleBinEntityAction extends UmbEntityActionBase<Me
 			},
 		});
 
-		const { destination } = await modal.onSubmit();
 		if (!destination) throw new Error('Cannot reload the structure without a destination.');
 
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!actionEventContext) {
+			throw new Error('Event context not found.');
+		}
 		const event = new UmbRequestReloadStructureForEntityEvent({
 			unique: this.args.unique,
 			entityType: this.args.entityType,

@@ -13,7 +13,7 @@ import { UmbUnpublishDocumentEntityAction } from '../unpublish/index.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing.workspace-context.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
@@ -50,11 +50,11 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, async (context) => {
 				this.#documentWorkspaceContext = context;
 				this.#initPendingChanges();
-			}).asPromise(),
+			}).asPromise({ preventTimeout: true }),
 
 			this.consumeContext(UMB_ACTION_EVENT_CONTEXT, async (context) => {
 				this.#eventContext = context;
-			}).asPromise(),
+			}).asPromise({ preventTimeout: true }),
 		]);
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
@@ -97,24 +97,20 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 		const { options, selected } = await this.#determineVariantOptions();
 
-		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const result = await modalManagerContext
-			.open(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
-				data: {
-					options,
-					activeVariants: selected,
-					pickableFilter: this.#publishableVariantsFilter,
-					prevalues: options.map((option) => ({
-						unique: option.unique,
-						schedule: {
-							publishTime: option.variant?.scheduledPublishDate,
-							unpublishTime: option.variant?.scheduledUnpublishDate,
-						},
-					})),
-				},
-			})
-			.onSubmit()
-			.catch(() => undefined);
+		const result = await umbOpenModal(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
+			data: {
+				options,
+				activeVariants: selected,
+				pickableFilter: this.#publishableVariantsFilter,
+				prevalues: options.map((option) => ({
+					unique: option.unique,
+					schedule: {
+						publishTime: option.variant?.scheduledPublishDate,
+						unpublishTime: option.variant?.scheduledUnpublishDate,
+					},
+				})),
+			},
+		}).catch(() => undefined);
 
 		if (!result?.selection.length) return;
 
@@ -164,6 +160,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			},
 			async (reason?: any) => {
 				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+				if (!notificationContext) {
+					throw new Error('Notification context is missing');
+				}
 				notificationContext.peek('danger', {
 					data: { message: this.#localize.term('speechBubbles_editContentScheduledNotSavedText') },
 				});
@@ -212,17 +211,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 		const { options, selected } = await this.#determineVariantOptions();
 
-		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const result = await modalManagerContext
-			.open(this, UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL, {
-				data: {
-					options,
-					pickableFilter: this.#publishableVariantsFilter,
-				},
-				value: { selection: selected },
-			})
-			.onSubmit()
-			.catch(() => undefined);
+		const result = await umbOpenModal(this, UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL, {
+			data: {
+				options,
+				pickableFilter: this.#publishableVariantsFilter,
+			},
+			value: { selection: selected },
+		}).catch(() => undefined);
 
 		if (!result?.selection.length) return;
 
@@ -290,17 +285,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else {
 			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
-			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-			const result = await modalManagerContext
-				.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
-					data: {
-						options,
-						pickableFilter: this.#publishableVariantsFilter,
-					},
-					value: { selection: selected },
-				})
-				.onSubmit()
-				.catch(() => undefined);
+			const result = await umbOpenModal(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+				data: {
+					options,
+					pickableFilter: this.#publishableVariantsFilter,
+				},
+				value: { selection: selected },
+			}).catch(() => undefined);
 
 			if (!result?.selection.length || !unique) return;
 
@@ -321,6 +312,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 				await this.#documentWorkspaceContext!.performCreateOrUpdate(variantIds, saveData);
 				// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
 				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+				if (!notificationContext) {
+					throw new Error('Notification context is missing');
+				}
 				// TODO: Get rid of the save notification.
 				notificationContext.peek('danger', {
 					data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },

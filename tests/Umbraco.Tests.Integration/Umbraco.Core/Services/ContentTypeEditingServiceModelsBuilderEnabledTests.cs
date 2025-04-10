@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public class ContentTypeEditingServiceModelsBuilderEnabledTests : ContentTypeEditingServiceModelsBuilderEnabledTestsBase
+internal sealed class ContentTypeEditingServiceModelsBuilderEnabledTests : ContentTypeEditingServiceModelsBuilderEnabledTestsBase
 {
     // test some properties from IPublishedContent
     [TestCaseSource(nameof(DifferentCapitalizedAlias), new object[] { nameof(IPublishedContent.Id) })]

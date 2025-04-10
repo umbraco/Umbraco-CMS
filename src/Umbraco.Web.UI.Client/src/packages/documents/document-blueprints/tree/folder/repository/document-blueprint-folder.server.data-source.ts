@@ -2,7 +2,7 @@ import { UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE } from '../../../entity.js';
 import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 
@@ -49,7 +49,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentBlueprintService.getDocumentBlueprintFolderById({
 				id: unique,
@@ -86,7 +86,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 			name: model.name,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			DocumentBlueprintService.postDocumentBlueprintFolder({
 				requestBody,
@@ -111,7 +111,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.name) throw new Error('Folder name is missing');
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			DocumentBlueprintService.putDocumentBlueprintFolderById({
 				id: model.unique,
@@ -134,7 +134,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			DocumentBlueprintService.deleteDocumentBlueprintFolderById({
 				id: unique,

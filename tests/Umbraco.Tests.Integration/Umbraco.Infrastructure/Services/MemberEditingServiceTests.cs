@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [TestFixture]
 [Category("Slow")]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MemberEditingServiceTests : UmbracoIntegrationTest
+internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
 {
     private IMemberEditingService MemberEditingService => GetRequiredService<IMemberEditingService>();
 

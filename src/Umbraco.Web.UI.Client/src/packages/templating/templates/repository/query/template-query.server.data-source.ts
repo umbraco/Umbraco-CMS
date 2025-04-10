@@ -2,7 +2,7 @@ import type { UmbExecuteTemplateQueryRequestModel } from './types.js';
 import type { TemplateQueryExecuteModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { TemplateService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Template Query Builder that fetches data from the server
@@ -28,7 +28,7 @@ export class UmbTemplateQueryServerDataSource {
 	 * @memberof UmbTemplateQueryServerDataSource
 	 */
 	async getTemplateQuerySettings() {
-		return tryExecuteAndNotify(this.#host, TemplateService.getTemplateQuerySettings());
+		return tryExecute(this.#host, TemplateService.getTemplateQuerySettings());
 	}
 	/**
 	 * Executes a query builder query on the server
@@ -45,6 +45,6 @@ export class UmbTemplateQueryServerDataSource {
 			take: args.take,
 		};
 
-		return tryExecuteAndNotify(this.#host, TemplateService.postTemplateQueryExecute({ requestBody }));
+		return tryExecute(this.#host, TemplateService.postTemplateQueryExecute({ requestBody }));
 	}
 }

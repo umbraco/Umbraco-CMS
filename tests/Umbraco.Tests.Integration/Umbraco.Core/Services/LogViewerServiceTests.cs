@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class LogViewerServiceTests : UmbracoIntegrationTest
+internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
 {
     private ILogViewerService LogViewerService => GetRequiredService<ILogViewerService>();
 

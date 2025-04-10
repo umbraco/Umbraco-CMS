@@ -5,7 +5,7 @@ import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Media that fetches data from the server
@@ -66,7 +66,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, MediaService.getMediaById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, MediaService.getMediaById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -123,7 +123,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 			})),
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			MediaService.postMedia({
 				requestBody,
@@ -153,7 +153,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 			variants: model.variants,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			MediaService.putMediaById({
 				id: model.unique,
@@ -177,6 +177,6 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(this.#host, MediaService.deleteMediaById({ id: unique }));
+		return tryExecute(this.#host, MediaService.deleteMediaById({ id: unique }));
 	}
 }

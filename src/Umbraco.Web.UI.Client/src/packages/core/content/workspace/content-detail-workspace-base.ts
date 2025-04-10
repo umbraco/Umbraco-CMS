@@ -39,7 +39,7 @@ import {
 	UmbValidationController,
 } from '@umbraco-cms/backoffice/validation';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UmbEntityUpdatedEvent,
@@ -641,6 +641,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
 		if (variantsWithoutAName.length > 0) {
 			const validationContext = await this.getContext(UMB_VALIDATION_CONTEXT);
+			if (!validationContext) {
+				throw new Error('Validation context is missing');
+			}
 			variantsWithoutAName.forEach((variant) => {
 				validationContext.messages.addMessage(
 					'client',
@@ -720,17 +723,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else if (this.#saveModalToken) {
 			// If there are multiple variants, we will open the modal to let the user pick which variants to save.
-			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-			const result = await modalManagerContext
-				.open(this, this.#saveModalToken, {
-					data: {
-						options,
-						pickableFilter: this._saveableVariantsFilter,
-					},
-					value: { selection: selected },
-				})
-				.onSubmit()
-				.catch(() => undefined);
+			const result = await umbOpenModal(this, this.#saveModalToken, {
+				data: {
+					options,
+					pickableFilter: this._saveableVariantsFilter,
+				},
+				value: { selection: selected },
+			}).catch(() => undefined);
 
 			if (!result?.selection.length) return;
 
@@ -820,6 +819,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this._data.setCurrent(newCurrentData);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) {
+			throw new Error('Event context is missing');
+		}
 		const event = new UmbRequestReloadChildrenOfEntityEvent({
 			entityType: parent.entityType,
 			unique: parent.unique,
@@ -864,6 +866,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const entityType = this.getEntityType();
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) {
+			throw new Error('Event context is missing');
+		}
 		const structureEvent = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 		eventContext.dispatchEvent(structureEvent);
 

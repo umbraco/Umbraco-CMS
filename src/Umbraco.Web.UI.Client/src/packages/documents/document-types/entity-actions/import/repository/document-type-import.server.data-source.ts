@@ -1,6 +1,6 @@
 import { DocumentTypeService, type PostDocumentTypeImportData } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Document Type Import Server Data Source
@@ -32,6 +32,6 @@ export class UmbDocumentTypeImportServerDataSource {
 			requestBody: { file: { id: temporaryUnique } },
 		};
 
-		return tryExecuteAndNotify(this.#host, DocumentTypeService.postDocumentTypeImport(requestBody));
+		return tryExecute(this.#host, DocumentTypeService.postDocumentTypeImport(requestBody));
 	}
 }

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -19,15 +19,14 @@ internal sealed class DocumentNotificationPresentationFactory : IDocumentNotific
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    public async Task<IEnumerable<DocumentNotificationResponseModel>> CreateNotificationModelsAsync(IContent content)
+    public Task<IEnumerable<DocumentNotificationResponseModel>> CreateNotificationModelsAsync(IContent content)
     {
         var subscribedActionIds = _notificationService
-                                          .GetUserNotifications(_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, content.Path)?
-                                          .Select(n => n.Action)
-                                          .ToArray()
-                                      ?? Array.Empty<string>();
+            .GetUserNotifications(_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, content.Path)?
+            .Select(n => n.Action)
+            .ToArray() ?? Array.Empty<string>();
 
-        return await Task.FromResult(_actionCollection
+        return Task.FromResult<IEnumerable<DocumentNotificationResponseModel>>(_actionCollection
             .Where(action => action.ShowInNotifier)
             .Select(action => new DocumentNotificationResponseModel
             {
