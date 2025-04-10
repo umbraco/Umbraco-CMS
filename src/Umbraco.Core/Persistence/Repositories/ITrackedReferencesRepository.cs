@@ -43,7 +43,6 @@ public interface ITrackedReferencesRepository
         bool filterMustBeIsDependency,
         out long totalRecords);
 
-
     /// <summary>
     ///     Gets a page of items used in any kind of relation from selected integer ids.
     /// </summary>
