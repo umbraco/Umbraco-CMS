@@ -258,28 +258,21 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
-		let preset: Partial<UmbDocumentDetailModel> = {
-			documentType: {
-				unique: documentTypeUnique,
-				collection: null,
-			},
-		};
 		if (blueprintUnique) {
 			const blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
 			const { data } = await blueprintRepository.requestByUnique(blueprintUnique);
 
-			if (!data) {
-				throw new Error(`Blueprint with unique ${blueprintUnique} not found`);
-			}
-
-			preset = {
-				documentType: data.documentType,
-				values: data.values,
-				variants: data.variants as Array<UmbDocumentVariantModel>,
-			};
+			return this.createScaffold({
+				parent,
+				preset: {
+					documentType: data?.documentType,
+					values: data?.values,
+					variants: data?.variants as Array<UmbDocumentVariantModel>,
+				},
+			});
 		}
 
-		const scaffold = this.createScaffold({
+		return this.createScaffold({
 			parent,
 			preset: {
 				documentType: {
@@ -288,8 +281,6 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		});
-
-		return scaffold;
 	}
 
 	getCollectionAlias() {
