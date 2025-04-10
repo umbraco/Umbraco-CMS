@@ -3,6 +3,7 @@ import path from 'path';
 import { createImportMap } from '../importmap/index.js';
 
 const ILLEGAL_CORE_IMPORTS_THRESHOLD = 10;
+const SELF_IMPORTS_THRESHOLD = 32;
 
 const clientProjectRoot = path.resolve(import.meta.dirname, '../../');
 const modulePrefix = '@umbraco-cms/backoffice/';
@@ -105,14 +106,17 @@ function getUmbracoModuleImportsInModule(moduleAlias) {
 }
 
 function reportIllegalImportsFromCore() {
-	let numberOfModulesWithIllegalImports = 0;
+	console.error(`🔍 Scanning core modules for importing packages...`);
+	console.log(`\n`);
+
+	let total = 0;
 	// Check if any of the core modules import one of the package modules
 	// Run through all core modules and find the imports
 	coreModules.forEach(([alias, path]) => {
-		const modules = getUmbracoModuleImportsInModule(alias);
+		const importsInModule = getUmbracoModuleImportsInModule(alias);
 
 		// Check if any of the imports are in the package modules
-		const illegalImports = modules.filter((imp) => packageModuleAliases.includes(imp));
+		const illegalImports = importsInModule.filter((imp) => packageModuleAliases.includes(imp));
 
 		// If there are no illegal imports, skip
 		if (illegalImports.length === 0) {
@@ -125,17 +129,60 @@ function reportIllegalImportsFromCore() {
 			console.error(`  → ${imp}`);
 		});
 		console.log(`\n`);
-		numberOfModulesWithIllegalImports++;
+		total++;
 	});
 
-	if (numberOfModulesWithIllegalImports > ILLEGAL_CORE_IMPORTS_THRESHOLD) {
-		throw new Error(`Illegal imports found in ${numberOfModulesWithIllegalImports} core modules.`);
+	if (total > ILLEGAL_CORE_IMPORTS_THRESHOLD) {
+		throw new Error(`Illegal imports found in ${total} core modules.`);
 	} else {
-		console.log(`✅ Success! Still under the threshold of ${ILLEGAL_CORE_IMPORTS_THRESHOLD} illegal imports.`);
+		console.log(
+			`✅ Success! Still under the threshold of ${ILLEGAL_CORE_IMPORTS_THRESHOLD} illegal imports. ${total - ILLEGAL_CORE_IMPORTS_THRESHOLD} more than the threshold.`,
+		);
 	}
+
+	console.log(`\n\n`);
 }
 
-reportIllegalImportsFromCore();
+function reportSelfImportsFromModules() {
+	console.error(`🔍 Scanning all modules for importing itself...`);
+	console.log(`\n`);
+
+	let total = 0;
+
+	importMapEntries.forEach(([alias, path]) => {
+		const importsInModule = getUmbracoModuleImportsInModule(alias);
+		const selfImports = importsInModule.filter((imp) => imp === alias);
+
+		// If there are no self imports, skip
+		if (selfImports.length === 0) {
+			return;
+		}
+
+		// If there are self imports, log them
+		console.error(`🚨 ${alias} is importing itself`);
+		total++;
+	});
+
+	console.log(`\n`);
+
+	if (total > SELF_IMPORTS_THRESHOLD) {
+		throw new Error(
+			`Self imports found in ${total} modules. ${total - SELF_IMPORTS_THRESHOLD} more than the threshold.`,
+		);
+	} else {
+		console.log(`✅ Success! Still under the threshold of ${SELF_IMPORTS_THRESHOLD} self imports.`);
+	}
+
+	console.log(`\n\n`);
+}
+
+function report() {
+	reportIllegalImportsFromCore();
+	reportSelfImportsFromModules();
+}
+
+report();
+
 // TODO:
 // - Check what packages another package depends on (not modules) - This will be used when we split the tsconfig into multiple configs
 // - Check for circular module imports
