@@ -46,7 +46,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		meta: {
 			schemaType: 'DocumentPropertyValuePermissionPresentationModel',
 			label: 'Document Property Values',
-			description: 'Assign Permissions to Document property values',
+			description: 'Assign permissions to Document property values',
 		},
 	},
 	...conditionManifests,
