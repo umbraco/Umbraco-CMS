@@ -91,18 +91,22 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 
 		this.#properties.forEach((property) => {
 			const propertyVariantId = new UmbVariantId(this._variantId?.culture, this._variantId?.segment);
-			this.observe(propertyViewGuard.isPermittedForVariantAndProperty(propertyVariantId, property), (permitted) => {
-				if (permitted) {
-					this.#visiblePropertiesUniques.push(property.unique);
-					this.#calculateVisibleProperties();
-				} else {
-					const index = this.#visiblePropertiesUniques.indexOf(property.unique);
-					if (index !== -1) {
-						this.#visiblePropertiesUniques.splice(index, 1);
+			this.observe(
+				propertyViewGuard.isPermittedForVariantAndProperty(propertyVariantId, property),
+				(permitted) => {
+					if (permitted) {
+						this.#visiblePropertiesUniques.push(property.unique);
 						this.#calculateVisibleProperties();
+					} else {
+						const index = this.#visiblePropertiesUniques.indexOf(property.unique);
+						if (index !== -1) {
+							this.#visiblePropertiesUniques.splice(index, 1);
+							this.#calculateVisibleProperties();
+						}
 					}
-				}
-			});
+				},
+				`propertyViewGuard-permittedForVariantAndProperty-${property.unique}`,
+			);
 		});
 	}
 
