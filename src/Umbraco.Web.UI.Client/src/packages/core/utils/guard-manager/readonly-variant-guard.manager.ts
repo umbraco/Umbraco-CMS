@@ -34,7 +34,7 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 	/**
 	 * Observe if the given variantId is permitted to read
 	 * @param {UmbVariantId} variantId
-	 * @return {Observable<boolean>} - true if the variantId is permitted to read, false otherwise
+	 * @return {Observable<boolean>} - Observable that emits true if the variantId is permitted to read, false otherwise
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
 	isPermittedForVariant(variantId: UmbVariantId): Observable<boolean> {
@@ -43,7 +43,12 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 		});
 	}
 
-	permittedForVariantObservable(variantId: Observable<UmbVariantId | undefined>): Observable<boolean> {
+	/**
+	 * @param {Observable<UmbVariantId | undefined>} variantId
+	 * @return {Observable<boolean>} - Observable that emits true if the variantId is permitted to read, false otherwise
+	 * @memberof UmbReadOnlyVariantGuardManager
+	 */
+	isPermittedForObservableVariant(variantId: Observable<UmbVariantId | undefined>): Observable<boolean> {
 		return mergeObservables([this.rules, variantId], ([states, variantId]) => {
 			if (!variantId) {
 				// Or should we know about the fallback state here? [NL]

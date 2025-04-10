@@ -577,7 +577,7 @@ export abstract class UmbBlockEntryContext<
 		// TODO: This could benefit from a more dynamic approach, where we inherit all non-variant and variant scoped states. [NL]
 		this.observe(
 			// TODO: Instead transfer all variant states.
-			this._manager.readOnlyState.permittedForVariantObservable(this._variantId),
+			this._manager.readOnlyState.isPermittedForObservableVariant(this._variantId),
 			(isReadOnly) => {
 				const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
 
