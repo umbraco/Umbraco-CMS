@@ -20,7 +20,9 @@ export class UmbBlockRTEPropertyValueCloner implements UmbPropertyValueCloner<Um
 				contentIdUpdatedCallback: this.#replaceContentKeyInMarkup,
 			});
 			const result = {} as UmbPropertyEditorRteValueType;
-			result.blocks = await cloner.cloneValue(value.blocks);
+			if (value.blocks) {
+				result.blocks = await cloner.cloneValue(value.blocks);
+			}
 			result.markup = this.#markup;
 			return result;
 		}

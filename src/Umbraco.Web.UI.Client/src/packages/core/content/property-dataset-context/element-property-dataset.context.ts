@@ -81,7 +81,8 @@ export abstract class UmbElementPropertyDatasetContext<
 		// TODO: Refactor this into a separate manager/controller of some sort? [NL]
 		this.observe(
 			this._dataOwner.structure.contentTypeProperties,
-			(props: UmbPropertyTypeModel[]) => {
+			(props) => {
+				if (!props) return;
 				const map = props.map((prop) => ({ alias: prop.alias, variantId: this.#createPropertyVariantId(prop) }));
 				this.#propertyVariantIdMap.setValue(map);
 				// Resolve promise, to let the once waiting on this know.

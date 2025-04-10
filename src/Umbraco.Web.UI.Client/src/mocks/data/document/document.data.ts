@@ -296,39 +296,84 @@ export const data: Array<UmbMockDocumentModel> = [
 						{
 							key: '1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-							elementProperty: 'Hello world',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
+								},
+							],
 						},
 					],
 					settingsData: [
 						{
 							key: '5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
-							elementProperty: 'Hello world',
-							textBox: 'Hello world 123',
-							blockList: {
-								layout: {
-									'Umbraco.BlockList': [
-										{
-											contentKey: '1234b',
-											settingsKey: '5678b',
-										},
-									],
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world',
 								},
-								contentData: [
-									{
-										key: '1234b',
-										contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-										elementProperty: 'Hello world',
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'textBox',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
+								},
+								{
+									editorAlias: 'Umbraco.BlockList',
+									alias: 'blockList',
+									culture: null,
+									segment: null,
+									value: {
+										layout: {
+											'Umbraco.BlockList': [
+												{
+													contentKey: '1234b',
+													settingsKey: '5678b',
+												},
+											],
+										},
+										contentData: [
+											{
+												key: '1234b',
+												contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+												values: [
+													{
+														editorAlias: 'Umbraco.TextBox',
+														alias: 'elementProperty',
+														culture: null,
+														segment: null,
+														value: 'Hello world 123',
+													},
+												],
+											},
+										],
+										settingsData: [
+											{
+												key: '5678b',
+												contentTypeKey: 'all-property-editors-document-type-id',
+												elementProperty: 'Hello world',
+												values: [
+													{
+														editorAlias: 'Umbraco.TextBox',
+														alias: 'elementProperty',
+														culture: null,
+														segment: null,
+														value: 'Hello world 123',
+													},
+												],
+											},
+										],
 									},
-								],
-								settingsData: [
-									{
-										key: '5678b',
-										contentTypeKey: 'all-property-editors-document-type-id',
-										elementProperty: 'Hello world',
-									},
-								],
-							},
+								},
+							],
 						},
 					],
 				},
@@ -475,39 +520,95 @@ export const data: Array<UmbMockDocumentModel> = [
 						{
 							key: '1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-							elementProperty: 'Hello world',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world',
+								},
+							],
 						},
 						{
 							key: 'a1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-							elementProperty: 'Hello world from area 1',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world  from area 1',
+								},
+							],
 						},
 						{
 							key: 'b1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-							elementProperty: 'Hello world from area 2',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world  from area 2',
+								},
+							],
 						},
 						{
 							key: 'c1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-							elementProperty: 'Hello CCC from area 1',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world from area 1',
+								},
+							],
 						},
 					],
 					settingsData: [
 						{
 							key: '5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
-							elementProperty: 'Hello world',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world',
+								},
+							],
 						},
 						{
 							key: 'a5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
-							elementProperty: 'Hello world from area 1 settings',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world from area 1 settings',
+								},
+							],
 						},
 						{
 							key: 'b5678',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-							elementProperty: 'Hello world from area 2 settings',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world from area 2 settings',
+								},
+							],
 						},
 					],
 				},
@@ -515,27 +616,6 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				editorAlias: 'Umbraco.BlockGrid',
 				alias: 'blockGrid',
-				culture: null,
-				segment: null,
-				value: null,
-			},
-			{
-				editorAlias: '',
-				alias: 'numberRange',
-				culture: null,
-				segment: null,
-				value: null,
-			},
-			{
-				editorAlias: '',
-				alias: 'orderDirection',
-				culture: null,
-				segment: null,
-				value: null,
-			},
-			{
-				editorAlias: '',
-				alias: 'overlaySize',
 				culture: null,
 				segment: null,
 				value: null,

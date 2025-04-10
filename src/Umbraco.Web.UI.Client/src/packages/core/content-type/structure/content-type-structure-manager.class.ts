@@ -69,10 +69,12 @@ export class UmbContentTypeStructureManager<
 	readonly ownerContentTypeCompositions = createObservablePart(this.ownerContentType, (x) => x?.compositions);
 
 	readonly #contentTypeContainers = this.#contentTypes.asObservablePart((contentTypes) => {
+		if (contentTypes.length === 0) return undefined;
 		// Notice this may need to use getValue to avoid resetting it self. [NL]
 		return contentTypes.flatMap((x) => x.containers ?? []);
 	});
 	readonly contentTypeProperties = this.#contentTypes.asObservablePart((contentTypes) => {
+		if (contentTypes.length === 0) return undefined;
 		// Notice this may need to use getValue to avoid resetting it self. [NL]
 		return contentTypes.flatMap((x) => x.properties ?? []);
 	});
@@ -80,17 +82,19 @@ export class UmbContentTypeStructureManager<
 		return await this.observe(this.contentTypeProperties).asPromise();
 	}
 	readonly contentTypeDataTypeUniques = this.#contentTypes.asObservablePart((contentTypes) => {
+		if (contentTypes.length === 0) return undefined;
 		// Notice this may need to use getValue to avoid resetting it self. [NL]
 		return contentTypes
 			.flatMap((x) => x.properties?.map((p) => p.dataType.unique) ?? [])
 			.filter(UmbFilterDuplicateStrings);
 	});
 	readonly contentTypeHasProperties = this.#contentTypes.asObservablePart((contentTypes) => {
+		if (contentTypes.length === 0) return undefined;
 		// Notice this may need to use getValue to avoid resetting it self. [NL]
 		return contentTypes.some((x) => x.properties.length > 0);
 	});
 	readonly contentTypePropertyAliases = createObservablePart(this.contentTypeProperties, (properties) =>
-		properties.map((x) => x.alias),
+		properties?.map((x) => x.alias),
 	);
 	readonly contentTypeUniques = this.#contentTypes.asObservablePart((x) => x.map((y) => y.unique));
 	readonly contentTypeAliases = this.#contentTypes.asObservablePart((x) => x.map((y) => y.alias));
@@ -122,7 +126,7 @@ export class UmbContentTypeStructureManager<
 			this.#loadContentTypeCompositions(ownerContentTypeCompositions);
 		});
 		this.observe(this.#contentTypeContainers, (contentTypeContainers) => {
-			this.#containers.setValue(contentTypeContainers);
+			this.#containers.setValue(contentTypeContainers ?? []);
 		});
 	}
 

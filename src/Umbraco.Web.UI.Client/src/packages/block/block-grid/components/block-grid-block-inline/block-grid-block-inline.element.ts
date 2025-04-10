@@ -104,7 +104,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 					this.observe(
 						this.#workspaceContext.content.structure.contentTypeProperties,
 						(contentTypeProperties) => {
-							this._inlineProperty = contentTypeProperties[0];
+							this._inlineProperty = contentTypeProperties?.[0];
 							this.#generatePropertyDataPath();
 						},
 						'observeProperties',

@@ -16,7 +16,9 @@ export class UmbRteBlockValueResolver extends UmbBlockValueResolver<UmbPropertyE
 				...property,
 				value: {
 					...property.value,
-					blocks: await this._processValueBlockData(property.value.blocks, valuesCallback),
+					blocks: property.value.blocks
+						? await this._processValueBlockData(property.value.blocks, valuesCallback)
+						: undefined,
 				},
 			};
 		}
@@ -32,7 +34,9 @@ export class UmbRteBlockValueResolver extends UmbBlockValueResolver<UmbPropertyE
 				...property,
 				value: {
 					...property.value,
-					blocks: await this._processVariantBlockData(property.value.blocks, variantsCallback),
+					blocks: property.value.blocks
+						? await this._processVariantBlockData(property.value.blocks, variantsCallback)
+						: undefined,
 				},
 			};
 		}
