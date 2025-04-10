@@ -80,7 +80,8 @@ export class UmbDocumentWorkspaceContext
 			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
 			contentValidationRepository: UmbDocumentValidationRepository,
-			skipValidationOnSubmit: true,
+			skipValidationOnSubmit: false,
+			ignoreValidationResultOnSubmit: true,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			contentTypePropertyName: 'documentType',
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
@@ -99,7 +100,13 @@ export class UmbDocumentWorkspaceContext
 					allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE],
 				},
 				onChange: (permitted: boolean) => {
+					if (permitted === this.#userCanCreate) return;
 					this.#userCanCreate = permitted;
+					this.#setReadOnlyStateForUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_CREATE,
+						this.#userCanCreate,
+						'You do not have permission to create documents.',
+					);
 				},
 			},
 		]);
@@ -110,10 +117,30 @@ export class UmbDocumentWorkspaceContext
 					allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE],
 				},
 				onChange: (permitted: boolean) => {
+					if (permitted === this.#userCanUpdate) return;
 					this.#userCanUpdate = permitted;
+					this.#setReadOnlyStateForUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+						this.#userCanUpdate,
+						'You do not have permission to update documents.',
+					);
 				},
 			},
 		]);
+
+		this.observe(this.variants, () => {
+			this.#setReadOnlyStateForUserPermission(
+				UMB_USER_PERMISSION_DOCUMENT_CREATE,
+				this.#userCanCreate,
+				'You do not have permission to create documents.',
+			);
+
+			this.#setReadOnlyStateForUserPermission(
+				UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+				this.#userCanUpdate,
+				'You do not have permission to update documents.',
+			);
+		});
 
 		this.routes.setRoutes([
 			{
@@ -147,13 +174,6 @@ export class UmbDocumentWorkspaceContext
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const documentTypeUnique = info.match.params.documentTypeUnique;
 					await this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
-
-					this.#setReadOnlyStateForUserPermission(
-						UMB_USER_PERMISSION_DOCUMENT_CREATE,
-						this.#userCanCreate,
-						'You do not have permission to create documents.',
-					);
-
 					new UmbWorkspaceIsNewRedirectController(
 						this,
 						this,
@@ -168,11 +188,6 @@ export class UmbDocumentWorkspaceContext
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
 					await this.load(unique);
-					this.#setReadOnlyStateForUserPermission(
-						UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-						this.#userCanUpdate,
-						'You do not have permission to update documents.',
-					);
 				},
 			},
 		]);
@@ -256,11 +271,11 @@ export class UmbDocumentWorkspaceContext
 	 * @returns {Promise<void>} a promise which resolves once it has been completed.
 	 */
 	public override requestSubmit() {
-		return this._handleSubmit();
-	}
-
-	// Because we do not make validation prevent submission this also submits the workspace. [NL]
-	public override invalidSubmit() {
+		const elementStyle = (this.getHostElement() as HTMLElement).style;
+		elementStyle.setProperty('--uui-color-invalid', 'var(--uui-color-warning)');
+		elementStyle.setProperty('--uui-color-invalid-emphasis', 'var(--uui-color-warning-emphasis)');
+		elementStyle.setProperty('--uui-color-invalid-standalone', 'var(--uui-color-warning-standalone)');
+		elementStyle.setProperty('--uui-color-invalid-contrast', 'var(--uui-color-warning-contrast)');
 		return this._handleSubmit();
 	}
 

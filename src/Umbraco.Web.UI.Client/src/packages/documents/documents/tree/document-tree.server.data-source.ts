@@ -61,6 +61,12 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 
 const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel => {
 	return {
+		ancestors: item.ancestors.map((ancestor) => {
+			return {
+				unique: ancestor.id,
+				entityType: UMB_DOCUMENT_ENTITY_TYPE,
+			};
+		}),
 		unique: item.id,
 		parent: {
 			unique: item.parent ? item.parent.id : null,

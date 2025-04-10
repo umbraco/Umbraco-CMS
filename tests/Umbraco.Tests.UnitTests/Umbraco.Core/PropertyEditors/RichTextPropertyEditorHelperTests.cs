@@ -30,7 +30,7 @@ public class RichTextPropertyEditorHelperTests
                                    "markup": "<p>this is some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"><!--Umbraco-Block--></umb-rte-block>",
                                    "blocks": {
                                        "layout": {
-                                           "Umbraco.TinyMCE": [{
+                                           "Umbraco.RichText": [{
                                                    "contentKey": "36cc710a-d8a6-45d0-a07f-7bbd8742cf02",
                                                    "settingsKey": "d2eeef66-4111-42f4-a164-7a523eaffbc2"
                                                }
@@ -118,7 +118,7 @@ public class RichTextPropertyEditorHelperTests
                               "markup": "<p>this is some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"><!--Umbraco-Block--></umb-rte-block>",
                               "blocks": {
                                   "layout": {
-                                      "Umbraco.TinyMCE": [{
+                                      "Umbraco.RichText": [{
                                               "contentKey": "36cc710a-d8a6-45d0-a07f-7bbd8742cf02",
                                               "settingsKey": "d2eeef66-4111-42f4-a164-7a523eaffbc2"
                                           }
@@ -190,7 +190,7 @@ public class RichTextPropertyEditorHelperTests
                               "markup": "<p>this is some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"></umb-rte-block>",
                               "blocks": {
                                   "layout": {
-                                      "Umbraco.TinyMCE": [{
+                                      "Umbraco.RichText": [{
                                               "contentKey": "36cc710a-d8a6-45d0-a07f-7bbd8742cf02"
                                           }
                                       ]
@@ -241,7 +241,7 @@ public class RichTextPropertyEditorHelperTests
                               "markup": "<p>this is <umb-rte-block-inline data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf03\"></umb-rte-block-inline> some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"></umb-rte-block>",
                               "blocks": {
                                   "layout": {
-                                      "Umbraco.TinyMCE": [{
+                                      "Umbraco.RichText": [{
                                               "contentKey": "36cc710a-d8a6-45d0-a07f-7bbd8742cf02"
                                           }, {
                                               "contentKey": "36cc710a-d8a6-45d0-a07f-7bbd8742cf03"

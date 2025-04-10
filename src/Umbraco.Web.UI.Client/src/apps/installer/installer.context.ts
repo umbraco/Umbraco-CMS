@@ -87,7 +87,7 @@ export class UmbInstallerContext extends UmbContextBase<UmbInstallerContext, typ
 	/**
 	 * Set the data for the installation process
 	 * @public
-	 * @param {Partial<PostInstallRequest>} data
+	 * @param {Partial<InstallRequestModel>} data The data to set
 	 * @memberof UmbInstallerContext
 	 */
 	public appendData(data: Partial<InstallRequestModelReadable>): void {
@@ -102,6 +102,22 @@ export class UmbInstallerContext extends UmbContextBase<UmbInstallerContext, typ
 	 */
 	public getData(): InstallRequestModelReadable {
 		return this._data.getValue();
+	}
+
+	public async postInstallSetup(): Promise<boolean> {
+		const { error } = await tryExecute(this, InstallService.postInstallSetup({ body: this.getData() }), {
+			disableNotifications: true,
+		});
+		if (error) {
+			if (UmbApiError.isUmbApiError(error)) this.setInstallStatus(error.problemDetails);
+			else this.setInstallStatus({ title: 'Unknown error', detail: error.message, status: 500, type: 'error' });
+			return false;
+		}
+
+		// TODO: The post install will probably return a user in the future, so we have to set that context somewhere to let the client know that it is authenticated
+		history.replaceState(null, '', 'section/content');
+
+		return true;
 	}
 
 	/**

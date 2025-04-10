@@ -10,7 +10,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { InstallService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecute, UmbApiError, type UmbProblemDetails } from '@umbraco-cms/backoffice/resources';
+import { tryExecute, UmbApiError } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabaseElement extends UmbLitElement {
@@ -196,28 +196,8 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 
 		this._installerContext.nextStep();
 
-		const { error } = await tryExecute(
-			this,
-			InstallService.postInstallSetup({ body: this._installerContext.getData() }),
-			{ disableNotifications: true },
-		);
-		if (error) {
-			if (UmbApiError.isUmbApiError(error)) this._handleRejected(error.problemDetails);
-		} else {
-			this._handleFulfilled();
-		}
+		this._installerContext.postInstallSetup();
 	};
-
-	private _handleFulfilled() {
-		// TODO: The post install will probably return a user in the future, so we have to set that context somewhere to let the client know that it is authenticated
-		console.warn('TODO: Set up real authentication');
-		sessionStorage.setItem('is-authenticated', 'true');
-		history.replaceState(null, '', 'section/content');
-	}
-
-	private _handleRejected(e: UmbProblemDetails) {
-		this._installerContext?.setInstallStatus(e);
-	}
 
 	private _onBack() {
 		this._installerContext?.prevStep();
