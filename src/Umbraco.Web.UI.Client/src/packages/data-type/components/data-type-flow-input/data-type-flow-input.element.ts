@@ -115,9 +115,9 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 				--uui-button-padding-bottom-factor: 4;
 			}
 			:host(:invalid:not([pristine])) #empty-state-button {
-				--uui-button-border-color: var(--uui-color-danger);
+				--uui-button-border-color: var(--uui-color-invalid);
 				--uui-button-border-width: 2px;
-				--uui-button-contrast: var(--uui-color-danger);
+				--uui-button-contrast: var(--uui-color-invalid);
 			}
 		`,
 	];
