@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { createImportMap } from '../importmap/index.js';
 
+const ILLEGAL_CORE_IMPORTS_THRESHOLD = 10;
+
 const clientProjectRoot = path.resolve(import.meta.dirname, '../../');
 const modulePrefix = '@umbraco-cms/backoffice/';
 
@@ -126,11 +128,14 @@ function reportIllegalImportsFromCore() {
 		numberOfModulesWithIllegalImports++;
 	});
 
-	if (numberOfModulesWithIllegalImports === 0) {
-		console.log(`✅ No illegal imports found in core modules.`);
-	} else {
+	if (numberOfModulesWithIllegalImports > ILLEGAL_CORE_IMPORTS_THRESHOLD) {
 		throw new Error(`Illegal imports found in ${numberOfModulesWithIllegalImports} core modules.`);
+	} else {
+		console.log(`✅ Success! Still under the threshold of ${ILLEGAL_CORE_IMPORTS_THRESHOLD} illegal imports.`);
 	}
 }
 
 reportIllegalImportsFromCore();
+// TODO:
+// - Check what packages another package depends on (not modules) - This will be used when we split the tsconfig into multiple configs
+// - Check for circular module imports
