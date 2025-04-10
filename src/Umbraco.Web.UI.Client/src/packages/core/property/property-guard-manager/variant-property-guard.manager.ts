@@ -54,21 +54,6 @@ export class UmbVariantPropertyGuardManager extends UmbGuardManagerBase<UmbVaria
 		return this._rules.asObservablePart((rules) => CompareVariantAndPropertyWithStates(rules, variantId, propertyType));
 	}
 
-	/*
-	isPermittedForVariantObservableAndProperty(
-		variantId: Observable<UmbVariantId | undefined>,
-		propertyType: UmbReferenceByUnique,
-	): Observable<boolean> {
-		return mergeObservables([this._rulesObservable, variantId], ([states, variantId]) => {
-			if (!variantId) {
-				// Or should we know about the fallback state here? [NL]
-				return false;
-			}
-			return CompareVariantAndPropertyWithStates(states, variantId, propertyType);
-		});
-	}
-	*/
-
 	getPermittedForVariant(variantId: UmbVariantId, propertyType: UmbReferenceByUnique): boolean {
 		return CompareVariantAndPropertyWithStates(this._rules.getValue(), variantId, propertyType);
 	}
