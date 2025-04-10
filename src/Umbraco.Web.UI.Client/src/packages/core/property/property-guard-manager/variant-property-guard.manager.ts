@@ -8,7 +8,7 @@ export interface UmbVariantPropertyGuardRule extends UmbPropertyGuardRule {
 	variantId?: UmbVariantId;
 }
 
-function CompareVariantAndPropertyWithStates(
+function compareVariantAndPropertyWithStates(
 	rules: UmbVariantPropertyGuardRule[],
 	variantId: UmbVariantId,
 	propertyType: UmbReferenceByUnique,
@@ -57,7 +57,7 @@ export class UmbVariantPropertyGuardManager extends UmbGuardManagerBase<UmbVaria
 	 * @memberof UmbVariantPropertyGuardManager
 	 */
 	isPermittedForVariantAndProperty(variantId: UmbVariantId, propertyType: UmbReferenceByUnique): Observable<boolean> {
-		return this._rules.asObservablePart((rules) => CompareVariantAndPropertyWithStates(rules, variantId, propertyType));
+		return this._rules.asObservablePart((rules) => compareVariantAndPropertyWithStates(rules, variantId, propertyType));
 	}
 
 	/**
@@ -68,6 +68,6 @@ export class UmbVariantPropertyGuardManager extends UmbGuardManagerBase<UmbVaria
 	 * @memberof UmbVariantPropertyGuardManager
 	 */
 	getIsPermittedForVariantAndProperty(variantId: UmbVariantId, propertyType: UmbReferenceByUnique): boolean {
-		return CompareVariantAndPropertyWithStates(this._rules.getValue(), variantId, propertyType);
+		return compareVariantAndPropertyWithStates(this._rules.getValue(), variantId, propertyType);
 	}
 }
