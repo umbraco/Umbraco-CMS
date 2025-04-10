@@ -293,12 +293,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// <param name="readLock">The read lock value, should be -333 or -334 for content and media trees.</param>
     /// <param name="objectTypeKey">The key of the object type to rebuild.</param>
     /// <param name="trashed">Indicates whether the items are in the recycle bin.</param>
-    protected async Task HandleRebuildAsync(int readLock, Guid objectTypeKey, bool trashed)
+    protected Task HandleRebuildAsync(int readLock, Guid objectTypeKey, bool trashed)
     {
         // This is only relevant for items in the content and media trees
         if (readLock != Constants.Locks.ContentTree && readLock != Constants.Locks.MediaTree)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
@@ -307,14 +307,18 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         // Build the corresponding navigation structure
         if (trashed)
         {
+            _recycleBinRoots.Clear();
             IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey);
             BuildNavigationDictionary(_recycleBinNavigationStructure, _recycleBinRoots,  navigationModels);
         }
         else
         {
+            _roots.Clear();
             IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
             BuildNavigationDictionary(_navigationStructure, _roots, navigationModels);
         }
+
+        return Task.CompletedTask;
     }
 
     private bool TryGetParentKeyFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid childKey, out Guid? parentKey)

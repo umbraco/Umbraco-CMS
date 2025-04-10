@@ -89,21 +89,6 @@ public class MultipleTextStringPropertyEditor : DataEditor
                 return null;
             }
 
-            if (!(editorValue.DataTypeConfiguration is MultipleTextStringConfiguration config))
-            {
-                throw new PanicException(
-                    $"editorValue.DataTypeConfiguration is {editorValue.DataTypeConfiguration?.GetType()} but must be {typeof(MultipleTextStringConfiguration)}");
-            }
-
-            var max = config.Max;
-
-            // The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
-            // only allow the max if over 0
-            if (max > 0)
-            {
-                return string.Join(_newLine, value.Take(max));
-            }
-
             return string.Join(_newLine, value);
         }
 
@@ -114,9 +99,12 @@ public class MultipleTextStringPropertyEditor : DataEditor
 
             // The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
             return value is string stringValue
-                ? stringValue.Split(_newLineDelimiters, StringSplitOptions.None)
+                ? SplitPropertyValue(stringValue)
                 : Array.Empty<string>();
         }
+
+        internal static string[] SplitPropertyValue(string propertyValue)
+            => propertyValue.Split(_newLineDelimiters, StringSplitOptions.None);
     }
 
     /// <summary>
@@ -166,13 +154,13 @@ public class MultipleTextStringPropertyEditor : DataEditor
                 yield break;
             }
 
-            // If we have a null value, treat as an empty collection for minimum number validation.
-            if (value is not IEnumerable<string> stringValues)
-            {
-                stringValues = [];
-            }
-
-            var stringCount = stringValues.Count();
+            // Handle both a newline delimited string and an IEnumerable<string> as the value (see: https://github.com/umbraco/Umbraco-CMS/pull/18936).
+            // If we have a null value, treat as a string count of zero for minimum number validation.
+            var stringCount = value is string stringValue
+                ? MultipleTextStringPropertyValueEditor.SplitPropertyValue(stringValue).Length
+                : value is IEnumerable<string> strings
+                    ? strings.Count()
+                    : 0;
 
             if (stringCount < multipleTextStringConfiguration.Min)
             {

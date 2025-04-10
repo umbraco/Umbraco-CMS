@@ -296,6 +296,10 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
         TValue? mergedBlockValue =
             MergeVariantInvariantPropertyValueTyped(source, target, canUpdateInvariantData, allowedCultures);
+        if (mergedBlockValue is null)
+        {
+            return null;
+        }
 
         return _jsonSerializer.Serialize(mergedBlockValue);
     }
