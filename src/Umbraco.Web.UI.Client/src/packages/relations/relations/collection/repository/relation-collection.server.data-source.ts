@@ -30,13 +30,16 @@ export class UmbRelationCollectionServerDataSource implements UmbCollectionDataS
 	 * @memberof UmbRelationCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbRelationCollectionFilterModel) {
-		const body = {
-			skip: filter.skip,
-			take: filter.take,
-			id: filter.relationType.unique,
-		};
-
-		const { data, error } = await tryExecute(this.#host, RelationService.getRelationByRelationTypeId(body));
+		const { data, error } = await tryExecute(
+			this.#host,
+			RelationService.getRelationByRelationTypeId({
+				path: { id: filter.relationType.unique },
+				query: {
+					skip: filter.skip,
+					take: filter.take,
+				},
+			}),
+		);
 
 		if (data) {
 			const items = data.items.map((item) => {
