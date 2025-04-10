@@ -91,7 +91,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 
 		this.#properties.forEach((property) => {
 			const propertyVariantId = new UmbVariantId(this._variantId?.culture, this._variantId?.segment);
-			this.observe(propertyViewGuard.permittedForVariantAndProperty(propertyVariantId, property), (permitted) => {
+			this.observe(propertyViewGuard.isPermittedForVariantAndProperty(propertyVariantId, property), (permitted) => {
 				if (permitted) {
 					this.#visiblePropertiesUniques.push(property.unique);
 					this.#calculateVisaibleProperties();

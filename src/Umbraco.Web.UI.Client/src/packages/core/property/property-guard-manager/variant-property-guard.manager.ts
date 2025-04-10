@@ -44,7 +44,7 @@ function CompareVariantAndPropertyWithStates(
 
 export class UmbVariantPropertyGuardManager extends UmbGuardManagerBase<UmbVariantPropertyGuardRule> {
 	//
-	permittedForVariantAndProperty(variantId: UmbVariantId, propertyType: UmbReferenceByUnique): Observable<boolean> {
+	isPermittedForVariantAndProperty(variantId: UmbVariantId, propertyType: UmbReferenceByUnique): Observable<boolean> {
 		return this._rules.asObservablePart((rules) => CompareVariantAndPropertyWithStates(rules, variantId, propertyType));
 	}
 

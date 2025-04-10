@@ -70,7 +70,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 
 		it('is not on for a variant when no states', (done) => {
 			manager
-				.permittedForVariantAndProperty(invariantVariant, propB)
+				.isPermittedForVariantAndProperty(invariantVariant, propB)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -82,7 +82,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 			manager.addRule(ruleEn);
 
 			manager
-				.permittedForVariantAndProperty(englishVariant, propB)
+				.isPermittedForVariantAndProperty(englishVariant, propB)
 				.subscribe((value) => {
 					expect(value).to.be.true;
 					done();
@@ -94,7 +94,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 			manager.addRule(ruleInv);
 
 			manager
-				.permittedForVariantAndProperty(englishVariant, propB)
+				.isPermittedForVariantAndProperty(englishVariant, propB)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -106,7 +106,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 			manager.addRule(statePropAInv);
 
 			manager
-				.permittedForVariantAndProperty(englishVariant, propB)
+				.isPermittedForVariantAndProperty(englishVariant, propB)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -117,7 +117,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 			manager.addRule(statePropAInv);
 
 			manager
-				.permittedForVariantAndProperty(invariantVariant, propB)
+				.isPermittedForVariantAndProperty(invariantVariant, propB)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -129,7 +129,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 			manager.addRule(statePropAInv);
 
 			manager
-				.permittedForVariantAndProperty(englishVariant, propA)
+				.isPermittedForVariantAndProperty(englishVariant, propA)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -141,7 +141,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 			manager.addRule(rulePlain);
 
 			manager
-				.permittedForVariantAndProperty(englishVariant, propB)
+				.isPermittedForVariantAndProperty(englishVariant, propB)
 				.subscribe((value) => {
 					expect(value).to.be.true;
 					done();
@@ -154,7 +154,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 			manager.addRule(ruleNoEn);
 
 			manager
-				.permittedForVariantAndProperty(englishVariant, propB)
+				.isPermittedForVariantAndProperty(englishVariant, propB)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -166,7 +166,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 			manager.addRule(ruleNoPlain);
 
 			manager
-				.permittedForVariantAndProperty(englishVariant, propB)
+				.isPermittedForVariantAndProperty(englishVariant, propB)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -179,7 +179,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 			manager.addRule(ruleEn);
 
 			manager
-				.permittedForVariantAndProperty(englishVariant, propB)
+				.isPermittedForVariantAndProperty(englishVariant, propB)
 				.subscribe((value) => {
 					expect(value).to.be.true;
 					done();
@@ -193,7 +193,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 			manager.addRule(ruleNoEn);
 
 			manager
-				.permittedForVariantAndProperty(englishVariant, propB)
+				.isPermittedForVariantAndProperty(englishVariant, propB)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -206,7 +206,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 			manager.addRule(rulePlain);
 
 			manager
-				.permittedForVariantAndProperty(englishVariant, propB)
+				.isPermittedForVariantAndProperty(englishVariant, propB)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -220,7 +220,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 			manager.addRule(statePropAInv);
 
 			manager
-				.permittedForVariantAndProperty(invariantVariant, propA)
+				.isPermittedForVariantAndProperty(invariantVariant, propA)
 				.subscribe((value) => {
 					expect(value).to.be.true;
 					done();
@@ -234,7 +234,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 			manager.addRule(stateNoPropAInv);
 
 			manager
-				.permittedForVariantAndProperty(invariantVariant, propA)
+				.isPermittedForVariantAndProperty(invariantVariant, propA)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();

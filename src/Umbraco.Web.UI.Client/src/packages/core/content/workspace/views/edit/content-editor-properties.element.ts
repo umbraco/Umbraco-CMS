@@ -70,7 +70,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 		this.#properties.forEach((property) => {
 			const propertyVariantId = new UmbVariantId(this._variantId?.culture, this._variantId?.segment);
 			this.observe(
-				propertyViewGuard.permittedForVariantAndProperty(propertyVariantId, property),
+				propertyViewGuard.isPermittedForVariantAndProperty(propertyVariantId, property),
 				(permitted) => {
 					if (permitted) {
 						this.#visiblePropertiesUniques.push(property.unique);
