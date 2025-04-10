@@ -133,11 +133,11 @@ function reportIllegalImportsFromCore() {
 	});
 
 	if (total > ILLEGAL_CORE_IMPORTS_THRESHOLD) {
-		throw new Error(`Illegal imports found in ${total} core modules.`);
-	} else {
-		console.log(
-			`✅ Success! Still under the threshold of ${ILLEGAL_CORE_IMPORTS_THRESHOLD} illegal imports. ${total - ILLEGAL_CORE_IMPORTS_THRESHOLD} more than the threshold.`,
+		throw new Error(
+			`Illegal imports found in ${total} core modules. ${total - ILLEGAL_CORE_IMPORTS_THRESHOLD} more than the threshold.`,
 		);
+	} else {
+		console.log(`✅ Success! Still under the threshold of ${ILLEGAL_CORE_IMPORTS_THRESHOLD} illegal imports. `);
 	}
 
 	console.log(`\n\n`);
