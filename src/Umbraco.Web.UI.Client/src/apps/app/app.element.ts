@@ -2,6 +2,7 @@ import { onInit } from '../../packages/core/entry-point.js';
 import type { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAppAuthController } from './app-auth.controller.js';
 import type { UmbAppOauthElement } from './app-oauth.element.js';
+import { UmbNetworkConnectionStatusManager } from './network-connection-status.manager.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { UmbServerConnection, UmbServerContext } from '@umbraco-cms/backoffice/server';
@@ -144,6 +145,8 @@ export class UmbAppElement extends UmbLitElement {
 		new UUIIconRegistryEssential().attach(this);
 
 		new UmbContextDebugController(this);
+
+		new UmbNetworkConnectionStatusManager(this);
 	}
 
 	override connectedCallback(): void {
