@@ -53,7 +53,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			const newPath = decodeURIComponent(data);
 			const newPathUnique = this.#serverFilePathUniqueSerializer.toUnique(newPath);
 			return this.read(newPathUnique);
@@ -70,7 +70,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 
 		const { data, error } = await tryExecute(
 			this.#host,
-			StylesheetService.getStylesheetByPath({ path: encodeURIComponent(path) }),
+			StylesheetService.getStylesheetByPath({ path: { path: encodeURIComponent(path) } }),
 		);
 
 		if (error || !data) {
@@ -100,7 +100,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const { error } = await tryExecute(
 			this.#host,
 			StylesheetService.putStylesheetByPath({
-				path: encodeURIComponent(path),
+				path: { path: encodeURIComponent(path) },
 				body,
 			}),
 		);
@@ -121,7 +121,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		return tryExecute(
 			this.#host,
 			StylesheetService.deleteStylesheetByPath({
-				path: encodeURIComponent(path),
+				path: { path: encodeURIComponent(path) },
 			}),
 		);
 	}

@@ -59,7 +59,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, TemplateService.getTemplateById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, TemplateService.getTemplateById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -103,7 +103,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 		);
 
 		if (data) {
-			return this.read(data);
+			return this.read(data as never);
 		}
 
 		return { error };
@@ -129,7 +129,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 		const { error } = await tryExecute(
 			this.#host,
 			TemplateService.putTemplateById({
-				id: model.unique,
+				path: { id: model.unique },
 				body,
 			}),
 		);
@@ -153,7 +153,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 		return tryExecute(
 			this.#host,
 			TemplateService.deleteTemplateById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}
