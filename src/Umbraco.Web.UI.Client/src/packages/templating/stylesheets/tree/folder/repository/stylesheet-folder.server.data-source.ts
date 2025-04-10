@@ -52,7 +52,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 		const { data, error } = await tryExecute(
 			this.#host,
 			StylesheetService.getStylesheetFolderByPath({
-				path: encodeURIComponent(path),
+				path: { path: encodeURIComponent(path) },
 			}),
 		);
 
@@ -95,7 +95,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			const newPath = decodeURIComponent(data);
 			const newPathUnique = this.#serverFilePathUniqueSerializer.toUnique(newPath);
 			return this.read(newPathUnique);
@@ -119,7 +119,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 		return tryExecute(
 			this.#host,
 			StylesheetService.deleteStylesheetFolderByPath({
-				path: encodeURIComponent(path),
+				path: { path: encodeURIComponent(path) },
 			}),
 		);
 	}

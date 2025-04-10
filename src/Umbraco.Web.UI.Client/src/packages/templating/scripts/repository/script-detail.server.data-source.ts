@@ -50,7 +50,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			const newPath = decodeURIComponent(data);
 			const newPathUnique = this.#serverFilePathUniqueSerializer.toUnique(newPath);
 			return this.read(newPathUnique);
@@ -67,7 +67,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 
 		const { data, error } = await tryExecute(
 			this.#host,
-			ScriptService.getScriptByPath({ path: encodeURIComponent(path) }),
+			ScriptService.getScriptByPath({ path: { path: encodeURIComponent(path) } }),
 		);
 
 		if (error || !data) {
@@ -97,7 +97,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const { error } = await tryExecute(
 			this.#host,
 			ScriptService.putScriptByPath({
-				path: encodeURIComponent(path),
+				path: { path: encodeURIComponent(path) },
 				body,
 			}),
 		);
@@ -118,7 +118,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		return tryExecute(
 			this.#host,
 			ScriptService.deleteScriptByPath({
-				path: encodeURIComponent(path),
+				path: { path: encodeURIComponent(path) },
 			}),
 		);
 	}
