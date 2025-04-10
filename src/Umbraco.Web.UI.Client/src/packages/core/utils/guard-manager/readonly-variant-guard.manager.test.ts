@@ -35,7 +35,7 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 
 		it('is not on for a variant when no rules', (done) => {
 			manager
-				.permittedForVariant(invariantVariant)
+				.isPermittedForVariant(invariantVariant)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -47,7 +47,7 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 			manager.addRule(ruleEn);
 
 			manager
-				.permittedForVariant(englishVariant)
+				.isPermittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.true;
 					done();
@@ -59,7 +59,7 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 			manager.addRule(ruleInv);
 
 			manager
-				.permittedForVariant(englishVariant)
+				.isPermittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -71,7 +71,7 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 			manager.addRule(rulePlain);
 
 			manager
-				.permittedForVariant(englishVariant)
+				.isPermittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.true;
 					done();
@@ -84,7 +84,7 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 			manager.addRule(ruleNoEn);
 
 			manager
-				.permittedForVariant(englishVariant)
+				.isPermittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -96,7 +96,7 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 			manager.addRule(ruleNoPlain);
 
 			manager
-				.permittedForVariant(englishVariant)
+				.isPermittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -109,7 +109,7 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 			manager.addRule(ruleEn);
 
 			manager
-				.permittedForVariant(englishVariant)
+				.isPermittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.true;
 					done();
@@ -123,7 +123,7 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 			manager.addRule(ruleNoEn);
 
 			manager
-				.permittedForVariant(englishVariant)
+				.isPermittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();
@@ -136,7 +136,7 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 			manager.addRule(rulePlain);
 
 			manager
-				.permittedForVariant(englishVariant)
+				.isPermittedForVariant(englishVariant)
 				.subscribe((value) => {
 					expect(value).to.be.false;
 					done();

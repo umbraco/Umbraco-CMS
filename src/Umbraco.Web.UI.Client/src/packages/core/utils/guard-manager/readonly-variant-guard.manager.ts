@@ -24,9 +24,20 @@ function compareStateAndVariantId(rules: Array<UmbVariantGuardRule>, variantId: 
 }
 
 // TODO: Check the need for this one.
+/**
+ * Read only guard manager for variant rules.
+ * @export
+ * @class UmbReadOnlyVariantGuardManager
+ * @extends {UmbReadOnlyGuardManager<UmbVariantGuardRule>}
+ */
 export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbVariantGuardRule> {
-	//
-	permittedForVariant(variantId: UmbVariantId): Observable<boolean> {
+	/**
+	 * Observe if the given variantId is permitted to read
+	 * @param {UmbVariantId} variantId
+	 * @return {Observable<boolean>} - true if the variantId is permitted to read, false otherwise
+	 * @memberof UmbReadOnlyVariantGuardManager
+	 */
+	isPermittedForVariant(variantId: UmbVariantId): Observable<boolean> {
 		return this._rules.asObservablePart((states) => {
 			return compareStateAndVariantId(states, variantId);
 		});
@@ -42,7 +53,13 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 		});
 	}
 
-	getPermittedForVariant(variantId: UmbVariantId): boolean {
+	/**
+	 * Check if the given variantId is permitted to read
+	 * @param {UmbVariantId} variantId
+	 * @return {boolean} - true if the variantId is permitted to read, false otherwise
+	 * @memberof UmbReadOnlyVariantGuardManager
+	 */
+	getIsPermittedForVariant(variantId: UmbVariantId): boolean {
 		return compareStateAndVariantId(this.getRules(), variantId);
 	}
 }

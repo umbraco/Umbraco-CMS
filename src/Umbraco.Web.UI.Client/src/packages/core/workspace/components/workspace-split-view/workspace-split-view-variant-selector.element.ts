@@ -168,7 +168,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	#setReadOnlyCultures(workspaceContext: UmbContentWorkspaceContext) {
 		this._readOnlyCultures = this._variantOptions
-			.filter((variant) => workspaceContext.readOnlyGuard.getPermittedForVariant(UmbVariantId.Create(variant)))
+			.filter((variant) => workspaceContext.readOnlyGuard.getIsPermittedForVariant(UmbVariantId.Create(variant)))
 			.map((variant) => variant.culture);
 	}
 

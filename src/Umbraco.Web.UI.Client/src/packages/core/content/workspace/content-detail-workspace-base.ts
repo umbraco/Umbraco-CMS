@@ -591,7 +591,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const selectedVariantIds = activeVariantIds.concat(changedVariantIds);
 
 		const writableSelectedVariantIds = selectedVariantIds.filter(
-			(x) => this.readOnlyGuard.getPermittedForVariant(x) === false,
+			(x) => this.readOnlyGuard.getIsPermittedForVariant(x) === false,
 		);
 
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
@@ -604,7 +604,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected _saveableVariantsFilter = (option: VariantOptionModelType) => {
-		return this.readOnlyGuard.getPermittedForVariant(UmbVariantId.Create(option)) === false;
+		return this.readOnlyGuard.getIsPermittedForVariant(UmbVariantId.Create(option)) === false;
 	};
 
 	/* validation */
