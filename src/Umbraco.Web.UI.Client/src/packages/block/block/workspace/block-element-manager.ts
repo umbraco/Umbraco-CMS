@@ -35,7 +35,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 	#getDataResolver!: () => void;
 
 	// TODO: who is controlling this? We need to be aware about seperation of concerns. [NL]
-	public readonly readonlyGuard = new UmbReadOnlyVariantGuardManager(this);
+	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	readonly variantId = this.#variantId.asObservable();

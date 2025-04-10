@@ -448,11 +448,11 @@ export class UmbDocumentWorkspaceContext
 
 	async #setReadOnlyStateForUserPermission(identifier: string, permitted: boolean, message: string) {
 		if (permitted) {
-			this.readonlyGuard?.removeRule(identifier);
+			this.readOnlyGuard?.removeRule(identifier);
 			return;
 		}
 
-		this.readonlyGuard?.addRule({
+		this.readOnlyGuard?.addRule({
 			unique: identifier,
 			message,
 		});

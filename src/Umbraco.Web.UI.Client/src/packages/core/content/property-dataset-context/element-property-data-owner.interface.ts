@@ -21,7 +21,7 @@ export interface UmbElementPropertyDataOwner<
 	getValues(): ContentModel['values'] | undefined;
 
 	isLoaded(): Promise<unknown> | undefined;
-	readonly readonlyGuard: UmbReadOnlyVariantGuardManager;
+	readonly readOnlyGuard: UmbReadOnlyVariantGuardManager;
 
 	// Same as from UmbVariantDatasetWorkspaceContext, could be refactored later [NL]
 	propertyValueByAlias<ReturnValue = unknown>(

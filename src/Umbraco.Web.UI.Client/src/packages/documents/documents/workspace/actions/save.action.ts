@@ -34,7 +34,7 @@ export class UmbDocumentSaveWorkspaceAction
 			(variants) => {
 				const allVariantsAreReadOnly =
 					variants?.filter((variant) =>
-						this._workspaceContext!.readonlyGuard.getPermittedForVariant(UmbVariantId.Create(variant)),
+						this._workspaceContext!.readOnlyGuard.getPermittedForVariant(UmbVariantId.Create(variant)),
 					).length === variants?.length;
 				if (allVariantsAreReadOnly) {
 					this.disable();

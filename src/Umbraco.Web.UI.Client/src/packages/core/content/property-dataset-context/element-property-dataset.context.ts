@@ -70,7 +70,7 @@ export abstract class UmbElementPropertyDatasetContext<
 		});
 
 		this.observe(
-			this._dataOwner.readonlyGuard.permittedForVariant(this.#variantId),
+			this._dataOwner.readOnlyGuard.permittedForVariant(this.#variantId),
 			(isReadOnly) => {
 				this._readOnly.setValue(isReadOnly);
 			},

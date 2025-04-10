@@ -364,7 +364,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
-		return this.#documentWorkspaceContext!.readonlyGuard.getPermittedForVariant(UmbVariantId.Create(option));
+		return this.#documentWorkspaceContext!.readOnlyGuard.getPermittedForVariant(UmbVariantId.Create(option));
 	};
 
 	async #determineVariantOptions(): Promise<{
@@ -387,7 +387,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		// TODO: This would not work with segments, as the 'selected'-array is an array of strings, not UmbVariantId's. [NL]
 		// Please have a look at the implementation in the content-detail workspace context, as that one compares variantIds. [NL]
 		selected = selected.filter(
-			(x) => this.#documentWorkspaceContext!.readonlyGuard.getPermittedForVariant(new UmbVariantId(x)) === false,
+			(x) => this.#documentWorkspaceContext!.readOnlyGuard.getPermittedForVariant(new UmbVariantId(x)) === false,
 		);
 
 		return {

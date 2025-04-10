@@ -68,10 +68,10 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase<UmbLanguag
 		// remove all previous states before adding new ones
 		// TODO: But maybe options that was added previously is not there any longer? [NL]
 		const uniques = this.#variantOptions?.map((variant) => identifier + variant.culture) || [];
-		this.#workspaceContext.readonlyGuard?.removeRules(uniques);
+		this.#workspaceContext.readOnlyGuard?.removeRules(uniques);
 
 		// add new states
-		this.#workspaceContext.readonlyGuard?.addRules(readOnlyRules);
+		this.#workspaceContext.readOnlyGuard?.addRules(readOnlyRules);
 	}
 }
 

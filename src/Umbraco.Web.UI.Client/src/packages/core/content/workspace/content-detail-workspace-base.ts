@@ -101,7 +101,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
-	public readonly readonlyGuard = new UmbReadOnlyVariantGuardManager(this);
+	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
 	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
@@ -591,7 +591,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const selectedVariantIds = activeVariantIds.concat(changedVariantIds);
 
 		const writableSelectedVariantIds = selectedVariantIds.filter(
-			(x) => this.readonlyGuard.getPermittedForVariant(x) === false,
+			(x) => this.readOnlyGuard.getPermittedForVariant(x) === false,
 		);
 
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
@@ -604,7 +604,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected _saveableVariantsFilter = (option: VariantOptionModelType) => {
-		return this.readonlyGuard.getPermittedForVariant(UmbVariantId.Create(option)) === false;
+		return this.readOnlyGuard.getPermittedForVariant(UmbVariantId.Create(option)) === false;
 	};
 
 	/* validation */
@@ -885,7 +885,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	override resetState() {
 		super.resetState();
-		this.readonlyGuard.clearRules();
+		this.readOnlyGuard.clearRules();
 		this.propertyViewGuard.clearRules();
 		this.propertyWriteGuard.clearRules();
 		this.propertyReadOnlyGuard.clearRules();
