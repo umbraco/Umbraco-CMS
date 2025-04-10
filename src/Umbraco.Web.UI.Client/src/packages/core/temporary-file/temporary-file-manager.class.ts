@@ -11,7 +11,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { formatBytes } from '@umbraco-cms/backoffice/utils';
-import { isCancelError } from '@umbraco-cms/backoffice/resources';
+import { UmbCancelError } from '@umbraco-cms/backoffice/resources';
 
 export class UmbTemporaryFileManager<
 	UploadableItem extends UmbTemporaryFileModel = UmbTemporaryFileModel,
@@ -164,7 +164,7 @@ export class UmbTemporaryFileManager<
 		let status = TemporaryFileStatus.SUCCESS;
 		if (error) {
 			status = TemporaryFileStatus.ERROR;
-			if (isCancelError(error)) {
+			if (UmbCancelError.isUmbCancelError(error)) {
 				status = TemporaryFileStatus.CANCELLED;
 			}
 		}
