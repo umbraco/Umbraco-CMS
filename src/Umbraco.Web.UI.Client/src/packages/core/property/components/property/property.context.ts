@@ -60,8 +60,8 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	#editorManifest = new UmbBasicState<ManifestPropertyEditorUi | undefined>(undefined);
 	public readonly editorManifest = this.#editorManifest.asObservable();
 
-	public readonly readonlyState = new UmbReadOnlyStateManager(this);
-	public readonly isReadOnly = this.readonlyState.isOn;
+	public readonly readOnlyState = new UmbReadOnlyStateManager(this);
+	public readonly isReadOnly = this.readOnlyState.isReadOnly;
 
 	/**
 	 * Set the property editor UI element for this property.
@@ -163,11 +163,11 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 			const unique = 'UMB_DATASET';
 
 			if (value) {
-				this.readonlyState.addState({
+				this.readOnlyState.addState({
 					unique,
 				});
 			} else {
-				this.readonlyState.removeState(unique);
+				this.readOnlyState.removeState(unique);
 			}
 		});
 	}
@@ -342,7 +342,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	 * @memberof UmbPropertyContext
 	 */
 	public getIsReadOnly(): boolean {
-		return this.readonlyState.getIsOn();
+		return this.readOnlyState.getIsReadOnly();
 	}
 
 	public setDataPath(dataPath: string | undefined): void {

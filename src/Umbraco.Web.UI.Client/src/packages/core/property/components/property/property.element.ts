@@ -153,11 +153,11 @@ export class UmbPropertyElement extends UmbLitElement {
 		const unique = 'UMB_ELEMENT';
 
 		if (this._readonly) {
-			this.#propertyContext.readonlyState.addState({
+			this.#propertyContext.readOnlyState.addState({
 				unique,
 			});
 		} else {
-			this.#propertyContext.readonlyState.removeState(unique);
+			this.#propertyContext.readOnlyState.removeState(unique);
 		}
 	}
 	public get readonly(): boolean {
