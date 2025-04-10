@@ -42,6 +42,12 @@ function CompareVariantAndPropertyWithStates(
 	return false;
 }
 
+/**
+ * UmbVariantPropertyGuardManager is a class that manages the rules for variant properties.
+ * @export
+ * @class UmbVariantPropertyGuardManager
+ * @extends {UmbGuardManagerBase<UmbVariantPropertyGuardRule>}
+ */
 export class UmbVariantPropertyGuardManager extends UmbGuardManagerBase<UmbVariantPropertyGuardRule> {
 	/**
 	 * Checks if the variant and propertyType is permitted.
