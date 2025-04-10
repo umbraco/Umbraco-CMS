@@ -25,7 +25,7 @@ import {
 	type UmbEntityVariantModel,
 	type UmbEntityVariantOptionModel,
 } from '@umbraco-cms/backoffice/variant';
-import { UmbDeprecation, UmbReadonlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeDetailRepository, UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
@@ -101,7 +101,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
-	public readonly readonlyGuard = new UmbReadonlyVariantGuardManager(this);
+	public readonly readonlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
 	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);

@@ -1,4 +1,4 @@
-import { UmbReadonlyGuardManager } from './readonly-guard.manager.js';
+import { UmbReadOnlyGuardManager } from './readonly-guard.manager.js';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { mergeObservables, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbGuardRule } from './guard.manager.base.js';
@@ -24,7 +24,7 @@ function CompareStateAndVariantId(rules: Array<UmbVariantGuardRule>, variantId: 
 }
 
 // TODO: Check the need for this one.
-export class UmbReadonlyVariantGuardManager extends UmbReadonlyGuardManager<UmbVariantGuardRule> {
+export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbVariantGuardRule> {
 	//
 	permittedForVariant(variantId: UmbVariantId): Observable<boolean> {
 		return this._rules.asObservablePart((states) => {

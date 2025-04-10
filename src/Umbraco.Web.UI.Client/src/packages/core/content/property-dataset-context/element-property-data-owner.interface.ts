@@ -4,7 +4,7 @@ import type { UmbContentTypeModel, UmbContentTypeStructureManager } from '@umbra
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import type { UmbReadonlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 
 /**
  * The data supplier for a Element Property Dataset
@@ -21,7 +21,7 @@ export interface UmbElementPropertyDataOwner<
 	getValues(): ContentModel['values'] | undefined;
 
 	isLoaded(): Promise<unknown> | undefined;
-	readonly readonlyGuard: UmbReadonlyVariantGuardManager;
+	readonly readonlyGuard: UmbReadOnlyVariantGuardManager;
 
 	// Same as from UmbVariantDatasetWorkspaceContext, could be refactored later [NL]
 	propertyValueByAlias<ReturnValue = unknown>(

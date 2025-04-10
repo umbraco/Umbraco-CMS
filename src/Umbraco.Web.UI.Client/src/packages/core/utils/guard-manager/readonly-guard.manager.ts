@@ -10,7 +10,7 @@ function CompareRules(rules: Array<UmbGuardRule>): boolean {
 }
 
 // TODO: Check the need for this one.
-export class UmbReadonlyGuardManager<RuleType extends UmbGuardRule> extends UmbGuardManagerBase<RuleType> {
+export class UmbReadOnlyGuardManager<RuleType extends UmbGuardRule> extends UmbGuardManagerBase<RuleType> {
 	public readonly permitted = this._rules.asObservablePart((rules) => {
 		return CompareRules(rules);
 	});

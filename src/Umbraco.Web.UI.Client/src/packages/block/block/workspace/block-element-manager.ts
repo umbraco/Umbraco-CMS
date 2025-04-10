@@ -15,7 +15,7 @@ import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/documen
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 import { UmbElementWorkspaceDataManager, type UmbElementPropertyDataOwner } from '@umbraco-cms/backoffice/content';
-import { UmbReadonlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
@@ -35,7 +35,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 	#getDataResolver!: () => void;
 
 	// TODO: who is controlling this? We need to be aware about seperation of concerns. [NL]
-	public readonly readonlyGuard = new UmbReadonlyVariantGuardManager(this);
+	public readonly readonlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	readonly variantId = this.#variantId.asObservable();

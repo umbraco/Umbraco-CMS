@@ -1,14 +1,14 @@
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { UmbReadonlyVariantGuardManager } from './readonly-variant-guard.manager.js';
+import { UmbReadOnlyVariantGuardManager } from './readonly-variant-guard.manager.js';
 import { UmbVariantId } from '../../variant/variant-id.class.js';
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-describe('UmbReadonlyVariantGuardManager', () => {
-	let manager: UmbReadonlyVariantGuardManager;
+describe('UmbReadOnlyVariantGuardManager', () => {
+	let manager: UmbReadOnlyVariantGuardManager;
 	const invariantVariant = UmbVariantId.CreateInvariant();
 	const englishVariant = UmbVariantId.Create({ culture: 'en', segment: null });
 	const ruleInv = { unique: '1', message: 'State 1', permitted: true, variantId: invariantVariant };
@@ -20,7 +20,7 @@ describe('UmbReadonlyVariantGuardManager', () => {
 
 	beforeEach(() => {
 		const hostElement = new UmbTestControllerHostElement();
-		manager = new UmbReadonlyVariantGuardManager(hostElement);
+		manager = new UmbReadOnlyVariantGuardManager(hostElement);
 	});
 
 	describe('VariantIds based rules', () => {
