@@ -52,7 +52,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, DictionaryService.getDictionaryById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, DictionaryService.getDictionaryById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -94,7 +94,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			return this.read(data);
 		}
 
@@ -120,7 +120,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 		const { error } = await tryExecute(
 			this.#host,
 			DictionaryService.putDictionaryById({
-				id: model.unique,
+				path: { id: model.unique },
 				body,
 			}),
 		);
@@ -144,7 +144,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 		return tryExecute(
 			this.#host,
 			DictionaryService.deleteDictionaryById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}
