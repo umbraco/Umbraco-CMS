@@ -1,7 +1,7 @@
-﻿using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_4_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_0_0;
 
 [Obsolete("Remove in Umbraco 18.")]
 internal class AddDocumentPropertyPermissions : MigrationBase
