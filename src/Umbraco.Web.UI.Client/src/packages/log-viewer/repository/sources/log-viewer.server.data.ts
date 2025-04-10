@@ -32,7 +32,7 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async getAllSavedSearches({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
-		return await tryExecute(this.#host, LogViewerService.getLogViewerSavedSearch({ skip, take }));
+		return await tryExecute(this.#host, LogViewerService.getLogViewerSavedSearch({ query: { skip, take } }));
 	}
 	/**
 	 * Get a log viewer saved search by name from the server
@@ -41,7 +41,7 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async getSavedSearchByName({ name }: { name: string }) {
-		return await tryExecute(this.#host, LogViewerService.getLogViewerSavedSearchByName({ name }));
+		return await tryExecute(this.#host, LogViewerService.getLogViewerSavedSearchByName({ path: { name } }));
 	}
 
 	/**
@@ -60,7 +60,7 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async deleteSavedSearchByName({ name }: { name: string }) {
-		return await tryExecute(this.#host, LogViewerService.deleteLogViewerSavedSearchByName({ name }));
+		return await tryExecute(this.#host, LogViewerService.deleteLogViewerSavedSearchByName({ path: { name } }));
 	}
 }
 /**
@@ -87,7 +87,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerLevel({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
-		return await tryExecute(this.#host, LogViewerService.getLogViewerLevel({ skip, take }));
+		return await tryExecute(this.#host, LogViewerService.getLogViewerLevel({ query: { skip, take } }));
 	}
 
 	/**
@@ -100,8 +100,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 		return await tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerLevelCount({
-				startDate,
-				endDate,
+				query: { startDate, endDate },
 			}),
 		);
 	}
@@ -147,13 +146,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 		return await tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerLog({
-				skip,
-				take,
-				orderDirection,
-				filterExpression,
-				logLevel,
-				startDate,
-				endDate,
+				query: { skip, take, orderDirection, filterExpression, logLevel, startDate, endDate },
 			}),
 		);
 	}
@@ -187,10 +180,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 		return await tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerMessageTemplate({
-				skip,
-				take,
-				startDate,
-				endDate,
+				query: { skip, take, startDate, endDate },
 			}),
 		);
 	}
@@ -199,8 +189,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 		return await tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerValidateLogsSize({
-				startDate,
-				endDate,
+				query: { startDate, endDate },
 			}),
 		);
 	}
