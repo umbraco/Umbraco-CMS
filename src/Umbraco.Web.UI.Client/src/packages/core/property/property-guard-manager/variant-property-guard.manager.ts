@@ -54,6 +54,13 @@ export class UmbVariantPropertyGuardManager extends UmbGuardManagerBase<UmbVaria
 		return this._rules.asObservablePart((rules) => CompareVariantAndPropertyWithStates(rules, variantId, propertyType));
 	}
 
+	/**
+	 * Checks if the variant and propertyType is permitted.
+	 * @param {UmbVariantId} variantId - The variant id to check.
+	 * @param {UmbReferenceByUnique} propertyType - The property type to check.
+	 * @return {boolean} - Returns true if the variant and propertyType is permitted, false otherwise.
+	 * @memberof UmbVariantPropertyGuardManager
+	 */
 	getIsPermittedForVariantAndProperty(variantId: UmbVariantId, propertyType: UmbReferenceByUnique): boolean {
 		return CompareVariantAndPropertyWithStates(this._rules.getValue(), variantId, propertyType);
 	}
