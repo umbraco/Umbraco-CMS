@@ -13,18 +13,18 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 		this.#host = host;
 	}
 
-	async getCollection(query: UmbMediaCollectionFilterModel) {
-		const params = {
-			id: query.unique ?? '',
-			dataTypeId: query.dataTypeId,
-			orderBy: query.orderBy ?? 'updateDate',
-			orderDirection: query.orderDirection === 'asc' ? DirectionModel.ASCENDING : DirectionModel.DESCENDING,
-			filter: query.filter,
-			skip: query.skip ?? 0,
-			take: query.take ?? 100,
+	async getCollection(filter: UmbMediaCollectionFilterModel) {
+		const query = {
+			id: filter.unique ?? '',
+			dataTypeId: filter.dataTypeId,
+			orderBy: filter.orderBy ?? 'updateDate',
+			orderDirection: filter.orderDirection === 'asc' ? DirectionModel.ASCENDING : DirectionModel.DESCENDING,
+			filter: filter.filter,
+			skip: filter.skip ?? 0,
+			take: filter.take ?? 100,
 		};
 
-		const { data, error } = await tryExecute(this.#host, MediaService.getCollectionMedia(params));
+		const { data, error } = await tryExecute(this.#host, MediaService.getCollectionMedia({ query }));
 
 		if (data) {
 			const items = data.items.map((item: MediaCollectionResponseModel) => {

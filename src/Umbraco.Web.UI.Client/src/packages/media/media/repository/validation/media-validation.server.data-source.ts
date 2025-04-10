@@ -8,6 +8,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A server data source for Media Validation
@@ -25,7 +26,10 @@ export class UmbMediaValidationServerDataSource {
 	 * @param {UmbEntityUnique} parentUnique - Parent Unique
 	 * @returns {*}
 	 */
-	async validateCreate(model: UmbMediaDetailModel, parentUnique: UmbEntityUnique = null) {
+	async validateCreate(
+		model: UmbMediaDetailModel,
+		parentUnique: UmbEntityUnique = null,
+	): Promise<UmbDataSourceResponse<string>> {
 		if (!model) throw new Error('Media is missing');
 		if (!model.unique) throw new Error('Media unique is missing');
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
@@ -40,12 +44,18 @@ export class UmbMediaValidationServerDataSource {
 		};
 
 		// Maybe use: tryExecuteAndNotify
-		return tryExecute(
+		const { data, error } = await tryExecute(
 			this.#host,
 			MediaService.postMediaValidate({
 				body,
 			}),
 		);
+
+		if (data && typeof data === 'string') {
+			return { data };
+		}
+
+		return { error };
 	}
 
 	/**
@@ -55,7 +65,10 @@ export class UmbMediaValidationServerDataSource {
 	 * @returns {Promise<*>} - The response from the server
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async validateUpdate(model: UmbMediaDetailModel, variantIds: Array<UmbVariantId>) {
+	async validateUpdate(
+		model: UmbMediaDetailModel,
+		variantIds: Array<UmbVariantId>,
+	): Promise<UmbDataSourceResponse<string>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		//const cultures = variantIds.map((id) => id.culture).filter((culture) => culture !== null) as Array<string>;
@@ -67,12 +80,18 @@ export class UmbMediaValidationServerDataSource {
 		};
 
 		// Maybe use: tryExecuteAndNotify
-		return tryExecute(
+		const { data, error } = await tryExecute(
 			this.#host,
 			MediaService.putMediaByIdValidate({
-				id: model.unique,
+				path: { id: model.unique },
 				body,
 			}),
 		);
+
+		if (data && typeof data === 'string') {
+			return { data };
+		}
+
+		return { error };
 	}
 }

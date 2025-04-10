@@ -66,7 +66,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, MediaTypeService.getMediaTypeById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, MediaTypeService.getMediaTypeById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -187,7 +187,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			return this.read(data);
 		}
 
@@ -248,7 +248,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 		const { error } = await tryExecute(
 			this.#host,
 			MediaTypeService.putMediaTypeById({
-				id: model.unique,
+				path: { id: model.unique },
 				body,
 			}),
 		);
@@ -272,7 +272,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 		return tryExecute(
 			this.#host,
 			MediaTypeService.deleteMediaTypeById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

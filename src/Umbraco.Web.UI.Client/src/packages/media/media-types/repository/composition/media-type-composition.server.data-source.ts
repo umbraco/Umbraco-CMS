@@ -39,7 +39,7 @@ export class UmbMediaTypeCompositionServerDataSource
 	async getReferences(unique: string) {
 		const response = await tryExecute(
 			this.#host,
-			MediaTypeService.getMediaTypeByIdCompositionReferences({ id: unique }),
+			MediaTypeService.getMediaTypeByIdCompositionReferences({ path: { id: unique } }),
 		);
 		const error = response.error;
 		const data: Array<UmbMediaTypeCompositionReferenceModel> | undefined = response.data?.map((reference) => {

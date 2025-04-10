@@ -34,7 +34,7 @@ export class UmbMoveMediaServerDataSource implements UmbMoveDataSource {
 		return tryExecute(
 			this.#host,
 			MediaService.putMediaByIdMove({
-				id: args.unique,
+				path: { id: args.unique },
 				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},

@@ -1,4 +1,4 @@
-import { MediaTypeService, type PostMediaTypeImportData } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaTypeService, type ImportMediaTypeRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
@@ -28,10 +28,10 @@ export class UmbMediaTypeImportServerDataSource {
 	async import(temporaryUnique: string) {
 		if (!temporaryUnique) throw new Error('Unique is missing');
 
-		const body: PostMediaTypeImportData = {
-			body: { file: { id: temporaryUnique } },
+		const body: ImportMediaTypeRequestModel = {
+			file: { id: temporaryUnique },
 		};
 
-		return tryExecute(this.#host, MediaTypeService.postMediaTypeImport(body));
+		return tryExecute(this.#host, MediaTypeService.postMediaTypeImport({ body }));
 	}
 }

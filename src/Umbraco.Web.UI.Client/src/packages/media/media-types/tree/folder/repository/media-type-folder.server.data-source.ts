@@ -52,7 +52,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 		const { data, error } = await tryExecute(
 			this.#host,
 			MediaTypeService.getMediaTypeFolderById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 
@@ -114,7 +114,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 		const { error } = await tryExecute(
 			this.#host,
 			MediaTypeService.putMediaTypeFolderById({
-				id: model.unique,
+				path: { id: model.unique },
 				body: { name: model.name },
 			}),
 		);
@@ -137,7 +137,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 		return tryExecute(
 			this.#host,
 			MediaTypeService.deleteMediaTypeFolderById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

@@ -28,6 +28,6 @@ export class UmbExportMediaTypeServerDataSource {
 	async export(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecute(this.#host, MediaTypeService.getMediaTypeByIdExport({ id: unique }));
+		return tryExecute(this.#host, MediaTypeService.getMediaTypeByIdExport({ path: { id: unique } }));
 	}
 }
