@@ -18,8 +18,8 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		weight: 200,
 		meta: {
 			verbs: [UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ],
-			label: 'Read',
-			description: 'Read Document property values',
+			label: 'UI Read',
+			description: 'Read Document property values in the UI',
 		},
 	},
 	{
@@ -30,8 +30,8 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		weight: 200,
 		meta: {
 			verbs: [UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE],
-			label: 'Write',
-			description: 'Write Document property values',
+			label: 'UI Write',
+			description: 'Write Document property values from the UI',
 		},
 	},
 	{
