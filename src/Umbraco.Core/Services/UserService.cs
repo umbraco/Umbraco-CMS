@@ -1130,7 +1130,21 @@ internal partial class UserService : RepositoryService, IUserService
         return keys;
     }
 
+    /// <inheritdoc/>
     public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeUserPasswordModel model)
+    {
+        IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+        IUser? performingUser = await userStore.GetAsync(performingUserKey);
+        if (performingUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new PasswordChangedModel());
+        }
+
+        return await ChangePasswordAsync(performingUser, model);
+    }
+
+    private async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(IUser performingUser, ChangeUserPasswordModel model)
     {
         IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -1145,12 +1159,6 @@ internal partial class UserService : RepositoryService, IUserService
         if (user.Kind != UserKind.Default)
         {
             return Attempt.FailWithStatus(UserOperationStatus.InvalidUserType, new PasswordChangedModel());
-        }
-
-        IUser? performingUser = await userStore.GetAsync(performingUserKey);
-        if (performingUser is null)
-        {
-            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new PasswordChangedModel());
         }
 
         // require old password for self change when outside of invite or resetByToken flows
@@ -1176,12 +1184,13 @@ internal partial class UserService : RepositoryService, IUserService
         IBackOfficePasswordChanger passwordChanger = serviceScope.ServiceProvider.GetRequiredService<IBackOfficePasswordChanger>();
         Attempt<PasswordChangedModel?> result = await passwordChanger.ChangeBackOfficePassword(
             new ChangeBackOfficeUserPasswordModel
-        {
-            NewPassword = model.NewPassword,
-            OldPassword = model.OldPassword,
-            User = user,
-            ResetPasswordToken = model.ResetPasswordToken,
-        }, performingUser);
+            {
+                NewPassword = model.NewPassword,
+                OldPassword = model.OldPassword,
+                User = user,
+                ResetPasswordToken = model.ResetPasswordToken,
+            },
+            performingUser);
 
         if (result.Success is false)
         {
@@ -1967,9 +1976,26 @@ internal partial class UserService : RepositoryService, IUserService
     public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ResetPasswordAsync(Guid userKey, string token, string password)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+
+        IUser? user = await userStore.GetAsync(userKey);
+        if (user is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, new PasswordChangedModel());
+        }
+
+        var savingNotification = new UserPasswordResettingNotification(user, evtMsgs);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus(UserOperationStatus.CancelledByNotification, new PasswordChangedModel());
+        }
 
         Attempt<PasswordChangedModel, UserOperationStatus> changePasswordAttempt =
-            await ChangePasswordAsync(userKey, new ChangeUserPasswordModel
+            await ChangePasswordAsync(user, new ChangeUserPasswordModel
             {
                 NewPassword = password,
                 UserKey = userKey,

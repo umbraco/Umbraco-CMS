@@ -171,6 +171,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			return (await this._getDataPromise) as GetDataType;
 		}
 		this.resetState();
+		this.setIsNew(false);
 		this.#entityContext.setUnique(unique);
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
 		await this.#init;
@@ -182,7 +183,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		if (data) {
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
-			this.setIsNew(false);
 
 			this.observe(
 				response.asObservable(),
@@ -246,8 +246,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				data = { ...data, ...this.modalContext.data.preset };
 			}
 
-			this.#entityContext.setUnique(data.unique);
 			this.setIsNew(true);
+			this.#entityContext.setUnique(data.unique);
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
 		}

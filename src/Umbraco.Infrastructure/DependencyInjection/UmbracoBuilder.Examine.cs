@@ -1,3 +1,4 @@
+using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -21,6 +22,8 @@ public static partial class UmbracoBuilderExtensions
 {
     public static IUmbracoBuilder AddExamine(this IUmbracoBuilder builder)
     {
+        builder.Services.AddUnique<IExamineManager, ExamineManager>();
+
         // populators are not a collection: one cannot remove ours, and can only add more
         // the container can inject IEnumerable<IIndexPopulator> and get them all
         builder.Services.AddSingleton<IIndexPopulator, MemberIndexPopulator>();

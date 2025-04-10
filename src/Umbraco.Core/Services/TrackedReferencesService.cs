@@ -10,7 +10,6 @@ public class TrackedReferencesService : ITrackedReferencesService
     private readonly IEntityService _entityService;
     private readonly ITrackedReferencesRepository _trackedReferencesRepository;
 
-
     public TrackedReferencesService(
         ITrackedReferencesRepository trackedReferencesRepository,
         ICoreScopeProvider scopeProvider,
@@ -30,7 +29,7 @@ public class TrackedReferencesService : ITrackedReferencesService
         return Task.FromResult(pagedModel);
     }
 
-    public async Task<PagedModel<RelationItemModel>> GetPagedRelationsForRecycleBinAsync(UmbracoObjectTypes objectType, long skip, long take, bool filterMustBeIsDependency)
+    public Task<PagedModel<RelationItemModel>> GetPagedRelationsForRecycleBinAsync(UmbracoObjectTypes objectType, long skip, long take, bool filterMustBeIsDependency)
     {
         Guid objectTypeKey = objectType switch
         {
@@ -42,7 +41,7 @@ public class TrackedReferencesService : ITrackedReferencesService
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         IEnumerable<RelationItemModel> items = _trackedReferencesRepository.GetPagedRelationsForRecycleBin(objectTypeKey, skip, take, filterMustBeIsDependency, out var totalItems);
         var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
-        return await Task.FromResult(pagedModel);
+        return Task.FromResult(pagedModel);
     }
 
     public Task<PagedModel<RelationItemModel>> GetPagedDescendantsInReferencesAsync(Guid parentKey, long skip, long take, bool filterMustBeIsDependency)

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     Value converter for the RTE so that it always returns IHtmlString so that Html.Raw doesn't have to be used.
 /// </summary>
 [DefaultPropertyValueConverter]
-public class SimpleTinyMceValueConverter : PropertyValueConverterBase
+public class SimpleRichTextValueConverter : PropertyValueConverterBase
 {
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias == Constants.PropertyEditors.Aliases.RichText;

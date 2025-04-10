@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
@@ -128,7 +129,8 @@ public class DeliveryApiTests
         IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null,
         IPublishedContentCache? contentCache = null,
         IDocumentNavigationQueryService? navigationQueryService = null,
-        IPublishStatusQueryService? publishStatusQueryService = null)
+        IPublishStatusQueryService? publishStatusQueryService = null,
+        IDocumentUrlService? documentUrlService = null)
     {
         if (requestHandlerSettingsMonitor == null)
         {
@@ -145,6 +147,7 @@ public class DeliveryApiTests
             requestHandlerSettingsMonitor,
             contentCache ?? Mock.Of<IPublishedContentCache>(),
             navigationQueryService ?? Mock.Of<IDocumentNavigationQueryService>(),
-            publishStatusQueryService ?? PublishStatusQueryService);
+            publishStatusQueryService ?? PublishStatusQueryService,
+            documentUrlService ?? Mock.Of<IDocumentUrlService>());
     }
 }
