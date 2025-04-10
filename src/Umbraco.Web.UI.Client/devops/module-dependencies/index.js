@@ -46,9 +46,9 @@ function getAllFiles(dirPath, arrayOfFiles = []) {
  */
 function getImportsInFile(filePath) {
 	const ext = path.extname(filePath);
-	if (filePath.includes('.stories.ts')) return;
-	if (filePath.includes('.test.ts')) return;
-	if (!['.ts'].includes(ext)) return;
+	if (filePath.includes('.stories.ts')) return [];
+	if (filePath.includes('.test.ts')) return [];
+	if (!['.ts'].includes(ext)) return [];
 
 	const content = fs.readFileSync(filePath, 'utf-8');
 	const imports = [];
