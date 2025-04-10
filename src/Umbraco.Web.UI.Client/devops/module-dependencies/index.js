@@ -139,3 +139,4 @@ reportIllegalImportsFromCore();
 // TODO:
 // - Check what packages another package depends on (not modules) - This will be used when we split the tsconfig into multiple configs
 // - Check for circular module imports
+// - Report if a module imports itself
