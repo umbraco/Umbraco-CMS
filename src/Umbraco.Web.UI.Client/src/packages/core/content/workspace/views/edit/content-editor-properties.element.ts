@@ -74,12 +74,12 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 				(permitted) => {
 					if (permitted) {
 						this.#visiblePropertiesUniques.push(property.unique);
-						this.#calculateVisaibleProperties();
+						this.#calculateVisibleProperties();
 					} else {
 						const index = this.#visiblePropertiesUniques.indexOf(property.unique);
 						if (index !== -1) {
 							this.#visiblePropertiesUniques.splice(index, 1);
-							this.#calculateVisaibleProperties();
+							this.#calculateVisibleProperties();
 						}
 					}
 				},
@@ -88,7 +88,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 		});
 	}
 
-	#calculateVisaibleProperties() {
+	#calculateVisibleProperties() {
 		this._visibleProperties = this.#properties!.filter((property) =>
 			this.#visiblePropertiesUniques.includes(property.unique),
 		);
