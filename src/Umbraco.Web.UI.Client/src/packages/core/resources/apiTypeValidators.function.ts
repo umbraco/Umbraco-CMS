@@ -1,4 +1,4 @@
-import type { UmbProblemDetails } from './types';
+import type { UmbProblemDetails } from './types.js';
 
 /**
  * Checks if the given error is an instance of ApiError.
