@@ -52,7 +52,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		const skip = this.page * this.itemsPerPage - this.itemsPerPage;
 		const { data } = await tryExecute(
 			this,
-			RedirectManagementService.getRedirectManagement({ filter, take: this.itemsPerPage, skip }),
+			RedirectManagementService.getRedirectManagement({ query: { filter, take: this.itemsPerPage, skip } }),
 		);
 		if (!data) return;
 
@@ -89,7 +89,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		this.#redirectDelete(data.id!);
 	}
 	async #redirectDelete(id: string) {
-		const { error } = await tryExecute(this, RedirectManagementService.deleteRedirectManagementById({ id }));
+		const { error } = await tryExecute(this, RedirectManagementService.deleteRedirectManagementById({ path: { id } }));
 		if (error) return;
 
 		this._redirectData = this._redirectData?.filter((x) => x.id !== id);
@@ -127,7 +127,10 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 
 	async #trackerToggle() {
 		const status = this._trackerEnabled ? RedirectStatusModel.DISABLED : RedirectStatusModel.ENABLED;
-		const { error } = await tryExecute(this, RedirectManagementService.postRedirectManagementStatus({ status }));
+		const { error } = await tryExecute(
+			this,
+			RedirectManagementService.postRedirectManagementStatus({ query: { status } }),
+		);
 		if (error) return;
 		this._trackerEnabled = !this._trackerEnabled;
 	}
