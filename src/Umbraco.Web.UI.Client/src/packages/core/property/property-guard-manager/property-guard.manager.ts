@@ -28,7 +28,7 @@ export class UmbPropertyGuardManager extends UmbGuardManagerBase<UmbPropertyGuar
 		return this._rules.asObservablePart((rules) => comparePropertyRefWithStates(rules, propertyType));
 	}
 
-	getPermittedForVariant(propertyType: UmbReferenceByUnique): boolean {
+	getIsPermittedForProperty(propertyType: UmbReferenceByUnique): boolean {
 		return comparePropertyRefWithStates(this.getRules(), propertyType);
 	}
 }
