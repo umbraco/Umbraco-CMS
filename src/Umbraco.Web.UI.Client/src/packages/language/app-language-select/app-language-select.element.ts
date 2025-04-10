@@ -83,7 +83,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			this._appLanguage = language;
 		});
 
-		this.observe(this.#appLanguageContext.appLanguageReadOnlyState.isOn, (isReadOnly) => {
+		this.observe(this.#appLanguageContext.appLanguageReadOnlyState.isReadOnly, (isReadOnly) => {
 			this._appLanguageIsReadOnly = isReadOnly;
 		});
 	}
