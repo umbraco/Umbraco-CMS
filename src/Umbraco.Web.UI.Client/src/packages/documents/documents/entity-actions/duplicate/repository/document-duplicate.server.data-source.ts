@@ -32,7 +32,7 @@ export class UmbDuplicateDocumentServerDataSource {
 		return tryExecute(
 			this.#host,
 			DocumentService.postDocumentByIdCopy({
-				id: args.unique,
+				path: { id: args.unique },
 				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 					relateToOriginal: args.relateToOriginal,

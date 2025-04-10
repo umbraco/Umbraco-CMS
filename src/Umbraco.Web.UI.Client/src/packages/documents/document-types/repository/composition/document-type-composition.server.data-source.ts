@@ -42,7 +42,7 @@ export class UmbDocumentTypeCompositionServerDataSource
 	async getReferences(unique: string) {
 		const response = await tryExecute(
 			this.#host,
-			DocumentTypeService.getDocumentTypeByIdCompositionReferences({ id: unique }),
+			DocumentTypeService.getDocumentTypeByIdCompositionReferences({ path: { id: unique } }),
 		);
 		const error = response.error;
 		const data: Array<UmbDocumentTypeCompositionReferenceModel> | undefined = response.data?.map((reference) => {

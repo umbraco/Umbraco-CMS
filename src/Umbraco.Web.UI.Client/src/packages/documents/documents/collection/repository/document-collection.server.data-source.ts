@@ -13,23 +13,25 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 		this.#host = host;
 	}
 
-	async getCollection(query: UmbDocumentCollectionFilterModel) {
-		if (!query.unique) {
+	async getCollection(filter: UmbDocumentCollectionFilterModel) {
+		if (!filter.unique) {
 			throw new Error('Unique ID is required to fetch a collection.');
 		}
 
-		const params = {
-			id: query.unique,
-			dataTypeId: query.dataTypeId ?? '',
-			orderBy: query.orderBy ?? 'updateDate',
-			orderCulture: query.orderCulture ?? 'en-US',
-			orderDirection: query.orderDirection === 'asc' ? DirectionModel.ASCENDING : DirectionModel.DESCENDING,
-			filter: query.filter,
-			skip: query.skip || 0,
-			take: query.take || 100,
+		const query = {
+			dataTypeId: filter.dataTypeId ?? '',
+			orderBy: filter.orderBy ?? 'updateDate',
+			orderCulture: filter.orderCulture ?? 'en-US',
+			orderDirection: filter.orderDirection === 'asc' ? DirectionModel.ASCENDING : DirectionModel.DESCENDING,
+			filter: filter.filter,
+			skip: filter.skip || 0,
+			take: filter.take || 100,
 		};
 
-		const { data, error } = await tryExecute(this.#host, DocumentService.getCollectionDocumentById(params));
+		const { data, error } = await tryExecute(
+			this.#host,
+			DocumentService.getCollectionDocumentById({ path: { id: filter.unique }, query }),
+		);
 
 		if (data) {
 			const items = data.items.map((item: DocumentCollectionResponseModel) => {

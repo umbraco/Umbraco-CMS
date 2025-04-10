@@ -52,7 +52,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentTypeService.getDocumentTypeFolderById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 
@@ -113,7 +113,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 		const { error } = await tryExecute(
 			this.#host,
 			DocumentTypeService.putDocumentTypeFolderById({
-				id: model.unique,
+				path: { id: model.unique },
 				body: { name: model.name },
 			}),
 		);
@@ -136,7 +136,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 		return tryExecute(
 			this.#host,
 			DocumentTypeService.deleteDocumentTypeFolderById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

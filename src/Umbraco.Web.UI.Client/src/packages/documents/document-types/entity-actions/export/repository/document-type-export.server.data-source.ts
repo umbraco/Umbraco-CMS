@@ -27,6 +27,6 @@ export class UmbExportDocumentTypeServerDataSource {
 	async export(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecute(this.#host, DocumentTypeService.getDocumentTypeByIdExport({ id: unique }));
+		return tryExecute(this.#host, DocumentTypeService.getDocumentTypeByIdExport({ path: { id: unique } }));
 	}
 }
