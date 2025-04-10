@@ -93,19 +93,20 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 
 		await umbConfirmModal(this, {
 			color: 'positive',
-			headline: `Run migrations for ${this.name}?`,
-			content: `Do you want to start run migrations for ${this.name}`,
-			confirmLabel: 'Run migrations',
+			headline: this.name,
+			content: this.localize.term('packager_packageMigrationsConfirmText'),
 		});
 
 		this._migrationButtonState = 'waiting';
-		const { error } = await tryExecute(this, PackageService.postPackageByNameRunMigration({ name: this.name }));
+		const { error } = await tryExecute(
+			this,
+			PackageService.postPackageByNameRunMigration({ path: { name: this.name } }),
+		);
 
 		if (error) return;
 
 		this.#notificationContext?.peek('positive', {
 			data: {
-				headline: 'Migrations completed',
 				message: this.localize.term('packager_packageMigrationsComplete'),
 			},
 		});
@@ -130,9 +131,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 										.state=${this._migrationButtonState}
 										color="warning"
 										look="primary"
-										label=${this.localize.term('packageMigrationsRun')}>
-										Run pending migrations
-									</uui-button>`
+										label=${this.localize.term('packageMigrationsRun')}></uui-button>`
 								: nothing}
 						</div>
 					</uui-ref-node-package>
