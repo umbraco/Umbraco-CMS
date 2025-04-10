@@ -10,6 +10,11 @@ export interface UmbOpenApiConfiguration {
 	readonly base?: string;
 
 	/**
+	 * The `credentials` option for the Fetch API.
+	 */
+	readonly credentials?: 'include' | 'omit' | 'same-origin';
+
+	/**
 	 * The token to use for the Authorization header.
 	 * @returns A resolver for the token to use for the Authorization header.
 	 */

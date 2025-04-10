@@ -229,6 +229,7 @@ export class UmbAppElement extends UmbLitElement {
 		// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
 		umbHttpClient.setConfig({
 			baseUrl: this.serverUrl,
+			credentials: 'include',
 			auth: () => this.#authContext!.getLatestToken(),
 		});
 	}

@@ -249,6 +249,7 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 		const config = umbHttpClient.getConfig();
 		return {
 			base: config.baseUrl,
+			credentials: config.credentials,
 			token: this.getLatestToken,
 		};
 	}
