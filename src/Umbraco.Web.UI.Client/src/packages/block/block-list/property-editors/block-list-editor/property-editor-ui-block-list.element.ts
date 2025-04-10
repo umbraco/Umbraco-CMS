@@ -130,7 +130,7 @@ export class UmbPropertyEditorUIBlockListElement
 			this.#managerContext.readOnlyState.fallbackToPermitted();
 		} else {
 			this.#sorter.enable();
-			this.#managerContext.readOnlyState.fallbackToDisallowed();
+			this.#managerContext.readOnlyState.fallbackToNotPermitted();
 		}
 	}
 	public get readonly() {

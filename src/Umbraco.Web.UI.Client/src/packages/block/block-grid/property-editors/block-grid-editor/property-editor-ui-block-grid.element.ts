@@ -70,7 +70,7 @@ export class UmbPropertyEditorUIBlockGridElement
 		if (this.#readonly) {
 			this.#managerContext.readOnlyState.fallbackToPermitted();
 		} else {
-			this.#managerContext.readOnlyState.fallbackToDisallowed();
+			this.#managerContext.readOnlyState.fallbackToNotPermitted();
 		}
 	}
 	public get readonly() {

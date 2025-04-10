@@ -78,7 +78,7 @@ describe('UmbPermissionGuardManager', () => {
 		});
 
 		it('sort default states last', () => {
-			manager.fallbackToDisallowed();
+			manager.fallbackToNotPermitted();
 			manager.addRules([rule1, ruleFalse, rule2]);
 			const rules = manager.getRules();
 			expect(rules[0]).to.deep.equal(ruleFalse);

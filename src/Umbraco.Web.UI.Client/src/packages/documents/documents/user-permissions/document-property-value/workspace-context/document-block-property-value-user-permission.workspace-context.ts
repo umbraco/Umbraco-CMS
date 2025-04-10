@@ -36,8 +36,8 @@ export class UmbDocumentBlockPropertyValueUserPermissionWorkspaceContext extends
 			// TODO: If zero properties I guess we should then clear the state? [NL]
 			if (properties.length === 0) return;
 
-			ownerContent.propertyViewGuard.fallbackToDisallowed();
-			ownerContent.propertyWriteGuard.fallbackToDisallowed();
+			ownerContent.propertyViewGuard.fallbackToNotPermitted();
+			ownerContent.propertyWriteGuard.fallbackToNotPermitted();
 			this._setPermissions(properties, ownerContent.propertyViewGuard, ownerContent.propertyWriteGuard);
 		});
 
@@ -47,8 +47,8 @@ export class UmbDocumentBlockPropertyValueUserPermissionWorkspaceContext extends
 			// TODO: If zero properties I guess we should then clear the state? [NL]
 			if (properties.length === 0) return;
 
-			ownerSettings.propertyViewGuard.fallbackToDisallowed();
-			ownerSettings.propertyWriteGuard.fallbackToDisallowed();
+			ownerSettings.propertyViewGuard.fallbackToNotPermitted();
+			ownerSettings.propertyWriteGuard.fallbackToNotPermitted();
 			this._setPermissions(properties, ownerSettings.propertyViewGuard, ownerSettings.propertyWriteGuard);
 		});
 	}

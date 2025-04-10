@@ -30,7 +30,7 @@ export class UmbGuardManagerBase<
 	public readonly rules = this._rules.asObservable();
 	public readonly hasRules = this._rules.asObservablePart((x) => x.length > 0);
 
-	public fallbackToDisallowed() {
+	public fallbackToNotPermitted() {
 		this._rules.appendOne({ unique: DefaultRuleUnique, permitted: false } as RuleType);
 	}
 
