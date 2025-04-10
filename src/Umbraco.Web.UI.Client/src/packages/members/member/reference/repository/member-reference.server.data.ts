@@ -27,7 +27,10 @@ export class UmbMemberReferenceServerDataSource extends UmbControllerBase implem
 		skip: number = 0,
 		take: number = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>> {
-		const { data, error } = await tryExecute(this, MemberService.getMemberByIdReferencedBy({ id: unique, skip, take }));
+		const { data, error } = await tryExecute(
+			this,
+			MemberService.getMemberByIdReferencedBy({ path: { id: unique }, query: { skip, take } }),
+		);
 
 		if (data) {
 			const promises = data.items.map(async (item) => {
@@ -65,7 +68,10 @@ export class UmbMemberReferenceServerDataSource extends UmbControllerBase implem
 		skip: number = 0,
 		take: number = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>> {
-		const { data, error } = await tryExecute(this, MemberService.getMemberAreReferenced({ id: uniques, skip, take }));
+		const { data, error } = await tryExecute(
+			this,
+			MemberService.getMemberAreReferenced({ query: { id: uniques, skip, take } }),
+		);
 
 		if (data) {
 			const items: Array<UmbEntityModel> = data.items.map((item) => {
@@ -96,7 +102,7 @@ export class UmbMemberReferenceServerDataSource extends UmbControllerBase implem
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>> {
 		const { data, error } = await tryExecute(
 			this,
-			MemberService.getMemberByIdReferencedDescendants({ id: unique, skip, take }),
+			MemberService.getMemberByIdReferencedDescendants({ path: { id: unique }, query: { skip, take } }),
 		);
 
 		if (data) {

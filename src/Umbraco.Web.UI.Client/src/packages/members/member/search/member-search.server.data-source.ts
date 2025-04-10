@@ -34,8 +34,10 @@ export class UmbMemberSearchServerDataSource
 		const { data, error } = await tryExecute(
 			this.#host,
 			MemberService.getItemMemberSearch({
-				query: args.query,
-				allowedMemberTypes: args.allowedContentTypes?.map((memberReference) => memberReference.unique),
+				query: {
+					query: args.query,
+					allowedMemberTypes: args.allowedContentTypes?.map((memberReference) => memberReference.unique),
+				},
 			}),
 		);
 

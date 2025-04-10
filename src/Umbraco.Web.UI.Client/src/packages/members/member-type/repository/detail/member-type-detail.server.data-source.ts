@@ -66,7 +66,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, MemberTypeService.getMemberTypeById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, MemberTypeService.getMemberTypeById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -176,7 +176,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			return this.read(data);
 		}
 
@@ -232,7 +232,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 		const { error } = await tryExecute(
 			this.#host,
 			MemberTypeService.putMemberTypeById({
-				id: model.unique,
+				path: { id: model.unique },
 				body,
 			}),
 		);
@@ -256,7 +256,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 		return tryExecute(
 			this.#host,
 			MemberTypeService.deleteMemberTypeById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

@@ -8,6 +8,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A server data source for Member Validation
@@ -25,7 +26,10 @@ export class UmbMemberValidationServerDataSource {
 	 * @param {UmbEntityUnique} parentUnique - Parent Unique
 	 * @returns {*} - The response from the server
 	 */
-	async validateCreate(model: UmbMemberDetailModel, parentUnique: UmbEntityUnique = null) {
+	async validateCreate(
+		model: UmbMemberDetailModel,
+		parentUnique: UmbEntityUnique = null,
+	): Promise<UmbDataSourceResponse<string>> {
 		if (!model) throw new Error('Member is missing');
 		if (!model.unique) throw new Error('Member unique is missing');
 		if (!model.newPassword) throw new Error('Member newPassword is missing');
@@ -43,13 +47,19 @@ export class UmbMemberValidationServerDataSource {
 			variants: model.variants,
 		};
 
-		// Maybe use: tryExecuteAndNotify
-		return tryExecute(
+		const { data, error } = await tryExecute(
 			this.#host,
 			MemberService.postMemberValidate({
 				body,
 			}),
+			{ disableNotifications: true },
 		);
+
+		if (data && typeof data === 'string') {
+			return { data };
+		}
+
+		return { error };
 	}
 
 	/**
@@ -59,7 +69,10 @@ export class UmbMemberValidationServerDataSource {
 	 * @returns {Promise<*>} - The response from the server
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async validateUpdate(model: UmbMemberDetailModel, variantIds: Array<UmbVariantId>) {
+	async validateUpdate(
+		model: UmbMemberDetailModel,
+		variantIds: Array<UmbVariantId>,
+	): Promise<UmbDataSourceResponse<string>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		//const cultures = variantIds.map((id) => id.culture).filter((culture) => culture !== null) as Array<string>;
@@ -76,12 +89,19 @@ export class UmbMemberValidationServerDataSource {
 		};
 
 		// Maybe use: tryExecuteAndNotify
-		return tryExecute(
+		const { data, error } = await tryExecute(
 			this.#host,
 			MemberService.putMemberByIdValidate({
-				id: model.unique,
+				path: { id: model.unique },
 				body,
 			}),
+			{ disableNotifications: true },
 		);
+
+		if (data && typeof data === 'string') {
+			return { data };
+		}
+
+		return { error };
 	}
 }

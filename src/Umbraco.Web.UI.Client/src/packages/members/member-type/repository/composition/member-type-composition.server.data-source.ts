@@ -42,7 +42,7 @@ export class UmbMemberTypeCompositionServerDataSource
 	async getReferences(unique: string) {
 		const response = await tryExecute(
 			this.#host,
-			MemberTypeService.getMemberTypeByIdCompositionReferences({ id: unique }),
+			MemberTypeService.getMemberTypeByIdCompositionReferences({ path: { id: unique } }),
 		);
 		const error = response.error;
 		const data: Array<UmbMemberTypeCompositionReferenceModel> | undefined = response.data?.map((reference) => {
