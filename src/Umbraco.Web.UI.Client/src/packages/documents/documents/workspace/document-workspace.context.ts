@@ -231,7 +231,6 @@ export class UmbDocumentWorkspaceContext
 						allOf: [defaultLanguageUnique],
 					},
 					onChange: (permitted: boolean) => {
-						debugger;
 						if (permitted) {
 							this.propertyReadOnlyGuard.removeRule(ruleUnique);
 						} else {
