@@ -6,7 +6,7 @@ export interface UmbPropertyGuardRule extends UmbGuardRule {
 	propertyType?: UmbReferenceByUnique;
 }
 
-function ComparePropertyRefWithStates(rules: UmbPropertyGuardRule[], propertyType: UmbReferenceByUnique) {
+function comparePropertyRefWithStates(rules: UmbPropertyGuardRule[], propertyType: UmbReferenceByUnique) {
 	// any specific states for the propertyType?
 	const propertyState = rules.find((s) => s.propertyType?.unique === propertyType.unique);
 	if (propertyState) {
@@ -25,10 +25,10 @@ function ComparePropertyRefWithStates(rules: UmbPropertyGuardRule[], propertyTyp
 export class UmbPropertyGuardManager extends UmbGuardManagerBase<UmbPropertyGuardRule> {
 	//
 	isPermittedForProperty(propertyType: UmbReferenceByUnique): Observable<boolean> {
-		return this._rules.asObservablePart((rules) => ComparePropertyRefWithStates(rules, propertyType));
+		return this._rules.asObservablePart((rules) => comparePropertyRefWithStates(rules, propertyType));
 	}
 
 	getPermittedForVariant(propertyType: UmbReferenceByUnique): boolean {
-		return ComparePropertyRefWithStates(this.getRules(), propertyType);
+		return comparePropertyRefWithStates(this.getRules(), propertyType);
 	}
 }
