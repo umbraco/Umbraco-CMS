@@ -1,6 +1,6 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbPartialSome } from '../type';
+import type { UmbPartialSome } from '../type/index.js';
 
 export interface UmbGuardIncomingRuleBase {
 	unique?: string | symbol;
@@ -13,7 +13,7 @@ export interface UmbGuardRule extends UmbGuardIncomingRuleBase {
 	permitted: boolean;
 }
 
-const DefaultRuleUnique = Symbol();
+const defaultRuleUnique = Symbol();
 
 export class UmbGuardManagerBase<
 	RuleType extends UmbGuardRule = UmbGuardRule,
@@ -22,8 +22,8 @@ export class UmbGuardManagerBase<
 	//
 	protected readonly _rules = new UmbArrayState<RuleType>([], (x) => x.unique).sortBy((a, b) => {
 		// Ensure DefaultRuleUnique always comes last:
-		if (a.unique === DefaultRuleUnique) return 1;
-		if (b.unique === DefaultRuleUnique) return -1;
+		if (a.unique === defaultRuleUnique) return 1;
+		if (b.unique === defaultRuleUnique) return -1;
 		// Otherwise disallowed first and permitted last:
 		return a.permitted === b.permitted ? 0 : a.permitted ? 1 : -1;
 	});
@@ -31,11 +31,11 @@ export class UmbGuardManagerBase<
 	public readonly hasRules = this._rules.asObservablePart((x) => x.length > 0);
 
 	public fallbackToNotPermitted() {
-		this._rules.appendOne({ unique: DefaultRuleUnique, permitted: false } as RuleType);
+		this._rules.appendOne({ unique: defaultRuleUnique, permitted: false } as RuleType);
 	}
 
 	public fallbackToPermitted() {
-		this._rules.appendOne({ unique: DefaultRuleUnique, permitted: true } as RuleType);
+		this._rules.appendOne({ unique: defaultRuleUnique, permitted: true } as RuleType);
 	}
 
 	/**
