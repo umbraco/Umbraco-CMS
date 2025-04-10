@@ -32,8 +32,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.Read'],
-			label: '#actions_browse',
-			description: '#actionDescriptions_browse',
+			label: '#actions_read',
+			description: '#actionDescriptions_read',
 		},
 	},
 	{
