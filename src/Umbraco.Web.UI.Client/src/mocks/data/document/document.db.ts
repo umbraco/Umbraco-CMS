@@ -94,7 +94,7 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 	const now = new Date().toString();
 
 	return {
-		ancestors: [],
+		ancestors,
 		documentType: {
 			id: documentType.id,
 			icon: documentType.icon,
