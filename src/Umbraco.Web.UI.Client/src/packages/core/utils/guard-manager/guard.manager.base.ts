@@ -89,7 +89,7 @@ export class UmbGuardManagerBase<
 	/**
 	 * Clear all rules
 	 */
-	clear(): void {
+	clearRules(): void {
 		this._rules.setValue([]);
 	}
 

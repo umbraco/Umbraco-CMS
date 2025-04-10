@@ -135,12 +135,12 @@ describe('UmbPermissionGuardManager', () => {
 		});
 
 		it('clears all states', () => {
-			manager.clear();
+			manager.clearRules();
 			expect(manager.getRules()).to.deep.equal([]);
 		});
 
 		it('updates the observable', (done) => {
-			manager.clear();
+			manager.clearRules();
 
 			manager.rules
 				.subscribe((value) => {

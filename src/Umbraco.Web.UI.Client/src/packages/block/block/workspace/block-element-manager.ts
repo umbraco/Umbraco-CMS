@@ -108,9 +108,9 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 
 	resetState() {
 		this.#data.clear();
-		this.propertyViewGuard.clear();
-		this.propertyWriteGuard.clear();
-		this.propertyReadOnlyGuard.clear();
+		this.propertyViewGuard.clearRules();
+		this.propertyWriteGuard.clearRules();
+		this.propertyReadOnlyGuard.clearRules();
 		// default:
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();

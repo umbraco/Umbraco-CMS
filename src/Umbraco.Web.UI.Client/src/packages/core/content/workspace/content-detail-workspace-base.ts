@@ -885,10 +885,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	override resetState() {
 		super.resetState();
-		this.readonlyGuard.clear();
-		this.propertyViewGuard.clear();
-		this.propertyWriteGuard.clear();
-		this.propertyReadOnlyGuard.clear();
+		this.readonlyGuard.clearRules();
+		this.propertyViewGuard.clearRules();
+		this.propertyWriteGuard.clearRules();
+		this.propertyReadOnlyGuard.clearRules();
 		// default:
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
