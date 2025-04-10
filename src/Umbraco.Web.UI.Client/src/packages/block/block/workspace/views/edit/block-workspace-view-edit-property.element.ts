@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import type UmbBlockElementManager from '../../block-element-manager';
+import type UmbBlockElementManager from '../../block-element-manager.js';
 
 @customElement('umb-block-workspace-view-edit-property')
 export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {

@@ -1,8 +1,8 @@
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { type Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import type { UmbPropertyGuardRule } from './property-guard.manager';
-import { UmbGuardManagerBase } from '../../utils/guard-manager';
+import type { UmbPropertyGuardRule } from './property-guard.manager.js';
+import { UmbGuardManagerBase } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbVariantPropertyGuardRule extends UmbPropertyGuardRule {
 	variantId?: UmbVariantId;

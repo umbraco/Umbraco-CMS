@@ -595,7 +595,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
-		let selected = writableSelectedVariantIds.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
+		const selected = writableSelectedVariantIds.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
 
 		return {
 			options,
