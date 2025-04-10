@@ -1,5 +1,6 @@
 import type { UmbModalToken } from '../token/modal-token.js';
-import { UmbModalContext, type UmbModalContextClassArgs } from './modal.context.js';
+import { UmbModalContext } from './modal.context.js';
+import type { UmbModalContextClassArgs } from './modal.context.js';
 import { UmbBasicState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
