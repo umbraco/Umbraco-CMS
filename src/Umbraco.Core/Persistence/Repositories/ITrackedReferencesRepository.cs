@@ -81,13 +81,17 @@ public interface ITrackedReferencesRepository
         bool filterMustBeIsDependency,
         out long totalRecords);
 
+    /// <summary>
+    /// Gets a paged collection of node keys that have dependant references.
+    /// </summary>
+    /// <param name="keys">The keys to check for relations.</param>
+    /// <param name="nodeObjectTypeId">The node object Id.</param>
+    /// <param name="skip">The amount of items to skip.</param>
+    /// <param name="take">The amount of items to take.</param>
+    /// <returns></returns>
     Task<PagedModel<Guid>> GetPagedNodeKeysWithDependantReferencesAsync(
         ISet<Guid> keys,
         Guid nodeObjectTypeId,
         long skip,
-        long take)
-    {
-        IEnumerable<RelationItemModel> pagedItems = GetPagedItemsWithRelations(keys, skip, take, true, out var total);
-        return Task.FromResult(new PagedModel<Guid>(total, pagedItems.Select(i => i.NodeKey)));
-    }
+        long take);
 }
