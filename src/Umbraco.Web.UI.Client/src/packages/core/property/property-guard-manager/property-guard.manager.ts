@@ -22,12 +22,29 @@ function comparePropertyRefWithStates(rules: UmbPropertyGuardRule[], propertyTyp
 	return false;
 }
 
+/**
+ * @description - A Guard to manage property rules.
+ * @export
+ * @class UmbPropertyGuardManager
+ * @extends {UmbGuardManagerBase<UmbPropertyGuardRule>}
+ */
 export class UmbPropertyGuardManager extends UmbGuardManagerBase<UmbPropertyGuardRule> {
-	//
+	/**
+	 * Checks if the property is permitted for the given property type
+	 * @param {UmbReferenceByUnique} propertyType
+	 * @return {Observable<boolean>} - Observable that emits true if the property is permitted
+	 * @memberof UmbPropertyGuardManager
+	 */
 	isPermittedForProperty(propertyType: UmbReferenceByUnique): Observable<boolean> {
 		return this._rules.asObservablePart((rules) => comparePropertyRefWithStates(rules, propertyType));
 	}
 
+	/**
+	 * Checks if the property is permitted for the given property type
+	 * @param {UmbReferenceByUnique} propertyType
+	 * @return {boolean} - Returns true if the property is permitted
+	 * @memberof UmbPropertyGuardManager
+	 */
 	getIsPermittedForProperty(propertyType: UmbReferenceByUnique): boolean {
 		return comparePropertyRefWithStates(this.getRules(), propertyType);
 	}
