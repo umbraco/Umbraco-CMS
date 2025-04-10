@@ -42,13 +42,13 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 
 		let headline = 'An error occurred';
 		let message = 'An error occurred while trying to execute the request.';
-		let details: Record<string, string[]> = {};
+		let details: Record<string, string[]> | undefined = undefined;
 
 		if (UmbApiError.isUmbApiError(error)) {
 			// UmbApiError, show notification
 			headline = error.problemDetails.title ?? error.name;
 			message = error.problemDetails.detail ?? error.message;
-			details = error.problemDetails.errors ?? {};
+			details = error.problemDetails.errors ?? undefined;
 		} else {
 			// Unknown error, show notification
 			headline = '';

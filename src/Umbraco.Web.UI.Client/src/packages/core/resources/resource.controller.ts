@@ -1,4 +1,4 @@
-import { isApiError, isCancelablePromise, isCancelError } from './apiTypeValidators.function.js';
+import { isApiError, isCancelablePromise, isCancelError, isProblemDetailsLike } from './apiTypeValidators.function.js';
 import { UmbApiError, UmbCancelError, UmbError } from './umb-error.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -23,7 +23,9 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 	 * @returns {*} The mapped error
 	 */
 	mapToUmbError(error: unknown): UmbApiError | UmbCancelError | UmbError {
-		if (isApiError(error)) {
+		if (isProblemDetailsLike(error)) {
+			return new UmbApiError(error.detail ?? error.title, error.status, null, error);
+		} else if (isApiError(error)) {
 			return UmbApiError.fromLegacyApiError(error as never);
 		} else if (isCancelError(error)) {
 			return UmbCancelError.fromLegacyCancelError(error);
