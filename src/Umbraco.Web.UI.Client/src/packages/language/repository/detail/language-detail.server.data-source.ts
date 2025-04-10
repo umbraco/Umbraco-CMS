@@ -55,7 +55,10 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, LanguageService.getLanguageByIsoCode({ isoCode: unique }));
+		const { data, error } = await tryExecute(
+			this.#host,
+			LanguageService.getLanguageByIsoCode({ path: { isoCode: unique } }),
+		);
 
 		if (error || !data) {
 			return { error };
@@ -99,7 +102,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			return this.read(data);
 		}
 
@@ -127,7 +130,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 		const { error } = await tryExecute(
 			this.#host,
 			LanguageService.putLanguageByIsoCode({
-				isoCode: model.unique,
+				path: { isoCode: model.unique },
 				body,
 			}),
 		);
@@ -151,7 +154,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 		return tryExecute(
 			this.#host,
 			LanguageService.deleteLanguageByIsoCode({
-				isoCode: unique,
+				path: { isoCode: unique },
 			}),
 		);
 	}
