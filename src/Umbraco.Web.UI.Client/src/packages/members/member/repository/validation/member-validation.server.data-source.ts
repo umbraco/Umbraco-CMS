@@ -68,9 +68,9 @@ export class UmbMemberValidationServerDataSource {
 	 * @param {Array<UmbVariantId>} variantIds - Variant Ids
 	 * @returns {Promise<*>} - The response from the server
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async validateUpdate(
 		model: UmbMemberDetailModel,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		variantIds: Array<UmbVariantId>,
 	): Promise<UmbDataSourceResponse<string>> {
 		if (!model.unique) throw new Error('Unique is missing');

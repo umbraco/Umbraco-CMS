@@ -64,9 +64,9 @@ export class UmbMediaValidationServerDataSource {
 	 * @param {Array<UmbVariantId>} variantIds - Variant Ids
 	 * @returns {Promise<*>} - The response from the server
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async validateUpdate(
 		model: UmbMediaDetailModel,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		variantIds: Array<UmbVariantId>,
 	): Promise<UmbDataSourceResponse<string>> {
 		if (!model.unique) throw new Error('Unique is missing');
