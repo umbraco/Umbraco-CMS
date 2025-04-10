@@ -34,7 +34,7 @@ export class UmbMoveDocumentBlueprintServerDataSource implements UmbMoveDataSour
 		return tryExecute(
 			this.#host,
 			DocumentBlueprintService.putDocumentBlueprintByIdMove({
-				id: args.unique,
+				path: { id: args.unique },
 				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},

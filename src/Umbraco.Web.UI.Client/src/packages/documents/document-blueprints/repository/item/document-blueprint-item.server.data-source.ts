@@ -33,7 +33,7 @@ export class UmbDocumentBlueprintItemServerDataSource extends UmbItemServerDataS
 		if (!unique) throw new Error('Unique is missing');
 		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentTypeService.getDocumentTypeByIdBlueprint({ id: unique }),
+			DocumentTypeService.getDocumentTypeByIdBlueprint({ path: { id: unique } }),
 		);
 
 		if (data) {
@@ -50,7 +50,8 @@ export class UmbDocumentBlueprintItemServerDataSource extends UmbItemServerDataS
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => DocumentBlueprintService.getItemDocumentBlueprint({ id: uniques });
+const getItems = (uniques: Array<string>) =>
+	DocumentBlueprintService.getItemDocumentBlueprint({ query: { id: uniques } });
 
 const mapper = (item: DocumentBlueprintItemResponseModel): UmbDocumentBlueprintItemModel => {
 	return {

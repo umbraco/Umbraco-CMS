@@ -52,7 +52,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentBlueprintService.getDocumentBlueprintFolderById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 
@@ -114,7 +114,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 		const { error } = await tryExecute(
 			this.#host,
 			DocumentBlueprintService.putDocumentBlueprintFolderById({
-				id: model.unique,
+				path: { id: model.unique },
 				body: { name: model.name },
 			}),
 		);
@@ -137,7 +137,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 		return tryExecute(
 			this.#host,
 			DocumentBlueprintService.deleteDocumentBlueprintFolderById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

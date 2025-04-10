@@ -79,7 +79,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 
 		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentBlueprintService.getDocumentBlueprintById({ id: unique }),
+			DocumentBlueprintService.getDocumentBlueprintById({ path: { id: unique } }),
 		);
 
 		if (error || !data) {
@@ -146,7 +146,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			return this.read(data);
 		}
 
@@ -172,7 +172,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		const { error } = await tryExecute(
 			this.#host,
 			DocumentBlueprintService.putDocumentBlueprintById({
-				id: model.unique,
+				path: { id: model.unique },
 				body,
 			}),
 		);
@@ -193,7 +193,6 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		// TODO: update to delete when implemented
-		return tryExecute(this.#host, DocumentBlueprintService.deleteDocumentBlueprintById({ id: unique }));
+		return tryExecute(this.#host, DocumentBlueprintService.deleteDocumentBlueprintById({ path: { id: unique } }));
 	}
 }
