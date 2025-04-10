@@ -29,7 +29,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockListName);
 });
 
-test('block list with an mandatory radiobox', async ({umbracoApi, umbracoUi}) => {
+test('can not publish a block list with a mandatory radiobox without a value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   propertyEditorId = await umbracoApi.dataType.createRadioboxDataType(propertyEditorName, optionValues);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
@@ -58,7 +58,7 @@ test('block list with an mandatory radiobox', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 });
 
-test('block list with an mandatory checkbox list', async ({umbracoApi, umbracoUi}) => {
+test('can not publish a block list with a mandatory checkbox list without a value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   propertyEditorId = await umbracoApi.dataType.createCheckboxListDataType(propertyEditorName, optionValues);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
@@ -87,7 +87,7 @@ test('block list with an mandatory checkbox list', async ({umbracoApi, umbracoUi
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 });
 
-test('block list with an mandatory dropdown ', async ({umbracoApi, umbracoUi}) => {
+test('can not publish a block list with a mandatory dropdown without a value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   propertyEditorId = await umbracoApi.dataType.createDropdownDataType(propertyEditorName, false, optionValues);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);

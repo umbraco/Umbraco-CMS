@@ -129,7 +129,7 @@ test('can limit the media picker in the content by setting the start node', asyn
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('can set media picker as mandatory in the content', async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory media picker with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', false, false, true);

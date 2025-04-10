@@ -82,7 +82,7 @@ test('can create content with the custom checkbox list data type', async ({umbra
   expect(contentData.values[0].value).toEqual([optionValues[0]]);
 });
 
-test('can set checkbox list as mandatory in the content', async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory checkbox list with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const optionValues = ['testOption1', 'testOption2'];
   const customDataTypeId = await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, optionValues);

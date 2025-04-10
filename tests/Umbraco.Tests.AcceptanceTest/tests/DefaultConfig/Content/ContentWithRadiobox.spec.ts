@@ -5,6 +5,7 @@ const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Radiobox';
 const customDataTypeName = 'CustomRadiobox';
+const optionValues = ['testOption1', 'testOption2'];
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -65,7 +66,6 @@ test('can publish content with the radiobox data type', async ({umbracoApi, umbr
 
 test('can create content with the custom radiobox data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const optionValues = ['testOption1', 'testOption2'];
   const customDataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, optionValues);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -85,9 +85,8 @@ test('can create content with the custom radiobox data type', async ({umbracoApi
   expect(contentData.values[0].value).toEqual(optionValues[0]);
 });
 
-test('can set radiobox as mandatory in the content', async ({umbracoApi, umbracoUi}) => {
+test('can not publish mandatory radiobox with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const optionValues = ['testOption1', 'testOption2'];
   const customDataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, optionValues);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'Test Group', false, false, true);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
