@@ -68,7 +68,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 * @internal
 	 */
 	addErrorInterceptor(client: typeof umbHttpClient) {
-		client.interceptors.error.use(async (_error, response) => {
+		client.interceptors.response.use(async (response) => {
+			if (response.ok) return response;
+
 			// Handle 500 errors - we need to show a notification
 			if (response.status === 500) {
 				try {
@@ -76,13 +78,13 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 					const origResponse = response.clone();
 					const error = await origResponse.json();
 
-					if (!error) return;
+					if (!error) return response;
 
 					// If the error is not an UmbError, we check if it is a problem details object
 					// Check if the error is a problem details object
 					if (!('type' in error) || !('title' in error) || !('status' in error)) {
-						// If not, we just return
-						return;
+						// If not, we just return the response
+						return response;
 					}
 
 					let headline = error.title ?? error.name ?? 'Server Error';
@@ -104,6 +106,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 					console.error('[Interceptor] Caught a 500 Error, but failed parsing error body (expected JSON)', e);
 				}
 			}
+
+			// Return original response
+			return response;
 		});
 	}
 
