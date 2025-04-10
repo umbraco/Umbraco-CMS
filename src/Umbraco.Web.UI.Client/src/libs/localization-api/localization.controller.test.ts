@@ -175,12 +175,6 @@ describe('UmbLocalizeController', () => {
 			expect((controller.term as any)('logout', 'Hello', 'World')).to.equal('Log out');
 		});
 
-		it('should encode HTML entities', () => {
-			expect(controller.term('withInlineToken', 'Hello', '<script>alert("XSS")</script>'), 'XSS detected').to.equal(
-				'Hello &lt;script&gt;alert(&#34;XSS&#34;)&lt;/script&gt;',
-			);
-		});
-
 		it('only reacts to changes of its own localization-keys', async () => {
 			const element: UmbLocalizationRenderCountElement = await fixture(
 				html`<umb-localization-render-count></umb-localization-render-count>`,

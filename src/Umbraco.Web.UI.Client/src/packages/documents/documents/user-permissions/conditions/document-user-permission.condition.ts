@@ -1,7 +1,7 @@
 import { isDocumentUserPermission } from '../utils.js';
 import type { UmbDocumentUserPermissionConditionConfig } from './types.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_ENTITY_CONTEXT, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -20,6 +20,7 @@ export class UmbDocumentUserPermissionCondition extends UmbControllerBase implem
 	#documentPermissions: Array<DocumentPermissionPresentationModel> = [];
 	#fallbackPermissions: string[] = [];
 	#onChange: UmbOnChangeCallbackType;
+	#ancestors: Array<UmbEntityUnique> = [];
 
 	constructor(
 		host: UmbControllerHost,
@@ -54,6 +55,17 @@ export class UmbDocumentUserPermissionCondition extends UmbControllerBase implem
 				'umbUserPermissionEntityContextObserver',
 			);
 		});
+
+		this.consumeContext(UMB_ANCESTORS_ENTITY_CONTEXT, (instance) => {
+			this.observe(
+				instance?.ancestors,
+				(ancestors) => {
+					this.#ancestors = ancestors.map((item) => item.unique);
+					this.#checkPermissions();
+				},
+				'observeAncestors',
+			);
+		});
 	}
 
 	#checkPermissions() {
@@ -68,21 +80,29 @@ export class UmbDocumentUserPermissionCondition extends UmbControllerBase implem
 			return;
 		}
 
-		/* If there are document permission we check if there are permissions for the current document
-		 If there aren't we use the fallback permissions */
+		// If there are document permissions, we need to check the full path to see if any permissions are defined for the current document
+		// If we find multiple permissions in the same path, we will apply the closest one
 		if (hasDocumentPermissions) {
-			const permissionsForCurrentDocument = this.#documentPermissions.find(
-				(permission) => permission.document.id === this.#unique,
-			);
+			// Path including the current document and all ancestors
+			const path = [...this.#ancestors, this.#unique].filter((unique) => unique !== null);
+			// Reverse the path to find the closest document permission quickly
+			const reversedPath = [...path].reverse();
+			const documentPermissionsMap = new Map(this.#documentPermissions.map((p) => [p.document.id, p]));
+
+			// Find the closest document permission in the path
+			const closestDocumentPermission = reversedPath.find((id) => documentPermissionsMap.has(id));
+
+			// Retrieve the corresponding permission data
+			const match = closestDocumentPermission ? documentPermissionsMap.get(closestDocumentPermission) : undefined;
 
 			// no permissions for the current document - use the fallback permissions
-			if (!permissionsForCurrentDocument) {
+			if (!match) {
 				this.#check(this.#fallbackPermissions);
 				return;
 			}
 
-			// we found permissions for the current document - check them
-			this.#check(permissionsForCurrentDocument.verbs);
+			// we found permissions - check them
+			this.#check(match.verbs);
 		}
 	}
 

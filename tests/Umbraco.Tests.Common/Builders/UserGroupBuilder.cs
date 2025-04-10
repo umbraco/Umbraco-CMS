@@ -159,7 +159,7 @@ public class UserGroupBuilder<TParent>
             Key = key,
             StartContentId = startContentId,
             StartMediaId = startMediaId,
-            Permissions = _permissions
+            Permissions = _permissions,
         };
 
         BuildAllowedSections(userGroup);
@@ -168,7 +168,6 @@ public class UserGroupBuilder<TParent>
 
         return userGroup;
     }
-
 
     private void BuildAllowedSections(UserGroup userGroup)
     {
@@ -204,6 +203,6 @@ public class UserGroupBuilder<TParent>
             .WithAlias(alias + suffix)
             .WithName(name + suffix)
             .WithPermissions(permissions ?? new[] { "A", "B", "C" }.ToHashSet())
-            .WithAllowedSections(allowedSections ?? new[] { "content", "media" })
+            .WithAllowedSections(allowedSections ?? ["content", "media"])
             .Build();
 }

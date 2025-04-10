@@ -223,6 +223,8 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		const entityUpdatedEvent = new UmbEntityUpdatedEvent({ unique, entityType });
 		actionEventContext.dispatchEvent(entityUpdatedEvent);
 
+		this.value = {};
+
 		this.modalContext?.submit();
 	}
 
@@ -243,7 +245,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		if (!version) return;
 
 		version.preventCleanup = preventCleanup;
-		this.requestUpdate('versions');
+		this.requestUpdate('_versions');
 	}
 
 	#onChangeCulture(event: UUISelectEvent) {

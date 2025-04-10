@@ -75,6 +75,14 @@ public class BlockListEditorPropertyValueEditorTests
         }
     }
 
+    [Test]
+    public void MergeVariantInvariantPropertyValue_Can_Merge_Null_Values()
+    {
+        var editor = CreateValueEditor();
+        var result = editor.MergeVariantInvariantPropertyValue(null, null, true, ["en-US"]);
+        Assert.IsNull(result);
+    }
+
     private static JsonObject CreateBlocksJson(int numberOfBlocks)
     {
         var layoutItems = new JsonArray();
