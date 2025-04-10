@@ -92,11 +92,8 @@ export class UmbDocumentWorkspaceContext
 		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
 			const documentConfiguration = (await context?.getDocumentConfiguration()) ?? undefined;
 
-			if (documentConfiguration) {
-				if (documentConfiguration.allowEditInvariantFromNonDefault !== true) {
-					this.#preventEditInvariantFromNonDefault();
-				} else {
-				}
+			if (documentConfiguration?.allowEditInvariantFromNonDefault !== true) {
+				this.#preventEditInvariantFromNonDefault();
 			}
 		});
 
