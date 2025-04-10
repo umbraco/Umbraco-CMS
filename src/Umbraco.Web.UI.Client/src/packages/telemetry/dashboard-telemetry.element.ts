@@ -26,7 +26,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 	}
 
 	private async _setup() {
-		const telemetryLevels = await tryExecute(this, TelemetryService.getTelemetry({ skip: 0, take: 3 }));
+		const telemetryLevels = await tryExecute(this, TelemetryService.getTelemetry({ query: { skip: 0, take: 3 } }));
 		this._telemetryLevels = telemetryLevels.data?.items ?? [];
 
 		const telemetryLevel = await tryExecute(this, TelemetryService.getTelemetryLevel());
