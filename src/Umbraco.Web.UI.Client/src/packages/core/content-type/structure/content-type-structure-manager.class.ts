@@ -36,8 +36,10 @@ export class UmbContentTypeStructureManager<
 	T extends UmbContentTypeModel = UmbContentTypeModel,
 > extends UmbControllerBase {
 	#initResolver?: (respoonse: UmbRepositoryResponse<T>) => void;
-	#init = new Promise<UmbRepositoryResponse<T>>((resolve) => {
+	#initRejection?: (reason: any) => void;
+	#init = new Promise<UmbRepositoryResponse<T>>((resolve, reject) => {
 		this.#initResolver = resolve;
+		this.#initRejection = reject;
 	});
 
 	#repository?: UmbDetailRepository<T>;
@@ -242,7 +244,10 @@ export class UmbContentTypeStructureManager<
 
 		// Lets initiate the content type:
 		const { data, asObservable } = await this.#repository!.requestByUnique(unique);
-		if (!data) return {};
+		if (!data) {
+			this.#initRejection?.(`Content Type structure manager could not load: ${unique}`);
+			return {};
+		}
 
 		await this.#observeContentType(data);
 		return { data, asObservable };
@@ -638,8 +643,10 @@ export class UmbContentTypeStructureManager<
 		});
 	}
 	async propertyStructureByAlias(propertyAlias: string) {
+		console.log('#init', this.#init);
 		await this.#init;
 		return this.#contentTypes.asObservablePart((docTypes) => {
+			console.log('propertyStructureByAlias', docTypes);
 			for (const docType of docTypes) {
 				const foundProp = docType.properties?.find((property) => property.alias === propertyAlias);
 				if (foundProp) {
@@ -800,9 +807,9 @@ export class UmbContentTypeStructureManager<
 	}
 
 	#clear() {
-		this.#init = new Promise((resolve) => {
+		/*this.#init = new Promise((resolve) => {
 			this.#initResolver = resolve;
-		});
+		});*/
 		this.#contentTypes.setValue([]);
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];
@@ -813,6 +820,7 @@ export class UmbContentTypeStructureManager<
 	public override destroy() {
 		this.#contentTypes.destroy();
 		this.#containers.destroy();
+		this.#initRejection?.('Content Type structure manager was destroyed.');
 		super.destroy();
 	}
 }

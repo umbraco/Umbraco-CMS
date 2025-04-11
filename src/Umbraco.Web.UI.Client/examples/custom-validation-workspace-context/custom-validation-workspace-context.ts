@@ -18,12 +18,10 @@ export class CustomValidationWorkspaceContext extends UmbContextBase<
 		super(host, EXAMPLE_CUSTOM_VALIDATION_CONTEXT);
 
 		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, async (context) => {
-			console.log('context', await context.structure.getContentTypeProperties());
 			// Observe the property type to see if it varies by culture:
 			this.observe(
 				await context?.structure.propertyStructureByAlias(EXAMPLE_CUSTOM_VALIDATION_PROPERTY_ALIAS),
 				(propertyType) => {
-					console.log('property type', propertyType);
 					if (!propertyType) {
 						this.removeUmbControllerByAlias('observeVariantOptions');
 						this.#validators?.forEach((x) => x.destroy());
