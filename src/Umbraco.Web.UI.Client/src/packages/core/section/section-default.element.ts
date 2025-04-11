@@ -75,7 +75,9 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 				// TODO: we only support extensions with an element prop
 				const extensionsWithElement = sectionRouteExtensions.filter((extension) => extension.manifest.element);
 				const extensionsWithoutElement = sectionRouteExtensions.filter((extension) => !extension.manifest.element);
-				if (extensionsWithoutElement.length > 0) throw new Error('sectionRoute extensions must have an element');
+				if (extensionsWithoutElement.length > 0) {
+					throw new Error('sectionRoute extensions must have an element');
+				}
 
 				const routes: Array<IRoute> = await Promise.all(
 					extensionsWithElement.map(async (extensionController) => {
