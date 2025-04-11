@@ -33,12 +33,13 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	/**
 	 * @param path
 	 * @deprecated Use extension type 'propertyValidationPathTranslator' instead. Will be removed in v.17
+	 * @returns {any} - Returns the translation data for the given path.
 	 */
 	translationDataOf(path: string): any {
 		return this.#translationData.asObservablePart((data) => GetValueByJsonPath(data, path));
 	}
 	/**
-	 * @param data
+	 * @param {any} data - The translation data to set.
 	 * @deprecated Use extension type 'propertyValidationPathTranslator' instead. Will be removed in v.17
 	 */
 	setTranslationData(data: any): void {
@@ -46,6 +47,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	}
 	/**
 	 * @deprecated Use extension type 'propertyValidationPathTranslator' instead. Will be removed in v.17
+	 * @returns {any} - Returns the translation data
 	 */
 	getTranslationData(): any {
 		new UmbDeprecation({
@@ -108,7 +110,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 	/**
 	 * Add a path translator to this validation context.
-	 * @param translator
+	 * @param {UmbValidationMessageTranslator} translator - The translator to add.
 	 */
 	async addTranslator(translator: UmbValidationMessageTranslator) {
 		this.messages.addTranslator(translator);
@@ -116,7 +118,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 	/**
 	 * Remove a path translator from this validation context.
-	 * @param translator
+	 * @param {UmbValidationMessageTranslator} translator - The translator to remove.
 	 */
 	async removeTranslator(translator: UmbValidationMessageTranslator) {
 		// Because this may have been destroyed at this point. and because we do not know if a context has been destroyed, then we allow this call, but let it soft-fail if messages does not exists. [NL]
@@ -127,7 +129,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	/**
 	 * Provide this validation context to a specific controller host.
 	 * This can be used to Host a validation context in a Workspace, but provide it on a certain scope, like a specific Workspace View.
-	 * @param controllerHost {UmbClassInterface}
+	 * @param {UmbClassInterface} controllerHost - The controller host to provide this validation context to.
 	 */
 	provideAt(controllerHost: UmbClassInterface): void {
 		if (this.#currentProvideHost === controllerHost) return;
@@ -160,7 +162,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 * @see {@link autoReport} Call `autoReport()` to continuously synchronize changes to the parent context.
 	 *
 	 * messages and data will be localizes accordingly to the given data path.
-	 * @param dataPath {string} - The data path to bind this validation context to.
+	 * @param {string} dataPath - The data path to bind this validation context to.
 	 * @example
 	 * ```ts
 	 * const validationContext = new UmbValidationContext(this);

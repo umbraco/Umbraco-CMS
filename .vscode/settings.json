@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
-        "unprovide"
+      "unprovide",
+      "Unproviding"
     ],
     "eslint.workingDirectories": [
     "./src/Umbraco.Web.UI.Client/",
