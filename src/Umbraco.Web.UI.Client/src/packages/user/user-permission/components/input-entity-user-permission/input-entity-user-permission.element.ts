@@ -90,7 +90,7 @@ export class UmbInputEntityUserPermissionElement extends UmbFormControlMixin(Umb
 					${group !== 'undefined'
 						? html` <h5><umb-localize .key=${`actionCategories_${group}`}>${group}</umb-localize></h5> `
 						: nothing}
-					${manifests.map((manifest) => html` ${this.#renderPermission(manifest)} `)}
+					<div>${manifests.map((manifest) => html` ${this.#renderPermission(manifest)} `)}</div>
 				`,
 			)}
 		`;
