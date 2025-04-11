@@ -643,10 +643,8 @@ export class UmbContentTypeStructureManager<
 		});
 	}
 	async propertyStructureByAlias(propertyAlias: string) {
-		console.log('#init', this.#init);
 		await this.#init;
 		return this.#contentTypes.asObservablePart((docTypes) => {
-			console.log('propertyStructureByAlias', docTypes);
 			for (const docType of docTypes) {
 				const foundProp = docType.properties?.find((property) => property.alias === propertyAlias);
 				if (foundProp) {
