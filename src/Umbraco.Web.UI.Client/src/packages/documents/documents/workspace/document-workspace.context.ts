@@ -215,6 +215,7 @@ export class UmbDocumentWorkspaceContext
 				unique: ruleUnique,
 				permitted: false,
 				message: 'Shared properties can only be edited in the default language',
+				variantId: UmbVariantId.CreateInvariant(),
 			};
 
 			/* The permission is false by default, and the onChange callback will not be triggered if the permission hasn't changed.
