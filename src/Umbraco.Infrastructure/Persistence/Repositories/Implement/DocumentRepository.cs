@@ -400,17 +400,15 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         {
             foreach (ContentVariation v in contentVariation)
             {
-                content.SetCultureInfo(v.Culture, v.Name, DateTime.SpecifyKind(v.Date, DateTimeKind.Local));
+                content.SetCultureInfo(v.Culture, v.Name, v.Date);
             }
         }
 
-        // Dates stored in the database are local server time, but for SQL Server, will be considered
-        // as DateTime.Kind = Utc. Fix this so we are consistent when later mapping to DataTimeOffset.
         if (content.PublishedState is PublishedState.Published && content.PublishedVersionId > 0 && contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
         {
             foreach (ContentVariation v in contentVariation)
             {
-                content.SetPublishInfo(v.Culture, v.Name, DateTime.SpecifyKind(v.Date, DateTimeKind.Local));
+                content.SetPublishInfo(v.Culture, v.Name, v.Date);
             }
         }
 

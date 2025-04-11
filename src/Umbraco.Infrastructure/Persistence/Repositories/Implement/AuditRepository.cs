@@ -29,7 +29,7 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
 
         List<LogDto>? dtos = Database.Fetch<LogDto>(sql);
 
-        return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType, x.Comment, x.Parameters, DateTime.SpecifyKind(x.Datestamp, DateTimeKind.Local))).ToList();
+        return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType, x.Comment, x.Parameters, x.Datestamp)).ToList();
     }
 
     public void CleanLogs(int maximumAgeOfLogsInMinutes)
@@ -104,12 +104,12 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
         totalRecords = page.TotalItems;
 
         var items = page.Items.Select(
-            dto => new AuditItem(dto.NodeId, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters, DateTime.SpecifyKind(dto.Datestamp, DateTimeKind.Local))).ToList();
+            dto => new AuditItem(dto.NodeId, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters, dto.Datestamp)).ToList();
 
         // map the DateStamp
         for (var i = 0; i < items.Count; i++)
         {
-            items[i].CreateDate = DateTime.SpecifyKind(page.Items[i].Datestamp, DateTimeKind.Local);
+            items[i].CreateDate = page.Items[i].Datestamp;
         }
 
         return items;
@@ -149,7 +149,7 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
         LogDto? dto = Database.First<LogDto>(sql);
         return dto == null
             ? null
-            : new AuditItem(dto.NodeId, Enum<AuditType>.Parse(dto.Header), dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters, DateTime.SpecifyKind(dto.Datestamp, DateTimeKind.Local));
+            : new AuditItem(dto.NodeId, Enum<AuditType>.Parse(dto.Header), dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters, dto.Datestamp);
     }
 
     protected override IEnumerable<IAuditItem> PerformGetAll(params int[]? ids) => throw new NotImplementedException();
@@ -162,7 +162,7 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
 
         List<LogDto>? dtos = Database.Fetch<LogDto>(sql);
 
-        return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType,  x.Comment, x.Parameters, DateTime.SpecifyKind(x.Datestamp, DateTimeKind.Local))).ToList();
+        return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType,  x.Comment, x.Parameters, x.Datestamp)).ToList();
     }
 
     protected override Sql<ISqlContext> GetBaseQuery(bool isCount)

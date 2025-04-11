@@ -39,24 +39,15 @@ internal static class UserFactory
             user.Language = dto.UserLanguage;
             user.SecurityStamp = dto.SecurityStampToken;
             user.FailedPasswordAttempts = dto.FailedLoginAttempts ?? 0;
+            user.LastLockoutDate = dto.LastLockoutDate;
+            user.LastLoginDate = dto.LastLoginDate;
+            user.LastPasswordChangeDate = dto.LastPasswordChangeDate;
+            user.CreateDate = dto.CreateDate;
+            user.UpdateDate = dto.UpdateDate;
             user.Avatar = dto.Avatar;
             user.EmailConfirmedDate = dto.EmailConfirmedDate;
             user.InvitedDate = dto.InvitedDate;
             user.Kind = (UserKind)dto.Kind;
-
-            // Dates stored in the database are local server time, but for SQL Server, will be considered
-            // as DateTime.Kind = Utc. Fix this so we are consistent when later mapping to DataTimeOffset.
-            user.LastLockoutDate = dto.LastLockoutDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastLockoutDate.Value, DateTimeKind.Local)
-                : null;
-            user.LastLoginDate = dto.LastLoginDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastLoginDate.Value, DateTimeKind.Local)
-                : null;
-            user.LastPasswordChangeDate = dto.LastPasswordChangeDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastPasswordChangeDate.Value, DateTimeKind.Local)
-                : null;
-            user.CreateDate = DateTime.SpecifyKind(dto.CreateDate, DateTimeKind.Local);
-            user.UpdateDate = DateTime.SpecifyKind(dto.UpdateDate, DateTimeKind.Local);
 
             // reset dirty initial properties (U4-1946)
             user.ResetDirtyProperties(false);
