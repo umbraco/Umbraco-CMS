@@ -3,7 +3,6 @@ import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type'
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 @customElement('umb-content-workspace-view-edit-property')
