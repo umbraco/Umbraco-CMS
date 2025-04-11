@@ -7,11 +7,7 @@ import { filter, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_SECTION_PATH_PATTERN } from '@umbraco-cms/backoffice/section';
-import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext> {
 	#currentUser = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
@@ -60,7 +56,6 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 		if (asObservable) {
 			await this.observe(asObservable(), (currentUser) => {
 				this.#currentUser?.setValue(currentUser);
-				this.#redirectToFirstAllowedSectionIfNeeded();
 			}).asPromise();
 		}
 	}
@@ -227,42 +222,6 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 				this.load();
 			}
 		});
-	}
-
-	async #redirectToFirstAllowedSectionIfNeeded() {
-		const url = new URL(window.location.href);
-
-		const serverContext = await this.getContext(UMB_SERVER_CONTEXT);
-		if (!serverContext) {
-			throw new Error('Server context not available');
-		}
-		const backofficePath = serverContext.getBackofficePath();
-
-		if (url.pathname === backofficePath || url.pathname === ensurePathEndsWithSlash(backofficePath)) {
-			const sectionManifest = await this.#firstAllowedSection();
-			if (!sectionManifest) return;
-
-			const fallbackSectionPath = UMB_SECTION_PATH_PATTERN.generateLocal({
-				sectionName: sectionManifest.meta.pathname,
-			});
-
-			history.pushState(null, '', fallbackSectionPath);
-		}
-	}
-
-	async #firstAllowedSection() {
-		const currentUser = this.#currentUser.getValue();
-		if (!currentUser) return;
-
-		/* TODO: this solution is not bullet proof as we still rely on the "correct" section to be registered at this point in time so we can get the path.
-		 It probably would have been better if we used the section alias instead as the path.
-		 Then we would have it available at all times and it also ensured a unique path. */
-		const sections = await this.observe(
-			umbExtensionsRegistry.byTypeAndAliases('section', currentUser.allowedSections),
-			() => {},
-		).asPromise();
-
-		return sections[0];
 	}
 }
 

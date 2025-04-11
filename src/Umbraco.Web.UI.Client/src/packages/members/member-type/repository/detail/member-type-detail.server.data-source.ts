@@ -87,6 +87,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			properties: data.properties.map((property) => {
 				return {
 					id: property.id,
+					unique: property.id,
 					container: property.container ? { id: property.container.id } : null,
 					sortOrder: property.sortOrder,
 					alias: property.alias,

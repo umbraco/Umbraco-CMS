@@ -408,7 +408,7 @@ export type CreateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id?: string | null;
 };
 
@@ -467,7 +467,7 @@ export type CurrentUserResponseModel = {
     hasAccessToAllLanguages: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     allowedSections: Array<string>;
     isAdmin: boolean;
 };
@@ -669,6 +669,13 @@ export type DocumentNotificationResponseModel = {
 export type DocumentPermissionPresentationModel = {
     $type: string;
     document: ReferenceByIdModel;
+    verbs: Array<string>;
+};
+
+export type DocumentPropertyValuePermissionPresentationModel = {
+    $type: string;
+    documentType: ReferenceByIdModel;
+    propertyType: ReferenceByIdModel;
     verbs: Array<string>;
 };
 
@@ -2757,7 +2764,7 @@ export type UpdateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 };
 
 export type UpdateUserGroupsOnUserRequestModel = {
@@ -2864,7 +2871,7 @@ export type UserGroupResponseModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;

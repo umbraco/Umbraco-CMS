@@ -4,7 +4,6 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UmbArrayState,
 	UmbBasicState,
-	UmbBooleanState,
 	UmbClassState,
 	UmbDeepState,
 	UmbObjectState,
@@ -22,6 +21,7 @@ import type {
 	UmbPropertyTypeAppearanceModel,
 	UmbPropertyTypeValidationModel,
 } from '@umbraco-cms/backoffice/content-type';
+import { UmbReadOnlyStateManager } from '@umbraco-cms/backoffice/utils';
 
 export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPropertyContext<ValueType>> {
 	#alias = new UmbStringState(undefined);
@@ -60,8 +60,8 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	#editorManifest = new UmbBasicState<ManifestPropertyEditorUi | undefined>(undefined);
 	public readonly editorManifest = this.#editorManifest.asObservable();
 
-	#isReadOnly = new UmbBooleanState(false);
-	public readonly isReadOnly = this.#isReadOnly.asObservable();
+	public readonly readOnlyState = new UmbReadOnlyStateManager(this);
+	public readonly isReadOnly = this.readOnlyState.isReadOnly;
 
 	/**
 	 * Set the property editor UI element for this property.
@@ -160,7 +160,15 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 		);
 
 		this.observe(this.#datasetContext.readOnly, (value) => {
-			this.#isReadOnly.setValue(value);
+			const unique = 'UMB_DATASET';
+
+			if (value) {
+				this.readOnlyState.addState({
+					unique,
+				});
+			} else {
+				this.readOnlyState.removeState(unique);
+			}
 		});
 	}
 
@@ -334,7 +342,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	 * @memberof UmbPropertyContext
 	 */
 	public getIsReadOnly(): boolean {
-		return this.#isReadOnly.getValue();
+		return this.readOnlyState.getIsReadOnly();
 	}
 
 	public setDataPath(dataPath: string | undefined): void {
@@ -370,7 +378,6 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 		this.#configValues.destroy();
 		this.#value.destroy();
 		this.#config.destroy();
-		this.#isReadOnly.destroy();
 		this.#datasetContext = undefined;
 	}
 }

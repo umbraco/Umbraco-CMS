@@ -36,11 +36,13 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/language';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
-
 export class UmbDocumentWorkspaceContext
 	extends UmbContentDetailWorkspaceContextBase<
 		ContentModel,
@@ -85,6 +87,14 @@ export class UmbDocumentWorkspaceContext
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			contentTypePropertyName: 'documentType',
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
+		});
+
+		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
+			const documentConfiguration = (await context?.getDocumentConfiguration()) ?? undefined;
+
+			if (documentConfiguration?.allowEditInvariantFromNonDefault !== true) {
+				this.#preventEditInvariantFromNonDefault();
+			}
 		});
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
@@ -191,6 +201,42 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	#preventEditInvariantFromNonDefault() {
+		this.observe(observeMultiple([this.structure.contentTypeProperties, this.languages]), ([properties, languages]) => {
+			if (properties.length === 0) return;
+			if (languages.length === 0) return;
+
+			const defaultLanguageUnique = languages.find((x) => x.isDefault)?.unique;
+			const ruleUnique = 'UMB_preventEditInvariantFromNonDefault';
+
+			const rule = {
+				unique: ruleUnique,
+				permitted: false,
+				message: 'Shared properties can only be edited in the default language',
+				variantId: UmbVariantId.CreateInvariant(),
+			};
+
+			/* The permission is false by default, and the onChange callback will not be triggered if the permission hasn't changed.
+			Therefore, we add the rule to the readOnlyGuard here. */
+			this.propertyWriteGuard.addRule(rule);
+
+			createExtensionApiByAlias(this, UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS, [
+				{
+					config: {
+						allOf: [defaultLanguageUnique],
+					},
+					onChange: (permitted: boolean) => {
+						if (permitted) {
+							this.propertyWriteGuard.removeRule(ruleUnique);
+						} else {
+							this.propertyWriteGuard.addRule(rule);
+						}
+					},
+				},
+			]);
+		});
 	}
 
 	override resetState(): void {
@@ -393,27 +439,15 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async #setReadOnlyStateForUserPermission(identifier: string, permitted: boolean, message: string) {
-		const variants = this.getVariants();
-		const uniques = variants?.map((variant) => identifier + variant.culture) || [];
-
 		if (permitted) {
-			this.readOnlyState?.removeStates(uniques);
+			this.readOnlyGuard?.removeRule(identifier);
 			return;
 		}
 
-		const variantIds = variants?.map((variant) => new UmbVariantId(variant.culture, variant.segment)) || [];
-
-		const readOnlyStates = variantIds.map((variantId) => {
-			return {
-				unique: identifier + variantId.culture,
-				variantId,
-				message,
-			};
+		this.readOnlyGuard?.addRule({
+			unique: identifier,
+			message,
 		});
-
-		this.readOnlyState?.removeStates(uniques);
-
-		this.readOnlyState?.addStates(readOnlyStates);
 	}
 }
 

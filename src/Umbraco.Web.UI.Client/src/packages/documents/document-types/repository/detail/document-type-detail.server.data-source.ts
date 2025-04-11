@@ -98,6 +98,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			properties: data.properties.map((property) => {
 				return {
 					id: property.id,
+					unique: property.id,
 					container: property.container,
 					sortOrder: property.sortOrder,
 					alias: property.alias,

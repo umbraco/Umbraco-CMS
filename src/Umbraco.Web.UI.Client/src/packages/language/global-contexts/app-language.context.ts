@@ -33,6 +33,7 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 	public readonly appLanguage = this.#appLanguage.asObservable();
 	public readonly appLanguageCulture = this.#appLanguage.asObservablePart((x) => x?.unique);
 
+	// TODO: I think we should move all read only states to this context and then make a observable regarding the read only state of the app language. [NL]
 	public readonly appLanguageReadOnlyState = new UmbReadOnlyStateManager(this);
 
 	public readonly appMandatoryLanguages = this.#languages.asObservablePart((languages) =>

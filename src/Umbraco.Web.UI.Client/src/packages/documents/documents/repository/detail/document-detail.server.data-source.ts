@@ -1,5 +1,5 @@
 import type { UmbDocumentDetailModel } from '../../types.js';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
@@ -94,6 +94,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			values: data.values.map((value) => {
 				return {
 					editorAlias: value.editorAlias,
+					entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
 					culture: value.culture || null,
 					segment: value.segment || null,
 					alias: value.alias,

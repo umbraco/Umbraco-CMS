@@ -263,8 +263,19 @@ public class UserPresentationFactory : IUserPresentationFactory
 
     private HashSet<IPermissionPresentationModel> GetAggregatedGranularPermissions(IUser user, IEnumerable<UserGroupResponseModel> presentationGroups)
     {
+        var aggregatedPermissions = new HashSet<IPermissionPresentationModel>();
+
         var permissions = presentationGroups.SelectMany(x => x.Permissions).ToHashSet();
 
+        AggregateAndAddDocumentPermissions(user, aggregatedPermissions, permissions);
+
+        AggregateAndAddDocumentPropertyValuePermissions(aggregatedPermissions, permissions);
+
+        return aggregatedPermissions;
+    }
+
+    private void AggregateAndAddDocumentPermissions(IUser user, HashSet<IPermissionPresentationModel> aggregatedPermissions, HashSet<IPermissionPresentationModel> permissions)
+    {
         // The raw permission data consists of several permissions for each document.  We want to aggregate this server-side so
         // we return one set of aggregate permissions per document that the client will use.
 
@@ -275,7 +286,6 @@ public class UserPresentationFactory : IUserPresentationFactory
             .Select(x => x.Document.Id)
             .Distinct();
 
-        var aggregatedPermissions = new HashSet<IPermissionPresentationModel>();
         foreach (Guid documentKey in documentKeysWithGranularPermissions)
         {
             // Retrieve the path of the document.
@@ -293,8 +303,28 @@ public class UserPresentationFactory : IUserPresentationFactory
                 Verbs = permissionsForPath.GetAllPermissions()
             });
         }
+    }
 
-        return aggregatedPermissions;
+    private static void AggregateAndAddDocumentPropertyValuePermissions(HashSet<IPermissionPresentationModel> aggregatedPermissions, HashSet<IPermissionPresentationModel> permissions)
+    {
+        // We also have permissions for document type/property type combinations.
+        // These don't have an ancestor relationship that we need to take into account, but should be aggregated
+        // and included in the set.
+        IEnumerable<((Guid DocumentTypeId, Guid PropertyTypeId) Key, ISet<string> Verbs)> documentTypePropertyTypeKeysWithGranularPermissions = permissions
+            .Where(x => x is DocumentPropertyValuePermissionPresentationModel)
+            .Cast<DocumentPropertyValuePermissionPresentationModel>()
+            .GroupBy(x => (x.DocumentType.Id, x.PropertyType.Id))
+            .Select(x => (x.Key, (ISet<string>)x.SelectMany(y => y.Verbs).Distinct().ToHashSet()));
+
+        foreach (((Guid DocumentTypeId, Guid PropertyTypeId) Key, ISet<string> Verbs) documentTypePropertyTypeKey in documentTypePropertyTypeKeysWithGranularPermissions)
+        {
+            aggregatedPermissions.Add(new DocumentPropertyValuePermissionPresentationModel
+            {
+                DocumentType = new ReferenceByIdModel(documentTypePropertyTypeKey.Key.DocumentTypeId),
+                PropertyType = new ReferenceByIdModel(documentTypePropertyTypeKey.Key.PropertyTypeId),
+                Verbs = documentTypePropertyTypeKey.Verbs
+            });
+        }
     }
 
     public Task<CalculatedUserStartNodesResponseModel> CreateCalculatedUserStartNodesResponseModelAsync(IUser user)

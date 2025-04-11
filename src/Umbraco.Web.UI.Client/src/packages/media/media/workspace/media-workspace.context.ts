@@ -56,6 +56,9 @@ export class UmbMediaWorkspaceContext
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
 
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
+
 		this.routes.setRoutes([
 			{
 				path: UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN.toString(),
