@@ -24,7 +24,7 @@ internal class ContentScheduleDto
     [NullSetting(NullSetting = NullSettings.Null)] // can be invariant
     public int? LanguageId { get; set; }
 
-    [Column("date")]
+    [Column("date", ForceToUtc = false)]
     public DateTime Date { get; set; }
 
     [Column("action")]
