@@ -3,6 +3,7 @@
         "unprovide"
     ],
     "eslint.workingDirectories": [
-    "./src/Umbraco.Web.UI.Client/"
+    "./src/Umbraco.Web.UI.Client/",
+    "./src/Umbraco.Web.UI.Login/"
   ]
 }
