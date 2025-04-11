@@ -364,7 +364,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
-		return this.#documentWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(UmbVariantId.Create(option));
+		const variantId = UmbVariantId.Create(option);
+		// If the read only guard is permitted it means the variant is read only
+		const isReadOnly = this.#documentWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(variantId);
+		// If the variant is read only, we can't publish it
+		const isPublishable = !isReadOnly;
+		return isPublishable;
 	};
 
 	async #determineVariantOptions(): Promise<{
