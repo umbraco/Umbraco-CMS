@@ -1,6 +1,6 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../workspace/constants.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbPropertyValueUserPermissionWorkspaceContextBase } from './property-value-user-permission-workspace-context-base.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDocumentPropertyValueUserPermissionWorkspaceContext extends UmbPropertyValueUserPermissionWorkspaceContextBase {
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
@@ -22,7 +22,7 @@ export class UmbDocumentPropertyValueUserPermissionWorkspaceContext extends UmbP
 
 		this.observe(this.#documentWorkspaceContext.structure.contentTypeProperties, (properties) => {
 			// TODO: If zero properties I guess we should then clear the state? [NL]
-			if (properties.length === 0) return;
+			if (!properties || properties.length === 0) return;
 
 			this.#documentWorkspaceContext!.propertyViewGuard.fallbackToNotPermitted();
 			this.#documentWorkspaceContext!.propertyWriteGuard.fallbackToNotPermitted();
