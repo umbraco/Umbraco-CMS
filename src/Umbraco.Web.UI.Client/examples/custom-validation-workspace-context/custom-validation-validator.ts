@@ -32,7 +32,6 @@ export class CustomValidationValidator extends UmbControllerBase implements UmbV
 			segment: this.#variantId?.segment ?? null,
 		})}].value`;
 
-		//TODO: A double consumption would be great here...
 		this.consumeContext(UMB_VALIDATION_CONTEXT, (context) => {
 			this.#validationContext = context;
 			this.#checkValidation();
