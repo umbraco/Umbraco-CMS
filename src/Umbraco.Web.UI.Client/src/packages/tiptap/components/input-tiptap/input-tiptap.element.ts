@@ -237,10 +237,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				justify-content: center;
 			}
 
-			:host(:not([pristine]):invalid),
+			:host(:invalid:not([pristine])),
 			/* polyfill support */
 			:host(:not([pristine])[internals-invalid]) {
-				--umb-tiptap-edge-border-color: var(--uui-color-invalid);
+				--umb-tiptap-edge-border-color: red;
 				#editor {
 					border-color: var(--uui-color-invalid);
 				}
