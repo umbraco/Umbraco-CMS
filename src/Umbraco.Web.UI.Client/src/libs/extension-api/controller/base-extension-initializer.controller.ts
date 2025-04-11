@@ -1,13 +1,9 @@
 import { createExtensionApi } from '../functions/index.js';
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
+import type { ManifestCondition, ManifestWithDynamicConditions } from '../types/index.js';
+import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type {
-	UmbConditionConfigBase,
-	ManifestCondition,
-	ManifestWithDynamicConditions,
-	UmbExtensionRegistry,
-} from '@umbraco-cms/backoffice/extension-api';
 import { jsonStringComparison, type UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 const observeConditionsCtrlAlias = Symbol();
