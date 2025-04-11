@@ -15,7 +15,7 @@ export interface UmbGuardRule extends UmbGuardIncomingRuleBase {
 
 const defaultRuleUnique = Symbol();
 
-export class UmbGuardManagerBase<
+export abstract class UmbGuardManagerBase<
 	RuleType extends UmbGuardRule = UmbGuardRule,
 	IncomingRuleType extends UmbGuardIncomingRuleBase = UmbPartialSome<RuleType, 'unique' | 'permitted'>,
 > extends UmbControllerBase {
