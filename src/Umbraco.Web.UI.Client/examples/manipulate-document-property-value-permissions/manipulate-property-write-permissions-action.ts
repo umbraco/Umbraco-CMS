@@ -12,6 +12,9 @@ export class ExampleWorkspaceActionManipulateWritePermission
 	// This method is executed
 	override async execute() {
 		const context = await this.getContext(UMB_CONTENT_WORKSPACE_CONTEXT);
+		if (!context) {
+			throw new Error('No context found');
+		}
 		if (this.#isOn) {
 			context.propertyWriteGuard.removeRule('exampleRule');
 		} else {

@@ -1,5 +1,4 @@
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbWorkspaceActionBase, type UmbWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 // The Example Incrementor Workspace Action Controller:
@@ -12,6 +11,9 @@ export class ExampleWorkspaceActionManipulateReadonlyPermission
 	// This method is executed
 	override async execute() {
 		const context = await this.getContext(UMB_CONTENT_WORKSPACE_CONTEXT);
+		if (!context) {
+			throw new Error('No context found');
+		}
 		if (this.#isOn) {
 			context.propertyReadOnlyGuard.removeRule('exampleRule');
 		} else {
