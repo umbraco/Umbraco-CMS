@@ -1,3 +1,4 @@
+import { data as permissionsTestData } from './data/permissions-test.data.js';
 import type {
 	DocumentItemResponseModel,
 	DocumentResponseModel,
@@ -1221,4 +1222,5 @@ export const data: Array<UmbMockDocumentModel> = [
 			},
 		],
 	},
+	...permissionsTestData,
 ];

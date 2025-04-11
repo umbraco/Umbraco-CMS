@@ -4,7 +4,7 @@ const NON_ALPHANUMERIC_REGEXP = /([^#-~| |!])/g;
 
 /**
  * Escapes HTML entities in a string.
- * @example escapeHTML('<script>alert("XSS")</script>'), // "&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;"
+ * @example escapeHTML('<script>alert("XSS")</script>'), // "&lt;script&gt;alert(&#34;XSS&#34;)&lt;/script&gt;"
  * @param html The HTML string to escape.
  * @returns The sanitized HTML string.
  */

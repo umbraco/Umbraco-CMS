@@ -669,7 +669,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			}
 
 			.invaild {
-				color: var(--uui-color-danger, #d42054);
+				color: var(--uui-color-danger, var(--uui-color-invalid));
 			}
 
 			.trash {

@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
@@ -127,7 +128,8 @@ public class PropertyValueConverterTests : DeliveryApiTests
         IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null,
         IPublishedContentCache? contentCache = null,
         IDocumentNavigationQueryService? navigationQueryService = null,
-        IPublishStatusQueryService? publishStatusQueryService = null)
+        IPublishStatusQueryService? publishStatusQueryService = null,
+        IDocumentUrlService? documentUrlService = null)
     {
         contentCache ??= PublishedContentCacheMock.Object;
         navigationQueryService ??= DocumentNavigationQueryServiceMock.Object;
@@ -140,6 +142,7 @@ public class PropertyValueConverterTests : DeliveryApiTests
             requestHandlerSettingsMonitor,
             contentCache,
             navigationQueryService,
-            publishStatusQueryService);
+            publishStatusQueryService,
+            documentUrlService);
     }
 }

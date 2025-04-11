@@ -9,88 +9,24 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
+    /// <summary>
+    /// Implements <see cref="ITrackedReferencesRepository"/> to provide database access for tracked references."
+    /// </summary>
     internal class TrackedReferencesRepository : ITrackedReferencesRepository
     {
         private readonly IScopeAccessor _scopeAccessor;
         private readonly IUmbracoMapper _umbracoMapper;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TrackedReferencesRepository"/> class.
+        /// </summary>
         public TrackedReferencesRepository(IScopeAccessor scopeAccessor, IUmbracoMapper umbracoMapper)
         {
             _scopeAccessor = scopeAccessor;
             _umbracoMapper = umbracoMapper;
         }
 
-        private Sql<ISqlContext> GetInnerUnionSql()
-        {
-            if (_scopeAccessor.AmbientScope is null)
-            {
-                throw new InvalidOperationException("No Ambient Scope available");
-            }
-
-            Sql<ISqlContext> innerUnionSqlChild = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
-                    "[cn].uniqueId as [key]",
-                    "[cn].trashed as [trashed]",
-                    "[cn].nodeObjectType as [nodeObjectType]",
-                    "[pn].uniqueId as otherKey," +
-                    "[cr].childId as id",
-                    "[cr].parentId as otherId",
-                    "[rt].[alias]",
-                    "[rt].[name]",
-                    "[rt].[isDependency]",
-                    "[rt].[dual]")
-                .From<RelationDto>("cr")
-                .InnerJoin<RelationTypeDto>("rt")
-                .On<RelationDto, RelationTypeDto>((cr, rt) => rt.Dual == false && rt.Id == cr.RelationType, "cr", "rt")
-                .InnerJoin<NodeDto>("cn")
-                .On<RelationDto, NodeDto>((cr, cn) => cr.ChildId == cn.NodeId, "cr", "cn")
-                .InnerJoin<NodeDto>("pn")
-                .On<RelationDto, NodeDto>((cr, pn) => cr.ParentId == pn.NodeId, "cr", "pn");
-
-            Sql<ISqlContext> innerUnionSqlDualParent = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
-                    "[pn].uniqueId as [key]",
-                    "[pn].trashed as [trashed]",
-                    "[pn].nodeObjectType as [nodeObjectType]",
-                    "[cn].uniqueId as otherKey," +
-                    "[dpr].parentId as id",
-                    "[dpr].childId as otherId",
-                    "[dprt].[alias]",
-                    "[dprt].[name]",
-                    "[dprt].[isDependency]",
-                    "[dprt].[dual]")
-                .From<RelationDto>("dpr")
-                .InnerJoin<RelationTypeDto>("dprt")
-                .On<RelationDto, RelationTypeDto>(
-                    (dpr, dprt) => dprt.Dual == true && dprt.Id == dpr.RelationType, "dpr", "dprt")
-                .InnerJoin<NodeDto>("cn")
-                .On<RelationDto, NodeDto>((dpr, cn) => dpr.ChildId == cn.NodeId, "dpr", "cn")
-                .InnerJoin<NodeDto>("pn")
-                .On<RelationDto, NodeDto>((dpr, pn) => dpr.ParentId == pn.NodeId, "dpr", "pn");
-
-            Sql<ISqlContext> innerUnionSql3 = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
-                    "[cn].uniqueId as [key]",
-                    "[cn].trashed as [trashed]",
-                    "[cn].nodeObjectType as [nodeObjectType]",
-                    "[pn].uniqueId as otherKey," +
-                    "[dcr].childId as id",
-                    "[dcr].parentId as otherId",
-                    "[dcrt].[alias]",
-                    "[dcrt].[name]",
-                    "[dcrt].[isDependency]",
-                    "[dcrt].[dual]")
-                .From<RelationDto>("dcr")
-                .InnerJoin<RelationTypeDto>("dcrt")
-                .On<RelationDto, RelationTypeDto>(
-                    (dcr, dcrt) => dcrt.Dual == true && dcrt.Id == dcr.RelationType, "dcr", "dcrt")
-                .InnerJoin<NodeDto>("cn")
-                .On<RelationDto, NodeDto>((dcr, cn) => dcr.ChildId == cn.NodeId, "dcr", "cn")
-                .InnerJoin<NodeDto>("pn")
-                .On<RelationDto, NodeDto>((dcr, pn) => dcr.ParentId == pn.NodeId, "dcr", "pn");
-
-            Sql<ISqlContext> innerUnionSql = innerUnionSqlChild.Union(innerUnionSqlDualParent).Union(innerUnionSql3);
-
-            return innerUnionSql;
-        }
-
+        /// <inheritdoc/>
         public IEnumerable<RelationItemModel> GetPagedRelationsForItem(
             Guid key,
             long skip,
@@ -104,6 +40,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 filterMustBeIsDependency,
                 out totalRecords);
 
+        /// <inheritdoc/>
         public IEnumerable<RelationItemModel> GetPagedRelationsForRecycleBin(
             Guid objectTypeKey,
             long skip,
@@ -193,6 +130,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return _umbracoMapper.MapEnumerable<RelationItemDto, RelationItemModel>(pagedResult);
         }
 
+        /// <inheritdoc/>
         public IEnumerable<RelationItemModel> GetPagedItemsWithRelations(
            ISet<Guid> keys,
            long skip,
@@ -258,6 +196,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return _umbracoMapper.MapEnumerable<RelationItemDto, RelationItemModel>(pagedResult);
         }
 
+        /// <inheritdoc/>
         public async Task<PagedModel<Guid>> GetPagedNodeKeysWithDependantReferencesAsync(
             ISet<Guid> keys,
             Guid nodeObjectTypeId,
@@ -300,7 +239,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return new PagedModel<Guid>(totalRecords, result);
         }
 
-        public IEnumerable<RelationItemModel> GetPagedDescendantsInReferences(Guid parentKey, long skip, long take,
+        /// <inheritdoc/>
+        public IEnumerable<RelationItemModel> GetPagedDescendantsInReferences(
+            Guid parentKey,
+            long skip,
+            long take,
             bool filterMustBeIsDependency,
             out long totalRecords)
         {
@@ -388,6 +331,77 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return _umbracoMapper.MapEnumerable<RelationItemDto, RelationItemModel>(pagedResult);
         }
 
+        private Sql<ISqlContext> GetInnerUnionSql()
+        {
+            if (_scopeAccessor.AmbientScope is null)
+            {
+                throw new InvalidOperationException("No Ambient Scope available");
+            }
+
+            Sql<ISqlContext> innerUnionSqlChild = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
+                    "[cn].uniqueId as [key]",
+                    "[cn].trashed as [trashed]",
+                    "[cn].nodeObjectType as [nodeObjectType]",
+                    "[pn].uniqueId as otherKey," +
+                    "[cr].childId as id",
+                    "[cr].parentId as otherId",
+                    "[rt].[alias]",
+                    "[rt].[name]",
+                    "[rt].[isDependency]",
+                    "[rt].[dual]")
+                .From<RelationDto>("cr")
+                .InnerJoin<RelationTypeDto>("rt")
+                .On<RelationDto, RelationTypeDto>((cr, rt) => rt.Dual == false && rt.Id == cr.RelationType, "cr", "rt")
+                .InnerJoin<NodeDto>("cn")
+                .On<RelationDto, NodeDto>((cr, cn) => cr.ChildId == cn.NodeId, "cr", "cn")
+                .InnerJoin<NodeDto>("pn")
+                .On<RelationDto, NodeDto>((cr, pn) => cr.ParentId == pn.NodeId, "cr", "pn");
+
+            Sql<ISqlContext> innerUnionSqlDualParent = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
+                    "[pn].uniqueId as [key]",
+                    "[pn].trashed as [trashed]",
+                    "[pn].nodeObjectType as [nodeObjectType]",
+                    "[cn].uniqueId as otherKey," +
+                    "[dpr].parentId as id",
+                    "[dpr].childId as otherId",
+                    "[dprt].[alias]",
+                    "[dprt].[name]",
+                    "[dprt].[isDependency]",
+                    "[dprt].[dual]")
+                .From<RelationDto>("dpr")
+                .InnerJoin<RelationTypeDto>("dprt")
+                .On<RelationDto, RelationTypeDto>(
+                    (dpr, dprt) => dprt.Dual == true && dprt.Id == dpr.RelationType, "dpr", "dprt")
+                .InnerJoin<NodeDto>("cn")
+                .On<RelationDto, NodeDto>((dpr, cn) => dpr.ChildId == cn.NodeId, "dpr", "cn")
+                .InnerJoin<NodeDto>("pn")
+                .On<RelationDto, NodeDto>((dpr, pn) => dpr.ParentId == pn.NodeId, "dpr", "pn");
+
+            Sql<ISqlContext> innerUnionSql3 = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
+                    "[cn].uniqueId as [key]",
+                    "[cn].trashed as [trashed]",
+                    "[cn].nodeObjectType as [nodeObjectType]",
+                    "[pn].uniqueId as otherKey," +
+                    "[dcr].childId as id",
+                    "[dcr].parentId as otherId",
+                    "[dcrt].[alias]",
+                    "[dcrt].[name]",
+                    "[dcrt].[isDependency]",
+                    "[dcrt].[dual]")
+                .From<RelationDto>("dcr")
+                .InnerJoin<RelationTypeDto>("dcrt")
+                .On<RelationDto, RelationTypeDto>(
+                    (dcr, dcrt) => dcrt.Dual == true && dcrt.Id == dcr.RelationType, "dcr", "dcrt")
+                .InnerJoin<NodeDto>("cn")
+                .On<RelationDto, NodeDto>((dcr, cn) => dcr.ChildId == cn.NodeId, "dcr", "cn")
+                .InnerJoin<NodeDto>("pn")
+                .On<RelationDto, NodeDto>((dcr, pn) => dcr.ParentId == pn.NodeId, "dcr", "pn");
+
+            Sql<ISqlContext> innerUnionSql = innerUnionSqlChild.Union(innerUnionSqlDualParent).Union(innerUnionSql3);
+
+            return innerUnionSql;
+        }
+
         private class UnionHelperDto
         {
             [Column("id")] public int Id { get; set; }
@@ -411,9 +425,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             [Column("dual")] public bool Dual { get; set; }
         }
 
-        private RelationItem MapDtoToEntity(RelationItemDto dto)
-        {
-            return new RelationItem()
+        private RelationItem MapDtoToEntity(RelationItemDto dto) =>
+            new()
             {
                 NodeId = dto.ChildNodeId,
                 NodeKey = dto.ChildNodeKey,
@@ -428,6 +441,5 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 ContentTypeIcon = dto.ChildContentTypeIcon,
                 ContentTypeName = dto.ChildContentTypeName,
             };
-        }
     }
 }
