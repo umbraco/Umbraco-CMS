@@ -6,6 +6,8 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
+class UmbTestGuardManager extends UmbGuardManagerBase {}
+
 describe('UmbPermissionGuardManager', () => {
 	let manager: UmbGuardManagerBase;
 	const rule1: UmbGuardIncomingRuleBase = { unique: '1', message: 'Rule 1', permitted: true };
@@ -14,7 +16,7 @@ describe('UmbPermissionGuardManager', () => {
 
 	beforeEach(() => {
 		const hostElement = new UmbTestControllerHostElement();
-		manager = new UmbGuardManagerBase(hostElement);
+		manager = new UmbTestGuardManager(hostElement);
 	});
 
 	describe('Public API', () => {
