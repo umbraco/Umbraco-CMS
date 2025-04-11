@@ -221,8 +221,6 @@ export class UmbDocumentWorkspaceContext
 			Therefore, we add the rule to the readOnlyGuard here. */
 			this.propertyWriteGuard.addRule(rule);
 
-			console.log('RUNs', this.propertyWriteGuard);
-
 			createExtensionApiByAlias(this, UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS, [
 				{
 					config: {
