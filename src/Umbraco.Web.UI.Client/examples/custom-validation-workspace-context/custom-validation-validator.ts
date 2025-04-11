@@ -62,7 +62,7 @@ export class CustomValidationValidator extends UmbControllerBase implements UmbV
 				this.#isValid = false;
 			}
 		} else {
-			this.#isValid = false;
+			this.#isValid = true;
 		}
 
 		// Update validation message:
@@ -70,7 +70,11 @@ export class CustomValidationValidator extends UmbControllerBase implements UmbV
 			if (this.#isValid) {
 				this.#validationContext.messages.removeMessagesByTypeAndPath('custom', this.#dataPath);
 			} else {
-				this.#validationContext.messages.addMessage('custom', this.#dataPath, 'Custom validation says this is invalid');
+				this.#validationContext.messages.addMessage(
+					'custom',
+					this.#dataPath,
+					'Custom validation says this contains too long words',
+				);
 			}
 		}
 	}
