@@ -213,14 +213,15 @@ export class UmbDocumentWorkspaceContext
 
 			const rule = {
 				unique: ruleUnique,
-				permitted: true,
+				permitted: false,
 				message: 'Shared properties can only be edited in the default language',
-				variantId: new UmbVariantId(),
 			};
 
-			/* The permission is false by default, and the onChange callback will not be triggered if the permission hasn't changed. 
+			/* The permission is false by default, and the onChange callback will not be triggered if the permission hasn't changed.
 			Therefore, we add the rule to the readOnlyGuard here. */
-			this.propertyReadOnlyGuard.addRule(rule);
+			this.propertyWriteGuard.addRule(rule);
+
+			console.log('RUNs', this.propertyWriteGuard);
 
 			createExtensionApiByAlias(this, UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS, [
 				{
@@ -229,9 +230,9 @@ export class UmbDocumentWorkspaceContext
 					},
 					onChange: (permitted: boolean) => {
 						if (permitted) {
-							this.propertyReadOnlyGuard.removeRule(ruleUnique);
+							this.propertyWriteGuard.removeRule(ruleUnique);
 						} else {
-							this.propertyReadOnlyGuard.addRule(rule);
+							this.propertyWriteGuard.addRule(rule);
 						}
 					},
 				},

@@ -30,7 +30,6 @@ export interface UmbContentWorkspaceContext<
 
 	readonly propertyViewGuard: UmbVariantPropertyGuardManager;
 	readonly propertyWriteGuard: UmbVariantPropertyGuardManager;
-	readonly propertyReadOnlyGuard: UmbVariantPropertyGuardManager;
 
 	//initiatePropertyValueChange(): void;
 	//finishPropertyValueChange(): void;

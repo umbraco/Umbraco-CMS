@@ -13,29 +13,23 @@ export interface UmbGuardRule extends UmbGuardIncomingRuleBase {
 	permitted: boolean;
 }
 
-const defaultRuleUnique = Symbol();
-
 export abstract class UmbGuardManagerBase<
 	RuleType extends UmbGuardRule = UmbGuardRule,
 	IncomingRuleType extends UmbGuardIncomingRuleBase = UmbPartialSome<RuleType, 'unique' | 'permitted'>,
 > extends UmbControllerBase {
 	//
-	protected readonly _rules = new UmbArrayState<RuleType>([], (x) => x.unique).sortBy((a, b) => {
-		// Ensure DefaultRuleUnique always comes last:
-		if (a.unique === defaultRuleUnique) return 1;
-		if (b.unique === defaultRuleUnique) return -1;
-		// Otherwise disallowed first and permitted last:
-		return a.permitted === b.permitted ? 0 : a.permitted ? 1 : -1;
-	});
+	protected readonly _rules = new UmbArrayState<RuleType>([], (x) => x.unique);
 	public readonly rules = this._rules.asObservable();
 	public readonly hasRules = this._rules.asObservablePart((x) => x.length > 0);
 
+	protected _fallback = false;
+
 	public fallbackToNotPermitted() {
-		this._rules.appendOne({ unique: defaultRuleUnique, permitted: false } as RuleType);
+		this._fallback = false;
 	}
 
 	public fallbackToPermitted() {
-		this._rules.appendOne({ unique: defaultRuleUnique, permitted: true } as RuleType);
+		this._fallback = true;
 	}
 
 	/**

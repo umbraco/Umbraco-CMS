@@ -6,20 +6,8 @@ export interface UmbPropertyGuardRule extends UmbGuardRule {
 	propertyType?: UmbReferenceByUnique;
 }
 
-function comparePropertyRefWithStates(rules: UmbPropertyGuardRule[], propertyType: UmbReferenceByUnique) {
-	// any specific states for the propertyType?
-	const propertyState = rules.find((s) => s.propertyType?.unique === propertyType.unique);
-	if (propertyState) {
-		return propertyState.permitted;
-	}
-
-	// any state without variant:
-	const nonVariantState = rules.find((s) => s.propertyType === undefined);
-	if (nonVariantState) {
-		return nonVariantState.permitted;
-	}
-
-	return false;
+function findRule(rule: UmbPropertyGuardRule, propertyType: UmbReferenceByUnique) {
+	return rule.propertyType?.unique === propertyType.unique || rule.propertyType === undefined;
 }
 
 /**
@@ -36,7 +24,7 @@ export class UmbPropertyGuardManager extends UmbGuardManagerBase<UmbPropertyGuar
 	 * @memberof UmbPropertyGuardManager
 	 */
 	isPermittedForProperty(propertyType: UmbReferenceByUnique): Observable<boolean> {
-		return this._rules.asObservablePart((rules) => comparePropertyRefWithStates(rules, propertyType));
+		return this._rules.asObservablePart((rules) => this.#resolvePermission(rules, propertyType));
 	}
 
 	/**
@@ -46,6 +34,16 @@ export class UmbPropertyGuardManager extends UmbGuardManagerBase<UmbPropertyGuar
 	 * @memberof UmbPropertyGuardManager
 	 */
 	getIsPermittedForProperty(propertyType: UmbReferenceByUnique): boolean {
-		return comparePropertyRefWithStates(this.getRules(), propertyType);
+		return this.#resolvePermission(this.getRules(), propertyType);
+	}
+
+	#resolvePermission(rules: UmbPropertyGuardRule[], propertyType: UmbReferenceByUnique) {
+		if (rules.filter((x) => x.permitted === false).some((rule) => findRule(rule, propertyType))) {
+			return false;
+		}
+		if (rules.filter((x) => x.permitted === true).some((rule) => findRule(rule, propertyType))) {
+			return true;
+		}
+		return this._fallback;
 	}
 }

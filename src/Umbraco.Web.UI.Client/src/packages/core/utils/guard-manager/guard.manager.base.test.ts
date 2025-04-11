@@ -77,28 +77,6 @@ describe('UmbPermissionGuardManager', () => {
 				})
 				.unsubscribe();
 		});
-
-		it('sort negative states first', () => {
-			manager.addRules([rule1, ruleFalse, rule2]);
-			expect(manager.getRules()).to.deep.equal([ruleFalse, rule1, rule2]);
-		});
-
-		it('sort default states last', () => {
-			manager.fallbackToNotPermitted();
-			manager.addRules([rule1, ruleFalse, rule2]);
-			const rules = manager.getRules();
-			expect(rules[0]).to.deep.equal(ruleFalse);
-			expect(rules[1]).to.deep.equal(rule1);
-			expect(rules[2]).to.deep.equal(rule2);
-			expect(rules[3].permitted).to.be.false;
-
-			manager.fallbackToPermitted();
-			const rules2 = manager.getRules();
-			expect(rules2[0]).to.deep.equal(ruleFalse);
-			expect(rules2[1]).to.deep.equal(rule1);
-			expect(rules2[2]).to.deep.equal(rule2);
-			expect(rules2[3].permitted).to.be.true;
-		});
 	});
 
 	describe('Remove State', () => {

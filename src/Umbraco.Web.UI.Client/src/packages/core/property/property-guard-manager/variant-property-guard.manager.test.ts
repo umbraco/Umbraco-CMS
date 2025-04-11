@@ -68,7 +68,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 			expect(manager.getRules()[1].variantId?.compare(invariantVariant)).to.be.false;
 		});
 
-		it('is not on for a variant when no states', (done) => {
+		it('is not permitted for a variant when no states', (done) => {
 			manager
 				.isPermittedForVariantAndProperty(invariantVariant, propB)
 				.subscribe((value) => {
@@ -78,7 +78,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is on for present variant', (done) => {
+		it('is permitted for present variant', (done) => {
 			manager.addRule(ruleEn);
 
 			manager
@@ -90,7 +90,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on for incompatible variant', (done) => {
+		it('is not permitted for incompatible variant', (done) => {
 			manager.addRule(ruleInv);
 
 			manager
@@ -102,7 +102,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on for incompatible variant and incompatible property', (done) => {
+		it('is not permitted for incompatible variant and incompatible property', (done) => {
 			manager.addRule(statePropAInv);
 
 			manager
@@ -113,7 +113,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 				})
 				.unsubscribe();
 		});
-		it('is not on for compatible variant with incompatible property', (done) => {
+		it('is not permitted for compatible variant with incompatible property', (done) => {
 			manager.addRule(statePropAInv);
 
 			manager
@@ -125,7 +125,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on for incompatible variant with compatible property', (done) => {
+		it('is not permitted for incompatible variant with compatible property', (done) => {
 			manager.addRule(statePropAInv);
 
 			manager
@@ -137,7 +137,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is on by generic state', (done) => {
+		it('is permitted by generic state', (done) => {
 			manager.addRule(rulePlain);
 
 			manager
@@ -149,7 +149,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on when specific variant states false', (done) => {
+		it('is not permitted when specific variant states false', (done) => {
 			manager.addRule(rulePlain);
 			manager.addRule(ruleNoEn);
 
@@ -162,7 +162,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on when generic variant states false', (done) => {
+		it('is not permitted when generic variant states false', (done) => {
 			manager.addRule(ruleNoPlain);
 
 			manager
@@ -174,14 +174,14 @@ describe('UmbVariantPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on when specific state states true', (done) => {
+		it('is not permitted despite a specific state is permitting', (done) => {
 			manager.addRule(ruleNoPlain);
 			manager.addRule(ruleEn);
 
 			manager
 				.isPermittedForVariantAndProperty(englishVariant, propB)
 				.subscribe((value) => {
-					expect(value).to.be.true;
+					expect(value).to.be.false;
 					done();
 				})
 				.unsubscribe();
@@ -214,7 +214,7 @@ describe('UmbVariantPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('a specific state wins over general states', (done) => {
+		it('a specific state does not win over a general negative rule', (done) => {
 			manager.addRule(stateNoPropAPlain);
 			manager.addRule(statePropAPlain);
 			manager.addRule(statePropAInv);
@@ -222,13 +222,13 @@ describe('UmbVariantPropertyGuardManager', () => {
 			manager
 				.isPermittedForVariantAndProperty(invariantVariant, propA)
 				.subscribe((value) => {
-					expect(value).to.be.true;
+					expect(value).to.be.false;
 					done();
 				})
 				.unsubscribe();
 		});
 
-		it('a specific negative state wins over general states', (done) => {
+		it('a specific negative state wins over general permitting rule', (done) => {
 			manager.addRule(stateNoPropAPlain);
 			manager.addRule(statePropAPlain);
 			manager.addRule(stateNoPropAInv);

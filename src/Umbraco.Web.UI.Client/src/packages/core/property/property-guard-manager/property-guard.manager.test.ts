@@ -30,7 +30,7 @@ describe('UmbPropertyGuardManager', () => {
 			expect(manager.getRules()[1].propertyType?.unique).to.be.equal(propB.unique);
 		});
 
-		it('is not on for a variant when no states', (done) => {
+		it('is not permitted for a variant when no states', (done) => {
 			manager
 				.isPermittedForProperty(propA)
 				.subscribe((value) => {
@@ -40,7 +40,7 @@ describe('UmbPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is on for present variant', (done) => {
+		it('is permitted for present variant', (done) => {
 			manager.addRule(rulePropB);
 
 			manager
@@ -52,7 +52,7 @@ describe('UmbPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on for incompatible variant', (done) => {
+		it('is not permitted for incompatible variant', (done) => {
 			manager.addRule(rulePropA);
 
 			manager
@@ -64,7 +64,7 @@ describe('UmbPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is on by generic state', (done) => {
+		it('is permitted by generic state', (done) => {
 			manager.addRule(rulePlain);
 
 			manager
@@ -76,7 +76,7 @@ describe('UmbPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on when specific state states false', (done) => {
+		it('is not permitted when specific state states false', (done) => {
 			manager.addRule(rulePlain);
 			manager.addRule(ruleNoPropB);
 
@@ -89,7 +89,7 @@ describe('UmbPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on when generic state states false', (done) => {
+		it('is not permitted when generic state states false', (done) => {
 			manager.addRule(ruleNoPlain);
 
 			manager
@@ -101,14 +101,14 @@ describe('UmbPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on when specific state states true', (done) => {
+		it('is not permitted despite specific state states true', (done) => {
 			manager.addRule(ruleNoPlain);
 			manager.addRule(rulePropB);
 
 			manager
 				.isPermittedForProperty(propB)
 				.subscribe((value) => {
-					expect(value).to.be.true;
+					expect(value).to.be.false;
 					done();
 				})
 				.unsubscribe();

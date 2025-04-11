@@ -105,7 +105,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
 	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
-	public readonly propertyReadOnlyGuard = new UmbVariantPropertyGuardManager(this);
 
 	/* Content Data */
 	protected override readonly _data = new UmbContentWorkspaceDataManager<DetailModelType, VariantModelType>(this);
@@ -888,7 +887,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.readOnlyGuard.clearRules();
 		this.propertyViewGuard.clearRules();
 		this.propertyWriteGuard.clearRules();
-		this.propertyReadOnlyGuard.clearRules();
 		// default:
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();

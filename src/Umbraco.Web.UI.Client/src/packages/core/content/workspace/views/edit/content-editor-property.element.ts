@@ -47,12 +47,9 @@ export class UmbContentWorkspaceViewEditPropertyElement extends UmbLitElement {
 				})}].value`;
 
 				this.observe(
-					observeMultiple([
-						this._context.propertyReadOnlyGuard.isPermittedForVariantAndProperty(propertyVariantId, this.property),
-						this._context.propertyWriteGuard.isPermittedForVariantAndProperty(propertyVariantId, this.property),
-					]),
-					([readonly, write]) => {
-						this._writeable = !readonly && write;
+					this._context.propertyWriteGuard.isPermittedForVariantAndProperty(propertyVariantId, this.property),
+					(write) => {
+						this._writeable = write;
 					},
 					'observeView',
 				);

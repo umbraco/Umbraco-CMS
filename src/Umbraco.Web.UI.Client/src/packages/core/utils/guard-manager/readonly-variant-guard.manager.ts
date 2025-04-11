@@ -7,20 +7,8 @@ export interface UmbVariantGuardRule extends UmbGuardRule {
 	variantId?: UmbVariantId;
 }
 
-function compareStateAndVariantId(rules: Array<UmbVariantGuardRule>, variantId: UmbVariantId): boolean {
-	// any specific states for the variant?
-	const variantState = rules.find((s) => s.variantId?.compare(variantId));
-	if (variantState) {
-		return variantState.permitted;
-	}
-
-	// any state without variant:
-	const nonVariantState = rules.find((s) => s.variantId === undefined);
-	if (nonVariantState) {
-		return nonVariantState.permitted;
-	}
-
-	return false;
+function findRule(rule: UmbVariantGuardRule, variantId: UmbVariantId) {
+	return rule.variantId?.compare(variantId) || rule.variantId === undefined;
 }
 
 // TODO: Check the need for this one.
@@ -39,7 +27,7 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 	 */
 	isPermittedForVariant(variantId: UmbVariantId): Observable<boolean> {
 		return this._rules.asObservablePart((states) => {
-			return compareStateAndVariantId(states, variantId);
+			return this.#resolvePermission(states, variantId);
 		});
 	}
 
@@ -54,7 +42,7 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 				// Or should we know about the fallback state here? [NL]
 				return false;
 			}
-			return compareStateAndVariantId(states, variantId);
+			return this.#resolvePermission(states, variantId);
 		});
 	}
 
@@ -65,6 +53,16 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
 	getIsPermittedForVariant(variantId: UmbVariantId): boolean {
-		return compareStateAndVariantId(this.getRules(), variantId);
+		return this.#resolvePermission(this.getRules(), variantId);
+	}
+
+	#resolvePermission(rules: UmbVariantGuardRule[], variantId: UmbVariantId) {
+		if (rules.filter((x) => x.permitted === false).some((rule) => findRule(rule, variantId))) {
+			return false;
+		}
+		if (rules.filter((x) => x.permitted === true).some((rule) => findRule(rule, variantId))) {
+			return true;
+		}
+		return this._fallback;
 	}
 }

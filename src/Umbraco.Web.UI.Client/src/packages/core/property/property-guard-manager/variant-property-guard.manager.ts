@@ -8,38 +8,13 @@ export interface UmbVariantPropertyGuardRule extends UmbPropertyGuardRule {
 	variantId?: UmbVariantId;
 }
 
-function compareVariantAndPropertyWithStates(
-	rules: UmbVariantPropertyGuardRule[],
-	variantId: UmbVariantId,
-	propertyType: UmbReferenceByUnique,
-) {
-	// any specific states for the variant and propertyType?
-	const variantAndPropertyState = rules.find(
-		(s) => s.variantId?.compare(variantId) && s.propertyType?.unique === propertyType.unique,
+function findRule(rule: UmbVariantPropertyGuardRule, variantId: UmbVariantId, propertyType: UmbReferenceByUnique) {
+	return (
+		(rule.variantId?.compare(variantId) && rule.propertyType?.unique === propertyType.unique) ||
+		(rule.variantId === undefined && rule.propertyType?.unique === propertyType.unique) ||
+		(rule.variantId?.compare(variantId) && rule.propertyType === undefined) ||
+		(rule.variantId === undefined && rule.propertyType === undefined)
 	);
-	if (variantAndPropertyState) {
-		return variantAndPropertyState.permitted;
-	}
-
-	// any specific states for the propertyType?
-	const propertyState = rules.find((s) => s.variantId === undefined && s.propertyType?.unique === propertyType.unique);
-	if (propertyState) {
-		return propertyState.permitted;
-	}
-
-	// any specific states for the variant?
-	const variantState = rules.find((s) => s.variantId?.compare(variantId) && s.propertyType === undefined);
-	if (variantState) {
-		return variantState.permitted;
-	}
-
-	// any state without variant:
-	const nonVariantState = rules.find((s) => s.variantId === undefined && s.propertyType === undefined);
-	if (nonVariantState) {
-		return nonVariantState.permitted;
-	}
-
-	return false;
 }
 
 /**
@@ -57,7 +32,7 @@ export class UmbVariantPropertyGuardManager extends UmbGuardManagerBase<UmbVaria
 	 * @memberof UmbVariantPropertyGuardManager
 	 */
 	isPermittedForVariantAndProperty(variantId: UmbVariantId, propertyType: UmbReferenceByUnique): Observable<boolean> {
-		return this._rules.asObservablePart((rules) => compareVariantAndPropertyWithStates(rules, variantId, propertyType));
+		return this._rules.asObservablePart((rules) => this.#resolvePermission(rules, variantId, propertyType));
 	}
 
 	/**
@@ -68,6 +43,20 @@ export class UmbVariantPropertyGuardManager extends UmbGuardManagerBase<UmbVaria
 	 * @memberof UmbVariantPropertyGuardManager
 	 */
 	getIsPermittedForVariantAndProperty(variantId: UmbVariantId, propertyType: UmbReferenceByUnique): boolean {
-		return compareVariantAndPropertyWithStates(this._rules.getValue(), variantId, propertyType);
+		return this.#resolvePermission(this._rules.getValue(), variantId, propertyType);
+	}
+
+	#resolvePermission(
+		rules: UmbVariantPropertyGuardRule[],
+		variantId: UmbVariantId,
+		propertyType: UmbReferenceByUnique,
+	) {
+		if (rules.filter((x) => x.permitted === false).some((rule) => findRule(rule, variantId, propertyType))) {
+			return false;
+		}
+		if (rules.filter((x) => x.permitted === true).some((rule) => findRule(rule, variantId, propertyType))) {
+			return true;
+		}
+		return this._fallback;
 	}
 }

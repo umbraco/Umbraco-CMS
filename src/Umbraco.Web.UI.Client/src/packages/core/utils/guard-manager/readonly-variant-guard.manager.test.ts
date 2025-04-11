@@ -33,7 +33,7 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 			expect(manager.getRules()[1].variantId?.compare(invariantVariant)).to.be.false;
 		});
 
-		it('is not on for a variant when no rules', (done) => {
+		it('is not permitted for a variant when no rules', (done) => {
 			manager
 				.isPermittedForVariant(invariantVariant)
 				.subscribe((value) => {
@@ -43,7 +43,7 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is on for present variant', (done) => {
+		it('is permitted for present variant', (done) => {
 			manager.addRule(ruleEn);
 
 			manager
@@ -55,7 +55,7 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on for incompatible variant', (done) => {
+		it('is not permitted for incompatible variant', (done) => {
 			manager.addRule(ruleInv);
 
 			manager
@@ -67,7 +67,7 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is on by generic rule', (done) => {
+		it('is permitted by generic rule', (done) => {
 			manager.addRule(rulePlain);
 
 			manager
@@ -79,7 +79,7 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on when specific permitted does not permit', (done) => {
+		it('is not permitted when specific permitted does not permit', (done) => {
 			manager.addRule(rulePlain);
 			manager.addRule(ruleNoEn);
 
@@ -92,7 +92,7 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on when generic permitted does not permit', (done) => {
+		it('is not permitted when generic permitted does not permit', (done) => {
 			manager.addRule(ruleNoPlain);
 
 			manager
@@ -104,14 +104,14 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 				.unsubscribe();
 		});
 
-		it('is not on when specific rule permits', (done) => {
+		it('is not permitted despite a specific rule permits', (done) => {
 			manager.addRule(ruleNoPlain);
 			manager.addRule(ruleEn);
 
 			manager
 				.isPermittedForVariant(englishVariant)
 				.subscribe((value) => {
-					expect(value).to.be.true;
+					expect(value).to.be.false;
 					done();
 				})
 				.unsubscribe();
