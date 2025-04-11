@@ -5,7 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
-const EXAMPLE_CUSTOM_VALIDATION_PROPERTY_ALIAS = 'richTextEditor';
+const EXAMPLE_CUSTOM_VALIDATION_PROPERTY_ALIAS = 'tiptap';
 
 // The Example Workspace Context Controller:
 export class CustomValidationWorkspaceContext extends UmbContextBase<
