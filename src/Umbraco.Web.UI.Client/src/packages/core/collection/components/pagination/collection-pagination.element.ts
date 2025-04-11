@@ -1,8 +1,7 @@
-import { UMB_COLLECTION_CONTEXT } from '../../default/index.js';
+import { UMB_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from '../../default/index.js';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, nothing, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-pagination')
