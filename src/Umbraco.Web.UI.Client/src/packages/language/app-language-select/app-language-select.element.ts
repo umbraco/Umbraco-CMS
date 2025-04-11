@@ -37,6 +37,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	#appLanguageContext?: UmbAppLanguageContext;
 	#languagesObserver?: any;
 
+	// TODO: Here we have some read only state logic and then we have it again in the context. We should align this otherwise it will become a nightmare to maintain. [NL]
 	#currentUserAllowedLanguages?: Array<string>;
 	#currentUserHasAccessToAllLanguages?: boolean;
 

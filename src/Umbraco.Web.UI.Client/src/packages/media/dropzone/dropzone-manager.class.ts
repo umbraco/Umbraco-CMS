@@ -1,5 +1,3 @@
-import { UmbMediaDetailRepository } from '../media/repository/index.js';
-import type { UmbMediaDetailModel, UmbMediaValueModel } from '../media/types.js';
 import { UmbFileDropzoneItemStatus } from './constants.js';
 import { UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL } from './modals/index.js';
 import type {
@@ -25,6 +23,12 @@ import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-typ
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import {
+	UMB_MEDIA_PROPERTY_VALUE_ENTITY_TYPE,
+	UmbMediaDetailRepository,
+	type UmbMediaDetailModel,
+	type UmbMediaValueModel,
+} from '@umbraco-cms/backoffice/media';
 
 /**
  * Manages the dropzone and uploads folders and files to the server.
@@ -318,6 +322,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			value: { temporaryFileId: item.temporaryFile?.temporaryUnique },
 			culture: null,
 			segment: null,
+			entityType: UMB_MEDIA_PROPERTY_VALUE_ENTITY_TYPE,
 		};
 
 		const preset: Partial<UmbMediaDetailModel> = {

@@ -17,7 +17,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
-import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import {
 	UmbPropertyValuePresetVariantBuilderController,
 	type UmbPropertyTypePresetModel,
@@ -77,7 +77,8 @@ export abstract class UmbBlockManagerContext<
 	readonly #settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly settings = this.#settings.asObservable();
 
-	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	// TODO: This is a bad seperation of concerns, this should be self initializing, not defined from the outside. [NL]
+	public readonly readOnlyState = new UmbReadOnlyVariantGuardManager(this);
 
 	readonly #exposes = new UmbArrayState(
 		<Array<UmbBlockExposeModel>>[],
