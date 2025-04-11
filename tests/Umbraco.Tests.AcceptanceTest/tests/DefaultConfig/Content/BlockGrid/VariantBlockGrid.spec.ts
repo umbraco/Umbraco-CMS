@@ -82,7 +82,7 @@ test('can not create unsupported invariant document type with invariant block gr
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 
-test('unsupport invariant document type with invariant block grid with variant block with an variant textString', async ({umbracoApi, umbracoUi}) => {
+test('can not create unsupported invariant document type with invariant block grid with variant block with an variant textString', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   elementTypeId = await umbracoApi.documentType.createDefaultElementTypeWithVaryByCulture(blockName, elementGroupName, textStringName, textStringDataTypeId, true, true);
   blockGridId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridName, elementTypeId, true);

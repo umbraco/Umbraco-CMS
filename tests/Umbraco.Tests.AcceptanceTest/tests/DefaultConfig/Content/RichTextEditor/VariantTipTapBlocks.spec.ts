@@ -65,7 +65,7 @@ test('invariant document type with invariant tiptap RTE with invariant block wit
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);
 });
 
-test('unsupport invariant document type with invariant tiptap RTE with variant block with an invariant textString', async ({umbracoApi, umbracoUi}) => {
+test('can not create unsupported invariant document type with invariant tiptap RTE with variant block with an invariant textString', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   elementTypeId = await umbracoApi.documentType.createDefaultElementTypeWithVaryByCulture(blockName, elementGroupName, textStringName, textStringDataTypeId, true, false);
   tipTapId = await umbracoApi.dataType.createTipTapDataTypeWithABlock(tipTapName, elementTypeId);
@@ -83,7 +83,7 @@ test('unsupport invariant document type with invariant tiptap RTE with variant b
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 
-test('unsupport invariant document type with invariant tiptap RTE with variant block with an variant textString', async ({umbracoApi, umbracoUi}) => {
+test('can not create unsupported invariant document type with invariant tiptap RTE with variant block with an variant textString', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   elementTypeId = await umbracoApi.documentType.createDefaultElementTypeWithVaryByCulture(blockName, elementGroupName, textStringName, textStringDataTypeId, true, true);
   tipTapId = await umbracoApi.dataType.createTipTapDataTypeWithABlock(tipTapName, elementTypeId);
