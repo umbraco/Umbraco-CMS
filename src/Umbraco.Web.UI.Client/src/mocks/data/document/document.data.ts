@@ -74,7 +74,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				editorAlias: 'Umbraco.RichText',
 				alias: 'richTextEditor',
-				culture: null,
+				culture: 'en-US',
 				segment: null,
 				value: {
 					blocks: {},
