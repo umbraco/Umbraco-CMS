@@ -21,8 +21,8 @@ describe('UmbPermissionGuardManager', () => {
 
 	describe('Public API', () => {
 		describe('methods', () => {
-			it('has a fallbackToDisallowed method', () => {
-				expect(manager).to.have.property('fallbackToDisallowed').that.is.a('function');
+			it('has a fallbackToNotPermitted method', () => {
+				expect(manager).to.have.property('fallbackToNotPermitted').that.is.a('function');
 			});
 
 			it('has a fallbackToPermitted method', () => {
@@ -41,8 +41,12 @@ describe('UmbPermissionGuardManager', () => {
 				expect(manager).to.have.property('removeRule').that.is.a('function');
 			});
 
-			it('has a clear method', () => {
-				expect(manager).to.have.property('clear').that.is.a('function');
+			it('has a removeRules method', () => {
+				expect(manager).to.have.property('removeRules').that.is.a('function');
+			});
+
+			it('has a clearRules method', () => {
+				expect(manager).to.have.property('clearRules').that.is.a('function');
 			});
 		});
 	});
