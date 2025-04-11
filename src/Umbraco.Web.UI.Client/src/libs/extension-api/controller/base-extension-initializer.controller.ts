@@ -1,6 +1,6 @@
 import { createExtensionApi } from '../functions/index.js';
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
-import type { ManifestCondition, ManifestWithDynamicConditions } from '../types/index.js';
+import type { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types/index.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';

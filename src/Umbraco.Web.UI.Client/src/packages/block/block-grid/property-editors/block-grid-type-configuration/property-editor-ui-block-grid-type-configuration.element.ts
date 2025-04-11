@@ -26,7 +26,8 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbBlockGridTypeGroupType } from '../../types.js';
-import type { UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL } from '../../workspace/index.js';
+import { UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL } from '../../workspace/index.js';
+import { UMB_BLOCK_GRID_TYPE } from '../../constants.js';
 
 interface MappedGroupWithBlockTypes extends UmbBlockGridTypeGroupType {
 	blocks: Array<UmbBlockTypeWithGroupKey>;
