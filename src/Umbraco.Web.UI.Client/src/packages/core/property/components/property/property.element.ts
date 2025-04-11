@@ -140,6 +140,30 @@ export class UmbPropertyElement extends UmbLitElement {
 		return this.#propertyContext.getDataPath();
 	}
 
+	/**
+	 * Sets the property to readonly, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @default false
+	 */
+	private _readonly: boolean = false;
+	@property({ type: Boolean, reflect: true })
+	public set readonly(value: boolean) {
+		this._readonly = value;
+
+		const unique = 'UMB_ELEMENT';
+
+		if (this._readonly) {
+			this.#propertyContext.readOnlyState.addState({
+				unique,
+			});
+		} else {
+			this.#propertyContext.readOnlyState.removeState(unique);
+		}
+	}
+	public get readonly(): boolean {
+		return this._readonly;
+	}
+
 	@state()
 	private _variantDifference?: string;
 
@@ -242,7 +266,10 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#propertyContext.isReadOnly,
 			(value) => {
 				this._isReadOnly = value;
-				this._element?.toggleAttribute('readonly', value);
+				if (this._element) {
+					this._element.readonly = value;
+					this._element.toggleAttribute('readonly', value);
+				}
 			},
 			null,
 		);
@@ -355,7 +382,9 @@ export class UmbPropertyElement extends UmbLitElement {
 					}
 				}
 
+				this._element.readonly = this._isReadOnly;
 				this._element.toggleAttribute('readonly', this._isReadOnly);
+
 				this.#createController(manifest);
 			}
 

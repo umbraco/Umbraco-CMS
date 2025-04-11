@@ -214,7 +214,12 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 			this.#raf = undefined;
 		}
 
-		this.#promiseRejecter?.('Context request was cancelled, host was disconnected.');
+		if (this.#promiseRejecter) {
+			const hostElement = this._retrieveHost();
+			this.#promiseRejecter(
+				`Context request was cancelled, host was disconnected. (Context Alias: ${this.#contextAlias} with API Alias: ${this.#apiAlias}). Controller is hosted on ${hostElement?.parentNode?.nodeName ?? 'Not attached node'} > ${hostElement?.nodeName}`,
+			);
+		}
 		this.#promise = undefined;
 		this.#promiseOptions = undefined;
 		this.#promiseResolver = undefined;
