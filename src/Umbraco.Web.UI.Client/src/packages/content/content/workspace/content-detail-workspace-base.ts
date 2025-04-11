@@ -25,7 +25,7 @@ import {
 	type UmbEntityVariantModel,
 	type UmbEntityVariantOptionModel,
 } from '@umbraco-cms/backoffice/variant';
-import { UmbDeprecation, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeDetailRepository, UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
@@ -49,6 +49,7 @@ import {
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import {
 	UmbPropertyValuePresetVariantBuilderController,
+	UmbVariantPropertyGuardManager,
 	type UmbPropertyTypePresetModel,
 	type UmbPropertyTypePresetModelTypeModel,
 } from '@umbraco-cms/backoffice/property';
@@ -100,7 +101,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
-	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
+
+	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
+	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
 
 	/* Content Data */
 	protected override readonly _data = new UmbContentWorkspaceDataManager<DetailModelType, VariantModelType>(this);
@@ -138,6 +142,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	/**
 	 * @private
 	 * @description - Should not be used by external code.
+	 * @internal
 	 */
 	public readonly languages = this.#languages.asObservable();
 
@@ -170,6 +175,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		>,
 	) {
 		super(host, args);
+
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
 
 		this.#serverValidation.addPathTranslator(UmbContentDetailValidationPathTranslator);
 
@@ -524,7 +532,15 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 
 		// Notice the order of the properties is important for our JSON String Compare function. [NL]
-		const entry = { editorAlias, ...variantId.toObject(), alias, value } as UmbElementValueModel;
+		const entry: UmbElementValueModel = {
+			editorAlias,
+			// Be aware that this solution is a bit magical, and based on a naming convention.
+			// We might want to make this more flexible at some point and get the entityType from somewhere instead of constructing it here.
+			entityType: `${this.getEntityType()}-property-value`,
+			...variantId.toObject(),
+			alias,
+			value,
+		};
 
 		const currentData = this.getData();
 		if (currentData) {
@@ -573,10 +589,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const changedVariantIds = this._data.getChangedVariants();
 		const selectedVariantIds = activeVariantIds.concat(changedVariantIds);
 
+		const writableSelectedVariantIds = selectedVariantIds.filter(
+			(x) => this.readOnlyGuard.getIsPermittedForVariant(x) === false,
+		);
+
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
-		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
-		let selected = selectedVariantIds.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
-		selected = selected.filter((x) => readOnlyCultures.includes(x) === false);
+		const selected = writableSelectedVariantIds.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
 
 		return {
 			options,
@@ -585,8 +603,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected _saveableVariantsFilter = (option: VariantOptionModelType) => {
-		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
-		return readOnlyCultures.includes(option.culture) === false;
+		return this.readOnlyGuard.getIsPermittedForVariant(UmbVariantId.Create(option)) === false;
 	};
 
 	/* validation */
@@ -867,7 +884,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	override resetState() {
 		super.resetState();
-		this.readOnlyState.clear();
+		this.readOnlyGuard.clearRules();
+		this.propertyViewGuard.clearRules();
+		this.propertyWriteGuard.clearRules();
+		// default:
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
 	}
 
 	abstract getContentTypeUnique(): string | undefined;

@@ -364,9 +364,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
-		const readOnlyCultures =
-			this.#documentWorkspaceContext?.readOnlyState.getStates().map((s) => s.variantId.culture) ?? [];
-		return readOnlyCultures.includes(option.culture) === false;
+		const variantId = UmbVariantId.Create(option);
+		// If the read only guard is permitted it means the variant is read only
+		const isReadOnly = this.#documentWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(variantId);
+		// If the variant is read only, we can't publish it
+		const isPublishable = !isReadOnly;
+		return isPublishable;
 	};
 
 	async #determineVariantOptions(): Promise<{
@@ -388,8 +391,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		// Filter out read-only variants
 		// TODO: This would not work with segments, as the 'selected'-array is an array of strings, not UmbVariantId's. [NL]
 		// Please have a look at the implementation in the content-detail workspace context, as that one compares variantIds. [NL]
-		const readOnlyCultures = this.#documentWorkspaceContext.readOnlyState.getStates().map((s) => s.variantId.culture);
-		selected = selected.filter((x) => readOnlyCultures.includes(x) === false);
+		selected = selected.filter(
+			(x) => this.#documentWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(new UmbVariantId(x)) === false,
+		);
 
 		return {
 			options,

@@ -80,6 +80,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 			this._userGroupPermissions.filter((permission) => permission.$type === schemaType) || [];
 
 		(extension.component as any).permissions = permissionsForSchemaType;
+		(extension.component as any).fallbackPermissions = this._userGroupFallbackPermissions;
 		extension.component.addEventListener(UmbChangeEvent.TYPE, this.#onValueChange);
 
 		return html`
