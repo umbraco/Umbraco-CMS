@@ -286,9 +286,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		);
 
 		this.observe(
-			this.#context.readOnlyState.isReadOnly,
+			this.#context.readOnlyGuard.permitted,
 			(isReadOnly) => (this._isReadOnly = isReadOnly),
-			'umbReadonlyObserver',
+			'umbReadOnlyObserver',
 		);
 	}
 

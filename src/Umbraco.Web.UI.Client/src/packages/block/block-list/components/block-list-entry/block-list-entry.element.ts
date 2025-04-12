@@ -231,9 +231,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			null,
 		);
 		this.observe(
-			this.#context.readOnlyState.isReadOnly,
+			this.#context.readOnlyGuard.permitted,
 			(isReadOnly) => (this._isReadOnly = isReadOnly),
-			'umbReadonlyObserver',
+			'umbReadOnlyObserver',
 		);
 	}
 

@@ -260,7 +260,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			);
 
 			this.observe(
-				manager.readOnlyState.isReadOnly,
+				manager.readOnlyState.permitted,
 				(isReadOnly) => (this._isReadOnly = isReadOnly),
 				'observeIsReadOnly',
 			);

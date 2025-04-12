@@ -6,6 +6,7 @@ export * from './direction/index.js';
 export * from './download/blob-download.function.js';
 export * from './get-guid-from-udi.function.js';
 export * from './get-processed-image-url.function.js';
+export * from './guard-manager/index.js';
 export * from './math/math.js';
 export * from './media/image-size.function.js';
 export * from './object/deep-merge.function.js';

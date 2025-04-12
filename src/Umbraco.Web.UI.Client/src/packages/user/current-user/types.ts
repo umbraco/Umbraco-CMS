@@ -1,6 +1,4 @@
 import type {
-	DocumentPermissionPresentationModel,
-	UnknownTypePermissionPresentationModel,
 	UserExternalLoginProviderModel,
 	UserTwoFactorProviderModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
@@ -26,7 +24,7 @@ export interface UmbCurrentUserModel {
 	languages: Array<string>;
 	mediaStartNodeUniques: Array<UmbReferenceByUnique>;
 	name: string;
-	permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+	permissions: Array<unknown>;
 	unique: string;
 	userName: string;
 	userGroupUniques: string[];
