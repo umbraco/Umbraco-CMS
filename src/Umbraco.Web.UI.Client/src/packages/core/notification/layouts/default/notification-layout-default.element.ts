@@ -8,7 +8,8 @@ import {
 	css,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbNotificationDefaultData, UmbNotificationHandler } from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationDefaultData } from '../../types.js';
+import type { UmbNotificationHandler } from '../../notification-handler.js';
 
 export type { UmbNotificationDefaultData };
 

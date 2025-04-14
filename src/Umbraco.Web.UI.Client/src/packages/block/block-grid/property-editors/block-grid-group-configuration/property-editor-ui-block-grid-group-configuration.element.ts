@@ -6,8 +6,8 @@ import type {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbBlockGridTypeGroupType } from '@umbraco-cms/backoffice/block-grid';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbBlockGridTypeGroupType } from '../../types.js';
 
 @customElement('umb-property-editor-ui-block-grid-group-configuration')
 export class UmbPropertyEditorUIBlockGridGroupConfigurationElement

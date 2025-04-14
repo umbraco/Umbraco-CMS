@@ -6,14 +6,14 @@ import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context-tok
 import { css, customElement, html, nothing, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/template';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 import '@umbraco-cms/backoffice/code-editor';
 import '../../local-components/insert-menu/index.js';
-import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+import { UMB_TEMPLATE_PICKER_MODAL } from '../modals/index.js';
 
 @customElement('umb-template-workspace-editor')
 export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {

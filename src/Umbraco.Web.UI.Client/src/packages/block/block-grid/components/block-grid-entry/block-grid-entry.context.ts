@@ -1,5 +1,5 @@
 import { closestColumnSpanOption, forEachBlockLayoutEntryOf } from '../../utils/index.js';
-import type { UmbBlockGridValueModel } from '../../types.js';
+import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel, UmbBlockGridValueModel } from '../../types.js';
 import {
 	UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 	UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
@@ -20,7 +20,6 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
-import type { UmbBlockGridTypeModel, UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
