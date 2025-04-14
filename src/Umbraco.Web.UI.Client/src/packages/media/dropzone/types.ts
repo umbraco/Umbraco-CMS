@@ -1,6 +1,5 @@
 import type { UmbFileDropzoneItemStatus } from './constants.js';
 import type { UUIFileFolder } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
 
 export interface UmbFileDropzoneDroppedItems {
