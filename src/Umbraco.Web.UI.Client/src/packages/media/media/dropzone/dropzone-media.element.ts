@@ -6,6 +6,7 @@ import {
 } from '@umbraco-cms/backoffice/dropzone';
 import { css, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbMediaDropzoneManager } from './media-dropzone.manager';
 
 /**
  * A dropzone for uploading files and folders as media items. It is hidden by default and will be shown when dragging files over the window.
@@ -22,19 +23,6 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 	parentUnique: string | null = null;
 
 	/**
-	 * Determines if the dropzone should create temporary files or media items directly.
-	 * @deprecated Use the {@link UmbInputDropzoneElement} instead.
-	 */
-	@property({ type: Boolean, attribute: 'create-as-temporary' })
-	createAsTemporary: boolean = false;
-
-	/**
-	 * @deprecated Please use `getItems()` instead; this method will be removed in Umbraco 17.
-	 * @returns {Array<UmbUploadableItem>} An array of uploadable items.
-	 */
-	public getFiles = this.getItems;
-
-	/**
 	 * Gets the current value of the uploaded items.
 	 * @returns {Array<UmbUploadableItem>} An array of uploadable items.
 	 */
@@ -42,6 +30,7 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		return this._progressItems;
 	}
 
+	protected override _manager = new UmbMediaDropzoneManager(this);
 	public progressItems = () => this._manager.progressItems;
 	public progress = () => this._manager.progress;
 
@@ -75,13 +64,8 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		if (this.disabled) return;
 		if (!event.detail.files.length && !event.detail.folders.length) return;
 
-		if (this.createAsTemporary) {
-			const uploadable = this._manager.createTemporaryFiles(event.detail.files);
-			this.dispatchEvent(new UmbDropzoneSubmittedEvent(await uploadable));
-		} else {
-			const uploadable = this._manager.createMediaItems(event.detail, this.parentUnique);
-			this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadable));
-		}
+		const uploadable = this._manager.createMediaItems(event.detail, this.parentUnique);
+		this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadable));
 	}
 
 	#handleDragEnter(e: DragEvent) {
