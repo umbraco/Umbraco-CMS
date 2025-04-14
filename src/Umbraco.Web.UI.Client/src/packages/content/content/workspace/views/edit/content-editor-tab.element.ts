@@ -5,9 +5,11 @@ import type {
 	UmbContentTypeStructureManager,
 	UmbPropertyTypeContainerModel,
 } from '@umbraco-cms/backoffice/content-type';
-import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
+import {
+	UmbContentTypeContainerStructureHelper,
+	UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT,
+} from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import './content-editor-properties.element.js';
 
 @customElement('umb-content-workspace-view-edit-tab')

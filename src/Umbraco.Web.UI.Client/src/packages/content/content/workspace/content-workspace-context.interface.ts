@@ -3,11 +3,8 @@ import type { UmbElementPropertyDataOwner } from '../property-dataset-context/in
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantId, UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
-import type {
-	UmbPropertyStructureWorkspaceContext,
-	UmbRoutableWorkspaceContext,
-	UmbVariantDatasetWorkspaceContext,
-} from '@umbraco-cms/backoffice/workspace';
+import type { UmbRoutableWorkspaceContext, UmbVariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type { UmbPropertyStructureWorkspaceContext } from '@umbraco-cms/backoffice/content-type';
 import type { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
 
 export interface UmbContentWorkspaceContext<

@@ -1,10 +1,10 @@
-import type { UmbEntityWorkspaceContext } from './entity-workspace-context.interface.js';
 import type {
 	UmbContentTypeModel,
 	UmbContentTypeStructureManager,
 	UmbPropertyTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbEntityWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 export interface UmbPropertyStructureWorkspaceContext<
 	ContentTypeModel extends UmbContentTypeModel = UmbContentTypeModel,

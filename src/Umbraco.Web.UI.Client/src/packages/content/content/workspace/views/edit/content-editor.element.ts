@@ -6,12 +6,14 @@ import type {
 	UmbContentTypeStructureManager,
 	UmbPropertyTypeContainerModel,
 } from '@umbraco-cms/backoffice/content-type';
-import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
+import {
+	UmbContentTypeContainerStructureHelper,
+	UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT,
+} from '@umbraco-cms/backoffice/content-type';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import './content-editor-tab.element.js';
 
 @customElement('umb-content-workspace-view-edit')
