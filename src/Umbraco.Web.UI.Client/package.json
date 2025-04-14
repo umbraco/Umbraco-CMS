@@ -166,6 +166,8 @@
 		"example": "node ./devops/example-runner/index.js",
 		"format:fix": "npm run format -- --write",
 		"format": "prettier 'src/**/*.ts' --check",
+		"generate:server-api-dev": "npm run generate:server-api-dev -w @umbraco-backoffice/core",
+		"generate:server-api": "npm run generate:server-api -w @umbraco-backoffice/core",
 		"generate:icons": "node ./devops/icons/index.js",
 		"generate:overrides": "node ./devops/tsc/index.js",
 		"generate:jsonschema:imports": "node ./devops/json-schema-generator/index.js",
