@@ -13,6 +13,7 @@ export default defineConfig({
 		entry: {
 			'content-type/index': './content-type/index.ts',
 			'content/index': './content/index.ts',
+			'property-type/index': './property-type/index.ts',
 			'umbraco-package': 'umbraco-package.ts',
 			manifests: 'manifests.ts',
 		},
