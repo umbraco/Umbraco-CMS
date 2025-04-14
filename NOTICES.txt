@@ -452,6 +452,14 @@ Copyright: 2018 Justkey
 
 ---
 
+Typedoc: A documentation generator for TypeScript projects
+
+URL: https://typedoc.org/
+License: Apache License, Version 2.0
+Copyright: Gerrit Birkeland and Contributors
+
+---
+
 Umbraco.Code: Provides code-level tools for Umbraco
 
 URL: https://github.com/umbraco/Umbraco-Code
