@@ -50,11 +50,11 @@ export class UmbDocumentPublishingServerDataSource {
 		);
 
 		// TODO: THIS DOES NOT TAKE SEGMENTS INTO ACCOUNT!!!!!!
-		const requestBody: PublishDocumentRequestModel = {
+		const body: PublishDocumentRequestModel = {
 			publishSchedules,
 		};
 
-		return tryExecute(this.#host, DocumentService.putDocumentByIdPublish({ id: unique, requestBody }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdPublish({ path: { id: unique }, body: body }));
 	}
 
 	/**
@@ -73,18 +73,18 @@ export class UmbDocumentPublishingServerDataSource {
 		const hasInvariant = variantIds.some((variant) => variant.isCultureInvariant());
 
 		if (hasInvariant) {
-			const requestBody: UnpublishDocumentRequestModel = {
+			const body: UnpublishDocumentRequestModel = {
 				cultures: null,
 			};
 
-			return tryExecute(this.#host, DocumentService.putDocumentByIdUnpublish({ id: unique, requestBody }));
+			return tryExecute(this.#host, DocumentService.putDocumentByIdUnpublish({ path: { id: unique }, body: body }));
 		}
 
-		const requestBody: UnpublishDocumentRequestModel = {
+		const body: UnpublishDocumentRequestModel = {
 			cultures: variantIds.map((variant) => variant.toCultureString()),
 		};
 
-		return tryExecute(this.#host, DocumentService.putDocumentByIdUnpublish({ id: unique, requestBody }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdUnpublish({ path: { id: unique }, body: body }));
 	}
 
 	/**
@@ -101,7 +101,7 @@ export class UmbDocumentPublishingServerDataSource {
 	) {
 		if (!unique) throw new Error('Id is missing');
 
-		const requestBody: PublishDocumentWithDescendantsRequestModel = {
+		const body: PublishDocumentWithDescendantsRequestModel = {
 			cultures: variantIds.map((variant) => variant.toCultureString()),
 			includeUnpublishedDescendants,
 		};
@@ -109,7 +109,7 @@ export class UmbDocumentPublishingServerDataSource {
 		// Initiate the publish descendants task and get back a task Id.
 		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentService.putDocumentByIdPublishWithDescendants({ id: unique, requestBody }),
+			DocumentService.putDocumentByIdPublishWithDescendants({ path: { id: unique }, body: body }),
 		);
 
 		if (error || !data) {
@@ -125,7 +125,8 @@ export class UmbDocumentPublishingServerDataSource {
 			isFirstPoll = false;
 			const { data, error } = await tryExecute(
 				this.#host,
-				DocumentService.getDocumentByIdPublishWithDescendantsResultByTaskId({ id: unique, taskId }));
+				DocumentService.getDocumentByIdPublishWithDescendantsResultByTaskId({ path: { id: unique, taskId } }),
+			);
 			if (error || !data) {
 				return { error };
 			}
@@ -133,7 +134,6 @@ export class UmbDocumentPublishingServerDataSource {
 			if (data.isComplete) {
 				return { error: null };
 			}
-
 		}
 	}
 
@@ -148,7 +148,7 @@ export class UmbDocumentPublishingServerDataSource {
 
 		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentService.getDocumentByIdPublished({ id: unique }),
+			DocumentService.getDocumentByIdPublished({ path: { id: unique } }),
 		);
 
 		if (error || !data) {

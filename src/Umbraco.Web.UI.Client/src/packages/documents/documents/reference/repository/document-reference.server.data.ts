@@ -29,7 +29,7 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase impl
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>> {
 		const { data, error } = await tryExecute(
 			this,
-			DocumentService.getDocumentByIdReferencedBy({ id: unique, skip, take }),
+			DocumentService.getDocumentByIdReferencedBy({ path: { id: unique }, query: { skip, take } }),
 		);
 
 		if (data) {
@@ -70,7 +70,7 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase impl
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>> {
 		const { data, error } = await tryExecute(
 			this,
-			DocumentService.getDocumentAreReferenced({ id: uniques, skip, take }),
+			DocumentService.getDocumentAreReferenced({ query: { id: uniques, skip, take } }),
 		);
 
 		if (data) {
@@ -102,7 +102,7 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase impl
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>> {
 		const { data, error } = await tryExecute(
 			this,
-			DocumentService.getDocumentByIdReferencedDescendants({ id: unique, skip, take }),
+			DocumentService.getDocumentByIdReferencedDescendants({ path: { id: unique }, query: { skip, take } }),
 		);
 
 		if (data) {

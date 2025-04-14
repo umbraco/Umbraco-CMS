@@ -40,7 +40,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(parentUnique);
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateStylesheetRequestModel = {
+		const body: CreateStylesheetRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
 			name: appendFileExtensionIfNeeded(model.name, '.css'),
 			content: model.content,
@@ -49,11 +49,11 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const { data, error } = await tryExecute(
 			this.#host,
 			StylesheetService.postStylesheet({
-				requestBody,
+				body,
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			const newPath = decodeURIComponent(data);
 			const newPathUnique = this.#serverFilePathUniqueSerializer.toUnique(newPath);
 			return this.read(newPathUnique);
@@ -70,7 +70,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 
 		const { data, error } = await tryExecute(
 			this.#host,
-			StylesheetService.getStylesheetByPath({ path: encodeURIComponent(path) }),
+			StylesheetService.getStylesheetByPath({ path: { path: encodeURIComponent(path) } }),
 		);
 
 		if (error || !data) {
@@ -93,15 +93,15 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(model.unique);
 		if (!path) throw new Error('Path is missing');
 
-		const requestBody: UpdateStylesheetRequestModel = {
+		const body: UpdateStylesheetRequestModel = {
 			content: model.content,
 		};
 
 		const { error } = await tryExecute(
 			this.#host,
 			StylesheetService.putStylesheetByPath({
-				path: encodeURIComponent(path),
-				requestBody,
+				path: { path: encodeURIComponent(path) },
+				body,
 			}),
 		);
 
@@ -121,7 +121,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		return tryExecute(
 			this.#host,
 			StylesheetService.deleteStylesheetByPath({
-				path: encodeURIComponent(path),
+				path: { path: encodeURIComponent(path) },
 			}),
 		);
 	}

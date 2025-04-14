@@ -42,7 +42,7 @@ export class UmbDocumentTypeCompositionServerDataSource
 	async getReferences(unique: string) {
 		const response = await tryExecute(
 			this.#host,
-			DocumentTypeService.getDocumentTypeByIdCompositionReferences({ id: unique }),
+			DocumentTypeService.getDocumentTypeByIdCompositionReferences({ path: { id: unique } }),
 		);
 		const error = response.error;
 		const data: Array<UmbDocumentTypeCompositionReferenceModel> | undefined = response.data?.map((reference) => {
@@ -57,23 +57,20 @@ export class UmbDocumentTypeCompositionServerDataSource
 	}
 	/**
 	 * Updates the compositions for a document type on the server
-	 * @param {DocumentTypeCompositionRequestModel} requestBody
+	 * @param {DocumentTypeCompositionRequestModel} body
 	 * @param args
 	 * @returns {*}
 	 * @memberof UmbDocumentTypeCompositionServerDataSource
 	 */
 	async availableCompositions(args: UmbDocumentTypeAvailableCompositionRequestModel) {
-		const requestBody: DocumentTypeCompositionRequestModel = {
+		const body: DocumentTypeCompositionRequestModel = {
 			id: args.unique,
 			isElement: args.isElement,
 			currentCompositeIds: args.currentCompositeUniques,
 			currentPropertyAliases: args.currentPropertyAliases,
 		};
 
-		const response = await tryExecute(
-			this.#host,
-			DocumentTypeService.postDocumentTypeAvailableCompositions({ requestBody }),
-		);
+		const response = await tryExecute(this.#host, DocumentTypeService.postDocumentTypeAvailableCompositions({ body }));
 		const error = response.error;
 		const data: Array<UmbDocumentTypeCompositionCompatibleModel> | undefined = response.data?.map((composition) => {
 			return {

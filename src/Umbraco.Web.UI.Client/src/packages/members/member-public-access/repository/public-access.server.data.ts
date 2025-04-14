@@ -28,7 +28,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 */
 	async create(unique: string, data: PublicAccessRequestModel) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecute(this.#host, DocumentService.postDocumentByIdPublicAccess({ id: unique, requestBody: data }));
+		return tryExecute(this.#host, DocumentService.postDocumentByIdPublicAccess({ path: { id: unique }, body: data }));
 	}
 
 	/**
@@ -40,19 +40,19 @@ export class UmbDocumentPublicAccessServerDataSource {
 		if (!unique) throw new Error('unique is missing');
 		// NOTE: The entity will not be present, when fetching Public Access for a descendant of a protected Document.
 		//       This is a perfectly valid scenario, which is handled in the view. In other words, just use tryExecute here.
-		return tryExecute(this.#host, DocumentService.getDocumentByIdPublicAccess({ id: unique }));
+		return tryExecute(this.#host, DocumentService.getDocumentByIdPublicAccess({ path: { id: unique } }));
 	}
 
 	/**
 	 * Updates Public Access for the given Document unique
 	 * @param {string} unique
 	 * @param {PublicAccessRequestModel} data
-	 * @param requestBody
+	 * @param body
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
-	async update(unique: string, requestBody: PublicAccessRequestModel) {
+	async update(unique: string, body: PublicAccessRequestModel) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecute(this.#host, DocumentService.putDocumentByIdPublicAccess({ id: unique, requestBody }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdPublicAccess({ path: { id: unique }, body }));
 	}
 
 	/**
@@ -62,6 +62,6 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecute(this.#host, DocumentService.deleteDocumentByIdPublicAccess({ id: unique }));
+		return tryExecute(this.#host, DocumentService.deleteDocumentByIdPublicAccess({ path: { id: unique } }));
 	}
 }

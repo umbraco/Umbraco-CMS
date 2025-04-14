@@ -59,7 +59,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, TemplateService.getTemplateById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, TemplateService.getTemplateById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -88,7 +88,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 		if (!model) throw new Error('Template is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateTemplateRequestModel = {
+		const body: CreateTemplateRequestModel = {
 			id: model.unique,
 			name: model.name,
 			content: model.content,
@@ -98,12 +98,12 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 		const { data, error } = await tryExecute(
 			this.#host,
 			TemplateService.postTemplate({
-				requestBody,
+				body,
 			}),
 		);
 
 		if (data) {
-			return this.read(data);
+			return this.read(data as never);
 		}
 
 		return { error };
@@ -120,7 +120,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateTemplateRequestModel = {
+		const body: UpdateTemplateRequestModel = {
 			name: model.name,
 			content: model.content,
 			alias: model.alias,
@@ -129,8 +129,8 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 		const { error } = await tryExecute(
 			this.#host,
 			TemplateService.putTemplateById({
-				id: model.unique,
-				requestBody,
+				path: { id: model.unique },
+				body,
 			}),
 		);
 
@@ -153,7 +153,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 		return tryExecute(
 			this.#host,
 			TemplateService.deleteTemplateById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

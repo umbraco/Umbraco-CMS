@@ -40,7 +40,7 @@ export class UmbDataTypeItemServerDataSource extends UmbItemServerDataSourceBase
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => DataTypeService.getItemDataType({ id: uniques });
+const getItems = (uniques: Array<string>) => DataTypeService.getItemDataType({ query: { id: uniques } });
 
 const mapper = (item: DataTypeItemResponseModel): UmbDataTypeItemModel => {
 	return {

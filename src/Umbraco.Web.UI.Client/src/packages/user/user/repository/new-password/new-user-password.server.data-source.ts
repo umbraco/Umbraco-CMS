@@ -30,7 +30,7 @@ export class UmbNewUserPasswordServerDataSource {
 		return tryExecute(
 			this.#host,
 			UserService.postUserByIdResetPassword({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

@@ -1,19 +1,18 @@
 import { UmbResourceController } from './resource.controller.js';
-import type { UmbTryExecuteOptions } from './types.js';
+import type { UmbApiResponse, UmbTryExecuteOptions } from './types.js';
 import { UmbApiError, UmbCancelError } from './umb-error.js';
-import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
-export class UmbTryExecuteController extends UmbResourceController {
+export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 	#abortSignal?: AbortSignal;
 
-	async tryExecute<T>(opts?: UmbTryExecuteOptions): Promise<UmbDataSourceResponse<T>> {
+	async tryExecute(opts?: UmbTryExecuteOptions): Promise<UmbApiResponse<T>> {
 		try {
 			if (opts?.abortSignal) {
 				this.#abortSignal = opts.abortSignal;
 				this.#abortSignal.addEventListener('abort', () => this.cancel(), { once: true });
 			}
 
-			return { data: await this._promise };
+			return (await this._promise) as UmbApiResponse<T>;
 		} catch (error) {
 			// Error might be a legacy error, so we need to check if it is an UmbError
 			const umbError = this.mapToUmbError(error);
@@ -24,7 +23,7 @@ export class UmbTryExecuteController extends UmbResourceController {
 
 			return {
 				error: umbError,
-			};
+			} as UmbApiResponse<T>;
 		}
 	}
 
@@ -43,13 +42,13 @@ export class UmbTryExecuteController extends UmbResourceController {
 
 		let headline = 'An error occurred';
 		let message = 'An error occurred while trying to execute the request.';
-		let details: Record<string, string[]> = {};
+		let details: Record<string, string[]> | undefined = undefined;
 
 		if (UmbApiError.isUmbApiError(error)) {
 			// UmbApiError, show notification
 			headline = error.problemDetails.title ?? error.name;
 			message = error.problemDetails.detail ?? error.message;
-			details = error.problemDetails.errors ?? {};
+			details = error.problemDetails.errors ?? undefined;
 		} else {
 			// Unknown error, show notification
 			headline = '';

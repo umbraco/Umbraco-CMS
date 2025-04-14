@@ -17,6 +17,9 @@ export class UmbDictionaryExportServerDataSource {
 	 * @memberof UmbDictionaryExportServerDataSource
 	 */
 	async export(unique: string, includeChildren: boolean) {
-		return await tryExecute(this.#host, DictionaryService.getDictionaryByIdExport({ id: unique, includeChildren }));
+		return await tryExecute(
+			this.#host,
+			DictionaryService.getDictionaryByIdExport({ path: { id: unique }, query: { includeChildren } }),
+		);
 	}
 }

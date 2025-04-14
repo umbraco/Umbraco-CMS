@@ -35,12 +35,12 @@ export class UmbDataTypeCollectionServerDataSource implements UmbCollectionDataS
 
 	/**
 	 * Gets the DataType collection filtered by the given filter.
-	 * @param {UmbDataTypeCollectionFilterModel} filter
+	 * @param {UmbDataTypeCollectionFilterModel} query
 	 * @returns {*}
 	 * @DataTypeof UmbDataTypeCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbDataTypeCollectionFilterModel) {
-		const { data, error } = await tryExecute(this.#host, DataTypeService.getFilterDataType(filter));
+	async getCollection(query: UmbDataTypeCollectionFilterModel) {
+		const { data, error } = await tryExecute(this.#host, DataTypeService.getFilterDataType({ query }));
 
 		if (error) {
 			return { error };

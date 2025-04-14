@@ -1,5 +1,5 @@
 import type { UmbDataSourceResponse } from '../repository/index.js';
-import { TemporaryFileService, type PostTemporaryFileResponse } from '@umbraco-cms/backoffice/external/backend-api';
+import { TemporaryFileService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute, tryXhrRequest } from '@umbraco-cms/backoffice/resources';
 
@@ -32,11 +32,11 @@ export class UmbTemporaryFileServerDataSource {
 		file: File,
 		onProgress?: (progress: ProgressEvent) => void,
 		abortSignal?: AbortSignal,
-	): Promise<UmbDataSourceResponse<PostTemporaryFileResponse>> {
+	): Promise<UmbDataSourceResponse<unknown>> {
 		const body = new FormData();
 		body.append('Id', id);
 		body.append('File', file);
-		const xhrRequest = tryXhrRequest<PostTemporaryFileResponse>(this.#host, {
+		const xhrRequest = tryXhrRequest<unknown>(this.#host, {
 			url: '/umbraco/management/api/v1/temporary-file',
 			method: 'POST',
 			responseHeader: 'Umb-Generated-Resource',
@@ -55,7 +55,7 @@ export class UmbTemporaryFileServerDataSource {
 	 */
 	read(id: string) {
 		if (!id) throw new Error('Id is missing');
-		return tryExecute(this.#host, TemporaryFileService.getTemporaryFileById({ id }));
+		return tryExecute(this.#host, TemporaryFileService.getTemporaryFileById({ path: { id } }));
 	}
 
 	/**
@@ -66,6 +66,6 @@ export class UmbTemporaryFileServerDataSource {
 	 */
 	delete(id: string) {
 		if (!id) throw new Error('Id is missing');
-		return tryExecute(this.#host, TemporaryFileService.deleteTemporaryFileById({ id }));
+		return tryExecute(this.#host, TemporaryFileService.deleteTemporaryFileById({ path: { id } }));
 	}
 }

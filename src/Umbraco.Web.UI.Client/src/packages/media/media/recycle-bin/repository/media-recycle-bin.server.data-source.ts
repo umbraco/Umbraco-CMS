@@ -16,15 +16,15 @@ export class UmbMediaRecycleBinServerDataSource implements UmbRecycleBinDataSour
 	}
 
 	trash(args: UmbRecycleBinTrashRequestArgs) {
-		return tryExecute(this.#host, MediaService.putMediaByIdMoveToRecycleBin({ id: args.unique }));
+		return tryExecute(this.#host, MediaService.putMediaByIdMoveToRecycleBin({ path: { id: args.unique } }));
 	}
 
 	restore(args: UmbRecycleBinRestoreRequestArgs) {
 		return tryExecute(
 			this.#host,
 			MediaService.putRecycleBinMediaByIdRestore({
-				id: args.unique,
-				requestBody: {
+				path: { id: args.unique },
+				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},
 			}),
@@ -38,7 +38,7 @@ export class UmbMediaRecycleBinServerDataSource implements UmbRecycleBinDataSour
 	async getOriginalParent(args: UmbRecycleBinOriginalParentRequestArgs) {
 		const { data, error } = await tryExecute(
 			this.#host,
-			MediaService.getRecycleBinMediaByIdOriginalParent({ id: args.unique }),
+			MediaService.getRecycleBinMediaByIdOriginalParent({ path: { id: args.unique } }),
 		);
 
 		// only check for undefined because data can be null if the parent is the root

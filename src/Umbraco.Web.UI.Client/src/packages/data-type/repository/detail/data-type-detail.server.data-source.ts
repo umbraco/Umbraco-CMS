@@ -57,7 +57,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, DataTypeService.getDataTypeById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, DataTypeService.getDataTypeById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -90,7 +90,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		if (!model.editorUiAlias) throw new Error('Property Editor UI Alias is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateDataTypeRequestModel = {
+		const body: CreateDataTypeRequestModel = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			name: model.name,
@@ -102,12 +102,12 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		const { data, error } = await tryExecute(
 			this.#host,
 			DataTypeService.postDataType({
-				requestBody,
+				body: body,
 			}),
 		);
 
 		if (data) {
-			return this.read(data);
+			return this.read(data as any);
 		}
 
 		return { error };
@@ -126,7 +126,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		if (!model.editorUiAlias) throw new Error('Property Editor UI Alias is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateDataTypeRequestModel = {
+		const body: UpdateDataTypeRequestModel = {
 			name: model.name,
 			editorAlias: model.editorAlias,
 			editorUiAlias: model.editorUiAlias,
@@ -136,8 +136,8 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		const { error } = await tryExecute(
 			this.#host,
 			DataTypeService.putDataTypeById({
-				id: model.unique,
-				requestBody,
+				path: { id: model.unique },
+				body: body,
 			}),
 		);
 
@@ -160,7 +160,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		return tryExecute(
 			this.#host,
 			DataTypeService.deleteDataTypeById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

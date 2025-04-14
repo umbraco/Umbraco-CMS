@@ -33,7 +33,7 @@ export class UmbUserSetGroupsServerDataSource {
 		return tryExecute(
 			this.#host,
 			UserService.postUserSetUserGroups({
-				requestBody: {
+				body: {
 					userIds: userIds.map((id) => ({ id })),
 					userGroupIds: userGroupIds.map((id) => ({ id })),
 				},

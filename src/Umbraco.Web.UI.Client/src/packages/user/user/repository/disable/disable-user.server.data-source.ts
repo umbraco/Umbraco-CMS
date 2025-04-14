@@ -31,7 +31,7 @@ export class UmbDisableUserServerDataSource implements UmbDisableUserDataSource 
 		return tryExecute(
 			this.#host,
 			UserService.postUserDisable({
-				requestBody: {
+				body: {
 					userIds: userIds.map((id) => ({ id })),
 				},
 			}),

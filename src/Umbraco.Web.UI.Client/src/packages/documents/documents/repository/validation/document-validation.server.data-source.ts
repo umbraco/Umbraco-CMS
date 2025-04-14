@@ -8,6 +8,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A server data source for Document Validation
@@ -25,13 +26,16 @@ export class UmbDocumentValidationServerDataSource {
 	 * @param parentUnique - Parent Unique
 	 * @returns {*}
 	 */
-	async validateCreate(model: UmbDocumentDetailModel, parentUnique: UmbEntityUnique = null) {
+	async validateCreate(
+		model: UmbDocumentDetailModel,
+		parentUnique: UmbEntityUnique = null,
+	): Promise<UmbDataSourceResponse<string>> {
 		if (!model) throw new Error('Document is missing');
 		if (!model.unique) throw new Error('Document unique is missing');
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateDocumentRequestModel = {
+		const body: CreateDocumentRequestModel = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			documentType: { id: model.documentType.unique },
@@ -41,15 +45,21 @@ export class UmbDocumentValidationServerDataSource {
 		};
 
 		// Maybe use: tryExecuteAndNotify
-		return tryExecute(
+		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentService.postDocumentValidate({
-				requestBody,
+				body,
 			}),
 			{
 				disableNotifications: true,
 			},
 		);
+
+		if (data && typeof data === 'string') {
+			return { data };
+		}
+
+		return { error };
 	}
 
 	/**
@@ -58,13 +68,16 @@ export class UmbDocumentValidationServerDataSource {
 	 * @param {Array<UmbVariantId>} variantIds - Variant Ids
 	 * @returns {*}
 	 */
-	async validateUpdate(model: UmbDocumentDetailModel, variantIds: Array<UmbVariantId>) {
+	async validateUpdate(
+		model: UmbDocumentDetailModel,
+		variantIds: Array<UmbVariantId>,
+	): Promise<UmbDataSourceResponse<string>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		const cultures = variantIds.map((id) => id.culture).filter((culture) => culture !== null) as Array<string>;
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: ValidateUpdateDocumentRequestModel = {
+		const body: ValidateUpdateDocumentRequestModel = {
 			template: model.template ? { id: model.template.unique } : null,
 			values: model.values,
 			variants: model.variants,
@@ -72,15 +85,21 @@ export class UmbDocumentValidationServerDataSource {
 		};
 
 		// Maybe use: tryExecuteAndNotify
-		return tryExecute(
+		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentService.putUmbracoManagementApiV11DocumentByIdValidate11({
-				id: model.unique,
-				requestBody,
+				path: { id: model.unique },
+				body,
 			}),
 			{
 				disableNotifications: true,
 			},
 		);
+
+		if (data && typeof data === 'string') {
+			return { data };
+		}
+
+		return { error };
 	}
 }

@@ -1195,6 +1195,7 @@ export default {
 			'This package file doesn\'t contain any items to uninstall.<br/><br/>\n      You can safely remove this from the system by clicking "uninstall package" below.',
 		packageOptions: 'Package options',
 		packageMigrationsRun: 'Run pending package migrations',
+		packageMigrationsConfirmText: 'Do you want to run the pending package migrations?',
 		packageReadme: 'Package readme',
 		packageRepository: 'Package repository',
 		packageUninstallConfirm: 'Confirm package uninstall',

@@ -43,6 +43,6 @@ export class UmbTagServerDataSource {
 		tagGroup?: string;
 		culture?: string;
 	}) {
-		return tryExecute(this.#host, TagService.getTag({ query, skip, take, tagGroup, culture }));
+		return tryExecute(this.#host, TagService.getTag({ query: { query, skip, take, tagGroup, culture } }));
 	}
 }

@@ -24,12 +24,12 @@ export class UmbDictionaryCollectionServerDataSource implements UmbCollectionDat
 
 	/**
 	 * Gets the dictionary collection filtered by the given filter.
-	 * @param {UmbDictionaryCollectionFilterModel} filter
+	 * @param {UmbDictionaryCollectionFilterModel} query
 	 * @returns {*}
 	 * @memberof UmbDictionaryCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbDictionaryCollectionFilterModel) {
-		const { data, error } = await tryExecute(this.#host, DictionaryService.getDictionary(filter));
+	async getCollection(query: UmbDictionaryCollectionFilterModel) {
+		const { data, error } = await tryExecute(this.#host, DictionaryService.getDictionary({ query }));
 
 		if (data) {
 			const items = data.items.map((item) => {

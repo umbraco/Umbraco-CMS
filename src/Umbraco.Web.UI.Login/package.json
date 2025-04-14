@@ -6,14 +6,17 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "watch": "tsc && vite build --watch",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate:server-api": "openapi-ts"
   },
   "engines": {
     "node": ">=22",
     "npm": ">=10.9"
   },
   "devDependencies": {
-    "@umbraco-cms/backoffice": "15.2.1",
+    "@hey-api/client-fetch": "^0.10.0",
+    "@hey-api/openapi-ts": "^0.66.3",
+    "@umbraco-cms/backoffice": "15.3.0",
     "msw": "^2.7.0",
     "typescript": "^5.7.3",
     "vite": "^6.2.5",

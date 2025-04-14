@@ -2,7 +2,7 @@ import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UmbWorkspaceActionBase, type UmbWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 // The Example Incrementor Workspace Action Controller:
-export class ExampleWorkspaceActionManipulateWiewPermission
+export class ExampleWorkspaceActionManipulateViewPermission
 	extends UmbWorkspaceActionBase
 	implements UmbWorkspaceAction
 {
@@ -30,4 +30,4 @@ export class ExampleWorkspaceActionManipulateWiewPermission
 }
 
 // Declare a api export, so Extension Registry can initialize this class:
-export const api = ExampleWorkspaceActionManipulateWiewPermission;
+export const api = ExampleWorkspaceActionManipulateViewPermission;

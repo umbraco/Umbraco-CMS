@@ -33,7 +33,7 @@ export class UmbSortChildrenOfDocumentServerDataSource implements UmbSortChildre
 		return tryExecute(
 			this.#host,
 			DocumentService.putDocumentSort({
-				requestBody: {
+				body: {
 					parent: args.unique ? { id: args.unique } : null,
 					sorting: sortingMapping,
 				},

@@ -1,9 +1,10 @@
+import type { UmbDataSourceResponse } from '../data-source-response.interface.js';
+import type { UmbItemDataSource } from './item-data-source.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import type { UmbItemDataSource } from './item-data-source.interface.js';
 
 export interface UmbItemServerDataSourceBaseArgs<ServerItemType, ClientItemType extends { unique: string }> {
-	getItems: (uniques: Array<string>) => Promise<Array<ServerItemType>>;
+	getItems: (uniques: Array<string>) => Promise<UmbDataSourceResponse<Array<ServerItemType>>>;
 	mapper: (item: ServerItemType) => ClientItemType;
 }
 
@@ -16,7 +17,7 @@ export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType
 	implements UmbItemDataSource<ClientItemType>
 {
 	#host: UmbControllerHost;
-	#getItems: (uniques: Array<string>) => Promise<Array<ServerItemType>>;
+	#getItems: (uniques: Array<string>) => Promise<UmbDataSourceResponse<Array<ServerItemType>>>;
 	#mapper: (item: ServerItemType) => ClientItemType;
 
 	/**

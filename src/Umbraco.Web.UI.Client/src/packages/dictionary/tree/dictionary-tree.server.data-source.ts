@@ -36,7 +36,7 @@ export class UmbDictionaryTreeServerDataSource extends UmbTreeServerDataSourceBa
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	DictionaryService.getTreeDictionaryRoot({ skip: args.skip, take: args.take });
+	DictionaryService.getTreeDictionaryRoot({ query: { skip: args.skip, take: args.take } });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parent.unique === null) {
@@ -44,9 +44,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DictionaryService.getTreeDictionaryChildren({
-			parentId: args.parent.unique,
-			skip: args.skip,
-			take: args.take,
+			query: { parentId: args.parent.unique, skip: args.skip, take: args.take },
 		});
 	}
 };
@@ -54,7 +52,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	DictionaryService.getTreeDictionaryAncestors({
-		descendantId: args.treeItem.unique,
+		query: { descendantId: args.treeItem.unique },
 	});
 
 const mapper = (item: NamedEntityTreeItemResponseModel): UmbDictionaryTreeItemModel => {

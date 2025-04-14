@@ -27,7 +27,7 @@ export class UmbRollbackServerDataSource {
 	 * @memberof UmbRollbackServerDataSource
 	 */
 	getVersionsByDocumentId(id: string, culture?: string) {
-		return tryExecute(this.#host, DocumentVersionService.getDocumentVersion({ documentId: id, culture }));
+		return tryExecute(this.#host, DocumentVersionService.getDocumentVersion({ query: { documentId: id, culture } }));
 	}
 
 	/**
@@ -37,17 +37,23 @@ export class UmbRollbackServerDataSource {
 	 * @memberof UmbRollbackServerDataSource
 	 */
 	getVersionById(versionId: string) {
-		return tryExecute(this.#host, DocumentVersionService.getDocumentVersionById({ id: versionId }));
+		return tryExecute(this.#host, DocumentVersionService.getDocumentVersionById({ path: { id: versionId } }));
 	}
 
 	setPreventCleanup(versionId: string, preventCleanup: boolean) {
 		return tryExecute(
 			this.#host,
-			DocumentVersionService.putDocumentVersionByIdPreventCleanup({ id: versionId, preventCleanup }),
+			DocumentVersionService.putDocumentVersionByIdPreventCleanup({
+				path: { id: versionId },
+				query: { preventCleanup },
+			}),
 		);
 	}
 
 	rollback(versionId: string, culture?: string) {
-		return tryExecute(this.#host, DocumentVersionService.postDocumentVersionByIdRollback({ id: versionId, culture }));
+		return tryExecute(
+			this.#host,
+			DocumentVersionService.postDocumentVersionByIdRollback({ path: { id: versionId }, query: { culture } }),
+		);
 	}
 }

@@ -74,7 +74,10 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, DocumentTypeService.getDocumentTypeById({ id: unique }));
+		const { data, error } = await tryExecute(
+			this.#host,
+			DocumentTypeService.getDocumentTypeById({ path: { id: unique } }),
+		);
 
 		if (error || !data) {
 			return { error };
@@ -142,7 +145,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 		if (!model.unique) throw new Error('Media Type unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateDocumentTypeRequestModel = {
+		const body: CreateDocumentTypeRequestModel = {
 			parent: parentUnique ? { id: parentUnique } : null,
 			alias: model.alias,
 			name: model.name,
@@ -190,12 +193,12 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentTypeService.postDocumentType({
-				requestBody,
+				body: body,
 			}),
 		);
 
 		if (data) {
-			return this.read(data);
+			return this.read(data as any);
 		}
 
 		return { error };
@@ -212,7 +215,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateDocumentTypeRequestModel = {
+		const body: UpdateDocumentTypeRequestModel = {
 			alias: model.alias,
 			name: model.name,
 			description: model.description,
@@ -266,8 +269,8 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 		const { error } = await tryExecute(
 			this.#host,
 			DocumentTypeService.putDocumentTypeById({
-				id: model.unique,
-				requestBody,
+				path: { id: model.unique },
+				body: body,
 			}),
 		);
 
@@ -290,7 +293,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 		return tryExecute(
 			this.#host,
 			DocumentTypeService.deleteDocumentTypeById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}
