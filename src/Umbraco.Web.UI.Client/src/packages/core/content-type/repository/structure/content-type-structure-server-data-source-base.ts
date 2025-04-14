@@ -3,6 +3,7 @@ import type { UmbContentTypeStructureDataSource } from './content-type-structure
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 // Keep this type internal
 type AllowedContentTypeBaseModel = {
@@ -19,7 +20,7 @@ export interface UmbContentTypeStructureServerDataSourceBaseArgs<
 	getAllowedChildrenOf: (
 		unique: string | null,
 		parentContentUnique: string | null,
-	) => Promise<UmbPagedModel<ServerItemType>>;
+	) => Promise<UmbDataSourceResponse<UmbPagedModel<ServerItemType>>>;
 	mapper: (item: ServerItemType) => ClientItemType;
 }
 

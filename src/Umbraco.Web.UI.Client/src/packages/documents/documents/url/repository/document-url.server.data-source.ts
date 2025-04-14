@@ -24,6 +24,6 @@ export class UmbDocumentUrlServerDataSource extends UmbItemServerDataSourceBase<
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => DocumentService.getDocumentUrls({ id: uniques });
+const getItems = (uniques: Array<string>) => DocumentService.getDocumentUrls({ query: { id: uniques } });
 
 const mapper = (item: DocumentUrlInfoResponseModel): UmbDocumentUrlsModel => ({ unique: item.id, urls: item.urlInfos });

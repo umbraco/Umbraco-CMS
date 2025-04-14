@@ -34,9 +34,11 @@ export class UmbMediaSearchServerDataSource
 		const { data, error } = await tryExecute(
 			this.#host,
 			MediaService.getItemMediaSearch({
-				query: args.query,
-				parentId: args.searchFrom?.unique || undefined,
-				allowedMediaTypes: args.allowedContentTypes?.map((mediaReference) => mediaReference.unique),
+				query: {
+					query: args.query,
+					parentId: args.searchFrom?.unique || undefined,
+					allowedMediaTypes: args.allowedContentTypes?.map((mediaReference) => mediaReference.unique),
+				},
 			}),
 		);
 

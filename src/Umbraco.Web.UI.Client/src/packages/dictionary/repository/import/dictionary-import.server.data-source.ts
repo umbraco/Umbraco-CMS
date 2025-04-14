@@ -21,7 +21,7 @@ export class UmbDictionaryImportServerDataSource {
 		if (!temporaryFileUnique) throw new Error('temporaryFileUnique is required');
 		if (parentUnique === undefined) throw new Error('parentUnique is required');
 
-		const requestBody: ImportDictionaryRequestModel = {
+		const body: ImportDictionaryRequestModel = {
 			temporaryFile: { id: temporaryFileUnique },
 			parent: parentUnique ? { id: parentUnique } : null,
 		};
@@ -29,7 +29,7 @@ export class UmbDictionaryImportServerDataSource {
 		return tryExecute(
 			this.#host,
 			DictionaryService.postDictionaryImport({
-				requestBody,
+				body,
 			}),
 		);
 	}

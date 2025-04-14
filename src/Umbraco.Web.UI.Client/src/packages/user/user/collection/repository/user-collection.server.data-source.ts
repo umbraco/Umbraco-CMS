@@ -39,13 +39,15 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 		const { data, error } = await tryExecute(
 			this.#host,
 			UserService.getFilterUser({
-				filter: filter.filter,
-				orderBy: filter.orderBy as unknown as UserOrderModel, // TODO: This is a temporary workaround to avoid a type error.
-				orderDirection: filter.orderDirection as unknown as DirectionModel, // TODO: This is a temporary workaround to avoid a type error.
-				skip: filter.skip,
-				take: filter.take,
-				userGroupIds: filter.userGroupIds,
-				userStates: filter.userStates as unknown as Array<UserStateModel>, // TODO: This is a temporary workaround to avoid a type error.
+				query: {
+					filter: filter.filter,
+					orderBy: filter.orderBy as unknown as UserOrderModel, // TODO: This is a temporary workaround to avoid a type error.
+					orderDirection: filter.orderDirection as unknown as DirectionModel, // TODO: This is a temporary workaround to avoid a type error.
+					skip: filter.skip,
+					take: filter.take,
+					userGroupIds: filter.userGroupIds,
+					userStates: filter.userStates as unknown as Array<UserStateModel>, // TODO: This is a temporary workaround to avoid a type error.
+				},
 			}),
 		);
 

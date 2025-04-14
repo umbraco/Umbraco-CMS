@@ -25,6 +25,6 @@ export class UmbOEmbedServerDataSource {
 	 * @memberof UmbOEmbedServerDataSource
 	 */
 	async getOEmbedQuery({ url, maxWidth, maxHeight }: { url?: string; maxWidth?: number; maxHeight?: number }) {
-		return tryExecute(this.#host, OEmbedService.getOembedQuery({ url, maxWidth, maxHeight }));
+		return tryExecute(this.#host, OEmbedService.getOembedQuery({ query: { url, maxWidth, maxHeight } }));
 	}
 }

@@ -63,7 +63,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		}
 		const { data: _data } = await tryExecute(
 			this,
-			UserService.getUserCurrent2FaByProviderName({ providerName: this.providerName }),
+			UserService.getUserCurrent2FaByProviderName({ path: { providerName: this.providerName } }),
 		);
 		const data: any = _data;
 		if (!data) {

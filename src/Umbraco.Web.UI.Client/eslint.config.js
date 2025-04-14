@@ -28,6 +28,8 @@ export default [
 			'src/packages/core/icon-registry/icons',
 			'src/packages/core/icon-registry/icons.ts',
 			'src/**/*.test.ts',
+			'src/packages/core/backend-api',
+			'src/packages/core/openapi-ts.*.js',
 		],
 	},
 

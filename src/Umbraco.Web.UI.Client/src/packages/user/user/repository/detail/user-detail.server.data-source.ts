@@ -72,7 +72,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, UserService.getUserById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, UserService.getUserById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -128,7 +128,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 		if (!model) throw new Error('User is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateUserRequestModel = {
+		const body: CreateUserRequestModel = {
 			email: model.email,
 			name: model.name,
 			userGroupIds: model.userGroupUniques.map((reference) => {
@@ -143,12 +143,12 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 		const { data, error } = await tryExecute(
 			this.#host,
 			UserService.postUser({
-				requestBody,
+				body,
 			}),
 		);
 
 		if (data) {
-			return this.read(data);
+			return this.read(data as never);
 		}
 
 		return { error };
@@ -165,7 +165,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateUserRequestModel = {
+		const body: UpdateUserRequestModel = {
 			documentStartNodeIds: model.documentStartNodeUniques.map((node) => {
 				return {
 					id: node.unique,
@@ -192,8 +192,8 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 		const { error } = await tryExecute(
 			this.#host,
 			UserService.putUserById({
-				id: model.unique,
-				requestBody,
+				path: { id: model.unique },
+				body,
 			}),
 		);
 
@@ -216,7 +216,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 		return tryExecute(
 			this.#host,
 			UserService.deleteUserById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}
@@ -233,7 +233,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 		const { data, error } = await tryExecute(
 			this.#host,
 			UserService.getUserByIdCalculateStartNodes({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 

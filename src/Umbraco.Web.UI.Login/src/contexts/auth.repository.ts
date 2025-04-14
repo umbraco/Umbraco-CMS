@@ -3,7 +3,6 @@ import {
 	LoginResponse,
 	MfaCodeResponse,
 	NewPasswordResponse,
-	PasswordConfigurationModel,
 	ResetPasswordResponse,
 	ValidateInviteCodeResponse,
 	ValidatePasswordResetCodeResponse,
@@ -11,20 +10,20 @@ import {
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import {
-	ApiError,
-	CancelError,
-	ProblemDetails,
-	SecurityService,
-	UserService,
-} from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+	postSecurityForgotPassword,
+	postSecurityForgotPasswordReset,
+	postSecurityForgotPasswordVerify,
+	postUserInviteCreatePassword,
+	postUserInviteVerify,
+} from '../api/index.js';
+import { isProblemDetails } from '../utils/is-problem-details.function.js';
 
 export class UmbAuthRepository extends UmbRepositoryBase {
 	#localize = new UmbLocalizationController(this);
 
 	public async login(data: LoginRequestModel): Promise<LoginResponse> {
 		try {
-			const request = new Request('management/api/v1/security/back-office/login', {
+			const request = new Request('/umbraco/management/api/v1/security/back-office/login', {
 				method: 'POST',
 				body: JSON.stringify({
 					username: data.username,
@@ -70,7 +69,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 
 	public async validateMfaCode(code: string, provider: string): Promise<MfaCodeResponse> {
 		try {
-			const requestData = new Request('management/api/v1/security/back-office/verify-2fa', {
+			const requestData = new Request('/umbraco/management/api/v1/security/back-office/verify-2fa', {
 				method: 'POST',
 				body: JSON.stringify({
 					code,
@@ -99,18 +98,15 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 	}
 
 	public async resetPassword(email: string): Promise<ResetPasswordResponse> {
-		const response = await tryExecuteAndNotify(
-			this,
-			SecurityService.postSecurityForgotPassword({
-				requestBody: {
-					email,
-				},
-			})
-		);
+		const { error } = await postSecurityForgotPassword({
+			body: {
+				email,
+			},
+		});
 
-		if (response.error) {
+		if (error) {
 			return {
-				error: this.#getApiErrorDetailText(response.error, 'Could not reset the password'),
+				error: this.#getApiErrorDetailText(error, 'Could not reset the password'),
 			};
 		}
 
@@ -121,17 +117,14 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 		userId: string,
 		resetCode: string
 	): Promise<ValidatePasswordResetCodeResponse> {
-		const { data, error } = await tryExecuteAndNotify(
-			this,
-			SecurityService.postSecurityForgotPasswordVerify({
-				requestBody: {
-					user: {
-						id: userId,
-					},
-					resetCode,
+		const { data, error } = await postSecurityForgotPasswordVerify({
+			body: {
+				user: {
+					id: userId,
 				},
-			})
-		);
+				resetCode,
+			},
+		});
 
 		if (error || !data) {
 			return {
@@ -139,29 +132,23 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 			};
 		}
 
-		return {
-			passwordConfiguration: (data as unknown as { passwordConfiguration: PasswordConfigurationModel })
-				.passwordConfiguration, // TODO: Fix this when the API schema has been updated
-		};
+		return data;
 	}
 
 	public async newPassword(password: string, resetCode: string, userId: string): Promise<NewPasswordResponse> {
-		const response = await tryExecuteAndNotify(
-			this,
-			SecurityService.postSecurityForgotPasswordReset({
-				requestBody: {
-					password,
-					resetCode,
-					user: {
-						id: userId,
-					},
+		const { error } = await postSecurityForgotPasswordReset({
+			body: {
+				password,
+				resetCode,
+				user: {
+					id: userId,
 				},
-			})
-		);
+			},
+		});
 
-		if (response.error) {
+		if (error) {
 			return {
-				error: this.#getApiErrorDetailText(response.error, 'Could not reset the password'),
+				error: this.#getApiErrorDetailText(error, 'Could not reset the password'),
 			};
 		}
 
@@ -169,17 +156,14 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 	}
 
 	public async validateInviteCode(token: string, userId: string): Promise<ValidateInviteCodeResponse> {
-		const { data, error } = await tryExecuteAndNotify(
-			this,
-			UserService.postUserInviteVerify({
-				requestBody: {
-					token,
-					user: {
-						id: userId,
-					},
+		const { data, error } = await postUserInviteVerify({
+			body: {
+				token,
+				user: {
+					id: userId,
 				},
-			})
-		);
+			},
+		});
 
 		if (error || !data) {
 			return {
@@ -187,49 +171,44 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 			};
 		}
 
-		return {
-			passwordConfiguration: (data as unknown as { passwordConfiguration: PasswordConfigurationModel })
-				.passwordConfiguration, // TODO: Fix this when the API schema has been updated
-		};
+		return data;
 	}
 
 	public async newInvitedUserPassword(password: string, token: string, userId: string): Promise<NewPasswordResponse> {
-		const response = await tryExecuteAndNotify(
-			this,
-			UserService.postUserInviteCreatePassword({
-				requestBody: {
-					password,
-					token,
-					user: {
-						id: userId,
-					},
+		const { error } = await postUserInviteCreatePassword({
+			body: {
+				password,
+				token,
+				user: {
+					id: userId,
 				},
-			})
-		);
+			},
+		});
 
-		if (response.error) {
+		if (error) {
 			return {
-				error: this.#getApiErrorDetailText(response.error, 'Could not create a password for the invited user'),
+				error: this.#getApiErrorDetailText(error, 'Could not create a password for the invited user'),
 			};
 		}
 
 		return {};
 	}
 
-	#getApiErrorDetailText(error: ApiError | CancelError | undefined, fallbackText?: string): string | undefined {
-		if (error instanceof ApiError) {
-			// Try to parse the body
-			return typeof error.body === 'object'
-				? (error.body as ProblemDetails).title ?? fallbackText
-				: fallbackText ?? 'An unknown error occurred.';
+	#getApiErrorDetailText(error: unknown, fallbackText?: string): string | undefined {
+		if (isProblemDetails(error)) {
+			return error.detail ?? error.title ?? undefined;
+		}
+
+		if (false === error instanceof Error) {
+			return fallbackText ?? 'An unknown error occurred.';
 		}
 
 		// Ignore cancel errors (user cancelled the request)
-		if (error instanceof CancelError) {
+		if (error.name === 'CancelError') {
 			return undefined;
 		}
 
-		return fallbackText ?? 'An unknown error occurred.';
+		return error.message;
 	}
 
 	async #getErrorText(response: Response): Promise<string> {

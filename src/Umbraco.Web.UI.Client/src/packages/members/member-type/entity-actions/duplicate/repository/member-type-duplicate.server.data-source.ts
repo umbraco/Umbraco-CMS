@@ -31,7 +31,7 @@ export class UmbDuplicateMemberTypeServerDataSource implements UmbDuplicateDataS
 		return tryExecute(
 			this.#host,
 			MemberTypeService.postMemberTypeByIdCopy({
-				id: args.unique,
+				path: { id: args.unique },
 			}),
 		);
 	}

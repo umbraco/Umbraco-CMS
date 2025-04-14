@@ -1,8 +1,7 @@
 {
-    "cSpell.words": [
-        "unprovide"
-    ],
-    "eslint.workingDirectories": [
+  "cSpell.words": ["unprovide"],
+  "eslint.useFlatConfig": true,
+  "eslint.workingDirectories": [
     "./src/Umbraco.Web.UI.Client/",
     "./src/Umbraco.Web.UI.Login/"
   ]

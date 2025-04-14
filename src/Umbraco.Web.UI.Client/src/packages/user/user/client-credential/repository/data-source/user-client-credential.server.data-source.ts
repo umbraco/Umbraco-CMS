@@ -31,8 +31,8 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 		const { error } = await tryExecute(
 			this.#host,
 			UserService.postUserByIdClientCredentials({
-				id: args.user.unique,
-				requestBody: {
+				path: { id: args.user.unique },
+				body: {
 					clientId: args.client.unique,
 					clientSecret: args.client.secret,
 				},
@@ -56,7 +56,7 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 		const { data, error } = await tryExecute(
 			this.#host,
 			UserService.getUserByIdClientCredentials({
-				id: args.user.unique,
+				path: { id: args.user.unique },
 			}),
 		);
 
@@ -81,8 +81,7 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 		return tryExecute(
 			this.#host,
 			UserService.deleteUserByIdClientCredentialsByClientId({
-				id: args.user.unique,
-				clientId: args.client.unique,
+				path: { id: args.user.unique, clientId: args.client.unique },
 			}),
 		);
 	}

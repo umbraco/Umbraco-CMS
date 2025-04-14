@@ -37,7 +37,7 @@ export class UmbTemplateQueryServerDataSource {
 	 * @memberof UmbTemplateQueryServerDataSource
 	 */
 	async executeTemplateQuery(args: UmbExecuteTemplateQueryRequestModel) {
-		const requestBody: TemplateQueryExecuteModel = {
+		const body: TemplateQueryExecuteModel = {
 			rootDocument: args.rootDocument ? { id: args.rootDocument.unique } : null,
 			documentTypeAlias: args.documentTypeAlias,
 			filters: args.filters,
@@ -45,6 +45,6 @@ export class UmbTemplateQueryServerDataSource {
 			take: args.take,
 		};
 
-		return tryExecute(this.#host, TemplateService.postTemplateQueryExecute({ requestBody }));
+		return tryExecute(this.#host, TemplateService.postTemplateQueryExecute({ body }));
 	}
 }

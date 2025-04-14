@@ -55,7 +55,10 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, LanguageService.getLanguageByIsoCode({ isoCode: unique }));
+		const { data, error } = await tryExecute(
+			this.#host,
+			LanguageService.getLanguageByIsoCode({ path: { isoCode: unique } }),
+		);
 
 		if (error || !data) {
 			return { error };
@@ -84,7 +87,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 		if (!model) throw new Error('Language is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateLanguageRequestModel = {
+		const body: CreateLanguageRequestModel = {
 			fallbackIsoCode: model.fallbackIsoCode,
 			isDefault: model.isDefault,
 			isMandatory: model.isMandatory,
@@ -95,11 +98,11 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 		const { data, error } = await tryExecute(
 			this.#host,
 			LanguageService.postLanguage({
-				requestBody,
+				body,
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			return this.read(data);
 		}
 
@@ -117,7 +120,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateLanguageRequestModel = {
+		const body: UpdateLanguageRequestModel = {
 			fallbackIsoCode: model.fallbackIsoCode,
 			isDefault: model.isDefault,
 			isMandatory: model.isMandatory,
@@ -127,8 +130,8 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 		const { error } = await tryExecute(
 			this.#host,
 			LanguageService.putLanguageByIsoCode({
-				isoCode: model.unique,
-				requestBody,
+				path: { isoCode: model.unique },
+				body,
 			}),
 		);
 
@@ -151,7 +154,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 		return tryExecute(
 			this.#host,
 			LanguageService.deleteLanguageByIsoCode({
-				isoCode: unique,
+				path: { isoCode: unique },
 			}),
 		);
 	}

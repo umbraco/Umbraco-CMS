@@ -43,7 +43,7 @@ export class UmbStylesheetItemServerDataSource implements UmbItemDataSource<UmbS
 		const { data, error } = await tryExecute(
 			this.#host,
 			StylesheetService.getItemStylesheet({
-				path: paths,
+				query: { path: paths },
 			}),
 		);
 

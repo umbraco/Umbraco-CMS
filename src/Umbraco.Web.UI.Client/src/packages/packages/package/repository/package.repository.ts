@@ -3,20 +3,19 @@ import { UMB_PACKAGE_STORE_TOKEN } from './package.store.context-token.js';
 import { UmbPackageServerDataSource } from './sources/package.server.data.js';
 import type { UmbPackageStore } from './package.store.js';
 import { isManifestBaseType } from '@umbraco-cms/backoffice/extension-api';
-import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 /**
  * A repository for Packages which mimics a tree store.
- 
+
  */
 export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 	#init!: Promise<void>;
 	#packageStore?: UmbPackageStore;
 	#packageSource: UmbPackageServerDataSource;
-	#apiBaseUrl = OpenAPI.BASE;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -111,6 +110,14 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 			store.appendItems(packages.filter((p) => p.name?.length));
 			const extensions: ManifestBase[] = [];
 
+			const serverContext = await this.getContext(UMB_SERVER_CONTEXT);
+
+			if (!serverContext) {
+				return;
+			}
+
+			const serverUrl = serverContext.getServerUrl();
+
 			packages.forEach((p) => {
 				p.extensions?.forEach((e) => {
 					// Crudely validate that the extension at least follows a basic manifest structure
@@ -122,17 +129,17 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 						 */
 						// Add base url if the js path is relative
 						if ('js' in e && typeof e.js === 'string' && !e.js.startsWith('http')) {
-							e.js = `${this.#apiBaseUrl}${e.js}`;
+							e.js = `${serverUrl}${e.js}`;
 						}
 
 						// Add base url if the element path is relative
 						if ('element' in e && typeof e.element === 'string' && !e.element.startsWith('http')) {
-							e.element = `${this.#apiBaseUrl}${e.element}`;
+							e.element = `${serverUrl}${e.element}`;
 						}
 
 						// Add base url if the element path api relative
 						if ('api' in e && typeof e.api === 'string' && !e.api.startsWith('http')) {
-							e.api = `${this.#apiBaseUrl}${e.api}`;
+							e.api = `${serverUrl}${e.api}`;
 						}
 
 						extensions.push(e);

@@ -7,7 +7,7 @@ import type {
 } from './types.js';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbTreeServerDataSourceBaseArgs<
 	ServerTreeItemType extends { hasChildren: boolean },
@@ -16,9 +16,13 @@ export interface UmbTreeServerDataSourceBaseArgs<
 	TreeChildrenOfRequestArgsType extends UmbTreeChildrenOfRequestArgs = UmbTreeChildrenOfRequestArgs,
 	TreeAncestorsOfRequestArgsType extends UmbTreeAncestorsOfRequestArgs = UmbTreeAncestorsOfRequestArgs,
 > {
-	getRootItems: (args: TreeRootItemsRequestArgsType) => Promise<UmbPagedModel<ServerTreeItemType>>;
-	getChildrenOf: (args: TreeChildrenOfRequestArgsType) => Promise<UmbPagedModel<ServerTreeItemType>>;
-	getAncestorsOf: (args: TreeAncestorsOfRequestArgsType) => Promise<Array<ServerTreeItemType>>;
+	getRootItems: (
+		args: TreeRootItemsRequestArgsType,
+	) => Promise<UmbDataSourceResponse<UmbPagedModel<ServerTreeItemType>>>;
+	getChildrenOf: (
+		args: TreeChildrenOfRequestArgsType,
+	) => Promise<UmbDataSourceResponse<UmbPagedModel<ServerTreeItemType>>>;
+	getAncestorsOf: (args: TreeAncestorsOfRequestArgsType) => Promise<UmbDataSourceResponse<Array<ServerTreeItemType>>>;
 	mapper: (item: ServerTreeItemType) => ClientTreeItemType;
 }
 

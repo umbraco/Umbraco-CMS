@@ -32,11 +32,13 @@ export class UmbMediaAuditLogServerDataSource implements UmbAuditLogDataSource<U
 		const { data, error } = await tryExecute(
 			this.#host,
 			MediaService.getMediaByIdAuditLog({
-				id: args.unique,
-				orderDirection: args.orderDirection as DirectionModel, // TODO: fix this type cast
-				sinceDate: args.sinceDate,
-				skip: args.skip,
-				take: args.take,
+				path: { id: args.unique },
+				query: {
+					orderDirection: args.orderDirection as DirectionModel, // TODO: fix this type cast
+					sinceDate: args.sinceDate,
+					skip: args.skip,
+					take: args.take,
+				},
 			}),
 		);
 

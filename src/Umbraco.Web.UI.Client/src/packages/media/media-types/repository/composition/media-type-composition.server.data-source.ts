@@ -39,7 +39,7 @@ export class UmbMediaTypeCompositionServerDataSource
 	async getReferences(unique: string) {
 		const response = await tryExecute(
 			this.#host,
-			MediaTypeService.getMediaTypeByIdCompositionReferences({ id: unique }),
+			MediaTypeService.getMediaTypeByIdCompositionReferences({ path: { id: unique } }),
 		);
 		const error = response.error;
 		const data: Array<UmbMediaTypeCompositionReferenceModel> | undefined = response.data?.map((reference) => {
@@ -54,19 +54,19 @@ export class UmbMediaTypeCompositionServerDataSource
 	}
 	/**
 	 * Updates the compositions for a media type on the server
-	 * @param {MediaTypeCompositionRequestModel} requestBody
+	 * @param {MediaTypeCompositionRequestModel} body
 	 * @param args
 	 * @returns {*}
 	 * @memberof UmbMediaTypeCompositionServerDataSource
 	 */
 	async availableCompositions(args: UmbMediaTypeAvailableCompositionRequestModel) {
-		const requestBody: MediaTypeCompositionRequestModel = {
+		const body: MediaTypeCompositionRequestModel = {
 			id: args.unique,
 			currentCompositeIds: args.currentCompositeUniques,
 			currentPropertyAliases: args.currentPropertyAliases,
 		};
 
-		const response = await tryExecute(this.#host, MediaTypeService.postMediaTypeAvailableCompositions({ requestBody }));
+		const response = await tryExecute(this.#host, MediaTypeService.postMediaTypeAvailableCompositions({ body }));
 		const error = response.error;
 		const data: Array<UmbMediaTypeCompositionCompatibleModel> | undefined = response.data?.map((composition) => {
 			return {

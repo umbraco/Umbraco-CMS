@@ -35,7 +35,7 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 	private async _changeProfilingStatus() {
 		const { error } = await tryExecute(
 			this,
-			ProfilingService.putProfilingStatus({ requestBody: { enabled: !this._profilingStatus } }),
+			ProfilingService.putProfilingStatus({ body: { enabled: !this._profilingStatus } }),
 		);
 
 		if (error) {

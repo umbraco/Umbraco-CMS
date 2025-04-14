@@ -28,7 +28,7 @@ export class UmbDataTypeReferenceServerDataSource extends UmbControllerBase impl
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>> {
 		const { data, error } = await tryExecute(
 			this,
-			DataTypeService.getDataTypeByIdReferencedBy({ id: unique, skip, take }),
+			DataTypeService.getDataTypeByIdReferencedBy({ path: { id: unique }, query: { skip, take } }),
 		);
 
 		if (data) {
