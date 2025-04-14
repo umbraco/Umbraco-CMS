@@ -4,7 +4,7 @@
  * Copyright © 2016-2023 Lee Kelleher
  * Copyright © 2024 Umbraco A/S
  * Originally licensed under the Mozilla Public License, v. 2.0
- * Relicensed under the MIT License with permission from Lee Kelleher
+ * Relicensed under the MIT License with permission from the copyright holder.
  */
 
 export interface IFormatBytesOptions {
