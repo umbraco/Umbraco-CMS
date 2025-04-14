@@ -51,10 +51,15 @@ function getImportsInFile(filePath) {
 	if (!['.ts'].includes(ext)) return [];
 
 	const content = fs.readFileSync(filePath, 'utf-8');
+
+	// remove all comments from the content
+	const regex = /\/\/.*|\/\*[\s\S]*?\*\//gm;
+	const cleanedContent = content.replace(regex, '');
+
 	const imports = [];
 
 	let match;
-	while ((match = importRegex.exec(content)) !== null) {
+	while ((match = importRegex.exec(cleanedContent)) !== null) {
 		imports.push({ type: 'import', value: match[1] });
 	}
 
