@@ -3,7 +3,7 @@ import type { UmbInputImageCropperFieldElement } from './image-cropper-field.ele
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { assignToFrozenObject } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFileDropzoneItemStatus, UmbInputDropzoneDashedStyles } from '@umbraco-cms/backoffice/dropzone';
+import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
@@ -146,7 +146,7 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	#renderDropzone() {
 		return html`
 			<umb-input-dropzone
-				id="dropzone"
+				standalone
 				accept=${ifDefined(this._accept)}
 				disable-folder-upload
 				@change="${this.#onUpload}"></umb-input-dropzone>
@@ -185,7 +185,6 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 
 	static override readonly styles = [
 		UmbTextStyles,
-		UmbInputDropzoneDashedStyles,
 		css`
 			#loader {
 				display: flex;
