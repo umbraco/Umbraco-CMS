@@ -16,26 +16,6 @@ export interface WorkspaceAliasConditionConfig extends UmbConditionConfigBase<ty
 	oneOf?: Array<string>;
 }
 
-export type UmbWorkspaceContentTypeAliasConditionConfig =
-	UmbConditionConfigBase<'Umb.Condition.WorkspaceContentTypeAlias'> & {
-		/**
-		 * Define a content type alias in which workspace this extension should be available
-		 * @example
-		 * Depends on implementation, but i.e. "article", "image", "blockPage"
-		 */
-		match?: string;
-		/**
-		 * Define one or more content type aliases in which workspace this extension should be available
-		 * @example
-		 * ["article", "image", "blockPage"]
-		 */
-		oneOf?: Array<string>;
-	};
-/**
- * @deprecated Use `UmbWorkspaceContentTypeAliasConditionConfig` instead. This will be removed in Umbraco 17.
- */
-export type WorkspaceContentTypeAliasConditionConfig = UmbWorkspaceContentTypeAliasConditionConfig;
-
 export type UmbWorkspaceEntityTypeConditionConfig = UmbConditionConfigBase<'Umb.Condition.WorkspaceEntityType'> & {
 	/**
 	 * Define the workspace that this extension should be available in
@@ -63,7 +43,6 @@ export interface WorkspaceEntityIsNewConditionConfig extends UmbWorkspaceEntityI
 declare global {
 	interface UmbExtensionConditionConfigMap {
 		umbWorkspaceAlias: WorkspaceAliasConditionConfig;
-		umbWorkspaceContentTypeAlias: UmbWorkspaceContentTypeAliasConditionConfig;
 		umbWorkspaceEntityIsNewConditionConfig: UmbWorkspaceEntityIsNewConditionConfig;
 		umbWorkspaceEntityType: UmbWorkspaceEntityTypeConditionConfig;
 	}
