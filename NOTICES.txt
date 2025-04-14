@@ -260,6 +260,14 @@ Copyright: Charlie Poole, Rob Prouse and Contributors
 
 ---
 
+Open Web Components: A set of standards and libraries for building web components
+
+URL: https://open-wc.org/
+License: MIT License
+Copyright: 2018 open-wc
+
+---
+
 Openapi-ts: The OpenAPI to TypeScript codegen
 
 URL: https://github.com/hey-api/openapi-ts
