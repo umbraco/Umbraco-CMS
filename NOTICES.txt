@@ -460,6 +460,14 @@ Copyright: Gerrit Birkeland and Contributors
 
 ---
 
+Typescript: A typed superset of JavaScript that compiles to plain JavaScript
+
+URL: https://www.typescriptlang.org/
+License: Apache License, Version 2.0
+Copyright: 2012-present Microsoft Corporation
+
+---
+
 Umbraco.Code: Provides code-level tools for Umbraco
 
 URL: https://github.com/umbraco/Umbraco-Code
