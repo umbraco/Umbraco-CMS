@@ -61,7 +61,8 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	multiple: boolean = false;
 
 	/**
-	 * @description The style the dropzone with a border.
+	 * Style the dropzone with a border.
+	 * @description This is useful if you want to display the dropzone directly rather than as a part of a separate component.
 	 */
 	@property({ type: Boolean, reflect: true })
 	standalone: boolean = false;
