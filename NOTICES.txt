@@ -186,6 +186,14 @@ Copyright: 2022 Lucide Contributors
 
 ---
 
+Madge: A dependency graph generator for JavaScript
+
+URL: https://github.com/pahen/madge
+License: MIT License
+Copyright: 2017 Patrik Henningsson
+
+---
+
 MailKit: A library for sending email in .NET
 
 URL: https://github.com/jstedfast/MailKit
