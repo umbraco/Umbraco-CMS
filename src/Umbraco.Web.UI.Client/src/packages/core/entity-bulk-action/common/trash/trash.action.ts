@@ -1,6 +1,5 @@
 import type { UmbBulkTrashRepository } from './trash-repository.interface.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbEntityBulkActionBase, type UmbEntityBulkActionArgs } from '@umbraco-cms/backoffice/entity-bulk-action';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
@@ -11,6 +10,8 @@ import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { MetaEntityBulkActionTrashKind } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { UmbEntityBulkActionBase } from '../../entity-bulk-action-base.js';
+import type { UmbEntityBulkActionArgs } from '../../types.js';
 
 /**
  * @deprecated since v15.3.0. Will be removed in v17.0.0. import `UmbMediaTrashEntityBulkAction` from @umbraco-cms/backoffice/recycle-bin instead.

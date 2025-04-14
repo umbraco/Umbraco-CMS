@@ -23,25 +23,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
-		name: 'Example Manipulate Document Property Value Readonly Permissions Workspace Action',
-		alias: 'example.workspaceAction.manipulate.readonly',
-		weight: 1000,
-		api: () => import('./manipulate-property-readonly-permissions-action.js'),
-		meta: {
-			label: 'Toggle readonly RTE',
-			look: 'primary',
-			color: 'danger',
-		},
-		conditions: [
-			{
-				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: 'Umb.Workspace.Document',
-			},
-		],
-	},
-	{
-		type: 'workspaceAction',
-		kind: 'default',
 		name: 'Example Manipulate Document Property Value View Permissions Workspace Action',
 		alias: 'example.workspaceAction.manipulate.view',
 		weight: 1000,

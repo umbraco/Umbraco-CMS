@@ -1,16 +1,13 @@
+import type { UmbApiConstructorArgumentsMethodType } from '../functions/index.js';
+import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
+import type { ManifestApi, ManifestBase } from '../types/index.js';
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import {
 	type PermittedControllerType,
 	UmbBaseExtensionsInitializer,
+	type UmbBaseExtensionsInitializerArgs,
 } from './base-extensions-initializer.controller.js';
 import { UmbExtensionApiInitializer } from './extension-api-initializer.controller.js';
-import type {
-	ManifestApi,
-	ManifestBase,
-	UmbApiConstructorArgumentsMethodType,
-	UmbBaseExtensionsInitializerArgs,
-	UmbExtensionRegistry,
-} from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

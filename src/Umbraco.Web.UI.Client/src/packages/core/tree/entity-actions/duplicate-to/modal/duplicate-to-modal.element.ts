@@ -2,9 +2,8 @@ import type { UmbDuplicateToModalData, UmbDuplicateToModalValue } from './duplic
 import { html, customElement, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeElement } from '../../../tree.element.js';
 
 const elementName = 'umb-duplicate-to-modal';
 @customElement(elementName)

@@ -30,8 +30,8 @@ export class UmbMemberGroupCollectionServerDataSource implements UmbCollectionDa
 	 * @returns {*}
 	 * @memberof UmbMemberGroupCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbMemberGroupCollectionFilterModel) {
-		const { data, error } = await tryExecute(this.#host, MemberGroupService.getMemberGroup(filter));
+	async getCollection(query: UmbMemberGroupCollectionFilterModel) {
+		const { data, error } = await tryExecute(this.#host, MemberGroupService.getMemberGroup({ query }));
 
 		if (error) {
 			return { error };

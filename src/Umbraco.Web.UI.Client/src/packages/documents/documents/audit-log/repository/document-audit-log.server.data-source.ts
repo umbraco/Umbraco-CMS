@@ -32,11 +32,13 @@ export class UmbDocumentAuditLogServerDataSource implements UmbAuditLogDataSourc
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentService.getDocumentByIdAuditLog({
-				id: args.unique,
-				orderDirection: args.orderDirection as DirectionModel, // TODO: Fix type cast
-				sinceDate: args.sinceDate,
-				skip: args.skip,
-				take: args.take,
+				path: { id: args.unique },
+				query: {
+					orderDirection: args.orderDirection as DirectionModel, // TODO: Fix type cast
+					sinceDate: args.sinceDate,
+					skip: args.skip,
+					take: args.take,
+				},
 			}),
 		);
 

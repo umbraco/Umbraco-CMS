@@ -17,7 +17,7 @@ export class UmbHealthCheckContext extends UmbControllerBase implements UmbApi {
 	public readonly results = this.#results.asObservable();
 
 	async getGroupChecks(name: string) {
-		const { data } = await tryExecute(this, HealthCheckService.getHealthCheckGroupByName({ name }));
+		const { data } = await tryExecute(this, HealthCheckService.getHealthCheckGroupByName({ path: { name } }));
 
 		if (data) {
 			this.#checks.setValue(data);
@@ -27,7 +27,7 @@ export class UmbHealthCheckContext extends UmbControllerBase implements UmbApi {
 	}
 
 	async checkGroup(name: string) {
-		const { data } = await tryExecute(this, HealthCheckService.postHealthCheckGroupByNameCheck({ name }));
+		const { data } = await tryExecute(this, HealthCheckService.postHealthCheckGroupByNameCheck({ path: { name } }));
 
 		if (data) {
 			this.#results.setValue(data);

@@ -43,7 +43,7 @@ export class UmbPartialViewItemServerDataSource implements UmbItemDataSource<Umb
 		const { data, error } = await tryExecute(
 			this.#host,
 			PartialViewService.getItemPartialView({
-				path: paths,
+				query: { path: paths },
 			}),
 		);
 

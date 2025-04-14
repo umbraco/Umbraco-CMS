@@ -31,8 +31,8 @@ export class UmbChangeUserPasswordServerDataSource {
 		return tryExecute(
 			this.#host,
 			UserService.postUserByIdChangePassword({
-				id,
-				requestBody: {
+				path: { id },
+				body: {
 					newPassword,
 				},
 			}),

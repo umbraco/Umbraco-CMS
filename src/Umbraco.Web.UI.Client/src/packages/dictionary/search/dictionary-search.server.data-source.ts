@@ -32,7 +32,7 @@ export class UmbDictionarySearchServerDataSource implements UmbSearchDataSource<
 		const { data, error } = await tryExecute(
 			this.#host,
 			DictionaryService.getDictionary({
-				filter: args.query,
+				query: { filter: args.query },
 			}),
 		);
 

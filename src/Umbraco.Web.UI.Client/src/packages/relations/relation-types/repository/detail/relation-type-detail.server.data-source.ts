@@ -31,7 +31,10 @@ export class UmbRelationTypeDetailServerDataSource implements UmbReadDetailDataS
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, RelationTypeService.getRelationTypeById({ id: unique }));
+		const { data, error } = await tryExecute(
+			this.#host,
+			RelationTypeService.getRelationTypeById({ path: { id: unique } }),
+		);
 
 		if (error || !data) {
 			return { error };

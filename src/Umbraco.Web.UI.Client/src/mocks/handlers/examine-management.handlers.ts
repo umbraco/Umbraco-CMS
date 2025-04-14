@@ -6,7 +6,7 @@ import type {
 	IndexResponseModel,
 	PagedIndexResponseModel,
 	PagedSearcherResponseModel,
-	PagedSearchResultResponseModel,
+	PagedSearchResultResponseModelReadable,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
@@ -65,7 +65,7 @@ export const handlers = [
 		if (searcherName) {
 			return res(
 				ctx.status(200),
-				ctx.json<PagedSearchResultResponseModel>({
+				ctx.json<PagedSearchResultResponseModelReadable>({
 					total: 0,
 					items: searchResultMockData,
 				}),

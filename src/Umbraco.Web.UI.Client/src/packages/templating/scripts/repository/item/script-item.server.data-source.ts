@@ -43,7 +43,7 @@ export class UmbScriptItemServerDataSource implements UmbItemDataSource<UmbScrip
 		const { data, error } = await tryExecute(
 			this.#host,
 			ScriptService.getItemScript({
-				path: paths,
+				query: { path: paths },
 			}),
 		);
 

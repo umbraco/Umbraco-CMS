@@ -38,14 +38,17 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 	 * ```
 	 */
 	async search({ query, skip, take }: { query: string; skip: number; take: number }) {
-		const { data, error } = await tryExecute(this.#host, MediaService.getItemMediaSearch({ query, skip, take }));
+		const { data, error } = await tryExecute(
+			this.#host,
+			MediaService.getItemMediaSearch({ query: { query, skip, take } }),
+		);
 		const mapped = data?.items.map((item) => mapper(item));
 		return { data: mapped, error };
 	}
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => MediaService.getItemMedia({ id: uniques });
+const getItems = (uniques: Array<string>) => MediaService.getItemMedia({ query: { id: uniques } });
 
 const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 	return {

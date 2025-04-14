@@ -29,6 +29,6 @@ export class UmbCultureServerDataSource implements UmbCultureDataSource {
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async getCollection({ skip, take }: { skip: number; take: number }) {
-		return tryExecute(this.#host, CultureService.getCulture({ skip, take }));
+		return tryExecute(this.#host, CultureService.getCulture({ query: { skip, take } }));
 	}
 }

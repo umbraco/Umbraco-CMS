@@ -1,12 +1,12 @@
 import { UmbDocumentTypeCompositionServerDataSource } from './document-type-composition.server.data-source.js';
 import type { UmbContentTypeCompositionRepository } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type {
 	UmbDocumentTypeAvailableCompositionRequestModel,
 	UmbDocumentTypeCompositionCompatibleModel,
 	UmbDocumentTypeCompositionReferenceModel,
-} from '@umbraco-cms/backoffice/document-type';
-import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+} from '../../types.js';
 
 export class UmbDocumentTypeCompositionRepository
 	extends UmbRepositoryBase

@@ -33,7 +33,7 @@ export class UmbImagingServerDataSource {
 
 		const { data, error } = await tryExecute(
 			this.#host,
-			ImagingService.getImagingResizeUrls({ id: uniques, ...imagingModel }),
+			ImagingService.getImagingResizeUrls({ query: { id: uniques, ...imagingModel } }),
 		);
 
 		if (data) {

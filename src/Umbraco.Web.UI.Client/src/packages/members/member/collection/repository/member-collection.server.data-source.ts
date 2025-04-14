@@ -31,8 +31,8 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 	 * @returns {*}
 	 * @memberof UmbMemberCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbMemberCollectionFilterModel) {
-		const { data, error } = await tryExecute(this.#host, MemberService.getFilterMember(filter));
+	async getCollection(query: UmbMemberCollectionFilterModel) {
+		const { data, error } = await tryExecute(this.#host, MemberService.getFilterMember({ query }));
 
 		if (error) {
 			return { error };

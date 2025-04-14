@@ -27,7 +27,7 @@ export class UmbUserGroupItemServerDataSource extends UmbItemServerDataSourceBas
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => UserGroupService.getItemUserGroup({ id: uniques });
+const getItems = (uniques: Array<string>) => UserGroupService.getItemUserGroup({ query: { id: uniques } });
 
 const mapper = (item: UserGroupItemResponseModel): UmbUserGroupItemModel => {
 	return {

@@ -52,7 +52,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 		const { data, error } = await tryExecute(
 			this.#host,
 			StylesheetService.getStylesheetFolderByPath({
-				path: encodeURIComponent(path),
+				path: { path: encodeURIComponent(path) },
 			}),
 		);
 
@@ -83,7 +83,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 
 		const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(parentUnique);
 
-		const requestBody: CreateStylesheetFolderRequestModel = {
+		const body: CreateStylesheetFolderRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
 			name: model.name,
 		};
@@ -91,11 +91,11 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 		const { data, error } = await tryExecute(
 			this.#host,
 			StylesheetService.postStylesheetFolder({
-				requestBody,
+				body,
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			const newPath = decodeURIComponent(data);
 			const newPathUnique = this.#serverFilePathUniqueSerializer.toUnique(newPath);
 			return this.read(newPathUnique);
@@ -119,7 +119,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 		return tryExecute(
 			this.#host,
 			StylesheetService.deleteStylesheetFolderByPath({
-				path: encodeURIComponent(path),
+				path: { path: encodeURIComponent(path) },
 			}),
 		);
 	}

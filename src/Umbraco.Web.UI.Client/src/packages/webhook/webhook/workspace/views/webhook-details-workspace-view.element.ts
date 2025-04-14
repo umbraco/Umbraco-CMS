@@ -6,9 +6,9 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
-import type { UmbWebhookDetailModel } from '@umbraco-cms/backoffice/webhook';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbWebhookDetailModel } from '../../types.js';
 
 import '@umbraco-cms/backoffice/culture';
 import '../../../components/input-webhook-headers.element.js';

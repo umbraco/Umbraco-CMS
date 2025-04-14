@@ -47,7 +47,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 	}
 
 	#registerHealthChecks = async () => {
-		const { data } = await tryExecute(this, HealthCheckService.getHealthCheckGroup({ skip: 0, take: 9999 }));
+		const { data } = await tryExecute(this, HealthCheckService.getHealthCheckGroup({ query: { skip: 0, take: 9999 } }));
 		if (!data) return;
 		const manifests = this.#createManifests(data.items);
 		this.#register(manifests);

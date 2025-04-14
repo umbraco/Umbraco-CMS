@@ -1,18 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { isApiError, isCancelablePromise, isCancelError } from './apiTypeValidators.function.js';
-import type { UmbCancelablePromise } from './cancelable-promise.js';
+import { isApiError, isCancelablePromise, isCancelError, isProblemDetailsLike } from './apiTypeValidators.function.js';
 import { UmbApiError, UmbCancelError, UmbError } from './umb-error.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbResourceController extends UmbControllerBase {
+export class UmbResourceController<T = unknown> extends UmbControllerBase {
 	/**
 	 * The promise that is being executed.
 	 * @protected
 	 */
-	protected _promise: UmbCancelablePromise<any> | Promise<any>;
+	protected _promise;
 
-	constructor(host: UmbControllerHost, promise: Promise<unknown>, alias?: string) {
+	constructor(host: UmbControllerHost, promise: PromiseLike<T>, alias?: string) {
 		super(host, alias);
 
 		this._promise = promise;
@@ -25,8 +23,10 @@ export class UmbResourceController extends UmbControllerBase {
 	 * @returns {*} The mapped error
 	 */
 	mapToUmbError(error: unknown): UmbApiError | UmbCancelError | UmbError {
-		if (isApiError(error)) {
-			return UmbApiError.fromLegacyApiError(error as any);
+		if (isProblemDetailsLike(error)) {
+			return new UmbApiError(error.detail ?? error.title, error.status, null, error);
+		} else if (isApiError(error)) {
+			return UmbApiError.fromLegacyApiError(error as never);
 		} else if (isCancelError(error)) {
 			return UmbCancelError.fromLegacyCancelError(error);
 		} else if (UmbCancelError.isUmbCancelError(error)) {

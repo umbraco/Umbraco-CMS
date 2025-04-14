@@ -1,5 +1,5 @@
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UpgradeSettingsResponseModelReadable } from '@umbraco-cms/backoffice/external/backend-api';
 import { UpgradeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute, UmbApiError } from '@umbraco-cms/backoffice/resources';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -13,7 +13,7 @@ import './upgrader-view.element.js';
 @customElement('umb-upgrader')
 export class UmbUpgraderElement extends UmbLitElement {
 	@state()
-	private upgradeSettings?: UpgradeSettingsResponseModel;
+	private upgradeSettings?: UpgradeSettingsResponseModelReadable;
 
 	@state()
 	private fetching = true;
