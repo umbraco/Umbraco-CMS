@@ -468,6 +468,14 @@ Copyright: 2012-present Microsoft Corporation
 
 ---
 
+Typescript-eslint: A set of tools for linting TypeScript code
+
+URL: https://github.com/typescript-eslint/typescript-eslint
+License: MIT License
+Copyright: 2019 typescript-eslint and other contributors
+
+---
+
 Umbraco.Code: Provides code-level tools for Umbraco
 
 URL: https://github.com/umbraco/Umbraco-Code
