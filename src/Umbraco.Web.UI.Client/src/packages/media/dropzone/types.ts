@@ -25,16 +25,6 @@ export interface UmbUploadableFolder extends UmbUploadableItem {
 	folder: { name: string };
 }
 
-export interface UmbAllowedMediaTypesOfExtension {
-	extension: string | null; // Null is considered a folder.
-	availableMediaTypes: Array<UmbAllowedMediaTypeModel>;
-}
-
-export interface UmbAllowedChildrenOfMediaType {
-	mediaTypeUnique: string | null;
-	allowedChildren: Array<UmbAllowedMediaTypeModel>;
-}
-
 export interface UmbFileDropzoneProgress {
 	total: number;
 	completed: number;
