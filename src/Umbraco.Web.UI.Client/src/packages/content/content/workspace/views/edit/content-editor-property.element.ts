@@ -1,9 +1,9 @@
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '../../content-workspace.context-token.js';
 import { html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 @customElement('umb-content-workspace-view-edit-property')
 export class UmbContentWorkspaceViewEditPropertyElement extends UmbLitElement {
