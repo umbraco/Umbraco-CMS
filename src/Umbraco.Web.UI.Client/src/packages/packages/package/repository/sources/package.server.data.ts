@@ -8,7 +8,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Data source for packages from the server
-
+ 
  */
 export class UmbPackageServerDataSource {
 	constructor(private readonly host: UmbControllerHost) {}

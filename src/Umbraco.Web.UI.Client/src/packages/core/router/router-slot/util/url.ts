@@ -29,6 +29,7 @@ export function pathWithoutBasePath(options: Partial<ISlashOptions> = {}): strin
  *
  * To make this method more performant we could cache the anchor element.
  * As default it will return the base path with slashes in front and at the end.
+ * @param options
  */
 export function basePath(options: Partial<ISlashOptions> = {}): string {
 	return constructPathWithBasePath('.', options);
@@ -92,8 +93,10 @@ export function ensureSlash(path: string): string {
 /**
  * Makes sure that the start and end slashes are present or not depending on the options.
  * @param path
+ * @param start.start
  * @param start
  * @param end
+ * @param start.end
  */
 export function slashify(path: string, { start = true, end = true }: Partial<ISlashOptions> = {}): string {
 	path = start && !path.startsWith('/') ? `/${path}` : !start && path.startsWith('/') ? path.slice(1) : path;

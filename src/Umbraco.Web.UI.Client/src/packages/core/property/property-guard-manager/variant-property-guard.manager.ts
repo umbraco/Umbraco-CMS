@@ -1,13 +1,19 @@
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { type Observable } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyGuardRule } from './property-guard.manager.js';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { UmbGuardManagerBase } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbVariantPropertyGuardRule extends UmbPropertyGuardRule {
 	variantId?: UmbVariantId;
 }
 
+/**
+ *
+ * @param rule
+ * @param variantId
+ * @param propertyType
+ */
 function findRule(rule: UmbVariantPropertyGuardRule, variantId: UmbVariantId, propertyType: UmbReferenceByUnique) {
 	return (
 		(rule.variantId?.compare(variantId) && rule.propertyType?.unique === propertyType.unique) ||
@@ -21,14 +27,14 @@ function findRule(rule: UmbVariantPropertyGuardRule, variantId: UmbVariantId, pr
  * UmbVariantPropertyGuardManager is a class that manages the rules for variant properties.
  * @export
  * @class UmbVariantPropertyGuardManager
- * @extends {UmbGuardManagerBase<UmbVariantPropertyGuardRule>}
+ * @augments {UmbGuardManagerBase<UmbVariantPropertyGuardRule>}
  */
 export class UmbVariantPropertyGuardManager extends UmbGuardManagerBase<UmbVariantPropertyGuardRule> {
 	/**
 	 * Checks if the variant and propertyType is permitted.
 	 * @param {UmbVariantId} variantId - The variant id to check.
 	 * @param {UmbReferenceByUnique} propertyType - The property type to check.
-	 * @return {Observable<boolean>} - Returns an observable that emits true if the variant and propertyType is permitted, false otherwise.
+	 * @returns {Observable<boolean>} - Returns an observable that emits true if the variant and propertyType is permitted, false otherwise.
 	 * @memberof UmbVariantPropertyGuardManager
 	 */
 	isPermittedForVariantAndProperty(variantId: UmbVariantId, propertyType: UmbReferenceByUnique): Observable<boolean> {
@@ -39,7 +45,7 @@ export class UmbVariantPropertyGuardManager extends UmbGuardManagerBase<UmbVaria
 	 * Checks if the variant and propertyType is permitted.
 	 * @param {UmbVariantId} variantId - The variant id to check.
 	 * @param {UmbReferenceByUnique} propertyType - The property type to check.
-	 * @return {boolean} - Returns true if the variant and propertyType is permitted, false otherwise.
+	 * @returns {boolean} - Returns true if the variant and propertyType is permitted, false otherwise.
 	 * @memberof UmbVariantPropertyGuardManager
 	 */
 	getIsPermittedForVariantAndProperty(variantId: UmbVariantId, propertyType: UmbReferenceByUnique): boolean {

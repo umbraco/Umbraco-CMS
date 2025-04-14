@@ -1,13 +1,13 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../tree/index.js';
-import type { UmbDocumentTypeCreateOptionsModalData } from './constants.js';
-import { html, customElement, map } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 import {
 	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
 	type UmbCreateDocumentTypeWorkspacePresetType,
 } from '../../../paths.js';
 import type { UmbDocumentTypeEntityTypeUnion } from '../../../entity.js';
+import type { UmbDocumentTypeCreateOptionsModalData } from './constants.js';
+import { html, customElement, map } from '@umbraco-cms/backoffice/external/lit';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 
 // Include the types from the DocumentTypeWorkspacePresetType + folder.
 type OptionsPresetType = UmbCreateDocumentTypeWorkspacePresetType | 'folder' | null;
