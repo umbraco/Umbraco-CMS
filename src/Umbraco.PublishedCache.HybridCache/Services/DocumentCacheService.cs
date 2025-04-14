@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -115,12 +115,9 @@ internal sealed class DocumentCacheService : IDocumentCacheService
                 // When unpublishing a node, a payload with RefreshBranch is published, so we don't have to worry about this.
                 // Similarly, when a branch is published, next time the content is requested, the parent will be published,
                 // this works because we don't cache null values.
-                if (preview is false && contentCacheNode is not null)
+                if (preview is false && contentCacheNode is not null && HasPublishedAncestorPath(contentCacheNode.Key) is false)
                 {
-                    if (HasPublishedAncestorPath(contentCacheNode.Key) is false)
-                    {
-                        return null;
-                    }
+                    contentCacheNode = null;
                 }
 
                 scope.Complete();
