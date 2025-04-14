@@ -284,6 +284,14 @@ Copyright: Kévin Chalet
 
 ---
 
+Playwright: A Node.js library to automate browser testing
+
+URL: https://playwright.dev/
+License: Apache License, Version 2.0
+Copyright: 2025 Microsoft Corporation
+
+---
+
 rxjs: Reactive Extensions for JavaScript
 
 URL: https://rxjs.dev/
