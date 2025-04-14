@@ -33,6 +33,14 @@ Copyright: .NET Foundation and contributors
 
 ---
 
+Babel: A JavaScript compiler
+
+URL: https://babeljs.io/
+License: MIT License
+Copyright: 2014-present Sebastian McKenzie and other contributors
+
+---
+
 BenchmarkDotNet: Powerful .NET library for benchmarking
 
 URL: https://github.com/dotnet/BenchmarkDotNet
