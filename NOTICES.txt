@@ -129,7 +129,7 @@ Copyright: 2017 Milosz Krajewski
 
 ---
 
-lit: A simple library for building fast, lightweight web components
+Lit: A simple library for building fast, lightweight web components
 
 URL: https://lit.dev
 License: BSD 3-Clause License
@@ -292,7 +292,7 @@ Copyright: 2016 Richard Morris
 
 ---
 
-tinymce, version 6.x: A rich text editor for the web
+TinyMCE, version 6.x: A rich text editor for the web
 
 URL: https://www.tiny.cloud/
 License: MIT License
@@ -300,7 +300,7 @@ Copyright: 2022 Ephox Corporation DBA Tiny Technologies, Inc.
 
 ---
 
-tiptap: A renderless rich-text editor for the web
+Tiptap: A renderless rich-text editor for the web
 
 URL: https://tiptap.dev/
 License: MIT License
