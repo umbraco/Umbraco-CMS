@@ -13,7 +13,6 @@ import { manifests as pickerManifests } from './picker/manifests.js';
 import { manifests as propertyActionManifests } from './property-action/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
 import { manifests as propertyManifests } from './property/manifests.js';
-import { manifests as propertyTypeManifests } from './property-type/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as sectionManifests } from './section/manifests.js';
 import { manifests as serverFileSystemManifests } from './server-file-system/manifests.js';
@@ -40,7 +39,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...propertyActionManifests,
 	...propertyEditorManifests,
 	...propertyManifests,
-	...propertyTypeManifests,
 	...recycleBinManifests,
 	...sectionManifests,
 	...serverFileSystemManifests,
