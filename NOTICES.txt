@@ -89,6 +89,14 @@ Copyright: 2021 Caleb Williams
 
 ---
 
+Eslint: A tool for identifying and reporting on patterns in JavaScript
+
+URL: https://eslint.org/
+License: MIT License
+Copyright: OpenJS Foundation and other contributors
+
+---
+
 Examine: A search and indexing library for .NET
 
 URL: https://github.com/Shazwazza/Examine
