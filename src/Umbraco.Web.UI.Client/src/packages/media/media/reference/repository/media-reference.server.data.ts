@@ -27,7 +27,10 @@ export class UmbMediaReferenceServerDataSource extends UmbControllerBase impleme
 		skip: number = 0,
 		take: number = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>> {
-		const { data, error } = await tryExecute(this, MediaService.getMediaByIdReferencedBy({ id: unique, skip, take }));
+		const { data, error } = await tryExecute(
+			this,
+			MediaService.getMediaByIdReferencedBy({ path: { id: unique }, query: { skip, take } }),
+		);
 
 		if (data) {
 			const promises = data.items.map(async (item) => {
@@ -65,7 +68,10 @@ export class UmbMediaReferenceServerDataSource extends UmbControllerBase impleme
 		skip: number = 0,
 		take: number = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>> {
-		const { data, error } = await tryExecute(this, MediaService.getMediaAreReferenced({ id: uniques, skip, take }));
+		const { data, error } = await tryExecute(
+			this,
+			MediaService.getMediaAreReferenced({ query: { id: uniques, skip, take } }),
+		);
 
 		if (data) {
 			const items: Array<UmbEntityModel> = data.items.map((item) => {
@@ -96,7 +102,7 @@ export class UmbMediaReferenceServerDataSource extends UmbControllerBase impleme
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>> {
 		const { data, error } = await tryExecute(
 			this,
-			MediaService.getMediaByIdReferencedDescendants({ id: unique, skip, take }),
+			MediaService.getMediaByIdReferencedDescendants({ path: { id: unique }, query: { skip, take } }),
 		);
 
 		if (data) {

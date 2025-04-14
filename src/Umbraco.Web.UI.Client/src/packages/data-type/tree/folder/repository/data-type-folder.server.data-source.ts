@@ -52,7 +52,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<Um
 		const { data, error } = await tryExecute(
 			this.#host,
 			DataTypeService.getDataTypeFolderById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 
@@ -80,7 +80,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<Um
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.name) throw new Error('Name is missing');
 
-		const requestBody = {
+		const body = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			name: model.name,
@@ -89,7 +89,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<Um
 		const { error } = await tryExecute(
 			this.#host,
 			DataTypeService.postDataTypeFolder({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -114,8 +114,8 @@ export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<Um
 		const { error } = await tryExecute(
 			this.#host,
 			DataTypeService.putDataTypeFolderById({
-				id: model.unique,
-				requestBody: { name: model.name },
+				path: { id: model.unique },
+				body: { name: model.name },
 			}),
 		);
 
@@ -137,7 +137,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<Um
 		return tryExecute(
 			this.#host,
 			DataTypeService.deleteDataTypeFolderById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

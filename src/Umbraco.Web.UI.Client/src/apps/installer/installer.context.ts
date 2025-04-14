@@ -1,5 +1,8 @@
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { InstallSettingsResponseModel, InstallRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	InstallSettingsResponseModel,
+	InstallRequestModelReadable,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { InstallService, TelemetryLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute, UmbApiError, type UmbProblemDetails } from '@umbraco-cms/backoffice/resources';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -12,7 +15,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
  * @class UmbInstallerContext
  */
 export class UmbInstallerContext extends UmbContextBase<UmbInstallerContext, typeof UMB_INSTALLER_CONTEXT> {
-	private _data = new UmbObjectState<InstallRequestModel>({
+	private _data = new UmbObjectState<InstallRequestModelReadable>({
 		user: { name: '', email: '', password: '', subscribeToNewsletter: false },
 		database: { id: '', providerName: '', useIntegratedAuthentication: false, trustServerCertificate: false },
 		telemetryLevel: TelemetryLevelModel.DETAILED,
@@ -87,7 +90,7 @@ export class UmbInstallerContext extends UmbContextBase<UmbInstallerContext, typ
 	 * @param {Partial<InstallRequestModel>} data The data to set
 	 * @memberof UmbInstallerContext
 	 */
-	public appendData(data: Partial<InstallRequestModel>): void {
+	public appendData(data: Partial<InstallRequestModelReadable>): void {
 		this._data.setValue({ ...this.getData(), ...data });
 	}
 
@@ -97,12 +100,12 @@ export class UmbInstallerContext extends UmbContextBase<UmbInstallerContext, typ
 	 * @returns {*}  {PostInstallRequest}
 	 * @memberof UmbInstallerContext
 	 */
-	public getData(): InstallRequestModel {
+	public getData(): InstallRequestModelReadable {
 		return this._data.getValue();
 	}
 
 	public async postInstallSetup(): Promise<boolean> {
-		const { error } = await tryExecute(this, InstallService.postInstallSetup({ requestBody: this.getData() }), {
+		const { error } = await tryExecute(this, InstallService.postInstallSetup({ body: this.getData() }), {
 			disableNotifications: true,
 		});
 		if (error) {

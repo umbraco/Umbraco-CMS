@@ -37,7 +37,7 @@ export class UmbDocumentRecycleBinTreeServerDataSource extends UmbTreeServerData
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	DocumentService.getRecycleBinDocumentRoot({ skip: args.skip, take: args.take });
+	DocumentService.getRecycleBinDocumentRoot({ query: { skip: args.skip, take: args.take } });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parent.unique === null) {
@@ -45,9 +45,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DocumentService.getRecycleBinDocumentChildren({
-			parentId: args.parent.unique,
-			skip: args.skip,
-			take: args.take,
+			query: { parentId: args.parent.unique, skip: args.skip, take: args.take },
 		});
 	}
 };
@@ -55,7 +53,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	DocumentService.getTreeDocumentAncestors({
-		descendantId: args.treeItem.unique,
+		query: { descendantId: args.treeItem.unique },
 	});
 
 const mapper = (item: DocumentRecycleBinItemResponseModel): UmbDocumentRecycleBinTreeItemModel => {

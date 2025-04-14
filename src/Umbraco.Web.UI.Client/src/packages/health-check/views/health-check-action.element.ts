@@ -17,10 +17,7 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 	private async _onActionClick(e: SubmitEvent) {
 		e.preventDefault();
 		this._buttonState = 'waiting';
-		const { error } = await tryExecute(
-			this,
-			HealthCheckService.postHealthCheckExecuteAction({ requestBody: this.action }),
-		);
+		const { error } = await tryExecute(this, HealthCheckService.postHealthCheckExecuteAction({ body: this.action }));
 
 		if (error) {
 			this._buttonState = 'failed';

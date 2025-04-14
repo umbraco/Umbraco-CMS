@@ -32,7 +32,7 @@ const getItems = (uniques: Array<string>) => {
 	const path = uniques.map((unique) => serializer.toServerPath(unique)!);
 
 	/* eslint-disable local-rules/no-direct-api-import */
-	return StaticFileService.getItemStaticFile({ path });
+	return StaticFileService.getItemStaticFile({ query: { path } });
 };
 
 const mapper = (item: StaticFileItemResponseModel): UmbStaticFileItemModel => {

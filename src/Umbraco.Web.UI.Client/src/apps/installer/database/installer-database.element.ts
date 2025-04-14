@@ -1,9 +1,9 @@
 import type { UmbInstallerContext } from '../installer.context.js';
 import { UMB_INSTALLER_CONTEXT } from '../installer.context.js';
+
 import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, nothing, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
-
 import type {
 	DatabaseInstallRequestModel,
 	DatabaseSettingsPresentationModel,
@@ -165,7 +165,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 
 				const { error } = await tryExecute(
 					this,
-					InstallService.postInstallValidateDatabase({ requestBody: databaseDetails }),
+					InstallService.postInstallValidateDatabase({ body: databaseDetails }),
 					{ disableNotifications: true },
 				);
 

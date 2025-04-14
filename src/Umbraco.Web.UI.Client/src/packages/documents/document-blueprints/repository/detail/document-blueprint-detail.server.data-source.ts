@@ -80,7 +80,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 
 		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentBlueprintService.getDocumentBlueprintById({ id: unique }),
+			DocumentBlueprintService.getDocumentBlueprintById({ path: { id: unique } }),
 		);
 
 		if (error || !data) {
@@ -133,7 +133,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		if (!model.unique) throw new Error('Document unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateDocumentBlueprintRequestModel = {
+		const body: CreateDocumentBlueprintRequestModel = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			documentType: { id: model.documentType.unique },
@@ -144,11 +144,11 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentBlueprintService.postDocumentBlueprint({
-				requestBody,
+				body,
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			return this.read(data);
 		}
 
@@ -166,7 +166,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateDocumentBlueprintRequestModel = {
+		const body: UpdateDocumentBlueprintRequestModel = {
 			values: model.values,
 			variants: model.variants,
 		};
@@ -174,8 +174,8 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		const { error } = await tryExecute(
 			this.#host,
 			DocumentBlueprintService.putDocumentBlueprintById({
-				id: model.unique,
-				requestBody,
+				path: { id: model.unique },
+				body,
 			}),
 		);
 
@@ -195,7 +195,6 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		// TODO: update to delete when implemented
-		return tryExecute(this.#host, DocumentBlueprintService.deleteDocumentBlueprintById({ id: unique }));
+		return tryExecute(this.#host, DocumentBlueprintService.deleteDocumentBlueprintById({ path: { id: unique } }));
 	}
 }

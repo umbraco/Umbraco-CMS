@@ -75,7 +75,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, MemberService.getMemberById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, MemberService.getMemberById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -134,7 +134,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 		if (!model) throw new Error('Member is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateMemberRequestModel = {
+		const body: CreateMemberRequestModel = {
 			id: model.unique,
 			email: model.email,
 			username: model.username,
@@ -149,11 +149,11 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 		const { data, error } = await tryExecute(
 			this.#host,
 			MemberService.postMember({
-				requestBody,
+				body,
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			return this.read(data);
 		}
 
@@ -171,7 +171,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateMemberRequestModel = {
+		const body: UpdateMemberRequestModel = {
 			email: model.email,
 			groups: model.groups,
 			isApproved: model.isApproved,
@@ -187,8 +187,8 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 		const { error } = await tryExecute(
 			this.#host,
 			MemberService.putMemberById({
-				id: model.unique,
-				requestBody,
+				path: { id: model.unique },
+				body,
 			}),
 		);
 
@@ -211,7 +211,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 		return tryExecute(
 			this.#host,
 			MemberService.deleteMemberById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

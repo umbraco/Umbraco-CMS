@@ -1,6 +1,6 @@
 import { UmbTryExecuteController } from './try-execute.controller.js';
+import type { UmbApiResponse } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
@@ -9,7 +9,7 @@ import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
  * It is useful for making requests where you want to handle errors in a consistent way.
  * @param {UmbControllerHost} host The host to use for the request.
  * @param {Promise<T>} resource The resource to request.
- * @returns {Promise<UmbDataSourceResponse<T>>} A promise that resolves with the response data or rejects with an error.
+ * @returns {Promise<UmbApiResponse<T>>} A promise that resolves with the response data or rejects with an error.
  * @template T The type of the response data.
  * @deprecated Use the {@link tryExecute} function instead and handle the error in the caller.
  * This function is kept for backwards compatibility and will be removed in a future version.
@@ -17,7 +17,7 @@ import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 export async function tryExecuteAndNotify<T>(
 	host: UmbControllerHost,
 	resource: Promise<T>,
-): Promise<UmbDataSourceResponse<T>> {
+): Promise<UmbApiResponse<T>> {
 	new UmbDeprecation({
 		deprecated: 'The tryExecuteAndNotify function is deprecated.',
 		removeInVersion: '18.0.0',
@@ -26,5 +26,5 @@ export async function tryExecuteAndNotify<T>(
 	const controller = new UmbTryExecuteController(host, resource);
 	const response = await controller.tryExecute({ disableNotifications: false });
 	controller.destroy();
-	return response as UmbDataSourceResponse<T>;
+	return response;
 }

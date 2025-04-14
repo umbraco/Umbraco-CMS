@@ -40,7 +40,10 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	}
 
 	async #getIndexData() {
-		const { data } = await tryExecute(this, IndexerService.getIndexerByIndexName({ indexName: this.indexName }));
+		const { data } = await tryExecute(
+			this,
+			IndexerService.getIndexerByIndexName({ path: { indexName: this.indexName } }),
+		);
 		return data;
 	}
 
@@ -75,7 +78,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 		this._buttonState = 'waiting';
 		const { error } = await tryExecute(
 			this,
-			IndexerService.postIndexerByIndexNameRebuild({ indexName: this.indexName }),
+			IndexerService.postIndexerByIndexNameRebuild({ path: { indexName: this.indexName } }),
 		);
 		if (error) {
 			this._buttonState = 'failed';

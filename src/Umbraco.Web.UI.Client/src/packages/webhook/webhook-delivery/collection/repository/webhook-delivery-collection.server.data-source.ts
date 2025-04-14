@@ -8,7 +8,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source that fetches the webhook delivery collection data from the server.
  * @class UmbWebhookDeliveryCollectionServerDataSource
- * @implements {UmbCollectionDataSource}
+ * @implements {UmbWebhookDeliveryCollectionServerDataSource}
  */
 export class UmbWebhookDeliveryCollectionServerDataSource implements UmbWebhookDeliveryCollectionServerDataSource {
 	#host: UmbControllerHost;
@@ -33,9 +33,8 @@ export class UmbWebhookDeliveryCollectionServerDataSource implements UmbWebhookD
 		const { data, error } = await tryExecute(
 			this.#host,
 			WebhookService.getWebhookByIdLogs({
-				id: filter.webhook.unique,
-				skip: filter.skip,
-				take: filter.take,
+				path: { id: filter.webhook.unique },
+				query: { skip: filter.skip, take: filter.take },
 			}),
 		);
 

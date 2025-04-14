@@ -27,7 +27,7 @@ export class UmbWebhookItemServerDataSource extends UmbItemServerDataSourceBase<
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => WebhookService.getItemWebhook({ id: uniques });
+const getItems = (uniques: Array<string>) => WebhookService.getItemWebhook({ query: { id: uniques } });
 
 const mapper = (item: WebhookItemResponseModel): UmbWebhookItemModel => {
 	return {

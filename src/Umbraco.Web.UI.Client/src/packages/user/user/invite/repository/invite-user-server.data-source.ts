@@ -31,7 +31,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 	async invite(request: UmbInviteUserRequestModel) {
 		if (!request) throw new Error('Request Data is missing');
 
-		const requestBody = {
+		const body = {
 			email: request.email,
 			userName: request.userName,
 			name: request.name,
@@ -44,12 +44,12 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 		const { data, error } = await tryExecute(
 			this.#host,
 			UserService.postUserInvite({
-				requestBody,
+				body,
 			}),
 		);
 
 		if (data) {
-			return this.#detailSource.read(data);
+			return this.#detailSource.read(data as never);
 		}
 
 		return { error };
@@ -65,7 +65,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 		if (!request.user.unique) throw new Error('User unique is missing');
 		if (!request) throw new Error('Request data is missing');
 
-		const requestBody = {
+		const body = {
 			user: {
 				id: request.user.unique,
 			},
@@ -75,7 +75,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 		return tryExecute(
 			this.#host,
 			UserService.postUserInviteResend({
-				requestBody,
+				body,
 			}),
 		);
 	}

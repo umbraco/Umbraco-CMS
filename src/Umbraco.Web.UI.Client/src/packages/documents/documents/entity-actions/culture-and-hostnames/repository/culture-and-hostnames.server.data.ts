@@ -27,7 +27,7 @@ export class UmbDocumentCultureAndHostnamesServerDataSource {
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecute(this.#host, DocumentService.getDocumentByIdDomains({ id: unique }));
+		return tryExecute(this.#host, DocumentService.getDocumentByIdDomains({ path: { id: unique } }));
 	}
 
 	/**
@@ -38,6 +38,6 @@ export class UmbDocumentCultureAndHostnamesServerDataSource {
 	 */
 	async update(unique: string, data: UpdateDomainsRequestModel) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecute(this.#host, DocumentService.putDocumentByIdDomains({ id: unique, requestBody: data }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdDomains({ path: { id: unique }, body: data }));
 	}
 }

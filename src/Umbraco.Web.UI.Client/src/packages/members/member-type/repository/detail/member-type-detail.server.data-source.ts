@@ -66,7 +66,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, MemberTypeService.getMemberTypeById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, MemberTypeService.getMemberTypeById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -134,7 +134,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 		if (!model) throw new Error('Member Type is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateMemberTypeRequestModel = {
+		const body: CreateMemberTypeRequestModel = {
 			alias: model.alias,
 			name: model.name,
 			description: model.description,
@@ -173,11 +173,11 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 		const { data, error } = await tryExecute(
 			this.#host,
 			MemberTypeService.postMemberType({
-				requestBody,
+				body,
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			return this.read(data);
 		}
 
@@ -195,7 +195,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateMemberTypeRequestModel = {
+		const body: UpdateMemberTypeRequestModel = {
 			alias: model.alias,
 			name: model.name,
 			description: model.description,
@@ -233,8 +233,8 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 		const { error } = await tryExecute(
 			this.#host,
 			MemberTypeService.putMemberTypeById({
-				id: model.unique,
-				requestBody,
+				path: { id: model.unique },
+				body,
 			}),
 		);
 
@@ -257,7 +257,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 		return tryExecute(
 			this.#host,
 			MemberTypeService.deleteMemberTypeById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

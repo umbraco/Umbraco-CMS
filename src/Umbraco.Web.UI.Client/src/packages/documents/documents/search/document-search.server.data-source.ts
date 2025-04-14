@@ -34,9 +34,11 @@ export class UmbDocumentSearchServerDataSource
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentService.getItemDocumentSearch({
-				query: args.query,
-				parentId: args.searchFrom?.unique ?? undefined,
-				allowedDocumentTypes: args.allowedContentTypes?.map((contentType) => contentType.unique),
+				query: {
+					query: args.query,
+					parentId: args.searchFrom?.unique ?? undefined,
+					allowedDocumentTypes: args.allowedContentTypes?.map((contentType) => contentType.unique),
+				},
 			}),
 		);
 

@@ -31,7 +31,7 @@ export class UmbEnableUserServerDataSource implements UmbEnableUserDataSource {
 		return tryExecute(
 			this.#host,
 			UserService.postUserEnable({
-				requestBody: {
+				body: {
 					userIds: userIds.map((id) => ({ id })),
 				},
 			}),

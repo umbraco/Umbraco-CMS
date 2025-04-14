@@ -115,7 +115,7 @@ export class UmbPartialViewWorkspaceContext
 		return tryExecute(
 			this,
 			PartialViewService.getPartialViewSnippetById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

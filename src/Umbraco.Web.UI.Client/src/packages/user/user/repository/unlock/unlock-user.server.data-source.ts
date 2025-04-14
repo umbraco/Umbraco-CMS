@@ -31,7 +31,7 @@ export class UmbUnlockUserServerDataSource implements UmbUnlockUserDataSource {
 		return tryExecute(
 			this.#host,
 			UserService.postUserUnlock({
-				requestBody: {
+				body: {
 					userIds: userIds.map((id) => ({ id })),
 				},
 			}),
