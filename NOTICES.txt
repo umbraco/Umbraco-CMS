@@ -340,6 +340,14 @@ Copyright: 2022 Peter Weller
 
 ---
 
+Prettier: An opinionated code formatter
+
+URL: https://prettier.io/
+License: MIT License
+Copyright: James Long and contributors
+
+---
+
 Rollup: A module bundler for JavaScript
 
 URL: https://rollupjs.org/
