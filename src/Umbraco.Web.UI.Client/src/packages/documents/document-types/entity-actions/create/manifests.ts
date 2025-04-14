@@ -10,7 +10,11 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		alias: 'Umb.EntityAction.DocumentType.Create',
 		name: 'Create Document Type Entity Action',
 		weight: 1200,
-		forEntityTypes: [UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE, UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE],
+		forEntityTypes: [
+			UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+			UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+			UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
+		],
 		meta: {
 			icon: 'icon-add',
 			label: '#actions_create',
