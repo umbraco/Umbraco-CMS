@@ -292,6 +292,14 @@ Copyright: 2025 Microsoft Corporation
 
 ---
 
+Rollup: A module bundler for JavaScript
+
+URL: https://rollupjs.org/
+License: MIT License
+Copyright: 2015-present Rollup contributors
+
+---
+
 rxjs: Reactive Extensions for JavaScript
 
 URL: https://rxjs.dev/
