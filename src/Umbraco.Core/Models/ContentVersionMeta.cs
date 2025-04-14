@@ -37,7 +37,7 @@ public class ContentVersionMeta
 
     public int UserId { get; }
 
-    public DateTime VersionDate { get; private set; }
+    public DateTime VersionDate { get; }
 
     public bool CurrentPublishedVersion { get; }
 
@@ -46,8 +46,6 @@ public class ContentVersionMeta
     public bool PreventCleanup { get; }
 
     public string? Username { get; }
-
-    public void SpecifyVersionDateKind(DateTimeKind kind) => VersionDate = DateTime.SpecifyKind(VersionDate, kind);
 
     public override string ToString() => $"ContentVersionMeta(versionId: {VersionId}, versionDate: {VersionDate:s}";
 }
