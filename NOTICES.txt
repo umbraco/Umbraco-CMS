@@ -121,6 +121,14 @@ Copyright: 2009-2023 Isaac Z. Schlueter and Contributors
 
 ---
 
+Globals: A library for managing global variables in JavaScript
+
+URL: https://github.com/sindresorhus/globals
+License: MIT License
+Copyright: Sindre Sorhus
+
+---
+
 Html Agility Pack: An HTML parser for .NET
 
 URL: https://html-agility-pack.net/
