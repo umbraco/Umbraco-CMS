@@ -1,0 +1,322 @@
+Third-Party Notices
+===================
+
+This file contains notices and attributions for third-party software used in the Umbraco CMS project.
+
+It is not a license and does not grant any rights to use the third-party software.
+
+Umbraco CMS is licensed under the MIT License, which can be found in the LICENSE file.
+
+---
+
+@openid/AppAuth-JS: An OpenID Connect and OAuth 2.0 client library for JavaScript
+
+URL: https://github.com/openid/AppAuth-JS
+License: Apache License, Version 2.0
+Copyright: 2017 Google Inc.
+
+---
+
+AutoFixture: Write maintainable unit tests, faster
+
+URL: https://github.com/AutoFixture/AutoFixture
+License: MIT License
+Copyright: 2013 Mark Seemann
+
+---
+
+Asp.Versioning.Mvc: A library for ASP.NET Core versioning
+
+URL: https://github.com/dotnet/aspnet-api-versioning
+License: MIT License
+Copyright: .NET Foundation and contributors
+
+---
+
+BenchmarkDotNet: Powerful .NET library for benchmarking
+
+URL: https://github.com/dotnet/BenchmarkDotNet
+License: MIT License
+Copyright: .NET Foundation and Contributors
+
+---
+
+Bogus: A simple and sane data generator for populating objects that supports different locales.
+
+URL: https://github.com/bchavez/Bogus
+License: MIT License
+Copyright: 2015 Brian Chavez
+
+---
+
+CommandLineParser: Terse syntax C# command line parser for .NET
+
+URL: https://github.com/commandlineparser/commandline
+License: MIT License
+Copyright: 2005-2015 Giacomo Stelluti Scala & Contributors
+
+---
+
+Dazinator.Extensions.FileProviders: A library for file provider extensions
+
+URL: https://github.com/dazinator/Dazinator.Extensions.FileProviders
+License: MIT License
+Copyright: 2016 Darrell
+
+---
+
+DomPurify: A DOM-only XSS sanitizer for HTML, MathML and SVG
+
+URL: https://github.com/cure53/DOMPurify
+License: Apache License, Version 2.0
+Copyright: 2025 Dr.-Ing. Mario Heiderich, Cure53
+
+---
+
+Examine: A search and indexing library for .NET
+
+URL: https://github.com/Shazwazza/Examine
+License: Microsoft Public License (Ms-PL)
+Copyright: 2023 Shannon Deminick
+
+---
+
+Html Agility Pack: An HTML parser for .NET
+
+URL: https://html-agility-pack.net/
+License: MIT License
+Copyright: ZZZ Projects Inc.
+
+---
+
+ImageSharp: A cross-platform library for processing images in .NET
+
+URL: https://github.com/SixLabors/ImageSharp
+License: Apache License, Version 2.0 under the Six Labors Split License
+Copyright: Six Labors
+
+---
+
+jsdiff: A JavaScript text differencing implementation
+
+URL: https://github.com/kpdecker/jsdiff
+License: BSD 3-Clause License
+Copyright: 2009-2015 Kevin Decker <kpdecker@gmail.com>
+
+---
+
+JsonPatch.Net: A library for JSON Patch (RFC 6902) in .NET
+
+URL: https://github.com/json-everything/json-everything
+License: MIT License
+Copyright: .NET Foundation and Contributors
+
+---
+
+K4os.Compression.LZ4: A fast LZ4 compression library for .NET
+
+URL: https://github.com/MiloszKrajewski/K4os.Compression.LZ4
+License: MIT License
+Copyright: 2017 Milosz Krajewski
+
+---
+
+lit: A simple library for building fast, lightweight web components
+
+URL: https://lit.dev
+License: BSD 3-Clause License
+Copyright: 2020 Google LLC. All rights reserved.
+
+---
+
+MailKit: A library for sending email in .NET
+
+URL: https://github.com/jstedfast/MailKit
+License: MIT License
+Copyright: 2013-2024 .NET Foundation and Contributors
+
+---
+
+Markdown: A library for parsing and compiling Markdown
+
+URL: https://github.com/hey-red/Markdown
+License: MIT License
+Copyright: 2018 red
+
+---
+
+marked: A markdown parser and compiler
+
+URL: https://marked.js.org/
+License: MIT License
+Copyright: 2011-2018, Christopher Jeffrey (https://github.com/chjj/)
+Copyright: 2018+, MarkedJS (https://github.com/markedjs/)
+
+---
+
+Message Pack: The extremely fast MessagePack serializer for C#
+
+URL: https://github.com/MessagePack-CSharp/MessagePack-CSharp
+License: MIT License
+Copyright: 2017 Yoshifumi Kawai and contributors
+
+---
+
+Miniprofiler: A mini profiler for .NET
+
+URL: https://github.com/MiniProfiler/dotnet
+License: MIT License
+Copyright: .NET MiniProfiler Contributors
+
+---
+
+Monaco Editor: A browser-based code editor
+
+URL: https://microsoft.github.io/monaco-editor/
+License: MIT License
+Copyright: 2016-present Microsoft Corporation
+
+---
+
+Moq: A mocking library for .NET
+
+URL: https://github.com/moq/moq
+License: BSD 3-Clause License
+Copyright: 2007 Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
+
+---
+
+NCrontab: A cron schedule parser for .NET
+
+URL: https://github.com/atifaziz/NCrontab
+License: Apache License, Version 2.0
+Copyright: 2001 The OpenSymphony Group
+Copyright: 2008 Atif Aziz
+
+---
+
+Nerdbank.GitVersioning: A library for versioning .NET projects
+
+URL: https://github.com/dotnet/Nerdbank.GitVersioning
+License: MIT License
+Copyright: .NET Foundation and Contributors
+
+---
+
+NJsonSchema: A JSON schema validator for .NET
+
+URL: https://github.com/RicoSuter/NJsonSchema
+License: MIT License
+Copyright: 2022 Rico Suter
+
+---
+
+NPoco: A micro ORM for .NET
+
+URL: https://github.com/schotime/NPoco
+License: Apache License, Version 2.0
+Copyright: Schotime
+
+---
+
+NUnit: A unit testing framework for .NET
+
+URL: https://github.com/nunit/nunit
+License: MIT License
+Copyright: Charlie Poole, Rob Prouse and Contributors
+
+---
+
+OpenIddict: A simple and flexible OpenID Connect server for ASP.NET Core
+
+URL: https://github.com/openiddict/openiddict-core
+License: Apache License, Version 2.0
+Copyright: Kévin Chalet
+
+---
+
+rxjs: Reactive Extensions for JavaScript
+
+URL: https://rxjs.dev/
+License: Apache License, Version 2.0
+Copyright: 2015-present Ben Lesh <ben@benlesh.com>, Google, Inc., Netflix, Inc., Microsoft Corp., and contributors
+
+---
+
+Serilog: A diagnostic logging library for .NET
+
+URL: https://github.com/serilog/serilog
+License: Apache License, Version 2.0
+Copyright: Serilog Contributors
+
+---
+
+StyleCop.Analyzers: Analyzers for StyleCop
+
+URL: https://github.com/DotNetAnalyzers/StyleCopAnalyzers
+License: MIT License
+Copyright: Tunnel Vision Laboratories, LLC
+
+---
+
+Swashbuckle.AspNetCore: A library for generating Swagger documentation for ASP.NET Core APIs
+
+URL: https://github.com/domaindrivendev/Swashbuckle.AspNetCore
+License: MIT License
+Copyright: 2016 Richard Morris
+
+---
+
+tinymce, version 6.x: A rich text editor for the web
+
+URL: https://www.tiny.cloud/
+License: MIT License
+Copyright: 2022 Ephox Corporation DBA Tiny Technologies, Inc.
+
+---
+
+tiptap: A renderless rich-text editor for the web
+
+URL: https://tiptap.dev/
+License: MIT License
+Copyright: 2025 Tiptap GmbH
+
+---
+
+Umbraco.Code: Provides code-level tools for Umbraco
+
+URL: https://github.com/umbraco/Umbraco-Code
+License: MIT License
+Copyright: 2005-present Umbraco A/S
+
+---
+
+Umbraco.GitVersioning.Extensions: Utilities for Nerdbank.GitVersioning
+
+URL: https://github.com/umbraco/Umbraco.GitVersioning.Extensions
+License: MIT License
+Copyright: 2005-present Umbraco A/S
+
+---
+
+Umbraco.JsonSchema.Extensions: Utilities for JSON schema generation
+
+URL: https://github.com/umbraco/Umbraco.JsonSchema.Extensions
+License: MIT License
+Copyright: 2005-present Umbraco A/S
+
+---
+
+Umbraco UI Library: A set of UI components for building web applications
+
+URL: https://uui.umbraco.com/
+License: MIT License
+Copyright: 2005-present Umbraco A/S
+
+---
+
+uuid: A library for generating unique identifiers
+
+URL: https://github.com/uuidjs/uuid
+License: MIT License
+Copyright: 2010-2020 Robert Kieffer and other contributors
