@@ -1,4 +1,5 @@
-import type { UmbDataSourceResponse, UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse } from '../data-source-response.interface.js';
+import type { UmbItemDataSource } from './item-data-source.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 

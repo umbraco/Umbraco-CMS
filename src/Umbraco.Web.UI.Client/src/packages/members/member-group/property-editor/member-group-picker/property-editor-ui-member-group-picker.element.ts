@@ -1,12 +1,12 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbInputMemberGroupElement } from '../../components/index.js';
 
 /**
  * @element umb-property-editor-ui-member-group-picker

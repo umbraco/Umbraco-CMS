@@ -1,7 +1,7 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UMB_TREE_PICKER_MODAL_ALIAS } from '@umbraco-cms/backoffice/tree';
 import type { UmbTreePickerModalValue, UmbTreePickerModalData } from '@umbraco-cms/backoffice/tree';
-import type { UmbTemplateTreeItemModel } from '@umbraco-cms/backoffice/template';
+import type { UmbTemplateTreeItemModel } from '../tree/index.js';
 
 export type UmbTemplatePickerModalData = UmbTreePickerModalData<UmbTemplateTreeItemModel>;
 export type UmbTemplatePickerModalValue = UmbTreePickerModalValue;
