@@ -372,6 +372,14 @@ Copyright: 2020 EGOIST
 
 ---
 
+Rollup-plugin-import-css: A Rollup plugin for importing CSS files
+
+URL: https://github.com/jleeson/rollup-plugin-import-css
+License: MIT License
+Copyright: 2020 Jacob Leeson
+
+---
+
 rxjs: Reactive Extensions for JavaScript
 
 URL: https://rxjs.dev/
