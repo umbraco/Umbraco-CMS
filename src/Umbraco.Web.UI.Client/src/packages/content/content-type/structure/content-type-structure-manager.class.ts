@@ -118,6 +118,7 @@ export class UmbContentTypeStructureManager<
 
 		// Observe owner content type compositions, as we only allow one level of compositions at this moment. [NL]
 		// But, we could support more, we would just need to flatMap all compositions and make sure the entries are unique and then base the observation on that. [NL]
+		// TODO: Do something like above ^^
 		this.observe(this.ownerContentTypeCompositions, (ownerContentTypeCompositions) => {
 			this.#loadContentTypeCompositions(ownerContentTypeCompositions);
 		});
@@ -235,6 +236,8 @@ export class UmbContentTypeStructureManager<
 	async #loadType(unique?: string) {
 		if (!unique) return {};
 		await this.#initRepository;
+
+		// TODO: Some way to know who are already in loading state...
 
 		// Lets initiate the content type:
 		const { data, asObservable } = await this.#repository!.requestByUnique(unique);
