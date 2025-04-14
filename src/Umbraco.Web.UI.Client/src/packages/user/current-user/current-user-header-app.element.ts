@@ -1,10 +1,10 @@
 import { UMB_CURRENT_USER_MODAL } from './modals/current-user/current-user-modal.token.js';
+import type { UmbCurrentUserModel } from './types.js';
+import { UMB_CURRENT_USER_CONTEXT } from './constants.js';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbHeaderAppButtonElement } from '@umbraco-cms/backoffice/components';
-import type { UmbCurrentUserModel } from './types.js';
-import { UMB_CURRENT_USER_CONTEXT } from './constants.js';
 
 @customElement('umb-current-user-header-app')
 export class UmbCurrentUserHeaderAppElement extends UmbHeaderAppButtonElement {

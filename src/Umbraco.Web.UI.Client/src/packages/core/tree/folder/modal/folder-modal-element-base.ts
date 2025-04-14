@@ -1,3 +1,4 @@
+import type { UmbFolderModel } from '../types.js';
 import { css, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -5,7 +6,6 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import type { UmbFolderModel } from '../types.js';
 
 export abstract class UmbFolderModalElementBase<
 	FolderModalDataType extends { folderRepositoryAlias: string },

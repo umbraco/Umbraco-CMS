@@ -1,12 +1,17 @@
 import { UmbReadOnlyGuardManager } from './readonly-guard.manager.js';
+import type { UmbGuardRule } from './guard.manager.base.js';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { mergeObservables, type Observable } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbGuardRule } from './guard.manager.base.js';
 
 export interface UmbVariantGuardRule extends UmbGuardRule {
 	variantId?: UmbVariantId;
 }
 
+/**
+ *
+ * @param rule
+ * @param variantId
+ */
 function findRule(rule: UmbVariantGuardRule, variantId: UmbVariantId) {
 	return rule.variantId?.compare(variantId) || rule.variantId === undefined;
 }
@@ -16,13 +21,13 @@ function findRule(rule: UmbVariantGuardRule, variantId: UmbVariantId) {
  * Read only guard manager for variant rules.
  * @export
  * @class UmbReadOnlyVariantGuardManager
- * @extends {UmbReadOnlyGuardManager<UmbVariantGuardRule>}
+ * @augments {UmbReadOnlyGuardManager<UmbVariantGuardRule>}
  */
 export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbVariantGuardRule> {
 	/**
 	 * Observe if the given variantId is permitted to read
 	 * @param {UmbVariantId} variantId
-	 * @return {Observable<boolean>} - Observable that emits true if the variantId is permitted to read, false otherwise
+	 * @returns {Observable<boolean>} - Observable that emits true if the variantId is permitted to read, false otherwise
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
 	isPermittedForVariant(variantId: UmbVariantId): Observable<boolean> {
@@ -33,7 +38,7 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 
 	/**
 	 * @param {Observable<UmbVariantId | undefined>} variantId
-	 * @return {Observable<boolean>} - Observable that emits true if the variantId is permitted to read, false otherwise
+	 * @returns {Observable<boolean>} - Observable that emits true if the variantId is permitted to read, false otherwise
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
 	isPermittedForObservableVariant(variantId: Observable<UmbVariantId | undefined>): Observable<boolean> {
@@ -49,7 +54,7 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 	/**
 	 * Check if the given variantId is permitted to read
 	 * @param {UmbVariantId} variantId
-	 * @return {boolean} - true if the variantId is permitted to read, false otherwise
+	 * @returns {boolean} - true if the variantId is permitted to read, false otherwise
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
 	getIsPermittedForVariant(variantId: UmbVariantId): boolean {

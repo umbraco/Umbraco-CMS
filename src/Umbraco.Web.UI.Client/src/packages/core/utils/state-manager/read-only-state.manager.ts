@@ -5,7 +5,7 @@ import { UmbStateManager } from './state.manager.js';
  * A State Manager to manage read-only states.
  * @export
  * @class UmbReadOnlyStateManager
- * @extends {UmbStateManager<StateType>}
+ * @augments {UmbStateManager<StateType>}
  * @template StateType
  */
 export class UmbReadOnlyStateManager<StateType extends UmbState> extends UmbStateManager<StateType> {
@@ -17,7 +17,7 @@ export class UmbReadOnlyStateManager<StateType extends UmbState> extends UmbStat
 
 	/**
 	 * Checks if the state is read-only
-	 * @return {boolean} - true if the state is read-only
+	 * @returns {boolean} - true if the state is read-only
 	 * @memberof UmbReadOnlyStateManager
 	 */
 	getIsReadOnly(): boolean {

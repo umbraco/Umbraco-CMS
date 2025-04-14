@@ -1,3 +1,4 @@
+import { UmbEntityBulkActionBase } from '../../entity-bulk-action-base.js';
 import type { UmbBulkDuplicateToRepository } from './duplicate-to-repository.interface.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import {
@@ -9,7 +10,6 @@ import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/tree';
 import type { MetaEntityBulkActionDuplicateToKind } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbEntityBulkActionBase } from '../../entity-bulk-action-base.js';
 
 export class UmbMediaDuplicateEntityBulkAction extends UmbEntityBulkActionBase<MetaEntityBulkActionDuplicateToKind> {
 	async execute() {

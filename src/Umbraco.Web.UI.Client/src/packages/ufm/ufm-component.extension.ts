@@ -1,5 +1,5 @@
-import type { ManifestApi, UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UfmToken } from './plugins/index.js';
+import type { ManifestApi, UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export interface UmbUfmComponentApi extends UmbApi {
 	render(token: UfmToken): string | undefined;
