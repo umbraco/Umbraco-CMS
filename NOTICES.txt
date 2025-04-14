@@ -332,6 +332,14 @@ Copyright: 2025 Microsoft Corporation
 
 ---
 
+Playwright-msw: A library to wrap Mock Service Worker with Playwright
+
+URL: https://github.com/valendres/playwright-msw
+License: MIT License
+Copyright: 2022 Peter Weller
+
+---
+
 Rollup: A module bundler for JavaScript
 
 URL: https://rollupjs.org/
