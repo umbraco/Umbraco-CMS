@@ -537,3 +537,11 @@ Vite-plugin-static-copy: A Vite plugin for copying static files
 URL: https://github.com/sapphi-red/vite-plugin-static-copy
 License: MIT License
 Copyright: 2021 sapphi-red
+
+---
+
+Vite-tsconfig-paths: A Vite plugin for resolving TypeScript paths
+
+URL: https://github.com/aleclarson/vite-tsconfig-paths
+License: MIT License
+Copyright: Alec Larson
