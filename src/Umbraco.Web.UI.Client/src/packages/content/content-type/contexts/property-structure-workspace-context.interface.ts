@@ -1,8 +1,5 @@
-import type {
-	UmbContentTypeModel,
-	UmbContentTypeStructureManager,
-	UmbPropertyTypeModel,
-} from '@umbraco-cms/backoffice/content-type';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from '../types.js';
+import type { UmbContentTypeStructureManager } from '../structure/index.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbEntityWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
