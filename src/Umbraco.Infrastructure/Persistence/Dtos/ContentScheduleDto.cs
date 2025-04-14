@@ -24,7 +24,8 @@ internal class ContentScheduleDto
     [NullSetting(NullSetting = NullSettings.Null)] // can be invariant
     public int? LanguageId { get; set; }
 
-    [Column("date", ForceToUtc = false)]
+    // NOTE: this date is explicitly stored and treated as UTC despite the lack of "Utc" postfix.
+    [Column("date")]
     public DateTime Date { get; set; }
 
     [Column("action")]
