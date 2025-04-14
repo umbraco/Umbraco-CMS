@@ -364,6 +364,14 @@ Copyright: 2015-present Rollup contributors
 
 ---
 
+Rollup-plugin-esbuild: A Rollup plugin for using esbuild
+
+URL: https://github.com/egoist/rollup-plugin-esbuild
+License: MIT License
+Copyright: 2020 EGOIST
+
+---
+
 rxjs: Reactive Extensions for JavaScript
 
 URL: https://rxjs.dev/
