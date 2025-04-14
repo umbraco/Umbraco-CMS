@@ -251,6 +251,14 @@ Copyright: 2007 Clarius Consulting, Manas Technology Solutions, InSTEDD, and Con
 
 ---
 
+Mock Service Worker (MSW): A library for mocking API requests in JavaScript
+
+URL: https://mswjs.io/
+License: MIT License
+Copyright: 2018–present Artem Zakharchenko
+
+---
+
 NCrontab: A cron schedule parser for .NET
 
 URL: https://github.com/atifaziz/NCrontab
