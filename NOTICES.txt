@@ -476,6 +476,14 @@ Copyright: 2019 typescript-eslint and other contributors
 
 ---
 
+Typescript-json-schema: A library for generating JSON schema from TypeScript types
+
+URL: https://github.com/YousefED/typescript-json-schema
+License: BSD 3-Clause License
+Copyright: 2016 typescript-json-schema contributors
+
+---
+
 Umbraco.Code: Provides code-level tools for Umbraco
 
 URL: https://github.com/umbraco/Umbraco-Code
