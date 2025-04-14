@@ -117,6 +117,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
                 // this works because we don't cache null values.
                 if (preview is false && contentCacheNode is not null && HasPublishedAncestorPath(contentCacheNode.Key) is false)
                 {
+                    // Careful not to early return here. We need to complete the scope even if returning null.
                     contentCacheNode = null;
                 }
 
