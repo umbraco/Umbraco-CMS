@@ -1,7 +1,6 @@
 import { UmbFileDropzoneItemStatus } from './constants.js';
 import type {
 	UmbUploadableFile,
-	UmbUploadableFolder,
 	UmbFileDropzoneDroppedItems,
 	UmbFileDropzoneProgress,
 	UmbUploadableItem,
