@@ -324,6 +324,14 @@ Copyright: Simple Icons Contributors
 
 ---
 
+Storybook: A UI component explorer for Web Components
+
+URL: https://storybook.js.org/
+License: MIT License
+Copyright: 2024 Storybook
+
+---
+
 StyleCop.Analyzers: Analyzers for StyleCop
 
 URL: https://github.com/DotNetAnalyzers/StyleCopAnalyzers
