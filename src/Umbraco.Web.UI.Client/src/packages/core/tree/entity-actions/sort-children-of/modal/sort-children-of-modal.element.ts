@@ -5,11 +5,11 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbTreeRepository, UmbTreeItemModel, UmbSortChildrenOfRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbDocumentTreeItemModel } from '@umbraco-cms/backoffice/document';
 import type { UmbMediaTreeItemModel } from '@umbraco-cms/backoffice/media';
+import type { UmbTreeItemModel } from '../../../types.js';
 
 const elementName = 'umb-sort-children-of-modal';
 
