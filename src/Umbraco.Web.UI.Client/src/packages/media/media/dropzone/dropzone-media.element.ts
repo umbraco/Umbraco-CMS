@@ -1,3 +1,4 @@
+import { UmbMediaDropzoneManager } from './media-dropzone.manager.js';
 import {
 	UmbInputDropzoneElement,
 	UmbFileDropzoneItemStatus,
@@ -6,7 +7,6 @@ import {
 } from '@umbraco-cms/backoffice/dropzone';
 import { css, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbMediaDropzoneManager } from './media-dropzone.manager';
 
 /**
  * A dropzone for uploading files and folders as media items. It is hidden by default and will be shown when dragging files over the window.
