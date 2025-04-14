@@ -545,3 +545,11 @@ Vite-tsconfig-paths: A Vite plugin for resolving TypeScript paths
 URL: https://github.com/aleclarson/vite-tsconfig-paths
 License: MIT License
 Copyright: Alec Larson
+
+---
+
+Web Component Analyzer: A tool for analyzing web components
+
+URL: https://github.com/runem/web-component-analyzer
+License: MIT License
+Copyright: 2019 Rune Mehlsen
