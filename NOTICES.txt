@@ -404,6 +404,14 @@ Copyright: Tunnel Vision Laboratories, LLC
 
 ---
 
+SVGO: A tool for optimizing SVG files
+
+URL: https://svgo.dev/
+License: MIT License
+Copyright: Kir Belevich
+
+---
+
 Swashbuckle.AspNetCore: A library for generating Swagger documentation for ASP.NET Core APIs
 
 URL: https://github.com/domaindrivendev/Swashbuckle.AspNetCore
