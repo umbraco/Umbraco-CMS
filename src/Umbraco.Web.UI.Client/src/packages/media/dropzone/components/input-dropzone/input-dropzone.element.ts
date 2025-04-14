@@ -320,16 +320,6 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	];
 }
 
-export const UmbInputDropzoneDashedStyles = css`
-	umb-input-dropzone {
-		position: relative;
-		display: block;
-		inset: 0;
-		cursor: pointer;
-		border: 1px dashed var(--uui-color-divider-emphasis);
-	}
-`;
-
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-input-dropzone': UmbInputDropzoneElement;
