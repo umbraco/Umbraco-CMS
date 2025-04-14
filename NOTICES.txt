@@ -73,6 +73,14 @@ Copyright: 2025 Dr.-Ing. Mario Heiderich, Cure53
 
 ---
 
+Element Internals Polyfill: A polyfill for the Element Internals API
+
+URL: https://github.com/calebdwilliams/element-internals-polyfill
+License: MIT License
+Copyright: 2021 Caleb Williams
+
+---
+
 Examine: A search and indexing library for .NET
 
 URL: https://github.com/Shazwazza/Examine
