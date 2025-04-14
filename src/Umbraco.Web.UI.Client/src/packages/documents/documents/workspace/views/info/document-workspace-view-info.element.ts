@@ -6,7 +6,7 @@ import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cm
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UMB_TEMPLATE_PICKER_MODAL, UmbTemplateItemRepository } from '@umbraco-cms/backoffice/template';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
@@ -287,8 +287,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	}
 
 	async #openTemplatePicker() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modal = modalManager.open(this, UMB_TEMPLATE_PICKER_MODAL, {
+		const result = await umbOpenModal(this, UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				multiple: false,
 				pickableFilter: (template) =>
@@ -297,9 +296,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			value: {
 				selection: [this._templateUnique],
 			},
-		});
-
-		const result = await modal?.onSubmit().catch(() => undefined);
+		}).catch(() => undefined);
 
 		if (!result?.selection.length) return;
 

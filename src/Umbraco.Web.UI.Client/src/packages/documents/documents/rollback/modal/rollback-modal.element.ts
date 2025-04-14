@@ -3,7 +3,7 @@ import { UmbRollbackRepository } from '../repository/rollback.repository.js';
 import { UmbDocumentDetailRepository } from '../../repository/index.js';
 import type { UmbDocumentDetailModel } from '../../types.js';
 import type { UmbRollbackModalData, UmbRollbackModalValue } from './types.js';
-import { diffWords, type Change } from '@umbraco-cms/backoffice/external/diff';
+import { diffWords, type UmbDiffChange } from '@umbraco-cms/backoffice/utils';
 import { css, customElement, html, nothing, repeat, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -53,7 +53,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	_availableVariants: Option[] = [];
 
 	@state()
-	_diffs: Array<{ alias: string; diff: Change[] }> = [];
+	_diffs: Array<{ alias: string; diff: UmbDiffChange[] }> = [];
 
 	#rollbackRepository = new UmbRollbackRepository(this);
 	#userItemRepository = new UmbUserItemRepository(this);
@@ -216,6 +216,9 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		}
 
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!actionEventContext) {
+			throw new Error('Action event context not found');
+		}
 
 		const reloadStructureEvent = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 		actionEventContext.dispatchEvent(reloadStructureEvent);
@@ -320,7 +323,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			throw new Error('Current name is not set');
 		}
 
-		const diffs: Array<{ alias: string; diff: Change[] }> = [];
+		const diffs: Array<{ alias: string; diff: UmbDiffChange[] }> = [];
 
 		const nameDiff = diffWords(currentName, this._selectedVersion.name);
 		diffs.push({ alias: 'name', diff: nameDiff });

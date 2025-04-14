@@ -20,12 +20,12 @@ import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
-import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 // TODO: consider moving the components to the property editor folder as they are only used here
 import '../../local-components.js';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
+import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '../../types.js';
 
 /**
  * @element umb-property-editor-ui-block-grid
@@ -58,6 +58,25 @@ export class UmbPropertyEditorUIBlockGridElement
 		//config.useLiveEditing, is covered by the EditorConfiguration of context. [NL]
 		this.#managerContext.setEditorConfiguration(config);
 	}
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @default
+	 */
+	public set readonly(value) {
+		this.#readonly = value;
+
+		if (this.#readonly) {
+			this.#managerContext.readOnlyState.fallbackToPermitted();
+		} else {
+			this.#managerContext.readOnlyState.fallbackToNotPermitted();
+		}
+	}
+	public get readonly() {
+		return this.#readonly;
+	}
+	#readonly = false;
 
 	@state()
 	private _layoutColumns?: number;
@@ -185,28 +204,6 @@ export class UmbPropertyEditorUIBlockGridElement
 					this.#managerContext.setPropertyAlias(alias);
 				},
 				'observePropertyAlias',
-			);
-
-			// If the current property is readonly all inner block content should also be readonly.
-			this.observe(
-				observeMultiple([propertyContext.isReadOnly, propertyContext.variantId]),
-				([isReadOnly, variantId]) => {
-					const unique = 'UMB_PROPERTY_EDITOR_UI';
-					if (variantId === undefined) return;
-
-					if (isReadOnly) {
-						const state = {
-							unique,
-							variantId,
-							message: '',
-						};
-
-						this.#managerContext.readOnlyState.addState(state);
-					} else {
-						this.#managerContext.readOnlyState.removeState(unique);
-					}
-				},
-				'observeIsReadOnly',
 			);
 		});
 

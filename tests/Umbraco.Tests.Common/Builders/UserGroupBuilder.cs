@@ -169,6 +169,7 @@ public class UserGroupBuilder<TParent>
         return userGroup;
     }
 
+
     private void BuildAllowedSections(UserGroup userGroup)
     {
         foreach (var section in _allowedSections)

@@ -298,7 +298,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
     private IPublishedPropertyType SetupMediaPropertyType(bool multiSelect)
     {
-        var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MediaPicker3Configuration
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MediaPicker3Configuration
         {
             Multiple = multiSelect,
             EnableLocalFocalPoint = true,

@@ -1,12 +1,10 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -22,20 +20,6 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IDocumentCollectionPresentationFactory _documentCollectionPresentationFactory;
 
-    [Obsolete("Please use the constructor taking all parameters.")]
-    public ByKeyDocumentCollectionController(
-        IContentListViewService contentListViewService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUmbracoMapper mapper)
-        : this(
-              contentListViewService,
-              backOfficeSecurityAccessor,
-              mapper,
-              StaticServiceProvider.Instance.GetRequiredService<IDocumentCollectionPresentationFactory>())
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public ByKeyDocumentCollectionController(
         IContentListViewService contentListViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,

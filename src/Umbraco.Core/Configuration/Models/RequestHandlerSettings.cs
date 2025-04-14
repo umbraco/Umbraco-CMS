@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using System.ComponentModel;
-using Umbraco.Cms.Core.Configuration.UmbracoSettings;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
@@ -99,5 +98,5 @@ public class RequestHandlerSettings
     /// <summary>
     ///     Add additional character replacements, or override defaults
     /// </summary>
-    public IEnumerable<CharItem>? UserDefinedCharCollection { get; set; }
+    public ISet<CharItem> UserDefinedCharCollection { get; set; } = new HashSet<CharItem>();
 }

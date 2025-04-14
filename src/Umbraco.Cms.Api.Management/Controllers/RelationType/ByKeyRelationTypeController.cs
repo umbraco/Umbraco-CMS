@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.RelationType;
@@ -24,16 +24,16 @@ public class ByKeyRelationTypeController : RelationTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(RelationTypeResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
+    public Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         IRelationType? relationType = _relationService.GetRelationTypeById(id);
         if (relationType is null)
         {
-            return RelationTypeNotFound();
+            return Task.FromResult(RelationTypeNotFound());
         }
 
         RelationTypeResponseModel mappedRelationType = _mapper.Map<RelationTypeResponseModel>(relationType)!;
 
-        return await Task.FromResult(Ok(mappedRelationType));
+        return Task.FromResult<IActionResult>(Ok(mappedRelationType));
     }
 }

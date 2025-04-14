@@ -33,7 +33,7 @@ public class HstsCheck : BaseHttpHeaderCheck
     ///     but then you should include subdomains and I wouldn't suggest to do that for Umbraco-sites.
     /// </remarks>
     public HstsCheck(IHostingEnvironment hostingEnvironment, ILocalizedTextService textService)
-        : base(hostingEnvironment, textService, "Strict-Transport-Security", LocalizationPrefix, true)
+        : base(hostingEnvironment, textService, "Strict-Transport-Security", LocalizationPrefix, true, false)
     {
         _hostingEnvironment = hostingEnvironment;
         _textService = textService;

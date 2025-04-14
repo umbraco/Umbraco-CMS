@@ -28,7 +28,7 @@ export class UmbMemberGroupItemServerDataSource extends UmbItemServerDataSourceB
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => MemberGroupService.getItemMemberGroup({ id: uniques });
+const getItems = (uniques: Array<string>) => MemberGroupService.getItemMemberGroup({ query: { id: uniques } });
 
 const mapper = (item: MemberGroupItemResponseModel): UmbMemberGroupItemModel => {
 	return {

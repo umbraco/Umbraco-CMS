@@ -63,14 +63,10 @@ public class MediaType : ContentTypeCompositionBase, IMediaType
     }
 
     /// <inheritdoc />
-    // This is very hacky, but we cannot override the base DeepCloneWithResetIdentities as it would be breaking.
-    // We have to be able to set a new alias when cloning system types.
-    // TODO: Make ContentTypeBase.DeepCloneWithResetIdentities overrideable.
-
-    IMediaType IMediaType.DeepCloneWithResetIdentities(string newAlias)
+    public new IMediaType DeepCloneWithResetIdentities(string newAlias)
     {
         _isCloning = true;
-        var clone = (IMediaType)DeepCloneWithResetIdentities(newAlias);
+        var clone = (IMediaType)base.DeepCloneWithResetIdentities(newAlias);
         _isCloning = false;
         return clone;
     }

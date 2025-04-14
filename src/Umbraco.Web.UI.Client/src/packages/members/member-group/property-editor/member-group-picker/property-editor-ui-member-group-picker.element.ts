@@ -1,7 +1,7 @@
+import type { UmbInputMemberGroupElement } from '../../components/index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,

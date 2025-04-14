@@ -243,7 +243,7 @@ public class MemberUserStoreTests
         };
 
         _mockMemberService.Setup(x => x.GetById(mockMember.Id)).Returns(mockMember);
-        _mockMemberService.Setup(x => x.GetByKey(mockMember.Key)).Returns(mockMember);
+        _mockMemberService.Setup(x => x.GetById(mockMember.Key)).Returns(mockMember);
         _mockMemberService.Setup(x => x.Delete(mockMember, Constants.Security.SuperUserId));
 
         // act
@@ -252,7 +252,7 @@ public class MemberUserStoreTests
         // assert
         Assert.IsTrue(identityResult.Succeeded);
         Assert.IsTrue(!identityResult.Errors.Any());
-        _mockMemberService.Verify(x => x.GetByKey(mockMember.Key));
+        _mockMemberService.Verify(x => x.GetById(mockMember.Key));
         _mockMemberService.Verify(x => x.Delete(mockMember, Constants.Security.SuperUserId));
         _mockMemberService.VerifyNoOtherCalls();
     }

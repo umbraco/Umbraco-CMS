@@ -37,9 +37,7 @@ export class UmbDocumentBlueprintTreeServerDataSource extends UmbTreeServerDataS
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	DocumentBlueprintService.getTreeDocumentBlueprintRoot({
-		foldersOnly: args.foldersOnly,
-		skip: args.skip,
-		take: args.take,
+		query: { foldersOnly: args.foldersOnly, skip: args.skip, take: args.take },
 	});
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
@@ -48,8 +46,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DocumentBlueprintService.getTreeDocumentBlueprintChildren({
-			parentId: args.parent.unique,
-			foldersOnly: args.foldersOnly,
+			query: { parentId: args.parent.unique, foldersOnly: args.foldersOnly },
 		});
 	}
 };

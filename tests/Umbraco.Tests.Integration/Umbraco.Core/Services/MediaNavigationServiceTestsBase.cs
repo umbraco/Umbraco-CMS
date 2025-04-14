@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public abstract class MediaNavigationServiceTestsBase : UmbracoIntegrationTest
+internal abstract class MediaNavigationServiceTestsBase : UmbracoIntegrationTest
 {
     protected IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 

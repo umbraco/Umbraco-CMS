@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
@@ -35,6 +35,6 @@ public class UpdateNotificationsController : DocumentControllerBase
         }
 
         _notificationService.SetNotifications(_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, content, updateModel.SubscribedActionIds);
-        return await Task.FromResult(Ok());
+        return Ok();
     }
 }

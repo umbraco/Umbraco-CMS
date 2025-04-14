@@ -1,3 +1,5 @@
+import type { UmbSortChildrenOfRepository, UmbTreeItemModel } from '../../../types.js';
+import type { UmbTreeRepository } from '../../../data/index.js';
 import type { UmbSortChildrenOfModalData, UmbSortChildrenOfModalValue } from './sort-children-of-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, css, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
@@ -5,7 +7,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbTreeRepository, UmbTreeItemModel, UmbSortChildrenOfRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbDocumentTreeItemModel } from '@umbraco-cms/backoffice/document';

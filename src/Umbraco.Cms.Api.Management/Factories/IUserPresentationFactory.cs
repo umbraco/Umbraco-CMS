@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.User;
+using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Api.Management.ViewModels.User.Item;
 using Umbraco.Cms.Core.Models;
@@ -22,7 +22,7 @@ public interface IUserPresentationFactory
 
     Task<UserConfigurationResponseModel> CreateUserConfigurationModelAsync();
 
-    Task<CurrenUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync();
+    Task<CurrentUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync();
 
     UserItemResponseModel CreateItemResponseModel(IUser user);
 

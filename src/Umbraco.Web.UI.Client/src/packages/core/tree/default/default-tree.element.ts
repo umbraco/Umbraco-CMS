@@ -59,73 +59,71 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@state()
 	private _totalPages = 1;
 
-	#treeContext?: UmbDefaultTreeContext<UmbTreeItemModel, UmbTreeRootModel>;
-	#init: Promise<unknown>;
+	@state()
+	_treeContext?: UmbDefaultTreeContext<UmbTreeItemModel, UmbTreeRootModel>;
 
 	constructor() {
 		super();
 
-		this.#init = Promise.all([
-			// TODO: Notice this can be retrieve via a api property. [NL]
-			this.consumeContext(UMB_TREE_CONTEXT, (instance) => {
-				this.#treeContext = instance;
-				this.observe(this.#treeContext.treeRoot, (treeRoot) => (this._treeRoot = treeRoot));
-				this.observe(this.#treeContext.rootItems, (rootItems) => (this._rootItems = rootItems));
-				this.observe(this.#treeContext.pagination.currentPage, (value) => (this._currentPage = value));
-				this.observe(this.#treeContext.pagination.totalPages, (value) => (this._totalPages = value));
-			}).asPromise(),
-		]);
+		// TODO: Notice this can be retrieve via a api property. [NL]
+		this.consumeContext(UMB_TREE_CONTEXT, (instance) => {
+			this._treeContext = instance;
+			this.observe(this._treeContext.treeRoot, (treeRoot) => (this._treeRoot = treeRoot));
+			this.observe(this._treeContext.rootItems, (rootItems) => (this._rootItems = rootItems));
+			this.observe(this._treeContext.pagination.currentPage, (value) => (this._currentPage = value));
+			this.observe(this._treeContext.pagination.totalPages, (value) => (this._totalPages = value));
+		});
 	}
 
 	protected override async updated(
 		_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
 	): Promise<void> {
 		super.updated(_changedProperties);
-		await this.#init;
+		if (this._treeContext === undefined) return;
 
 		if (_changedProperties.has('selectionConfiguration')) {
 			this._selectionConfiguration = this.selectionConfiguration;
 
-			this.#treeContext!.selection.setMultiple(this._selectionConfiguration.multiple ?? false);
-			this.#treeContext!.selection.setSelectable(this._selectionConfiguration.selectable ?? true);
-			this.#treeContext!.selection.setSelection(this._selectionConfiguration.selection ?? []);
+			this._treeContext!.selection.setMultiple(this._selectionConfiguration.multiple ?? false);
+			this._treeContext!.selection.setSelectable(this._selectionConfiguration.selectable ?? true);
+			this._treeContext!.selection.setSelection(this._selectionConfiguration.selection ?? []);
 		}
 
 		if (_changedProperties.has('startNode')) {
-			this.#treeContext!.setStartNode(this.startNode);
+			this._treeContext!.setStartNode(this.startNode);
 		}
 
 		if (_changedProperties.has('hideTreeRoot')) {
-			this.#treeContext!.setHideTreeRoot(this.hideTreeRoot);
+			this._treeContext!.setHideTreeRoot(this.hideTreeRoot);
 		}
 
 		if (_changedProperties.has('expandTreeRoot')) {
-			this.#treeContext!.setExpandTreeRoot(this.expandTreeRoot);
+			this._treeContext!.setExpandTreeRoot(this.expandTreeRoot);
 		}
 
 		if (_changedProperties.has('foldersOnly')) {
-			this.#treeContext!.setFoldersOnly(this.foldersOnly ?? false);
+			this._treeContext!.setFoldersOnly(this.foldersOnly ?? false);
 		}
 
 		if (_changedProperties.has('selectableFilter')) {
-			this.#treeContext!.selectableFilter = this.selectableFilter;
+			this._treeContext!.selectableFilter = this.selectableFilter;
 		}
 
 		if (_changedProperties.has('filter')) {
-			this.#treeContext!.filter = this.filter;
+			this._treeContext!.filter = this.filter;
 		}
 
 		if (_changedProperties.has('expansion')) {
-			this.#treeContext!.setExpansion(this.expansion);
+			this._treeContext!.setExpansion(this.expansion);
 		}
 	}
 
 	getSelection() {
-		return this.#treeContext?.selection.getSelection();
+		return this._treeContext?.selection.getSelection();
 	}
 
 	getExpansion() {
-		return this.#treeContext?.expansion.getExpansion();
+		return this._treeContext?.expansion.getExpansion();
 	}
 
 	override render() {
@@ -163,7 +161,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	#onLoadMoreClick = (event: any) => {
 		event.stopPropagation();
 		const next = (this._currentPage = this._currentPage + 1);
-		this.#treeContext?.pagination.setCurrentPageNumber(next);
+		this._treeContext?.pagination.setCurrentPageNumber(next);
 	};
 
 	#renderPaging() {

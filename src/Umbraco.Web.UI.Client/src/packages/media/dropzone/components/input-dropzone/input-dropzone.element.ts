@@ -61,6 +61,13 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	multiple: boolean = false;
 
 	/**
+	 * Style the dropzone with a border.
+	 * @description This is useful if you want to display the dropzone directly rather than as a part of a separate component.
+	 */
+	@property({ type: Boolean, reflect: true })
+	standalone: boolean = false;
+
+	/**
 	 * The label for the dropzone.
 	 */
 	@property({ type: String })
@@ -255,6 +262,14 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				pointer-events: none;
 			}
 
+			:host([standalone]) {
+				position: relative;
+				display: block;
+				inset: 0;
+				cursor: pointer;
+				border: 1px dashed var(--uui-color-divider-emphasis);
+			}
+
 			#dropzone {
 				width: 100%;
 				inset: 0;
@@ -305,16 +320,6 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		`,
 	];
 }
-
-export const UmbInputDropzoneDashedStyles = css`
-	umb-input-dropzone {
-		position: relative;
-		display: block;
-		inset: 0;
-		cursor: pointer;
-		border: 1px dashed var(--uui-color-divider-emphasis);
-	}
-`;
 
 declare global {
 	interface HTMLElementTagNameMap {

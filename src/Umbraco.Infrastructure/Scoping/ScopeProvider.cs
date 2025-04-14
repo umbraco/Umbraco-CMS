@@ -150,7 +150,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             otherScope.Attached = true;
             otherScope.OrigScope = AmbientScope;
             otherScope.OrigContext = AmbientContext;
-            otherScope.CallContext = callContext;
 
             PushAmbientScopeContext(otherScope.Context);
             PushAmbientScope(otherScope);

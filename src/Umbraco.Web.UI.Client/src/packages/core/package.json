@@ -3,6 +3,17 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"build": "vite build"
+		"build": "vite build",
+		"generate:server-api-dev": "openapi-ts --file openapi-ts.dev.config.js",
+		"generate:server-api": "openapi-ts --file openapi-ts.config.js"
+	},
+	"dependencies": {
+		"@types/diff": "^7.0.1",
+		"diff": "^7.0.0",
+		"uuid": "^11.0.5"
+	},
+	"devDependencies": {
+		"@hey-api/client-fetch": "^0.10.0",
+		"@hey-api/openapi-ts": "^0.66.1"
 	}
 }

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
@@ -13,13 +13,12 @@ internal class MarkDownPropertyValueEditor : DataValueEditor
     private readonly IMarkdownSanitizer _markdownSanitizer;
 
     public MarkDownPropertyValueEditor(
-        ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
         DataEditorAttribute attribute,
         IMarkdownSanitizer markdownSanitizer)
-        : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute) => _markdownSanitizer = markdownSanitizer;
+        : base(shortStringHelper, jsonSerializer, ioHelper, attribute) => _markdownSanitizer = markdownSanitizer;
 
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {

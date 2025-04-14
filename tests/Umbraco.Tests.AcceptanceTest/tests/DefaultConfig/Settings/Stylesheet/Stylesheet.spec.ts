@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
 const stylesheetName = 'TestStyleSheetFile.css';
@@ -53,27 +53,6 @@ test('can create a stylesheet with content', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName);
 });
 
-test.skip('can create a new Rich Text Editor stylesheet file', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
-  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
-
-  //Act
-  await umbracoUi.stylesheet.clickActionsMenuAtRoot();
-  await umbracoUi.stylesheet.clickCreateButton();
-  await umbracoUi.stylesheet.clickNewRichTextEditorStylesheetButton();
-  await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
-  await umbracoUi.stylesheet.addRTEStyle(styleName, styleSelector, styleStyles);
-  await umbracoUi.stylesheet.clickSaveButton();
-
-  // Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  expect(await umbracoApi.stylesheet.doesExist(stylesheetName)).toBeTruthy();
-  const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
-  expect(stylesheetData.content).toEqual(stylesheetContent);
-  await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName);
-});
-
 test.skip('can update a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
@@ -83,7 +62,6 @@ test.skip('can update a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbrac
 
   //Act
   await umbracoUi.stylesheet.openStylesheetByNameAtRoot(stylesheetName);
-  await umbracoUi.stylesheet.addRTEStyle(styleName, styleSelector, styleStyles);
   await umbracoUi.stylesheet.clickSaveButton();
 
   // Assert
@@ -124,46 +102,6 @@ test('can rename a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.renamed);
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
   expect(await umbracoApi.stylesheet.doesNameExist(wrongStylesheetName)).toBeFalsy();
-});
-
-test('can edit rich text editor styles', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const newStyleName = 'TestNewStyleName';
-  const newStyleSelector = 'h2';
-  const newStyleStyles = 'color: white';
-  const newStylesheetContent = '/**umb_name:' + newStyleName + '*/\n' + newStyleSelector + ' {\n\t' +  newStyleStyles + '\n}';
-  const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
-  await umbracoApi.stylesheet.create(stylesheetName, stylesheetContent);
-  expect(await umbracoApi.stylesheet.doesExist(stylesheetName)).toBeTruthy();
-  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
-
-  //Act
-  await umbracoUi.stylesheet.openStylesheetByNameAtRoot(stylesheetName);
-  await umbracoUi.stylesheet.editRTEStyle(styleName, newStyleName, newStyleSelector, newStyleStyles);
-  await umbracoUi.stylesheet.clickSaveButton();
-
-  // Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
-  expect(stylesheetData.content).toEqual(newStylesheetContent);
-});
-
-test('can remove rich text editor styles', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
-  await umbracoApi.stylesheet.create(stylesheetName, stylesheetContent);
-  expect(await umbracoApi.stylesheet.doesExist(stylesheetName)).toBeTruthy();
-  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
-
-  //Act
-  await umbracoUi.stylesheet.openStylesheetByNameAtRoot(stylesheetName);
-  await umbracoUi.stylesheet.removeRTEStyle(styleName);
-  await umbracoUi.stylesheet.clickSaveButton();
-
-  // Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
-  expect(stylesheetData.content).toEqual('');
 });
 
 test('cannot create a stylesheet with an empty name', async ({umbracoApi, umbracoUi}) => {

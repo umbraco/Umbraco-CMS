@@ -79,7 +79,7 @@ public class ProfileModelBuilder : MemberModelBuilderBase
         }
 
         // TODO: This wouldn't be required if we support exposing custom member properties on the MemberIdentityUser at the ASP.NET Identity level.
-        IMember? persistedMember = _memberService.GetByKey(member.Key);
+        IMember? persistedMember = _memberService.GetById(member.Key);
         if (persistedMember == null)
         {
             // should never happen

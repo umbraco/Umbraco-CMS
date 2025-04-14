@@ -1,17 +1,15 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../tree/index.js';
-import type { UmbDocumentTypeCreateOptionsModalData } from './constants.js';
-import { customElement, html, map } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
 	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_ELEMENT,
 	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_TEMPLATE,
-} from '@umbraco-cms/backoffice/document-type';
-import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
+	type UmbCreateDocumentTypeWorkspacePresetType,
+} from '../../../paths.js';
+import type { UmbDocumentTypeEntityTypeUnion } from '../../../entity.js';
+import type { UmbDocumentTypeCreateOptionsModalData } from './constants.js';
+import { html, customElement, map } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type {
-	UmbCreateDocumentTypeWorkspacePresetType,
-	UmbDocumentTypeEntityTypeUnion,
-} from '@umbraco-cms/backoffice/document-type';
+import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 
 const CREATE_FOLDER_PRESET = 'folder';
 
@@ -82,7 +80,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 					this._submitModal();
 					return;
 				} catch {
-					//console.error(error);
+					return;
 				}
 
 				break;

@@ -1,5 +1,3 @@
-import { UmbMediaDetailRepository } from '../media/repository/index.js';
-import type { UmbMediaDetailModel, UmbMediaValueModel } from '../media/types.js';
 import { UmbFileDropzoneItemStatus } from './constants.js';
 import { UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL } from './modals/index.js';
 import type {
@@ -20,11 +18,17 @@ import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observabl
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import {
+	UMB_MEDIA_PROPERTY_VALUE_ENTITY_TYPE,
+	UmbMediaDetailRepository,
+	type UmbMediaDetailModel,
+	type UmbMediaValueModel,
+} from '@umbraco-cms/backoffice/media';
 
 /**
  * Manages the dropzone and uploads folders and files to the server.
@@ -70,6 +74,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	}
 
 	/**
+	 * @param isAllowed
 	 * @deprecated Not used anymore; this method will be removed in Umbraco 17.
 	 */
 	public setIsFoldersAllowed(isAllowed: boolean) {
@@ -172,9 +177,9 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	}
 
 	async #showDialogMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this.#host, UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL, { data: { options } });
-		const value = await modalContext.onSubmit().catch(() => undefined);
+		const value = await umbOpenModal(this.#host, UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL, { data: { options } }).catch(
+			() => undefined,
+		);
 		return value?.mediaTypeUnique;
 	}
 
@@ -317,6 +322,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			value: { temporaryFileId: item.temporaryFile?.temporaryUnique },
 			culture: null,
 			segment: null,
+			entityType: UMB_MEDIA_PROPERTY_VALUE_ENTITY_TYPE,
 		};
 
 		const preset: Partial<UmbMediaDetailModel> = {

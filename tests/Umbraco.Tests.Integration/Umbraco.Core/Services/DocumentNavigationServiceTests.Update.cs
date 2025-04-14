@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class DocumentNavigationServiceTests
+internal sealed partial class DocumentNavigationServiceTests
 {
     [Test]
     public async Task Structure_Does_Not_Update_When_Updating_Content()

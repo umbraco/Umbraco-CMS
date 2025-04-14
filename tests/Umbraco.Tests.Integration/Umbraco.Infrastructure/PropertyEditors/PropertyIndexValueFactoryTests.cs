@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
+internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -50,7 +50,7 @@ internal class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
                 Blocks = JsonSerializer.Deserialize<RichTextBlockValue>($$"""
                                                                   {
                                                                   	"layout": {
-                                                                  		"Umbraco.TinyMCE": [{
+                                                                  		"Umbraco.RichText": [{
                                                                   				"contentKey": "{{elementId:D}}"
                                                                   			}
                                                                   		]

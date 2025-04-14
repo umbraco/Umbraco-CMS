@@ -5,39 +5,6 @@ namespace Umbraco.Cms.Core.Routing;
 
 public class PublishedRequest : IPublishedRequest
 {
-    [Obsolete("Please use the constructor that accepts a segment. Will be removed in V16.")]
-    public PublishedRequest(
-        Uri uri,
-        string absolutePathDecoded,
-        IPublishedContent? publishedContent,
-        bool isInternalRedirect,
-        ITemplate? template,
-        DomainAndUri? domain,
-        string? culture,
-        string? redirectUrl,
-        int? responseStatusCode,
-        IReadOnlyList<string>? cacheExtensions,
-        IReadOnlyDictionary<string, string>? headers,
-        bool setNoCacheHeader,
-        bool ignorePublishedContentCollisions)
-        : this(
-            uri,
-            absolutePathDecoded,
-            publishedContent,
-            isInternalRedirect,
-            template,
-            domain,
-            culture,
-            segment: null,
-            redirectUrl,
-            responseStatusCode,
-            cacheExtensions,
-            headers,
-            setNoCacheHeader,
-            ignorePublishedContentCollisions)
-    {
-    }
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedRequest" /> class.
     /// </summary>

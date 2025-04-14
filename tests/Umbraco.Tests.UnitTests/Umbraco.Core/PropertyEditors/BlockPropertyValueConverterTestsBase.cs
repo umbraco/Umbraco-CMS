@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -51,7 +51,7 @@ public abstract class BlockPropertyValueConverterTestsBase<TPropertyEditorConfig
 
     protected IPublishedPropertyType GetPropertyType(TPropertyEditorConfig config)
     {
-        var dataType = new PublishedDataType(1, "test", new Lazy<object>(() => config));
+        var dataType = new PublishedDataType(1, "test", "test", new Lazy<object>(() => config));
         var propertyType = Mock.Of<IPublishedPropertyType>(x =>
             x.EditorAlias == PropertyEditorAlias
             && x.DataType == dataType);

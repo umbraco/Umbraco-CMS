@@ -26,7 +26,7 @@ export class UmbDictionaryImportRepository extends UmbRepositoryBase {
 
 		const { data, error } = await this.#importSource.import(temporaryFileUnique, parentUnique);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			// Request the detail for the imported dictionary. This will also append it to the detail store
 			return this.#detailRepository.requestByUnique(data);
 		}

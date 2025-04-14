@@ -8,10 +8,10 @@ import type {
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbProblemDetails } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Base class for a tree repository.
@@ -62,7 +62,7 @@ export abstract class UmbTreeRepositoryBase<
 
 		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
 			this._treeStore = instance;
-		}).asPromise();
+		}).asPromise({ preventTimeout: true });
 	}
 
 	/**
@@ -70,7 +70,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	abstract requestTreeRoot(): Promise<{ data?: TreeRootType; error?: ProblemDetails }>;
+	abstract requestTreeRoot(): Promise<{ data?: TreeRootType; error?: UmbProblemDetails }>;
 
 	/**
 	 * Requests root items of a tree

@@ -1,15 +1,15 @@
 import type { ManifestBase } from '../types/index.js';
 import { isManifestBaseType } from '../type-guards/index.js';
-import { OpenAPI, ManifestService, type ManifestResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { ManifestService, type ManifestResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 // TODO: consider if this can be replaced by the new extension controllers
 export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	#extensionRegistry: UmbBackofficeExtensionRegistry;
-	#apiBaseUrl = OpenAPI.BASE;
 
 	constructor(host: UmbControllerHost, extensionRegistry: UmbBackofficeExtensionRegistry) {
 		super(host, UmbServerExtensionRegistrator.name);
@@ -22,7 +22,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	 * @remark Users must have the BACKOFFICE_ACCESS permission to access this method.
 	 */
 	public async registerAllExtensions() {
-		const { data: packages } = await tryExecuteAndNotify(this, ManifestService.getManifestManifest());
+		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifest());
 		if (packages) {
 			await this.#loadServerPackages(packages);
 		}
@@ -34,7 +34,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	 * @remark Users must have the BACKOFFICE_ACCESS permission to access this method.
 	 */
 	public async registerPrivateExtensions() {
-		const { data: packages } = await tryExecuteAndNotify(this, ManifestService.getManifestManifestPrivate());
+		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifestPrivate());
 		if (packages) {
 			await this.#loadServerPackages(packages);
 		}
@@ -46,7 +46,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	 * @remark Any user can access this method without any permissions.
 	 */
 	public async registerPublicExtensions() {
-		const { data: packages } = await tryExecuteAndNotify(this, ManifestService.getManifestManifestPublic());
+		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifestPublic());
 		if (packages) {
 			await this.#loadServerPackages(packages);
 		}
@@ -54,6 +54,14 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 
 	async #loadServerPackages(packages: ManifestResponseModel[]) {
 		const extensions: ManifestBase[] = [];
+
+		const serverContext = await this.getContext(UMB_SERVER_CONTEXT);
+
+		if (!serverContext) {
+			throw new Error('Server context is not available');
+		}
+
+		const apiBaseUrl = serverContext?.getServerUrl();
 
 		packages.forEach((p) => {
 			p.extensions?.forEach((e) => {
@@ -68,17 +76,17 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 					// TODO: add helper to check for relative paths
 					// Add base url if the js path is relative
 					if ('js' in e && typeof e.js === 'string' && !e.js.startsWith('http')) {
-						e.js = `${this.#apiBaseUrl}${e.js}`;
+						e.js = `${apiBaseUrl}${e.js}`;
 					}
 
 					// Add base url if the element path is relative
 					if ('element' in e && typeof e.element === 'string' && !e.element.startsWith('http')) {
-						e.element = `${this.#apiBaseUrl}${e.element}`;
+						e.element = `${apiBaseUrl}${e.element}`;
 					}
 
 					// Add base url if the element path api relative
 					if ('api' in e && typeof e.api === 'string' && !e.api.startsWith('http')) {
-						e.api = `${this.#apiBaseUrl}${e.api}`;
+						e.api = `${apiBaseUrl}${e.api}`;
 					}
 
 					extensions.push(e);

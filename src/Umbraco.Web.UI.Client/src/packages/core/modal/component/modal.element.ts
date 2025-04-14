@@ -1,7 +1,7 @@
 import type { UmbModalContext } from '../context/modal.context.js';
 import { UMB_MODAL_CONTEXT } from '../context/modal.context-token.js';
+import type { ManifestModal } from '../extensions/types.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestModal } from '@umbraco-cms/backoffice/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
