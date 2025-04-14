@@ -420,6 +420,14 @@ Copyright: 2016 Richard Morris
 
 ---
 
+Tiny Glob: A tiny globbing library for Node.js
+
+URL: https://github.com/terkelg/tiny-glob
+License: MIT License
+Copyright: 2018 Terkel
+
+---
+
 TinyMCE, version 6.x: A rich text editor for the web
 
 URL: https://www.tiny.cloud/
