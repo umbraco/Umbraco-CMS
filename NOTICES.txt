@@ -260,6 +260,14 @@ Copyright: Charlie Poole, Rob Prouse and Contributors
 
 ---
 
+Openapi-ts: The OpenAPI to TypeScript codegen
+
+URL: https://github.com/hey-api/openapi-ts
+License: MIT License
+Copyright: Hey API
+
+---
+
 OpenIddict: A simple and flexible OpenID Connect server for ASP.NET Core
 
 URL: https://github.com/openiddict/openiddict-core
