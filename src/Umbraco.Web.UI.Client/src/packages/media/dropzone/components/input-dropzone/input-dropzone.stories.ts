@@ -46,6 +46,12 @@ export const WithAccept: Story = {
 	},
 };
 
+export const Standalone: Story = {
+	args: {
+		standalone: true,
+	},
+};
+
 export const WithDefaultSlot: Story = {
 	render: () =>
 		html`<umb-input-dropzone>

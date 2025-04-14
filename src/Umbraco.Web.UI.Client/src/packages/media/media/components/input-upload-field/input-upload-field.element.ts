@@ -6,7 +6,7 @@ import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbFileDropzoneItemStatus, UmbInputDropzoneDashedStyles } from '@umbraco-cms/backoffice/dropzone';
+import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
@@ -174,7 +174,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	#renderDropzone() {
 		return html`
 			<umb-input-dropzone
-				id="dropzone"
+				standalone
 				disable-folder-upload
 				accept=${ifDefined(this._extensions?.join(','))}
 				@change=${this.#onUpload}></umb-input-dropzone>
@@ -230,7 +230,6 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	static override readonly styles = [
 		UmbTextStyles,
-		UmbInputDropzoneDashedStyles,
 		css`
 			:host {
 				position: relative;
