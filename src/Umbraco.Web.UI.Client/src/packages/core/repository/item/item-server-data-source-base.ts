@@ -1,6 +1,6 @@
-import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbItemDataSource } from './item-data-source.interface.js';
 
 export interface UmbItemServerDataSourceBaseArgs<ServerItemType, ClientItemType extends { unique: string }> {
 	getItems: (uniques: Array<string>) => Promise<Array<ServerItemType>>;

@@ -1,7 +1,8 @@
 import { html, customElement, property, css, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbConfirmModalData, UmbConfirmModalValue, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbModalContext } from '../../context/index.js';
+import type { UmbConfirmModalData, UmbConfirmModalValue } from './confirm-modal.token.js';
 
 @customElement('umb-confirm-modal')
 export class UmbConfirmModalElement extends UmbLitElement {

@@ -1,11 +1,11 @@
 import { distinctUntilChanged } from '@umbraco-cms/backoffice/external/rxjs';
 import { Node } from '@umbraco-cms/backoffice/external/tiptap';
-import { UmbTiptapExtensionApiBase } from '@umbraco-cms/backoffice/tiptap';
 import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
 import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockRteLayoutModel } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbTiptapExtensionApiBase } from '../base.js';
 
 declare module '@tiptap/core' {
 	interface Commands<ReturnType> {

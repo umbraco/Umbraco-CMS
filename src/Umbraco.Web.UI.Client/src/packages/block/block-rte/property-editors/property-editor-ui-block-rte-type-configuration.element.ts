@@ -3,13 +3,13 @@ import { UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UMB_BLOCK_RTE_TYPE } from '@umbraco-cms/backoffice/block-rte';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_BLOCK_RTE_TYPE } from '../constants.js';
 
 /**
  * @element umb-property-editor-ui-block-rte-type-configuration

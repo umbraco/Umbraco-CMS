@@ -8,10 +8,10 @@ import {
 	state,
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbItemPickerModalData, UmbItemPickerModel } from '@umbraco-cms/backoffice/modal';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UmbModalBaseElement } from '../../component/modal-base.element.js';
+import type { UmbItemPickerModalData, UmbItemPickerModel } from './item-picker-modal.token.js';
 
 @customElement('umb-item-picker-modal')
 export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPickerModalData, UmbItemPickerModel> {

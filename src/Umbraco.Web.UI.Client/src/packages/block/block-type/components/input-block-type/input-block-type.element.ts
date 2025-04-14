@@ -1,4 +1,4 @@
-import type { UmbBlockTypeWithGroupKey } from '../../types.js';
+import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../../types.js';
 import type { UmbBlockTypeCardElement } from '../block-type-card/index.js';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
@@ -14,7 +14,6 @@ import {
 	type UmbDocumentTypePickerModalValue,
 } from '@umbraco-cms/backoffice/document-type';
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 
 import '../block-type-card/index.js';
 
