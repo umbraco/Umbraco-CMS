@@ -1,9 +1,9 @@
+import type UmbBlockElementManager from '../../block-element-manager.js';
 import { html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type UmbBlockElementManager from '../../block-element-manager.js';
 
 @customElement('umb-block-workspace-view-edit-property')
 export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {

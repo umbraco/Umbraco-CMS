@@ -1,5 +1,5 @@
-import { umbUrlPatternToString, type UrlParametersRecord } from '@umbraco-cms/backoffice/utils';
 import { stripSlash } from './router-slot/util.js';
+import { umbUrlPatternToString, type UrlParametersRecord } from '@umbraco-cms/backoffice/utils';
 
 /**
  *

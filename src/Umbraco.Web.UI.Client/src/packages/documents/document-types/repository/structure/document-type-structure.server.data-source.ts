@@ -7,7 +7,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  *
-
+ 
  * @class UmbDocumentTypeStructureServerDataSource
  * @augments {UmbContentTypeStructureServerDataSourceBase}
  */
