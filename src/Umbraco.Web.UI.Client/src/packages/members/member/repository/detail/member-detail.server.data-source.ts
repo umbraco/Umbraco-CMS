@@ -1,12 +1,12 @@
 import type { UmbMemberDetailModel } from '../../types.js';
-import { UMB_MEMBER_ENTITY_TYPE } from '../../entity.js';
+import { UMB_MEMBER_ENTITY_TYPE, UMB_MEMBER_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
 import { UmbMemberKind } from '../../utils/index.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type { CreateMemberRequestModel, UpdateMemberRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Member that fetches data from the server
@@ -75,7 +75,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, MemberService.getMemberById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, MemberService.getMemberById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -102,10 +102,11 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			groups: data.groups,
 			values: data.values.map((value) => {
 				return {
-					editorAlias: value.editorAlias,
-					culture: value.culture || null,
-					segment: value.segment || null,
 					alias: value.alias,
+					culture: value.culture || null,
+					editorAlias: value.editorAlias,
+					entityType: UMB_MEMBER_PROPERTY_VALUE_ENTITY_TYPE,
+					segment: value.segment || null,
 					value: value.value,
 				};
 			}),
@@ -145,7 +146,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			variants: model.variants,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			MemberService.postMember({
 				requestBody,
@@ -183,7 +184,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			variants: model.variants,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			MemberService.putMemberById({
 				id: model.unique,
@@ -207,7 +208,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			MemberService.deleteMemberById({
 				id: unique,

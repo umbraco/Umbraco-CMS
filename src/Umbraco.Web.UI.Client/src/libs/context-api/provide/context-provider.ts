@@ -40,15 +40,15 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 		this.#contextAlias = idSplit[0];
 		this.#apiAlias = idSplit[1] ?? 'default';
 		this.#instance = instance;
-
-		this.#eventTarget.addEventListener(UMB_CONTEXT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
-		this.#eventTarget.addEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this.#handleDebugContextRequest);
 	}
 
 	/**
 	 * @memberof UmbContextProvider
 	 */
 	public hostConnected(): void {
+		this.#eventTarget.addEventListener(UMB_CONTEXT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
+		this.#eventTarget.addEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this.#handleDebugContextRequest);
+
 		this.#eventTarget.dispatchEvent(new UmbContextProvideEventImplementation(this.#contextAlias));
 	}
 
@@ -56,6 +56,8 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	 * @memberof UmbContextProvider
 	 */
 	public hostDisconnected(): void {
+		this.#eventTarget.removeEventListener(UMB_CONTEXT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
+		this.#eventTarget.removeEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this.#handleDebugContextRequest);
 		// Out-commented for now, but kept if we like to reintroduce this:
 		//window.dispatchEvent(new UmbContextUnprovidedEventImplementation(this._contextAlias, this.#instance));
 	}

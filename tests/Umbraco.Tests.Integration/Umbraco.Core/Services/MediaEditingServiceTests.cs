@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MediaEditingServiceTests : UmbracoIntegrationTest
+internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
 {
     protected IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 

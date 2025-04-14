@@ -2,7 +2,7 @@ import { UmbUserServerDataSource } from '../../repository/detail/user-detail.ser
 import type { UmbInviteUserDataSource, UmbInviteUserRequestModel, UmbResendUserInviteRequestModel } from './types.js';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for inviting users
@@ -41,7 +41,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 			message: request.message,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			UserService.postUserInvite({
 				requestBody,
@@ -72,7 +72,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 			message: request.message,
 		};
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			UserService.postUserInviteResend({
 				requestBody,

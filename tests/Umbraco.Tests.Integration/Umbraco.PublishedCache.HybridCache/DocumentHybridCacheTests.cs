@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
+internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {

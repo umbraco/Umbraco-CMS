@@ -1,7 +1,7 @@
 import type { UmbMoveRepository } from './move-repository.interface.js';
 import type { MetaEntityActionMoveToKind } from './types.js';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/tree';
@@ -11,8 +11,7 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_TREE_PICKER_MODAL, {
+		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
@@ -21,7 +20,6 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 			},
 		});
 
-		const value = await modalContext.onSubmit();
 		const destinationUnique = value.selection[0];
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
 
@@ -35,6 +33,7 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 
 	async #reloadMenu() {
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!actionEventContext) throw new Error('Action Event Context is not available');
 		const event = new UmbRequestReloadStructureForEntityEvent({
 			unique: this.args.unique,
 			entityType: this.args.entityType,

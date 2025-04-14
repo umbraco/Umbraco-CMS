@@ -6,26 +6,20 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbManagementApiDataMapper, type UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the User Group that fetches data from the server
  * @class UmbUserGroupServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUserGroupDetailModel> {
-	#host: UmbControllerHost;
-
-	/**
-	 * Creates an instance of UmbUserGroupServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbUserGroupServerDataSource
-	 */
-	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
+export class UmbUserGroupServerDataSource
+	extends UmbControllerBase
+	implements UmbDetailDataSource<UmbUserGroupDetailModel>
+{
+	#dataMapper = new UmbManagementApiDataMapper(this);
 
 	/**
 	 * Creates a new User Group scaffold
@@ -65,11 +59,26 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserGroupService.getUserGroupById({ id: unique }));
+		const { data, error } = await tryExecute(this, UserGroupService.getUserGroupById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
 		}
+
+		const permissionDataPromises = data.permissions.map(async (item) => {
+			return this.#dataMapper.map({
+				forDataModel: item.$type,
+				data: item,
+				fallback: async () => {
+					return {
+						...item,
+						permissionType: 'unknown',
+					};
+				},
+			});
+		});
+
+		const permissions = await Promise.all(permissionDataPromises);
 
 		// TODO: make data mapper to prevent errors
 		const userGroup: UmbUserGroupDetailModel = {
@@ -86,7 +95,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 			mediaRootAccess: data.mediaRootAccess,
 			mediaStartNode: data.mediaStartNode ? { unique: data.mediaStartNode.id } : null,
 			name: data.name,
-			permissions: data.permissions,
+			permissions,
 			sections: data.sections,
 			unique: data.id,
 		};
@@ -103,6 +112,16 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	async create(model: UmbUserGroupDetailModel) {
 		if (!model) throw new Error('User Group is missing');
 
+		const permissionDataPromises = model.permissions.map(async (item) => {
+			return this.#dataMapper.map({
+				forDataModel: item.permissionType,
+				data: item,
+				fallback: async () => item,
+			});
+		});
+
+		const permissions = await Promise.all(permissionDataPromises);
+
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateUserGroupRequestModel = {
 			alias: model.alias,
@@ -115,12 +134,12 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 			mediaRootAccess: model.mediaRootAccess,
 			mediaStartNode: model.mediaStartNode ? { id: model.mediaStartNode.unique } : null,
 			name: model.name,
-			permissions: model.permissions,
+			permissions,
 			sections: model.sections,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
-			this.#host,
+		const { data, error } = await tryExecute(
+			this,
 			UserGroupService.postUserGroup({
 				requestBody,
 			}),
@@ -143,6 +162,16 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	async update(model: UmbUserGroupDetailModel) {
 		if (!model.unique) throw new Error('Unique is missing');
 
+		const permissionDataPromises = model.permissions.map(async (item) => {
+			return this.#dataMapper.map({
+				forDataModel: item.userPermissionType,
+				data: item,
+				fallback: async () => item,
+			});
+		});
+
+		const permissions = await Promise.all(permissionDataPromises);
+
 		// TODO: make data mapper to prevent errors
 		const requestBody: UpdateUserGroupRequestModel = {
 			alias: model.alias,
@@ -155,12 +184,12 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 			mediaRootAccess: model.mediaRootAccess,
 			mediaStartNode: model.mediaStartNode ? { id: model.mediaStartNode.unique } : null,
 			name: model.name,
-			permissions: model.permissions,
+			permissions,
 			sections: model.sections,
 		};
 
-		const { error } = await tryExecuteAndNotify(
-			this.#host,
+		const { error } = await tryExecute(
+			this,
 			UserGroupService.putUserGroupById({
 				id: model.unique,
 				requestBody,
@@ -183,8 +212,8 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(
-			this.#host,
+		return tryExecute(
+			this,
 			UserGroupService.deleteUserGroupById({
 				id: unique,
 			}),

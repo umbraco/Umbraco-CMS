@@ -1,7 +1,7 @@
 import type { UmbMemberDetailModel, UmbMemberValueModel } from '../../types.js';
 import { UMB_MEMBER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbMemberCollectionFilterModel } from '../types.js';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { MemberResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -32,7 +32,7 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 	 * @memberof UmbMemberCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbMemberCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, MemberService.getFilterMember(filter));
+		const { data, error } = await tryExecute(this.#host, MemberService.getFilterMember(filter));
 
 		if (error) {
 			return { error };

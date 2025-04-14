@@ -231,9 +231,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			null,
 		);
 		this.observe(
-			this.#context.readOnlyState.isReadOnly,
+			this.#context.readOnlyGuard.permitted,
 			(isReadOnly) => (this._isReadOnly = isReadOnly),
-			'umbReadonlyObserver',
+			'umbReadOnlyObserver',
 		);
 	}
 
@@ -293,6 +293,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
 		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
 		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+		if (!propertyDatasetContext || !propertyContext || !clipboardContext) {
+			throw new Error('Could not get required contexts to copy.');
+		}
 
 		const workspaceName = propertyDatasetContext?.getName();
 		const propertyLabel = propertyContext?.getLabel();

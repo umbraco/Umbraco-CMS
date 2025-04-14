@@ -1,8 +1,6 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -20,25 +18,6 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     private readonly IEntityService _entityService;
     private readonly IContentService _contentService;
     private readonly IIdKeyMap _idKeyMap;
-
-    [Obsolete("Please use the constructor that accepts all parameter. Will be removed in V16.")]
-    public PublicAccessService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IPublicAccessRepository publicAccessRepository,
-        IEntityService entityService,
-        IContentService contentService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            publicAccessRepository,
-            entityService,
-            contentService,
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
-    {
-    }
 
     public PublicAccessService(
         ICoreScopeProvider provider,

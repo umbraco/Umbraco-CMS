@@ -1,5 +1,5 @@
 import type { UmbDocumentDetailModel } from '../../types.js';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
@@ -8,7 +8,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document that fetches data from the server
@@ -81,7 +81,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, DocumentService.getDocumentById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, DocumentService.getDocumentById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -94,6 +94,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			values: data.values.map((value) => {
 				return {
 					editorAlias: value.editorAlias,
+					entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
 					culture: value.culture || null,
 					segment: value.segment || null,
 					alias: value.alias,
@@ -152,7 +153,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			variants: model.variants,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentService.postDocument({
 				requestBody,
@@ -182,7 +183,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			variants: model.variants,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			DocumentService.putDocumentById({
 				id: model.unique,
@@ -205,6 +206,6 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentService.deleteDocumentById({ id: unique }));
+		return tryExecute(this.#host, DocumentService.deleteDocumentById({ id: unique }));
 	}
 }

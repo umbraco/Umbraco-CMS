@@ -1,8 +1,8 @@
-import { UmbDocumentUserPermissionCondition } from '../../../user-permissions/conditions/document-user-permission.condition.js';
+import { UmbDocumentUserPermissionCondition } from '../../../user-permissions/document/conditions/document-user-permission.condition.js';
 import {
 	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-} from '../../../user-permissions/constants.js';
+} from '../../../user-permissions/document/constants.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../../workspace-context/constants.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../constants.js';
 import { UmbWorkspaceActionBase, type UmbWorkspaceActionArgs } from '@umbraco-cms/backoffice/workspace';
@@ -34,12 +34,18 @@ export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction
 
 	async hasAdditionalOptions() {
 		const workspaceContext = await this.getContext(UMB_DOCUMENT_WORKSPACE_CONTEXT);
+		if (!workspaceContext) {
+			throw new Error('The workspace context is missing');
+		}
 		const variantOptions = await this.observe(workspaceContext.variantOptions).asPromise();
 		return variantOptions?.length > 1;
 	}
 
 	override async execute() {
 		const workspaceContext = await this.getContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT);
+		if (!workspaceContext) {
+			throw new Error('The workspace context is missing');
+		}
 		return workspaceContext.saveAndPublish();
 	}
 }

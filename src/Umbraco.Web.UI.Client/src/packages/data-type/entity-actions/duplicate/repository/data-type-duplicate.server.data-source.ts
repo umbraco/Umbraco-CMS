@@ -1,6 +1,6 @@
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbDuplicateToDataSource, UmbDuplicateToRequestArgs } from '@umbraco-cms/backoffice/tree';
 
 /**
@@ -29,7 +29,7 @@ export class UmbDuplicateDataTypeServerDataSource implements UmbDuplicateToDataS
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			DataTypeService.postDataTypeByIdCopy({
 				id: args.unique,

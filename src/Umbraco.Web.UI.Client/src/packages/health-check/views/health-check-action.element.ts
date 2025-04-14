@@ -4,7 +4,7 @@ import { css, html, nothing, customElement, property, state, ifDefined } from '@
 import type { HealthCheckActionRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthCheckService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-health-check-action')
 export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
@@ -17,7 +17,7 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 	private async _onActionClick(e: SubmitEvent) {
 		e.preventDefault();
 		this._buttonState = 'waiting';
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this,
 			HealthCheckService.postHealthCheckExecuteAction({ requestBody: this.action }),
 		);

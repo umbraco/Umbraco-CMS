@@ -427,7 +427,6 @@ export default {
 		newPartialViewMacroFromSnippet: 'Neues Partial-View-Makro nach Vorlage',
 		newPartialViewMacroNoMacro: 'Neues Partial-View-Makro (ohne Makro)',
 		newStyleSheetFile: 'Neue Style-Sheet-Datei',
-		newRteStyleSheetFile: 'Neue Rich-Text-Editor Style-Sheet-Datei',
 	},
 	dashboard: {
 		browser: 'Website anzeigen',

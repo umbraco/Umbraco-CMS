@@ -39,6 +39,14 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 
 	private _ownerEntityType?: string;
 
+	/**
+	 * Sets the property to readonly, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	public readonly: boolean = false;
+
 	@state()
 	private _propertyEditorUiAlias?: string;
 
@@ -120,7 +128,8 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 				.appearance=${this._property.appearance}
 				property-editor-ui-alias=${ifDefined(this._propertyEditorUiAlias)}
 				.config=${this._dataTypeData}
-				.validation=${this._property.validation}>
+				.validation=${this._property.validation}
+				?readonly=${this.readonly}>
 			</umb-property>
 		`;
 	}

@@ -136,6 +136,6 @@ public class HealthCheckNotifierJobTests
     {
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action) => new("Check message");
 
-        public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() => Enumerable.Empty<HealthCheckStatus>();
+        public override Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() => Task.FromResult(Enumerable.Empty<HealthCheckStatus>());
     }
 }

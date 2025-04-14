@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MemberRepositoryTest : UmbracoIntegrationTest
+internal sealed class MemberRepositoryTest : UmbracoIntegrationTest
 {
     private IPasswordHasher PasswordHasher => GetRequiredService<IPasswordHasher>();
 

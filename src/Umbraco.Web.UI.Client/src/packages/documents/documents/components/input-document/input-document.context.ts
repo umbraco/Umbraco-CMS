@@ -61,6 +61,3 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 		return true;
 	};
 }
-
-/** @deprecated Use `UmbDocumentPickerInputContext` instead. This method will be removed in Umbraco 15. */
-export { UmbDocumentPickerInputContext as UmbDocumentPickerContext };

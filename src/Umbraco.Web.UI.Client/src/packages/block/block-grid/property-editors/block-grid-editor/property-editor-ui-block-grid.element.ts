@@ -59,6 +59,25 @@ export class UmbPropertyEditorUIBlockGridElement
 		this.#managerContext.setEditorConfiguration(config);
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @default false
+	 */
+	public set readonly(value) {
+		this.#readonly = value;
+
+		if (this.#readonly) {
+			this.#managerContext.readOnlyState.fallbackToPermitted();
+		} else {
+			this.#managerContext.readOnlyState.fallbackToNotPermitted();
+		}
+	}
+	public get readonly() {
+		return this.#readonly;
+	}
+	#readonly = false;
+
 	@state()
 	private _layoutColumns?: number;
 
@@ -185,28 +204,6 @@ export class UmbPropertyEditorUIBlockGridElement
 					this.#managerContext.setPropertyAlias(alias);
 				},
 				'observePropertyAlias',
-			);
-
-			// If the current property is readonly all inner block content should also be readonly.
-			this.observe(
-				observeMultiple([propertyContext.isReadOnly, propertyContext.variantId]),
-				([isReadOnly, variantId]) => {
-					const unique = 'UMB_PROPERTY_EDITOR_UI';
-					if (variantId === undefined) return;
-
-					if (isReadOnly) {
-						const state = {
-							unique,
-							variantId,
-							message: '',
-						};
-
-						this.#managerContext.readOnlyState.addState(state);
-					} else {
-						this.#managerContext.readOnlyState.removeState(unique);
-					}
-				},
-				'observeIsReadOnly',
 			);
 		});
 

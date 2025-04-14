@@ -1,7 +1,7 @@
 import { UMB_CURRENT_USER_MODAL } from './modals/current-user/current-user-modal.token.js';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_CURRENT_USER_CONTEXT, type UmbCurrentUserModel } from '@umbraco-cms/backoffice/current-user';
 import { UmbHeaderAppButtonElement } from '@umbraco-cms/backoffice/components';
 
@@ -34,8 +34,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbHeaderAppButtonElement {
 	}
 
 	async #handleUserClick() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		modalManager.open(this, UMB_CURRENT_USER_MODAL);
+		await umbOpenModal(this, UMB_CURRENT_USER_MODAL).catch(() => undefined);
 	}
 
 	override render() {

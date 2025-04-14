@@ -1,5 +1,5 @@
 import type { UmbDocumentDetailModel, UmbDocumentVariantPublishModel } from '../../types.js';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
 import type {
 	CultureAndScheduleRequestModel,
 	PublishDocumentRequestModel,
@@ -8,7 +8,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
@@ -54,7 +54,7 @@ export class UmbDocumentPublishingServerDataSource {
 			publishSchedules,
 		};
 
-		return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdPublish({ id: unique, requestBody }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdPublish({ id: unique, requestBody }));
 	}
 
 	/**
@@ -77,14 +77,14 @@ export class UmbDocumentPublishingServerDataSource {
 				cultures: null,
 			};
 
-			return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdUnpublish({ id: unique, requestBody }));
+			return tryExecute(this.#host, DocumentService.putDocumentByIdUnpublish({ id: unique, requestBody }));
 		}
 
 		const requestBody: UnpublishDocumentRequestModel = {
 			cultures: variantIds.map((variant) => variant.toCultureString()),
 		};
 
-		return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdUnpublish({ id: unique, requestBody }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdUnpublish({ id: unique, requestBody }));
 	}
 
 	/**
@@ -107,7 +107,7 @@ export class UmbDocumentPublishingServerDataSource {
 		};
 
 		// Initiate the publish descendants task and get back a task Id.
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentService.putDocumentByIdPublishWithDescendants({ id: unique, requestBody }),
 		);
@@ -123,7 +123,7 @@ export class UmbDocumentPublishingServerDataSource {
 		while (true) {
 			await new Promise((resolve) => setTimeout(resolve, isFirstPoll ? 1000 : 5000));
 			isFirstPoll = false;
-			const { data, error } = await tryExecuteAndNotify(
+			const { data, error } = await tryExecute(
 				this.#host,
 				DocumentService.getDocumentByIdPublishWithDescendantsResultByTaskId({ id: unique, taskId }));
 			if (error || !data) {
@@ -146,7 +146,7 @@ export class UmbDocumentPublishingServerDataSource {
 	async published(unique: string): Promise<UmbDataSourceResponse<UmbDocumentDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentService.getDocumentByIdPublished({ id: unique }),
 		);
@@ -162,6 +162,7 @@ export class UmbDocumentPublishingServerDataSource {
 			values: data.values.map((value) => {
 				return {
 					editorAlias: value.editorAlias,
+					entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
 					culture: value.culture || null,
 					segment: value.segment || null,
 					alias: value.alias,

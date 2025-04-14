@@ -9,7 +9,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Media;
 
-[ApiVersion("1.0")]
 [ApiVersion("2.0")]
 public class ByIdsMediaApiController : MediaApiControllerBase
 {
@@ -17,13 +16,6 @@ public class ByIdsMediaApiController : MediaApiControllerBase
         : base(publishedMediaCache, apiMediaWithCropsResponseBuilder)
     {
     }
-
-    [HttpGet("item")]
-    [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<IApiMediaWithCropsResponse>), StatusCodes.Status200OK)]
-    [Obsolete("Please use version 2 of this API. Will be removed in V15.")]
-    public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
-        => await HandleRequest(ids);
 
     /// <summary>
     ///     Gets media items by ids.
@@ -33,10 +25,10 @@ public class ByIdsMediaApiController : MediaApiControllerBase
     [HttpGet("items")]
     [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(IEnumerable<IApiMediaWithCropsResponse>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ItemsV20([FromQuery(Name = "id")] HashSet<Guid> ids)
-        => await HandleRequest(ids);
+    public Task<IActionResult> ItemsV20([FromQuery(Name = "id")] HashSet<Guid> ids)
+        => Task.FromResult(HandleRequest(ids));
 
-    private async Task<IActionResult> HandleRequest(HashSet<Guid> ids)
+    private IActionResult HandleRequest(HashSet<Guid> ids)
     {
         IPublishedContent[] mediaItems = ids
             .Select(PublishedMediaCache.GetById)
@@ -47,6 +39,6 @@ public class ByIdsMediaApiController : MediaApiControllerBase
             .Select(BuildApiMediaWithCrops)
             .ToArray();
 
-        return await Task.FromResult(Ok(apiMediaItems));
+        return Ok(apiMediaItems);
     }
 }

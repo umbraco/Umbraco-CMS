@@ -32,13 +32,10 @@ public static partial class UmbracoBuilderExtensions
         .AddMembersIdentity()
         .AddUmbracoProfiler()
         .AddMvcAndRazor(configureMvc)
-        .AddWebServer()
         .AddRecurringBackgroundJobs()
         .AddUmbracoHybridCache()
         .AddDistributedCache()
-        .AddCoreNotifications()
-        .AddExamine()
-        .AddExamineIndexes();
+        .AddCoreNotifications();
 
     public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
     {

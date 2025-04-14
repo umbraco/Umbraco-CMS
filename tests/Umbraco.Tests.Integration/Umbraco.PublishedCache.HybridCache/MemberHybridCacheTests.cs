@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MemberHybridCacheTests : UmbracoIntegrationTest
+internal sealed class MemberHybridCacheTests : UmbracoIntegrationTest
 {
     private IPublishedMemberCache PublishedMemberHybridCache => GetRequiredService<IPublishedMemberCache>();
 

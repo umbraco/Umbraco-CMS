@@ -1,13 +1,13 @@
 import { UMB_EXAMINE_FIELDS_SETTINGS_MODAL, UMB_EXAMINE_FIELDS_VIEWER_MODAL } from '../modal/constants.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type { SearchResultResponseModel, FieldPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { SearcherService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 interface ExposedSearchResultField {
 	name: string;
@@ -58,7 +58,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		if (!this._searchInput.value.length) return;
 		this._searchLoading = true;
 
-		const { data } = await tryExecuteAndNotify(
+		const { data } = await tryExecute(
 			this,
 			SearcherService.getSearcherBySearcherNameQuery({
 				searcherName: this.searcherName,
@@ -96,28 +96,21 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	}
 
 	async #onFieldFilterClick() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_EXAMINE_FIELDS_SETTINGS_MODAL, {
+		const value = await umbOpenModal(this, UMB_EXAMINE_FIELDS_SETTINGS_MODAL, {
 			value: { fields: this._exposedFields ?? [] },
-		});
-		await modalContext.onSubmit().catch(() => undefined);
-
-		const value = modalContext.getValue();
+		}).catch(() => undefined);
 
 		this._exposedFields = value?.fields;
 	}
 
 	async #onFieldViewClick(rowData: SearchResultResponseModel) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-
-		const modalContext = modalManager.open(this, UMB_EXAMINE_FIELDS_VIEWER_MODAL, {
+		await umbOpenModal(this, UMB_EXAMINE_FIELDS_VIEWER_MODAL, {
 			modal: {
 				type: 'sidebar',
 				size: 'medium',
 			},
 			data: { searchResult: rowData, name: this.getSearchResultNodeName(rowData) },
-		});
-		await modalContext.onSubmit().catch(() => undefined);
+		}).catch(() => undefined);
 	}
 
 	override render() {

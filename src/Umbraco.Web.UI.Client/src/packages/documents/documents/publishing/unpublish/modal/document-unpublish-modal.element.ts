@@ -140,7 +140,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 
 		if (total > 0) {
 			const context = await this.getContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT);
-			this._canUnpublish = (await context.getDocumentConfiguration())?.disableUnpublishWhenReferenced === false;
+			this._canUnpublish = (await context?.getDocumentConfiguration())?.disableUnpublishWhenReferenced === false;
 		}
 	}
 

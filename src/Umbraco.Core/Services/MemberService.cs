@@ -338,10 +338,6 @@ namespace Umbraco.Cms.Core.Services
             return GetMemberFromRepository(id);
         }
 
-        [Obsolete($"Use {nameof(GetById)}. Will be removed in V15.")]
-        public IMember? GetByKey(Guid id)
-            => GetById(id);
-
         /// <summary>
         /// Gets a list of paged <see cref="IMember"/> objects
         /// </summary>
@@ -395,7 +391,7 @@ namespace Umbraco.Cms.Core.Services
             Attempt<Guid> asGuid = id.TryConvertTo<Guid>();
             if (asGuid.Success)
             {
-                return GetByKey(asGuid.Result);
+                return GetById(asGuid.Result);
             }
 
             Attempt<int> asInt = id.TryConvertTo<int>();
@@ -854,7 +850,7 @@ namespace Umbraco.Cms.Core.Services
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
-        [Obsolete($"Use the {nameof(Save)} method that yields an Attempt. Will be removed in V15.")]
+        /// <inheritdoc />
         public void Save(IEnumerable<IMember> members)
             => Save(members, Constants.Security.SuperUserId);
 

@@ -44,6 +44,6 @@ public class AllCreatedPackageController : CreatedPackageControllerBase
             Items = _umbracoMapper.MapEnumerable<PackageDefinition, PackageDefinitionResponseModel>(createdPackages.Items)
         };
 
-        return await Task.FromResult(Ok(viewModel));
+        return Ok(viewModel);
     }
 }

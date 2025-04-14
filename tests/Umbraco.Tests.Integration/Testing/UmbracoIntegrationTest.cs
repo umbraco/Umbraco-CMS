@@ -151,12 +151,11 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         var hostingEnvironment = TestHelper.GetHostingEnvironment();
         var typeLoader = services.AddTypeLoader(
             GetType().Assembly,
-            hostingEnvironment,
             TestHelper.ConsoleLoggerFactory,
             AppCaches.NoCache,
             Configuration,
             TestHelper.Profiler);
-        var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache, hostingEnvironment);
+        var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache);
 
         builder.AddConfiguration()
             .AddUmbracoCore()

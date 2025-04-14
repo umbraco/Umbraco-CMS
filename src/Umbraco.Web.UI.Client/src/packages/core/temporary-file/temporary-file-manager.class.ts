@@ -99,6 +99,7 @@ export class UmbTemporaryFileManager<
 			maxFileSize *= 1024;
 			if (item.file.size > maxFileSize) {
 				const notification = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+				if (!notification) throw new Error('Notification context is missing');
 				notification.peek('warning', {
 					data: {
 						headline: 'Upload',
@@ -127,6 +128,7 @@ export class UmbTemporaryFileManager<
 			(disallowedExtensions?.length && disallowedExtensions.includes(fileExtension))
 		) {
 			const notification = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+			if (!notification) throw new Error('Notification context is missing');
 			notification.peek('warning', {
 				data: {
 					message: `${this.#localization.term('media_disallowedFileType')}: ${fileExtension}`,

@@ -10,6 +10,7 @@ schedules:
       include:
         - v14/dev
         - v15/dev
+        - v16/dev
 
 variables:
   nodeVersion: 20
@@ -428,7 +429,7 @@ stages:
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
-          
+
           # Publish test results
           - task: PublishTestResults@2
             displayName: "Publish test results"

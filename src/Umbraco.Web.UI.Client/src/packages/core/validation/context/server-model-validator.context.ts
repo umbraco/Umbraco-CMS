@@ -50,7 +50,7 @@ export class UmbServerModelValidatorContext
 			context.addValidator(this);
 
 			// Run translators?
-		}).asPromise();
+		}).asPromise({ preventTimeout: true });
 	}
 
 	addPathTranslator(translator: ClassConstructor<UmbValidationPathTranslator<any>>): void {

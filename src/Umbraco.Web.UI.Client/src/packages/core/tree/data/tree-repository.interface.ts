@@ -6,8 +6,8 @@ import type {
 } from './types.js';
 import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbProblemDetails } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Interface for a tree repository.
@@ -29,7 +29,7 @@ export interface UmbTreeRepository<
 	 */
 	requestTreeRoot: () => Promise<{
 		data?: TreeRootType;
-		error?: ProblemDetails;
+		error?: UmbProblemDetails;
 	}>;
 
 	/**
@@ -39,7 +39,7 @@ export interface UmbTreeRepository<
 	 */
 	requestTreeRootItems: (args: TreeRootItemsRequestArgsType) => Promise<{
 		data?: UmbPagedModel<TreeItemType>;
-		error?: ProblemDetails;
+		error?: UmbProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;
 	}>;
 
@@ -50,7 +50,7 @@ export interface UmbTreeRepository<
 	 */
 	requestTreeItemsOf: (args: TreeChildrenOfRequestArgsType) => Promise<{
 		data?: UmbPagedModel<TreeItemType>;
-		error?: ProblemDetails;
+		error?: UmbProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;
 	}>;
 
@@ -61,7 +61,7 @@ export interface UmbTreeRepository<
 	 */
 	requestTreeItemAncestors: (
 		args: TreeAncestorsOfRequestArgsType,
-	) => Promise<{ data?: TreeItemType[]; error?: ProblemDetails; asObservable?: () => Observable<TreeItemType[]> }>;
+	) => Promise<{ data?: TreeItemType[]; error?: UmbProblemDetails; asObservable?: () => Observable<TreeItemType[]> }>;
 
 	/**
 	 * Returns an observable of the root items of the tree.

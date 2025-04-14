@@ -358,7 +358,6 @@ export default {
 		newPartialViewMacroFromSnippet: 'Nové makro částečné šablony ze snippetu',
 		newPartialViewMacroNoMacro: 'Nové makro pro částečnou šablonu (bez makra)',
 		newStyleSheetFile: 'Nový soubor stylů - stylopis',
-		newRteStyleSheetFile: 'Nový soubor stylů Rich Text editoru',
 	},
 	dashboard: {
 		browser: 'Prohlédnout svůj web',

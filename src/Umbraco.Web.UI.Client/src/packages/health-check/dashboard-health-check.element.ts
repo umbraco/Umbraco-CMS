@@ -7,7 +7,7 @@ import { HealthCheckService } from '@umbraco-cms/backoffice/external/backend-api
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-health-check')
 export class UmbDashboardHealthCheckElement extends UmbLitElement {
@@ -47,7 +47,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 	}
 
 	#registerHealthChecks = async () => {
-		const { data } = await tryExecuteAndNotify(this, HealthCheckService.getHealthCheckGroup({ skip: 0, take: 9999 }));
+		const { data } = await tryExecute(this, HealthCheckService.getHealthCheckGroup({ skip: 0, take: 9999 }));
 		if (!data) return;
 		const manifests = this.#createManifests(data.items);
 		this.#register(manifests);

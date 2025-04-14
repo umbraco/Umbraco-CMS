@@ -6,7 +6,7 @@ import type {
 import type { UmbUserClientCredentialDataSource } from './types.js';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Server data source for user client credentials
@@ -28,7 +28,7 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
 	async create(args: UmbCreateUserClientCredentialRequestArgs) {
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			UserService.postUserByIdClientCredentials({
 				id: args.user.unique,
@@ -53,7 +53,7 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
 	async read(args: UmbUserClientCredentialRequestArgs) {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			UserService.getUserByIdClientCredentials({
 				id: args.user.unique,
@@ -78,7 +78,7 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
 	delete(args: UmbDeleteUserClientCredentialRequestArgs) {
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			UserService.deleteUserByIdClientCredentialsByClientId({
 				id: args.user.unique,

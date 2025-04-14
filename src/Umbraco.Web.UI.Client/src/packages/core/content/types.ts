@@ -8,8 +8,9 @@ export interface UmbElementDetailModel {
 }
 
 export interface UmbElementValueModel<ValueType = unknown> extends UmbPropertyValueData<ValueType> {
-	editorAlias: string;
 	culture: string | null;
+	editorAlias: string;
+	entityType: string;
 	segment: string | null;
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

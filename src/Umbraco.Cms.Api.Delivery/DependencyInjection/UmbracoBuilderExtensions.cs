@@ -62,7 +62,6 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddTransient<IMemberApplicationManager, MemberApplicationManager>();
         builder.Services.AddTransient<IRequestMemberAccessService, RequestMemberAccessService>();
         builder.Services.AddTransient<ICurrentMemberClaimsProvider, CurrentMemberClaimsProvider>();
-        builder.Services.AddScoped<IMemberClientCredentialsManager, MemberClientCredentialsManager>();
 
         builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
         builder.AddUmbracoApiOpenApiUI();

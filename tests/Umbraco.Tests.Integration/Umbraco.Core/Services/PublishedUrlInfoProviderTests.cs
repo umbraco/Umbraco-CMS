@@ -4,7 +4,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTestsBase
+internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTestsBase
 {
 
     [Test]

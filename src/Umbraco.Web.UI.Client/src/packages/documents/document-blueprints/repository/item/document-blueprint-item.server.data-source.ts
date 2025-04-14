@@ -4,7 +4,7 @@ import { DocumentBlueprintService, DocumentTypeService } from '@umbraco-cms/back
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { DocumentBlueprintItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Document Blueprint items that fetches data from the server
@@ -31,7 +31,7 @@ export class UmbDocumentBlueprintItemServerDataSource extends UmbItemServerDataS
 
 	async getItemsByDocumentType(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentTypeService.getDocumentTypeByIdBlueprint({ id: unique }),
 		);

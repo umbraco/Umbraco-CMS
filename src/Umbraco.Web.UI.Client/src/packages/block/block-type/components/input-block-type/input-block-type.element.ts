@@ -140,6 +140,9 @@ export class UmbInputBlockTypeElement<
 
 	async #onRequestDelete(item: BlockType) {
 		const store = await this.getContext(UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT);
+		if (!store) {
+			return;
+		}
 		const contentType = store.getItems([item.contentElementTypeKey]);
 		await umbConfirmModal(this, {
 			color: 'danger',

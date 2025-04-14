@@ -25,7 +25,7 @@ import {
 	type UmbEntityVariantModel,
 	type UmbEntityVariantOptionModel,
 } from '@umbraco-cms/backoffice/variant';
-import { UmbDeprecation, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeDetailRepository, UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
@@ -39,7 +39,7 @@ import {
 	UmbValidationController,
 } from '@umbraco-cms/backoffice/validation';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UmbEntityUpdatedEvent,
@@ -49,6 +49,7 @@ import {
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import {
 	UmbPropertyValuePresetVariantBuilderController,
+	UmbVariantPropertyGuardManager,
 	type UmbPropertyTypePresetModel,
 	type UmbPropertyTypePresetModelTypeModel,
 } from '@umbraco-cms/backoffice/property';
@@ -100,7 +101,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
-	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
+
+	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
+	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
 
 	/* Content Data */
 	protected override readonly _data = new UmbContentWorkspaceDataManager<DetailModelType, VariantModelType>(this);
@@ -138,6 +142,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	/**
 	 * @private
 	 * @description - Should not be used by external code.
+	 * @internal
 	 */
 	public readonly languages = this.#languages.asObservable();
 
@@ -170,6 +175,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		>,
 	) {
 		super(host, args);
+
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
 
 		this.#serverValidation.addPathTranslator(UmbContentDetailValidationPathTranslator);
 
@@ -524,7 +532,15 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 
 		// Notice the order of the properties is important for our JSON String Compare function. [NL]
-		const entry = { editorAlias, ...variantId.toObject(), alias, value } as UmbElementValueModel;
+		const entry: UmbElementValueModel = {
+			editorAlias,
+			// Be aware that this solution is a bit magical, and based on a naming convention.
+			// We might want to make this more flexible at some point and get the entityType from somewhere instead of constructing it here.
+			entityType: `${this.getEntityType()}-property-value`,
+			...variantId.toObject(),
+			alias,
+			value,
+		};
 
 		const currentData = this.getData();
 		if (currentData) {
@@ -573,10 +589,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const changedVariantIds = this._data.getChangedVariants();
 		const selectedVariantIds = activeVariantIds.concat(changedVariantIds);
 
+		const writableSelectedVariantIds = selectedVariantIds.filter(
+			(x) => this.readOnlyGuard.getIsPermittedForVariant(x) === false,
+		);
+
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
-		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
-		let selected = selectedVariantIds.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
-		selected = selected.filter((x) => readOnlyCultures.includes(x) === false);
+		const selected = writableSelectedVariantIds.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
 
 		return {
 			options,
@@ -585,8 +603,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected _saveableVariantsFilter = (option: VariantOptionModelType) => {
-		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
-		return readOnlyCultures.includes(option.culture) === false;
+		return this.readOnlyGuard.getIsPermittedForVariant(UmbVariantId.Create(option)) === false;
 	};
 
 	/* validation */
@@ -623,6 +640,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
 		if (variantsWithoutAName.length > 0) {
 			const validationContext = await this.getContext(UMB_VALIDATION_CONTEXT);
+			if (!validationContext) {
+				throw new Error('Validation context is missing');
+			}
 			variantsWithoutAName.forEach((variant) => {
 				validationContext.messages.addMessage(
 					'client',
@@ -702,17 +722,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else if (this.#saveModalToken) {
 			// If there are multiple variants, we will open the modal to let the user pick which variants to save.
-			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-			const result = await modalManagerContext
-				.open(this, this.#saveModalToken, {
-					data: {
-						options,
-						pickableFilter: this._saveableVariantsFilter,
-					},
-					value: { selection: selected },
-				})
-				.onSubmit()
-				.catch(() => undefined);
+			const result = await umbOpenModal(this, this.#saveModalToken, {
+				data: {
+					options,
+					pickableFilter: this._saveableVariantsFilter,
+				},
+				value: { selection: selected },
+			}).catch(() => undefined);
 
 			if (!result?.selection.length) return;
 
@@ -802,6 +818,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this._data.setCurrent(newCurrentData);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) {
+			throw new Error('Event context is missing');
+		}
 		const event = new UmbRequestReloadChildrenOfEntityEvent({
 			entityType: parent.entityType,
 			unique: parent.unique,
@@ -846,6 +865,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const entityType = this.getEntityType();
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) {
+			throw new Error('Event context is missing');
+		}
 		const structureEvent = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 		eventContext.dispatchEvent(structureEvent);
 
@@ -862,7 +884,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	override resetState() {
 		super.resetState();
-		this.readOnlyState.clear();
+		this.readOnlyGuard.clearRules();
+		this.propertyViewGuard.clearRules();
+		this.propertyWriteGuard.clearRules();
+		// default:
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
 	}
 
 	abstract getContentTypeUnique(): string | undefined;

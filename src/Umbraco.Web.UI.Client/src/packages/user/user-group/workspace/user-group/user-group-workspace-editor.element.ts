@@ -7,7 +7,7 @@ import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbInputSectionElement } from '@umbraco-cms/backoffice/section';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbInputLanguageElement } from '@umbraco-cms/backoffice/language';
 import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
@@ -179,21 +179,20 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 	async #onIconClick() {
 		const [alias, color] = this._icon?.replace('color-', '')?.split(' ') ?? [];
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_ICON_PICKER_MODAL, {
+		const result = await umbOpenModal(this, UMB_ICON_PICKER_MODAL, {
 			value: {
 				icon: alias,
 				color: color,
 			},
-		});
+		}).catch(() => undefined);
 
-		modalContext?.onSubmit().then((saved) => {
-			if (saved.icon && saved.color) {
-				this.#workspaceContext?.updateProperty('icon', `${saved.icon} color-${saved.color}`);
-			} else if (saved.icon) {
-				this.#workspaceContext?.updateProperty('icon', saved.icon);
-			}
-		});
+		if (!result) return;
+
+		if (result.icon && result.color) {
+			this.#workspaceContext?.updateProperty('icon', `${result.icon} color-${result.color}`);
+		} else if (result.icon) {
+			this.#workspaceContext?.updateProperty('icon', result.icon);
+		}
 	}
 
 	#onNameAndAliasChange(event: InputEvent & { target: UmbInputWithAliasElement }) {

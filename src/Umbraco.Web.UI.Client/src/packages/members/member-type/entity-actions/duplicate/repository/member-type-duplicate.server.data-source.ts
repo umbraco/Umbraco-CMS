@@ -1,6 +1,6 @@
 import { MemberTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbDuplicateDataSource, UmbDuplicateRequestArgs } from '@umbraco-cms/backoffice/entity-action';
 
 /**
@@ -28,7 +28,7 @@ export class UmbDuplicateMemberTypeServerDataSource implements UmbDuplicateDataS
 	async duplicate(args: UmbDuplicateRequestArgs) {
 		if (!args.unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			MemberTypeService.postMemberTypeByIdCopy({
 				id: args.unique,

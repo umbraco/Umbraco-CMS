@@ -46,6 +46,9 @@ export class UmbMemberWorkspaceContext
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
 
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
+
 		this.routes.setRoutes([
 			{
 				path: 'create/:memberTypeUnique',

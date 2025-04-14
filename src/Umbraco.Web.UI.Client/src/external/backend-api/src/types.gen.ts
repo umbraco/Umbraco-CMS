@@ -408,7 +408,7 @@ export type CreateUserGroupRequestModel = {
     mediaStartNode?: ((ReferenceByIdModel) | null);
     mediaRootAccess: boolean;
     fallbackPermissions: Array<(string)>;
-    permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
+    permissions: Array<(DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
     id?: (string) | null;
 };
 
@@ -444,6 +444,13 @@ export type CultureReponseModel = {
     englishName: string;
 };
 
+export type CurrentUserConfigurationResponseModel = {
+    keepUserLoggedIn: boolean;
+    passwordConfiguration: (PasswordConfigurationResponseModel);
+    allowChangePassword: boolean;
+    allowTwoFactor: boolean;
+};
+
 export type CurrentUserResponseModel = {
     email: string;
     userName: string;
@@ -460,20 +467,9 @@ export type CurrentUserResponseModel = {
     hasAccessToAllLanguages: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<(string)>;
-    permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
+    permissions: Array<(DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
     allowedSections: Array<(string)>;
     isAdmin: boolean;
-};
-
-export type CurrenUserConfigurationResponseModel = {
-    keepUserLoggedIn: boolean;
-    /**
-     * @deprecated
-     */
-    usernameIsEmail: boolean;
-    passwordConfiguration: (PasswordConfigurationResponseModel);
-    allowChangePassword: boolean;
-    allowTwoFactor: boolean;
 };
 
 export type DatabaseInstallRequestModel = {
@@ -652,10 +648,6 @@ export type DocumentConfigurationResponseModel = {
     disableUnpublishWhenReferenced: boolean;
     allowEditInvariantFromNonDefault: boolean;
     allowNonExistingSegmentsCreation: boolean;
-    /**
-     * @deprecated
-     */
-    reservedFieldNames: Array<(string)>;
 };
 
 export type DocumentItemResponseModel = {
@@ -677,6 +669,13 @@ export type DocumentNotificationResponseModel = {
 export type DocumentPermissionPresentationModel = {
     $type: string;
     document: (ReferenceByIdModel);
+    verbs: Array<(string)>;
+};
+
+export type DocumentPropertyValuePermissionPresentationModel = {
+    $type: string;
+    documentType: (ReferenceByIdModel);
+    propertyType: (ReferenceByIdModel);
     verbs: Array<(string)>;
 };
 
@@ -1203,10 +1202,6 @@ export type MediaCollectionResponseModel = {
 export type MediaConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
-    /**
-     * @deprecated
-     */
-    reservedFieldNames: Array<(string)>;
 };
 
 export type MediaItemResponseModel = {
@@ -1397,10 +1392,7 @@ export type MediaVariantResponseModel = {
 };
 
 export type MemberConfigurationResponseModel = {
-    /**
-     * @deprecated
-     */
-    reservedFieldNames: Array<(string)>;
+    [key: string]: unknown;
 };
 
 export type MemberGroupItemResponseModel = {
@@ -2707,7 +2699,7 @@ export type UpdateUserGroupRequestModel = {
     mediaStartNode?: ((ReferenceByIdModel) | null);
     mediaRootAccess: boolean;
     fallbackPermissions: Array<(string)>;
-    permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
+    permissions: Array<(DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
 };
 
 export type UpdateUserGroupsOnUserRequestModel = {
@@ -2807,7 +2799,7 @@ export type UserGroupResponseModel = {
     mediaStartNode?: ((ReferenceByIdModel) | null);
     mediaRootAccess: boolean;
     fallbackPermissions: Array<(string)>;
-    permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
+    permissions: Array<(DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;
@@ -3365,13 +3357,6 @@ export type PutDocumentByIdUnpublishData = {
 };
 
 export type PutDocumentByIdUnpublishResponse = (string);
-
-export type PutDocumentByIdValidateData = {
-    id: string;
-    requestBody?: (UpdateDocumentRequestModel);
-};
-
-export type PutDocumentByIdValidateResponse = (string);
 
 export type PutUmbracoManagementApiV11DocumentByIdValidate11Data = {
     id: string;
@@ -5299,7 +5284,7 @@ export type PostUserCurrentChangePasswordData = {
 
 export type PostUserCurrentChangePasswordResponse = (string);
 
-export type GetUserCurrentConfigurationResponse = ((CurrenUserConfigurationResponseModel));
+export type GetUserCurrentConfigurationResponse = ((CurrentUserConfigurationResponseModel));
 
 export type GetUserCurrentLoginProvidersResponse = (Array<(UserExternalLoginProviderModel)>);
 

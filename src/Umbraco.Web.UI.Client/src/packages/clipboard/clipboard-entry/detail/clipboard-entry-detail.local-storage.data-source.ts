@@ -7,11 +7,8 @@ import type {
 	UmbDataSourceResponse,
 	UmbDetailDataSource,
 } from '@umbraco-cms/backoffice/repository';
-import { ApiError } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-
-// TODO: these are temp solutions to comply to the ApiError interface
-const localstorageFakeUrl = 'localstorage';
+import { UmbError } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Manage clipboard entries in local storage
@@ -56,20 +53,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 	async create(model: UmbClipboardEntryDetailModel): Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>> {
 		if (!model) {
 			return {
-				error: new ApiError(
-					{
-						method: 'POST',
-						url: localstorageFakeUrl,
-					},
-					{
-						ok: false,
-						status: 400,
-						statusText: 'Bad Request',
-						url: localstorageFakeUrl,
-						body: {},
-					},
-					'Clipboard entry is missing',
-				),
+				error: new UmbError('Clipboard entry is missing'),
 			};
 		}
 
@@ -78,20 +62,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 
 		if (entry) {
 			return {
-				error: new ApiError(
-					{
-						method: 'POST',
-						url: localstorageFakeUrl,
-					},
-					{
-						ok: false,
-						status: 400,
-						statusText: 'Bad Request',
-						url: localstorageFakeUrl,
-						body: {},
-					},
-					'Clipboard entry already exists',
-				),
+				error: new UmbError('Clipboard entry already exists'),
 			};
 		}
 
@@ -117,20 +88,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 	async read(unique: string): Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>> {
 		if (!unique) {
 			return {
-				error: new ApiError(
-					{
-						method: 'GET',
-						url: localstorageFakeUrl,
-					},
-					{
-						ok: false,
-						status: 400,
-						statusText: 'Bad Request',
-						url: localstorageFakeUrl,
-						body: {},
-					},
-					'Unique is missing',
-				),
+				error: new UmbError('Unique is missing'),
 			};
 		}
 
@@ -139,20 +97,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 
 		if (!entry) {
 			return {
-				error: new ApiError(
-					{
-						method: 'GET',
-						url: localstorageFakeUrl,
-					},
-					{
-						ok: false,
-						status: 404,
-						statusText: 'Not Found',
-						url: localstorageFakeUrl,
-						body: {},
-					},
-					'Entry not found',
-				),
+				error: new UmbError('Entry not found'),
 			};
 		}
 
@@ -168,20 +113,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 	async update(model: UmbClipboardEntryDetailModel): Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>> {
 		if (!model) {
 			return {
-				error: new ApiError(
-					{
-						method: 'PUT',
-						url: localstorageFakeUrl,
-					},
-					{
-						ok: false,
-						status: 400,
-						statusText: 'Bad Request',
-						url: localstorageFakeUrl,
-						body: {},
-					},
-					'Clipboard entry is missing',
-				),
+				error: new UmbError('Clipboard entry is missing'),
 			};
 		}
 
@@ -189,20 +121,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 		const entry = await this.#localStorageManager.getEntry(model.unique);
 		if (!entry) {
 			return {
-				error: new ApiError(
-					{
-						method: 'GET',
-						url: localstorageFakeUrl,
-					},
-					{
-						ok: false,
-						status: 404,
-						statusText: 'Not Found',
-						url: localstorageFakeUrl,
-						body: {},
-					},
-					'Entry not found',
-				),
+				error: new UmbError('Entry not found'),
 			};
 		}
 
@@ -234,20 +153,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) {
 			return {
-				error: new ApiError(
-					{
-						method: 'DELETE',
-						url: localstorageFakeUrl,
-					},
-					{
-						ok: false,
-						status: 400,
-						statusText: 'Bad Request',
-						url: localstorageFakeUrl,
-						body: {},
-					},
-					'Unique is missing',
-				),
+				error: new UmbError('Unique is missing'),
 			};
 		}
 
@@ -256,20 +162,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 
 		if (!entry) {
 			return {
-				error: new ApiError(
-					{
-						method: 'GET',
-						url: localstorageFakeUrl,
-					},
-					{
-						ok: false,
-						status: 404,
-						statusText: 'Not Found',
-						url: localstorageFakeUrl,
-						body: {},
-					},
-					'Entry not found',
-				),
+				error: new UmbError('Entry not found'),
 			};
 		}
 

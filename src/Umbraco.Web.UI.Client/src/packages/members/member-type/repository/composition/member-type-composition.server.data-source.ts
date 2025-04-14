@@ -8,7 +8,7 @@ import {
 	MemberTypeService,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbContentTypeCompositionDataSource } from '@umbraco-cms/backoffice/content-type';
 
 /**
@@ -40,7 +40,7 @@ export class UmbMemberTypeCompositionServerDataSource
 	 * @memberof UmbMemberTypeCompositionServerDataSource
 	 */
 	async getReferences(unique: string) {
-		const response = await tryExecuteAndNotify(
+		const response = await tryExecute(
 			this.#host,
 			MemberTypeService.getMemberTypeByIdCompositionReferences({ id: unique }),
 		);
@@ -69,7 +69,7 @@ export class UmbMemberTypeCompositionServerDataSource
 			currentPropertyAliases: args.currentPropertyAliases,
 		};
 
-		const response = await tryExecuteAndNotify(
+		const response = await tryExecute(
 			this.#host,
 			MemberTypeService.postMemberTypeAvailableCompositions({ requestBody }),
 		);

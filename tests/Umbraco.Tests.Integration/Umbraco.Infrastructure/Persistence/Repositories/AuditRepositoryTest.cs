@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
-public class AuditRepositoryTest : UmbracoIntegrationTest
+internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void Prepare() => _logger = LoggerFactory.CreateLogger<AuditRepository>();
