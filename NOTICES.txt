@@ -521,3 +521,19 @@ uuid: A library for generating unique identifiers
 URL: https://github.com/uuidjs/uuid
 License: MIT License
 Copyright: 2010-2020 Robert Kieffer and other contributors
+
+---
+
+Vite: A fast build tool and development server for modern web projects
+
+URL: https://vite.dev/
+License: MIT License
+Copyright: 2019-present VoidZero Inc. and Vite contributors
+
+---
+
+Vite-plugin-static-copy: A Vite plugin for copying static files
+
+URL: https://github.com/sapphi-red/vite-plugin-static-copy
+License: MIT License
+Copyright: 2021 sapphi-red
