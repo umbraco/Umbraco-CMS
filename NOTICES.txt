@@ -65,6 +65,14 @@ Copyright: 2005-2015 Giacomo Stelluti Scala & Contributors
 
 ---
 
+cross-env: A CLI tool to set environment variables across platforms
+
+URL: https://github.com/kentcdodds/cross-env
+License: MIT License
+Copyright: 2017 Kent C. Dodds
+
+---
+
 Dazinator.Extensions.FileProviders: A library for file provider extensions
 
 URL: https://github.com/dazinator/Dazinator.Extensions.FileProviders
