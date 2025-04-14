@@ -65,7 +65,7 @@ Copyright: 2016 Darrell
 
 ---
 
-DomPurify: A DOM-only XSS sanitizer for HTML, MathML and SVG
+DOMPurify: A DOM-only XSS sanitizer for HTML, MathML and SVG
 
 URL: https://github.com/cure53/DOMPurify
 License: Apache License, Version 2.0
