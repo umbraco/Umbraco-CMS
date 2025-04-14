@@ -348,6 +348,14 @@ Copyright: James Long and contributors
 
 ---
 
+Remark-gfm: A GitHub Flavored Markdown plugin for Remark
+
+URL: https://github.com/remarkjs/remark-gfm
+License: MIT License
+Copyright: Titus Wormer
+
+---
+
 Rollup: A module bundler for JavaScript
 
 URL: https://rollupjs.org/
