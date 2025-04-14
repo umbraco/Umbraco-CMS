@@ -1,6 +1,6 @@
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathVariantQuery } from '../utils/data-path-variant-query.function.js';
 import { UmbAbstractArrayValidationPathTranslator } from './abstract-array-path-translator.controller.js';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbVariantsValidationPathTranslator extends UmbAbstractArrayValidationPathTranslator {

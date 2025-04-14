@@ -4,6 +4,7 @@ export { UMB_MEMBER_VARIANT_CONTEXT } from './property-dataset-context/member-pr
 export * from './collection/constants.js';
 export * from './entity-actions/constants.js';
 export * from './item/constants.js';
+export * from './reference/constants.js';
 export * from './repository/constants.js';
 export * from './search/constants.js';
 export * from './workspace/constants.js';

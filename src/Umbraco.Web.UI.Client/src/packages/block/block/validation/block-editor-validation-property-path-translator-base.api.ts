@@ -1,3 +1,5 @@
+import type { UmbBlockDataModel } from '../types.js';
+import { UmbDataPathBlockElementDataQuery } from './data-path-element-data-query.function.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '@umbraco-cms/backoffice/property';
 import {
@@ -7,7 +9,6 @@ import {
 	umbScopeMapperForJsonPaths,
 	type UmbPropertyValidationPathTranslator,
 } from '@umbraco-cms/backoffice/validation';
-import { UmbDataPathBlockElementDataQuery, type UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 
 export abstract class UmbBlockEditorValidationPropertyPathTranslatorBase<PropertyValueType>
 	extends UmbControllerBase

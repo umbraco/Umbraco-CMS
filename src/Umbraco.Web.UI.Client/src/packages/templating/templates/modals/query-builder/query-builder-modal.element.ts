@@ -135,21 +135,26 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 
 	#setSortProperty(event: Event) {
 		const target = event.target as UUIComboboxListElement;
-		this.#setSort(target.value as string, this._queryRequest.sort?.direction as SortOrder ?? this._defaultSortDirection);
+		this.#setSort(
+			target.value as string,
+			(this._queryRequest.sort?.direction as SortOrder) ?? this._defaultSortDirection,
+		);
 	}
 
 	#setSortDirection() {
 		const direction = this._queryRequest.sort?.direction
-			? this._queryRequest.sort.direction === SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending
+			? this._queryRequest.sort.direction === SortOrder.Ascending
+				? SortOrder.Descending
+				: SortOrder.Ascending
 			: this._defaultSortDirection;
-		this.#setSort(this._queryRequest.sort?.propertyAlias ?? "", direction);
+		this.#setSort(this._queryRequest.sort?.propertyAlias ?? '', direction);
 	}
 
 	#setSort(propertyAlias: string, direction: SortOrder) {
 		this.#updateQueryRequest({
 			sort: {
 				propertyAlias,
-				direction
+				direction,
 			},
 		});
 	}
@@ -238,9 +243,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 						</div>
 						<div class="row query-results">
 							<span id="results-count">
-								${this._templateQuery?.resultCount ?? 0}
-								<umb-localize key="template_itemsReturned">items returned, in</umb-localize>
-								${this._templateQuery?.executionTime ?? 0} ms
+								<umb-localize key="template_publishedItemsReturned" .args=${[this._templateQuery?.resultCount ?? 0, this._templateQuery?.executionTime ?? 0]}>items returned, in</umb-localize>
 							</span>
 							${this._templateQuery?.sampleResults.map(
 								(sample) => html`<span><umb-icon name=${sample.icon}></umb-icon>${sample.name}</span>`,

@@ -67,7 +67,9 @@ export class UmbLocalizationRegistry {
 				if (!translations.length) return;
 
 				if (diff.length) {
-					const filteredTranslations = translations.filter((t) => diff.some((ext) => ext.meta.culture === t.$code));
+					const filteredTranslations = translations.filter((t) =>
+						diff.some((ext) => ext.meta.culture.toLowerCase() === t.$code),
+					);
 					umbLocalizationManager.registerManyLocalizations(filteredTranslations);
 				}
 

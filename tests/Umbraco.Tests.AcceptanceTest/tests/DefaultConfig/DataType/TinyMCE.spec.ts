@@ -1,4 +1,4 @@
-import {NotificationConstantHelper, test} from "@umbraco/playwright-testhelpers";
+import {ConstantHelper, NotificationConstantHelper, test} from "@umbraco/playwright-testhelpers";
 import {expect} from "@playwright/test";
 
 const tinyMCEName = 'TestTinyMCE';
@@ -19,6 +19,22 @@ test('can create a rich text editor with tinyMCE', {tag: '@smoke'}, async ({umbr
   const tinyMCEFilterKeyword = 'Rich Text Editor';
   const tinyMCEAlias = 'Umbraco.RichText';
   const tinyMCEUiAlias = 'Umb.PropertyEditorUi.TinyMCE';
+  const toolbarValue = [
+    "styles",
+    "bold",
+    "italic",
+    "alignleft",
+    "aligncenter",
+    "alignright",
+    "bullist",
+    "numlist",
+    "outdent",
+    "indent",
+    "sourcecode",
+    "link",
+    "umbmediapicker",
+    "umbembeddialog"
+  ];
 
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
@@ -32,9 +48,17 @@ test('can create a rich text editor with tinyMCE', {tag: '@smoke'}, async ({umbr
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.dataType.doesNameExist(tinyMCEName)).toBeTruthy();
+  // Verify the default configuration
+  await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.tinyMCESettings);
+  await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.tinyMCESettings);
+  await umbracoUi.dataType.doesPropertyEditorHaveAlias(tinyMCEAlias);
+  await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(tinyMCEUiAlias);
   const dataTypeData = await umbracoApi.dataType.getByName(tinyMCEName);
   expect(dataTypeData.editorAlias).toBe(tinyMCEAlias);
   expect(dataTypeData.editorUiAlias).toBe(tinyMCEUiAlias);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tinyMCEName, 'maxImageSize', 500)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tinyMCEName, 'mode', 'Classic')).toBeTruthy();
+  expect(await umbracoApi.dataType.doesTinyMCEToolbarHaveItems(tinyMCEName, toolbarValue)).toBeTruthy();
 });
 
 test('can rename a rich text editor with tinyMCE', async ({umbracoApi, umbracoUi}) => {
@@ -89,12 +113,7 @@ test('can enable toolbar options', async ({umbracoApi, umbracoUi}) => {
 test('can add stylesheet', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'StylesheetForDataType.css';
-  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
   const stylesheetPath = await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
-  const expectedTinyMCEValues = {
-    "alias": "stylesheets",
-    "value": [stylesheetPath]
-  };
   await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
@@ -104,8 +123,7 @@ test('can add stylesheet', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
-  expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tinyMCEName, 'stylesheets', [stylesheetPath])).toBeTruthy();
 
   // Clean
   await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
@@ -115,13 +133,6 @@ test('can add dimensions', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const width = 100;
   const height = 10;
-  const expectedTinyMCEValues = {
-    "alias": "dimensions",
-    "value": {
-      "width": width,
-      "height": height
-    }
-  };
   await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
@@ -131,17 +142,12 @@ test('can add dimensions', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
-  expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
+  expect(await umbracoApi.dataType.doesRTEHaveDimensions(tinyMCEName, width, height)).toBeTruthy();
 });
 
 test('can update maximum size for inserted images', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const maximumSize = 300;
-  const expectedTinyMCEValues = {
-    "alias": "maxImageSize",
-    "value": maximumSize
-  };
   await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
@@ -151,17 +157,12 @@ test('can update maximum size for inserted images', async ({umbracoApi, umbracoU
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
-  expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tinyMCEName, 'maxImageSize', maximumSize)).toBeTruthy();
 });
 
 test('can enable inline editing mode', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mode = 'Inline';
-  const expectedTinyMCEValues = {
-    "alias": "mode",
-    "value": mode
-  };
   await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
@@ -171,23 +172,14 @@ test('can enable inline editing mode', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
-  expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tinyMCEName, 'mode', mode)).toBeTruthy();
 });
 
 test('can add an available block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementTypeName = 'TestElementType';
-  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
-  const expectedTinyMCEValues = {
-    alias: "blocks",
-    value: [
-      {
-        contentElementTypeKey: elementTypeId,
-      }
-    ]
-  };
+
   await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
@@ -197,8 +189,7 @@ test('can add an available block', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
-  expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
+  expect(await umbracoApi.dataType.doesRTEContainBlocks(tinyMCEName, [elementTypeId])).toBeTruthy();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
@@ -207,10 +198,6 @@ test('can add an available block', async ({umbracoApi, umbracoUi}) => {
 test('can select overlay size', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const overlaySizeValue = 'large';
-  const expectedTinyMCEValues = {
-    "alias": "overlaySize",
-    "value": overlaySizeValue
-  };
   await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
@@ -220,16 +207,11 @@ test('can select overlay size', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
-  expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tinyMCEName, 'overlaySize', overlaySizeValue)).toBeTruthy();
 });
 
 test('can enable hide label', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const expectedTinyMCEValues = {
-    "alias": "hideLabel",
-    "value": true
-  };
   await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
@@ -239,19 +221,13 @@ test('can enable hide label', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
-  expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tinyMCEName, 'hideLabel', true)).toBeTruthy();
 });
 
 test('can add image upload folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaFolderName = 'TestMediaFolder';
-  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
   const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
-  const expectedTinyMCEValues = {
-    "alias": "mediaParentId",
-    "value": mediaFolderId
-  };
   await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
@@ -261,8 +237,7 @@ test('can add image upload folder', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
-  expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tinyMCEName, 'mediaParentId', mediaFolderId)).toBeTruthy();
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
@@ -270,10 +245,6 @@ test('can add image upload folder', async ({umbracoApi, umbracoUi}) => {
 
 test('can enable ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const expectedTinyMCEValues = {
-    "alias": "ignoreUserStartNodes",
-    "value": true
-  };
   await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
@@ -283,6 +254,5 @@ test('can enable ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
-  expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tinyMCEName, 'ignoreUserStartNodes', true)).toBeTruthy();
 });
