@@ -113,6 +113,14 @@ Copyright: 2023 Shannon Deminick
 
 ---
 
+Glob: A library for matching file paths using glob patterns
+
+URL: https://github.com/isaacs/node-glob
+License: ISC License
+Copyright: 2009-2023 Isaac Z. Schlueter and Contributors
+
+---
+
 Html Agility Pack: An HTML parser for .NET
 
 URL: https://html-agility-pack.net/
