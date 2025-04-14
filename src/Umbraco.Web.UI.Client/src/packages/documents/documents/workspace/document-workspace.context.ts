@@ -17,6 +17,7 @@ import {
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, UmbDocumentPublishingRepository } from '../publishing/index.js';
 import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
+import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -36,7 +37,6 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/language';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';

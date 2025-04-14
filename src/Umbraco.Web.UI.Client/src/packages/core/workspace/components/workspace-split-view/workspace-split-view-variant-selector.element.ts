@@ -1,4 +1,5 @@
 import type { ActiveVariant } from '../../controllers/index.js';
+import type { UmbVariantDatasetWorkspaceContext } from '../../contexts/index.js';
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT } from './workspace-split-view.context.js';
 import { css, customElement, html, ifDefined, nothing, query, ref, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -7,7 +8,6 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDataPathVariantQuery, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
@@ -61,7 +61,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		this.consumeContext(UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, (instance) => {
 			this.#splitViewContext = instance;
 
-			const workspaceContext = this.#splitViewContext.getWorkspaceContext() as unknown as UmbContentWorkspaceContext;
+			const workspaceContext =
+				this.#splitViewContext.getWorkspaceContext() as unknown as UmbVariantDatasetWorkspaceContext;
 			if (!workspaceContext) throw new Error('Split View Workspace context not found');
 
 			this.#observeVariants(workspaceContext);
@@ -76,7 +77,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		});
 	}
 
-	async #observeVariants(workspaceContext: UmbContentWorkspaceContext) {
+	async #observeVariants(workspaceContext: UmbVariantDatasetWorkspaceContext) {
 		this.observe(
 			workspaceContext.variantOptions,
 			(variantOptions) => {
@@ -87,7 +88,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		);
 	}
 
-	async #observeActiveVariants(workspaceContext: UmbContentWorkspaceContext) {
+	async #observeActiveVariants(workspaceContext: UmbVariantDatasetWorkspaceContext) {
 		this.observe(
 			workspaceContext.splitView.activeVariantsInfo,
 			(activeVariants) => {
@@ -113,7 +114,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	async #observeCurrentVariant() {
 		if (!this.#datasetContext || !this.#splitViewContext) return;
-		const workspaceContext = this.#splitViewContext.getWorkspaceContext() as unknown as UmbContentWorkspaceContext;
+		const workspaceContext =
+			this.#splitViewContext.getWorkspaceContext() as unknown as UmbVariantDatasetWorkspaceContext;
 		if (!workspaceContext) return;
 
 		this._variantId = this.#datasetContext.getVariantId();
@@ -166,7 +168,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		return this._variantOptions?.length > 1;
 	}
 
-	#setReadOnlyCultures(workspaceContext: UmbContentWorkspaceContext) {
+	#setReadOnlyCultures(workspaceContext: UmbVariantDatasetWorkspaceContext) {
 		this._readOnlyCultures = this._variantOptions
 			.filter((variant) => workspaceContext.readOnlyGuard.getIsPermittedForVariant(UmbVariantId.Create(variant)))
 			.map((variant) => variant.culture);

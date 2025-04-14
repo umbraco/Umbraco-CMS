@@ -84,6 +84,9 @@ export function saveNativeFunction(obj: any, name: string, func: () => void) {
 /**
  * Dispatches and event and returns whether the state change should be cancelled.
  * The state will be considered as cancelled if the "willChangeState" event was cancelled.
+ * @param data
+ * @param data.url
+ * @param data.eventName
  */
 function shouldCancelChangeState(data: { url?: string | null; eventName: GlobalRouterEvent }): boolean {
 	return !GLOBAL_ROUTER_EVENTS_TARGET.dispatchEvent(

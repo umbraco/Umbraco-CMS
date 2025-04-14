@@ -1,6 +1,6 @@
-import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbEntityActionElement } from './entity-action-element.interface.js';
 import type { UmbEntityAction } from './entity-action.interface.js';
+import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * An action to perform on an entity

@@ -8,7 +8,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 // TODO: Turn this into a Repository with a Store that holds the cache [NL]
 /**
  * A context for fetching and caching the document configuration.
- * @internal Do not use this one, it is only for internal usage.
+ * @internal
  */
 export class UmbDocumentConfigurationContext
 	extends UmbContextBase<UmbDocumentConfigurationContext, typeof UMB_DOCUMENT_CONFIGURATION_CONTEXT>
@@ -46,7 +46,7 @@ export class UmbDocumentConfigurationContext
 export default UmbDocumentConfigurationContext;
 
 /**
- * @internal Do not use this one, it is only for internal usage.
+ * @internal
  */
 export const UMB_DOCUMENT_CONFIGURATION_CONTEXT = new UmbContextToken<UmbDocumentConfigurationContext>(
 	'UmbDocumentConfigurationContext',

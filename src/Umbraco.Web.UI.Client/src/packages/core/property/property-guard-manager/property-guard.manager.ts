@@ -1,4 +1,4 @@
-import { type Observable } from '@umbraco-cms/backoffice/observable-api';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { UmbGuardManagerBase, type UmbGuardRule } from '@umbraco-cms/backoffice/utils';
 
@@ -6,6 +6,11 @@ export interface UmbPropertyGuardRule extends UmbGuardRule {
 	propertyType?: UmbReferenceByUnique;
 }
 
+/**
+ *
+ * @param rule
+ * @param propertyType
+ */
 function findRule(rule: UmbPropertyGuardRule, propertyType: UmbReferenceByUnique) {
 	return rule.propertyType?.unique === propertyType.unique || rule.propertyType === undefined;
 }
@@ -14,13 +19,13 @@ function findRule(rule: UmbPropertyGuardRule, propertyType: UmbReferenceByUnique
  * @description - A Guard to manage property rules.
  * @export
  * @class UmbPropertyGuardManager
- * @extends {UmbGuardManagerBase<UmbPropertyGuardRule>}
+ * @augments {UmbGuardManagerBase<UmbPropertyGuardRule>}
  */
 export class UmbPropertyGuardManager extends UmbGuardManagerBase<UmbPropertyGuardRule> {
 	/**
 	 * Checks if the property is permitted for the given property type
 	 * @param {UmbReferenceByUnique} propertyType
-	 * @return {Observable<boolean>} - Observable that emits true if the property is permitted
+	 * @returns {Observable<boolean>} - Observable that emits true if the property is permitted
 	 * @memberof UmbPropertyGuardManager
 	 */
 	isPermittedForProperty(propertyType: UmbReferenceByUnique): Observable<boolean> {
@@ -30,7 +35,7 @@ export class UmbPropertyGuardManager extends UmbGuardManagerBase<UmbPropertyGuar
 	/**
 	 * Checks if the property is permitted for the given property type
 	 * @param {UmbReferenceByUnique} propertyType
-	 * @return {boolean} - Returns true if the property is permitted
+	 * @returns {boolean} - Returns true if the property is permitted
 	 * @memberof UmbPropertyGuardManager
 	 */
 	getIsPermittedForProperty(propertyType: UmbReferenceByUnique): boolean {

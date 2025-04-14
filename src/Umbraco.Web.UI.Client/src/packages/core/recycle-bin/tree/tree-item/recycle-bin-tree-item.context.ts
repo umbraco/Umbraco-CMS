@@ -1,10 +1,10 @@
+import { UmbEntityTrashedEvent } from '../../entity-action/trash/index.js';
 import type { ManifestTreeItemRecycleBinKind } from './types.js';
 import { UmbDefaultTreeItemContext, type UmbTreeItemModel, type UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { debounce } from '@umbraco-cms/backoffice/utils';
-import { UmbEntityTrashedEvent } from '../../entity-action/trash/index.js';
 
 export class UmbRecycleBinTreeItemContext<
 	RecycleBinTreeItemModelType extends UmbTreeItemModel,

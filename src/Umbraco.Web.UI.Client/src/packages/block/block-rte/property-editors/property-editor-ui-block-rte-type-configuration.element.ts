@@ -1,3 +1,4 @@
+import { UMB_BLOCK_RTE_TYPE } from '../constants.js';
 import { customElement, html, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -9,7 +10,6 @@ import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_BLOCK_RTE_TYPE } from '../constants.js';
 
 /**
  * @element umb-property-editor-ui-block-rte-type-configuration
