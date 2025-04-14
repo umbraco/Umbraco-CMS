@@ -364,6 +364,14 @@ Copyright: 2015-present Rollup contributors
 
 ---
 
+Rollup Plugins: A collection of Rollup plugins
+
+URL: https://github.com/rollup/plugins
+License: MIT License
+Copyright: 2019-present Rollup Plugins contributors
+
+---
+
 Rollup-plugin-esbuild: A Rollup plugin for using esbuild
 
 URL: https://github.com/egoist/rollup-plugin-esbuild
