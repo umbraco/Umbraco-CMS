@@ -1,11 +1,10 @@
-import type { UmbTableColumn } from '@umbraco-cms/backoffice/components';
 import type { UmbContentTreeItemModel } from '../../types.js';
-import { customElement, css, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSortChildrenOfModalElement } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-sort-children-of-content-modal')
-export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModalElement {
+export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModalElement<UmbContentTreeItemModel> {
 	#localizeDateOptions: Intl.DateTimeFormatOptions = {
 		day: 'numeric',
 		month: 'short',
@@ -27,6 +26,27 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 				allowSorting: true,
 			},
 		];
+	}
+
+	protected override _createTableItems() {
+		this._tableItems = this._children.map((treeItem) => {
+			// TODO: implement ItemDataResolver for document and media
+			// This will fix both the icon and the variant name
+			return {
+				id: treeItem.unique,
+				icon: 'icon-document',
+				data: [
+					{
+						columnAlias: 'name',
+						value: treeItem.name,
+					},
+					{
+						columnAlias: 'createDate',
+						value: this.localize.date(treeItem.createDate, this.#localizeDateOptions),
+					},
+				],
+			};
+		});
 	}
 
 	static override styles = [UmbTextStyles, css``];

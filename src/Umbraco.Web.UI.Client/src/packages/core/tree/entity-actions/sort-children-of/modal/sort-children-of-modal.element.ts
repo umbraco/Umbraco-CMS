@@ -20,12 +20,11 @@ import type {
 const elementName = 'umb-sort-children-of-modal';
 
 @customElement(elementName)
-export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
-	UmbSortChildrenOfModalData,
-	UmbSortChildrenOfModalValue
-> {
+export class UmbSortChildrenOfModalElement<
+	TreeItemModelType extends UmbTreeItemModel = UmbTreeItemModel,
+> extends UmbModalBaseElement<UmbSortChildrenOfModalData, UmbSortChildrenOfModalValue> {
 	@state()
-	private _children: Array<UmbTreeItemModel> = [];
+	protected _children: Array<TreeItemModelType> = [];
 
 	@state()
 	_currentPage = 1;
@@ -42,7 +41,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	};
 
 	@state()
-	private _tableItems: Array<UmbTableItem> = [];
+	protected _tableItems: Array<UmbTableItem> = [];
 
 	@state()
 	private _sortable = false;
@@ -88,7 +87,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		if (this.data?.unique === undefined) throw new Error('unique is required');
 		if (!this.data?.treeRepositoryAlias) throw new Error('treeRepositoryAlias is required');
 
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<UmbTreeItemModel>>(
+		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<TreeItemModelType>>(
 			this,
 			this.data.treeRepositoryAlias,
 		);
