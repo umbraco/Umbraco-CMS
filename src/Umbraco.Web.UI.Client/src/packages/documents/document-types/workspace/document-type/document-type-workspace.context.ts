@@ -174,7 +174,7 @@ export class UmbDocumentTypeWorkspaceContext
 			super._create(currentData, parent);
 			this.createTemplateMode = false;
 		} catch (error) {
-			console.log(error);
+			console.warn(error);
 		}
 	}
 
