@@ -93,14 +93,21 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 
 	constructor() {
 		super();
+		this._observeProgress();
+		this._observeProgressItems();
+	}
 
+	_observeProgress() {
 		this.observe(
 			this._manager.progress,
-			(progress) =>
-				this.dispatchEvent(new ProgressEvent('progress', { loaded: progress.completed, total: progress.total })),
+			(progress) => {
+				this.dispatchEvent(new ProgressEvent('progress', { loaded: progress.completed, total: progress.total }));
+			},
 			'_observeProgress',
 		);
+	}
 
+	protected _observeProgressItems() {
 		this.observe(
 			this._manager.progressItems,
 			(progressItems) => {
