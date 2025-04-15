@@ -147,7 +147,7 @@ export class UmbContentTypeStructureManager<
 	 * @param {string} unique - The unique of the ContentType to load.
 	 * @returns {Promise} - Promise resolved
 	 */
-	public async loadType(unique?: string): Promise<UmbRepositoryResponseWithAsObservable<T>> {
+	public async loadType(unique: string): Promise<UmbRepositoryResponseWithAsObservable<T>> {
 		if (this.#ownerContentTypeUnique === unique) {
 			// Its the same, but we do not know if its done loading jet, so we will wait for the load promise to finish. [NL]
 			await this.#init;
@@ -156,7 +156,11 @@ export class UmbContentTypeStructureManager<
 		await this.#initRepository;
 		this.#clear();
 		this.#ownerContentTypeUnique = unique;
-		if (!unique) return Promise.reject();
+		if (!unique) {
+			return Promise.reject(
+				new Error('The unique identifier is missing. A valid unique identifier is required to load the content type.'),
+			);
+		}
 		this.#repoManager!.setUniques([unique]);
 		const result = await this.observe(this.#repoManager!.entryByUnique(unique)).asPromise();
 		this.#initResolver?.(result);
@@ -176,6 +180,8 @@ export class UmbContentTypeStructureManager<
 
 		// Add the new content type to the list of content types, this holds our draft state of this scaffold.
 		this.#contentTypes.appendOne(data);
+		// Make a entry in the repo manager:
+		this.#repoManager!.addEntry(data);
 		this.#initResolver?.(data);
 		return repsonse;
 	}
@@ -197,6 +203,8 @@ export class UmbContentTypeStructureManager<
 		// Update state with latest version:
 		this.#contentTypes.updateOne(contentType.unique, data);
 
+		// Update entry in the repo manager:
+		this.#repoManager!.addEntry(data);
 		return data;
 	}
 
