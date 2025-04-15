@@ -10,9 +10,10 @@ import {
 	when,
 	LitElement,
 } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-// TODO: move to UI Library - entity actions should NOT be moved to UI Library but stay in an UmbTable element
 export interface UmbTableItem {
 	id: string;
 	icon?: string | null;
@@ -64,6 +65,19 @@ export class UmbTableOrderedEvent extends Event {
 	}
 }
 
+export class UmbTableSortedEvent extends Event {
+	#itemId: string;
+
+	public constructor({ itemId }: { itemId: string }) {
+		super('sorted', { bubbles: true, composed: true });
+		this.#itemId = itemId;
+	}
+
+	public getItemId() {
+		return this.#itemId;
+	}
+}
+
 /**
  *  @element umb-table
  *  @description - Element for displaying a table
@@ -73,14 +87,21 @@ export class UmbTableOrderedEvent extends Event {
  *  @augments LitElement
  */
 @customElement('umb-table')
-export class UmbTableElement extends LitElement {
+export class UmbTableElement extends UmbLitElement {
 	/**
 	 * Table Items
 	 * @type {Array<UmbTableItem>}
 	 * @memberof UmbTableElement
 	 */
 	@property({ type: Array, attribute: false })
-	public items: Array<UmbTableItem> = [];
+	private _items: Array<UmbTableItem> = [];
+	public get items(): Array<UmbTableItem> {
+		return this._items;
+	}
+	public set items(value: Array<UmbTableItem>) {
+		this._items = value;
+		this.#sorter.setModel(value);
+	}
 
 	/**
 	 * @description Table Columns
@@ -115,8 +136,47 @@ export class UmbTableElement extends LitElement {
 	@property({ type: Boolean, attribute: false })
 	public orderingDesc = false;
 
+	@property({ type: Boolean })
+	private _sortable = false;
+	public get sortable() {
+		return this._sortable;
+	}
+	public set sortable(value) {
+		this._sortable = value;
+		if (value) {
+			this.#sorter.enable();
+		} else {
+			this.#sorter.disable();
+		}
+	}
+
 	@state()
 	private _selectionMode = false;
+
+	#sorter = new UmbSorterController<UmbTableItem>(this, {
+		getUniqueOfElement: (element) => {
+			return element.dataset.sortableId;
+		},
+		getUniqueOfModel: (item) => {
+			return item.id;
+		},
+		identifier: 'Umb.SorterIdentifier.UmbTable',
+		itemSelector: 'uui-table-row',
+		containerSelector: 'uui-table',
+		onChange: ({ model }) => {
+			const oldValue = this.items;
+			this.items = model;
+			this.requestUpdate('items', oldValue);
+		},
+		onEnd: ({ item }) => {
+			this.dispatchEvent(new UmbTableSortedEvent({ itemId: item.id }));
+		},
+	});
+
+	constructor() {
+		super();
+		this.#sorter.disable();
+	}
 
 	private _isSelected(key: string) {
 		return this.selection.includes(key);
@@ -230,6 +290,7 @@ export class UmbTableElement extends LitElement {
 	private _renderRow = (item: UmbTableItem) => {
 		return html`
 			<uui-table-row
+				data-sortable-id=${item.id}
 				?selectable="${this.config.allowSelection}"
 				?select-only=${this._selectionMode}
 				?selected=${this._isSelected(item.id)}
