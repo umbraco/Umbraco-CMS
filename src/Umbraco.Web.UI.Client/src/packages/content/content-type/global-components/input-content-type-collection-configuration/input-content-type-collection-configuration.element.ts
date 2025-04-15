@@ -9,10 +9,11 @@ import {
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
-@customElement('umb-input-collection-configuration')
-export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin<string, typeof UmbLitElement>(
-	UmbLitElement,
-) {
+@customElement('umb-input-content-type-collection-configuration')
+export class UmbInputContentTypeCollectionConfigurationElement extends UmbFormControlMixin<
+	string,
+	typeof UmbLitElement
+>(UmbLitElement) {
 	protected override getFormElement() {
 		return undefined;
 	}
@@ -122,10 +123,8 @@ export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin<
 	];
 }
 
-export default UmbInputCollectionConfigurationElement;
-
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-collection-configuration': UmbInputCollectionConfigurationElement;
+		'umb-input-content-type-collection-configuration': UmbInputContentTypeCollectionConfigurationElement;
 	}
 }
