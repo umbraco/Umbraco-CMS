@@ -191,7 +191,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 				.config=${this._tableConfig}
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
-				?sortable=${this._sortable}
+				.sortable=${this._sortable}
 				@sorted=${this.#onSorted}></umb-table>
 
 			${this._hasMorePages()
