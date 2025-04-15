@@ -74,7 +74,12 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 
 	get source(): string {
 		if (this.src) {
-			return `${this._serverUrl}${this.src}`;
+			// Test that URL is relative:
+			if (this.src.startsWith('/')) {
+				return `${this._serverUrl}${this.src}`;
+			} else {
+				return this.src;
+			}
 		}
 
 		return this.fileDataUrl ?? '';
