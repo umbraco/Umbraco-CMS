@@ -127,10 +127,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					this.#sorter.disable();
 				}
 			},
-			'_observeIsSorting',
+			null,
 		);
-
-		//TODO: We need to differentiate between local and composition tabs (and hybrids)
 
 		this.#tabsStructureHelper.setContainerChildType('Tab');
 		this.#tabsStructureHelper.setIsRoot(true);

@@ -32,6 +32,9 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 
 	#entries = new UmbArrayState<DetailType>([], (x) => x.unique);
 	entries = this.#entries.asObservable();
+	entryByUnique(unique: string) {
+		return this.#entries.asObservablePart((items) => items.find((item) => item.unique === unique));
+	}
 
 	#statuses = new UmbArrayState<UmbRepositoryStatus>([], (x) => x.unique);
 	statuses = this.#statuses.asObservable();
@@ -107,20 +110,28 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 		this.#uniques.setValue(uniques ?? []);
 	}
 
+	addUnique(unique: string): void {
+		this.#uniques.appendOne(unique);
+	}
+
+	addEntry(data: DetailType): void {
+		const unique = data.unique;
+		this.#statuses.appendOne({
+			state: {
+				type: 'success',
+			},
+			unique,
+		});
+		this.#entries.appendOne(data);
+		this.#uniques.appendOne(unique);
+	}
+
 	getItems(): Array<DetailType> {
 		return this.#entries.getValue();
 	}
 
 	itemByUnique(unique: string) {
 		return this.#entries.asObservablePart((items) => items.find((item) => item.unique === unique));
-	}
-
-	async getItemByUnique(unique: string) {
-		// TODO: Make an observeOnce feature, to avoid this amount of code: [NL]
-		const ctrl = this.observe(this.itemByUnique(unique));
-		const result = await ctrl.asPromise();
-		ctrl.destroy();
-		return result;
 	}
 
 	async #requestNewItems(): Promise<void> {
