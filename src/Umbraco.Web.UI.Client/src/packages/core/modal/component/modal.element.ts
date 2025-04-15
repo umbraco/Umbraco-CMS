@@ -1,5 +1,6 @@
 import type { UmbModalContext } from '../context/modal.context.js';
 import { UMB_MODAL_CONTEXT } from '../context/modal.context-token.js';
+import type { ManifestModal } from '../extensions/types.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -22,7 +23,6 @@ import {
 	UmbContextBoundary,
 	UmbContextProvider,
 } from '@umbraco-cms/backoffice/context-api';
-import type { ManifestModal } from '../extensions/types.js';
 
 @customElement('umb-modal')
 export class UmbModalElement extends UmbLitElement {

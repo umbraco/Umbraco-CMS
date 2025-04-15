@@ -1,7 +1,7 @@
 import type { UmbModalRejectReason, UmbModalContext } from '../context/index.js';
+import type { ManifestModal, UmbModalExtensionElement } from '../extensions/types.js';
 import { property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestModal, UmbModalExtensionElement } from '../extensions/types.js';
 
 export abstract class UmbModalBaseElement<
 		ModalDataType extends object = object,

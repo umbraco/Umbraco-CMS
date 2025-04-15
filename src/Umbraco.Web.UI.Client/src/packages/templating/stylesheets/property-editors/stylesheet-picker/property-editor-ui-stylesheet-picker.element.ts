@@ -1,3 +1,4 @@
+import type { UmbStylesheetInputElement } from '../../global-components/index.js';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
@@ -6,7 +7,6 @@ import type {
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbStylesheetInputElement } from '../../global-components/index.js';
 
 @customElement('umb-property-editor-ui-stylesheet-picker')
 export class UmbPropertyEditorUIStylesheetPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {

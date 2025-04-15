@@ -1,10 +1,10 @@
+import { UMB_TREE_PICKER_MODAL } from '../../tree-picker-modal/index.js';
 import type { UmbMoveRepository } from './move-repository.interface.js';
 import type { MetaEntityActionMoveToKind } from './types.js';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UMB_TREE_PICKER_MODAL } from '../../tree-picker-modal/index.js';
 
 export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionMoveToKind> {
 	override async execute() {
