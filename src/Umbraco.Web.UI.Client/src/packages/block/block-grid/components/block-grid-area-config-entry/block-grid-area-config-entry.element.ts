@@ -80,7 +80,7 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 							<uui-icon name="icon-remove"></uui-icon>
 						</uui-button>
 					</uui-action-bar>
-					<umb-block-scale-handler @mousedown=${(e: MouseEvent) => this.#context.scaleManager.onScaleMouseDown(e)}>
+					<umb-block-scale-handler @mouseup=${(e: MouseEvent) => this.#context.scaleManager.onScaleMouseDown(e)}>
 						${this._columnSpan}x${this._rowSpan}
 					</umb-block-scale-handler>
 				`

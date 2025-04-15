@@ -2,7 +2,7 @@ import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET, type UmbBlockGridTypeAreaType
 import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL } from '../../components/block-grid-area-config-entry/constants.js';
 import { UmbBlockGridAreaTypeEntriesContext } from './block-grid-area-type-entries.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, repeat,css } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
@@ -10,6 +10,7 @@ import type {
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { incrementString } from '@umbraco-cms/backoffice/utils';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '../../components/block-grid-area-config-entry/block-grid-area-config-entry.element.js';
 @customElement('umb-property-editor-ui-block-grid-areas-config')
@@ -52,6 +53,9 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 
 	@state()
 	private _areaGridColumns?: number;
+
+	@state()
+	private _draggedIndex?: number = undefined;
 
 	constructor() {
 		super();
@@ -112,7 +116,19 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 		return alias;
 	}
 
+	_handleDrop(targetIndex: number) {
+		if (!this._draggedIndex || this._draggedIndex === targetIndex) return;
+	
+		const newValue = [...this.value];
+		const [movedItem] = newValue.splice(this._draggedIndex, 1);
+		newValue.splice(targetIndex, 0, movedItem);
+	
+		this.value = newValue;
+		this._draggedIndex = undefined;
+	}
+
 	override render() {
+		
 		return this._areaGridColumns
 			? html`${this._styleElement}
 					<div
@@ -122,17 +138,33 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 						${repeat(
 							this.value,
 							(area) => area.key,
-							(area) =>
+							(area, index) =>
 								html`<umb-block-area-config-entry
 									class="umb-block-grid__area"
+									draggable="true"
 									.workspacePath=${this._workspacePath}
 									.areaGridColumns=${this._areaGridColumns}
+									@dragstart=${(e: any) => {
+										this._draggedIndex = index;
+										e.dataTransfer.effectAllowed = 'move';
+									}}
+									@dragover=${(e: any) => e.preventDefault()}
+									@drop=${() => this._handleDrop(index)}
 									.key=${area.key}></umb-block-area-config-entry>`,
 						)}
 					</div>
 					<uui-button look="placeholder" label=${'Add area'} href=${this._workspacePath + 'create'}></uui-button>`
 			: '';
 	}
+
+	static override styles = [
+		UmbTextStyles,
+		css`
+			.umb-block-grid__area{
+				cursor: move;
+			}
+		`
+	]
 }
 
 export default UmbPropertyEditorUIBlockGridAreasConfigElement;
