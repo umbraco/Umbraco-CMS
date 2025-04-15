@@ -5,9 +5,9 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
+import type { UmbDocumentItemModel } from '../../item/types.js';
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
