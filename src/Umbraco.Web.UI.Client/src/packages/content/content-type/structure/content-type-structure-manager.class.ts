@@ -25,7 +25,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
-type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
+type UmbPropertyTypeUnique = UmbPropertyTypeModel['unique'];
 
 const UmbFilterDuplicateStrings = (value: string, index: number, array: Array<string>) =>
 	array.indexOf(value) === index;
@@ -342,10 +342,7 @@ export class UmbContentTypeStructureManager<
 
 		containers.push(clonedContainer);
 
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		// TODO: fix TS partial complaint [NL]
-		this.#contentTypes.updateOne(toContentTypeUnique, { containers });
+		this.#contentTypes.updateOne(toContentTypeUnique, { containers } as Partial<T>);
 
 		return clonedContainer;
 	}
@@ -398,10 +395,7 @@ export class UmbContentTypeStructureManager<
 		const containers = [...(contentTypes.find((x) => x.unique === contentTypeUnique)?.containers ?? [])];
 		containers.push(container);
 
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		// TODO: fix TS partial complaint
-		this.#contentTypes.updateOne(contentTypeUnique, { containers });
+		this.#contentTypes.updateOne(contentTypeUnique, { containers } as Partial<T>);
 
 		return container;
 	}
@@ -424,10 +418,7 @@ export class UmbContentTypeStructureManager<
 
 		const containers = appendToFrozenArray(frozenContainers, container, (x) => x.id === container.id);
 
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		// TODO: fix TS partial complaint
-		this.#contentTypes.updateOne(contentTypeUnique, { containers });
+		this.#contentTypes.updateOne(contentTypeUnique, { containers } as Partial<T>);
 	}*/
 
 	makeEmptyContainerName(
@@ -488,7 +479,11 @@ export class UmbContentTypeStructureManager<
 			);
 		}
 
-		const containers = partialUpdateFrozenArray(frozenContainers, partialUpdate, (x) => x.id === containerId);
+		const containers: UmbPropertyTypeContainerModel[] = partialUpdateFrozenArray(
+			frozenContainers,
+			partialUpdate,
+			(x) => x.id === containerId,
+		);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
@@ -515,10 +510,7 @@ export class UmbContentTypeStructureManager<
 			x.container ? !removedContainerIds.some((ids) => ids === x.container?.id) : true,
 		);
 
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		// TODO: fix TS partial complaint
-		this.#contentTypes.updateOne(contentTypeUnique, { containers, properties });
+		this.#contentTypes.updateOne(contentTypeUnique, { containers, properties } as Partial<T>);
 	}
 
 	async insertProperty(contentTypeUnique: string | null, property: UmbPropertyTypeModel) {
@@ -546,10 +538,7 @@ export class UmbContentTypeStructureManager<
 
 		const properties = appendToFrozenArray(frozenProperties, property, (x) => x.id === property.id);
 
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		// TODO: fix TS partial complaint
-		this.#contentTypes.updateOne(contentTypeUnique, { properties });
+		this.#contentTypes.updateOne(contentTypeUnique, { properties } as Partial<T>);
 	}
 
 	async removeProperty(contentTypeUnique: string | null, propertyId: string) {
@@ -561,10 +550,7 @@ export class UmbContentTypeStructureManager<
 
 		const properties = filterFrozenArray(frozenProperties, (x) => x.id !== propertyId);
 
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		// TODO: fix TS partial complaint
-		this.#contentTypes.updateOne(contentTypeUnique, { properties });
+		this.#contentTypes.updateOne(contentTypeUnique, { properties } as Partial<T>);
 	}
 
 	async updateProperty(
@@ -579,10 +565,7 @@ export class UmbContentTypeStructureManager<
 			this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.properties ?? [];
 		const properties = partialUpdateFrozenArray(frozenProperties, partialUpdate, (x) => x.id === propertyId);
 
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		// TODO: fix TS partial complaint
-		this.#contentTypes.updateOne(contentTypeUnique, { properties });
+		this.#contentTypes.updateOne(contentTypeUnique, { properties } as Partial<T>);
 	}
 
 	// TODO: Refactor: These property methods, should maybe be named without structure in their name.
@@ -739,9 +722,9 @@ export class UmbContentTypeStructureManager<
 			.find((contentType) => contentType.containers.some((c) => c.id === containerId));
 	}
 
-	contentTypeOfProperty(propertyId: UmbPropertyTypeId) {
+	contentTypeOfProperty(propertyId: UmbPropertyTypeUnique) {
 		return this.#contentTypes.asObservablePart((contentTypes) =>
-			contentTypes.find((contentType) => contentType.properties.some((p) => p.id === propertyId)),
+			contentTypes.find((contentType) => contentType.properties.some((p) => p.unique === propertyId)),
 		);
 	}
 
