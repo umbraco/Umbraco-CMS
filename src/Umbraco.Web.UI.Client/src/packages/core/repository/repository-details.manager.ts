@@ -128,6 +128,7 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 		});
 		this.#entries.appendOne(data);
 		this.#uniques.appendOne(unique);
+		// Notice in this case we do not have a observable from the repo, but it should maybe be fine that we just listen for ACTION EVENTS.
 	}
 
 	getItems(): Array<DetailType> {
