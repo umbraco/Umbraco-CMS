@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 /// <summary>
 ///     A validator that validates that the value against a regular expression.
 /// </summary>
-public sealed class RegexValidator : IValueFormatValidator, IManifestValueValidator
+public class RegexValidator : IValueFormatValidator, IManifestValueValidator
 {
     private const string ValueIsInvalid = "Value is invalid, it does not match the correct pattern";
     private readonly ILocalizedTextService _textService;
@@ -83,7 +83,7 @@ public sealed class RegexValidator : IValueFormatValidator, IManifestValueValida
     }
 
     /// <inheritdoc cref="IValueFormatValidator.ValidateFormat" />
-    public IEnumerable<ValidationResult> ValidateFormat(object? value, string? valueType, string format)
+    public virtual IEnumerable<ValidationResult> ValidateFormat(object? value, string? valueType, string format)
     {
         if (format == null)
         {

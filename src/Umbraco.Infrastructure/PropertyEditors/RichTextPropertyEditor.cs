@@ -176,6 +176,7 @@ public class RichTextPropertyEditor : DataEditor
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IBlockEditorElementTypeCache _elementTypeCache;
         private readonly IRichTextRequiredValidator _richTextRequiredValidator;
+        private readonly IRichTextRegexValidator _richTextRegexValidator;
         private readonly ILogger<RichTextPropertyValueEditor> _logger;
 
         [Obsolete("Use non-obsolete constructor. This is schedules for removal in v16.")]
@@ -215,7 +216,8 @@ public class RichTextPropertyEditor : DataEditor
                 elementTypeCache,
                 propertyValidationService,
                 dataValueReferenceFactoryCollection,
-                StaticServiceProvider.Instance.GetRequiredService<IRichTextRequiredValidator>())
+                StaticServiceProvider.Instance.GetRequiredService<IRichTextRequiredValidator>(),
+                StaticServiceProvider.Instance.GetRequiredService<IRichTextRegexValidator>())
         {
 
         }
@@ -237,7 +239,8 @@ public class RichTextPropertyEditor : DataEditor
             IBlockEditorElementTypeCache elementTypeCache,
             IPropertyValidationService propertyValidationService,
             DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
-            IRichTextRequiredValidator richTextRequiredValidator)
+            IRichTextRequiredValidator richTextRequiredValidator,
+            IRichTextRegexValidator richTextRegexValidator)
             : base(attribute, propertyEditors, dataTypeReadCache, localizedTextService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactoryCollection)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -249,6 +252,7 @@ public class RichTextPropertyEditor : DataEditor
             _macroParameterParser = macroParameterParser;
             _elementTypeCache = elementTypeCache;
             _richTextRequiredValidator = richTextRequiredValidator;
+            _richTextRegexValidator = richTextRegexValidator;
             _jsonSerializer = jsonSerializer;
             _logger = logger;
 
@@ -256,6 +260,8 @@ public class RichTextPropertyEditor : DataEditor
         }
 
         public override IValueRequiredValidator RequiredValidator => _richTextRequiredValidator;
+
+        public override IValueFormatValidator FormatValidator => _richTextRegexValidator;
 
         /// <inheritdoc />
         public override object? Configuration
