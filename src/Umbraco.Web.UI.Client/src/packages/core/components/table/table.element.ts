@@ -302,6 +302,12 @@ export class UmbTableElement extends UmbLitElement {
 	};
 
 	private _renderRowCheckboxCell(item: UmbTableItem) {
+		if (this.sortable === true) {
+			return html`<uui-table-cell style="text-align: center;">
+				<uui-icon name="icon-grip"></uui-icon>
+			</uui-table-cell>`;
+		}
+
 		if (this.config.hideIcon && !this.config.allowSelection) return;
 
 		return html`
