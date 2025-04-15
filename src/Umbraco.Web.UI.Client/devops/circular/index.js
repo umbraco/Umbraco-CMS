@@ -12,7 +12,7 @@ import { join } from 'path';
 //const __dirname = import.meta.dirname;
 
 // Adjust this number as needed.
-const MAX_CIRCULAR_DEPENDENCIES = 5;
+const MAX_CIRCULAR_DEPENDENCIES = 4;
 
 const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
 const IS_AZURE_PIPELINES = process.env.TF_BUILD === 'true';
