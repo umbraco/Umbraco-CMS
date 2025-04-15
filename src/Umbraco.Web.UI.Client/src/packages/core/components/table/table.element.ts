@@ -135,18 +135,23 @@ export class UmbTableElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: false })
 	public orderingDesc = false;
 
-	@property({ type: Boolean })
 	private _sortable = false;
-	public get sortable() {
+	@property({ type: Boolean, reflect: true })
+	get sortable() {
 		return this._sortable;
 	}
-	public set sortable(value) {
-		this._sortable = value;
-		if (value) {
+	set sortable(newVal) {
+		const oldVal = this._sortable;
+		if (oldVal === newVal) return;
+		this._sortable = newVal;
+
+		if (this._sortable) {
 			this.#sorter.enable();
 		} else {
 			this.#sorter.disable();
 		}
+
+		this.requestUpdate('sortable', oldVal);
 	}
 
 	@state()

@@ -13,6 +13,7 @@ import type {
 	UmbTableConfig,
 	UmbTableElement,
 	UmbTableItem,
+	UmbTableOrderedEvent,
 	UmbTableSortedEvent,
 } from '@umbraco-cms/backoffice/components';
 
@@ -24,7 +25,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	UmbSortChildrenOfModalValue
 > {
 	@state()
-	_children: Array<UmbTreeItemModel> = [];
+	private _children: Array<UmbTreeItemModel> = [];
 
 	@state()
 	_currentPage = 1;
@@ -175,6 +176,28 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		this._tableItems = items;
 	}
 
+	#onOrdered(event: UmbTableOrderedEvent) {
+		const target = event.target as UmbTableElement;
+		const orderingColumn = target.orderingColumn;
+		const orderingDesc = target.orderingDesc;
+
+		if (orderingColumn === 'name') {
+			this._tableItems = [...this._tableItems].sort((a, b) => {
+				const aColumn = a.data.find((column) => column.columnAlias === orderingColumn);
+				const bColumn = b.data.find((column) => column.columnAlias === orderingColumn);
+				if (aColumn && bColumn) {
+				}
+			});
+
+			if (orderingDesc) {
+				this._tableItems.reverse();
+			}
+
+			this._sortedUniques.clear();
+			this._tableItems.map((tableItem) => tableItem.id).forEach((u) => this._sortedUniques.add(u));
+		}
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline=${'Sort Children'}>
@@ -192,7 +215,8 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
 				.sortable=${this._sortable}
-				@sorted=${this.#onSorted}></umb-table>
+				@sorted=${this.#onSorted}
+				@ordered=${this.#onOrdered}></umb-table>
 
 			${this._hasMorePages()
 				? html`
