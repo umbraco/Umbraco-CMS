@@ -1,7 +1,10 @@
 import { UMB_MEDIA_WORKSPACE_ALIAS } from './constants.js';
 import { UmbSubmitWorkspaceAction, UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
-import { UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION } from '@umbraco-cms/backoffice/content';
+import {
+	UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION,
+	UMB_WORKSPACE_HAS_CONTENT_COLLECTION_CONDITION_ALIAS,
+} from '@umbraco-cms/backoffice/content';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -30,7 +33,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 				match: UMB_MEDIA_WORKSPACE_ALIAS,
 			},
 			{
-				alias: 'Umb.Condition.WorkspaceHasCollection',
+				alias: UMB_WORKSPACE_HAS_CONTENT_COLLECTION_CONDITION_ALIAS,
 			},
 		],
 	},

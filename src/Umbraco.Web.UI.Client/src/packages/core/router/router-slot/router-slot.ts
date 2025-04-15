@@ -295,6 +295,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 
 	/**
 	 * Notify the listeners.
+	 * @param info
 	 */
 	notifyChildRouters<D = any>(info: IRoutingInfo<D>) {
 		// This method should be called before routeMatch is being set!
@@ -316,6 +317,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 	/**
 	 * Loads a new path based on the routes.
 	 * Returns true if a navigation was made to a new page.
+	 * @param path
 	 */
 	protected async renderPath(path: string | PathFragment): Promise<boolean> {
 		// Notice: Since this is never called from any other place than one higher in this file(when writing this...), we could just retrieve the path and find a match by using this.getRouteMatch() [NL]

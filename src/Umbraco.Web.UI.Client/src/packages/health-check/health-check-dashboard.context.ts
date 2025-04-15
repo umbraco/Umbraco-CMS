@@ -1,6 +1,6 @@
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbHealthCheckContext } from './health-check.context.js';
 import type { ManifestHealthCheck } from './health-check.extension.js';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

@@ -1,6 +1,6 @@
+import type { UmbPartialSome } from '../type/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbPartialSome } from '../type/index.js';
 
 export interface UmbGuardIncomingRuleBase {
 	unique?: string | symbol;

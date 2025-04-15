@@ -2057,7 +2057,7 @@ export default {
 		duplicateUsername: "Username '%0%' is already taken",
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
-		entriesExceed: 'Maximum %0% entries, <strong>%1%</strong> too many.',
+		entriesExceed: 'Maximum %0% entries, you have entered <strong>%1%</strong> too many.',
 		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
 	},
 	healthcheck: {
@@ -2563,7 +2563,7 @@ export default {
 		consentForAnalytics: 'Consent for telemetry data',
 		analyticsLevelSavedSuccess: 'Telemetry level saved!',
 		analyticsDescription:
-		'In order to improve Umbraco and add new functionality based on as relevant information as possible, we would like to collect system- and usage information from your installation.\n<br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n<br>Hopefully, you will help us collect some valuable data.\n<br>\n<br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.',
+			'In order to improve Umbraco and add new functionality based on as relevant information as possible, we would like to collect system- and usage information from your installation.\n<br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n<br>Hopefully, you will help us collect some valuable data.\n<br>\n<br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.',
 		minimalLevelDescription: 'We will only send an anonymized site ID to let us know that the site exists.',
 		basicLevelDescription: 'We will send an anonymized site ID, Umbraco version, and packages installed',
 		detailedLevelDescription:
