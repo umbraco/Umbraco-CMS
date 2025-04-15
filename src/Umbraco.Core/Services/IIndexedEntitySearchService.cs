@@ -25,6 +25,7 @@ public interface IIndexedEntitySearchService
         => Search(objectType,query, skip, take, ignoreUserStartNodes);
 
     // default implementation to avoid breaking changes falls back to old behaviour
+    [Obsolete("Please use async version of this method. Will be removed in V17.")]
     PagedModel<IEntitySlim> Search(
         UmbracoObjectTypes objectType,
         string query,
@@ -35,4 +36,14 @@ public interface IIndexedEntitySearchService
         int take = 100,
         bool ignoreUserStartNodes = false)
         => Search(objectType,query, skip, take, ignoreUserStartNodes);
+
+    Task<PagedModel<IEntitySlim>> SearchAsync(
+        UmbracoObjectTypes objectType,
+        string query,
+        Guid? parentId,
+        IEnumerable<Guid>? contentTypeIds,
+        bool? trashed,
+        int skip = 0,
+        int take = 100,
+        bool ignoreUserStartNodes = false);
 }
