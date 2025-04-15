@@ -25,7 +25,7 @@ public interface IIndexedEntitySearchService
         => Search(objectType,query, skip, take, ignoreUserStartNodes);
 
     // default implementation to avoid breaking changes falls back to old behaviour
-    [Obsolete("Please use async version of this method. Will be removed in V17.")]
+    [Obsolete("Please use the async version of this method, SearchAsync. Scheduled for removal in V17.")]
     PagedModel<IEntitySlim> Search(
         UmbracoObjectTypes objectType,
         string query,
