@@ -1,7 +1,7 @@
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, repeat, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbMediaItemModel } from '@umbraco-cms/backoffice/media';
-import { UmbMediaItemRepository } from '@umbraco-cms/backoffice/media';
+import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 @customElement('umb-user-media-start-node')
 export class UmbUserMediaStartNodeElement extends UmbLitElement {
@@ -22,14 +22,15 @@ export class UmbUserMediaStartNodeElement extends UmbLitElement {
 	readonly = false;
 
 	@state()
-	_displayValue: Array<UmbMediaItemModel> = [];
-
-	#itemRepository = new UmbMediaItemRepository(this);
+	_displayValue: Array<any> = [];
 
 	async #observeItems() {
-		const { asObservable } = await this.#itemRepository.requestItems(this.#uniques);
+		// TODO: get back to this when documents have been decoupled from users.
+		// The repository alias is hardcoded on purpose to avoid a document import in the user module.
+		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(this, 'Umb.Repository.MediaItem');
+		const { asObservable } = await itemRepository.requestItems(this.#uniques);
 
-		this.observe(asObservable(), (data) => {
+		this.observe(asObservable?.(), (data) => {
 			this._displayValue = data || [];
 		});
 	}
