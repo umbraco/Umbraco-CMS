@@ -749,6 +749,7 @@ export class UmbContentTypeStructureManager<
 		this.#init = new Promise((resolve) => {
 			this.#initResolver = resolve;
 		});
+		this.#repoManager?.clear();
 		this.#contentTypes.setValue([]);
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];

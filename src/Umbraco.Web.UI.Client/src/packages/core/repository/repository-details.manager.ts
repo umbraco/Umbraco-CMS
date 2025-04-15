@@ -75,12 +75,10 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 			(uniques) => {
 				// remove entries based on no-longer existing uniques:
 				const removedEntries = this.#entries.getValue().filter((entry) => !uniques.includes(entry.unique));
+				this.#entries.remove(removedEntries);
+				this.#statuses.remove(removedEntries);
 				removedEntries.forEach((entry) => {
-					const unique = entry.unique;
-					if (unique) {
-						this.#entries.removeOne(unique);
-						this.removeUmbControllerByAlias('observeEntry_' + unique);
-					}
+					this.removeUmbControllerByAlias('observeEntry_' + entry.unique);
 				});
 
 				this.#requestNewItems();
@@ -100,6 +98,12 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);
 		});
+	}
+
+	clear(): void {
+		this.#uniques.setValue([]);
+		this.#entries.setValue([]);
+		this.#statuses.setValue([]);
 	}
 
 	getUniques(): Array<string> {
