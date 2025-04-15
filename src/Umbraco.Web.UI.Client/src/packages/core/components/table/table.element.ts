@@ -8,7 +8,6 @@ import {
 	repeat,
 	state,
 	when,
-	LitElement,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
