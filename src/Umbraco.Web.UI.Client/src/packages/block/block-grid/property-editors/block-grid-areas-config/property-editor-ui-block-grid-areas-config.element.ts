@@ -116,7 +116,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 		return alias;
 	}
 
-	_handleDrop(targetIndex: number) {
+	#handleDrop(targetIndex: number) {
 		if (!this._draggedIndex || this._draggedIndex === targetIndex) return;
 	
 		const newValue = [...this.value];
@@ -149,7 +149,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 										e.dataTransfer.effectAllowed = 'move';
 									}}
 									@dragover=${(e: any) => e.preventDefault()}
-									@drop=${() => this._handleDrop(index)}
+									@drop=${() => this.#handleDrop(index)}
 									.key=${area.key}></umb-block-area-config-entry>`,
 						)}
 					</div>
