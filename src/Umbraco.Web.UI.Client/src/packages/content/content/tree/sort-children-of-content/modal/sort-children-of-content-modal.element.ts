@@ -49,6 +49,14 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 		});
 	}
 
+	protected override _sortCompare(columnAlias: string, valueA: unknown, valueB: unknown): number {
+		if (columnAlias === 'createDate') {
+			return Date.parse(valueA as string) - Date.parse(valueB as string);
+		}
+
+		return super._sortCompare(columnAlias, valueA, valueB);
+	}
+
 	static override styles = [UmbTextStyles, css``];
 }
 

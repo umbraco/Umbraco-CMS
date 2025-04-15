@@ -186,21 +186,25 @@ export class UmbSortChildrenOfModalElement<
 		const orderingColumn = target.orderingColumn;
 		const orderingDesc = target.orderingDesc;
 
-		if (orderingColumn === 'name') {
-			this._tableItems = [...this._tableItems].sort((a, b) => {
-				const aColumn = a.data.find((column) => column.columnAlias === orderingColumn);
-				const bColumn = b.data.find((column) => column.columnAlias === orderingColumn);
-				if (aColumn && bColumn) {
-				}
-			});
+		this._tableItems = [...this._tableItems].sort((a, b) => {
+			const aColumn = a.data.find((column) => column.columnAlias === orderingColumn);
+			const bColumn = b.data.find((column) => column.columnAlias === orderingColumn);
+			return this._sortCompare(orderingColumn, aColumn?.value, bColumn?.value);
+		});
 
-			if (orderingDesc) {
-				this._tableItems.reverse();
-			}
-
-			this._sortedUniques.clear();
-			this._tableItems.map((tableItem) => tableItem.id).forEach((u) => this._sortedUniques.add(u));
+		if (orderingDesc) {
+			this._tableItems.reverse();
 		}
+
+		this._sortedUniques.clear();
+		this._tableItems.map((tableItem) => tableItem.id).forEach((u) => this._sortedUniques.add(u));
+	}
+
+	protected _sortCompare(columnAlias: string, valueA: unknown, valueB: unknown): number {
+		if (columnAlias === 'name') {
+			return (valueA as string).localeCompare(valueB as string);
+		}
+		return 0;
 	}
 
 	override render() {
