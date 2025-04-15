@@ -291,7 +291,7 @@ export class UmbTableElement extends UmbLitElement {
 		return html`
 			<uui-table-row
 				data-sortable-id=${item.id}
-				?selectable="${this.config.allowSelection}"
+				?selectable="${this.config.allowSelection && !this._sortable}"
 				?select-only=${this._selectionMode}
 				?selected=${this._isSelected(item.id)}
 				@selected=${() => this._selectRow(item.id)}
