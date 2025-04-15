@@ -29,7 +29,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeDesignE
 		return element.getAttribute('data-umb-property-id');
 	},
 	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.id;
+		return modelEntry.unique;
 	},
 	identifier: 'content-type-property-sorter',
 	itemSelector: 'umb-content-type-design-editor-property',
@@ -52,7 +52,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			if (this._containerId === undefined) {
 				throw new Error('ContainerId is not set');
 			}
-			this.#propertyStructureHelper.partialUpdateProperty(item.id, {
+			this.#propertyStructureHelper.partialUpdateProperty(item.unique, {
 				container: this._containerId ? { id: this._containerId } : null,
 			});
 		},
@@ -66,7 +66,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
 			 */
 			const model = this._properties;
-			const newIndex = model.findIndex((entry) => entry.id === item.id);
+			const newIndex = model.findIndex((entry) => entry.unique === item.unique);
 
 			// Doesn't exist in model
 			if (newIndex === -1) return;
@@ -80,7 +80,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			}
 
 			// increase the prevSortOrder and use it for the moved item,
-			this.#propertyStructureHelper.partialUpdateProperty(item.id, {
+			this.#propertyStructureHelper.partialUpdateProperty(item.unique, {
 				sortOrder: ++prevSortOrder,
 			});
 
@@ -90,7 +90,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			// As long as there is an item with the index & the sortOrder is less or equal to the prevSortOrder, we will update the sortOrder:
 			while ((entry = model[i]) !== undefined && entry.sortOrder <= prevSortOrder) {
 				// Increase the prevSortOrder and use it for the item:
-				this.#propertyStructureHelper.partialUpdateProperty(entry.id, {
+				this.#propertyStructureHelper.partialUpdateProperty(entry.unique, {
 					sortOrder: ++prevSortOrder,
 				});
 
@@ -257,11 +257,11 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 					<div id="property-list" ?sort-mode-active=${this._sortModeActive}>
 						${repeat(
 							this._properties,
-							(property) => property.id,
+							(property) => property.unique,
 							(property) => {
 								return html`
 									<umb-content-type-design-editor-property
-										data-umb-property-id=${property.id}
+										data-umb-property-id=${property.unique}
 										data-mark="property-type:${property.name}"
 										.editContentTypePath=${this.editContentTypePath}
 										.editPropertyTypePath=${this._editPropertyTypePath}

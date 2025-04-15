@@ -536,26 +536,26 @@ export class UmbContentTypeStructureManager<
 		const frozenProperties =
 			this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.properties ?? [];
 
-		const properties = appendToFrozenArray(frozenProperties, property, (x) => x.id === property.id);
+		const properties = appendToFrozenArray(frozenProperties, property, (x) => x.unique === property.unique);
 
 		this.#contentTypes.updateOne(contentTypeUnique, { properties } as Partial<T>);
 	}
 
-	async removeProperty(contentTypeUnique: string | null, propertyId: string) {
+	async removeProperty(contentTypeUnique: string | null, propertyUnique: string) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
 		const frozenProperties =
 			this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.properties ?? [];
 
-		const properties = filterFrozenArray(frozenProperties, (x) => x.id !== propertyId);
+		const properties = filterFrozenArray(frozenProperties, (x) => x.unique !== propertyUnique);
 
 		this.#contentTypes.updateOne(contentTypeUnique, { properties } as Partial<T>);
 	}
 
 	async updateProperty(
 		contentTypeUnique: string | null,
-		propertyId: string,
+		propertyUnique: string,
 		partialUpdate: Partial<UmbPropertyTypeModel>,
 	) {
 		await this.#init;
@@ -563,17 +563,17 @@ export class UmbContentTypeStructureManager<
 
 		const frozenProperties =
 			this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.properties ?? [];
-		const properties = partialUpdateFrozenArray(frozenProperties, partialUpdate, (x) => x.id === propertyId);
+		const properties = partialUpdateFrozenArray(frozenProperties, partialUpdate, (x) => x.unique === propertyUnique);
 
 		this.#contentTypes.updateOne(contentTypeUnique, { properties } as Partial<T>);
 	}
 
 	// TODO: Refactor: These property methods, should maybe be named without structure in their name.
-	async propertyStructureById(propertyId: string) {
+	async propertyStructureById(propertyUnique: string) {
 		await this.#init;
 		return this.#contentTypes.asObservablePart((docTypes) => {
 			for (const docType of docTypes) {
-				const foundProp = docType.properties?.find((property) => property.id === propertyId);
+				const foundProp = docType.properties?.find((property) => property.unique === propertyUnique);
 				if (foundProp) {
 					return foundProp;
 				}
@@ -594,10 +594,10 @@ export class UmbContentTypeStructureManager<
 		});
 	}
 
-	async getPropertyStructureById(propertyId: string) {
+	async getPropertyStructureById(propertyUnique: string) {
 		await this.#init;
 		for (const docType of this.#contentTypes.getValue()) {
-			const foundProp = docType.properties?.find((property) => property.id === propertyId);
+			const foundProp = docType.properties?.find((property) => property.unique === propertyUnique);
 			if (foundProp) {
 				return foundProp;
 			}
