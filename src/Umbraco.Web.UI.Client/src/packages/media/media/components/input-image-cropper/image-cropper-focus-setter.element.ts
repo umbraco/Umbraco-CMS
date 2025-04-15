@@ -304,7 +304,6 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 			border: solid 2px white;
 			border-radius: 50%;
 			pointer-events: none;
-			background-color: var(--uui-palette-white);
 			transition: 150ms transform;
 			box-sizing: inherit;
 		}
