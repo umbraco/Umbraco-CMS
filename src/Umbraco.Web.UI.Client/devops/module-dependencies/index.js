@@ -142,7 +142,9 @@ function reportIllegalImportsFromCore() {
 			`Illegal imports found in ${total} core modules. ${total - ILLEGAL_CORE_IMPORTS_THRESHOLD} more than the threshold.`,
 		);
 	} else {
-		console.log(`✅ Success! Still under the threshold of ${ILLEGAL_CORE_IMPORTS_THRESHOLD} illegal imports. `);
+		console.log(
+			`✅ Success! Still (${total}) under the threshold of ${ILLEGAL_CORE_IMPORTS_THRESHOLD} illegal imports. `,
+		);
 	}
 
 	console.log(`\n\n`);
