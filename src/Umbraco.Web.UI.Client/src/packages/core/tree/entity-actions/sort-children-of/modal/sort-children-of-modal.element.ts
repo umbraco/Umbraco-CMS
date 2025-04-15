@@ -34,13 +34,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	_totalPages = 1;
 
 	@state()
-	private _tableColumns: Array<UmbTableColumn> = [
-		{
-			name: this.localize.term('general_name'),
-			alias: 'name',
-			allowSorting: true,
-		},
-	];
+	protected _tableColumns: Array<UmbTableColumn> = [];
 
 	@state()
 	private _tableConfig: UmbTableConfig = {
@@ -69,6 +63,18 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 			},
 			'umbPaginationObserver',
 		);
+
+		this._setTableColumns();
+	}
+
+	protected _setTableColumns() {
+		this._tableColumns = [
+			{
+				name: this.localize.term('general_name'),
+				alias: 'name',
+				allowSorting: true,
+			},
+		];
 	}
 
 	protected override async firstUpdated(

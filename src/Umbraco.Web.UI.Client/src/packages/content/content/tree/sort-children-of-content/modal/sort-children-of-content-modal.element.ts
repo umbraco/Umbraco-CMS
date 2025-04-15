@@ -1,5 +1,6 @@
+import type { UmbTableColumn } from '@umbraco-cms/backoffice/components';
 import type { UmbContentTreeItemModel } from '../../types.js';
-import { customElement, css } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSortChildrenOfModalElement } from '@umbraco-cms/backoffice/tree';
 
@@ -12,6 +13,21 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 		hour: 'numeric',
 		minute: '2-digit',
 	};
+
+	protected override _setTableColumns() {
+		this._tableColumns = [
+			{
+				name: this.localize.term('general_name'),
+				alias: 'name',
+				allowSorting: true,
+			},
+			{
+				name: this.localize.term('content_createDate'),
+				alias: 'createDate',
+				allowSorting: true,
+			},
+		];
+	}
 
 	static override styles = [UmbTextStyles, css``];
 }

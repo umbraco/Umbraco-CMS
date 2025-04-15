@@ -1,4 +1,10 @@
-import { UmbSortChildrenOfEntityAction } from '@umbraco-cms/backoffice/tree';
+import { UMB_SORT_CHILDREN_OF_CONTENT_MODAL } from './constants.js';
+import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbSortChildrenOfEntityAction,
+	type UmbSortChildrenOfModalData,
+	type UmbSortChildrenOfModalValue,
+} from '@umbraco-cms/backoffice/tree';
 
 /**
  * Entity action for sorting children of a content item
@@ -6,8 +12,8 @@ import { UmbSortChildrenOfEntityAction } from '@umbraco-cms/backoffice/tree';
  * @augments UmbSortChildrenOfEntityAction
  */
 export class UmbSortChildrenOfContentEntityAction extends UmbSortChildrenOfEntityAction {
-	override execute() {
-		alert('Sort children of content action executed');
+	protected override _getModalToken(): UmbModalToken<UmbSortChildrenOfModalData, UmbSortChildrenOfModalValue> {
+		return UMB_SORT_CHILDREN_OF_CONTENT_MODAL;
 	}
 }
 
