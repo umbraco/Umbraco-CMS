@@ -360,34 +360,10 @@ export class UmbSearchModalElement extends UmbLitElement {
 			<div class="navigation-tips-key" style="grid-column: span 2;">Tab</div>
 			<span>${this.localize.term('globalSearch_navigateSearchProviders')}</span>
 			<div class="navigation-tips-key">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="18"
-					height="18"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round">
-					<path d="m5 12 7-7 7 7" />
-					<path d="M12 19V5" />
-				</svg>
+				<uui-icon name="icon-arrow-up"></uui-icon>
 			</div>
 			<div class="navigation-tips-key">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="18"
-					height="18"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round">
-					<path d="M12 5v14" />
-					<path d="m19 12-7 7-7-7" />
-				</svg>
+				<uui-icon name="icon-arrow-down"></uui-icon>
 			</div>
 			<span>${this.localize.term('globalSearch_navigateSearchResults')}</span>
 		</div>`;
