@@ -141,6 +141,8 @@ function reportIllegalImportsFromCore() {
 		throw new Error(
 			`Illegal imports found in ${total} core modules. ${total - ILLEGAL_CORE_IMPORTS_THRESHOLD} more than the threshold.`,
 		);
+	} else if (total === 0) {
+		console.log(`✅ Success! No illegal imports found.`);
 	} else {
 		console.log(
 			`✅ Success! Still (${total}) under the threshold of ${ILLEGAL_CORE_IMPORTS_THRESHOLD} illegal imports. `,
@@ -176,6 +178,8 @@ function reportSelfImportsFromModules() {
 		throw new Error(
 			`Self imports found in ${total} modules. ${total - SELF_IMPORTS_THRESHOLD} more than the threshold.`,
 		);
+	} else if (total === 0) {
+		console.log(`✅ Success! No self imports found.`);
 	} else {
 		console.log(`✅ Success! Still (${total}) under the threshold of ${SELF_IMPORTS_THRESHOLD} self imports.`);
 	}
