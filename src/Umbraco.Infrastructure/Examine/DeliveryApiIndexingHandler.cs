@@ -1,13 +1,14 @@
-﻿using Examine;
+using Examine;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.Examine.Deferred;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Search;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
@@ -28,6 +29,8 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
     private readonly IDeliveryApiContentIndexValueSetBuilder _deliveryApiContentIndexValueSetBuilder;
     private readonly IDeliveryApiContentIndexHelper _deliveryApiContentIndexHelper;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+    private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
+
 
     public DeliveryApiIndexingHandler(
         ExamineIndexingMainDomHandler mainDomHandler,
@@ -39,7 +42,8 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
         IPublicAccessService publicAccessService,
         IDeliveryApiContentIndexValueSetBuilder deliveryApiContentIndexValueSetBuilder,
         IDeliveryApiContentIndexHelper deliveryApiContentIndexHelper,
-        IBackgroundTaskQueue backgroundTaskQueue)
+        IBackgroundTaskQueue backgroundTaskQueue,
+        IDeliveryApiCompositeIdHandler deliveryApiCompositeIdHandler)
     {
         _mainDomHandler = mainDomHandler;
         _examineManager = examineManager;
@@ -50,6 +54,8 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
         _deliveryApiContentIndexValueSetBuilder = deliveryApiContentIndexValueSetBuilder;
         _deliveryApiContentIndexHelper = deliveryApiContentIndexHelper;
         _backgroundTaskQueue = backgroundTaskQueue;
+        _deliveryApiCompositeIdHandler = deliveryApiCompositeIdHandler;
+
         _enabled = new Lazy<bool>(IsEnabled);
         _deliveryApiSettings = deliveryApiSettings.CurrentValue;
         deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
@@ -79,7 +85,8 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
             this,
             _deliveryApiContentIndexValueSetBuilder,
             _contentService,
-            _backgroundTaskQueue);
+            _backgroundTaskQueue,
+            _deliveryApiCompositeIdHandler);
         Execute(deferred);
     }
 

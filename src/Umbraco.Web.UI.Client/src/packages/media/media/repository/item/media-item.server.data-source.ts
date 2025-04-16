@@ -4,7 +4,7 @@ import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/external/ba
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Media items that fetches data from the server
@@ -38,9 +38,9 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 	 * ```
 	 */
 	async search({ query, skip, take }: { query: string; skip: number; take: number }) {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
-			MediaService.getItemMediaSearch({ query, skip, take }),
+			MediaService.getItemMediaSearch({ query: { query, skip, take } }),
 		);
 		const mapped = data?.items.map((item) => mapper(item));
 		return { data: mapped, error };
@@ -48,7 +48,7 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => MediaService.getItemMedia({ id: uniques });
+const getItems = (uniques: Array<string>) => MediaService.getItemMedia({ query: { id: uniques } });
 
 const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 	return {

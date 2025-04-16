@@ -53,7 +53,7 @@ export abstract class UmbBlockEntriesContext<
 		this._retrieveManager = this.consumeContext(blockManagerContextToken, (blockGridManager) => {
 			this._manager = blockGridManager;
 			this._gotBlockManager();
-		}).asPromise();
+		}).asPromise({ preventTimeout: true });
 	}
 
 	async getManager() {

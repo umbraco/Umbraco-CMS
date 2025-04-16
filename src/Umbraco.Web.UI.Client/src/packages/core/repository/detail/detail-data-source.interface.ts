@@ -13,5 +13,5 @@ export interface UmbDetailDataSource<DetailType> extends UmbReadDetailDataSource
 	createScaffold(preset?: Partial<DetailType>): Promise<UmbDataSourceResponse<DetailType>>;
 	create(data: DetailType, parentUnique: string | null): Promise<UmbDataSourceResponse<DetailType>>;
 	update(data: DetailType): Promise<UmbDataSourceResponse<DetailType>>;
-	delete(unique: string): Promise<UmbDataSourceResponse>;
+	delete(unique: string): Promise<UmbDataSourceResponse<unknown>>;
 }

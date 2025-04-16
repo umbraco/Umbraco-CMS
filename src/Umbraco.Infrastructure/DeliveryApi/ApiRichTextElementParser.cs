@@ -1,4 +1,4 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -33,9 +33,6 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         _apiElementBuilder = apiElementBuilder;
         _logger = logger;
     }
-
-    [Obsolete($"Please use the overload that accepts {nameof(RichTextBlockModel)}. Will be removed in V15.")]
-    public IRichTextElement? Parse(string html) => Parse(html, null);
 
     public IRichTextElement? Parse(string html, RichTextBlockModel? richTextBlockModel)
     {

@@ -6,7 +6,7 @@ import type {
 } from '@umbraco-cms/backoffice/recycle-bin';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 export class UmbDocumentRecycleBinServerDataSource implements UmbRecycleBinDataSource {
 	#host: UmbControllerHost;
@@ -16,15 +16,15 @@ export class UmbDocumentRecycleBinServerDataSource implements UmbRecycleBinDataS
 	}
 
 	trash(args: UmbRecycleBinTrashRequestArgs) {
-		return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdMoveToRecycleBin({ id: args.unique }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdMoveToRecycleBin({ path: { id: args.unique } }));
 	}
 
 	restore(args: UmbRecycleBinRestoreRequestArgs) {
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			DocumentService.putRecycleBinDocumentByIdRestore({
-				id: args.unique,
-				requestBody: {
+				path: { id: args.unique },
+				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},
 			}),
@@ -32,13 +32,13 @@ export class UmbDocumentRecycleBinServerDataSource implements UmbRecycleBinDataS
 	}
 
 	empty() {
-		return tryExecuteAndNotify(this.#host, DocumentService.deleteRecycleBinDocument());
+		return tryExecute(this.#host, DocumentService.deleteRecycleBinDocument());
 	}
 
 	async getOriginalParent(args: UmbRecycleBinOriginalParentRequestArgs) {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentService.getRecycleBinDocumentByIdOriginalParent({ id: args.unique }),
+			DocumentService.getRecycleBinDocumentByIdOriginalParent({ path: { id: args.unique } }),
 		);
 
 		// only check for undefined because data can be null if the parent is the root

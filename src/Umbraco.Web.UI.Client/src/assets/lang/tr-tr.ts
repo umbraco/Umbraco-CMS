@@ -362,7 +362,6 @@ export default {
 		newPartialViewMacroFromSnippet: "Snippet'ten yeni kısmi görünüm makrosu",
 		newPartialViewMacroNoMacro: 'Yeni kısmi görünüm makrosu (makrosuz)',
 		newStyleSheetFile: 'Yeni stil sayfası dosyası',
-		newRteStyleSheetFile: 'Yeni Zengin Metin Düzenleyicisi stil sayfası dosyası',
 	},
 	dashboard: {
 		browser: 'Web sitenize göz atın',

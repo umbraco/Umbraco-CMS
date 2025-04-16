@@ -11,7 +11,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { formatBytes } from '@umbraco-cms/backoffice/utils';
-import { isCancelError } from '@umbraco-cms/backoffice/resources';
+import { UmbCancelError } from '@umbraco-cms/backoffice/resources';
 
 export class UmbTemporaryFileManager<
 	UploadableItem extends UmbTemporaryFileModel = UmbTemporaryFileModel,
@@ -99,6 +99,7 @@ export class UmbTemporaryFileManager<
 			maxFileSize *= 1024;
 			if (item.file.size > maxFileSize) {
 				const notification = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+				if (!notification) throw new Error('Notification context is missing');
 				notification.peek('warning', {
 					data: {
 						headline: 'Upload',
@@ -127,6 +128,7 @@ export class UmbTemporaryFileManager<
 			(disallowedExtensions?.length && disallowedExtensions.includes(fileExtension))
 		) {
 			const notification = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+			if (!notification) throw new Error('Notification context is missing');
 			notification.peek('warning', {
 				data: {
 					message: `${this.#localization.term('media_disallowedFileType')}: ${fileExtension}`,
@@ -162,7 +164,7 @@ export class UmbTemporaryFileManager<
 		let status = TemporaryFileStatus.SUCCESS;
 		if (error) {
 			status = TemporaryFileStatus.ERROR;
-			if (isCancelError(error)) {
+			if (UmbCancelError.isUmbCancelError(error)) {
 				status = TemporaryFileStatus.CANCELLED;
 			}
 		}

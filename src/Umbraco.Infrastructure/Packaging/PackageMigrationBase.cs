@@ -8,17 +8,11 @@ using Umbraco.Cms.Infrastructure.Migrations;
 
 namespace Umbraco.Cms.Infrastructure.Packaging;
 
-public abstract class PackageMigrationBase : MigrationBase
+/// <inheritdoc />
+[Obsolete("Use AsyncPackageMigrationBase instead. Scheduled for removal in Umbraco 18.")]
+public abstract class PackageMigrationBase : AsyncPackageMigrationBase
 {
-    private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-    private readonly MediaFileManager _mediaFileManager;
-    private readonly IMediaService _mediaService;
-    private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
-    private readonly IOptions<PackageMigrationSettings> _packageMigrationsSettings;
-    private readonly IPackagingService _packagingService;
-    private readonly IShortStringHelper _shortStringHelper;
-
-    public PackageMigrationBase(
+    protected PackageMigrationBase(
         IPackagingService packagingService,
         IMediaService mediaService,
         MediaFileManager mediaFileManager,
@@ -27,27 +21,19 @@ public abstract class PackageMigrationBase : MigrationBase
         IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
         IMigrationContext context,
         IOptions<PackageMigrationSettings> packageMigrationsSettings)
-        : base(context)
+        : base(packagingService, mediaService, mediaFileManager, mediaUrlGenerators, shortStringHelper, contentTypeBaseServiceProvider, context, packageMigrationsSettings)
+    { }
+
+    /// <inheritdoc />
+    protected override Task MigrateAsync()
     {
-        _packagingService = packagingService;
-        _mediaService = mediaService;
-        _mediaFileManager = mediaFileManager;
-        _mediaUrlGenerators = mediaUrlGenerators;
-        _shortStringHelper = shortStringHelper;
-        _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
-        _packageMigrationsSettings = packageMigrationsSettings;
+        Migrate();
+
+        return Task.CompletedTask;
     }
 
-        public IImportPackageBuilder ImportPackage => BeginBuild(
-            new ImportPackageBuilder(
-                _packagingService,
-                _mediaService,
-                _mediaFileManager,
-                _mediaUrlGenerators,
-                _shortStringHelper,
-                _contentTypeBaseServiceProvider,
-                Context,
-                _packageMigrationsSettings));
-
-
+    /// <summary>
+    /// Executes the migration.
+    /// </summary>
+    protected abstract void Migrate();
 }

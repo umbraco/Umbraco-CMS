@@ -5,13 +5,7 @@ export * from './reference/index.js';
 export * from './repository/index.js';
 export * from './search/index.js';
 export * from './url/index.js';
-export * from './utils/index.js';
 
 export { UmbMediaAuditLogRepository } from './audit-log/index.js';
 
 export type * from './types.js';
-
-/**
- * @deprecated Please import directly from the `@umbraco-cms/backoffice/dropzone` package instead. This package will be removed in Umbraco 18.
- */
-export * from '@umbraco-cms/backoffice/dropzone';

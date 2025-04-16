@@ -1,5 +1,5 @@
+import type { UmbItemRepository } from './item/index.js';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class EntityRepositoryTest : UmbracoIntegrationTest
+internal sealed class EntityRepositoryTest : UmbracoIntegrationTest
 {
     [Test]
     [LongRunning]

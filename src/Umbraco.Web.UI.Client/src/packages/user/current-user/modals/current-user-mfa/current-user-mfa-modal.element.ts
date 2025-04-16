@@ -4,7 +4,7 @@ import { UMB_CURRENT_USER_MFA_DISABLE_PROVIDER_MODAL } from '../current-user-mfa
 import type { UmbCurrentUserMfaProviderModel } from '../../types.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_MODAL_MANAGER_CONTEXT, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
@@ -141,13 +141,9 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 * @param item
 	 */
 	async #onProviderEnable(item: UmbMfaLoginProviderOption) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		await modalManager
-			.open(this, UMB_CURRENT_USER_MFA_ENABLE_PROVIDER_MODAL, {
-				data: { providerName: item.providerName, displayName: item.displayName },
-			})
-			.onSubmit()
-			.catch(() => undefined);
+		await umbOpenModal(this, UMB_CURRENT_USER_MFA_ENABLE_PROVIDER_MODAL, {
+			data: { providerName: item.providerName, displayName: item.displayName },
+		}).catch(() => undefined);
 	}
 
 	/**
@@ -157,13 +153,9 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 * @param item
 	 */
 	async #onProviderDisable(item: UmbMfaLoginProviderOption) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		await modalManager
-			.open(this, UMB_CURRENT_USER_MFA_DISABLE_PROVIDER_MODAL, {
-				data: { providerName: item.providerName, displayName: item.displayName },
-			})
-			.onSubmit()
-			.catch(() => undefined);
+		await umbOpenModal(this, UMB_CURRENT_USER_MFA_DISABLE_PROVIDER_MODAL, {
+			data: { providerName: item.providerName, displayName: item.displayName },
+		}).catch(() => undefined);
 	}
 
 	static override readonly styles = [

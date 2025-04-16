@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class ContentTypeEditingServiceTests
+internal sealed partial class ContentTypeEditingServiceTests
 {
     [TestCase(false)]
     [TestCase(true)]

@@ -1,4 +1,4 @@
-import type { ManifestSection } from '@umbraco-cms/backoffice/section';
+import type { ManifestSection } from './extensions/section.extension.js';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

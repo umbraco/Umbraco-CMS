@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MediaRepositoryTest : UmbracoIntegrationTest
+internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUpTestData() => CreateTestData();

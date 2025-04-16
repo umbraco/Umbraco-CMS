@@ -1,6 +1,6 @@
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, LitElement, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UpgradeSettingsResponseModelReadable } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * @element umb-upgrader-view
@@ -18,7 +18,7 @@ export class UmbUpgraderViewElement extends LitElement {
 	errorMessage = '';
 
 	@property({ type: Object, reflect: true })
-	settings?: UpgradeSettingsResponseModel;
+	settings?: UpgradeSettingsResponseModelReadable;
 
 	private _renderLayout() {
 		return html`

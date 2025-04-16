@@ -1,6 +1,4 @@
-import type { ManifestModal } from '@umbraco-cms/backoffice/modal';
-
-export const manifests: Array<ManifestModal> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.ErrorViewer',

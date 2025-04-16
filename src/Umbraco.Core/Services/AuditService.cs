@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -17,49 +15,6 @@ public sealed class AuditService : RepositoryService, IAuditService
     private readonly IAuditRepository _auditRepository;
     private readonly IEntityService _entityService;
     private readonly Lazy<bool> _isAvailable;
-
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V15.")]
-    public AuditService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IAuditRepository auditRepository,
-        IAuditEntryRepository auditEntryRepository,
-        IUserService userService,
-        IEntityRepository entityRepository)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            auditRepository,
-            auditEntryRepository,
-            userService,
-            StaticServiceProvider.Instance.GetRequiredService<IEntityService>()
-        )
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V15.")]
-    public AuditService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IAuditRepository auditRepository,
-        IAuditEntryRepository auditEntryRepository,
-        IUserService userService,
-        IEntityRepository entityRepository,
-        IEntityService entityService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            auditRepository,
-            auditEntryRepository,
-            userService,
-            entityService
-        )
-    {
-    }
 
     public AuditService(
         ICoreScopeProvider provider,
@@ -236,7 +191,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         }
     }
 
-    public async Task<PagedModel<IAuditItem>> GetItemsByKeyAsync(
+    public Task<PagedModel<IAuditItem>> GetItemsByKeyAsync(
         Guid entityKey,
         UmbracoObjectTypes entityType,
         int skip,
@@ -258,7 +213,7 @@ public sealed class AuditService : RepositoryService, IAuditService
             Attempt<int> keyToIdAttempt = _entityService.GetId(entityKey, entityType);
             if (keyToIdAttempt.Success is false)
             {
-                return await Task.FromResult(new PagedModel<IAuditItem> { Items = Enumerable.Empty<IAuditItem>(), Total = 0 });
+                return Task.FromResult(new PagedModel<IAuditItem> { Items = Enumerable.Empty<IAuditItem>(), Total = 0 });
             }
 
             using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -268,7 +223,7 @@ public sealed class AuditService : RepositoryService, IAuditService
                 PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
                 IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out var totalRecords, orderDirection, auditTypeFilter, customFilter);
-                return new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords };
+                return Task.FromResult(new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords });
             }
         }
 
@@ -294,7 +249,7 @@ public sealed class AuditService : RepositoryService, IAuditService
 
         if (user is null)
         {
-            return await Task.FromResult(new PagedModel<IAuditItem>());
+            return new PagedModel<IAuditItem>();
         }
 
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -304,7 +259,7 @@ public sealed class AuditService : RepositoryService, IAuditService
             PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
             IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out var totalRecords, orderDirection, auditTypeFilter, customFilter);
-            return await Task.FromResult(new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords });
+            return new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords };
         }
     }
 

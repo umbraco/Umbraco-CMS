@@ -1,3 +1,4 @@
+import { data as permissionsTestData } from './data/permissions-test.data.js';
 import type {
 	DocumentItemResponseModel,
 	DocumentResponseModel,
@@ -9,6 +10,7 @@ export type UmbMockDocumentModel = DocumentResponseModel & DocumentTreeItemRespo
 
 export const data: Array<UmbMockDocumentModel> = [
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -49,6 +51,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -602,6 +605,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -741,6 +745,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [],
 		template: null,
 		id: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
@@ -825,6 +830,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -873,6 +879,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -948,28 +955,10 @@ export const data: Array<UmbMockDocumentModel> = [
 					`,
 				},
 			},
-			{
-				alias: 'tinymce',
-				editorAlias: 'Umb.PropertyEditorUi.TinyMCE',
-				culture: null,
-				segment: null,
-				value: {
-					blocks: undefined,
-					markup: `
-						<p>
-							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
-						</p>
-						<div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
-						<p>
-							<img width="384" height="228" loading="lazy" alt="Installer illustration" src="/umbraco/backoffice/assets/installer-illustration.svg" />
-						</p>
-						<p>End of test content</p>
-					`,
-				},
-			},
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -1233,4 +1222,5 @@ export const data: Array<UmbMockDocumentModel> = [
 			},
 		],
 	},
+	...permissionsTestData,
 ];

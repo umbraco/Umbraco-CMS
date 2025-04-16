@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 /// </remarks>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DocumentVersionRepositoryTest : UmbracoIntegrationTest
+internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
 {
     public IFileService FileService => GetRequiredService<IFileService>();
     public IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();

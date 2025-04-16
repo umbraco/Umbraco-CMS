@@ -40,7 +40,7 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
         _scopeProvider = scopeProvider;
     }
 
-    public async Task<IEnumerable<IReferenceResponseModel>> CreateReferenceResponseModelsAsync(
+    public Task<IEnumerable<IReferenceResponseModel>> CreateReferenceResponseModelsAsync(
         IEnumerable<RelationItemModel> relationItemModels)
     {
         IReadOnlyCollection<RelationItemModel> relationItemModelsCollection = relationItemModels.ToArray();
@@ -56,13 +56,16 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
         IReferenceResponseModel[] result = relationItemModelsCollection.Select(relationItemModel =>
             relationItemModel.NodeType switch
             {
-                Constants.UdiEntityType.Document => MapDocumentReference(relationItemModel, slimEntities),
-                Constants.UdiEntityType.Media => _umbracoMapper.Map<MediaReferenceResponseModel>(relationItemModel),
-                Constants.UdiEntityType.Member => _umbracoMapper.Map<MemberReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.Document => MapDocumentReference(relationItemModel, slimEntities),
+                Constants.ReferenceType.Media => _umbracoMapper.Map<MediaReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.Member => _umbracoMapper.Map<MemberReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.DocumentTypePropertyType => _umbracoMapper.Map<DocumentTypePropertyTypeReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.MediaTypePropertyType => _umbracoMapper.Map<MediaTypePropertyTypeReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.MemberTypePropertyType => _umbracoMapper.Map<MemberTypePropertyTypeReferenceResponseModel>(relationItemModel),
                 _ => _umbracoMapper.Map<DefaultReferenceResponseModel>(relationItemModel),
             }).WhereNotNull().ToArray();
 
-        return await Task.FromResult(result);
+        return Task.FromResult<IEnumerable<IReferenceResponseModel>>(result);
     }
 
     private IReferenceResponseModel? MapDocumentReference(RelationItemModel relationItemModel,

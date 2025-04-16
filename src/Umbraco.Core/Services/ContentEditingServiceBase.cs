@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -185,7 +185,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         TContent? content = ContentService.GetById(key);
         if (content == null)
         {
-            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
         }
 
         // checking the trash status is not done when it is irrelevant
@@ -195,10 +195,10 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             ContentEditingOperationStatus status = trashStatusRequirement is ContentTrashStatusRequirement.MustBeTrashed
                 ? ContentEditingOperationStatus.NotInTrash
                 : ContentEditingOperationStatus.InTrash;
-            return await Task.FromResult(Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(status, content));
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(status, content);
         }
 
-        if (disabledWhenReferenced && _relationService.IsRelated(content.Id))
+        if (disabledWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child))
         {
             return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(referenceFailStatus, content);
         }
@@ -217,12 +217,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         TContent? content = ContentService.GetById(key);
         if (content is null)
         {
-            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
         }
 
         if (mustBeInRecycleBin && content.Trashed is false)
         {
-            return await Task.FromResult(Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotInTrash, content));
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotInTrash, content);
         }
 
         TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
@@ -265,7 +265,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         TContent? content = ContentService.GetById(key);
         if (content is null)
         {
-            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
         }
 
         TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
@@ -383,7 +383,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return contentType;
     }
 
-    protected virtual async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, TContentType contentType)
+    protected virtual Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, TContentType contentType)
     {
         TContent? parent = parentKey.HasValue
             ? ContentService.GetById(parentKey.Value)
@@ -391,19 +391,19 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         if (parentKey.HasValue && parent == null)
         {
-            return await Task.FromResult<(int? ParentId, ContentEditingOperationStatus OperationStatus)>((null, ContentEditingOperationStatus.ParentNotFound));
+            return Task.FromResult<(int?, ContentEditingOperationStatus)>((null, ContentEditingOperationStatus.ParentNotFound));
         }
 
         if (parent == null && contentType.AllowedAsRoot == false)
         {
-            return (null, ContentEditingOperationStatus.NotAllowed);
+            return Task.FromResult<(int?, ContentEditingOperationStatus)>((null, ContentEditingOperationStatus.NotAllowed));
         }
 
         if (parent != null)
         {
             if (parent.Trashed)
             {
-                return (null, ContentEditingOperationStatus.InTrash);
+                return Task.FromResult<(int?, ContentEditingOperationStatus)>((null, ContentEditingOperationStatus.InTrash));
             }
 
             TContentType? parentContentType = ContentTypeService.Get(parent.ContentType.Key);
@@ -412,11 +412,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
             if (allowedContentTypeKeys.Contains(contentType.Key) == false)
             {
-                return (null, ContentEditingOperationStatus.NotAllowed);
+                return Task.FromResult<(int?, ContentEditingOperationStatus)>((null, ContentEditingOperationStatus.NotAllowed));
             }
         }
 
-        return (parent?.Id ?? Constants.System.Root, ContentEditingOperationStatus.Success);
+        return Task.FromResult<(int?, ContentEditingOperationStatus)>((parent?.Id ?? Constants.System.Root, ContentEditingOperationStatus.Success));
     }
 
     private void UpdateNames(ContentEditingModelBase contentEditingModelBase, TContent content, TContentType contentType)

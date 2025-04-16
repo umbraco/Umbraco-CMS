@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 /// Tests for the media list view service. Please notice that a lot of functional test is covered by the content list
 /// view service tests, since these services share the same base implementation.
 /// </summary>
-public class MediaListViewServiceTests : ContentListViewServiceTestsBase
+internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBase
 {
     private IMediaListViewService MediaListViewService => GetRequiredService<IMediaListViewService>();
 

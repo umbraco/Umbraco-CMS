@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class TelemetryProviderTests : UmbracoIntegrationTest
+internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -47,6 +47,8 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IUserService UserService => GetRequiredService<IUserService>();
+
+    private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
@@ -266,11 +268,11 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void UserTelemetry_Can_Get_With_Saved_UserGroups()
+    public async Task UserTelemetry_Can_Get_With_Saved_UserGroups()
     {
         var userGroup = BuildUserGroup("testGroup");
 
-        UserService.Save(userGroup);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
         var result = UserTelemetryProvider.GetInformation()
             .FirstOrDefault(x => x.Name == Constants.Telemetry.UserGroupCount);
 
@@ -278,14 +280,13 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void UserTelemetry_Can_Get_More_UserGroups()
+    public async Task UserTelemetry_Can_Get_More_UserGroups()
     {
         var userGroups = BuildUserGroups(100);
 
-
         foreach (var userGroup in userGroups)
         {
-            UserService.Save(userGroup);
+            await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
         }
 
         var result = UserTelemetryProvider.GetInformation()

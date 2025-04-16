@@ -39,9 +39,7 @@ export class UmbDocumentTreeServerDataSource extends UmbTreeServerDataSourceBase
 const getRootItems = (args: UmbDocumentTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	DocumentService.getTreeDocumentRoot({
-		dataTypeId: args.dataType?.unique,
-		skip: args.skip,
-		take: args.take,
+		query: { dataTypeId: args.dataType?.unique, skip: args.skip, take: args.take },
 	});
 
 const getChildrenOf = (args: UmbDocumentTreeChildrenOfRequestArgs) => {
@@ -50,10 +48,7 @@ const getChildrenOf = (args: UmbDocumentTreeChildrenOfRequestArgs) => {
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DocumentService.getTreeDocumentChildren({
-			parentId: args.parent.unique,
-			dataTypeId: args.dataType?.unique,
-			skip: args.skip,
-			take: args.take,
+			query: { parentId: args.parent.unique, dataTypeId: args.dataType?.unique, skip: args.skip, take: args.take },
 		});
 	}
 };
@@ -61,11 +56,17 @@ const getChildrenOf = (args: UmbDocumentTreeChildrenOfRequestArgs) => {
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	DocumentService.getTreeDocumentAncestors({
-		descendantId: args.treeItem.unique,
+		query: { descendantId: args.treeItem.unique },
 	});
 
 const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel => {
 	return {
+		ancestors: item.ancestors.map((ancestor) => {
+			return {
+				unique: ancestor.id,
+				entityType: UMB_DOCUMENT_ENTITY_TYPE,
+			};
+		}),
 		unique: item.id,
 		parent: {
 			unique: item.parent ? item.parent.id : null,

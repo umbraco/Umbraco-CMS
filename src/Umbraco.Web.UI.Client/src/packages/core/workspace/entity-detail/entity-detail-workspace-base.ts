@@ -4,7 +4,7 @@ import type { UmbEntityDetailWorkspaceContextArgs, UmbEntityDetailWorkspaceConte
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import { UMB_DISCARD_CHANGES_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_DISCARD_CHANGES_MODAL, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbEntityUpdatedEvent,
@@ -14,7 +14,7 @@ import {
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
@@ -171,6 +171,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			return (await this._getDataPromise) as GetDataType;
 		}
 		this.resetState();
+		this.setIsNew(false);
 		this.#entityContext.setUnique(unique);
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
 		await this.#init;
@@ -182,7 +183,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		if (data) {
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
-			this.setIsNew(false);
 
 			this.observe(
 				response.asObservable(),
@@ -246,8 +246,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				data = { ...data, ...this.modalContext.data.preset };
 			}
 
-			this.#entityContext.setUnique(data.unique);
 			this.setIsNew(true);
+			this.#entityContext.setUnique(data.unique);
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
 		}
@@ -316,6 +316,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this._data.setCurrent(data);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) throw new Error('Event context not found.');
 		const event = new UmbRequestReloadChildrenOfEntityEvent({
 			entityType: parent.entityType,
 			unique: parent.unique,
@@ -337,6 +338,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		const entityType = this.getEntityType();
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) throw new Error('Event context not found.');
 		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 
 		eventContext.dispatchEvent(event);
@@ -359,25 +361,16 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			return true;
 		}
 
-		/* TODO: temp removal of discard changes in workspace modals.
-		 The modal closes before the discard changes dialog is resolved.*/
-		// TODO: I think this can go away now???
-		if (newUrl.includes('/modal/umb-modal-workspace/')) {
-			return true;
-		}
-
-		if (this._checkWillNavigateAway(newUrl) && this._getHasUnpersistedChanges()) {
+		if (this._checkWillNavigateAway(newUrl) && this.getHasUnpersistedChanges()) {
 			/* Since ours modals are async while events are synchronous, we need to prevent the default behavior of the event, even if the modal hasn’t been resolved yet.
 			Once the modal is resolved (the user accepted to discard the changes and navigate away from the route), we will push a new history state.
 			This push will make the "willchangestate" event happen again and due to this somewhat "backward" behavior,
 			we set an "allowNavigateAway"-flag to prevent the "discard-changes" functionality from running in a loop.*/
 			e.preventDefault();
-			const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-			const modal = modalManager.open(this, UMB_DISCARD_CHANGES_MODAL);
 
 			try {
 				// navigate to the new url when discarding changes
-				await modal.onSubmit();
+				await umbOpenModal(this, UMB_DISCARD_CHANGES_MODAL);
 				this.#allowNavigateAway = true;
 				history.pushState({}, '', e.detail.url);
 				return true;
@@ -393,8 +386,17 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * Check if there are unpersisted changes.
 	 * @returns { boolean } true if there are unpersisted changes.
 	 */
-	protected _getHasUnpersistedChanges(): boolean {
+	public getHasUnpersistedChanges(): boolean {
 		return this._data.getHasUnpersistedChanges();
+	}
+	// @deprecated use getHasUnpersistedChanges instead, will be removed in v17.0
+	protected _getHasUnpersistedChanges(): boolean {
+		new UmbDeprecation({
+			removeInVersion: '17',
+			deprecated: '_getHasUnpersistedChanges',
+			solution: 'use public getHasUnpersistedChanges instead.',
+		}).warn();
+		return this.getHasUnpersistedChanges();
 	}
 
 	override resetState() {

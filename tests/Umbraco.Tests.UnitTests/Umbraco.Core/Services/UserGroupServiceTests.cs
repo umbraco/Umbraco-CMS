@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
@@ -90,11 +91,10 @@ public class UserGroupServiceTests
         });
     }
 
-    // Obsoletion will be resolved when they are converted to internal consts.
     [TestCase(null, null, UserGroupOperationStatus.Success)]
     [TestCase(Constants.Security.AdminGroupKeyString, Constants.Security.AdminGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
-    [TestCase(Constants.Security.SensitiveDataGroupKeyString, Constants.Security.SensitiveDataGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
-    [TestCase(Constants.Security.TranslatorGroupString, Constants.Security.TranslatorGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
+    [TestCase(Constants.Security.SensitiveDataGroupKeyString, DatabaseDataCreator.SensitiveDataGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
+    [TestCase(Constants.Security.TranslatorGroupString, DatabaseDataCreator.TranslatorGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
     public async Task Can_Not_Update_SystemGroup_Alias(string? systemGroupKey, string? systemGroupAlias, UserGroupOperationStatus status)
     {
         // prep

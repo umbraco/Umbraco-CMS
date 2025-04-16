@@ -3,7 +3,7 @@ import type { UmbTemplatingInsertMenuElement } from '../../local-components/inse
 import { UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT } from './partial-view-workspace.context-token.js';
 import { css, customElement, html, nothing, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '@umbraco-cms/backoffice/template';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 
@@ -52,15 +52,11 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	async #openQueryBuilder() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const queryBuilderModal = modalManager.open(this, UMB_TEMPLATE_QUERY_BUILDER_MODAL);
+		const queryBuilderModalValue = await umbOpenModal(this, UMB_TEMPLATE_QUERY_BUILDER_MODAL).catch(() => undefined);
 
-		queryBuilderModal
-			?.onSubmit()
-			.then((queryBuilderModalValue) => {
-				if (queryBuilderModalValue.value) this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
-			})
-			.catch(() => undefined);
+		if (queryBuilderModalValue?.value) {
+			this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
+		}
 	}
 
 	override render() {

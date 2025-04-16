@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Preview;
@@ -6,14 +6,14 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Preview;
 
-public class EnterPreviewTests : ManagementApiTest<EnterPreviewController>
+internal sealed class EnterPreviewTests : ManagementApiTest<EnterPreviewController>
 {
     protected override Expression<Func<EnterPreviewController, object>> MethodSelector =>
         x => x.Enter(CancellationToken.None);
 
 
     [Test]
-    public virtual async Task As_Editor_I_Can_Enter_Preview_Mode()
+    public async Task As_Editor_I_Can_Enter_Preview_Mode()
     {
         await AuthenticateClientAsync(Client, "admin@umbraco.com", "1234567890", false);
 

@@ -19,15 +19,9 @@ public class RuntimeSettings
     public RuntimeMode Mode { get; set; } = RuntimeMode.BackofficeDevelopment;
 
     /// <summary>
-    /// Gets or sets a value for the maximum query string length.
-    /// </summary>
-    [Obsolete("No longer used and will be removed in Umbraco 16.")]
-    public int? MaxQueryStringLength { get; set; }
-
-    /// <summary>
     ///     Gets or sets a value for the maximum request length in kb.
     /// </summary>
-    public int? MaxRequestLength { get; set; }
+    public long? MaxRequestLength { get; set; }
 
     /// <summary>
     /// Gets or sets the timespan temporary files are kept, before they are removed by a background task.

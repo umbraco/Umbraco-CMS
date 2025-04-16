@@ -3,7 +3,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class MediaNavigationServiceTests
+internal sealed partial class MediaNavigationServiceTests
 {
     [Test]
     public async Task Structure_Updates_When_Moving_Media_To_Recycle_Bin()

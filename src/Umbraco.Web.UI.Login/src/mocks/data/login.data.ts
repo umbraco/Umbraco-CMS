@@ -25,14 +25,14 @@ class UmbLoginData {
 		if (valid)
 			return {
 				data: {
-          passwordConfiguration: {
-            minimumLength: 8,
-            requireDigit: true,
-            requireLowercase: true,
-            requireUppercase: true,
-            requireNonAlphanumeric: true,
-          }
-        },
+					passwordConfiguration: {
+						minimumLength: 8,
+						requireDigit: true,
+						requireLowercase: true,
+						requireUppercase: true,
+						requireNonAlphanumeric: true,
+					},
+				},
 				status: 200,
 			};
 		else
@@ -51,6 +51,7 @@ class UmbLoginData {
 			email: '2fa@umbraco.com',
 			password: '2fa',
 			twoFactor: true,
+			enabledTwoFactorProviderNames: ['sms'],
 		},
 		{
 			id: '2',
@@ -58,8 +59,8 @@ class UmbLoginData {
 			email: '2fa@umbraco.com',
 			password: 'html',
 			twoFactor: true,
-      twoFactorLoginView: '/src/mocks/customViews/my-custom-view.html',
-      enabledTwoFactorProviderNames: ['sms', 'email']
+			twoFactorLoginView: '/src/mocks/customViews/my-custom-view.html',
+			enabledTwoFactorProviderNames: ['sms', 'email'],
 		},
 		{
 			id: '3',
@@ -67,8 +68,8 @@ class UmbLoginData {
 			email: '2fa@umbraco.com',
 			password: 'js',
 			twoFactor: true,
-      twoFactorLoginView: '/src/mocks/customViews/my-custom-view.js',
-      enabledTwoFactorProviderNames: ['sms', 'email']
+			twoFactorLoginView: '/src/mocks/customViews/my-custom-view.js',
+			enabledTwoFactorProviderNames: ['sms', 'email'],
 		},
 		{
 			id: '4',

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -58,31 +58,56 @@ internal sealed class ContentEditingService
         _languageService = languageService;
     }
 
-    public async Task<IContent?> GetAsync(Guid key)
+    public Task<IContent?> GetAsync(Guid key)
     {
         IContent? content = ContentService.GetById(key);
-        return await Task.FromResult(content);
+        return Task.FromResult(content);
     }
 
-    [Obsolete("Please use the validate update method that is not obsoleted. Will be removed in V16.")]
-    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ContentUpdateModel updateModel)
-    {
-        IContent? content = ContentService.GetById(key);
-        return content is not null
-            ? await ValidateCulturesAndPropertiesAsync(updateModel, content.ContentType.Key)
-            : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
-    }
-
+    [Obsolete("Please use the validate update method that is not obsoleted. Scheduled for removal in V17.")]
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateContentUpdateModel updateModel)
+        => await ValidateUpdateAsync(key, updateModel, Guid.Empty);
+
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateContentUpdateModel updateModel, Guid userKey)
     {
         IContent? content = ContentService.GetById(key);
         return content is not null
-            ? await ValidateCulturesAndPropertiesAsync(updateModel, content.ContentType.Key, updateModel.Cultures)
+            ? await ValidateCulturesAndPropertiesAsync(updateModel, content.ContentType.Key, await GetCulturesToValidate(updateModel.Cultures, userKey))
             : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
     }
 
+    [Obsolete("Please use the validate create method that is not obsoleted. Scheduled for removal in V17.")]
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel)
-        => await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey, createModel.Variants.Select(variant => variant.Culture));
+        => await ValidateCreateAsync(createModel, Guid.Empty);
+
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel, Guid userKey)
+        => await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey, await GetCulturesToValidate(createModel.Variants.Select(variant => variant.Culture), userKey));
+
+    private async Task<IEnumerable<string?>?> GetCulturesToValidate(IEnumerable<string?>? cultures, Guid userKey)
+    {
+        // Cultures to validate can be provided by the calling code, but if the editor is restricted to only have
+        // access to certain languages, we don't want to validate by any they aren't allowed to edit.
+
+        // TODO: Remove this check once the obsolete overloads to ValidateCreateAsync and ValidateUpdateAsync that don't provide a user key are removed.
+        // We only have this to ensure backwards compatibility with the obsolete overloads.
+        if (userKey == Guid.Empty)
+        {
+            return cultures;
+        }
+
+        HashSet<string>? allowedCultures = await GetAllowedCulturesForEditingUser(userKey);
+
+        if (cultures == null)
+        {
+            // If no cultures are provided, we are asking to validate all cultures. But if the user doesn't have access to all, we
+            // should only validate the ones they do.
+            var allCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode).ToList();
+            return allowedCultures.Count == allCultures.Count ? null : allowedCultures;
+        }
+
+        // If explicit cultures are provided, we should only validate the ones the user has access to.
+        return cultures.Where(x => !string.IsNullOrEmpty(x) && allowedCultures.Contains(x)).ToList();
+    }
 
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
     {
@@ -127,16 +152,7 @@ internal sealed class ContentEditingService
 
         IContent? existingContent = await GetAsync(contentWithPotentialUnallowedChanges.Key);
 
-        IUser? user = await _userService.GetAsync(userKey);
-
-        if (user is null)
-        {
-            return contentWithPotentialUnallowedChanges;
-        }
-
-        var allowedLanguageIds = user.CalculateAllowedLanguageIds(_localizationService)!;
-
-        var allowedCultures = (await _languageService.GetIsoCodesByIdsAsync(allowedLanguageIds)).ToHashSet();
+        HashSet<string>? allowedCultures = await GetAllowedCulturesForEditingUser(userKey);
 
         ILanguage? defaultLanguage = await _languageService.GetDefaultLanguageAsync();
 
@@ -209,6 +225,16 @@ internal sealed class ContentEditingService
         }
 
         return contentWithPotentialUnallowedChanges;
+    }
+
+    private async Task<HashSet<string>> GetAllowedCulturesForEditingUser(Guid userKey)
+    {
+        IUser? user = await _userService.GetAsync(userKey)
+            ?? throw new InvalidOperationException($"Could not find user by key {userKey} when editing or validating content.");
+
+        var allowedLanguageIds = user.CalculateAllowedLanguageIds(_localizationService)!;
+
+        return (await _languageService.GetIsoCodesByIdsAsync(allowedLanguageIds)).ToHashSet();
     }
 
     public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentUpdateModel updateModel, Guid userKey)

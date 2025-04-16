@@ -1,33 +1,23 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.DependencyInjection;
-using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
-using Umbraco.Cms.Infrastructure.HostedServices;
-using Umbraco.Cms.Infrastructure.Search;
-using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
-using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Mock)]
-public class PublishStatusServiceTest : UmbracoIntegrationTestWithContent
+internal sealed class PublishStatusServiceTest : UmbracoIntegrationTestWithContent
 {
     protected IPublishStatusQueryService PublishStatusQueryService => GetRequiredService<IPublishStatusQueryService>();
 
@@ -164,7 +154,7 @@ public class PublishStatusServiceTest : UmbracoIntegrationTestWithContent
     {
         var grandchild = ContentBuilder.CreateSimpleContent(ContentType, "Grandchild", Subpage2.Id);
 
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
         ContentService.Save(grandchild, -1, contentSchedule);
 
         var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);

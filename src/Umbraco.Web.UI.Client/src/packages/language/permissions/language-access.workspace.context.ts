@@ -57,7 +57,7 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase<UmbLanguag
 
 		// create a list of states for the disallowed languages
 		const identifier = 'UMB_LANGUAGE_PERMISSION_';
-		const readOnlyStates = variantIds.map((variantId) => {
+		const readOnlyRules = variantIds.map((variantId) => {
 			return {
 				unique: identifier + variantId.culture,
 				variantId,
@@ -66,11 +66,12 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase<UmbLanguag
 		});
 
 		// remove all previous states before adding new ones
+		// TODO: But maybe options that was added previously is not there any longer? [NL]
 		const uniques = this.#variantOptions?.map((variant) => identifier + variant.culture) || [];
-		this.#workspaceContext.readOnlyState?.removeStates(uniques);
+		this.#workspaceContext.readOnlyGuard?.removeRules(uniques);
 
 		// add new states
-		this.#workspaceContext.readOnlyState?.addStates(readOnlyStates);
+		this.#workspaceContext.readOnlyGuard?.addRules(readOnlyRules);
 	}
 }
 

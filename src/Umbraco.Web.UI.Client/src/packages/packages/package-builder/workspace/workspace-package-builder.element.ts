@@ -92,7 +92,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			this._submitState = 'waiting';
 
 			const unique = await this.#packageRepository.saveCreatedPackage(this._package);
-			if (!unique) return;
+			if (!unique || typeof unique !== 'string') return;
 
 			this._package.unique = unique;
 			this.requestUpdate('_package');

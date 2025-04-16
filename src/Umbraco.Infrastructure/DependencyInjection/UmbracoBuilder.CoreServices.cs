@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
@@ -43,14 +44,12 @@ using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HealthChecks;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Mail;
 using Umbraco.Cms.Infrastructure.Mail.Interfaces;
 using Umbraco.Cms.Infrastructure.Manifest;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
-using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Routing;
@@ -148,8 +147,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IMigrationPlanExecutor, MigrationPlanExecutor>();
         builder.Services.AddSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
-        builder.Services.AddSingleton<ICacheRebuilder, CacheRebuilder>();
-
         builder.Services.AddSingleton<IVariationContextAccessor, HybridVariationContextAccessor>();
         builder.Services.AddSingleton<IBackOfficeVariationContextAccessor, HttpContextBackOfficeVariationContextAccessor>();
 
@@ -167,7 +164,7 @@ public static partial class UmbracoBuilderExtensions
         // discovered when CoreBootManager configures the converters. We will remove the basic one defined
         // in core so that the more enhanced version is active.
         builder.PropertyValueConverters()
-            .Remove<SimpleTinyMceValueConverter>();
+            .Remove<SimpleRichTextValueConverter>();
 
         // register *all* checks, except those marked [HideFromTypeFinder] of course
         builder.Services.AddSingleton<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
@@ -189,7 +186,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddTransient<IUserInviteSender, EmailUserInviteSender>();
         builder.Services.AddTransient<IUserForgotPasswordSender, EmailUserForgotPasswordSender>();
 
-        builder.Services.AddSingleton<IExamineManager, ExamineManager>();
+        builder.Services.AddSingleton<IExamineManager, NoopExamineManager>();
+        builder.Services.AddSingleton<IIndexRebuilder, NoopIndexRebuilder>();
 
         builder.Services.AddScoped<ITagQuery, TagQuery>();
 
@@ -227,8 +225,13 @@ public static partial class UmbracoBuilderExtensions
 
         builder.AddInstaller();
 
-        // Services required to run background jobs (with out the handler)
-        builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+        // Services required to run background jobs
+        // We can simplify this registration once the obsolete IBackgroundTaskQueue is removed.
+        builder.Services.AddSingleton<HostedServices.BackgroundTaskQueue>();
+        builder.Services.AddSingleton<IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
+#pragma warning disable CS0618 // Type or member is obsolete
+        builder.Services.AddSingleton<HostedServices.IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
+#pragma warning restore CS0618 // Type or member is obsolete
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
 
@@ -451,6 +454,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiRichTextMarkupParser, ApiRichTextMarkupParser>();
         builder.Services.AddSingleton<IApiPropertyRenderer, ApiPropertyRenderer>();
         builder.Services.AddSingleton<IApiDocumentUrlService, ApiDocumentUrlService>();
+        builder.Services.AddScoped<IMemberClientCredentialsManager, MemberClientCredentialsManager>();
 
         return builder;
     }

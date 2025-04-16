@@ -428,7 +428,6 @@ export default {
 		newPartialViewMacroFromSnippet: 'Ny partial view makro fra snippet',
 		newPartialViewMacroNoMacro: 'Ny partial view makro (uden makro)',
 		newStyleSheetFile: 'Ny stylesheet-fil',
-		newRteStyleSheetFile: 'Ny Rich Text Editor stylesheet-fil',
 	},
 	dashboard: {
 		browser: 'Til dit website',
@@ -442,7 +441,7 @@ export default {
 	prompt: {
 		stay: 'Bliv',
 		discardChanges: 'Kassér ændringer',
-		unsavedChanges: 'Du har ikke-gemte ændringer',
+		unsavedChanges: 'Kassér ugemte ændringer',
 		unsavedChangesWarning:
 			'Er du sikker på du vil navigere væk fra denne side? - du har ikke-gemte\n      ændringer\n    ',
 		confirmListViewPublish: 'Udgivelse vil gøre de valgte sider synlige på sitet.',

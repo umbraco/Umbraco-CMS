@@ -1,6 +1,8 @@
 import type { UmbBlockDataModel, UmbBlockLayoutBaseModel } from '../types.js';
+import { UMB_BLOCK_ENTRIES_CONTEXT, UMB_BLOCK_ENTRY_CONTEXT, UMB_BLOCK_MANAGER_CONTEXT } from '../context/index.js';
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
+import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
@@ -16,14 +18,9 @@ import {
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { decodeFilePath, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
-import {
-	UMB_BLOCK_ENTRIES_CONTEXT,
-	UMB_BLOCK_MANAGER_CONTEXT,
-	type UmbBlockWorkspaceOriginData,
-	UMB_BLOCK_ENTRY_CONTEXT,
-} from '@umbraco-cms/backoffice/block';
+import { UMB_DISCARD_CHANGES_MODAL, UMB_MODAL_CONTEXT, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { decodeFilePath, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
@@ -74,12 +71,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#exposed = new UmbBooleanState<undefined>(undefined);
 	readonly exposed = this.#exposed.asObservable();
 
-	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
 		const manifest = workspaceArgs.manifest;
 		this.#entityType = manifest.meta?.entityType;
+
+		window.addEventListener('willchangestate', this.#onWillNavigate);
 
 		this.addValidationContext(this.content.validation);
 		this.addValidationContext(this.settings.validation);
@@ -88,7 +87,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.#modalContext = context;
 			this.#originData = context?.data.originData;
 			context.onSubmit().catch(this.#modalRejected);
-		}).asPromise();
+		}).asPromise({ preventTimeout: true });
 
 		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
 			this.#blockManager = manager;
@@ -97,7 +96,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
 			this.#blockEntries = context;
-		}).asPromise();
+		}).asPromise({ preventTimeout: true });
 
 		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
 			this.#name.setValue(context.getName());
@@ -186,21 +185,20 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		);
 
 		this.observe(
-			observeMultiple([manager.readOnlyState.isReadOnly, this.variantId]),
-			([isReadOnly, variantId]) => {
+			// TODO: Again we need to parse on all variants....
+			manager.readOnlyState.isPermittedForObservableVariant(this.variantId),
+			(isReadOnly) => {
 				const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
-				if (variantId === undefined) return;
 
 				if (isReadOnly) {
-					const state = {
+					const rule = {
 						unique,
-						variantId,
-						message: '',
+						variantId: this.#variantId.getValue(),
 					};
 
-					this.readOnlyState?.addState(state);
+					this.readOnlyGuard?.addRule(rule);
 				} else {
-					this.readOnlyState?.removeState(unique);
+					this.readOnlyGuard?.removeRule(unique);
 				}
 			},
 			'observeIsReadOnly',
@@ -223,6 +221,51 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		);
 	}
 
+	#allowNavigateAway = false;
+	#onWillNavigate = async (e: CustomEvent) => {
+		const newUrl = e.detail.url;
+
+		if (this.#allowNavigateAway) {
+			return true;
+		}
+
+		if (this._checkWillNavigateAway(newUrl) && this.getHasUnpersistedChanges()) {
+			/* Since ours modals are async while events are synchronous, we need to prevent the default behavior of the event, even if the modal hasn’t been resolved yet.
+			Once the modal is resolved (the user accepted to discard the changes and navigate away from the route), we will push a new history state.
+			This push will make the "willchangestate" event happen again and due to this somewhat "backward" behavior,
+			we set an "allowNavigateAway"-flag to prevent the "discard-changes" functionality from running in a loop.*/
+			e.preventDefault();
+			const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT).catch(() => undefined);
+			const modal = modalManager?.open(this, UMB_DISCARD_CHANGES_MODAL);
+			if (modal) {
+				try {
+					// navigate to the new url when discarding changes
+					await modal.onSubmit();
+					this.#allowNavigateAway = true;
+					history.pushState({}, '', e.detail.url);
+					return true;
+				} catch {
+					return false;
+				}
+			} else {
+				console.error('No modal manager found!');
+			}
+		}
+
+		return true;
+	};
+
+	/**
+	 * Check if the workspace is about to navigate away.
+	 * @protected
+	 * @param {string} newUrl The new url that the workspace is navigating to.
+	 * @returns { boolean} true if the workspace is navigating away.
+	 * @memberof UmbEntityWorkspaceContextBase
+	 */
+	protected _checkWillNavigateAway(newUrl: string): boolean {
+		return !newUrl.includes(this.routes.getActiveLocalPath());
+	}
+
 	setEditorSize(editorSize: UUIModalSidebarSize) {
 		this.#modalContext?.setModalSize(editorSize);
 	}
@@ -236,6 +279,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#initialSettings = undefined;
 		this.content.resetState();
 		this.settings.resetState();
+		this.#allowNavigateAway = false;
 		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 	}
 
@@ -425,6 +469,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	/**
+	 * Check if there are unpersisted changes.
+	 * @returns { boolean } true if there are unpersisted changes.
+	 */
+	public getHasUnpersistedChanges(): boolean {
+		return this.content.getHasUnpersistedChanges() || this.settings.getHasUnpersistedChanges();
+	}
+
+	/**
 	 * @function propertyValueByAlias
 	 * @param {string} propertyAlias - The alias of the property to get the value of.
 	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} - The value of the property.
@@ -463,6 +515,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 
 		const settingsData = this.settings.getData();
+		this.content.setPersistedData(contentData);
+		if (settingsData) {
+			this.settings.setPersistedData(settingsData);
+		}
 
 		if (!this.#liveEditingMode) {
 			if (this.getIsNew() === true) {
@@ -534,6 +590,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	public override destroy(): void {
 		super.destroy();
+		window.removeEventListener('willchangestate', this.#onWillNavigate);
 		this.#layout?.destroy();
 		this.#name?.destroy();
 		this.#layout = undefined as any;
