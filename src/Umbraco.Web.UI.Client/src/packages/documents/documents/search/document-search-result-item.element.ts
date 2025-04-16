@@ -6,8 +6,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 
-const elementName = 'umb-document-search-result-item';
-@customElement(elementName)
+@customElement('umb-document-search-result-item')
 export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 	@property({ type: Object })
 	item?: UmbSearchResultItemModel & UmbDocumentItemModel;
