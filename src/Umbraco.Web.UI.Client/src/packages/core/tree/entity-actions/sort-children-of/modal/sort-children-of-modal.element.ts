@@ -109,10 +109,6 @@ export class UmbSortChildrenOfModalElement<
 		}
 	}
 
-	protected _hasMorePages() {
-		return this._currentPage < this._totalPages;
-	}
-
 	protected _createTableItems() {
 		this._tableItems = this._children.map((treeItem) => {
 			return {
@@ -126,6 +122,10 @@ export class UmbSortChildrenOfModalElement<
 				],
 			};
 		});
+	}
+
+	#hasMorePages() {
+		return this._currentPage < this._totalPages;
 	}
 
 	#onLoadMore(event: PointerEvent) {
@@ -174,6 +174,7 @@ export class UmbSortChildrenOfModalElement<
 	}
 
 	#onSorted(event: UmbTableSortedEvent) {
+		event.stopPropagation();
 		const sortedId = event.getItemId();
 		this._sortedUniques.add(sortedId);
 		const target = event.target as UmbTableElement;
@@ -182,6 +183,7 @@ export class UmbSortChildrenOfModalElement<
 	}
 
 	#onOrdered(event: UmbTableOrderedEvent) {
+		event.stopPropagation();
 		const target = event.target as UmbTableElement;
 		const orderingColumn = target.orderingColumn;
 		const orderingDesc = target.orderingDesc;
@@ -227,7 +229,7 @@ export class UmbSortChildrenOfModalElement<
 				@sorted=${this.#onSorted}
 				@ordered=${this.#onOrdered}></umb-table>
 
-			${this._hasMorePages()
+			${this.#hasMorePages()
 				? html`
 						<uui-button id="loadMoreButton" look="secondary" @click=${this.#onLoadMore}
 							>Load More (${this._currentPage}/${this._totalPages})</uui-button
