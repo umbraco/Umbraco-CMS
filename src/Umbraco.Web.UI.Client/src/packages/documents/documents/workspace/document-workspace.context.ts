@@ -211,7 +211,7 @@ export class UmbDocumentWorkspaceContext
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
 		if (blueprintUnique) {
 			const blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
-			const { data } = await blueprintRepository.requestByUnique(blueprintUnique);
+			const data = await blueprintRepository.scaffoldByUnique(blueprintUnique);
 
 			return this.createScaffold({
 				parent,

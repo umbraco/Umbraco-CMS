@@ -4,6 +4,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDocumentBlueprintRequestModel,
+	DocumentBlueprintResponseModel,
 	UpdateDocumentBlueprintRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -117,6 +118,37 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		};
 
 		return { data: document };
+	}
+
+	createDocumentBlueprintDetailModel(data: DocumentBlueprintResponseModel) : UmbDocumentBlueprintDetailModel {
+		return {
+			entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
+			unique: data.id,
+			values: data.values.map((value) => {
+				return {
+					editorAlias: value.editorAlias,
+					culture: value.culture || null,
+					segment: value.segment || null,
+					alias: value.alias,
+					value: value.value,
+				};
+			}),
+			variants: data.variants.map((variant) => {
+				return {
+					state: variant.state,
+					culture: variant.culture || null,
+					segment: variant.segment || null,
+					name: variant.name,
+					publishDate: variant.publishDate || null,
+					createDate: variant.createDate,
+					updateDate: variant.updateDate,
+				};
+			}),
+			documentType: {
+				unique: data.documentType.id,
+				collection: data.documentType.collection ? { unique: data.documentType.collection.id } : null,
+			},
+		};
 	}
 
 	/**
