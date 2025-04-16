@@ -397,7 +397,6 @@ export class UmbSearchModalElement extends UmbLitElement {
 				background-color: var(--uui-color-surface);
 				box-sizing: border-box;
 				color: var(--uui-color-text);
-				font-size: 1rem;
 				padding-bottom: var(--uui-size-space-2);
 			}
 
