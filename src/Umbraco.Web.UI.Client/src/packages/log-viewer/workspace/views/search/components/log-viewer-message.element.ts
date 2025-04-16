@@ -73,8 +73,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		{
 			label: 'Search in Umbraco Forum with Google',
 			title: 'Search Umbraco Forum using Google',
-			href: () =>
-				`https://www.google.co.uk/?q=site:forum.umbraco.com ${this.renderedMessage}&safe=off#q=site:forum.umbraco.com ${this.renderedMessage} ${this.properties.find((property) => property.name === 'SourceContext')?.value}&safe=off"`,
+			href: () => `https://www.google.com/?q=site:forum.umbraco.com%20${this.renderedMessage}`,
 			icon: 'icon-google',
 		},
 		{
