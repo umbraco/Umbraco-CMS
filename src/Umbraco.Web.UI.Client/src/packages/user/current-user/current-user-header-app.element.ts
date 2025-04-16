@@ -1,7 +1,6 @@
 import { UMB_CURRENT_USER_MODAL } from './modals/current-user/current-user-modal.token.js';
 import type { UmbCurrentUserModel } from './types.js';
 import { UMB_CURRENT_USER_CONTEXT } from './constants.js';
-import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbHeaderAppButtonElement } from '@umbraco-cms/backoffice/components';
@@ -43,7 +42,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbHeaderAppButtonElement {
 			<uui-button
 				@click=${this.#handleUserClick}
 				look="primary"
-				label="${this.localize.term('visuallyHiddenTexts_openCloseBackofficeProfileOptions')}"
+				label=${this.localize.term('visuallyHiddenTexts_openCloseBackofficeProfileOptions')}
 				compact>
 				<umb-user-avatar
 					id="Avatar"
@@ -53,8 +52,8 @@ export class UmbCurrentUserHeaderAppElement extends UmbHeaderAppButtonElement {
 		`;
 	}
 
-	static override styles: CSSResultGroup = [
-		UmbHeaderAppButtonElement.styles,
+	static override readonly styles = [
+		...UmbHeaderAppButtonElement.styles,
 		css`
 			uui-button {
 				font-size: 14px;

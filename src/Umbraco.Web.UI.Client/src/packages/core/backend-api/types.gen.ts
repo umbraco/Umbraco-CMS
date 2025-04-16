@@ -4312,6 +4312,41 @@ export type PutDocumentBlueprintByIdMoveResponses = {
     200: unknown;
 };
 
+export type GetDocumentBlueprintByIdScaffoldData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document-blueprint/{id}/scaffold';
+};
+
+export type GetDocumentBlueprintByIdScaffoldErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetDocumentBlueprintByIdScaffoldError = GetDocumentBlueprintByIdScaffoldErrors[keyof GetDocumentBlueprintByIdScaffoldErrors];
+
+export type GetDocumentBlueprintByIdScaffoldResponses = {
+    /**
+     * OK
+     */
+    200: DocumentBlueprintResponseModel;
+};
+
+export type GetDocumentBlueprintByIdScaffoldResponse = GetDocumentBlueprintByIdScaffoldResponses[keyof GetDocumentBlueprintByIdScaffoldResponses];
+
 export type PostDocumentBlueprintFolderData = {
     body?: CreateFolderRequestModel;
     path?: never;

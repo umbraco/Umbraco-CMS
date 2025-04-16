@@ -8,9 +8,9 @@ import type {
 import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
 import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, nothing, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-default-tree')
 export class UmbDefaultTreeElement extends UmbLitElement {
@@ -146,10 +146,11 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 				${repeat(
 					this._rootItems,
 					(item, index) => item.name + '___' + index,
-					(item) =>
-						html`<umb-tree-item
+					(item) => html`
+						<umb-tree-item
 							.entityType=${item.entityType}
-							.props=${{ hideActions: this.hideTreeItemActions, item }}></umb-tree-item>`,
+							.props=${{ hideActions: this.hideTreeItemActions, item }}></umb-tree-item>
+					`,
 				)}
 				${this.#renderPaging()}
 			`;
