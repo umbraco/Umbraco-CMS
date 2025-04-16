@@ -53,6 +53,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 	protected override async firstUpdated(_changedProperties: PropertyValues): Promise<void> {
 		super.firstUpdated(_changedProperties);
+		// TODO: cache this request
 		const { data } = await this.#configurationRepository.requestConfiguration();
 
 		if (data) {
