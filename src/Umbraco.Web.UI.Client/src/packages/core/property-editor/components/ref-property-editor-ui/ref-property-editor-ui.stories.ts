@@ -1,7 +1,7 @@
+import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '../../constants.js';
 import type { UmbRefPropertyEditorUIElement } from './ref-property-editor-ui.element.js';
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 import './ref-property-editor-ui.element.js';
 
 const meta: Meta<UmbRefPropertyEditorUIElement> = {
