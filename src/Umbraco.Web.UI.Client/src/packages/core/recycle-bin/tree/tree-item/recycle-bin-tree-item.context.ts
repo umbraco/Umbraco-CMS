@@ -32,7 +32,7 @@ export class UmbRecycleBinTreeItemContext<
 		const entityType = event.getEntityType();
 		if (!entityType) throw new Error('Entity type is required');
 
-		const supportedEntityTypes = this.getManifest()?.meta.supportedEntityTypes;
+		const supportedEntityTypes = this.manifest?.meta.supportedEntityTypes;
 
 		if (!supportedEntityTypes) {
 			throw new Error('Entity types are missing from the manifest (manifest.meta.supportedEntityTypes).');
