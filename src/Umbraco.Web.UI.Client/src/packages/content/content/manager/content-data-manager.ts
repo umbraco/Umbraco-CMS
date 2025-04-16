@@ -157,18 +157,4 @@ export class UmbContentWorkspaceDataManager<
 				.map((x) => new UmbVariantId(x.culture, x.segment)) ?? []
 		);
 	}
-
-	override async constructData(selectedVariantIds: Array<UmbVariantId>) {
-		let selection = selectedVariantIds;
-
-		// If we vary by segment we need to save all segments for a selected culture.
-		if (this._variesBySegment === true) {
-			const dataVariants = this.getCurrent()?.variants ?? [];
-			const selectedCultures = selectedVariantIds.map((x) => x.culture);
-			const selectedCulturesIncludingSegments = dataVariants.filter((x) => selectedCultures.includes(x.culture));
-			selection = selectedCulturesIncludingSegments.map((x) => UmbVariantId.Create(x));
-		}
-
-		return super.constructData(selection);
-	}
 }

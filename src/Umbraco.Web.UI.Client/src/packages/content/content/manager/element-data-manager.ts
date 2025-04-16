@@ -84,6 +84,15 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 			variantsToStore = [...selectedVariants, invariantVariantId];
 		}
 
+		// If we vary by segment we need to save all segments for a selected culture.
+		if (this._variesBySegment === true) {
+			const dataSegments = this.getCurrent()!.values.map((x) => x.segment);
+			variantsToStore = [
+				...variantsToStore,
+				...dataSegments.flatMap((segment) => variantsToStore.map((variant) => variant.toSegment(segment))),
+			];
+		}
+
 		const data = this.getCurrent();
 		if (!data) throw new Error('Current data is missing');
 		//if (!data.unique) throw new Error('Unique of current data is missing');
