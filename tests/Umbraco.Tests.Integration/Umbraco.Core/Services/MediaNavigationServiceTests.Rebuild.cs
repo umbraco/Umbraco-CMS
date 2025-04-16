@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
@@ -22,7 +23,10 @@ public partial class MediaNavigationServiceTests
         MediaNavigationQueryService.TryGetSiblingsKeys(nodeKey, out IEnumerable<Guid> originalSiblingsKeys);
 
         // In-memory navigation structure is empty here
-        var newMediaNavigationService = new MediaNavigationService(GetRequiredService<ICoreScopeProvider>(), GetRequiredService<INavigationRepository>());
+        var newMediaNavigationService = new MediaNavigationService(
+            GetRequiredService<ICoreScopeProvider>(),
+            GetRequiredService<INavigationRepository>(),
+            GetRequiredService<IMediaTypeService>());
         var initialNodeExists = newMediaNavigationService.TryGetParentKey(nodeKey, out _);
 
         // Act
@@ -67,7 +71,10 @@ public partial class MediaNavigationServiceTests
         MediaNavigationQueryService.TryGetSiblingsKeysInBin(nodeKey, out IEnumerable<Guid> originalSiblingsKeys);
 
         // In-memory navigation structure is empty here
-        var newMediaNavigationService = new MediaNavigationService(GetRequiredService<ICoreScopeProvider>(), GetRequiredService<INavigationRepository>());
+        var newMediaNavigationService = new MediaNavigationService(
+            GetRequiredService<ICoreScopeProvider>(),
+            GetRequiredService<INavigationRepository>(),
+            GetRequiredService<IMediaTypeService>());
         var initialNodeExists = newMediaNavigationService.TryGetParentKeyInBin(nodeKey, out _);
 
         // Act

@@ -188,8 +188,7 @@ test('can remove create button label for an area in a block', async ({umbracoApi
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithCreateButtonLabel(blockGridEditorName, contentElementTypeId, areaAlias, '')).toBeTruthy();
 });
 
-//TODO: Frontend issue. when value is inserted to the min or max, it is set as a string instead of number
-test.skip('can add min allowed for an area in a block', async ({umbracoApi, umbracoUi}) => {
+test('can add min allowed for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
@@ -284,7 +283,7 @@ test('can remove max allowed for an area in a block', async ({umbracoApi, umbrac
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMaxAllowed(blockGridEditorName, contentElementTypeId, areaAlias, maxAllowed)).toBeFalsy();
 });
 
-// TODO: There is no frontend validation for min and max values
+// TODO: Remove skip when the front-end is ready. Currently there is no frontend validation for min and max values
 test.skip('min can not be more than max an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const areaAlias = 'TestArea';
@@ -309,8 +308,7 @@ test.skip('min can not be more than max an area in a block', async ({umbracoApi,
   await umbracoUi.dataType.isSuccessNotificationVisible();
 });
 
-// TODO: It is currently not possible to add a specified allowance
-test.skip('can add specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
+test('can add specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const areaAlias = 'TestArea';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);

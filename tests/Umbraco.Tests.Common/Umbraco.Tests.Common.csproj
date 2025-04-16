@@ -7,15 +7,21 @@
     <IsPackable>true</IsPackable>
     <EnablePackageValidation>$(BaseEnablePackageValidation)</EnablePackageValidation>
   </PropertyGroup>
+  
   <PropertyGroup>
-    <!--  TODO: Fix [CS1998] async, [CSO618] obsolete references, fix [SYSLIB0012] obsolete references,
-          and remove overrides -->
-    <WarningsNotAsErrors>CS1998,CS0618,SYSLIB0012</WarningsNotAsErrors>
+    <!--
+      TODO: Fix and remove overrides:
+      [CS1998] async
+      [CS0618] obsolete references
+      [SYSLIB0012] obsolete references
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),CS1998,CS0618,SYSLIB0012</WarningsNotAsErrors>
   </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="AutoFixture.AutoMoq" />
-    <PackageReference Include="Moq" />
     <PackageReference Include="AutoFixture.NUnit3" />
+    <PackageReference Include="Moq" />
     <PackageReference Include="NUnit" />
   </ItemGroup>
 

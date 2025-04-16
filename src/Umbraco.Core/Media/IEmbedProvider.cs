@@ -20,5 +20,6 @@ public interface IEmbedProvider
 
     [Obsolete("Use GetMarkupAsync instead. This will be removed in Umbraco 15.")]
     string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
+
     Task<string?> GetMarkupAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken) => Task.FromResult(GetMarkup(url, maxWidth ?? 0, maxHeight ?? 0));
 }

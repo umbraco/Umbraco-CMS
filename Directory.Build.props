@@ -14,10 +14,19 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
-    <TreatWarningsAsErrors Condition="'$(Configuration)' != 'Debug'">true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--
+      TODO: Fix and remove overrides:
+      [NU5104] Warning As Error: A stable release of a package should not have a prerelease dependency. Either modify the version spec of dependency
+    -->
+    <NoWarn>$(NoWarn),NU5104,SA1309</NoWarn>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),NU5104,SA1600</WarningsNotAsErrors>
   </PropertyGroup>
 
   <!-- SourceLink -->
@@ -30,8 +39,8 @@
   <!-- Package Validation -->
   <PropertyGroup>
     <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
-    <EnablePackageValidation>false</EnablePackageValidation>
-    <PackageValidationBaselineVersion>14.0.0</PackageValidationBaselineVersion>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageValidationBaselineVersion>15.0.0</PackageValidationBaselineVersion>
     <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
     <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
   </PropertyGroup>

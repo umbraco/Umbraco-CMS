@@ -87,7 +87,7 @@ public partial class DocumentNavigationServiceTests
     public async Task Structure_Updates_When_Sorting_Items_At_Root()
     {
         // Arrange
-        var anotherRootCreateModel = CreateContentCreateModel("Root 2", Guid.NewGuid(), Constants.System.RootKey);
+        var anotherRootCreateModel = CreateContentCreateModel("Root 2", Guid.NewGuid(), parentKey: Constants.System.RootKey);
         await ContentEditingService.CreateAsync(anotherRootCreateModel, Constants.Security.SuperUserKey);
         DocumentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> initialRootKeys);
 
@@ -175,9 +175,9 @@ public partial class DocumentNavigationServiceTests
     {
         // Arrange
         Guid node = Root.Key;
-        var anotherRootCreateModel1 = CreateContentCreateModel("Root 2", Guid.NewGuid(), Constants.System.RootKey);
+        var anotherRootCreateModel1 = CreateContentCreateModel("Root 2", Guid.NewGuid(), parentKey: Constants.System.RootKey);
         await ContentEditingService.CreateAsync(anotherRootCreateModel1, Constants.Security.SuperUserKey);
-        var anotherRootCreateModel2 = CreateContentCreateModel("Root 3", Guid.NewGuid(), Constants.System.RootKey);
+        var anotherRootCreateModel2 = CreateContentCreateModel("Root 3", Guid.NewGuid(), parentKey: Constants.System.RootKey);
         await ContentEditingService.CreateAsync(anotherRootCreateModel2, Constants.Security.SuperUserKey);
         DocumentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> initialRootKeys);
 

@@ -1,0 +1,14 @@
+{
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"allowJs": true,
+		"noEmit": false,
+		"outDir": "../dist-cms",
+		"rootDir": "./",
+		"sourceMap": false,
+		"declaration": false,
+		"allowImportingTsExtensions": false
+	},
+	"include": ["./**/*.ts", "./**/*.json", "./**/*.js"],
+	"exclude": ["./**/*.test.ts", "./**/*.stories.ts", "tsconfig.json", "rollup.config.js"]
+}

@@ -13,21 +13,27 @@ public interface INavigationQueryService
 
     bool TryGetRootKeys(out IEnumerable<Guid> rootKeys);
 
+    bool TryGetRootKeysOfType(string contentTypeAlias, out IEnumerable<Guid> rootKeys);
+
     bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys);
+
+    bool TryGetChildrenKeysOfType(Guid parentKey, string contentTypeAlias, out IEnumerable<Guid> childrenKeys);
 
     bool TryGetDescendantsKeys(Guid parentKey, out IEnumerable<Guid> descendantsKeys);
 
-    bool TryGetDescendantsKeysOrSelfKeys(Guid childKey, out IEnumerable<Guid> descendantsOrSelfKeys)
+    bool TryGetDescendantsKeysOrSelfKeys(Guid parentKey, out IEnumerable<Guid> descendantsOrSelfKeys)
     {
-        if (TryGetDescendantsKeys(childKey, out IEnumerable<Guid>? descendantsKeys))
+        if (TryGetDescendantsKeys(parentKey, out IEnumerable<Guid>? descendantsKeys))
         {
-            descendantsOrSelfKeys = childKey.Yield().Concat(descendantsKeys);
+            descendantsOrSelfKeys = parentKey.Yield().Concat(descendantsKeys);
             return true;
         }
 
         descendantsOrSelfKeys = Array.Empty<Guid>();
         return false;
     }
+
+    bool TryGetDescendantsKeysOfType(Guid parentKey, string contentTypeAlias, out IEnumerable<Guid> descendantsKeys);
 
     bool TryGetAncestorsKeys(Guid childKey, out IEnumerable<Guid> ancestorsKeys);
 
@@ -43,7 +49,11 @@ public interface INavigationQueryService
         return false;
     }
 
+    bool TryGetAncestorsKeysOfType(Guid parentKey, string contentTypeAlias, out IEnumerable<Guid> ancestorsKeys);
+
     bool TryGetSiblingsKeys(Guid key, out IEnumerable<Guid> siblingsKeys);
+
+    bool TryGetSiblingsKeysOfType(Guid key, string contentTypeAlias, out IEnumerable<Guid> siblingsKeys);
 
     bool TryGetLevel(Guid contentKey, [NotNullWhen(true)] out int? level);
 }

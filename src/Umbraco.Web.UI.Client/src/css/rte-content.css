@@ -1,0 +1,54 @@
+/* TinyMCE specific styles */
+#tinymce {
+	.umb-embed-holder {
+		position: relative;
+	}
+
+	.umb-embed-holder > * {
+		user-select: none;
+		pointer-events: none;
+	}
+
+	.umb-embed-holder[data-mce-selected] {
+		outline: 2px solid var(--uui-palette-spanish-pink-light);
+	}
+
+	.umb-embed-holder::before {
+		z-index: 1000;
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		content: ' ';
+	}
+
+	.umb-embed-holder[data-mce-selected]::before {
+		background: rgba(0, 0, 0, 0.025);
+	}
+
+	*[data-mce-selected='inline-boundary'] {
+		background: rgba(0, 0, 0, 0.025);
+		outline: 2px solid var(--uui-palette-spanish-pink-light);
+	}
+}
+
+/* General styles (that apply to both TinyMCE and Tiptap RTEs) */
+
+.umb-macro-holder {
+	border: 3px dotted red;
+	padding: 7px;
+	margin: 3px;
+	display: block;
+	position: relative;
+}
+
+.umb-macro-holder::after {
+	content: 'Macros are no longer supported. Please use the block picker instead.';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: white;
+	background-color: rgba(0, 0, 0, 0.7);
+	padding: 10px;
+	border-radius: 5px;
+}

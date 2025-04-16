@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
@@ -9,7 +9,15 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 /// </summary>
 public class DateTimeValidator : IValueValidator
 {
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+    /// <summary>
+    ///    Validates if the value is a valid date/time
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="valueType"></param>
+    /// <param name="dataTypeConfiguration"></param>
+    /// <param name="validationContext"></param>
+    /// <returns></returns>
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
     {
         // don't validate if empty
         if (value == null || value.ToString().IsNullOrWhiteSpace())
@@ -17,10 +25,10 @@ public class DateTimeValidator : IValueValidator
             yield break;
         }
 
-        if (DateTime.TryParse(value.ToString(), CultureInfo.InvariantCulture, out DateTime dt) == false)
+        if (DateTime.TryParse(value.ToString(), out DateTime dt) == false)
         {
             yield return new ValidationResult(
-                string.Format("The string value {0} cannot be parsed into a DateTime", value),
+                $"The string value {value} cannot be parsed into a DateTime",
                 new[]
                 {
                     // we only store a single value for this editor so the 'member' or 'field'

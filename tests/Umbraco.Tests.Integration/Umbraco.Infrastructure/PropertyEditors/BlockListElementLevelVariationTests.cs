@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -10,12 +12,12 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
-public partial class BlockListElementLevelVariationTests : BlockEditorElementVariationTestBase
+internal partial class BlockListElementLevelVariationTests : BlockEditorElementVariationTestBase
 {
-    [OneTimeSetUp]
-    public void OneTimeSetUp()
+    public static new void ConfigureAllowEditInvariantFromNonDefaultTrue(IUmbracoBuilder builder)
     {
-        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Publish_Invariant_Properties_Without_Default_Culture_With_AllowEditInvariantFromNonDefault));
+        builder.Services.Configure<ContentSettings>(config =>
+            config.AllowEditInvariantFromNonDefault = true);
     }
 
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
@@ -144,6 +146,63 @@ public partial class BlockListElementLevelVariationTests : BlockEditorElementVar
 
         var content = CreateContent(contentType, elementType, blockContentValues, blockSettingsValues, true);
         return GetPublishedContent(content.Key);
+    }
+
+    private IContentType CreateElementTypeWithValidation(ContentVariation contentVariation = ContentVariation.Culture)
+    {
+        var elementType = CreateElementType(contentVariation);
+        foreach (var propertyType in elementType.PropertyTypes)
+        {
+            propertyType.Mandatory = true;
+            propertyType.ValidationRegExp = "^Valid.*$";
+        }
+
+        ContentTypeService.Save(elementType);
+        return elementType;
+    }
+
+    private async Task<(IContentType RootElementType, IContentType NestedElementType)> CreateElementTypeWithValidationAndNestedBlocksAsync()
+    {
+        var nestedElementType = CreateElementTypeWithValidation();
+        var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
+
+        var rootElementType = new ContentTypeBuilder()
+            .WithAlias("myRootElementType")
+            .WithName("My Root Element Type")
+            .WithIsElement(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyType()
+            .WithAlias("invariantText")
+            .WithName("Invariant text")
+            .WithMandatory(true)
+            .WithValidationRegExp("^Valid.*$")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .WithValueStorageType(ValueStorageType.Nvarchar)
+            .WithVariations(ContentVariation.Nothing)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("variantText")
+            .WithName("Variant text")
+            .WithMandatory(true)
+            .WithValidationRegExp("^Valid.*$")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .WithValueStorageType(ValueStorageType.Nvarchar)
+            .WithVariations(ContentVariation.Culture)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("nestedBlocks")
+            .WithName("Nested blocks")
+            .WithDataTypeId(nestedBlockListDataType.Id)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.BlockList)
+            .WithValueStorageType(ValueStorageType.Ntext)
+            .WithVariations(ContentVariation.Nothing)
+            .Done()
+            .Build();
+        ContentTypeService.Save(rootElementType);
+
+        return (rootElementType, nestedElementType);
     }
 
     private class BlockProperty

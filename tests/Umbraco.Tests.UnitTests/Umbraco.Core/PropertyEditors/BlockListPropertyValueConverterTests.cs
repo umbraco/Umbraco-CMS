@@ -24,7 +24,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
     private BlockListPropertyValueConverter CreateConverter()
     {
         var publishedModelFactory = new NoopPublishedModelFactory();
-        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>());
+        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>(), Mock.Of<IContentTypeService>());
         var editor = new BlockListPropertyValueConverter(
             Mock.Of<IProfilingLogger>(),
             new BlockEditorConverter(GetPublishedContentTypeCache(), Mock.Of<ICacheManager>(), publishedModelFactory, Mock.Of<IVariationContextAccessor>(), blockVarianceHandler),

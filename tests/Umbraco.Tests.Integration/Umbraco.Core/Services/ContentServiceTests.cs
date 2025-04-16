@@ -55,6 +55,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     private IUserService UserService => GetRequiredService<IUserService>();
 
+    private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
+
     private IRelationService RelationService => GetRequiredService<IRelationService>();
 
     private ILocalizedTextService TextService => GetRequiredService<ILocalizedTextService>();
@@ -326,7 +328,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         contentSchedule = ContentService.GetContentScheduleByContentId(content.Id);
         var sched = contentSchedule.FullSchedule;
         Assert.AreEqual(1, sched.Count);
-        Assert.AreEqual(1, sched.Count(x => x.Culture == string.Empty));
+        Assert.AreEqual(1, sched.Count(x => x.Culture == Constants.System.InvariantCulture));
         contentSchedule.Clear(ContentScheduleAction.Expire);
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
 
@@ -1359,7 +1361,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         // publish parent & its branch
         // only those that are not already published
         // only invariant/neutral values
-        var parentPublished = ContentService.PublishBranch(parent, true, parent.AvailableCultures.ToArray());
+        var parentPublished = ContentService.PublishBranch(parent, PublishBranchFilter.IncludeUnpublished, parent.AvailableCultures.ToArray());
 
         foreach (var result in parentPublished)
         {
@@ -1584,7 +1586,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         ContentService.Save(content);
 
         // Act
-        var published = ContentService.PublishBranch(content, true, content.AvailableCultures.ToArray());
+        var published = ContentService.PublishBranch(content, PublishBranchFilter.IncludeUnpublished, content.AvailableCultures.ToArray());
 
         // Assert
         Assert.That(published.All(x => x.Success), Is.False);
@@ -2056,11 +2058,11 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         ContentService.Save(content2);
         Assert.IsTrue(ContentService.Publish(content2, content2.AvailableCultures.ToArray(), userId: -1).Success);
 
-        var editorGroup = UserService.GetUserGroupByAlias(Constants.Security.EditorGroupAlias);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
         editorGroup.StartContentId = content1.Id;
         UserService.Save(editorGroup);
 
-        var admin = UserService.GetUserById(Constants.Security.SuperUserId);
+        var admin = await UserService.GetAsync(Constants.Security.SuperUserKey);
         admin.StartContentIds = new[] { content1.Id };
         UserService.Save(admin);
 
@@ -2072,7 +2074,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             new List<PublicAccessRule> { new() { RuleType = "test", RuleValue = "test" } }));
         Assert.IsTrue(PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
-        var user = UserService.GetUserById(Constants.Security.SuperUserId);
+        var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
         var userGroup = UserService.GetUserGroupByAlias(user.Groups.First().Alias);
         Assert.IsNotNull(NotificationService.CreateNotification(user, content1, "X"));
 

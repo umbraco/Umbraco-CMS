@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -29,7 +27,8 @@ public abstract class ContentTypeBaseBuilder<TParent, TType>
         IWithIconBuilder,
         IWithThumbnailBuilder,
         IWithTrashedBuilder,
-        IWithIsContainerBuilder
+        IWithIsContainerBuilder,
+        IWithAllowAsRootBuilder
     where TParent : IBuildContentTypes
 {
     private string _alias;
@@ -49,6 +48,7 @@ public abstract class ContentTypeBaseBuilder<TParent, TType>
     private string _thumbnail;
     private bool? _trashed;
     private DateTime? _updateDate;
+    private bool? _allowedAtRoot;
 
     public ContentTypeBaseBuilder(TParent parentBuilder)
         : base(parentBuilder)
@@ -168,6 +168,12 @@ public abstract class ContentTypeBaseBuilder<TParent, TType>
         set => _updateDate = value;
     }
 
+    bool? IWithAllowAsRootBuilder.AllowAsRoot
+    {
+        get => _allowedAtRoot;
+        set => _allowedAtRoot = value;
+    }
+
     protected int GetId() => _id ?? 0;
 
     protected Guid GetKey() => _key ?? Guid.NewGuid();
@@ -201,6 +207,8 @@ public abstract class ContentTypeBaseBuilder<TParent, TType>
     protected bool GetTrashed() => _trashed ?? false;
 
     protected Guid? GetListView() => _listView;
+
+    protected bool GetAllowedAtRoot() => _allowedAtRoot ?? false;
 
     protected void BuildPropertyGroups(ContentTypeCompositionBase contentType, IEnumerable<PropertyGroup> propertyGroups)
     {

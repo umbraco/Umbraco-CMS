@@ -49,27 +49,35 @@ public static partial class Constants
         /// <summary>
         /// The key of the admin group
         /// </summary>
-        public static readonly Guid AdminGroupKey = new("E5E7F6C8-7F9C-4B5B-8D5D-9E1E5A4F7E4D");
+        public static readonly Guid AdminGroupKey = new(AdminGroupKeyString);
+        internal const string AdminGroupKeyString = "E5E7F6C8-7F9C-4B5B-8D5D-9E1E5A4F7E4D";
+
 
         /// <summary>
         /// The key of the editor group
         /// </summary>
-        public static readonly Guid EditorGroupKey = new("44DC260E-B4D4-4DD9-9081-EEC5598F1641");
+        public static readonly Guid EditorGroupKey = new(EditorGroupKeyString);
+        internal const string EditorGroupKeyString = "44DC260E-B4D4-4DD9-9081-EEC5598F1641";
+
 
         /// <summary>
         /// The key of the sensitive data group
         /// </summary>
-        public static readonly Guid SensitiveDataGroupKey = new("8C6AD70F-D307-4E4A-AF58-72C2E4E9439D");
+        public static readonly Guid SensitiveDataGroupKey = new(SensitiveDataGroupKeyString);
+        internal const string SensitiveDataGroupKeyString = "8C6AD70F-D307-4E4A-AF58-72C2E4E9439D";
 
         /// <summary>
         /// The key of the translator group
         /// </summary>
-        public static readonly Guid TranslatorGroupKey = new("F2012E4C-D232-4BD1-8EAE-4384032D97D8");
+        public static readonly Guid TranslatorGroupKey = new(TranslatorGroupString);
+        internal const string TranslatorGroupString = "F2012E4C-D232-4BD1-8EAE-4384032D97D8";
 
         /// <summary>
         /// The key of the writer group
         /// </summary>
-        public static readonly Guid WriterGroupKey = new("9FC2A16F-528C-46D6-A014-75BF4EC2480C");
+        public static readonly Guid WriterGroupKey = new(WriterGroupKeyString);
+        internal const string WriterGroupKeyString = "9FC2A16F-528C-46D6-A014-75BF4EC2480C";
+
 
         public const string BackOfficeAuthenticationType = "UmbracoBackOffice";
         public const string BackOfficeExternalAuthenticationType = "UmbracoExternalCookie";

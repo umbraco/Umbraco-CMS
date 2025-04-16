@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Factories;
@@ -50,6 +50,7 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
         {
             responseModel.IsTrashed = entity.Trashed;
             responseModel.Id = entity.Key;
+            responseModel.CreateDate = entity.CreateDate;
 
             responseModel.Variants = _mediaPresentationFactory.CreateVariantsItemResponseModels(mediaEntitySlim);
             responseModel.MediaType = _mediaPresentationFactory.CreateMediaTypeReferenceResponseModel(mediaEntitySlim);

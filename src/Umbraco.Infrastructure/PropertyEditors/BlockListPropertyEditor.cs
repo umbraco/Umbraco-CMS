@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
-///     Represents a block list property editor.
+/// Represents a block list property editor.
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.BlockList,
@@ -19,6 +19,9 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
 {
     private readonly IIOHelper _ioHelper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BlockListPropertyEditor"/> class.
+    /// </summary>
     public BlockListPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
@@ -27,6 +30,9 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
         : base(dataValueEditorFactory, blockValuePropertyIndexValueFactory, jsonSerializer)
         => _ioHelper = ioHelper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BlockListPropertyEditor"/> class.
+    /// </summary>
     [Obsolete("Use constructor that doesn't take PropertyEditorCollection, scheduled for removal in V15")]
     public BlockListPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
@@ -38,6 +44,7 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
     {
     }
 
+    /// <inheritdoc/>
     public override bool SupportsConfigurableElements => true;
 
     /// <inheritdoc />
@@ -50,10 +57,18 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
         return valueEditor.MergePartialPropertyValueForCulture(sourceValue, targetValue, culture);
     }
 
-    #region Pre Value Editor
+    /// <inheritdoc/>
+    public override object? MergeVariantInvariantPropertyValue(
+        object? sourceValue,
+        object? targetValue,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
+        var valueEditor = (BlockListEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.MergeVariantInvariantPropertyValue(sourceValue, targetValue, canUpdateInvariantData, allowedCultures);
+    }
 
+    /// <inheritdoc/>
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new BlockListConfigurationEditor(_ioHelper);
-
-    #endregion
 }

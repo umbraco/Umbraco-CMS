@@ -1,8 +1,9 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -15,12 +16,22 @@ internal abstract class BlockEditorMinMaxValidatorBase<TValue, TLayout> : IValue
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BlockEditorMinMaxValidatorBase{TValue, TLayout}"/> class.
+    /// </summary>
     protected BlockEditorMinMaxValidatorBase(ILocalizedTextService textService) => TextService = textService;
 
+    /// <summary>
+    /// Gets the <see cref="ILocalizedTextService"/>
+    /// </summary>
     protected ILocalizedTextService TextService { get; }
 
-    public abstract IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration);
+    /// <inheritdoc/>
+    public abstract IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext);
 
+    /// <summary>
+    /// Validates the number of blocks are within the configured minimum and maximum values.
+    /// </summary>
     protected IEnumerable<ValidationResult> ValidateNumberOfBlocks(BlockEditorData<TValue, TLayout>? blockEditorData, int? min, int? max)
     {
         var numberOfBlocks = blockEditorData?.Layout?.Count() ?? 0;
@@ -34,8 +45,8 @@ internal abstract class BlockEditorMinMaxValidatorBase<TValue, TLayout> : IValue
                     TextService.Localize(
                         "validation",
                         "entriesShort",
-                        new[] { min.ToString(), (min - numberOfBlocks).ToString(), }),
-                    new[] { "minCount" });
+                        [min.ToString(), (min - numberOfBlocks).ToString(),]),
+                    ["value"]);
             }
         }
 
@@ -45,8 +56,8 @@ internal abstract class BlockEditorMinMaxValidatorBase<TValue, TLayout> : IValue
                 TextService.Localize(
                     "validation",
                     "entriesExceed",
-                    new[] { max.ToString(), (numberOfBlocks - max).ToString(), }),
-                new[] { "maxCount" });
+                    [max.ToString(), (numberOfBlocks - max).ToString(),]),
+                ["value"]);
         }
     }
 }

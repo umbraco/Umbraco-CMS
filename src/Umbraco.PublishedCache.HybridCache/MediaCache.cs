@@ -1,19 +1,22 @@
 ﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Infrastructure.HybridCache.Services;
+using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
-public class MediaCache : IPublishedMediaCache
+public sealed class MediaCache : IPublishedMediaCache
 {
     private readonly IMediaCacheService _mediaCacheService;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
+    private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
 
-    public MediaCache(IMediaCacheService mediaCacheService, IPublishedContentTypeCache publishedContentTypeCache)
+    public MediaCache(IMediaCacheService mediaCacheService, IPublishedContentTypeCache publishedContentTypeCache, IMediaNavigationQueryService mediaNavigationQueryService)
     {
         _mediaCacheService = mediaCacheService;
         _publishedContentTypeCache = publishedContentTypeCache;
+        _mediaNavigationQueryService = mediaNavigationQueryService;
     }
 
     public async Task<IPublishedContent?> GetByIdAsync(int id) => await _mediaCacheService.GetByIdAsync(id);
@@ -37,20 +40,53 @@ public class MediaCache : IPublishedMediaCache
 
     public IPublishedContentType GetContentType(string alias) => _publishedContentTypeCache.Get(PublishedItemType.Media, alias);
 
-    // FIXME - these need to be removed when removing nucache
-    public IPublishedContent? GetById(bool preview, Udi contentId) => throw new NotImplementedException();
+    [Obsolete("Scheduled for removal in v17")]
+    public IPublishedContent? GetById(bool preview, Udi contentId)
+    {
+        if(contentId is not GuidUdi guidUdi)
+        {
+            throw new NotSupportedException("Only GuidUdi is supported");
+        }
 
-    public IPublishedContent? GetById(Udi contentId) => throw new NotImplementedException();
+        return GetById(preview, guidUdi.Guid);
+    }
 
-    public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null) => throw new NotImplementedException();
+    [Obsolete("Scheduled for removal in v17")]
+    public IPublishedContent? GetById(Udi contentId)
+    {
+        if(contentId is not GuidUdi guidUdi)
+        {
+            throw new NotSupportedException("Only GuidUdi is supported");
+        }
 
-    public IEnumerable<IPublishedContent> GetAtRoot(string? culture = null) => throw new NotImplementedException();
+        return GetById(guidUdi.Guid);
+    }
 
-    public bool HasContent(bool preview) => throw new NotImplementedException();
+    public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null)
+    {
+        _mediaNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
 
-    public bool HasContent() => throw new NotImplementedException();
+        IEnumerable<IPublishedContent> rootContent = rootKeys.Select(key => GetById(preview, key)).WhereNotNull();
+        return culture is null ? rootContent : rootContent.Where(x => x.IsInvariantOrHasCulture(culture));
+    }
 
+    public IEnumerable<IPublishedContent> GetAtRoot(string? culture = null)
+    {
+        _mediaNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+
+        IEnumerable<IPublishedContent> rootContent = rootKeys.Select(key => GetById(key)).WhereNotNull();
+        return culture is null ? rootContent : rootContent.Where(x => x.IsInvariantOrHasCulture(culture));
+    }
+
+    [Obsolete("Media does not support preview, this method will be removed in future versions")]
+    public bool HasContent(bool preview) => HasContent();
+
+    public bool HasContent()
+    {
+        _mediaNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+        return rootKeys.Any();
+    }
 
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType) =>
-        throw new NotImplementedException();
+        _mediaCacheService.GetByContentType(contentType);
 }

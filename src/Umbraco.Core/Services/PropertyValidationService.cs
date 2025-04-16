@@ -1,9 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
 
@@ -16,6 +19,8 @@ public class PropertyValidationService : IPropertyValidationService
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IValueEditorCache _valueEditorCache;
     private readonly ICultureDictionary _cultureDictionary;
+    private readonly ILanguageService _languageService;
+    private readonly ContentSettings _contentSettings;
 
     [Obsolete("Use the constructor that accepts ICultureDictionary. Will be removed in V15.")]
     public PropertyValidationService(
@@ -27,45 +32,87 @@ public class PropertyValidationService : IPropertyValidationService
     {
     }
 
+    [Obsolete("Use the constructor that accepts ILanguageService and ContentSettings options. Will be removed in V17.")]
     public PropertyValidationService(
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,
         ILocalizedTextService textService,
         IValueEditorCache valueEditorCache,
         ICultureDictionary cultureDictionary)
+        : this(
+            propertyEditors,
+            dataTypeService,
+            textService,
+            valueEditorCache,
+            cultureDictionary,
+            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>())
+    {
+    }
+
+    public PropertyValidationService(
+        PropertyEditorCollection propertyEditors,
+        IDataTypeService dataTypeService,
+        ILocalizedTextService textService,
+        IValueEditorCache valueEditorCache,
+        ICultureDictionary cultureDictionary,
+        ILanguageService languageService,
+        IOptions<ContentSettings> contentSettings)
     {
         _propertyEditors = propertyEditors;
         _dataTypeService = dataTypeService;
         _textService = textService;
         _valueEditorCache = valueEditorCache;
         _cultureDictionary = cultureDictionary;
+        _languageService = languageService;
+        _contentSettings = contentSettings.Value;
     }
 
     /// <inheritdoc />
     public IEnumerable<ValidationResult> ValidatePropertyValue(
         IPropertyType propertyType,
-        object? postedValue)
+        object? postedValue,
+        PropertyValidationContext validationContext)
     {
         if (propertyType is null)
         {
             throw new ArgumentNullException(nameof(propertyType));
         }
 
-        IDataType? dataType = _dataTypeService.GetDataType(propertyType.DataTypeId);
+        IDataType? dataType = GetDataType(propertyType);
         if (dataType == null)
         {
             throw new InvalidOperationException("No data type found by id " + propertyType.DataTypeId);
         }
 
-        IDataEditor? editor = _propertyEditors[propertyType.PropertyEditorAlias];
-        if (editor == null)
+        IDataEditor? dataEditor = GetDataEditor(propertyType);
+        if (dataEditor == null)
         {
             throw new InvalidOperationException("No property editor found by alias " +
                                                 propertyType.PropertyEditorAlias);
         }
 
-        return ValidatePropertyValue(editor, dataType, postedValue, propertyType.Mandatory, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage);
+        // only validate culture invariant properties if
+        // - AllowEditInvariantFromNonDefault is true, or
+        // - the default language is being validated, or
+        // - the underlying data editor supports partial property value merging (e.g. block level variance)
+        var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        if (propertyType.VariesByCulture() is false
+            && _contentSettings.AllowEditInvariantFromNonDefault is false
+            && validationContext.CulturesBeingValidated.InvariantContains(defaultCulture) is false
+            && dataEditor.CanMergePartialPropertyValues(propertyType) is false)
+        {
+            return [];
+        }
+
+        return ValidatePropertyValue(dataEditor, dataType, postedValue, propertyType.Mandatory, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage, validationContext);
     }
+
+    [Obsolete("Please use the overload that accepts a PropertyValidationContext. Will be removed in V16.")]
+    public IEnumerable<ValidationResult> ValidatePropertyValue(
+        IPropertyType propertyType,
+        object? postedValue)
+        => ValidatePropertyValue(propertyType, postedValue, PropertyValidationContext.Empty());
 
     /// <inheritdoc />
     public IEnumerable<ValidationResult> ValidatePropertyValue(
@@ -75,15 +122,16 @@ public class PropertyValidationService : IPropertyValidationService
         bool isRequired,
         string? validationRegExp,
         string? isRequiredMessage,
-        string? validationRegExpMessage)
+        string? validationRegExpMessage,
+        PropertyValidationContext validationContext)
     {
         // Retrieve default messages used for required and regex validatation.  We'll replace these
         // if set with custom ones if they've been provided for a given property.
-        var requiredDefaultMessages = new[] { Constants.Validation.ErrorMessages.Properties.Missing };
+        var requiredDefaultMessages = new[] { Constants.Validation.ErrorMessages.Properties.Missing, Constants.Validation.ErrorMessages.Properties.Empty };
         var formatDefaultMessages = new[] { Constants.Validation.ErrorMessages.Properties.PatternMismatch };
 
         IDataValueEditor valueEditor = _valueEditorCache.GetValueEditor(editor, dataType);
-        foreach (ValidationResult validationResult in valueEditor.Validate(postedValue, isRequired, validationRegExp))
+        foreach (ValidationResult validationResult in valueEditor.Validate(postedValue, isRequired, validationRegExp, validationContext))
         {
             // If we've got custom error messages, we'll replace the default ones that will have been applied in the call to Validate().
             if (isRequired && !string.IsNullOrWhiteSpace(isRequiredMessage) &&
@@ -102,6 +150,17 @@ public class PropertyValidationService : IPropertyValidationService
         }
     }
 
+    [Obsolete("Please use the overload that accepts a PropertyValidationContext. Will be removed in V16.")]
+    public IEnumerable<ValidationResult> ValidatePropertyValue(
+        IDataEditor editor,
+        IDataType dataType,
+        object? postedValue,
+        bool isRequired,
+        string? validationRegExp,
+        string? isRequiredMessage,
+        string? validationRegExpMessage)
+        => ValidatePropertyValue(editor, dataType, postedValue, isRequired, validationRegExp, isRequiredMessage, validationRegExpMessage, PropertyValidationContext.Empty());
+
     /// <inheritdoc />
     public bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact? impact)
     {
@@ -118,19 +177,30 @@ public class PropertyValidationService : IPropertyValidationService
             // impacts invariant = validate invariant property, invariant culture
             if (impact.ImpactsOnlyInvariantCulture)
             {
-                return !(propertyTypeVaries || IsPropertyValid(x, null));
+                return !(propertyTypeVaries || IsPropertyValid(x, PropertyValidationContext.Empty()));
             }
 
             // impacts all = validate property, all cultures (incl. invariant)
             if (impact.ImpactsAllCultures)
             {
-                return !IsPropertyValid(x);
+                return !IsPropertyValid(x, PropertyValidationContext.CultureAndSegment("*", null));
             }
 
             // impacts explicit culture = validate variant property, explicit culture
             if (propertyTypeVaries)
             {
-                return !IsPropertyValid(x, impact.Culture);
+                return !IsPropertyValid(x, PropertyValidationContext.CultureAndSegment(impact.Culture, null));
+            }
+
+            if (impact.ImpactsExplicitCulture && GetDataEditor(x.PropertyType)?.CanMergePartialPropertyValues(x.PropertyType) is true)
+            {
+                return !IsPropertyValid(x, new PropertyValidationContext
+                {
+                    Culture = null,
+                    Segment = null,
+                    CulturesBeingValidated = [impact.Culture!],
+                    SegmentsBeingValidated = []
+                });
             }
 
             // and, for explicit culture, we may also have to validate invariant property, invariant culture
@@ -138,19 +208,31 @@ public class PropertyValidationService : IPropertyValidationService
             // - it is impacted (default culture), or
             // - there is no published version of the content - maybe non-default culture, but no published version
             var alsoInvariant = impact.ImpactsAlsoInvariantProperties || !content.Published;
-            return alsoInvariant && !IsPropertyValid(x, null);
+            return alsoInvariant && !IsPropertyValid(x, PropertyValidationContext.Empty());
         }).ToArray();
 
         return invalidProperties.Length == 0;
     }
 
+    [Obsolete("Please use the overload that accepts a PropertyValidationContext. Will be removed in V16.")]
+    public bool IsPropertyValid(IProperty property, string culture = "*", string segment = "*")
+        => IsPropertyValid(property, PropertyValidationContext.CultureAndSegment(culture, segment));
+
     /// <inheritdoc />
-    public bool IsPropertyValid(IProperty property, string? culture = "*", string? segment = "*")
+    public bool IsPropertyValid(IProperty property, PropertyValidationContext validationContext)
     {
         // NOTE - the pvalue and vvalues logic in here is borrowed directly from the Property.Values setter so if you are wondering what that's all about, look there.
         // The underlying Property._pvalue and Property._vvalues are not exposed but we can re-create these values ourselves which is what it's doing.
-        culture = culture?.NullOrWhiteSpaceAsNull();
-        segment = segment?.NullOrWhiteSpaceAsNull();
+        validationContext = new PropertyValidationContext
+        {
+            Culture = validationContext.Culture?.NullOrWhiteSpaceAsNull(),
+            Segment = validationContext.Segment?.NullOrWhiteSpaceAsNull(),
+            CulturesBeingValidated = validationContext.CulturesBeingValidated,
+            SegmentsBeingValidated = validationContext.SegmentsBeingValidated
+        };
+
+        var culture = validationContext.Culture;
+        var segment = validationContext.Segment;
 
         IPropertyValue? pvalue = null;
 
@@ -161,7 +243,7 @@ public class PropertyValidationService : IPropertyValidationService
         {
             // validate pvalue (which is the invariant value)
             pvalue = property.Values.FirstOrDefault(x => x.Culture == null && x.Segment == null);
-            if (!IsValidPropertyValue(property, pvalue?.EditedValue))
+            if (!IsValidPropertyValue(property, pvalue?.EditedValue, validationContext))
             {
                 return false;
             }
@@ -188,7 +270,7 @@ public class PropertyValidationService : IPropertyValidationService
         // if we don't have vvalues (property.Values is empty or only contains pvalue), validate null
         if (property.Values.Count == (pvalue == null ? 0 : 1))
         {
-            return culture == "*" || IsValidPropertyValue(property, null);
+            return culture == "*" || IsValidPropertyValue(property, null, validationContext);
         }
 
         // else validate vvalues (but don't revalidate pvalue)
@@ -202,10 +284,10 @@ public class PropertyValidationService : IPropertyValidationService
         // if we do not have any vvalues at this point, validate null (no variant values present)
         if (vvalues.Any() is false)
         {
-            return IsValidPropertyValue(property, null);
+            return IsValidPropertyValue(property, null, validationContext);
         }
 
-        return vvalues.All(x => IsValidPropertyValue(property, x.EditedValue));
+        return vvalues.All(x => IsValidPropertyValue(property, x.EditedValue, validationContext));
     }
 
     /// <summary>
@@ -213,16 +295,17 @@ public class PropertyValidationService : IPropertyValidationService
     /// </summary>
     /// <param name="property"></param>
     /// <param name="value"></param>
+    /// <param name="validationContext"></param>
     /// <returns>True is property value is valid, otherwise false</returns>
-    private bool IsValidPropertyValue(IProperty property, object? value) =>
-        IsPropertyValueValid(property.PropertyType, value);
+    private bool IsValidPropertyValue(IProperty property, object? value, PropertyValidationContext validationContext) =>
+        IsPropertyValueValid(property.PropertyType, value, validationContext);
 
     /// <summary>
     ///     Determines whether a value is valid for this property type.
     /// </summary>
-    private bool IsPropertyValueValid(IPropertyType propertyType, object? value)
+    private bool IsPropertyValueValid(IPropertyType propertyType, object? value, PropertyValidationContext validationContext)
     {
-        IDataEditor? editor = _propertyEditors[propertyType.PropertyEditorAlias];
+        IDataEditor? editor = GetDataEditor(propertyType);
         if (editor == null)
         {
             // nothing much we can do validation wise if the property editor has been removed.
@@ -230,8 +313,15 @@ public class PropertyValidationService : IPropertyValidationService
             return true;
         }
 
-        var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId)?.ConfigurationObject;
+        var configuration = GetDataType(propertyType)?.ConfigurationObject;
         IDataValueEditor valueEditor = editor.GetValueEditor(configuration);
-        return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.ValidationRegExp).Any();
+
+        return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.ValidationRegExp, validationContext).Any();
     }
+
+    private IDataType? GetDataType(IPropertyType propertyType)
+        => _dataTypeService.GetDataType(propertyType.DataTypeId);
+
+    private IDataEditor? GetDataEditor(IPropertyType propertyType)
+        => _propertyEditors[propertyType.PropertyEditorAlias];
 }

@@ -23,12 +23,6 @@ variables:
   npm_config_cache: $(Pipeline.Workspace)/.npm_client
   NODE_OPTIONS: --max_old_space_size=16384
 
-parameters:
-  - name: runSmokeTests
-    displayName: Run the smoke tests
-    type: boolean
-    default: false
-
 stages:
   ###############################################
   ## Build
@@ -115,10 +109,24 @@ stages:
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.Sqlite
         strategy:
           matrix:
-            Linux:
-              vmImage: 'ubuntu-latest'
-            Windows:
-              vmImage: 'windows-latest'
+            LinuxPart1Of3:
+              vmImage: "ubuntu-latest"
+              testCommand: "npm run test -- --shard=1/3"
+            LinuxPart2Of3:
+              vmImage: "ubuntu-latest"
+              testCommand: "npm run test -- --shard=2/3"
+            LinuxPart3Of3:
+              vmImage: "ubuntu-latest"
+              testCommand: "npm run test -- --shard=3/3"
+            WindowsPart1Of3:
+              vmImage: "windows-latest"
+              testCommand: "npm run test -- --shard=1/3"
+            WindowsPart2Of3:
+              vmImage: "windows-latest"
+              testCommand: "npm run test -- --shard=2/3"
+            WindowsPart3Of3:
+              vmImage: "windows-latest"
+              testCommand: "npm run test -- --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -206,10 +214,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - ${{ if eq(parameters.runSmokeTests, true) }}:
-              pwsh: npm run smokeTestSqlite --ignore-certificate-errors
-            ${{ else }}:
-              pwsh: npm run testSqlite --ignore-certificate-errors
+          - pwsh: $(testCommand)
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -230,7 +235,7 @@ stages:
           # Copy artifacts
           - pwsh: |
               if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
-                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results $(Build.ArtifactStagingDirectory) -Recurse
+                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results/* $(Build.ArtifactStagingDirectory) -Recurse
               }
             displayName: Copy Playwright results
             condition: succeededOrFailed()
@@ -241,7 +246,17 @@ stages:
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: 'Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)'
+              artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
+
+          # Publish test results
+          - task: PublishTestResults@2
+            displayName: "Publish test results"
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '*.xml'
+              searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
+              testRunTitle: "$(Agent.JobName)"
 
       - job:
         displayName: E2E Tests (SQL Server)
@@ -252,12 +267,30 @@ stages:
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
         strategy:
           matrix:
-            Linux:
-              vmImage: 'ubuntu-latest'
+            LinuxPart1Of3:
+              testCommand: "npm run testSqlite -- --shard=1/3"
+              vmImage: "ubuntu-latest"
               SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              CONNECTIONSTRINGS__UMBRACODBDSN: 'Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True'
-            Windows:
-              vmImage: 'windows-latest'
+              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+            LinuxPart2Of3:
+              testCommand: "npm run testSqlite -- --shard=2/3"
+              vmImage: "ubuntu-latest"
+              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+            LinuxPart3Of3:
+              testCommand: "npm run testSqlite -- --shard=3/3"
+              vmImage: "ubuntu-latest"
+              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+            WindowsPart1Of3:
+              vmImage: "windows-latest"
+              testCommand: "npm run testSqlite -- --shard=1/3"
+            WindowsPart2Of3:
+              vmImage: "windows-latest"
+              testCommand: "npm run testSqlite -- --shard=2/3"
+            WindowsPart3Of3:
+              vmImage: "windows-latest"
+              testCommand: "npm run testSqlite -- --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -353,10 +386,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - ${{ if eq(parameters.runSmokeTests, true) }}:
-              pwsh: npm run smokeTest --ignore-certificate-errors
-            ${{ else }}:
-              pwsh: npm run test --ignore-certificate-errors
+          - pwsh: $(testCommand)
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -386,7 +416,7 @@ stages:
           # Copy artifacts
           - pwsh: |
               if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
-                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results $(Build.ArtifactStagingDirectory) -Recurse
+                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results/* $(Build.ArtifactStagingDirectory) -Recurse
               }
             displayName: Copy Playwright results
             condition: succeededOrFailed()
@@ -397,4 +427,14 @@ stages:
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: 'Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)'
+              artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
+          
+          # Publish test results
+          - task: PublishTestResults@2
+            displayName: "Publish test results"
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '*.xml'
+              searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
+              testRunTitle: "$(Agent.JobName)"

@@ -1,12 +1,11 @@
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
 using System.Linq.Expressions;
-using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Editors;
@@ -35,11 +34,10 @@ namespace Umbraco.Cms.Core.Services;
 ///     Represents the UserService, which is an easy access to operations involving <see cref="IProfile" />,
 ///     <see cref="IMembershipUser" /> and eventually Backoffice Users.
 /// </summary>
-internal class UserService : RepositoryService, IUserService
+internal partial class UserService : RepositoryService, IUserService
 {
     private readonly GlobalSettings _globalSettings;
     private readonly SecuritySettings _securitySettings;
-    private readonly ILogger<UserService> _logger;
     private readonly IUserGroupRepository _userGroupRepository;
     private readonly UserEditorAuthorizationHelper _userEditorAuthorizationHelper;
     private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -136,7 +134,6 @@ internal class UserService : RepositoryService, IUserService
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _contentSettings = contentSettings.Value;
-        _logger = loggerFactory.CreateLogger<UserService>();
     }
 
     /// <summary>
@@ -477,6 +474,7 @@ internal class UserService : RepositoryService, IUserService
     ///     This is just the default user group that the membership provider will use
     /// </summary>
     /// <returns></returns>
+    [Obsolete("No (backend) code path is using this anymore, so it can not be considered the default. Planned for removal in V16.")]
     public string GetDefaultMemberType() => Constants.Security.WriterGroupAlias;
 
     /// <summary>
@@ -915,7 +913,7 @@ internal class UserService : RepositoryService, IUserService
         {
             return UserOperationStatus.UserNameIsNotEmail;
         }
-        if (!IsEmailValid(model.Email))
+        if (model.Email.IsEmail() is false)
         {
             return UserOperationStatus.InvalidEmail;
         }
@@ -962,6 +960,15 @@ internal class UserService : RepositoryService, IUserService
         {
             scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MissingUser, existingUser);
+        }
+
+        // User names can only contain the configured allowed characters. This is validated by ASP.NET Identity on create
+        // as the setting is applied to the BackOfficeIdentityOptions, but we need to check ourselves for updates.
+        var allowedUserNameCharacters = _securitySettings.AllowedUserNameCharacters;
+        if (model.UserName.Any(c => allowedUserNameCharacters.Contains(c) == false))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.InvalidUserName, existingUser);
         }
 
         IEnumerable<IUserGroup> allUserGroups = _userGroupRepository.GetMany().ToArray();
@@ -1134,7 +1141,7 @@ internal class UserService : RepositoryService, IUserService
             return UserOperationStatus.UserNameIsNotEmail;
         }
 
-        if (IsEmailValid(model.Email) is false)
+        if (model.Email.IsEmail() is false)
         {
             return UserOperationStatus.InvalidEmail;
         }
@@ -1162,8 +1169,6 @@ internal class UserService : RepositoryService, IUserService
         return UserOperationStatus.Success;
     }
 
-    private static bool IsEmailValid(string email) => new EmailAddressAttribute().IsValid(email);
-
     private List<int>? GetIdsFromKeys(IEnumerable<Guid>? guids, UmbracoObjectTypes type)
     {
         var keys = guids?
@@ -1175,7 +1180,21 @@ internal class UserService : RepositoryService, IUserService
         return keys;
     }
 
+    /// <inheritdoc/>
     public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeUserPasswordModel model)
+    {
+        IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+        IUser? performingUser = await userStore.GetAsync(performingUserKey);
+        if (performingUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new PasswordChangedModel());
+        }
+
+        return await ChangePasswordAsync(performingUser, model);
+    }
+
+    private async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(IUser performingUser, ChangeUserPasswordModel model)
     {
         IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -1190,12 +1209,6 @@ internal class UserService : RepositoryService, IUserService
         if (user.Kind != UserKind.Default)
         {
             return Attempt.FailWithStatus(UserOperationStatus.InvalidUserType, new PasswordChangedModel());
-        }
-
-        IUser? performingUser = await userStore.GetAsync(performingUserKey);
-        if (performingUser is null)
-        {
-            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new PasswordChangedModel());
         }
 
         // require old password for self change when outside of invite or resetByToken flows
@@ -1221,12 +1234,13 @@ internal class UserService : RepositoryService, IUserService
         IBackOfficePasswordChanger passwordChanger = serviceScope.ServiceProvider.GetRequiredService<IBackOfficePasswordChanger>();
         Attempt<PasswordChangedModel?> result = await passwordChanger.ChangeBackOfficePassword(
             new ChangeBackOfficeUserPasswordModel
-        {
-            NewPassword = model.NewPassword,
-            OldPassword = model.OldPassword,
-            User = user,
-            ResetPasswordToken = model.ResetPasswordToken,
-        }, performingUser);
+            {
+                NewPassword = model.NewPassword,
+                OldPassword = model.OldPassword,
+                User = user,
+                ResetPasswordToken = model.ResetPasswordToken,
+            },
+            performingUser);
 
         if (result.Success is false)
         {
@@ -1333,7 +1347,6 @@ internal class UserService : RepositoryService, IUserService
             includedUserGroupAliases = userGroupKeyConversionAttempt.Result.ToArray();
         }
 
-
         if (mergedFilter.NameFilters is not null)
         {
             foreach (var nameFilter in mergedFilter.NameFilters)
@@ -1352,16 +1365,18 @@ internal class UserService : RepositoryService, IUserService
         }
         else
         {
-            includeUserStates = new HashSet<UserState>(filter.IncludeUserStates!);
-            includeUserStates.IntersectWith(baseFilter.IncludeUserStates);
+            includeUserStates = new HashSet<UserState>(baseFilter.IncludeUserStates);
+            if (filter.IncludeUserStates is not null && filter.IncludeUserStates.Contains(UserState.All) is false)
+            {
+                includeUserStates.IntersectWith(filter.IncludeUserStates);
+            }
 
             // This means that we've only chosen to include a user state that is not allowed, so we'll return an empty result
-            if(includeUserStates.Count == 0)
+            if (includeUserStates.Count == 0)
             {
                 return Attempt.SucceedWithStatus(UserOperationStatus.Success, new PagedModel<IUser>());
             }
         }
-
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize);
         Expression<Func<IUser, object?>> orderByExpression = GetOrderByExpression(orderBy);
@@ -2178,9 +2193,26 @@ internal class UserService : RepositoryService, IUserService
     public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ResetPasswordAsync(Guid userKey, string token, string password)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+
+        IUser? user = await userStore.GetAsync(userKey);
+        if (user is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, new PasswordChangedModel());
+        }
+
+        var savingNotification = new UserPasswordResettingNotification(user, evtMsgs);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus(UserOperationStatus.CancelledByNotification, new PasswordChangedModel());
+        }
 
         Attempt<PasswordChangedModel, UserOperationStatus> changePasswordAttempt =
-            await ChangePasswordAsync(userKey, new ChangeUserPasswordModel
+            await ChangePasswordAsync(user, new ChangeUserPasswordModel
             {
                 NewPassword = password,
                 UserKey = userKey,
@@ -2483,6 +2515,11 @@ internal class UserService : RepositoryService, IUserService
 
     public async Task<UserClientCredentialsOperationStatus> AddClientIdAsync(Guid userKey, string clientId)
     {
+        if (ValidClientId().IsMatch(clientId) is false)
+        {
+            return UserClientCredentialsOperationStatus.InvalidClientId;
+        }
+
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         IEnumerable<string> currentClientIds = _userRepository.GetAllClientIds();
@@ -2606,7 +2643,7 @@ internal class UserService : RepositoryService, IUserService
     {
         if (pathIds.Length == 0)
         {
-            return new EntityPermissionCollection(Enumerable.Empty<EntityPermission>());
+            return new EntityPermissionCollection([]);
         }
 
         // get permissions for all nodes in the path by group
@@ -2669,6 +2706,9 @@ internal class UserService : RepositoryService, IUserService
             assignedPermissions.Add(additionalPermission);
         }
     }
+
+    [GeneratedRegex(@"^[\w\d\-\._~]{1,100}$")]
+    private static partial Regex ValidClientId();
 
     #endregion
 }

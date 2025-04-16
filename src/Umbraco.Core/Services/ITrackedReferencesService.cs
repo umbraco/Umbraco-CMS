@@ -64,6 +64,20 @@ public interface ITrackedReferencesService
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
     Task<PagedModel<RelationItemModel>> GetPagedRelationsForItemAsync(Guid key, long skip, long take, bool filterMustBeIsDependency);
 
+    /// <summary>
+    ///     Gets a paged result of items which are in relation with an item in the recycle bin.
+    /// </summary>
+    /// <param name="objectType">The Umbraco object type that has recycle bin support (currently Document or Media).</param>
+    /// <param name="skip">The amount of items to skip</param>
+    /// <param name="take">The amount of items to take.</param>
+    /// <param name="filterMustBeIsDependency">
+    ///     A boolean indicating whether to filter only the RelationTypes which are
+    ///     dependencies (isDependency field is set to true).
+    /// </param>
+    /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
+    Task<PagedModel<RelationItemModel>> GetPagedRelationsForRecycleBinAsync(UmbracoObjectTypes objectType, long skip, long take, bool filterMustBeIsDependency)
+        => Task.FromResult(new PagedModel<RelationItemModel>(0, []));
+
     [Obsolete("Use method that takes key (Guid) instead of id (int). This will be removed in Umbraco 15.")]
     PagedModel<RelationItemModel> GetPagedDescendantsInReferences(int parentId, long skip, long take, bool filterMustBeIsDependency);
 
@@ -97,4 +111,10 @@ public interface ITrackedReferencesService
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
     Task<PagedModel<RelationItemModel>> GetPagedItemsWithRelationsAsync(ISet<Guid> keys, long skip, long take,
         bool filterMustBeIsDependency);
+
+    Task<PagedModel<Guid>> GetPagedKeysWithDependentReferencesAsync(ISet<Guid> keys, Guid nodeObjectTypeId, long skip, long take)
+    {
+        PagedModel<RelationItemModel> pagedItems = GetPagedItemsWithRelationsAsync(keys, skip, take, true).GetAwaiter().GetResult();
+        return Task.FromResult(new PagedModel<Guid>(pagedItems.Total, pagedItems.Items.Select(i => i.NodeKey)));
+    }
 }

@@ -1,6 +1,5 @@
 ﻿using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
@@ -102,8 +101,9 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         // - non-#comment nodes
         // - non-#text nodes
         // - non-empty #text nodes
+        // - empty #text between inline elements (see #17037)
         HtmlNode[] childNodes = element.ChildNodes
-            .Where(c => c.Name != CommentNodeName && (c.Name != TextNodeName || string.IsNullOrWhiteSpace(c.InnerText) is false))
+            .Where(c => c.Name != CommentNodeName && (c.Name != TextNodeName || c.NextSibling is not null || string.IsNullOrWhiteSpace(c.InnerText) is false))
             .ToArray();
 
         var tag = TagName(element);
@@ -124,16 +124,16 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         return createElement(tag, attributes, childElements);
     }
 
-    private string TagName(HtmlNode htmlNode) => htmlNode.Name;
+    private static string TagName(HtmlNode htmlNode) => htmlNode.Name;
 
     private void ReplaceLocalLinks(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, Dictionary<string, object> attributes)
     {
-        if (attributes.ContainsKey("href") is false || attributes["href"] is not string href)
+        if (attributes.TryGetValue("href", out object? hrefAttribute) is false || hrefAttribute is not string href)
         {
             return;
         }
 
-        if (attributes.ContainsKey("type") is false || attributes["type"] is not string type)
+        if (attributes.TryGetValue("type", out object? typeAttribute) is false || typeAttribute is not string type)
         {
             type = "unknown";
         }
@@ -154,7 +154,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
 
     private void ReplaceLocalImages(IPublishedMediaCache mediaCache, string tag, Dictionary<string, object> attributes)
     {
-        if (tag is not "img" || attributes.ContainsKey("data-udi") is false || attributes["data-udi"] is not string dataUdi)
+        if (tag is not "img" || attributes.TryGetValue("data-udi", out object? dataUdiAttribute) is false || dataUdiAttribute is not string dataUdi)
         {
             return;
         }
@@ -166,9 +166,9 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         });
     }
 
-    private void CleanUpBlocks(string tag, Dictionary<string, object> attributes)
+    private static void CleanUpBlocks(string tag, Dictionary<string, object> attributes)
     {
-        if (tag.StartsWith("umb-rte-block") is false || attributes.ContainsKey(BlockContentKeyAttribute) is false || attributes[BlockContentKeyAttribute] is not string dataKey)
+        if (tag.StartsWith("umb-rte-block") is false || attributes.TryGetValue(BlockContentKeyAttribute, out object? blockContentKeyAttribute) is false || blockContentKeyAttribute is not string dataKey)
         {
             return;
         }
@@ -190,7 +190,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
 
         foreach (KeyValuePair<string, object> dataAttribute in dataAttributes)
         {
-            var actualKey = dataAttribute.Key.TrimStartExact("data-");
+            var actualKey = dataAttribute.Key.TrimStart("data-");
             attributes.TryAdd(actualKey, dataAttribute.Value);
 
             attributes.Remove(dataAttribute.Key);

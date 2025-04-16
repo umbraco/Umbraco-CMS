@@ -7,11 +7,7 @@ internal interface IDatabaseCacheRepository
 {
     Task DeleteContentItemAsync(int id);
 
-    Task<ContentCacheNode?> GetContentSourceAsync(int id, bool preview = false);
-
     Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false);
-
-    Task<ContentCacheNode?> GetMediaSourceAsync(int id);
 
     Task<ContentCacheNode?> GetMediaSourceAsync(Guid key);
 
@@ -67,4 +63,6 @@ internal interface IDatabaseCacheRepository
     ///     Rebuilds the caches for content, media and/or members based on the content type ids specified
     /// </summary>
     bool VerifyMediaDbCache();
+
+    Task<IEnumerable<Guid>> GetContentKeysAsync(Guid nodeObjectType);
 }

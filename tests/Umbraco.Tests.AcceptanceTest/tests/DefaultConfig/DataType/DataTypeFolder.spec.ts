@@ -1,4 +1,4 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'TestDataType';
@@ -20,9 +20,10 @@ test.afterEach(async ({umbracoApi}) => {
 test('can create a data type folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
-  await umbracoUi.dataType.createFolder(dataTypeFolderName);
+  await umbracoUi.dataType.createDataTypeFolder(dataTypeFolderName);
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
 });
 
@@ -38,9 +39,10 @@ test('can rename a data type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickActionsMenuForDataType(wrongDataTypeFolderName);
   await umbracoUi.dataType.clickRenameFolderButton();
   await umbracoUi.dataType.enterFolderName(dataTypeFolderName);
-  await umbracoUi.dataType.clickConfirmRenameFolderButton();
+  await umbracoUi.dataType.clickConfirmRenameButton();
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
   expect(await umbracoApi.dataType.doesNameExist(wrongDataTypeFolderName)).toBeFalsy();
 });
@@ -55,6 +57,7 @@ test('can delete a data type folder', {tag: '@smoke'}, async ({umbracoApi, umbra
   await umbracoUi.dataType.deleteDataTypeFolder(dataTypeFolderName);
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
   expect(await umbracoApi.dataType.doesFolderExist(dataTypeFolderName)).toBeFalsy();
 });
 
@@ -67,14 +70,15 @@ test('can create a data type in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
-  await umbracoUi.dataType.clickCreateButton();
-  await umbracoUi.dataType.clickNewDataTypeThreeDotsButton();
+  await umbracoUi.dataType.clickActionsMenuCreateButton();
+  await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor(propertyEditorName);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   const dataTypeChildren = await umbracoApi.dataType.getChildren(dataTypeFolderId);
   expect(dataTypeChildren[0].name).toBe(dataTypeName);
@@ -91,9 +95,10 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
-  await umbracoUi.dataType.createFolder(childFolderName);
+  await umbracoUi.dataType.createDataTypeFolder(childFolderName);
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.dataType.doesNameExist(childFolderName)).toBeTruthy();
   const dataTypeChildren = await umbracoApi.dataType.getChildren(dataTypeFolderId);
   expect(dataTypeChildren[0].name).toBe(childFolderName);
@@ -111,10 +116,10 @@ test('can create a folder in a folder in a folder', async ({umbracoApi, umbracoU
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickCaretButtonForName(dataTypeFolderName);
   await umbracoUi.dataType.clickActionsMenuForDataType(childFolderName);
-  await umbracoUi.dataType.createFolder(childOfChildFolderName);
+  await umbracoUi.dataType.createDataTypeFolder(childOfChildFolderName);
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.dataType.doesNameExist(childOfChildFolderName)).toBeTruthy();
   const childrenFolderData = await umbracoApi.dataType.getChildren(childFolderId);
   expect(childrenFolderData[0].name).toBe(childOfChildFolderName);
@@ -135,7 +140,7 @@ test('cannot delete a non-empty data type folder', async ({umbracoApi, umbracoUi
   await umbracoUi.dataType.deleteDataTypeFolder(dataTypeFolderName);
 
   // Assert
-  await umbracoUi.dataType.isErrorNotificationVisible();
+  await umbracoUi.dataType.doesErrorNotificationHaveText(NotificationConstantHelper.error.notEmptyFolder);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
   const dataTypeChildren = await umbracoApi.dataType.getChildren(dataTypeFolderId);
@@ -161,7 +166,7 @@ test('can move a data type to a data type folder', async ({umbracoApi, umbracoUi
   await umbracoUi.dataType.moveDataTypeToFolder(dataTypeFolderName);
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
   const dataTypeInFolder = await umbracoApi.dataType.getChildren(dataTypeFolderId);
   expect(dataTypeInFolder[0].id).toEqual(dataTypeId);
 
@@ -184,7 +189,7 @@ test('can duplicate a data type to a data type folder', async ({umbracoApi, umbr
   await umbracoUi.dataType.duplicateDataTypeToFolder(dataTypeFolderName);
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);
   const dataTypeInFolder = await umbracoApi.dataType.getChildren(dataTypeFolderId);
   expect(dataTypeInFolder[0].name).toEqual(dataTypeName + ' (copy)');
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();

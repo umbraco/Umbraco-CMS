@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -21,8 +23,21 @@ internal sealed class MediaEditingService
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
         ITreeEntitySortingService treeEntitySortingService,
-        IMediaValidationService mediaValidationService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, mediaValidationService, treeEntitySortingService)
+        IMediaValidationService mediaValidationService,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService)
+        : base(
+            contentService,
+            contentTypeService,
+            propertyEditorCollection,
+            dataTypeService,
+            logger,
+            scopeProvider,
+            userIdKeyResolver,
+            mediaValidationService,
+            treeEntitySortingService,
+            optionsMonitor,
+            relationService)
         => _logger = logger;
 
     public async Task<IMedia?> GetAsync(Guid key)
@@ -55,12 +70,18 @@ internal sealed class MediaEditingService
         ContentEditingOperationStatus validationStatus = result.Status;
         ContentValidationResult validationResult = result.Result.ValidationResult;
 
+        // If we have property validation errors, don't allow saving, as media only supports "published" status.
+        if (result.Status == ContentEditingOperationStatus.PropertyValidationError)
+        {
+            return Attempt.FailWithStatus(validationStatus, new MediaCreateResult { ValidationResult = validationResult });
+        }
+
         IMedia media = result.Result.Content!;
 
         var currentUserId = await GetUserIdAsync(userKey);
         ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
         return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(validationStatus, new MediaCreateResult { Content = media, ValidationResult = validationResult })
+            ? Attempt.SucceedWithStatus(validationStatus, new MediaCreateResult { Content = media })
             : Attempt.FailWithStatus(operationStatus, new MediaCreateResult { Content = media });
     }
 

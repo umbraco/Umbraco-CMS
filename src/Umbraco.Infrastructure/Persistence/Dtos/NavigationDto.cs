@@ -7,6 +7,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(NodeDto.TableName)]
 internal class NavigationDto : INavigationModel
 {
+    // Public constants to bind properties between DTOs
+    public const string ContentTypeKeyColumnName = "contentTypeKey";
+
     /// <inheritdoc/>
     [Column(NodeDto.IdColumnName)]
     public int Id { get; set; }
@@ -14,6 +17,9 @@ internal class NavigationDto : INavigationModel
     /// <inheritdoc/>
     [Column(NodeDto.KeyColumnName)]
     public Guid Key { get; set; }
+
+    [Column(ContentTypeKeyColumnName)]
+    public Guid ContentTypeKey { get; set; }
 
     /// <inheritdoc/>
     [Column(NodeDto.ParentIdColumnName)]

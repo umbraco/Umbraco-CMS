@@ -3,6 +3,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
@@ -49,7 +50,7 @@ public sealed class RegexValidator : IValueFormatValidator, IValueValidator
         => _regex = regex;
 
     /// <inheritdoc cref="IValueValidator.Validate" />
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
     {
         if (_regex == null)
         {

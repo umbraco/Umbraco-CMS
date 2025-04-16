@@ -2,6 +2,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
@@ -16,6 +17,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
     private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
     private readonly IMediaNavigationManagementService _mediaNavigationManagementService;
     private readonly IMediaService _mediaService;
+    private readonly IMediaCacheService _mediaCacheService;
 
     public MediaCacheRefresher(
         AppCaches appCaches,
@@ -25,13 +27,15 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         ICacheRefresherNotificationFactory factory,
         IMediaNavigationQueryService mediaNavigationQueryService,
         IMediaNavigationManagementService mediaNavigationManagementService,
-        IMediaService mediaService)
+        IMediaService mediaService,
+        IMediaCacheService mediaCacheService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
         _mediaNavigationQueryService = mediaNavigationQueryService;
         _mediaNavigationManagementService = mediaNavigationManagementService;
         _mediaService = mediaService;
+        _mediaCacheService = mediaCacheService;
     }
 
     #region Indirect
@@ -106,6 +110,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
                 }
             }
 
+            HandleMemoryCache(payload);
             HandleNavigation(payload);
         }
 
@@ -113,6 +118,41 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
 
         base.Refresh(payloads);
+    }
+
+    private void HandleMemoryCache(JsonPayload payload)
+    {
+        Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        {
+            _mediaCacheService.RefreshMemoryCacheAsync(key).GetAwaiter().GetResult();
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        {
+            if (_mediaNavigationQueryService.TryGetDescendantsKeys(key, out IEnumerable<Guid> descendantsKeys))
+            {
+                var branchKeys = descendantsKeys.ToList();
+                branchKeys.Add(key);
+
+                foreach (Guid branchKey in branchKeys)
+                {
+                    _mediaCacheService.RefreshMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
+                }
+            }
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        {
+            _mediaCacheService.ClearMemoryCacheAsync(CancellationToken.None).GetAwaiter().GetResult();
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        {
+            _mediaCacheService.RemoveFromMemoryCacheAsync(key).GetAwaiter().GetResult();
+        }
     }
 
     private void HandleNavigation(JsonPayload payload)
@@ -168,7 +208,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         // First creation
         if (ExistsInNavigation(media.Key) is false && ExistsInNavigationBin(media.Key) is false)
         {
-            _mediaNavigationManagementService.Add(media.Key, GetParentKey(media), media.SortOrder);
+            _mediaNavigationManagementService.Add(media.Key, media.ContentType.Key, GetParentKey(media), media.SortOrder);
             if (media.Trashed)
             {
                 // If created as trashed, move to bin

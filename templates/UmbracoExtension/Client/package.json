@@ -1,0 +1,21 @@
+{
+  "name": "umbraco-extension",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "watch": "tsc && vite build --watch",
+    "build": "tsc && vite build",
+    "generate-client": "node scripts/generate-openapi.js https://localhost:44339/umbraco/swagger/umbracoextension/swagger.json"
+  },
+  "devDependencies": {
+    "@hey-api/client-fetch": "^0.8.3",
+    "@hey-api/openapi-ts": "^0.64.10",
+    "@umbraco-cms/backoffice": "^UMBRACO_VERSION_FROM_TEMPLATE",
+    "chalk": "^5.4.1",
+    "cross-env": "^7.0.3",
+    "node-fetch": "^3.3.2",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.0"
+  }
+}

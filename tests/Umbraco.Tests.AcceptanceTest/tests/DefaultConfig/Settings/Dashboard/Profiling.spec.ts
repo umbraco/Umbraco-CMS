@@ -6,12 +6,11 @@ test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.profiling.clickProfilingTab();
 });
 
-// TODO: Remove .skip when frontend is ready. Currently the value of active the profiler by default is not updated after reloading the page
-test.skip('can update value of activate the profiler by default', async ({umbracoUi}) => {
+test('can update value of activate the profiler by default', async ({umbracoUi}) => {
   // Act
-  await umbracoUi.profiling.clickActivateProfilerByDefaultSlider();
+  await umbracoUi.profiling.clickActivateProfilerByDefaultToggle();
   await umbracoUi.reloadPage();
 
   // Assert
-  await umbracoUi.profiling.isActivateProfilerByDefaultSliderChecked(true);
+  await umbracoUi.profiling.isActivateProfilerByDefaultToggleChecked(true);
 });

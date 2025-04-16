@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AddRazorSupportForMvc Condition="'$(SupportPagesAndViews)' == 'True'">true</AddRazorSupportForMvc>
+    <RootNamespace Condition="'$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">Umbraco.Extension</RootNamespace>
+    <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Umbraco.Extension</PackageId>
+    <Product>Umbraco.Extension</Product>
+    <Title>Umbraco.Extension</Title>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(SupportPagesAndViews)' == 'True'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Cms.Web.Website" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+    <PackageReference Include="Umbraco.Cms.Web.Common" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+    <PackageReference Include="Umbraco.Cms.Api.Common" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+    <PackageReference Include="Umbraco.Cms.Api.Management" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ClientAssetsInputs Include="Client\**" Exclude="$(DefaultItemExcludes)" />
+
+    <!-- Dont include the client folder as part of packaging nuget build -->
+    <Content Remove="Client\**" />
+
+    <!-- However make the Umbraco-package.json included for dotnet pack or nuget package and visible to the solution -->
+    <None Include="Client\public\umbraco-package.json" Pack="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <!-- Restore and build Client files -->
+  <Target Name="RestoreClient" Inputs="Client\package.json;Client\package-lock.json" Outputs="Client\node_modules\.package-lock.json">
+    <Message Importance="high" Text="Restoring Client NPM packages..." />
+    <Exec Command="npm i" WorkingDirectory="Client" />
+  </Target>
+
+  <Target Name="BuildClient" BeforeTargets="AssignTargetPaths" DependsOnTargets="RestoreClient" Inputs="@(ClientAssetsInputs)" Outputs="$(IntermediateOutputPath)client.complete.txt">
+    <Message Importance="high" Text="Executing Client NPM build script..." />
+    <Exec Command="npm run build" WorkingDirectory="Client" />
+    <ItemGroup>
+      <_ClientAssetsBuildOutput Include="wwwroot\App_Plugins\**" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)client.complete.txt" Lines="@(_ClientAssetsBuildOutput)" Overwrite="true" />
+  </Target>
+
+</Project>

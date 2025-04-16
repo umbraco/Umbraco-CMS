@@ -5,35 +5,35 @@
   </PropertyGroup>
   <!-- Global packages (private, build-time packages for all projects) -->
   <ItemGroup>
-    <GlobalPackageReference Include="Nerdbank.GitVersioning" Version="3.6.143" />
+    <GlobalPackageReference Include="Nerdbank.GitVersioning" Version="3.6.146" />
     <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
     <GlobalPackageReference Include="Umbraco.Code" Version="2.2.0" />
     <GlobalPackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.2.0" />
   </ItemGroup>
   <!-- Microsoft packages -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.0-rc.2.24474.3" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" />
-    <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.0-rc.2.24474.1" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0-rc.2.24474.1" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0-rc.2.24474.1" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.0-rc.2.24473.5" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0-rc.2.24473.5" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0-rc.2.24473.5" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0-rc.2.24473.5" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0-rc.2.24473.5" />
-    <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.0-rc.2.24474.3" />
-    <PackageVersion Include="Microsoft.Extensions.FileProviders.Physical" Version="9.0.0-rc.2.24473.5" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.0-rc.2.24473.5" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.0-rc.2.24473.5" />
-    <PackageVersion Include="Microsoft.Extensions.Identity.Core" Version="9.0.0-rc.2.24474.3" />
-    <PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="9.0.0-rc.2.24474.3" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.0-rc.2.24473.5" />
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="9.0.0-rc.2.24473.5" />
-    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0-rc.2.24473.5" />
-    <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.0-rc.2.24473.5" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.0.0-preview.9.24507.7" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Physical" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Identity.Core" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.0.0-preview.9.24556.5" />
   </ItemGroup>
   <!-- Umbraco packages -->
   <ItemGroup>
@@ -45,24 +45,24 @@
     <PackageVersion Include="Asp.Versioning.Mvc" Version="8.1.0" />
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
     <PackageVersion Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
-    <PackageVersion Include="Examine" Version="3.3.0" />
-    <PackageVersion Include="Examine.Core" Version="3.3.0" />
-    <PackageVersion Include="HtmlAgilityPack" Version="1.11.67" />
+    <PackageVersion Include="Examine" Version="3.7.0" />
+    <PackageVersion Include="Examine.Core" Version="3.7.0" />
+    <PackageVersion Include="HtmlAgilityPack" Version="1.11.74" />
     <PackageVersion Include="JsonPatch.Net" Version="3.1.1" />
     <PackageVersion Include="K4os.Compression.LZ4" Version="1.3.8" />
-    <PackageVersion Include="MailKit" Version="4.8.0" />
+    <PackageVersion Include="MailKit" Version="4.10.0" />
     <PackageVersion Include="Markdown" Version="2.2.1" />
-    <PackageVersion Include="MessagePack" Version="2.5.187" />
+    <PackageVersion Include="MessagePack" Version="2.5.192" />
     <PackageVersion Include="MiniProfiler.AspNetCore.Mvc" Version="4.3.8" />
-    <PackageVersion Include="MiniProfiler.Shared" Version="4.3.8" />
+    <PackageVersion Include="MiniProfiler.Shared" Version="4.5.4" />
     <PackageVersion Include="ncrontab" Version="3.3.3" />
     <PackageVersion Include="NPoco" Version="5.7.1" />
     <PackageVersion Include="NPoco.SqlServer" Version="5.7.1" />
-    <PackageVersion Include="OpenIddict.Abstractions" Version="6.0.0-preview1.24504.78" />
-    <PackageVersion Include="OpenIddict.AspNetCore" Version="6.0.0-preview1.24504.78" />
-    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="6.0.0-preview1.24504.78" />
-    <PackageVersion Include="Serilog" Version="4.0.2" />
-    <PackageVersion Include="Serilog.AspNetCore" Version="8.0.2" />
+    <PackageVersion Include="OpenIddict.Abstractions" Version="6.1.1" />
+    <PackageVersion Include="OpenIddict.AspNetCore" Version="6.1.1" />
+    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="6.1.1" />
+    <PackageVersion Include="Serilog" Version="4.2.0" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="8.0.3" />
     <PackageVersion Include="Serilog.Enrichers.Process" Version="3.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Thread" Version="4.0.0" />
     <PackageVersion Include="Serilog.Expressions" Version="5.0.0" />
@@ -70,30 +70,34 @@
     <PackageVersion Include="Serilog.Formatting.Compact" Version="3.0.0" />
     <PackageVersion Include="Serilog.Formatting.Compact.Reader" Version="4.0.0" />
     <PackageVersion Include="Serilog.Settings.Configuration" Version="8.0.4" />
-    <PackageVersion Include="Serilog.Sinks.Async" Version="2.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.Map" Version="2.0.0" />
-    <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.5" />
+    <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.7" />
     <PackageVersion Include="SixLabors.ImageSharp.Web" Version="3.1.3" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.8.1" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.1.0" />
   </ItemGroup>
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->
   <ItemGroup>
-    <!-- Both Microsoft.EntityFrameworkCore.SqlServer and NPoco.SqlServer bring in a vulnerable version of Azure.Identity -->
-    <PackageVersion Include="Azure.Identity" Version="1.12.1" />
-    <!-- Both Microsoft.EntityFrameworkCore.SqlServer and NPoco.SqlServer bring in a vulnerable version of Azure.Identity -->
-    <PackageVersion Include="System.Runtime.Caching" Version="9.0.0-rc.2.24473.5" />
+    <!-- Microsoft.EntityFrameworkCore.SqlServer and NPoco.SqlServer brings in a vulnerable version of Azure.Identity -->
+    <!-- Take top-level depedendency on Azure.Identity, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
+    <PackageVersion Include="Azure.Identity" Version="1.13.1" />
+    <!-- Microsoft.EntityFrameworkCore.SqlServer brings in a vulnerable version of System.Runtime.Caching -->
+    <PackageVersion Include="System.Runtime.Caching" Version="9.0.0" />
     <!-- Dazinator.Extensions.FileProviders brings in a vulnerable version of System.Net.Http -->
     <PackageVersion Include="System.Net.Http" Version="4.3.4" />
     <!-- Examine brings in a vulnerable version of System.Security.Cryptography.Xml -->
-    <PackageVersion Include="System.Security.Cryptography.Xml" Version="9.0.0-rc.2.24473.5" />
-    <!-- Both Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc bring in a vulnerable version of System.Text.RegularExpressions -->
+    <PackageVersion Include="System.Security.Cryptography.Xml" Version="9.0.0" />
+    <!-- Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc brings in a vulnerable version of System.Text.RegularExpressions -->
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
-    <!-- Both OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer bring in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
-    <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.1.2" />
-    <!-- Both  Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders bring in legacy versions of System.Text.Encodings.Web  -->
-    <PackageVersion Include="System.Text.Encodings.Web" Version="9.0.0-rc.2.24473.5" />
-    <!-- NPoco.SqlServer bring in vulnerable version of Microsoft.Data.SqlClient  -->
+    <!-- OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer brings in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
+    <!-- Take top-level depedendency on Microsoft.IdentityModel.JsonWebTokens, because OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
+    <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.2.1" />
+    <!-- Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer and Dazinator.Extensions.FileProviders brings in a legacy version of System.Text.Encodings.Web -->
+    <PackageVersion Include="System.Text.Encodings.Web" Version="9.0.0" />
+    <!-- NPoco.SqlServer brings in a vulnerable version of Microsoft.Data.SqlClient  -->
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+    <!-- Examine.Lucene brings in a vulnerable version of Lucene.Net.Replicator -->
+    <PackageVersion Include="Lucene.Net.Replicator" Version="4.8.0-beta00017" />
   </ItemGroup>
 </Project>

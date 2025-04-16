@@ -70,6 +70,29 @@ public interface ITrackedReferencesRepository
         bool filterMustBeIsDependency,
         out long totalRecords);
 
+    /// <summary>
+    ///     Gets a paged result of items which are in relation with an item in the recycle bin.
+    /// </summary>
+    /// <param name="objectTypeKey">The Umbraco object type that has recycle bin support (currently Document or Media).</param>
+    /// <param name="skip">The amount of items to skip.</param>
+    /// <param name="take">The amount of items to take.</param>
+    /// <param name="filterMustBeIsDependency">
+    ///     A boolean indicating whether to filter only the RelationTypes which are
+    ///     dependencies (isDependency field is set to true).
+    /// </param>
+    /// <param name="totalRecords">The total count of the items with reference to the current item.</param>
+    /// <returns>An enumerable list of <see cref="RelationItem" /> objects.</returns>
+    IEnumerable<RelationItemModel> GetPagedRelationsForRecycleBin(
+        Guid objectTypeKey,
+        long skip,
+        long take,
+        bool filterMustBeIsDependency,
+        out long totalRecords)
+    {
+        totalRecords = 0;
+        return [];
+    }
+
     [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
     IEnumerable<RelationItemModel> GetPagedRelationsForItem(
         int id,
@@ -131,4 +154,14 @@ public interface ITrackedReferencesRepository
         long take,
         bool filterMustBeIsDependency,
         out long totalRecords);
+
+    Task<PagedModel<Guid>> GetPagedNodeKeysWithDependantReferencesAsync(
+        ISet<Guid> keys,
+        Guid nodeObjectTypeId,
+        long skip,
+        long take)
+    {
+        IEnumerable<RelationItemModel> pagedItems = GetPagedItemsWithRelations(keys, skip, take, true, out var total);
+        return Task.FromResult(new PagedModel<Guid>(total, pagedItems.Select(i => i.NodeKey)));
+    }
 }

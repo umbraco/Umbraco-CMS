@@ -46,6 +46,24 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
+        /// Appends a WHERE clause to the Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto1">The type of Dto 1.</typeparam>
+        /// <typeparam name="TDto2">The type of Dto 2.</typeparam>
+        /// <typeparam name="TDto3">The type of Dto 3.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="predicate">A predicate to transform and append to the Sql statement.</param>
+        /// <param name="alias1">An optional alias for Dto 1 table.</param>
+        /// <param name="alias2">An optional alias for Dto 2 table.</param>
+        /// <param name="alias3">An optional alias for Dto 3 table.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> Where<TDto1, TDto2, TDto3>(this Sql<ISqlContext> sql, Expression<Func<TDto1, TDto2, TDto3, bool>> predicate, string? alias1 = null, string? alias2 = null, string? alias3 = null)
+        {
+            var (s, a) = sql.SqlContext.VisitDto(predicate, alias1, alias2, alias3);
+            return sql.Where(s, a);
+        }
+
+        /// <summary>
         /// Appends a WHERE IN clause to the Sql statement.
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
@@ -209,7 +227,7 @@ namespace Umbraco.Extensions
 
                 var temp = new Sql<ISqlContext>(sql.SqlContext);
                 temp = predicates[i](temp);
-                wsql.Append(temp.SQL.TrimStartExact("WHERE "), temp.Arguments);
+                wsql.Append(temp.SQL.TrimStart("WHERE "), temp.Arguments);
             }
             wsql.Append(")");
 
@@ -600,7 +618,7 @@ namespace Umbraco.Extensions
         {
             var sql = new Sql<ISqlContext>(sqlJoin.SqlContext);
             sql = on(sql);
-            var text = sql.SQL.Trim().TrimStartExact("WHERE").Trim();
+            var text = sql.SQL.Trim().TrimStart("WHERE").Trim();
             return sqlJoin.On(text, sql.Arguments);
         }
 

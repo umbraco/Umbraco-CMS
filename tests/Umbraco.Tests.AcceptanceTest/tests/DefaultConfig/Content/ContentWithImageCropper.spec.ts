@@ -44,8 +44,7 @@ test('can create content with the image cropper data type', {tag: '@smoke'}, asy
   expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value.src).toContain(AliasHelper.toAlias(imageFileName));
-  // TODO: is no longer null, we need to set an expected crops value
-  // expect(contentData.values[0].value.crops).toEqual([]);
+  expect(contentData.values[0].value.crops).toEqual([]);
   expect(contentData.values[0].value.focalPoint).toEqual(defaultFocalPoint);
 });
 
@@ -69,16 +68,17 @@ test('can publish content with the image cropper data type', {tag: '@smoke'}, as
   expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value.src).toContain(AliasHelper.toAlias(imageFileName));
-  // TODO: is no longer null, we need to set an expected crops value
-  // expect(contentData.values[0].value.crops).toEqual([]);
+  expect(contentData.values[0].value.crops).toEqual([]);
   expect(contentData.values[0].value.focalPoint).toEqual(defaultFocalPoint);
 });
 
 test('can create content with the custom image cropper data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeName = 'CustomImageCropper';
-  const cropValue = ['TestCropLabel', 100, 50];
-  const customDataTypeId = await umbracoApi.dataType.createImageCropperDataTypeWithOneCrop(customDataTypeName, cropValue[0], cropValue[1], cropValue[2]);
+  const cropAlias = 'TestCropLabel';
+  const cropWidth = 100;
+  const cropHeight = 50;
+  const customDataTypeId = await umbracoApi.dataType.createImageCropperDataTypeWithOneCrop(customDataTypeName, AliasHelper.toAlias(cropAlias), cropWidth, cropHeight);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -95,9 +95,9 @@ test('can create content with the custom image cropper data type', {tag: '@smoke
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
   expect(contentData.values[0].value.src).toContain(AliasHelper.toAlias(imageFileName));
   expect(contentData.values[0].value.focalPoint).toEqual(defaultFocalPoint);
-  expect(contentData.values[0].value.crops[0].alias).toEqual(AliasHelper.toAlias(cropValue[0]));
-  expect(contentData.values[0].value.crops[0].width).toEqual(cropValue[1]);
-  expect(contentData.values[0].value.crops[0].height).toEqual(cropValue[2]);
+  expect(contentData.values[0].value.crops[0].alias).toEqual(AliasHelper.toAlias(cropAlias));
+  expect(contentData.values[0].value.crops[0].width).toEqual(cropWidth);
+  expect(contentData.values[0].value.crops[0].height).toEqual(cropHeight);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);

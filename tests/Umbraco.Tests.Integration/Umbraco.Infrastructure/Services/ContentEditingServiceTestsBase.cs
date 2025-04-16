@@ -21,7 +21,11 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
 
     protected IContentBlueprintEditingService ContentBlueprintEditingService => GetRequiredService<IContentBlueprintEditingService>();
 
-    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+    protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+
+    protected IUserService UserService => GetRequiredService<IUserService>();
+
+    protected IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
     protected IContentType CreateInvariantContentType(params ITemplate[] templates)
     {
@@ -30,15 +34,23 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
             .WithName("Invariant Test")
             .WithContentVariation(ContentVariation.Nothing)
             .AddPropertyType()
-            .WithAlias("title")
-            .WithName("Title")
-            .WithVariations(ContentVariation.Nothing)
-            .Done()
+                .WithAlias("title")
+                .WithName("Title")
+                .WithMandatory(true)
+                .WithVariations(ContentVariation.Nothing)
+                .Done()
             .AddPropertyType()
-            .WithAlias("text")
-            .WithName("Text")
-            .WithVariations(ContentVariation.Nothing)
-            .Done();
+                .WithAlias("text")
+                .WithName("Text")
+                .WithVariations(ContentVariation.Nothing)
+                .Done()
+            .AddPropertyType()
+                .WithAlias("label")
+                .WithName("Label")
+                .WithDataTypeId(Constants.DataTypes.LabelString)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
+                .WithVariations(ContentVariation.Nothing)
+                .Done();
 
         foreach (var template in templates)
         {
@@ -74,15 +86,23 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
             .WithName("Culture Variation Test")
             .WithContentVariation(ContentVariation.Culture)
             .AddPropertyType()
-            .WithAlias("variantTitle")
-            .WithName("Variant Title")
-            .WithVariations(ContentVariation.Culture)
-            .Done()
+                .WithAlias("variantTitle")
+                .WithName("Variant Title")
+                .WithMandatory(true)
+                .WithVariations(ContentVariation.Culture)
+                .Done()
             .AddPropertyType()
-            .WithAlias("invariantTitle")
-            .WithName("Invariant Title")
-            .WithVariations(ContentVariation.Nothing)
-            .Done()
+                .WithAlias("invariantTitle")
+                .WithName("Invariant Title")
+                .WithVariations(ContentVariation.Nothing)
+                .Done()
+            .AddPropertyType()
+                .WithAlias("variantLabel")
+                .WithName("Variant Label")
+                .WithDataTypeId(Constants.DataTypes.LabelString)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
+                .WithVariations(ContentVariation.Culture)
+                .Done()
             .Build();
         contentType.AllowedAsRoot = true;
         ContentTypeService.Save(contentType);

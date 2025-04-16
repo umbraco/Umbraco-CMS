@@ -88,7 +88,7 @@ public class StringExtensionsTests
     [TestCase("Hello this is my string string", "Hello this is my string string", "")]
     public void TrimEnd(string input, string forTrimming, string shouldBe)
     {
-        var trimmed = input.TrimEndExact(forTrimming);
+        var trimmed = input.TrimEnd(forTrimming);
         Assert.AreEqual(shouldBe, trimmed);
     }
 
@@ -98,7 +98,7 @@ public class StringExtensionsTests
     [TestCase("Hello this is my string", "Hello this is my string", "")]
     public void TrimStart(string input, string forTrimming, string shouldBe)
     {
-        var trimmed = input.TrimStartExact(forTrimming);
+        var trimmed = input.TrimStart(forTrimming);
         Assert.AreEqual(shouldBe, trimmed);
     }
 
@@ -364,6 +364,16 @@ public class StringExtensionsTests
         TryIsFullPath("   ", false, false); // technically, a valid filename on Linux
     }
 
+    [TestCase("test@test.com", true)]
+    [TestCase("test@test", true)]
+    [TestCase("testtest.com", false)]
+    [TestCase("test@test.dk", true)]
+    [TestCase("test@test.se", true)]
+    [TestCase(null, false)]
+    [TestCase("", false)]
+    [TestCase(" ", false)]
+    public void IsEmail(string? email, bool isEmail) => Assert.AreEqual(isEmail, email.IsEmail());
+
     private static void TryIsFullPath(string path, bool expectedIsFull, bool expectedIsValid = true)
     {
         Assert.AreEqual(expectedIsFull, path.IsFullPath(), "IsFullPath('" + path + "')");
@@ -376,5 +386,13 @@ public class StringExtensionsTests
         {
             Assert.AreNotEqual(path, Path.GetFullPath(path));
         }
+    }
+
+    [TestCase("1,2,3,4,5", "5,4,3,2,1")]
+    [TestCase("1,2,x,4,5", "5,4,2,1")]
+    public void GetIdsFromPathReversed(string input, string expected)
+    {
+        var ids = input.GetIdsFromPathReversed();
+        Assert.AreEqual(expected, string.Join(",", ids));
     }
 }

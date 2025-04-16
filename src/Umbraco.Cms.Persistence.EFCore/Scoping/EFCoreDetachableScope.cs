@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
-internal class EFCoreDetachableScope<TDbContext> : EFCoreScope<TDbContext> where TDbContext : DbContext
+internal sealed class EFCoreDetachableScope<TDbContext> : EFCoreScope<TDbContext> where TDbContext : DbContext
 {
     private readonly IEFCoreScopeAccessor<TDbContext> _efCoreScopeAccessor;
     private readonly EFCoreScopeProvider<TDbContext> _efCoreScopeProvider;

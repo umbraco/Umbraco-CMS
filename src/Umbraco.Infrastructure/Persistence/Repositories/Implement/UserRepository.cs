@@ -36,7 +36,7 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
     private readonly IRuntimeState _runtimeState;
     private string? _passwordConfigJson;
     private bool _passwordConfigInitialized;
-    private readonly object _sqliteValidateSessionLock = new();
+    private readonly Lock _sqliteValidateSessionLock = new();
     private readonly IDictionary<string, IPermissionMapper> _permissionMappers;
     private readonly IAppPolicyCache _globalCache;
     private readonly IScopeAccessor _scopeAccessor;
@@ -1218,7 +1218,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         var args = filterSql.Arguments;
         var sqlFilter = hasWhereClause
             ? filterSql.SQL
-            : " WHERE " + filterSql.SQL.TrimStartExact("AND ");
+            : " WHERE " + filterSql.SQL.TrimStart("AND ");
 
         sql.Append(SqlContext.Sql(sqlFilter, args));
 

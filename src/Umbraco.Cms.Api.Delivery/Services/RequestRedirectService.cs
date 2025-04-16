@@ -42,31 +42,42 @@ internal sealed class RequestRedirectService : RoutingServiceBase, IRequestRedir
     {
         requestedPath = requestedPath.EnsureStartsWith("/");
 
+        IPublishedContent? startItem = GetStartItem();
+
         // must append the root content url segment if it is not hidden by config, because
         // the URL tracking is based on the actual URL, including the root content url segment
-        if (_globalSettings.HideTopLevelNodeFromPath == false)
+        if (_globalSettings.HideTopLevelNodeFromPath == false && startItem?.UrlSegment != null)
         {
-            IPublishedContent? startItem = GetStartItem();
-            if (startItem?.UrlSegment != null)
-            {
-                requestedPath = $"{startItem.UrlSegment.EnsureStartsWith("/")}{requestedPath}";
-            }
+            requestedPath = $"{startItem.UrlSegment.EnsureStartsWith("/")}{requestedPath}";
         }
 
         var culture = _requestCultureService.GetRequestedCulture();
 
-        // append the configured domain content ID to the path if we have a domain bound request,
-        // because URL tracking registers the tracked url like "{domain content ID}/{content path}"
-        Uri contentRoute = GetDefaultRequestUri(requestedPath);
-        DomainAndUri? domainAndUri = GetDomainAndUriForRoute(contentRoute);
-        if (domainAndUri != null)
+        // important: redirect URLs are always tracked without trailing slashes
+        requestedPath = requestedPath.TrimEnd("/");
+        IRedirectUrl? redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(requestedPath, culture);
+
+        // if a redirect URL was not found, try by appending the start item ID because URL tracking might have tracked
+        // a redirect with "{root content ID}/{content path}"
+        if (redirectUrl is null && startItem is not null)
         {
-            requestedPath = GetContentRoute(domainAndUri, contentRoute);
-            culture ??= domainAndUri.Culture;
+            redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl($"{startItem.Id}{requestedPath}", culture);
         }
 
-        // important: redirect URLs are always tracked without trailing slashes
-        IRedirectUrl? redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(requestedPath.TrimEndExact("/"), culture);
+        // still no redirect URL found - try looking for a configured domain if we have a domain bound request,
+        // because URL tracking might have tracked a redirect with "{domain content ID}/{content path}"
+        if (redirectUrl is null)
+        {
+            Uri contentRoute = GetDefaultRequestUri(requestedPath);
+            DomainAndUri? domainAndUri = GetDomainAndUriForRoute(contentRoute);
+            if (domainAndUri is not null)
+            {
+                requestedPath = GetContentRoute(domainAndUri, contentRoute);
+                culture ??= domainAndUri.Culture;
+                redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(requestedPath, culture);
+            }
+        }
+
         IPublishedContent? content = redirectUrl != null
             ? _apiPublishedContentCache.GetById(redirectUrl.ContentKey)
             : null;

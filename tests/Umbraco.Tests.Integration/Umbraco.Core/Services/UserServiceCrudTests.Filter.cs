@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -10,42 +10,48 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 public partial class UserServiceCrudTests
 {
-    [Test]
-    [TestCase(UserState.Disabled)]
-    [TestCase(UserState.All)]
-    public async Task Cannot_Request_Disabled_If_Hidden(UserState includeState)
+    [TestCase(null, 1)]                     // Requesting no filter, will just get the admin user but not the created and disabled one.
+                                            //  - verifies fix for https://github.com/umbraco/Umbraco-CMS/issues/18812
+    [TestCase(UserState.Inactive, 1)]       // Requesting inactive, will just get the admin user but not the created and disabled one.
+    [TestCase(UserState.Disabled, 0)]       // Requesting disabled, won't get any as admin user isn't disabled and, whilst the created one is, disabled users are hidden.
+    [TestCase(UserState.All, 1)]            // Requesting all, will just get the admin user but not the created and disabled one.
+    public async Task Cannot_Request_Disabled_If_Hidden(UserState? includeState, int expectedCount)
     {
-        var userService = CreateUserService(new SecuritySettings {HideDisabledUsersInBackOffice = true});
-        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var userService = CreateUserService(new SecuritySettings { HideDisabledUsersInBackOffice = true });
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
 
         var createModel = new UserCreateModel
         {
             UserName = "editor@mail.com",
             Email = "editor@mail.com",
             Name = "Editor",
-            UserGroupKeys = new HashSet<Guid> { editorGroup.Key }
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key },
         };
 
         var createAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
         Assert.IsTrue(createAttempt.Success);
 
         var disableStatus =
-            await userService.DisableAsync(Constants.Security.SuperUserKey, new HashSet<Guid>{ createAttempt.Result.CreatedUser!.Key });
+            await userService.DisableAsync(Constants.Security.SuperUserKey, new HashSet<Guid> { createAttempt.Result.CreatedUser!.Key });
         Assert.AreEqual(UserOperationStatus.Success, disableStatus);
 
-        var filter = new UserFilter {IncludeUserStates = new HashSet<UserState> {includeState}};
+        var filter = new UserFilter();
+        if (includeState.HasValue)
+        {
+            filter.IncludeUserStates = new HashSet<UserState> { includeState.Value };
+        }
 
         var filterAttempt = await userService.FilterAsync(Constants.Security.SuperUserKey, filter, 0, 1000);
         Assert.IsTrue(filterAttempt.Success);
-        Assert.AreEqual(0, filterAttempt.Result.Items.Count());
+        Assert.AreEqual(expectedCount, filterAttempt.Result.Items.Count());
     }
 
     [Test]
     public async Task Only_Super_User_Can_Filter_Super_user()
     {
         var userService = CreateUserService();
-        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
-        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
+        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupKey);
 
         var nonSuperCreateModel = new UserCreateModel
         {
@@ -78,7 +84,7 @@ public partial class UserServiceCrudTests
     public async Task Super_User_Can_Filter_Super_User()
     {
         var userService = CreateUserService();
-        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
 
         var nonSuperCreateModel = new UserCreateModel
         {
@@ -107,8 +113,8 @@ public partial class UserServiceCrudTests
     public async Task Non_Admins_Cannot_Filter_Admins()
     {
         var userService = CreateUserService();
-        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
-        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupKey);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
 
         var editorCreateModel = new UserCreateModel
         {
@@ -146,8 +152,8 @@ public partial class UserServiceCrudTests
     public async Task Admins_Can_Filter_Admins()
     {
         var userService = CreateUserService();
-        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
-        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupKey);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
 
         var editorCreateModel = new UserCreateModel
         {
@@ -185,10 +191,10 @@ public partial class UserServiceCrudTests
 
     private async Task CreateTestUsers(IUserService userService)
     {
-        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
-        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
-        var writerGroup = await UserGroupService.GetAsync(Constants.Security.WriterGroupAlias);
-        var translatorGroup = await UserGroupService.GetAsync(Constants.Security.TranslatorGroupAlias);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
+        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupKey);
+        var writerGroup = await UserGroupService.GetAsync(Constants.Security.WriterGroupKey);
+        var translatorGroup = await UserGroupService.GetAsync(Constants.Security.TranslatorGroupKey);
 
         var createModels = new List<UserCreateModel>
         {
@@ -262,7 +268,7 @@ public partial class UserServiceCrudTests
         var userService = CreateUserService();
         await CreateTestUsers(userService);
 
-        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
         var filter = new UserFilter
         {
             ExcludeUserGroups = new HashSet<Guid> { editorGroup!.Key }

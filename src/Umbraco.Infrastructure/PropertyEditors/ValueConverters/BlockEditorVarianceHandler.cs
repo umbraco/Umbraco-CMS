@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -9,10 +11,21 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 public sealed class BlockEditorVarianceHandler
 {
     private readonly ILanguageService _languageService;
+    private readonly IContentTypeService _contentTypeService;
 
+    [Obsolete("Please use the constructor that accepts IContentTypeService. Will be removed in V16.")]
     public BlockEditorVarianceHandler(ILanguageService languageService)
-        => _languageService = languageService;
+        : this(languageService, StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
+    {
+    }
 
+    public BlockEditorVarianceHandler(ILanguageService languageService, IContentTypeService contentTypeService)
+    {
+        _languageService = languageService;
+        _contentTypeService = contentTypeService;
+    }
+
+    [Obsolete("Please use the method that allows alignment for a collection of values. Scheduled for removal in V17.")]
     public async Task AlignPropertyVarianceAsync(BlockPropertyValue blockPropertyValue, IPropertyType propertyType, string? culture)
     {
         culture ??= await _languageService.GetDefaultIsoCodeAsync();
@@ -24,6 +37,57 @@ public sealed class BlockEditorVarianceHandler
         }
     }
 
+    /// <summary>
+    /// Aligns a collection of block property values for variance changes.
+    /// </summary>
+    /// <param name="blockPropertyValues">The block property values to align.</param>
+    /// <param name="culture">The culture being handled (null if invariant).</param>
+    /// <remarks>
+    /// Used for aligning variance changes when editing content.
+    /// </remarks>
+    public async Task<IList<BlockPropertyValue>> AlignPropertyVarianceAsync(IList<BlockPropertyValue> blockPropertyValues, string? culture)
+    {
+        var defaultIsoCodeAsync = await _languageService.GetDefaultIsoCodeAsync();
+        culture ??= defaultIsoCodeAsync;
+
+        var valuesToRemove = new List<BlockPropertyValue>();
+        foreach (BlockPropertyValue blockPropertyValue in blockPropertyValues)
+        {
+            IPropertyType? propertyType = blockPropertyValue.PropertyType;
+            if (propertyType is null)
+            {
+                throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them to editor.", nameof(blockPropertyValues));
+            }
+
+            if (propertyType.VariesByCulture() == VariesByCulture(blockPropertyValue))
+            {
+                continue;
+            }
+
+            if (propertyType.VariesByCulture() is false && blockPropertyValue.Culture.InvariantEquals(defaultIsoCodeAsync) is false)
+            {
+                valuesToRemove.Add(blockPropertyValue);
+            }
+            else
+            {
+                blockPropertyValue.Culture = propertyType.VariesByCulture()
+                    ? culture
+                    : null;
+            }
+        }
+
+        return blockPropertyValues.Except(valuesToRemove).ToList();
+    }
+
+    /// <summary>
+    /// Aligns a block property value for variance changes.
+    /// </summary>
+    /// <param name="blockPropertyValue">The block property value to align.</param>
+    /// <param name="propertyType">The underlying property type.</param>
+    /// <param name="owner">The containing block element.</param>
+    /// <remarks>
+    /// Used for aligning variance changes when rendering content.
+    /// </remarks>
     public async Task<BlockPropertyValue?> AlignedPropertyVarianceAsync(BlockPropertyValue blockPropertyValue, IPublishedPropertyType propertyType, IPublishedElement owner)
     {
         ContentVariation propertyTypeVariation = owner.ContentType.Variations & propertyType.Variations;
@@ -65,6 +129,15 @@ public sealed class BlockEditorVarianceHandler
         return null;
     }
 
+    /// <summary>
+    /// Aligns a block value for variance changes.
+    /// </summary>
+    /// <param name="blockValue">The block property value to align.</param>
+    /// <param name="owner">The owner element (the content for block properties at content level, or the parent element for nested block properties).</param>
+    /// <param name="element">The containing block element.</param>
+    /// <remarks>
+    /// Used for aligning variance changes when rendering content.
+    /// </remarks>
     public async Task<IEnumerable<BlockItemVariation>> AlignedExposeVarianceAsync(BlockValue blockValue, IPublishedElement owner, IPublishedElement element)
     {
         BlockItemVariation[] blockVariations = blockValue.Expose.Where(v => v.ContentKey == element.Key).ToArray();
@@ -96,13 +169,43 @@ public sealed class BlockEditorVarianceHandler
         return blockVariations;
     }
 
+    /// <summary>
+    /// Aligns block value expose for variance changes.
+    /// </summary>
+    /// <param name="blockValue">The block value to align.</param>
+    /// <remarks>
+    /// <para>
+    /// Used for aligning variance changes when editing content.
+    /// </para>
+    /// <para>
+    /// This is expected to be invoked after all block values have been aligned for variance changes by <see cref="AlignPropertyVarianceAsync"/>.
+    /// </para>
+    /// </remarks>
     public void AlignExposeVariance(BlockValue blockValue)
     {
         var contentDataToAlign = new List<BlockItemData>();
+        var elementTypesByKey = blockValue
+            .ContentData
+            .Select(cd => cd.ContentTypeKey)
+            .Distinct()
+            .Select(_contentTypeService.Get)
+            .WhereNotNull()
+            .ToDictionary(c => c.Key);
+
         foreach (BlockItemVariation variation in blockValue.Expose)
         {
             BlockItemData? contentData = blockValue.ContentData.FirstOrDefault(cd => cd.Key == variation.ContentKey);
             if (contentData is null)
+            {
+                continue;
+            }
+
+            if (elementTypesByKey.TryGetValue(contentData.ContentTypeKey, out IContentType? elementType) is false)
+            {
+                continue;
+            }
+
+            if (variation.Culture is not null == elementType.VariesByCulture())
             {
                 continue;
             }
@@ -130,6 +233,8 @@ public sealed class BlockEditorVarianceHandler
                 blockValue.Expose.Add(new BlockItemVariation(contentData.Key, value.Culture, value.Segment));
             }
         }
+
+        blockValue.Expose = blockValue.Expose.DistinctBy(e => $"{e.ContentKey}.{e.Culture}.{e.Segment}").ToList();
     }
 
     private static bool VariesByCulture(BlockPropertyValue blockPropertyValue)

@@ -353,7 +353,7 @@ public class PackagingService : IPackagingService
             }
 
             // Set additional values
-            installedPackage.AllowPackageTelemetry = packageManifest.AllowTelemetry;
+            installedPackage.AllowPackageTelemetry = packageManifest is { AllowTelemetry: true, AllowPackageTelemetry: true };
 
             if (!string.IsNullOrEmpty(packageManifest.Version))
             {
@@ -382,16 +382,16 @@ public class PackagingService : IPackagingService
             _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
 
         InstalledPackage[] installedPackages = _packageMigrationPlans
-            .GroupBy(plan => plan.PackageName)
+            .GroupBy(plan => (plan.PackageName, plan.PackageId))
             .Select(group =>
             {
                 var package = new InstalledPackage
                 {
-                    PackageName = group.Key,
+                    PackageName = group.Key.PackageName,
                 };
 
                 var currentState = keyValues?
-                    .GetValueOrDefault(Constants.Conventions.Migrations.KeyValuePrefix + package.PackageName);
+                    .GetValueOrDefault(Constants.Conventions.Migrations.KeyValuePrefix + group.Key.PackageId);
 
                 package.PackageMigrationPlans = group
                     .Select(plan => new InstalledPackageMigrationPlans

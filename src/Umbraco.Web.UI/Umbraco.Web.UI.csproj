@@ -3,13 +3,18 @@
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
     <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
-    <CompressionEnabled>false</CompressionEnabled> <!-- Disable compression. E.g. for umbraco backoffice files. These files should be precompressed by node and not let dotnet handle it -->
+    <!-- Disable compression for static files, because MapStaticAssets() is not used anyway (yet) -->
+    <CompressionEnabled>false</CompressionEnabled>
   </PropertyGroup>
 
   <PropertyGroup>
-    <!--  TODO: [SA1119] Correct unnecessary parenthesis and remove this override -->
-    <WarningsNotAsErrors>SA1119</WarningsNotAsErrors>
+    <!--
+      TODO: Fix and remove overrides:
+      [SA1119] Correct unnecessary parenthesis
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1119</WarningsNotAsErrors>
   </PropertyGroup>
+  
   <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
   <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
   <ItemGroup>

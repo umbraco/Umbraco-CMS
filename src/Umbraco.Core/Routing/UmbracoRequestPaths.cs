@@ -30,7 +30,7 @@ public class UmbracoRequestPaths
         _appPath = hostingEnvironment.ApplicationVirtualPath;
 
         _backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment)
-            .EnsureStartsWith('/').TrimStartExact(_appPath).EnsureStartsWith('/');
+            .EnsureStartsWith('/').TrimStart(_appPath).EnsureStartsWith('/');
 
         string mvcArea = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
 
@@ -73,7 +73,7 @@ public class UmbracoRequestPaths
     /// </remarks>
     public bool IsBackOfficeRequest(string absPath)
     {
-        string urlPath = absPath.TrimStartExact(_appPath).EnsureStartsWith('/');
+        string urlPath = absPath.TrimStart(_appPath).EnsureStartsWith('/');
 
         // check if this is in the umbraco back office
         if (!urlPath.InvariantStartsWith(_backOfficePath))

@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -332,5 +332,99 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Update_Invariant_Readonly_Property_Value()
+    {
+        var content = await CreateInvariantContent();
+        content.SetValue("label", "The initial label value");
+        ContentService.Save(content);
+
+        var updateModel = new ContentUpdateModel
+        {
+            InvariantName = "Updated Name",
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "title", Value = "The initial title" },
+                new PropertyValueModel { Alias = "label", Value = "The updated label value" }
+            }
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.IsNotNull(result.Result.Content);
+        });
+
+        // re-get and validate
+        content = await ContentEditingService.GetAsync(content.Key);
+        Assert.IsNotNull(content);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Updated Name", content.Name);
+            Assert.AreEqual("The initial label value", content.GetValue<string>("label"));
+        });
+    }
+
+    [Test]
+    public async Task Cannot_Update_Variant_Readonly_Property_Value()
+    {
+        var content = await CreateVariantContent();
+        content.SetValue("variantLabel", "The initial English label value", "en-US");
+        content.SetValue("variantLabel", "The initial Danish label value", "da-DK");
+        ContentService.Save(content);
+
+        var updateModel = new ContentUpdateModel
+        {
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }
+            },
+            Variants = new []
+            {
+                new VariantModel
+                {
+                    Culture = "en-US",
+                    Name = "Updated English Name",
+                    Properties = new []
+                    {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The initial English title" },
+                        new PropertyValueModel { Alias = "variantLabel", Value = "The updated English label value" }
+                    }
+                },
+                new VariantModel
+                {
+                    Culture = "da-DK",
+                    Name = "Updated Danish Name",
+                    Properties = new []
+                    {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The initial Danish title" },
+                        new PropertyValueModel { Alias = "variantLabel", Value = "The updated Danish  label value" }
+                    }
+                }
+            }
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.IsNotNull(result.Result.Content);
+        });
+
+        // re-get and validate
+        content = await ContentEditingService.GetAsync(content.Key);
+        Assert.IsNotNull(content);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Updated English Name", content.GetCultureName("en-US"));
+            Assert.AreEqual("Updated Danish Name", content.GetCultureName("da-DK"));
+            Assert.AreEqual("The initial English label value", content.GetValue<string>("variantLabel", "en-US"));
+            Assert.AreEqual("The initial Danish label value", content.GetValue<string>("variantLabel", "da-DK"));
+        });
     }
 }

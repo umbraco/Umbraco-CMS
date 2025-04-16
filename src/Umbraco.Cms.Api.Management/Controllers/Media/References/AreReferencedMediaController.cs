@@ -1,8 +1,9 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -38,13 +39,13 @@ public class AreReferencedMediaController : MediaControllerBase
         int skip = 0,
         int take = 20)
     {
-        PagedModel<RelationItemModel> distinctByKeyItemsWithReferencedRelations = await _trackedReferencesSkipTakeService.GetPagedItemsWithRelationsAsync(ids, skip, take, true);
+        PagedModel<Guid> distinctByKeyItemsWithReferencedRelations = await _trackedReferencesSkipTakeService.GetPagedKeysWithDependentReferencesAsync(ids, Constants.ObjectTypes.Media, skip, take);
         var pagedViewModel = new PagedViewModel<ReferenceByIdModel>
         {
             Total = distinctByKeyItemsWithReferencedRelations.Total,
-            Items = _umbracoMapper.MapEnumerable<RelationItemModel, ReferenceByIdModel>(distinctByKeyItemsWithReferencedRelations.Items),
+            Items = _umbracoMapper.MapEnumerable<Guid, ReferenceByIdModel>(distinctByKeyItemsWithReferencedRelations.Items),
         };
 
-        return await Task.FromResult(pagedViewModel);
+        return pagedViewModel;
     }
 }

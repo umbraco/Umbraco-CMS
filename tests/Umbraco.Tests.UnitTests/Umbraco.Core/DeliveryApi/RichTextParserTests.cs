@@ -358,6 +358,48 @@ public class RichTextParserTests : PropertyValueConverterTests
     }
 
     [Test]
+    public void ParseElement_CanHandleWhitespaceAroundInlineElemements()
+    {
+        var parser = CreateRichTextElementParser();
+
+        var element = parser.Parse("<p>What follows from <strong>here</strong> <em>is</em> <a href=\"#\">just</a> a bunch of text.</p>") as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var paragraphElement = element.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(paragraphElement);
+
+        var childElements = paragraphElement.Elements.ToArray();
+        Assert.AreEqual(7, childElements.Length);
+
+        var childElementCounter = 0;
+
+        void AssertNextChildElementIsText(string expectedText)
+        {
+            var textElement = childElements[childElementCounter++] as RichTextTextElement;
+            Assert.IsNotNull(textElement);
+            Assert.AreEqual(expectedText, textElement.Text);
+        }
+
+        void AssertNextChildElementIsGeneric(string expectedTag, string expectedInnerText)
+        {
+            var genericElement = childElements[childElementCounter++] as RichTextGenericElement;
+            Assert.IsNotNull(genericElement);
+            Assert.AreEqual(expectedTag, genericElement.Tag);
+            Assert.AreEqual(1, genericElement.Elements.Count());
+            var textElement = genericElement.Elements.First() as RichTextTextElement;
+            Assert.IsNotNull(textElement);
+            Assert.AreEqual(expectedInnerText, textElement.Text);
+        }
+
+        AssertNextChildElementIsText("What follows from ");
+        AssertNextChildElementIsGeneric("strong", "here");
+        AssertNextChildElementIsText(" ");
+        AssertNextChildElementIsGeneric("em", "is");
+        AssertNextChildElementIsText(" ");
+        AssertNextChildElementIsGeneric("a", "just");
+        AssertNextChildElementIsText(" a bunch of text.");
+    }
+
+    [Test]
     public void ParseMarkup_CanParseContentLink()
     {
         var parser = CreateRichTextMarkupParser();
@@ -520,7 +562,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         element.SetupGet(c => c.ContentType).Returns(elementType.Object);
 
         var numberPropertyType = SetupPublishedPropertyType(new IntegerValueConverter(), "number", Constants.PropertyEditors.Aliases.Label);
-        var property = new PublishedElementPropertyBase(numberPropertyType, element.Object, false, PropertyCacheLevel.None, CacheManager, propertyValue);
+        var property = new PublishedElementPropertyBase(numberPropertyType, element.Object, false, PropertyCacheLevel.None, VariationContext, CacheManager, propertyValue);
 
         element.SetupGet(c => c.Properties).Returns(new[] { property });
         return element.Object;

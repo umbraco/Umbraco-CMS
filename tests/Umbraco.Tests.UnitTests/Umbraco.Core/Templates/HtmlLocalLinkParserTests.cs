@@ -222,8 +222,12 @@ public class HtmlLocalLinkParserTests
         var webRoutingSettings = new WebRoutingSettings();
 
         var navigationQueryService = new Mock<IDocumentNavigationQueryService>();
-        Guid? parentKey = null;
-        navigationQueryService.Setup(x => x.TryGetParentKey(It.IsAny<Guid>(), out parentKey)).Returns(true);
+        // Guid? parentKey = null;
+        // navigationQueryService.Setup(x => x.TryGetParentKey(It.IsAny<Guid>(), out parentKey)).Returns(true);
+        IEnumerable<Guid> ancestorKeys = [];
+        navigationQueryService.Setup(x => x.TryGetAncestorsKeys(It.IsAny<Guid>(), out ancestorKeys)).Returns(true);
+
+        var publishedContentStatusFilteringService = new Mock<IPublishedContentStatusFilteringService>();
 
         using (var reference = umbracoContextFactory.EnsureUmbracoContext())
         {
@@ -235,14 +239,19 @@ public class HtmlLocalLinkParserTests
             mediaCache.Setup(x => x.GetById(It.IsAny<int>())).Returns(media.Object);
             mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
 
+            var publishStatusQueryService = new Mock<IPublishStatusQueryService>();
+            publishStatusQueryService
+                .Setup(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
+                .Returns(true);
+
             var publishedUrlProvider = new UrlProvider(
                 umbracoContextAccessor,
                 Options.Create(webRoutingSettings),
                 new UrlProviderCollection(() => new[] { contentUrlProvider.Object }),
                 new MediaUrlProviderCollection(() => new[] { mediaUrlProvider.Object }),
                 Mock.Of<IVariationContextAccessor>(),
-                contentCache.Object,
-                navigationQueryService.Object);
+                navigationQueryService.Object,
+                publishedContentStatusFilteringService.Object);
 
             var linkParser = new HtmlLocalLinkParser(publishedUrlProvider);
 

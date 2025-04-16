@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
     <PackageId>Umbraco.Cms.Tests.Integration</PackageId>
@@ -7,18 +7,26 @@
     <RootNamespace>Umbraco.Cms.Tests.Integration</RootNamespace>
     <IsPackable>true</IsPackable>
     <EnablePackageValidation>$(BaseEnablePackageValidation)</EnablePackageValidation>
-    <NoWarn>NU5100</NoWarn>
+    <NoWarn>$(NoWarn),NU5100</NoWarn>
   </PropertyGroup>
+
   <PropertyGroup>
-    <!--  TODO: Fix [CS0108] hidden inherited members, fix [SYSLIB0012] and [CS0618] obsolete references,
-          [CS1998] async, [SA1116] and [SA1117] parameter formatting, [CS0162] unreachable code, [CS0169]
-          unused fields, [SA1134] attribute on each line of code, [SA1405] Debug.Assert provide message text,
-          [CS4014]/[CS1998] await call, [CS0649] field not assigned to, [CS0168] unused variable,
-          and remove overrides -->
-    <WarningsNotAsErrors>
-      SYSLIB0012,SA1117,SA1116,CS0162,CS0169,SA1134,SA1405,CS0108,CS0618,CS4014,CS1998,CS0649,CS0168
-    </WarningsNotAsErrors>
+    <!--
+      TODO: Fix and remove overrides:
+      [CS0108] hidden inherited members
+      [SYSLIB0012] and [CS0618] obsolete references
+      [SA1116] and [SA1117] parameter formatting
+      [CS0162] unreachable code
+      [CS0169] unused fields
+      [SA1134] attribute on each line of code
+      [SA1405] Debug.Assert provide message text
+      [CS4014]/[CS1998] await call
+      [CS0649] field not assigned to
+      [CS0168] unused variable
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0108,SYSLIB0012,CS0618,SA1116,SA1117,CS0162,CS0169,SA1134,SA1405,CS4014,CS1998,CS0649,CS0168</WarningsNotAsErrors>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Bogus" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
@@ -87,6 +95,9 @@
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Update.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Validate.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentPublishingServiceTests.Publish.cs">
@@ -167,11 +178,35 @@
     <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Indexing.cs">
       <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Editing.cs">
+      <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Parsing.cs">
       <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Publishing.cs">
       <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Validation.cs">
+      <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests.Publish.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests.SchedulePublish.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests.ScheduleUnpublish.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests.UnschedulePublish.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests.UnscheduleUnpublish.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests.ClearSchedule.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Copy.cs">
       <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
@@ -233,9 +268,23 @@
     <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Update.cs">
       <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
+    <Compile Update="Umbraco.Core\Services\PublishedUrlInfoProvider_hidetoplevel_false.cs">
+      <DependentUpon>PublishedUrlInfoProviderTestsBase.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\PublishedUrlInfoProviderTests.cs">
+      <DependentUpon>PublishedUrlInfoProviderTestsBase.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceTests.ChildUserAccessEntities.cs">
+      <DependentUpon>UserStartNodeEntitiesServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceTests.RootUserAccessEntities.cs">
+      <DependentUpon>UserStartNodeEntitiesServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceMediaTests.childUserAccessEntities.cs">
+      <DependentUpon>UserStartNodeEntitiesServiceMediaTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceMediaTests.RootUserAccessEntities.cs">
+      <DependentUpon>UserStartNodeEntitiesServiceMediaTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
