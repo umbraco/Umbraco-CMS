@@ -18,13 +18,7 @@ export interface UmbContentWorkspaceContext<
 	getData(): ContentModel | undefined;
 	isLoaded(): Promise<unknown> | undefined;
 	variantById(variantId: UmbVariantId): Observable<VariantModelType | undefined>;
-	varies: Observable<boolean | undefined>;
-	variesByCulture: Observable<boolean | undefined>;
-	variesBySegment: Observable<boolean | undefined>;
 
 	readonly propertyViewGuard: UmbVariantPropertyGuardManager;
 	readonly propertyWriteGuard: UmbVariantPropertyGuardManager;
-
-	//initiatePropertyValueChange(): void;
-	//finishPropertyValueChange(): void;
 }
