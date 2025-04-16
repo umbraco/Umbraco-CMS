@@ -65,16 +65,16 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 			icon: 'https://www.bing.com/favicon.ico',
 		},
 		{
-			label: 'Search in OurUmbraco',
-			title: 'Search this message on Our Umbraco forums and docs',
-			href: () => `https://our.umbraco.com/search?q=${this.renderedMessage}&content=wiki,forum,documentation`,
+			label: 'Search in Umbraco Forum',
+			title: 'Search this message on the Umbraco forum',
+			href: () => `https://forum.umbraco.com/search?q=${this.renderedMessage}`,
 			icon: 'https://our.umbraco.com/assets/images/app-icons/favicon.png',
 		},
 		{
-			label: 'Search in OurUmbraco with Google',
-			title: 'Search Our Umbraco forums using Google',
+			label: 'Search in Umbraco Forum with Google',
+			title: 'Search Umbraco Forum using Google',
 			href: () =>
-				`https://www.google.co.uk/?q=site:our.umbraco.com ${this.renderedMessage}&safe=off#q=site:our.umbraco.com ${
+				`https://www.google.co.uk/?q=site:forum.umbraco.com ${this.renderedMessage}&safe=off#q=site:forum.umbraco.com ${
 					this.renderedMessage
 				} ${this.properties.find((property) => property.name === 'SourceContext')?.value}&safe=off"`,
 			icon: 'https://www.google.com/favicon.ico',
