@@ -1,7 +1,7 @@
 import { html, customElement, css, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VALIDATION_CONTEXT, umbBindToValidation, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
-import type { UmbValidationMessage } from 'src/packages/core/validation/context/validation-messages.manager';
+import type { UmbValidationMessage } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-example-validation-context-dashboard')
 export class UmbExampleValidationContextDashboardElement extends UmbLitElement {
