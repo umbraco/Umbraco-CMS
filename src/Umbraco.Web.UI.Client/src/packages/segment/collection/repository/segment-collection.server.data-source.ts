@@ -3,7 +3,7 @@ import { UMB_SEGMENT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbSegmentCollectionItemModel } from './types.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import { SegmentService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
@@ -22,7 +22,7 @@ export class UmbSegmentCollectionServerDataSource
 	 * @memberof UmbLanguageCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbSegmentCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this, SegmentService.getSegment(filter));
+		const { data, error } = await tryExecute(this, SegmentService.getSegment({ query: filter }));
 
 		if (data) {
 			const items = data.items.map((item) => {
