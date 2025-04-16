@@ -1,5 +1,5 @@
 import type { UmbContentTreeItemModel } from '../../types.js';
-import { customElement, css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSortChildrenOfModalElement } from '@umbraco-cms/backoffice/tree';
 
