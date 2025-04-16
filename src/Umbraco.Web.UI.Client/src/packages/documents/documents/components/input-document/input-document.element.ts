@@ -89,6 +89,9 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
 
+	@property({ type: Boolean, attribute: 'include-trashed' })
+	includeTrashed = false;
+
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
@@ -153,6 +156,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 					unique: id,
 					entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 				})),
+				includeTrashed: this.includeTrashed,
 			},
 		);
 	}
