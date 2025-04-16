@@ -8,7 +8,7 @@ import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 
 const elementName = 'umb-document-search-result-item';
 @customElement(elementName)
-export class UmbSearchResultItemElement extends UmbLitElement {
+export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 	@property({ type: Object })
 	item?: UmbSearchResultItemModel & UmbDocumentItemModel;
 
@@ -119,10 +119,10 @@ export class UmbSearchResultItemElement extends UmbLitElement {
 	];
 }
 
-export { UmbSearchResultItemElement as element };
+export { UmbDocumentSearchResultItemElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbSearchResultItemElement;
+		'umb-document-search-result-item': UmbDocumentSearchResultItemElement;
 	}
 }
