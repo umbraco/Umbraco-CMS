@@ -11,7 +11,7 @@ import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/bac
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbPaginationManager, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbPaginationManager, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	type UmbEntityActionEvent,
@@ -110,13 +110,18 @@ export class UmbDefaultTreeContext<
 		return this.#manifest;
 	}
 
-	// TODO: getManifest, could be refactored to use the getter method [NL]
 	/**
 	 * Returns the manifest.
 	 * @returns {ManifestTree}
 	 * @memberof UmbDefaultTreeContext
+	 * @deprecated Use get the `.manifest` property instead.
 	 */
 	public getManifest() {
+		new UmbDeprecation({
+			removeInVersion: '18.0.0',
+			deprecated: 'getManifest',
+			solution: 'Use .manifest property instead',
+		}).warn();
 		return this.#manifest;
 	}
 

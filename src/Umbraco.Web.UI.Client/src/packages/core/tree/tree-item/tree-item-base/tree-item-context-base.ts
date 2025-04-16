@@ -17,7 +17,7 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
@@ -112,13 +112,18 @@ export abstract class UmbTreeItemContextBase<
 		return this.#manifest;
 	}
 
-	// TODO: Be aware that this method, could be removed and we can use the getter method instead [NL]
 	/**
 	 * Returns the manifest.
 	 * @returns {ManifestCollection}
 	 * @memberof UmbCollectionContext
+	 * @deprecated Use get the `.manifest` property instead.
 	 */
 	public getManifest() {
+		new UmbDeprecation({
+			removeInVersion: '18.0.0',
+			deprecated: 'getManifest',
+			solution: 'Use .manifest property instead',
+		}).warn();
 		return this.#manifest;
 	}
 

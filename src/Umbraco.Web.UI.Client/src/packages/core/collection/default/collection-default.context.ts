@@ -15,7 +15,7 @@ import { UmbArrayState, UmbBasicState, UmbNumberState, UmbObjectState } from '@u
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectionManager, UmbPaginationManager, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -336,6 +336,11 @@ export class UmbDefaultCollectionContext<
 	 * @deprecated Use get the `.manifest` property instead.
 	 */
 	public getManifest() {
+		new UmbDeprecation({
+			removeInVersion: '18.0.0',
+			deprecated: 'getManifest',
+			solution: 'Use .manifest property instead',
+		}).warn();
 		return this._manifest;
 	}
 
