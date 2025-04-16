@@ -1741,6 +1741,7 @@ export default {
 		segmentVariantHeading: 'Allow segmentation',
 		cultureInvariantLabel: 'Shared across cultures',
 		segmentInvariantLabel: 'Shared across segments',
+		cultureAndVariantInvariantLabel: 'Shared across cultures and segments',
 		cultureVariantLabel: 'Vary by culture',
 		segmentVariantLabel: 'Vary by segment',
 		variantsDescription: 'Allow editors to create content of this type in different languages.',
