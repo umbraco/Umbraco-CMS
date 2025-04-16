@@ -127,7 +127,7 @@ export class UmbAppElement extends UmbLitElement {
 		},
 		{
 			path: '**',
-			component: () => import('../../../apps/backoffice/backoffice.element.js'),
+			component: () => import('../backoffice/backoffice.element.js'),
 			guards: [this.#isAuthorizedGuard()],
 		},
 	];
