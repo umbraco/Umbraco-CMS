@@ -91,6 +91,11 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 				...variantsToStore,
 				...dataSegments.flatMap((segment) => variantsToStore.map((variant) => variant.toSegment(segment))),
 			];
+
+			selectedVariants = [
+				...selectedVariants,
+				...dataSegments.flatMap((segment) => selectedVariants.map((variant) => variant.toSegment(segment))),
+			];
 		}
 
 		const data = this.getCurrent();
