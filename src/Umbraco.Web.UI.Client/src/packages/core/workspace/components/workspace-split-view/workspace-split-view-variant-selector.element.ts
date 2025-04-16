@@ -1,4 +1,3 @@
-import type { ActiveVariant } from '../../controllers/index.js';
 import type { UmbVariantDatasetWorkspaceContext } from '../../contexts/index.js';
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT } from './workspace-split-view.context.js';
 import { css, customElement, html, nothing, query, ref, state } from '@umbraco-cms/backoffice/external/lit';
@@ -9,7 +8,6 @@ import { UmbDataPathVariantQuery, umbBindToValidation } from '@umbraco-cms/backo
 import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
-import type { UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-workspace-split-view-variant-selector')
@@ -25,9 +23,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	@state()
 	private _cultureVariantOptions: Array<VariantOptionModelType> = [];
-
-	@state()
-	private _readOnlyStates: Array<UmbVariantGuardRule> = [];
 
 	@state()
 	_activeVariants: Array<UmbVariantId> = [];
