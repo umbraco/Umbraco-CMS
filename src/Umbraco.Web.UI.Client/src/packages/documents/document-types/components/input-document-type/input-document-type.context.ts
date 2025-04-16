@@ -6,6 +6,10 @@ import type { UmbDocumentTypeTreeItemModel } from '../../tree/types.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+interface UmbDocumentTypePickerInputContextOpenArgs {
+	elementTypesOnly?: boolean;
+}
+
 export class UmbDocumentTypePickerInputContext extends UmbPickerInputContext<
 	UmbDocumentTypeItemModel,
 	UmbDocumentTypeTreeItemModel,
@@ -30,6 +34,11 @@ export class UmbDocumentTypePickerInputContext extends UmbPickerInputContext<
 				...pickerData?.search,
 			};
 		}
+
+		combinedPickerData.search!.queryParams = {
+			elementTypesOnly: args?.elementTypesOnly,
+			...pickerData?.search?.queryParams,
+		};
 
 		await super.openPicker(combinedPickerData);
 	}
