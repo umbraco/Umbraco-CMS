@@ -716,6 +716,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 					UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 				);
 			});
+			console.error('All variants must have a name', variantsWithoutAName);
 			throw new Error('All variants must have a name');
 		}
 	}
