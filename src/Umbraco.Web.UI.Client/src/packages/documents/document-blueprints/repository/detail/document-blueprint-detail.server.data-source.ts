@@ -87,12 +87,27 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 			return { error };
 		}
 
-		const document = this.createDocumentBlueprintDetailModel(data);
+		const document = this.#createDocumentBlueprintDetailModel(data);
 
 		return { data: document };
 	}
 
-	createDocumentBlueprintDetailModel(data: DocumentBlueprintResponseModel) : UmbDocumentBlueprintDetailModel {
+	async scaffoldByUnique(unique: string): Promise<UmbDocumentBlueprintDetailModel | undefined> {
+		if (!unique) throw new Error('Unique is missing');
+
+		const { data } = await tryExecuteAndNotify(
+			this.#host,
+			DocumentBlueprintService.getDocumentBlueprintByIdScaffold({ id: unique }),
+		);
+
+		if (!data) {
+			return undefined;
+		}
+
+		return this.#createDocumentBlueprintDetailModel(data);
+	}
+
+	#createDocumentBlueprintDetailModel(data: DocumentBlueprintResponseModel): UmbDocumentBlueprintDetailModel {
 		return {
 			entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
 			unique: data.id,
