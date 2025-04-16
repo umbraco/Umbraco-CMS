@@ -5,7 +5,7 @@
 	"type": "module",
 	"exports": {
 		".": null,
-		"./app": "./dist-cms/apps/app/index.js",
+		"./app": "./dist-cms/packages/core/app/index.js",
 		"./class-api": "./dist-cms/libs/class-api/index.js",
 		"./context-api": "./dist-cms/libs/context-api/index.js",
 		"./controller-api": "./dist-cms/libs/controller-api/index.js",
