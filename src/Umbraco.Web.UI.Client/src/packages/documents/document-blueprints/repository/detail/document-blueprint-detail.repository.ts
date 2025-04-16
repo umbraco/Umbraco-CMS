@@ -4,8 +4,7 @@ import { UmbDocumentBlueprintServerDataSource } from './document-blueprint-detai
 import { UMB_DOCUMENT_BLUEPRINT_DETAIL_STORE_CONTEXT } from './document-blueprint-detail.store.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import { DocumentBlueprintService, type DocumentBlueprintResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../../entity.js';
+import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbDocumentBlueprintDetailRepository extends UmbDetailRepositoryBase<UmbDocumentBlueprintDetailModel> {
 	constructor(host: UmbControllerHost) {
