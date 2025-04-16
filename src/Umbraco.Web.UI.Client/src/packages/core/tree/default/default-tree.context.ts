@@ -114,7 +114,7 @@ export class UmbDefaultTreeContext<
 	 * Returns the manifest.
 	 * @returns {ManifestTree}
 	 * @memberof UmbDefaultTreeContext
-	 * @deprecated Use get the `.manifest` property instead.
+	 * @deprecated Use the `.manifest` property instead.
 	 */
 	public getManifest() {
 		new UmbDeprecation({

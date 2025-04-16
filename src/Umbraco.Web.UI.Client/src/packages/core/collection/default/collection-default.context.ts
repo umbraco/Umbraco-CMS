@@ -333,7 +333,7 @@ export class UmbDefaultCollectionContext<
 	 * Returns the manifest for the collection.
 	 * @returns {ManifestCollection}
 	 * @memberof UmbCollectionContext
-	 * @deprecated Use get the `.manifest` property instead.
+	 * @deprecated Use the `.manifest` property instead.
 	 */
 	public getManifest() {
 		new UmbDeprecation({

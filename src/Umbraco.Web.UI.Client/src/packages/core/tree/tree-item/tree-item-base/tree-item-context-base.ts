@@ -116,7 +116,7 @@ export abstract class UmbTreeItemContextBase<
 	 * Returns the manifest.
 	 * @returns {ManifestCollection}
 	 * @memberof UmbCollectionContext
-	 * @deprecated Use get the `.manifest` property instead.
+	 * @deprecated Use the `.manifest` property instead.
 	 */
 	public getManifest() {
 		new UmbDeprecation({
