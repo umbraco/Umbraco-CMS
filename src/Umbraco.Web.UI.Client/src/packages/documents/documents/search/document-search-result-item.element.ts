@@ -3,7 +3,6 @@ import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 
 @customElement('umb-document-search-result-item')
@@ -29,14 +28,14 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 		});
 	}
 
-	#observeAppCulture(context: UmbAppLanguageContext) {
+	#observeAppCulture(context: typeof UMB_APP_LANGUAGE_CONTEXT.TYPE) {
 		this.observe(context.appLanguageCulture, (value) => {
 			this._currentCulture = value;
 			this._variant = this.#getVariant(value);
 		});
 	}
 
-	#observeDefaultCulture(context: UmbAppLanguageContext) {
+	#observeDefaultCulture(context: typeof UMB_APP_LANGUAGE_CONTEXT.TYPE) {
 		this.observe(context.appDefaultLanguage, (value) => {
 			this._defaultCulture = value?.unique;
 		});
