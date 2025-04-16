@@ -24,6 +24,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	private _variantOptions: Array<VariantOptionModelType> = [];
 
 	@state()
+	private _cultureVariantOptions: Array<VariantOptionModelType> = [];
+
+	@state()
 	private _readOnlyStates: Array<UmbVariantGuardRule> = [];
 
 	@state()
@@ -55,9 +58,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	@state()
 	private _expandedVariants: Array<UmbVariantId> = [];
-
-	@state()
-	private _cultureVariants: Array<VariantOptionModelType> = [];
 
 	@state()
 	private _labelDefault = '';
@@ -108,7 +108,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			workspaceContext.variantOptions,
 			(variantOptions) => {
 				this._variantOptions = (variantOptions as Array<VariantOptionModelType>).sort(this._variantSorter);
-				this._cultureVariants = this._variantOptions.filter((variant) => variant.segment === null);
+				this._cultureVariantOptions = this._variantOptions.filter((variant) => variant.segment === null);
 				this.#setReadOnlyCultures(workspaceContext);
 			},
 			'_observeVariantOptions',
@@ -196,7 +196,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	#selectorIsEnabled() {
 		// only varies by segment
 		if (!this._variesByCulture && this._variesBySegment) {
-			return this._cultureVariants.length > 1 || this._variantOptions[0].variant?.state;
+			return this._cultureVariantOptions.length > 1 || this._variantOptions[0].variant?.state;
 		}
 
 		return this._variantOptions.length > 1;
@@ -228,7 +228,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 		// If the active variant is a segment then we expend the culture variant when the selector is opened.
 		if (this.#isSegmentVariantOption(this._activeVariant)) {
-			const culture = this._cultureVariants.find((variant) => {
+			const culture = this._cultureVariantOptions.find((variant) => {
 				return variant.culture === this._activeVariant?.culture && variant.segment === null;
 			});
 
@@ -336,7 +336,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 							<div id="dropdown">
 								<uui-scroll-container>
 									<ul class="variant-list">
-										${this._cultureVariants.map((variant) => this.#renderCultureVariantOption(variant))}
+										${this._cultureVariantOptions.map((variant) => this.#renderCultureVariantOption(variant))}
 									</ul>
 								</uui-scroll-container>
 							</div>
