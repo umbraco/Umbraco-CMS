@@ -1,6 +1,5 @@
 import { nothing, customElement, property, type PropertyValueMap, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestWorkspace } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbExtensionsApiInitializer,
 	UmbExtensionsElementAndApiInitializer,
@@ -8,6 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspace } from './extensions/types.js';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
