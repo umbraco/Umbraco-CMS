@@ -110,6 +110,9 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	@property({ type: Array })
 	allowedContentTypeIds?: Array<string> | undefined;
 
+	@property({ type: Boolean, attribute: 'include-trashed' })
+	includeTrashed = false;
+
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
@@ -194,6 +197,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 					unique: id,
 					entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 				})),
+				includeTrashed: this.includeTrashed,
 			},
 		);
 	}
