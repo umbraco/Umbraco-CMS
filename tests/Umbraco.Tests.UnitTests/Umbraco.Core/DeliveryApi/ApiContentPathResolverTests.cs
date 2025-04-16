@@ -10,17 +10,18 @@ public class ApiContentPathResolverTests
 {
     private const string TestPath = "/test/page";
 
-    [TestCase("file.txt")]
-    [TestCase("test/file.txt")]
-    [TestCase("test/test2/file.txt")]
-    [TestCase("/file.txt")]
-    [TestCase("/test/file.txt")]
-    [TestCase("/test/test2/file.txt")]
-    public void Resolves_Null_For_File_Requests(string path)
+    [TestCase(TestPath, true)]
+    [TestCase("file.txt", false)]
+    [TestCase("test/file.txt", false)]
+    [TestCase("test/test2/file.txt", false)]
+    [TestCase("/file.txt", false)]
+    [TestCase("/test/file.txt", false)]
+    [TestCase("/test/test2/file.txt", false)]
+    public void Can_Verify_Resolveable_Paths(string path, bool expected)
     {
         var resolver = CreateResolver();
-        var result = resolver.ResolveContentPath(path);
-        Assert.IsNull(result);
+        var result = resolver.IsResolveablePath(path);
+        Assert.AreEqual(expected, result);
     }
 
     [Test]
