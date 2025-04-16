@@ -1,7 +1,7 @@
 import { UmbWorkspaceSplitViewContext } from './workspace-split-view.context.js';
-import { css, html, customElement, property, ifDefined, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { css, html, customElement, property, ifDefined, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 // import local components
 import './workspace-split-view-variant-selector.element.js';
@@ -44,22 +44,24 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 				.hideNavigation=${!this.displayNavigation}
 				.enforceNoFooter=${true}>
 				<slot id="header" name="variant-selector" slot="header" @slotchange=${this.#onVariantSelectorSlotChanged}>
-					${this._variantSelectorSlotHasContent
-						? nothing
-						: html`<umb-workspace-split-view-variant-selector></umb-workspace-split-view-variant-selector>`}
+					${when(
+						!this._variantSelectorSlotHasContent,
+						() => html`<umb-workspace-split-view-variant-selector></umb-workspace-split-view-variant-selector>`,
+					)}
 				</slot>
-
-				${this.displayNavigation
-					? html`<umb-workspace-entity-action-menu
+				${when(
+					this.displayNavigation,
+					() =>
+						html`<umb-workspace-entity-action-menu
 							slot="action-menu"
-							data-mark="workspace:action-menu"></umb-workspace-entity-action-menu>`
-					: ''}
+							data-mark="workspace:action-menu"></umb-workspace-entity-action-menu>`,
+				)}
 				<slot name="action-menu" slot="action-menu"></slot>
 			</umb-workspace-editor>
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host {
