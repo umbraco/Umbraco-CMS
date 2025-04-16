@@ -716,8 +716,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 					UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 				);
 			});
-			console.error('All variants must have a name', variantsWithoutAName);
-			throw new Error('All variants must have a name');
+			throw new Error(
+				'All variants must have a name, these variants are missing a name: ' +
+					variantsWithoutAName.map((x) => (x.culture ?? 'invariant') + '_' + (x.segment ?? '')).join(', '),
+			);
 		}
 	}
 
