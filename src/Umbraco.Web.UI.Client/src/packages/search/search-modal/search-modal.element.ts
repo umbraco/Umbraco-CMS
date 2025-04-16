@@ -1,5 +1,5 @@
 import type { UmbSearchProvider, UmbSearchResultItemModel } from '../types.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { ManifestSearchResultItem } from '../extensions/types.js';
 import {
 	css,
 	html,
@@ -9,14 +9,15 @@ import {
 	query,
 	state,
 	property,
+	when,
 } from '@umbraco-cms/backoffice/external/lit';
+import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
 import '../search-result/search-result-item.element.js';
-import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import type { ManifestSearchResultItem } from '../extensions/types.js';
 
 type SearchProvider = {
 	name: string;
@@ -282,48 +283,62 @@ export class UmbSearchModalElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div id="top">
-				${this.#renderSearchIcon()}
+				<div id="search-icon">
+					${when(
+						this._loading,
+						() => html`<uui-loader-circle></uui-loader-circle>`,
+						() => html`<uui-icon name="search"></uui-icon>`,
+					)}
+				</div>
 				<div id="input-wrapper">
 					<div id="input-wrapper-fake-cursor" aria-hidden="true"></div>
 					<input
+						type="text"
+						autocomplete="off"
+						placeholder=${this.localize.term('placeholders_search')}
 						value=${this._search}
 						@input=${this.#onSearchChange}
 						@blur=${() => this.#setShowFakeCursor(true)}
-						@focus=${() => this.#setShowFakeCursor(false)}
-						type="text"
-						placeholder=${this.localize.term('placeholders_search')}
-						autocomplete="off" />
+						@focus=${() => this.#setShowFakeCursor(false)} />
 				</div>
 			</div>
-
 			${this.#renderSearchTags()}
-			${this._search
-				? html`<div id="main">${this._searchResults.length > 0 ? this.#renderResults() : this.#renderNoResults()}</div>`
-				: this.#renderNavigationTips()}
+			${when(
+				this._search,
+				() => html`
+					<uui-scroll-container>
+						<div id="main">
+							${when(
+								this._searchResults.length > 0,
+								() => this.#renderResults(),
+								() => this.#renderNoResults(),
+							)}
+						</div>
+					</uui-scroll-container>
+				`,
+				() => this.#renderNavigationTips(),
+			)}
 		`;
 	}
 
-	#renderSearchIcon() {
-		return html` <div id="search-icon">
-			${this._loading ? html`<uui-loader-circle></uui-loader-circle>` : html`<uui-icon name="search"></uui-icon>`}
-		</div>`;
-	}
-
 	#renderSearchTags() {
-		return html`<div id="search-providers">
-			${repeat(
-				this._searchProviders,
-				(searchProvider) => searchProvider,
-				(searchProvider) =>
-					html`<button
-						data-provider-alias=${searchProvider.alias}
-						@click=${() => this.#setCurrentProvider(searchProvider)}
-						@keydown=${() => ''}
-						class="search-provider ${this._currentProvider?.alias === searchProvider.alias ? 'active' : ''}">
-						${searchProvider.name}
-					</button>`,
-			)}
-		</div> `;
+		return html`
+			<div id="search-providers">
+				${repeat(
+					this._searchProviders,
+					(searchProvider) => searchProvider.alias,
+					(searchProvider) => html`
+						<button
+							class="search-provider ${this._currentProvider?.alias === searchProvider.alias ? 'active' : ''}"
+							data-provider-alias=${searchProvider.alias}
+							@click=${() => this.#setCurrentProvider(searchProvider)}
+							@keydown=${() => ''}>
+							${searchProvider.name}
+						</button>
+					`,
+				)}
+			</div>
+		`;
 	}
 
 	#renderResults() {
@@ -337,9 +352,9 @@ export class UmbSearchModalElement extends UmbLitElement {
 	#renderResultItem(item: UmbSearchResultItemModel, index: number) {
 		return html`
 			<a
-				href=${item.href}
-				data-item-index=${index}
 				class="search-item"
+				data-item-index=${index}
+				href=${item.href}
 				@click=${this.#closeModal}
 				@keydown=${this.#closeModal}>
 				<umb-extension-slot
@@ -352,7 +367,8 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	#renderNoResults() {
-		return this._loading ? nothing : html`<div id="no-results">${this.localize.term('general_searchNoResult')}</div>`;
+		if (this._loading) return nothing;
+		return html`<div id="no-results">${this.localize.term('general_searchNoResult')}</div>`;
 	}
 
 	#renderNavigationTips() {
@@ -384,6 +400,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 				font-size: 1rem;
 				padding-bottom: var(--uui-size-space-2);
 			}
+
 			#navigation-tips {
 				display: grid;
 				grid-template-columns: 50px 50px auto;
@@ -394,6 +411,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 				margin-top: var(--uui-size-layout-3);
 				margin-inline: auto;
 			}
+
 			.navigation-tips-key {
 				display: flex;
 				align-items: center;
@@ -404,21 +422,24 @@ export class UmbSearchModalElement extends UmbLitElement {
 				font-size: 0.9rem;
 				font-weight: bold;
 			}
+
 			#navigation-tips .navigation-tips-key + span {
 				margin-left: var(--uui-size-space-2);
 			}
+
 			#top {
 				background-color: var(--uui-color-surface);
 				display: flex;
 				height: 48px;
 				flex-shrink: 0;
 			}
+
 			#main {
 				display: flex;
 				flex-direction: column;
 				height: 100%;
-				overflow: auto;
 			}
+
 			#search-providers {
 				display: flex;
 				flex-wrap: wrap;
@@ -426,6 +447,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 				padding: 0 var(--uui-size-space-5);
 				padding-bottom: var(--uui-size-space-2);
 			}
+
 			.search-provider {
 				padding: var(--uui-size-space-3) var(--uui-size-space-4);
 				background: var(--uui-color-surface-alt);
@@ -436,28 +458,34 @@ export class UmbSearchModalElement extends UmbLitElement {
 				cursor: pointer;
 				border: 2px solid transparent;
 			}
+
 			.search-provider:hover {
 				background: var(--uui-color-surface-emphasis);
 				color: var(--uui-color-interactive-emphasis);
 			}
+
 			.search-provider.active {
 				background: var(--uui-color-focus);
 				color: var(--uui-color-selected-contrast);
 				border-color: transparent;
 			}
+
 			.search-provider.active:focus {
 				outline-offset: -4px;
 				outline-color: var(--uui-color-focus);
 			}
+
 			input {
 				all: unset;
 				height: 100%;
 				width: 100%;
 			}
+
 			#input-wrapper {
 				width: 100%;
 				position: relative;
 			}
+
 			#input-wrapper-fake-cursor {
 				position: absolute;
 				left: 0;
@@ -469,6 +497,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 				bottom: 14px;
 				animation: blink-animation 1s infinite;
 			}
+
 			@keyframes blink-animation {
 				0%,
 				50% {
@@ -479,11 +508,13 @@ export class UmbSearchModalElement extends UmbLitElement {
 					border-color: transparent;
 				}
 			}
+
 			button {
 				font-family: unset;
 				font-size: unset;
 				cursor: pointer;
 			}
+
 			#search-icon {
 				display: flex;
 				align-items: center;
@@ -491,6 +522,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 				aspect-ratio: 1;
 				height: 100%;
 			}
+
 			#no-results {
 				display: flex;
 				flex-direction: column;
@@ -502,21 +534,25 @@ export class UmbSearchModalElement extends UmbLitElement {
 				color: var(--uui-color-text-alt);
 				margin: var(--uui-size-space-5) 0;
 			}
+
 			.search-item {
 				color: var(--uui-color-text);
 				text-decoration: none;
 				outline-offset: -3px;
 				display: flex;
 			}
+
 			.search-item:hover {
 				background: var(--uui-color-surface-emphasis);
 				color: var(--uui-color-interactive-emphasis);
 			}
+
 			.search-item:focus {
 				outline: 2px solid var(--uui-color-interactive-emphasis);
 				border-radius: 6px;
 				outline-offset: -4px;
 			}
+
 			.search-item.active:not(:focus-within) {
 				outline: 2px solid var(--uui-color-border);
 				border-radius: 6px;
