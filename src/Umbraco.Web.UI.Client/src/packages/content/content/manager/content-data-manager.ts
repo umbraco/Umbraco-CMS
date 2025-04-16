@@ -72,8 +72,6 @@ export class UmbContentWorkspaceDataManager<
 			if (variantId.isInvariant()) {
 				this.#updateInvariantData(update);
 			} else {
-				// The server requires a segment name. It doesn't matter what it is as long as it is not empty. The server will overwrite it with the name of the default.
-				update = { ...update, name: 'Segment' } as ModelVariantType;
 				this.#updateVariantData(variantId, update);
 			}
 			return;
@@ -90,6 +88,11 @@ export class UmbContentWorkspaceDataManager<
 	#updateVariantData(variantId: UmbVariantId, update?: Partial<ModelVariantType>) {
 		const currentData = this.getCurrent();
 		if (!currentData) throw new Error('Data is missing');
+
+		if (!variantId.isSegmentInvariant()) {
+			// The server requires a segment name. It doesn't matter what it is as long as it is not empty. The server will overwrite it with the name of the default.
+			update = { ...update, name: 'Segment' } as ModelVariantType;
+		}
 
 		const variant = currentData.variants.find((x) => variantId.compare(x));
 		const newVariants = appendToFrozenArray(
