@@ -1,6 +1,6 @@
 import type { UmbTreeItemContext } from '../index.js';
 import type { UmbTreeItemModel } from '../../types.js';
-import { html, nothing, state, ifDefined, repeat, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, ifDefined, nothing, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -8,11 +8,7 @@ export abstract class UmbTreeItemElementBase<
 	TreeItemModelType extends UmbTreeItemModel,
 	TreeItemContextType extends UmbTreeItemContext<TreeItemModelType> = UmbTreeItemContext<TreeItemModelType>,
 > extends UmbLitElement {
-	protected _item?: TreeItemModelType;
 	@property({ type: Object, attribute: false })
-	get item(): TreeItemModelType | undefined {
-		return this._item;
-	}
 	set item(newVal: TreeItemModelType) {
 		this._item = newVal;
 
@@ -20,12 +16,12 @@ export abstract class UmbTreeItemElementBase<
 			this.#initTreeItem();
 		}
 	}
-
-	#api: TreeItemContextType | undefined;
-	@property({ type: Object, attribute: false })
-	public get api(): TreeItemContextType | undefined {
-		return this.#api;
+	get item(): TreeItemModelType | undefined {
+		return this._item;
 	}
+	protected _item?: TreeItemModelType;
+
+	@property({ type: Object, attribute: false })
 	public set api(value: TreeItemContextType | undefined) {
 		this.#api = value;
 
@@ -44,6 +40,10 @@ export abstract class UmbTreeItemElementBase<
 			this.#initTreeItem();
 		}
 	}
+	public get api(): TreeItemContextType | undefined {
+		return this.#api;
+	}
+	#api: TreeItemContextType | undefined;
 
 	@property({ type: Boolean, attribute: false })
 	hideActions: boolean = false;
@@ -180,15 +180,16 @@ export abstract class UmbTreeItemElementBase<
 	}
 
 	#renderActions() {
-		if (this.hideActions) return;
-		return this.#api && this._item
-			? html`<umb-entity-actions-bundle
-					slot="actions"
-					.entityType=${this.#api.entityType}
-					.unique=${this.#api.unique}
-					.label=${this._item.name}>
-				</umb-entity-actions-bundle>`
-			: '';
+		if (this.hideActions) return nothing;
+		if (!this.#api || !this._item) return nothing;
+		return html`
+			<umb-entity-actions-bundle
+				slot="actions"
+				.entityType=${this.#api.entityType}
+				.unique=${this.#api.unique}
+				.label=${this._item.name}>
+			</umb-entity-actions-bundle>
+		`;
 	}
 
 	#renderChildItems() {
@@ -197,10 +198,11 @@ export abstract class UmbTreeItemElementBase<
 				? repeat(
 						this._childItems,
 						(item, index) => item.name + '___' + index,
-						(item) =>
-							html`<umb-tree-item
+						(item) => html`
+							<umb-tree-item
 								.entityType=${item.entityType}
-								.props=${{ hideActions: this.hideActions, item }}></umb-tree-item>`,
+								.props=${{ hideActions: this.hideActions, item }}></umb-tree-item>
+						`,
 					)
 				: ''}
 		`;

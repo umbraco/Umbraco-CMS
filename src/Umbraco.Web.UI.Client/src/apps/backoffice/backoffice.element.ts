@@ -92,7 +92,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: flex;
