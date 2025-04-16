@@ -1,4 +1,4 @@
-import { onInit } from '../../packages/core/entry-point.js';
+import { onInit } from '../entry-point.js';
 import type { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAppAuthController } from './app-auth.controller.js';
 import type { UmbAppOauthElement } from './app-oauth.element.js';
@@ -55,7 +55,7 @@ export class UmbAppElement extends UmbLitElement {
 		},
 		{
 			path: 'install',
-			component: () => import('../installer/installer.element.js'),
+			component: () => import('../../../apps/installer/installer.element.js'),
 		},
 		{
 			path: 'oauth_complete',
@@ -99,12 +99,12 @@ export class UmbAppElement extends UmbLitElement {
 		},
 		{
 			path: 'upgrade',
-			component: () => import('../upgrader/upgrader.element.js'),
+			component: () => import('../../../apps/upgrader/upgrader.element.js'),
 			guards: [this.#isAuthorizedGuard()],
 		},
 		{
 			path: 'preview',
-			component: () => import('../preview/preview.element.js'),
+			component: () => import('../../../apps/preview/preview.element.js'),
 			guards: [this.#isAuthorizedGuard()],
 		},
 		{
@@ -127,7 +127,7 @@ export class UmbAppElement extends UmbLitElement {
 		},
 		{
 			path: '**',
-			component: () => import('../backoffice/backoffice.element.js'),
+			component: () => import('../../../apps/backoffice/backoffice.element.js'),
 			guards: [this.#isAuthorizedGuard()],
 		},
 	];
