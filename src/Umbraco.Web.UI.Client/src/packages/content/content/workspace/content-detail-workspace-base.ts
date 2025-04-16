@@ -804,16 +804,20 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			throw new Error('No variant picker modal token is set. There are multiple variants to save. Cannot proceed.');
 		}
 
+		/*
 		const segmentVariants = this.getVariants()?.filter((x) => x.segment !== null) ?? [];
-
+		
 		// It is currently not possible to have custom names for segments, so we need to set the name of the segment variant to the name of the culture variant.
 		segmentVariants.forEach((segmentVariant) => {
 			const matchingCultureVariant = this.getVariants()?.find(
 				(x) => x.segment === null && x.culture === segmentVariant.culture,
 			);
-			if (!matchingCultureVariant) throw new Error('Matching culture variant is missing');
+			if (!matchingCultureVariant) {
+				throw new Error('Matching culture variant is missing');
+			}
 			this.setName(matchingCultureVariant.name, UmbVariantId.Create(segmentVariant));
 		});
+		*/
 
 		const saveData = await this.constructSaveData(variantIds);
 
