@@ -72,6 +72,8 @@ export class UmbContentWorkspaceDataManager<
 			if (variantId.isInvariant()) {
 				this.#updateInvariantData(update);
 			} else {
+				// The server requires a segment name. It doesn't matter what it is as long as it is not empty. The server will overwrite it with the name of the default.
+				update = { ...update, name: 'Segment' } as ModelVariantType;
 				this.#updateVariantData(variantId, update);
 			}
 			return;
