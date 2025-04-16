@@ -54,7 +54,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 	private _searchMenuData: Array<{ label: string; href: () => string; icon: string; title: string }> = [
 		{
 			label: 'Search in Google',
-			title: '@logViewer_searchThisMessageWithGoogle',
+			title: '#logViewer_searchThisMessageWithGoogle',
 			href: () => `https://www.google.com/search?q=${this.renderedMessage}`,
 			icon: 'https://www.google.com/favicon.ico',
 		},
@@ -81,7 +81,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		},
 		{
 			label: 'Search Umbraco Source',
-			title: 'Search within Umbraco source code on Github',
+			title: 'Search within Umbraco source code on GitHub',
 			href: () =>
 				`https://github.com/umbraco/Umbraco-CMS/search?q=${
 					this.properties.find((property) => property.name === 'SourceContext')?.value
@@ -90,7 +90,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		},
 		{
 			label: 'Search Umbraco Issues',
-			title: 'Search Umbraco Issues on Github',
+			title: 'Search Umbraco Issues on GitHub',
 			href: () =>
 				`https://github.com/umbraco/Umbraco-CMS/issues?q=${
 					this.properties.find((property) => property.name === 'SourceContext')?.value
