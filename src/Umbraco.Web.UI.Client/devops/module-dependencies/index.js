@@ -3,7 +3,7 @@ import path from 'path';
 import { createImportMap } from '../importmap/index.js';
 
 const ILLEGAL_CORE_IMPORTS_THRESHOLD = 6;
-const SELF_IMPORTS_THRESHOLD = 4;
+const SELF_IMPORTS_THRESHOLD = 0;
 
 const clientProjectRoot = path.resolve(import.meta.dirname, '../../');
 const modulePrefix = '@umbraco-cms/backoffice/';
@@ -169,10 +169,9 @@ function reportSelfImportsFromModules() {
 
 		// If there are self imports, log them
 		console.error(`🚨 ${alias} is importing itself`);
+		console.log(`\n`);
 		total++;
 	});
-
-	console.log(`\n`);
 
 	if (total > SELF_IMPORTS_THRESHOLD) {
 		throw new Error(
