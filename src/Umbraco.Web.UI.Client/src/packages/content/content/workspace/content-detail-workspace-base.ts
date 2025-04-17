@@ -239,8 +239,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 					if (missingThis) {
 						const context = new UmbValidationController(this);
 						context.inheritFrom(this.validationContext, '$');
-						context.autoReport();
 						context.setVariantId(UmbVariantId.Create(variantOption));
+						context.autoReport();
 						this.#variantValidationContexts.push(context);
 					}
 				});
