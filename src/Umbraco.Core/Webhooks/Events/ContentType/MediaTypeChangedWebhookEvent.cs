@@ -21,5 +21,9 @@ public class MediaTypeChangedWebhookEvent : WebhookEventBase<MediaTypeChangedNot
     public override string Alias => Constants.WebhookEvents.Aliases.MediaTypeChanged;
 
     public override object? ConvertNotificationToRequestPayload(MediaTypeChangedNotification notification)
-        => notification.Changes;
+        => notification.Changes.Select(contentTypeChange => new
+        {
+            Id = contentTypeChange.Item.Key,
+            contentTypeChange = contentTypeChange.ChangeTypes,
+        });
 }

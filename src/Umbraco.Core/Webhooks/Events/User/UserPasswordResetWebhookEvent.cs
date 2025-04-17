@@ -19,4 +19,16 @@ public class UserPasswordResetWebhookEvent : WebhookEventBase<UserPasswordResetN
     }
 
     public override string Alias => Constants.WebhookEvents.Aliases.UserPasswordReset;
+
+    public override object? ConvertNotificationToRequestPayload(UserPasswordResetNotification notification)
+        => new
+        {
+            Id = notification.AffectedUserId is not null &&
+                 Guid.TryParse(notification.AffectedUserId, out Guid affectedUserGuid)
+                ? affectedUserGuid
+                : Guid.Empty,
+            PerormingId = Guid.TryParse(notification.AffectedUserId, out Guid performingUserGuid)
+                ? performingUserGuid
+                : Guid.Empty,
+        };
 }

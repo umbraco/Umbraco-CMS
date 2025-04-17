@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
@@ -38,8 +39,13 @@ public class ContentPublishedWebhookEvent : WebhookEventContentBase<ContentPubli
     protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentPublishedNotification notification) => notification.PublishedEntities;
 
     protected override object? ConvertEntityToRequestPayload(IContent entity)
-    {
-        IPublishedContent? publishedContent = _publishedContentCache.GetById(entity.Key);
-        return publishedContent is null ? null : _apiContentBuilder.Build(publishedContent);
-    }
+        => new
+        {
+            Id = entity.Key,
+            Cultures = entity.PublishCultureInfos?.Values.Select(cultureInfo => new
+            {
+                cultureInfo.Name,
+                cultureInfo.Date,
+            }),
+        };
 }
