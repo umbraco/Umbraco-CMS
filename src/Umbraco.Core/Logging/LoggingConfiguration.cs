@@ -68,6 +68,6 @@ public class LoggingConfiguration : ILoggingConfiguration
         {
             MachineNameFileFormatArgument => Environment.MachineName,
             EnvironmentNameFileFormatArgument => Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production",
-            _ => throw new ArgumentOutOfRangeException(nameof(arg), $"The argument '{arg}' is not supported."),
+            _ => string.Empty,
         };
 }
