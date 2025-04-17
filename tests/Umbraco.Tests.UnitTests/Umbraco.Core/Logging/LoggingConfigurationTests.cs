@@ -6,6 +6,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Logging;
 [TestFixture]
 public class LoggingConfigurationTests
 {
+    [SetUp]
+    public void SetUp() => Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production");
+
     [Test]
     public void Can_Get_Supported_Log_File_Name_Format_Arguments()
     {
