@@ -10,6 +10,7 @@ import type { UmbMediaTypeEntityType } from '@umbraco-cms/backoffice/media-type'
 
 interface UmbMediaPickerInputContextOpenArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbMediaTypeEntityType }>;
+	includeTrashed?: boolean;
 }
 
 export class UmbMediaPickerInputContext extends UmbPickerInputContext<
@@ -41,6 +42,7 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 		// pass allowedContentTypes to the search request args
 		combinedPickerData.search!.queryParams = {
 			allowedContentTypes: args?.allowedContentTypes,
+			includeTrashed: args?.includeTrashed,
 			...pickerData?.search?.queryParams,
 		};
 
