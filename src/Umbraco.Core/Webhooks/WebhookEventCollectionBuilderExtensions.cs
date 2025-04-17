@@ -15,31 +15,31 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilder AddCms(this WebhookEventCollectionBuilder builder, bool onlyDefault = false)
+    public static WebhookEventCollectionBuilder AddCms(this WebhookEventCollectionBuilder builder, bool onlyDefault = false, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
         => builder.AddCms(builder =>
         {
             if (onlyDefault)
             {
-                builder.AddDefault();
+                builder.AddDefault(payloadType);
             }
             else
             {
                 builder
-                    .AddContent()
-                    .AddContentType()
-                    .AddDataType()
-                    .AddDictionary()
-                    .AddDomain()
-                    .AddFile()
-                    .AddHealthCheck()
-                    .AddLanguage()
-                    .AddMedia()
-                    .AddMember()
-                    .AddPackage()
-                    .AddPublicAccess()
-                    .AddRelation()
-                    .AddRelationType()
-                    .AddUser();
+                    .AddContent(onlyDefault, payloadType)
+                    .AddContentType(payloadType)
+                    .AddDataType(payloadType)
+                    .AddDictionary(payloadType)
+                    .AddDomain(payloadType)
+                    .AddFile(payloadType)
+                    .AddHealthCheck(payloadType)
+                    .AddLanguage(payloadType)
+                    .AddMedia(payloadType)
+                    .AddMember(onlyDefault, payloadType)
+                    .AddPackage(payloadType)
+                    .AddPublicAccess(payloadType)
+                    .AddRelation(payloadType)
+                    .AddRelationType(payloadType)
+                    .AddUser(onlyDefault, payloadType);
             }
         });
 

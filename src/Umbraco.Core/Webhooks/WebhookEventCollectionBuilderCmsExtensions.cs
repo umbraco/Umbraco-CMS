@@ -18,6 +18,24 @@ public static class WebhookEventCollectionBuilderCmsExtensions
         typeof(MediaSavedWebhookEvent),
     ];
 
+    private static readonly Type[] _extendedDefaultTypes =
+    [
+        typeof(ContentDeletedWebhookEvent),
+        typeof(ExtendedContentPublishedWebhookEvent),
+        typeof(ContentUnpublishedWebhookEvent),
+        typeof(MediaDeletedWebhookEvent),
+        typeof(ExtendedMediaSavedWebhookEvent),
+    ];
+
+    private static readonly Type[] _legacyDefaultTypes =
+    [
+        typeof(LegacyContentDeletedWebhookEvent),
+        typeof(LegacyContentPublishedWebhookEvent),
+        typeof(LegacyContentUnpublishedWebhookEvent),
+        typeof(LegacyMediaDeletedWebhookEvent),
+        typeof(LegacyMediaSavedWebhookEvent),
+    ];
+
     /// <summary>
     /// Adds the default webhook events.
     /// </summary>
@@ -28,9 +46,20 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <remarks>
     /// This is a special subset of webhook events that is added by default.
     /// </remarks>
-    public static WebhookEventCollectionBuilderCms AddDefault(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddDefault(this WebhookEventCollectionBuilderCms builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
     {
-        builder.Builder.Add(_defaultTypes);
+        switch (payloadType)
+        {
+            case WebhookPayloadType.Minimal:
+                builder.Builder.Add(_defaultTypes);
+                break;
+            case WebhookPayloadType.Extended:
+                builder.Builder.Add(_extendedDefaultTypes);
+                break;
+            case WebhookPayloadType.Legacy:
+                builder.Builder.Add(_legacyDefaultTypes);
+                break;
+        }
 
         return builder;
     }
@@ -42,8 +71,21 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms RemoveDefault(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms RemoveDefault(this WebhookEventCollectionBuilderCms builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
     {
+        switch (payloadType)
+        {
+            case WebhookPayloadType.Minimal:
+                builder.Builder.Add(_defaultTypes);
+                break;
+            case WebhookPayloadType.Extended:
+                builder.Builder.Add(_extendedDefaultTypes);
+                break;
+            case WebhookPayloadType.Legacy:
+                builder.Builder.Add(_legacyDefaultTypes);
+                break;
+        }
+
         foreach (Type type in _defaultTypes)
         {
             builder.Builder.Remove(type);
@@ -60,16 +102,16 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddContent(this WebhookEventCollectionBuilderCms builder, bool onlyDefault = false)
+    public static WebhookEventCollectionBuilderCms AddContent(this WebhookEventCollectionBuilderCms builder, bool onlyDefault = false, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
         => builder.AddContent(builder =>
         {
-            builder.AddDefault();
+            builder.AddDefault(payloadType);
 
             if (onlyDefault is false)
             {
                 builder
-                    .AddBlueprint()
-                    .AddVersion();
+                    .AddBlueprint(payloadType)
+                    .AddVersion(payloadType);
             }
         });
 
@@ -95,13 +137,13 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddContentType(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddContentType(this WebhookEventCollectionBuilderCms builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
         => builder.AddContentType(builder =>
         {
             builder
-                .AddDocumentType()
-                .AddMediaType()
-                .AddMemberType();
+                .AddDocumentType(payloadType)
+                .AddMediaType(payloadType)
+                .AddMemberType(payloadType);
         });
 
     /// <summary>
@@ -126,12 +168,24 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddDataType(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddDataType(this WebhookEventCollectionBuilderCms builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
     {
-        builder.Builder
-            .Add<DataTypeDeletedWebhookEvent>()
-            .Add<DataTypeMovedWebhookEvent>()
-            .Add<DataTypeSavedWebhookEvent>();
+        switch (payloadType)
+        {
+            case WebhookPayloadType.Extended:
+            case WebhookPayloadType.Minimal:
+                builder.Builder
+                    .Add<DataTypeDeletedWebhookEvent>()
+                    .Add<DataTypeMovedWebhookEvent>()
+                    .Add<DataTypeSavedWebhookEvent>();
+                break;
+            case WebhookPayloadType.Legacy:
+                builder.Builder
+                    .Add<LegacyDataTypeDeletedWebhookEvent>()
+                    .Add<LegacyDataTypeMovedWebhookEvent>()
+                    .Add<LegacyDataTypeSavedWebhookEvent>();
+                break;
+        }
 
         return builder;
     }
@@ -143,11 +197,22 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddDictionary(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddDictionary(this WebhookEventCollectionBuilderCms builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
     {
-        builder.Builder
-            .Add<DictionaryItemDeletedWebhookEvent>()
-            .Add<DictionaryItemSavedWebhookEvent>();
+        switch (payloadType)
+        {
+            case WebhookPayloadType.Extended:
+            case WebhookPayloadType.Minimal:
+                builder.Builder
+                    .Add<DictionaryItemDeletedWebhookEvent>()
+                    .Add<DictionaryItemSavedWebhookEvent>();
+                break;
+            case WebhookPayloadType.Legacy:
+                builder.Builder
+                    .Add<LegacyDictionaryItemDeletedWebhookEvent>()
+                    .Add<LegacyDictionaryItemSavedWebhookEvent>();
+                break;
+        }
 
         return builder;
     }
@@ -159,11 +224,22 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddDomain(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddDomain(this WebhookEventCollectionBuilderCms builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
     {
-        builder.Builder
-            .Add<DomainDeletedWebhookEvent>()
-            .Add<DomainSavedWebhookEvent>();
+        switch (payloadType)
+        {
+            case WebhookPayloadType.Extended:
+            case WebhookPayloadType.Minimal:
+                builder.Builder
+                    .Add<DomainDeletedWebhookEvent>()
+                    .Add<DomainSavedWebhookEvent>();
+                break;
+            case WebhookPayloadType.Legacy:
+                builder.Builder
+                    .Add<LegacyDomainDeletedWebhookEvent>()
+                    .Add<LegacyDomainSavedWebhookEvent>();
+                break;
+        }
 
         return builder;
     }
@@ -175,14 +251,14 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddFile(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddFile(this WebhookEventCollectionBuilderCms builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
         => builder.AddFile(builder =>
         {
             builder
-                .AddPartialView()
-                .AddScript()
-                .AddStylesheet()
-                .AddTemplate();
+                .AddPartialView(payloadType)
+                .AddScript(payloadType)
+                .AddStylesheet(payloadType)
+                .AddTemplate(payloadType);
         });
 
     /// <summary>
@@ -207,10 +283,20 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddHealthCheck(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddHealthCheck(this WebhookEventCollectionBuilderCms builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
     {
-        builder.Builder
-            .Add<HealthCheckCompletedWebhookEvent>();
+        switch (payloadType)
+        {
+            case WebhookPayloadType.Extended:
+            case WebhookPayloadType.Minimal:
+                builder.Builder
+                    .Add<HealthCheckCompletedWebhookEvent>();
+                break;
+            case WebhookPayloadType.Legacy:
+                builder.Builder
+                    .Add<LegacyHealthCheckCompletedWebhookEvent>();
+                break;
+        }
 
         return builder;
     }
@@ -222,11 +308,22 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddLanguage(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddLanguage(this WebhookEventCollectionBuilderCms builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
     {
-        builder.Builder
-            .Add<LanguageDeletedWebhookEvent>()
-            .Add<LanguageSavedWebhookEvent>();
+        switch (payloadType)
+        {
+            case WebhookPayloadType.Extended:
+            case WebhookPayloadType.Minimal:
+                builder.Builder
+                    .Add<LanguageDeletedWebhookEvent>()
+                    .Add<LanguageSavedWebhookEvent>();
+                break;
+            case WebhookPayloadType.Legacy:
+                builder.Builder
+                    .Add<LegacyLanguageDeletedWebhookEvent>()
+                    .Add<LegacyLanguageSavedWebhookEvent>();
+                break;
+        }
 
         return builder;
     }
@@ -238,14 +335,36 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddMedia(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddMedia(this WebhookEventCollectionBuilderCms builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
     {
-        builder.Builder
-            .Add<MediaDeletedWebhookEvent>()
-            .Add<MediaSavedWebhookEvent>()
-            .Add<MediaEmptiedRecycleBinWebhookEvent>()
-            .Add<MediaMovedWebhookEvent>()
-            .Add<MediaMovedToRecycleBinWebhookEvent>();
+        switch (payloadType)
+        {
+            case WebhookPayloadType.Extended:
+                builder.Builder
+                    .Add<MediaDeletedWebhookEvent>()
+                    .Add<ExtendedMediaSavedWebhookEvent>()
+                    .Add<MediaEmptiedRecycleBinWebhookEvent>()
+                    .Add<MediaMovedWebhookEvent>()
+                    .Add<MediaMovedToRecycleBinWebhookEvent>();
+                break;
+            case WebhookPayloadType.Minimal:
+                builder.Builder
+                    .Add<MediaDeletedWebhookEvent>()
+                    .Add<MediaSavedWebhookEvent>()
+                    .Add<MediaEmptiedRecycleBinWebhookEvent>()
+                    .Add<MediaMovedWebhookEvent>()
+                    .Add<MediaMovedToRecycleBinWebhookEvent>();
+                break;
+            case WebhookPayloadType.Legacy:
+                builder.Builder
+                    .Add<LegacyMediaDeletedWebhookEvent>()
+                    .Add<LegacyMediaSavedWebhookEvent>()
+                    .Add<LegacyMediaEmptiedRecycleBinWebhookEvent>()
+                    .Add<LegacyMediaMovedWebhookEvent>()
+                    .Add<LegacyMediaMovedToRecycleBinWebhookEvent>();
+
+                break;
+        }
 
         return builder;
     }
@@ -258,16 +377,16 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddMember(this WebhookEventCollectionBuilderCms builder, bool onlyDefault = false)
+    public static WebhookEventCollectionBuilderCms AddMember(this WebhookEventCollectionBuilderCms builder, bool onlyDefault = false, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
         => builder.AddMember(builder =>
         {
-            builder.AddDefault();
+            builder.AddDefault(payloadType);
 
             if (onlyDefault is false)
             {
                 builder
-                    .AddRoles()
-                    .AddGroup();
+                    .AddRoles(payloadType)
+                    .AddGroup(payloadType);
             }
         });
 
@@ -293,10 +412,20 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddPackage(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddPackage(this WebhookEventCollectionBuilderCms builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
     {
-        builder.Builder
-            .Add<ImportedPackageWebhookEvent>();
+        switch (payloadType)
+        {
+            case WebhookPayloadType.Extended:
+            case WebhookPayloadType.Minimal:
+                builder.Builder
+                    .Add<ImportedPackageWebhookEvent>();
+                break;
+            case WebhookPayloadType.Legacy:
+                builder.Builder
+                    .Add<LegacyImportedPackageWebhookEvent>();
+                break;
+        }
 
         return builder;
     }
@@ -308,11 +437,22 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddPublicAccess(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddPublicAccess(this WebhookEventCollectionBuilderCms builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
     {
-        builder.Builder
-            .Add<PublicAccessEntryDeletedWebhookEvent>()
-            .Add<PublicAccessEntrySavedWebhookEvent>();
+        switch (payloadType)
+        {
+            case WebhookPayloadType.Extended:
+            case WebhookPayloadType.Minimal:
+                builder.Builder
+                    .Add<PublicAccessEntryDeletedWebhookEvent>()
+                    .Add<PublicAccessEntrySavedWebhookEvent>();
+                break;
+            case WebhookPayloadType.Legacy:
+                builder.Builder
+                    .Add<LegacyPublicAccessEntryDeletedWebhookEvent>()
+                    .Add<LegacyPublicAccessEntrySavedWebhookEvent>();
+                break;
+        }
 
         return builder;
     }
@@ -324,11 +464,22 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddRelation(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddRelation(this WebhookEventCollectionBuilderCms builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
     {
-        builder.Builder
-            .Add<RelationDeletedWebhookEvent>()
-            .Add<RelationSavedWebhookEvent>();
+        switch (payloadType)
+        {
+            case WebhookPayloadType.Extended:
+            case WebhookPayloadType.Minimal:
+                builder.Builder
+                    .Add<RelationDeletedWebhookEvent>()
+                    .Add<RelationSavedWebhookEvent>();
+                break;
+            case WebhookPayloadType.Legacy:
+                builder.Builder
+                    .Add<LegacyRelationDeletedWebhookEvent>()
+                    .Add<LegacyRelationSavedWebhookEvent>();
+                break;
+        }
 
         return builder;
     }
@@ -340,11 +491,22 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddRelationType(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddRelationType(this WebhookEventCollectionBuilderCms builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
     {
-        builder.Builder
-            .Add<RelationTypeDeletedWebhookEvent>()
-            .Add<RelationTypeSavedWebhookEvent>();
+        switch (payloadType)
+        {
+            case WebhookPayloadType.Extended:
+            case WebhookPayloadType.Minimal:
+                builder.Builder
+                    .Add<RelationTypeDeletedWebhookEvent>()
+                    .Add<RelationTypeSavedWebhookEvent>();
+                break;
+            case WebhookPayloadType.Legacy:
+                builder.Builder
+                    .Add<LegacyRelationTypeDeletedWebhookEvent>()
+                    .Add<LegacyRelationTypeSavedWebhookEvent>();
+                break;
+        }
 
         return builder;
     }
@@ -357,17 +519,17 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddUser(this WebhookEventCollectionBuilderCms builder, bool onlyDefault = false)
+    public static WebhookEventCollectionBuilderCms AddUser(this WebhookEventCollectionBuilderCms builder, bool onlyDefault = false, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
         => builder.AddUser(builder =>
         {
-            builder.AddDefault();
+            builder.AddDefault(payloadType);
 
             if (onlyDefault is false)
             {
                 builder
-                    .AddPassword()
-                    .AddLogin()
-                    .AddGroup();
+                    .AddPassword(payloadType)
+                    .AddLogin(payloadType)
+                    .AddGroup(payloadType);
             }
         });
 
