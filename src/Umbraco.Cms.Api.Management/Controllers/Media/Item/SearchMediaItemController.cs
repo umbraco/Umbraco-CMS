@@ -29,15 +29,15 @@ public class SearchMediaItemController : MediaItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<MediaItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<IActionResult> SearchFromParentWithAllowedTypes(CancellationToken cancellationToken, string query, bool? trashed = null, int skip = 0, int take = 100, Guid? parentId = null, [FromQuery]IEnumerable<Guid>? allowedMediaTypes = null)
+    public async Task<IActionResult> SearchFromParentWithAllowedTypes(CancellationToken cancellationToken, string query, bool? trashed = null, int skip = 0, int take = 100, Guid? parentId = null, [FromQuery]IEnumerable<Guid>? allowedMediaTypes = null)
     {
-        PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Media, query, parentId, allowedMediaTypes, trashed, skip, take);
+        PagedModel<IEntitySlim> searchResult = await _indexedEntitySearchService.SearchAsync(UmbracoObjectTypes.Media, query, parentId, allowedMediaTypes, trashed, skip, take);
         var result = new PagedModel<MediaItemResponseModel>
         {
             Items = searchResult.Items.OfType<IMediaEntitySlim>().Select(_mediaPresentationFactory.CreateItemResponseModel),
             Total = searchResult.Total,
         };
 
-        return Task.FromResult<IActionResult>(Ok(result));
+        return Ok(result);
     }
 }

@@ -89,9 +89,9 @@ The `umb-localize` component is used to translate text in the UI. It is used lik
 
 Experiment with the component here: [Localize](/story/api-localization-umblocalizeelement--default)
 
-### UmbLocalizeController
+### UmbLocalizationController
 
-The `UmbLocalizeController` is used to translate text in the UI. It is used like this:
+The `UmbLocalizationController` is used to translate text in the UI. It is used like this:
 
 **UmbElementMixin**
 
@@ -110,11 +110,11 @@ export class MyElement extends UmbElementMixin(LitElement) {
 If you do not use the `UmbElementMixin` in your element, you can use the reactive controller like this:
 
 ```ts
-import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class MyElement extends LitElement {
 	// Create a new instance of the controller and attach it to the element
-	private localize = new UmbLocalizeController(this);
+	private localize = new UmbLocalizationController(this);
 
 	override render() {
 		return html` <uui-button .label=${this.localize.localize('general_close')}></uui-button> `;

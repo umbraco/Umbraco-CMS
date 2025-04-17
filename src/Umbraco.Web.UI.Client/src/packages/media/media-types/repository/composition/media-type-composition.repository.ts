@@ -1,11 +1,11 @@
-import { UmbMediaTypeCompositionServerDataSource } from './media-type-composition.server.data-source.js';
-import type { UmbContentTypeCompositionRepository } from '@umbraco-cms/backoffice/content-type';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbMediaTypeAvailableCompositionRequestModel,
 	UmbMediaTypeCompositionCompatibleModel,
 	UmbMediaTypeCompositionReferenceModel,
-} from '@umbraco-cms/backoffice/media-type';
+} from '../../types.js';
+import { UmbMediaTypeCompositionServerDataSource } from './media-type-composition.server.data-source.js';
+import type { UmbContentTypeCompositionRepository } from '@umbraco-cms/backoffice/content-type';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 export class UmbMediaTypeCompositionRepository

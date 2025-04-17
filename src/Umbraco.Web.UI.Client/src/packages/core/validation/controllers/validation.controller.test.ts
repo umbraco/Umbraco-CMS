@@ -48,11 +48,33 @@ describe('UmbValidationController', () => {
 			expect(ctrl.isValid).to.be.false;
 		});
 
-		it('is invalid when holding relevant variant messages', async () => {
+		it('is invalid when holding relevant culture and segmented variant', async () => {
 			ctrl.setVariantId(new UmbVariantId('en-us', 'mySegment'));
 			ctrl.messages.addMessage(
 				'server',
 				"$.values[?(@.alias == 'my-property' && @.culture == 'en-us' && @.segment == 'mySegment')].value",
+				'test',
+			);
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
+		});
+
+		it('is invalid when holding relevant culture variant', async () => {
+			ctrl.setVariantId(new UmbVariantId('en-us', null));
+			ctrl.messages.addMessage(
+				'server',
+				"$.values[?(@.alias == 'my-property' && @.culture == 'en-us' && @.segment == null)].value",
+				'test',
+			);
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
+		});
+
+		it('is invalid when holding relevant segmented variant', async () => {
+			ctrl.setVariantId(new UmbVariantId(null, 'mySegment'));
+			ctrl.messages.addMessage(
+				'server',
+				"$.values[?(@.alias == 'my-property' && @.culture == null && @.segment == 'mySegment')].value",
 				'test',
 			);
 			await ctrl.validate().catch(() => undefined);
