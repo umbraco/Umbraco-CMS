@@ -15,7 +15,7 @@ public class ApiContentPathResolver : IApiContentPathResolver
         _apiPublishedContentCache = apiPublishedContentCache;
     }
 
-    public virtual bool IsResolveablePath(string path)
+    public virtual bool IsResolvablePath(string path)
     {
         // File requests will blow up with an downstream exception in GetRequiredPublishedSnapshot, which fails due to an UmbracoContext
         // not being available for what's considered a static file request.

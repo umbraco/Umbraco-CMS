@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.DeliveryApi;
 
 public interface IApiContentPathResolver
 {
-    bool IsResolveablePath(string path) => true;
+    bool IsResolvablePath(string path) => true;
 
     IPublishedContent? ResolveContentPath(string path);
 }

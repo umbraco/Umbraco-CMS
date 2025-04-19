@@ -20,7 +20,7 @@ public class ApiContentPathResolverTests
     public void Can_Verify_Resolveable_Paths(string path, bool expected)
     {
         var resolver = CreateResolver();
-        var result = resolver.IsResolveablePath(path);
+        var result = resolver.IsResolvablePath(path);
         Assert.AreEqual(expected, result);
     }
 
