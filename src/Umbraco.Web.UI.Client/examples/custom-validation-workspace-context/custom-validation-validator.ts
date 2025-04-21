@@ -55,7 +55,7 @@ export class CustomValidationValidator extends UmbControllerBase implements UmbV
 			const cleanedMarkup = this.#value.markup?.replace(/<\/?[^>]+(>|$)/g, '');
 			// Check if markup contains words longer than 6 characters:
 			const words = cleanedMarkup.split(/\s+/);
-			const invalidWords = words.filter((word) => word.length > 10);
+			const invalidWords = words.filter((word) => word.length > 8);
 			if (invalidWords.length === 0) {
 				this.#isValid = true;
 			} else {
