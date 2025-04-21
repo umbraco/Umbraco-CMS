@@ -80,8 +80,10 @@ export class CustomValidationValidator extends UmbControllerBase implements UmbV
 	}
 
 	async validate(): Promise<void> {
-		// validate is called when the validation state has to be fully resolved. Like when user clicks Save & Publish.
+		// Validate is called when the validation state of this validator is asked to be fully resolved. Like when user clicks Save & Publish.
 		// If you need to ask the server then it can be done here, instead of asking the server each time the value changes.
+		// In this particular example we do not need to do anything, because our validation is represented via a message that we always set no matter the user interaction.
+		// If we did not like to only to check the Validation State when absolute needed then this method must be implemented.
 	}
 
 	get isValid(): boolean {
@@ -97,6 +99,13 @@ export class CustomValidationValidator extends UmbControllerBase implements UmbV
 	 */
 	focusFirstInvalidElement(): void {
 		alert('custom validation is invalid, you should implement a feature to focus the problematic element');
+	}
+
+	override destroy(): void {
+		this.#validationContext = undefined;
+		this.#workspaceContext = undefined;
+		this.#value = undefined;
+		super.destroy();
 	}
 }
 
