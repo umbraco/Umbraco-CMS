@@ -44,7 +44,7 @@ public class ContentPublishedWebhookEvent : WebhookEventContentBase<ContentPubli
             Id = entity.Key,
             Cultures = entity.PublishCultureInfos?.Values.Select(cultureInfo => new
             {
-                cultureInfo.Name,
+                cultureInfo.Culture,
                 cultureInfo.Date,
             }),
         };

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Umbraco.Cms.Core.Webhooks;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
@@ -10,6 +11,7 @@ public class WebhookSettings
     internal const string StaticPeriod = "00:00:10";
     private const bool StaticEnableLoggingCleanup = true;
     private const int StaticKeepLogsForDays = 30;
+    private const WebhookPayloadType StaticPayloadType = WebhookPayloadType.Legacy;
 
 
     /// <summary>
@@ -63,4 +65,15 @@ public class WebhookSettings
     /// </remarks>
     [DefaultValue(StaticKeepLogsForDays)]
     public int KeepLogsForDays { get; set; } = StaticKeepLogsForDays;
+
+    /// <summary>
+    ///     Gets or sets a value indicating the type of payload used for sending webhooks
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         By default, minimal payloads are used see <see cref="WebhookPayloadType"/> for more info.
+    ///     </para>
+    /// </remarks>
+    [DefaultValue(StaticPayloadType)]
+    public WebhookPayloadType PayloadType { get; set; } = StaticPayloadType;
 }

@@ -31,6 +31,7 @@ public static class WebhookEventCollectionBuilderCmsContentExtensions
                     .Add<ExtendedContentSavedWebhookEvent>()
                     .Add<ContentSortedWebhookEvent>()
                     .Add<ContentUnpublishedWebhookEvent>();
+                break;
             case WebhookPayloadType.Minimal:
                 builder.Builder
                     .Add<ContentCopiedWebhookEvent>()
