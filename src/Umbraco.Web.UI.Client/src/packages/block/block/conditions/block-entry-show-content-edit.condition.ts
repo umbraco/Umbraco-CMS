@@ -16,7 +16,7 @@ export class UmbBlockEntryShowContentEditCondition
 
 		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
 			this.observe(
-				context.showContentEdit,
+				context?.showContentEdit,
 				(showContentEdit) => {
 					this.permitted = !!showContentEdit;
 				},

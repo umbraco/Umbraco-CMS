@@ -36,7 +36,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		super();
 
 		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
-			if (modalContext.data.createBlockInWorkspace) {
+			if (modalContext?.data.createBlockInWorkspace) {
 				new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
 					//.addAdditionalPath('block') // No need for additional path specification in this context as this is for sure the only workspace we want to open here.
 					.onSetup(() => {

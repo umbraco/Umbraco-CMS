@@ -45,7 +45,7 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number));
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
-			context.addEventListener(UmbRequestReloadStructureForEntityEvent.TYPE, () => {
+			context?.addEventListener(UmbRequestReloadStructureForEntityEvent.TYPE, () => {
 				this.#requestAuditLogs();
 			});
 		});

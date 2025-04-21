@@ -46,19 +46,19 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 
 	override firstUpdated(): void {
 		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
-			this._serverUrl = context.getServerUrl();
+			this._serverUrl = context?.getServerUrl() ?? '';
 			this.style.setProperty(
 				'--image',
 				`url('${this._serverUrl}/umbraco/management/api/v1/security/back-office/graphics/login-background') no-repeat center center/cover`,
 			);
 
-			const serverConnection = context.getServerConnection();
+			const serverConnection = context?.getServerConnection();
 
-			this.observe(serverConnection.allowLocalLogin, (allowLocalLogin) => {
-				this._allowLocalLogin = allowLocalLogin;
+			this.observe(serverConnection?.allowLocalLogin, (allowLocalLogin) => {
+				this._allowLocalLogin = allowLocalLogin ?? false;
 			});
 
-			this.observe(serverConnection.isConnected, (isConnected) => {
+			this.observe(serverConnection?.isConnected, (isConnected) => {
 				this._loading = !isConnected;
 			});
 		});

@@ -68,10 +68,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		// TODO: Notice this can be retrieve via a api property. [NL]
 		this.consumeContext(UMB_TREE_CONTEXT, (instance) => {
 			this._treeContext = instance;
-			this.observe(this._treeContext.treeRoot, (treeRoot) => (this._treeRoot = treeRoot));
-			this.observe(this._treeContext.rootItems, (rootItems) => (this._rootItems = rootItems));
-			this.observe(this._treeContext.pagination.currentPage, (value) => (this._currentPage = value));
-			this.observe(this._treeContext.pagination.totalPages, (value) => (this._totalPages = value));
+			this.observe(this._treeContext?.treeRoot, (treeRoot) => (this._treeRoot = treeRoot));
+			this.observe(this._treeContext?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []));
+			this.observe(this._treeContext?.pagination.currentPage, (value) => (this._currentPage = value ?? 1));
+			this.observe(this._treeContext?.pagination.totalPages, (value) => (this._totalPages = value ?? 1));
 		});
 	}
 

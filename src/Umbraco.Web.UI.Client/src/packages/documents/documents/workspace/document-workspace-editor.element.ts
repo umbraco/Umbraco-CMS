@@ -29,7 +29,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
 			this.#appLanguage = instance;
-			this.observe(this.#appLanguage.appLanguageCulture, (appCulture) => {
+			this.observe(this.#appLanguage?.appLanguageCulture, (appCulture) => {
 				this.#appCulture = appCulture;
 				this.#generateRoutes();
 			});
@@ -38,7 +38,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.observe(
-				this.#workspaceContext.variantOptions,
+				this.#workspaceContext?.variantOptions,
 				(variants) => {
 					this.#variants = variants;
 					this.#generateRoutes();

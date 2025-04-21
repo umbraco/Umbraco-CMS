@@ -120,39 +120,44 @@ export abstract class UmbPropertyEditorUiRteElementBase
 		super();
 
 		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (context) => {
-			this.observe(
-				observeMultiple([
-					this.#managerContext.blockTypes,
-					context.structure.variesByCulture,
-					context.structure.variesBySegment,
-				]),
-				async ([blockTypes, variesByCulture, variesBySegment]) => {
-					if (blockTypes.length > 0 && (variesByCulture === false || variesBySegment === false)) {
-						// check if any of the Blocks varyByCulture or Segment and then display a warning.
-						const promises = await Promise.all(
-							blockTypes.map(async (blockType) => {
-								const elementType = blockType.contentElementTypeKey;
-								await this.#managerContext.contentTypesLoaded;
-								const structure = await this.#managerContext.getStructure(elementType);
-								if (variesByCulture === false && structure?.getVariesByCulture() === true) {
-									// If block varies by culture but document does not.
-									return true;
-								} else if (variesBySegment === false && structure?.getVariesBySegment() === true) {
-									// If block varies by segment but document does not.
-									return true;
-								}
-								return false;
-							}),
-						);
-						const notSupportedVariantSetting = promises.filter((x) => x === true).length > 0;
+			if (context) {
+				this.observe(
+					observeMultiple([
+						this.#managerContext.blockTypes,
+						context.structure.variesByCulture,
+						context.structure.variesBySegment,
+					]),
+					async ([blockTypes, variesByCulture, variesBySegment]) => {
+						if (blockTypes.length > 0 && (variesByCulture === false || variesBySegment === false)) {
+							// check if any of the Blocks varyByCulture or Segment and then display a warning.
+							const promises = await Promise.all(
+								blockTypes.map(async (blockType) => {
+									const elementType = blockType.contentElementTypeKey;
+									await this.#managerContext.contentTypesLoaded;
+									const structure = await this.#managerContext.getStructure(elementType);
+									if (variesByCulture === false && structure?.getVariesByCulture() === true) {
+										// If block varies by culture but document does not.
+										return true;
+									} else if (variesBySegment === false && structure?.getVariesBySegment() === true) {
+										// If block varies by segment but document does not.
+										return true;
+									}
+									return false;
+								}),
+							);
+							const notSupportedVariantSetting = promises.filter((x) => x === true).length > 0;
 
-						if (notSupportedVariantSetting) {
-							this.setCustomValidity('#blockEditor_blockVariantConfigurationNotSupported');
-							this.checkValidity();
+							if (notSupportedVariantSetting) {
+								this.setCustomValidity('#blockEditor_blockVariantConfigurationNotSupported');
+								this.checkValidity();
+							}
 						}
-					}
-				},
-			);
+					},
+					'blockTypeConfigurationCheck',
+				);
+			} else {
+				this.removeUmbControllerByAlias('blockTypeConfigurationCheck');
+			}
 		}).passContextAliasMatches();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
@@ -179,9 +184,9 @@ export abstract class UmbPropertyEditorUiRteElementBase
 		);
 	}
 
-	#gotPropertyContext(context: typeof UMB_PROPERTY_CONTEXT.TYPE) {
+	#gotPropertyContext(context: typeof UMB_PROPERTY_CONTEXT.TYPE | undefined) {
 		this.observe(
-			context.dataPath,
+			context?.dataPath,
 			(dataPath) => {
 				if (dataPath) {
 					// Set the data path for the local validation context:
@@ -240,7 +245,7 @@ export abstract class UmbPropertyEditorUiRteElementBase
 					return;
 				}
 
-				context.setValue(super.value);
+				context?.setValue(super.value);
 			},
 			'motherObserver',
 		);

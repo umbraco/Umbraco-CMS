@@ -62,7 +62,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			this.#splitViewContext = instance;
 
 			const workspaceContext =
-				this.#splitViewContext.getWorkspaceContext() as unknown as UmbVariantDatasetWorkspaceContext;
+				this.#splitViewContext?.getWorkspaceContext() as unknown as UmbVariantDatasetWorkspaceContext;
 			if (!workspaceContext) throw new Error('Split View Workspace context not found');
 
 			this.#observeVariants(workspaceContext);

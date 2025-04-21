@@ -92,7 +92,7 @@ export class UmbModalRouteRegistrationController<
 
 		this.consumeContext(UMB_ROUTE_PATH_ADDENDUM_CONTEXT, (context) => {
 			this.observe(
-				context.addendum,
+				context?.addendum,
 				(addendum) => {
 					this.#addendum = addendum;
 					this.#registerModal();

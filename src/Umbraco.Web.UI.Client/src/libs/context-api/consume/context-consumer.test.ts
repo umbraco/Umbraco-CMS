@@ -312,8 +312,8 @@ describe('UmbContextConsumer', () => {
 			const localConsumer = new UmbContextConsumer(
 				element,
 				new UmbContextToken(testContextAlias, undefined, discriminator),
-				(instance: A) => {
-					expect(instance.prop).to.eq('value from provider');
+				(instance: A | undefined) => {
+					expect(instance?.prop).to.eq('value from provider');
 					provider.destroy();
 					localConsumer.destroy();
 					done();
@@ -336,7 +336,7 @@ describe('UmbContextConsumer', () => {
 				element,
 				new UmbContextToken(testContextAlias, undefined, discriminator),
 				(_instance) => {
-					expect(_instance.prop).to.eq('value from provider');
+					expect(_instance?.prop).to.eq('value from provider');
 					localConsumer.hostDisconnected();
 					provider.hostDisconnected();
 					done();
@@ -353,7 +353,7 @@ describe('UmbContextConsumer', () => {
 				element,
 				new UmbContextToken(testContextAlias, undefined, badDiscriminator),
 				(_instance) => {
-					expect(_instance.prop).to.eq('this must not happen!');
+					expect(_instance?.prop).to.eq('this must not happen!');
 				},
 			);
 			localConsumer.hostConnected();
@@ -381,7 +381,7 @@ describe('UmbContextConsumer', () => {
 				element,
 				new UmbContextToken(testContextAlias, undefined, discriminator),
 				(_instance) => {
-					expect(_instance.prop).to.eq('this must not happen!');
+					expect(_instance?.prop).to.eq('this must not happen!');
 				},
 			);
 			localConsumer.hostConnected();
@@ -409,7 +409,7 @@ describe('UmbContextConsumer', () => {
 				element,
 				new UmbContextToken(testContextAlias, undefined, discriminator),
 				(_instance) => {
-					expect(_instance.prop).to.eq('value from provider');
+					expect(_instance?.prop).to.eq('value from provider');
 					localConsumer.hostDisconnected();
 					provider.hostDisconnected();
 					done();

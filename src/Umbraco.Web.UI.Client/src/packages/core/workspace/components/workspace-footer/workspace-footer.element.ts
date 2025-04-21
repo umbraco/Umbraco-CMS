@@ -40,7 +40,7 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.consumeContext(UMB_SUBMITTABLE_WORKSPACE_CONTEXT, (context) => {
-			this._isNew = context.getIsNew();
+			this._isNew = context?.getIsNew();
 		});
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			this._modalContext = context;

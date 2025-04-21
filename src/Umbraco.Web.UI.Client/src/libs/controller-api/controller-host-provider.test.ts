@@ -12,7 +12,7 @@ export class UmbTestControllerHostInitializerConsumerElement extends UmbControll
 		super();
 
 		new UmbContextConsumerController<string>(this, 'my-test-context-alias', (value) => {
-			this.value = value;
+			this.value = value ?? null;
 		});
 	}
 }

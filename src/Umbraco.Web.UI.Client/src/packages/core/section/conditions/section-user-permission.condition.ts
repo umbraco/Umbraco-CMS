@@ -22,7 +22,7 @@ export class UmbSectionUserPermissionCondition extends UmbControllerBase impleme
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
 			this.observe(
-				context.currentUser,
+				context?.currentUser,
 				(currentUser) => {
 					const allowedSections = currentUser?.allowedSections || [];
 					this.permitted = allowedSections.includes(this.config.match);

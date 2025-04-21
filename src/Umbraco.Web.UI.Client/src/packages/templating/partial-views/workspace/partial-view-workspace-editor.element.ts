@@ -29,11 +29,11 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
 
-			this.observe(this.#workspaceContext.content, (content) => {
+			this.observe(this.#workspaceContext?.content, (content) => {
 				this._content = content;
 			});
 
-			this.observe(this.#workspaceContext.isNew, (isNew) => {
+			this.observe(this.#workspaceContext?.isNew, (isNew) => {
 				this._isNew = isNew;
 			});
 		});

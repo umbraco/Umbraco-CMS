@@ -17,7 +17,7 @@ export class UmbMemberTypeWorkspaceViewMemberInfoElement extends UmbLitElement i
 
 		this.consumeContext(UMB_MEMBER_GROUP_WORKSPACE_CONTEXT, async (context) => {
 			this._workspaceContext = context;
-			this._unique = this._workspaceContext.getUnique() ?? '';
+			this._unique = this._workspaceContext?.getUnique() ?? '';
 		});
 	}
 

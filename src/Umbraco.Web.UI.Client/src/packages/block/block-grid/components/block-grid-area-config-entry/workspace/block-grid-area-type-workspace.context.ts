@@ -82,7 +82,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		this.resetState();
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(
-				context.value,
+				context?.value,
 				(value) => {
 					if (value) {
 						const blockTypeData = value.find((x: UmbBlockGridTypeAreaType) => x.key === unique);

@@ -49,7 +49,7 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTipt
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (dataset) => {
 			this.observe(
-				await dataset.propertyValueByAlias<Array<string>>('extensions'),
+				await dataset?.propertyValueByAlias<Array<string>>('extensions'),
 				(extensions) => {
 					if (extensions) {
 						this.#extensionsEnabled.clear();

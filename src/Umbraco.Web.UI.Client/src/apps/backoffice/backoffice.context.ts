@@ -28,7 +28,7 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 
 		// TODO: We need to ensure this request is called every time the user logs in, but this should be done somewhere across the app and not here [JOV]
 		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-			this.observe(authContext.isAuthorized, (isAuthorized) => {
+			this.observe(authContext?.isAuthorized, (isAuthorized) => {
 				if (!isAuthorized) return;
 				this.#getVersion();
 			});
@@ -36,7 +36,7 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (userContext) => {
 			this.observe(
-				userContext.allowedSections,
+				userContext?.allowedSections,
 				(allowedSections) => {
 					if (!allowedSections) return;
 					// TODO: Please be aware that we re-initialize this initializer based on user permissions. I suggest we should solve this specific case should be improved by the ability to change the filter [NL]

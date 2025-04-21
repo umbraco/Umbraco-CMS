@@ -30,7 +30,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	constructor() {
 		super();
 		this.consumeContext(UMB_ICON_REGISTRY_CONTEXT, (context) => {
-			this.observe(context.approvedIcons, (icons) => {
+			this.observe(context?.approvedIcons, (icons) => {
 				this.#icons = icons;
 				this.#filterIcons();
 			});

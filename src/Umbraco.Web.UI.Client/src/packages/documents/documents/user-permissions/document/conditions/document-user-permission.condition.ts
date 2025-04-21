@@ -32,7 +32,7 @@ export class UmbDocumentUserPermissionCondition extends UmbControllerBase implem
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
 			this.observe(
-				context.currentUser,
+				context?.currentUser,
 				(currentUser) => {
 					this.#documentPermissions = currentUser?.permissions?.filter(isDocumentUserPermission) || [];
 					this.#fallbackPermissions = currentUser?.fallbackPermissions || [];
@@ -60,7 +60,7 @@ export class UmbDocumentUserPermissionCondition extends UmbControllerBase implem
 			this.observe(
 				instance?.ancestors,
 				(ancestors) => {
-					this.#ancestors = ancestors.map((item) => item.unique);
+					this.#ancestors = ancestors?.map((item) => item.unique) ?? [];
 					this.#checkPermissions();
 				},
 				'observeAncestors',

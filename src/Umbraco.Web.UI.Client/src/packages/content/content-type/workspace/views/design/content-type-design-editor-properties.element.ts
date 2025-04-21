@@ -153,7 +153,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 
 		this.consumeContext(UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT, (context) => {
 			this.observe(
-				context.isSorting,
+				context?.isSorting,
 				(isSorting) => {
 					this._sortModeActive = isSorting;
 					if (isSorting) {
@@ -167,13 +167,15 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
-			this.#propertyStructureHelper.setStructureManager(workspaceContext.structure);
+			if (workspaceContext) {
+				this.#propertyStructureHelper.setStructureManager(workspaceContext.structure);
+			}
 
-			this._ownerContentTypeUnique = workspaceContext.structure.getOwnerContentTypeUnique();
+			this._ownerContentTypeUnique = workspaceContext?.structure.getOwnerContentTypeUnique();
 			this.createPropertyTypeWorkspaceRoutes();
 
 			this.observe(
-				workspaceContext.variesByCulture,
+				workspaceContext?.variesByCulture,
 				(variesByCulture) => {
 					this._ownerContentTypeVariesByCulture = variesByCulture;
 				},

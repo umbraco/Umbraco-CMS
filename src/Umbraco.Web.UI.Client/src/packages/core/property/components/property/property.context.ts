@@ -109,7 +109,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (variantContext) => {
 			this.#datasetContext = variantContext;
-			this.setVariantId(variantContext.getVariantId?.());
+			this.setVariantId(variantContext?.getVariantId?.());
 			this._generateVariantDifferenceString();
 			this._observeProperty();
 		});

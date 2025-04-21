@@ -33,7 +33,7 @@ export class UmbDocumentPropertyValueUserPermissionCondition
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
 			this.observe(
-				context.currentUser,
+				context?.currentUser,
 				(currentUser) => {
 					this.#documentPropertyValuePermissions =
 						currentUser?.permissions?.filter(isDocumentPropertyValueUserPermission) || [];

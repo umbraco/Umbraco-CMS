@@ -26,7 +26,7 @@ export class UmbPreviewContext extends UmbContextBase<UmbPreviewContext> {
 		super(host, UMB_PREVIEW_CONTEXT);
 
 		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
-			this.#serverUrl = instance.getServerUrl();
+			this.#serverUrl = instance?.getServerUrl() ?? '';
 
 			const params = new URLSearchParams(window.location.search);
 

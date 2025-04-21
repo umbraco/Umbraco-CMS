@@ -21,13 +21,13 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;
 
-			this.observe(this._workspaceContext.isNew, (isNew) => {
+			this.observe(this._workspaceContext?.isNew, (isNew) => {
 				this._isNew = !!isNew;
 			});
 		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(context.hasAccessToSensitiveData, (hasAccessToSensitiveData) => {
+			this.observe(context?.hasAccessToSensitiveData, (hasAccessToSensitiveData) => {
 				this._hasAccessToSensitiveData = hasAccessToSensitiveData === true;
 			});
 		});

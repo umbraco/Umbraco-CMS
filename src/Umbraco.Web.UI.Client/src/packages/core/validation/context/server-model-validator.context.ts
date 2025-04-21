@@ -36,7 +36,7 @@ export class UmbServerModelValidatorContext
 				this.#context.removeValidator(this);
 			}
 			this.#context = context;
-			context.addValidator(this);
+			context?.addValidator(this);
 
 			// Run translators?
 		}).asPromise({ preventTimeout: true });

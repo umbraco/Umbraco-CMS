@@ -66,7 +66,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this._mediaTypeUnique = this.#workspaceContext.getContentTypeId()!;
+			this._mediaTypeUnique = context?.getContentTypeId();
 			this.#getData();
 			this.#observeContent();
 		});

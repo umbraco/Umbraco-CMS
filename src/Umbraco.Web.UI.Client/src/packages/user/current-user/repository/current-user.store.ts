@@ -27,7 +27,7 @@ export class UmbCurrentUserStore extends UmbContextBase<UmbCurrentUserStore> {
 		super(host, UMB_CURRENT_USER_STORE_CONTEXT);
 
 		this.consumeContext(UMB_USER_DETAIL_STORE_CONTEXT, (instance) => {
-			this.observe(instance?.all(), (users) => this.#onUserDetailStoreUpdate(users));
+			this.observe(instance?.all(), (users) => this.#onUserDetailStoreUpdate(users ?? []));
 		});
 	}
 

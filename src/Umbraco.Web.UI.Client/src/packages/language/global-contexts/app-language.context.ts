@@ -56,19 +56,19 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 
 		// TODO: We need to ensure this request is called every time the user logs in, but this should be done somewhere across the app and not here [JOV]
 		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-			this.observe(authContext.isAuthorized, (isAuthorized) => {
+			this.observe(authContext?.isAuthorized, (isAuthorized) => {
 				if (!isAuthorized) return;
 				this.#requestLanguages();
 			});
 		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(context.languages, (languages) => {
+			this.observe(context?.languages, (languages) => {
 				this.#currentUserAllowedLanguages = languages || [];
 				this.#setIsReadOnly();
 			});
 
-			this.observe(context.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
+			this.observe(context?.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
 				this.#currentUserHasAccessToAllLanguages = hasAccessToAllLanguages || false;
 				this.#setIsReadOnly();
 			});

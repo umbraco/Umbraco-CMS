@@ -60,8 +60,8 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
 
 		this.consumeContext(UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#structureManager = workspaceContext.structure;
-			this._tabsStructureHelper.setStructureManager(workspaceContext.structure);
+			this.#structureManager = workspaceContext?.structure;
+			this._tabsStructureHelper.setStructureManager(workspaceContext?.structure);
 			this.#observeRootGroups();
 		});
 	}

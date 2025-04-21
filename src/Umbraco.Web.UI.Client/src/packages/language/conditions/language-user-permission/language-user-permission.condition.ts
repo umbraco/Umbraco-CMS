@@ -23,7 +23,7 @@ export class UmbLanguageUserPermissionCondition extends UmbControllerBase implem
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
 			this.observe(
-				context.currentUser,
+				context?.currentUser,
 				(currentUser) => {
 					this.#check(currentUser);
 				},

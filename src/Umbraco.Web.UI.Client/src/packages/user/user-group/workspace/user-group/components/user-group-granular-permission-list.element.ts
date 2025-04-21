@@ -23,7 +23,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 			this.#workspaceContext = instance;
 
 			this.observe(
-				this.#workspaceContext.data,
+				this.#workspaceContext?.data,
 				(userGroup) => {
 					this._userGroupPermissions = userGroup?.permissions;
 					this._userGroupFallbackPermissions = userGroup?.fallbackPermissions;
