@@ -108,7 +108,7 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			flex-direction: column;
 
 			position: sticky;
-			top: -25px;
+			top: var(--umb-tiptap-top,-25px);
 			left: 0;
 			right: 0;
 			padding: var(--uui-size-3);
