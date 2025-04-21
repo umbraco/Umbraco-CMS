@@ -105,6 +105,10 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	public override get value(): string | undefined {
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
+
+	@property({ type: Boolean, attribute: 'readonly' })
+	readonly?: boolean;
+
 	@state()
 	private _items?: Array<UmbDocumentTypeItemModel>;
 
@@ -176,7 +180,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	}
 
 	#renderAddButton() {
-		if (this.max > 0 && this.selection.length >= this.max) return nothing;
+		if (this.readonly || (this.max > 0 && this.selection.length >= this.max)) return nothing;
 		return html`
 			<uui-button
 				id="btn-add"
@@ -206,7 +210,11 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 			<uui-ref-node-document-type id=${item.unique} name=${this.localize.string(item.name)} href=${href}>
 				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
+					${this.readonly
+						? nothing
+						: html`<uui-button
+								@click=${() => this.#removeItem(item)}
+								label=${this.localize.term('general_remove')}></uui-button>`}
 				</uui-action-bar>
 			</uui-ref-node-document-type>
 		`;
