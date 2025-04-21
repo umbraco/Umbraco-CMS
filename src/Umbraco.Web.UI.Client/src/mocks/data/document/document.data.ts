@@ -74,7 +74,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				editorAlias: 'Umbraco.RichText',
 				alias: 'richTextEditor',
-				culture: null,
+				culture: 'en-US',
 				segment: null,
 				value: {
 					blocks: {},
@@ -125,28 +125,28 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'email',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.ColorPicker',
 				alias: 'colorPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MultiNodeTreePicker',
 				alias: 'contentPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.ColorPicker.EyeDropper',
 				alias: 'eyeDropper',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MultiUrlPicker',
@@ -170,7 +170,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'multiUrlPicker',
 				culture: 'da-dk',
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MultiNodeTreePicker',
@@ -206,77 +206,77 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'email',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.TextBox',
 				alias: 'textBox',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.DropDown.Flexible',
 				alias: 'dropdown',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.DropDown.Flexible',
 				alias: 'dropdownMultiple',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.TextArea',
 				alias: 'textArea',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.Slider',
 				alias: 'slider',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.TrueFalse',
 				alias: 'toggle',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.Tags',
 				alias: 'tags',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MarkdownEditor',
 				alias: 'markdownEditor',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.RadioButtonList',
 				alias: 'radioButtonList',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.CheckBoxList',
 				alias: 'checkboxList',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.BlockList',
@@ -296,39 +296,84 @@ export const data: Array<UmbMockDocumentModel> = [
 						{
 							key: '1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-							elementProperty: 'Hello world',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
+								},
+							],
 						},
 					],
 					settingsData: [
 						{
 							key: '5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
-							elementProperty: 'Hello world',
-							textBox: 'Hello world 123',
-							blockList: {
-								layout: {
-									'Umbraco.BlockList': [
-										{
-											contentKey: '1234b',
-											settingsKey: '5678b',
-										},
-									],
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
 								},
-								contentData: [
-									{
-										key: '1234b',
-										contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-										elementProperty: 'Hello world',
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'textBox',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
+								},
+								{
+									editorAlias: 'Umbraco.BlockList',
+									alias: 'blockList',
+									culture: null,
+									segment: null,
+									value: {
+										layout: {
+											'Umbraco.BlockList': [
+												{
+													contentKey: '1234b',
+													settingsKey: '5678b',
+												},
+											],
+										},
+										contentData: [
+											{
+												key: '1234b',
+												contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+												values: [
+													{
+														editorAlias: 'Umbraco.TextBox',
+														alias: 'elementProperty',
+														culture: null,
+														segment: null,
+														value: 'Hello world 123',
+													},
+												],
+											},
+										],
+										settingsData: [
+											{
+												key: '5678b',
+												contentTypeKey: 'all-property-editors-document-type-id',
+												elementProperty: 'Hello world',
+												values: [
+													{
+														editorAlias: 'Umbraco.TextBox',
+														alias: 'elementProperty',
+														culture: null,
+														segment: null,
+														value: 'Hello world 123',
+													},
+												],
+											},
+										],
 									},
-								],
-								settingsData: [
-									{
-										key: '5678b',
-										contentTypeKey: 'all-property-editors-document-type-id',
-										elementProperty: 'Hello world',
-									},
-								],
-							},
+								},
+							],
 						},
 					],
 				},
@@ -338,7 +383,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'mediaPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.ImageCropper',
@@ -426,7 +471,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'uploadField',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.BlockGrid',
@@ -475,7 +520,15 @@ export const data: Array<UmbMockDocumentModel> = [
 						{
 							key: '1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-							elementProperty: 'Hello world',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
+								},
+							],
 						},
 						{
 							key: 'a1234',
@@ -497,7 +550,15 @@ export const data: Array<UmbMockDocumentModel> = [
 						{
 							key: '5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
-							elementProperty: 'Hello world',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
+								},
+							],
 						},
 						{
 							key: 'a5678',
@@ -517,70 +578,49 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'blockGrid',
 				culture: null,
 				segment: null,
-				value: null,
-			},
-			{
-				editorAlias: '',
-				alias: 'numberRange',
-				culture: null,
-				segment: null,
-				value: null,
-			},
-			{
-				editorAlias: '',
-				alias: 'orderDirection',
-				culture: null,
-				segment: null,
-				value: null,
-			},
-			{
-				editorAlias: '',
-				alias: 'overlaySize',
-				culture: null,
-				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.Label',
 				alias: 'label',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.Integer',
 				alias: 'integer',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.Decimal',
 				alias: 'decimal',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MemberPicker',
 				alias: 'memberPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MemberGroupPicker',
 				alias: 'memberGroupPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.UserPicker',
 				alias: 'userPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 		],
 		variants: [
@@ -867,14 +907,14 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'multiNodeTreePicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.ListView',
 				alias: 'listView',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 		],
 	},
