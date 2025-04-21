@@ -956,7 +956,6 @@ export const data: Array<UmbMockDocumentModel> = [
 				culture: null,
 				segment: null,
 				value: {
-					blocks: undefined,
 					markup: `
 						<p><a id="anchor"></a> Here is a link for <a href="https://gist.github.com/leekelleher/9490718" target="_blank">all HTML tags</a>.</p>
 						<p>
