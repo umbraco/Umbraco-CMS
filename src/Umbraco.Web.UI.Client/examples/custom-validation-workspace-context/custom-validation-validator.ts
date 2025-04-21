@@ -62,6 +62,12 @@ export class CustomValidationValidator extends UmbControllerBase implements UmbV
 				this.#isValid = false;
 			}
 		} else {
+			// Notice how we say the validation is valid if the value is empty.
+			// If you end up making a validation rule that requires the value to be present,
+			// then still make this Validator approve when empty,
+			// and then mark the property to be Mandatory so that Validation will enforce the value to be filled in,
+			// and then your Validator can be used to check the value it is present.
+			// — In this way you avoid overwhelming the user with validation messages before the user even entered a value.
 			this.#isValid = true;
 		}
 
@@ -81,7 +87,7 @@ export class CustomValidationValidator extends UmbControllerBase implements UmbV
 
 	async validate(): Promise<void> {
 		// Validate is called when the validation state of this validator is asked to be fully resolved. Like when user clicks Save & Publish.
-		// If you need to ask the server then it can be done here, instead of asking the server each time the value changes.
+		// If you need to ask the server then it could be done here, instead of asking the server each time the value changes.
 		// In this particular example we do not need to do anything, because our validation is represented via a message that we always set no matter the user interaction.
 		// If we did not like to only to check the Validation State when absolute needed then this method must be implemented.
 	}
