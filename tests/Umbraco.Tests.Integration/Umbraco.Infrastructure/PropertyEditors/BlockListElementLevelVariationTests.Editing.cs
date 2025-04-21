@@ -102,15 +102,15 @@ internal partial class BlockListElementLevelVariationTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantProperties = new[]
+            Properties = new[]
             {
                 new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
             },
             Variants = new[]
             {
-                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US", Properties = [] },
-                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK", Properties = [] },
-                new VariantModel { Name = content.GetCultureName("de-DE")!, Culture = "de-DE", Properties = [] }
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US" },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK" },
+                new VariantModel { Name = content.GetCultureName("de-DE")!, Culture = "de-DE" }
             }
         };
 
@@ -236,15 +236,15 @@ internal partial class BlockListElementLevelVariationTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantProperties = new[]
+            Properties = new[]
             {
                 new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
             },
             Variants = new[]
             {
-                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US", Properties = [] },
-                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK", Properties = [] },
-                new VariantModel { Name = content.GetCultureName("de-DE")!, Culture = "de-DE", Properties = [] }
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US" },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK" },
+                new VariantModel { Name = content.GetCultureName("de-DE")!, Culture = "de-DE" }
             }
         };
 
@@ -385,15 +385,15 @@ internal partial class BlockListElementLevelVariationTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantProperties = new[]
+            Properties = new[]
             {
                 new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
             },
             Variants = new[]
             {
-                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US", Properties = [] },
-                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK", Properties = [] },
-                new VariantModel { Name = content.GetCultureName("de-DE")!, Culture = "de-DE", Properties = [] }
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US" },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK" },
+                new VariantModel { Name = content.GetCultureName("de-DE")!, Culture = "de-DE" }
             }
         };
 
@@ -522,15 +522,15 @@ internal partial class BlockListElementLevelVariationTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantProperties = new[]
+            Properties = new[]
             {
                 new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
             },
             Variants = new[]
             {
-                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US", Properties = [] },
-                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK", Properties = [] },
-                new VariantModel { Name = content.GetCultureName("de-DE")!, Culture = "de-DE", Properties = [] }
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US" },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK" },
+                new VariantModel { Name = content.GetCultureName("de-DE")!, Culture = "de-DE" }
             }
         };
 
@@ -679,15 +679,15 @@ internal partial class BlockListElementLevelVariationTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantProperties = new[]
+            Properties = new[]
             {
                 new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
             },
             Variants = new[]
             {
-                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US", Properties = [] },
-                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK", Properties = [] },
-                new VariantModel { Name = content.GetCultureName("de-DE")!, Culture = "de-DE", Properties = [] }
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US" },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK" },
+                new VariantModel { Name = content.GetCultureName("de-DE")!, Culture = "de-DE" }
             }
         };
 

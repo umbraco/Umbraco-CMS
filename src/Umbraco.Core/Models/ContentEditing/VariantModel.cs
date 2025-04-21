@@ -7,6 +7,4 @@ public class VariantModel
     public string? Segment { get; set; }
 
     public required string Name { get; set; }
-
-    public required IEnumerable<PropertyValueModel> Properties { get; set; }
 }

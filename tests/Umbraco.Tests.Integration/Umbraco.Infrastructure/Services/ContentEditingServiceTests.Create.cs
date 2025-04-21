@@ -28,12 +28,15 @@ public partial class ContentEditingServiceTests
             ContentTypeKey = contentType.Key,
             TemplateKey = template.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create",
-            InvariantProperties = new[]
-            {
+            Variants =
+            [
+                new VariantModel { Name = "Test Create" }
+            ],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The title value" },
-                new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
-            }
+                new PropertyValueModel { Alias = "bodyText", Value = "The body text"  }
+            ]
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -91,7 +94,12 @@ public partial class ContentEditingServiceTests
         var rootKey = (await ContentEditingService.CreateAsync(
             new ContentCreateModel
             {
-                ContentTypeKey = rootContentType.Key, InvariantName = "Root", ParentKey = Constants.System.RootKey,
+                ContentTypeKey = rootContentType.Key,
+                ParentKey = Constants.System.RootKey,
+                Variants =
+                [
+                    new VariantModel { Name = "Root" }
+                ],
             },
             Constants.Security.SuperUserKey)).Result.Content!.Key;
 
@@ -100,12 +108,15 @@ public partial class ContentEditingServiceTests
             ContentTypeKey = childContentType.Key,
             TemplateKey = template.Key,
             ParentKey = rootKey,
-            InvariantName = "Test Create Child",
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The child title value" },
-                new PropertyValueModel { Alias = "bodyText", Value = "The child body text" }
-            }
+            Variants =
+            [
+                new VariantModel { Name = "Test Create Child" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The child title value"  },
+                new PropertyValueModel { Alias = "bodyText", Value = "The child body text"  }
+            ]
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -144,11 +155,14 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create",
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" }
-            }
+            Variants =
+            [
+                new VariantModel { Name = "Test Create" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value"  }
+            ]
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -173,7 +187,10 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create"
+            Variants =
+            [
+                new VariantModel { Name = "Test Create" }
+            ],
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -204,11 +221,14 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create",
-            InvariantProperties = new[]
+            Variants =
+            [
+                new VariantModel { Name = "Test Create" }
+            ],
+            Properties = new[]
             {
-                new PropertyValueModel { Alias = "title", Value = titleValue },
-                new PropertyValueModel { Alias = "keywords", Value = keywordsValue }
+                new PropertyValueModel { Alias = "title", Value = titleValue  },
+                new PropertyValueModel { Alias = "keywords", Value = keywordsValue  }
             }
         };
 
@@ -243,7 +263,10 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Guid.NewGuid(),
-            InvariantName = "Test Create"
+            Variants =
+            [
+                new VariantModel { Name = "Test Create" }
+            ],
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -260,7 +283,10 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = Guid.NewGuid(),
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create",
+            Variants =
+            [
+                new VariantModel { Name = "Test Create" }
+            ],
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -285,7 +311,10 @@ public partial class ContentEditingServiceTests
             ContentTypeKey = contentType.Key,
             TemplateKey = template.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create"
+            Variants =
+            [
+                new VariantModel { Name = "Test Create" }
+            ],
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -307,7 +336,10 @@ public partial class ContentEditingServiceTests
             ContentTypeKey = contentType.Key,
             TemplateKey = Guid.NewGuid(),
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create"
+            Variants =
+            [
+                new VariantModel { Name = "Test Create" }
+            ],
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -329,12 +361,15 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create",
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-                new PropertyValueModel { Alias = "no_such_property", Value = "No such property value" },
-            }
+            Variants =
+            [
+                new VariantModel { Name = "Test Create" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value"  },
+                new PropertyValueModel { Alias = "no_such_property", Value = "No such property value"  }
+            ]
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -356,11 +391,11 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = null,
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" }
-            }
+            Variants = [],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value"  }
+            ]
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -383,24 +418,25 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create",
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" }
-            },
-            Variants = new []
-            {
-                new VariantModel
+            Variants =
+            [
+                new VariantModel { Name = "Test Create" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel
                 {
+                    Alias = "title",
+                    Value = "The title value"
+                },
+                new PropertyValueModel
+                {
+                    Alias = "bodyText",
+                    Value = "The body text value",
                     Culture = contentVariation is ContentVariation.Culture ? "en-US" : null,
-                    Segment = contentVariation is ContentVariation.Segment ? "segment" : null,
-                    Name = "The English Name",
-                    Properties = new []
-                    {
-                        new PropertyValueModel { Alias = "bodyText", Value = "The body text value" }
-                    }
+                    Segment = contentVariation is ContentVariation.Segment ? "segment" : null
                 }
-            }
+            ]
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -419,31 +455,17 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" }
-            },
-            Variants = new[]
-            {
-                new VariantModel
-                {
-                    Culture = "en-US",
-                    Name = "The English Name",
-                    Properties = new[]
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The English Title" }
-                    }
-                },
-                new VariantModel
-                {
-                    Culture = "da-DK",
-                    Name = "The Danish Name",
-                    Properties = new[]
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The Danish Title" }
-                    }
-                }
-            }
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The English Title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The Danish Title", Culture = "da-DK" }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "The English Name" },
+                new VariantModel { Culture = "da-DK", Name = "The Danish Name" }
+            ]
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -475,39 +497,18 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantProperties =
+            Properties =
             [
-                new () { Alias = "invariantTitle", Value = "The Invariant Title" }
+                new () { Alias = "invariantTitle", Value = "The Invariant Title" },
+                new () { Alias = "variantTitle", Value = "The Default Title" },
+                new () { Alias = "variantTitle", Value = "The Seg-1 Title", Segment = "seg-1" },
+                new () { Alias = "variantTitle", Value = "The Seg-2 Title", Segment = "seg-2" }
             ],
             Variants =
             [
-                new ()
-                {
-                    Segment = null,
-                    Name = "The Name",
-                    Properties =
-                    [
-                        new () { Alias = "variantTitle", Value = "The Default Title" }
-                    ]
-                },
-                new ()
-                {
-                    Segment = "seg-1",
-                    Name = "The Name",
-                    Properties =
-                    [
-                        new () { Alias = "variantTitle", Value = "The Seg-1 Title" }
-                    ]
-                },
-                new ()
-                {
-                    Segment = "seg-2",
-                    Name = "The Name",
-                    Properties =
-                    [
-                        new () { Alias = "variantTitle", Value = "The Seg-2 Title" }
-                    ]
-                }
+                new () { Name = "The Name" },
+                new () { Segment = "seg-1", Name = "The Name" },
+                new () { Segment = "seg-2", Name = "The Name" }
             ]
         };
 
@@ -543,72 +544,24 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantProperties =
+            Properties =
             [
-                new () { Alias = "invariantTitle", Value = "The Invariant Title" }
+                new () { Alias = "invariantTitle", Value = "The Invariant Title" },
+                new () { Alias = "variantTitle", Value = "The Default Title in English", Culture = "en-US" },
+                new () { Alias = "variantTitle", Value = "The Seg-1 Title in English", Culture = "en-US", Segment = "seg-1" },
+                new () { Alias = "variantTitle", Value = "The Seg-2 Title in English", Culture = "en-US", Segment = "seg-2" },
+                new () { Alias = "variantTitle", Value = "The Default Title in Danish", Culture = "da-DK" },
+                new () { Alias = "variantTitle", Value = "The Seg-1 Title in Danish", Culture = "da-DK", Segment = "seg-1" },
+                new () { Alias = "variantTitle", Value = "The Seg-2 Title in Danish", Culture = "da-DK", Segment = "seg-2" }
             ],
             Variants =
             [
-                new ()
-                {
-                    Name = "The English Name",
-                    Culture = "en-US",
-                    Segment = null,
-                    Properties =
-                    [
-                        new () { Alias = "variantTitle", Value = "The Default Title in English" }
-                    ]
-                },
-                new ()
-                {
-                    Name = "The English Name",
-                    Culture = "en-US",
-                    Segment = "seg-1",
-                    Properties =
-                    [
-                        new () { Alias = "variantTitle", Value = "The Seg-1 Title in English" }
-                    ]
-                },
-                new ()
-                {
-                    Name = "The English Name",
-                    Culture = "en-US",
-                    Segment = "seg-2",
-                    Properties =
-                    [
-                        new () { Alias = "variantTitle", Value = "The Seg-2 Title in English" }
-                    ]
-                },
-                new ()
-                {
-                    Name = "The Danish Name",
-                    Culture = "da-DK",
-                    Segment = null,
-                    Properties =
-                    [
-                        new () { Alias = "variantTitle", Value = "The Default Title in Danish" }
-                    ]
-                },
-                new ()
-                {
-                    Name = "The Danish Name",
-                    Culture = "da-DK",
-                    Segment = "seg-1",
-                    Properties =
-                    [
-                        new () { Alias = "variantTitle", Value = "The Seg-1 Title in Danish" }
-                    ]
-                },
-                new ()
-                {
-                    Name = "The Danish Name",
-                    Culture = "da-DK",
-                    Segment = "seg-2",
-                    Properties =
-                    [
-                        new () { Alias = "variantTitle", Value = "The Seg-2 Title in Danish" }
-                    ]
-                }
+                new () { Name = "The English Name", Culture = "en-US" },
+                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-1" },
+                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-2" },
+                new () { Name = "The Danish Name", Culture = "da-DK" },
+                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-1" },
+                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-2" }
             ]
         };
 
@@ -640,6 +593,134 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
+    public async Task Can_Create_Culture_And_Segment_Variant_With_Segment_Only_Variant_Property()
+    {
+        var contentType = await CreateVariantContentType(ContentVariation.CultureAndSegment);
+        var propertyType = contentType.PropertyTypes.First(pt => pt.Alias == "invariantTitle");
+        propertyType.Alias = "segmentVariantTitle";
+        propertyType.Variations = ContentVariation.Segment;
+        ContentTypeService.Save(contentType);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Properties =
+            [
+                new () { Alias = "segmentVariantTitle", Value = "The Default Segment Variant Title", Segment = null },
+                new () { Alias = "segmentVariantTitle", Value = "The Seg-1 Segment Variant Title", Segment = "seg-1" },
+                new () { Alias = "segmentVariantTitle", Value = "The Seg-2 Segment Variant Title", Segment = "seg-2" },
+                new () { Alias = "variantTitle", Value = "The Default Title in English", Culture = "en-US" },
+                new () { Alias = "variantTitle", Value = "The Seg-1 Title in English", Culture = "en-US", Segment = "seg-1" },
+                new () { Alias = "variantTitle", Value = "The Seg-2 Title in English", Culture = "en-US", Segment = "seg-2" },
+                new () { Alias = "variantTitle", Value = "The Default Title in Danish", Culture = "da-DK" },
+                new () { Alias = "variantTitle", Value = "The Seg-1 Title in Danish", Culture = "da-DK", Segment = "seg-1" },
+                new () { Alias = "variantTitle", Value = "The Seg-2 Title in Danish", Culture = "da-DK", Segment = "seg-2" }
+            ],
+            Variants =
+            [
+                new () { Name = "The English Name", Culture = "en-US" },
+                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-1" },
+                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-2" },
+                new () { Name = "The Danish Name", Culture = "da-DK" },
+                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-1" },
+                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-2" }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.IsNotNull(result.Result.Content);
+        VerifyCreate(result.Result.Content);
+
+        // re-get and re-test
+        VerifyCreate(await ContentEditingService.GetAsync(result.Result.Content.Key));
+
+        void VerifyCreate(IContent? createdContent)
+        {
+            Assert.IsNotNull(createdContent);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual("The English Name", createdContent.GetCultureName("en-US"));
+                Assert.AreEqual("The Danish Name", createdContent.GetCultureName("da-DK"));
+                Assert.AreEqual("The Default Segment Variant Title", createdContent.GetValue<string>("segmentVariantTitle"));
+                Assert.AreEqual("The Seg-1 Segment Variant Title", createdContent.GetValue<string>("segmentVariantTitle", segment: "seg-1"));
+                Assert.AreEqual("The Seg-2 Segment Variant Title", createdContent.GetValue<string>("segmentVariantTitle", segment: "seg-2"));
+                Assert.AreEqual("The Default Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: null));
+                Assert.AreEqual("The Seg-1 Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"));
+                Assert.AreEqual("The Seg-2 Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"));
+                Assert.AreEqual("The Default Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: null));
+                Assert.AreEqual("The Seg-1 Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"));
+                Assert.AreEqual("The Seg-2 Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
+            });
+        }
+    }
+
+    [Test]
+    public async Task Can_Create_Culture_And_Segment_Variant_With_Culture_Only_Variant_Property()
+    {
+        var contentType = await CreateVariantContentType(ContentVariation.CultureAndSegment);
+        var propertyType = contentType.PropertyTypes.First(pt => pt.Alias == "invariantTitle");
+        propertyType.Alias = "cultureVariantTitle";
+        propertyType.Variations = ContentVariation.Culture;
+        ContentTypeService.Save(contentType);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Properties =
+            [
+                new () { Alias = "cultureVariantTitle", Value = "The English Culture Variant Title", Culture = "en-US" },
+                new () { Alias = "cultureVariantTitle", Value = "The Danish Culture Variant Title", Culture = "da-DK" },
+                new () { Alias = "variantTitle", Value = "The Default Title in English", Culture = "en-US" },
+                new () { Alias = "variantTitle", Value = "The Seg-1 Title in English", Culture = "en-US", Segment = "seg-1" },
+                new () { Alias = "variantTitle", Value = "The Seg-2 Title in English", Culture = "en-US", Segment = "seg-2" },
+                new () { Alias = "variantTitle", Value = "The Default Title in Danish", Culture = "da-DK" },
+                new () { Alias = "variantTitle", Value = "The Seg-1 Title in Danish", Culture = "da-DK", Segment = "seg-1" },
+                new () { Alias = "variantTitle", Value = "The Seg-2 Title in Danish", Culture = "da-DK", Segment = "seg-2" }
+            ],
+            Variants =
+            [
+                new () { Name = "The English Name", Culture = "en-US" },
+                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-1" },
+                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-2" },
+                new () { Name = "The Danish Name", Culture = "da-DK" },
+                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-1" },
+                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-2" }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.IsNotNull(result.Result.Content);
+        VerifyCreate(result.Result.Content);
+
+        // re-get and re-test
+        VerifyCreate(await ContentEditingService.GetAsync(result.Result.Content.Key));
+
+        void VerifyCreate(IContent? createdContent)
+        {
+            Assert.IsNotNull(createdContent);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual("The English Name", createdContent.GetCultureName("en-US"));
+                Assert.AreEqual("The Danish Name", createdContent.GetCultureName("da-DK"));
+                Assert.AreEqual("The English Culture Variant Title", createdContent.GetValue<string>("cultureVariantTitle", culture: "en-US"));
+                Assert.AreEqual("The Danish Culture Variant Title", createdContent.GetValue<string>("cultureVariantTitle", culture: "da-DK"));
+                Assert.AreEqual("The Default Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: null));
+                Assert.AreEqual("The Seg-1 Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"));
+                Assert.AreEqual("The Seg-2 Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"));
+                Assert.AreEqual("The Default Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: null));
+                Assert.AreEqual("The Seg-1 Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"));
+                Assert.AreEqual("The Seg-2 Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
+            });
+        }
+    }
+
+    [Test]
     public async Task Can_Create_With_Explicit_Key()
     {
         var contentType = ContentTypeBuilder.CreateContentMetaContentType();
@@ -653,11 +734,14 @@ public partial class ContentEditingServiceTests
             Key = key,
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create",
-            InvariantProperties = new[]
-            {
+            Variants =
+            [
+                new () { Name = "Test Create" }
+            ],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The title value" }
-            }
+            ]
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -682,11 +766,15 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantProperties = new[]
-            {
+            Variants =
+            [
+                new () { Name = "Test Create", Culture = "en-US" }
+            ],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" },
                 new PropertyValueModel { Alias = "variantTitle", Value = "The Variant Title" }
-            }
+            ]
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -705,19 +793,14 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantProperties = [
+            Properties =
+            [
                 new () { Alias = "invariantTitle", Value = "The Invariant Title" },
+                new () { Alias = "variantTitle", Value = "The Variant Title", Culture = "en-US", Segment = "segment" }
             ],
-            Variants = [
-                new ()
-                {
-                    Name = "The name",
-                    Culture = "en-US",
-                    Segment = "segment",
-                    Properties = [
-                        new () { Alias = "variantTitle", Value = "The Variant Title" }
-                    ]
-                }
+            Variants =
+            [
+                new () { Name = "The name", Culture = "en-US", Segment = "segment" }
             ]
         };
 
@@ -742,7 +825,12 @@ public partial class ContentEditingServiceTests
         var rootKey = (await ContentEditingService.CreateAsync(
             new ContentCreateModel
             {
-                ContentTypeKey = contentType.Key, InvariantName = "Root", ParentKey = Constants.System.RootKey
+                ContentTypeKey = contentType.Key,
+                ParentKey = Constants.System.RootKey,
+                Variants =
+                [
+                    new () { Name = "Root" }
+                ]
             },
             Constants.Security.SuperUserKey)).Result.Content!.Key;
 
@@ -751,7 +839,12 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.CreateAsync(
             new ContentCreateModel
             {
-                ContentTypeKey = contentType.Key, InvariantName = "Child", ParentKey = rootKey,
+                ContentTypeKey = contentType.Key,
+                ParentKey = rootKey,
+                Variants =
+                [
+                    new () { Name = "Child" }
+                ]
             },
             Constants.Security.SuperUserKey);
 
@@ -770,31 +863,17 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" }
-            },
-            Variants = new[]
-            {
-                new VariantModel
-                {
-                    Culture = "en-us",
-                    Name = "The English Name",
-                    Properties = new[]
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The English Title" }
-                    }
-                },
-                new VariantModel
-                {
-                    Culture = "da-dk",
-                    Name = "The Danish Name",
-                    Properties = new[]
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The Danish Title" }
-                    }
-                }
-            }
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The English Title", Culture = "en-us" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The Danish Title", Culture = "da-dk" }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-us", Name = "The English Name" },
+                new VariantModel { Culture = "da-dk", Name = "The Danish Name" }
+            ]
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -811,30 +890,16 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" }
-            },
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The Seg-1 Title", Segment = "seg-1" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The Seg-2 Title", Segment = "seg-2" }
+            ],
             Variants =
             [
-                new ()
-                {
-                    Segment = "seg-1",
-                    Name = "The Name",
-                    Properties =
-                    [
-                        new () { Alias = "variantTitle", Value = "The Seg-1 Title" }
-                    ]
-                },
-                new ()
-                {
-                    Segment = "seg-2",
-                    Name = "The Name",
-                    Properties =
-                    [
-                        new () { Alias = "variantTitle", Value = "The Seg-2 Title" }
-                    ]
-                }
+                new () { Segment = "seg-1", Name = "The Name" },
+                new () { Segment = "seg-2", Name = "The Name" }
             ]
         };
 

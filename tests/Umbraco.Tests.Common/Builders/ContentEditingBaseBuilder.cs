@@ -1,5 +1,7 @@
 ﻿using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
@@ -64,10 +66,23 @@ public abstract class ContentEditingBaseBuilder<TCreateModel> : BuilderBase<TCre
             _model.ParentKey = _parentKey;
         }
 
-        _model.InvariantName = _invariantName ?? Guid.NewGuid().ToString();
         _model.ContentTypeKey = _contentTypeKey;
         _model.Key = _key ?? Guid.NewGuid();
-        _model.InvariantProperties = _invariantProperties.Select(x => x.Build()).ToList();
+        _model.Properties = _invariantProperties
+            .Select(p => p.Build())
+            .Union(_variants.SelectMany(variant => variant.GetProperties().Select(p => p.Build())))
+            .ToArray();
+
+        if (_invariantName.IsNullOrWhiteSpace() is false)
+        {
+            if (_variants.Any())
+            {
+                throw new InvalidOperationException("Cannot combine invariant and variant variants.");
+            }
+
+            AddVariant().WithName(_invariantName);
+        }
+
         _model.Variants = _variants.Select(x => x.Build()).ToList();
 
         return _model;

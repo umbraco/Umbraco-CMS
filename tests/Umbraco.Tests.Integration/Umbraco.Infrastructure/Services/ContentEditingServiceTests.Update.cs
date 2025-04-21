@@ -17,12 +17,15 @@ public partial class ContentEditingServiceTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantName = "Updated Name",
-            InvariantProperties = new[]
-            {
+            Variants =
+            [
+                new VariantModel { Name = "Updated Name" }
+            ],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The updated title" },
                 new PropertyValueModel { Alias = "text", Value = "The updated text" }
-            }
+            ]
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
@@ -49,31 +52,17 @@ public partial class ContentEditingServiceTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }
-            },
-            Variants = new []
-            {
-                new VariantModel
-                {
-                    Culture = "en-US",
-                    Name = "Updated English Name",
-                    Properties = new []
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title" }
-                    }
-                },
-                new VariantModel
-                {
-                    Culture = "da-DK",
-                    Name = "Updated Danish Name",
-                    Properties = new []
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish title" }
-                    }
-                }
-            }
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish title", Culture = "da-DK" },
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "Updated English Name" },
+                new VariantModel { Culture = "da-DK", Name = "Updated Danish Name" }
+            ]
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
@@ -102,40 +91,19 @@ public partial class ContentEditingServiceTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }
-            },
-            Variants = new []
-            {
-                new VariantModel
-                {
-                    Segment = null,
-                    Name = "The Updated Name",
-                    Properties = new []
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated default title" }
-                    }
-                },
-                new VariantModel
-                {
-                    Segment = "seg-1",
-                    Name = "The Updated Name",
-                    Properties = new []
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-1 title" }
-                    }
-                },
-                new VariantModel
-                {
-                    Segment = "seg-2",
-                    Name = "The Updated Name",
-                    Properties = new []
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-2 title" }
-                    }
-                },
-            }
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated default title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-1 title", Segment = "seg-1" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-2 title", Segment = "seg-2" }
+            ],
+            Variants =
+            [
+                new VariantModel { Name = "The Updated Name" },
+                new VariantModel { Segment = "seg-1", Name = "The Updated Name" },
+                new VariantModel { Segment = "seg-2", Name = "The Updated Name" }
+            ]
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
@@ -161,6 +129,122 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
+    public async Task Can_Update_Culture_And_Segment_Variant_With_Culture_Only_Variant_Property()
+    {
+        var content = await CreateCultureAndSegmentVariantContent(ContentVariation.Culture);
+
+        var updateModel = new ContentUpdateModel
+        {
+            Properties =
+            [
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated default English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-1 English title", Culture = "en-US", Segment = "seg-1" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-2 English title", Culture = "en-US", Segment = "seg-2" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated default Danish title", Culture = "da-DK" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-1 Danish title", Culture = "da-DK", Segment = "seg-1" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-2 Danish title", Culture = "da-DK", Segment = "seg-2" },
+                new PropertyValueModel { Alias = "otherTitle", Value = "The updated other English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "otherTitle", Value = "The updated other Danish title", Culture = "da-DK" },
+            ],
+            Variants =
+            [
+                new VariantModel { Name = "The Updated English Default Name", Culture = "en-US" },
+                new VariantModel { Name = "The Updated English Seg-1 Name", Culture = "en-US", Segment = "seg-1" },
+                new VariantModel { Name = "The Updated English Seg-2 Name", Culture = "en-US", Segment = "seg-2" },
+                new VariantModel { Name = "The Updated Danish Default Name", Culture = "da-DK" },
+                new VariantModel { Name = "The Updated Danish Seg-1 Name", Culture = "da-DK", Segment = "seg-1" },
+                new VariantModel { Name = "The Updated Danish Seg-2 Name", Culture = "da-DK", Segment = "seg-2" },
+            ]
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        VerifyUpdate(result.Result.Content);
+
+        // re-get and re-test
+        VerifyUpdate(await ContentEditingService.GetAsync(content.Key));
+
+        void VerifyUpdate(IContent? updatedContent)
+        {
+            Assert.IsNotNull(updatedContent);
+            Assert.Multiple(() =>
+            {
+                // NOTE: names cannot differ between segments, only between culture - should always prefer segment-less names
+                Assert.AreEqual("The Updated English Default Name", updatedContent.GetCultureName("en-US"));
+                Assert.AreEqual("The Updated Danish Default Name", updatedContent.GetCultureName("da-DK"));
+                Assert.AreEqual("The updated default English title", updatedContent.GetValue<string>("variantTitle", culture: "en-US", segment: null));
+                Assert.AreEqual("The updated seg-1 English title", updatedContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"));
+                Assert.AreEqual("The updated seg-2 English title", updatedContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"));
+                Assert.AreEqual("The updated default Danish title", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: null));
+                Assert.AreEqual("The updated seg-1 Danish title", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"));
+                Assert.AreEqual("The updated seg-2 Danish title", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
+                Assert.AreEqual("The updated other English title", updatedContent.GetValue<string>("otherTitle", culture: "en-US", segment: null));
+                Assert.AreEqual("The updated other Danish title", updatedContent.GetValue<string>("otherTitle", culture: "da-DK", segment: null));
+            });
+        }
+    }
+
+    [Test]
+    public async Task Can_Update_Culture_And_Segment_Variant_With_Segment_Only_Variant_Property()
+    {
+        var content = await CreateCultureAndSegmentVariantContent(ContentVariation.Segment);
+
+        var updateModel = new ContentUpdateModel
+        {
+            Properties =
+            [
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated default English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-1 English title", Culture = "en-US", Segment = "seg-1" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-2 English title", Culture = "en-US", Segment = "seg-2" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated default Danish title", Culture = "da-DK" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-1 Danish title", Culture = "da-DK", Segment = "seg-1" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-2 Danish title", Culture = "da-DK", Segment = "seg-2" },
+                new PropertyValueModel { Alias = "otherTitle", Value = "The updated other default title", Segment = null },
+                new PropertyValueModel { Alias = "otherTitle", Value = "The updated other seg-1 title", Segment = "seg-1" },
+                new PropertyValueModel { Alias = "otherTitle", Value = "The updated other seg-2 title", Segment = "seg-2" },
+            ],
+            Variants =
+            [
+                new VariantModel { Name = "The Updated English Default Name", Culture = "en-US" },
+                new VariantModel { Name = "The Updated English Seg-1 Name", Culture = "en-US", Segment = "seg-1" },
+                new VariantModel { Name = "The Updated English Seg-2 Name", Culture = "en-US", Segment = "seg-2" },
+                new VariantModel { Name = "The Updated Danish Default Name", Culture = "da-DK" },
+                new VariantModel { Name = "The Updated Danish Seg-1 Name", Culture = "da-DK", Segment = "seg-1" },
+                new VariantModel { Name = "The Updated Danish Seg-2 Name", Culture = "da-DK", Segment = "seg-2" },
+            ]
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        VerifyUpdate(result.Result.Content);
+
+        // re-get and re-test
+        VerifyUpdate(await ContentEditingService.GetAsync(content.Key));
+
+        void VerifyUpdate(IContent? updatedContent)
+        {
+            Assert.IsNotNull(updatedContent);
+            Assert.Multiple(() =>
+            {
+                // NOTE: names cannot differ between segments, only between culture - should always prefer segment-less names
+                Assert.AreEqual("The Updated English Default Name", updatedContent.GetCultureName("en-US"));
+                Assert.AreEqual("The Updated Danish Default Name", updatedContent.GetCultureName("da-DK"));
+                Assert.AreEqual("The updated default English title", updatedContent.GetValue<string>("variantTitle", culture: "en-US", segment: null));
+                Assert.AreEqual("The updated seg-1 English title", updatedContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"));
+                Assert.AreEqual("The updated seg-2 English title", updatedContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"));
+                Assert.AreEqual("The updated default Danish title", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: null));
+                Assert.AreEqual("The updated seg-1 Danish title", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"));
+                Assert.AreEqual("The updated seg-2 Danish title", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
+                Assert.AreEqual("The updated other default title", updatedContent.GetValue<string>("otherTitle", culture: null, segment: null));
+                Assert.AreEqual("The updated other seg-1 title", updatedContent.GetValue<string>("otherTitle", culture: null, segment: "seg-1"));
+                Assert.AreEqual("The updated other seg-2 title", updatedContent.GetValue<string>("otherTitle", culture: null, segment: "seg-2"));
+            });
+        }
+    }
+
+    [Test]
     public async Task Can_Update_Template()
     {
         var templateOne = new TemplateBuilder().WithAlias("textPageOne").WithName("Text page one").Build();
@@ -173,7 +257,10 @@ public partial class ContentEditingServiceTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantName = "Updated Name",
+            Variants =
+            [
+                new VariantModel { Name = "Updated Name" }
+            ],
             TemplateKey = templateTwo.Key
         };
 
@@ -202,7 +289,10 @@ public partial class ContentEditingServiceTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantName = "Updated Name",
+            Variants =
+            [
+                new VariantModel { Name = "Updated Name" }
+            ],
             TemplateKey = null
         };
 
@@ -227,8 +317,11 @@ public partial class ContentEditingServiceTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantName = "Updated Name",
-            InvariantProperties = new[]
+            Variants =
+            [
+                new VariantModel { Name = "Updated Name" }
+            ],
+            Properties = new[]
             {
                 new PropertyValueModel { Alias = "title", Value = "The updated title" }
             }
@@ -266,8 +359,11 @@ public partial class ContentEditingServiceTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantName = content.Name,
-            InvariantProperties = new[]
+            Variants =
+            [
+                new VariantModel { Name = content.Name }
+            ],
+            Properties = new[]
             {
                 new PropertyValueModel { Alias = "title", Value = titleValue },
                 new PropertyValueModel { Alias = "text", Value = textValue }
@@ -300,28 +396,20 @@ public partial class ContentEditingServiceTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantName = "Updated Name",
-            InvariantProperties = new[]
-            {
+            Variants =
+            [
+                new VariantModel { Name = "Updated Name" }
+            ],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The updated title" },
-            },
-            Variants = new[]
-            {
-                new VariantModel
-                {
-                    Culture = "en-US",
-                    Name = "Updated English Name",
-                    Properties = new[]
-                    {
-                        new PropertyValueModel { Alias = "text", Value = "The updated text" }
-                    }
-                }
-            }
+                new PropertyValueModel { Alias = "text", Value = "The updated title", Culture = "en-US" }
+            ]
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status);
+        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
 
         // re-get and validate
         content = await ContentEditingService.GetAsync(content.Key);
@@ -338,8 +426,12 @@ public partial class ContentEditingServiceTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantName = "Updated Name",
-            InvariantProperties = new[]
+            Variants =
+            [
+                new VariantModel { Name = "Updated English Name", Culture = "en-US" },
+                new VariantModel { Name = "Updated Danish Name", Culture = "da-DK" },
+            ],
+            Properties = new[]
             {
                 new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" },
                 new PropertyValueModel { Alias = "variantTitle", Value = "The updated variant title" }
@@ -367,31 +459,17 @@ public partial class ContentEditingServiceTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }
-            },
-            Variants = new []
-            {
-                new VariantModel
-                {
-                    Culture = "en-us",
-                    Name = "Updated English Name",
-                    Properties = new []
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title" }
-                    }
-                },
-                new VariantModel
-                {
-                    Culture = "da-dk",
-                    Name = "Updated Danish Name",
-                    Properties = new []
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish title" }
-                    }
-                }
-            }
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title", Culture = "en-us" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish title", Culture = "da-dk" }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-us", Name = "Updated English Name" },
+                new VariantModel { Culture = "da-dk", Name = "Updated Danish Name" }
+            ]
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
@@ -408,12 +486,15 @@ public partial class ContentEditingServiceTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantName = "Updated Name",
-            InvariantProperties = new[]
-            {
+            Variants =
+            [
+                new VariantModel { Name = "Updated Name" }
+            ],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The initial title" },
                 new PropertyValueModel { Alias = "label", Value = "The updated label value" }
-            }
+            ]
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
@@ -444,33 +525,27 @@ public partial class ContentEditingServiceTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }
-            },
-            Variants = new []
-            {
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The initial English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantLabel", Value = "The updated English label value", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The initial Danish title", Culture = "da-DK" },
+                new PropertyValueModel { Alias = "variantLabel", Value = "The updated Danish label value", Culture = "da-DK" }
+            ],
+            Variants =
+            [
                 new VariantModel
                 {
                     Culture = "en-US",
-                    Name = "Updated English Name",
-                    Properties = new []
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The initial English title" },
-                        new PropertyValueModel { Alias = "variantLabel", Value = "The updated English label value" }
-                    }
+                    Name = "Updated English Name"
                 },
                 new VariantModel
                 {
                     Culture = "da-DK",
-                    Name = "Updated Danish Name",
-                    Properties = new []
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The initial Danish title" },
-                        new PropertyValueModel { Alias = "variantLabel", Value = "The updated Danish  label value" }
-                    }
+                    Name = "Updated Danish Name"
                 }
-            }
+            ]
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
