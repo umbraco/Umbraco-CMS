@@ -165,7 +165,7 @@ export abstract class UmbPropertyEditorUiRteElementBase
 		});
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-			this.#managerContext.setVariantId(context.getVariantId());
+			this.#managerContext.setVariantId(context?.getVariantId());
 		});
 
 		this.observe(

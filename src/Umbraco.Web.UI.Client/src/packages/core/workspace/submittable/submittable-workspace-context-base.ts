@@ -52,7 +52,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		this.workspaceAlias = workspaceAlias;
 		// TODO: Consider if we can move this consumption to #resolveSubmit, just as a getContext, but it depends if others use the modalContext prop.. [NL]
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
-			(this.modalContext as UmbModalContext) = context;
+			(this.modalContext as UmbModalContext | undefined) = context;
 		});
 	}
 

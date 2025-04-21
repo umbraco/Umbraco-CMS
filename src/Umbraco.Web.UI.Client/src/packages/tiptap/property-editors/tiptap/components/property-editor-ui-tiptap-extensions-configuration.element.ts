@@ -62,7 +62,7 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 		super();
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (dataset) => {
 			this.observe(
-				await dataset.propertyValueByAlias<Array<unknown>>('blocks'),
+				await dataset?.propertyValueByAlias<Array<unknown>>('blocks'),
 				(blocks) => {
 					const tmpValue = this.value ? [...this.value] : [];
 

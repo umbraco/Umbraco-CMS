@@ -15,7 +15,7 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_LANGUAGE_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this.observe(this.#workspaceContext.isNew, (isNew) => (this._isNew = isNew));
+			this.observe(this.#workspaceContext?.isNew, (isNew) => (this._isNew = isNew));
 		});
 	}
 

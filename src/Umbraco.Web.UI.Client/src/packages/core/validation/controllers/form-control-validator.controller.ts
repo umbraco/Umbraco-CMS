@@ -28,9 +28,9 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 				this.#context.removeValidator(this);
 			}
 			this.#context = context;
-			context.addValidator(this);
+			context?.addValidator(this);
 			// If we have a message already, then un-pristine the control:
-			if (dataPath && context.messages.getHasMessagesOfPathAndDescendant(dataPath)) {
+			if (dataPath && context?.messages.getHasMessagesOfPathAndDescendant(dataPath)) {
 				formControl.pristine = false;
 			}
 		});

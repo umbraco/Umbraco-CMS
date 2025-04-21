@@ -17,19 +17,19 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase<UmbLanguag
 
 		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.observe(instance.variantOptions, (variantOptions) => {
+			this.observe(instance?.variantOptions, (variantOptions) => {
 				this.#variantOptions = variantOptions;
 				this.#checkForLanguageAccess();
 			});
 		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(context.languages, (languages) => {
+			this.observe(context?.languages, (languages) => {
 				this.#currentUserAllowedLanguages = languages;
 				this.#checkForLanguageAccess();
 			});
 
-			this.observe(context.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
+			this.observe(context?.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
 				this.#currentUserHasAccessToAllLanguages = hasAccessToAllLanguages;
 				this.#checkForLanguageAccess();
 			});
