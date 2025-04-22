@@ -63,6 +63,12 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
                 .WithName("Content")
                 .WithSupportsPublishing(true)
                 .Done()
+            .AddPropertyType()
+                .WithAlias("title")
+                .WithName("Title")
+                .WithMandatory(true)
+                .WithVariations(ContentVariation.Culture)
+                .Done()
             .Build();
 
         contentType.AllowedAsRoot = true;
@@ -82,7 +88,13 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         return (langEn, langDa, langBe, contentType);
     }
 
-    private async Task<IContent> CreateVariantContentAsync(ILanguage langEn, ILanguage langDa, ILanguage langBe, IContentType contentType, Guid? parentKey = null)
+    private async Task<IContent> CreateVariantContentAsync(
+        ILanguage langEn,
+        ILanguage langDa,
+        ILanguage langBe,
+        IContentType contentType,
+        Guid? parentKey = null,
+        string? englishTitleValue = "Test title")
     {
         var documentKey = Guid.NewGuid();
 
@@ -97,19 +109,40 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
                 {
                     Name = langEn.CultureName,
                     Culture = langEn.IsoCode,
-                    Properties = Enumerable.Empty<PropertyValueModel>(),
+                    Properties =
+                    [
+                        new PropertyValueModel
+                        {
+                            Alias = "title",
+                            Value = englishTitleValue,
+                        }
+                    ]
                 },
                 new VariantModel
                 {
                     Name = langDa.CultureName,
                     Culture = langDa.IsoCode,
-                    Properties = Enumerable.Empty<PropertyValueModel>(),
+                    Properties =
+                    [
+                        new PropertyValueModel
+                        {
+                            Alias = "title",
+                            Value = "Test titel",
+                        }
+                    ]
                 },
                 new VariantModel
                 {
                     Name = langBe.CultureName,
                     Culture = langBe.IsoCode,
-                    Properties = Enumerable.Empty<PropertyValueModel>(),
+                    Properties =
+                    [
+                        new PropertyValueModel
+                        {
+                            Alias = "title",
+                            Value = "Titel van de test",
+                        }
+                    ]
                 }
             ]
         };
@@ -137,6 +170,11 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
                 .WithName("Content")
                 .WithSupportsPublishing(true)
                 .Done()
+            .AddPropertyType()
+                .WithAlias("title")
+                .WithName("Title")
+                .WithMandatory(true)
+                .Done()
             .Build();
 
         var createAttempt = await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
@@ -155,7 +193,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         return contentType;
     }
 
-    private async Task<IContent> CreateInvariantContentAsync(IContentType contentType, Guid? parentKey = null)
+    private async Task<IContent> CreateInvariantContentAsync(IContentType contentType, Guid? parentKey = null, string? titleValue = "Test title")
     {
         var documentKey = Guid.NewGuid();
 
@@ -165,6 +203,14 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             ContentTypeKey = contentType.Key,
             InvariantName = "Test",
             ParentKey = parentKey,
+            InvariantProperties =
+            [
+                new PropertyValueModel
+                {
+                    Alias = "title",
+                    Value = titleValue,
+                }
+            ],
         };
 
         var createAttempt = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
