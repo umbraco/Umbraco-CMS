@@ -45,6 +45,8 @@ export class UmbContentTypeStructureManager<
 		this.#initResolver = resolve;
 	});
 
+	#editedTypes = new UmbArrayState<string, string>([], (x) => x);
+
 	#repository?: UmbDetailRepository<T>;
 	#initRepositoryResolver?: (repo: UmbDetailRepository<T>) => void;
 
@@ -78,6 +80,12 @@ export class UmbContentTypeStructureManager<
 	readonly contentTypeCompositions = this.#contentTypes.asObservablePart((contentTypes) => {
 		return contentTypes.flatMap((x) => x.compositions ?? []);
 	});
+	async getContentTypeCompositions() {
+		return await this.observe(this.contentTypeCompositions).asPromise();
+	}
+	async getOwnerContentTypeCompositions() {
+		return await this.observe(this.ownerContentTypeCompositions).asPromise();
+	}
 	readonly #contentTypeContainers = this.#contentTypes.asObservablePart((contentTypes) => {
 		return contentTypes.flatMap((x) => x.containers ?? []);
 	});
@@ -129,7 +137,16 @@ export class UmbContentTypeStructureManager<
 				);
 			}
 			this.#repoManager = new UmbRepositoryDetailsManager(this, typeRepository);
-			this.observe(this.#repoManager.entries, (entries) => this.#contentTypes.append(entries), null);
+			this.observe(
+				this.#repoManager.entries,
+				(entries) => {
+					// Prevent updating once that are have edited here.
+					entries = entries.filter((x) => !(this.#editedTypes.hasOne(x.unique) && this.#contentTypes.hasOne(x.unique)));
+
+					this.#contentTypes.append(entries);
+				},
+				null,
+			);
 		});
 
 		// Observe all Content Types compositions: [NL]
@@ -238,6 +255,7 @@ export class UmbContentTypeStructureManager<
 		const compositionUniques = contentTypeCompositions?.map((x) => x.contentType.unique) ?? [];
 		const newUniques = [ownerUnique, ...compositionUniques];
 		this.#contentTypes.filter((x) => newUniques.includes(x.unique));
+		await Promise.resolve();
 		this.#repoManager?.setUniques(newUniques);
 	}
 
@@ -273,6 +291,7 @@ export class UmbContentTypeStructureManager<
 	}
 
 	updateOwnerContentType(entry: Partial<T>) {
+		this.#editedTypes.appendOne(this.#ownerContentTypeUnique!);
 		this.#contentTypes.updateOne(this.#ownerContentTypeUnique, entry);
 	}
 
@@ -322,6 +341,7 @@ export class UmbContentTypeStructureManager<
 	): Promise<UmbPropertyTypeContainerModel | undefined> {
 		await this.#init;
 		toContentTypeUnique = toContentTypeUnique ?? this.#ownerContentTypeUnique!;
+		this.#editedTypes.appendOne(toContentTypeUnique);
 
 		// Find container.
 		const container = this.#containers.getValue().find((x) => x.id === containerId);
@@ -364,6 +384,7 @@ export class UmbContentTypeStructureManager<
 		this.getOwnerContainers(type, parentId)?.forEach((container) => {
 			if (container.name === '') {
 				const newName = 'Unnamed';
+				this.#editedTypes.appendOne(contentTypeUnique);
 				this.updateContainer(null, container.id, {
 					name: this.makeContainerNameUniqueForOwnerContentType(container.id, newName, type, parentId) ?? newName,
 				});
@@ -379,6 +400,7 @@ export class UmbContentTypeStructureManager<
 	): Promise<UmbPropertyTypeContainerModel> {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
+		this.#editedTypes.appendOne(contentTypeUnique);
 
 		if (parentId) {
 			const duplicatedParentContainer = await this.ensureContainerOf(parentId, contentTypeUnique);
@@ -464,6 +486,7 @@ export class UmbContentTypeStructureManager<
 	) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
+		this.#editedTypes.appendOne(contentTypeUnique);
 
 		/*
 		// If we have a container, we need to ensure it exists, and then update the container with the new parent id.
@@ -502,6 +525,7 @@ export class UmbContentTypeStructureManager<
 	async removeContainer(contentTypeUnique: string | null, containerId: string | null = null) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
+		this.#editedTypes.appendOne(contentTypeUnique);
 
 		const contentType = this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique);
 		if (!contentType) {
@@ -524,6 +548,7 @@ export class UmbContentTypeStructureManager<
 	async insertProperty(contentTypeUnique: string | null, property: UmbPropertyTypeModel) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
+		this.#editedTypes.appendOne(contentTypeUnique);
 
 		// If we have a container, we need to ensure it exists, and then update the container with the new parent id. [NL]
 		if (property.container) {
@@ -552,6 +577,7 @@ export class UmbContentTypeStructureManager<
 	async removeProperty(contentTypeUnique: string | null, propertyUnique: string) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
+		this.#editedTypes.appendOne(contentTypeUnique);
 
 		const frozenProperties =
 			this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.properties ?? [];
@@ -568,6 +594,7 @@ export class UmbContentTypeStructureManager<
 	) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
+		this.#editedTypes.appendOne(contentTypeUnique);
 
 		const frozenProperties =
 			this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.properties ?? [];
