@@ -249,11 +249,11 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		if (!isUmbContextUnprovidedEventType(event)) return;
 
 		if (this.#contextAlias === event.contextAlias && event.instance === this.#instance) {
-			this.#unProvide();
+			this.#unprovide();
 		}
 	};
 
-	#unProvide() {
+	#unprovide() {
 		if (this.#instance !== undefined) {
 			this.#instance = undefined;
 			this.#callback?.(undefined);
