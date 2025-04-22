@@ -23,6 +23,7 @@ import { hasOwnOpener, retrieveStoredPath } from '@umbraco-cms/backoffice/utils'
 import { UmbApiInterceptorController } from '@umbraco-cms/backoffice/resources';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 
+import './app-logo.element.js';
 import './app-oauth.element.js';
 
 @customElement('umb-app')
