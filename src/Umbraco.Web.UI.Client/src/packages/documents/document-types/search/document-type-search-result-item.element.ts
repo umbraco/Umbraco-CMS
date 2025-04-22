@@ -1,22 +1,33 @@
-import type { UmbSearchResultItemModel } from '../types.js';
+import type { UmbDocumentTypeItemModel } from '../repository/types.js';
 import { css, customElement, html, nothing, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
-@customElement('umb-search-result-item')
-export class UmbSearchResultItemElement extends UmbLitElement {
+@customElement('umb-document-type-search-result-item')
+export class UmbDocumentTypeSearchResultItemElement extends UmbLitElement {
 	@property({ type: Object })
-	item?: UmbSearchResultItemModel;
+	item?: UmbSearchResultItemModel & UmbDocumentTypeItemModel;
 
 	override render() {
 		if (!this.item) return nothing;
+
 		return html`
 			${when(
 				this.item.icon,
 				(icon) => html`<umb-icon name=${icon}></umb-icon>`,
-				() => html`<uui-icon name="icon-shape-hexagon"></uui-icon>`,
+				() => html`<uui-icon name="icon-document"></uui-icon>`,
 			)}
 			<span>${this.item.name}</span>
-			<div class="extra"></div>
+			<div class="extra">
+				${when(
+					this.item.isElement,
+					() => html`
+						<uui-tag look="secondary">
+							<umb-localize key="contentTypeEditor_elementType">Element Type</umb-localize>
+						</uui-tag>
+					`,
+				)}
+			</div>
 		`;
 	}
 
@@ -41,10 +52,10 @@ export class UmbSearchResultItemElement extends UmbLitElement {
 	];
 }
 
-export { UmbSearchResultItemElement as element };
+export { UmbDocumentTypeSearchResultItemElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-search-result-item': UmbSearchResultItemElement;
+		'umb-document-type-search-result-item': UmbDocumentTypeSearchResultItemElement;
 	}
 }

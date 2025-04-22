@@ -38,6 +38,7 @@ export class UmbDocumentSearchServerDataSource
 					query: args.query,
 					parentId: args.searchFrom?.unique ?? undefined,
 					allowedDocumentTypes: args.allowedContentTypes?.map((contentType) => contentType.unique),
+					trashed: args.includeTrashed,
 				},
 			}),
 		);
