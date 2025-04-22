@@ -238,6 +238,7 @@ export class UmbContextConsumer<
 		this.#promiseRejecter = undefined;
 
 		this.#dismentalCurrentTarget();
+		this.#currentTarget = window;
 	}
 
 	#currentTarget: EventTarget = window;
