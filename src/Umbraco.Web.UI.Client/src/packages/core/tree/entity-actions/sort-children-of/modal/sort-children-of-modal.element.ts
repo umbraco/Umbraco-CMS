@@ -220,6 +220,8 @@ export class UmbSortChildrenOfModalElement<
 	}
 
 	#renderTable() {
+		if (this._children.length === 0) return html`<uui-label>There are no children</uui-label>`;
+
 		return html`
 			<umb-table
 				.config=${this._tableConfig}
