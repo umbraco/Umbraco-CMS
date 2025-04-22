@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { createImportMap } from '../importmap/index.js';
 
-const ILLEGAL_CORE_IMPORTS_THRESHOLD = 6;
+const ILLEGAL_CORE_IMPORTS_THRESHOLD = 5;
 const SELF_IMPORTS_THRESHOLD = 0;
 
 const clientProjectRoot = path.resolve(import.meta.dirname, '../../');
