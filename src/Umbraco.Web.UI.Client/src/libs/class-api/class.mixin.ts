@@ -116,9 +116,11 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 		public override destroy(): void {
 			if (this._host) {
 				this._host.removeUmbController(this);
-				this._host = undefined as never;
 			}
 			super.destroy();
+			if (this._host) {
+				this._host = undefined as never;
+			}
 		}
 	}
 

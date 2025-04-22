@@ -1,7 +1,10 @@
 import type { UmbContextRequestEvent } from '../consume/context-request.event.js';
 import type { UmbContextToken } from '../token/index.js';
 import { UMB_CONTEXT_REQUEST_EVENT_TYPE, UMB_DEBUG_CONTEXT_EVENT_TYPE } from '../consume/context-request.event.js';
-import { UmbContextProvideEventImplementation } from './context-provide.event.js';
+import {
+	UmbContextProvideEventImplementation,
+	UmbContextUnprovidedEventImplementation,
+} from './context-provide.event.js';
 
 /**
  * @class UmbContextProvider
@@ -59,7 +62,7 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 		this.#eventTarget.removeEventListener(UMB_CONTEXT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
 		this.#eventTarget.removeEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this.#handleDebugContextRequest);
 		// Out-commented for now, but kept if we like to reintroduce this:
-		//window.dispatchEvent(new UmbContextUnprovidedEventImplementation(this._contextAlias, this.#instance));
+		window.dispatchEvent(new UmbContextUnprovidedEventImplementation(this.#contextAlias, this.#instance));
 	}
 
 	/**

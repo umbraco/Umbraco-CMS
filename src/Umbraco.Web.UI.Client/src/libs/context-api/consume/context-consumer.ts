@@ -1,5 +1,10 @@
 import type { UmbContextDiscriminator, UmbContextToken } from '../token/context-token.js';
-import { isUmbContextProvideEventType, UMB_CONTEXT_PROVIDE_EVENT_TYPE } from '../provide/context-provide.event.js';
+import {
+	isUmbContextProvideEventType,
+	isUmbContextUnprovidedEventType,
+	UMB_CONTEXT_PROVIDE_EVENT_TYPE,
+	UMB_CONTEXT_UNPROVIDED_EVENT_TYPE,
+} from '../provide/context-provide.event.js';
 import type { UmbContextCallback } from './context-request.event.js';
 import { UmbContextRequestEventImplementation } from './context-request.event.js';
 
@@ -204,7 +209,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	public hostConnected(): void {
 		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
 		window.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#handleNewProvider);
-		//window.addEventListener(umbContextUnprovidedEventType, this.#handleRemovedProvider);
+		window.addEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#handleRemovedProvider);
 		this.request();
 	}
 
@@ -227,7 +232,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 
 		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
 		window.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#handleNewProvider);
-		//window.removeEventListener(umbContextUnprovidedEventType, this.#handleRemovedProvider);
+		window.removeEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#handleRemovedProvider);
 	}
 
 	#handleNewProvider = (event: Event): void => {
@@ -239,8 +244,6 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		}
 	};
 
-	//Niels: I'm keeping this code around as it might be relevant, but I wanted to try to see if leaving this feature out for now could work for us. [NL]
-	/*
 	#handleRemovedProvider = (event: Event) => {
 		// Does seem a bit unnecessary, we could just assume the type via type casting...
 		if (!isUmbContextUnprovidedEventType(event)) return;
@@ -256,7 +259,6 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 			this.#callback?.(undefined);
 		}
 	}
-	*/
 
 	public destroy(): void {
 		this.hostDisconnected();
