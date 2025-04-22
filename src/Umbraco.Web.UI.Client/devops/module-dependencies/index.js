@@ -4,6 +4,7 @@ import { createImportMap } from '../importmap/index.js';
 
 const ILLEGAL_CORE_IMPORTS_THRESHOLD = 6;
 const SELF_IMPORTS_THRESHOLD = 0;
+const BIDIRECTIONAL_IMPORTS_THRESHOLD = 30;
 
 const clientProjectRoot = path.resolve(import.meta.dirname, '../../');
 const modulePrefix = '@umbraco-cms/backoffice/';
@@ -186,9 +187,45 @@ function reportSelfImportsFromModules() {
 	console.log(`\n\n`);
 }
 
+function reportBidirectionalModuleImports() {
+	console.error(`🔍 Scanning all modules for bidirectional imports...`);
+	console.log(`\n`);
+
+	let total = 0;
+
+	packageModules.forEach(([alias, path]) => {
+		const importsInModule = getUmbracoModuleImportsInModule(alias);
+
+		// Check imports for all the modules
+		importsInModule.forEach((importedModule) => {
+			// Check if the imported module imports the current module
+			const importedModuleImports = getUmbracoModuleImportsInModule(importedModule);
+			if (importedModuleImports.includes(alias)) {
+				console.error(`🚨 ${alias} and ${importedModule} are importing each other`);
+				total++;
+			}
+		});
+	});
+
+	if (total > BIDIRECTIONAL_IMPORTS_THRESHOLD) {
+		throw new Error(
+			`Bidirectional imports found in ${total} modules. ${total - BIDIRECTIONAL_IMPORTS_THRESHOLD} more than the threshold.`,
+		);
+	} else if (total === 0) {
+		console.log(`✅ Success! No bidirectional imports found.`);
+	} else {
+		console.log(
+			`✅ Success! Still (${total}) under the threshold of ${BIDIRECTIONAL_IMPORTS_THRESHOLD} bidirectional imports.`,
+		);
+	}
+
+	console.log(`\n\n`);
+}
+
 function report() {
 	reportIllegalImportsFromCore();
 	reportSelfImportsFromModules();
+	reportBidirectionalModuleImports();
 }
 
 report();
