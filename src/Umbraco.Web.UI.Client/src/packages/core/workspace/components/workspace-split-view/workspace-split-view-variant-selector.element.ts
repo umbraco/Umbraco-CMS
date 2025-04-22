@@ -61,9 +61,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		this.consumeContext(UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, (instance) => {
 			this.#splitViewContext = instance;
 
-			const workspaceContext =
-				this.#splitViewContext?.getWorkspaceContext() as unknown as UmbVariantDatasetWorkspaceContext;
-			if (!workspaceContext) throw new Error('Split View Workspace context not found');
+			const workspaceContext = this.#splitViewContext?.getWorkspaceContext();
 
 			this.#observeVariants(workspaceContext);
 			this.#observeActiveVariants(workspaceContext);
@@ -77,20 +75,20 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		});
 	}
 
-	async #observeVariants(workspaceContext: UmbVariantDatasetWorkspaceContext) {
+	async #observeVariants(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
 		this.observe(
-			workspaceContext.variantOptions,
+			workspaceContext?.variantOptions,
 			(variantOptions) => {
-				this._variantOptions = (variantOptions as Array<VariantOptionModelType>).sort(this._variantSorter);
+				this._variantOptions = ((variantOptions ?? []) as VariantOptionModelType[]).sort(this._variantSorter);
 				this.#setReadOnlyCultures(workspaceContext);
 			},
 			'_observeVariantOptions',
 		);
 	}
 
-	async #observeActiveVariants(workspaceContext: UmbVariantDatasetWorkspaceContext) {
+	async #observeActiveVariants(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
 		this.observe(
-			workspaceContext.splitView.activeVariantsInfo,
+			workspaceContext?.splitView.activeVariantsInfo,
 			(activeVariants) => {
 				if (activeVariants) {
 					this._activeVariants = activeVariants;
@@ -168,10 +166,14 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		return this._variantOptions?.length > 1;
 	}
 
-	#setReadOnlyCultures(workspaceContext: UmbVariantDatasetWorkspaceContext) {
-		this._readOnlyCultures = this._variantOptions
-			.filter((variant) => workspaceContext.readOnlyGuard.getIsPermittedForVariant(UmbVariantId.Create(variant)))
-			.map((variant) => variant.culture);
+	#setReadOnlyCultures(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
+		if (workspaceContext) {
+			this._readOnlyCultures = this._variantOptions
+				.filter((variant) => workspaceContext.readOnlyGuard.getIsPermittedForVariant(UmbVariantId.Create(variant)))
+				.map((variant) => variant.culture);
+		} else {
+			this._readOnlyCultures = [];
+		}
 	}
 
 	#onPopoverToggle(event: ToggleEvent) {

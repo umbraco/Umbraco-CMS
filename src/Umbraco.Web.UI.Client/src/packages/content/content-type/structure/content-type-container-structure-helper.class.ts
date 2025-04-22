@@ -45,7 +45,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 	public setStructureManager(structure: UmbContentTypeStructureManager<T> | undefined) {
 		if (this.#structure === structure || !structure) return;
-		if (this.#structure) {
+		if (this.#structure && !structure) {
 			throw new Error(
 				'Structure manager is already set, the helpers are not designed to be re-setup with new managers',
 			);
