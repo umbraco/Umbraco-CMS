@@ -212,16 +212,18 @@ export class UmbSortChildrenOfModalElement<
 	override render() {
 		return html`
 			<umb-body-layout headline=${'Sort Children'}>
-				<uui-box>${this.#renderTable()}</uui-box>
+				${this._children.length === 0 ? this.#renderEmptyState() : this.#renderTable()}
 				<uui-button slot="actions" label="Cancel" @click="${this._rejectModal}"></uui-button>
 				<uui-button slot="actions" color="positive" look="primary" label="Sort" @click=${this.#onSubmit}></uui-button>
 			</umb-body-layout>
 		`;
 	}
 
-	#renderTable() {
-		if (this._children.length === 0) return html`<uui-label>There are no children</uui-label>`;
+	#renderEmptyState() {
+		return html`<uui-label>There are no children</uui-label>`;
+	}
 
+	#renderTable() {
 		return html`
 			<umb-table
 				.config=${this._tableConfig}
@@ -233,8 +235,8 @@ export class UmbSortChildrenOfModalElement<
 
 			${this.#hasMorePages()
 				? html`
-						<uui-button id="loadMoreButton" look="secondary" @click=${this.#onLoadMore}
-							>Load More (${this._currentPage}/${this._totalPages})</uui-button
+						<uui-button id="loadMoreButton" look="placeholder" @click=${this.#onLoadMore}
+							>Load more (${this._currentPage}/${this._totalPages})</uui-button
 						>
 					`
 				: nothing}
@@ -246,10 +248,7 @@ export class UmbSortChildrenOfModalElement<
 		css`
 			#loadMoreButton {
 				width: 100%;
-			}
-
-			uui-box {
-				--uui-box-default-padding: 0;
+				margin-top: var(--uui-size-space-3);
 			}
 		`,
 	];
