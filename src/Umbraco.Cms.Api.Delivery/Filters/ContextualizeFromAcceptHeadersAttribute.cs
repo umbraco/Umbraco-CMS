@@ -31,8 +31,8 @@ internal sealed class ContextualizeFromAcceptHeadersAttribute : TypeFilterAttrib
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            var requestedCulture = _requestCultureService.GetRequestedCulture();
-            var requestedSegment = _requestSegmentService.GetRequestedSegment();
+            var requestedCulture = _requestCultureService.GetRequestedCulture().NullOrWhiteSpaceAsNull();
+            var requestedSegment = _requestSegmentService.GetRequestedSegment().NullOrWhiteSpaceAsNull();
             if (requestedCulture.IsNullOrWhiteSpace() && requestedSegment.IsNullOrWhiteSpace())
             {
                 return;
