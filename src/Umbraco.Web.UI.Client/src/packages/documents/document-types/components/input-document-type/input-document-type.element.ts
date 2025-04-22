@@ -2,7 +2,7 @@ import type { UmbDocumentTypeItemModel, UmbDocumentTypeTreeItemModel } from '../
 import { UMB_DOCUMENT_TYPE_WORKSPACE_MODAL } from '../../constants.js';
 import { UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UmbDocumentTypePickerInputContext } from './input-document-type.context.js';
-import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -210,11 +210,14 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 			<uui-ref-node-document-type id=${item.unique} name=${this.localize.string(item.name)} href=${href}>
 				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
-					${this.readonly
-						? nothing
-						: html`<uui-button
-								@click=${() => this.#removeItem(item)}
-								label=${this.localize.term('general_remove')}></uui-button>`}
+					${when(
+						!this.readonly,
+						() => html`
+							<uui-button
+								label=${this.localize.term('general_remove')}
+								@click=${() => this.#removeItem(item)}></uui-button>
+						`,
+					)}
 				</uui-action-bar>
 			</uui-ref-node-document-type>
 		`;
