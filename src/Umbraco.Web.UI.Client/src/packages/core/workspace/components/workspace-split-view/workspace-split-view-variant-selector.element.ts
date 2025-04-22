@@ -191,7 +191,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	#selectorIsEnabled() {
 		// only varies by segment
 		if (!this._variesByCulture && this._variesBySegment) {
-			return this._cultureVariantOptions.length > 1 || this._variantOptions[0].variant?.state;
+			return (
+				this._cultureVariantOptions.length > 1 ||
+				(this._variantOptions.length > 1 && this._variantOptions[0].variant?.state)
+			);
 		}
 
 		return this._variantOptions.length > 1;
