@@ -29,7 +29,7 @@ import { UmbDataTypeDetailRepository, UmbDataTypeItemRepositoryManager } from '@
 import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	UMB_VALIDATION_CONTEXT,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
@@ -154,6 +154,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	// @ts-ignore
 	// TODO: fix type error
 	public readonly variantOptions;
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected _variantOptionsFilter = (variantOption: VariantOptionModelType) => true;
 
 	#variantValidationContexts: Array<UmbValidationController> = [];
 	getVariantValidationContext(variantId: UmbVariantId): UmbValidationController | undefined {
@@ -285,7 +287,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 				return [] as Array<VariantOptionModelType>;
 			},
-		);
+		).pipe(map((options) => options.filter((option) => this._variantOptionsFilter(option))));
 
 		this.observe(
 			this.variantOptions,
