@@ -13,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
-		name: 'Dictionary Search Result Item ',
+		name: 'Dictionary Search Result Item',
 		alias: 'Umb.SearchResultItem.Dictionary',
 		type: 'searchResultItem',
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
