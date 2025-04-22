@@ -1,6 +1,5 @@
 import type { UmbContentTreeItemModel } from '../../types.js';
-import { customElement, css } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSortChildrenOfModalElement } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-sort-children-of-content-modal')
@@ -18,12 +17,12 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 			{
 				name: this.localize.term('general_name'),
 				alias: 'name',
-				allowSorting: true,
+				allowSorting: this._hasMorePages() === false,
 			},
 			{
 				name: this.localize.term('content_createDate'),
 				alias: 'createDate',
-				allowSorting: true,
+				allowSorting: this._hasMorePages() === false,
 			},
 		];
 	}
@@ -55,6 +54,14 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 		}
 
 		return super._sortCompare(columnAlias, valueA, valueB);
+	}
+
+	protected override _onLoadMore(event: PointerEvent): void {
+		super._onLoadMore(event);
+		// TODO: make nicer API for enable/disable orderBy for individual columns
+		const allowOrderBy = this._hasMorePages() === false;
+		this._tableColumns[0].allowSorting = allowOrderBy;
+		this._tableColumns[1].allowSorting = allowOrderBy;
 	}
 }
 

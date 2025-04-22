@@ -62,8 +62,6 @@ export class UmbSortChildrenOfModalElement<
 			},
 			'umbPaginationObserver',
 		);
-
-		this._setTableColumns();
 	}
 
 	protected _setTableColumns() {
@@ -80,7 +78,8 @@ export class UmbSortChildrenOfModalElement<
 		_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
 	): Promise<void> {
 		super.firstUpdated(_changedProperties);
-		this.#requestChildren();
+		await this.#requestChildren();
+		this._setTableColumns();
 	}
 
 	async #requestChildren() {
@@ -124,11 +123,11 @@ export class UmbSortChildrenOfModalElement<
 		});
 	}
 
-	#hasMorePages() {
+	protected _hasMorePages() {
 		return this._currentPage < this._totalPages;
 	}
 
-	#onLoadMore(event: PointerEvent) {
+	protected _onLoadMore(event: PointerEvent) {
 		event.stopPropagation();
 		if (this._currentPage >= this._totalPages) return;
 		this.#pagination.setCurrentPageNumber(this._currentPage + 1);
@@ -233,9 +232,9 @@ export class UmbSortChildrenOfModalElement<
 				@sorted=${this.#onSorted}
 				@ordered=${this.#onOrdered}></umb-table>
 
-			${this.#hasMorePages()
+			${this._hasMorePages()
 				? html`
-						<uui-button id="loadMoreButton" look="placeholder" @click=${this.#onLoadMore}
+						<uui-button id="loadMoreButton" look="placeholder" @click=${this._onLoadMore}
 							>Load more (${this._currentPage}/${this._totalPages})</uui-button
 						>
 					`
