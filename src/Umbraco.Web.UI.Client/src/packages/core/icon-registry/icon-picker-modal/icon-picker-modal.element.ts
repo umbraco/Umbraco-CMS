@@ -94,7 +94,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 										label=${color.alias}
 										title=${color.alias}
 										value=${color.alias}
-										style="--uui-swatch-color: var(${color.varName})"></uui-color-swatch>
+										style="--uui-swatch-color: var(${color.varName})">
+									</uui-color-swatch>
 								`,
 							)
 						}
@@ -117,15 +118,17 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	}
 
 	renderSearch() {
-		return html` <uui-input
-			type="search"
-			placeholder=${this.localize.term('placeholders_filter')}
-			label=${this.localize.term('placeholders_filter')}
-			id="search"
-			@keyup=${this.#filterIcons}
-			${umbFocus()}>
-			<uui-icon name="search" slot="prepend" id="search_icon"></uui-icon>
-		</uui-input>`;
+		return html`
+			<uui-input
+				type="search"
+				placeholder=${this.localize.term('placeholders_filter')}
+				label=${this.localize.term('placeholders_filter')}
+				id="search"
+				@keyup=${this.#filterIcons}
+				${umbFocus()}>
+				<uui-icon name="search" slot="prepend" id="search_icon"></uui-icon>
+			</uui-input>
+		`;
 	}
 
 	renderIcons() {

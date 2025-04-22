@@ -6,6 +6,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_ANCESTORS_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
 import { UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
@@ -139,11 +140,9 @@ export class UmbPropertyEditorUIContentPickerElement
 		if (this._rootUnique) return;
 		if (!this.#dynamicRoot) return;
 
-		const menuStructureWorkspaceContext = (await this.getContext('UmbMenuStructureWorkspaceContext')) as any;
-		const structure = (await this.observe(menuStructureWorkspaceContext.structure, () => {})?.asPromise()) as any[];
-		const [parentUnique, unique] = structure?.slice(-2).map((x) => x.unique) ?? [];
-
-		if (!unique) return;
+		const ancestorsContext = await this.getContext(UMB_ANCESTORS_ENTITY_CONTEXT);
+		const ancestors = ancestorsContext?.getAncestors();
+		const [parentUnique, unique] = ancestors?.slice(-2).map((x) => x.unique) ?? [];
 
 		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
 		if (result && result.length > 0) {

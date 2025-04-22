@@ -1,5 +1,6 @@
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import { UMB_DOCUMENT_TYPE_SEARCH_PROVIDER_ALIAS } from '../search/index.js';
 import type { UmbDocumentTypeTreeItemModel } from '../tree/index.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import {
@@ -38,6 +39,9 @@ export const UMB_DOCUMENT_TYPE_PICKER_MODAL = new UmbModalToken<
 				parentUnique: null,
 				presetAlias: null,
 			},
+		},
+		search: {
+			providerAlias: UMB_DOCUMENT_TYPE_SEARCH_PROVIDER_ALIAS,
 		},
 	},
 });

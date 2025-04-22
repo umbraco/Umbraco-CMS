@@ -11,7 +11,7 @@ export class UmbCollectionAliasCondition
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<CollectionAliasConditionConfig>) {
 		super(host, args);
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
-			this.permitted = context.getManifest()?.alias === this.config.match;
+			this.permitted = context.manifest?.alias === this.config.match;
 		});
 	}
 }

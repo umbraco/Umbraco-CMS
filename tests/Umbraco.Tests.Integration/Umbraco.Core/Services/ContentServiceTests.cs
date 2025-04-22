@@ -214,7 +214,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         ctVariant.Variations = ContentVariation.Culture;
         ContentTypeService.Save(ctVariant);
 
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
 
         // 10x invariant content, half is scheduled to be published in 5 seconds, the other half is scheduled to be unpublished in 5 seconds
         var invariant = new List<IContent>();
@@ -321,7 +321,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         // Act
         var content = ContentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage");
 
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.Now.AddHours(2));
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddHours(2));
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
         Assert.AreEqual(1, contentSchedule.FullSchedule.Count);
 
@@ -676,7 +676,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         var root = ContentService.GetById(Textpage.Id);
         ContentService.Publish(root!, root!.AvailableCultures.ToArray());
         var content = ContentService.GetById(Subpage.Id);
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.Now.AddSeconds(1));
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddSeconds(1));
         ContentService.PersistContentSchedule(content!, contentSchedule);
         ContentService.Publish(content, content.AvailableCultures.ToArray());
 
@@ -1386,7 +1386,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var content = ContentService.GetById(Subpage.Id); // This Content expired 5min ago
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.Now.AddMinutes(-5));
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddMinutes(-5));
         ContentService.Save(content, contentSchedule: contentSchedule);
 
         var parent = ContentService.GetById(Textpage.Id);
@@ -1416,7 +1416,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var content = ContentBuilder.CreateBasicContent(contentType);
         content.SetCultureName("Hello", "en-US");
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", null, DateTime.Now.AddMinutes(-5));
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", null, DateTime.UtcNow.AddMinutes(-5));
         ContentService.Save(content, contentSchedule: contentSchedule);
 
         var published = ContentService.Publish(content, new[] { "en-US" });
@@ -1431,7 +1431,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var content = ContentService.GetById(Subpage.Id);
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddHours(2), null);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null);
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
 
         var parent = ContentService.GetById(Textpage.Id);
@@ -1488,7 +1488,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         content.Properties[0].SetValue("Foo", string.Empty);
         contentService.Save(content);
         contentService.PersistContentSchedule(content,
-            ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddHours(2), null));
+            ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null));
 
         // Act
         var result = contentService.Publish(content, Array.Empty<string>(), userId: Constants.Security.SuperUserId);
@@ -1540,7 +1540,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         contentService.Publish(content, Array.Empty<string>());
 
         contentService.PersistContentSchedule(content,
-            ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddHours(2), null));
+            ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null));
         contentService.Save(content);
 
         // Act
@@ -1568,7 +1568,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var content = ContentBuilder.CreateBasicContent(contentType);
         content.SetCultureName("Hello", "en-US");
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", DateTime.Now.AddHours(2), null);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", DateTime.UtcNow.AddHours(2), null);
         ContentService.Save(content, contentSchedule: contentSchedule);
 
         var published = ContentService.Publish(content, new[] { "en-US" });
