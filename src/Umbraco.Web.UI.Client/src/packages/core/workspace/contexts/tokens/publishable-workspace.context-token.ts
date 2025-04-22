@@ -1,5 +1,6 @@
+import type { UmbWorkspaceContext } from '../../types.js';
+import type { UmbPublishableWorkspaceContext } from './publishable-workspace-context.interface.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbPublishableWorkspaceContext, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_PUBLISHABLE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbWorkspaceContext,

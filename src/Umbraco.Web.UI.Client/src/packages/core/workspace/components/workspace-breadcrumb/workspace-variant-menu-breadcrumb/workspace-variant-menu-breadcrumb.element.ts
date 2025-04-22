@@ -1,12 +1,11 @@
+import { UMB_VARIANT_WORKSPACE_CONTEXT, type UmbVariantDatasetWorkspaceContext } from '../../../contexts/index.js';
 import { css, customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
-import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
-import type { UmbVariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-workspace-variant-menu-breadcrumb')

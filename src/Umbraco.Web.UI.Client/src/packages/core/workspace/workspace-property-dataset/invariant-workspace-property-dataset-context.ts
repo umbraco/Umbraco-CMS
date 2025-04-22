@@ -1,3 +1,4 @@
+import type { UmbInvariantDatasetWorkspaceContext } from '../contexts/index.js';
 import type {
 	UmbPropertyDatasetContext,
 	UmbNameablePropertyDatasetContext,
@@ -7,7 +8,6 @@ import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbInvariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbBooleanState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
 /**

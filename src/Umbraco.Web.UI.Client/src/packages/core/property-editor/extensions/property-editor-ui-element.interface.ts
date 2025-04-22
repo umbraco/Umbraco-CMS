@@ -1,4 +1,4 @@
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorConfigCollection } from '../config/index.js';
 
 export interface UmbPropertyEditorUiElement extends HTMLElement {
 	name?: string;

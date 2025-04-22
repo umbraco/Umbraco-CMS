@@ -156,10 +156,15 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	}
 
 	#openPicker() {
-		this.#pickerContext.openPicker({
-			hideTreeRoot: true,
-			pickableFilter: this.#getPickableFilter(),
-		});
+		this.#pickerContext.openPicker(
+			{
+				hideTreeRoot: true,
+				pickableFilter: this.#getPickableFilter(),
+			},
+			{
+				elementTypesOnly: this.elementTypesOnly ? true : undefined,
+			},
+		);
 	}
 
 	#removeItem(item: UmbDocumentTypeItemModel) {
