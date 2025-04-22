@@ -108,7 +108,7 @@ public class DomainService : RepositoryService, IDomainService
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         IDomain[] domains = items.ToArray();
-        if (domains.Length == 0)
+        if (domains.Length == 0 || AreDomainsAlreadySorted(domains))
         {
             return OperationResult.Attempt.NoOperation(eventMessages);
         }
@@ -143,5 +143,19 @@ public class DomainService : RepositoryService, IDomainService
         }
 
         return OperationResult.Attempt.Succeed(eventMessages);
+    }
+
+    private static bool AreDomainsAlreadySorted(IDomain[] domains)
+    {
+        // Check if the domains are already sorted by comparing the current sort order with what we'll set to be the new sort order.
+        for (int i = 0; i < domains.Length; i++)
+        {
+            if (domains[i].SortOrder != i)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
