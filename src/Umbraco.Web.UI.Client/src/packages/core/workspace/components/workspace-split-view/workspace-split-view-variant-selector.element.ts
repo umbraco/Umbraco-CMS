@@ -9,6 +9,7 @@ import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-workspace-split-view-variant-selector')
 export class UmbWorkspaceSplitViewVariantSelectorElement<
@@ -183,8 +184,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		return this._activeVariants.find((activeVariantId) => activeVariantId.equal(variantId)) !== undefined;
 	}
 
-	#isCreateMode(variantOption: VariantOptionModelType) {
-		const variantId = new UmbVariantId(variantOption.culture, variantOption.segment);
+	#isCreateMode(variantOption: VariantOptionModelType, variantId: UmbVariantId) {
 		return !variantOption.variant && !this.#isVariantActive(variantId);
 	}
 
@@ -236,7 +236,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	/**
 	 * Focuses the input element after a short delay to ensure it is rendered.
 	 * This works better than the {umbFocus()} directive, which does not work in this context.
-	 * @param element
+	 * @param {Element} element – The element to focus.
 	 */
 	#focusInput(element?: Element) {
 		if (!element) return;
@@ -330,9 +330,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 						<uui-popover-container id="popover" @beforetoggle=${this.#onPopoverToggle} placement="bottom-end">
 							<div id="dropdown">
 								<uui-scroll-container>
-									<ul class="variant-list">
-										${this._cultureVariantOptions.map((variant) => this.#renderCultureVariantOption(variant))}
-									</ul>
+									${this._cultureVariantOptions.map((variant) => this.#renderCultureVariantOption(variant))}
 								</uui-scroll-container>
 							</div>
 						</uui-popover-container>
@@ -343,16 +341,20 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	#renderCultureVariantOption(variantOption: VariantOptionModelType) {
 		const variantId = UmbVariantId.Create(variantOption);
+		const notCreated = this.#isCreateMode(variantOption, variantId);
+		const subVariantOptions = this.#getSegmentVariantOptionsForCulture(variantOption, variantId);
 		return html`
-			<li class="variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
-				<div class="expand-area">${this.#renderExpandToggle(variantOption, variantId)}</div>
+			<div class="variant culture-variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
+				${this._variesBySegment && this.#isCreated(variantOption)
+					? html`<div class="expand-area">${this.#renderExpandToggle(variantId)}</div>`
+					: nothing}
 
 				<button
-					class="variant-area switch-button ${this.#isCreateMode(variantOption)
-						? 'add-mode'
-						: ''} ${this.#isReadOnlyCulture(variantId.culture) ? 'readonly-mode' : ''}"
+					class="switch-button ${notCreated ? 'add-mode' : ''} ${this.#isReadOnlyCulture(variantId.culture)
+						? 'readonly-mode'
+						: ''}"
 					@click=${() => this.#switchVariant(variantOption)}>
-					${this.#isCreateMode(variantOption) ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
+					${notCreated ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
 						<div class="variant-name">
 							${this.#getVariantDisplayName(variantOption)}${this.#renderReadOnlyTag(variantId.culture)}
@@ -364,27 +366,21 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					<div class="specs-info">${this.#getVariantSpecInfo(variantOption)}</div>
 				</button>
 				${this.#renderSplitViewButton(variantOption)}
-				${this.#isVariantExpanded(variantId)
-					? html`
-							<div class="segments-area">
-								<ul class="variant-list">
-									${this.#getSegmentVariantOptionsForCulture(variantOption, variantId).map((option) =>
-										this.#renderSegmentVariantOption(option),
-									)}
-								</ul>
-							</div>
-						`
-					: nothing}
-			</li>
+			</div>
+			${this.#isVariantExpanded(variantId)
+				? html` ${subVariantOptions.map((option) => this.#renderSegmentVariantOption(option))} `
+				: nothing}
 		`;
 	}
 
-	#renderExpandToggle(variantOption: VariantOptionModelType, variantId: UmbVariantId) {
-		if (!variantOption.variant?.state) return nothing;
+	#isCreated(variantOption: VariantOptionModelType) {
+		return (
+			variantOption.variant?.state &&
+			variantOption.variant?.state !== ('NotCreated' as DocumentVariantStateModel.NOT_CREATED)
+		);
+	}
 
-		const hasSegmentVariants = this.#getSegmentVariantOptionsForCulture(variantOption, variantId).length > 0;
-		if (!hasSegmentVariants) return nothing;
-
+	#renderExpandToggle(variantId: UmbVariantId) {
 		return html`
 			<uui-button @click=${(event: PointerEvent) => this.#onVariantExpandClick(event, variantId)} compact>
 				<uui-symbol-expand .open=${this.#isVariantExpanded(variantId)}></uui-symbol-expand>
@@ -394,18 +390,17 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	#renderSegmentVariantOption(variantOption: VariantOptionModelType) {
 		const variantId = UmbVariantId.Create(variantOption);
+		const notCreated = this.#isCreateMode(variantOption, variantId);
 
 		return html`
-			<li class="variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
-				<div class="expand-area"></div>
+			<div class="variant segment-variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
+				${notCreated ? nothing : html`<div class="expand-area"></div>`}
 				<button
-					class="switch-button ${this.#isCreateMode(variantOption) ? 'add-mode' : ''} ${this.#isReadOnlyCulture(
-						variantId.culture,
-					)
+					class="switch-button ${notCreated ? 'add-mode' : ''} ${this.#isReadOnlyCulture(variantId.culture)
 						? 'readonly-mode'
 						: ''}"
 					@click=${() => this.#switchVariant(variantOption)}>
-					${this.#isCreateMode(variantOption) ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
+					${notCreated ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
 						<div class="variant-name">
 							${this.#getVariantDisplayName(variantOption)}${this.#renderReadOnlyTag(variantId.culture)}
@@ -417,7 +412,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					<div class="specs-info">${this.#getVariantSpecInfo(variantOption)}</div>
 				</button>
 				${this.#renderSplitViewButton(variantOption)}
-			</li>
+			</div>
 		`;
 	}
 
@@ -529,59 +524,38 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				max-height: 50dvh;
 			}
 
-			ul {
-				list-style-type: none;
-				padding: 0;
-				margin: 0;
+			.variant {
+				position: relative;
+				display: flex;
+				border-top: 1px solid var(--uui-color-divider-standalone);
 			}
 
-			.variant-list {
-				> li.variant {
-					display: grid;
-					grid-column-gap: 0px;
-					grid-row-gap: 0px;
-					grid-template-columns: var(--uui-size-10) 1fr;
-					grid-template-areas:
-						'expand variant'
-						'segments segments';
-					border-bottom: 1px solid var(--uui-color-divider-standalone);
-				}
+			.expand-area {
+				position: relative;
+				display: block;
+				width: var(--uui-size-12);
+				align-items: center;
+				justify-content: center;
+			}
 
-				.expand-area {
-					grid-area: expand;
-					display: flex;
-					align-items: center;
-					justify-content: center;
-				}
-
-				.variant-area {
-					grid-area: variant;
-				}
-
-				.segments-area {
-					grid-area: segments;
-					list-style: none;
-				}
+			.expand-area uui-button {
+				height: 100%;
+				width: 100%;
 			}
 
 			uui-symbol-expand {
 				background: none;
 			}
 
-			li {
-				position: relative;
-				margin-bottom: 1px;
-			}
-
-			li:hover > .split-view {
+			.variant:hover > .split-view {
 				display: flex;
 			}
 
-			li:nth-last-of-type(1) {
+			.variant:nth-last-of-type(1) {
 				margin-bottom: 0;
 			}
 
-			li.selected .expand-area:before {
+			.variant.selected:before {
 				background-color: var(--uui-color-current);
 				border-radius: 0 4px 4px 0;
 				bottom: 8px;
@@ -600,12 +574,20 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				border: none;
 				background: transparent;
 				color: var(--uui-color-current-contrast);
-				padding: 6px 20px;
+				padding: var(--uui-size-space-2) var(--uui-size-space-6);
 				font-weight: bold;
 				width: 100%;
 				text-align: left;
 				font-size: 14px;
 				cursor: pointer;
+			}
+
+			.expand-area + .switch-button {
+				padding-left: var(--uui-size-space-3);
+			}
+
+			.segment-variant > .switch-button {
+				padding-left: var(--uui-size-space-6);
 			}
 
 			.switch-button:hover {
@@ -618,12 +600,12 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 			.switch-button .variant-details {
 				color: var(--uui-color-text-alt);
-				font-size: 12px;
+				font-size: var(--uui-type-small-size);
 				font-weight: normal;
 			}
 			.switch-button .variant-details {
 				color: var(--uui-color-text-alt);
-				font-size: 12px;
+				font-size: var(--uui-type-small-size);
 				font-weight: normal;
 			}
 			.switch-button.add-mode .variant-details {
@@ -632,7 +614,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 			.switch-button .specs-info {
 				color: var(--uui-color-text-alt);
-				font-size: 12px;
+				font-size: var(--uui-type-small-size);
 				font-weight: normal;
 			}
 			.switch-button.add-mode .specs-info {
@@ -649,7 +631,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			}
 
 			.switch-button.add-mode:after {
-				border: 2px dashed var(--uui-color-divider-standalone);
+				border: 1px dashed var(--uui-color-divider-standalone);
 				bottom: 0;
 				content: '';
 				left: 0;
@@ -670,8 +652,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			}
 
 			.add-icon {
-				font-size: 12px;
-				margin-right: 12px;
+				font-size: var(--uui-type-small-size);
+				margin-right: 21px;
 			}
 
 			.split-view {
