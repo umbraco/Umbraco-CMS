@@ -203,11 +203,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		this.variantOptions = mergeObservables(
-			[this.varies, this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments],
-			([varies, variesByCulture, variesBySegment, variants, languages, segments]) => {
-				if ((varies || variesByCulture || variesBySegment) === undefined) {
+			[this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments],
+			([variesByCulture, variesBySegment, variants, languages, segments]) => {
+				if ((variesByCulture || variesBySegment) === undefined) {
 					return [];
 				}
+
+				const varies = variesByCulture || variesBySegment;
 
 				// No variation
 				if (!varies) {
