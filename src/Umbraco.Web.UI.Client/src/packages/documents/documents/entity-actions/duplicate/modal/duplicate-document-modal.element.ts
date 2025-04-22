@@ -48,7 +48,10 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 				<uui-box id="tree-box" headline="Duplicate to">
 					<umb-tree
 						alias=${UMB_DOCUMENT_TREE_ALIAS}
-						.props=${{ expandTreeRoot: true }}
+						.props=${{
+							expandTreeRoot: true,
+							hideTreeItemActions: true,
+						}}
 						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>
 				<uui-box headline="Options">
