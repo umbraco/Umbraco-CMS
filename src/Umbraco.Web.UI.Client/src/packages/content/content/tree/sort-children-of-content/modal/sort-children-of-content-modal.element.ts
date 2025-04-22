@@ -56,8 +56,6 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 
 		return super._sortCompare(columnAlias, valueA, valueB);
 	}
-
-	static override styles = [UmbTextStyles, css``];
 }
 
 export { UmbSortChildrenOfContentModalElement as element };
