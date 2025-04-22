@@ -111,7 +111,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 	): Promise<UmbPotentialContentValueModel | undefined> {
 		const editorAlias = draftValue?.editorAlias ?? persistedValue?.editorAlias;
 		if (!editorAlias) {
-			console.error(`Editor alias not found for ${editorAlias}`);
+			console.error(`Editor alias not found for ${editorAlias}`, draftValue, persistedValue);
 			return draftValue;
 		}
 		if (!draftValue) {
