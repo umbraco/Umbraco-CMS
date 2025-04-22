@@ -2518,7 +2518,7 @@ export default {
 		refreshStatus: 'Refresh status',
 		memoryCache: 'Memory Cache',
 		memoryCacheDescription:
-			'\n            This button lets you reload the in-memory cache, by entirely reloading it from the database\n    cache (but it does not rebuild that database cache). This is relatively fast.\n    Use it when you think that the memory cache has not been properly refreshed, after some events\n    triggered&mdash;which would indicate a minor Umbraco issue.\n    (note: triggers the reload on all servers in an LB environment).\n    ',
+			'\n            This button lets you reload the in-memory cache, by entirely reloading it from the database\n    cache (but it does not rebuild that database cache). This is relatively fast.\n    Use it when you think that the memory cache has not been properly refreshed, after some events\n    triggered&mdash;which would indicate a minor Umbraco issue.\n    (note: triggers the reload on all servers in an LB environment, and will clear the second level cache if you have it enabled).\n    ',
 		reload: 'Reload',
 		databaseCache: 'Database Cache',
 		databaseCacheDescription:
