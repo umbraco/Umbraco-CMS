@@ -382,6 +382,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	#renderExpandToggle(variantOption: VariantOptionModelType, variantId: UmbVariantId) {
 		if (!variantOption.variant?.state) return nothing;
 
+		const hasSegmentVariants = this.#getSegmentVariantOptionsForCulture(variantOption, variantId).length > 0;
+		if (!hasSegmentVariants) return nothing;
+
 		return html`
 			<uui-button @click=${(event: PointerEvent) => this.#onVariantExpandClick(event, variantId)} compact>
 				<uui-symbol-expand .open=${this.#isVariantExpanded(variantId)}></uui-symbol-expand>
