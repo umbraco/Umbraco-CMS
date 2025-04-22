@@ -372,6 +372,16 @@ export class UmbTableElement extends UmbLitElement {
 				height: fit-content;
 			}
 
+			:host([sortable]) {
+				uui-table-row:hover {
+					cursor: grab;
+				}
+
+				uui-table-row:active {
+					cursor: grabbing;
+				}
+			}
+
 			uui-table {
 				box-shadow: var(--uui-shadow-depth-1);
 			}
