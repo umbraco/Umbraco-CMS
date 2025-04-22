@@ -328,7 +328,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     {
         if (key is null)
         {
-            return [];
+            return new HashSet<string>();
         }
 
         var tags = new HashSet<string>

@@ -290,7 +290,7 @@ internal class MediaCacheService : IMediaCacheService
     {
         if (key is null)
         {
-            return [];
+            return new HashSet<string>();
         }
 
         var tags = new HashSet<string>
