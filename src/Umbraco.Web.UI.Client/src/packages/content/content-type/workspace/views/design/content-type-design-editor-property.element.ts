@@ -348,13 +348,13 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			`;
 		}
 
-		if (this.ownerVariesByCulture && this.property.variesByCulture && !this.property.variesBySegment) {
+		if (this.ownerVariesByCulture && !this.property.variesByCulture) {
 			return html`<uui-tag look="default">
 				<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureInvariantLabel')}
 			</uui-tag>`;
 		}
 
-		if (this.ownerVariesBySegment && !this.property.variesByCulture && this.property.variesBySegment) {
+		if (this.ownerVariesBySegment && !this.property.variesBySegment) {
 			return html`<uui-tag look="default">
 				<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_segmentInvariantLabel')}
 			</uui-tag>`;
