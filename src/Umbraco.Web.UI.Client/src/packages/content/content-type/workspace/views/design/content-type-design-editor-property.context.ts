@@ -3,7 +3,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbPropertyTypeContext extends UmbContextBase<UmbPropertyTypeContext> {
+export class UmbPropertyTypeContext extends UmbContextBase {
 	#alias = new UmbStringState(undefined);
 	public readonly alias = this.#alias.asObservable();
 	#label = new UmbStringState(undefined);

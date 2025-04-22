@@ -4,10 +4,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbRoutePathAddendumContext
-	extends UmbContextBase<UmbRoutePathAddendum, typeof UMB_ROUTE_PATH_ADDENDUM_CONTEXT>
-	implements UmbRoutePathAddendum
-{
+export class UmbRoutePathAddendumContext extends UmbContextBase implements UmbRoutePathAddendum {
 	#parent?: string;
 	#current?: string;
 

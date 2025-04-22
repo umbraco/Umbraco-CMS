@@ -35,7 +35,7 @@ export abstract class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 	BlockOriginDataType extends UmbBlockWorkspaceOriginData = UmbBlockWorkspaceOriginData,
-> extends UmbContextBase<UmbBlockManagerContext> {
+> extends UmbContextBase {
 	get contentTypesLoaded() {
 		return Promise.all(this.#contentTypeRequests);
 	}

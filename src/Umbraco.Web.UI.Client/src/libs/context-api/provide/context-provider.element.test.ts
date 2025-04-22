@@ -4,14 +4,21 @@ import { expect, fixture, html } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
+class UmbTestContextProviderControllerClass {
+	prop = 'value from provider';
+	getHostElement() {
+		return undefined as unknown as Element;
+	}
+}
+
 @customElement('umb-test-context')
 export class UmbTestContextElement extends UmbControllerHostElementMixin(HTMLElement) {
-	public value: string | null = null;
+	public value?: string;
 	constructor() {
 		super();
 
-		new UmbContextConsumerController<string, string>(this, 'test-context', (value) => {
-			this.value = value ?? null;
+		new UmbContextConsumerController<UmbTestContextProviderControllerClass>(this, 'test-context', (context) => {
+			this.value = context?.prop;
 		});
 	}
 }
@@ -19,11 +26,11 @@ export class UmbTestContextElement extends UmbControllerHostElementMixin(HTMLEle
 describe('UmbContextProvider', () => {
 	let element: HTMLElement;
 	let consumer: UmbTestContextElement;
-	const contextValue = 'test-value';
+	const context = new UmbTestContextProviderControllerClass();
 
 	beforeEach(async () => {
 		element = await fixture(
-			html` <umb-context-provider key="test-context" .value=${contextValue}>
+			html` <umb-context-provider key="test-context" .value=${context}>
 				<umb-test-context></umb-test-context>
 			</umb-context-provider>`,
 		);
@@ -35,6 +42,7 @@ describe('UmbContextProvider', () => {
 	});
 
 	it('provides the context', () => {
-		expect(consumer.value).to.equal(contextValue);
+		expect(consumer).to.equal(context);
+		expect(consumer.value).to.equal('value from provider');
 	});
 });

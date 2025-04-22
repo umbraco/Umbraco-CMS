@@ -26,7 +26,7 @@ export abstract class UmbTreeItemContextBase<
 		TreeRootType extends UmbTreeRootModel,
 		ManifestType extends ManifestTreeItem = ManifestTreeItem,
 	>
-	extends UmbContextBase<UmbTreeItemContext<TreeItemType>>
+	extends UmbContextBase
 	implements UmbTreeItemContext<TreeItemType>
 {
 	public unique?: UmbEntityUnique;

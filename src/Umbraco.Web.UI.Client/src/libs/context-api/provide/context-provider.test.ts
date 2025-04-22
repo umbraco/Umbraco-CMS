@@ -5,6 +5,9 @@ import { expect } from '@open-wc/testing';
 
 class UmbTestContextProviderClass {
 	prop = 'value from provider';
+	getHostElement() {
+		return undefined as unknown as Element;
+	}
 }
 
 describe('UmbContextProvider', () => {

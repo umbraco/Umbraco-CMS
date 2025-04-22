@@ -3,7 +3,7 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
 import { type UmbControllerAlias, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbContextToken, UmbContextCallback } from '@umbraco-cms/backoffice/context-api';
+import type { UmbContextToken, UmbContextCallback, UmbContextMinimal } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { ObserverCallback } from '@umbraco-cms/backoffice/observable-api';
 import { UmbObserverController, simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
@@ -56,7 +56,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		}
 
 		provideContext<
-			BaseType = unknown,
+			BaseType extends UmbContextMinimal = UmbContextMinimal,
 			ResultType extends BaseType = BaseType,
 			InstanceType extends ResultType = ResultType,
 		>(
@@ -66,14 +66,14 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 			return new UmbContextProviderController(this, alias, instance);
 		}
 
-		consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+		consumeContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
 			alias: string | UmbContextToken<BaseType, ResultType>,
 			callback: UmbContextCallback<ResultType>,
 		): UmbContextConsumerController<BaseType, ResultType> {
 			return new UmbContextConsumerController(this, alias, callback);
 		}
 
-		async getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+		async getContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
 			options?: UmbClassGetContextOptions,
 		): Promise<ResultType | undefined> {

@@ -6,29 +6,23 @@ import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DocumentPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 
-// Do not export - for internal use only
-type UmbOnChangeCallbackType = (permitted: boolean) => void;
-
-export class UmbDocumentUserPermissionCondition extends UmbControllerBase implements UmbExtensionCondition {
-	config: UmbDocumentUserPermissionConditionConfig;
-	permitted = false;
-
+export class UmbDocumentUserPermissionCondition
+	extends UmbConditionBase<UmbDocumentUserPermissionConditionConfig>
+	implements UmbExtensionCondition
+{
 	#entityType: string | undefined;
 	#unique: string | null | undefined;
 	#documentPermissions: Array<DocumentPermissionPresentationModel> = [];
 	#fallbackPermissions: string[] = [];
-	#onChange: UmbOnChangeCallbackType;
 	#ancestors: Array<UmbEntityUnique> = [];
 
 	constructor(
 		host: UmbControllerHost,
-		args: UmbConditionControllerArguments<UmbDocumentUserPermissionConditionConfig, UmbOnChangeCallbackType>,
+		args: UmbConditionControllerArguments<UmbDocumentUserPermissionConditionConfig>,
 	) {
-		super(host);
-		this.config = args.config;
-		this.#onChange = args.onChange;
+		super(host, args);
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
 			this.observe(
@@ -128,11 +122,7 @@ export class UmbDocumentUserPermissionCondition extends UmbControllerBase implem
 			oneOfPermitted = false;
 		}
 
-		const permitted = allOfPermitted && oneOfPermitted;
-		if (permitted === this.permitted) return;
-
-		this.permitted = permitted;
-		this.#onChange(permitted);
+		this.permitted = allOfPermitted && oneOfPermitted;
 	}
 }
 

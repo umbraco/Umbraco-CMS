@@ -4,32 +4,20 @@ import { isDocumentPropertyValueUserPermission } from './utils.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-
-// Do not export - for internal use only
-type UmbOnChangeCallbackType = (permitted: boolean) => void;
+import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbDocumentPropertyValueUserPermissionCondition
-	extends UmbControllerBase
+	extends UmbConditionBase<UmbDocumentPropertyValueUserPermissionConditionConfig>
 	implements UmbExtensionCondition
 {
-	config: UmbDocumentPropertyValueUserPermissionConditionConfig;
-	permitted = false;
-
 	#documentPropertyValuePermissions: Array<UmbDocumentPropertyValueUserPermissionModel> = [];
 	#fallbackPermissions: string[] = [];
-	#onChange: UmbOnChangeCallbackType;
 
 	constructor(
 		host: UmbControllerHost,
-		args: UmbConditionControllerArguments<
-			UmbDocumentPropertyValueUserPermissionConditionConfig,
-			UmbOnChangeCallbackType
-		>,
+		args: UmbConditionControllerArguments<UmbDocumentPropertyValueUserPermissionConditionConfig>,
 	) {
-		super(host);
-		this.config = args.config;
-		this.#onChange = args.onChange;
+		super(host, args);
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
 			this.observe(
@@ -94,11 +82,7 @@ export class UmbDocumentPropertyValueUserPermissionCondition
 			oneOfPermitted = false;
 		}
 
-		const permitted = allOfPermitted && oneOfPermitted;
-		if (permitted === this.permitted) return;
-
-		this.permitted = permitted;
-		this.#onChange(permitted);
+		this.permitted = allOfPermitted && oneOfPermitted;
 	}
 }
 

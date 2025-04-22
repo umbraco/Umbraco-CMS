@@ -6,7 +6,7 @@ import type { UmbEntityVariantOptionModel, UmbEntityVariantModel } from '@umbrac
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
-export class UmbLanguageAccessWorkspaceContext extends UmbContextBase<UmbLanguageAccessWorkspaceContext> {
+export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
 	#workspaceContext?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
 	#currentUserAllowedLanguages?: Array<string>;
 	#currentUserHasAccessToAllLanguages?: boolean;

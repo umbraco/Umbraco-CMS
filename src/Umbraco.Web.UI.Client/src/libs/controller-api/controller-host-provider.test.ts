@@ -5,28 +5,39 @@ import { expect, fixture, html } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 
+class UmbTestContextProviderControllerClass {
+	prop = 'value from provider';
+	getHostElement() {
+		return undefined as unknown as Element;
+	}
+}
+
 @customElement('umb-test-controller-host-initializer-consumer')
 export class UmbTestControllerHostInitializerConsumerElement extends UmbControllerHostElementMixin(HTMLElement) {
-	public value: string | null = null;
+	public value?: string;
 	constructor() {
 		super();
 
-		new UmbContextConsumerController<string>(this, 'my-test-context-alias', (value) => {
-			this.value = value ?? null;
-		});
+		new UmbContextConsumerController<UmbTestContextProviderControllerClass>(
+			this,
+			'my-test-context-alias',
+			(context) => {
+				this.value = context?.prop;
+			},
+		);
 	}
 }
 
 describe('UmbControllerHostTestElement', () => {
 	let element: UmbControllerHostProviderElement;
 	let consumer: UmbTestControllerHostInitializerConsumerElement;
-	const contextValue = 'test-value';
 
 	beforeEach(async () => {
 		element = await fixture(
 			html` <umb-controller-host-provider
-				.create=${(host: UmbControllerHostElement) =>
-					new UmbContextProviderController(host, 'my-test-context-alias', contextValue)}>
+				.create=${(host: UmbControllerHostElement): void => {
+					new UmbContextProviderController(host, 'my-test-context-alias', new UmbTestContextProviderControllerClass());
+				}}>
 				<umb-test-controller-host-initializer-consumer></umb-test-controller-host-initializer-consumer>
 			</umb-controller-host-provider>`,
 		);
@@ -44,6 +55,6 @@ describe('UmbControllerHostTestElement', () => {
 		// Potentially we need to wait a bit here, cause the value might not be set already? as of the context consumption...
 		expect(consumer).to.be.instanceOf(UmbTestControllerHostInitializerConsumerElement);
 		expect(consumer.value).to.not.be.null;
-		expect(consumer.value).to.equal(contextValue);
+		expect(consumer.value).to.equal('value from provider');
 	});
 });

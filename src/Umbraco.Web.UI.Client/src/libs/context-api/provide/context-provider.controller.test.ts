@@ -5,6 +5,9 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 class UmbTestContextProviderControllerClass {
 	prop = 'value from provider';
+	getHostElement() {
+		return undefined as unknown as Element;
+	}
 }
 
 class UmbTestControllerHostElement extends UmbLitElement {}

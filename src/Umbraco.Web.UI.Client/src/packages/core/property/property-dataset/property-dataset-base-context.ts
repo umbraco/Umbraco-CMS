@@ -13,7 +13,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
  * @augments {UmbContextBase}
  */
 export class UmbPropertyDatasetContextBase
-	extends UmbContextBase<typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE>
+	extends UmbContextBase
 	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext
 {
 	#name = new UmbStringState(undefined);

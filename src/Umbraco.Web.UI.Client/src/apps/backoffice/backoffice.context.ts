@@ -12,7 +12,7 @@ import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UmbSysinfoRepository } from '@umbraco-cms/backoffice/sysinfo';
 
-export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
+export class UmbBackofficeContext extends UmbContextBase {
 	#activeSectionAlias = new UmbStringState(undefined);
 	public readonly activeSectionAlias = this.#activeSectionAlias.asObservable();
 

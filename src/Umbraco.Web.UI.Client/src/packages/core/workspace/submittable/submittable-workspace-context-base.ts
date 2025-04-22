@@ -10,7 +10,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 
 export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
-	extends UmbContextBase<UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>>
+	extends UmbContextBase
 	implements UmbSubmittableWorkspaceContext
 {
 	public readonly workspaceAlias: string;

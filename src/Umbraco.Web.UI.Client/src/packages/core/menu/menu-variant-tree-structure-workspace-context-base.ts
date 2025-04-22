@@ -11,7 +11,7 @@ interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
 }
 
-export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends UmbContextBase<unknown> {
+export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends UmbContextBase {
 	// TODO: add correct interface
 	#workspaceContext?: any;
 	#args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs;

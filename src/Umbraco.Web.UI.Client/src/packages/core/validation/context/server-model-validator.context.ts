@@ -11,10 +11,7 @@ import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbApiError } from '@umbraco-cms/backoffice/resources';
 
-export class UmbServerModelValidatorContext
-	extends UmbContextBase<UmbServerModelValidatorContext>
-	implements UmbValidator
-{
+export class UmbServerModelValidatorContext extends UmbContextBase implements UmbValidator {
 	#pathTranslators: Array<ClassConstructor<UmbValidationPathTranslator<any>>> = [];
 
 	#validatePromise?: Promise<void>;

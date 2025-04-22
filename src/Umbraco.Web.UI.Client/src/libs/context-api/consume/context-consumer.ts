@@ -5,10 +5,11 @@ import {
 	UMB_CONTEXT_PROVIDE_EVENT_TYPE,
 	UMB_CONTEXT_UNPROVIDED_EVENT_TYPE,
 } from '../provide/context-provide.event.js';
+import type { UmbContextMinimal } from '../types.js';
 import type { UmbContextCallback } from './context-request.event.js';
 import { UmbContextRequestEventImplementation } from './context-request.event.js';
 
-type HostElementMethod = () => Element | undefined;
+type HostElementMethod = () => Element;
 
 export type UmbContextConsumerAsPromiseOptionsType = {
 	preventTimeout?: boolean;
@@ -20,7 +21,10 @@ export type UmbContextConsumerAsPromiseOptionsType = {
  * Notice it is not recommended to use this class directly, but rather use the `consumeContext` method from a `UmbElement` or `UmbElementMixin` or `UmbControllerBase` or `UmbClassMixin`.
  * Alternatively, you can use the `UmbContextConsumerController` to consume a context from a host element. But this does require that you can implement one of the Class Mixins mentioned above.
  */
-export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType = BaseType> {
+export class UmbContextConsumer<
+	BaseType extends UmbContextMinimal = UmbContextMinimal,
+	ResultType extends BaseType = BaseType,
+> {
 	protected _retrieveHost: HostElementMethod;
 
 	#raf?: number;
@@ -64,6 +68,10 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		this.#apiAlias = idSplit[1] ?? 'default';
 		this.#callback = callback;
 		this.#discriminator = (contextIdentifier as UmbContextToken<BaseType, ResultType>).getDiscriminator?.();
+	}
+
+	getHostElement(): Element {
+		return this._retrieveHost();
 	}
 
 	/**
@@ -113,6 +121,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 
 	protected async setInstance(instance: ResultType): Promise<void> {
 		this.#instance = instance;
+		this.#setCurrentTarget(instance.getHostElement());
 		await this.#callback?.(instance); // Resolve callback first as it might perform something you like completed before resolving the promise, as the promise might be used to determine when things are ready/initiated [NL]
 		this.#resolvePromise();
 	}
@@ -207,9 +216,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	}
 
 	public hostConnected(): void {
-		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
-		window.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#handleNewProvider);
-		window.addEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#handleRemovedProvider);
+		this.#setupCurrentTarget();
 		this.request();
 	}
 
@@ -230,12 +237,29 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		this.#promiseResolver = undefined;
 		this.#promiseRejecter = undefined;
 
-		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
-		window.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#handleNewProvider);
-		window.removeEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#handleRemovedProvider);
+		this.#dismentalCurrentTarget();
 	}
 
-	#handleNewProvider = (event: Event): void => {
+	#currentTarget: EventTarget = window;
+	#setCurrentTarget(target: EventTarget | undefined) {
+		this.#dismentalCurrentTarget();
+		this.#currentTarget = target ?? window;
+		this.#setupCurrentTarget();
+	}
+
+	#setupCurrentTarget() {
+		this.#currentTarget.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
+		this.#currentTarget.addEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
+	}
+
+	#dismentalCurrentTarget() {
+		if (this.#currentTarget) {
+			this.#currentTarget.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
+			this.#currentTarget.removeEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
+		}
+	}
+
+	#onProvide = (event: Event): void => {
 		// Does seem a bit unnecessary, we could just assume the type via type casting...
 		if (!isUmbContextProvideEventType(event)) return;
 
@@ -244,7 +268,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		}
 	};
 
-	#handleRemovedProvider = (event: Event) => {
+	#onUnprovided = (event: Event) => {
 		// Does seem a bit unnecessary, we could just assume the type via type casting...
 		if (!isUmbContextUnprovidedEventType(event)) return;
 

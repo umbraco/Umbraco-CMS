@@ -23,7 +23,7 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import { UmbReadOnlyStateManager } from '@umbraco-cms/backoffice/utils';
 
-export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPropertyContext<ValueType>> {
+export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 	#alias = new UmbStringState(undefined);
 	public readonly alias = this.#alias.asObservable();
 

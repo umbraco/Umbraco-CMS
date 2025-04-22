@@ -12,7 +12,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTiptapToolbarConfigurationContext> {
+export class UmbTiptapToolbarConfigurationContext extends UmbContextBase {
 	#extensions = new UmbArrayState<UmbTiptapToolbarExtension>([], (x) => x.alias);
 	public readonly extensions = this.#extensions.asObservable();
 

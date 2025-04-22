@@ -27,7 +27,7 @@ import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/back
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
-export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDocumentPublishingWorkspaceContext> {
+export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase {
 	/**
 	 * Manages the pending changes for the published document.
 	 * @memberof UmbDocumentPublishingWorkspaceContext

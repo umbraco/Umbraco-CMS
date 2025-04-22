@@ -1,5 +1,6 @@
 import { UmbContextProvider } from '../provide/context-provider.js';
 import { UmbContextToken } from '../token/context-token.js';
+import type { UmbContextMinimal } from '../types.js';
 import { UmbContextConsumer } from './context-consumer.js';
 import type { UmbContextRequestEventImplementation } from './context-request.event.js';
 import { UMB_CONTEXT_REQUEST_EVENT_TYPE } from './context-request.event.js';
@@ -11,10 +12,16 @@ const testContextAliasAndNotExistingApiAlias = 'my-test-context#notExistingTestA
 
 class UmbTestContextConsumerClass {
 	public prop: string = 'value from provider';
+	getHostElement() {
+		return document.body;
+	}
 }
 
 class UmbTestAlternativeContextConsumerClass {
 	public alternativeProp: string = 'value from alternative provider';
+	getHostElement() {
+		return document.body;
+	}
 }
 
 describe('UmbContextConsumer', () => {
@@ -180,7 +187,7 @@ describe('UmbContextConsumer', () => {
 		});
 
 		it('works with host method returning undefined', async () => {
-			const notExistingElement = undefined;
+			const notExistingElement = undefined as unknown as Element;
 
 			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(
 				() => notExistingElement,
@@ -291,7 +298,9 @@ describe('UmbContextConsumer', () => {
 			document.body.removeChild(element);
 		});
 
-		type A = { prop: string };
+		interface A extends UmbContextMinimal {
+			prop: string;
+		}
 
 		function discriminator(instance: unknown): instance is A {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any

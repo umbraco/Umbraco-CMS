@@ -11,7 +11,7 @@ import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 
 // TODO: Make a store for the App Languages.
 // TODO: Implement default language end-point, in progress at backend team, so we can avoid getting all languages.
-export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext> implements UmbApi {
+export class UmbAppLanguageContext extends UmbContextBase implements UmbApi {
 	#languagesResolve!: () => void;
 	#languagesPromise = new Promise<void>((resolve) => {
 		this.#languagesResolve = resolve;

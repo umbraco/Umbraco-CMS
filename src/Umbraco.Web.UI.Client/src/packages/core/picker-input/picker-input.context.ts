@@ -14,7 +14,7 @@ export class UmbPickerInputContext<
 	PickerItemType extends PickerItemBaseType = PickedItemType,
 	PickerModalConfigType extends UmbPickerModalData<PickerItemType> = UmbPickerModalData<PickerItemType>,
 	PickerModalValueType extends UmbPickerModalValue = UmbPickerModalValue,
-> extends UmbContextBase<UmbPickerInputContext> {
+> extends UmbContextBase {
 	modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>;
 	repository?: UmbItemRepository<PickedItemType>;
 	#getUnique: (entry: PickedItemType) => string | undefined;

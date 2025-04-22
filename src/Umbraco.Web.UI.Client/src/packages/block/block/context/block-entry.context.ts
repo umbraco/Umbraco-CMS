@@ -47,7 +47,7 @@ export abstract class UmbBlockEntryContext<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 	BlockOriginData extends UmbBlockWorkspaceOriginData = UmbBlockWorkspaceOriginData,
-> extends UmbContextBase<unknown> {
+> extends UmbContextBase {
 	//
 	_manager?: BlockManagerContextType;
 	_entries?: BlockEntriesContextType;
