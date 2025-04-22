@@ -4,7 +4,7 @@ import { createImportMap } from '../importmap/index.js';
 
 const ILLEGAL_CORE_IMPORTS_THRESHOLD = 6;
 const SELF_IMPORTS_THRESHOLD = 0;
-const BIDIRECTIONAL_IMPORTS_THRESHOLD = 30;
+const BIDIRECTIONAL_IMPORTS_THRESHOLD = 18;
 
 const clientProjectRoot = path.resolve(import.meta.dirname, '../../');
 const modulePrefix = '@umbraco-cms/backoffice/';
@@ -191,7 +191,7 @@ function reportBidirectionalModuleImports() {
 	console.error(`🔍 Scanning all modules for bidirectional imports...`);
 	console.log(`\n`);
 
-	let total = 0;
+	let entries = [];
 
 	packageModules.forEach(([alias, path]) => {
 		const importsInModule = getUmbracoModuleImportsInModule(alias);
@@ -201,10 +201,19 @@ function reportBidirectionalModuleImports() {
 			// Check if the imported module imports the current module
 			const importedModuleImports = getUmbracoModuleImportsInModule(importedModule);
 			if (importedModuleImports.includes(alias)) {
-				console.error(`🚨 ${alias} and ${importedModule} are importing each other`);
-				total++;
+				const entry = [alias, importedModule].sort();
+				entries = [...entries, entry];
 			}
 		});
+	});
+
+	// Remove duplicates
+	const uniqueEntries = [...new Set(entries.map(JSON.stringify))].map(JSON.parse);
+	const total = uniqueEntries.length;
+
+	uniqueEntries.forEach((entry) => {
+		const [moduleA, moduleB] = entry;
+		console.error(`🚨 ${moduleA} and ${moduleB} are importing each other`);
 	});
 
 	if (total > BIDIRECTIONAL_IMPORTS_THRESHOLD) {
