@@ -345,7 +345,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		const subVariantOptions = this.#getSegmentVariantOptionsForCulture(variantOption, variantId);
 		return html`
 			<div class="variant culture-variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
-				${this._variesBySegment && this.#isCreated(variantOption)
+				${this._variesBySegment && this.#isCreated(variantOption) && subVariantOptions.length > 0
 					? html`<div class="expand-area">${this.#renderExpandToggle(variantId)}</div>`
 					: nothing}
 
