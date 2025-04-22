@@ -32,7 +32,6 @@ export interface UmbVariantModel extends UmbEntityVariantModel {}
 export interface UmbEntityVariantOptionModel<VariantType extends UmbEntityVariantModel = UmbEntityVariantModel> {
 	variant?: VariantType;
 	language: UmbLanguageDetailModel;
-	// TODO: Rename this before merge
 	segmentInfo?: {
 		alias: string;
 		entityType: string;
