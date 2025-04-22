@@ -247,7 +247,7 @@ export abstract class UmbPropertyEditorUiRteElementBase
 
 				context?.setValue(super.value);
 			},
-			'motherObserver',
+			'blockManagerObserver',
 		);
 	}
 
