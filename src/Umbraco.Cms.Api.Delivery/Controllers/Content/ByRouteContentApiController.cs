@@ -145,6 +145,11 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
         path = DecodePath(path);
         path = path.Length == 0 ? "/" : path;
 
+        if (_apiContentPathResolver.IsResolvablePath(path) is false)
+        {
+            return NotFound();
+        }
+
         IPublishedContent? contentItem = GetContent(path);
         if (contentItem is not null)
         {
