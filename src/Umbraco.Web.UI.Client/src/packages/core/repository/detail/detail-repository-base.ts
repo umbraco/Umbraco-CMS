@@ -3,8 +3,6 @@ import type { UmbRepositoryResponse, UmbRepositoryResponseWithAsObservable } fro
 import type { UmbDetailDataSource, UmbDetailDataSourceConstructor } from './detail-data-source.interface.js';
 import type { UmbDetailRepository } from './detail-repository.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbNotificationContext, UmbNotificationHandler } from '@umbraco-cms/backoffice/notification';
-import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -21,10 +19,6 @@ export abstract class UmbDetailRepositoryBase<
 
 	#detailStore?: UmbDetailStore<DetailModelType>;
 	protected detailDataSource: UmbDetailDataSourceType;
-	#notificationContext?: UmbNotificationContext;
-	#createSuccessNotification?: UmbNotificationHandler;
-	#updateSuccessNotification?: UmbNotificationHandler;
-	#deleteSuccessNotification?: UmbNotificationHandler;
 
 	constructor(
 		host: UmbControllerHost,
@@ -42,10 +36,6 @@ export abstract class UmbDetailRepositoryBase<
 		this.#init = Promise.all([
 			this.consumeContext(detailStoreContextAlias, (instance) => {
 				this.#detailStore = instance;
-			}).asPromise({ preventTimeout: true }),
-
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
-				this.#notificationContext = instance;
 			}).asPromise({ preventTimeout: true }),
 		]);
 	}
@@ -98,10 +88,6 @@ export abstract class UmbDetailRepositoryBase<
 
 		if (createdData) {
 			this.#detailStore?.append(createdData);
-			this.#createSuccessNotification?.close();
-			// TODO: how do we handle generic notifications? Is this the correct place to do it?
-			const notification = { data: { message: `Created` } };
-			this.#createSuccessNotification = this.#notificationContext!.peek('positive', notification);
 		}
 
 		return { data: createdData, error };
@@ -122,11 +108,6 @@ export abstract class UmbDetailRepositoryBase<
 
 		if (updatedData) {
 			this.#detailStore!.updateItem(model.unique, updatedData);
-
-			// TODO: how do we handle generic notifications? Is this the correct place to do it?
-			this.#updateSuccessNotification?.close();
-			const notification = { data: { message: `Saved` } };
-			this.#updateSuccessNotification = this.#notificationContext!.peek('positive', notification);
 		}
 
 		return { data: updatedData, error };
@@ -146,11 +127,6 @@ export abstract class UmbDetailRepositoryBase<
 
 		if (!error) {
 			this.#detailStore!.removeItem(unique);
-
-			this.#deleteSuccessNotification?.close();
-			// TODO: how do we handle generic notifications? Is this the correct place to do it?
-			const notification = { data: { message: `Deleted` } };
-			this.#deleteSuccessNotification = this.#notificationContext!.peek('positive', notification);
 		}
 
 		return { error };
