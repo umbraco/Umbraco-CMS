@@ -275,6 +275,13 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				inset: 0;
 				cursor: pointer;
 				border: 1px dashed var(--uui-color-divider-emphasis);
+				border-radius: var(--uui-border-radius);
+			}
+
+			:host([standalone]:not([disabled]):hover) {
+				border-color: var(--uui-color-default-emphasis);
+				--uui-color-default: var(--uui-color-default-emphasis);
+				color: var(--uui-color-default-emphasis);
 			}
 
 			#dropzone {

@@ -186,6 +186,11 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	static override readonly styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: block;
+				max-width: 500px;
+				min-width: 300px;
+			}
 			#loader {
 				display: flex;
 				justify-content: center;
