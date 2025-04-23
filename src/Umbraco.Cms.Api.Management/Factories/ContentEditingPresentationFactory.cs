@@ -23,7 +23,6 @@ internal abstract class ContentEditingPresentationFactory<TValueModel, TVariantM
             InvariantProperties = invariantProperties.Select(ToPropertyValueModel).ToArray(),
             Variants = contentModel
                 .Variants
-                .Where(variant => variant.VariesByCulture() || variant.VariesBySegment())
                 .Select(variant => new VariantModel
                 {
                     Culture = variant.Culture,
