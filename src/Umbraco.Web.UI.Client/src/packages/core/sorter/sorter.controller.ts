@@ -72,7 +72,6 @@ function destroyIgnorerElements(element: HTMLElement, ignorerSelectors: string) 
  * @param element
  */
 function setupPreventEvent(element: Element) {
-	console.log('prevent on', element);
 	(element as HTMLElement).draggable = false;
 	//(element as HTMLElement).setAttribute('draggable', 'false');
 }
@@ -230,7 +229,7 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
 	Partial<Pick<INTERNAL_UmbSorterConfig<T, ElementType>, 'ignorerSelector' | 'containerSelector' | 'identifier'>>;
 
 /**
- 
+
  * @class UmbSorterController
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
