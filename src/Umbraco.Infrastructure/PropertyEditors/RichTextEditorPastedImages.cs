@@ -190,7 +190,7 @@ public sealed class RichTextEditorPastedImages
                 });
             }
 
-            img.SetAttributeValue("src", location);
+            img.SetAttributeValue("src", location ?? string.Empty);
 
             // Remove the data attribute (so we do not re-process this)
             img.Attributes.Remove(TemporaryImageDataAttribute);

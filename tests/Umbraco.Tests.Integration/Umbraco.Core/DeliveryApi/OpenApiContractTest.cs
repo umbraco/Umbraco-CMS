@@ -39,7 +39,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
     private const string ExpectedOpenApiContract =
     """
     {
-      "openapi": "3.0.1",
+      "openapi": "3.0.4",
       "info": {
         "title": "Umbraco Delivery API",
         "description": "You can find out more about the Umbraco Delivery API in [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api).",
