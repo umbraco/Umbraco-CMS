@@ -222,7 +222,7 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
         {
             ContentTypeKey = mediaTypeWithListView.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Album",
+            Variants = [new () { Name = "Album" }]
         };
 
         var result = await MediaEditingService.CreateAsync(rootContentCreateModel, Constants.Security.SuperUserKey);
@@ -234,7 +234,7 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
             {
                 ContentTypeKey = childImageMediaType.Key,
                 ParentKey = root.Key,
-                InvariantName = $"Image {i}",
+                Variants = [new () { Name = $"Image {i}" }],
                 Key = i.ToGuid(),
             };
 

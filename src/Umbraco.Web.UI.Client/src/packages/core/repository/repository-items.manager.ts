@@ -41,11 +41,12 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 	#statuses = new UmbArrayState<UmbRepositoryItemsStatus>([], (x) => x.unique);
 	statuses = this.#statuses.asObservable();
 
+	// TODO: Align with the other manager(details), and make a generic type/base for these. v.17.0 [NL]
 	/**
 	 * Creates an instance of UmbRepositoryItemsManager.
 	 * @param {UmbControllerHost} host - The host for the controller.
 	 * @param {string} repositoryAlias - The alias of the repository to use.
-	 * @param {((entry: ItemType) => string | undefined)} [getUniqueMethod] - DEPRECATED since 15.3. Will be removed in v. 17: A method to get the unique key from the item.
+	 * @param {((entry: ItemType) => string | undefined)} [getUniqueMethod] - DEPRECATED since 15.3. Will be removed in v.17.0: A method to get the unique key from the item.
 	 * @memberof UmbRepositoryItemsManager
 	 */
 	constructor(

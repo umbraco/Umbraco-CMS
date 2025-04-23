@@ -16,14 +16,16 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyTypeScaffoldModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
-export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropertyTypeModel = UmbPropertyTypeModel>
-	extends UmbSubmittableWorkspaceContextBase<PropertyTypeData>
+type PropertyTypeDataModel = UmbPropertyTypeScaffoldModel;
+
+export class UmbPropertyTypeWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<PropertyTypeDataModel>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	// Just for context token safety:
@@ -34,11 +36,11 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 
 	#entityType: string;
 
-	validationgContext: UmbValidationContext;
+	validationContext: UmbValidationContext;
 
 	// #persistedData
 	// #currentData
-	#data = new UmbObjectState<PropertyTypeData | undefined>(undefined);
+	#data = new UmbObjectState<PropertyTypeDataModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 
 	readonly name = this.#data.asObservablePart((data) => data?.name);
@@ -57,12 +59,12 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 		const manifest = args.manifest;
 		this.#entityType = manifest.meta?.entityType;
 
-		this.validationgContext = new UmbValidationContext(this);
-		this.addValidationContext(this.validationgContext);
+		this.validationContext = new UmbValidationContext(this);
+		this.addValidationContext(this.validationContext);
 
 		this.observe(this.unique, (unique) => {
 			if (unique) {
-				this.validationgContext.setDataPath(UmbDataPathPropertyTypeQuery({ id: unique }));
+				this.validationContext.setDataPath(UmbDataPathPropertyTypeQuery({ id: unique }));
 			}
 		});
 
@@ -118,7 +120,7 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 			await this.#contentTypeContext?.structure.propertyStructureById(unique),
 			(property) => {
 				if (property) {
-					this.#data.setValue(property as PropertyTypeData);
+					this.#data.setValue(property as PropertyTypeDataModel);
 					//this.#persistedData.setValue(property);
 					//this.#currentData.setValue(property);
 
@@ -135,8 +137,10 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 	async create(containerId?: string | null) {
 		this.resetState();
 
-		let data: PropertyTypeData = {
-			id: UmbId.new(),
+		const unique = UmbId.new();
+		let data: PropertyTypeDataModel = {
+			id: unique,
+			unique: unique,
 			container: containerId ? { id: containerId } : null,
 			alias: '',
 			name: '',
@@ -153,7 +157,7 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 				labelOnTop: false,
 			},
 			sortOrder: 0,
-		} as PropertyTypeData;
+		};
 
 		// If we have a modal context, we blend in the modal preset data: [NL]
 		if (this.modalContext) {
@@ -169,7 +173,7 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 	getData() {
 		return this.#data.getValue();
 	}
-	updateData(partialData: Partial<PropertyTypeData>) {
+	updateData(partialData: Partial<PropertyTypeDataModel>) {
 		this.#data?.update(partialData);
 	}
 
@@ -194,12 +198,12 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
 	 * @description Get an Observable for the value of this property.
 	 */
-	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-		return this.#data.asObservablePart((data) => data?.[propertyAlias as keyof PropertyTypeData] as ReturnType);
+	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: keyof PropertyTypeDataModel) {
+		return this.#data.asObservablePart((data) => data?.[propertyAlias] as ReturnType);
 	}
 
-	getPropertyValue<ReturnType = unknown>(propertyAlias: string) {
-		return this.#data.getValue()?.[propertyAlias as keyof PropertyTypeData] as ReturnType;
+	getPropertyValue<ReturnType = unknown>(propertyAlias: keyof PropertyTypeDataModel) {
+		return this.#data.getValue()?.[propertyAlias] as ReturnType;
 	}
 
 	/**
@@ -230,8 +234,8 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 
 		await this.#init;
 		if (this.#contentTypeContext) {
-			this.validationgContext.report();
-			await this.#contentTypeContext.structure.insertProperty(contentTypeUnique, data);
+			this.validationContext.report();
+			await this.#contentTypeContext.structure.insertProperty(contentTypeUnique, data as UmbPropertyTypeModel);
 
 			this.setIsNew(false);
 		} else {

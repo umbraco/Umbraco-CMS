@@ -83,7 +83,7 @@ internal sealed class UpdateDocumentTests : ManagementApiTest<UpdateDocumentCont
 
         var response = await GetManagementApiResponse(model, updateRequestModel);
 
-        AssertResponse(response, model, HttpStatusCode.Forbidden, model.InvariantName);
+        AssertResponse(response, model, HttpStatusCode.Forbidden, model.Variants.Single().Name);
     }
 
     [Test]

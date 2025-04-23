@@ -112,7 +112,15 @@ export class UmbDocumentWorkspaceContext
 			}
 		});
 
-		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+		this.observe(
+			this.contentTypeUnique,
+			(unique) => {
+				if (unique) {
+					this.structure.loadType(unique);
+				}
+			},
+			null,
+		);
 
 		// TODO: Remove this in v17 as we have moved the publishing methods to the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.
 		this.consumeContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, (context) => {

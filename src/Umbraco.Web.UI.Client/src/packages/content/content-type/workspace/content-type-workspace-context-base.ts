@@ -2,7 +2,11 @@ import type { UmbContentTypeCompositionModel, UmbContentTypeDetailModel, UmbCont
 import { UmbContentTypeStructureManager } from '../structure/index.js';
 import type { UmbContentTypeWorkspaceContext } from './content-type-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDetailRepository,
+	UmbRepositoryResponse,
+	UmbRepositoryResponseWithAsObservable,
+} from '@umbraco-cms/backoffice/repository';
 import {
 	UmbEntityDetailWorkspaceContextBase,
 	type UmbEntityDetailWorkspaceContextArgs,
@@ -105,11 +109,13 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	/**
 	 * Loads the data for the workspace
 	 * @param { string } unique The unique identifier of the data to load
-	 * @returns { Promise<DetailModelType> } The loaded data
+	 * @returns { Promise<UmbRepositoryResponse<DetailModelType> | UmbRepositoryResponseWithAsObservable<DetailModelType>> } The loaded data
 	 */
-	override async load(unique: string) {
+	override async load(
+		unique: string,
+	): Promise<UmbRepositoryResponse<DetailModelType> | UmbRepositoryResponseWithAsObservable<DetailModelType>> {
 		if (unique === this.getUnique() && this._getDataPromise) {
-			return (await this._getDataPromise) as any;
+			return await this._getDataPromise;
 		}
 
 		this.resetState();
@@ -118,13 +124,12 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		this._getDataPromise = this.structure.loadType(unique);
 		const response = await this._getDataPromise;
 		const data = response.data;
-
 		if (data) {
 			this._data.setPersisted(data);
 			this.setIsNew(false);
 
 			this.observe(
-				response.asObservable(),
+				this.structure.ownerContentType,
 				(entity: any) => this.#onDetailStoreChange(entity),
 				'umbContentTypeDetailStoreObserver',
 			);

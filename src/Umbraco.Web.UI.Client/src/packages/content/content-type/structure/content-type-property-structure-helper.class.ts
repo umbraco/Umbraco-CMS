@@ -9,7 +9,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 
-type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
+type UmbPropertyTypeUnique = UmbPropertyTypeModel['unique'];
 
 /**
  * This class is a helper class for managing the structure of containers in a content type.
@@ -24,7 +24,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	#containerId?: string | null;
 
 	// State which holds all the properties of the current container, this is a composition of all properties from the containers that matches our target [NL]
-	#propertyStructure = new UmbArrayState<UmbPropertyTypeModel>([], (x) => x.id);
+	#propertyStructure = new UmbArrayState<UmbPropertyTypeModel>([], (x) => x.unique);
 	readonly propertyStructure = this.#propertyStructure.asObservable();
 
 	constructor(host: UmbControllerHost) {
@@ -164,18 +164,20 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		);
 	}
 
-	async isOwnerProperty(propertyId: UmbPropertyTypeId) {
+	async isOwnerProperty(propertyUnique: UmbPropertyTypeUnique) {
 		await this.#init;
 		if (!this.#structure) return;
 
-		return this.#structure.ownerContentTypeObservablePart((x) => x?.properties.some((y) => y.id === propertyId));
+		return this.#structure.ownerContentTypeObservablePart((x) =>
+			x?.properties.some((y) => y.unique === propertyUnique),
+		);
 	}
 
-	async contentTypeOfProperty(propertyId: UmbPropertyTypeId) {
+	async contentTypeOfProperty(propertyUnique: UmbPropertyTypeUnique) {
 		await this.#init;
 		if (!this.#structure) return;
 
-		return this.#structure.contentTypeOfProperty(propertyId);
+		return this.#structure.contentTypeOfProperty(propertyUnique);
 	}
 
 	// TODO: consider moving this to another class, to separate 'viewer' from 'manipulator':
@@ -194,11 +196,11 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		return true;
 	}
 
-	async removeProperty(propertyId: UmbPropertyTypeId) {
+	async removeProperty(propertyUnique: UmbPropertyTypeUnique) {
 		await this.#init;
 		if (!this.#structure) return false;
 
-		await this.#structure.removeProperty(null, propertyId);
+		await this.#structure.removeProperty(null, propertyUnique);
 		return true;
 	}
 

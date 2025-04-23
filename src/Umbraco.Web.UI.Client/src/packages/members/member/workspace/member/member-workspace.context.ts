@@ -44,7 +44,15 @@ export class UmbMemberWorkspaceContext
 			contentTypePropertyName: 'memberType',
 		});
 
-		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+		this.observe(
+			this.contentTypeUnique,
+			(unique) => {
+				if (unique) {
+					this.structure.loadType(unique);
+				}
+			},
+			null,
+		);
 
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
