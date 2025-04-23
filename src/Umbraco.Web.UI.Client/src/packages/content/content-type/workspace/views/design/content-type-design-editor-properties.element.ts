@@ -138,6 +138,9 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	private _ownerContentTypeVariesByCulture?: boolean;
 
 	@state()
+	private _ownerContentTypeVariesBySegment?: boolean;
+
+	@state()
 	private _newPropertyPath?: string;
 
 	@state()
@@ -178,6 +181,13 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 					this._ownerContentTypeVariesByCulture = variesByCulture;
 				},
 				'observeOwnerVariesByCulture',
+			);
+			this.observe(
+				workspaceContext.variesBySegment,
+				(variesBySegment) => {
+					this._ownerContentTypeVariesBySegment = variesBySegment;
+				},
+				'observeOwnerVariesBySegment',
 			);
 		});
 		this.observe(this.#propertyStructureHelper.propertyStructure, (propertyStructure) => {
@@ -268,7 +278,8 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 										?sort-mode-active=${this._sortModeActive}
 										.propertyStructureHelper=${this.#propertyStructureHelper}
 										.property=${property}
-										.ownerVariesByCulture=${this._ownerContentTypeVariesByCulture}>
+										.ownerVariesByCulture=${this._ownerContentTypeVariesByCulture}
+										.ownerVariesBySegment=${this._ownerContentTypeVariesBySegment}>
 									</umb-content-type-design-editor-property>
 								`;
 							},

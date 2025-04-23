@@ -17,8 +17,8 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 	implements UmbWorkspaceDataManager<ModelType>
 {
 	protected _varies?: boolean;
-	//#variesByCulture?: boolean;
-	//#variesBySegment?: boolean;
+	protected _variesByCulture?: boolean;
+	protected _variesBySegment?: boolean;
 
 	protected override _sortCurrentData<GivenType extends Partial<ModelType> = Partial<ModelType>>(
 		persistedData: Partial<ModelType>,
@@ -60,14 +60,14 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 		}
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	setVariesByCulture(vary: boolean | undefined) {
-		//this.#variesByCulture = vary;
+		this._variesByCulture = vary;
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 	setVariesBySegment(vary: boolean | undefined) {
-		//this.#variesBySegment = vary;
+		this._variesBySegment = vary;
 	}
+
 	setVaries(vary: boolean | undefined) {
 		this._varies = vary;
 	}
@@ -82,6 +82,20 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 			selectedVariants = [invariantVariantId];
 		} else {
 			variantsToStore = [...selectedVariants, invariantVariantId];
+		}
+
+		// If we vary by segment we need to save all segments for a selected culture.
+		if (this._variesBySegment === true) {
+			const dataSegments = this.getCurrent()!.values.map((x) => x.segment);
+			variantsToStore = [
+				...variantsToStore,
+				...dataSegments.flatMap((segment) => variantsToStore.map((variant) => variant.toSegment(segment))),
+			];
+
+			selectedVariants = [
+				...selectedVariants,
+				...dataSegments.flatMap((segment) => selectedVariants.map((variant) => variant.toSegment(segment))),
+			];
 		}
 
 		const data = this.getCurrent();

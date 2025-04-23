@@ -379,11 +379,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		await this.#init;
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
-		const options = await firstValueFrom(this.#documentWorkspaceContext.variantOptions);
+		const allOptions = await firstValueFrom(this.#documentWorkspaceContext.variantOptions);
+		const options = allOptions.filter((option) => option.segment === null);
 
 		// TODO: this is a temporary copy of the content-detail workspace context method.
 		// we need to implement custom selection that makes sense for each the publishing modal.
-		let selected = this.#getChangedVariantsSelection();
+		let selected = this.#getPublishVariantsSelection();
 
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
 		selected = selected.filter((x) => options.some((o) => o.unique === x));
@@ -401,14 +402,25 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		};
 	}
 
-	#getChangedVariantsSelection() {
+	#getPublishVariantsSelection() {
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
-		const activeVariants = this.#documentWorkspaceContext.splitView
-			.getActiveVariants()
-			.map((activeVariant) => UmbVariantId.Create(activeVariant).toString());
-		const changedVariants = this.#documentWorkspaceContext.getChangedVariants().map((x) => x.toString());
-		const selection = [...activeVariants, ...changedVariants];
-		return [...new Set(selection)];
+		const activeVariants = this.#documentWorkspaceContext.splitView.getActiveVariants();
+		const activeVariantIds = activeVariants.map((x) => UmbVariantId.Create(x));
+		const changedVariantIds = this.#documentWorkspaceContext.getChangedVariants();
+		const activeAndChangedVariantIds = [...activeVariantIds, ...changedVariantIds];
+
+		// if a segment has been changed, we select the "parent" culture variant as it is currently only possible to select between cultures in the dialogs
+		const changedParentCultureVariantIds = activeAndChangedVariantIds
+			.filter((x) => x.segment !== null)
+			.map((x) => x.toSegmentInvariant());
+
+		const selected = [...activeAndChangedVariantIds, ...changedParentCultureVariantIds].map((variantId) =>
+			variantId.toString(),
+		);
+
+		const uniqueSelected = [...new Set(selected)];
+
+		return uniqueSelected;
 	}
 
 	async #initPendingChanges() {

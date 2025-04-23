@@ -74,7 +74,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				editorAlias: 'Umbraco.RichText',
 				alias: 'richTextEditor',
-				culture: null,
+				culture: 'en-US',
 				segment: null,
 				value: {
 					blocks: {},
@@ -125,28 +125,28 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'email',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.ColorPicker',
 				alias: 'colorPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MultiNodeTreePicker',
 				alias: 'contentPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.ColorPicker.EyeDropper',
 				alias: 'eyeDropper',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MultiUrlPicker',
@@ -170,7 +170,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'multiUrlPicker',
 				culture: 'da-dk',
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MultiNodeTreePicker',
@@ -206,77 +206,77 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'email',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.TextBox',
 				alias: 'textBox',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.DropDown.Flexible',
 				alias: 'dropdown',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.DropDown.Flexible',
 				alias: 'dropdownMultiple',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.TextArea',
 				alias: 'textArea',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.Slider',
 				alias: 'slider',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.TrueFalse',
 				alias: 'toggle',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.Tags',
 				alias: 'tags',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MarkdownEditor',
 				alias: 'markdownEditor',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.RadioButtonList',
 				alias: 'radioButtonList',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.CheckBoxList',
 				alias: 'checkboxList',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.BlockList',
@@ -296,39 +296,84 @@ export const data: Array<UmbMockDocumentModel> = [
 						{
 							key: '1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-							elementProperty: 'Hello world',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
+								},
+							],
 						},
 					],
 					settingsData: [
 						{
 							key: '5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
-							elementProperty: 'Hello world',
-							textBox: 'Hello world 123',
-							blockList: {
-								layout: {
-									'Umbraco.BlockList': [
-										{
-											contentKey: '1234b',
-											settingsKey: '5678b',
-										},
-									],
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
 								},
-								contentData: [
-									{
-										key: '1234b',
-										contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-										elementProperty: 'Hello world',
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'textBox',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
+								},
+								{
+									editorAlias: 'Umbraco.BlockList',
+									alias: 'blockList',
+									culture: null,
+									segment: null,
+									value: {
+										layout: {
+											'Umbraco.BlockList': [
+												{
+													contentKey: '1234b',
+													settingsKey: '5678b',
+												},
+											],
+										},
+										contentData: [
+											{
+												key: '1234b',
+												contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+												values: [
+													{
+														editorAlias: 'Umbraco.TextBox',
+														alias: 'elementProperty',
+														culture: null,
+														segment: null,
+														value: 'Hello world 123',
+													},
+												],
+											},
+										],
+										settingsData: [
+											{
+												key: '5678b',
+												contentTypeKey: 'all-property-editors-document-type-id',
+												elementProperty: 'Hello world',
+												values: [
+													{
+														editorAlias: 'Umbraco.TextBox',
+														alias: 'elementProperty',
+														culture: null,
+														segment: null,
+														value: 'Hello world 123',
+													},
+												],
+											},
+										],
 									},
-								],
-								settingsData: [
-									{
-										key: '5678b',
-										contentTypeKey: 'all-property-editors-document-type-id',
-										elementProperty: 'Hello world',
-									},
-								],
-							},
+								},
+							],
 						},
 					],
 				},
@@ -338,7 +383,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'mediaPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.ImageCropper',
@@ -426,7 +471,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'uploadField',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.BlockGrid',
@@ -475,7 +520,15 @@ export const data: Array<UmbMockDocumentModel> = [
 						{
 							key: '1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-							elementProperty: 'Hello world',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
+								},
+							],
 						},
 						{
 							key: 'a1234',
@@ -497,7 +550,15 @@ export const data: Array<UmbMockDocumentModel> = [
 						{
 							key: '5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
-							elementProperty: 'Hello world',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
+								},
+							],
 						},
 						{
 							key: 'a5678',
@@ -517,70 +578,49 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'blockGrid',
 				culture: null,
 				segment: null,
-				value: null,
-			},
-			{
-				editorAlias: '',
-				alias: 'numberRange',
-				culture: null,
-				segment: null,
-				value: null,
-			},
-			{
-				editorAlias: '',
-				alias: 'orderDirection',
-				culture: null,
-				segment: null,
-				value: null,
-			},
-			{
-				editorAlias: '',
-				alias: 'overlaySize',
-				culture: null,
-				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.Label',
 				alias: 'label',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.Integer',
 				alias: 'integer',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.Decimal',
 				alias: 'decimal',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MemberPicker',
 				alias: 'memberPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MemberGroupPicker',
 				alias: 'memberGroupPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.UserPicker',
 				alias: 'userPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 		],
 		variants: [
@@ -867,14 +907,14 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'multiNodeTreePicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.ListView',
 				alias: 'listView',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 		],
 	},
@@ -902,7 +942,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:32:24.957009',
-				culture: null,
+				culture: 'en-US',
 				segment: null,
 				name: 'All RTEs',
 				createDate: '2023-02-06T15:32:05.350038',
@@ -916,43 +956,13 @@ export const data: Array<UmbMockDocumentModel> = [
 				culture: null,
 				segment: null,
 				value: {
-					blocks: undefined,
-					markup: `
-						<p><a id="anchor"></a> Here is a link for <a href="https://gist.github.com/leekelleher/9490718" target="_blank">all HTML tags</a>.</p>
-						<p>
-							<span id="foo">Some</span> value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a>.
-						</p>
-						<div data-foo-bar="123">
-							<span>This is a plain old span tag.</span>
-							<span style="color:red;">Hello <span style="color:blue;">world</span>.</span>
-						</div>
-						<table>
-							<thead>
-								<tr>
-									<th>Version</th>
-									<th>Date</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>15.3</td>
-									<td>2025-03-20</td>
-								</tr>
-								<tr>
-									<td>16.0</td>
-									<td>2025-06-12</td>
-								</tr>
-								<tr>
-									<td>17.0</td>
-									<td>2025-11-27</td>
-								</tr>
-							</tbody>
-						</table>
-						<p>
-							<img width="384" height="228" loading="lazy" alt="Installer illustration" src="/umbraco/backoffice/assets/installer-illustration.svg" />
-						</p>
-						<p>End of test content</p>
-					`,
+					blocks: {
+						layout: {},
+						contentData: [],
+						settingsData: [],
+						expose: [],
+					},
+					markup: `<p><a id="anchor"></a> Here is a link for <a target="_blank" data-router-slot="disabled" href="https://gist.github.com/leekelleher/9490718" type="external">all HTML tags</a>.</p><p><span id="foo">Some</span> value for the RTE with an <a target="" data-router-slot="disabled" href="https://google.com" type="external">external link</a> and an <a target="" data-router-slot="disabled" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}" type="document">internal link</a>.</p><div data-foo-bar="123"><span>This is a plain old span tag.</span> <span style="color: red;">Hello </span><span style="color: blue;">world</span><span style="color: red;">.</span></div><table style="min-width: 50px"><colgroup><col style="min-width: 25px"><col style="min-width: 25px"></colgroup><tbody><tr><th colspan="1" rowspan="1"><p> Version</p></th><th colspan="1" rowspan="1"><p>Date</p></th></tr><tr><td colspan="1" rowspan="1"><p>15.3</p></td><td colspan="1" rowspan="1"><p>2025-03-20</p></td></tr><tr><td colspan="1" rowspan="1"><p>16.0</p></td><td colspan="1" rowspan="1"><p>2025-06-12</p></td></tr><tr><td colspan="1" rowspan="1"><p>17.0</p></td><td colspan="1" rowspan="1"><p>2025-11-27</p></td></tr></tbody></table><p><img src="/umbraco/backoffice/assets/installer-illustration.svg" alt="Installer illustration" width="384" height="228" loading="lazy"></p><p>End of test content</p>`,
 				},
 			},
 		],
