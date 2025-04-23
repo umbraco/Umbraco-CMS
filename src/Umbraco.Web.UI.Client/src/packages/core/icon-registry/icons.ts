@@ -607,6 +607,9 @@ path: () => import("./icons/icon-files.js"),
 name: "icon-filter-arrows",
 path: () => import("./icons/icon-filter-arrows.js"),
 },{
+name: "icon-filter",
+path: () => import("./icons/icon-filter.js"),
+},{
 name: "icon-fingerprint",
 path: () => import("./icons/icon-fingerprint.js"),
 },{
@@ -2380,11 +2383,6 @@ name: "icon-azure",
 legacy: true,
 hidden: true,
 path: () => import("./icons/icon-azure.js"),
-},{
-name: "icon-filter",
-legacy: true,
-hidden: true,
-path: () => import("./icons/icon-filter.js"),
 },{
 name: "icon-microsoft",
 legacy: true,
