@@ -38,6 +38,10 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 
 		const { data, error: _error } = await this.#itemSource.getItems(uniques);
 
+		if (!this._itemStore) {
+			// If store is gone, then we are most likely in a disassembled state.
+			return {};
+		}
 		const error: any = _error;
 		if (data) {
 			this._itemStore!.appendItems(data);
