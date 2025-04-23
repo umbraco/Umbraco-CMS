@@ -87,7 +87,7 @@ export abstract class UmbTreeRepositoryBase<
 			return {};
 		}
 		if (data) {
-			this._treeStore.appendItems(data.items);
+			this._treeStore?.appendItems(data.items);
 		}
 
 		// TODO: Notice we are casting the error here, is that right?
@@ -110,7 +110,7 @@ export abstract class UmbTreeRepositoryBase<
 		const { data, error: _error } = await this._treeSource.getChildrenOf(args);
 		const error: any = _error;
 		if (data) {
-			this._treeStore!.appendItems(data.items);
+			this._treeStore?.appendItems(data.items);
 		}
 
 		return { data, error, asObservable: () => this._treeStore!.childrenOf(args.parent.unique) };
