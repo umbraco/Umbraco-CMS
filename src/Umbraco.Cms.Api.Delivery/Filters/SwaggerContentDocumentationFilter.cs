@@ -33,6 +33,20 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
             }
         });
 
+        operation.Parameters.Add(new OpenApiParameter
+        {
+            Name = "Accept-Segment",
+            In = ParameterLocation.Header,
+            Required = false,
+            Description = "Defines the segment to return. Use this when querying segment variant content items.",
+            Schema = new OpenApiSchema { Type = "string" },
+            Examples = new Dictionary<string, OpenApiExample>
+            {
+                { "Default", new OpenApiExample { Value = new OpenApiString(string.Empty) } },
+                { "Segment One", new OpenApiExample { Value = new OpenApiString("segment-one") } }
+            }
+        });
+
         AddApiKey(operation);
 
         operation.Parameters.Add(new OpenApiParameter
