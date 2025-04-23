@@ -152,12 +152,20 @@ export class UmbContentTypeStructureManager<
 		});
 
 		// Observe all Content Types compositions: [NL]
-		this.observe(this.contentTypeCompositions, (contentTypeCompositions) => {
-			this.#loadContentTypeCompositions(contentTypeCompositions);
-		});
-		this.observe(this.#contentTypeContainers, (contentTypeContainers) => {
-			this.#containers.setValue(contentTypeContainers);
-		});
+		this.observe(
+			this.contentTypeCompositions,
+			(contentTypeCompositions) => {
+				this.#loadContentTypeCompositions(contentTypeCompositions);
+			},
+			null,
+		);
+		this.observe(
+			this.#contentTypeContainers,
+			(contentTypeContainers) => {
+				this.#containers.setValue(contentTypeContainers);
+			},
+			null,
+		);
 	}
 
 	/**
@@ -257,7 +265,6 @@ export class UmbContentTypeStructureManager<
 		const compositionUniques = contentTypeCompositions?.map((x) => x.contentType.unique) ?? [];
 		const newUniques = [ownerUnique, ...compositionUniques];
 		this.#contentTypes.filter((x) => newUniques.includes(x.unique));
-		await Promise.resolve();
 		this.#repoManager?.setUniques(newUniques);
 	}
 
@@ -786,12 +793,12 @@ export class UmbContentTypeStructureManager<
 		this.#init = new Promise((resolve) => {
 			this.#initResolver = resolve;
 		});
-		this.#repoManager?.clear();
 		this.#contentTypes.setValue([]);
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];
 		this.#contentTypes.setValue([]);
 		this.#containers.setValue([]);
+		this.#repoManager?.clear();
 	}
 
 	public override destroy() {
