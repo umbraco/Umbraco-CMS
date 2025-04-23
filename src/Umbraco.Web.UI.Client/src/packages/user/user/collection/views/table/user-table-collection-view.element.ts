@@ -99,9 +99,9 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		];
 		const { asObservable } = await this.#userGroupItemRepository.requestItems(userGroupsUniques);
 		this.observe(
-			asObservable(),
+			asObservable?.(),
 			(userGroups) => {
-				this._userGroupItems = userGroups;
+				this._userGroupItems = userGroups ?? [];
 				this.#createTableItems();
 			},
 			'umbUserGroupItemsObserver',

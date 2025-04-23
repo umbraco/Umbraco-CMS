@@ -185,7 +185,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 				'observeOwnerVariesByCulture',
 			);
 			this.observe(
-				workspaceContext.variesBySegment,
+				workspaceContext?.variesBySegment,
 				(variesBySegment) => {
 					this._ownerContentTypeVariesBySegment = variesBySegment;
 				},

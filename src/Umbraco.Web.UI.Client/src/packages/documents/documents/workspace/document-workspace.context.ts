@@ -90,7 +90,7 @@ export class UmbDocumentWorkspaceContext
 		});
 
 		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
-			const config = await context.getDocumentConfiguration();
+			const config = await context?.getDocumentConfiguration();
 			const allowSegmentCreation = config?.allowNonExistingSegmentsCreation ?? false;
 
 			this._variantOptionsFilter = (variantOption) => {
