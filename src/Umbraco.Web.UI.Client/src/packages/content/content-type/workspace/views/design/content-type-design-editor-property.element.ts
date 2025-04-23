@@ -49,7 +49,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this._property = value;
 		this.#context.setAlias(value?.alias);
 		this.#context.setLabel(value?.name);
-		this.#checkAliasAutoGenerate(this._property?.id);
+		this.#checkAliasAutoGenerate(this._property?.unique);
 		this.#checkInherited();
 		this.#setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
@@ -64,6 +64,9 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 	@property({ attribute: false })
 	public ownerVariesByCulture?: boolean;
+
+	@property({ attribute: false })
+	public ownerVariesBySegment?: boolean;
 
 	@property({ type: Boolean, reflect: true, attribute: '_inherited' })
 	public _inherited?: boolean;
@@ -98,7 +101,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		if (this._propertyStructureHelper && this._property) {
 			// We can first match with something if we have a name [NL]
 			this.observe(
-				await this._propertyStructureHelper!.contentTypeOfProperty(this._property.id),
+				await this._propertyStructureHelper!.contentTypeOfProperty(this._property.unique),
 				(contentType) => {
 					this._inherited =
 						this._propertyStructureHelper?.getStructureManager()?.getOwnerContentTypeUnique() !== contentType?.unique;
@@ -112,7 +115,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 	#partialUpdate(partialObject: UmbPropertyTypeModel) {
 		if (!this._property || !this._propertyStructureHelper) return;
-		this._propertyStructureHelper.partialUpdateProperty(this._property.id, partialObject);
+		this._propertyStructureHelper.partialUpdateProperty(this._property.unique, partialObject);
 	}
 
 	#singleValueUpdate<PropertyNameType extends keyof UmbPropertyTypeModel>(
@@ -122,7 +125,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		if (!this._property || !this._propertyStructureHelper) return;
 		const partialObject: Partial<UmbPropertyTypeModel> = {};
 		partialObject[propertyName] = value === null ? undefined : value;
-		this._propertyStructureHelper.partialUpdateProperty(this._property.id, partialObject);
+		this._propertyStructureHelper.partialUpdateProperty(this._property.unique, partialObject);
 	}
 
 	#onToggleAliasLock(event: CustomEvent) {
@@ -152,17 +155,19 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	async #requestRemove(e: Event) {
 		e.preventDefault();
 		e.stopImmediatePropagation();
-		if (!this._property || !this._property.id) return;
+		if (!this._property || !this._property.unique) return;
+
+		const unique = this._property.unique;
 
 		// TODO: Do proper localization here: [NL]
 		await umbConfirmModal(this, {
 			headline: `${this.localize.term('actions_delete')} property`,
-			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[this._property.name ?? this._property.id]}>Are you sure you want to delete the property <strong>${this._property.name ?? this._property.id}</strong></umb-localize></div>`,
+			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[this._property.name ?? unique]}>Are you sure you want to delete the property <strong>${this._property.name ?? unique}</strong></umb-localize></div>`,
 			confirmLabel: this.localize.term('actions_delete'),
 			color: 'danger',
 		});
 
-		this._propertyStructureHelper?.removeProperty(this._property.id);
+		this._propertyStructureHelper?.removeProperty(unique);
 	}
 
 	#onAliasChanged(event: UUIInputEvent) {
@@ -247,7 +252,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					look="outline"
 					label=${this.localize.term('contentTypeEditor_editorSettings')}
 					href=${this.editPropertyTypePath +
-					UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this.property.id })}>
+					UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this.property.unique })}>
 					${this.renderPropertyTags()}
 					<uui-action-bar>
 						<uui-button label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
@@ -258,6 +263,9 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			`;
 		}
 	}
+
+	#onPropertyOrderChanged = (e: UUIInputEvent) =>
+		this.#partialUpdate({ sortOrder: parseInt(e.target.value as string) ?? 0 } as UmbPropertyTypeModel);
 
 	renderSortableProperty() {
 		if (!this.property) return;
@@ -271,9 +279,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				type="number"
 				?disabled=${this._inherited}
 				label="sort order"
-				@change=${(e: UUIInputEvent) =>
-					this.#partialUpdate({ sortOrder: parseInt(e.target.value as string) ?? 0 } as UmbPropertyTypeModel)}
-				.value=${this.property.sortOrder ?? 0}></uui-input>
+				@change=${this.#onPropertyOrderChanged}
+				.value=${(this.property.sortOrder ?? 0).toString()}></uui-input>
 		`;
 	}
 
@@ -297,24 +304,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		return this.property
 			? html`<div class="types">
 					${this.property.dataType?.unique ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
-					${this.ownerVariesByCulture
-						? this.property.variesByCulture
-							? html`<uui-tag look="default">
-									<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term(
-										'contentTypeEditor_cultureVariantLabel',
-									)}
-								</uui-tag>`
-							: html`<uui-tag look="default">
-									<uui-icon name="icon-shared-value"></uui-icon> ${this.localize.term(
-										'contentTypeEditor_cultureInvariantLabel',
-									)}
-								</uui-tag>`
-						: nothing}
-					${this.property.variesBySegment
-						? html`<uui-tag look="default">
-								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_segmentVariantLabel')}
-							</uui-tag>`
-						: nothing}
+					${this.#renderVariantTags()}
 					${this.property.appearance?.labelOnTop == true
 						? html`<uui-tag look="default">
 								<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>
@@ -342,6 +332,40 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 						: nothing}
 				</div>`
 			: nothing;
+	}
+
+	#renderVariantTags() {
+		if (!this.property) return nothing;
+
+		if (
+			this.ownerVariesByCulture &&
+			this.ownerVariesBySegment &&
+			!this.property.variesByCulture &&
+			!this.property.variesBySegment
+		) {
+			return html`
+				<uui-tag look="default">
+					<uui-icon name="icon-shared-value"></uui-icon> ${this.localize.term(
+						'contentTypeEditor_cultureAndVariantInvariantLabel',
+					)}
+				</uui-tag>
+			`;
+		}
+
+		if (this.ownerVariesByCulture && !this.property.variesByCulture) {
+			return html`<uui-tag look="default">
+				<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureInvariantLabel')}
+			</uui-tag>`;
+		}
+
+		if (this.ownerVariesBySegment && !this.property.variesBySegment) {
+			return html`<uui-tag look="default">
+				<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_segmentInvariantLabel')}
+			</uui-tag>`;
+		}
+
+		// Not shared:
+		return nothing;
 	}
 
 	static override styles = [

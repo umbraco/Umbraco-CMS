@@ -54,7 +54,15 @@ export class UmbMediaWorkspaceContext
 			contentTypePropertyName: 'mediaType',
 		});
 
-		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+		this.observe(
+			this.contentTypeUnique,
+			(unique) => {
+				if (unique) {
+					this.structure.loadType(unique);
+				}
+			},
+			null,
+		);
 
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();

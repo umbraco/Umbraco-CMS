@@ -76,12 +76,12 @@ internal sealed class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
         // Update content
         var updateModel = new ContentUpdateModel
         {
-            InvariantName = "Root Create",
-            InvariantProperties = new[]
-            {
+            Variants = [new() { Name = "Root Create" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "Updated title" },
                 new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
-            },
+            ],
         };
 
         var updateResult = await ContentEditingService.UpdateAsync(textPage.Key, updateModel, Constants.Security.SuperUserKey);

@@ -1,4 +1,3 @@
-// import { UMB_COMPOSITION_PICKER_MODAL, type UmbCompositionPickerModalData } from '../../../modals/index.js';
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-token.js';
 import { UmbMemberKind, type UmbMemberKindType } from '../../../../utils/index.js';
 import { TimeFormatOptions } from './utils.js';

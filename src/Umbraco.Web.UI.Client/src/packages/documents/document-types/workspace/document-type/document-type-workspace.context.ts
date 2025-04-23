@@ -21,6 +21,7 @@ import type { UmbRoutableWorkspaceContext } from '@umbraco-cms/backoffice/worksp
 import type { UmbPathPatternTypeAsEncodedParamsType } from '@umbraco-cms/backoffice/router';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbTemplateDetailRepository } from '@umbraco-cms/backoffice/template';
+import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type DetailModelType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -148,6 +149,18 @@ export class UmbDocumentTypeWorkspaceContext
 				break;
 		}
 
+		if (parent.unique && parent.entityType === UMB_DOCUMENT_TYPE_ENTITY_TYPE) {
+			preset = {
+				...preset,
+				compositions: [
+					{
+						contentType: { unique: parent.unique },
+						compositionType: CompositionTypeModel.INHERITANCE,
+					},
+				],
+			};
+		}
+
 		this.createScaffold({ parent, preset });
 	}
 
@@ -161,7 +174,7 @@ export class UmbDocumentTypeWorkspaceContext
 			super._create(currentData, parent);
 			this.createTemplateMode = false;
 		} catch (error) {
-			console.log(error);
+			console.warn(error);
 		}
 	}
 

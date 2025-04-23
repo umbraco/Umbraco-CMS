@@ -49,7 +49,7 @@ internal abstract class DocumentNavigationServiceTestsBase : UmbracoIntegrationT
         {
             ContentTypeKey = contentTypeKey ?? ContentType.Key,
             ParentKey = parentKey ?? Constants.System.RootKey,
-            InvariantName = name,
+            Variants = [new () { Name = name }],
             Key = key,
         };
 

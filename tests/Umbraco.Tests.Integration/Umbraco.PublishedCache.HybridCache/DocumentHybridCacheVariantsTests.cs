@@ -59,27 +59,16 @@ internal sealed class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantProperties =
-                new[] { new PropertyValueModel { Alias = _invariantTitleAlias, Value = updatedInvariantTitle } },
-            Variants = new[]
-            {
-                new VariantModel
-                {
-                    Culture = _englishIsoCode,
-                    Name = "Updated English Name",
-                    Properties =
-                        new[] { new PropertyValueModel { Alias = _variantTitleAlias, Value = updatedVariantTitle } },
-                },
-                new VariantModel
-                {
-                    Culture = _danishIsoCode,
-                    Name = "Updated Danish Name",
-                    Properties = new[]
-                    {
-                        new PropertyValueModel { Alias = _variantTitleAlias, Value = updatedVariantTitle },
-                    },
-                },
-            },
+            Properties = [
+                new PropertyValueModel { Alias = _invariantTitleAlias, Value = updatedInvariantTitle },
+                new PropertyValueModel { Alias = _variantTitleAlias, Value = updatedVariantTitle, Culture = _englishIsoCode },
+                new PropertyValueModel { Alias = _variantTitleAlias, Value = updatedVariantTitle, Culture = _danishIsoCode }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = _englishIsoCode, Name = "Updated English Name" },
+                new VariantModel { Culture = _danishIsoCode, Name = "Updated Danish Name" }
+            ],
         };
 
         var result =
@@ -106,20 +95,15 @@ internal sealed class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantProperties =
-                new[] { new PropertyValueModel { Alias = _invariantTitleAlias, Value = updatedInvariantTitle } },
-            Variants = new[]
-            {
-                new VariantModel
-                {
-                    Culture = _englishIsoCode,
-                    Name = "Updated English Name",
-                    Properties = new[]
-                    {
-                        new PropertyValueModel { Alias = _variantTitleAlias, Value = updatedVariantTitle },
-                    },
-                },
-            },
+            Properties =
+            [
+                new PropertyValueModel { Alias = _invariantTitleAlias, Value = updatedInvariantTitle },
+                new PropertyValueModel { Alias = _variantTitleAlias, Value = updatedVariantTitle, Culture = _englishIsoCode }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = _englishIsoCode, Name = "Updated English Name" }
+            ],
         };
 
         var result =

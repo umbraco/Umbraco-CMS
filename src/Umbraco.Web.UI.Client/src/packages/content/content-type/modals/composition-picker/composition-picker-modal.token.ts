@@ -4,6 +4,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 export interface UmbCompositionPickerModalData {
 	compositionRepositoryAlias: string;
 	selection: Array<string>;
+	usedForInheritance: Array<string>;
 	unique: string | null;
 	isElement: boolean;
 	currentPropertyAliases: Array<string>;
