@@ -7,9 +7,6 @@ public interface IRequestCultureService
     /// </summary>
     string? GetRequestedCulture();
 
-    /// <summary>
-    ///     Updates the current request culture if applicable.
-    /// </summary>
-    /// <param name="culture">The culture to use for the current request.</param>
+    [Obsolete("Use IVariationContextAccessor to manipulate the variation context. Scheduled for removal in V17.")]
     void SetRequestCulture(string culture);
 }
