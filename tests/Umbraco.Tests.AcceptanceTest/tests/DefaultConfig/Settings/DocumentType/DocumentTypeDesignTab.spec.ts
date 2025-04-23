@@ -403,7 +403,7 @@ test('can allow vary by culture for a property in a document type', {tag: '@smok
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickEditorSettingsButton();
-  await umbracoUi.documentType.clickVaryByCultureToggle();
+  await umbracoUi.documentType.clickSharedAcrossCulturesToggle();
   await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickSaveButton();
 
