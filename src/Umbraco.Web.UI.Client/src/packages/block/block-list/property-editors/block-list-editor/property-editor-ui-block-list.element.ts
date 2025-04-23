@@ -122,14 +122,15 @@ export class UmbPropertyEditorUIBlockListElement
 	 * @type {boolean}
 	 * @default
 	 */
-	@property({ type: Boolean, reflect: true })
 	public set readonly(value) {
 		this.#readonly = value;
 
 		if (this.#readonly) {
 			this.#sorter.disable();
+			this.#managerContext.readOnlyState.fallbackToPermitted();
 		} else {
 			this.#sorter.enable();
+			this.#managerContext.readOnlyState.fallbackToNotPermitted();
 		}
 	}
 	public get readonly() {
@@ -350,28 +351,6 @@ export class UmbPropertyEditorUIBlockListElement
 				context.setValue(super.value);
 			},
 			'motherObserver',
-		);
-
-		// If the current property is readonly all inner block content should also be readonly.
-		this.observe(
-			observeMultiple([context.isReadOnly, context.variantId]),
-			([isReadOnly, variantId]) => {
-				const unique = 'UMB_PROPERTY_EDITOR_UI';
-				if (variantId === undefined) return;
-
-				if (isReadOnly) {
-					const state = {
-						unique,
-						variantId,
-						message: '',
-					};
-
-					this.#managerContext.readOnlyState.addState(state);
-				} else {
-					this.#managerContext.readOnlyState.removeState(unique);
-				}
-			},
-			'observeIsReadOnly',
 		);
 	}
 

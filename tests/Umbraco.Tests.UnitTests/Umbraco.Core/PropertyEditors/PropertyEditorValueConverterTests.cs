@@ -92,8 +92,7 @@ public class PropertyEditorValueConverterTests
     {
         var mockPublishedContentTypeFactory = new Mock<IPublishedContentTypeFactory>();
         mockPublishedContentTypeFactory.Setup(x => x.GetDataType(123))
-            .Returns(new PublishedDataType(123, "test",
-                new Lazy<object>(() => new DropDownFlexibleConfiguration { Multiple = true })));
+            .Returns(new PublishedDataType(123, "test", "test", new Lazy<object>(() => new DropDownFlexibleConfiguration { Multiple = true })));
 
         var publishedPropType = new PublishedPropertyType(
             new PublishedContentType(Guid.NewGuid(), 1234, "test", PublishedItemType.Content,

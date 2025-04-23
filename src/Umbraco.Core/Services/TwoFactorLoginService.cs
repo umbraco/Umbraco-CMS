@@ -51,58 +51,6 @@ public class TwoFactorLoginService : ITwoFactorLoginService
         await GetEnabledProviderNamesAsync(userOrMemberKey);
 
     /// <inheritdoc />
-    [Obsolete("Use DisableByCodeWithStatusAsync. This will be removed in Umbraco 15.")]
-    public async Task<bool> DisableWithCodeAsync(string providerName, Guid userOrMemberKey, string code)
-    {
-        var secret = await GetSecretForUserAndProviderAsync(userOrMemberKey, providerName);
-
-        if (!_twoFactorSetupGenerators.TryGetValue(providerName, out ITwoFactorProvider? generator))
-        {
-            throw new InvalidOperationException($"No ITwoFactorSetupGenerator found for provider: {providerName}");
-        }
-
-        var isValid = secret is not null && generator.ValidateTwoFactorPIN(secret, code);
-
-        if (!isValid)
-        {
-            return false;
-        }
-
-        return await DisableAsync(userOrMemberKey, providerName);
-    }
-
-    [Obsolete("Use ValidateAndSaveWithStatusAsync. This will be removed in Umbraco 15.")]
-    public async Task<bool> ValidateAndSaveAsync(string providerName, Guid userOrMemberKey, string secret, string code)
-    {
-        try
-        {
-            var isValid = ValidateTwoFactorSetup(providerName, secret, code);
-            if (isValid == false)
-            {
-                return false;
-            }
-
-            var twoFactorLogin = new TwoFactorLogin
-            {
-                Confirmed = true,
-                Secret = secret,
-                UserOrMemberKey = userOrMemberKey,
-                ProviderName = providerName,
-            };
-
-            await SaveAsync(twoFactorLogin);
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Could not log in with the provided one-time-password");
-        }
-
-        return false;
-    }
-
-    /// <inheritdoc />
     public async Task<bool> IsTwoFactorEnabledAsync(Guid userOrMemberKey) =>
         (await GetEnabledProviderNamesAsync(userOrMemberKey)).Any();
 
@@ -112,28 +60,6 @@ public class TwoFactorLoginService : ITwoFactorLoginService
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         return (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey))
             .FirstOrDefault(x => x.ProviderName == providerName)?.Secret;
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Use GetSetupInfoWithStatusAsync(). This will be removed in Umbraco 15.")]
-    public async Task<object?> GetSetupInfoAsync(Guid userOrMemberKey, string providerName)
-    {
-        var secret = await GetSecretForUserAndProviderAsync(userOrMemberKey, providerName);
-
-        // Dont allow to generate a new secrets if user already has one
-        if (!string.IsNullOrEmpty(secret))
-        {
-            return default;
-        }
-
-        secret = GenerateSecret();
-
-        if (!_twoFactorSetupGenerators.TryGetValue(providerName, out ITwoFactorProvider? generator))
-        {
-            throw new InvalidOperationException($"No ITwoFactorSetupGenerator found for provider: {providerName}");
-        }
-
-        return await generator.GetSetupDataAsync(userOrMemberKey, secret);
     }
 
     /// <inheritdoc />

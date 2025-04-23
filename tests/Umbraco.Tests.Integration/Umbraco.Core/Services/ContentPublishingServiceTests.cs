@@ -103,6 +103,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             Key = documentKey,
             ContentTypeKey = contentType.Key,
             ParentKey = parentKey,
+            Properties = [],
             Variants =
             [
                 new VariantModel
@@ -201,7 +202,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         {
             Key = documentKey,
             ContentTypeKey = contentType.Key,
-            InvariantName = "Test",
+            Variants = [new () { Name = "Test" }],
             ParentKey = parentKey,
             InvariantProperties =
             [

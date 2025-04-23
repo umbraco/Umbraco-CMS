@@ -136,11 +136,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				align-items: center;
 			}
 
-			/** TODO: Remove this fix when UUI gets upgrade to 1.3 */
-			umb-imaging-thumbnail {
-				pointer-events: none;
-			}
-
 			#media-grid {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

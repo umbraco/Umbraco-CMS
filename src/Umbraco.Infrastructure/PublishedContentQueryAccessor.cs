@@ -8,10 +8,6 @@ public class PublishedContentQueryAccessor : IPublishedContentQueryAccessor
 {
     private readonly IScopedServiceProvider _scopedServiceProvider;
 
-    [Obsolete("Please use alternative constructor")]
-    public PublishedContentQueryAccessor(IServiceProvider serviceProvider) =>
-        _scopedServiceProvider = serviceProvider.GetRequiredService<IScopedServiceProvider>();
-
     public PublishedContentQueryAccessor(IScopedServiceProvider scopedServiceProvider) =>
         _scopedServiceProvider = scopedServiceProvider;
 

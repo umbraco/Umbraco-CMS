@@ -74,7 +74,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         return contentType;
     }
 
-    protected async Task<IContentType> CreateVariantContentType()
+    protected async Task<IContentType> CreateVariantContentType(ContentVariation variation = ContentVariation.Culture)
     {
         var language = new LanguageBuilder()
             .WithCultureInfo("da-DK")
@@ -84,13 +84,13 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         var contentType = new ContentTypeBuilder()
             .WithAlias("cultureVariationTest")
             .WithName("Culture Variation Test")
-            .WithContentVariation(ContentVariation.Culture)
+            .WithContentVariation(variation)
             .AddPropertyType()
-                .WithAlias("variantTitle")
-                .WithName("Variant Title")
-                .WithMandatory(true)
-                .WithVariations(ContentVariation.Culture)
-                .Done()
+            .WithAlias("variantTitle")
+            .WithName("Variant Title")
+            .WithMandatory(true)
+            .WithVariations(variation)
+            .Done()
             .AddPropertyType()
                 .WithAlias("invariantTitle")
                 .WithName("Invariant Title")
@@ -101,7 +101,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
                 .WithName("Variant Label")
                 .WithDataTypeId(Constants.DataTypes.LabelString)
                 .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
-                .WithVariations(ContentVariation.Culture)
+                .WithVariations(variation)
                 .Done()
             .Build();
         contentType.AllowedAsRoot = true;
@@ -117,13 +117,16 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Initial Name",
+            Variants =
+            [
+                new VariantModel { Name = "Initial Name" }
+            ],
             TemplateKey = templates.FirstOrDefault()?.Key,
-            InvariantProperties = new[]
-            {
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The initial title" },
-                new PropertyValueModel { Alias = "text", Value = "The initial text" },
-            },
+                new PropertyValueModel { Alias = "text", Value = "The initial text" }
+            ],
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -131,7 +134,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         return result.Result.Content!;
     }
 
-    protected async Task<IContent> CreateVariantContent()
+    protected async Task<IContent> CreateCultureVariantContent()
     {
         var contentType = await CreateVariantContentType();
 
@@ -139,31 +142,97 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantProperties = new[]
-            {
+            Properties =
+            [
                 new PropertyValueModel { Alias = "invariantTitle", Value = "The initial invariant title" },
-            },
-            Variants = new[]
-            {
-                new VariantModel
-                {
-                    Culture = "en-US",
-                    Name = "Initial English Name",
-                    Properties = new[]
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The initial English title" },
-                    },
-                },
-                new VariantModel
-                {
-                    Culture = "da-DK",
-                    Name = "Initial Danish Name",
-                    Properties = new[]
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The initial Danish title" },
-                    },
-                },
-            },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The initial English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The initial Danish title", Culture = "da-DK" }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "Initial English Name" },
+                new VariantModel { Culture = "da-DK", Name = "Initial Danish Name" }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        return result.Result.Content!;
+    }
+
+    protected async Task<IContent> CreateSegmentVariantContent()
+    {
+        var contentType = await CreateVariantContentType(ContentVariation.Segment);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The initial invariant title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The initial default title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The initial seg-1 title", Segment = "seg-1" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The initial seg-2 title", Segment = "seg-2" }
+            ],
+            Variants =
+            [
+                new VariantModel { Segment = null, Name = "The Name" },
+                new VariantModel { Segment = "seg-1", Name = "The Name" },
+                new VariantModel { Segment = "seg-2", Name = "The Name" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        return result.Result.Content!;
+    }
+
+    protected async Task<IContent> CreateCultureAndSegmentVariantContent(ContentVariation otherTitleVariation)
+    {
+        var contentType = await CreateVariantContentType(ContentVariation.CultureAndSegment);
+        var propertyType = contentType.PropertyTypes.First(pt => pt.Alias == "invariantTitle");
+        propertyType.Alias = "otherTitle";
+        propertyType.Variations = otherTitleVariation;
+        ContentTypeService.Save(contentType);
+
+        IEnumerable<PropertyValueModel> otherTitleValues = otherTitleVariation switch
+        {
+            ContentVariation.Culture =>
+            [
+                new PropertyValueModel { Alias = "otherTitle", Value = "The initial other English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "otherTitle", Value = "The initial other Danish title", Culture = "da-DK" },
+            ],
+            ContentVariation.Segment =>
+            [
+                new PropertyValueModel { Alias = "otherTitle", Value = "The initial other default title" },
+                new PropertyValueModel { Alias = "otherTitle", Value = "The initial other seg-1 title", Segment = "seg-1" },
+                new PropertyValueModel { Alias = "otherTitle", Value = "The initial other seg-2 title", Segment = "seg-2" }
+            ],
+            _ => throw new ArgumentOutOfRangeException(nameof(otherTitleVariation))
+        };
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Properties = otherTitleValues.Union([
+                new () { Alias = "variantTitle", Value = "The initial title in English", Culture = "en-US" },
+                new () { Alias = "variantTitle", Value = "The initial seg-1 title in English", Culture = "en-US", Segment = "seg-1" },
+                new () { Alias = "variantTitle", Value = "The initial seg-2 title in English", Culture = "en-US", Segment = "seg-2" },
+                new () { Alias = "variantTitle", Value = "The initial title in Danish", Culture = "da-DK" },
+                new () { Alias = "variantTitle", Value = "The initial seg-1 title in Danish", Culture = "da-DK", Segment = "seg-1" },
+                new () { Alias = "variantTitle", Value = "The initial seg-2 title in Danish", Culture = "da-DK", Segment = "seg-2" }
+            ]),
+            Variants =
+            [
+                new VariantModel { Name = "The Name", Culture = "en-US", Segment = null },
+                new VariantModel { Name = "The Name", Culture = "en-US", Segment = "seg-1" },
+                new VariantModel { Name = "The Name", Culture = "en-US", Segment = "seg-2" },
+                new VariantModel { Name = "The Name", Culture = "da-DK", Segment = null },
+                new VariantModel { Name = "The Name", Culture = "da-DK", Segment = "seg-1" },
+                new VariantModel { Name = "The Name", Culture = "da-DK", Segment = "seg-2" },
+            ],
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);

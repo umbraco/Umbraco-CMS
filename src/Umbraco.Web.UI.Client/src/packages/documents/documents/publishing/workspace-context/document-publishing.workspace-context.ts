@@ -13,7 +13,7 @@ import { UmbUnpublishDocumentEntityAction } from '../unpublish/index.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing.workspace-context.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
@@ -50,11 +50,11 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, async (context) => {
 				this.#documentWorkspaceContext = context;
 				this.#initPendingChanges();
-			}).asPromise(),
+			}).asPromise({ preventTimeout: true }),
 
 			this.consumeContext(UMB_ACTION_EVENT_CONTEXT, async (context) => {
 				this.#eventContext = context;
-			}).asPromise(),
+			}).asPromise({ preventTimeout: true }),
 		]);
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
@@ -97,24 +97,20 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 		const { options, selected } = await this.#determineVariantOptions();
 
-		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const result = await modalManagerContext
-			.open(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
-				data: {
-					options,
-					activeVariants: selected,
-					pickableFilter: this.#publishableVariantsFilter,
-					prevalues: options.map((option) => ({
-						unique: option.unique,
-						schedule: {
-							publishTime: option.variant?.scheduledPublishDate,
-							unpublishTime: option.variant?.scheduledUnpublishDate,
-						},
-					})),
-				},
-			})
-			.onSubmit()
-			.catch(() => undefined);
+		const result = await umbOpenModal(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
+			data: {
+				options,
+				activeVariants: selected,
+				pickableFilter: this.#publishableVariantsFilter,
+				prevalues: options.map((option) => ({
+					unique: option.unique,
+					schedule: {
+						publishTime: option.variant?.scheduledPublishDate,
+						unpublishTime: option.variant?.scheduledUnpublishDate,
+					},
+				})),
+			},
+		}).catch(() => undefined);
 
 		if (!result?.selection.length) return;
 
@@ -164,6 +160,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			},
 			async (reason?: any) => {
 				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+				if (!notificationContext) {
+					throw new Error('Notification context is missing');
+				}
 				notificationContext.peek('danger', {
 					data: { message: this.#localize.term('speechBubbles_editContentScheduledNotSavedText') },
 				});
@@ -212,17 +211,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 		const { options, selected } = await this.#determineVariantOptions();
 
-		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const result = await modalManagerContext
-			.open(this, UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL, {
-				data: {
-					options,
-					pickableFilter: this.#publishableVariantsFilter,
-				},
-				value: { selection: selected },
-			})
-			.onSubmit()
-			.catch(() => undefined);
+		const result = await umbOpenModal(this, UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL, {
+			data: {
+				options,
+				pickableFilter: this.#publishableVariantsFilter,
+			},
+			value: { selection: selected },
+		}).catch(() => undefined);
 
 		if (!result?.selection.length) return;
 
@@ -290,17 +285,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else {
 			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
-			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-			const result = await modalManagerContext
-				.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
-					data: {
-						options,
-						pickableFilter: this.#publishableVariantsFilter,
-					},
-					value: { selection: selected },
-				})
-				.onSubmit()
-				.catch(() => undefined);
+			const result = await umbOpenModal(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+				data: {
+					options,
+					pickableFilter: this.#publishableVariantsFilter,
+				},
+				value: { selection: selected },
+			}).catch(() => undefined);
 
 			if (!result?.selection.length || !unique) return;
 
@@ -321,6 +312,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 				await this.#documentWorkspaceContext!.performCreateOrUpdate(variantIds, saveData);
 				// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
 				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+				if (!notificationContext) {
+					throw new Error('Notification context is missing');
+				}
 				// TODO: Get rid of the save notification.
 				notificationContext.peek('danger', {
 					data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
@@ -370,9 +364,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
-		const readOnlyCultures =
-			this.#documentWorkspaceContext?.readOnlyState.getStates().map((s) => s.variantId.culture) ?? [];
-		return readOnlyCultures.includes(option.culture) === false;
+		const variantId = UmbVariantId.Create(option);
+		// If the read only guard is permitted it means the variant is read only
+		const isReadOnly = this.#documentWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(variantId);
+		// If the variant is read only, we can't publish it
+		const isPublishable = !isReadOnly;
+		return isPublishable;
 	};
 
 	async #determineVariantOptions(): Promise<{
@@ -382,11 +379,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		await this.#init;
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
-		const options = await firstValueFrom(this.#documentWorkspaceContext.variantOptions);
+		const allOptions = await firstValueFrom(this.#documentWorkspaceContext.variantOptions);
+		const options = allOptions.filter((option) => option.segment === null);
 
 		// TODO: this is a temporary copy of the content-detail workspace context method.
 		// we need to implement custom selection that makes sense for each the publishing modal.
-		let selected = this.#getChangedVariantsSelection();
+		let selected = this.#getPublishVariantsSelection();
 
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
 		selected = selected.filter((x) => options.some((o) => o.unique === x));
@@ -394,8 +392,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		// Filter out read-only variants
 		// TODO: This would not work with segments, as the 'selected'-array is an array of strings, not UmbVariantId's. [NL]
 		// Please have a look at the implementation in the content-detail workspace context, as that one compares variantIds. [NL]
-		const readOnlyCultures = this.#documentWorkspaceContext.readOnlyState.getStates().map((s) => s.variantId.culture);
-		selected = selected.filter((x) => readOnlyCultures.includes(x) === false);
+		selected = selected.filter(
+			(x) => this.#documentWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(new UmbVariantId(x)) === false,
+		);
 
 		return {
 			options,
@@ -403,14 +402,25 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		};
 	}
 
-	#getChangedVariantsSelection() {
+	#getPublishVariantsSelection() {
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
-		const activeVariants = this.#documentWorkspaceContext.splitView
-			.getActiveVariants()
-			.map((activeVariant) => UmbVariantId.Create(activeVariant).toString());
-		const changedVariants = this.#documentWorkspaceContext.getChangedVariants().map((x) => x.toString());
-		const selection = [...activeVariants, ...changedVariants];
-		return [...new Set(selection)];
+		const activeVariants = this.#documentWorkspaceContext.splitView.getActiveVariants();
+		const activeVariantIds = activeVariants.map((x) => UmbVariantId.Create(x));
+		const changedVariantIds = this.#documentWorkspaceContext.getChangedVariants();
+		const activeAndChangedVariantIds = [...activeVariantIds, ...changedVariantIds];
+
+		// if a segment has been changed, we select the "parent" culture variant as it is currently only possible to select between cultures in the dialogs
+		const changedParentCultureVariantIds = activeAndChangedVariantIds
+			.filter((x) => x.segment !== null)
+			.map((x) => x.toSegmentInvariant());
+
+		const selected = [...activeAndChangedVariantIds, ...changedParentCultureVariantIds].map((variantId) =>
+			variantId.toString(),
+		);
+
+		const uniqueSelected = [...new Set(selected)];
+
+		return uniqueSelected;
 	}
 
 	async #initPendingChanges() {

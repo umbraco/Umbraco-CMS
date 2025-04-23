@@ -30,9 +30,6 @@ internal class JsonConfigManipulator : IConfigManipulator
         _logger = logger;
     }
 
-    public void RemoveConnectionString()
-        => RemoveConnectionStringAsync().GetAwaiter().GetResult();
-
     /// <inheritdoc />
     public async Task RemoveConnectionStringAsync()
     {
@@ -51,9 +48,6 @@ internal class JsonConfigManipulator : IConfigManipulator
 
         await SaveJsonAsync(provider, jsonNode);
     }
-
-    public void SaveConnectionString(string connectionString, string? providerName)
-        => SaveConnectionStringAsync(connectionString, providerName).GetAwaiter().GetResult();
 
     /// <inheritdoc />
     public async Task SaveConnectionStringAsync(string connectionString, string? providerName)
@@ -75,9 +69,6 @@ internal class JsonConfigManipulator : IConfigManipulator
 
         await SaveJsonAsync(provider, node);
     }
-
-    public void SaveConfigValue(string key, object value)
-        => SaveConfigValueAsync(key, value).GetAwaiter().GetResult();
 
     /// <inheritdoc />
     public async Task SaveConfigValueAsync(string itemPath, object value)
@@ -106,15 +97,9 @@ internal class JsonConfigManipulator : IConfigManipulator
         await SaveJsonAsync(provider, node);
     }
 
-    public void SaveDisableRedirectUrlTracking(bool disable)
-        => SaveDisableRedirectUrlTrackingAsync(disable).GetAwaiter().GetResult();
-
     /// <inheritdoc />
     public async Task SaveDisableRedirectUrlTrackingAsync(bool disable)
         => await CreateOrUpdateConfigValueAsync(DisableRedirectUrlTrackingPath, disable);
-
-    public void SetGlobalId(string id)
-        => SetGlobalIdAsync(id).GetAwaiter().GetResult();
 
     /// <inheritdoc />
     public async Task SetGlobalIdAsync(string id)

@@ -53,7 +53,11 @@ export abstract class UmbPropertyEditorUiRteElementBase
 
 		const buildUpValue: Partial<UmbPropertyEditorRteValueType> = value ? { ...value } : {};
 		buildUpValue.markup ??= '';
-		buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [], expose: [] };
+		if (buildUpValue.blocks) {
+			buildUpValue.blocks = { ...buildUpValue.blocks };
+		} else {
+			buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [], expose: [] };
+		}
 		buildUpValue.blocks.layout ??= {};
 		buildUpValue.blocks.contentData ??= [];
 		buildUpValue.blocks.settingsData ??= [];
@@ -238,7 +242,7 @@ export abstract class UmbPropertyEditorUiRteElementBase
 
 				context.setValue(super.value);
 			},
-			'motherObserver',
+			'blockManagerObserver',
 		);
 	}
 

@@ -12,7 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
-		name: 'Media Type Search Result Item ',
+		name: 'Media Type Search Result Item',
 		alias: 'Umb.SearchResultItem.MediaType',
 		type: 'searchResultItem',
 		forEntityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],

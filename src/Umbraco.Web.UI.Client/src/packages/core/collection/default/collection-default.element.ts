@@ -93,14 +93,16 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	}
 
 	#renderContent() {
-		return html` ${this.renderPagination()} ${this.renderSelectionActions()} `;
+		return html`${this.renderPagination()} ${this.renderSelectionActions()}`;
 	}
 
 	#renderEmptyState() {
 		if (!this._isDoneLoading) return nothing;
-		return html` <div id="empty-state" class="uui-text">
-			<h4><umb-localize key="collection_noItemsTitle"></umb-localize></h4>
-		</div>`;
+		return html`
+			<div id="empty-state" class="uui-text">
+				<h4><umb-localize key="collection_noItemsTitle"></umb-localize></h4>
+			</div>
+		`;
 	}
 
 	static override styles = [

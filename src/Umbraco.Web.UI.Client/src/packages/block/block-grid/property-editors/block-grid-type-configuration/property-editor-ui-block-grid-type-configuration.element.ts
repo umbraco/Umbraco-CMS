@@ -1,3 +1,6 @@
+import type { UmbBlockGridTypeGroupType } from '../../types.js';
+import { UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL } from '../../workspace/index.js';
+import { UMB_BLOCK_GRID_TYPE } from '../../constants.js';
 import type { UmbBlockTypeWithGroupKey, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
 import type {
 	UmbPropertyEditorUiElement,
@@ -15,11 +18,6 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UMB_BLOCK_GRID_TYPE,
-	UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL,
-	type UmbBlockGridTypeGroupType,
-} from '@umbraco-cms/backoffice/block-grid';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_PROPERTY_CONTEXT,

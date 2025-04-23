@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class DocumentNavigationServiceTests
+internal sealed partial class DocumentNavigationServiceTests
 {
     [TestCase(1, TestName = "Structure_Can_Rebuild")]
     [TestCase(2, TestName = "Structure_Can_Rebuild_MultipleTimes")]

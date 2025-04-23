@@ -175,10 +175,9 @@ export class UmbPickerSearchManager<
 	async #search() {
 		if (this.getSearchable() === false) throw new Error('Search is not enabled');
 		if (!this.#searchProvider) throw new Error('Search provider is not available');
-		const query = this.#query.getValue();
-		if (!query) throw new Error('No query provided');
 
-		if (!query.query) {
+		const query = this.#query.getValue();
+		if (!query?.query) {
 			this.clear();
 			return;
 		}

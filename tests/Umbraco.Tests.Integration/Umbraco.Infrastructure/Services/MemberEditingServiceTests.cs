@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [TestFixture]
 [Category("Slow")]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MemberEditingServiceTests : UmbracoIntegrationTest
+internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
 {
     private IMemberEditingService MemberEditingService => GetRequiredService<IMemberEditingService>();
 
@@ -77,12 +77,12 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Email = "test-updated@test.com",
             Username = "test-updated",
             IsApproved = false,
-            InvariantName = "T. Est Updated",
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = "T. Est Updated" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The updated title value" },
                 new PropertyValueModel { Alias = "author", Value = "The updated author value" }
-            }
+            ]
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
@@ -112,7 +112,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Email = member.Email,
             Username = member.Username,
             IsApproved = true,
-            InvariantName = member.Name,
+            Variants = [new VariantModel { Name = member.Name }],
             NewPassword = "NewSuperSecret123"
         };
 
@@ -140,7 +140,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Email = member.Email,
             Username = member.Username,
             IsApproved = true,
-            InvariantName = member.Name,
+            Variants = [new VariantModel { Name = member.Name }],
             Roles = groups.Select(x => x.Key),
         };
 
@@ -193,12 +193,12 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Password = "SuperSecret123",
             IsApproved = true,
             ContentTypeKey = memberType.Key,
-            InvariantName = "T. Est",
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = "T. Est" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = titleValue },
                 new PropertyValueModel { Alias = "author", Value = authorValue }
-            }
+            ]
         };
 
         var result = await MemberEditingService.CreateAsync(createModel, SuperUser());
@@ -240,12 +240,12 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Email = member.Email,
             Username = member.Username,
             IsApproved = true,
-            InvariantName = member.Name,
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = member.Name }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = titleValue },
                 new PropertyValueModel { Alias = "author", Value = authorValue }
-            }
+            ]
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
@@ -283,12 +283,12 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Email = "test-updated@test.com",
             Username = "test-updated",
             IsApproved = member.IsApproved,
-            InvariantName = "T. Est Updated",
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = "T. Est Updated" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The updated title value" },
                 new PropertyValueModel { Alias = "author", Value = "The updated author value" }
-            }
+            ]
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, useSuperUser ? SuperUser() : user);
@@ -341,11 +341,11 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
         {
             Email = "test-updated@test.com",
             Username = "test-updated",
-            InvariantName = "T. Est Updated",
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = "T. Est Updated" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "author", Value = "The updated author value" }
-            }
+            ]
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, user);
@@ -387,12 +387,12 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             IsApproved = true,
             ContentTypeKey = memberType.Key,
             Roles = new [] { group.Key },
-            InvariantName = "T. Est",
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = "T. Est" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The title value" },
                 new PropertyValueModel { Alias = "author", Value = "The author value" }
-            }
+            ]
         };
 
         var result = await MemberEditingService.CreateAsync(createModel, SuperUser());

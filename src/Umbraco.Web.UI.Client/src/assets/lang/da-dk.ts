@@ -428,7 +428,6 @@ export default {
 		newPartialViewMacroFromSnippet: 'Ny partial view makro fra snippet',
 		newPartialViewMacroNoMacro: 'Ny partial view makro (uden makro)',
 		newStyleSheetFile: 'Ny stylesheet-fil',
-		newRteStyleSheetFile: 'Ny Rich Text Editor stylesheet-fil',
 	},
 	dashboard: {
 		browser: 'Til dit website',
@@ -442,7 +441,7 @@ export default {
 	prompt: {
 		stay: 'Bliv',
 		discardChanges: 'Kassér ændringer',
-		unsavedChanges: 'Du har ikke-gemte ændringer',
+		unsavedChanges: 'Kassér ugemte ændringer',
 		unsavedChangesWarning:
 			'Er du sikker på du vil navigere væk fra denne side? - du har ikke-gemte\n      ændringer\n    ',
 		confirmListViewPublish: 'Udgivelse vil gøre de valgte sider synlige på sitet.',
@@ -2519,7 +2518,7 @@ export default {
 		refreshStatus: 'Refresh status',
 		memoryCache: 'Memory Cache',
 		memoryCacheDescription:
-			'\n            This button lets you reload the in-memory cache, by entirely reloading it from the database\n    cache (but it does not rebuild that database cache). This is relatively fast.\n    Use it when you think that the memory cache has not been properly refreshed, after some events\n    triggered&mdash;which would indicate a minor Umbraco issue.\n    (note: triggers the reload on all servers in an LB environment).\n    ',
+			'\n            This button lets you reload the in-memory cache, by entirely reloading it from the database\n    cache (but it does not rebuild that database cache). This is relatively fast.\n    Use it when you think that the memory cache has not been properly refreshed, after some events\n    triggered&mdash;which would indicate a minor Umbraco issue.\n    (note: triggers the reload on all servers in an LB environment, and will clear the second level cache if you have it enabled).\n    ',
 		reload: 'Reload',
 		databaseCache: 'Database Cache',
 		databaseCacheDescription:

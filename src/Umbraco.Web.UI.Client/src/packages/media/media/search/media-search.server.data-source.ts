@@ -3,7 +3,7 @@ import type { UmbMediaSearchItemModel, UmbMediaSearchRequestArgs } from './types
 import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Rollback that fetches data from the server
@@ -31,12 +31,15 @@ export class UmbMediaSearchServerDataSource
 	 * @memberof UmbMediaSearchServerDataSource
 	 */
 	async search(args: UmbMediaSearchRequestArgs) {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			MediaService.getItemMediaSearch({
-				query: args.query,
-				parentId: args.searchFrom?.unique || undefined,
-				allowedMediaTypes: args.allowedContentTypes?.map((mediaReference) => mediaReference.unique),
+				query: {
+					query: args.query,
+					parentId: args.searchFrom?.unique || undefined,
+					allowedMediaTypes: args.allowedContentTypes?.map((mediaReference) => mediaReference.unique),
+					trashed: args.includeTrashed,
+				},
 			}),
 		);
 

@@ -1,6 +1,6 @@
 import type { UmbInputTiptapElement } from '../../components/input-tiptap/input-tiptap.element.js';
 import { UmbPropertyEditorUiRteElementBase } from '@umbraco-cms/backoffice/rte';
-import { customElement, html, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 import '../../components/input-tiptap/input-tiptap.element.js';
 
@@ -74,6 +74,12 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 				@change=${this.#onChange}></umb-input-tiptap>
 		`;
 	}
+
+	static override styles = css`
+		:host(:invalid:not([pristine])) umb-input-tiptap {
+			--umb-tiptap-edge-border-color: var(--uui-color-invalid);
+		}
+	`;
 }
 
 export { UmbPropertyEditorUiTiptapElement as element };

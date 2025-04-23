@@ -13,21 +13,33 @@ export class UmbDataSourceDataMapper<fromModelType = unknown, toModelType = unkn
 
 	async map(args: UmbDataSourceDataMapperMapArgs<fromModelType, toModelType>) {
 		if (!args.forDataSource) {
-			throw new Error('data source identifier is required');
-		}
-
-		if (!args.forDataModel) {
-			throw new Error('data identifier is required');
+			const message = 'data source identifier is required';
+			console.error(message);
+			throw new Error(message);
 		}
 
 		if (!args.data) {
-			throw new Error('data is required');
+			const message = 'data is required';
+			console.error(message);
+			throw new Error(message);
+		}
+
+		if (!args.forDataModel && !args.fallback) {
+			const message = 'forDataModel is missing and no fallback provided.';
+			console.error(message);
+			throw new Error(message);
+		}
+
+		if (!args.forDataModel && args.fallback) {
+			return args.fallback(args.data);
 		}
 
 		const dataMapping = await this.#dataMappingResolver.resolve(args.forDataSource, args.forDataModel);
 
 		if (!dataMapping && !args.fallback) {
-			throw new Error('Data mapping not found and no fallback provided.');
+			const message = 'Data mapping not found and no fallback provided.';
+			console.error(message);
+			throw new Error(message);
 		}
 
 		if (!dataMapping && args.fallback) {
@@ -35,7 +47,9 @@ export class UmbDataSourceDataMapper<fromModelType = unknown, toModelType = unkn
 		}
 
 		if (!dataMapping?.map) {
-			throw new Error('Data mapping does not have a map method.');
+			const message = 'Data mapping does not have a map method.';
+			console.error(message);
+			throw new Error(message);
 		}
 
 		return dataMapping.map(args.data);

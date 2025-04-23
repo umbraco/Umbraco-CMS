@@ -3,23 +3,21 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Routing;
-using static Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.Common.AspNetCore;
 
 public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
 {
-    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;
     private string? _getAbsoluteUrl;
 
-    public AspNetCoreBackOfficeInfo(
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnviroment)
-    {
-        _globalSettings = globalSettings;
-        _hostingEnvironment = hostingEnviroment;
-    }
+    public AspNetCoreBackOfficeInfo(IHostingEnvironment hostingEnviroment)
+        => _hostingEnvironment = hostingEnviroment;
+
+    [Obsolete("The globalSettings parameter is not required anymore, use the other constructor instead. Scheduled for removal in Umbraco 17.")]
+    public AspNetCoreBackOfficeInfo(IOptionsMonitor<GlobalSettings> globalSettings, IHostingEnvironment hostingEnviroment)
+        : this(hostingEnviroment)
+    { }
 
     public string GetAbsoluteUrl
     {
@@ -34,7 +32,7 @@ public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
 
                 _getAbsoluteUrl = WebPath.Combine(
                     _hostingEnvironment.ApplicationMainUrl.ToString(),
-                    Core.Constants.System.DefaultUmbracoPath.TrimStart(CharArrays.TildeForwardSlash));
+                    Core.Constants.System.DefaultUmbracoPath.TrimStart(Core.Constants.CharArrays.TildeForwardSlash));
             }
 
             return _getAbsoluteUrl;

@@ -1,6 +1,6 @@
 import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Export Media Server Data Source
@@ -28,6 +28,6 @@ export class UmbExportMediaTypeServerDataSource {
 	async export(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(this.#host, MediaTypeService.getMediaTypeByIdExport({ id: unique }));
+		return tryExecute(this.#host, MediaTypeService.getMediaTypeByIdExport({ path: { id: unique } }));
 	}
 }

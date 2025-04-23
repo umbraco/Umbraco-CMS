@@ -1,6 +1,6 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DocumentVersionService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Rollback that fetches data from the server
@@ -27,7 +27,7 @@ export class UmbRollbackServerDataSource {
 	 * @memberof UmbRollbackServerDataSource
 	 */
 	getVersionsByDocumentId(id: string, culture?: string) {
-		return tryExecuteAndNotify(this.#host, DocumentVersionService.getDocumentVersion({ documentId: id, culture }));
+		return tryExecute(this.#host, DocumentVersionService.getDocumentVersion({ query: { documentId: id, culture } }));
 	}
 
 	/**
@@ -37,20 +37,23 @@ export class UmbRollbackServerDataSource {
 	 * @memberof UmbRollbackServerDataSource
 	 */
 	getVersionById(versionId: string) {
-		return tryExecuteAndNotify(this.#host, DocumentVersionService.getDocumentVersionById({ id: versionId }));
+		return tryExecute(this.#host, DocumentVersionService.getDocumentVersionById({ path: { id: versionId } }));
 	}
 
 	setPreventCleanup(versionId: string, preventCleanup: boolean) {
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
-			DocumentVersionService.putDocumentVersionByIdPreventCleanup({ id: versionId, preventCleanup }),
+			DocumentVersionService.putDocumentVersionByIdPreventCleanup({
+				path: { id: versionId },
+				query: { preventCleanup },
+			}),
 		);
 	}
 
 	rollback(versionId: string, culture?: string) {
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
-			DocumentVersionService.postDocumentVersionByIdRollback({ id: versionId, culture }),
+			DocumentVersionService.postDocumentVersionByIdRollback({ path: { id: versionId }, query: { culture } }),
 		);
 	}
 }

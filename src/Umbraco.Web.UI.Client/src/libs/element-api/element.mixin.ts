@@ -7,6 +7,7 @@ import type { UmbContextToken, UmbContextCallback } from '@umbraco-cms/backoffic
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { ObserverCallback } from '@umbraco-cms/backoffice/observable-api';
 import { UmbObserverController, simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbClassGetContextOptions } from '@umbraco-cms/backoffice/class-api';
 
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbElementMixinClass extends UmbControllerHostElementMixin(superClass) implements UmbElement {
@@ -74,13 +75,18 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 
 		async getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
-		): Promise<ResultType> {
+			options?: UmbClassGetContextOptions,
+		): Promise<ResultType | undefined> {
 			const controller = new UmbContextConsumerController(this, contextAlias);
-			const promise = controller.asPromise().then((result) => {
-				controller.destroy();
-				return result;
-			});
-			return promise;
+			if (options) {
+				if (options.passContextAliasMatches) {
+					controller.passContextAliasMatches();
+				}
+				if (options.skipHost) {
+					controller.skipHost();
+				}
+			}
+			return controller.asPromise(options);
 		}
 	}
 

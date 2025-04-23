@@ -6,7 +6,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public class PublishedUrlInfoProvider_hidetoplevel_false : PublishedUrlInfoProviderTestsBase
+internal sealed class PublishedUrlInfoProvider_hidetoplevel_false : PublishedUrlInfoProviderTestsBase
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {

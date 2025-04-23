@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
@@ -36,12 +37,21 @@ public class ContentEditingVariantBuilder<TParent>(TParent parentBuilder)
         return builder;
     }
 
+    public IReadOnlyCollection<ContentEditingPropertyValueBuilder<ContentEditingVariantBuilder<TParent>>> GetProperties()
+    {
+        if (_culture is null)
+        {
+            throw new InvalidOperationException("Culture must be defined for the variant before building.");
+        }
+
+        return _properties.Select(property => property.WithCulture(_culture)).ToList();
+    }
+
     public override VariantModel Build() =>
         new()
         {
             Culture = _culture,
             Segment = _segment,
-            Name = _name,
-            Properties = _properties.Select(x => x.Build()).ToList(),
+            Name = _name
         };
 }

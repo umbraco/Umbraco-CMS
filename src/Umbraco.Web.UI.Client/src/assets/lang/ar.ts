@@ -408,7 +408,6 @@ export default {
 		newPartialViewMacroFromSnippet: 'ماكرو عرض جزئي جديد من مقطع',
 		newPartialViewMacroNoMacro: 'ماكرو عرض جزئي جديد (بدون ماكرو)',
 		newStyleSheetFile: 'ملف ورقة أنماط جديد',
-		newRteStyleSheetFile: 'ملف ورقة أنماط محرر النصوص الغني الجديد',
 	},
 	dashboard: {
 		browser: 'تصفح موقعك',

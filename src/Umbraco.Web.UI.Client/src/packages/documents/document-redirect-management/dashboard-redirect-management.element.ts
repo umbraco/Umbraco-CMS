@@ -4,7 +4,7 @@ import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { RedirectUrlResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { RedirectManagementService, RedirectStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-dashboard-redirect-management')
@@ -43,16 +43,16 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	async #getTrackerStatus() {
-		const { data } = await tryExecuteAndNotify(this, RedirectManagementService.getRedirectManagementStatus());
+		const { data } = await tryExecute(this, RedirectManagementService.getRedirectManagementStatus());
 		if (data && data.status) this._trackerEnabled = data.status === RedirectStatusModel.ENABLED ? true : false;
 	}
 
 	// Fetch data
 	async #getRedirectData(filter: string | undefined = undefined) {
 		const skip = this.page * this.itemsPerPage - this.itemsPerPage;
-		const { data } = await tryExecuteAndNotify(
+		const { data } = await tryExecute(
 			this,
-			RedirectManagementService.getRedirectManagement({ filter, take: this.itemsPerPage, skip }),
+			RedirectManagementService.getRedirectManagement({ query: { filter, take: this.itemsPerPage, skip } }),
 		);
 		if (!data) return;
 
@@ -89,7 +89,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		this.#redirectDelete(data.id!);
 	}
 	async #redirectDelete(id: string) {
-		const { error } = await tryExecuteAndNotify(this, RedirectManagementService.deleteRedirectManagementById({ id }));
+		const { error } = await tryExecute(this, RedirectManagementService.deleteRedirectManagementById({ path: { id } }));
 		if (error) return;
 
 		this._redirectData = this._redirectData?.filter((x) => x.id !== id);
@@ -127,9 +127,9 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 
 	async #trackerToggle() {
 		const status = this._trackerEnabled ? RedirectStatusModel.DISABLED : RedirectStatusModel.ENABLED;
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this,
-			RedirectManagementService.postRedirectManagementStatus({ status }),
+			RedirectManagementService.postRedirectManagementStatus({ query: { status } }),
 		);
 		if (error) return;
 		this._trackerEnabled = !this._trackerEnabled;

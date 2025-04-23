@@ -1,7 +1,7 @@
 import type { UmbDuplicateDocumentRequestArgs } from './types.js';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Duplicate Document Server Data Source
@@ -29,11 +29,11 @@ export class UmbDuplicateDocumentServerDataSource {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			DocumentService.postDocumentByIdCopy({
-				id: args.unique,
-				requestBody: {
+				path: { id: args.unique },
+				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 					relateToOriginal: args.relateToOriginal,
 					includeDescendants: args.includeDescendants,

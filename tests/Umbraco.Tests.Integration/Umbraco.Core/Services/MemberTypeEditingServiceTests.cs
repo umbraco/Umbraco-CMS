@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 /// Tests for the member type editing service. Please notice that a lot of functional test is covered by the content type
 /// editing service tests, since these services share the same base implementation.
 /// </summary>
-public class MemberTypeEditingServiceTests : ContentTypeEditingServiceTestsBase
+internal sealed class MemberTypeEditingServiceTests : ContentTypeEditingServiceTestsBase
 {
     private IMemberTypeEditingService MemberTypeEditingService => GetRequiredService<IMemberTypeEditingService>();
 

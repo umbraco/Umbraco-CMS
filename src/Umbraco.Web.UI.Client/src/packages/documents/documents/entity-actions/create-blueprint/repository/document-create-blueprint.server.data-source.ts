@@ -1,4 +1,4 @@
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { CreateDocumentBlueprintFromDocumentRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -23,10 +23,10 @@ export class UmbDocumentCreateBlueprintServerDataSource {
 	/**
 	 * Fetches the Culture and Hostnames for the given Document unique
 	 * @param {string} unique
-	 * @param requestBody
+	 * @param body
 	 * @memberof UmbDocumentCreateBlueprintServerDataSource
 	 */
-	async create(requestBody: CreateDocumentBlueprintFromDocumentRequestModel) {
-		return tryExecuteAndNotify(this.#host, DocumentBlueprintService.postDocumentBlueprintFromDocument({ requestBody }));
+	async create(body: CreateDocumentBlueprintFromDocumentRequestModel) {
+		return tryExecute(this.#host, DocumentBlueprintService.postDocumentBlueprintFromDocument({ body }));
 	}
 }

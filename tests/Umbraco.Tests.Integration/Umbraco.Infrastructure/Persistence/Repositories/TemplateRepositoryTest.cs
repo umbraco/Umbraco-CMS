@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class TemplateRepositoryTest : UmbracoIntegrationTest
+internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 {
     [TearDown]
     public void TearDown()

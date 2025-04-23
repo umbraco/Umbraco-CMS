@@ -31,10 +31,10 @@ internal sealed class ContentBlueprintEditingService
         : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, validationService, optionsMonitor, relationService)
         => _containerService = containerService;
 
-    public async Task<IContent?> GetAsync(Guid key)
+    public Task<IContent?> GetAsync(Guid key)
     {
         IContent? blueprint = ContentService.GetBlueprintById(key);
-        return await Task.FromResult(blueprint);
+        return Task.FromResult(blueprint);
     }
 
     public Task<IContent?> GetScaffoldedAsync(Guid key)
@@ -86,7 +86,7 @@ internal sealed class ContentBlueprintEditingService
 
         IContent blueprint = result.Result.Content!;
 
-        if (ValidateUniqueName(createModel.InvariantName ?? string.Empty, blueprint) is false)
+        if (ValidateUniqueNames(createModel.Variants, blueprint) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.DuplicateName, new ContentCreateResult());
         }
@@ -133,7 +133,7 @@ internal sealed class ContentBlueprintEditingService
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentUpdateResult());
         }
 
-        if (ValidateUniqueName(updateModel.InvariantName ?? string.Empty, blueprint) is false)
+        if (ValidateUniqueNames(updateModel.Variants, blueprint) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.DuplicateName, new ContentUpdateResult());
         }
@@ -248,5 +248,19 @@ internal sealed class ContentBlueprintEditingService
     {
         IEnumerable<IContent> existing = ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
         return existing.Any(c => c.Name == name && c.Id != content.Id) is false;
+    }
+
+    private bool ValidateUniqueNames(IEnumerable<VariantModel> variants, IContent content)
+    {
+        IContent[] existing = ContentService.GetBlueprintsForContentTypes(content.ContentTypeId).ToArray();
+        foreach (VariantModel variant in variants)
+        {
+            if (existing.Any(c => c.GetCultureName(variant.Culture) == variant.Name && c.Id != content.Id))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

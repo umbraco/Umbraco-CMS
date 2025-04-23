@@ -17,6 +17,7 @@ import {
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, UmbDocumentPublishingRepository } from '../publishing/index.js';
 import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
+import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -34,13 +35,14 @@ import {
 } from '@umbraco-cms/backoffice/content';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/language';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
-
 export class UmbDocumentWorkspaceContext
 	extends UmbContentDetailWorkspaceContextBase<
 		ContentModel,
@@ -65,7 +67,6 @@ export class UmbDocumentWorkspaceContext
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent(
 		(data) => !!data?.documentType.collection,
 	);
-	readonly urls = this._data.createObservablePartOfCurrent((data) => data?.urls || []);
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
@@ -85,6 +86,30 @@ export class UmbDocumentWorkspaceContext
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			contentTypePropertyName: 'documentType',
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
+		});
+
+		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
+			const config = await context.getDocumentConfiguration();
+			const allowSegmentCreation = config?.allowNonExistingSegmentsCreation ?? false;
+
+			this._variantOptionsFilter = (variantOption) => {
+				const isNotCreatedSegmentVariant = variantOption.segment && !variantOption.variant;
+
+				// Do not allow creating a segment variant
+				if (!allowSegmentCreation && isNotCreatedSegmentVariant) {
+					return false;
+				}
+
+				return true;
+			};
+		});
+
+		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
+			const documentConfiguration = (await context?.getDocumentConfiguration()) ?? undefined;
+
+			if (documentConfiguration?.allowEditInvariantFromNonDefault !== true) {
+				this.#preventEditInvariantFromNonDefault();
+			}
 		});
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
@@ -191,6 +216,46 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	#preventEditInvariantFromNonDefault() {
+		this.observe(
+			observeMultiple([this.structure.contentTypeProperties, this.languages]),
+			([properties, languages]) => {
+				if (properties.length === 0) return;
+				if (languages.length === 0) return;
+
+				const defaultLanguageUnique = languages.find((x) => x.isDefault)?.unique;
+				const ruleUnique = 'UMB_preventEditInvariantFromNonDefault';
+
+				const rule = {
+					unique: ruleUnique,
+					permitted: false,
+					message: 'Shared properties can only be edited in the default language',
+					variantId: UmbVariantId.CreateInvariant(),
+				};
+
+				/* The permission is false by default, and the onChange callback will not be triggered if the permission hasn't changed.
+			Therefore, we add the rule to the readOnlyGuard here. */
+				this.propertyWriteGuard.addRule(rule);
+
+				createExtensionApiByAlias(this, UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS, [
+					{
+						config: {
+							allOf: [defaultLanguageUnique],
+						},
+						onChange: (permitted: boolean) => {
+							if (permitted) {
+								this.propertyWriteGuard.removeRule(ruleUnique);
+							} else {
+								this.propertyWriteGuard.addRule(rule);
+							}
+						},
+					},
+				]);
+			},
+			'observePreventEditInvariantFromNonDefault',
+		);
 	}
 
 	override resetState(): void {
@@ -304,10 +369,13 @@ export class UmbDocumentWorkspaceContext
 		// Tell the server that we're entering preview mode.
 		await new UmbDocumentPreviewRepository(this).enter();
 
-		const appContext = await this.getContext(UMB_APP_CONTEXT);
+		const serverContext = await this.getContext(UMB_SERVER_CONTEXT);
+		if (!serverContext) {
+			throw new Error('Server context is missing');
+		}
 
-		const backofficePath = appContext.getBackofficePath();
-		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', appContext.getServerUrl());
+		const backofficePath = serverContext.getBackofficePath();
+		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', serverContext.getServerUrl());
 		previewUrl.searchParams.set('id', unique);
 
 		if (culture && culture !== UMB_INVARIANT_CULTURE) {
@@ -392,27 +460,15 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async #setReadOnlyStateForUserPermission(identifier: string, permitted: boolean, message: string) {
-		const variants = this.getVariants();
-		const uniques = variants?.map((variant) => identifier + variant.culture) || [];
-
 		if (permitted) {
-			this.readOnlyState?.removeStates(uniques);
+			this.readOnlyGuard?.removeRule(identifier);
 			return;
 		}
 
-		const variantIds = variants?.map((variant) => new UmbVariantId(variant.culture, variant.segment)) || [];
-
-		const readOnlyStates = variantIds.map((variantId) => {
-			return {
-				unique: identifier + variantId.culture,
-				variantId,
-				message,
-			};
+		this.readOnlyGuard?.addRule({
+			unique: identifier,
+			message,
 		});
-
-		this.readOnlyState?.removeStates(uniques);
-
-		this.readOnlyState?.addStates(readOnlyStates);
 	}
 }
 

@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.None, Logger = UmbracoTestOptions.Logger.Console)]
-public class StylesheetRepositoryTest : UmbracoIntegrationTest
+internal sealed class StylesheetRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUpFileSystem()

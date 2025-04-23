@@ -68,7 +68,7 @@ public class AddEditorUiToDataType : MigrationBase
                 Constants.PropertyEditors.Aliases.TextBox => "Umb.PropertyEditorUi.TextBox",
                 Constants.PropertyEditors.Aliases.TextArea => "Umb.PropertyEditorUi.TextArea",
                 Constants.PropertyEditors.Aliases.RichText => "Umb.PropertyEditorUi.TinyMCE",
-                Constants.PropertyEditors.Aliases.TinyMce => "Umb.PropertyEditorUi.TinyMCE",
+                "Umbraco.TinyMCE" => "Umb.PropertyEditorUi.TinyMCE",
                 Constants.PropertyEditors.Aliases.Boolean => "Umb.PropertyEditorUi.Toggle",
                 Constants.PropertyEditors.Aliases.MarkdownEditor => "Umb.PropertyEditorUi.MarkdownEditor",
                 Constants.PropertyEditors.Aliases.UserPicker => "Umb.PropertyEditorUi.UserPicker",

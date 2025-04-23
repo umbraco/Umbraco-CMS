@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -20,27 +18,6 @@ public class RelationService : RepositoryService, IRelationService
     private readonly IEntityService _entityService;
     private readonly IRelationRepository _relationRepository;
     private readonly IRelationTypeRepository _relationTypeRepository;
-
-    [Obsolete("Please use ctor that takes all parameters, scheduled for removal in V15")]
-    public RelationService(
-        ICoreScopeProvider uowProvider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IEntityService entityService,
-        IRelationRepository relationRepository,
-        IRelationTypeRepository relationTypeRepository,
-        IAuditRepository auditRepository)
-        : this(
-            uowProvider,
-            loggerFactory,
-            eventMessagesFactory,
-            entityService,
-            relationRepository,
-            relationTypeRepository,
-            auditRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    {
-    }
 
     public RelationService(
         ICoreScopeProvider uowProvider,
@@ -114,22 +91,22 @@ public class RelationService : RepositoryService, IRelationService
     /// Gets the Relation types in a paged manner.
     /// Currently implements the paging in memory on the name property because the underlying repository does not support paging yet
     /// </summary>
-    public async Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids)
+    public Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         if (take == 0)
         {
-            return new PagedModel<IRelationType>(CountRelationTypes(), Enumerable.Empty<IRelationType>());
+            return Task.FromResult(new PagedModel<IRelationType>(CountRelationTypes(), Enumerable.Empty<IRelationType>()));
         }
 
-        IRelationType[] items = await Task.FromResult(_relationTypeRepository.GetMany(ids).ToArray());
+        IRelationType[] items = _relationTypeRepository.GetMany(ids).ToArray();
 
-        return new PagedModel<IRelationType>(
+        return Task.FromResult(new PagedModel<IRelationType>(
             items.Length,
             items.OrderBy(relationType => relationType.Name)
                 .Skip(skip)
-                .Take(take));
+                .Take(take)));
     }
 
     /// <inheritdoc />
@@ -281,20 +258,20 @@ public class RelationService : RepositoryService, IRelationService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKeyAsync(Guid key, int skip, int take, Ordering? ordering = null)
+    public Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKeyAsync(Guid key, int skip, int take, Ordering? ordering = null)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         IRelationType? relationType = _relationTypeRepository.Get(key);
         if (relationType is null)
         {
-            return await Task.FromResult(Attempt.FailWithStatus<PagedModel<IRelation>, RelationOperationStatus>(RelationOperationStatus.RelationTypeNotFound, null!));
+            return Task.FromResult(Attempt.FailWithStatus<PagedModel<IRelation>, RelationOperationStatus>(RelationOperationStatus.RelationTypeNotFound, null!));
         }
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
         IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
         IEnumerable<IRelation> relations = _relationRepository.GetPagedRelationsByQuery(query, pageNumber, pageSize, out var totalRecords, ordering);
-        return await Task.FromResult(Attempt.SucceedWithStatus(RelationOperationStatus.Success, new PagedModel<IRelation>(totalRecords, relations)));
+        return Task.FromResult(Attempt.SucceedWithStatus(RelationOperationStatus.Success, new PagedModel<IRelation>(totalRecords, relations)));
     }
 
     /// <inheritdoc />
@@ -631,7 +608,7 @@ public class RelationService : RepositoryService, IRelationService
                 new RelationTypeSavedNotification(relationType, eventMessages).WithStateFrom(savingNotification));
         }
 
-        return await Task.FromResult(Attempt.SucceedWithStatus(RelationTypeOperationStatus.Success, relationType));
+        return Attempt.SucceedWithStatus(RelationTypeOperationStatus.Success, relationType);
     }
 
     /// <inheritdoc />

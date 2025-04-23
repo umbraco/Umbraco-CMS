@@ -452,14 +452,6 @@ Copyright: 2018 Terkel
 
 ---
 
-TinyMCE, version 6.x: A rich text editor for the web
-
-URL: https://www.tiny.cloud/
-License: MIT License
-Copyright: 2022 Ephox Corporation DBA Tiny Technologies, Inc.
-
----
-
 Tiptap: A renderless rich-text editor for the web
 
 URL: https://tiptap.dev/

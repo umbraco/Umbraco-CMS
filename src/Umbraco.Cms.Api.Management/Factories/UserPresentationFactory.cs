@@ -133,7 +133,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Kind = user.Kind
         };
 
-    public async Task<UserCreateModel> CreateCreationModelAsync(CreateUserRequestModel requestModel)
+    public Task<UserCreateModel> CreateCreationModelAsync(CreateUserRequestModel requestModel)
     {
         var createModel = new UserCreateModel
         {
@@ -145,10 +145,10 @@ public class UserPresentationFactory : IUserPresentationFactory
             Kind = requestModel.Kind
         };
 
-        return await Task.FromResult(createModel);
+        return Task.FromResult(createModel);
     }
 
-    public async Task<UserInviteModel> CreateInviteModelAsync(InviteUserRequestModel requestModel)
+    public Task<UserInviteModel> CreateInviteModelAsync(InviteUserRequestModel requestModel)
     {
         var inviteModel = new UserInviteModel
         {
@@ -159,10 +159,10 @@ public class UserPresentationFactory : IUserPresentationFactory
             Message = requestModel.Message,
         };
 
-        return await Task.FromResult(inviteModel);
+        return Task.FromResult(inviteModel);
     }
 
-    public async Task<UserResendInviteModel> CreateResendInviteModelAsync(ResendInviteUserRequestModel requestModel)
+    public Task<UserResendInviteModel> CreateResendInviteModelAsync(ResendInviteUserRequestModel requestModel)
     {
         var inviteModel = new UserResendInviteModel
         {
@@ -170,15 +170,14 @@ public class UserPresentationFactory : IUserPresentationFactory
             Message = requestModel.Message,
         };
 
-        return await Task.FromResult(inviteModel);
+        return Task.FromResult(inviteModel);
     }
 
-    public async Task<CurrenUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync()
+    public Task<CurrentUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync()
     {
-        var model = new CurrenUserConfigurationResponseModel
+        var model = new CurrentUserConfigurationResponseModel
         {
             KeepUserLoggedIn = _securitySettings.KeepUserLoggedIn,
-            UsernameIsEmail = _securitySettings.UsernameIsEmail,
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
 
             // You should not be able to change any password or set 2fa if any providers has deny local login set.
@@ -186,7 +185,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             AllowTwoFactor = _externalLoginProviders.HasDenyLocalLogin() is false,
         };
 
-        return await Task.FromResult(model);
+        return Task.FromResult(model);
     }
 
     public Task<UserConfigurationResponseModel> CreateUserConfigurationModelAsync() =>
@@ -202,7 +201,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             AllowTwoFactor = _externalLoginProviders.HasDenyLocalLogin() is false,
         });
 
-    public async Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel)
+    public Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel)
     {
         var model = new UserUpdateModel
         {
@@ -219,7 +218,7 @@ public class UserPresentationFactory : IUserPresentationFactory
 
         model.UserGroupKeys = updateModel.UserGroupIds.Select(x => x.Id).ToHashSet();
 
-        return await Task.FromResult(model);
+        return Task.FromResult(model);
     }
 
     public async Task<CurrentUserResponseModel> CreateCurrentUserResponseModelAsync(IUser user)
@@ -239,7 +238,7 @@ public class UserPresentationFactory : IUserPresentationFactory
 
         var allowedSections = presentationGroups.SelectMany(x => x.Sections).ToHashSet();
 
-        return await Task.FromResult(new CurrentUserResponseModel()
+        return new CurrentUserResponseModel()
         {
             Id = presentationUser.Id,
             Email = presentationUser.Email,
@@ -259,13 +258,24 @@ public class UserPresentationFactory : IUserPresentationFactory
             AllowedSections = allowedSections,
             IsAdmin = user.IsAdmin(),
             UserGroupIds = presentationUser.UserGroupIds,
-        });
+        };
     }
 
     private HashSet<IPermissionPresentationModel> GetAggregatedGranularPermissions(IUser user, IEnumerable<UserGroupResponseModel> presentationGroups)
     {
+        var aggregatedPermissions = new HashSet<IPermissionPresentationModel>();
+
         var permissions = presentationGroups.SelectMany(x => x.Permissions).ToHashSet();
 
+        AggregateAndAddDocumentPermissions(user, aggregatedPermissions, permissions);
+
+        AggregateAndAddDocumentPropertyValuePermissions(aggregatedPermissions, permissions);
+
+        return aggregatedPermissions;
+    }
+
+    private void AggregateAndAddDocumentPermissions(IUser user, HashSet<IPermissionPresentationModel> aggregatedPermissions, HashSet<IPermissionPresentationModel> permissions)
+    {
         // The raw permission data consists of several permissions for each document.  We want to aggregate this server-side so
         // we return one set of aggregate permissions per document that the client will use.
 
@@ -276,7 +286,6 @@ public class UserPresentationFactory : IUserPresentationFactory
             .Select(x => x.Document.Id)
             .Distinct();
 
-        var aggregatedPermissions = new HashSet<IPermissionPresentationModel>();
         foreach (Guid documentKey in documentKeysWithGranularPermissions)
         {
             // Retrieve the path of the document.
@@ -294,18 +303,38 @@ public class UserPresentationFactory : IUserPresentationFactory
                 Verbs = permissionsForPath.GetAllPermissions()
             });
         }
-
-        return aggregatedPermissions;
     }
 
-    public async Task<CalculatedUserStartNodesResponseModel> CreateCalculatedUserStartNodesResponseModelAsync(IUser user)
+    private static void AggregateAndAddDocumentPropertyValuePermissions(HashSet<IPermissionPresentationModel> aggregatedPermissions, HashSet<IPermissionPresentationModel> permissions)
+    {
+        // We also have permissions for document type/property type combinations.
+        // These don't have an ancestor relationship that we need to take into account, but should be aggregated
+        // and included in the set.
+        IEnumerable<((Guid DocumentTypeId, Guid PropertyTypeId) Key, ISet<string> Verbs)> documentTypePropertyTypeKeysWithGranularPermissions = permissions
+            .Where(x => x is DocumentPropertyValuePermissionPresentationModel)
+            .Cast<DocumentPropertyValuePermissionPresentationModel>()
+            .GroupBy(x => (x.DocumentType.Id, x.PropertyType.Id))
+            .Select(x => (x.Key, (ISet<string>)x.SelectMany(y => y.Verbs).Distinct().ToHashSet()));
+
+        foreach (((Guid DocumentTypeId, Guid PropertyTypeId) Key, ISet<string> Verbs) documentTypePropertyTypeKey in documentTypePropertyTypeKeysWithGranularPermissions)
+        {
+            aggregatedPermissions.Add(new DocumentPropertyValuePermissionPresentationModel
+            {
+                DocumentType = new ReferenceByIdModel(documentTypePropertyTypeKey.Key.DocumentTypeId),
+                PropertyType = new ReferenceByIdModel(documentTypePropertyTypeKey.Key.PropertyTypeId),
+                Verbs = documentTypePropertyTypeKey.Verbs
+            });
+        }
+    }
+
+    public Task<CalculatedUserStartNodesResponseModel> CreateCalculatedUserStartNodesResponseModelAsync(IUser user)
     {
         var mediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
         ISet<ReferenceByIdModel> mediaStartNodeKeys = GetKeysFromIds(mediaStartNodeIds, UmbracoObjectTypes.Media);
         var contentStartNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
         ISet<ReferenceByIdModel> documentStartNodeKeys = GetKeysFromIds(contentStartNodeIds, UmbracoObjectTypes.Document);
 
-        return await Task.FromResult(new CalculatedUserStartNodesResponseModel()
+        return Task.FromResult<CalculatedUserStartNodesResponseModel>(new CalculatedUserStartNodesResponseModel()
         {
             Id = user.Key,
             MediaStartNodeIds = mediaStartNodeKeys,
