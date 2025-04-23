@@ -47,12 +47,6 @@ describe('UmbSelectionManager', () => {
 			let publishedDocument: UmbDocumentDetailModel;
 			let documentBase: UmbDocumentDetailModel = {
 				entityType: UMB_DOCUMENT_ENTITY_TYPE,
-				urls: [
-					{
-						culture: 'en-US',
-						url: '/document-1',
-					},
-				],
 				template: null,
 				unique: '1',
 				documentType: {
@@ -118,12 +112,6 @@ describe('UmbSelectionManager', () => {
 			let publishedDocument: UmbDocumentDetailModel;
 			let documentBase: UmbDocumentDetailModel = {
 				entityType: UMB_DOCUMENT_ENTITY_TYPE,
-				urls: [
-					{
-						culture: 'en-US',
-						url: '/document-1',
-					},
-				],
 				template: null,
 				unique: '1',
 				documentType: {

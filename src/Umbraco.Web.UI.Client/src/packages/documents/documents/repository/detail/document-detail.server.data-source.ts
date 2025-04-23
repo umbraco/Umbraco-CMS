@@ -37,7 +37,6 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		const data: UmbDocumentDetailModel = {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			unique: UmbId.new(),
-			urls: [],
 			template: null,
 			documentType: {
 				unique: '',
@@ -112,12 +111,6 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 					updateDate: variant.updateDate,
 					scheduledPublishDate: variant.scheduledPublishDate || null,
 					scheduledUnpublishDate: variant.scheduledUnpublishDate || null,
-				};
-			}),
-			urls: data.urls.map((url) => {
-				return {
-					culture: url.culture || null,
-					url: url.url,
 				};
 			}),
 			template: data.template ? { unique: data.template.id } : null,
