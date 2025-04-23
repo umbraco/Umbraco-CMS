@@ -12,6 +12,7 @@ import type { UmbContentTypeSortModel, UmbContentTypeWorkspaceContext } from '@u
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type DetailModelType = UmbMediaTypeDetailModel;
 export class UmbMediaTypeWorkspaceContext
@@ -93,7 +94,6 @@ export class UmbMediaTypeWorkspaceContext
 
 		if (parent.unique && parent.entityType === UMB_MEDIA_TYPE_ENTITY_TYPE) {
 			preset = {
-				...preset,
 				compositions: [
 					{
 						contentType: { unique: parent.unique },
