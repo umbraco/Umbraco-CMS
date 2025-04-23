@@ -13,6 +13,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
@@ -21,6 +23,9 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 
 	override async execute() {
 		if (!this.args.unique) throw new Error('The document unique identifier is missing');
+
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		const localize = new UmbLocalizationController(this);
 
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);
 		const { data: languageData } = await languageRepository.requestCollection({});
@@ -60,6 +65,30 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 			}),
 		);
 
+		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!actionEventContext) throw new Error('The action event context is missing');
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			unique: this.args.unique,
+			entityType: this.args.entityType,
+		});
+
+		// If the document has only one variant, we can skip the modal and publish directly:
+		if (options.length === 1) {
+			const variantId = UmbVariantId.Create(documentData.variants[0]);
+			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
+			const { error } = await publishingRepository.publish(this.args.unique, [{ variantId }]);
+			if (!error) {
+				notificationContext?.peek('positive', {
+					data: {
+						headline: localize.term('speechBubbles_editContentUnpublishedHeader'),
+						message: localize.term('speechBubbles_editContentUnpublishedText'),
+					},
+				});
+			}
+			actionEventContext.dispatchEvent(event);
+			return;
+		}
+
 		// Figure out the default selections
 		// TODO: Missing features to pre-select the variant that fits with the variant-id of the tree/collection? (Again only relevant if the action is executed from a Tree or Collection) [NL]
 		const selection: Array<string> = [];
@@ -88,20 +117,25 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 
 		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 
-		if (variantIds.length) {
-			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
-			const { error } = await publishingRepository.unpublish(this.args.unique, variantIds);
+		if (!variantIds.length) return;
 
-			if (!error) {
-				const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-				if (!actionEventContext) throw new Error('The action event context is missing');
-				const event = new UmbRequestReloadStructureForEntityEvent({
-					unique: this.args.unique,
-					entityType: this.args.entityType,
-				});
+		const publishingRepository = new UmbDocumentPublishingRepository(this._host);
+		const { error } = await publishingRepository.unpublish(this.args.unique, variantIds);
 
-				actionEventContext.dispatchEvent(event);
-			}
+		if (!error) {
+			const documentVariants = documentData.variants.filter((variant) => result.selection.includes(variant.culture!));
+
+			notificationContext?.peek('positive', {
+				data: {
+					headline: localize.term('speechBubbles_editContentUnpublishedHeader'),
+					message: localize.term(
+						'speechBubbles_editVariantUnpublishedText',
+						localize.list(documentVariants.map((v) => v.culture ?? v.name)),
+					),
+				},
+			});
+
+			actionEventContext.dispatchEvent(event);
 		}
 	}
 }
