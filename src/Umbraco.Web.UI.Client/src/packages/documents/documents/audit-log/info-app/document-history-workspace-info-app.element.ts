@@ -62,7 +62,8 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	async #requestAuditLogs() {
-		const unique = this.#workspaceContext?.getUnique();
+		if (!this.#workspaceContext) return;
+		const unique = this.#workspaceContext.getUnique();
 		if (!unique) throw new Error('Document unique is required');
 
 		const { data } = await this.#auditLogRepository.requestAuditLog({
