@@ -67,7 +67,6 @@ export class UmbDocumentWorkspaceContext
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent(
 		(data) => !!data?.documentType.collection,
 	);
-	readonly urls = this._data.createObservablePartOfCurrent((data) => data?.urls || []);
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
@@ -90,6 +89,22 @@ export class UmbDocumentWorkspaceContext
 		});
 
 		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
+			const config = await context.getDocumentConfiguration();
+			const allowSegmentCreation = config?.allowNonExistingSegmentsCreation ?? false;
+
+			this._variantOptionsFilter = (variantOption) => {
+				const isNotCreatedSegmentVariant = variantOption.segment && !variantOption.variant;
+
+				// Do not allow creating a segment variant
+				if (!allowSegmentCreation && isNotCreatedSegmentVariant) {
+					return false;
+				}
+
+				return true;
+			};
+		});
+
+		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
 			const documentConfiguration = (await context?.getDocumentConfiguration()) ?? undefined;
 
 			if (documentConfiguration?.allowEditInvariantFromNonDefault !== true) {
@@ -97,7 +112,15 @@ export class UmbDocumentWorkspaceContext
 			}
 		});
 
-		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+		this.observe(
+			this.contentTypeUnique,
+			(unique) => {
+				if (unique) {
+					this.structure.loadType(unique);
+				}
+			},
+			null,
+		);
 
 		// TODO: Remove this in v17 as we have moved the publishing methods to the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.
 		this.consumeContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, (context) => {

@@ -48,7 +48,9 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 		if (currentUserHasAccessToAllLanguages === undefined)
 			throw new Error('The current user access to all languages is missing');
 
-		const options: Array<UmbDocumentVariantOptionModel> = documentData.variants.map<UmbDocumentVariantOptionModel>(
+		const cultureVariantOptions = documentData.variants.filter((variant) => variant.segment === null);
+
+		const options: Array<UmbDocumentVariantOptionModel> = cultureVariantOptions.map<UmbDocumentVariantOptionModel>(
 			(variant) => ({
 				culture: variant.culture,
 				segment: variant.segment,

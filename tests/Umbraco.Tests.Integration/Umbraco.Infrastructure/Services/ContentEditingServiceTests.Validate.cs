@@ -18,8 +18,11 @@ public partial class ContentEditingServiceTests
 
         var validateContentUpdateModel = new ValidateContentUpdateModel
         {
-            InvariantName = "Updated Name",
-            InvariantProperties =
+            Variants =
+            [
+                new () { Name = "Updated Name" }
+            ],
+            Properties =
             [
                 new PropertyValueModel { Alias = "title", Value = "The updated title" },
                 new PropertyValueModel { Alias = "text", Value = "The updated text" }
@@ -38,8 +41,11 @@ public partial class ContentEditingServiceTests
 
         var validateContentUpdateModel = new ValidateContentUpdateModel
         {
-            InvariantName = "Updated Name",
-            InvariantProperties =
+            Variants =
+            [
+                new () { Name = "Updated Name" }
+            ],
+            Properties =
             [
                 new PropertyValueModel { Alias = "title", Value = null },
                 new PropertyValueModel { Alias = "text", Value = "The updated text" }
@@ -56,34 +62,20 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Can_Validate_Valid_Variant_Content()
     {
-        var content = await CreateVariantContent();
+        var content = await CreateCultureVariantContent();
 
         var validateContentUpdateModel = new ValidateContentUpdateModel
         {
-            InvariantProperties =
+            Properties =
             [
-                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish title", Culture = "da-DK" }
             ],
             Variants =
             [
-                new VariantModel
-                {
-                    Culture = "en-US",
-                    Name = "Updated English Name",
-                    Properties =
-                    [
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title" }
-                    ]
-                },
-                new VariantModel
-                {
-                    Culture = "da-DK",
-                    Name = "Updated Danish Name",
-                    Properties =
-                    [
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish title" }
-                    ]
-                }
+                new VariantModel { Culture = "en-US", Name = "Updated English Name" },
+                new VariantModel { Culture = "da-DK", Name = "Updated Danish Name" }
             ],
         };
 
@@ -95,34 +87,20 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Will_Fail_Invalid_Variant_Content()
     {
-        var content = await CreateVariantContent();
+        var content = await CreateCultureVariantContent();
 
         var validateContentUpdateModel = new ValidateContentUpdateModel
         {
-            InvariantProperties =
+            Properties =
             [
-                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = null, Culture = "da-DK" }
             ],
             Variants =
             [
-                new VariantModel
-                {
-                    Culture = "en-US",
-                    Name = "Updated English Name",
-                    Properties =
-                    [
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title" }
-                    ]
-                },
-                new VariantModel
-                {
-                    Culture = "da-DK",
-                    Name = "Updated Danish Name",
-                    Properties =
-                    [
-                        new PropertyValueModel { Alias = "variantTitle", Value = null }
-                    ]
-                }
+                new VariantModel { Culture = "en-US", Name = "Updated English Name" },
+                new VariantModel { Culture = "da-DK", Name = "Updated Danish Name" }
             ],
         };
 
@@ -136,28 +114,21 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Will_Succeed_For_Invalid_Variant_Content_Without_Access_To_Edited_Culture()
     {
-        var content = await CreateVariantContent();
+        var content = await CreateCultureVariantContent();
 
         IUser englishEditor = await CreateEnglishLanguageOnlyEditor();
 
         var validateContentUpdateModel = new ValidateContentUpdateModel
         {
-            InvariantProperties =
+            Properties =
             [
-                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title", Culture = "en-US" },
             ],
             Variants =
             [
-                new VariantModel
-                {
-                    Culture = "en-US",
-                    Name = "Updated English Name",
-                    Properties =
-                    [
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title" }
-                    ]
-                }
-            ],
+                new VariantModel { Culture = "en-US", Name = "Updated English Name" }
+            ]
         };
 
         Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await ContentEditingService.ValidateUpdateAsync(content.Key, validateContentUpdateModel, englishEditor.Key);

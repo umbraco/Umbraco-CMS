@@ -62,12 +62,12 @@ internal sealed class MemberHybridCacheTests : UmbracoIntegrationTest
             IsApproved = true,
             ContentTypeKey = memberType.Key,
             Roles = new [] { group.Key },
-            InvariantName = "T. Est",
-            InvariantProperties = new[]
-            {
+            Variants = [new () { Name = "T. Est" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The title value" },
                 new PropertyValueModel { Alias = "author", Value = "The author value" }
-            }
+            ]
         };
 
         var result = await MemberEditingService.CreateAsync(createModel, SuperUser());

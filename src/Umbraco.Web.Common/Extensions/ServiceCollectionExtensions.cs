@@ -42,7 +42,7 @@ public static class ServiceCollectionExtensions
         LoggingSettings loggerSettings = GetLoggerSettings(configuration);
 
         var loggingDir = loggerSettings.GetAbsoluteLoggingPath(hostEnvironment);
-        ILoggingConfiguration loggingConfig = new LoggingConfiguration(loggingDir);
+        ILoggingConfiguration loggingConfig = new LoggingConfiguration(loggingDir, loggerSettings.FileNameFormat, loggerSettings.FileNameFormatArguments);
 
         var umbracoFileConfiguration = new UmbracoFileConfiguration(configuration);
 
