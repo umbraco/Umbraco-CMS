@@ -64,7 +64,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	}
 
 	/**
-	 * @function hasOne
+	 * @function getHasOne
 	 * @param {U} unique - the unique value to compare with.
 	 * @returns {boolean} Wether it existed
 	 * @description - Check if a unique value exists in the current data of this Subject.
@@ -76,7 +76,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	 * const myState = new UmbArrayState(data, (x) => x.key);
 	 * myState.hasOne(1);
 	 */
-	hasOne(unique: U): boolean {
+	getHasOne(unique: U): boolean {
 		if (this.getUniqueMethod) {
 			return this.getValue().some((x) => this.getUniqueMethod(x) === unique);
 		} else {

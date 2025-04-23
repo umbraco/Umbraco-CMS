@@ -141,7 +141,9 @@ export class UmbContentTypeStructureManager<
 				this.#repoManager.entries,
 				(entries) => {
 					// Prevent updating once that are have edited here.
-					entries = entries.filter((x) => !(this.#editedTypes.hasOne(x.unique) && this.#contentTypes.hasOne(x.unique)));
+					entries = entries.filter(
+						(x) => !(this.#editedTypes.getHasOne(x.unique) && this.#contentTypes.getHasOne(x.unique)),
+					);
 
 					this.#contentTypes.append(entries);
 				},
