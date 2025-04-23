@@ -158,7 +158,6 @@ internal class MediaCacheService : IMediaCacheService
 
     public async Task SeedAsync(CancellationToken cancellationToken)
     {
-
         foreach (Guid key in SeedKeys)
         {
             if (cancellationToken.IsCancellationRequested)
@@ -168,7 +167,7 @@ internal class MediaCacheService : IMediaCacheService
 
             var cacheKey = GetCacheKey(key, false);
 
-            ContentCacheNode? cachedValue = await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
+            ContentCacheNode? cachedValue = await _hybridCache.GetOrCreateAsync(
                 cacheKey,
                 async cancel =>
                 {
@@ -178,7 +177,8 @@ internal class MediaCacheService : IMediaCacheService
                     return mediaCacheNode;
                 },
                 GetSeedEntryOptions(),
-                GenerateTags(key));
+                GenerateTags(key),
+                cancellationToken: cancellationToken);
 
             if (cachedValue is null)
             {
@@ -226,6 +226,7 @@ internal class MediaCacheService : IMediaCacheService
                 _hybridCache.RemoveAsync(GetCacheKey(content.Key, false)).GetAwaiter().GetResult();
             }
         }
+
         scope.Complete();
     }
 
@@ -281,23 +282,10 @@ internal class MediaCacheService : IMediaCacheService
         LocalCacheExpiration = _cacheSettings.Entry.Media.SeedCacheDuration,
     };
 
-    private string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";
+    private static string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";
 
     // Generates the cache tags for a given CacheNode
     // We use the tags to be able to clear all cache entries that are related to a given content item.
     // Tags for now are content/media, draft/published and all its ancestors, so we can clear when ChangeType.TreeChange
-    private HashSet<string> GenerateTags(Guid? key)
-    {
-        if (key is null)
-        {
-            return new HashSet<string>();
-        }
-
-        var tags = new HashSet<string>
-        {
-            Constants.Cache.Tags.Media,
-        };
-
-        return tags;
-    }
+    private static HashSet<string> GenerateTags(Guid? key) => key is null ? [] : [Constants.Cache.Tags.Media];
 }
