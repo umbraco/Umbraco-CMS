@@ -22,9 +22,8 @@ test.afterEach(async ({umbracoApi}) => {
 test('can render content with an approved color with label', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const templateId = await umbracoApi.template.createTemplateWithDisplayingApprovedColorValue(templateName, AliasHelper.toAlias(propertyName));
-  await umbracoApi.document.createPublishedDocumentWithValue(contentName, colorValue, dataTypeId, templateId, propertyName, documentTypeName);
-  const contentData = await umbracoApi.document.getByName(contentName);
-  const contentURL = contentData.urls[0].url;
+  const contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, colorValue, dataTypeId, templateId, propertyName, documentTypeName);
+  const contentURL = await umbracoApi.document.getDocumentUrl(contentKey);
 
   // Act
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
@@ -36,9 +35,8 @@ test('can render content with an approved color with label', async ({umbracoApi,
 test('can render content with an approved color without label', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const templateId = await umbracoApi.template.createTemplateWithDisplayingApprovedColorValue(templateName, AliasHelper.toAlias(propertyName), false);
-  await umbracoApi.document.createPublishedDocumentWithValue(contentName, colorValue, dataTypeId, templateId, propertyName, documentTypeName);
-  const contentData = await umbracoApi.document.getByName(contentName);
-  const contentURL = contentData.urls[0].url;
+  const contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, colorValue, dataTypeId, templateId, propertyName, documentTypeName);
+  const contentURL = await umbracoApi.document.getDocumentUrl(contentKey);
 
   // Act
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
