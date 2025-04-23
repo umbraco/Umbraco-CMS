@@ -413,13 +413,13 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		this.#workspaceContext.setCompositions([
 			...currentOwnerInheritanceCompositions,
-			...compositionIds.map(
-				(unique) =>
-					({
-						contentType: { unique },
-						compositionType: CompositionTypeModel.COMPOSITION,
-					}) as UmbContentTypeCompositionModel,
-			),
+			...compositionIds.map((unique) => {
+				const model: UmbContentTypeCompositionModel = {
+					contentType: { unique },
+					compositionType: CompositionTypeModel.COMPOSITION,
+				};
+				return model;
+			}),
 		]);
 	}
 
