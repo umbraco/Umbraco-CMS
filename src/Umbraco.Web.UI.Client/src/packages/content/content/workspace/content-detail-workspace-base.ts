@@ -124,7 +124,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/* Data Type */
 	// This dataTypeItemManager is used to load the data type items for this content type, so we have all data-types for this content type up front. [NL]
-	// But once we have a propert application cache this could be solved in a way where we ask the cache for the data type items. [NL]
+	// But once we have a proper application cache this could be solved in a way where we ask the cache for the data type items. [NL]
 	// And then we do not need to store them here in a local manager, but instead just request them here up-front and then again needed(which would get them from the cache, which as well could be update while this runs) [NL]
 	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
 
