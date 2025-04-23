@@ -6,8 +6,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Serialization;
 
-
-public sealed class ValidationProblemDetailsDetailsConverter : JsonConverter<ValidationProblemDetails>
+/// <summary>
+/// Custom JSON converter registered via <see cref="ConfigureUmbracoBackofficeJsonOptions"/> to serialize <see cref="ValidationProblemDetails" /> to JSON.
+/// </summary>
+public sealed class ValidationProblemDetailsConverter : JsonConverter<ValidationProblemDetails>
 {
     /// <inheritdoc />
     public override ValidationProblemDetails? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

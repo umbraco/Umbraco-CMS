@@ -52,6 +52,17 @@ public class BackOfficeSerializationTests
         }
     }
 
+    [Test]
+    public void Will_Serialize_ValidationProblemDetail_To_Casing_Aligned_With_Mvc()
+    {
+        var objectToSerialize = new TestValueWithValidationProblemDetail();
+
+        var json = JsonSerializer.Serialize(objectToSerialize, jsonOptions.JsonSerializerOptions);
+
+        var expectedJson = "{\"problemDetails\":{\"type\":\"Test type\",\"title\":\"Test title\",\"status\":400,\"detail\":\"Test detail\",\"instance\":\"Test instance\",\"errors\":[{\"$.testError1\":[\"Test error 1a\",\"Test error 1b\"]},{\"$.testError2\":[\"Test error 2a\"]},{\"$.testError3.testError3a\":[\"Test error 3b\"]}],\"traceId\":\"traceValue\"}}";
+        Assert.AreEqual(expectedJson, json);
+    }
+
     private static NestedJsonTestValue CreateNestedObject(int levels)
     {
         var root = new NestedJsonTestValue { Level = 1 };
@@ -76,5 +87,28 @@ public class BackOfficeSerializationTests
         public int Level { get; set; }
 
         public NestedJsonTestValue? Inner { get; set; }
+    }
+
+    private class TestValueWithValidationProblemDetail
+    {
+        public ValidationProblemDetails ProblemDetails { get; set; } = new()
+        {
+            Title = "Test title",
+            Detail = "Test detail",
+            Status = 400,
+            Type = "Test type",
+            Instance = "Test instance",
+            Extensions =
+            {
+                ["traceId"] = "traceValue",
+                ["someOtherExtension"] = "someOtherExtensionValue",
+            },
+            Errors =
+            {
+                ["TestError1"] = ["Test error 1a", "Test error 1b"],
+                ["TestError2"] = ["Test error 2a"],
+                ["TestError3.TestError3a"] = ["Test error 3b"],
+            }
+        };
     }
 }
