@@ -11,11 +11,11 @@ import { UmbDeepState } from './deep-state.js';
  *
  * The ArrayState provides methods to append data when the data is an Object.
  */
-export class UmbArrayState<T> extends UmbDeepState<T[]> {
-	readonly getUniqueMethod: (entry: T) => unknown;
+export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
+	readonly getUniqueMethod: (entry: T) => U;
 	#sortMethod?: (a: T, b: T) => number;
 
-	constructor(initialData: T[], getUniqueOfEntryMethod: (entry: T) => unknown) {
+	constructor(initialData: T[], getUniqueOfEntryMethod: (entry: T) => U) {
 		super(initialData);
 		this.getUniqueMethod = getUniqueOfEntryMethod;
 	}
@@ -58,6 +58,27 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 			super.setValue([...value].sort(this.#sortMethod));
 		} else {
 			super.setValue(value);
+		}
+	}
+
+	/**
+	 * @function getHasOne
+	 * @param {U} unique - the unique value to compare with.
+	 * @returns {boolean} Wether it existed
+	 * @description - Check if a unique value exists in the current data of this Subject.
+	 * @example <caption>Example check for key to exist.</caption>
+	 * const data = [
+	 * 	{ key: 1, value: 'foo'},
+	 * 	{ key: 2, value: 'bar'}
+	 * ];
+	 * const myState = new UmbArrayState(data, (x) => x.key);
+	 * myState.hasOne(1);
+	 */
+	getHasOne(unique: U): boolean {
+		if (this.getUniqueMethod) {
+			return this.getValue().some((x) => this.getUniqueMethod(x) === unique);
+		} else {
+			throw new Error('Cannot use hasOne when no unique method provided to check for uniqueness');
 		}
 	}
 
