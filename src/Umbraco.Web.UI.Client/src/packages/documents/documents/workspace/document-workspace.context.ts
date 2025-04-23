@@ -212,39 +212,43 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	#preventEditInvariantFromNonDefault() {
-		this.observe(observeMultiple([this.structure.contentTypeProperties, this.languages]), ([properties, languages]) => {
-			if (properties.length === 0) return;
-			if (languages.length === 0) return;
+		this.observe(
+			observeMultiple([this.structure.contentTypeProperties, this.languages]),
+			([properties, languages]) => {
+				if (properties.length === 0) return;
+				if (languages.length === 0) return;
 
-			const defaultLanguageUnique = languages.find((x) => x.isDefault)?.unique;
-			const ruleUnique = 'UMB_preventEditInvariantFromNonDefault';
+				const defaultLanguageUnique = languages.find((x) => x.isDefault)?.unique;
+				const ruleUnique = 'UMB_preventEditInvariantFromNonDefault';
 
-			const rule = {
-				unique: ruleUnique,
-				permitted: false,
-				message: 'Shared properties can only be edited in the default language',
-				variantId: UmbVariantId.CreateInvariant(),
-			};
+				const rule = {
+					unique: ruleUnique,
+					permitted: false,
+					message: 'Shared properties can only be edited in the default language',
+					variantId: UmbVariantId.CreateInvariant(),
+				};
 
-			/* The permission is false by default, and the onChange callback will not be triggered if the permission hasn't changed.
+				/* The permission is false by default, and the onChange callback will not be triggered if the permission hasn't changed.
 			Therefore, we add the rule to the readOnlyGuard here. */
-			this.propertyWriteGuard.addRule(rule);
+				this.propertyWriteGuard.addRule(rule);
 
-			createExtensionApiByAlias(this, UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS, [
-				{
-					config: {
-						allOf: [defaultLanguageUnique],
+				createExtensionApiByAlias(this, UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS, [
+					{
+						config: {
+							allOf: [defaultLanguageUnique],
+						},
+						onChange: (permitted: boolean) => {
+							if (permitted) {
+								this.propertyWriteGuard.removeRule(ruleUnique);
+							} else {
+								this.propertyWriteGuard.addRule(rule);
+							}
+						},
 					},
-					onChange: (permitted: boolean) => {
-						if (permitted) {
-							this.propertyWriteGuard.removeRule(ruleUnique);
-						} else {
-							this.propertyWriteGuard.addRule(rule);
-						}
-					},
-				},
-			]);
-		});
+				]);
+			},
+			'observePreventEditInvariantFromNonDefault',
+		);
 	}
 
 	override resetState(): void {
