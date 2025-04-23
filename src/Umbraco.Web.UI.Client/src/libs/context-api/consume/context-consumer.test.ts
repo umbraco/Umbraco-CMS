@@ -4,7 +4,7 @@ import type { UmbContextMinimal } from '../types.js';
 import { UmbContextConsumer } from './context-consumer.js';
 import type { UmbContextRequestEventImplementation } from './context-request.event.js';
 import { UMB_CONTEXT_REQUEST_EVENT_TYPE } from './context-request.event.js';
-import { expect, oneEvent } from '@open-wc/testing';
+import { assert, expect, oneEvent } from '@open-wc/testing';
 
 const testContextAlias = 'my-test-context';
 const testContextAliasAndApiAlias = 'my-test-context#testApi';
@@ -274,8 +274,16 @@ describe('UmbContextConsumer', () => {
 			);
 			provider.hostConnected();
 
-			const localConsumer = new UmbContextConsumer(element, testContextAliasAndNotExistingApiAlias, () => {
-				expect(false).to.be.true;
+			let callbackCount = 0;
+
+			const localConsumer = new UmbContextConsumer(element, testContextAliasAndNotExistingApiAlias, (context) => {
+				callbackCount++;
+				if (callbackCount === 1) {
+					expect(context).to.be.undefined;
+					done();
+				} else {
+					assert.fail('Callback should not be called more than once');
+				}
 			});
 			localConsumer.hostConnected();
 
@@ -283,7 +291,6 @@ describe('UmbContextConsumer', () => {
 			Promise.resolve().then(() => {
 				localConsumer.hostDisconnected();
 				provider.hostDisconnected();
-				done();
 			});
 		});
 	});
@@ -315,14 +322,19 @@ describe('UmbContextConsumer', () => {
 		it('discriminator determines the instance type', (done) => {
 			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
 
+			let callbackCount = 0;
+
 			const localConsumer = new UmbContextConsumer(
 				element,
 				new UmbContextToken(testContextAlias, undefined, discriminator),
 				(instance: A | undefined) => {
-					expect(instance?.prop).to.eq('value from provider');
-					provider.destroy();
-					localConsumer.destroy();
-					done();
+					callbackCount++;
+					if (callbackCount === 1) {
+						expect(instance?.prop).to.eq('value from provider');
+						provider.destroy();
+						localConsumer.destroy();
+						done();
+					}
 				},
 			);
 			localConsumer.hostConnected();
@@ -338,14 +350,19 @@ describe('UmbContextConsumer', () => {
 			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
 			provider.hostConnected();
 
+			let callbackCount = 0;
+
 			const localConsumer = new UmbContextConsumer(
 				element,
 				new UmbContextToken(testContextAlias, undefined, discriminator),
 				(_instance) => {
-					expect(_instance?.prop).to.eq('value from provider');
-					localConsumer.hostDisconnected();
-					provider.hostDisconnected();
-					done();
+					callbackCount++;
+					if (callbackCount === 1) {
+						expect(_instance?.prop).to.eq('value from provider');
+						localConsumer.hostDisconnected();
+						provider.hostDisconnected();
+						done();
+					}
 				},
 			);
 			localConsumer.hostConnected();
@@ -355,11 +372,19 @@ describe('UmbContextConsumer', () => {
 			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
 			provider.hostConnected();
 
+			let callbackCount = 0;
+
 			const localConsumer = new UmbContextConsumer(
 				element,
 				new UmbContextToken(testContextAlias, undefined, badDiscriminator),
 				(_instance) => {
-					expect(_instance?.prop).to.eq('this must not happen!');
+					callbackCount++;
+					if (callbackCount === 1) {
+						expect(_instance).to.be.undefined;
+						done();
+					} else {
+						assert.fail('Callback should not be called more than once');
+					}
 				},
 			);
 			localConsumer.hostConnected();
@@ -368,7 +393,6 @@ describe('UmbContextConsumer', () => {
 			Promise.resolve().then(() => {
 				localConsumer.hostDisconnected();
 				provider.hostDisconnected();
-				done();
 			});
 		});
 
@@ -383,11 +407,17 @@ describe('UmbContextConsumer', () => {
 			);
 			alternativeProvider.hostConnected();
 
+			let callbackCount = 0;
+
 			const localConsumer = new UmbContextConsumer(
 				element,
 				new UmbContextToken(testContextAlias, undefined, discriminator),
 				(_instance) => {
-					expect(_instance?.prop).to.eq('this must not happen!');
+					callbackCount++;
+					if (callbackCount === 1) {
+						expect(_instance).to.be.undefined;
+						done();
+					}
 				},
 			);
 			localConsumer.hostConnected();
@@ -396,7 +426,6 @@ describe('UmbContextConsumer', () => {
 			Promise.resolve().then(() => {
 				localConsumer.hostDisconnected();
 				provider.hostDisconnected();
-				done();
 			});
 		});
 
@@ -411,14 +440,21 @@ describe('UmbContextConsumer', () => {
 			);
 			alternativeProvider.hostConnected();
 
+			let callbackCount = 0;
+
 			const localConsumer = new UmbContextConsumer(
 				element,
 				new UmbContextToken(testContextAlias, undefined, discriminator),
 				(_instance) => {
-					expect(_instance?.prop).to.eq('value from provider');
-					localConsumer.hostDisconnected();
-					provider.hostDisconnected();
-					done();
+					callbackCount++;
+					if (callbackCount === 1) {
+						expect(_instance?.prop).to.eq('value from provider');
+						localConsumer.hostDisconnected();
+						provider.hostDisconnected();
+					} else {
+						expect(_instance).to.be.undefined;
+						done();
+					}
 				},
 			);
 			localConsumer.passContextAliasMatches();

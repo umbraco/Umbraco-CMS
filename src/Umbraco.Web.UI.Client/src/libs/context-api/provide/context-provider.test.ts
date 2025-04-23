@@ -54,13 +54,18 @@ describe('UmbContextProvider', () => {
 		const element = document.createElement('div');
 		document.body.appendChild(element);
 
+		let callbackCount = 0;
+
 		const localConsumer = new UmbContextConsumer(
 			element,
 			'my-test-context',
 			(_instance: UmbTestContextProviderClass | undefined) => {
-				expect(_instance?.prop).to.eq('value from provider');
-				done();
-				localConsumer.hostDisconnected();
+				callbackCount++;
+				if (callbackCount === 1) {
+					expect(_instance?.prop).to.eq('value from provider');
+					done();
+					localConsumer.hostDisconnected();
+				}
 			},
 		);
 		localConsumer.hostConnected();
