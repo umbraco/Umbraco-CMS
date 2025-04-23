@@ -17,11 +17,11 @@ public partial class ContentBlueprintEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create",
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-            },
+            Variants = [new VariantModel { Name = "Test Create" }],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" }
+            ],
         };
 
         var createContentResult = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);

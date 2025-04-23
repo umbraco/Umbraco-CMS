@@ -21,7 +21,7 @@ internal sealed partial class DocumentNavigationServiceTests
 
         var updateModel = new ContentUpdateModel
         {
-            InvariantName = "Updated Root",
+            Variants = [new () { Name = "Updated Root" }]
         };
 
         // Act

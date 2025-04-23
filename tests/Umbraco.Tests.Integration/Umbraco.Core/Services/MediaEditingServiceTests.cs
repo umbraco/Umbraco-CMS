@@ -54,7 +54,7 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
         {
             ContentTypeKey = mediaTypeKey,
             ParentKey = Constants.System.RootKey,
-            InvariantName = name,
+            Variants = [new () { Name = name }],
             Key = key,
         };
 }

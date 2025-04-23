@@ -36,7 +36,7 @@ internal sealed class DocumentHybridCacheTemplateTests : UmbracoIntegrationTestW
         var updateModel = new ContentUpdateModel();
         {
             updateModel.TemplateKey = null;
-            updateModel.InvariantName = textPageBefore.Name;
+            updateModel.Variants = [new() { Name = textPageBefore.Name }];
         }
 
         // Act

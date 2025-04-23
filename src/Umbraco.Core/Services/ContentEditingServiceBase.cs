@@ -318,7 +318,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return null;
         }
 
-        if (contentType.VariesByNothing() && contentEditingModelBase.InvariantName.IsNullOrWhiteSpace())
+        if (contentType.VariesByNothing() && contentEditingModelBase.Variants.Any(v => v.Culture is null && v.Segment is null) is false)
         {
             // does not vary by anything and is missing the invariant name = invalid
             operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
@@ -341,23 +341,13 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         var propertyTypesByAlias = contentType.CompositionPropertyTypes.ToDictionary(pt => pt.Alias);
         var propertyValuesAndVariance = contentEditingModelBase
-            .InvariantProperties
+            .Properties
             .Select(pv => new
             {
-                VariesByCulture = false,
-                VariesBySegment = false,
+                VariesByCulture = pv.Culture is not null,
+                VariesBySegment = pv.Segment is not null,
                 PropertyValue = pv
             })
-            .Union(contentEditingModelBase
-                .Variants
-                .SelectMany(v => v
-                    .Properties
-                    .Select(vpv => new
-                    {
-                        VariesByCulture = contentType.VariesByCulture(),
-                        VariesBySegment = v.Segment.IsNullOrWhiteSpace() == false,
-                        PropertyValue = vpv
-                    })))
             .ToArray();
 
         // verify that all property values are defined as property types
@@ -446,7 +436,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         else
         {
             // this should be validated already so it's OK to throw an exception here
-            content.Name = contentEditingModelBase.InvariantName
+            content.Name = contentEditingModelBase.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name
                            ?? throw new ArgumentException("Could not find a culture invariant variant", nameof(contentEditingModelBase));
         }
     }
@@ -456,21 +446,14 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         // create a mapping dictionary for all content type property types by their property aliases
         Dictionary<string, IPropertyType> propertyTypesByAlias = GetPropertyTypesByAlias(contentType);
 
-        // flatten the invariant and variant property values from the model into one array, and remove any properties
-        // that do not exist on the content type
-        var propertyValues = contentEditingModelBase
-            .InvariantProperties
-            .Select(pv => new { Culture = (string?)null, Segment = (string?)null, Alias = pv.Alias, Value = pv.Value })
-            .Union(contentEditingModelBase
-                .Variants
-                .SelectMany(v => v
-                    .Properties
-                    .Select(vpv => new { Culture = v.Culture, Segment = v.Segment, Alias = vpv.Alias, Value = vpv.Value })))
+        // remove any properties that do not exist on the content type
+        PropertyValueModel[] propertyValues = contentEditingModelBase
+            .Properties
             .Where(propertyValue => propertyTypesByAlias.ContainsKey(propertyValue.Alias))
             .ToArray();
 
         // update all properties on the content item
-        foreach (var propertyValue in propertyValues)
+        foreach (PropertyValueModel propertyValue in propertyValues)
         {
             // the following checks should already have been validated by now, so it's OK to throw exceptions here
             if(propertyTypesByAlias.TryGetValue(propertyValue.Alias, out IPropertyType? propertyType) == false
@@ -491,8 +474,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         // create a mapping dictionary for all content type property types by their property aliases
         Dictionary<string, IPropertyType> propertyTypesByAlias = GetPropertyTypesByAlias(contentType);
         var knownPropertyAliases = contentEditingModelBase
-            .InvariantProperties.Select(pv => pv.Alias)
-            .Union(contentEditingModelBase.Variants.SelectMany(v => v.Properties.Select(vpv => vpv.Alias)))
+            .Properties
+            .Select(pv => pv.Alias)
             .Distinct()
             .ToArray();
 
