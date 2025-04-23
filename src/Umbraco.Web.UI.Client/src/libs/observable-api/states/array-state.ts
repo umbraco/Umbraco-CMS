@@ -42,8 +42,6 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 		return this;
 	}
 
-	debug = false;
-
 	/**
 	 * @function setValue
 	 * @param value
