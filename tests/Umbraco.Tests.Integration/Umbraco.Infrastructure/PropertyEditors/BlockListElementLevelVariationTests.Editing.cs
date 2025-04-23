@@ -555,8 +555,7 @@ internal partial class BlockListElementLevelVariationTests
 
         content = ContentService.GetById(content.Key);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
-        Assert.NotNull(savedBlocksValue);
-        blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
+        blockListValue = savedBlocksValue is null ? null : JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
 
         // limited user access means invariant data is inaccessible since AllowEditInvariantFromNonDefault is disabled
         if (updateWithLimitedUserAccess)
@@ -973,7 +972,7 @@ internal partial class BlockListElementLevelVariationTests
         }
         else
         {
-            Assert.AreEqual("null", savedBlocksValue);
+            Assert.IsNull(savedBlocksValue);
         }
     }
 
