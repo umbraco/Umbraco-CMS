@@ -83,7 +83,8 @@ export abstract class UmbTreeRepositoryBase<
 
 		const { data, error } = await this._treeSource.getRootItems(args);
 		if (!this._treeStore) {
-			return { error: { type: 'client', title: 'Tree store is not available', status: 400 } as UmbProblemDetails };
+			// If the tree store is not available, then we most likely are in a destructed setting.
+			return {};
 		}
 		if (data) {
 			this._treeStore.appendItems(data.items);
