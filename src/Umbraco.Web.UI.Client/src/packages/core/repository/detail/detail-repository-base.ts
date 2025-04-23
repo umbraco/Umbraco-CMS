@@ -70,8 +70,6 @@ export abstract class UmbDetailRepositoryBase<
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
-		console.log('requestByUnique', unique);
-
 		const { data, error } = await this.detailDataSource.read(unique);
 
 		if (data) {
