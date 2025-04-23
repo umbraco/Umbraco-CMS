@@ -53,7 +53,7 @@
     <PackageVersion Include="MailKit" Version="4.10.0" />
     <PackageVersion Include="Markdown" Version="2.2.1" />
     <PackageVersion Include="MessagePack" Version="2.5.192" />
-    <PackageVersion Include="MiniProfiler.AspNetCore.Mvc" Version="4.3.8" />
+    <PackageVersion Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
     <PackageVersion Include="MiniProfiler.Shared" Version="4.5.4" />
     <PackageVersion Include="ncrontab" Version="3.3.3" />
     <PackageVersion Include="NPoco" Version="5.7.1" />
