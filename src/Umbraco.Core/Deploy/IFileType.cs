@@ -11,7 +11,7 @@ public interface IFileType
     /// <value>
     ///   <c>true</c> if the file can be set using a physical path; otherwise, <c>false</c>.
     /// </value>
-    [Obsolete("An interface should not expose implementation details. This will be removed in a future version.")]
+    [Obsolete("An interface should not expose implementation details. Scheduled for removal in Umbraco 18.")]
     bool CanSetPhysical { get; }
 
     /// <summary>
@@ -31,7 +31,7 @@ public interface IFileType
     /// <returns>
     /// The checksum stream.
     /// </returns>
-    [Obsolete("Use GetChecksumStreamAsync() instead. This will be removed in a future version.")]
+    [Obsolete("Use GetChecksumStreamAsync() instead. Scheduled for removal in Umbraco 18.")]
     Stream GetChecksumStream(StringUdi udi);
 
     /// <summary>
@@ -54,7 +54,7 @@ public interface IFileType
     /// <returns>
     /// The file length in bytes or <c>-1</c> if not found.
     /// </returns>
-    [Obsolete("Use GetLengthAsync() instead. This will be removed in a future version.")]
+    [Obsolete("Use GetLengthAsync() instead. Scheduled for removal in Umbraco 18.")]
     long GetLength(StringUdi udi);
 
     /// <summary>
@@ -87,7 +87,7 @@ public interface IFileType
     /// <param name="udi">The UDI.</param>
     /// <param name="physicalPath">The physical path.</param>
     /// <param name="copy">If set to <c>true</c> copies the file instead of moving.</param>
-    [Obsolete("Use SetStreamAsync() instead to not rely on physical file paths. This will be removed in a future version.")]
+    [Obsolete("Use SetStreamAsync() instead to not rely on physical file paths. Scheduled for removal in Umbraco 18.")]
     void Set(StringUdi udi, string physicalPath, bool copy = false);
 
     /// <summary>
@@ -106,6 +106,6 @@ public interface IFileType
     /// <returns>
     /// The virtual path or <see cref="string.Empty"/> if not found.
     /// </returns>
-    [Obsolete("This is not used anymore and will be removed in a future version.")]
+    [Obsolete("This is not used anymore. Scheduled for removal in Umbraco 18.")]
     string GetVirtualPath(StringUdi udi);
 }
