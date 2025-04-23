@@ -11,17 +11,18 @@ public interface IFileType
     /// <value>
     ///   <c>true</c> if the file can be set using a physical path; otherwise, <c>false</c>.
     /// </value>
+    [Obsolete("An interface should not expose implementation details. This will be removed in a future version.")]
     bool CanSetPhysical { get; }
 
     /// <summary>
-    /// Gets the stream as an asynchronous operation.
+    /// Gets the stream in an asynchronous operation.
     /// </summary>
     /// <param name="udi">The UDI.</param>
     /// <param name="token">The cancellation token.</param>
     /// <returns>
-    /// The task object representing the asynchronous operation.
+    /// The task object representing the asynchronous operation. The task result contains the stream.
     /// </returns>
-    Task<Stream> GetStreamAsync(StringUdi udi, CancellationToken token);
+    Task<Stream> GetStreamAsync(StringUdi udi, CancellationToken token); // TODO: Rename token to cancellationToken and add default value
 
     /// <summary>
     /// Gets the checksum stream.
@@ -78,7 +79,7 @@ public interface IFileType
     /// <returns>
     /// The task object representing the asynchronous operation.
     /// </returns>
-    Task SetStreamAsync(StringUdi udi, Stream stream, CancellationToken token);
+    Task SetStreamAsync(StringUdi udi, Stream stream, CancellationToken token); // TODO: Rename token to cancellationToken and add default value
 
     /// <summary>
     /// Sets the physical path of the file.
@@ -86,20 +87,16 @@ public interface IFileType
     /// <param name="udi">The UDI.</param>
     /// <param name="physicalPath">The physical path.</param>
     /// <param name="copy">If set to <c>true</c> copies the file instead of moving.</param>
+    [Obsolete("Use SetStreamAsync() instead to not rely on physical file paths. This will be removed in a future version.")]
     void Set(StringUdi udi, string physicalPath, bool copy = false);
 
     /// <summary>
-    /// Gets the physical path or <see cref="string.Empty"/> if not found.
+    /// Gets the path to the file, including the file name. Returns <see cref="string.Empty" /> if the file is not directly accessible.
     /// </summary>
     /// <param name="udi">The UDI.</param>
     /// <returns>
-    /// The physical path or <see cref="string.Empty"/> if not found.
+    /// The path to the file, including the file name or <see cref="string.Empty" /> if the file is not directly accessible.
     /// </returns>
-    /// <remarks>
-    /// This is not pretty as *everywhere* in Deploy we take care of ignoring
-    /// the physical path and always rely on the virtual IFileSystem,
-    /// but Cloud wants to add some of these files to Git and needs the path...
-    /// </remarks>
     string GetPhysicalPath(StringUdi udi);
 
     /// <summary>
@@ -109,5 +106,6 @@ public interface IFileType
     /// <returns>
     /// The virtual path or <see cref="string.Empty"/> if not found.
     /// </returns>
+    [Obsolete("This is not used anymore and will be removed in a future version.")]
     string GetVirtualPath(StringUdi udi);
 }
