@@ -53,7 +53,7 @@ public class BackOfficeSerializationTests
     }
 
     [Test]
-    public void Will_Serialize_ValidationProblemDetail_To_Casing_Aligned_With_Mvc()
+    public void Will_Serialize_ValidationProblemDetails_To_Casing_Aligned_With_Mvc()
     {
         var objectToSerialize = new TestValueWithValidationProblemDetail();
 
