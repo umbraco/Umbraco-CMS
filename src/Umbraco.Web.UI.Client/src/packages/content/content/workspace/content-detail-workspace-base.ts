@@ -20,7 +20,6 @@ import {
 	type UmbPropertyTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
 import {
-	UMB_INVARIANT_CULTURE,
 	UmbVariantId,
 	type UmbEntityVariantModel,
 	type UmbEntityVariantOptionModel,
@@ -30,7 +29,7 @@ import { UmbDataTypeDetailRepository, UmbDataTypeItemRepositoryManager } from '@
 import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	UMB_VALIDATION_CONTEXT,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
@@ -53,6 +52,7 @@ import {
 	type UmbPropertyTypePresetModel,
 	type UmbPropertyTypePresetModelTypeModel,
 } from '@umbraco-cms/backoffice/property';
+import { UmbSegmentCollectionRepository, type UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -116,9 +116,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/* Content Type (Structure) Data */
 	public readonly structure;
-	public readonly variesByCulture;
-	public readonly variesBySegment;
-	public readonly varies;
+	public readonly variesByCulture: Observable<boolean | undefined>;
+	public readonly variesBySegment: Observable<boolean | undefined>;
+	public readonly varies: Observable<boolean | undefined>;
 
 	abstract readonly contentTypeUnique: Observable<string | undefined>;
 
@@ -146,10 +146,16 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 */
 	public readonly languages = this.#languages.asObservable();
 
+	#segmentRepository = new UmbSegmentCollectionRepository(this);
+	#segments = new UmbArrayState<UmbSegmentCollectionItemModel>([], (x) => x.unique);
+	protected readonly _segments = this.#segments.asObservable();
+
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
 	// TODO: fix type error
 	public readonly variantOptions;
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected _variantOptionsFilter = (variantOption: VariantOptionModelType) => true;
 
 	#variantValidationContexts: Array<UmbValidationController> = [];
 	getVariantValidationContext(variantId: UmbVariantId): UmbValidationController | undefined {
@@ -197,35 +203,93 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		this.variantOptions = mergeObservables(
-			[this.varies, this.variants, this.languages],
-			([varies, variants, languages]) => {
-				// TODO: When including segments, when be aware about the case of segment varying when not culture varying. [NL]
-				if (varies === true) {
+			[this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments],
+			([variesByCulture, variesBySegment, variants, languages, segments]) => {
+				if ((variesByCulture || variesBySegment) === undefined) {
+					return [];
+				}
+
+				const varies = variesByCulture || variesBySegment;
+
+				// No variation
+				if (!varies) {
+					return [
+						{
+							variant: variants.find((x) => new UmbVariantId(x.culture, x.segment).isInvariant()),
+							language: languages.find((x) => x.isDefault),
+							culture: null,
+							segment: null,
+							unique: new UmbVariantId().toString(),
+						} as VariantOptionModelType,
+					];
+				}
+
+				// Only culture variation
+				if (variesByCulture && !variesBySegment) {
 					return languages.map((language) => {
 						return {
 							variant: variants.find((x) => x.culture === language.unique),
 							language,
-							// TODO: When including segments, this object should be updated to include a object for the segment. [NL]
-							// TODO: When including segments, the unique should be updated to include the segment as well. [NL]
-							unique: language.unique, // This must be a variantId string!
 							culture: language.unique,
 							segment: null,
+							unique: new UmbVariantId(language.unique).toString(),
 						} as VariantOptionModelType;
 					});
-				} else if (varies === false) {
-					return [
-						{
-							variant: variants.find((x) => x.culture === null),
-							language: languages.find((x) => x.isDefault),
-							culture: null,
-							segment: null,
-							unique: UMB_INVARIANT_CULTURE, // This must be a variantId string!
-						} as VariantOptionModelType,
-					];
 				}
+
+				// Only segment variation
+				if (!variesByCulture && variesBySegment) {
+					const invariantCulture = {
+						variant: variants.find((x) => new UmbVariantId(x.culture, x.segment).isInvariant()),
+						language: languages.find((x) => x.isDefault),
+						culture: null,
+						segment: null,
+						unique: new UmbVariantId().toString(),
+					} as VariantOptionModelType;
+
+					const segmentsForInvariantCulture = segments.map((segment) => {
+						return {
+							variant: variants.find((x) => x.culture === null && x.segment === segment.unique),
+							language: languages.find((x) => x.isDefault),
+							segmentInfo: segment,
+							culture: null,
+							segment: segment.unique,
+							unique: new UmbVariantId(null, segment.unique).toString(),
+						} as VariantOptionModelType;
+					});
+
+					return [invariantCulture, ...segmentsForInvariantCulture] as Array<VariantOptionModelType>;
+				}
+
+				// Culture and segment variation
+				if (variesByCulture && variesBySegment) {
+					return languages.flatMap((language) => {
+						const culture = {
+							variant: variants.find((x) => x.culture === language.unique),
+							language,
+							culture: language.unique,
+							segment: null,
+							unique: new UmbVariantId(language.unique).toString(),
+						} as VariantOptionModelType;
+
+						const segmentsForCulture = segments.map((segment) => {
+							return {
+								variant: variants.find((x) => x.culture === language.unique && x.segment === segment.unique),
+								language,
+								segmentInfo: segment,
+								culture: language.unique,
+								segment: segment.unique,
+								unique: new UmbVariantId(language.unique, segment.unique).toString(),
+							} as VariantOptionModelType;
+						});
+
+						return [culture, ...segmentsForCulture] as Array<VariantOptionModelType>;
+					});
+				}
+
 				return [] as Array<VariantOptionModelType>;
 			},
-		);
+		).pipe(map((options) => options.filter((option) => this._variantOptionsFilter(option))));
 
 		this.observe(
 			this.variantOptions,
@@ -281,12 +345,18 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		this.loadLanguages();
+		this.#loadSegments();
 	}
 
 	public async loadLanguages() {
 		// TODO: If we don't end up having a Global Context for languages, then we should at least change this into using a asObservable which should be returned from the repository. [Nl]
 		const { data } = await this.#languageRepository.requestCollection({});
 		this.#languages.setValue(data?.items ?? []);
+	}
+
+	async #loadSegments() {
+		const { data } = await this.#segmentRepository.requestCollection({});
+		this.#segments.setValue(data?.items ?? []);
 	}
 
 	protected override async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
@@ -582,23 +652,34 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		options: VariantOptionModelType[];
 		selected: string[];
 	}> {
-		const options = await firstValueFrom(this.variantOptions);
+		const options = (await firstValueFrom(this.variantOptions)).filter((option) => option.segment === null);
 
 		const activeVariants = this.splitView.getActiveVariants();
 		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
 		const changedVariantIds = this._data.getChangedVariants();
-		const selectedVariantIds = activeVariantIds.concat(changedVariantIds);
+		const activeAndChangedVariantIds = [...activeVariantIds, ...changedVariantIds];
+
+		// if a segment has been changed, we select the "parent" culture variant as it is currently only possible to select between cultures in the dialogs
+		const changedParentCultureVariantIds = activeAndChangedVariantIds
+			.filter((x) => x.segment !== null)
+			.map((x) => x.toSegmentInvariant());
+
+		const selectedVariantIds = [...activeAndChangedVariantIds, ...changedParentCultureVariantIds];
 
 		const writableSelectedVariantIds = selectedVariantIds.filter(
 			(x) => this.readOnlyGuard.getIsPermittedForVariant(x) === false,
 		);
 
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
-		const selected = writableSelectedVariantIds.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
+		const selected = writableSelectedVariantIds
+			.map((variantId) => variantId.toString())
+			.filter((variantId, index, all) => all.indexOf(variantId) === index);
+
+		const uniqueSelected = [...new Set(selected)];
 
 		return {
 			options,
-			selected,
+			selected: uniqueSelected,
 		};
 	}
 
@@ -650,7 +731,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 					UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 				);
 			});
-			throw new Error('All variants must have a name');
+			throw new Error(
+				'All variants must have a name, these variants are missing a name: ' +
+					variantsWithoutAName.map((x) => (x.culture ?? 'invariant') + '_' + (x.segment ?? '')).join(', '),
+			);
 		}
 	}
 
@@ -738,6 +822,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 
 		const saveData = await this.constructSaveData(variantIds);
+
 		await this.runMandatoryValidationForSaveData(saveData, variantIds);
 		if (this.#validateOnSubmit) {
 			await this.askServerToValidate(saveData, variantIds);

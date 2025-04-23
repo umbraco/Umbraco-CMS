@@ -207,14 +207,14 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		});
 	}
 
-	#onVaryByCultureChange(event: UUIBooleanInputEvent) {
-		const variesByCulture = event.target.checked;
-		this.updateValue({ variesByCulture });
+	#onShareAcrossCulturesChange(event: UUIBooleanInputEvent) {
+		const sharedAcrossCultures = event.target.checked;
+		this.updateValue({ variesByCulture: !sharedAcrossCultures });
 	}
 
-	#onVaryBySegmentChange(event: UUIBooleanInputEvent) {
-		const variesBySegment = event.target.checked;
-		this.updateValue({ variesBySegment });
+	#onShareAcrossSegmentsChange(event: UUIBooleanInputEvent) {
+		const sharedAcrossSegments = event.target.checked;
+		this.updateValue({ variesBySegment: !sharedAcrossSegments });
 	}
 
 	override render() {
@@ -424,9 +424,9 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		return html`
 			<div>
 				<uui-toggle
-					@change=${this.#onVaryByCultureChange}
-					.checked=${this._data?.variesByCulture ?? false}
-					label=${this.localize.term('contentTypeEditor_cultureVariantLabel')}></uui-toggle>
+					@change=${this.#onShareAcrossCulturesChange}
+					.checked=${!(this._data?.variesByCulture ?? false)}
+					label="Shared across cultures"></uui-toggle>
 			</div>
 		`;
 	}
@@ -435,9 +435,9 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		return html`
 			<div>
 				<uui-toggle
-					@change=${this.#onVaryBySegmentChange}
-					.checked=${this._data?.variesBySegment ?? false}
-					label=${this.localize.term('contentTypeEditor_segmentVariantLabel')}></uui-toggle>
+					@change=${this.#onShareAcrossSegmentsChange}
+					.checked=${!(this._data?.variesBySegment ?? false)}
+					label="Shared across segments"></uui-toggle>
 			</div>
 		`;
 	}

@@ -71,7 +71,7 @@ public partial class ContentBlueprintEditingServiceTests
     [TestCase(false)]
     public async Task Can_Create_From_Content_With_Explicit_Key(bool variant)
     {
-        var content = await (variant ? CreateVariantContent() : CreateInvariantContent());
+        var content = await (variant ? CreateCultureVariantContent() : CreateInvariantContent());
 
         var key = Guid.NewGuid();
         const string name = "Test Create From Content Blueprint";
@@ -105,7 +105,7 @@ public partial class ContentBlueprintEditingServiceTests
     [TestCase(false)]
     public async Task Cannot_Create_From_Content_With_Duplicate_Name(bool variant)
     {
-        var content = await (variant ? CreateVariantContent() : CreateInvariantContent());
+        var content = await (variant ? CreateCultureVariantContent() : CreateInvariantContent());
 
         const string name = "Test Create From Content Blueprint";
 
