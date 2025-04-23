@@ -182,12 +182,6 @@ export class UmbDocumentPublishingServerDataSource {
 					scheduledUnpublishDate: variant.scheduledUnpublishDate || null,
 				};
 			}),
-			urls: data.urls.map((url) => {
-				return {
-					culture: url.culture || null,
-					url: url.url,
-				};
-			}),
 			template: data.template ? { unique: data.template.id } : null,
 			documentType: {
 				unique: data.documentType.id,
