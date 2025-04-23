@@ -226,13 +226,34 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 		if (!variantIds.length) return;
 
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		const localize = new UmbLocalizationController(this);
+
+		const primaryVariantName = await this.observe(this.#documentWorkspaceContext.name(variantIds[0])).asPromise();
+
+		const waitNotice = notificationContext?.peek('warning', {
+			data: {
+				headline: localize.term('publish_publishAll', primaryVariantName),
+				message: localize.term('publish_inProgress'),
+			},
+		});
+
 		const { error } = await this.#publishingRepository.publishWithDescendants(
 			unique,
 			variantIds,
 			result.includeUnpublishedDescendants ?? false,
 		);
 
+		waitNotice?.close();
+
 		if (!error) {
+			notificationContext?.peek('positive', {
+				data: {
+					headline: localize.term('publish_publishAll', primaryVariantName),
+					message: localize.term('publish_nodePublishAll', primaryVariantName),
+				},
+			});
+
 			// reload the document so all states are updated after the publish operation
 			await this.#documentWorkspaceContext.reload();
 			this.#loadAndProcessLastPublished();
