@@ -95,7 +95,7 @@ export class UmbModalRouteRegistrationController<
 				context?.addendum,
 				(addendum) => {
 					this.#addendum = addendum;
-					this.#registerModal();
+					this.#registerModal().catch(() => undefined);
 				},
 				'observeAddendum',
 			);
@@ -103,7 +103,7 @@ export class UmbModalRouteRegistrationController<
 
 		this.#init = this.consumeContext(UMB_ROUTE_CONTEXT, (_routeContext) => {
 			this.#routeContext = _routeContext;
-			this.#registerModal();
+			this.#registerModal().catch(() => undefined);
 		}).asPromise({ preventTimeout: true });
 	}
 
