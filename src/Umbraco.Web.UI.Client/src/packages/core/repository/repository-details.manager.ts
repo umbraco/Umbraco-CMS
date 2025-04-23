@@ -7,7 +7,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
 
-interface UmbRepositoryStatus {
+interface UmbRepositoryRequestStatus {
 	state: {
 		type: 'success' | 'error' | 'loading';
 		error?: string;
@@ -36,7 +36,7 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 		return this.#entries.asObservablePart((items) => items.find((item) => item.unique === unique));
 	}
 
-	#statuses = new UmbArrayState<UmbRepositoryStatus>([], (x) => x.unique);
+	#statuses = new UmbArrayState<UmbRepositoryRequestStatus>([], (x) => x.unique);
 	statuses = this.#statuses.asObservable();
 
 	/**
@@ -179,7 +179,7 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 					error: '#general_notFound',
 				},
 				unique,
-			} as UmbRepositoryStatus);
+			} as UmbRepositoryRequestStatus);
 			this.#entries.removeOne(unique);
 			this.removeUmbControllerByAlias('observeEntry_' + unique);
 		}
