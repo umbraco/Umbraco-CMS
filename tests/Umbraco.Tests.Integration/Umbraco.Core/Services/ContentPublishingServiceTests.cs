@@ -91,25 +91,23 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             Key = documentKey,
             ContentTypeKey = contentType.Key,
             ParentKey = parentKey,
+            Properties = [],
             Variants =
             [
                 new VariantModel
                 {
                     Name = langEn.CultureName,
-                    Culture = langEn.IsoCode,
-                    Properties = Enumerable.Empty<PropertyValueModel>(),
+                    Culture = langEn.IsoCode
                 },
                 new VariantModel
                 {
                     Name = langDa.CultureName,
-                    Culture = langDa.IsoCode,
-                    Properties = Enumerable.Empty<PropertyValueModel>(),
+                    Culture = langDa.IsoCode
                 },
                 new VariantModel
                 {
                     Name = langBe.CultureName,
-                    Culture = langBe.IsoCode,
-                    Properties = Enumerable.Empty<PropertyValueModel>(),
+                    Culture = langBe.IsoCode
                 }
             ]
         };
@@ -163,7 +161,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         {
             Key = documentKey,
             ContentTypeKey = contentType.Key,
-            InvariantName = "Test",
+            Variants = [new () { Name = "Test" }],
             ParentKey = parentKey,
         };
 

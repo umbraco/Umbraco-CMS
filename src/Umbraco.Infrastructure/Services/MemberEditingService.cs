@@ -77,12 +77,16 @@ internal sealed class MemberEditingService : IMemberEditingService
             return Attempt.FailWithStatus(status, new MemberCreateResult());
         }
 
+        // this should be validated already so it's OK to throw an exception here
+        var memberName = createModel.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name
+                         ?? throw new ArgumentException("Expected an invariant variant for the member name.", nameof(createModel));
+
         var identityMember = MemberIdentityUser.CreateNew(
             createModel.Username,
             createModel.Email,
             memberType.Alias,
             createModel.IsApproved,
-            createModel.InvariantName,
+            memberName,
             createModel.Key);
 
         IdentityResult createResult = await _memberManager.CreateAsync(identityMember, createModel.Password);
@@ -219,7 +223,7 @@ internal sealed class MemberEditingService : IMemberEditingService
 
     private async Task<MemberEditingOperationStatus> ValidateMemberDataAsync(MemberEditingModelBase model, Guid? memberKey, string? password)
     {
-        if (model.InvariantName.IsNullOrWhiteSpace())
+        if (model.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name.IsNullOrWhiteSpace() is not false)
         {
             return MemberEditingOperationStatus.InvalidName;
         }

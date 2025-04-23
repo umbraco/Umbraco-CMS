@@ -43,33 +43,16 @@ internal sealed class ContentEditingServiceTests : UmbracoIntegrationTestWithCon
         {
             Key = documentKey,
             ContentTypeKey = variantTestData.contentType.Key,
-            Variants = new[]
-            {
-                new VariantModel
-                {
-                    Name = variantTestData.LangEn.CultureName,
-                    Culture = variantTestData.LangEn.IsoCode,
-                    Properties = new[]
-                    {
-                        new PropertyValueModel
-                        {
-                            Alias = propertyAlias, Value = originalPropertyValue
-                        }
-                    }
-                },
-                new VariantModel
-                {
-                    Name = variantTestData.LangDa.CultureName,
-                    Culture = variantTestData.LangDa.IsoCode,
-                    Properties = new[]
-                    {
-                        new PropertyValueModel
-                        {
-                            Alias = propertyAlias, Value = originalPropertyValue
-                        }
-                    }
-                }
-            }
+            Properties =
+            [
+                new () { Alias = propertyAlias, Value = originalPropertyValue, Culture = variantTestData.LangEn.IsoCode },
+                new () { Alias = propertyAlias, Value = originalPropertyValue, Culture = variantTestData.LangDa.IsoCode },
+            ],
+            Variants =
+            [
+                new () { Name = variantTestData.LangEn.CultureName, Culture = variantTestData.LangEn.IsoCode },
+                new () { Name = variantTestData.LangDa.CultureName, Culture = variantTestData.LangDa.IsoCode }
+            ]
         };
 
         await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -78,15 +61,14 @@ internal sealed class ContentEditingServiceTests : UmbracoIntegrationTestWithCon
 
         var updateModel = new ContentUpdateModel
         {
-            Variants = new[]
-            {
-                new VariantModel
-                {
-                    Name = updatedPropertyValue,
-                    Culture = variantTestData.LangEn.IsoCode,
-                    Properties = new[] { new PropertyValueModel { Alias = propertyAlias, Value = updatedPropertyValue } }
-                }
-            }
+            Properties =
+            [
+                new () { Alias = propertyAlias, Value = updatedPropertyValue, Culture = variantTestData.LangEn.IsoCode },
+            ],
+            Variants =
+            [
+                new () { Name = updatedPropertyValue, Culture = variantTestData.LangEn.IsoCode }
+            ]
         };
 
         await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
@@ -94,7 +76,7 @@ internal sealed class ContentEditingServiceTests : UmbracoIntegrationTestWithCon
         var updatedContent = ContentService.GetById(documentKey)!;
 
         Assert.AreEqual(originalPropertyValue, updatedContent.GetValue(propertyAlias,variantTestData.LangDa.IsoCode));
-        Assert.AreEqual(updatedPropertyValue, updatedContent.GetValue(propertyAlias,variantTestData.LangEn.IsoCode));
+        Assert.AreEqual(updatedPropertyValue, updatedContent.GetValue(propertyAlias, variantTestData.LangEn.IsoCode));
 
         Assert.AreEqual(variantTestData.LangDa.CultureName, updatedContent.GetCultureName(variantTestData.LangDa.IsoCode));
         Assert.AreEqual(updatedPropertyValue, updatedContent.GetCultureName(variantTestData.LangEn.IsoCode));

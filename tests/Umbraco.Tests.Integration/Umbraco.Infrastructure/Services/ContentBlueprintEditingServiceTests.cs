@@ -25,12 +25,12 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Initial Blueprint Name",
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = "Initial Blueprint Name" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The initial title" },
-                new PropertyValueModel { Alias = "text", Value = "The initial text" },
-            },
+                new PropertyValueModel { Alias = "text", Value = "The initial text" }
+            ],
         };
 
         var result = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -46,31 +46,17 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantProperties = new[]
-            {
+            Properties =
+            [
                 new PropertyValueModel { Alias = "invariantTitle", Value = "The initial invariant title" },
-            },
-            Variants = new[]
-            {
-                new VariantModel
-                {
-                    Culture = "en-US",
-                    Name = "Initial Blueprint English Name",
-                    Properties = new[]
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The initial English title" },
-                    },
-                },
-                new VariantModel
-                {
-                    Culture = "da-DK",
-                    Name = "Initial Blueprint Danish Name",
-                    Properties = new[]
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The initial Danish title" },
-                    },
-                },
-            },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The initial English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The initial Danish title", Culture = "da-DK" }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "Initial Blueprint English Name" },
+                new VariantModel { Culture = "da-DK", Name = "Initial Blueprint Danish Name" }
+            ],
         };
 
         var result = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -85,12 +71,12 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
             Key = blueprintKey,
             ContentTypeKey = ContentType.Key,
             ParentKey = containerKey,
-            InvariantName = "Blueprint #1",
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = "Blueprint #1" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The title value" },
                 new PropertyValueModel { Alias = "author", Value = "The author value" }
-            }
+            ]
         };
         return createModel;
     }
@@ -99,12 +85,12 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
     {
         var createModel = new ContentBlueprintUpdateModel
         {
-            InvariantName = "Blueprint #1 updated",
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = "Blueprint #1 updated" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The title value updated" },
                 new PropertyValueModel { Alias = "author", Value = "The author value updated" }
-            }
+            ]
         };
         return createModel;
     }

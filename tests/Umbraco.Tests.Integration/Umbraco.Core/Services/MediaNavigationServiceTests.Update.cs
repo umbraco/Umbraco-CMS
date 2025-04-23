@@ -21,7 +21,7 @@ internal sealed partial class MediaNavigationServiceTests
 
         var updateModel = new MediaUpdateModel
         {
-            InvariantName = "Updated Album",
+            Variants = [new () { Name = "Updated Album" }]
         };
 
         // Act
