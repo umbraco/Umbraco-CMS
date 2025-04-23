@@ -820,7 +820,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		} else {
 			/* If there are multiple variants but no modal token is set 
 			we will save the variants that would have been preselected in the modal. 
-			These are based on what variants have edited */
+			These are based on the variants that have been edited */
 			variantIds = selected.map((x) => UmbVariantId.FromString(x));
 		}
 
