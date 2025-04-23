@@ -81,13 +81,16 @@ export abstract class UmbTreeRepositoryBase<
 	async requestTreeRootItems(args: TreeRootItemsRequestArgsType) {
 		await this._init;
 
-		const { data, error: _error } = await this._treeSource.getRootItems(args);
-		const error: any = _error;
+		const { data, error } = await this._treeSource.getRootItems(args);
+		if (!this._treeStore) {
+			return { error: { type: 'client', title: 'Tree store is not available', status: 400 } as UmbProblemDetails };
+		}
 		if (data) {
-			this._treeStore!.appendItems(data.items);
+			this._treeStore.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this._treeStore!.rootItems };
+		// TODO: Notice we are casting the error here, is that right?
+		return { data, error: error as unknown as UmbProblemDetails, asObservable: () => this._treeStore!.rootItems };
 	}
 
 	/**
