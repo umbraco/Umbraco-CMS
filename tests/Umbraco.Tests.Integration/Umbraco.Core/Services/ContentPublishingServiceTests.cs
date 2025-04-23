@@ -103,48 +103,31 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             Key = documentKey,
             ContentTypeKey = contentType.Key,
             ParentKey = parentKey,
-            Properties = [],
+            Properties = [
+                new PropertyValueModel
+                {
+                    Alias = "title",
+                    Value = englishTitleValue,
+                    Culture = langEn.IsoCode
+                },
+                new PropertyValueModel
+                {
+                    Alias = "title",
+                    Value = "Test titel",
+                    Culture = langDa.IsoCode
+                },
+                new PropertyValueModel
+                {
+                    Alias = "title",
+                    Value = "Titel van de test",
+                    Culture = langBe.IsoCode
+                }
+            ],
             Variants =
             [
-                new VariantModel
-                {
-                    Name = langEn.CultureName,
-                    Culture = langEn.IsoCode,
-                    Properties =
-                    [
-                        new PropertyValueModel
-                        {
-                            Alias = "title",
-                            Value = englishTitleValue,
-                        }
-                    ]
-                },
-                new VariantModel
-                {
-                    Name = langDa.CultureName,
-                    Culture = langDa.IsoCode,
-                    Properties =
-                    [
-                        new PropertyValueModel
-                        {
-                            Alias = "title",
-                            Value = "Test titel",
-                        }
-                    ]
-                },
-                new VariantModel
-                {
-                    Name = langBe.CultureName,
-                    Culture = langBe.IsoCode,
-                    Properties =
-                    [
-                        new PropertyValueModel
-                        {
-                            Alias = "title",
-                            Value = "Titel van de test",
-                        }
-                    ]
-                }
+                new VariantModel { Name = langEn.CultureName, Culture = langEn.IsoCode },
+                new VariantModel { Name = langDa.CultureName, Culture = langDa.IsoCode },
+                new VariantModel { Name = langBe.CultureName, Culture = langBe.IsoCode }
             ]
         };
 
@@ -204,7 +187,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             ContentTypeKey = contentType.Key,
             Variants = [new () { Name = "Test" }],
             ParentKey = parentKey,
-            InvariantProperties =
+            Properties =
             [
                 new PropertyValueModel
                 {
