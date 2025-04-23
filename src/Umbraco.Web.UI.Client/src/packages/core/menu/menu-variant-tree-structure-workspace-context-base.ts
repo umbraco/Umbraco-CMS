@@ -13,7 +13,7 @@ interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 
 export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends UmbContextBase {
 	// TODO: add correct interface
-	#workspaceContext?: any;
+	#workspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
 	#args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs;
 
 	#structure = new UmbArrayState<UmbVariantStructureItemModel>([], (x) => x.unique);
@@ -29,21 +29,26 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		super(host, 'UmbMenuStructureWorkspaceContext');
 		this.#args = args;
 
+		// TODO: Implement a Context Token that supports parentUnique, parentEntityType, entityType
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			this.#workspaceContext.observe(this.#workspaceContext.unique, (value) => {
-				if (!value) return;
-				this.#requestStructure();
-			});
+			this.observe(
+				this.#workspaceContext?.unique,
+				(value) => {
+					if (!value) return;
+					this.#requestStructure();
+				},
+				'observeUnique',
+			);
 		});
 	}
 
 	async #requestStructure() {
 		const isNew = this.#workspaceContext?.getIsNew();
-		const uniqueObservable = isNew ? this.#workspaceContext?.parentUnique : this.#workspaceContext?.unique;
-		const entityTypeObservable = isNew ? this.#workspaceContext?.parentEntityType : this.#workspaceContext?.entityType;
+		const uniqueObservable = isNew ? (this.#workspaceContext as any)?.parentUnique : this.#workspaceContext?.unique;
+		const entityTypeObservable = isNew
+			? (this.#workspaceContext as any)?.parentEntityType
+			: (this.#workspaceContext as any)?.entityType;
 
 		let structureItems: Array<UmbVariantStructureItemModel> = [];
 
