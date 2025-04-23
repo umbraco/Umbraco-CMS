@@ -320,7 +320,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
     // Generates the cache tags for a given CacheNode
     // We use the tags to be able to clear all cache entries that are related to a given content item.
-    // Tags for now are content/media, draft/published and all its ancestors, so we can clear when ChangeType.TreeChange
+    // Tags for now are only content/media, but can be expanded with draft/published later.
     private static HashSet<string> GenerateTags(Guid? key) => key is null ? [] : [Constants.Cache.Tags.Content];
 
     public async Task DeleteItemAsync(IContentBase content)

@@ -141,9 +141,6 @@ internal class MediaCacheService : IMediaCacheService
     public async Task RefreshMediaAsync(IMedia media)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        // Always set draft node
-        // We have nodes seperate in the cache, cause 99% of the time, you are only using one
-        // and thus we won't get too much data when retrieving from the cache.
         var cacheNode = _cacheNodeFactory.ToContentCacheNode(media);
         await _databaseCacheRepository.RefreshMediaAsync(cacheNode);
         scope.Complete();
@@ -286,6 +283,6 @@ internal class MediaCacheService : IMediaCacheService
 
     // Generates the cache tags for a given CacheNode
     // We use the tags to be able to clear all cache entries that are related to a given content item.
-    // Tags for now are content/media, draft/published and all its ancestors, so we can clear when ChangeType.TreeChange
+    // Tags for now are only content/media, but can be expanded with draft/published later.
     private static HashSet<string> GenerateTags(Guid? key) => key is null ? [] : [Constants.Cache.Tags.Media];
 }
