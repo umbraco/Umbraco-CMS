@@ -49,6 +49,7 @@ public static class UmbracoBuilderExtensions
                 : provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
         });
         builder.Services.AddSingleton<IRequestCultureService, RequestCultureService>();
+        builder.Services.AddSingleton<IRequestSegmmentService, RequestSegmentService>();
         builder.Services.AddSingleton<IRequestRoutingService, RequestRoutingService>();
         builder.Services.AddSingleton<IRequestRedirectService, RequestRedirectService>();
         builder.Services.AddSingleton<IRequestPreviewService, RequestPreviewService>();
