@@ -250,6 +250,22 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 }
               },
               {
+                "name": "Accept-Segment",
+                "in": "header",
+                "description": "Defines the segment to return. Use this when querying segment variant content items.",
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "Default": {
+                    "value": ""
+                  },
+                  "Segment One": {
+                    "value": "segment-one"
+                  }
+                }
+              },
+              {
                 "name": "Api-Key",
                 "in": "header",
                 "description": "API key specified through configuration to authorize access to the API.",
@@ -389,6 +405,22 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 }
               },
               {
+                "name": "Accept-Segment",
+                "in": "header",
+                "description": "Defines the segment to return. Use this when querying segment variant content items.",
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "Default": {
+                    "value": ""
+                  },
+                  "Segment One": {
+                    "value": "segment-one"
+                  }
+                }
+              },
+              {
                 "name": "Api-Key",
                 "in": "header",
                 "description": "API key specified through configuration to authorize access to the API.",
@@ -516,6 +548,22 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                   },
                   "English culture": {
                     "value": "en-us"
+                  }
+                }
+              },
+              {
+                "name": "Accept-Segment",
+                "in": "header",
+                "description": "Defines the segment to return. Use this when querying segment variant content items.",
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "Default": {
+                    "value": ""
+                  },
+                  "Segment One": {
+                    "value": "segment-one"
                   }
                 }
               },
@@ -650,6 +698,22 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                   },
                   "English culture": {
                     "value": "en-us"
+                  }
+                }
+              },
+              {
+                "name": "Accept-Segment",
+                "in": "header",
+                "description": "Defines the segment to return. Use this when querying segment variant content items.",
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "Default": {
+                    "value": ""
+                  },
+                  "Segment One": {
+                    "value": "segment-one"
                   }
                 }
               },

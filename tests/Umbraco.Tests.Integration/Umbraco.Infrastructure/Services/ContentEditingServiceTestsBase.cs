@@ -74,7 +74,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         return contentType;
     }
 
-    protected async Task<IContentType> CreateVariantContentType()
+    protected async Task<IContentType> CreateVariantContentType(ContentVariation variation = ContentVariation.Culture)
     {
         var language = new LanguageBuilder()
             .WithCultureInfo("da-DK")
@@ -84,13 +84,13 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         var contentType = new ContentTypeBuilder()
             .WithAlias("cultureVariationTest")
             .WithName("Culture Variation Test")
-            .WithContentVariation(ContentVariation.Culture)
+            .WithContentVariation(variation)
             .AddPropertyType()
-                .WithAlias("variantTitle")
-                .WithName("Variant Title")
-                .WithMandatory(true)
-                .WithVariations(ContentVariation.Culture)
-                .Done()
+            .WithAlias("variantTitle")
+            .WithName("Variant Title")
+            .WithMandatory(true)
+            .WithVariations(variation)
+            .Done()
             .AddPropertyType()
                 .WithAlias("invariantTitle")
                 .WithName("Invariant Title")
@@ -101,7 +101,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
                 .WithName("Variant Label")
                 .WithDataTypeId(Constants.DataTypes.LabelString)
                 .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
-                .WithVariations(ContentVariation.Culture)
+                .WithVariations(variation)
                 .Done()
             .Build();
         contentType.AllowedAsRoot = true;
@@ -131,7 +131,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         return result.Result.Content!;
     }
 
-    protected async Task<IContent> CreateVariantContent()
+    protected async Task<IContent> CreateCultureVariantContent()
     {
         var contentType = await CreateVariantContentType();
 
@@ -161,6 +161,55 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
                     Properties = new[]
                     {
                         new PropertyValueModel { Alias = "variantTitle", Value = "The initial Danish title" },
+                    },
+                },
+            },
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        return result.Result.Content!;
+    }
+
+    protected async Task<IContent> CreateSegmentVariantContent()
+    {
+        var contentType = await CreateVariantContentType(ContentVariation.Segment);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The initial invariant title" },
+            },
+            Variants = new[]
+            {
+                new VariantModel
+                {
+                    Segment = null,
+                    Name = "The Name",
+                    Properties = new[]
+                    {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The initial default title" },
+                    },
+                },
+                new VariantModel
+                {
+                    Segment = "seg-1",
+                    Name = "The Name",
+                    Properties = new[]
+                    {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The initial seg-1 title" },
+                    },
+                },
+                new VariantModel
+                {
+                    Segment = "seg-2",
+                    Name = "The Name",
+                    Properties = new[]
+                    {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The initial seg-2 title" },
                     },
                 },
             },

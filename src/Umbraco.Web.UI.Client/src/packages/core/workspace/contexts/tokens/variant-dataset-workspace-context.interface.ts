@@ -20,6 +20,9 @@ export interface UmbVariantDatasetWorkspaceContext<VariantType extends UmbEntity
 	splitView: UmbWorkspaceSplitViewManager;
 	getVariant(variantId: UmbVariantId): VariantType | undefined;
 	readonly readOnlyGuard: UmbReadOnlyVariantGuardManager;
+	varies: Observable<boolean | undefined>;
+	variesByCulture: Observable<boolean | undefined>;
+	variesBySegment: Observable<boolean | undefined>;
 
 	// Property:
 	// This one is async cause it needs to structure to provide this data: [NL]
