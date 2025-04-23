@@ -265,7 +265,7 @@ export class UmbContentTypeStructureManager<
 		const compositionUniques = contentTypeCompositions?.map((x) => x.contentType.unique) ?? [];
 		const newUniques = [ownerUnique, ...compositionUniques];
 		this.#contentTypes.filter((x) => newUniques.includes(x.unique));
-		this.#repoManager?.setUniques(newUniques);
+		this.#repoManager!.setUniques(newUniques);
 	}
 
 	/** Public methods for consuming structure: */
@@ -793,12 +793,11 @@ export class UmbContentTypeStructureManager<
 		this.#init = new Promise((resolve) => {
 			this.#initResolver = resolve;
 		});
-		this.#contentTypes.setValue([]);
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];
-		this.#contentTypes.setValue([]);
 		this.#containers.setValue([]);
 		this.#repoManager?.clear();
+		this.#contentTypes.setValue([]);
 	}
 
 	public override destroy() {
