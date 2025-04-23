@@ -42,13 +42,20 @@ describe('UmbContextProviderController', () => {
 	});
 
 	it('works with UmbContextConsumer', (done) => {
+		let callbackCount = 0;
+
 		const localConsumer = new UmbContextConsumer(
 			element,
 			'my-test-context',
 			(_instance: UmbTestContextProviderControllerClass | undefined) => {
-				expect(_instance?.prop).to.eq('value from provider');
-				done();
-				localConsumer.hostDisconnected();
+				callbackCount++;
+				if (callbackCount === 1) {
+					expect(_instance?.prop).to.eq('value from provider');
+					localConsumer.hostDisconnected();
+				} else {
+					expect(_instance).to.be.undefined;
+					done();
+				}
 			},
 		);
 		localConsumer.hostConnected();
