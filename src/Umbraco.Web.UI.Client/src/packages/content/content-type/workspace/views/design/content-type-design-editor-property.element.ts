@@ -65,6 +65,9 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	@property({ attribute: false })
 	public ownerVariesByCulture?: boolean;
 
+	@property({ attribute: false })
+	public ownerVariesBySegment?: boolean;
+
 	@property({ type: Boolean, reflect: true, attribute: '_inherited' })
 	public _inherited?: boolean;
 
@@ -301,24 +304,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		return this.property
 			? html`<div class="types">
 					${this.property.dataType?.unique ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
-					${this.ownerVariesByCulture
-						? this.property.variesByCulture
-							? html`<uui-tag look="default">
-									<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term(
-										'contentTypeEditor_cultureVariantLabel',
-									)}
-								</uui-tag>`
-							: html`<uui-tag look="default">
-									<uui-icon name="icon-shared-value"></uui-icon> ${this.localize.term(
-										'contentTypeEditor_cultureInvariantLabel',
-									)}
-								</uui-tag>`
-						: nothing}
-					${this.property.variesBySegment
-						? html`<uui-tag look="default">
-								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_segmentVariantLabel')}
-							</uui-tag>`
-						: nothing}
+					${this.#renderVariantTags()}
 					${this.property.appearance?.labelOnTop == true
 						? html`<uui-tag look="default">
 								<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>
@@ -346,6 +332,40 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 						: nothing}
 				</div>`
 			: nothing;
+	}
+
+	#renderVariantTags() {
+		if (!this.property) return nothing;
+
+		if (
+			this.ownerVariesByCulture &&
+			this.ownerVariesBySegment &&
+			!this.property.variesByCulture &&
+			!this.property.variesBySegment
+		) {
+			return html`
+				<uui-tag look="default">
+					<uui-icon name="icon-shared-value"></uui-icon> ${this.localize.term(
+						'contentTypeEditor_cultureAndVariantInvariantLabel',
+					)}
+				</uui-tag>
+			`;
+		}
+
+		if (this.ownerVariesByCulture && !this.property.variesByCulture) {
+			return html`<uui-tag look="default">
+				<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureInvariantLabel')}
+			</uui-tag>`;
+		}
+
+		if (this.ownerVariesBySegment && !this.property.variesBySegment) {
+			return html`<uui-tag look="default">
+				<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_segmentInvariantLabel')}
+			</uui-tag>`;
+		}
+
+		// Not shared:
+		return nothing;
 	}
 
 	static override styles = [

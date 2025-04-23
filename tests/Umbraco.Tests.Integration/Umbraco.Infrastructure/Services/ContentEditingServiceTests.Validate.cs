@@ -56,7 +56,7 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Can_Validate_Valid_Variant_Content()
     {
-        var content = await CreateVariantContent();
+        var content = await CreateCultureVariantContent();
 
         var validateContentUpdateModel = new ValidateContentUpdateModel
         {
@@ -95,7 +95,7 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Will_Fail_Invalid_Variant_Content()
     {
-        var content = await CreateVariantContent();
+        var content = await CreateCultureVariantContent();
 
         var validateContentUpdateModel = new ValidateContentUpdateModel
         {
@@ -136,7 +136,7 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Will_Succeed_For_Invalid_Variant_Content_Without_Access_To_Edited_Culture()
     {
-        var content = await CreateVariantContent();
+        var content = await CreateCultureVariantContent();
 
         IUser englishEditor = await CreateEnglishLanguageOnlyEditor();
 
