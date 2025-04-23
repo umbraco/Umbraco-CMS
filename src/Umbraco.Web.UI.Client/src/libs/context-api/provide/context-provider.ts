@@ -65,7 +65,7 @@ export class UmbContextProvider<
 	public hostDisconnected(): void {
 		this.#eventTarget.removeEventListener(UMB_CONTEXT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
 		this.#eventTarget.removeEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this.#handleDebugContextRequest);
-		// Out-commented for now, but kept if we like to reintroduce this:
+
 		this.#eventTarget.dispatchEvent(new UmbContextUnprovidedEventImplementation(this.#contextAlias, this.#instance));
 	}
 

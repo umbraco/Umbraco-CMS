@@ -199,13 +199,6 @@ export class UmbContextConsumer<
 		);
 		(this.#skipHost ? this._retrieveHost()?.parentNode : this._retrieveHost())?.dispatchEvent(event);
 
-		/*
-		let i: number = this.#timeoutFrames ?? 1;
-		while (i-- > 0 && this.#promiseRejecter) {
-			await new Promise((resolve) => requestAnimationFrame(resolve));
-		}
-		*/
-
 		if (this.#promiseResolver && this.#promiseOptions?.preventTimeout !== true) {
 			this.#raf = requestAnimationFrame(() => {
 				// For unproviding, then setInstance to undefined here. [NL]
@@ -252,6 +245,7 @@ export class UmbContextConsumer<
 
 	#setupCurrentTarget() {
 		this.#currentTarget.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
+		// TODO: consider not listening if it does not have a Context....
 		this.#currentTarget.addEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
 	}
 
