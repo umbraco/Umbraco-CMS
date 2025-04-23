@@ -30,7 +30,21 @@ public interface IFileType
     /// <returns>
     /// The checksum stream.
     /// </returns>
+    [Obsolete("Use GetChecksumStreamAsync() instead. This will be removed in a future version.")]
     Stream GetChecksumStream(StringUdi udi);
+
+    /// <summary>
+    /// Gets the checksum stream in an asynchronous operation.
+    /// </summary>
+    /// <param name="udi">The UDI.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation. The task result contains the checksum stream.
+    /// </returns>
+    Task<Stream> GetChecksumStreamAsync(StringUdi udi, CancellationToken cancellationToken = default)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => Task.FromResult(GetChecksumStream(udi));
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Gets the file length in bytes or <c>-1</c> if not found.
@@ -39,7 +53,21 @@ public interface IFileType
     /// <returns>
     /// The file length in bytes or <c>-1</c> if not found.
     /// </returns>
+    [Obsolete("Use GetLengthAsync() instead. This will be removed in a future version.")]
     long GetLength(StringUdi udi);
+
+    /// <summary>
+    /// Gets the file length in bytes or <c>-1</c> if not found in an asynchronous operation.
+    /// </summary>
+    /// <param name="udi">The UDI.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation. The task result contains the file length in bytes or <c>-1</c> if not found.
+    /// </returns>
+    Task<long> GetLengthAsync(StringUdi udi, CancellationToken cancellationToken = default)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => Task.FromResult(GetLength(udi));
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Sets the stream as an asynchronous operation.
