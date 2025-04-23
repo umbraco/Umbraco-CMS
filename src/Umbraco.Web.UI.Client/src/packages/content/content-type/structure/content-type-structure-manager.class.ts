@@ -41,8 +41,10 @@ export class UmbContentTypeStructureManager<
 	T extends UmbContentTypeModel = UmbContentTypeModel,
 > extends UmbControllerBase {
 	#initResolver?: (result: T) => void;
-	#init = new Promise<T>((resolve) => {
+	#initRejection?: (reason: any) => void;
+	#init = new Promise<T>((resolve, reject) => {
 		this.#initResolver = resolve;
+		this.#initRejection = reject;
 	});
 
 	#editedTypes = new UmbArrayState<string, string>([], (x) => x);
@@ -184,6 +186,7 @@ export class UmbContentTypeStructureManager<
 		this.#clear();
 		this.#ownerContentTypeUnique = unique;
 		if (!unique) {
+			this.#initRejection?.(`Content Type structure manager could not load: ${unique}`);
 			return Promise.reject(
 				new Error('The unique identifier is missing. A valid unique identifier is required to load the content type.'),
 			);
@@ -201,7 +204,10 @@ export class UmbContentTypeStructureManager<
 
 		const repsonse = await this.#repository!.createScaffold(preset);
 		const { data } = repsonse;
-		if (!data) return { error: repsonse.error };
+		if (!data) {
+			this.#initRejection?.(`Content Type structure manager could not create scaffold`);
+			return { error: repsonse.error };
+		}
 
 		this.#ownerContentTypeUnique = data.unique;
 
@@ -790,6 +796,7 @@ export class UmbContentTypeStructureManager<
 	}
 
 	#clear() {
+		this.#initRejection?.(`Content Type structure manager could not load: ${this.#ownerContentTypeUnique}`);
 		this.#init = new Promise((resolve) => {
 			this.#initResolver = resolve;
 		});
