@@ -23,6 +23,9 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 		this.onlyElementTypes = config.getValueByAlias('onlyPickElementTypes') ?? false;
 	}
 
+	@property({ type: Boolean, attribute: 'readonly' })
+	readonly = false;
+
 	@state()
 	min = 0;
 
@@ -43,6 +46,7 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 				.min=${this.min}
 				.max=${this.max}
 				.value=${this.value}
+				.readonly=${this.readonly}
 				.elementTypesOnly=${this.onlyElementTypes ?? false}
 				@change=${this.#onChange}>
 			</umb-input-document-type>
