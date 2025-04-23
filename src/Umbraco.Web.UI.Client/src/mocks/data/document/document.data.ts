@@ -11,12 +11,7 @@ export type UmbMockDocumentModel = DocumentResponseModel & DocumentTreeItemRespo
 export const data: Array<UmbMockDocumentModel> = [
 	{
 		ancestors: [],
-		urls: [
-			{
-				culture: 'en-US',
-				url: '/',
-			},
-		],
+		urls: [],
 		template: null,
 		id: 'the-simplest-document-id',
 		createDate: '2023-02-06T15:32:05.350038',

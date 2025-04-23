@@ -8,7 +8,7 @@ import { css, customElement, html, nothing, query, state, when } from '@umbraco-
 import { isUmbracoFolder, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { umbBindToValidation, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { umbConfirmModal, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbDocumentDetailRepository } from '@umbraco-cms/backoffice/document';
+import { UmbDocumentDetailRepository, UmbDocumentUrlRepository } from '@umbraco-cms/backoffice/document';
 import { UmbMediaDetailRepository } from '@umbraco-cms/backoffice/media';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
@@ -136,7 +136,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					if (documentData) {
 						icon = documentData.documentType.icon;
 						name = documentData.variants[0].name;
-						url = documentData.urls[0]?.url ?? '';
+						const documentUrlRepository = new UmbDocumentUrlRepository(this);
+						const { data: documentUrlData } = await documentUrlRepository.requestItems([unique]);
+						url = documentUrlData?.[0].urls[0].url ?? '';
 					}
 					break;
 				}
