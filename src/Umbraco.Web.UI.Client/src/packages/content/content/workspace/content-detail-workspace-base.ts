@@ -203,11 +203,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		this.variantOptions = mergeObservables(
-			[this.varies, this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments],
-			([varies, variesByCulture, variesBySegment, variants, languages, segments]) => {
-				if ((varies || variesByCulture || variesBySegment) === undefined) {
+			[this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments],
+			([variesByCulture, variesBySegment, variants, languages, segments]) => {
+				if ((variesByCulture || variesBySegment) === undefined) {
 					return [];
 				}
+
+				const varies = variesByCulture || variesBySegment;
 
 				// No variation
 				if (!varies) {
@@ -655,18 +657,29 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const activeVariants = this.splitView.getActiveVariants();
 		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
 		const changedVariantIds = this._data.getChangedVariants();
-		const selectedVariantIds = activeVariantIds.concat(changedVariantIds);
+		const activeAndChangedVariantIds = [...activeVariantIds, ...changedVariantIds];
+
+		// if a segment has been changed, we select the "parent" culture variant as it is currently only possible to select between cultures in the dialogs
+		const changedParentCultureVariantIds = activeAndChangedVariantIds
+			.filter((x) => x.segment !== null)
+			.map((x) => x.toSegmentInvariant());
+
+		const selectedVariantIds = [...activeAndChangedVariantIds, ...changedParentCultureVariantIds];
 
 		const writableSelectedVariantIds = selectedVariantIds.filter(
 			(x) => this.readOnlyGuard.getIsPermittedForVariant(x) === false,
 		);
 
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
-		const selected = writableSelectedVariantIds.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
+		const selected = writableSelectedVariantIds
+			.map((variantId) => variantId.toString())
+			.filter((variantId, index, all) => all.indexOf(variantId) === index);
+
+		const uniqueSelected = [...new Set(selected)];
 
 		return {
 			options,
-			selected,
+			selected: uniqueSelected,
 		};
 	}
 

@@ -475,9 +475,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				? nothing
 				: html`
 						<uui-button
-							style="background-color: var(--uui-color-surface)"
-							label="Open Split view for ${variant.language.name}"
 							class="split-view"
+							label="Open Split view for ${variant.language.name}"
 							@click=${() => this.#openSplitView(variant)}>
 							Open in Split view
 						</uui-button>
@@ -665,6 +664,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				right: 0;
 				bottom: 1px;
 				display: none;
+				background-color: var(--uui-color-surface);
+				font-size: var(--uui-type-small-size);
+				font-weight: 700;
 			}
 		`,
 	];
