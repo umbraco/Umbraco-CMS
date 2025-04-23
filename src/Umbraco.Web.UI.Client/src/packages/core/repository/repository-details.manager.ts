@@ -1,6 +1,6 @@
 import type { UmbDetailRepository } from './detail/detail-repository.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -15,6 +15,12 @@ interface UmbRepositoryRequestStatus {
 	unique: string;
 }
 
+/**
+ * @export
+ * @class UmbRepositoryDetailsManager
+ * @augments {UmbControllerBase}
+ * @template DetailType
+ */
 export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> extends UmbControllerBase {
 	//
 	repository?: UmbDetailRepository<DetailType>;
@@ -32,18 +38,15 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 
 	#entries = new UmbArrayState<DetailType>([], (x) => x.unique);
 	entries = this.#entries.asObservable();
-	entryByUnique(unique: string) {
-		return this.#entries.asObservablePart((items) => items.find((item) => item.unique === unique));
-	}
 
 	#statuses = new UmbArrayState<UmbRepositoryRequestStatus>([], (x) => x.unique);
 	statuses = this.#statuses.asObservable();
 
 	/**
-	 * Creates an instance of UmbRepositoryItemsManager.
+	 * Creates an instance of UmbRepositoryDetailsManager.
 	 * @param {UmbControllerHost} host - The host for the controller.
 	 * @param {string} repository - The alias of the repository to use.
-	 * @memberof UmbRepositoryItemsManager
+	 * @memberof UmbRepositoryDetailsManager
 	 */
 	constructor(host: UmbControllerHost, repository: UmbDetailRepository<DetailType> | string) {
 		super(host);
@@ -81,7 +84,7 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 					this.removeUmbControllerByAlias('observeEntry_' + entry.unique);
 				});
 
-				this.#requestNewItems();
+				this.#requestNewDetails();
 			},
 			null,
 		);
@@ -100,24 +103,48 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 		});
 	}
 
+	/**
+	 * Clear the manager
+	 * @memberof UmbRepositoryDetailsManager
+	 */
 	clear(): void {
 		this.#uniques.setValue([]);
 		this.#entries.setValue([]);
 		this.#statuses.setValue([]);
 	}
 
+	/**
+	 * Get the uniques in the manager
+	 * @returns {Array<string>} - The uniques in the manager.
+	 * @memberof UmbRepositoryDetailsManager
+	 */
 	getUniques(): Array<string> {
 		return this.#uniques.getValue();
 	}
 
-	setUniques(uniques: string[] | undefined): void {
+	/**
+	 * Set the uniques in the manager
+	 * @param {(string[] | undefined)} uniques
+	 * @memberof UmbRepositoryDetailsManager
+	 */
+	setUniques(uniques: Array<string> | undefined): void {
 		this.#uniques.setValue(uniques ?? []);
 	}
 
+	/**
+	 * Add a unique to the manager
+	 * @param {string} unique
+	 * @memberof UmbRepositoryDetailsManager
+	 */
 	addUnique(unique: string): void {
 		this.#uniques.appendOne(unique);
 	}
 
+	/**
+	 * Add an entry to the manager
+	 * @param {DetailType} data
+	 * @memberof UmbRepositoryDetailsManager
+	 */
 	addEntry(data: DetailType): void {
 		const unique = data.unique;
 		this.#statuses.appendOne({
@@ -131,15 +158,26 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 		// Notice in this case we do not have a observable from the repo, but it should maybe be fine that we just listen for ACTION EVENTS.
 	}
 
-	getItems(): Array<DetailType> {
+	/**
+	 * Get all entries in the manager
+	 * @returns {Array<DetailType>} - The entries in the manager.
+	 * @memberof UmbRepositoryDetailsManager
+	 */
+	getEntries(): Array<DetailType> {
 		return this.#entries.getValue();
 	}
 
-	itemByUnique(unique: string) {
+	/**
+	 * Get an entry observable by unique
+	 * @param {string} unique
+	 * @returns {Observable<DetailType | undefined>} - The entry observable.
+	 * @memberof UmbRepositoryDetailsManager
+	 */
+	entryByUnique(unique: string): Observable<DetailType | undefined> {
 		return this.#entries.asObservablePart((items) => items.find((item) => item.unique === unique));
 	}
 
-	async #requestNewItems(): Promise<void> {
+	async #requestNewDetails(): Promise<void> {
 		await this.#init;
 		if (!this.repository) throw new Error('Repository is not initialized');
 
@@ -151,15 +189,15 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 		});
 
 		newRequestedUniques.forEach((unique) => {
-			this.#requestItem(unique);
+			this.#requestDetails(unique);
 		});
 	}
 
-	async #reloadItem(unique: string): Promise<void> {
-		return await this.#requestItem(unique);
+	async #reloadDetails(unique: string): Promise<void> {
+		return await this.#requestDetails(unique);
 	}
 
-	async #requestItem(unique: string): Promise<void> {
+	async #requestDetails(unique: string): Promise<void> {
 		await this.#init;
 		if (!this.repository) throw new Error('Repository is not initialized');
 
@@ -219,14 +257,14 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 	#onEntityUpdatedEvent = (event: UmbEntityUpdatedEvent) => {
 		const eventUnique = event.getUnique();
 
-		const items = this.getItems();
+		const items = this.getEntries();
 		if (items.length === 0) return;
 
 		// Ignore events if the entity is not in the list of items.
 		const item = items.find((item) => item.unique === eventUnique);
 		if (!item) return;
 
-		this.#reloadItem(item.unique);
+		this.#reloadDetails(item.unique);
 	};
 
 	override destroy(): void {
