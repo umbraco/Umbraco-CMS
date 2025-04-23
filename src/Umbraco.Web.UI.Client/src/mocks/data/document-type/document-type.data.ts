@@ -1750,7 +1750,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		description: null,
 		icon: 'icon-document',
 		allowedAsRoot: true,
-		variesByCulture: false,
+		variesByCulture: true,
 		variesBySegment: false,
 		isElement: false,
 		hasChildren: false,
