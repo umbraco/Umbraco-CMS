@@ -33,7 +33,7 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 		}
 
 		getHostElement(): Element {
-			return this._host.getHostElement();
+			return this._host?.getHostElement();
 		}
 
 		get controllerAlias(): UmbControllerAlias {

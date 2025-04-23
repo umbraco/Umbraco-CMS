@@ -25,7 +25,6 @@ describe('UmbValidationPropertyPathTranslationController', () => {
 			unique: 'test',
 			isTrashed: false,
 			template: null,
-			urls: [],
 			values: [
 				{
 					alias: 'headline',

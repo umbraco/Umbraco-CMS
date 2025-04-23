@@ -24,13 +24,21 @@ There are two npm scripts that can be used to execute the test:
 
 ### Executing single tests
 
-If you wish to run a single test, which may be helpful when writing tests you can use the following command. As before, you need to run these tests in the 'tests/Umbraco.Tests.AcceptanceTest' folder.
+If you wish to run a single set of tests, which may be helpful when writing tests you can use the following command. As before, you need to run these tests in the 'tests/Umbraco.Tests.AcceptanceTest' folder.
 
     npx playwright test <testname.ts>
 
-For example to run the Login Test,
+For example to run the Login Test:
 
     npx playwright test tests/DefaultConfig/Login/Login.spec.ts
+
+To run a single test (if you have several in a file), you can use this syntax.
+
+    npx playwright test -g "<name of test>"
+
+For example:
+
+    npx playwright test -g "can create content with the document link"
 
 ### Executing tests in UI Mode
 
