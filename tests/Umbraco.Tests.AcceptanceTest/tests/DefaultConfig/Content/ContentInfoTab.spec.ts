@@ -33,6 +33,7 @@ test('can see correct information when published', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
+  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.content.isSuccessNotificationVisible();
   const contentData = await umbracoApi.document.getByName(contentName);
   await umbracoUi.content.doesIdHaveText(contentData.id);

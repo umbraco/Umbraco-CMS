@@ -10,6 +10,7 @@ test('can update value of activate the profiler by default', async ({umbracoUi})
   // Act
   await umbracoUi.profiling.clickActivateProfilerByDefaultToggle();
   await umbracoUi.reloadPage();
+  await umbracoUi.waitForTimeout(500);
 
   // Assert
   await umbracoUi.profiling.isActivateProfilerByDefaultToggleChecked(true);

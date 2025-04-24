@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test, AliasHelper} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test, AliasHelper, NotificationConstantHelper} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -14,7 +14,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
@@ -84,7 +84,7 @@ test('cannot input the text that exceeds the allowed amount of characters', asyn
   // Arrange
   const maxChars = 20;
   const textExceedMaxChars = 'Lorem ipsum dolor sit';
-  const warningMessage = 'This field exceeds the allowed amount of characters';
+  const warningMessage = 'The string length exceeds the maximum length of';
   const dataTypeId = await umbracoApi.dataType.createTextstringDataType(customDataTypeName, maxChars);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -96,8 +96,8 @@ test('cannot input the text that exceeds the allowed amount of characters', asyn
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isTextWithExactNameVisible(warningMessage);
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isValidationMessageVisible(warningMessage);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
