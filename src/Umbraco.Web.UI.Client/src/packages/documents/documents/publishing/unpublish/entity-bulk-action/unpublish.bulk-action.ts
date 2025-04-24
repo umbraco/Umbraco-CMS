@@ -10,6 +10,7 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
@@ -19,6 +20,9 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 		}
 		const entityType = entityContext.getEntityType();
 		const unique = entityContext.getUnique();
+
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		const localize = new UmbLocalizationController(this);
 
 		if (!entityType) throw new Error('Entity type not found');
 		if (unique === undefined) throw new Error('Entity unique not found');
@@ -77,10 +81,23 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 			if (confirm !== false) {
 				const variantId = new UmbVariantId(options[0].language.unique, null);
 				const publishingRepository = new UmbDocumentPublishingRepository(this._host);
+				let documentCnt = 0;
+
 				for (let i = 0; i < this.selection.length; i++) {
 					const id = this.selection[i];
-					await publishingRepository.unpublish(id, [variantId]);
+					const { error } = await publishingRepository.unpublish(id, [variantId]);
+
+					if (!error) {
+						documentCnt++;
+					}
 				}
+
+				notificationContext?.peek('positive', {
+					data: {
+						headline: localize.term('speechBubbles_contentUnpublished'),
+						message: localize.term('speechBubbles_editMultiContentUnpublishedText', documentCnt),
+					},
+				});
 
 				eventContext.dispatchEvent(event);
 			}
@@ -112,10 +129,27 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 		const repository = new UmbDocumentPublishingRepository(this._host);
 
 		if (variantIds.length) {
+			let documentCnt = 0;
 			for (const unique of this.selection) {
-				await repository.unpublish(unique, variantIds);
-				eventContext.dispatchEvent(event);
+				const { error } = await repository.unpublish(unique, variantIds);
+
+				if (!error) {
+					documentCnt++;
+				}
 			}
+
+			notificationContext?.peek('positive', {
+				data: {
+					headline: localize.term('speechBubbles_contentUnpublished'),
+					message: localize.term(
+						'speechBubbles_editMultiVariantUnpublishedText',
+						documentCnt,
+						localize.list(variantIds.map((v) => v.culture ?? '')),
+					),
+				},
+			});
+
+			eventContext.dispatchEvent(event);
 		}
 	}
 }
