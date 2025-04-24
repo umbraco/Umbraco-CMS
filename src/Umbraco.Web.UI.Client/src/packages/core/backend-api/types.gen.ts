@@ -702,6 +702,9 @@ export type DocumentResponseModel = {
     variants: Array<DocumentVariantResponseModel>;
     id: string;
     documentType: DocumentTypeReferenceResponseModel;
+    /**
+     * @deprecated
+     */
     urls: Array<DocumentUrlInfoModel>;
     template?: ReferenceByIdModel | null;
     isTrashed: boolean;
@@ -2124,6 +2127,9 @@ export type PublishedDocumentResponseModel = {
     variants: Array<DocumentVariantResponseModel>;
     id: string;
     documentType: DocumentTypeReferenceResponseModel;
+    /**
+     * @deprecated
+     */
     urls: Array<DocumentUrlInfoModel>;
     template?: ReferenceByIdModel | null;
     isTrashed: boolean;
