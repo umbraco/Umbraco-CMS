@@ -9,7 +9,7 @@ import { isUmbracoFolder, UmbMediaTypeStructureRepository } from '@umbraco-cms/b
 import { umbBindToValidation, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { umbConfirmModal, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbDocumentDetailRepository, UmbDocumentUrlRepository } from '@umbraco-cms/backoffice/document';
-import { UmbMediaDetailRepository } from '@umbraco-cms/backoffice/media';
+import { UmbMediaDetailRepository, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -136,6 +136,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					if (documentData) {
 						icon = documentData.documentType.icon;
 						name = documentData.variants[0].name;
+
 						const documentUrlRepository = new UmbDocumentUrlRepository(this);
 						const { data: documentUrlData } = await documentUrlRepository.requestItems([unique]);
 						url = documentUrlData?.[0].urls[0].url ?? '';
@@ -148,7 +149,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					if (mediaData) {
 						icon = mediaData.mediaType.icon;
 						name = mediaData.variants[0].name;
-						url = mediaData.urls[0].url;
+
+						const mediaUrlRepository = new UmbMediaUrlRepository(this);
+						const { data: mediaUrlData } = await mediaUrlRepository.requestItems([unique]);
+						url = mediaUrlData?.[0].url ?? '';
 					}
 					break;
 				}
