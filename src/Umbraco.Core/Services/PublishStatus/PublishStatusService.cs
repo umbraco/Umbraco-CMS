@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -7,6 +6,10 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services.Navigation;
 
+/// <summary>
+/// Implements <see cref="IPublishStatusManagementService" /> and <see cref="IPublishStatusQueryService" /> verifying the published
+/// status of documents.
+/// </summary>
 public class PublishStatusService : IPublishStatusManagementService, IPublishStatusQueryService
 {
     private readonly ILogger<PublishStatusService> _logger;
@@ -14,10 +17,14 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly ILanguageService _languageService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
+
     private readonly IDictionary<Guid, ISet<string>> _publishedCultures = new Dictionary<Guid, ISet<string>>();
 
     private string? DefaultCulture { get; set; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishStatusService"/> class.
+    /// </summary>
     [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 17.")]
     public PublishStatusService(
         ILogger<PublishStatusService> logger,
@@ -32,6 +39,9 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishStatusService"/> class.
+    /// </summary>
     [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 17.")]
     public PublishStatusService(
         ILogger<PublishStatusService> logger,
@@ -47,6 +57,9 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishStatusService"/> class.
+    /// </summary>
     public PublishStatusService(
         ILogger<PublishStatusService> logger,
         IPublishStatusRepository publishStatusRepository,
@@ -61,6 +74,7 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
         _documentNavigationQueryService = documentNavigationQueryService;
     }
 
+    /// <inheritdoc/>
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
         _publishedCultures.Clear();
@@ -82,6 +96,7 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
         DefaultCulture = await _languageService.GetDefaultIsoCodeAsync();
     }
 
+    /// <inheritdoc/>
     public bool IsDocumentPublished(Guid documentKey, string culture)
     {
         if (string.IsNullOrEmpty(culture) && DefaultCulture is not null)
@@ -110,12 +125,13 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
         return false;
     }
 
+    /// <inheritdoc/>
     public bool HasPublishedAncestorPath(Guid contentKey)
     {
         var success = _documentNavigationQueryService.TryGetAncestorsKeys(contentKey, out IEnumerable<Guid> keys);
         if (success is false)
         {
-            // This might happen is certain cases, since 0notifications are not ordered, for instance, if you save and publish a content node in the same scope.
+            // This might happen is certain cases, since notifications are not ordered, for instance, if you save and publish a content node in the same scope.
             // In this case we'll try and update the node in the cache even though it hasn't been updated in the document navigation cache yet.
             // It's okay to just return false here, since the node will be loaded later when it's actually requested.
             return false;
@@ -133,6 +149,7 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
         return true;
     }
 
+    /// <inheritdoc/>
     public async Task AddOrUpdateStatusAsync(Guid documentKey, CancellationToken cancellationToken)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
@@ -141,12 +158,14 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
         scope.Complete();
     }
 
+    /// <inheritdoc/>
     public Task RemoveAsync(Guid documentKey, CancellationToken cancellationToken)
     {
         _publishedCultures.Remove(documentKey);
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc/>
     public async Task AddOrUpdateStatusWithDescendantsAsync(Guid rootDocumentKey, CancellationToken cancellationToken)
     {
         IDictionary<Guid, ISet<string>> publishStatus;
