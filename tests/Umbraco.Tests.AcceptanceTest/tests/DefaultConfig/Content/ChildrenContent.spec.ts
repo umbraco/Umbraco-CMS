@@ -125,7 +125,7 @@ test('can publish with descendants', {tag: '@smoke'}, async ({umbracoApi, umbrac
   await umbracoUi.content.clickPublishButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
