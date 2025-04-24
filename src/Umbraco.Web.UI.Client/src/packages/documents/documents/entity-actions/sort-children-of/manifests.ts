@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...repositoryManifests,
 	{
 		type: 'entityAction',
-		kind: 'sortChildrenOf',
+		kind: 'sortChildrenOfContent',
 		alias: 'Umb.EntityAction.Document.SortChildrenOf',
 		name: 'Sort Children Of Document Entity Action',
 		forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],

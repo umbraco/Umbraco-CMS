@@ -818,7 +818,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		} else {
-			throw new Error('No variant picker modal token is set. There are multiple variants to save. Cannot proceed.');
+			/* If there are multiple variants but no modal token is set 
+			we will save the variants that would have been preselected in the modal. 
+			These are based on the variants that have been edited */
+			variantIds = selected.map((x) => UmbVariantId.FromString(x));
 		}
 
 		const saveData = await this.constructSaveData(variantIds);
