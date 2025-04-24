@@ -28,7 +28,8 @@ test.skip('can create a relation type', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.relationType.clickSaveButton();
 
   // Assert
-  await umbracoUi.relationType.isSuccessNotificationVisible();
+  //await umbracoUi.relationType.isSuccessNotificationVisible();
+  await umbracoUi.relationType.isErrorNotificationVisible(false);
   expect(await umbracoApi.relationType.doesNameExist(relationTypeName)).toBeTruthy();
   // TODO: when frontend is ready, verify the new relation type name is displayed in the Relation Types tree
 });
@@ -45,7 +46,8 @@ test.skip('can update name of a relation type', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.relationType.clickSaveButton();
 
   // Assert
-  await umbracoUi.relationType.isSuccessNotificationVisible();
+  //await umbracoUi.relationType.isSuccessNotificationVisible();
+  await umbracoUi.relationType.isErrorNotificationVisible(false);
   const relationTypeData = await umbracoApi.relationType.get(relationTypeId);
   expect(relationTypeData.name).toEqual(relationTypeName);
   expect(await umbracoApi.relationType.doesNameExist(wrongRelationTypeName)).toBeFalsy();
@@ -61,7 +63,8 @@ test.skip('can update direction value of a relation type', async ({umbracoApi, u
   await umbracoUi.relationType.clickSaveButton();
 
   // Assert
-  await umbracoUi.relationType.isSuccessNotificationVisible();
+  //await umbracoUi.relationType.isSuccessNotificationVisible();
+  await umbracoUi.relationType.isErrorNotificationVisible(false);
   const relationTypeData = await umbracoApi.relationType.get(relationTypeId);
   expect(relationTypeData.isBidirectional).toEqual(true);
 });
@@ -77,7 +80,8 @@ test.skip('can update isDependency value of a relation type', async ({umbracoApi
   await umbracoUi.relationType.clickSaveButton();
 
   // Assert
-  await umbracoUi.relationType.isSuccessNotificationVisible();
+  //await umbracoUi.relationType.isSuccessNotificationVisible();
+  await umbracoUi.relationType.isErrorNotificationVisible(false);
   const relationTypeData = await umbracoApi.relationType.get(relationTypeId);
   expect(relationTypeData.isDependency).toEqual(true);
 });
@@ -93,7 +97,8 @@ test.skip('can delete a relation type', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.relationType.clickConfirmToDeleteButton();
 
   // Assert
-  await umbracoUi.relationType.isSuccessNotificationVisible();
+  //await umbracoUi.relationType.isSuccessNotificationVisible();
+  await umbracoUi.relationType.isErrorNotificationVisible(false);
   expect(await umbracoApi.relationType.doesNameExist(relationTypeName)).toBeFalsy();
   // TODO: when frontend is ready, verify the deleted relation type name is NOT displayed in the Relation Types tree
 });

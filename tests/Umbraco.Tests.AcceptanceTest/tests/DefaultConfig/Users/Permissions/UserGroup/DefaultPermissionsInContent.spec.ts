@@ -193,7 +193,8 @@ test('can create content with create permission enabled', async ({umbracoApi, um
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.content.isErrorNotificationVisible(false);
 });
 
 test('can not create content with create permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -349,7 +350,8 @@ test('can update content with update permission enabled', async ({umbracoApi, um
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
 });
 

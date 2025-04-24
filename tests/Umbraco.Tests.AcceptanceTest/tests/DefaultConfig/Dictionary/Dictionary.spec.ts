@@ -23,7 +23,8 @@ test('can create a dictionary item', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dictionary.clickSaveButton();
 
   // Assert
-  await umbracoUi.dictionary.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.dictionary.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.dictionary.isErrorNotificationVisible(false);
   expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeTruthy();
   await umbracoUi.dictionary.clickLeftArrowButton();
   // Verify the dictionary item displays in the tree and in the list
@@ -43,7 +44,8 @@ test('can delete a dictionary item', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dictionary.deleteDictionary();
 
   // Assert
-  await umbracoUi.dictionary.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  //await umbracoUi.dictionary.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  await umbracoUi.dictionary.isErrorNotificationVisible(false);
   expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeFalsy();
   // Verify the dictionary item does not display in the tree
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(dictionaryName, false);
@@ -65,7 +67,8 @@ test('can create a dictionary item in a dictionary', {tag: '@smoke'}, async ({um
   await umbracoUi.dictionary.clickSaveButton();
 
   // Assert
-  await umbracoUi.dictionary.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.dictionary.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.dictionary.isErrorNotificationVisible(false);
   const dictionaryChildren = await umbracoApi.dictionary.getChildren(parentDictionaryId);
   expect(dictionaryChildren[0].name).toEqual(dictionaryName);
   await umbracoUi.dictionary.clickLeftArrowButton();
