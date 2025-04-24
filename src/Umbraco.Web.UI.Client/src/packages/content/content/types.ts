@@ -2,6 +2,7 @@ import type { UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
 export type * from './collection/types.js';
+export type * from './tree/types.js';
 
 export interface UmbElementDetailModel {
 	values: Array<UmbElementValueModel>;
