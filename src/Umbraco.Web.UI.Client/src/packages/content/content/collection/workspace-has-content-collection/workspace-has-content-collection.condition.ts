@@ -18,9 +18,9 @@ export class UmbWorkspaceHasContentCollectionCondition
 
 		this.consumeContext(UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
-				context.contentTypeHasCollection,
+				context?.contentTypeHasCollection,
 				(hasCollection) => {
-					this.permitted = hasCollection;
+					this.permitted = hasCollection ?? false;
 				},
 				ObserveSymbol,
 			);

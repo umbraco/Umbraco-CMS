@@ -35,7 +35,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 
 		this.consumeContext(UMB_BACKOFFICE_CONTEXT, (context) => {
 			this.observe(
-				context.version,
+				context?.version,
 				(version) => {
 					if (!version) return;
 					this._version = version;

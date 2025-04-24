@@ -68,7 +68,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (blockContext) => {
 			this.#blockContext = blockContext;
 			this.observe(
-				this.#blockContext.unique,
+				this.#blockContext?.unique,
 				(contentKey) => {
 					this.#contentKey = contentKey;
 					this.#load();
@@ -77,8 +77,8 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 			);
 		});
 		this.consumeContext(UMB_BLOCK_GRID_ENTRIES_CONTEXT, (entriesContext) => {
-			this.#parentUnique = entriesContext.getParentUnique();
-			this.#areaKey = entriesContext.getAreaKey();
+			this.#parentUnique = entriesContext?.getParentUnique();
+			this.#areaKey = entriesContext?.getAreaKey();
 		});
 		new UmbExtensionApiInitializer(
 			this,

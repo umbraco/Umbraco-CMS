@@ -58,11 +58,11 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, async (context) => {
 			this.#workspaceContext = context;
-			this.observe(this.#workspaceContext.contentTypeUnique, (unique) => (this._memberTypeUnique = unique || ''));
-			this.observe(this.#workspaceContext.createDate, (date) => (this._createDate = this.#setDateFormat(date)));
-			this.observe(this.#workspaceContext.updateDate, (date) => (this._updateDate = this.#setDateFormat(date)));
-			this.observe(this.#workspaceContext.unique, (unique) => (this._unique = unique || ''));
-			this.observe(this.#workspaceContext.kind, (kind) => (this._memberKind = kind));
+			this.observe(this.#workspaceContext?.contentTypeUnique, (unique) => (this._memberTypeUnique = unique || ''));
+			this.observe(this.#workspaceContext?.createDate, (date) => (this._createDate = this.#setDateFormat(date)));
+			this.observe(this.#workspaceContext?.updateDate, (date) => (this._updateDate = this.#setDateFormat(date)));
+			this.observe(this.#workspaceContext?.unique, (unique) => (this._unique = unique || ''));
+			this.observe(this.#workspaceContext?.kind, (kind) => (this._memberKind = kind));
 
 			const memberType = (await this.#memberTypeItemRepository.requestItems([this._memberTypeUnique])).data?.[0];
 			if (!memberType) return;

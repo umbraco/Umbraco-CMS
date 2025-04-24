@@ -3,7 +3,7 @@ import type { UmbServerContextConfig } from './types.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbServerContext extends UmbContextBase<UmbServerContext> {
+export class UmbServerContext extends UmbContextBase {
 	#serverUrl: string;
 	#backofficePath: string;
 	#serverConnection;

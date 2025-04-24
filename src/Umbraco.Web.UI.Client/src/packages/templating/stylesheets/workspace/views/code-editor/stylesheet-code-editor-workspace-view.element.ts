@@ -20,7 +20,7 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 		this.consumeContext(UMB_STYLESHEET_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#stylesheetWorkspaceContext = workspaceContext;
 
-			this.observe(this.#stylesheetWorkspaceContext.content, (content) => {
+			this.observe(this.#stylesheetWorkspaceContext?.content, (content) => {
 				this._content = content;
 			});
 		});

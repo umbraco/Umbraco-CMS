@@ -191,7 +191,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 * @param {UmbValidationController} parent - The parent validation context to inherit from.
 	 * @param {string} dataPath - The data path to bind this validation context to.
 	 */
-	inheritFrom(parent: UmbValidationController, dataPath: string): void {
+	inheritFrom(parent: UmbValidationController | undefined, dataPath: string): void {
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
@@ -205,7 +205,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 		// @deprecated - Will be removed in v.17
 		this.observe(
-			parent.translationDataOf(dataPath),
+			parent?.translationDataOf(dataPath),
 			(data) => {
 				this.setTranslationData(data);
 			},
@@ -213,8 +213,12 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		);
 
 		this.observe(
-			parent.messages.messagesOfPathAndDescendant(dataPath),
+			parent?.messages.messagesOfPathAndDescendant(dataPath),
 			(msgs) => {
+				if (!msgs) {
+					this.messages.clear();
+					return;
+				}
 				this.messages.initiateChange();
 				if (this.#parentMessages) {
 					// Remove the local messages that does not exist in the parent anymore:

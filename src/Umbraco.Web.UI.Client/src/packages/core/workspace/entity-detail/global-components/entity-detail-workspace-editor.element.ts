@@ -27,7 +27,7 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
 			this.#context = context;
 			this.observe(this.#context?.entityType, (entityType) => (this._entityType = entityType));
-			this.observe(this.#context?.loading.isOn, (isLoading) => (this._isLoading = isLoading));
+			this.observe(this.#context?.loading.isOn, (isLoading) => (this._isLoading = isLoading ?? false));
 			this.observe(this.#context?.data, (data) => (this._exists = !!data));
 			this.observe(this.#context?.isNew, (isNew) => (this._isNew = isNew));
 		});

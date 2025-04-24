@@ -6,7 +6,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
-export class UmbLanguageNavigationStructureWorkspaceContext extends UmbContextBase<UmbLanguageNavigationStructureWorkspaceContext> {
+export class UmbLanguageNavigationStructureWorkspaceContext extends UmbContextBase {
 	// TODO: figure out the correct type where we have "data" available
 	#workspaceContext?: any;
 

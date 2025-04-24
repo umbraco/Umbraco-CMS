@@ -62,6 +62,8 @@ describe('UmbDocumentUserPermissionCondition', () => {
 			// This entity does not have any ancestors.
 			hostElement.setEntityAncestors([]);
 
+			let callbackCount = 0;
+
 			// We expect to find the read permission on the current entity
 			condition = new UmbDocumentUserPermissionCondition(hostElement, {
 				host: hostElement,
@@ -69,9 +71,13 @@ describe('UmbDocumentUserPermissionCondition', () => {
 					alias: UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
 					allOf: [UMB_USER_PERMISSION_DOCUMENT_READ],
 				},
-				onChange: (permitted) => {
-					expect(permitted).to.be.true;
-					done();
+				onChange: () => {
+					callbackCount++;
+					if (callbackCount === 1) {
+						expect(condition.permitted).to.be.true;
+						condition.hostDisconnected();
+						done();
+					}
 				},
 			});
 		});
@@ -88,6 +94,8 @@ describe('UmbDocumentUserPermissionCondition', () => {
 			// Sets the ancestors of the current entity. These are the ancestors that will be checked for permissions.
 			hostElement.setEntityAncestors([{ unique: 'permissions-document-id', entityType: UMB_DOCUMENT_ENTITY_TYPE }]);
 
+			let callbackCount = 0;
+
 			// We expect to find the read permission on the ancestor
 			condition = new UmbDocumentUserPermissionCondition(hostElement, {
 				host: hostElement,
@@ -95,9 +103,13 @@ describe('UmbDocumentUserPermissionCondition', () => {
 					alias: UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
 					allOf: [UMB_USER_PERMISSION_DOCUMENT_READ],
 				},
-				onChange: (permitted) => {
-					expect(permitted).to.be.true;
-					done();
+				onChange: () => {
+					callbackCount++;
+					if (callbackCount === 1) {
+						expect(condition.permitted).to.be.true;
+						condition.hostDisconnected();
+						done();
+					}
 				},
 			});
 		});
@@ -117,6 +129,8 @@ describe('UmbDocumentUserPermissionCondition', () => {
 				{ unique: 'no-permissions-parent-document-id', entityType: UMB_DOCUMENT_ENTITY_TYPE },
 			]);
 
+			let callbackCount = 0;
+
 			// We expect to find the read permission in the fallback permissions
 			condition = new UmbDocumentUserPermissionCondition(hostElement, {
 				host: hostElement,
@@ -124,9 +138,13 @@ describe('UmbDocumentUserPermissionCondition', () => {
 					alias: UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
 					allOf: [UMB_USER_PERMISSION_DOCUMENT_READ],
 				},
-				onChange: (permitted) => {
-					expect(permitted).to.be.true;
-					done();
+				onChange: () => {
+					callbackCount++;
+					if (callbackCount === 1) {
+						expect(condition.permitted).to.be.true;
+						condition.hostDisconnected();
+						done();
+					}
 				},
 			});
 		});

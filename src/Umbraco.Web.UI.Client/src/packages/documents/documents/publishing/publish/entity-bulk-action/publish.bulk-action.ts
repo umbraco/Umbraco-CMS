@@ -23,9 +23,6 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		const unique = entityContext.getUnique();
 
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		if (!notificationContext) {
-			throw new Error('Notification context not found');
-		}
 		const localize = new UmbLocalizationController(this);
 
 		if (!entityType) throw new Error('Entity type not found');
@@ -96,7 +93,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 					}
 				}
 
-				notificationContext.peek('positive', {
+				notificationContext?.peek('positive', {
 					data: {
 						headline: localize.term('speechBubbles_editContentPublishedHeader'),
 						message: localize.term('speechBubbles_editMultiContentPublishedText', documentCnt),
@@ -147,7 +144,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 				}
 			}
 
-			notificationContext.peek('positive', {
+			notificationContext?.peek('positive', {
 				data: {
 					headline: localize.term('speechBubbles_editContentPublishedHeader'),
 					message: localize.term(

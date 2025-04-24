@@ -88,7 +88,7 @@ export class UmbBlockGridManagerContext<
 		super(host);
 
 		this.#initAppUrl = this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
-			this.#serverUrl = instance.getServerUrl();
+			this.#serverUrl = instance?.getServerUrl();
 		}).asPromise({ preventTimeout: true });
 	}
 	/**

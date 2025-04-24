@@ -13,7 +13,7 @@ export default class UmbTiptapBlockPickerToolbarExtension extends UmbTiptapToolb
 
 		this.consumeContext(UMB_BLOCK_RTE_MANAGER_CONTEXT, (context) => {
 			this.observe(
-				context.blockTypes,
+				context?.blockTypes,
 				(blockTypes) => {
 					this.#blocks = blockTypes;
 				},

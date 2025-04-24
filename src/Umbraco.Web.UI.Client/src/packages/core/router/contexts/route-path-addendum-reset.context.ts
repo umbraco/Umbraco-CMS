@@ -4,10 +4,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbRoutePathAddendumResetContext
-	extends UmbContextBase<UmbRoutePathAddendum, typeof UMB_ROUTE_PATH_ADDENDUM_CONTEXT>
-	implements UmbRoutePathAddendum
-{
+export class UmbRoutePathAddendumResetContext extends UmbContextBase implements UmbRoutePathAddendum {
 	#appendum = new UmbStringState('');
 	readonly addendum = this.#appendum.asObservable();
 

@@ -40,7 +40,7 @@ export class CustomValidationValidator extends UmbControllerBase implements UmbV
 		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, async (context) => {
 			this.#workspaceContext = context;
 			this.observe(
-				await context.propertyValueByAlias<UmbPropertyEditorRteValueType>(propertyAlias, this.#variantId),
+				await context?.propertyValueByAlias<UmbPropertyEditorRteValueType>(propertyAlias, this.#variantId),
 				(value) => {
 					this.#value = value;
 					this.#checkValidation();

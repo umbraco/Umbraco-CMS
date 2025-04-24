@@ -81,7 +81,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		super();
 
 		this.consumeContext(UMB_CONTENT_PROPERTY_CONTEXT, (context) => {
-			this.observe(context.dataType, (dataType) => {
+			this.observe(context?.dataType, (dataType) => {
 				this.#dataType = dataType;
 			});
 		});

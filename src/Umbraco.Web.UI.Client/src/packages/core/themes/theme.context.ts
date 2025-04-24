@@ -9,7 +9,7 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 
 const LOCAL_STORAGE_KEY = 'umb-theme-alias';
 
-export class UmbThemeContext extends UmbContextBase<UmbThemeContext> {
+export class UmbThemeContext extends UmbContextBase {
 	#theme = new UmbStringState('umb-light-theme');
 	#themeObserver?: UmbObserverController<ManifestTheme[]>;
 

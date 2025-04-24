@@ -77,7 +77,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.observe(
-				await context.propertyValueByAlias<number | undefined>('areaGridColumns'),
+				await context?.propertyValueByAlias<number | undefined>('areaGridColumns'),
 				(value) => {
 					// Value can be undefined, but 'undefined > 0' is still valid JS and will return false. [NL]
 					this.#valueOfAreaGridColumns = (value as number) > 0 ? value : null;
@@ -87,7 +87,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 			);
 
 			this.observe(
-				await context.propertyValueByAlias<string | undefined>('layoutStylesheet'),
+				await context?.propertyValueByAlias<string | undefined>('layoutStylesheet'),
 				(stylesheet) => {
 					if (this._styleElement && this._styleElement.href === stylesheet) return;
 					this._styleElement = document.createElement('link');

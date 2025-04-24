@@ -22,9 +22,9 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
  * Clipboard context for managing clipboard entries for property values
  * @export
  * @class UmbClipboardPropertyContext
- * @augments {UmbContextBase<UmbClipboardPropertyContext>}
+ * @augments {UmbContextBase}
  */
-export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardPropertyContext> {
+export class UmbClipboardPropertyContext extends UmbContextBase {
 	#init?: Promise<unknown>;
 
 	constructor(host: UmbControllerHost) {

@@ -55,7 +55,7 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 				if (!statusbar.length) return;
 				this._statusbar = statusbar;
 				this.#value = statusbar.map((area) => [...area.data]);
-				propertyContext.setValue(this.#value);
+				propertyContext?.setValue(this.#value);
 			});
 		});
 	}

@@ -4,7 +4,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
-export class UmbPickerContext extends UmbContextBase<UmbPickerContext> {
+export class UmbPickerContext extends UmbContextBase {
 	public readonly selection = new UmbSelectionManager(this);
 	public readonly search = new UmbPickerSearchManager(this);
 

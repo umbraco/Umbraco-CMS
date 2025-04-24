@@ -6,7 +6,7 @@ import type { UmbEntityVariantOptionModel, UmbEntityVariantModel } from '@umbrac
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
-export class UmbLanguageAccessWorkspaceContext extends UmbContextBase<UmbLanguageAccessWorkspaceContext> {
+export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
 	#workspaceContext?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
 	#currentUserAllowedLanguages?: Array<string>;
 	#currentUserHasAccessToAllLanguages?: boolean;
@@ -17,19 +17,19 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase<UmbLanguag
 
 		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.observe(instance.variantOptions, (variantOptions) => {
+			this.observe(instance?.variantOptions, (variantOptions) => {
 				this.#variantOptions = variantOptions;
 				this.#checkForLanguageAccess();
 			});
 		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(context.languages, (languages) => {
+			this.observe(context?.languages, (languages) => {
 				this.#currentUserAllowedLanguages = languages;
 				this.#checkForLanguageAccess();
 			});
 
-			this.observe(context.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
+			this.observe(context?.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
 				this.#currentUserHasAccessToAllLanguages = hasAccessToAllLanguages;
 				this.#checkForLanguageAccess();
 			});

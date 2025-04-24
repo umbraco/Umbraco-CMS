@@ -8,7 +8,7 @@ import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 const UMB_LOCALSTORAGE_SESSION_KEY = 'umb:previewSessions';
 
-export class UmbPreviewContext extends UmbContextBase<UmbPreviewContext> {
+export class UmbPreviewContext extends UmbContextBase {
 	#culture?: string | null;
 	#serverUrl: string = '';
 	#webSocket?: WebSocket;
@@ -26,7 +26,7 @@ export class UmbPreviewContext extends UmbContextBase<UmbPreviewContext> {
 		super(host, UMB_PREVIEW_CONTEXT);
 
 		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
-			this.#serverUrl = instance.getServerUrl();
+			this.#serverUrl = instance?.getServerUrl() ?? '';
 
 			const params = new URLSearchParams(window.location.search);
 

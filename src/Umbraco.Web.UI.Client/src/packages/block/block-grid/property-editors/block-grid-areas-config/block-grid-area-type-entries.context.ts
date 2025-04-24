@@ -3,10 +3,7 @@ import { UMB_BLOCK_GRID_AREA_TYPE_ENTRIES_CONTEXT } from './block-grid-area-type
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbBlockGridAreaTypeEntriesContext
-	extends UmbContextBase<UmbBlockGridAreaTypeEntriesContext>
-	implements UmbBlockGridScalableContainerContext
-{
+export class UmbBlockGridAreaTypeEntriesContext extends UmbContextBase implements UmbBlockGridScalableContainerContext {
 	#layoutColumns?: number;
 	setLayoutColumns(layoutColumns: number) {
 		this.#layoutColumns = layoutColumns;

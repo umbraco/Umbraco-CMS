@@ -49,7 +49,7 @@ export class UmbPropertyEditorUINumberElement
 		super();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this._label = context.getLabel();
+			this._label = context?.getLabel();
 		});
 
 		this.addValidator(

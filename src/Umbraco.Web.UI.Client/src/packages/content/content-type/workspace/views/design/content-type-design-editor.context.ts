@@ -3,7 +3,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbContentTypeDesignEditorContext extends UmbContextBase<UmbContentTypeDesignEditorContext> {
+export class UmbContentTypeDesignEditorContext extends UmbContextBase {
 	#isSorting = new UmbBooleanState(false);
 	readonly isSorting = this.#isSorting.asObservable();
 

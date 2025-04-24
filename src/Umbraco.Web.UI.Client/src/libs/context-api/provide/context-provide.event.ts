@@ -39,17 +39,15 @@ export interface UmbContextUnprovidedEvent extends Event {
  * @augments {Event}
  * @implements {UmbContextUnprovidedEvent}
  */
-/*
-	export class UmbContextUnprovidedEventImplementation extends Event implements UmbContextUnprovidedEvent {
-		public constructor(
-			public readonly contextAlias: string | UmbContextToken,
-			public readonly instance: unknown,
-		) {
-			super(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, { bubbles: true, composed: true });
-		}
+export class UmbContextUnprovidedEventImplementation extends Event implements UmbContextUnprovidedEvent {
+	public constructor(
+		public readonly contextAlias: string | UmbContextToken,
+		public readonly instance: unknown,
+	) {
+		super(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, { bubbles: true, composed: true });
 	}
+}
 
-	export const isUmbContextUnprovidedEventType = (event: Event): event is UmbContextUnprovidedEventImplementation => {
-		return event.type === UMB_CONTEXT_UNPROVIDED_EVENT_TYPE;
-	};
-*/
+export const isUmbContextUnprovidedEventType = (event: Event): event is UmbContextUnprovidedEventImplementation => {
+	return event.type === UMB_CONTEXT_UNPROVIDED_EVENT_TYPE;
+};

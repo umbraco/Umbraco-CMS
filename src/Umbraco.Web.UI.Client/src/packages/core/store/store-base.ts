@@ -7,7 +7,7 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbStoreBase<StoreItemType = any> extends UmbContextBase<any> implements UmbStore<StoreItemType>, UmbApi {
+export class UmbStoreBase<StoreItemType = any> extends UmbContextBase implements UmbStore<StoreItemType>, UmbApi {
 	protected _data: UmbArrayState<StoreItemType>;
 
 	constructor(host: UmbControllerHost, storeAlias: string, data: UmbArrayState<StoreItemType>) {

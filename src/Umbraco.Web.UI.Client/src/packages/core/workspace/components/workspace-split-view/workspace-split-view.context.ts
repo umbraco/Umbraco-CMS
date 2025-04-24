@@ -8,7 +8,7 @@ import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import type { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 
-export class UmbWorkspaceSplitViewContext extends UmbContextBase<UmbWorkspaceSplitViewContext> {
+export class UmbWorkspaceSplitViewContext extends UmbContextBase {
 	//
 	#variantVariantValidationContext?: UmbValidationController;
 	#workspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;

@@ -12,7 +12,7 @@ const EmptyDiv = document.createElement('div');
 
 type UmbRoutePlusModalKey = UmbRoute & { __modalKey: string };
 
-export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
+export class UmbRouteContext extends UmbContextBase {
 	#modalRouter: IRouterSlot;
 	#modalRegistrations: UmbModalRouteRegistration[] = [];
 	#modalContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;

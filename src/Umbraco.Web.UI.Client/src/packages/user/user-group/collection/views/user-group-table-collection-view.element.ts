@@ -74,15 +74,15 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 		this.consumeContext(UMB_USER_GROUP_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
 			this.observe(
-				this.#collectionContext.selection.selection,
-				(selection) => (this._selection = selection),
+				this.#collectionContext?.selection.selection,
+				(selection) => (this._selection = selection ?? []),
 				'umbCollectionSelectionObserver',
 			);
 			this.observe(
-				this.#collectionContext.items,
+				this.#collectionContext?.items,
 				async (items) => {
 					await this.#initRepositories();
-					this._createTableItems(items);
+					this._createTableItems(items ?? []);
 				},
 				'umbCollectionItemsObserver',
 			);
