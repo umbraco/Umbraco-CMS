@@ -8,6 +8,22 @@ import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 const UMB_LOCALSTORAGE_SESSION_KEY = 'umb:previewSessions';
 
+interface UmbPreviewIframeArgs {
+	className?: string;
+	culture?: string;
+	height?: string;
+	segment?: string;
+	width?: string;
+}
+
+interface UmbPreviewUrlArgs {
+	culture?: string | null;
+	rnd?: number;
+	segment?: string | null;
+	serverUrl?: string;
+	unique?: string | null;
+}
+
 export class UmbPreviewContext extends UmbContextBase {
 	#culture?: string | null;
 	#serverUrl: string = '';
@@ -75,14 +91,16 @@ export class UmbPreviewContext extends UmbContextBase {
 		return Math.max(Number(localStorage.getItem(UMB_LOCALSTORAGE_SESSION_KEY)), 0) || 0;
 	}
 
-	#setPreviewUrl(args?: { serverUrl?: string; unique?: string | null; culture?: string | null; rnd?: number }) {
+	#setPreviewUrl(args?: UmbPreviewUrlArgs) {
 		const host = args?.serverUrl || this.#serverUrl;
 		const path = args?.unique || this.#unique;
 		const params = new URLSearchParams();
 		const culture = args?.culture || this.#culture;
+		const segment = args?.segment;
 
 		if (culture) params.set('culture', culture);
 		if (args?.rnd) params.set('rnd', args.rnd.toString());
+		if (segment) params.set('segment', segment);
 
 		this.#previewUrl.setValue(`${host}/${path}?${params}`);
 	}
@@ -165,7 +183,7 @@ export class UmbPreviewContext extends UmbContextBase {
 		this.#setSessionCount(sessions);
 	}
 
-	async updateIFrame(args?: { culture?: string; className?: string; height?: string; width?: string }) {
+	async updateIFrame(args?: UmbPreviewIframeArgs) {
 		if (!args) return;
 
 		const wrapper = this.getIFrameWrapper();
@@ -194,6 +212,17 @@ export class UmbPreviewContext extends UmbContextBase {
 			history.pushState(null, '', newRelativePathQuery);
 
 			this.#setPreviewUrl({ culture: args.culture });
+		}
+
+		if (args.segment) {
+			this.#iframeReady.setValue(false);
+
+			const params = new URLSearchParams(window.location.search);
+			params.set('segment', args.segment);
+			const newRelativePathQuery = window.location.pathname + '?' + params.toString();
+			history.pushState(null, '', newRelativePathQuery);
+
+			this.#setPreviewUrl({ segment: args.segment });
 		}
 
 		if (args.className) wrapper.className = args.className;
