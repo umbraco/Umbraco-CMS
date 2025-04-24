@@ -7,12 +7,12 @@
 		"generate:server-api": "openapi-ts --file openapi-ts.config.js"
 	},
 	"dependencies": {
-		"@types/diff": "^7.0.1",
+		"@types/diff": "^7.0.2",
 		"diff": "^7.0.0",
-		"uuid": "^11.0.5"
+		"uuid": "^11.1.0"
 	},
 	"devDependencies": {
 		"@hey-api/client-fetch": "^0.10.0",
-		"@hey-api/openapi-ts": "^0.66.1"
+		"@hey-api/openapi-ts": "^0.66.6"
 	}
 }
