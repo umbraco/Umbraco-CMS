@@ -65,6 +65,9 @@ public class DeliveryApiTests
         publishStatusQueryService
             .Setup(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns(true);
+        publishStatusQueryService
+            .Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>()))
+            .Returns(true);
 
         PublishStatusQueryService = publishStatusQueryService.Object;
     }
