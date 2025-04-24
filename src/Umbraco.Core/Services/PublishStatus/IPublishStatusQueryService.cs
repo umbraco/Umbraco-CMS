@@ -13,4 +13,6 @@ public interface IPublishStatusQueryService
     /// <param name="documentKey">Key to check for.</param>
     /// <returns>True if document has any published culture.</returns>
     bool IsDocumentPublishedInAnyCulture(Guid documentKey) => IsDocumentPublished(documentKey, string.Empty);
+
+    bool HasPublishedAncestorPath(Guid contentKey);
 }

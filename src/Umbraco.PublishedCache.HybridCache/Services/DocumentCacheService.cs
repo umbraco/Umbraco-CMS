@@ -115,7 +115,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
                 // When unpublishing a node, a payload with RefreshBranch is published, so we don't have to worry about this.
                 // Similarly, when a branch is published, next time the content is requested, the parent will be published,
                 // this works because we don't cache null values.
-                if (preview is false && contentCacheNode is not null && HasPublishedAncestorPath(contentCacheNode.Key) is false)
+                if (preview is false && contentCacheNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(contentCacheNode.Key) is false)
                 {
                     // Careful not to early return here. We need to complete the scope even if returning null.
                     contentCacheNode = null;
@@ -135,28 +135,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         }
 
         return _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);
-    }
-
-    private bool HasPublishedAncestorPath(Guid contentKey)
-    {
-        var success = _documentNavigationQueryService.TryGetAncestorsKeys(contentKey, out IEnumerable<Guid> keys);
-        if (success is false)
-        {
-            // This might happen is certain cases, since 0notifications are not ordered, for instance, if you save and publish a content node in the same scope.
-            // In this case we'll try and update the node in the cache even though it hasn't been updated in the document navigation cache yet.
-            // It's okay to just return false here, since the node will be loaded later when it's actually requested.
-            return false;
-        }
-
-        foreach (Guid key in keys)
-        {
-            if (_publishStatusQueryService.IsDocumentPublishedInAnyCulture(key) is false)
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private bool GetPreview() => _previewService.IsInPreview();
@@ -191,7 +169,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         }
 
         ContentCacheNode? publishedNode = await _databaseCacheRepository.GetContentSourceAsync(key, false);
-        if (publishedNode is not null && HasPublishedAncestorPath(publishedNode.Key))
+        if (publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key))
         {
             await _hybridCache.SetAsync(GetCacheKey(publishedNode.Key, false), publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(key));
         }
