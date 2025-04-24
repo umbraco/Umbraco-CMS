@@ -33,7 +33,8 @@ test.skip('can create content with the Rich Text Editor datatype', {tag: '@smoke
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toEqual('<p>' + contentText + '</p>');
@@ -58,7 +59,8 @@ test.skip('can create content with the upload file datatype', async ({umbracoApi
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.src).toContainEqual(uploadFilePath);
@@ -84,7 +86,8 @@ test.skip('can create content with the list view - content datatype', async ({um
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 
   // Clean

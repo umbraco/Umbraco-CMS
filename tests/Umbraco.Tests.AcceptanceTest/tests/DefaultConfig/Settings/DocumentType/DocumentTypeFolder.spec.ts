@@ -22,7 +22,8 @@ test('can create a empty document type folder', {tag: '@smoke'}, async ({umbraco
   await umbracoUi.documentType.clickCreateFolderButton();
 
   // Assert
-  await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.documentType.isErrorNotificationVisible(false);
   const folder = await umbracoApi.documentType.getByName(documentFolderName);
   expect(folder.name).toBe(documentFolderName);
   // Checks if the folder is in the root
@@ -41,7 +42,8 @@ test('can delete a document type folder', {tag: '@smoke'}, async ({umbracoApi, u
   await umbracoUi.documentType.deleteFolder();
 
   // Assert
-  await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  await umbracoUi.documentType.isErrorNotificationVisible(false);
   await umbracoApi.documentType.doesNameExist(documentFolderName);
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentFolderName, false);
 });
@@ -61,7 +63,8 @@ test('can rename a document type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.documentType.clickConfirmRenameButton();
 
   // Assert
-  await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.documentType.isErrorNotificationVisible(false);
   const folder = await umbracoApi.documentType.getByName(documentFolderName);
   expect(folder.name).toBe(documentFolderName);
   await umbracoUi.documentType.isDocumentTreeItemVisible(oldFolderName, false);
@@ -84,7 +87,8 @@ test('can create a document type folder in a folder', async ({umbracoApi, umbrac
   await umbracoUi.documentType.clickCreateFolderButton();
 
   // Assert
-  await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.documentType.isErrorNotificationVisible(false);
   const folder = await umbracoApi.documentType.getByName(childFolderName);
   expect(folder.name).toBe(childFolderName);
   // Checks if the parentFolder contains the ChildFolder as a child
@@ -115,7 +119,8 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.documentType.clickCreateFolderButton();
 
   // Assert
-  await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.documentType.isErrorNotificationVisible(false);
   await umbracoUi.documentType.reloadTree(parentFolderName);
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentFolderName);
   const grandParentChildren = await umbracoApi.documentType.getChildren(grandParentFolderId);

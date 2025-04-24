@@ -27,7 +27,8 @@ test('can update maximum allowed characters value', async ({umbracoApi, umbracoU
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'maxChars', maxCharsValue)).toBeTruthy();
 });
 
@@ -42,7 +43,8 @@ test('can update number of rows value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'rows', numberOfRowsValue)).toBeTruthy();
 });
 

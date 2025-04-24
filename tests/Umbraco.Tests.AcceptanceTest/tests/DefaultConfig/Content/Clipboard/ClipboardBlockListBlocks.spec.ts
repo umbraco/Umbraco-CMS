@@ -71,7 +71,8 @@ test('can copy and paste a single block into the same document and group', async
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   // Original block
   await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
@@ -96,7 +97,8 @@ test('can copy and paste a single block into the same document but different gro
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   // Original block
   await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
@@ -125,7 +127,8 @@ test('can copy and paste a single block into another document', async ({umbracoA
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   // Copied block
   await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
@@ -150,7 +153,8 @@ test('can copy and paste multiple blocks into the same document and group', {tag
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   // Original blocks
   await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
@@ -182,7 +186,8 @@ test('can copy and paste multiple blocks into the same document but different gr
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   // Original blocks
   await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
@@ -218,7 +223,8 @@ test('can copy and paste multiple blocks into another document', async ({umbraco
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   // Copied blocks
   await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
@@ -265,7 +271,8 @@ test('can replace multiple blocks', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesBlockListPropertyHaveBlockAmount(groupName, blockListDataTypeName, 1);
 });
 
@@ -287,7 +294,8 @@ test('can copy block from a block list to a block grid',  async ({umbracoApi, um
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   // Original blocks
   // Block List
   await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);

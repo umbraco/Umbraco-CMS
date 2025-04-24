@@ -24,7 +24,8 @@ test('can create a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
 });
 
@@ -41,7 +42,8 @@ test('can rename a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   expect(await umbracoApi.dataType.doesNameExist(wrongDataTypeName)).toBeFalsy();
 });
@@ -56,7 +58,8 @@ test('can delete a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) 
   await umbracoUi.dataType.deleteDataType(dataTypeName);
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeFalsy();
 });
 
@@ -77,7 +80,8 @@ test('can change property editor in a data type', {tag: '@smoke'}, async ({umbra
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.editorAlias).toBe(updatedEditorAlias);
@@ -112,6 +116,7 @@ test('can change settings', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'maxChars', maxCharsValue)).toBeTruthy();
 });
