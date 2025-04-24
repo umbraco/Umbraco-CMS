@@ -13,15 +13,15 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     public async Task Can_Publish_Single_Culture()
     {
         var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
-        var setupData = await CreateVariantContentAsync(langEn, langDa, langBe, contentType);
+        var content = await CreateVariantContentAsync(langEn, langDa, langBe, contentType);
 
         var publishAttempt = await ContentPublishingService.PublishAsync(
-            setupData.Key,
+            content.Key,
             [new() { Culture = langEn.IsoCode }],
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(publishAttempt.Success);
-        var content = ContentService.GetById(setupData.Key);
+        content = ContentService.GetById(content.Key);
         Assert.AreEqual(1, content!.PublishedCultures.Count());
     }
 
@@ -34,7 +34,8 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         var publishAttempt = await ContentPublishingService.PublishAsync(
             content.Key,
             [
-                new() { Culture = langEn.IsoCode }, new() { Culture = langDa.IsoCode },
+                new() { Culture = langEn.IsoCode },
+                new() { Culture = langDa.IsoCode },
             ],
             Constants.Security.SuperUserKey);
 
@@ -100,6 +101,75 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         content = ContentService.GetById(content.Key);
         Assert.NotNull(content!.PublishDate);
+    }
+
+    [Test]
+    public async Task Cannot_Publish_Invalid_Content_In_Invariant_Setup()
+    {
+        var doctype = await SetupInvariantDoctypeAsync();
+        var content = await CreateInvariantContentAsync(doctype, titleValue: null);
+
+        var publishAttempt = await ContentPublishingService.PublishAsync(
+            content.Key,
+            [new() { Culture = Constants.System.InvariantCulture }],
+            Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(publishAttempt.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, publishAttempt.Status);
+
+        content = ContentService.GetById(content.Key);
+        Assert.Null(content!.PublishDate);
+    }
+
+    [Test]
+    public async Task Cannot_Publish_Invalid_Content_In_Variant_Setup()
+    {
+        var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
+        var content = await CreateVariantContentAsync(
+            langEn,
+            langDa,
+            langBe,
+            contentType,
+            englishTitleValue: null);   // English is invalid, Danish is valid.
+
+        var publishAttempt = await ContentPublishingService.PublishAsync(
+            content.Key,
+            [
+                new() { Culture = langEn.IsoCode },
+                new() { Culture = langDa.IsoCode },
+            ],
+            Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(publishAttempt.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, publishAttempt.Status);
+        Assert.AreEqual("title", string.Join(",", publishAttempt.Result.InvalidPropertyAliases));
+
+        content = ContentService.GetById(content.Key);
+        Assert.AreEqual(0, content!.PublishedCultures.Count()); // Even though the Danish culture was valid, we still don't publish if if any are invalid.
+    }
+
+    [Test]
+    public async Task Can_Publish_Valid_Content_In_One_Culture_When_Another_Is_Invalid_In_Variant_Setup()
+    {
+        var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
+        var content = await CreateVariantContentAsync(
+            langEn,
+            langDa,
+            langBe,
+            contentType,
+            englishTitleValue: null);   // English is invalid, Danish is valid.
+
+        var publishAttempt = await ContentPublishingService.PublishAsync(
+            content.Key,
+            [
+                new() { Culture = langDa.IsoCode },
+            ],
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(publishAttempt.Success);
+        content = ContentService.GetById(content.Key);
+        Assert.AreEqual(1, content!.PublishedCultures.Count());
+        Assert.AreEqual(langDa.IsoCode, content!.PublishedCultures.First());
     }
 
     [Test]

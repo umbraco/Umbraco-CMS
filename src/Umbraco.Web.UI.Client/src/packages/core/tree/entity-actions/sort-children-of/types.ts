@@ -2,6 +2,7 @@ import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '@umbraco
 
 export type { UmbSortChildrenOfRepository } from './sort-children-of-repository.interface.js';
 export type { UmbSortChildrenOfDataSource } from './sort-children-of-data-source.interface.js';
+export type * from './modal/types.js';
 
 export interface UmbSortChildrenOfArgs {
 	unique: string | null;
