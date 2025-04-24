@@ -6,7 +6,7 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 export class UmbSortChildrenOfEntityAction extends UmbEntityActionBase<MetaEntityActionSortChildrenOfKind> {
 	override async execute() {
-		await umbOpenModal(this, UMB_SORT_CHILDREN_OF_MODAL, {
+		await umbOpenModal(this, this._getModalToken(), {
 			data: {
 				unique: this.args.unique,
 				entityType: this.args.entityType,
@@ -24,6 +24,10 @@ export class UmbSortChildrenOfEntityAction extends UmbEntityActionBase<MetaEntit
 				entityType: this.args.entityType,
 			}),
 		);
+	}
+
+	protected _getModalToken() {
+		return UMB_SORT_CHILDREN_OF_MODAL;
 	}
 }
 
