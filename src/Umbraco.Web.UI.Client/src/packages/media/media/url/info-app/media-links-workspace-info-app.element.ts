@@ -29,19 +29,14 @@ export class UmbMediaLinksWorkspaceInfoAppElement extends UmbLitElement {
 	@state()
 	private _links: Array<UmbMediaInfoViewLink> = [];
 
-	@state()
-	private _defaultCulture?: string;
-
 	#urls: Array<UmbMediaUrlModel> = [];
 
-	#mediaWorkspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
-			this.#mediaWorkspaceContext = context;
 			if (context) {
 				this.observe(
 					observeMultiple([context.isNew, context.unique]),
@@ -71,18 +66,6 @@ export class UmbMediaLinksWorkspaceInfoAppElement extends UmbLitElement {
 		this._links = links;
 	}
 
-	#getTargetUrl(url: string | undefined) {
-		if (!url || url.length === 0) {
-			return url;
-		}
-
-		if (url.includes('.') && !url.includes('//')) {
-			return '//' + url;
-		}
-
-		return url;
-	}
-
 	async #requestUrls() {
 		if (this._isNew) return;
 		if (!this._unique) return;
@@ -102,7 +85,7 @@ export class UmbMediaLinksWorkspaceInfoAppElement extends UmbLitElement {
 
 	#debounceRequestUrls = debounce(() => this.#requestUrls(), 50);
 
-	#onReloadRequest = (event: UmbEntityActionEvent) => {
+	#onReloadRequest = () => {
 		this.#debounceRequestUrls();
 	};
 
