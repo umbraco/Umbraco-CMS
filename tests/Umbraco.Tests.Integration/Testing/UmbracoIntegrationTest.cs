@@ -205,7 +205,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         }
     }
 
-    private static Type GetTestClassType()
+    private static Type? GetTestClassType()
     {
         string testClassName = TestContext.CurrentContext.Test.ClassName;
 
