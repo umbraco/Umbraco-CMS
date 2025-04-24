@@ -4,7 +4,7 @@ import type { UmbMediaUrlModel } from '../repository/types.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import type { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 
