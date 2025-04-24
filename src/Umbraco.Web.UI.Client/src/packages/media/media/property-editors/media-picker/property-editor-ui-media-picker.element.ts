@@ -91,8 +91,8 @@ export class UmbPropertyEditorUIMediaPickerElement
 		super();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this.observe(context.alias, (alias) => (this._alias = alias));
-			this.observe(context.variantId, (variantId) => (this._variantId = variantId?.toString() || 'invariant'));
+			this.observe(context?.alias, (alias) => (this._alias = alias));
+			this.observe(context?.variantId, (variantId) => (this._variantId = variantId?.toString() || 'invariant'));
 		});
 	}
 

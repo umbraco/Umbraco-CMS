@@ -45,7 +45,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_ENTITY_CONTEXT, (entityContext) => {
-			this._entityType = entityContext.getEntityType();
+			this._entityType = entityContext?.getEntityType();
 		});
 	}
 

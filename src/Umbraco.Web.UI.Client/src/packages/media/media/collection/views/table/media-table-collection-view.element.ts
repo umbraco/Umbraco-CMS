@@ -59,9 +59,9 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
 			this.#observeCollectionContext();
-			collectionContext.setupView(this);
+			collectionContext?.setupView(this);
 			this.observe(
-				collectionContext.workspacePathBuilder,
+				collectionContext?.workspacePathBuilder,
 				(builder) => {
 					this._workspacePathBuilder = builder;
 					this.#createTableItems();

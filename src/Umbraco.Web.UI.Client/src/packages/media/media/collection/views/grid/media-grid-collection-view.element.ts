@@ -28,9 +28,9 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		super();
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
-			collectionContext.setupView(this);
+			collectionContext?.setupView(this);
 			this.observe(
-				collectionContext.workspacePathBuilder,
+				collectionContext?.workspacePathBuilder,
 				(builder) => {
 					this._workspacePathBuilder = builder;
 				},

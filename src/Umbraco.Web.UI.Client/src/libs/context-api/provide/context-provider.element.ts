@@ -1,4 +1,5 @@
 import type { UmbContextToken } from '../token/index.js';
+import type { UmbContextMinimal } from '../types.js';
 import { UmbContextProviderController } from './context-provider.controller.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
@@ -15,13 +16,13 @@ export class UmbContextProviderElement extends UmbControllerHostElementMixin(HTM
 	 * The value to provide to the context.
 	 * @optional
 	 */
-	public create?: (host: UmbControllerHostElement) => unknown;
+	public create?: (host: UmbControllerHostElement) => UmbContextMinimal;
 
 	/**
 	 * The value to provide to the context.
 	 * @required
 	 */
-	public value: unknown;
+	public value?: UmbContextMinimal;
 
 	/**
 	 * The key to provide to the context.
@@ -33,9 +34,12 @@ export class UmbContextProviderElement extends UmbControllerHostElementMixin(HTM
 		return ['value', 'key'];
 	}
 
-	attributeChangedCallback(name: string, _oldValue: string | UmbContextToken, newValue: string | UmbContextToken) {
-		if (name === 'key') this.key = newValue;
-		if (name === 'value') this.value = newValue;
+	attributeChangedCallback(name: string, _oldValue: unknown, newValue: unknown) {
+		if (name === 'key') {
+			this.key = newValue as string | UmbContextToken;
+		} else if (name === 'value') {
+			this.value = newValue as UmbContextMinimal;
+		}
 	}
 
 	constructor() {

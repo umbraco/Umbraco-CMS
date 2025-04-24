@@ -16,7 +16,7 @@ export class UmbChangePasswordCurrentUserAction<ArgsMetaType = never>
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
 			this.observe(
-				context.unique,
+				context?.unique,
 				(unique) => {
 					this.#unique = unique;
 				},

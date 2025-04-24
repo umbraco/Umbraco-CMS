@@ -17,10 +17,10 @@ export class UmbPropertyTypeWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this.observe(context.isNew, (isNew) => {
+			this.observe(context?.isNew, (isNew) => {
 				this._isNew = isNew;
 			});
-			this.observe(context.name, (name) => {
+			this.observe(context?.name, (name) => {
 				this._name = name;
 			});
 			this.#workspaceContext?.createPropertyDatasetContext(this);

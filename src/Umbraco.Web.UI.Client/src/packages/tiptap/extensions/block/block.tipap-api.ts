@@ -92,10 +92,13 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 
 		this.consumeContext(UMB_BLOCK_RTE_MANAGER_CONTEXT, (context) => {
 			this.observe(
-				context.contents.pipe(
+				context?.contents.pipe(
 					distinctUntilChanged((prev, curr) => prev.map((y) => y.key).join() === curr.map((y) => y.key).join()),
 				),
 				(contents) => {
+					if (!contents || !context) {
+						return;
+					}
 					this.#updateBlocks(contents, context.getLayouts());
 				},
 				'contents',

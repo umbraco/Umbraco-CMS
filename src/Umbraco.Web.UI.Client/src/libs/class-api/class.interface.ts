@@ -2,6 +2,7 @@ import type {
 	UmbContextCallback,
 	UmbContextConsumerAsPromiseOptionsType,
 	UmbContextConsumerController,
+	UmbContextMinimal,
 	UmbContextProviderController,
 	UmbContextToken,
 } from '@umbraco-cms/backoffice/context-api';
@@ -48,7 +49,10 @@ export interface UmbClassInterface extends UmbControllerHost {
 	 * @returns {UmbContextProviderController} Reference to the created Context Provider Controller instance
 	 * @memberof UmbClassInterface
 	 */
-	provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R>;
+	provideContext<R extends UmbContextMinimal = UmbContextMinimal>(
+		alias: string | UmbContextToken<R>,
+		instance: R,
+	): UmbContextProviderController<R>;
 
 	/**
 	 * @description Setup a subscription for a context. The callback is called when the context is resolved.
@@ -57,7 +61,7 @@ export interface UmbClassInterface extends UmbControllerHost {
 	 * @returns {UmbContextConsumerController} Reference to the created Context Consumer Controller instance
 	 * @memberof UmbClassInterface
 	 */
-	consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+	consumeContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
 		alias: string | UmbContextToken<BaseType, ResultType>,
 		callback: UmbContextCallback<ResultType>,
 	): UmbContextConsumerController<BaseType, ResultType>;
@@ -68,7 +72,7 @@ export interface UmbClassInterface extends UmbControllerHost {
 	 * @returns {Promise<unknown>} A Promise with the reference to the Context Api Instance
 	 * @memberof UmbClassInterface
 	 */
-	getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+	getContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
 		alias: string | UmbContextToken<BaseType, ResultType>,
 		options?: UmbClassGetContextOptions,
 	): Promise<ResultType | undefined>;

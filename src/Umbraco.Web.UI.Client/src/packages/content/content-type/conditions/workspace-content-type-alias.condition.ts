@@ -30,7 +30,7 @@ export class UmbWorkspaceContentTypeAliasCondition
 		if (permissionCheck !== undefined) {
 			this.consumeContext(UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT, (context) => {
 				this.observe(
-					context.structure.contentTypeAliases,
+					context?.structure.contentTypeAliases,
 					(contentTypeAliases) => {
 						this.permitted = contentTypeAliases ? permissionCheck!(contentTypeAliases) : false;
 					},

@@ -9,7 +9,7 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
-export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext> {
+export class UmbCurrentUserContext extends UmbContextBase {
 	#currentUser = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
 	readonly currentUser = this.#currentUser.asObservable().pipe(filter((user) => !!user));
 	readonly allowedSections = this.#currentUser.asObservablePart((user) => user?.allowedSections);

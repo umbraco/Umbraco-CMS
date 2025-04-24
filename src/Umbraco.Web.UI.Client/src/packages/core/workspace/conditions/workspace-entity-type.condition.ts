@@ -11,7 +11,7 @@ export class UmbWorkspaceEntityTypeCondition
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbWorkspaceEntityTypeConditionConfig>) {
 		super(host, args);
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
-			this.permitted = context.getEntityType().toLowerCase() === this.config.match.toLowerCase();
+			this.permitted = context?.getEntityType().toLowerCase() === this.config.match.toLowerCase();
 		});
 	}
 }

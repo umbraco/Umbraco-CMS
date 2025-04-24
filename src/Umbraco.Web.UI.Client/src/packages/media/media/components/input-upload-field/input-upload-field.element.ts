@@ -67,7 +67,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
-			this._serverUrl = context.getServerUrl();
+			this._serverUrl = context?.getServerUrl() ?? '';
 		});
 	}
 

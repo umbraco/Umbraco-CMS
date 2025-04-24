@@ -146,7 +146,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
-			this.#tabsStructureHelper.setStructureManager(workspaceContext.structure);
+			this.#tabsStructureHelper.setStructureManager(workspaceContext?.structure);
 
 			this.#observeRootGroups();
 		});

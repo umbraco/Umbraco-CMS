@@ -23,7 +23,7 @@ export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (instance) => {
 			this.#userGroupWorkspaceContext = instance;
 			this.observe(
-				this.#userGroupWorkspaceContext.fallbackPermissions,
+				this.#userGroupWorkspaceContext?.fallbackPermissions,
 				(fallbackPermissions) => {
 					this._fallBackPermissions = fallbackPermissions;
 				},

@@ -14,7 +14,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
  * Context API for the installer
  * @class UmbInstallerContext
  */
-export class UmbInstallerContext extends UmbContextBase<UmbInstallerContext, typeof UMB_INSTALLER_CONTEXT> {
+export class UmbInstallerContext extends UmbContextBase {
 	private _data = new UmbObjectState<InstallRequestModelReadable>({
 		user: { name: '', email: '', password: '', subscribeToNewsletter: false },
 		database: { id: '', providerName: '', useIntegratedAuthentication: false, trustServerCertificate: false },

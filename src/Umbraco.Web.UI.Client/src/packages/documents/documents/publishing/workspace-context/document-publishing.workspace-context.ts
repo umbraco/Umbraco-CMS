@@ -27,7 +27,7 @@ import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/back
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
-export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDocumentPublishingWorkspaceContext> {
+export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase {
 	/**
 	 * Manages the pending changes for the published document.
 	 * @memberof UmbDocumentPublishingWorkspaceContext
@@ -424,7 +424,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	}
 
 	async #initPendingChanges() {
-		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+		if (!this.#documentWorkspaceContext) {
+			// Do not complain in this case.
+			return;
+		}
 		this.observe(
 			observeMultiple([this.#documentWorkspaceContext.unique, this.#documentWorkspaceContext.isNew]),
 			([unique, isNew]) => {

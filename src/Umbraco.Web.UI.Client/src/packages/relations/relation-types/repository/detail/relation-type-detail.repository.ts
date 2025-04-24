@@ -36,7 +36,7 @@ export class UmbRelationTypeDetailRepository
 		const { data, error } = await this.#detailSource.read(unique);
 
 		if (data) {
-			this.#detailStore!.append(data);
+			this.#detailStore?.append(data);
 		}
 
 		return { data, error, asObservable: () => this.#detailStore!.byUnique(unique) };

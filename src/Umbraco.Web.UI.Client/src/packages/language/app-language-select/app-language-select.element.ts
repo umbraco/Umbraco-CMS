@@ -53,12 +53,12 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(context.languages, (languages) => {
+			this.observe(context?.languages, (languages) => {
 				this.#currentUserAllowedLanguages = languages;
 				this.#checkForLanguageAccess();
 			});
 
-			this.observe(context.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
+			this.observe(context?.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
 				this.#currentUserHasAccessToAllLanguages = hasAccessToAllLanguages;
 				this.#checkForLanguageAccess();
 			});

@@ -26,7 +26,7 @@ export abstract class UmbElementPropertyDatasetContext<
 			ContentTypeModel
 		>,
 	>
-	extends UmbContextBase<UmbPropertyDatasetContext>
+	extends UmbContextBase
 	implements UmbPropertyDatasetContext
 {
 	protected readonly _dataOwner: DataOwnerType;

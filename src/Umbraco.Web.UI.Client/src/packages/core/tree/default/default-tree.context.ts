@@ -24,7 +24,7 @@ export class UmbDefaultTreeContext<
 		TreeRootType extends UmbTreeRootModel,
 		RequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
 	>
-	extends UmbContextBase<UmbDefaultTreeContext<TreeItemType, TreeRootType, RequestArgsType>>
+	extends UmbContextBase
 	implements UmbTreeContext
 {
 	#additionalRequestArgs = new UmbObjectState<Partial<RequestArgsType> | object>({});

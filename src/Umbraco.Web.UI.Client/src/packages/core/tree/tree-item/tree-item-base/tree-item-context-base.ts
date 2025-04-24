@@ -26,7 +26,7 @@ export abstract class UmbTreeItemContextBase<
 		TreeRootType extends UmbTreeRootModel,
 		ManifestType extends ManifestTreeItem = ManifestTreeItem,
 	>
-	extends UmbContextBase<UmbTreeItemContext<TreeItemType>>
+	extends UmbContextBase
 	implements UmbTreeItemContext<TreeItemType>
 {
 	public unique?: UmbEntityUnique;
@@ -300,17 +300,17 @@ export abstract class UmbTreeItemContextBase<
 			this.#removeEventListeners();
 			this.#actionEventContext = instance;
 
-			this.#actionEventContext.addEventListener(
+			this.#actionEventContext?.addEventListener(
 				UmbRequestReloadTreeItemChildrenEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 
-			this.#actionEventContext.addEventListener(
+			this.#actionEventContext?.addEventListener(
 				UmbRequestReloadChildrenOfEntityEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 
-			this.#actionEventContext.addEventListener(
+			this.#actionEventContext?.addEventListener(
 				UmbRequestReloadStructureForEntityEvent.TYPE,
 				this.#onReloadStructureRequest as unknown as EventListener,
 			);

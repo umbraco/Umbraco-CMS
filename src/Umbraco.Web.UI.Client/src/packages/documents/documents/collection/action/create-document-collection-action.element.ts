@@ -36,16 +36,16 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.observe(workspaceContext.unique, (unique) => {
+			this.observe(workspaceContext?.unique, (unique) => {
 				this._documentUnique = unique;
 			});
-			this.observe(workspaceContext.contentTypeUnique, (documentTypeUnique) => {
+			this.observe(workspaceContext?.contentTypeUnique, (documentTypeUnique) => {
 				this._documentTypeUnique = documentTypeUnique;
 			});
 		});
 
 		this.consumeContext(UMB_DOCUMENT_COLLECTION_CONTEXT, (collectionContext) => {
-			this.observe(collectionContext.workspacePathBuilder, (builder) => {
+			this.observe(collectionContext?.workspacePathBuilder, (builder) => {
 				this._workspacePathBuilder = builder;
 			});
 		});

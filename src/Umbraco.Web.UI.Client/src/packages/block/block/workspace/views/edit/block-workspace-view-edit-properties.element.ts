@@ -1,4 +1,5 @@
 import type { UmbBlockWorkspaceElementManagerNames } from '../../block-workspace.context.js';
+import type UmbBlockElementManager from '../../block-element-manager.js';
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
 import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -8,7 +9,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 import './block-workspace-view-edit-property.element.js';
-import type UmbBlockElementManager from '../../block-element-manager.js';
 
 @customElement('umb-block-workspace-view-edit-properties')
 export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -52,9 +52,9 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
-			this._ownerEntityType = this.#workspaceContext.getEntityType();
+			this._ownerEntityType = this.#workspaceContext?.getEntityType();
 			this.observe(
-				workspaceContext.variantId,
+				workspaceContext?.variantId,
 				(variantId) => {
 					this._variantId = variantId;
 					this.#processPropertyStructure();

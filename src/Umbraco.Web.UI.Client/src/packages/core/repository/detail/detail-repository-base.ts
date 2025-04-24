@@ -73,7 +73,7 @@ export abstract class UmbDetailRepositoryBase<
 		const { data, error } = await this.detailDataSource.read(unique);
 
 		if (data) {
-			this.#detailStore!.append(data);
+			this.#detailStore?.append(data);
 		}
 
 		return {
@@ -121,7 +121,7 @@ export abstract class UmbDetailRepositoryBase<
 		const { data: updatedData, error } = await this.detailDataSource.update(model);
 
 		if (updatedData) {
-			this.#detailStore!.updateItem(model.unique, updatedData);
+			this.#detailStore?.updateItem(model.unique, updatedData);
 
 			// TODO: how do we handle generic notifications? Is this the correct place to do it?
 			this.#updateSuccessNotification?.close();
@@ -145,7 +145,7 @@ export abstract class UmbDetailRepositoryBase<
 		const { error } = await this.detailDataSource.delete(unique);
 
 		if (!error) {
-			this.#detailStore!.removeItem(unique);
+			this.#detailStore?.removeItem(unique);
 
 			this.#deleteSuccessNotification?.close();
 			// TODO: how do we handle generic notifications? Is this the correct place to do it?

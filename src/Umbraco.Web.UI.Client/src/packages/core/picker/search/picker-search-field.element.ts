@@ -23,9 +23,12 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 
 		this.consumeContext(UMB_PICKER_CONTEXT, (context) => {
 			this.#pickerContext = context;
-			this.observe(this.#pickerContext.search.searchable, (isSearchable) => (this._isSearchable = isSearchable));
-			this.observe(this.#pickerContext.search.searching, (searching) => (this._searching = searching));
-			this.observe(this.#pickerContext.search.query, (query) => (this._query = query?.query || ''));
+			this.observe(
+				this.#pickerContext?.search.searchable,
+				(isSearchable) => (this._isSearchable = isSearchable ?? false),
+			);
+			this.observe(this.#pickerContext?.search.searching, (searching) => (this._searching = searching ?? false));
+			this.observe(this.#pickerContext?.search.query, (query) => (this._query = query?.query || ''));
 		});
 	}
 

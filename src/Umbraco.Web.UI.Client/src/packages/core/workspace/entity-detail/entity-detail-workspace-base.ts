@@ -99,11 +99,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
 			this.#eventContext = context;
 
-			this.#eventContext.removeEventListener(
+			this.#eventContext?.removeEventListener(
 				UmbEntityUpdatedEvent.TYPE,
 				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);
-			this.#eventContext.addEventListener(
+			this.#eventContext?.addEventListener(
 				UmbEntityUpdatedEvent.TYPE,
 				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);

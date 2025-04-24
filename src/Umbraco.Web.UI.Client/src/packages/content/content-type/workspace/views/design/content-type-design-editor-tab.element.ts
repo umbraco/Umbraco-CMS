@@ -110,13 +110,13 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
-			this.#groupStructureHelper.setStructureManager(context.structure);
+			this.#groupStructureHelper.setStructureManager(context?.structure);
 
-			const entityType = context.getEntityType();
+			const entityType = context?.getEntityType();
 
 			this.#workspaceModal?.destroy();
 			this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-				.addAdditionalPath(entityType)
+				.addAdditionalPath(entityType ?? 'unknown')
 				.onSetup(async () => {
 					return { data: { entityType: entityType, preset: {} } };
 				})
@@ -127,7 +127,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 
 		this.consumeContext(UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT, (context) => {
 			this.observe(
-				context.isSorting,
+				context?.isSorting,
 				(isSorting) => {
 					this._sortModeActive = isSorting;
 					if (isSorting) {

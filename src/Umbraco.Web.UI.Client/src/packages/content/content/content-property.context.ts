@@ -4,7 +4,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 
-export class UmbContentPropertyContext extends UmbContextBase<UmbContentPropertyContext> {
+export class UmbContentPropertyContext extends UmbContextBase {
 	#dataType = new UmbObjectState<UmbPropertyTypeModel['dataType'] | undefined>(undefined);
 	dataType = this.#dataType.asObservable();
 

@@ -59,15 +59,15 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, async (context) => {
 			this.observe(
-				await context.propertyValueByAlias<Array<UmbBlockTypeWithGroupKey>>('blocks'),
+				await context?.propertyValueByAlias<Array<UmbBlockTypeWithGroupKey>>('blocks'),
 				(blockTypes) => {
 					this._blockTypes = blockTypes ?? [];
-					this.#itemsManager.setUniques(blockTypes.map((block) => block.contentElementTypeKey));
+					this.#itemsManager.setUniques(this._blockTypes.map((block) => block.contentElementTypeKey));
 				},
 				'observeBlockType',
 			);
 			this.observe(
-				await context.propertyValueByAlias<Array<UmbBlockGridTypeGroupType>>('blockGroups'),
+				await context?.propertyValueByAlias<Array<UmbBlockGridTypeGroupType>>('blockGroups'),
 				(blockGroups) => {
 					this._blockGroups = blockGroups ?? [];
 				},

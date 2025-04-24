@@ -10,10 +10,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
  * A context for fetching and caching the document configuration.
  * @internal
  */
-export class UmbDocumentConfigurationContext
-	extends UmbContextBase<UmbDocumentConfigurationContext, typeof UMB_DOCUMENT_CONFIGURATION_CONTEXT>
-	implements UmbApi
-{
+export class UmbDocumentConfigurationContext extends UmbContextBase implements UmbApi {
 	/**
 	 * The cached document configuration.
 	 */

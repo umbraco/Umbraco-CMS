@@ -36,17 +36,17 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.observe(workspaceContext.unique, (unique) => {
+			this.observe(workspaceContext?.unique, (unique) => {
 				this._mediaUnique = unique;
 			});
 
-			this.observe(workspaceContext.contentTypeUnique, (mediaTypeUnique) => {
+			this.observe(workspaceContext?.contentTypeUnique, (mediaTypeUnique) => {
 				this._mediaTypeUnique = mediaTypeUnique;
 			});
 		});
 
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
-			this.observe(collectionContext.workspacePathBuilder, (builder) => {
+			this.observe(collectionContext?.workspacePathBuilder, (builder) => {
 				this._workspacePathBuilder = builder;
 			});
 		});
