@@ -74,23 +74,6 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 			entityType: this.args.entityType,
 		});
 
-		// If the document has only one variant, we can skip the modal and publish directly:
-		if (options.length === 1) {
-			const variantId = UmbVariantId.Create(documentData.variants[0]);
-			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
-			const { error } = await publishingRepository.publish(this.args.unique, [{ variantId }]);
-			if (!error) {
-				notificationContext?.peek('positive', {
-					data: {
-						headline: localize.term('speechBubbles_editContentUnpublishedHeader'),
-						message: localize.term('speechBubbles_editContentUnpublishedText'),
-					},
-				});
-			}
-			actionEventContext.dispatchEvent(event);
-			return;
-		}
-
 		// Figure out the default selections
 		// TODO: Missing features to pre-select the variant that fits with the variant-id of the tree/collection? (Again only relevant if the action is executed from a Tree or Collection) [NL]
 		const selection: Array<string> = [];
@@ -125,17 +108,28 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 		const { error } = await publishingRepository.unpublish(this.args.unique, variantIds);
 
 		if (!error) {
-			const documentVariants = documentData.variants.filter((variant) => result.selection.includes(variant.culture!));
+			// If the content is invariant, we need to show a different notification
+			const isInvariant = options.length === 1 && options[0].culture === null;
 
-			notificationContext?.peek('positive', {
-				data: {
-					headline: localize.term('speechBubbles_editContentUnpublishedHeader'),
-					message: localize.term(
-						'speechBubbles_editVariantUnpublishedText',
-						localize.list(documentVariants.map((v) => v.culture ?? v.name)),
-					),
-				},
-			});
+			if (isInvariant) {
+				notificationContext?.peek('positive', {
+					data: {
+						headline: localize.term('speechBubbles_editContentUnpublishedHeader'),
+						message: localize.term('speechBubbles_editContentUnpublishedText'),
+					},
+				});
+			} else {
+				const documentVariants = documentData.variants.filter((variant) => result.selection.includes(variant.culture!));
+				notificationContext?.peek('positive', {
+					data: {
+						headline: localize.term('speechBubbles_editContentUnpublishedHeader'),
+						message: localize.term(
+							'speechBubbles_editVariantUnpublishedText',
+							localize.list(documentVariants.map((v) => v.culture ?? v.name)),
+						),
+					},
+				});
+			}
 
 			actionEventContext.dispatchEvent(event);
 		}
