@@ -10,7 +10,6 @@ public class ContentEditingVariantBuilder<TParent>(TParent parentBuilder)
     private string? _culture;
     private string? _segment;
     private string _name;
-    private readonly List<ContentEditingPropertyValueBuilder<ContentEditingVariantBuilder<TParent>>> _properties = new();
 
     string? IWithCultureBuilder.Culture
     {
@@ -28,23 +27,6 @@ public class ContentEditingVariantBuilder<TParent>(TParent parentBuilder)
     {
         get => _name;
         set => _name = value;
-    }
-
-    public ContentEditingPropertyValueBuilder<ContentEditingVariantBuilder<TParent>> AddProperty()
-    {
-        var builder = new ContentEditingPropertyValueBuilder<ContentEditingVariantBuilder<TParent>>((ContentEditingVariantBuilder<TParent>)this);
-        _properties.Add(builder);
-        return builder;
-    }
-
-    public IReadOnlyCollection<ContentEditingPropertyValueBuilder<ContentEditingVariantBuilder<TParent>>> GetProperties()
-    {
-        if (_culture is null)
-        {
-            throw new InvalidOperationException("Culture must be defined for the variant before building.");
-        }
-
-        return _properties.Select(property => property.WithCulture(_culture)).ToList();
     }
 
     public override VariantModel Build() =>
