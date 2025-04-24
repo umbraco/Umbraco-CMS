@@ -1238,6 +1238,9 @@ export type MediaResponseModel = {
     values: Array<MediaValueResponseModel>;
     variants: Array<MediaVariantResponseModel>;
     id: string;
+    /**
+     * @deprecated
+     */
     urls: Array<MediaUrlInfoModel>;
     isTrashed: boolean;
     mediaType: MediaTypeReferenceResponseModel;
@@ -16140,5 +16143,5 @@ export type GetWebhookLogsResponses = {
 export type GetWebhookLogsResponse = GetWebhookLogsResponses[keyof GetWebhookLogsResponses];
 
 export type ClientOptions = {
-    baseUrl: `${string}://${string}` | (string & {});
+    baseUrl: 'http://localhost:11000' | (string & {});
 };
