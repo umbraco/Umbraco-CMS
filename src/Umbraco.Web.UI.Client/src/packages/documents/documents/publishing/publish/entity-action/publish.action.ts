@@ -22,7 +22,6 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 		if (!this.args.unique) throw new Error('The document unique identifier is missing');
 
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		if (!notificationContext) throw new Error('The notification context is missing');
 		const localize = new UmbLocalizationController(this);
 
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);
@@ -76,7 +75,7 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
 			const { error } = await publishingRepository.publish(this.args.unique, [{ variantId }]);
 			if (!error) {
-				notificationContext.peek('positive', {
+				notificationContext?.peek('positive', {
 					data: {
 						headline: localize.term('speechBubbles_editContentPublishedHeader'),
 						message: localize.term('speechBubbles_editContentPublishedText'),
@@ -123,7 +122,7 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 
 			if (!error) {
 				const documentVariants = documentData.variants.filter((variant) => result.selection.includes(variant.culture!));
-				notificationContext.peek('positive', {
+				notificationContext?.peek('positive', {
 					data: {
 						headline: localize.term('speechBubbles_editContentPublishedHeader'),
 						message: localize.term(

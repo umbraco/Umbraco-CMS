@@ -1,10 +1,10 @@
-import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * Header apps are displayed in the top right corner of the backoffice
  * The two provided header apps are the search and the user menu
  */
-export interface ManifestHeaderApp extends ManifestElement {
+export interface ManifestHeaderApp extends ManifestElement, ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'headerApp';
 	//meta: MetaHeaderApp;
 }

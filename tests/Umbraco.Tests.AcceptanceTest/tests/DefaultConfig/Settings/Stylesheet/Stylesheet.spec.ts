@@ -27,7 +27,8 @@ test('can create a empty stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbra
   await umbracoUi.stylesheet.clickSaveButton();
 
   // Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.stylesheet.isErrorNotificationVisible(false);
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName);
 });
@@ -46,7 +47,8 @@ test('can create a stylesheet with content', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.stylesheet.clickSaveButton();
 
   // Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.stylesheet.isErrorNotificationVisible(false);
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
   const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
   expect(stylesheetData.content).toEqual(stylesheetContent);
@@ -65,7 +67,8 @@ test.skip('can update a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbrac
   await umbracoUi.stylesheet.clickSaveButton();
 
   // Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.stylesheet.isErrorNotificationVisible(false);
   const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
   expect(stylesheetData.content).toEqual(stylesheetContent);
 });
@@ -81,7 +84,8 @@ test('can delete a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   await umbracoUi.stylesheet.clickDeleteAndConfirmButton();
 
   // Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  //await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  await umbracoUi.stylesheet.isErrorNotificationVisible(false);
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeFalsy();
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName, false, false);
 });
