@@ -21,11 +21,15 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT, (instance) => {
-				this.#currentUserStore = instance;
+				if (instance) {
+					this.#currentUserStore = instance;
+				}
 			}).asPromise({ preventTimeout: true }),
 
 			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
-				this.notificationContext = instance;
+				if (instance) {
+					this.notificationContext = instance;
+				}
 			}).asPromise({ preventTimeout: true }),
 		]);
 	}
