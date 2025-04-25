@@ -42,12 +42,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [
-			{
-				culture: null,
-				url: '/umbraco/backoffice/assets/installer-illustration.svg',
-			},
-		],
+		urls: [],
 	},
 	{
 		hasChildren: false,
