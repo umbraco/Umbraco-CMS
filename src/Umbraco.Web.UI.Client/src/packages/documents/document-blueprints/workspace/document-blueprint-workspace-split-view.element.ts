@@ -6,22 +6,25 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-document-blueprint-workspace-split-view')
 export class UmbDocumentBlueprintWorkspaceSplitViewElement extends UmbLitElement {
-	// TODO: Refactor: use the split view context token:
 	private _workspaceContext?: typeof UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	_variants?: Array<ActiveVariant>;
 
+	@state()
+	_isNew?: boolean;
+
 	constructor() {
 		super();
-		// TODO: Refactor: use a split view workspace context token:
+
 		this.consumeContext(UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;
-			this._observeActiveVariantInfo();
+			this.#observeActiveVariantInfo();
+			this.#observeIsNew();
 		});
 	}
 
-	private _observeActiveVariantInfo() {
+	#observeActiveVariantInfo() {
 		if (!this._workspaceContext) return;
 		this.observe(
 			this._workspaceContext.splitView.activeVariantsInfo,
@@ -30,6 +33,20 @@ export class UmbDocumentBlueprintWorkspaceSplitViewElement extends UmbLitElement
 			},
 			'_observeActiveVariantsInfo',
 		);
+	}
+
+	#observeIsNew() {
+		this.observe(
+			this._workspaceContext?.isNew,
+			(isNew) => {
+				this._isNew = isNew;
+			},
+			'#observeIsNew',
+		);
+	}
+
+	#getDisplayNavigation(view: ActiveVariant) {
+		return view.index === this._variants!.length - 1 && this._isNew === false;
 	}
 
 	override render() {
@@ -42,7 +59,7 @@ export class UmbDocumentBlueprintWorkspaceSplitViewElement extends UmbLitElement
 							(view) => html`
 								<umb-workspace-split-view
 									.splitViewIndex=${view.index}
-									.displayNavigation=${view.index === this._variants!.length - 1}></umb-workspace-split-view>
+									.displayNavigation=${this.#getDisplayNavigation(view)}></umb-workspace-split-view>
 							`,
 						)}
 					</div>

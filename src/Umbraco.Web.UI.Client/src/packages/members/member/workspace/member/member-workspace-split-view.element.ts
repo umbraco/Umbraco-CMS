@@ -7,23 +7,25 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-member-workspace-split-view')
 export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
-	// TODO: Refactor: use the split view context token:
 	private _workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	_variants?: Array<ActiveVariant>;
 
+	@state()
+	_isNew?: boolean;
+
 	constructor() {
 		super();
 
-		// TODO: Refactor: use a split view workspace context token:
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;
-			this._observeActiveVariantInfo();
+			this.#observeActiveVariantInfo();
+			this.#observeIsNew();
 		});
 	}
 
-	private _observeActiveVariantInfo() {
+	#observeActiveVariantInfo() {
 		if (!this._workspaceContext) return;
 		this.observe(
 			this._workspaceContext.splitView.activeVariantsInfo,
@@ -32,6 +34,20 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 			},
 			'_observeActiveVariantsInfo',
 		);
+	}
+
+	#observeIsNew() {
+		this.observe(
+			this._workspaceContext?.isNew,
+			(isNew) => {
+				this._isNew = isNew;
+			},
+			'#observeIsNew',
+		);
+	}
+
+	#getDisplayNavigation(view: ActiveVariant) {
+		return view.index === this._variants!.length - 1 && this._isNew === false;
 	}
 
 	override render() {
@@ -45,7 +61,7 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 								<umb-workspace-split-view
 									back-path=${UMB_MEMBER_ROOT_WORKSPACE_PATH}
 									.splitViewIndex=${view.index}
-									.displayNavigation=${view.index === this._variants!.length - 1}>
+									.displayNavigation=${this.#getDisplayNavigation(view)}>
 								</umb-workspace-split-view>
 							`,
 						)}

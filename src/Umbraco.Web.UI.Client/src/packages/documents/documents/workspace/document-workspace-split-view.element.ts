@@ -47,7 +47,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	}
 
 	#getDisplayNavigation(view: ActiveVariant) {
-		return view.index === this._variants!.length - 1 && this._isNew == false;
+		return view.index === this._variants!.length - 1 && this._isNew === false;
 	}
 
 	override render() {
