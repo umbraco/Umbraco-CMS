@@ -7,7 +7,7 @@ import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 interface UmbDocumentTypePickerInputContextOpenArgs {
-	elementTypesOnly?: boolean;
+	isElementType?: boolean;
 }
 
 export class UmbDocumentTypePickerInputContext extends UmbPickerInputContext<
@@ -36,7 +36,7 @@ export class UmbDocumentTypePickerInputContext extends UmbPickerInputContext<
 		}
 
 		combinedPickerData.search!.queryParams = {
-			elementTypesOnly: args?.elementTypesOnly,
+			isElementType: args?.isElementType,
 			...pickerData?.search?.queryParams,
 		};
 

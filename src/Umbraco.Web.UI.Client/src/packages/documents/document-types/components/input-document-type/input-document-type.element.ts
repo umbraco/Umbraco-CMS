@@ -160,13 +160,25 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	}
 
 	#openPicker() {
+		if (this.documentTypesOnly && this.elementTypesOnly) {
+			throw new Error('You cannot set both documentTypesOnly and elementTypesOnly to true.');
+		}
+
+		let isElementType = undefined;
+
+		if (this.documentTypesOnly) {
+			isElementType = false;
+		} else if (this.elementTypesOnly) {
+			isElementType = true;
+		}
+
 		this.#pickerContext.openPicker(
 			{
 				hideTreeRoot: true,
 				pickableFilter: this.#getPickableFilter(),
 			},
 			{
-				elementTypesOnly: this.elementTypesOnly ? true : undefined,
+				isElementType,
 			},
 		);
 	}
