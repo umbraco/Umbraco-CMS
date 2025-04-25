@@ -4,7 +4,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, ref } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { UmbContextProxy } from '@umbraco-cms/backoffice/context-proxy';
+import { UmbContextProxyController } from '@umbraco-cms/backoffice/context-proxy';
 
 @customElement('umb-section-sidebar-context-menu')
 export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
@@ -68,9 +68,9 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 	}
 
 	#setupProxy(target: EventTarget | undefined) {
-		new UmbContextProxy(this, target, () => this.#sectionSidebarContext?.getContextElement()).setIgnoreContextAliases([
-			UMB_SECTION_SIDEBAR_CONTEXT.contextAlias,
-		]);
+		new UmbContextProxyController(this, target, () =>
+			this.#sectionSidebarContext?.getContextElement(),
+		).setIgnoreContextAliases([UMB_SECTION_SIDEBAR_CONTEXT.contextAlias]);
 	}
 
 	override render() {

@@ -14,7 +14,7 @@ const CtrlAlias = Symbol();
  * This controller creates a Proxy for the Context API.
  * @description It is not advised for anyone to implement this unless they know exactly what they are doing.
  */
-export class UmbContextProxy extends UmbControllerBase {
+export class UmbContextProxyController extends UmbControllerBase {
 	#target?: EventTarget;
 	#getDestination: () => EventTarget | undefined;
 	#ignorer: Array<string> = [];

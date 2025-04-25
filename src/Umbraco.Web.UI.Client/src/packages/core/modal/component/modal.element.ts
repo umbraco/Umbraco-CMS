@@ -18,7 +18,7 @@ import {
 import { UMB_ROUTE_CONTEXT, type UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement, loadManifestElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbContextBoundary, UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
-import { UmbContextProxy } from '@umbraco-cms/backoffice/context-proxy';
+import { UmbContextProxyController } from '@umbraco-cms/backoffice/context-proxy';
 
 @customElement('umb-modal')
 export class UmbModalElement extends UmbLitElement {
@@ -60,9 +60,9 @@ export class UmbModalElement extends UmbLitElement {
 		// Makes sure that the modal triggers the reject of the context promise when it is closed by pressing escape.
 		this.element.addEventListener(UUIModalCloseEvent, this.#onClose);
 
-		new UmbContextProxy(this, this.element, () => this.#modalContext?.getHostElement()).setIgnoreContextAliases([
-			UMB_MODAL_CONTEXT.contextAlias,
-		]);
+		new UmbContextProxyController(this, this.element, () =>
+			this.#modalContext?.getHostElement(),
+		).setIgnoreContextAliases([UMB_MODAL_CONTEXT.contextAlias]);
 
 		this.#modalContext.onSubmit().then(
 			() => {
