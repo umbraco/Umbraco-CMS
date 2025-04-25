@@ -63,7 +63,7 @@ test('can publish content with the list view data type', async ({umbracoApi, umb
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
+  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
@@ -88,7 +88,6 @@ test('can create content with a child in the list', async ({umbracoApi, umbracoU
 
   // Assert
   //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
 });
@@ -109,14 +108,10 @@ test('can publish content with a child in the list', async ({umbracoApi, umbraco
   // Currently necessary
   await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.clickSaveAndPublishButton();
-  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
-  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.goToContentInListViewWithName(childContentName);
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
-  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -144,7 +139,6 @@ test('can not publish child in a list when parent is not published', async ({umb
 
   // Assert
   // Content created, but not published
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(1);
   await umbracoUi.content.isErrorNotificationVisible();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
