@@ -830,7 +830,7 @@ stages:
     jobs:
       - job:
         pool:
-          vmImage: "ubuntu-22.04" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so use 22.04 until an alternative is available.
+          vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
         displayName: Push to pre-release feed
         steps:
           - checkout: none
@@ -893,7 +893,7 @@ stages:
     jobs:
       - job:
         pool:
-          vmImage: "ubuntu-22.04" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so use 22.04 until an alternative is available.
+          vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
         displayName: Push to NuGet
         steps:
           - checkout: none
