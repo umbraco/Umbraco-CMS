@@ -567,4 +567,115 @@ public partial class ContentEditingServiceTests
             Assert.AreEqual("The initial Danish label value", content.GetValue<string>("variantLabel", "da-DK"));
         });
     }
+
+    [Test]
+    public async Task Updating_Single_Variant_Name_Does_Not_Change_Update_Dates_Of_Other_Vaiants()
+    {
+        var contentType = await CreateVariantContentType(variantTitleAsMandatory: false);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Properties = [],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "Initial English Name" },
+                new VariantModel { Culture = "da-DK", Name = "Initial Danish Name" }
+            ],
+        };
+
+        var createResult = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createResult.Success);
+
+        var firstUpdateDateEn = createResult.Result.Content!.GetUpdateDate("en-US")!;
+        var firstUpdateDateDa = createResult.Result.Content!.GetUpdateDate("da-DK")!;
+
+        Thread.Sleep(100);
+
+        var updateModel = new ContentUpdateModel
+        {
+            Properties = [],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "Updated English Name" },
+                new VariantModel { Culture = "da-DK", Name = "Initial Danish Name" }
+            ]
+        };
+
+        var updateResult = await ContentEditingService.UpdateAsync(createResult.Result.Content.Key, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(updateResult.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, updateResult.Status);
+        VerifyUpdate(updateResult.Result.Content);
+
+        // re-get and re-test
+        VerifyUpdate(await ContentEditingService.GetAsync(updateResult.Result.Content!.Key));
+
+        void VerifyUpdate(IContent? updatedContent)
+        {
+            Assert.IsNotNull(updatedContent);
+            Assert.AreEqual(firstUpdateDateDa, updatedContent.GetUpdateDate("da-DK"));
+
+            var lastUpdateDateEn = updatedContent.GetUpdateDate("en-US")
+                                   ?? throw new InvalidOperationException("Expected a publish date for EN");
+            Assert.Greater(lastUpdateDateEn, firstUpdateDateEn);
+        }
+    }
+
+    [Test]
+    public async Task Updating_Single_Variant_Property_Does_Not_Change_Update_Dates_Of_Other_Variants()
+    {
+        var content = await CreateCultureVariantContent();
+        var firstUpdateDateEn = content.GetUpdateDate("en-US")
+                                ?? throw new InvalidOperationException("Expected an update date for EN");
+        var firstUpdateDateDa = content.GetUpdateDate("da-DK")
+                                ?? throw new InvalidOperationException("Expected an update date for DA");
+
+        var updateModel = new ContentUpdateModel
+        {
+            Properties =
+            [
+                new PropertyValueModel
+                {
+                    Alias = "invariantTitle",
+                    Value = "The invariant title"
+                },
+                new PropertyValueModel
+                {
+                    Culture = "en-US",
+                    Alias = "variantTitle",
+                    Value = content.GetValue<string>("variantTitle", "en-US")!
+                },
+                new PropertyValueModel
+                {
+                    Culture = "da-DK",
+                    Alias = "variantTitle",
+                    Value = "The updated Danish title"
+                }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = content.GetCultureName("en-US")! },
+                new VariantModel { Culture = "da-DK", Name = content.GetCultureName("da-DK")! }
+            ]
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        VerifyUpdate(result.Result.Content);
+
+        // re-get and re-test
+        VerifyUpdate(await ContentEditingService.GetAsync(content.Key));
+
+        void VerifyUpdate(IContent? updatedContent)
+        {
+            Assert.IsNotNull(updatedContent);
+            Assert.AreEqual(firstUpdateDateEn, updatedContent.GetUpdateDate("en-US"));
+
+            var lastUpdateDateDa = updatedContent.GetUpdateDate("da-DK")
+                                   ?? throw new InvalidOperationException("Expected an update date for DA");
+            Assert.Greater(lastUpdateDateDa, firstUpdateDateDa);
+        }
+    }
 }
