@@ -837,7 +837,7 @@ stages:
             inputs:
               artifact: nupkg
               path: $(Build.ArtifactStagingDirectory)/nupkg
-          - task: DotnetCoreCLI@2
+          - task: NuGetCommand@2
             displayName: NuGet push
             inputs:
               command: "push"
