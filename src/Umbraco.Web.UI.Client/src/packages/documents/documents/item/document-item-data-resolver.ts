@@ -45,25 +45,23 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	constructor(host: UmbControllerHost) {
 		super(host);
 
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
+			this.#propertyDataSetCulture = context?.getVariantId();
+			this.#setVariantAwareValues();
+		});
+
 		// We do not depend on this context because we know is it only available in some cases
-		this.#init = Promise.all([
-			this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-				this.#propertyDataSetCulture = context?.getVariantId();
+		this.#init = this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (context) => {
+			this.observe(context?.appLanguageCulture, (culture) => {
+				this.#appCulture = culture;
 				this.#setVariantAwareValues();
-			}).asPromise({ preventTimeout: true }),
+			});
 
-			this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (context) => {
-				this.observe(context?.appLanguageCulture, (culture) => {
-					this.#appCulture = culture;
-					this.#setVariantAwareValues();
-				});
-
-				this.observe(context?.appDefaultLanguage, (value) => {
-					this.#defaultCulture = value?.unique;
-					this.#setVariantAwareValues();
-				});
-			}).asPromise(),
-		]);
+			this.observe(context?.appDefaultLanguage, (value) => {
+				this.#defaultCulture = value?.unique;
+				this.#setVariantAwareValues();
+			});
+		}).asPromise();
 	}
 
 	/**
