@@ -2,7 +2,7 @@ import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET, type UmbBlockGridTypeAreaType
 import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL } from '../../components/block-grid-area-config-entry/constants.js';
 import { UmbBlockGridAreaTypeEntriesContext } from './block-grid-area-type-entries.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, property, state, repeat,css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
@@ -12,7 +12,7 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UmbBlockGridAreaConfigEntryElement } from '../../../block-grid/components/block-grid-area-config-entry/block-grid-area-config-entry.element.js';
+import { type UmbBlockGridAreaConfigEntryElement } from '../../../block-grid/components/block-grid-area-config-entry/block-grid-area-config-entry.element.js';
 import '../../components/block-grid-area-config-entry/block-grid-area-config-entry.element.js';
 @customElement('umb-property-editor-ui-block-grid-areas-config')
 export class UmbPropertyEditorUIBlockGridAreasConfigElement
