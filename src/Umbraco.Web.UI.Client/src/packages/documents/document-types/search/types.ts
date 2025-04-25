@@ -6,5 +6,5 @@ export interface UmbDocumentTypeSearchItemModel extends UmbDocumentTypeItemModel
 }
 
 export interface UmbDocumentTypeSearchRequestArgs extends UmbSearchRequestArgs {
-	elementTypesOnly?: boolean;
+	isElementType?: boolean;
 }

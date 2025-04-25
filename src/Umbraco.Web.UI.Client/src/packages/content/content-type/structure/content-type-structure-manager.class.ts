@@ -796,10 +796,6 @@ export class UmbContentTypeStructureManager<
 	}
 
 	#clear() {
-		this.#initRejection?.(`Content Type structure manager could not load: ${this.#ownerContentTypeUnique}`);
-		this.#init = new Promise((resolve) => {
-			this.#initResolver = resolve;
-		});
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];
 		this.#containers.setValue([]);
