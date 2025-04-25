@@ -1,3 +1,4 @@
+using System.Web;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 
@@ -37,6 +38,7 @@ public class ApiContentPathResolver : IApiContentPathResolver
         path = path.EnsureStartsWith("/");
 
         var contentRoute = _requestRoutingService.GetContentRoute(path);
+        contentRoute = HttpUtility.UrlDecode(contentRoute);
         IPublishedContent? contentItem = _apiPublishedContentCache.GetByRoute(contentRoute);
         return contentItem;
     }
