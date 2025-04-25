@@ -11,7 +11,8 @@ import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbBlockGridAreaConfigEntryElement } from '../../../block-grid/components/block-grid-area-config-entry/block-grid-area-config-entry.element.js';
 import '../../components/block-grid-area-config-entry/block-grid-area-config-entry.element.js';
 @customElement('umb-property-editor-ui-block-grid-areas-config')
 export class UmbPropertyEditorUIBlockGridAreasConfigElement
@@ -23,6 +24,20 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	// local vars:
 	#defaultAreaGridColumns: number = 12;
 	#valueOfAreaGridColumns?: number | null;
+
+	#sorter = new UmbSorterController<UmbBlockGridTypeAreaType, UmbBlockGridAreaConfigEntryElement>(this, {
+		itemSelector: 'umb-block-area-config-entry',
+		containerSelector: '.umb-block-grid__area-container',
+		getUniqueOfElement: (element) => {
+			return element.key;
+		},
+		getUniqueOfModel: (modelEntry) => {
+			return modelEntry.key;
+		},
+		onChange: ({ model }) => {
+			this._value = model;
+		}
+	});
 
 	@property({ type: Array })
 	public set value(value: Array<UmbBlockGridTypeAreaType>) {
@@ -53,9 +68,6 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 
 	@state()
 	private _areaGridColumns?: number;
-
-	@state()
-	private _draggedIndex?: number = undefined;
 
 	constructor() {
 		super();
@@ -103,6 +115,14 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 		});
 	}
 
+	override updated(changedProperties: Map<string | number | symbol, unknown>) {
+		super.updated(changedProperties); 
+		
+		if (changedProperties.has('value')) {
+			this.#sorter.setModel(this.value ?? []);
+		}
+	}
+
 	#gotAreaColumns() {
 		if (!this.#defaultAreaGridColumns || this.#valueOfAreaGridColumns === undefined) return;
 		this._areaGridColumns = this.#valueOfAreaGridColumns ?? this.#defaultAreaGridColumns;
@@ -116,17 +136,6 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 		return alias;
 	}
 
-	#handleDrop(targetIndex: number) {
-		if (!this._draggedIndex || this._draggedIndex === targetIndex) return;
-	
-		const newValue = [...this.value];
-		const [movedItem] = newValue.splice(this._draggedIndex, 1);
-		newValue.splice(targetIndex, 0, movedItem);
-	
-		this.value = newValue;
-		this._draggedIndex = undefined;
-	}
-
 	override render() {
 		
 		return this._areaGridColumns
@@ -138,30 +147,24 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 						${repeat(
 							this.value,
 							(area) => area.key,
-							(area, index) =>
+							(area) =>
 								html`<umb-block-area-config-entry
 									class="umb-block-grid__area"
 									draggable="true"
 									.workspacePath=${this._workspacePath}
 									.areaGridColumns=${this._areaGridColumns}
-									@dragstart=${(e: any) => {
-										this._draggedIndex = index;
-										e.dataTransfer.effectAllowed = 'move';
-									}}
-									@dragover=${(e: any) => e.preventDefault()}
-									@drop=${() => this.#handleDrop(index)}
 									.key=${area.key}></umb-block-area-config-entry>`,
 						)}
 					</div>
 					<uui-button look="placeholder" label=${'Add area'} href=${this._workspacePath + 'create'}></uui-button>`
 			: '';
 	}
-
+			
 	static override styles = [
 		UmbTextStyles,
 		css`
 			.umb-block-grid__area{
-				cursor: move;
+				cursor: pointer;
 			}
 		`
 	]
