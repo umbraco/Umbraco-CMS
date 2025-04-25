@@ -9,16 +9,15 @@ export class UmbDeleteFolderEntityAction extends UmbEntityActionBase<MetaEntityA
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		const folderRepository = await createExtensionApiByAlias<UmbDetailRepository<UmbFolderModel>>(
-			this._host,
+			this,
 			this.args.meta.folderRepositoryAlias,
-			[this._host],
 		);
 
 		const { data: folder } = await folderRepository.requestByUnique(this.args.unique);
 
 		if (folder) {
 			// TODO: maybe we can show something about how many items are part of the folder?
-			await umbConfirmModal(this._host, {
+			await umbConfirmModal(this, {
 				headline: `Delete ${folder.name}`,
 				content: 'Are you sure you want to delete this folder?',
 				color: 'danger',
