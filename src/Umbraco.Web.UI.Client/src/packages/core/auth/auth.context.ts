@@ -10,7 +10,7 @@ import { ReplaySubject, Subject, firstValueFrom, switchMap } from '@umbraco-cms/
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 
-export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
+export class UmbAuthContext extends UmbContextBase {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
 	// Timeout is different from `isAuthorized` because it can occur repeatedly
 	#isTimeout = new Subject<void>();

@@ -96,13 +96,13 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		super();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, async (context) => {
-			this._alias = context.getAlias();
+			this._alias = context?.getAlias();
 		});
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.#datasetContext = context;
 			this.observe(
-				await this.#datasetContext.propertyValueByAlias('blockGroups'),
+				await this.#datasetContext?.propertyValueByAlias('blockGroups'),
 				(value) => {
 					this.#blockGroups = (value as Array<UmbBlockGridTypeGroupType>) ?? [];
 					this.#mapValuesToBlockGroups();

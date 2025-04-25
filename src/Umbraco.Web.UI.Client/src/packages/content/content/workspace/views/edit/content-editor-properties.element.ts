@@ -38,16 +38,15 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 		super();
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (datasetContext) => {
-			this._variantId = datasetContext.getVariantId();
+			this._variantId = datasetContext?.getVariantId();
 			this.#processPropertyStructure();
 		});
 
 		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
-
 			this.#propertyStructureHelper.setStructureManager(
 				// Assuming its the same content model type that we are working with here... [NL]
-				workspaceContext.structure as unknown as UmbContentTypeStructureManager<UmbContentTypeModel>,
+				workspaceContext?.structure as unknown as UmbContentTypeStructureManager<UmbContentTypeModel>,
 			);
 
 			this.observe(

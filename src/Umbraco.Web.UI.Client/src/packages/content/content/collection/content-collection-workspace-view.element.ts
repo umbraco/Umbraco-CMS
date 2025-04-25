@@ -31,11 +31,11 @@ export class UmbContentCollectionWorkspaceViewElement extends UmbLitElement impl
 
 	async #observeConfig() {
 		this.consumeContext(UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._collectionAlias = workspaceContext.getCollectionAlias();
-			this._documentUnique = workspaceContext.getUnique() ?? '';
+			this._collectionAlias = workspaceContext?.getCollectionAlias();
+			this._documentUnique = workspaceContext?.getUnique() ?? '';
 
 			this.observe(
-				workspaceContext.structure.ownerContentType,
+				workspaceContext?.structure.ownerContentType,
 				async (contentType) => {
 					if (!contentType || !contentType.collection) return;
 

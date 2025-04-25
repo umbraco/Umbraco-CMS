@@ -7,10 +7,10 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 /**
  * A entity context for the ancestors
  * @class UmbAncestorsEntityContext
- * @augments {UmbContextBase<UmbAncestorsEntityContext>}
+ * @augments {UmbContextBase}
  * @implements {UmbAncestorsEntityContext}
  */
-export class UmbAncestorsEntityContext extends UmbContextBase<UmbAncestorsEntityContext> {
+export class UmbAncestorsEntityContext extends UmbContextBase {
 	#ancestors = new UmbArrayState<UmbEntityModel>([], (x) => x.unique);
 	ancestors = this.#ancestors.asObservable();
 

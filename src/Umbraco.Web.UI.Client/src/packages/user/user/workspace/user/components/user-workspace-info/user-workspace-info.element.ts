@@ -25,7 +25,7 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
 			this.#userWorkspaceContext = instance;
 			this.observe(
-				this.#userWorkspaceContext.data,
+				this.#userWorkspaceContext?.data,
 				async (user) => {
 					if (!user) return;
 					this.#setUserInfoItems(user);

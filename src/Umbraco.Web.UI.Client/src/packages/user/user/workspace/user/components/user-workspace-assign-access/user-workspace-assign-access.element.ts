@@ -34,32 +34,32 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 			this.#workspaceContext = instance;
 
 			this.observe(
-				this.#workspaceContext.userGroupUniques,
-				(value) => (this._userGroupUniques = value),
+				this.#workspaceContext?.userGroupUniques,
+				(value) => (this._userGroupUniques = value ?? []),
 				'_observeUserGroupAccess',
 			);
 
 			this.observe(
-				this.#workspaceContext.hasDocumentRootAccess,
-				(value) => (this._documentRootAccess = value),
+				this.#workspaceContext?.hasDocumentRootAccess,
+				(value) => (this._documentRootAccess = value ?? false),
 				'_observeDocumentRootAccess',
 			);
 
 			this.observe(
-				this.#workspaceContext.documentStartNodeUniques,
-				(value) => (this._documentStartNodeUniques = value),
+				this.#workspaceContext?.documentStartNodeUniques,
+				(value) => (this._documentStartNodeUniques = value ?? []),
 				'_observeDocumentStartNode',
 			);
 
 			this.observe(
-				this.#workspaceContext.hasMediaRootAccess,
-				(value) => (this._mediaRootAccess = value),
+				this.#workspaceContext?.hasMediaRootAccess,
+				(value) => (this._mediaRootAccess = value ?? false),
 				'_observeMediaRootAccess',
 			);
 
 			this.observe(
-				this.#workspaceContext.mediaStartNodeUniques,
-				(value) => (this._mediaStartNodeUniques = value),
+				this.#workspaceContext?.mediaStartNodeUniques,
+				(value) => (this._mediaStartNodeUniques = value ?? []),
 				'_observeMediaStartNode',
 			);
 		});

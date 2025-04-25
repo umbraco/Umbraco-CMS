@@ -10,10 +10,7 @@ import { UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/obs
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-export class UmbBlockGridAreaConfigEntryContext
-	extends UmbContextBase<UmbBlockGridAreaConfigEntryContext>
-	implements UmbBlockGridScalableContext
-{
+export class UmbBlockGridAreaConfigEntryContext extends UmbContextBase implements UmbBlockGridScalableContext {
 	//
 	#entriesContext?: typeof UMB_BLOCK_GRID_AREA_TYPE_ENTRIES_CONTEXT.TYPE;
 	//

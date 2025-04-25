@@ -19,7 +19,7 @@ export class UmbBlockGridTypeWorkspaceViewAreasElement extends UmbLitElement imp
 
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, async (context) => {
 			this.observe(
-				await context.propertyValueByAlias<undefined | string>('gridColumns'),
+				await context?.propertyValueByAlias<undefined | string>('gridColumns'),
 				(value) => {
 					const dataTypeGridColumns = value ? parseInt(value, 10) : 12;
 					this._areaColumnsConfigurationObject = [{ alias: 'placeholder', value: dataTypeGridColumns }];

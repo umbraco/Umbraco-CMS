@@ -50,7 +50,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 
 	async #observePickedDocuments(uniques: Array<string>) {
 		const { asObservable } = await this.#documentItemRepository.requestItems(uniques);
-		this.observe(asObservable(), (items) => (this._items = items));
+		this.observe(asObservable?.(), (items) => (this._items = items), 'observeItems');
 	}
 
 	async #editGranularPermission(item: UmbDocumentItemModel) {

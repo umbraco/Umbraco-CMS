@@ -39,7 +39,7 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 		this.consumeContext(UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#groupStructureHelper.setStructureManager(
 				// Assuming its the same content model type that we are working with here... [NL]
-				workspaceContext.structure as unknown as UmbContentTypeStructureManager<UmbContentTypeModel>,
+				workspaceContext?.structure as unknown as UmbContentTypeStructureManager<UmbContentTypeModel>,
 			);
 		});
 		this.observe(this.#groupStructureHelper.mergedContainers, (groups) => {

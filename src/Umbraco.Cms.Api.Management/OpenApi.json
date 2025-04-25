@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.4",
   "info": {
     "title": "Umbraco Management API",
     "description": "This shows all APIs available in this version of Umbraco - including all the legacy apis that are available for backward compatibility",
@@ -37613,7 +37613,8 @@
                   "$ref": "#/components/schemas/DocumentUrlInfoModel"
                 }
               ]
-            }
+            },
+            "deprecated": true
           },
           "template": {
             "oneOf": [
@@ -39786,7 +39787,8 @@
                   "$ref": "#/components/schemas/MediaUrlInfoModel"
                 }
               ]
-            }
+            },
+            "deprecated": true
           },
           "isTrashed": {
             "type": "boolean"
@@ -43489,7 +43491,8 @@
                   "$ref": "#/components/schemas/DocumentUrlInfoModel"
                 }
               ]
-            }
+            },
+            "deprecated": true
           },
           "template": {
             "oneOf": [

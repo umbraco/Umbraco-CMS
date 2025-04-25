@@ -70,7 +70,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		this.consumeContext(UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#context = instance;
 			this.observe(
-				instance.data,
+				instance?.data,
 				(data) => {
 					if (!this._data && data?.alias) {
 						// Initial. Loading existing property
@@ -83,9 +83,15 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		});
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
-			this.observe(instance.variesByCulture, (variesByCulture) => (this._contentTypeVariesByCulture = variesByCulture));
-			this.observe(instance.variesBySegment, (variesBySegment) => (this._contentTypeVariesBySegment = variesBySegment));
-			this._entityType = instance.getEntityType();
+			this.observe(
+				instance?.variesByCulture,
+				(variesByCulture) => (this._contentTypeVariesByCulture = variesByCulture),
+			);
+			this.observe(
+				instance?.variesBySegment,
+				(variesBySegment) => (this._contentTypeVariesBySegment = variesBySegment),
+			);
+			this._entityType = instance?.getEntityType();
 		}).passContextAliasMatches();
 	}
 

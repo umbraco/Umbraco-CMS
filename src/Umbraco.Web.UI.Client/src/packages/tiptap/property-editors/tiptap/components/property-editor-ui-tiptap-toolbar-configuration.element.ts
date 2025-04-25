@@ -59,7 +59,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				if (!toolbar.length) return;
 				this._toolbar = toolbar;
 				this.#value = toolbar.map((rows) => rows.data.map((groups) => [...groups.data]));
-				propertyContext.setValue(this.#value);
+				propertyContext?.setValue(this.#value);
 			});
 		});
 	}

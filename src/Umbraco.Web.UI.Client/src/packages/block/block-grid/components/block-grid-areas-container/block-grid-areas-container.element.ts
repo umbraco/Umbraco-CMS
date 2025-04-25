@@ -25,14 +25,14 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 
 		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (context) => {
 			this.observe(
-				context.areas,
+				context?.areas,
 				(areas) => {
 					this._areas = areas;
 				},
 				'observeAreas',
 			);
 			this.observe(
-				context.areaGridColumns,
+				context?.areaGridColumns,
 				(areaGridColumns) => {
 					this._areaGridColumns = areaGridColumns;
 					//this.requestUpdate('_areaGridColumns');
@@ -42,7 +42,7 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 		});
 		this.consumeContext(UMB_BLOCK_GRID_MANAGER_CONTEXT, (manager) => {
 			this.observe(
-				manager.layoutStylesheet,
+				manager?.layoutStylesheet,
 				(stylesheet) => {
 					// Do not re-render stylesheet if its the same href.
 					if (!stylesheet || this._styleElement?.href === stylesheet) return;

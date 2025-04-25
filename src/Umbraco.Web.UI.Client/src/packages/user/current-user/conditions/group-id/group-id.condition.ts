@@ -13,7 +13,7 @@ export class UmbCurrentUserGroupCondition
 		super(host, args);
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(context.currentUser, this.observeCurrentUser, 'umbCurrentUserGroupConditionObserver');
+			this.observe(context?.currentUser, this.observeCurrentUser, 'umbCurrentUserGroupConditionObserver');
 		});
 	}
 

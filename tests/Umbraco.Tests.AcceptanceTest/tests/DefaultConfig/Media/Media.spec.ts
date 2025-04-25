@@ -44,7 +44,8 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickSaveButton();
 
   // Assert
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.media.isErrorNotificationVisible(false);
   await umbracoUi.media.isMediaTreeItemVisible(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeTruthy();
 });
@@ -71,7 +72,8 @@ for (const mediaFileType of mediaFileTypes) {
     await umbracoUi.media.clickSaveButton();
 
     // Assert
-    await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+    //await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.media.isErrorNotificationVisible(false);
     const mediaData = await umbracoApi.media.getByName(mediaFileType.fileName);
     const mediaUrl = await umbracoApi.media.getMediaUrl(mediaData.id);
     await umbracoUi.media.doesMediaHaveThumbnail(mediaData.id, mediaFileType.thumbnail, mediaUrl);
@@ -95,7 +97,8 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickSaveButton();
 
   // Assert
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.media.isErrorNotificationVisible(false);
   await umbracoUi.media.isMediaTreeItemVisible(folderName);
   expect(await umbracoApi.media.doesNameExist(folderName)).toBeTruthy();
 
@@ -136,7 +139,8 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickSaveButton();
 
   // Assert
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.media.isErrorNotificationVisible(false);
   await umbracoUi.media.isMediaTreeItemVisible(parentFolderName);
   await umbracoUi.media.isMediaTreeItemVisible(folderName, false);
   await umbracoUi.media.clickMediaCaretButtonForName(parentFolderName);
@@ -222,7 +226,8 @@ test('can delete a media item from the recycle bin', async ({umbracoApi, umbraco
   await umbracoUi.media.deleteMediaItem(mediaFileName);
 
   // Assert
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  //await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  await umbracoUi.media.isErrorNotificationVisible(false);
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false, false);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();

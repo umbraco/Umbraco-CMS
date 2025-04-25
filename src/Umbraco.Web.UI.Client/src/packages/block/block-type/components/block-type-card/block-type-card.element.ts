@@ -77,7 +77,7 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 		super();
 
 		this.#init = this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
-			this.#serverUrl = instance.getServerUrl();
+			this.#serverUrl = instance?.getServerUrl() ?? '';
 		}).asPromise({ preventTimeout: true });
 
 		this.observe(this.#itemManager.statuses, async (statuses) => {

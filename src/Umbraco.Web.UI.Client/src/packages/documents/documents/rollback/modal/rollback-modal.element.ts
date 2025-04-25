@@ -73,21 +73,22 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		super();
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (instance) => {
-			this.#currentDatasetCulture = instance.getVariantId().culture ?? undefined;
+			this.#currentDatasetCulture = instance?.getVariantId().culture ?? undefined;
 			this.#selectCulture();
 		});
 
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
-			this.#currentAppCulture = instance.getAppCulture();
+			this.#currentAppCulture = instance?.getAppCulture();
 			this.#selectCulture();
 		});
 
 		this.consumeContext(UMB_ENTITY_CONTEXT, async (instance) => {
+			if (!instance) return;
 			if (instance.getEntityType() !== UMB_DOCUMENT_ENTITY_TYPE) {
 				throw new Error(`Entity type is not ${UMB_DOCUMENT_ENTITY_TYPE}`);
 			}
 
-			const unique = instance?.getUnique();
+			const unique = instance.getUnique();
 
 			if (!unique) {
 				throw new Error('Document unique is not set');

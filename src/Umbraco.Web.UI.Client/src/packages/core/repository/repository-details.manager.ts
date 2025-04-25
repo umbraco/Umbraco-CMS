@@ -96,7 +96,7 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 			);
 
 			this.#eventContext = context;
-			this.#eventContext.addEventListener(
+			this.#eventContext?.addEventListener(
 				UmbEntityUpdatedEvent.TYPE,
 				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);

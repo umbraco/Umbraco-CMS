@@ -86,7 +86,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			this.#modalContext = context;
 			this.#originData = context?.data.originData;
-			context.onSubmit().catch(this.#modalRejected);
+			context?.onSubmit().catch(this.#modalRejected);
 		}).asPromise({ preventTimeout: true });
 
 		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
@@ -99,7 +99,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}).asPromise({ preventTimeout: true });
 
 		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
-			this.#name.setValue(context.getName());
+			this.#name.setValue(context?.getName());
 		});
 
 		this.observe(this.variantId, (variantId) => {

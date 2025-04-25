@@ -43,12 +43,12 @@ export class UmbAppLogoElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
-			this._serverUrl = instance.getServerUrl();
+			this._serverUrl = instance?.getServerUrl();
 		});
 
 		this.consumeContext(UMB_THEME_CONTEXT, (context) => {
 			this.observe(
-				context.theme,
+				context?.theme,
 				(theme) => {
 					this._theme = theme;
 				},

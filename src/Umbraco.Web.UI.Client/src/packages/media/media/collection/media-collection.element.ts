@@ -26,7 +26,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		});
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
-			this.observe(instance.unique, (unique) => {
+			this.observe(instance?.unique, (unique) => {
 				this._unique = unique ?? null;
 			});
 		});

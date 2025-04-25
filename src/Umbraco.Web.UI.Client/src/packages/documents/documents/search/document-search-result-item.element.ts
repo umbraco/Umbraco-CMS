@@ -36,15 +36,15 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 		});
 	}
 
-	#observeAppCulture(context: typeof UMB_APP_LANGUAGE_CONTEXT.TYPE) {
-		this.observe(context.appLanguageCulture, (value) => {
+	#observeAppCulture(context: typeof UMB_APP_LANGUAGE_CONTEXT.TYPE | undefined) {
+		this.observe(context?.appLanguageCulture, (value) => {
 			this._currentCulture = value;
 			this._variant = this.#getVariant(value);
 		});
 	}
 
-	#observeDefaultCulture(context: typeof UMB_APP_LANGUAGE_CONTEXT.TYPE) {
-		this.observe(context.appDefaultLanguage, (value) => {
+	#observeDefaultCulture(context: typeof UMB_APP_LANGUAGE_CONTEXT.TYPE | undefined) {
+		this.observe(context?.appDefaultLanguage, (value) => {
 			this._defaultCulture = value?.unique;
 		});
 	}

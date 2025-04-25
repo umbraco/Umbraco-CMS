@@ -27,7 +27,7 @@ import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/back
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
-export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDocumentPublishingWorkspaceContext> {
+export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase {
 	/**
 	 * Manages the pending changes for the published document.
 	 * @memberof UmbDocumentPublishingWorkspaceContext
@@ -226,13 +226,34 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 		if (!variantIds.length) return;
 
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		const localize = new UmbLocalizationController(this);
+
+		const primaryVariantName = await this.observe(this.#documentWorkspaceContext.name(variantIds[0])).asPromise();
+
+		const waitNotice = notificationContext?.peek('warning', {
+			data: {
+				headline: localize.term('publish_publishAll', primaryVariantName),
+				message: localize.term('publish_inProgress'),
+			},
+		});
+
 		const { error } = await this.#publishingRepository.publishWithDescendants(
 			unique,
 			variantIds,
 			result.includeUnpublishedDescendants ?? false,
 		);
 
+		waitNotice?.close();
+
 		if (!error) {
+			notificationContext?.peek('positive', {
+				data: {
+					headline: localize.term('publish_publishAll', primaryVariantName),
+					message: localize.term('publish_nodePublishAll', primaryVariantName),
+				},
+			});
+
 			// reload the document so all states are updated after the publish operation
 			await this.#documentWorkspaceContext.reload();
 			this.#loadAndProcessLastPublished();
@@ -424,7 +445,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	}
 
 	async #initPendingChanges() {
-		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+		if (!this.#documentWorkspaceContext) {
+			// Do not complain in this case.
+			return;
+		}
 		this.observe(
 			observeMultiple([this.#documentWorkspaceContext.unique, this.#documentWorkspaceContext.isNew]),
 			([unique, isNew]) => {

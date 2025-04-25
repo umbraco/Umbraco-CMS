@@ -16,7 +16,7 @@ import { UmbBooleanState, type Observable } from '@umbraco-cms/backoffice/observ
 export class UmbInvariantWorkspacePropertyDatasetContext<
 		WorkspaceType extends UmbInvariantDatasetWorkspaceContext = UmbInvariantDatasetWorkspaceContext,
 	>
-	extends UmbContextBase<UmbPropertyDatasetContext>
+	extends UmbContextBase
 	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext
 {
 	#readOnly = new UmbBooleanState(false);

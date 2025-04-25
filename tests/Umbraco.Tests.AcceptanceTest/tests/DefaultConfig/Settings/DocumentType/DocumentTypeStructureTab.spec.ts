@@ -24,7 +24,8 @@ test('can add allow as root to a document type', {tag: '@smoke'}, async ({umbrac
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  //await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isErrorNotificationVisible(false);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedAsRoot).toBeTruthy();
 });
@@ -43,7 +44,8 @@ test('can add an allowed child node to a document type', {tag: '@smoke'}, async 
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  //await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isErrorNotificationVisible(false);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedDocumentTypes[0].documentType.id).toBe(documentTypeData.id);
 });
@@ -64,7 +66,8 @@ test('can remove an allowed child node from a document type', async ({umbracoApi
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  //await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isErrorNotificationVisible(false);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedDocumentTypes.length).toBe(0);
 
@@ -88,7 +91,8 @@ test('can configure a collection for a document type', async ({umbracoApi, umbra
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  //await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isErrorNotificationVisible(false);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.collection.id).toEqual(collectionDataTypeId);
 

@@ -8,6 +8,9 @@ const testApiAlias = 'my-test-api';
 
 class UmbTestContextTokenClass {
 	prop = 'value from provider';
+	getHostElement() {
+		return undefined as unknown as Element;
+	}
 }
 
 describe('UmbContextToken', () => {

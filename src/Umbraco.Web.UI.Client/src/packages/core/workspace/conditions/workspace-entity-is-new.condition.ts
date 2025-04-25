@@ -16,7 +16,7 @@ export class UmbWorkspaceEntityIsNewCondition
 
 		this.consumeContext(UMB_SUBMITTABLE_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
-				context.isNew,
+				context?.isNew,
 				(isNew) => {
 					if (isNew !== undefined) {
 						// Check if equal to match, if match not set it defaults to true.

@@ -77,7 +77,7 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 	constructor() {
 		super();
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this._label = context.getLabel();
+			this._label = context?.getLabel();
 		});
 	}
 
