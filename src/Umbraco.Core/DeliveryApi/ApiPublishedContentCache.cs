@@ -1,5 +1,4 @@
-﻿using System.Web;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -80,12 +79,10 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
 
     public IPublishedContent? GetByRoute(string route)
     {
-        // We may encounter encoded routes, and can end up in some wierd scenarios, as such, try decoding the route first.
-        string decodedRoute = HttpUtility.UrlDecode(route);
         var isPreviewMode = _requestPreviewService.IsPreview();
 
         Guid? documentKey = _apiDocumentUrlService.GetDocumentKeyByRoute(
-            decodedRoute,
+            route,
             _variationContextAccessor.VariationContext?.Culture,
             _requestPreviewService.IsPreview());
 
@@ -93,10 +90,10 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
         // e.g. "1234/second-root-url-segment". in V15+, IDocumentUrlService won't resolve this anymore; it will
         // however resolve "1234/" correctly, so to remain backwards compatible, we need to perform this extra step.
         var verifyUrlSegment = false;
-        if (documentKey is null && decodedRoute.TrimEnd('/').CountOccurrences("/") is 1)
+        if (documentKey is null && route.TrimEnd('/').CountOccurrences("/") is 1)
         {
             documentKey = _apiDocumentUrlService.GetDocumentKeyByRoute(
-                decodedRoute[..(decodedRoute.IndexOf('/') + 1)],
+                route[..(route.IndexOf('/') + 1)],
                 _variationContextAccessor.VariationContext?.Culture,
                 _requestPreviewService.IsPreview());
             verifyUrlSegment = true;
@@ -111,7 +108,7 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
         // get resolved. to counter for this, we compare the requested URL segment with the resolved content URL segment.
         if (content is not null && verifyUrlSegment)
         {
-            string expectedUrlSegment = decodedRoute[(decodedRoute.IndexOf('/') + 1)..];
+            var expectedUrlSegment = route[(route.IndexOf('/') + 1)..];
             if (content.UrlSegment != expectedUrlSegment)
             {
                 content = null;
