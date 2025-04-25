@@ -24,7 +24,10 @@ export class UmbDeleteFolderEntityAction extends UmbEntityActionBase<MetaEntityA
 				confirmLabel: 'Delete',
 			});
 
-			await folderRepository.delete(this.args.unique);
+			const { error } = await folderRepository.delete(this.args.unique);
+			if (error) {
+				throw error;
+			}
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			if (!actionEventContext) throw new Error('Action event context is missing');
