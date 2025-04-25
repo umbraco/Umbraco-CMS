@@ -16143,5 +16143,5 @@ export type GetWebhookLogsResponses = {
 export type GetWebhookLogsResponse = GetWebhookLogsResponses[keyof GetWebhookLogsResponses];
 
 export type ClientOptions = {
-    baseUrl: 'http://localhost:11000' | (string & {});
+    baseUrl: `${string}://${string}` | (string & {});
 };
