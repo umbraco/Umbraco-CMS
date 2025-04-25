@@ -16,7 +16,9 @@ export class UmbDataTypeCollectionRepository extends UmbRepositoryBase implement
 		super(host);
 
 		this.#init = this.consumeContext(UMB_DATA_TYPE_ITEM_STORE_CONTEXT, (instance) => {
-			this.#itemStore = instance;
+			if (instance) {
+				this.#itemStore = instance;
+			}
 		}).asPromise({ preventTimeout: true });
 
 		this.#collectionSource = new UmbDataTypeCollectionServerDataSource(host);
