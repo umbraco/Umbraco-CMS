@@ -175,7 +175,7 @@ export class UmbTemporaryFileManager<
 			} else if (error instanceof UmbApiError && error.problemDetails.title.includes('Request body too large')) {
 				// Special handling for when the request body is too large
 				const maxFileSizeGuestimate = parseInt(/\d+/.exec(error.problemDetails.title)?.[0] ?? '0', 10);
-				this.#notifyOnFileSizeLimitExceeded(maxFileSizeGuestimate, item);
+				await this.#notifyOnFileSizeLimitExceeded(maxFileSizeGuestimate, item);
 			} else {
 				const notification = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 				notification?.peek('danger', {
