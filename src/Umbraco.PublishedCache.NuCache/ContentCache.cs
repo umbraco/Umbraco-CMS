@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Web;
 using System.Xml.XPath;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -128,10 +127,8 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         // have to look for /foo (see note in ApplyHideTopLevelNodeFromPath).
         if (content == null && hideTopLevelNode.Value && parts.Length == 1)
         {
-            // UrlSegment returns a decoded value and parts[] can be encoded, therefor we need to decode parts[] before comparing.
-            string decodedString = HttpUtility.UrlDecode(parts[0]);
             content = GetAtRoot(preview)
-                .FirstOrDefault(x => x.UrlSegment(_variationContextAccessor, culture) == decodedString);
+                .FirstOrDefault(x => x.UrlSegment(_variationContextAccessor, culture) == parts[0]);
         }
 
         return content;
