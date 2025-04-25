@@ -39,8 +39,6 @@ export class UmbMediaWorkspaceContext
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.mediaType.unique);
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent((data) => !!data?.mediaType.collection);
 
-	readonly urls = this._data.createObservablePartOfCurrent((data) => data?.urls || []);
-
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 
 	constructor(host: UmbControllerHost) {
