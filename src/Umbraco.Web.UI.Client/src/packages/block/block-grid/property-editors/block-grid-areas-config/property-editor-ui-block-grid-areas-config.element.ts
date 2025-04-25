@@ -137,7 +137,6 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	}
 
 	override render() {
-		
 		return this._areaGridColumns
 			? html`${this._styleElement}
 					<div
@@ -150,7 +149,6 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 							(area) =>
 								html`<umb-block-area-config-entry
 									class="umb-block-grid__area"
-									draggable="true"
 									.workspacePath=${this._workspacePath}
 									.areaGridColumns=${this._areaGridColumns}
 									.key=${area.key}></umb-block-area-config-entry>`,
