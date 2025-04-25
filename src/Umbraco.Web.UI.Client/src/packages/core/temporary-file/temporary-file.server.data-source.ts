@@ -40,6 +40,7 @@ export class UmbTemporaryFileServerDataSource {
 			url: '/umbraco/management/api/v1/temporary-file',
 			method: 'POST',
 			responseHeader: 'Umb-Generated-Resource',
+			disableNotifications: true,
 			body,
 			onProgress,
 			abortSignal,

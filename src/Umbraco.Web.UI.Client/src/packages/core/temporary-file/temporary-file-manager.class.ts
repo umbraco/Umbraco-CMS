@@ -11,7 +11,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { formatBytes } from '@umbraco-cms/backoffice/utils';
-import { UmbCancelError } from '@umbraco-cms/backoffice/resources';
+import { UmbApiError, UmbCancelError } from '@umbraco-cms/backoffice/resources';
 
 export class UmbTemporaryFileManager<
 	UploadableItem extends UmbTemporaryFileModel = UmbTemporaryFileModel,
@@ -91,6 +91,20 @@ export class UmbTemporaryFileManager<
 		return filesCompleted;
 	}
 
+	async #notifyOnFileSizeLimitExceeded(maxFileSize: number, item: UploadableItem) {
+		const notification = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		notification?.peek('warning', {
+			data: {
+				headline: 'Upload',
+				message: `
+	${this.#localization.term('media_invalidFileSize')}: ${item.file.name} (${formatBytes(item.file.size)}).
+
+	${this.#localization.term('media_maxFileSize')} ${maxFileSize > 0 ? formatBytes(maxFileSize) : 'N/A'}.
+						`,
+			},
+		});
+	}
+
 	async #validateItem(item: UploadableItem): Promise<boolean> {
 		const config = await this.getConfiguration();
 		let maxFileSize = await this.observe(config.part('maxFileSize')).asPromise();
@@ -98,18 +112,7 @@ export class UmbTemporaryFileManager<
 			// Convert from kilobytes to bytes
 			maxFileSize *= 1024;
 			if (item.file.size > maxFileSize) {
-				const notification = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-				if (!notification) throw new Error('Notification context is missing');
-				notification.peek('warning', {
-					data: {
-						headline: 'Upload',
-						message: `
-	${this.#localization.term('media_invalidFileSize')}: ${item.file.name} (${formatBytes(item.file.size)}).
-
-	${this.#localization.term('media_maxFileSize')} ${formatBytes(maxFileSize)}.
-						`,
-					},
-				});
+				await this.#notifyOnFileSizeLimitExceeded(maxFileSize, item);
 				return false;
 			}
 		}
@@ -161,11 +164,26 @@ export class UmbTemporaryFileManager<
 			},
 			item.abortController?.signal ?? item.abortSignal,
 		);
+
 		let status = TemporaryFileStatus.SUCCESS;
+
 		if (error) {
 			status = TemporaryFileStatus.ERROR;
-			if (UmbCancelError.isUmbCancelError(error)) {
+			if (error instanceof UmbCancelError) {
+				// Ignore the error if the upload was cancelled
 				status = TemporaryFileStatus.CANCELLED;
+			} else if (error instanceof UmbApiError && error.problemDetails.title.includes('Request body too large')) {
+				// Special handling for when the request body is too large
+				const maxFileSizeGuestimate = parseInt(/\d+/.exec(error.problemDetails.title)?.[0] ?? '0', 10);
+				this.#notifyOnFileSizeLimitExceeded(maxFileSizeGuestimate, item);
+			} else {
+				const notification = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+				notification?.peek('danger', {
+					data: {
+						headline: this.#localization.term('errors_receivedErrorFromServer'),
+						message: error.message,
+					},
+				});
 			}
 		}
 
