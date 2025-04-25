@@ -44,7 +44,7 @@ export class UmbTrashEntityAction<
 		const message = '#defaultdialogs_confirmTrash';
 
 		// TODO: handle items with variants
-		await umbConfirmModal(this._host, {
+		await umbConfirmModal(this, {
 			headline,
 			content: this.#localize.string(message, item.name),
 			color: 'danger',
