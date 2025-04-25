@@ -39787,7 +39787,8 @@
                   "$ref": "#/components/schemas/MediaUrlInfoModel"
                 }
               ]
-            }
+            },
+            "deprecated": true
           },
           "isTrashed": {
             "type": "boolean"
