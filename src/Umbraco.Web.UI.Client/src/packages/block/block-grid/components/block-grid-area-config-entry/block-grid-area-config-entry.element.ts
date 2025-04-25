@@ -2,7 +2,7 @@ import { UmbBlockGridAreaConfigEntryContext } from './block-grid-area-config-ent
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
-
+import '../block-scale-handler/block-scale-handler.element.js';
 /**
  * @element umb-block-area-config-entry
  */
@@ -80,7 +80,7 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 							<uui-icon name="icon-remove"></uui-icon>
 						</uui-button>
 					</uui-action-bar>
-					<umb-block-scale-handler @mouseup=${(e: MouseEvent) => this.#context.scaleManager.onScaleMouseDown(e)}>
+					<umb-block-scale-handler @mousedown=${(e: MouseEvent) => this.#context.scaleManager.onScaleMouseDown(e)}>
 						${this._columnSpan}x${this._rowSpan}
 					</umb-block-scale-handler>
 				`
