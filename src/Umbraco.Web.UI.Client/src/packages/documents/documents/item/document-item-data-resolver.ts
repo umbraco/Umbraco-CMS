@@ -164,9 +164,12 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 
 	#setName() {
 		const variant = this.#getCurrentVariant();
+		if (variant) {
+			this.#name.setValue(variant.name);
+			return;
+		}
 		const fallbackName = this.#findVariant(this.#defaultCulture)?.name;
-		const name = variant?.name ?? `(${fallbackName})`;
-		this.#name.setValue(name);
+		this.#name.setValue(`(${fallbackName})`);
 	}
 
 	#setIsDraft() {
