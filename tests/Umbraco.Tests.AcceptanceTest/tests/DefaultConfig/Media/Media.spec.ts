@@ -288,9 +288,9 @@ test('can bulk trash media nodes with a relation', async ({umbracoApi, umbracoUi
   await umbracoApi.media.emptyRecycleBin();
   await umbracoApi.media.createDefaultMediaFile(firstMediaFileName);
   await umbracoApi.media.createDefaultMediaFile(secondMediaFileName);
-  // Create a document that have media picker is firstMediaFileName
+  // Create a document that has a media picker with firstMediaFileName
   await umbracoApi.document.createDefaultDocumentWithOneMediaLink(documentPickerName1[0], firstMediaFileName, documentPickerName1[1]);
-  // Create a document that have media picker is secondMediaFileName
+  // Create a document that has a media picker with secondMediaFileName
   await umbracoApi.document.createDefaultDocumentWithOneMediaLink(documentPickerName2[0], secondMediaFileName, documentPickerName2[1]);
 
   // Act

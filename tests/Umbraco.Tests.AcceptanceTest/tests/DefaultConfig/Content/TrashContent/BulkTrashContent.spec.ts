@@ -63,7 +63,7 @@ test('can bulk trash content nodes with a relation', async ({umbracoApi, umbraco
   const firstChildContentId = await umbracoApi.document.createDefaultDocumentWithParent(firstChildContentName, childDocumentTypeId, contentId);
   await umbracoApi.document.publish(firstChildContentId);
   await umbracoApi.document.createDefaultDocumentWithParent(secondChildContentName, childDocumentTypeId, contentId);
-  // Create a document that have document picker is firstChildContentName
+  // Create a document that has a document picker with firstChildContentName
   await umbracoApi.document.createDefaultDocumentWithOneDocumentLink(documentPickerName[0], firstChildContentName, firstChildContentId, documentPickerName[1]);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
