@@ -20,9 +20,11 @@ export class UmbUserConfigRepository extends UmbRepositoryBase implements UmbApi
 		super(host);
 		this.initialized = new Promise<void>((resolve) => {
 			this.consumeContext(UMB_USER_CONFIG_STORE_CONTEXT, async (store) => {
-				this.#dataStore = store;
-				await this.#init();
-				resolve();
+				if (store) {
+					this.#dataStore = store;
+					await this.#init();
+					resolve();
+				}
 			});
 		});
 	}

@@ -35,7 +35,9 @@ export abstract class UmbDetailRepositoryBase<
 		// TODO: ideally no preventTimeouts here.. [NL]
 		this.#init = Promise.all([
 			this.consumeContext(detailStoreContextAlias, (instance) => {
-				this.#detailStore = instance;
+				if (instance) {
+					this.#detailStore = instance;
+				}
 			}).asPromise({ preventTimeout: true }),
 		]);
 	}

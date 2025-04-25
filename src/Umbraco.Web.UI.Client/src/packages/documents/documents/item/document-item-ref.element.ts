@@ -26,22 +26,22 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	standalone = false;
 
 	@state()
-	_unique = '';
+	private _unique = '';
 
 	@state()
-	_name = '';
+	private _name = '';
 
 	@state()
-	_icon = '';
+	private _icon = '';
 
 	@state()
-	_isTrashed = false;
+	private _isTrashed = false;
 
 	@state()
-	_isDraft = false;
+	private _isDraft = false;
 
 	@state()
-	_editPath = '';
+	private _editPath = '';
 
 	constructor() {
 		super();
