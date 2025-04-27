@@ -27,7 +27,6 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	}
 
 	override render() {
-
 		if (!this.items?.length) return nothing;
 
 		return html`<uui-button
