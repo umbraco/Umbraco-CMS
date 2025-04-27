@@ -122,9 +122,14 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 			body.memberGroupNames = groupNames;
 		}
 
-		const createOrUpdate = this.#isNew ? this.#publicAccessRepository.create : this.#publicAccessRepository.update;
-		const { error } = await createOrUpdate(this.#unique, body);
-		if (error) return;
+		const createOrUpdate = this.#isNew
+			? this.#publicAccessRepository.create(this.#unique, body)
+			: this.#publicAccessRepository.update(this.#unique, body);
+
+		const { error } = await createOrUpdate;
+		if (error) {
+			throw error;
+		}
 
 		this.modalContext?.submit();
 	}
