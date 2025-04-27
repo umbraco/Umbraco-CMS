@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '../../document-type-workspace.context-token.js';
-import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent, UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -100,26 +100,32 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setVariesByCulture((e.target as UUIToggleElement).checked);
 							}}
-							label="Vary by culture"></uui-toggle>
+							label=${this.localize.term('contentTypeEditor_cultureVariantLabel')}></uui-toggle>
 					</div>
 				</umb-property-layout>
-				<umb-property-layout
-					alias="VaryBySegments"
-					label=${this.localize.term('contentTypeEditor_segmentVariantHeading')}>
-					<div slot="description">
-						<umb-localize key="contentTypeEditor_segmentVariantDescription"
-							>Allow editors to segment their content.</umb-localize
-						>
-					</div>
-					<div slot="editor">
-						<uui-toggle
-							?checked=${this._variesBySegment}
-							@change=${(e: CustomEvent) => {
-								this.#workspaceContext?.setVariesBySegment((e.target as UUIToggleElement).checked);
-							}}
-							label="Vary by segments"></uui-toggle>
-					</div>
-				</umb-property-layout>
+
+				${this._isElement
+					? nothing
+					: html`
+							<umb-property-layout
+								alias="VaryBySegments"
+								label=${this.localize.term('contentTypeEditor_segmentVariantHeading')}>
+								<div slot="description">
+									<umb-localize key="contentTypeEditor_segmentVariantDescription"
+										>Allow editors to segment their content.</umb-localize
+									>
+								</div>
+								<div slot="editor">
+									<uui-toggle
+										?checked=${this._variesBySegment}
+										@change=${(e: CustomEvent) => {
+											this.#workspaceContext?.setVariesBySegment((e.target as UUIToggleElement).checked);
+										}}
+										label=${this.localize.term('contentTypeEditor_segmentVariantLabel')}></uui-toggle>
+								</div>
+							</umb-property-layout>
+						`}
+
 				<umb-property-layout alias="ElementType" label=${this.localize.term('contentTypeEditor_elementHeading')}>
 					<div slot="description">
 						<umb-localize key="contentTypeEditor_elementDescription"
@@ -136,7 +142,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					</div>
 				</umb-property-layout>
 			</uui-box>
-			<uui-box headline="History cleanup">
+			<uui-box headline=${this.localize.term('contentTypeEditor_historyCleanupHeading')}>
 				<umb-property-layout
 					alias="HistoryCleanup"
 					label=${this.localize.term('contentTypeEditor_historyCleanupHeading')}>

@@ -14,7 +14,7 @@ import {
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
@@ -85,10 +85,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	constructor(host: UmbControllerHost, args: UmbEntityDetailWorkspaceContextArgs) {
 		super(host, args.workspaceAlias);
+		this.addValidationContext(this.validationContext);
 		this.#entityContext.setEntityType(args.entityType);
 		window.addEventListener('willchangestate', this.#onWillNavigate);
 		this.#observeRepository(args.detailRepositoryAlias);
-		this.addValidationContext(this.validationContext);
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
 			this.#eventContext = context;
@@ -167,7 +167,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	async load(unique: string) {
+		if (unique === this.getUnique() && this._getDataPromise) {
+			return (await this._getDataPromise) as GetDataType;
+		}
 		this.resetState();
+		this.setIsNew(false);
 		this.#entityContext.setUnique(unique);
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
 		await this.#init;
@@ -179,7 +183,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		if (data) {
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
-			this.setIsNew(false);
 
 			this.observe(
 				response.asObservable(),
@@ -236,19 +239,25 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		let { data } = await request;
 
 		if (data) {
-			this.#entityContext.setUnique(data.unique);
+			data = await this._scaffoldProcessData(data);
 
 			if (this.modalContext) {
+				// Notice if the preset comes with values, they will overwrite the scaffolded values... [NL]
 				data = { ...data, ...this.modalContext.data.preset };
 			}
 
 			this.setIsNew(true);
+			this.#entityContext.setUnique(data.unique);
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
 		}
 
 		this.loading.removeState(LOADING_STATE_UNIQUE);
 
+		return data;
+	}
+
+	protected async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
 		return data;
 	}
 
@@ -350,13 +359,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			return true;
 		}
 
-		/* TODO: temp removal of discard changes in workspace modals.
-		 The modal closes before the discard changes dialog is resolved.*/
-		if (newUrl.includes('/modal/umb-modal-workspace/')) {
-			return true;
-		}
-
-		if (this._checkWillNavigateAway(newUrl) && this._getHasUnpersistedChanges()) {
+		if (this._checkWillNavigateAway(newUrl) && this.getHasUnpersistedChanges()) {
 			/* Since ours modals are async while events are synchronous, we need to prevent the default behavior of the event, even if the modal hasn’t been resolved yet.
 			Once the modal is resolved (the user accepted to discard the changes and navigate away from the route), we will push a new history state.
 			This push will make the "willchangestate" event happen again and due to this somewhat "backward" behavior,
@@ -383,14 +386,25 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * Check if there are unpersisted changes.
 	 * @returns { boolean } true if there are unpersisted changes.
 	 */
-	protected _getHasUnpersistedChanges(): boolean {
+	public getHasUnpersistedChanges(): boolean {
 		return this._data.getHasUnpersistedChanges();
+	}
+	// @deprecated use getHasUnpersistedChanges instead, will be removed in v17.0
+	protected _getHasUnpersistedChanges(): boolean {
+		new UmbDeprecation({
+			removeInVersion: '17',
+			deprecated: '_getHasUnpersistedChanges',
+			solution: 'use public getHasUnpersistedChanges instead.',
+		}).warn();
+		return this.getHasUnpersistedChanges();
 	}
 
 	override resetState() {
 		super.resetState();
+		this.loading.clear();
 		this._data.clear();
 		this.#allowNavigateAway = false;
+		this._getDataPromise = undefined;
 	}
 
 	#checkIfInitialized() {
@@ -407,7 +421,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			this,
 			umbExtensionsRegistry,
 			repositoryAlias,
-			[this._host],
+			[],
 			(permitted, ctrl) => {
 				this._detailRepository = permitted ? ctrl.api : undefined;
 				this.#checkIfInitialized();
@@ -447,6 +461,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		);
 		this._detailRepository?.destroy();
 		this.#entityContext.destroy();
+		this._getDataPromise = undefined;
 		super.destroy();
 	}
 }

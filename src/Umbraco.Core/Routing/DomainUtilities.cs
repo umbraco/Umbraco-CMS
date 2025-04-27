@@ -17,21 +17,7 @@ namespace Umbraco.Cms.Core.Routing
     {
         #region Document Culture
 
-        /// <summary>
-        /// Gets the culture assigned to a document by domains, in the context of a current Uri.
-        /// </summary>
-        /// <param name="contentId">The document identifier.</param>
-        /// <param name="contentPath">The document path.</param>
-        /// <param name="current">An optional current Uri.</param>
-        /// <param name="umbracoContext">An Umbraco context.</param>
-        /// <param name="siteDomainMapper">The site domain helper.</param>
-        /// <returns>The culture assigned to the document by domains.</returns>
-        /// <remarks>
-        /// <para>In 1:1 multilingual setup, a document contains several cultures (there is not
-        /// one document per culture), and domains, withing the context of a current Uri, assign
-        /// a culture to that document.</para>
-        /// </remarks>
-        [Obsolete("Please use the method taking all parameters. This overload will be removed in V17.")]
+        [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
         public static string? GetCultureFromDomains(
             int contentId,
             string contentPath,
@@ -45,8 +31,28 @@ namespace Umbraco.Cms.Core.Routing
                 umbracoContext,
                 siteDomainMapper,
                 StaticServiceProvider.Instance.GetRequiredService<IDomainCache>(),
-                StaticServiceProvider.Instance.GetRequiredService<IPublishedCache>(),
-                StaticServiceProvider.Instance.GetRequiredService<INavigationQueryService>());
+                StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
+                StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
+
+        [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
+        public static string? GetCultureFromDomains(
+            int contentId,
+            string contentPath,
+            Uri? current,
+            IUmbracoContext umbracoContext,
+            ISiteDomainMapper siteDomainMapper,
+            IDomainCache domainCache,
+            IPublishedCache publishedCache,
+            INavigationQueryService navigationQueryService)
+            => GetCultureFromDomains(
+                contentId,
+                contentPath,
+                current,
+                umbracoContext,
+                siteDomainMapper,
+                domainCache,
+                navigationQueryService,
+                StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
 
         /// <summary>
         /// Gets the culture assigned to a document by domains, in the context of a current Uri.
@@ -57,8 +63,8 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="umbracoContext">An Umbraco context.</param>
         /// <param name="siteDomainMapper">The site domain helper.</param>
         /// <param name="domainCache">The domain cache.</param>
-        /// <param name="publishedCache">The published content cache.</param>
         /// <param name="navigationQueryService">The navigation query service.</param>
+        /// <param name="publishedStatusFilteringService"></param>
         /// <returns>The culture assigned to the document by domains.</returns>
         /// <remarks>
         /// <para>In 1:1 multilingual setup, a document contains several cultures (there is not
@@ -72,8 +78,8 @@ namespace Umbraco.Cms.Core.Routing
             IUmbracoContext umbracoContext,
             ISiteDomainMapper siteDomainMapper,
             IDomainCache domainCache,
-            IPublishedCache publishedCache,
-            INavigationQueryService navigationQueryService)
+            INavigationQueryService navigationQueryService,
+            IPublishedStatusFilteringService publishedStatusFilteringService)
         {
             if (umbracoContext == null)
             {
@@ -85,7 +91,7 @@ namespace Umbraco.Cms.Core.Routing
                 current = umbracoContext.CleanedUmbracoUrl;
             }
 
-            var domainNodeId = GetAncestorNodeWithDomainsAssigned(contentId, umbracoContext, domainCache, publishedCache, navigationQueryService);
+            var domainNodeId = GetAncestorNodeWithDomainsAssigned(contentId, umbracoContext, domainCache, navigationQueryService, publishedStatusFilteringService);
 
             DomainAndUri? domain = domainNodeId.HasValue
                 ? DomainForNode(umbracoContext.Domains, siteDomainMapper, domainNodeId.Value, current)
@@ -107,13 +113,13 @@ namespace Umbraco.Cms.Core.Routing
             return umbracoContext.Domains?.DefaultCulture;
         }
 
-        private static int? GetAncestorNodeWithDomainsAssigned(int contentId, IUmbracoContext umbracoContext, IDomainCache domainCache, IPublishedCache publishedCache, INavigationQueryService navigationQueryService)
+        private static int? GetAncestorNodeWithDomainsAssigned(int contentId, IUmbracoContext umbracoContext, IDomainCache domainCache, INavigationQueryService navigationQueryService, IPublishedStatusFilteringService publishedStatusFilteringService)
         {
             IPublishedContent? content = umbracoContext.Content.GetById(contentId);
             var hasDomains = ContentHasAssignedDomains(content, domainCache);
             while (content is not null && !hasDomains)
             {
-                content = content.Parent<IPublishedContent>(publishedCache, navigationQueryService);
+                content = content.Parent<IPublishedContent>(navigationQueryService, publishedStatusFilteringService);
                 hasDomains = content is not null && domainCache.HasAssigned(content.Id, true);
             }
 
@@ -382,7 +388,7 @@ namespace Umbraco.Cms.Core.Routing
         public static Uri ParseUriFromDomainName(string domainName, Uri currentUri)
         {
             // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
-            var name = domainName.StartsWith("/") && currentUri != null
+            var name = domainName.StartsWith("/", StringComparison.Ordinal) && currentUri != null
                 ? currentUri.GetLeftPart(UriPartial.Authority) + domainName
                 : domainName;
             var scheme = currentUri?.Scheme ?? Uri.UriSchemeHttp;

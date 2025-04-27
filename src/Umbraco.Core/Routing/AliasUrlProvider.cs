@@ -18,8 +18,8 @@ public class AliasUrlProvider : IUrlProvider
     private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly ISiteDomainMapper _siteDomainMapper;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-    private readonly IPublishedContentCache _contentCache;
     private readonly IDocumentNavigationQueryService _navigationQueryService;
+    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
     private readonly UriUtility _uriUtility;
     private RequestHandlerSettings _requestConfig;
 
@@ -29,21 +29,62 @@ public class AliasUrlProvider : IUrlProvider
         UriUtility uriUtility,
         IPublishedValueFallback publishedValueFallback,
         IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService navigationQueryService)
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
     {
         _requestConfig = requestConfig.CurrentValue;
         _siteDomainMapper = siteDomainMapper;
         _uriUtility = uriUtility;
         _publishedValueFallback = publishedValueFallback;
         _umbracoContextAccessor = umbracoContextAccessor;
-        _contentCache = contentCache;
         _navigationQueryService = navigationQueryService;
+        _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
 
         requestConfig.OnChange(x => _requestConfig = x);
     }
 
-    [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17.")]
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
+    public AliasUrlProvider(
+        IOptionsMonitor<RequestHandlerSettings> requestConfig,
+        ISiteDomainMapper siteDomainMapper,
+        UriUtility uriUtility,
+        IPublishedValueFallback publishedValueFallback,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
+        : this(
+            requestConfig,
+            siteDomainMapper,
+            uriUtility,
+            publishedValueFallback,
+            umbracoContextAccessor,
+            navigationQueryService,
+            publishedContentStatusFilteringService)
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
+    public AliasUrlProvider(
+        IOptionsMonitor<RequestHandlerSettings> requestConfig,
+        ISiteDomainMapper siteDomainMapper,
+        UriUtility uriUtility,
+        IPublishedValueFallback publishedValueFallback,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
+        : this(
+            requestConfig,
+            siteDomainMapper,
+            uriUtility,
+            publishedValueFallback,
+            umbracoContextAccessor,
+            navigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
     public AliasUrlProvider(
         IOptionsMonitor<RequestHandlerSettings> requestConfig,
         ISiteDomainMapper siteDomainMapper,
@@ -56,8 +97,8 @@ public class AliasUrlProvider : IUrlProvider
             uriUtility,
             publishedValueFallback,
             umbracoContextAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
     {
     }
 
@@ -108,7 +149,7 @@ public class AliasUrlProvider : IUrlProvider
         while (domainUris == null && n != null)
         {
             // move to parent node
-            n = n.Parent<IPublishedContent>(_contentCache, _navigationQueryService);
+            n = n.Parent<IPublishedContent>(_navigationQueryService, _publishedContentStatusFilteringService);
             domainUris = n == null
                 ? null
                 : DomainUtilities.DomainsForNode(umbracoContext.Domains, _siteDomainMapper, n.Id, current, false);

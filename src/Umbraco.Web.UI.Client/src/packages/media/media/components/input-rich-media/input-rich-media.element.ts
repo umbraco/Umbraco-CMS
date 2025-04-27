@@ -1,6 +1,7 @@
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL, UMB_MEDIA_PICKER_MODAL } from '../../modals/index.js';
 import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValueEntry } from '../../types.js';
-import type { UmbUploadableItem } from '../../dropzone/types.js';
+import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
+import type { UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -13,7 +14,6 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
-import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice/media';
 
 import '@umbraco-cms/backoffice/imaging';
 
@@ -173,11 +173,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	@state()
 	private _routeBuilder?: UmbModalRouteBuilder;
 
-	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(
-		this,
-		UMB_MEDIA_ITEM_REPOSITORY_ALIAS,
-		(x) => x.unique,
-	);
+	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
 
 	constructor() {
 		super();
@@ -358,7 +354,9 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	#renderDropzone() {
 		if (this.readonly) return nothing;
 		if (this._cards && this._cards.length >= this.max) return;
-		return html`<umb-dropzone ?multiple=${this.max > 1} @complete=${this.#onUploadCompleted}></umb-dropzone>`;
+		return html`<umb-dropzone-media
+			?multiple=${this.max > 1}
+			@complete=${this.#onUploadCompleted}></umb-dropzone-media>`;
 	}
 
 	#renderItems() {
@@ -436,9 +434,9 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 			}
 			.container {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-				grid-auto-rows: 150px;
 				gap: var(--uui-size-space-5);
+				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
+				grid-auto-rows: var(--umb-card-medium-min-width);
 			}
 
 			#btn-add {

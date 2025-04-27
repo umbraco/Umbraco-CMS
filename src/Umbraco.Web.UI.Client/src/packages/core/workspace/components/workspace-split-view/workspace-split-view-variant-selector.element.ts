@@ -206,6 +206,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	/**
 	 * Focuses the input element after a short delay to ensure it is rendered.
 	 * This works better than the {umbFocus()} directive, which does not work in this context.
+	 * @param element
 	 */
 	#focusInput(element?: Element) {
 		if (!element) return;
@@ -357,7 +358,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
 				width: 100%;
-				height: 100%;
+				height: auto;
 				box-sizing: border-box;
 				box-shadow: var(--uui-shadow-depth-3);
 			}

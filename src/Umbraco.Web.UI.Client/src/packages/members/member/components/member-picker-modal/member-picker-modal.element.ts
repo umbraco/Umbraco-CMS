@@ -1,6 +1,6 @@
 import { UmbMemberCollectionRepository } from '../../collection/index.js';
 import type { UmbMemberDetailModel } from '../../types.js';
-import type { UmbMemberItemModel } from '../../repository/index.js';
+import type { UmbMemberItemModel } from '../../item/types.js';
 import type { UmbMemberPickerModalValue, UmbMemberPickerModalData } from './member-picker-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
@@ -127,7 +127,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 				@selected=${() => this.#pickerContext.selection.select(item.unique)}
 				@deselected=${() => this.#pickerContext.selection.deselect(item.unique)}
 				?selected=${this.#pickerContext.selection.isSelected(item.unique)}>
-				<uui-icon slot="icon" name="icon-user"></uui-icon>
+				<umb-icon slot="icon" name=${item.memberType.icon}></umb-icon>
 			</uui-menu-item>
 		`;
 	}

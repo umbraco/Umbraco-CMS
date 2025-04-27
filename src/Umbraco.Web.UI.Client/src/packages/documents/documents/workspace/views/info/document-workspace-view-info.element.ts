@@ -60,7 +60,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		super();
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath(':entityType')
+			.addAdditionalPath('general/:entityType')
 			.onSetup((params) => {
 				return { data: { entityType: params.entityType, preset: {} } };
 			})
@@ -192,7 +192,8 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 		return html`
 			<div class="general-item"><span>${this.#renderStateTag()}</span></div>
-			${this.#renderCreateDate()}
+			${this.#renderCreateDate()} ${this.#renderUpdateDate()} ${this.#renderPublishDate()}
+			${this.#renderScheduledPublishDate()} ${this.#renderScheduledUnpublishDate()}
 
 			<div class="general-item">
 				<strong><umb-localize key="content_documentType">Document Type</umb-localize></strong>
@@ -251,12 +252,35 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	#renderCreateDate() {
 		if (!this._variant?.createDate) return nothing;
+		return this.#renderDate(this._variant.createDate, 'content_createDate', 'Created');
+	}
 
+	#renderUpdateDate() {
+		if (!this._variant?.updateDate) return nothing;
+		return this.#renderDate(this._variant.updateDate, 'content_updateDate', 'Last edited');
+	}
+
+	#renderPublishDate() {
+		if (!this._variant?.publishDate) return nothing;
+		return this.#renderDate(this._variant.publishDate, 'content_lastPublished', 'Last published');
+	}
+
+	#renderScheduledPublishDate() {
+		if (!this._variant?.scheduledPublishDate) return nothing;
+		return this.#renderDate(this._variant.scheduledPublishDate, 'content_releaseDate', 'Publish At');
+	}
+
+	#renderScheduledUnpublishDate() {
+		if (!this._variant?.scheduledUnpublishDate) return nothing;
+		return this.#renderDate(this._variant.scheduledUnpublishDate, 'content_expireDate', 'Remove At');
+	}
+
+	#renderDate(date: string, labelKey: string, labelText: string) {
 		return html`
 			<div class="general-item">
-				<strong><umb-localize key="content_createDate">Created</umb-localize></strong>
+				<strong><umb-localize .key=${labelKey}>${labelText}</umb-localize></strong>
 				<span>
-					<umb-localize-date .date=${this._variant.createDate} .options=${TimeOptions}></umb-localize-date>
+					<umb-localize-date .date=${date} .options=${TimeOptions}></umb-localize-date>
 				</span>
 			</div>
 		`;

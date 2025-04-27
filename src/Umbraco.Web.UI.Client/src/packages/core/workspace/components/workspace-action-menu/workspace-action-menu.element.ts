@@ -27,34 +27,33 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this.items?.length
-			? html`
-					<uui-button
-						id="popover-trigger"
-						popovertarget="workspace-action-popover"
-						look="${this.look}"
-						color="${this.color}"
-						label=${this.localize.term('visuallyHiddenTexts_tabExpand')}
-						compact>
-						<uui-symbol-expand id="expand-symbol" .open=${this._popoverOpen}></uui-symbol-expand>
-					</uui-button>
-					<uui-popover-container
-						id="workspace-action-popover"
-						margin="6"
-						placement="top-end"
-						@toggle=${this.#onPopoverToggle}>
-						<umb-popover-layout id="workspace-action-popover-layout">
-							<uui-scroll-container>
-								${repeat(
-									this.items,
-									(ext) => ext.alias,
-									(ext) => ext.component,
-								)}
-							</uui-scroll-container>
-						</umb-popover-layout>
-					</uui-popover-container>
-				`
-			: nothing;
+
+		if (!this.items?.length) return nothing;
+
+		return html`<uui-button
+				id="popover-trigger"
+				popovertarget="workspace-action-popover"
+				look="${this.look}"
+				color="${this.color}"
+				label=${this.localize.term('visuallyHiddenTexts_tabExpand')}
+				compact>
+				<uui-symbol-expand id="expand-symbol" .open=${this._popoverOpen}></uui-symbol-expand>
+			</uui-button>
+			<uui-popover-container
+				id="workspace-action-popover"
+				margin="6"
+				placement="top-end"
+				@toggle=${this.#onPopoverToggle}>
+				<umb-popover-layout id="workspace-action-popover-layout">
+					<uui-scroll-container>
+						${repeat(
+							this.items,
+							(ext) => ext.alias,
+							(ext) => ext.component,
+						)}
+					</uui-scroll-container>
+				</umb-popover-layout>
+			</uui-popover-container>`;
 	}
 
 	static override styles = [

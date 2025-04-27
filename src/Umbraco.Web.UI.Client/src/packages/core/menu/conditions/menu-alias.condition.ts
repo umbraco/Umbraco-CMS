@@ -1,4 +1,3 @@
-import { UMB_MENU_CONTEXT } from '../components/menu/menu.context.js';
 import { UmbConditionBase } from '../../extension-registry/conditions/condition-base.controller.js';
 import type { MenuAliasConditionConfig } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -12,6 +11,10 @@ export class UmbMenuAliasCondition extends UmbConditionBase<MenuAliasConditionCo
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<MenuAliasConditionConfig>) {
 		super(host, args);
 
+		console.error(
+			'Condition of alias `Umb.Condition.MenuAlias` is not implemented. Please report this issue if you where expecting this condition to work.',
+		);
+		/*
 		this.consumeContext(UMB_MENU_CONTEXT, (context) => {
 			this.observe(
 				context.alias,
@@ -21,6 +24,7 @@ export class UmbMenuAliasCondition extends UmbConditionBase<MenuAliasConditionCo
 				'observeAlias',
 			);
 		});
+		*/
 	}
 }
 

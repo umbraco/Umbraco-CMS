@@ -1,3 +1,4 @@
+import { data as permissionsTestData } from './data/permissions-test.data.js';
 import type {
 	DocumentItemResponseModel,
 	DocumentResponseModel,
@@ -9,6 +10,7 @@ export type UmbMockDocumentModel = DocumentResponseModel & DocumentTreeItemRespo
 
 export const data: Array<UmbMockDocumentModel> = [
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -49,6 +51,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -602,6 +605,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -741,6 +745,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [],
 		template: null,
 		id: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
@@ -825,6 +830,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -873,6 +879,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -911,9 +918,36 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: {
 					blocks: undefined,
 					markup: `
+						<p><a id="anchor"></a> Here is a link for <a href="https://gist.github.com/leekelleher/9490718" target="_blank">all HTML tags</a>.</p>
 						<p>
-							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
+							<span id="foo">Some</span> value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a>.
 						</p>
+						<div data-foo-bar="123">
+							<span>This is a plain old span tag.</span>
+							<span style="color:red;">Hello <span style="color:blue;">world</span>.</span>
+						</div>
+						<table>
+							<thead>
+								<tr>
+									<th>Version</th>
+									<th>Date</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>15.3</td>
+									<td>2025-03-20</td>
+								</tr>
+								<tr>
+									<td>16.0</td>
+									<td>2025-06-12</td>
+								</tr>
+								<tr>
+									<td>17.0</td>
+									<td>2025-11-27</td>
+								</tr>
+							</tbody>
+						</table>
 						<p>
 							<img width="384" height="228" loading="lazy" alt="Installer illustration" src="/umbraco/backoffice/assets/installer-illustration.svg" />
 						</p>
@@ -943,6 +977,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -1206,4 +1241,5 @@ export const data: Array<UmbMockDocumentModel> = [
 			},
 		],
 	},
+	...permissionsTestData,
 ];

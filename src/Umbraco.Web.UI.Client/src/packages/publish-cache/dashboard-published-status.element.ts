@@ -14,6 +14,8 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	@state()
 	private _buttonStateRebuild: UUIButtonState = undefined;
 
+	#isFirstRebuildStatusPoll: boolean = true;
+
 	//Reload
 	private async _reloadMemoryCache() {
 		this._buttonStateReload = 'waiting';
@@ -42,7 +44,25 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 		if (error) {
 			this._buttonStateRebuild = 'failed';
 		} else {
-			this._buttonStateRebuild = 'success';
+			this.#isFirstRebuildStatusPoll = true;
+			this._pollForRebuildDatabaseCacheStatus();
+		}
+	}
+
+	private async _pollForRebuildDatabaseCacheStatus() {
+		//Checking the server after 1 second and then every 5 seconds to see if the database cache is still rebuilding.
+		while (this._buttonStateRebuild === 'waiting') {
+			await new Promise((resolve) => setTimeout(resolve, this.#isFirstRebuildStatusPoll ? 1000 : 5000));
+			this.#isFirstRebuildStatusPoll = false;
+			const { data, error } = await tryExecuteAndNotify(this, PublishedCacheService.getPublishedCacheRebuildStatus());
+			if (error || !data) {
+				this._buttonStateRebuild = 'failed';
+				return;
+			}
+
+			if (!data.isRebuilding) {
+				this._buttonStateRebuild = 'success';
+			}
 		}
 	}
 

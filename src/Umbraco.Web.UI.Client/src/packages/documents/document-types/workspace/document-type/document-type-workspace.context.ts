@@ -169,7 +169,7 @@ export class UmbDocumentTypeWorkspaceContext
 	async #createAndAssignTemplate() {
 		const { data: templateScaffold } = await this.#templateRepository.createScaffold({
 			name: this.getName(),
-			alias: this.getAlias(),
+			alias: this.getName(), // NOTE: Uses "name" over alias, as the server handle the template filename. [LK]
 		});
 
 		if (!templateScaffold) throw new Error('Could not create template scaffold');

@@ -1,4 +1,4 @@
-import type { UmbMemberItemModel } from '../../repository/index.js';
+import type { UmbMemberItemModel } from '../../item/types.js';
 import {
 	UMB_MEMBER_PICKER_MODAL,
 	type UmbMemberPickerModalData,
@@ -48,7 +48,7 @@ export class UmbMemberPickerInputContext extends UmbPickerInputContext<
 			...pickerData?.search?.queryParams,
 		};
 
-		super.openPicker(combinedPickerData);
+		await super.openPicker(combinedPickerData);
 	}
 
 	#pickableFilter = (
