@@ -1,9 +1,9 @@
-import type { UmbIntegerPropertyEditorUiValue } from './types.js';
+import type { UmbDecimalPropertyEditorUiValue } from './types.js';
 import type { UmbPropertyValuePreset } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbDecimalPropertyValuePreset
-	implements UmbPropertyValuePreset<UmbIntegerPropertyEditorUiValue, UmbPropertyEditorConfig>
+	implements UmbPropertyValuePreset<UmbDecimalPropertyEditorUiValue, UmbPropertyEditorConfig>
 {
 	async processValue(value: undefined | UmbIntegerPropertyEditorUiValue, config: UmbPropertyEditorConfig) {
 		const min = Number(config.find((x) => x.alias === 'minVal') ?? 0);
