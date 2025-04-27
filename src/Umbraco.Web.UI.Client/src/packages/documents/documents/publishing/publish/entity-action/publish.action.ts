@@ -120,6 +120,10 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 				variantIds.map((variantId) => ({ variantId })),
 			);
 
+			if (error) {
+				throw error;
+			}
+
 			if (!error) {
 				const documentVariants = documentData.variants.filter((variant) => result.selection.includes(variant.culture!));
 				notificationContext?.peek('positive', {

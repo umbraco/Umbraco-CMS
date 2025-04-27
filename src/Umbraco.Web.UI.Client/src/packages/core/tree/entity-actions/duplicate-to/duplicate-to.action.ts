@@ -33,9 +33,11 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 			destination: { unique: destinationUnique },
 		});
 
-		if (!error) {
-			this.#reloadMenu();
+		if (error) {
+			throw error;
 		}
+
+		this.#reloadMenu();
 	}
 
 	async #reloadMenu() {
