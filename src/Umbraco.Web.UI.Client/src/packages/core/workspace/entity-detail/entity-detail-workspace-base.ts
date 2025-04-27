@@ -1,5 +1,6 @@
 import { UmbSubmittableWorkspaceContextBase } from '../submittable/index.js';
 import { UmbEntityWorkspaceDataManager } from '../entity/entity-workspace-data-manager.js';
+import type { UmbTreeEntityWorkspaceContext } from '../contexts/tokens/tree-entity-workspace-context.interface.js';
 import type { UmbEntityDetailWorkspaceContextArgs, UmbEntityDetailWorkspaceContextCreateArgs } from './types.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -25,11 +26,14 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 const LOADING_STATE_UNIQUE = 'umbLoadingEntityDetail';
 
 export abstract class UmbEntityDetailWorkspaceContextBase<
-	DetailModelType extends UmbEntityModel = UmbEntityModel,
-	DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
-	CreateArgsType extends
-		UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
-> extends UmbSubmittableWorkspaceContextBase<DetailModelType> {
+		DetailModelType extends UmbEntityModel = UmbEntityModel,
+		DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
+		CreateArgsType extends
+			UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
+	>
+	extends UmbSubmittableWorkspaceContextBase<DetailModelType>
+	implements UmbTreeEntityWorkspaceContext
+{
 	// Just for context token safety:
 	public readonly IS_ENTITY_DETAIL_WORKSPACE_CONTEXT = true;
 

@@ -1,8 +1,8 @@
 import { UMB_TEMPLATE_TREE_REPOSITORY_ALIAS } from '../tree/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbMenuTreeStructureWorkspaceContextBase } from '@umbraco-cms/backoffice/menu';
+import { UmbMenuStructureWorkspaceContextBase } from '@umbraco-cms/backoffice/menu';
 
-export class UmbTemplateMenuStructureWorkspaceContext extends UmbMenuTreeStructureWorkspaceContextBase {
+export class UmbTemplateMenuStructureWorkspaceContext extends UmbMenuStructureWorkspaceContextBase {
 	constructor(host: UmbControllerHost) {
 		super(host, { treeRepositoryAlias: UMB_TEMPLATE_TREE_REPOSITORY_ALIAS });
 	}

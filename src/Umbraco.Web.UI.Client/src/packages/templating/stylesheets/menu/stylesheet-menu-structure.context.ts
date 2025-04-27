@@ -1,8 +1,8 @@
 import { UMB_STYLESHEET_TREE_REPOSITORY_ALIAS } from '../constants.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbMenuTreeStructureWorkspaceContextBase } from '@umbraco-cms/backoffice/menu';
+import { UmbMenuStructureWorkspaceContextBase } from '@umbraco-cms/backoffice/menu';
 
-export class UmbStylesheetMenuStructureWorkspaceContext extends UmbMenuTreeStructureWorkspaceContextBase {
+export class UmbStylesheetMenuStructureWorkspaceContext extends UmbMenuStructureWorkspaceContextBase {
 	constructor(host: UmbControllerHost) {
 		super(host, { treeRepositoryAlias: UMB_STYLESHEET_TREE_REPOSITORY_ALIAS });
 	}
