@@ -163,13 +163,13 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     protected void MapBlockValueFromEditor(TValue editedBlockValue, TValue? currentBlockValue, Guid contentKey)
     {
         MapBlockItemDataFromEditor(
-            editedBlockValue?.ContentData ?? new List<BlockItemData>(),
-            currentBlockValue?.ContentData ?? new List<BlockItemData>(),
+            editedBlockValue?.ContentData ?? [],
+            currentBlockValue?.ContentData ?? [],
             contentKey);
 
         MapBlockItemDataFromEditor(
-            editedBlockValue?.SettingsData ?? new List<BlockItemData>(),
-            currentBlockValue?.SettingsData ?? new List<BlockItemData>(),
+            editedBlockValue?.SettingsData ?? [],
+            currentBlockValue?.SettingsData ?? [],
             contentKey);
     }
 
