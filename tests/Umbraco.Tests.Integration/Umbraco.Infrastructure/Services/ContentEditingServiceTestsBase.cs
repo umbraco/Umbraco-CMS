@@ -74,7 +74,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         return contentType;
     }
 
-    protected async Task<IContentType> CreateVariantContentType(ContentVariation variation = ContentVariation.Culture)
+    protected async Task<IContentType> CreateVariantContentType(ContentVariation variation = ContentVariation.Culture, bool variantTitleAsMandatory = true)
     {
         var language = new LanguageBuilder()
             .WithCultureInfo("da-DK")
@@ -88,7 +88,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
             .AddPropertyType()
             .WithAlias("variantTitle")
             .WithName("Variant Title")
-            .WithMandatory(true)
+            .WithMandatory(variantTitleAsMandatory)
             .WithVariations(variation)
             .Done()
             .AddPropertyType()
