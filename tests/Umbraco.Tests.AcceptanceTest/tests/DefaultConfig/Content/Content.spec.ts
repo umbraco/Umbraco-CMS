@@ -128,7 +128,7 @@ test('can update content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   expect(updatedContentData.values[0].value).toBe(contentText);
 });
 
-test('can publish content', async ({umbracoApi, umbracoUi}) => {
+test('can publish invariant content node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -165,4 +165,23 @@ test('can unpublish content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Draft');
+});
+
+test('can publish variant content node', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, contentText, dataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  await umbracoUi.content.clickPublishButton();
+  await umbracoUi.content.clickConfirmToPublishButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
 });
