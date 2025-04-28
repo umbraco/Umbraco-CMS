@@ -121,7 +121,8 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 
 			return clipboardEntry;
 		} catch (error) {
-			notificationContext.peek('danger', { data: { message: error as string } });
+			const errorMessage = error instanceof Error ? error.message : String(error);
+			notificationContext.peek('danger', { data: { message: errorMessage } });
 		}
 
 		return undefined;
