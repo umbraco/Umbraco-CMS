@@ -433,38 +433,37 @@ export class UmbContentTypeStructureManager<
 			sortOrder: sortOrder ?? 0,
 		};
 
-		// Ensure
-		this.ensureContainerNames(contentTypeUnique, type, parentId);
-
-		const contentTypes = this.#contentTypes.getValue();
-		const containers = [...(contentTypes.find((x) => x.unique === contentTypeUnique)?.containers ?? [])];
-		containers.push(container);
-
-		this.#contentTypes.updateOne(contentTypeUnique, { containers } as Partial<T>);
-
-		return container;
+		return this.insertContainer(contentTypeUnique, container);
 	}
 
-	/*async insertContainer(contentTypeUnique: string | null, container: UmbPropertyTypeContainerModel) {
+	async insertContainer(contentTypeUnique: string | null, container: UmbPropertyTypeContainerModel) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
+		const newContainer = { ...container };
+		const type = newContainer.type;
+		const parentId = newContainer.parent?.id ?? null;
 
 		// If we have a parent, we need to ensure it exists, and then update the parent property with the new container id.
-		if (container.parent) {
-			const parentContainer = await this.ensureContainerOf(container.parent.id, contentTypeUnique);
+		if (newContainer.parent) {
+			const parentContainer = await this.ensureContainerOf(newContainer.parent.id, contentTypeUnique);
 			if (!parentContainer) {
 				throw new Error('Container for inserting property could not be found or created');
 			}
-			container.parent.id = parentContainer.id;
+			newContainer.parent.id = parentContainer.id;
 		}
+
+		// Ensure
+		this.ensureContainerNames(contentTypeUnique, type, parentId);
 
 		const frozenContainers =
 			this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.containers ?? [];
 
-		const containers = appendToFrozenArray(frozenContainers, container, (x) => x.id === container.id);
+		const containers = appendToFrozenArray(frozenContainers, newContainer, (x) => x.id === newContainer.id);
 
 		this.#contentTypes.updateOne(contentTypeUnique, { containers } as Partial<T>);
-	}*/
+
+		return newContainer;
+	}
 
 	makeEmptyContainerName(
 		containerId: string,
@@ -537,7 +536,11 @@ export class UmbContentTypeStructureManager<
 		this.#contentTypes.updateOne(contentTypeUnique, { containers });
 	}
 
-	async removeContainer(contentTypeUnique: string | null, containerId: string | null = null) {
+	async removeContainer(
+		contentTypeUnique: string | null,
+		containerId: string | null = null,
+		args?: { preventRemovingProperties?: boolean },
+	): Promise<void> {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 		this.#editedTypes.appendOne(contentTypeUnique);
@@ -552,12 +555,15 @@ export class UmbContentTypeStructureManager<
 			.map((x) => x.id);
 		const containers = frozenContainers.filter((x) => x.id !== containerId && x.parent?.id !== containerId);
 
-		const frozenProperties = contentType.properties;
-		const properties = frozenProperties.filter((x) =>
-			x.container ? !removedContainerIds.some((ids) => ids === x.container?.id) : true,
-		);
+		const updates: Partial<T> = { containers } as Partial<T>;
 
-		this.#contentTypes.updateOne(contentTypeUnique, { containers, properties } as Partial<T>);
+		if (args?.preventRemovingProperties !== true) {
+			updates.properties = contentType.properties.filter((x) =>
+				x.container ? !removedContainerIds.some((ids) => ids === x.container?.id) : true,
+			);
+		}
+
+		this.#contentTypes.updateOne(contentTypeUnique, updates);
 	}
 
 	async insertProperty(contentTypeUnique: string | null, property: UmbPropertyTypeModel) {
@@ -655,6 +661,11 @@ export class UmbContentTypeStructureManager<
 		return undefined;
 	}
 
+	async getOwnerPropertyById(propertyUnique: string | null): Promise<UmbPropertyTypeModel | undefined> {
+		await this.#init;
+		return this.getOwnerContentType()?.properties?.find((property) => property.unique === propertyUnique);
+	}
+
 	async getPropertyStructureByAlias(propertyAlias: string) {
 		await this.#init;
 		for (const docType of this.#contentTypes.getValue()) {
@@ -719,7 +730,14 @@ export class UmbContentTypeStructureManager<
 		);
 	}
 
-	getOwnerContainers(containerType: UmbPropertyContainerTypes, parentId: string | null) {
+	getOwnerContainerById(id: string | null): UmbPropertyTypeContainerModel | undefined {
+		return this.getOwnerContentType()?.containers?.find((x) => x.id === id);
+	}
+
+	getOwnerContainers(
+		containerType: UmbPropertyContainerTypes,
+		parentId: string | null,
+	): Array<UmbPropertyTypeContainerModel> | undefined {
 		return this.getOwnerContentType()?.containers?.filter(
 			(x) => (parentId ? x.parent?.id === parentId : x.parent === null) && x.type === containerType,
 		);

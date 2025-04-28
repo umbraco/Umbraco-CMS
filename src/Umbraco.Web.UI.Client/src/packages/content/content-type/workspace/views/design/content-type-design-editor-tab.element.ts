@@ -72,6 +72,35 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				i++;
 			}
 		},
+		onRequestDrop: async ({ unique }) => {
+			const context = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
+			if (!context) {
+				throw new Error('Could not get Workspace Context');
+			}
+			return context.structure.getOwnerContainerById(unique);
+		},
+		requestExternalRemove: async ({ item }) => {
+			const context = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
+			if (!context) {
+				throw new Error('Could not get Workspace Context');
+			}
+			return await context.structure.removeContainer(null, item.id, { preventRemovingProperties: true }).then(
+				() => true,
+				() => false,
+			);
+		},
+		requestExternalInsert: async ({ item }) => {
+			const context = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
+			if (!context) {
+				throw new Error('Could not get Workspace Context');
+			}
+			const parent = this.#containerId ? { id: this.#containerId } : null;
+			const updatedItem = { ...item, parent };
+			return await context.structure.insertContainer(null, updatedItem).then(
+				() => true,
+				() => false,
+			);
+		},
 	});
 
 	#workspaceModal?: UmbModalRouteRegistrationController<
@@ -233,7 +262,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				gap: 10px;
 			}
 
-			#convert-to-tab {
+			.container-list #convert-to-tab {
 				margin-bottom: var(--uui-size-layout-1);
 				display: flex;
 			}
