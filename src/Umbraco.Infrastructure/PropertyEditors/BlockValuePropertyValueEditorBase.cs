@@ -99,17 +99,17 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                 continue;
             }
 
-            var districtValues = valuesByPropertyEditorAlias.Distinct().ToArray();
+            var distinctValues = valuesByPropertyEditorAlias.Distinct().ToArray();
 
             if (dataEditor.GetValueEditor() is IDataValueReference reference)
             {
-                foreach (UmbracoEntityReference value in districtValues.SelectMany(reference.GetReferences))
+                foreach (UmbracoEntityReference value in distinctValues.SelectMany(reference.GetReferences))
                 {
                     result.Add(value);
                 }
             }
 
-            IEnumerable<UmbracoEntityReference> references = _dataValueReferenceFactoryCollection.GetReferences(dataEditor, districtValues);
+            IEnumerable<UmbracoEntityReference> references = _dataValueReferenceFactoryCollection.GetReferences(dataEditor, distinctValues);
 
             foreach (UmbracoEntityReference value in references)
             {
