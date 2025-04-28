@@ -129,7 +129,8 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 							headline: localize.term('speechBubbles_editContentPublishedHeader'),
 							message: localize.term(
 								'speechBubbles_editVariantPublishedText',
-								localize.list(documentVariants.map((v) => v.culture ?? v.name)),
+								// TODO: show correct variant names instead of variant strings [MR]
+								localize.list(documentVariants.map((v) => UmbVariantId.Create(v).toString() ?? v.name)),
 							),
 						},
 					});
