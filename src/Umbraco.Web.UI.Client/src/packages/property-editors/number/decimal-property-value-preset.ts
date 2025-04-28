@@ -5,7 +5,7 @@ import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-e
 export class UmbDecimalPropertyValuePreset
 	implements UmbPropertyValuePreset<UmbDecimalPropertyEditorUiValue, UmbPropertyEditorConfig>
 {
-	async processValue(value: undefined | UmbIntegerPropertyEditorUiValue, config: UmbPropertyEditorConfig) {
+	async processValue(value: undefined | UmbDecimalPropertyEditorUiValue, config: UmbPropertyEditorConfig) {
 		const min = Number(config.find((x) => x.alias === 'minVal') ?? 0);
 		const minVerified = isNaN(min) ? 0 : min;
 
