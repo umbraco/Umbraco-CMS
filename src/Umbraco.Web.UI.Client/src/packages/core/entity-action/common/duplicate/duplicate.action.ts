@@ -9,26 +9,24 @@ export class UmbDuplicateEntityAction extends UmbEntityActionBase<any> {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
-		try {
-			const duplicateRepository = await createExtensionApiByAlias<UmbDuplicateRepository>(
-				this,
-				this.args.meta.duplicateRepositoryAlias,
-			);
-			if (!duplicateRepository) throw new Error('Duplicate repository is not available');
+		const duplicateRepository = await createExtensionApiByAlias<UmbDuplicateRepository>(
+			this,
+			this.args.meta.duplicateRepositoryAlias,
+		);
+		if (!duplicateRepository) throw new Error('Duplicate repository is not available');
 
-			const { error } = await duplicateRepository.requestDuplicate({
-				unique: this.args.unique,
-			});
+		const { error } = await duplicateRepository.requestDuplicate({
+			unique: this.args.unique,
+		});
 
-			if (!error) {
-				this.#reloadMenu();
-			}
-		} catch (error) {
-			console.log(error);
+		if (error) {
+			throw error;
 		}
+
+		this.#notify();
 	}
 
-	async #reloadMenu() {
+	async #notify() {
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		if (!actionEventContext) {
 			throw new Error('Action event context is not available');
