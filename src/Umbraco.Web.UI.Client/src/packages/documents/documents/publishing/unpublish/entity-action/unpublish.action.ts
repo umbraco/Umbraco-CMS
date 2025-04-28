@@ -100,6 +100,10 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 		const publishingRepository = new UmbDocumentPublishingRepository(this._host);
 		const { error } = await publishingRepository.unpublish(this.args.unique, variantIds);
 
+		if (error) {
+			throw error;
+		}
+
 		if (!error) {
 			// If the content is invariant, we need to show a different notification
 			const isInvariant = options.length === 1 && options[0].culture === null;

@@ -34,7 +34,10 @@ export class UmbTrashEntityAction<
 			this.args.meta.recycleBinRepositoryAlias,
 		);
 
-		await recycleBinRepository.requestTrash({ unique: this.args.unique });
+		const { error } = await recycleBinRepository.requestTrash({ unique: this.args.unique });
+		if (error) {
+			throw error;
+		}
 
 		this.#notify();
 	}

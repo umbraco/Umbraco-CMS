@@ -97,6 +97,10 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 				variantIds.map((variantId) => ({ variantId })),
 			);
 
+			if (error) {
+				throw error;
+			}
+
 			if (!error) {
 				// If the content is invariant, we need to show a different notification
 				const isInvariant = options.length === 1 && options[0].culture === null;
