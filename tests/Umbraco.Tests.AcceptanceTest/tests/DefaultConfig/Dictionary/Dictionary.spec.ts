@@ -44,6 +44,7 @@ test('can delete a dictionary item', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dictionary.deleteDictionary();
 
   // Assert
+  await umbracoUi.waitForTimeout(500);
   //await umbracoUi.dictionary.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
   await umbracoUi.dictionary.isErrorNotificationVisible(false);
   expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeFalsy();
