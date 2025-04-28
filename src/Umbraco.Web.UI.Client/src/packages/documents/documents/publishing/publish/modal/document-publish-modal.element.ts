@@ -115,6 +115,12 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 							.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>`,
 			)}
 
+			<p>
+				<umb-localize key="prompt_confirmPublish">
+					Publishing will make this page and all its published descendants visible on the site.
+				</umb-localize>
+			</p>
+
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
