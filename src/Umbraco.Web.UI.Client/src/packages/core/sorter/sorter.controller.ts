@@ -7,8 +7,9 @@ const autoScrollSpeed = 16;
 
 /**
  *
- * @param el
- * @param includeSelf
+ * @param {Element} el - The element to check for ability to scroll
+ * @param {Boolean} includeSelf - If true, the element itself will be included in the check
+ * @returns {Element | null}
  */
 function getParentScrollElement(el: Element, includeSelf: boolean) {
 	if (!el || !el.getBoundingClientRect) return null;
@@ -45,8 +46,8 @@ function getParentScrollElement(el: Element, includeSelf: boolean) {
 
 /**
  *
- * @param element
- * @param ignorerSelectors
+ * @param {HTMLElement} element - The element to check
+ * @param {string} ignorerSelectors - A comma separated list of selectors to ignore
  */
 function setupIgnorerElements(element: HTMLElement, ignorerSelectors: string) {
 	const selectors = ignorerSelectors.split(',');
@@ -57,8 +58,8 @@ function setupIgnorerElements(element: HTMLElement, ignorerSelectors: string) {
 }
 /**
  *
- * @param element
- * @param ignorerSelectors
+ * @param {HTMLElement} element - The element to check
+ * @param {string} ignorerSelectors - A comma separated list of selectors to ignore
  */
 function destroyIgnorerElements(element: HTMLElement, ignorerSelectors: string) {
 	const selectors = ignorerSelectors.split(',');
@@ -69,7 +70,7 @@ function destroyIgnorerElements(element: HTMLElement, ignorerSelectors: string) 
 }
 /**
  *
- * @param element
+ * @param {Element} element - The element to check
  */
 function setupPreventEvent(element: Element) {
 	(element as HTMLElement).draggable = false;
@@ -77,7 +78,7 @@ function setupPreventEvent(element: Element) {
 }
 /**
  *
- * @param element
+ * @param {Element} element - The element to check
  */
 function destroyPreventEvent(element: Element) {
 	(element as HTMLElement).draggable = false;
