@@ -377,7 +377,7 @@
     <key alias="invalidEmpty">Value cannot be empty</key>
     <key alias="invalidPattern">Value is invalid, it does not match the correct pattern</key>
     <key alias="entriesShort"><![CDATA[Minimum %0% entries, requires <strong>%1%</strong> more.]]></key>
-    <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
+    <key alias="entriesExceed"><![CDATA[Maximum %0% entries, you have entered <strong>%1%</strong> too many.]]></key>
     <key alias="stringLengthExceeded">The string length exceeds the maximum length of %0% characters, %1% too many.</key>
     <key alias="entriesAreasMismatch">The content amount requirements are not met for one or more areas.</key>
     <key alias="invalidMemberGroupName">Invalid member group name</key>

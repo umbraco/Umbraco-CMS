@@ -211,14 +211,16 @@ export class UmbDocumentWorkspaceContext
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
 		if (blueprintUnique) {
 			const blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
-			const { data } = await blueprintRepository.requestByUnique(blueprintUnique);
+			const { data } = await blueprintRepository.scaffoldByUnique(blueprintUnique);
+
+			if (!data) throw new Error('Blueprint data is missing');
 
 			return this.createScaffold({
 				parent,
 				preset: {
-					documentType: data?.documentType,
-					values: data?.values,
-					variants: data?.variants as Array<UmbDocumentVariantModel>,
+					documentType: data.documentType,
+					values: data.values,
+					variants: data.variants as Array<UmbDocumentVariantModel>,
 				},
 			});
 		}

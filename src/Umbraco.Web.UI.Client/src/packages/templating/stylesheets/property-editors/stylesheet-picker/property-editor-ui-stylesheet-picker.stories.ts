@@ -2,7 +2,7 @@ import { umbDataTypeMockDb } from '../../../../../mocks/data/data-type/data-type
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import type { Meta } from '@storybook/web-components';
 
-import './property-editor-ui-tiny-mce-stylesheets-configuration.element.js';
+import './property-editor-ui-stylesheet-picker.element.js';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 
 const dataTypeData = umbDataTypeMockDb.read('dt-richTextEditor') as unknown as UmbDataTypeDetailModel;
@@ -10,7 +10,7 @@ const dataTypeData = umbDataTypeMockDb.read('dt-richTextEditor') as unknown as U
 export default {
 	title: 'Property Editor UIs/Stylesheet Picker',
 	component: 'umb-property-editor-ui-stylesheet-picker',
-	id: 'umb-property-editor-ui-sstylesheet-picker',
+	id: 'umb-property-editor-ui-stylesheet-picker',
 } as Meta;
 
 export const AAAOverview = ({ value }: any) =>
