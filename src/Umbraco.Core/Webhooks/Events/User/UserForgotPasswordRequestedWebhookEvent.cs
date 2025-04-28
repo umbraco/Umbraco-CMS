@@ -10,17 +10,13 @@ namespace Umbraco.Cms.Core.Webhooks.Events;
 [WebhookEvent("User Forgot Password Requested")]
 public class UserForgotPasswordRequestedWebhookEvent : WebhookEventBase<UserForgotPasswordRequestedNotification>
 {
-    private readonly IUserService _userService;
-
     public UserForgotPasswordRequestedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
-        IServerRoleAccessor serverRoleAccessor,
-        IUserService userService)
+        IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
-        _userService = userService;
     }
 
     public override string Alias => Constants.WebhookEvents.Aliases.UserForgotPasswordRequested;

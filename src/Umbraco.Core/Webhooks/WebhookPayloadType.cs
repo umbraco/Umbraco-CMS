@@ -15,6 +15,6 @@ public enum WebhookPayloadType
     /// <summary>
     /// Mix of minimal and full service models with old int references
     /// </summary>
-    [Obsolete("Planned for removal in v17")]
+    [Obsolete("Planned for removal in v18")]
     Legacy = 2,
 }

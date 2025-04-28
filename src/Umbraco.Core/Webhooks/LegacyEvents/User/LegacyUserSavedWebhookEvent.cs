@@ -22,7 +22,6 @@ public class LegacyUserSavedWebhookEvent : WebhookEventBase<UserSavedNotificatio
 
     public override object? ConvertNotificationToRequestPayload(UserSavedNotification notification)
     {
-        // TODO: Map more stuff here
         var result = notification.SavedEntities.Select(entity => new
         {
             entity.Id,

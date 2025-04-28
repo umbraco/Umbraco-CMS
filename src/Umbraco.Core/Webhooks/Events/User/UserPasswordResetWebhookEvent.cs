@@ -27,7 +27,7 @@ public class UserPasswordResetWebhookEvent : WebhookEventBase<UserPasswordResetN
                  Guid.TryParse(notification.AffectedUserId, out Guid affectedUserGuid)
                 ? affectedUserGuid
                 : Guid.Empty,
-            PerormingId = Guid.TryParse(notification.AffectedUserId, out Guid performingUserGuid)
+            PerformingId = Guid.TryParse(notification.AffectedUserId, out Guid performingUserGuid)
                 ? performingUserGuid
                 : Guid.Empty,
         };

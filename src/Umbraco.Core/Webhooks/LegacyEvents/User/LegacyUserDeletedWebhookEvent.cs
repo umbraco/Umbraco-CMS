@@ -22,7 +22,6 @@ public class LegacyUserDeletedWebhookEvent : WebhookEventBase<UserDeletedNotific
 
     public override object? ConvertNotificationToRequestPayload(UserDeletedNotification notification)
     {
-        // TODO: Map more stuff here
         var result = notification.DeletedEntities.Select(entity => new
         {
             entity.Id,

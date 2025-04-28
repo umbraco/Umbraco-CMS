@@ -16,7 +16,7 @@ public static class WebhookEventCollectionBuilderCmsUserExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsUser AddDefault(this WebhookEventCollectionBuilderCmsUser builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsUser AddDefault(this WebhookEventCollectionBuilderCmsUser builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {
@@ -43,7 +43,7 @@ public static class WebhookEventCollectionBuilderCmsUserExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsUser AddLogin(this WebhookEventCollectionBuilderCmsUser builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsUser AddLogin(this WebhookEventCollectionBuilderCmsUser builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {switch (payloadType)
         {
             case WebhookPayloadType.Extended:
@@ -79,7 +79,7 @@ public static class WebhookEventCollectionBuilderCmsUserExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsUser AddPassword(this WebhookEventCollectionBuilderCmsUser builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsUser AddPassword(this WebhookEventCollectionBuilderCmsUser builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {
@@ -108,7 +108,7 @@ public static class WebhookEventCollectionBuilderCmsUserExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsUser AddGroup(this WebhookEventCollectionBuilderCmsUser builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsUser AddGroup(this WebhookEventCollectionBuilderCmsUser builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {

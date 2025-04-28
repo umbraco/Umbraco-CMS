@@ -71,7 +71,8 @@ public class WebhookSettings
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         By default, minimal payloads are used see <see cref="WebhookPayloadType"/> for more info.
+    ///         By default, Legacy payloads are used see <see cref="WebhookPayloadType"/> for more info.
+    ///         This default will change to minimal starting from v17
     ///     </para>
     /// </remarks>
     [DefaultValue(StaticPayloadType)]
