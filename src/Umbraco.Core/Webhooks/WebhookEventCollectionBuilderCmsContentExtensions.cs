@@ -16,7 +16,7 @@ public static class WebhookEventCollectionBuilderCmsContentExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsContent AddDefault(this WebhookEventCollectionBuilderCmsContent builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsContent AddDefault(this WebhookEventCollectionBuilderCmsContent builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {
@@ -68,7 +68,7 @@ public static class WebhookEventCollectionBuilderCmsContentExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsContent AddBlueprint(this WebhookEventCollectionBuilderCmsContent builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsContent AddBlueprint(this WebhookEventCollectionBuilderCmsContent builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {
@@ -95,7 +95,7 @@ public static class WebhookEventCollectionBuilderCmsContentExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsContent AddVersion(this WebhookEventCollectionBuilderCmsContent builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsContent AddVersion(this WebhookEventCollectionBuilderCmsContent builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {

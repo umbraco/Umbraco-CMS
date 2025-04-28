@@ -15,7 +15,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilder AddCms(this WebhookEventCollectionBuilder builder, bool onlyDefault = false, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilder AddCms(this WebhookEventCollectionBuilder builder, bool onlyDefault = false, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
         => builder.AddCms(builder =>
         {
             if (onlyDefault)

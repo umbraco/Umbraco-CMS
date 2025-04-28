@@ -16,7 +16,7 @@ public static class WebhookEventCollectionBuilderCmsContentTypeExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsContentType AddDocumentType(this WebhookEventCollectionBuilderCmsContentType builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsContentType AddDocumentType(this WebhookEventCollectionBuilderCmsContentType builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {
@@ -47,7 +47,7 @@ public static class WebhookEventCollectionBuilderCmsContentTypeExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsContentType AddMediaType(this WebhookEventCollectionBuilderCmsContentType builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsContentType AddMediaType(this WebhookEventCollectionBuilderCmsContentType builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {
@@ -79,7 +79,7 @@ public static class WebhookEventCollectionBuilderCmsContentTypeExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsContentType AddMemberType(this WebhookEventCollectionBuilderCmsContentType builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsContentType AddMemberType(this WebhookEventCollectionBuilderCmsContentType builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {

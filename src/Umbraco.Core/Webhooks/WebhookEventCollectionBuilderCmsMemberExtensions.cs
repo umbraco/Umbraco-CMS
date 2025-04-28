@@ -16,7 +16,7 @@ public static class WebhookEventCollectionBuilderCmsMemberExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsMember AddDefault(this WebhookEventCollectionBuilderCmsMember builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsMember AddDefault(this WebhookEventCollectionBuilderCmsMember builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {
@@ -45,7 +45,7 @@ public static class WebhookEventCollectionBuilderCmsMemberExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsMember AddRoles(this WebhookEventCollectionBuilderCmsMember builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsMember AddRoles(this WebhookEventCollectionBuilderCmsMember builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {
@@ -72,7 +72,7 @@ public static class WebhookEventCollectionBuilderCmsMemberExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsMember AddGroup(this WebhookEventCollectionBuilderCmsMember builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsMember AddGroup(this WebhookEventCollectionBuilderCmsMember builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {

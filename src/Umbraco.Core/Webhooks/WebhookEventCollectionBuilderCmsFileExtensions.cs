@@ -16,7 +16,7 @@ public static class WebhookEventCollectionBuilderCmsFileExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsFile AddPartialView(this WebhookEventCollectionBuilderCmsFile builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsFile AddPartialView(this WebhookEventCollectionBuilderCmsFile builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {
@@ -43,7 +43,7 @@ public static class WebhookEventCollectionBuilderCmsFileExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsFile AddScript(this WebhookEventCollectionBuilderCmsFile builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsFile AddScript(this WebhookEventCollectionBuilderCmsFile builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {
@@ -70,7 +70,7 @@ public static class WebhookEventCollectionBuilderCmsFileExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsFile AddStylesheet(this WebhookEventCollectionBuilderCmsFile builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsFile AddStylesheet(this WebhookEventCollectionBuilderCmsFile builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {
@@ -97,7 +97,7 @@ public static class WebhookEventCollectionBuilderCmsFileExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsFile AddTemplate(this WebhookEventCollectionBuilderCmsFile builder, WebhookPayloadType payloadType = WebhookPayloadType.Minimal)
+    public static WebhookEventCollectionBuilderCmsFile AddTemplate(this WebhookEventCollectionBuilderCmsFile builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
         switch (payloadType)
         {
