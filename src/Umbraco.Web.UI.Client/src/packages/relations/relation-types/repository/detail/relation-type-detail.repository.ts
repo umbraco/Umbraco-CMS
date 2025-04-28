@@ -19,7 +19,9 @@ export class UmbRelationTypeDetailRepository
 		super(host);
 
 		this.#init = this.consumeContext(UMB_RELATION_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
-			this.#detailStore = instance;
+			if (instance) {
+				this.#detailStore = instance;
+			}
 		}).asPromise({ preventTimeout: true });
 	}
 

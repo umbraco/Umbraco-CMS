@@ -99,14 +99,14 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 				<umb-property-layout alias="collection" label="${this.localize.term('contentTypeEditor_collections')}">
 					<div slot="description">${this.localize.term('contentTypeEditor_collectionsDescription')}</div>
 					<div slot="editor">
-						<umb-input-collection-configuration
+						<umb-input-content-type-collection-configuration
 							default-value="3a0156c4-3b8c-4803-bdc1-6871faa83fff"
 							.value=${this._collection}
 							@change=${(e: CustomEvent) => {
 								const unique = (e.target as UmbInputContentTypeCollectionConfigurationElement).value as string;
 								this.#workspaceContext?.setCollection({ unique });
 							}}>
-						</umb-input-collection-configuration>
+						</umb-input-content-type-collection-configuration>
 					</div>
 				</umb-property-layout>
 			</uui-box>

@@ -352,22 +352,20 @@ export abstract class UmbTreeItemContextBase<
 	}
 
 	#observeFoldersOnly() {
-		if (!this.treeContext || this.unique === undefined) return;
+		if (this.unique === undefined) return;
 
 		this.observe(
-			this.treeContext.foldersOnly,
+			this.treeContext?.foldersOnly,
 			(foldersOnly) => {
-				this.#foldersOnly.setValue(foldersOnly);
+				this.#foldersOnly.setValue(foldersOnly ?? false);
 			},
 			'observeFoldersOnly',
 		);
 	}
 
 	#observeSectionPath() {
-		if (!this.#sectionContext) return;
-
 		this.observe(
-			this.#sectionContext.pathname,
+			this.#sectionContext?.pathname,
 			(pathname) => {
 				if (!pathname || !this.entityType || this.unique === undefined) return;
 				const path = this.constructPath(pathname, this.entityType, this.unique);
@@ -393,17 +391,16 @@ export abstract class UmbTreeItemContextBase<
 	#observeExpansion() {
 		if (this.unique === undefined) return;
 		if (!this.entityType) return;
-		if (!this.treeContext) return;
 
 		this.observe(
-			this.treeContext.expansion.isExpanded({ entityType: this.entityType, unique: this.unique }),
+			this.treeContext?.expansion.isExpanded({ entityType: this.entityType, unique: this.unique }),
 			(isExpanded) => {
 				// If this item has children, load them
 				if (isExpanded && this.#hasChildren.getValue() && this.#isOpen.getValue() === false) {
 					this.loadChildren();
 				}
 
-				this.#isOpen.setValue(isExpanded);
+				this.#isOpen.setValue(isExpanded ?? false);
 			},
 			'observeExpansion',
 		);
