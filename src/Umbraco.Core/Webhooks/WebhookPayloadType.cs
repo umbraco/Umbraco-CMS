@@ -19,8 +19,8 @@ public enum WebhookPayloadType
     /// Legacy payloads containing a mix of minimal information and full service models with legacy integer references.
     /// </summary>
     /// <remarks>
-    /// This is the default option for Umbraco 16 and will be available as a configurable option for Umbraco 17. 
- Expected to be removed in Umbraco 18.
+    /// This is the default option for Umbraco 16 and will be available as a configurable option for Umbraco 17.
+    /// Expected to be removed in Umbraco 18.
     /// </remarks>
     [Obsolete("Planned for removal in v18")]
     Legacy = 2,
