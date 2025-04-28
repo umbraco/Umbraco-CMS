@@ -45,8 +45,10 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 		if (currentUserHasAccessToAllLanguages === undefined)
 			throw new Error('The current user access to all languages is missing');
 
-		const options: Array<UmbDocumentVariantOptionModel> = documentData.variants.map<UmbDocumentVariantOptionModel>(
-			(variant) => ({
+		const options: Array<UmbDocumentVariantOptionModel> = documentData.variants
+			// only display culture variants as options
+			.filter((variant) => variant.segment === null)
+			.map<UmbDocumentVariantOptionModel>((variant) => ({
 				culture: variant.culture,
 				segment: variant.segment,
 				language: languageData?.items.find((language) => language.unique === variant.culture) ?? {
@@ -59,8 +61,7 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 				},
 				variant,
 				unique: new UmbVariantId(variant.culture, variant.segment).toString(),
-			}),
-		);
+			}));
 
 		// Figure out the default selections
 		// TODO: Missing features to pre-select the variant that fits with the variant-id of the tree/collection? (Again only relevant if the action is executed from a Tree or Collection) [NL]
@@ -90,11 +91,18 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 
 		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 
-		if (variantIds.length) {
+		// find all segments of a selected culture
+		const publishableVariantIds = variantIds.flatMap((variantId) =>
+			documentData.variants
+				.filter((variant) => variantId.culture === variant.culture)
+				.map((variant) => UmbVariantId.Create(variant).toSegment(variant.segment)),
+		);
+
+		if (publishableVariantIds.length) {
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
 			const { error } = await publishingRepository.publish(
 				this.args.unique,
-				variantIds.map((variantId) => ({ variantId })),
+				publishableVariantIds.map((variantId) => ({ variantId })),
 			);
 
 			if (error) {
