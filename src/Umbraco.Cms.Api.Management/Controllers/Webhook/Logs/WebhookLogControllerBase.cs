@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Webhook.Logs;
 
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Webhook}")]
 [ApiExplorerSettings(GroupName = "Webhook")]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessWebhooks)]
 public class WebhookLogControllerBase : ManagementApiControllerBase
 {
     protected PagedViewModel<WebhookLogResponseModel> CreatePagedWebhookLogResponseModel(PagedModel<WebhookLog> logs, IWebhookPresentationFactory webhookPresentationFactory)
