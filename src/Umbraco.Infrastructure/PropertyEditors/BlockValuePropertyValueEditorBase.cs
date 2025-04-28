@@ -157,17 +157,116 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         return result;
     }
 
-    protected void MapBlockValueFromEditor(TValue? editedBlockValue, TValue? currentBlockValue, ContentPropertyData contentPropertyData)
+    [Obsolete("This method is no longer used within Umbraco. Please use the overload taking all parameters. Scheduled for removal in Umbraco 17.")]
+    protected void MapBlockValueFromEditor(TValue blockValue) => MapBlockValueFromEditor(blockValue, null, Guid.Empty);
+
+    // TODO (V17): When the obsolete method above is removed, remove the nullability on the contentPropertyData parameter.
+    protected void MapBlockValueFromEditor(TValue editedBlockValue, TValue? currentBlockValue, Guid contentKey)
     {
         MapBlockItemDataFromEditor(
             editedBlockValue?.ContentData ?? new List<BlockItemData>(),
             currentBlockValue?.ContentData ?? new List<BlockItemData>(),
-            contentPropertyData);
+            contentKey);
 
         MapBlockItemDataFromEditor(
             editedBlockValue?.SettingsData ?? new List<BlockItemData>(),
             currentBlockValue?.SettingsData ?? new List<BlockItemData>(),
-            contentPropertyData);
+            contentKey);
+    }
+
+    private void MapBlockItemDataFromEditor(List<BlockItemData> editedItems, List<BlockItemData> currentItems, Guid contentKey)
+    {
+        // creating mapping between edited and current block items
+        IEnumerable<BlockStateMapping<BlockItemData>> itemsMapping = GetBlockStatesMapping(editedItems, currentItems, (mapping, current) => mapping.Edited?.Key == current.Key);
+
+        foreach (BlockStateMapping<BlockItemData> itemMapping in itemsMapping)
+        {
+            // creating mapping between edited and current block item values
+            IEnumerable<BlockStateMapping<BlockPropertyValue>> valuesMapping = GetBlockStatesMapping(itemMapping.Edited?.Values, itemMapping.Current?.Values, (mapping, current) => mapping.Edited?.Alias == current.Alias);
+
+            foreach (BlockStateMapping<BlockPropertyValue> valueMapping in valuesMapping)
+            {
+                BlockPropertyValue? editedValue = valueMapping.Edited;
+                BlockPropertyValue? currentValue = valueMapping.Current;
+
+                IPropertyType propertyType = editedValue?.PropertyType
+                    ?? currentValue?.PropertyType
+                    ?? throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them from editor.", nameof(editedItems));
+
+                // Lookup the property editor
+                IDataEditor? propertyEditor = _propertyEditors[propertyType.PropertyEditorAlias];
+                if (propertyEditor is null)
+                {
+                    continue;
+                }
+
+                // Fetch the property types prevalue
+                var configuration = _dataTypeConfigurationCache.GetConfiguration(propertyType.DataTypeKey);
+
+                // Create a real content property data object
+                var propertyData = new ContentPropertyData(editedValue?.Value, configuration)
+                {
+                    ContentKey = contentKey,
+                    PropertyTypeKey = propertyType.Key,
+                };
+
+                // Get the property editor to do it's conversion
+                IDataValueEditor valueEditor = propertyEditor.GetValueEditor();
+                var newValue = valueEditor.FromEditor(propertyData, currentValue?.Value);
+
+                // update the raw value since this is what will get serialized out
+                if (editedValue != null)
+                {
+                    editedValue.Value = newValue;
+                }
+            }
+        }
+    }
+
+    private sealed class BlockStateMapping<T>
+    {
+        public T? Edited { get; set; }
+
+        public T? Current { get; set; }
+    }
+
+    private static IEnumerable<BlockStateMapping<T>> GetBlockStatesMapping<T>(IList<T>? editedItems, IList<T>? currentItems, Func<BlockStateMapping<T>, T, bool> condition)
+    {
+        // filling with edited items first
+        List<BlockStateMapping<T>> mapping = editedItems?
+            .Select(editedItem => new BlockStateMapping<T>
+            {
+                Current = default,
+                Edited = editedItem,
+            })
+            .ToList()
+            ?? [];
+
+        if (currentItems is null)
+        {
+            return mapping;
+        }
+
+        // then adding current items
+        foreach (T currentItem in currentItems)
+        {
+            BlockStateMapping<T>? mappingItem = mapping.FirstOrDefault(x => condition(x, currentItem));
+
+            if (mappingItem == null) // if there is no edited item, then adding just current
+            {
+                mapping.Add(new BlockStateMapping<T>
+                {
+                    Current = currentItem,
+                    Edited = default,
+                });
+            }
+            else
+            {
+                mappingItem.Current = currentItem;
+            }
+        }
+
+        return mapping;
     }
 
     protected void MapBlockValueToEditor(IProperty property, TValue blockValue, string? culture, string? segment)
@@ -230,100 +329,6 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                 blockPropertyValue.Value = editorValue;
             }
         }
-    }
-
-    private void MapBlockItemDataFromEditor(List<BlockItemData> editedItems, List<BlockItemData> currentItems, ContentPropertyData contentPropertyData)
-    {
-        // creating mapping between edited and current block items
-        IReadOnlyList<BlockStateMapping<BlockItemData>> itemsMapping = GetBlockStatesMapping(editedItems, currentItems, (mapping, current) => mapping.Edited?.Key == current.Key);
-
-        foreach (BlockStateMapping<BlockItemData> itemMapping in itemsMapping)
-        {
-            // creating mapping between edited and current block item values
-            IReadOnlyList<BlockStateMapping<BlockPropertyValue>> valuesMapping = GetBlockStatesMapping(itemMapping.Edited?.Values, itemMapping.Current?.Values, (mapping, current) => mapping.Edited?.Alias == current.Alias);
-
-            foreach (BlockStateMapping<BlockPropertyValue> valueMapping in valuesMapping)
-            {
-                BlockPropertyValue? editedValue = valueMapping.Edited;
-                BlockPropertyValue? currentValue = valueMapping.Current;
-
-                IPropertyType propertyType = editedValue?.PropertyType
-                    ?? currentValue?.PropertyType
-                    ?? throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them from editor.", nameof(editedItems));
-
-                // Lookup the property editor
-                IDataEditor? propertyEditor = _propertyEditors[propertyType.PropertyEditorAlias];
-                if (propertyEditor is null)
-                {
-                    continue;
-                }
-
-                // Fetch the property types prevalue
-                var configuration = _dataTypeConfigurationCache.GetConfiguration(propertyType.DataTypeKey);
-
-                // Create a real content property data object
-                var propertyData = new ContentPropertyData(editedValue?.Value, configuration)
-                {
-                    ContentKey = contentPropertyData.ContentKey,
-                    PropertyTypeKey = propertyType.Key
-                };
-
-                // Get the property editor to do it's conversion
-                IDataValueEditor valueEditor = propertyEditor.GetValueEditor();
-                var newValue = valueEditor.FromEditor(propertyData, currentValue?.Value);
-
-                // update the raw value since this is what will get serialized out
-                if (editedValue != null)
-                {
-                    editedValue.Value = newValue;
-                }
-            }
-        }
-    }
-
-    // TODO: maybe there is more suitable class for this purpose
-    // TODO: place this class to more suitable place
-    private sealed class BlockStateMapping<T>
-    {
-        public T? Edited { get; set; }
-        public T? Current { get; set; }
-    }
-
-    // TODO: there is should be more efficient way to map states
-    private static IReadOnlyList<BlockStateMapping<T>> GetBlockStatesMapping<T>(IList<T>? editedItems, IList<T>? currentItems, Func<BlockStateMapping<T>, T, bool> condition)
-    {
-        // filling with edited items first
-        List<BlockStateMapping<T>> mapping = editedItems?
-            .Select(editedItem => new BlockStateMapping<T>
-            {
-                Current = default,
-                Edited = editedItem,
-            })
-            .ToList()
-            ?? new List<BlockStateMapping<T>>();
-
-        currentItems ??= new List<T>();
-
-        // then adding current items
-        foreach (T currentItem in currentItems)
-        {
-            BlockStateMapping<T>? mappingItem = mapping.FirstOrDefault(x => condition(x, currentItem));
-
-            if (mappingItem == null) // if there is no edited item, then adding just current
-            {
-                mapping.Add(new BlockStateMapping<T>
-                {
-                    Current = currentItem,
-                    Edited = default,
-                });
-            }
-            else
-            {
-                mappingItem.Current = currentItem;
-            }
-        }
-
-        return mapping;
     }
 
     /// <summary>
