@@ -125,12 +125,12 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         BlockEditorData<TValue, TLayout>? currentBlockEditorData = GetBlockEditorData(currentValue);
         BlockEditorData<TValue, TLayout>? blockEditorData = GetBlockEditorData(editorValue.Value);
 
-        MapBlockValueFromEditor(blockEditorData?.BlockValue, currentBlockEditorData?.BlockValue, editorValue);
-
         if (blockEditorData == null || blockEditorData.BlockValue.ContentData.Count == 0)
         {
             return string.Empty;
         }
+
+        MapBlockValueFromEditor(blockEditorData.BlockValue, currentBlockEditorData?.BlockValue, editorValue.ContentKey);
 
         // return json
         return JsonSerializer.Serialize(blockEditorData.BlockValue);

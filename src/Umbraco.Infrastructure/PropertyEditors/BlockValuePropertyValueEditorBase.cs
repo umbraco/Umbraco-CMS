@@ -160,7 +160,6 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     [Obsolete("This method is no longer used within Umbraco. Please use the overload taking all parameters. Scheduled for removal in Umbraco 17.")]
     protected void MapBlockValueFromEditor(TValue blockValue) => MapBlockValueFromEditor(blockValue, null, Guid.Empty);
 
-    // TODO (V17): When the obsolete method above is removed, remove the nullability on the contentPropertyData parameter.
     protected void MapBlockValueFromEditor(TValue editedBlockValue, TValue? currentBlockValue, Guid contentKey)
     {
         MapBlockItemDataFromEditor(
