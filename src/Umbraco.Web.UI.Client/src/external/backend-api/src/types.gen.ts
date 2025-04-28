@@ -643,6 +643,7 @@ export type DocumentCollectionResponseModel = {
     documentType: (DocumentTypeCollectionReferenceResponseModel);
     isTrashed: boolean;
     isProtected: boolean;
+    ancestors: Array<(ReferenceByIdModel)>;
     updater?: (string) | null;
 };
 
@@ -715,6 +716,7 @@ export type DocumentTreeItemResponseModel = {
     id: string;
     createDate: string;
     isProtected: boolean;
+    ancestors: Array<(ReferenceByIdModel)>;
     documentType: (DocumentTypeReferenceResponseModel);
     variants: Array<(DocumentVariantItemResponseModel)>;
 };
@@ -775,6 +777,14 @@ export type DocumentTypePropertyTypeContainerResponseModel = {
     name?: (string) | null;
     type: string;
     sortOrder: number;
+};
+
+export type DocumentTypePropertyTypeReferenceResponseModel = {
+    $type: string;
+    id: string;
+    name?: (string) | null;
+    alias?: (string) | null;
+    documentType: (TrackedReferenceDocumentTypeModel);
 };
 
 export type DocumentTypePropertyTypeResponseModel = {
@@ -1285,6 +1295,14 @@ export type MediaTypePropertyTypeContainerResponseModel = {
     sortOrder: number;
 };
 
+export type MediaTypePropertyTypeReferenceResponseModel = {
+    $type: string;
+    id: string;
+    name?: (string) | null;
+    alias?: (string) | null;
+    mediaType: (TrackedReferenceMediaTypeModel);
+};
+
 export type MediaTypePropertyTypeResponseModel = {
     id: string;
     container?: ((ReferenceByIdModel) | null);
@@ -1465,6 +1483,14 @@ export type MemberTypePropertyTypeContainerResponseModel = {
     name?: (string) | null;
     type: string;
     sortOrder: number;
+};
+
+export type MemberTypePropertyTypeReferenceResponseModel = {
+    $type: string;
+    id: string;
+    name?: (string) | null;
+    alias?: (string) | null;
+    memberType: (TrackedReferenceMemberTypeModel);
 };
 
 export type MemberTypePropertyTypeResponseModel = {
@@ -1759,7 +1785,7 @@ export type PagedIndexResponseModel = {
 
 export type PagedIReferenceResponseModel = {
     total: number;
-    items: Array<(DefaultReferenceResponseModel | DocumentReferenceResponseModel | MediaReferenceResponseModel | MemberReferenceResponseModel)>;
+    items: Array<(DefaultReferenceResponseModel | DocumentReferenceResponseModel | DocumentTypePropertyTypeReferenceResponseModel | MediaReferenceResponseModel | MediaTypePropertyTypeReferenceResponseModel | MemberReferenceResponseModel | MemberTypePropertyTypeReferenceResponseModel)>;
 };
 
 export type PagedLanguageResponseModel = {
@@ -2409,18 +2435,21 @@ export type TemporaryFileResponseModel = {
 };
 
 export type TrackedReferenceDocumentTypeModel = {
+    id: string;
     icon?: (string) | null;
     alias?: (string) | null;
     name?: (string) | null;
 };
 
 export type TrackedReferenceMediaTypeModel = {
+    id: string;
     icon?: (string) | null;
     alias?: (string) | null;
     name?: (string) | null;
 };
 
 export type TrackedReferenceMemberTypeModel = {
+    id: string;
     icon?: (string) | null;
     alias?: (string) | null;
     name?: (string) | null;
@@ -2999,6 +3028,14 @@ export type PutDataTypeByIdMoveData = {
 
 export type PutDataTypeByIdMoveResponse = (string);
 
+export type GetDataTypeByIdReferencedByData = {
+    id: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetDataTypeByIdReferencedByResponse = ((PagedIReferenceResponseModel));
+
 export type GetDataTypeByIdReferencesData = {
     id: string;
 };
@@ -3417,6 +3454,13 @@ export type GetRecycleBinDocumentChildrenData = {
 
 export type GetRecycleBinDocumentChildrenResponse = ((PagedDocumentRecycleBinItemResponseModel));
 
+export type GetRecycleBinDocumentReferencedByData = {
+    skip?: number;
+    take?: number;
+};
+
+export type GetRecycleBinDocumentReferencedByResponse = ((PagedIReferenceResponseModel));
+
 export type GetRecycleBinDocumentRootData = {
     skip?: number;
     take?: number;
@@ -3478,6 +3522,12 @@ export type PutDocumentBlueprintByIdMoveData = {
 };
 
 export type PutDocumentBlueprintByIdMoveResponse = (string);
+
+export type GetDocumentBlueprintByIdScaffoldData = {
+    id: string;
+};
+
+export type GetDocumentBlueprintByIdScaffoldResponse = ((DocumentBlueprintResponseModel));
 
 export type PostDocumentBlueprintFolderData = {
     requestBody?: (CreateFolderRequestModel);
@@ -4087,6 +4137,13 @@ export type GetRecycleBinMediaChildrenData = {
 };
 
 export type GetRecycleBinMediaChildrenResponse = ((PagedMediaRecycleBinItemResponseModel));
+
+export type GetRecycleBinMediaReferencedByData = {
+    skip?: number;
+    take?: number;
+};
+
+export type GetRecycleBinMediaReferencedByResponse = ((PagedIReferenceResponseModel));
 
 export type GetRecycleBinMediaRootData = {
     skip?: number;

@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -33,6 +35,21 @@ internal sealed class ContentBlueprintEditingService
     {
         IContent? blueprint = ContentService.GetBlueprintById(key);
         return await Task.FromResult(blueprint);
+    }
+
+    public Task<IContent?> GetScaffoldedAsync(Guid key)
+    {
+        IContent? blueprint = ContentService.GetBlueprintById(key);
+        if (blueprint is null)
+        {
+            return Task.FromResult<IContent?>(null);
+        }
+
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        scope.Notifications.Publish(new ContentScaffoldedNotification(blueprint, blueprint, Constants.System.Root, new EventMessages()));
+        scope.Complete();
+
+        return Task.FromResult<IContent?>(blueprint);
     }
 
     public async Task<Attempt<PagedModel<IContent>?, ContentEditingOperationStatus>> GetPagedByContentTypeAsync(Guid contentTypeKey, int skip, int take)
