@@ -257,10 +257,8 @@ public class Property : EntityBase, IProperty
         }
     }
 
-    /// <summary>
-    ///     Sets a value.
-    /// </summary>
-    public void SetValue(object? value, string? culture = null, string? segment = null)
+    /// <inheritdoc />
+    public bool SetValue(object? value, string? culture = null, string? segment = null)
     {
         culture = culture?.NullOrWhiteSpaceAsNull();
         segment = segment?.NullOrWhiteSpaceAsNull();
@@ -273,6 +271,7 @@ public class Property : EntityBase, IProperty
 
         (IPropertyValue? pvalue, var change) = GetPValue(culture, segment, true);
 
+        var changed = false;
         if (pvalue is not null)
         {
             var origValue = pvalue.EditedValue;
@@ -280,8 +279,10 @@ public class Property : EntityBase, IProperty
 
             pvalue.EditedValue = setValue;
 
-            DetectChanges(setValue, origValue, nameof(Values), PropertyValueComparer, change);
+            changed = DetectChanges(setValue, origValue, nameof(Values), PropertyValueComparer, change);
         }
+
+        return changed;
     }
 
     public object? ConvertAssignedValue(object? value) =>

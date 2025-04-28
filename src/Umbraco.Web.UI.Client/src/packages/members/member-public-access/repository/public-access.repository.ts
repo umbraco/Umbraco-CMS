@@ -7,14 +7,12 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbDocumentPublicAccessRepository extends UmbControllerBase implements UmbApi {
-	#dataSource: UmbDocumentPublicAccessServerDataSource;
+	#dataSource = new UmbDocumentPublicAccessServerDataSource(this);
 
 	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-
-		this.#dataSource = new UmbDocumentPublicAccessServerDataSource(this);
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 			this.#notificationContext = instance as UmbNotificationContext;

@@ -347,4 +347,45 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             Constants.Security.SuperUserKey);
         Assert.IsTrue(publishAttempt.Success);
     }
+
+    [Test]
+    public async Task Republishing_Single_Culture_Does_Not_Change_Publish_Or_Update_Date_For_Other_Cultures()
+    {
+        var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
+        var setupData = await CreateVariantContentAsync(langEn, langDa, langBe, contentType);
+
+        var publishAttempt = await ContentPublishingService.PublishAsync(
+            setupData.Key,
+            [
+                new() { Culture = langEn.IsoCode },
+                new() { Culture = langDa.IsoCode },
+                new() { Culture = langBe.IsoCode },
+            ],
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishAttempt.Success);
+
+        var content = ContentService.GetById(setupData.Key)!;
+        var firstPublishDateEn = content.GetPublishDate(langEn.IsoCode)
+                                 ?? throw new InvalidOperationException("Expected a publish date for EN");
+        var firstPublishDateDa = content.GetPublishDate(langDa.IsoCode)
+                                 ?? throw new InvalidOperationException("Expected a publish date for DA");
+        var firstPublishDateBe = content.GetPublishDate(langBe.IsoCode)
+                                 ?? throw new InvalidOperationException("Expected a publish date for BE");
+
+        Thread.Sleep(100);
+
+        publishAttempt = await ContentPublishingService.PublishAsync(
+            content.Key,
+            [new() { Culture = langEn.IsoCode }],
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishAttempt.Success);
+
+        content = ContentService.GetById(content.Key)!;
+        Assert.AreEqual(firstPublishDateDa, content.GetPublishDate(langDa.IsoCode));
+        Assert.AreEqual(firstPublishDateBe, content.GetPublishDate(langBe.IsoCode));
+
+        var lastPublishDateEn = content.GetPublishDate(langEn.IsoCode)
+                                ?? throw new InvalidOperationException("Expected a publish date for EN");
+        Assert.Greater(lastPublishDateEn, firstPublishDateEn);
+    }
 }
