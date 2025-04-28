@@ -67,13 +67,6 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 			}),
 		);
 
-		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		if (!actionEventContext) throw new Error('The action event context is missing');
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			unique: this.args.unique,
-			entityType: this.args.entityType,
-		});
-
 		// Figure out the default selections
 		// TODO: Missing features to pre-select the variant that fits with the variant-id of the tree/collection? (Again only relevant if the action is executed from a Tree or Collection) [NL]
 		const selection: Array<string> = [];
@@ -107,6 +100,10 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 		const publishingRepository = new UmbDocumentPublishingRepository(this._host);
 		const { error } = await publishingRepository.unpublish(this.args.unique, variantIds);
 
+		if (error) {
+			throw error;
+		}
+
 		if (!error) {
 			// If the content is invariant, we need to show a different notification
 			const isInvariant = options.length === 1 && options[0].culture === null;
@@ -131,7 +128,13 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 				});
 			}
 
-			actionEventContext.dispatchEvent(event);
+			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.args.unique,
+				entityType: this.args.entityType,
+			});
+
+			actionEventContext?.dispatchEvent(event);
 		}
 	}
 }

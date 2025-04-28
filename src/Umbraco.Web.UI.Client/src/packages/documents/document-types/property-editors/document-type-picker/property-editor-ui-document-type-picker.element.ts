@@ -17,23 +17,23 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 		if (!config) return;
 
 		const minMax = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
-		this.min = minMax?.min ?? 0;
-		this.max = minMax?.max ?? Infinity;
+		this._min = minMax?.min ?? 0;
+		this._max = minMax?.max ?? Infinity;
 
-		this.onlyElementTypes = config.getValueByAlias('onlyPickElementTypes') ?? false;
+		this._elementTypesOnly = config.getValueByAlias('onlyPickElementTypes') ?? false;
 	}
 
 	@property({ type: Boolean, attribute: 'readonly' })
 	readonly = false;
 
 	@state()
-	min = 0;
+	private _min = 0;
 
 	@state()
-	max = Infinity;
+	private _max = Infinity;
 
 	@state()
-	onlyElementTypes?: boolean;
+	private _elementTypesOnly?: boolean;
 
 	#onChange(event: CustomEvent & { target: UmbInputDocumentTypeElement }) {
 		this.value = event.target.value;
@@ -43,11 +43,11 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 	override render() {
 		return html`
 			<umb-input-document-type
-				.min=${this.min}
-				.max=${this.max}
+				.min=${this._min}
+				.max=${this._max}
 				.value=${this.value}
 				.readonly=${this.readonly}
-				.elementTypesOnly=${this.onlyElementTypes ?? false}
+				.elementTypesOnly=${this._elementTypesOnly ?? false}
 				@change=${this.#onChange}>
 			</umb-input-document-type>
 		`;

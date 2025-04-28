@@ -8,6 +8,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 interface UmbDocumentTypePickerInputContextOpenArgs {
 	elementTypesOnly?: boolean;
+	documentTypesOnly?: boolean;
 }
 
 export class UmbDocumentTypePickerInputContext extends UmbPickerInputContext<
@@ -24,6 +25,11 @@ export class UmbDocumentTypePickerInputContext extends UmbPickerInputContext<
 		pickerData?: Partial<UmbDocumentTypePickerModalData>,
 		args?: UmbDocumentTypePickerInputContextOpenArgs,
 	): Promise<void> {
+		if (args?.documentTypesOnly && args?.elementTypesOnly) {
+			throw new Error('You cannot set both documentTypesOnly and elementTypesOnly to true.');
+		}
+		const isElementType = args?.elementTypesOnly ?? (args?.documentTypesOnly === true ? false : undefined);
+
 		const combinedPickerData = {
 			...pickerData,
 		};
@@ -36,7 +42,7 @@ export class UmbDocumentTypePickerInputContext extends UmbPickerInputContext<
 		}
 
 		combinedPickerData.search!.queryParams = {
-			elementTypesOnly: args?.elementTypesOnly,
+			isElementType,
 			...pickerData?.search?.queryParams,
 		};
 

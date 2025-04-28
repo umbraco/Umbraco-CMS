@@ -34,7 +34,10 @@ export class UmbTrashEntityAction<
 			this.args.meta.recycleBinRepositoryAlias,
 		);
 
-		await recycleBinRepository.requestTrash({ unique: this.args.unique });
+		const { error } = await recycleBinRepository.requestTrash({ unique: this.args.unique });
+		if (error) {
+			throw error;
+		}
 
 		this.#notify();
 	}
@@ -44,7 +47,7 @@ export class UmbTrashEntityAction<
 		const message = '#defaultdialogs_confirmTrash';
 
 		// TODO: handle items with variants
-		await umbConfirmModal(this._host, {
+		await umbConfirmModal(this, {
 			headline,
 			content: this.#localize.string(message, item.name),
 			color: 'danger',

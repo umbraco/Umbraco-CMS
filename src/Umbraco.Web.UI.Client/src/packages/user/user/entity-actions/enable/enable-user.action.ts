@@ -29,7 +29,10 @@ export class UmbEnableUserEntityAction extends UmbEntityActionBase<never> {
 		});
 
 		const enableRepository = new UmbEnableUserRepository(this);
-		await enableRepository.enable([this.args.unique]);
+		const { error } = await enableRepository.enable([this.args.unique]);
+		if (error) {
+			throw error;
+		}
 	}
 }
 

@@ -7,6 +7,7 @@ export const UMB_CONTEXT_PROVIDE_EVENT_TYPE = 'umb:context-provide';
  */
 export interface UmbContextProvideEvent extends Event {
 	readonly contextAlias: string | UmbContextToken;
+	clone(): UmbContextProvideEvent;
 }
 
 /**
@@ -17,6 +18,9 @@ export interface UmbContextProvideEvent extends Event {
 export class UmbContextProvideEventImplementation extends Event implements UmbContextProvideEvent {
 	public constructor(public readonly contextAlias: string | UmbContextToken) {
 		super(UMB_CONTEXT_PROVIDE_EVENT_TYPE, { bubbles: true, composed: true });
+	}
+	public clone(): UmbContextProvideEvent {
+		return new UmbContextProvideEventImplementation(this.contextAlias);
 	}
 }
 

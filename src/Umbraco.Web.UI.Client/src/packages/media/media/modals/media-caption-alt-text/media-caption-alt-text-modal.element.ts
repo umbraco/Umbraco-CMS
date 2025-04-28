@@ -6,6 +6,7 @@ import type {
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbMediaUrlRepository } from '../../url/index.js';
 
 @customElement('umb-media-caption-alt-text-modal')
 export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
@@ -14,6 +15,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 > {
 	#mediaUnique?: string;
 	readonly #mediaDetailRepository = new UmbMediaDetailRepository(this);
+	readonly #mediaUrlRepository = new UmbMediaUrlRepository(this);
 
 	override connectedCallback() {
 		super.connectedCallback();
@@ -23,10 +25,16 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 
 	async #getMediaDetail() {
 		if (!this.#mediaUnique) return;
-		const { data } = await this.#mediaDetailRepository.requestByUnique(this.#mediaUnique);
-		if (!data) return;
+		const { data: mediaData } = await this.#mediaDetailRepository.requestByUnique(this.#mediaUnique);
+		if (!mediaData) return;
 
-		this.value = { ...this.value, altText: this.value?.altText ?? data.variants[0].name, url: data.urls[0]?.url ?? '' };
+		const { data: mediaUrlData } = await this.#mediaUrlRepository.requestItems([this.#mediaUnique]);
+
+		this.value = {
+			...this.value,
+			altText: this.value?.altText ?? mediaData.variants[0].name,
+			url: mediaUrlData?.[0].url ?? ''
+		};
 	}
 
 	override render() {
