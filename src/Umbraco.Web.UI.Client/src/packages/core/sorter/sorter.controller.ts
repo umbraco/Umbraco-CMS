@@ -812,9 +812,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	};
 
 	#handleMoveEnd() {
-		if (UmbSorterController.originalSorter !== (this as unknown as UmbSorterController<unknown>)) {
-			return;
-		}
 		if (!UmbSorterController.activeElement || !UmbSorterController.activeItem) {
 			return;
 		}
@@ -1209,7 +1206,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			console.error('Failed to retrieve active item unique');
 			return false;
 		}
-		const item = UmbSorterController.activeItem as T;
+		let item = UmbSorterController.activeItem as T;
 		if (fromCtrl) {
 			// If we got a fromCtrl, we should use it to get the item, to verify that it holds the model.
 			// We use the getItem method to find the current item/object of this entry, as we cannot trust the object instance(activeItem) to be the same as in the model. [NL]
@@ -1219,6 +1216,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				console.error('Could not find item of model to move', itemUnique, this.#model);
 				return false;
 			}
+			// Update item with latest find:
+			item = foundTheItem;
 		}
 		// If we do not have a formCtrl, then it means that we dont know where it comes from, like via native drag across the Sorters awareness.
 

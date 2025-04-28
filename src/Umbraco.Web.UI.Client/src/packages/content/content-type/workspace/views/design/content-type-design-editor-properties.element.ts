@@ -97,6 +97,35 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 				i++;
 			}
 		},
+		onRequestDrop: async ({ unique }) => {
+			const context = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
+			if (!context) {
+				throw new Error('Could not get Workspace Context');
+			}
+			return context.structure.getOwnerPropertyById(unique);
+		},
+		requestExternalRemove: async ({ item }) => {
+			const context = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
+			if (!context) {
+				throw new Error('Could not get Workspace Context');
+			}
+			return await context.structure.removeProperty(null, item.unique).then(
+				() => true,
+				() => false,
+			);
+		},
+		requestExternalInsert: async ({ item }) => {
+			const context = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
+			if (!context) {
+				throw new Error('Could not get Workspace Context');
+			}
+			const parent = this._containerId ? { id: this._containerId } : null;
+			const updatedItem = { ...item, parent };
+			return await context.structure.insertProperty(null, updatedItem).then(
+				() => true,
+				() => false,
+			);
+		},
 	});
 
 	private _containerId: string | null | undefined;
