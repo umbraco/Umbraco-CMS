@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -452,7 +453,10 @@ namespace Umbraco.Cms.Core.Routing
         /// <returns>The path part relative to the uri of the domain.</returns>
         /// <remarks>Eg the relative part of <c>/foo/bar/nil</c> to domain <c>example.com/foo</c> is <c>/bar/nil</c>.</remarks>
         public static string PathRelativeToDomain(Uri domainUri, string path)
-            => path.Substring(domainUri.GetAbsolutePathDecoded().Length).EnsureStartsWith('/');
+        {
+            string decodedPath = HttpUtility.UrlDecode(path);
+            return decodedPath.Substring(domainUri.GetAbsolutePathDecoded().Length).EnsureStartsWith('/');
+        }
 
         #endregion
     }
