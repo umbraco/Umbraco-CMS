@@ -4,7 +4,6 @@ import {
 	css,
 	customElement,
 	html,
-	map,
 	property,
 	repeat,
 	state,
