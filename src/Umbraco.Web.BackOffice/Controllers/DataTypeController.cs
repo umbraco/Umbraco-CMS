@@ -1,14 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Net.Mime;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -424,7 +420,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <summary>
         /// Returns the references (usages) for the data type.
         /// </summary>
-        /// <param name="id">Date type's integer Id.</param>
+        /// <param name="id">Data type's integer Id.</param>
         [HttpGet]
         public DataTypeReferences GetReferences(int id)
         {
@@ -466,7 +462,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <summary>
         /// Returns the references (usages) for the data type.
         /// </summary>
-        /// <param name="id">Date type's key.</param>
+        /// <param name="id">Data type's key.</param>
         [HttpGet]
         public DataTypeReferences GetReferences(Guid id)
         {
