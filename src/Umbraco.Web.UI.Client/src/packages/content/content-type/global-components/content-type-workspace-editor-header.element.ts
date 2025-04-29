@@ -136,7 +136,6 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 			#description {
 				width: 100%;
 				--uui-input-height: var(--uui-size-8);
-				--uui-input-border-color: transparent;
 			}
 
 			#description:hover {
