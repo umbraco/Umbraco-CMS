@@ -467,6 +467,7 @@ export default {
 		unsavedChangesWarning: 'Are you sure you want to navigate away from this page? You have unsaved changes',
 		confirmListViewPublish: 'Publishing will make the selected items visible on the site.',
 		confirmListViewUnpublish: 'Unpublishing will remove the selected items and all their descendants from the site.',
+		confirmPublish: 'Publishing will make this page and all its published descendants visible on the site.',
 		confirmUnpublish: 'Unpublishing will remove this page and all its descendants from the site.',
 		doctypeChangeWarning: 'You have unsaved changes. Making changes to the Document Type will discard the changes.',
 	},
@@ -2456,6 +2457,7 @@ export default {
 		labelForCopyToClipboard: 'Copy to clipboard',
 		confirmDeleteHeadline: 'Delete from clipboard',
 		confirmDeleteDescription: 'Are you sure you want to delete <strong>{0}</strong> from the clipboard?',
+		copySuccessHeadline: 'Copied to clipboard',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Open Property Actions',

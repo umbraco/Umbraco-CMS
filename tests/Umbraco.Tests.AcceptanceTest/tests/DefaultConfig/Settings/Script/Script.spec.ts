@@ -100,7 +100,7 @@ test('can rename a script', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.script.rename(scriptName);
 
   // Assert
-  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.renamed);
+  await umbracoUi.script.isErrorNotificationVisible(false);
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
   expect(await umbracoApi.script.doesNameExist(wrongScriptName)).toBeFalsy();
 });

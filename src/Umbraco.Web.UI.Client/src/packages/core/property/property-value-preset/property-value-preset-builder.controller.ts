@@ -90,7 +90,7 @@ export class UmbPropertyValuePresetBuilderController<
 			value = await api.processValue(value, propertyType.config, propertyType.typeArgs, callArgs);
 		}
 
-		if (!value) {
+		if (value === undefined) {
 			return;
 		}
 

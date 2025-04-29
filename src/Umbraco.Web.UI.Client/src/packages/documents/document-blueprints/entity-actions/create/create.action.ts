@@ -15,7 +15,9 @@ export class UmbCreateDocumentBlueprintEntityAction extends UmbEntityActionBase<
 		});
 
 		const documentTypeUnique = value.documentTypeUnique;
-		if (!documentTypeUnique) return;
+		if (!documentTypeUnique) {
+			throw new Error('Document type unique is not available');
+		}
 
 		// TODO: Lets avoid having such hardcoded URLs. [NL]
 		const url = `section/settings/workspace/${UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE}/create/parent/${this.args.entityType}/${this.args.unique ?? 'null'}/${documentTypeUnique}`;

@@ -248,6 +248,7 @@ test('can publish content with publish permission enabled', async ({umbracoApi, 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickPublishButton();
+  await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
