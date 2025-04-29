@@ -113,12 +113,11 @@ public class BlockListEditorPropertyValueEditorTests
         var contentPropertyData = new ContentPropertyData(editedValue, null);
 
         var result = editor.FromEditor(contentPropertyData, currentValue);
-        var resultAsJson = (JsonObject)JsonNode.Parse(result.ToString());
         AssertResultValue(result, 0, "B");
     }
 
     [Test]
-    public void FromEditor_With_Block_Item_Editor_That_Uses_Current_Value_With_Single_Updated_Property_Returns_Expected_Json_Value()
+    public void FromEditor_With_Block_Item_Editor_That_Uses_Current_Value_With_Edited_Property_Returns_Expected_Json_Value()
     {
         var editedValue = CreateBlocksJson(1, "B");
         var currentValue = CreateBlocksJson(1);
@@ -127,12 +126,11 @@ public class BlockListEditorPropertyValueEditorTests
         var contentPropertyData = new ContentPropertyData(editedValue, null);
 
         var result = editor.FromEditor(contentPropertyData, currentValue);
-        var resultAsJson = (JsonObject)JsonNode.Parse(result.ToString());
         AssertResultValue(result, 0, "A, B");
     }
 
     [Test]
-    public void FromEditor_With_Block_Item_Editor_That_Uses_Current_Value_With_Updated_And_Added_Property_Returns_Expected_Json_Value()
+    public void FromEditor_With_Block_Item_Editor_That_Uses_Current_Value_With_Edited_And_Added_Property_Returns_Expected_Json_Value()
     {
         var editedValue = CreateBlocksJson(1, "B", "C");
         var currentValue = CreateBlocksJson(1);
@@ -141,8 +139,21 @@ public class BlockListEditorPropertyValueEditorTests
         var contentPropertyData = new ContentPropertyData(editedValue, null);
 
         var result = editor.FromEditor(contentPropertyData, currentValue);
-        var resultAsJson = (JsonObject)JsonNode.Parse(result.ToString());
         AssertResultValue(result, 0, "A, B");
+        AssertResultValue(result, 1, "C");
+    }
+
+    [Test]
+    public void FromEditor_With_Block_Item_Editor_That_Uses_Current_Value_With_Edited_And_Removed_Property_Returns_Expected_Json_Value()
+    {
+        var editedValue = CreateBlocksJson(1, "B", "C");
+        var currentValue = CreateBlocksJson(1, null);
+        var editor = CreateValueEditor(ValueEditorSetup.ConcatenatingTextValueEditor);
+
+        var contentPropertyData = new ContentPropertyData(editedValue, null);
+
+        var result = editor.FromEditor(contentPropertyData, currentValue);
+        AssertResultValue(result, 0, "B");
         AssertResultValue(result, 1, "C");
     }
 
