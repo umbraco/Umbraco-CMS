@@ -16,6 +16,12 @@ import './tiptap-statusbar.element.js';
 
 const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
 
+/**
+ * The root path for the stylesheets on the server.
+ * This is used to load the stylesheets from the server as a workaround until the server supports virtual paths.
+ */
+const STYLESHEET_ROOT_PATH = '/css';
+
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
 	#stylesheets = new Set(['/umbraco/backoffice/css/rte-content.css']);
@@ -182,7 +188,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	#renderStyles() {
 		if (!this._styles?.length) return;
 		return html`
-			${map(this.#stylesheets, (stylesheet) => html`<link rel="stylesheet" href=${stylesheet} />`)}
+			${map(
+				this.#stylesheets,
+				(stylesheet) => html`<link rel="stylesheet" href="${STYLESHEET_ROOT_PATH}${stylesheet}" />`,
+			)}
 			<style>
 				${this._styles.map((style) => unsafeCSS(style))}
 			</style>
