@@ -144,7 +144,13 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 		const stylesheets = this.configuration?.getValueByAlias<Array<string>>('stylesheets');
 		if (stylesheets?.length) {
-			stylesheets.forEach((x) => this.#stylesheets.add(x));
+			stylesheets.forEach((stylesheet) => {
+				const linkHref =
+					stylesheet.startsWith('http') || stylesheet.startsWith(STYLESHEET_ROOT_PATH)
+						? stylesheet
+						: `${STYLESHEET_ROOT_PATH}${stylesheet}`;
+				this.#stylesheets.add(linkHref);
+			});
 		}
 
 		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
@@ -200,13 +206,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			${repeat(
 				this.#stylesheets,
 				(stylesheet) => stylesheet,
-				(stylesheet) => {
-					const linkHref =
-						stylesheet.startsWith('http') || stylesheet.startsWith(STYLESHEET_ROOT_PATH)
-							? stylesheet
-							: `${STYLESHEET_ROOT_PATH}${stylesheet}`;
-					return html`<link rel="stylesheet" href="${linkHref}" />`;
-				},
+				(stylesheet) => html`<link rel="stylesheet" href="${stylesheet}" />`,
 			)}
 			<style>
 				${this._styles.map((style) => unsafeCSS(style))}
