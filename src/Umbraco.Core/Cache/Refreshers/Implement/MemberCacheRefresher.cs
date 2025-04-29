@@ -12,6 +12,8 @@ namespace Umbraco.Cms.Core.Cache;
 
 public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCacheRefresherNotification, MemberCacheRefresher.JsonPayload>
 {
+    private static string UserNameCachePrefix = "uRepo_userNameKey+";
+
     public static readonly Guid UniqueId = Guid.Parse("E285DF34-ACDC-4226-AE32-C0CB5CF388DA");
 
     private readonly IIdKeyMap _idKeyMap;
@@ -73,11 +75,14 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
         foreach (JsonPayload p in payloads)
         {
             _idKeyMap.ClearCache(p.Id);
-            if (memberCache.Success)
+            if (memberCache.Success is false)
             {
-                memberCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMember, int>(p.Id));
-                memberCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMember, string>(p.Username));
+                continue;
             }
+
+            memberCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMember, int>(p.Id));
+            memberCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMember, string>(p.Username));
+            memberCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMember, string>(UserNameCachePrefix + p.Username));
         }
     }
 }
