@@ -25,7 +25,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         return new MultiNodeTreePickerValueConverter(
             Mock.Of<IUmbracoContextAccessor>(),
             Mock.Of<IMemberService>(),
-            new ApiContentBuilder(contentNameProvider, routeBuilder, expansionStrategyAccessor),
+            new ApiContentBuilder(contentNameProvider, routeBuilder, expansionStrategyAccessor, CreateVariationContextAccessor()),
             new ApiMediaBuilder(contentNameProvider, apiUrProvider, Mock.Of<IPublishedValueFallback>(), expansionStrategyAccessor),
             CacheManager.Content,
             CacheManager.Media,
