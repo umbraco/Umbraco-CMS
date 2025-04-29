@@ -37,6 +37,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
     [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
+    [ParameterSwapControllerActionSelector(nameof(GetReferences), "id", typeof(int), typeof(Guid))]
     public class DataTypeController : BackOfficeNotificationsController
     {
         private readonly PropertyEditorCollection _propertyEditors;
@@ -421,10 +422,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        /// Returns the references (usages) for the data type
+        /// Returns the references (usages) for the data type.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">Date type's integer Id.</param>
+        [HttpGet]
         public DataTypeReferences GetReferences(int id)
         {
             var result = new DataTypeReferences();
@@ -460,6 +461,22 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Returns the references (usages) for the data type.
+        /// </summary>
+        /// <param name="id">Date type's key.</param>
+        [HttpGet]
+        public DataTypeReferences GetReferences(Guid id)
+        {
+            IDataType? dataType = _dataTypeService.GetDataType(id);
+            if (dataType is null)
+            {
+                return new DataTypeReferences();
+            }
+
+            return GetReferences(dataType.Id);
         }
 
         [HttpGet]
