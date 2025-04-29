@@ -20,6 +20,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickPublishButton();
+  await umbracoUi.content.clickConfirmToPublishButton();
 });
 
 test.afterEach(async ({umbracoApi}) => {
