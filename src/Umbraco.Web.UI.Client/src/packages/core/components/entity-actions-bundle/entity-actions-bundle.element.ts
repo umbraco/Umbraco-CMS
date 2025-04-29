@@ -1,7 +1,7 @@
 import { UmbEntityContext } from '../../entity/entity.context.js';
 import type { UmbEntityAction, ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, property, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
@@ -97,10 +97,12 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		return html`
 			<umb-dropdown id="action-modal" .open=${this._dropdownIsOpen} @click=${this.#onDropdownClick} compact hide-expand>
 				<uui-symbol-more slot="label" label="Open actions menu"></uui-symbol-more>
-				<umb-entity-action-list
-					@action-executed=${this.#onActionExecuted}
-					.entityType=${this.entityType}
-					.unique=${this.unique}></umb-entity-action-list>
+				<uui-scroll-container>
+					<umb-entity-action-list
+						@action-executed=${this.#onActionExecuted}
+						.entityType=${this.entityType}
+						.unique=${this.unique}></umb-entity-action-list>
+				</uui-scroll-container>
 			</umb-dropdown>
 		`;
 	}
@@ -114,6 +116,14 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			<uui-icon name=${ifDefined(this._firstActionManifest?.meta.icon)}></uui-icon>
 		</uui-button>`;
 	}
+
+	static override styles = [
+		css`
+			uui-scroll-container {
+				max-height: 700px;
+			}
+		`,
+	];
 }
 
 declare global {
