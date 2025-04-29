@@ -122,10 +122,15 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
     /// <returns></returns>
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
+        if (editorValue.Value is null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
+        {
+            return null;
+        }
+
         BlockEditorData<TValue, TLayout>? currentBlockEditorData = GetBlockEditorData(currentValue);
         BlockEditorData<TValue, TLayout>? blockEditorData = GetBlockEditorData(editorValue.Value);
 
-        if (blockEditorData == null || blockEditorData.BlockValue.ContentData.Count == 0)
+        if (blockEditorData is null || blockEditorData.BlockValue.ContentData.Count == 0)
         {
             return string.Empty;
         }
