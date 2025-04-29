@@ -1,6 +1,16 @@
 import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
 import type { UmbTiptapStatusbarValue, UmbTiptapToolbarValue } from '../types.js';
-import { css, customElement, html, map, property, state, unsafeCSS, when } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	map,
+	property,
+	repeat,
+	state,
+	unsafeCSS,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { Editor } from '@umbraco-cms/backoffice/external/tiptap';
@@ -188,9 +198,16 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	#renderStyles() {
 		if (!this._styles?.length) return;
 		return html`
-			${map(
+			${repeat(
 				this.#stylesheets,
-				(stylesheet) => html`<link rel="stylesheet" href="${STYLESHEET_ROOT_PATH}${stylesheet}" />`,
+				(stylesheet) => stylesheet,
+				(stylesheet) => {
+					const linkHref =
+						stylesheet.startsWith('http') || stylesheet.startsWith(STYLESHEET_ROOT_PATH)
+							? stylesheet
+							: `${STYLESHEET_ROOT_PATH}${stylesheet}`;
+					return html`<link rel="stylesheet" href="${linkHref}" />`;
+				},
 			)}
 			<style>
 				${this._styles.map((style) => unsafeCSS(style))}
