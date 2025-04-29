@@ -38,12 +38,12 @@ export class UmbPreviewSegmentElement extends UmbLitElement {
 		}
 	}
 
-	async #onClick(segment: UmbSegmentCollectionItemModel) {
+	async #onClick(segment?: UmbSegmentCollectionItemModel) {
 		if (this._segment === segment) return;
 		this._segment = segment;
 
 		const previewContext = await this.getContext(UMB_PREVIEW_CONTEXT);
-		previewContext?.updateIFrame({ segment: segment.unique });
+		previewContext?.updateIFrame({ segment: segment?.unique });
 	}
 
 	override render() {
@@ -51,12 +51,13 @@ export class UmbPreviewSegmentElement extends UmbLitElement {
 		return html`
 			<uui-button look="primary" popovertarget="segments-popover">
 				<div>
-					<uui-icon name="icon-globe"></uui-icon>
-					<span>${this._segment?.name ?? this.localize.term('treeHeaders_languages')}</span>
+					<uui-icon name="icon-filter"></uui-icon>
+					<span>${this._segment?.name ?? 'Segments'}</span>
 				</div>
 			</uui-button>
 			<uui-popover-container id="segments-popover" placement="top-end">
 				<umb-popover-layout>
+					<uui-menu-item label="Default" ?active=${!this._segment} @click=${() => this.#onClick()}></uui-menu-item>
 					${repeat(
 						this._segments,
 						(item) => item.unique,
@@ -65,7 +66,6 @@ export class UmbPreviewSegmentElement extends UmbLitElement {
 								label=${item.name}
 								?active=${item.unique === this._segment?.unique}
 								@click=${() => this.#onClick(item)}>
-								<uui-icon slot="icon" name="icon-funnel"></uui-icon>
 							</uui-menu-item>
 						`,
 					)}
