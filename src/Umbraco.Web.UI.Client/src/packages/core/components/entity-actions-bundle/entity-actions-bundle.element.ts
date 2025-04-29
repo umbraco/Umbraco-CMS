@@ -95,7 +95,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		if (this._numberOfActions === 1) return nothing;
 
 		return html`
-			<umb-dropdown .open=${this._dropdownIsOpen} @click=${this.#onDropdownClick} compact hide-expand>
+			<umb-dropdown id="action-modal" .open=${this._dropdownIsOpen} @click=${this.#onDropdownClick} compact hide-expand>
 				<uui-symbol-more slot="label" label="Open actions menu"></uui-symbol-more>
 				<umb-entity-action-list
 					@action-executed=${this.#onActionExecuted}
