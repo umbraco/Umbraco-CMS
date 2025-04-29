@@ -179,6 +179,8 @@ test('can trash a media item', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.media.clickActionsMenuForName(mediaFileName);
   await umbracoUi.media.clickTrashButton();
+  // Verify the references list not displayed
+  await umbracoUi.content.isReferenceHeadlineVisible(false);
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
@@ -250,4 +252,80 @@ test('can empty the recycle bin', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.emptiedRecycleBin);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
+});
+
+test('can trash a media node with a relation', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const documentPickerName = ['TestPicker', 'DocumentTypeForPicker'];
+  await umbracoApi.media.emptyRecycleBin();
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
+  await umbracoApi.media.doesNameExist(mediaFileName);
+  // Create a document that have media picker is firstMediaFileName
+  await umbracoApi.document.createDefaultDocumentWithOneMediaLink(documentPickerName[0], mediaFileName, documentPickerName[1]);
+  await umbracoUi.media.goToSection(ConstantHelper.sections.media);
+
+  // Act
+  await umbracoUi.media.clickActionsMenuForName(mediaFileName);
+  await umbracoUi.media.clickTrashButton();
+  // Verify the references list
+  await umbracoUi.media.doesReferenceHeadlineHaveText(ConstantHelper.trashDeleteDialogMessage.referenceHeadline);
+  await umbracoUi.media.doesReferenceItemsHaveCount(1);
+  await umbracoUi.media.isReferenceItemNameVisible(documentPickerName[0]);
+  await umbracoUi.media.clickConfirmTrashButton();
+
+  // Assert
+  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName);
+  expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
+  expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.media.emptyRecycleBin();
+  await umbracoApi.document.ensureNameNotExists(documentPickerName[0]);
+  await umbracoApi.documentType.ensureNameNotExists(documentPickerName[1]);
+});
+
+test('can bulk trash media nodes with a relation', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const firstMediaFileName = 'FirstMediaFile';
+  const secondMediaFileName = 'SecondMediaFile';
+  const documentPickerName1 = ['TestPicker1', 'DocumentTypeForPicker1'];
+  const documentPickerName2 = ['TestPicker2', 'DocumentTypeForPicker2'];
+  await umbracoApi.media.emptyRecycleBin();
+  await umbracoApi.media.createDefaultMediaFile(firstMediaFileName);
+  await umbracoApi.media.createDefaultMediaFile(secondMediaFileName);
+  // Create a document that has a media picker with firstMediaFileName
+  await umbracoApi.document.createDefaultDocumentWithOneMediaLink(documentPickerName1[0], firstMediaFileName, documentPickerName1[1]);
+  // Create a document that has a media picker with secondMediaFileName
+  await umbracoApi.document.createDefaultDocumentWithOneMediaLink(documentPickerName2[0], secondMediaFileName, documentPickerName2[1]);
+
+  // Act
+  await umbracoUi.media.goToSection(ConstantHelper.sections.media);
+  await umbracoUi.media.selectMediaWithName(firstMediaFileName);
+  await umbracoUi.media.selectMediaWithName(secondMediaFileName);
+  await umbracoUi.media.clickBulkTrashButton();
+  // Verify the references list
+  await umbracoUi.media.doesReferenceHeadlineHaveText(ConstantHelper.trashDeleteDialogMessage.bulkReferenceHeadline);
+  await umbracoUi.media.doesReferenceItemsHaveCount(2);
+  await umbracoUi.media.isReferenceItemNameVisible(firstMediaFileName);
+  await umbracoUi.media.isReferenceItemNameVisible(secondMediaFileName);
+  await umbracoUi.media.clickConfirmTrashButton();
+
+  // Assert
+  await umbracoUi.media.isSuccessNotificationVisible();
+  expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
+  expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
+  expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();
+  expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(secondMediaFileName)).toBeTruthy();
+  await umbracoUi.media.isItemVisibleInRecycleBin(firstMediaFileName);
+  await umbracoUi.media.isItemVisibleInRecycleBin(secondMediaFileName, true, false);
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(firstMediaFileName);
+  await umbracoApi.media.ensureNameNotExists(secondMediaFileName);
+  await umbracoApi.document.ensureNameNotExists(documentPickerName1[0]);
+  await umbracoApi.documentType.ensureNameNotExists(documentPickerName1[1]);
+  await umbracoApi.document.ensureNameNotExists(documentPickerName2[0]);
+  await umbracoApi.documentType.ensureNameNotExists(documentPickerName2[1]);
+  await umbracoApi.media.emptyRecycleBin();
 });
