@@ -95,20 +95,18 @@ public class BlockListEditorPropertyValueEditorTests
     public void FromEditor_With_Null_Current_Value_Returns_Expected_Json_Value()
     {
         var editedValue = CreateBlocksJson(1);
-        var currentValue = CreateBlocksJson(1, "Hello 2");
         var editor = CreateValueEditor();
 
         var contentPropertyData = new ContentPropertyData(editedValue, null);
 
         var result = editor.FromEditor(contentPropertyData, null);
-        var resultAsJson = (JsonObject)JsonNode.Parse(result.ToString());
-        Assert.AreEqual("Hello", resultAsJson["contentData"][0]["values"][0]["value"].ToString());
+        AssertResultValue(result, 0, "A");
     }
 
     [Test]
     public void FromEditor_With_Current_Value_Returns_Expected_Json_Value()
     {
-        var editedValue = CreateBlocksJson(1, "Hello 2");
+        var editedValue = CreateBlocksJson(1, "B");
         var currentValue = CreateBlocksJson(1);
         var editor = CreateValueEditor();
 
@@ -116,13 +114,13 @@ public class BlockListEditorPropertyValueEditorTests
 
         var result = editor.FromEditor(contentPropertyData, currentValue);
         var resultAsJson = (JsonObject)JsonNode.Parse(result.ToString());
-        Assert.AreEqual("Hello 2", resultAsJson["contentData"][0]["values"][0]["value"].ToString());
+        AssertResultValue(result, 0, "B");
     }
 
     [Test]
-    public void FromEditor_With_Block_Item_Editor_That_Uses_Current_Value_Returns_Expected_Json_Value()
+    public void FromEditor_With_Block_Item_Editor_That_Uses_Current_Value_With_Single_Updated_Property_Returns_Expected_Json_Value()
     {
-        var editedValue = CreateBlocksJson(1, "Hello 2");
+        var editedValue = CreateBlocksJson(1, "B");
         var currentValue = CreateBlocksJson(1);
         var editor = CreateValueEditor(ValueEditorSetup.ConcatenatingTextValueEditor);
 
@@ -130,17 +128,32 @@ public class BlockListEditorPropertyValueEditorTests
 
         var result = editor.FromEditor(contentPropertyData, currentValue);
         var resultAsJson = (JsonObject)JsonNode.Parse(result.ToString());
-        Assert.AreEqual("Hello, Hello 2", resultAsJson["contentData"][0]["values"][0]["value"].ToString());
+        AssertResultValue(result, 0, "A, B");
     }
 
-    private static JsonObject CreateBlocksJson(int numberOfBlocks, string blockPropertyValue = "Hello")
+    [Test]
+    public void FromEditor_With_Block_Item_Editor_That_Uses_Current_Value_With_Updated_And_Added_Property_Returns_Expected_Json_Value()
+    {
+        var editedValue = CreateBlocksJson(1, "B", "C");
+        var currentValue = CreateBlocksJson(1);
+        var editor = CreateValueEditor(ValueEditorSetup.ConcatenatingTextValueEditor);
+
+        var contentPropertyData = new ContentPropertyData(editedValue, null);
+
+        var result = editor.FromEditor(contentPropertyData, currentValue);
+        var resultAsJson = (JsonObject)JsonNode.Parse(result.ToString());
+        AssertResultValue(result, 0, "A, B");
+        AssertResultValue(result, 1, "C");
+    }
+
+    private static JsonObject CreateBlocksJson(int numberOfBlocks, string? blockMessagePropertyValue = "A", string? blockMessage2PropertyValue = null)
     {
         var layoutItems = new JsonArray();
         var contentData = new JsonArray();
         for (int i = 0; i < numberOfBlocks; i++)
         {
             layoutItems.Add(CreateLayoutBlockJson());
-            contentData.Add(CreateContentDataBlockJson(blockPropertyValue));
+            contentData.Add(CreateContentDataBlockJson(blockMessagePropertyValue, blockMessage2PropertyValue));
         }
 
         return new JsonObject
@@ -162,24 +175,36 @@ public class BlockListEditorPropertyValueEditorTests
             { "contentKey", _contentKey },
         };
 
-    private static JsonObject CreateContentDataBlockJson(string blockPropertyValue) =>
-        new()
+    private static JsonObject CreateContentDataBlockJson(string? blockMessagePropertyValue, string? blockMessage2PropertyValue)
+    {
+        var values = new JsonArray();
+        if (!string.IsNullOrEmpty(blockMessagePropertyValue))
+        {
+            values.Add(new JsonObject
+            {
+                { "editorAlias", "Umbraco.TextBox" },
+                { "alias", "message" },
+                { "value", blockMessagePropertyValue },
+            });
+        }
+
+        if (!string.IsNullOrEmpty(blockMessage2PropertyValue))
+        {
+            values.Add(new JsonObject
+            {
+                { "editorAlias", "Umbraco.TextBox" },
+                { "alias", "message2" },
+                { "value", blockMessage2PropertyValue },
+            });
+        }
+
+        return new()
         {
             { "contentTypeKey", _contentTypeKey },
             { "key", _contentKey },
-            {
-                "values",
-                new JsonArray
-                {
-                    new JsonObject
-                    {
-                        { "editorAlias", "Umbraco.TextBox" },
-                        { "alias", "message" },
-                        { "value", blockPropertyValue },
-                    },
-                }
-            }
+            { "values", values }
         };
+    }
 
     private enum ValueEditorSetup
     {
@@ -237,6 +262,9 @@ public class BlockListEditorPropertyValueEditorTests
             .WithKey(_contentTypeKey)
             .AddPropertyType()
                 .WithAlias("message")
+                .Done()
+            .AddPropertyType()
+                .WithAlias("message2")
                 .Done()
             .Build();
         var elementTypeCacheMock = new Mock<IBlockEditorElementTypeCache>();
@@ -306,10 +334,26 @@ public class BlockListEditorPropertyValueEditorTests
 
         public override object FromEditor(ContentPropertyData propertyData, object? currentValue)
         {
+            var values = new List<string>();
+            if (currentValue is not null)
+            {
+                values.Add(currentValue.ToString());
+            }
+
             var editedValue = propertyData.Value;
-            var currentValueAsString = currentValue?.ToString() ?? string.Empty;
-            var editedValueAsString = editedValue?.ToString() ?? string.Empty;
-            return $"{currentValueAsString}, {editedValueAsString}";
+            if (editedValue is not null)
+            {
+                values.Add(editedValue.ToString());
+            }
+
+            return string.Join(", ", values);
         }
+    }
+
+    private static void AssertResultValue(object? result, int valueIndex, string expectedValue)
+    {
+        Assert.IsNotNull(result);
+        var resultAsJson = (JsonObject)JsonNode.Parse(result.ToString());
+        Assert.AreEqual(expectedValue, resultAsJson["contentData"][0]["values"][valueIndex]["value"].ToString());
     }
 }
