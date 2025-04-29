@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Cache;
 
 public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCacheRefresherNotification, MemberCacheRefresher.JsonPayload>
 {
-    private static string UserNameCachePrefix = "uRepo_userNameKey+";
+    private static readonly string UserNameCachePrefix = "uRepo_userNameKey+";
 
     public static readonly Guid UniqueId = Guid.Parse("E285DF34-ACDC-4226-AE32-C0CB5CF388DA");
 
