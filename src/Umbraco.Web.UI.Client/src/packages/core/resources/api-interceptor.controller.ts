@@ -1,5 +1,6 @@
 import { extractUmbNotificationColor } from './extractUmbNotificationColor.function.js';
 import { isUmbNotifications, UMB_NOTIFICATION_HEADER } from './isUmbNotifications.function.js';
+import { isProblemDetailsLike } from './apiTypeValidators.function.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
@@ -78,16 +79,16 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 					const origResponse = response.clone();
 					const error = await origResponse.json();
 
+					// If there is no JSON in the error, we just return the response
 					if (!error) return response;
 
-					// If the error is not an UmbError, we check if it is a problem details object
 					// Check if the error is a problem details object
-					if (!('type' in error) || !('title' in error) || !('status' in error)) {
+					if (!isProblemDetailsLike(error)) {
 						// If not, we just return the response
 						return response;
 					}
 
-					let headline = error.title ?? error.name ?? 'Server Error';
+					let headline = error.title ?? 'Server Error';
 					let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
 
 					// Special handling for ObjectCacheAppCache corruption errors, which we are investigating
@@ -100,7 +101,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 							'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
 					}
 
-					this.#peekError(headline, message, error.errors ?? error.detail);
+					this.#peekError(headline, message, error.errors);
 				} catch (e) {
 					// Ignore JSON parse error
 					console.error('[Interceptor] Caught a 500 Error, but failed parsing error body (expected JSON)', e);

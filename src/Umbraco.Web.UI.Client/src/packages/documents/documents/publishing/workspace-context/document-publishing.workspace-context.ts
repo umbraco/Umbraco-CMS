@@ -370,7 +370,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase {
 					headline: this.#localize.term('speechBubbles_editContentPublishedHeader'),
 					message: this.#localize.term(
 						'speechBubbles_editVariantPublishedText',
-						this.#localize.list(variants.map((v) => v.culture ?? v.name)),
+						// TODO: use correct variant names instead of variant strings [MR]
+						this.#localize.list(variants.map((v) => UmbVariantId.Create(v).toString() ?? v.name)),
 					),
 				},
 			});
