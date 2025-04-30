@@ -35,6 +35,7 @@ test('can see correct information when published', async ({umbracoApi, umbracoUi
   // Assert
   //await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
+  // TODO: Since we are not asserting on a success notification yet, we need to wait for a second to make sure the content is published
   await umbracoUi.waitForTimeout(1000);
   const contentData = await umbracoApi.document.getByName(contentName);
   await umbracoUi.content.doesIdHaveText(contentData.id);
