@@ -56,9 +56,9 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 			? html`
 					<uui-button
 						id="action-button"
+						data-mark="workspace:action-menu-button"
 						popovertarget="workspace-entity-action-menu-popover"
 						label=${this.localize.term('general_actions')}
-						aria-label=${this.localize.term('general_actions')}
 						compact>
 						<uui-symbol-more></uui-symbol-more>
 					</uui-button>
