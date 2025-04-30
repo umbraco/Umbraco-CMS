@@ -75,7 +75,8 @@ for (const mediaFileType of mediaFileTypes) {
     //await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   await umbracoUi.media.isErrorNotificationVisible(false);
     const mediaData = await umbracoApi.media.getByName(mediaFileType.fileName);
-    await umbracoUi.media.doesMediaHaveThumbnail(mediaData.id, mediaFileType.thumbnail, mediaData.urls[0].url);
+    const mediaUrl = await umbracoApi.media.getMediaUrl(mediaData.id);
+    await umbracoUi.media.doesMediaHaveThumbnail(mediaData.id, mediaFileType.thumbnail, mediaUrl);
     await umbracoUi.media.isMediaTreeItemVisible(mediaFileType.fileName);
     expect(await umbracoApi.media.doesNameExist(mediaFileType.fileName)).toBeTruthy();
 
