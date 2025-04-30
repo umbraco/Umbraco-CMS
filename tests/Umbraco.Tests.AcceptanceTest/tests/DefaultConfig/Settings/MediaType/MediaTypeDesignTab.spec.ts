@@ -203,6 +203,7 @@ test('can create a media type with a property in a tab', {tag: '@smoke'}, async 
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickAddTabButton();
   await umbracoUi.mediaType.enterTabName(tabName);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.mediaType.addPropertyEditor(dataTypeName);
   await umbracoUi.mediaType.clickSaveButton();
 
