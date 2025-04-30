@@ -383,7 +383,7 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		const backofficePath = serverContext.getBackofficePath();
-		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', serverContext.getServerUrl());
+		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', window.location.origin);
 		previewUrl.searchParams.set('id', unique);
 
 		if (culture && culture !== UMB_INVARIANT_CULTURE) {
