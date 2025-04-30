@@ -215,9 +215,7 @@ export class UmbPreviewContext extends UmbContextBase {
 
 	#currentArgs: UmbPreviewIframeArgs = {};
 	async updateIFrame(args?: UmbPreviewIframeArgs) {
-		console.log(this.#currentArgs);
 		const mergedArgs = { ...this.#currentArgs, ...args };
-		debugger;
 
 		const wrapper = this.getIFrameWrapper();
 		if (!wrapper) return;
