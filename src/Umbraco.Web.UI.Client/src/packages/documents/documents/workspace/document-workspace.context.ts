@@ -20,7 +20,7 @@ import { UmbDocumentValidationRepository } from '../repository/validation/index.
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	type UmbPublishableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
@@ -362,13 +362,13 @@ export class UmbDocumentWorkspaceContext
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
-		let culture = UMB_INVARIANT_CULTURE;
+		let firstVariantId = UmbVariantId.CreateInvariant();
 
 		// Save document (the active variant) before previewing.
 		const { selected } = await this._determineVariantOptions();
 		if (selected.length > 0) {
-			culture = selected[0];
-			const variantIds = [UmbVariantId.FromString(culture)];
+			firstVariantId = UmbVariantId.FromString(selected[0]);
+			const variantIds = [firstVariantId];
 			const saveData = await this._data.constructData(variantIds);
 			await this.runMandatoryValidationForSaveData(saveData);
 			await this.performCreateOrUpdate(variantIds, saveData);
@@ -386,8 +386,12 @@ export class UmbDocumentWorkspaceContext
 		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', window.location.origin);
 		previewUrl.searchParams.set('id', unique);
 
-		if (culture && culture !== UMB_INVARIANT_CULTURE) {
-			previewUrl.searchParams.set('culture', culture);
+		if (firstVariantId.culture) {
+			previewUrl.searchParams.set('culture', firstVariantId.culture);
+		}
+
+		if (firstVariantId.segment) {
+			previewUrl.searchParams.set('segment', firstVariantId.segment);
 		}
 
 		const previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
