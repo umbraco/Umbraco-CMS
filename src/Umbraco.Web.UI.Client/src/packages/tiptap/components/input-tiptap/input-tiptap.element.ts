@@ -1,6 +1,15 @@
 import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
 import type { UmbTiptapStatusbarValue, UmbTiptapToolbarValue } from '../types.js';
-import { css, customElement, html, map, property, state, unsafeCSS, when } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	property,
+	repeat,
+	state,
+	unsafeCSS,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { Editor } from '@umbraco-cms/backoffice/external/tiptap';
@@ -15,6 +24,12 @@ import './tiptap-toolbar.element.js';
 import './tiptap-statusbar.element.js';
 
 const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
+
+/**
+ * The root path for the stylesheets on the server.
+ * This is used to load the stylesheets from the server as a workaround until the server supports virtual paths.
+ */
+const STYLESHEET_ROOT_PATH = '/css';
 
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
@@ -129,7 +144,13 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 		const stylesheets = this.configuration?.getValueByAlias<Array<string>>('stylesheets');
 		if (stylesheets?.length) {
-			stylesheets.forEach((x) => this.#stylesheets.add(x));
+			stylesheets.forEach((stylesheet) => {
+				const linkHref =
+					stylesheet.startsWith('http') || stylesheet.startsWith(STYLESHEET_ROOT_PATH)
+						? stylesheet
+						: `${STYLESHEET_ROOT_PATH}${stylesheet}`;
+				this.#stylesheets.add(linkHref);
+			});
 		}
 
 		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
@@ -182,7 +203,11 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	#renderStyles() {
 		if (!this._styles?.length) return;
 		return html`
-			${map(this.#stylesheets, (stylesheet) => html`<link rel="stylesheet" href=${stylesheet} />`)}
+			${repeat(
+				this.#stylesheets,
+				(stylesheet) => stylesheet,
+				(stylesheet) => html`<link rel="stylesheet" href="${stylesheet}" />`,
+			)}
 			<style>
 				${this._styles.map((style) => unsafeCSS(style))}
 			</style>
@@ -240,9 +265,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			:host(:not([pristine]):invalid),
 			/* polyfill support */
 			:host(:not([pristine])[internals-invalid]) {
-				--umb-tiptap-edge-border-color: var(--uui-color-danger);
+				--umb-tiptap-edge-border-color: var(--uui-color-invalid);
 				#editor {
-					border-color: var(--uui-color-danger);
+					border-color: var(--uui-color-invalid);
 				}
 			}
 
