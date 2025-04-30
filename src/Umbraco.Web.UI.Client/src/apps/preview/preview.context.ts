@@ -25,10 +25,11 @@ interface UmbPreviewUrlArgs {
 }
 
 export class UmbPreviewContext extends UmbContextBase {
+	#unique?: string | null;
 	#culture?: string | null;
+	#segment?: string | null;
 	#serverUrl: string = '';
 	#webSocket?: WebSocket;
-	#unique?: string | null;
 
 	#iframeReady = new UmbBooleanState(false);
 	public readonly iframeReady = this.#iframeReady.asObservable();
@@ -46,8 +47,9 @@ export class UmbPreviewContext extends UmbContextBase {
 
 			const params = new URLSearchParams(window.location.search);
 
-			this.#culture = params.get('culture');
 			this.#unique = params.get('id');
+			this.#culture = params.get('culture');
+			this.#segment = params.get('segment');
 
 			if (!this.#unique) {
 				console.error('No unique ID found in query string.');
@@ -93,16 +95,44 @@ export class UmbPreviewContext extends UmbContextBase {
 
 	#setPreviewUrl(args?: UmbPreviewUrlArgs) {
 		const host = args?.serverUrl || this.#serverUrl;
-		const path = args?.unique || this.#unique;
-		const params = new URLSearchParams();
+		const unique = args?.unique || this.#unique;
+
+		if (!unique) {
+			throw new Error('No unique ID found in query string.');
+		}
+
+		const url = new URL(unique, host);
+		const params = new URLSearchParams(url.search);
+
 		const culture = args?.culture || this.#culture;
-		const segment = args?.segment;
+		const segment = args?.segment || this.#segment;
 
-		if (culture) params.set('culture', culture);
-		if (args?.rnd) params.set('rnd', args.rnd.toString());
-		if (segment) params.set('segment', segment);
+		const cultureParam = 'culture';
+		const rndParam = 'rnd';
+		const segmentParam = 'segment';
 
-		this.#previewUrl.setValue(`${host}/${path}?${params}`);
+		if (culture) {
+			params.set(cultureParam, culture);
+		} else {
+			params.delete(cultureParam);
+		}
+
+		if (args?.rnd) {
+			params.set(rndParam, args.rnd.toString());
+		} else {
+			params.delete(rndParam);
+		}
+
+		if (segment) {
+			params.set(segmentParam, segment);
+		} else {
+			params.delete(segmentParam);
+		}
+
+		const previewUrl = new URL(url.pathname + '?' + params.toString(), host);
+		const previewUrlString = previewUrl.toString();
+
+		this.#previewUrl.setValue(previewUrlString);
 	}
 
 	#setSessionCount(sessions: number) {
@@ -183,8 +213,11 @@ export class UmbPreviewContext extends UmbContextBase {
 		this.#setSessionCount(sessions);
 	}
 
+	#currentArgs: UmbPreviewIframeArgs = {};
 	async updateIFrame(args?: UmbPreviewIframeArgs) {
-		if (!args) return;
+		console.log(this.#currentArgs);
+		const mergedArgs = { ...this.#currentArgs, ...args };
+		debugger;
 
 		const wrapper = this.getIFrameWrapper();
 		if (!wrapper) return;
@@ -203,31 +236,32 @@ export class UmbPreviewContext extends UmbContextBase {
 		window.addEventListener('resize', scaleIFrame);
 		wrapper.addEventListener('transitionend', scaleIFrame);
 
-		if (args.culture) {
-			this.#iframeReady.setValue(false);
+		this.#iframeReady.setValue(false);
 
-			const params = new URLSearchParams(window.location.search);
-			params.set('culture', args.culture);
-			const newRelativePathQuery = window.location.pathname + '?' + params.toString();
-			history.pushState(null, '', newRelativePathQuery);
+		const params = new URLSearchParams(window.location.search);
 
-			this.#setPreviewUrl({ culture: args.culture });
+		if (mergedArgs.culture) {
+			params.set('culture', mergedArgs.culture);
+		} else {
+			params.delete('culture');
 		}
 
-		if (args.segment) {
-			this.#iframeReady.setValue(false);
-
-			const params = new URLSearchParams(window.location.search);
-			params.set('segment', args.segment);
-			const newRelativePathQuery = window.location.pathname + '?' + params.toString();
-			history.pushState(null, '', newRelativePathQuery);
-
-			this.#setPreviewUrl({ segment: args.segment });
+		if (mergedArgs.segment) {
+			params.set('segment', mergedArgs.segment);
+		} else {
+			params.delete('segment');
 		}
 
-		if (args.className) wrapper.className = args.className;
-		if (args.height) wrapper.style.height = args.height;
-		if (args.width) wrapper.style.width = args.width;
+		const newRelativePathQuery = window.location.pathname + '?' + params.toString();
+		history.pushState(null, '', newRelativePathQuery);
+
+		this.#currentArgs = mergedArgs;
+
+		this.#setPreviewUrl({ culture: mergedArgs.culture, segment: mergedArgs.segment });
+
+		if (mergedArgs.className) wrapper.className = mergedArgs.className;
+		if (mergedArgs.height) wrapper.style.height = mergedArgs.height;
+		if (mergedArgs.width) wrapper.style.width = mergedArgs.width;
 	}
 }
 
