@@ -44,7 +44,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	}
 
 	async #requestStructure() {
-		const isNew = this.#workspaceContext?.getIsNew();
+		const isNew = this.#workspaceContext?.getIsNew() ?? false;
 		const uniqueObservable = isNew ? (this.#workspaceContext as any)?.parentUnique : this.#workspaceContext?.unique;
 		const entityTypeObservable = isNew
 			? (this.#workspaceContext as any)?.parentEntityType
@@ -58,7 +58,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
 		if (!entityType) throw new Error('Entity type is not available');
 
-		// TODO: add correct tree variant item model
+		// TODO: introduce variant tree item model
 		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<any, UmbTreeRootModel>>(
 			this,
 			this.#args.treeRepositoryAlias,
@@ -79,7 +79,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		const { data } = await treeRepository.requestTreeItemAncestors({ treeItem: { unique, entityType } });
 
 		if (data) {
-			const ancestorItems = data.map((treeItem) => {
+			const treeItemAncestors = data.map((treeItem) => {
 				return {
 					unique: treeItem.unique,
 					entityType: treeItem.entityType,
@@ -93,20 +93,31 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				};
 			});
 
-			const ancestorEntities = data.map((treeItem) => {
-				return {
-					unique: treeItem.unique,
-					entityType: treeItem.entityType,
-				};
-			});
-
-			this.#ancestorContext.setAncestors(ancestorEntities);
-
-			structureItems.push(...ancestorItems);
+			structureItems.push(...treeItemAncestors);
 
 			const parent = structureItems[structureItems.length - 2];
 			this.#parent.setValue(parent);
 			this.#structure.setValue(structureItems);
+
+			this.#setAncestorData(data, isNew);
 		}
+	}
+
+	// TODO: introduce variant tree item model
+	#setAncestorData(data: any, isNew: boolean) {
+		let ancestorEntities = data.map((treeItem: any) => {
+			return {
+				unique: treeItem.unique,
+				entityType: treeItem.entityType,
+			};
+		});
+
+		if (!isNew) {
+			/* If the item is not new, we need to remove the last item from the ancestor entities
+			 because it is the current item and we don't want to include it in the ancestors */
+			ancestorEntities = ancestorEntities.slice(0, -1);
+		}
+
+		this.#ancestorContext.setAncestors(ancestorEntities);
 	}
 }
