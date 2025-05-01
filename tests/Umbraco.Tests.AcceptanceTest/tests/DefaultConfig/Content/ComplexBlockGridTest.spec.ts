@@ -63,14 +63,14 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(richTextDataTypeName);
 });
 
-test('can update property value nested in a block grid area with an RTE with a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can update property value nested in a block grid area with an RTE with a block list editor', {tag: '@smoke'}, async ({page,umbracoApi, umbracoUi}) => {
+  test.slow()
   // Arrange
   // ElementType with Textstring And REGEX only accept letters and numbers
   const textStringElementDataType = await umbracoApi.dataType.getByName(textStringElementDataTypeName);
   textStringElementTypeId = await umbracoApi.documentType.createElementTypeWithRegexValidation(textStringElementTypeName, textStringElementGroupName, textStringElementDataTypeName, textStringElementDataType.id, textStringElementRegex);
   // Block List Editor with Textstring
   blockListDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListDataTypeName, textStringElementTypeId);
-  await umbracoUi.goToBackOffice();
   // ElementType with Block List Editor
   blockListElementTypeId = await umbracoApi.documentType.createDefaultElementType(blockListElementTypeName, blockListGroupName, blockListDataTypeName, blockListDataTypeId);
   // Rich Text Editor in an ElementType,  with a Block(Element Type), the block contains a Block List Editor
@@ -84,7 +84,6 @@ test('can update property value nested in a block grid area with an RTE with a b
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId, groupName);
   // Creates Content
   contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -93,12 +92,12 @@ test('can update property value nested in a block grid area with an RTE with a b
   await umbracoUi.content.clickAddBlockGridElementWithName(areaElementTypeName);
   await umbracoUi.content.clickSelectBlockElementWithName(areaElementTypeName);
   await umbracoUi.content.clickAddBlockGridElementWithName(richTextEditorElementTypeName);
-  await umbracoUi.content.clickSelectBlockElementInAreaWithName(richTextEditorElementTypeName);
+  await umbracoUi.content.clickExactLinkWithName(richTextEditorElementTypeName);
   await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickSelectBlockElementInAreaWithName(blockListElementTypeName);
+  await umbracoUi.content.clickExactLinkWithName(blockListElementTypeName);
   await umbracoUi.content.clickAddBlockGridElementWithName(textStringElementTypeName);
-  await umbracoUi.content.clickSelectBlockElementInAreaWithName(textStringElementTypeName);
-  // Enter text in the textstring block that wont match regex
+  await umbracoUi.content.clickExactLinkWithName(textStringElementTypeName);
+  // Enter text in the textstring block that won't match regex
   await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, wrongPropertyValue);
   await umbracoUi.content.clickCreateButtonForModalWithElementTypeNameAndGroupName(textStringElementTypeName, textStringElementGroupName);
   await umbracoUi.content.clickCreateButtonForModalWithElementTypeNameAndGroupName(blockListElementTypeName, blockListGroupName);
@@ -106,8 +105,9 @@ test('can update property value nested in a block grid area with an RTE with a b
   await umbracoUi.content.clickSaveAndPublishButton();
   // Checks that the error notification is shown since the textstring block has the wrong value
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved, true, true);
-  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentWasNotPublished, true, true);
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished,true, true);
   // Updates the textstring block with the correct value
+  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.content.clickBlockElementWithName(blockListElementTypeName);
   await umbracoUi.content.clickEditBlockListEntryWithName(textStringElementTypeName);
   await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, correctPropertyValue);
@@ -116,14 +116,18 @@ test('can update property value nested in a block grid area with an RTE with a b
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved, true, true);
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published, true, true);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved,true, true);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published,true, true);
   // Checks if published
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
   // Checks if the textstring block has the correct value after reloading the page
   await umbracoUi.reloadPage();
+  // Waits to make sure the page has loaded
+  await umbracoUi.waitForTimeout(2000);
   await umbracoUi.content.clickBlockElementWithName(blockListElementTypeName);
+  // Needs to wait to make sure it has loaded
+  await umbracoUi.waitForTimeout(2000);
   await umbracoUi.content.clickEditBlockListEntryWithName(textStringElementTypeName);
   await umbracoUi.content.doesPropertyContainValue(textStringElementDataTypeName, correctPropertyValue);
 });
