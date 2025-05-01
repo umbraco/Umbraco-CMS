@@ -41,6 +41,7 @@ export class UmbMemberWorkspaceContext
 			// TODO: Enable Validation Repository when we have UI for showing validation issues on other tabs. [NL]
 			//contentValidationRepository: UmbMemberValidationRepository,
 			contentVariantScaffold: UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
+			contentTypePropertyName: 'memberType',
 		});
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
@@ -78,7 +79,7 @@ export class UmbMemberWorkspaceContext
 			preset: {
 				memberType: {
 					unique: memberTypeUnique,
-					icon: "icon-user"
+					icon: 'icon-user',
 				},
 			},
 		});

@@ -20,7 +20,6 @@ import type {
 import { umbLocalizationManager } from './localization.manager.js';
 import type { LitElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 
 const LocalizationControllerAlias = Symbol();
 /**
@@ -137,20 +136,16 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 			return String(key);
 		}
 
-		// As translated texts can contain HTML, we will need to render with unsafeHTML.
-		// But arguments can come from user input, so they should be escaped.
-		const sanitizedArgs = args.map((a) => escapeHTML(a));
-
 		if (typeof term === 'function') {
-			return term(...sanitizedArgs) as string;
+			return term(...args) as string;
 		}
 
 		if (typeof term === 'string') {
-			if (sanitizedArgs.length) {
+			if (args.length) {
 				// Replace placeholders of format "%index%" and "{index}" with provided values
 				term = term.replace(/(%(\d+)%|\{(\d+)\})/g, (match, _p1, p2, p3): string => {
 					const index = p2 || p3;
-					return typeof sanitizedArgs[index] !== 'undefined' ? String(sanitizedArgs[index]) : match;
+					return typeof args[index] !== 'undefined' ? String(args[index]) : match;
 				});
 			}
 		}
@@ -182,6 +177,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 
 	/**
 	 * Outputs a localized time in relative format.
+	 * @example "in 2 days"
 	 * @param {number} value - the value to format.
 	 * @param {Intl.RelativeTimeFormatUnit} unit - the unit of time to format.
 	 * @param {Intl.RelativeTimeFormatOptions} options - the options to use when formatting the time.
@@ -189,6 +185,60 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 */
 	relativeTime(value: number, unit: Intl.RelativeTimeFormatUnit, options?: Intl.RelativeTimeFormatOptions): string {
 		return new Intl.RelativeTimeFormat(this.lang(), options).format(value, unit);
+	}
+
+	/**
+	 * Outputs a localized compounded time in a duration format.
+	 * @example "2 days, 3 hours and 5 minutes"
+	 * @param {Date} fromDate - the date to compare from.
+	 * @param {Date} toDate - the date to compare to, usually the current date (default: current date).
+	 * @param {object} options - the options to use when formatting the time.
+	 * @returns {string} - the formatted time, example: "2 days, 3 hours, 5 minutes"
+	 */
+	duration(fromDate: Date | string, toDate?: Date | string, options?: any): string {
+		const d1 = new Date(fromDate);
+		const d2 = new Date(toDate ?? Date.now());
+		const diff = Math.abs(d1.getTime() - d2.getTime());
+		const diffInSecs = Math.abs(Math.floor(diff / 1000));
+
+		if (false === 'DurationFormat' in Intl) {
+			return `${diffInSecs} seconds`;
+		}
+
+		const diffInDays = Math.floor(diff / (1000 * 60 * 60 * 24));
+		const restDiffInHours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+		const restDiffInMins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+		const restDiffInSecs = Math.floor((diff % (1000 * 60)) / 1000);
+
+		const formatOptions = {
+			style: 'long',
+			...options,
+		};
+
+		// TODO: This is a hack to get around the fact that the DurationFormat is not yet available in the TypeScript typings. [JOV]
+		const formatter = new (Intl as any).DurationFormat(this.lang(), formatOptions);
+
+		if (diffInDays === 0 && restDiffInHours === 0 && restDiffInMins === 0) {
+			return formatter.format({ seconds: diffInSecs });
+		}
+
+		return formatter.format({
+			days: diffInDays,
+			hours: restDiffInHours,
+			minutes: restDiffInMins,
+			seconds: restDiffInSecs,
+		});
+	}
+
+	/**
+	 * Outputs a localized list of values in the specified format.
+	 * @example "one, two, and three"
+	 * @param {Iterable<string>} values - the values to format.
+	 * @param {Intl.ListFormatOptions} options - the options to use when formatting the list.
+	 * @returns {string} - the formatted list.
+	 */
+	list(values: Iterable<string>, options?: Intl.ListFormatOptions): string {
+		return new Intl.ListFormat(this.lang(), options).format(values);
 	}
 
 	// TODO: for V.16 we should set type to be string | undefined. [NL]

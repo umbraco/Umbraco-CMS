@@ -1,5 +1,4 @@
 import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../types.js';
-import { UmbBlockElementValuesDataValidationPathTranslator } from '../validation/block-element-values-validation-path-translator.controller.js';
 import { UmbBlockElementPropertyDatasetContext } from './block-element-property-dataset.context.js';
 import type { UmbBlockWorkspaceContext } from './block-workspace.context.js';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
@@ -120,6 +119,18 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		return this.#data.getCurrent();
 	}
 
+	setPersistedData(data: UmbBlockDataModel | undefined) {
+		this.#data.setPersisted(data);
+	}
+
+	/**
+	 * Check if there are unpersisted changes.
+	 * @returns { boolean } true if there are unpersisted changes.
+	 */
+	public getHasUnpersistedChanges(): boolean {
+		return this.#data.getHasUnpersistedChanges();
+	}
+
 	getUnique() {
 		return this.getData()?.key;
 	}
@@ -133,10 +144,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 	}
 
 	#createPropertyVariantId(property: UmbPropertyTypeModel, variantId: UmbVariantId) {
-		return UmbVariantId.Create({
-			culture: property.variesByCulture ? variantId.culture : null,
-			segment: property.variesBySegment ? variantId.segment : null,
-		});
+		return variantId.toVariant(property.variesByCulture, property.variesBySegment);
 	}
 
 	// We will implement propertyAlias in the future, when implementing Varying Blocks. [NL]
@@ -192,12 +200,13 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 			throw new Error(`Property alias "${alias}" not found.`);
 		}
 
+		// TODO: I think we should await this in the same way as we do for Content Detail Workspace Context. [NL]
 		const editorAlias = this.#dataTypeSchemaAliasMap.get(property.dataType.unique);
 		if (!editorAlias) {
 			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
 		}
 
-		const entry = { ...variantId.toObject(), alias, editorAlias, value } as UmbBlockDataValueModel<ValueType>;
+		const entry = { editorAlias, ...variantId.toObject(), alias, value } as UmbBlockDataValueModel<ValueType>;
 
 		const currentData = this.getData();
 		if (currentData) {
@@ -227,9 +236,6 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 
 		// Provide Validation Context for this view:
 		this.validation.provideAt(host);
-
-		// TODO: Implement ctrl alias.
-		new UmbBlockElementValuesDataValidationPathTranslator(host);
 	}
 
 	public override destroy(): void {

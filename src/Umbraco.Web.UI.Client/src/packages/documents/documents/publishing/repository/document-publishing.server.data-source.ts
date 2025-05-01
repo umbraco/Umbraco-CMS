@@ -92,27 +92,49 @@ export class UmbDocumentPublishingServerDataSource {
 	 * @param unique
 	 * @param variantIds
 	 * @param includeUnpublishedDescendants
-	 * @param forceRepublish
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async publishWithDescendants(
 		unique: string,
 		variantIds: Array<UmbVariantId>,
 		includeUnpublishedDescendants: boolean,
-		forceRepublish: boolean,
 	) {
 		if (!unique) throw new Error('Id is missing');
 
 		const requestBody: PublishDocumentWithDescendantsRequestModel = {
 			cultures: variantIds.map((variant) => variant.toCultureString()),
 			includeUnpublishedDescendants,
-			forceRepublish,
 		};
 
-		return tryExecuteAndNotify(
+		// Initiate the publish descendants task and get back a task Id.
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			DocumentService.putDocumentByIdPublishWithDescendants({ id: unique, requestBody }),
 		);
+
+		if (error || !data) {
+			return { error };
+		}
+
+		const taskId = data.taskId;
+
+		// Poll until we know publishing is finished, then return the result.
+		let isFirstPoll = true;
+		while (true) {
+			await new Promise((resolve) => setTimeout(resolve, isFirstPoll ? 1000 : 5000));
+			isFirstPoll = false;
+			const { data, error } = await tryExecuteAndNotify(
+				this.#host,
+				DocumentService.getDocumentByIdPublishWithDescendantsResultByTaskId({ id: unique, taskId }));
+			if (error || !data) {
+				return { error };
+			}
+
+			if (data.isComplete) {
+				return { error: null };
+			}
+
+		}
 	}
 
 	/**
@@ -140,9 +162,9 @@ export class UmbDocumentPublishingServerDataSource {
 			values: data.values.map((value) => {
 				return {
 					editorAlias: value.editorAlias,
-					alias: value.alias,
 					culture: value.culture || null,
 					segment: value.segment || null,
+					alias: value.alias,
 					value: value.value,
 				};
 			}),

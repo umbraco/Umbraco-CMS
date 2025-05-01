@@ -2,8 +2,7 @@ import { UMB_PREVIEW_CONTEXT } from '../preview.context.js';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const elementName = 'umb-preview-open-website';
-@customElement(elementName)
+@customElement('umb-preview-open-website')
 export class UmbPreviewOpenWebsiteElement extends UmbLitElement {
 	async #onClick() {
 		const previewContext = await this.getContext(UMB_PREVIEW_CONTEXT);
@@ -44,6 +43,6 @@ export { UmbPreviewOpenWebsiteElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPreviewOpenWebsiteElement;
+		'umb-preview-open-website': UmbPreviewOpenWebsiteElement;
 	}
 }

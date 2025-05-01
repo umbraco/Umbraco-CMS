@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Mapping.Permissions;
@@ -34,15 +34,15 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
         services.AddTransient<IUserGroupPresentationFactory, UserGroupPresentationFactory>();
         services.AddSingleton<IPermissionPresentationFactory, PermissionPresentationFactory>();
         services.AddSingleton<DocumentPermissionMapper>();
-        services.AddSingleton<IPermissionMapper>(x=>x.GetRequiredService<DocumentPermissionMapper>());
-        services.AddSingleton<IPermissionPresentationMapper>(x=>x.GetRequiredService<DocumentPermissionMapper>());
+        services.AddSingleton<IPermissionMapper>(x => x.GetRequiredService<DocumentPermissionMapper>());
+        services.AddSingleton<IPermissionPresentationMapper>(x => x.GetRequiredService<DocumentPermissionMapper>());
     }
 
 
     [Test]
     public async Task Can_Map_Create_Model_And_Create()
     {
-        var updateModel = new CreateUserGroupRequestModel()
+        var createModel = new CreateUserGroupRequestModel()
         {
             Alias = "testAlias",
             FallbackPermissions = new HashSet<string>(),
@@ -53,7 +53,7 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
             Permissions = new HashSet<IPermissionPresentationModel>()
         };
 
-        var attempt = await UserGroupPresentationFactory.CreateAsync(updateModel);
+        var attempt = await UserGroupPresentationFactory.CreateAsync(createModel);
         Assert.IsTrue(attempt.Success);
 
         var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
@@ -71,7 +71,7 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     [Test]
     public async Task Cannot_Create_UserGroup_With_Unexisting_Document_Reference()
     {
-        var updateModel = new CreateUserGroupRequestModel()
+        var createModel = new CreateUserGroupRequestModel()
         {
             Alias = "testAlias",
             FallbackPermissions = new HashSet<string>(),
@@ -89,7 +89,7 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
             }
         };
 
-        var attempt = await UserGroupPresentationFactory.CreateAsync(updateModel);
+        var attempt = await UserGroupPresentationFactory.CreateAsync(createModel);
         Assert.IsTrue(attempt.Success);
 
         var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
@@ -102,11 +102,11 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Create_Usergroup_With_Empty_Granluar_Permissions_For_Document()
+    public async Task Can_Create_Usergroup_With_Empty_Granular_Permissions_For_Document()
     {
         var contentKey = await CreateContent();
 
-        var updateModel = new CreateUserGroupRequestModel()
+        var createModel = new CreateUserGroupRequestModel()
         {
             Alias = "testAlias",
             FallbackPermissions = new HashSet<string>(),
@@ -124,7 +124,7 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
             }
         };
 
-        var attempt = await UserGroupPresentationFactory.CreateAsync(updateModel);
+        var attempt = await UserGroupPresentationFactory.CreateAsync(createModel);
         Assert.IsTrue(attempt.Success);
 
         var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);

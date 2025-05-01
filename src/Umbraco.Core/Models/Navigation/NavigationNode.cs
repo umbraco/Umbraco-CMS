@@ -39,9 +39,6 @@ public sealed class NavigationNode
         child.SortOrder = _children.Count;
 
         _children.Add(childKey);
-
-        // Update the navigation structure
-        navigationStructure[childKey] = child;
     }
 
     public void RemoveChild(ConcurrentDictionary<Guid, NavigationNode> navigationStructure, Guid childKey)
@@ -53,8 +50,5 @@ public sealed class NavigationNode
 
         _children.Remove(childKey);
         child.Parent = null;
-
-        // Update the navigation structure
-        navigationStructure[childKey] = child;
     }
 }

@@ -16,8 +16,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
     private readonly CommonMapper _commonMapper;
 
     public DocumentMapDefinition(PropertyEditorCollection propertyEditorCollection, CommonMapper commonMapper)
-        : base(propertyEditorCollection)
-        => _commonMapper = commonMapper;
+        : base(propertyEditorCollection) => _commonMapper = commonMapper;
 
     public void DefineMaps(IUmbracoMapper mapper)
     {
@@ -68,7 +67,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.IsTrashed = source.Trashed;
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -IsProtected -Ancestors
     private void Map(IContent source, DocumentCollectionResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -76,6 +75,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.SortOrder = source.SortOrder;
         target.Creator = _commonMapper.GetOwnerName(source, context);
         target.Updater = _commonMapper.GetCreatorName(source, context);
+        target.IsTrashed = source.Trashed;
 
         // If there's a set of property aliases specified in the collection configuration, we will check if the current property's
         // value should be mapped. If it isn't one of the ones specified in 'includeProperties', we will just return the result

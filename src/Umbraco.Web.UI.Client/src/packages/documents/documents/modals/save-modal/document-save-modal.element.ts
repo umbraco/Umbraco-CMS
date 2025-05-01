@@ -56,7 +56,7 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<umb-body-layout headline=${this.localize.term('content_saveModalTitle')}>
+		return html`<uui-dialog-layout headline=${this.localize.term('content_saveModalTitle')}>
 			<p id="subtitle">
 				<umb-localize key="content_variantsToSave">Choose which variants to be saved.</umb-localize>
 			</p>
@@ -74,7 +74,7 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 					color="positive"
 					@click=${this.#submit}></uui-button>
 			</div>
-		</umb-body-layout> `;
+		</uui-dialog-layout> `;
 	}
 
 	static override styles = [

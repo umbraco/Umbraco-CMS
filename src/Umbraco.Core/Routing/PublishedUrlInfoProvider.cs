@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
@@ -66,6 +66,12 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
             }
 
             urlInfos.Add(UrlInfo.Url(url, culture));
+        }
+
+        // If the content is trashed, we can't get the other URLs, as we have no parent structure to navigate through.
+        if (content.Trashed)
+        {
+            return urlInfos;
         }
 
         // Then get "other" urls - I.E. Not what you'd get with GetUrl(), this includes all the urls registered using domains.

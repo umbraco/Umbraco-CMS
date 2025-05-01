@@ -3,6 +3,7 @@ export interface UmbWorkspaceModalData<DataModelType = unknown> {
 	entityType: string;
 	preset: Partial<DataModelType>;
 	baseDataPath?: string;
+	inheritValidationLook?: boolean;
 }
 
 export type UmbWorkspaceModalValue =

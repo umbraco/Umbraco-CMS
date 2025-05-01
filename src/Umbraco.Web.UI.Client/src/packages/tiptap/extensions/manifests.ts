@@ -1,15 +1,46 @@
+import { manifests as blockExtensions } from './block/manifests.js';
+import { manifests as styleSelectExtensions } from './style-select/manifests.js';
+import { manifests as tableExtensions } from './table/manifests.js';
+import { manifests as statusbarExtensions } from './statusbar/manifests.js';
 import type { ManifestTiptapExtension } from './tiptap.extension.js';
-import type { ManifestTiptapToolbarExtension } from './tiptap-toolbar.extension.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 const kinds: Array<UmbExtensionManifestKind> = [
 	{
 		type: 'kind',
-		alias: 'Umb.Kind.Button',
+		alias: 'Umb.Kind.TiptapToolbar.Button',
 		matchKind: 'button',
 		matchType: 'tiptapToolbarExtension',
 		manifest: {
 			element: () => import('../components/toolbar/tiptap-toolbar-button.element.js'),
+		},
+	},
+	{
+		type: 'kind',
+		alias: 'Umb.Kind.TiptapToolbar.ColorPickerButton',
+		matchKind: 'colorPickerButton',
+		matchType: 'tiptapToolbarExtension',
+		manifest: {
+			element: () => import('../components/toolbar/tiptap-toolbar-color-picker-button.element.js'),
+		},
+	},
+	{
+		type: 'kind',
+		alias: 'Umb.Kind.TiptapToolbar.Menu',
+		matchKind: 'menu',
+		matchType: 'tiptapToolbarExtension',
+		manifest: {
+			element: () => import('../components/toolbar/tiptap-toolbar-menu.element.js'),
+		},
+	},
+	{
+		type: 'kind',
+		alias: 'Umb.Kind.TiptapToolbar.StyleMenu',
+		matchKind: 'styleMenu',
+		matchType: 'tiptapToolbarExtension',
+		manifest: {
+			api: () => import('../components/toolbar/style-menu.tiptap-toolbar-api.js'),
+			element: () => import('../components/toolbar/tiptap-toolbar-menu.element.js'),
 		},
 	},
 ];
@@ -99,18 +130,6 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 	{
 		type: 'tiptapExtension',
 		kind: 'button',
-		alias: 'Umb.Tiptap.Table',
-		name: 'Table Tiptap Extension',
-		api: () => import('./core/table.tiptap-api.js'),
-		meta: {
-			icon: 'icon-table',
-			label: 'Table',
-			group: '#tiptap_extGroup_interactive',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		kind: 'button',
 		alias: 'Umb.Tiptap.Underline',
 		name: 'Underline Tiptap Extension',
 		api: () => import('./core/underline.tiptap-api.js'),
@@ -133,6 +152,17 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 	},
 	{
 		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.TextDirection',
+		name: 'Text Direction Tiptap Extension',
+		api: () => import('./core/text-direction.tiptap-api.js'),
+		meta: {
+			icon: 'icon-text-direction-ltr',
+			label: 'Text Direction',
+			group: '#tiptap_extGroup_formatting',
+		},
+	},
+	{
+		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.MediaUpload',
 		name: 'Media Upload Tiptap Extension',
 		api: () => import('./core/media-upload.tiptap-api.js'),
@@ -142,9 +172,31 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 			group: '#tiptap_extGroup_media',
 		},
 	},
+	{
+		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.TextIndent',
+		name: 'Text Indent Tiptap Extension',
+		api: () => import('./core/text-indent.tiptap-api.js'),
+		meta: {
+			icon: 'icon-indent',
+			label: 'Text Indent',
+			group: '#tiptap_extGroup_formatting',
+		},
+	},
+	{
+		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.WordCount',
+		name: 'Word Count Tiptap Extension',
+		api: () => import('./core/word-count.tiptap-api.js'),
+		meta: {
+			icon: 'icon-speed-gauge',
+			label: 'Word Count',
+			group: '#tiptap_extGroup_interactive',
+		},
+	},
 ];
 
-const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
+const toolbarExtensions: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'button',
@@ -166,7 +218,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'bold',
 			icon: 'icon-bold',
-			label: 'Bold',
+			label: '#buttons_bold',
 		},
 	},
 	{
@@ -178,7 +230,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'italic',
 			icon: 'icon-italic',
-			label: 'Italic',
+			label: '#buttons_italic',
 		},
 	},
 	{
@@ -272,6 +324,56 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 	},
 	{
 		type: 'tiptapToolbarExtension',
+		kind: 'colorPickerButton',
+		alias: 'Umb.Tiptap.Toolbar.TextColorBackground',
+		name: 'Text Color Background Tiptap Extension',
+		api: () => import('./toolbar/text-color-background.tiptap-toolbar-api.js'),
+		meta: {
+			alias: 'text-color-background',
+			icon: 'icon-color-bucket',
+			label: 'Background color',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'colorPickerButton',
+		alias: 'Umb.Tiptap.Toolbar.TextColorForeground',
+		name: 'Text Color Foreground Tiptap Extension',
+		api: () => import('./toolbar/text-color-foreground.tiptap-toolbar-api.js'),
+		meta: {
+			alias: 'text-color-foreground',
+			icon: 'icon-colorpicker',
+			label: 'Color',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.TextDirectionRtl',
+		name: 'Text Direction RTL Tiptap Extension',
+		api: () => import('./toolbar/text-direction-rtl.tiptap-toolbar-api.js'),
+		forExtensions: ['Umb.Tiptap.TextDirection'],
+		meta: {
+			alias: 'text-direction-rtl',
+			icon: 'icon-text-direction-rtl',
+			label: 'Right to left',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.TextDirectionLtr',
+		name: 'Text Direction LTR Tiptap Extension',
+		api: () => import('./toolbar/text-direction-ltr.tiptap-toolbar-api.js'),
+		forExtensions: ['Umb.Tiptap.TextDirection'],
+		meta: {
+			alias: 'text-direction-ltr',
+			icon: 'icon-text-direction-ltr',
+			label: 'Left to right',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Heading1',
 		name: 'Heading 1 Tiptap Extension',
@@ -315,7 +417,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'bulletList',
 			icon: 'icon-bulleted-list',
-			label: 'Bullet List',
+			label: '#buttons_listBullet',
 		},
 	},
 	{
@@ -328,6 +430,18 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 			alias: 'orderedList',
 			icon: 'icon-ordered-list',
 			label: 'Ordered List',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.Anchor',
+		name: 'Anchor Tiptap Extension',
+		api: () => import('./toolbar/anchor.tiptap-toolbar-api.js'),
+		meta: {
+			alias: 'anchor',
+			icon: 'icon-anchor',
+			label: '#tiptap_anchor',
 		},
 	},
 	{
@@ -429,7 +543,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'undo',
 			icon: 'icon-undo',
-			label: 'Undo',
+			label: '#buttons_undo',
 		},
 	},
 	{
@@ -442,7 +556,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'redo',
 			icon: 'icon-redo',
-			label: 'Redo',
+			label: '#buttons_redo',
 		},
 	},
 	{
@@ -455,7 +569,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		meta: {
 			alias: 'umbMedia',
 			icon: 'icon-picture',
-			label: 'Media picker',
+			label: '#general_mediaPicker',
 		},
 	},
 	{
@@ -473,19 +587,92 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 	},
 	{
 		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Table',
-		name: 'Table Tiptap Extension',
-		api: () => import('./toolbar/table.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.Table'],
+		kind: 'menu',
+		alias: 'Umb.Tiptap.Toolbar.FontFamily',
+		name: 'Font Family Tiptap Extension',
+		api: () => import('./toolbar/font-family.tiptap-toolbar-api.js'),
+		items: [
+			{ label: 'Sans serif', appearance: { style: 'font-family: sans-serif;' }, data: 'sans-serif' },
+			{ label: 'Serif', appearance: { style: 'font-family: serif;' }, data: 'serif' },
+			{ label: 'Monospace', appearance: { style: 'font-family: monospace;' }, data: 'monospace' },
+			{ label: 'Cursive', appearance: { style: 'font-family: cursive;' }, data: 'cursive' },
+			{ label: 'Fantasy', appearance: { style: 'font-family: fantasy;' }, data: 'fantasy' },
+		],
 		meta: {
-			alias: 'table',
-			icon: 'icon-table',
-			label: 'Table',
+			alias: 'umbFontFamily',
+			icon: 'icon-ruler-alt',
+			label: 'Font family',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'menu',
+		alias: 'Umb.Tiptap.Toolbar.FontSize',
+		name: 'Font Size Tiptap Extension',
+		api: () => import('./toolbar/font-size.tiptap-toolbar-api.js'),
+		items: [
+			{ label: '8pt', data: '8pt;' },
+			{ label: '10pt', data: '10pt;' },
+			{ label: '12pt', data: '12pt;' },
+			{ label: '14pt', data: '14pt;' },
+			{ label: '16pt', data: '16pt;' },
+			{ label: '18pt', data: '18pt;' },
+			{ label: '24pt', data: '24pt;' },
+			{ label: '26pt', data: '26pt;' },
+			{ label: '48pt', data: '48pt;' },
+		],
+		meta: {
+			alias: 'umbFontSize',
+			icon: 'icon-ruler',
+			label: 'Font size',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.CharacterMap',
+		name: 'Character Map Tiptap Extension',
+		api: () => import('./toolbar/character-map.tiptap-toolbar-api.js'),
+		meta: {
+			alias: 'umbCharacterMap',
+			icon: 'icon-omega',
+			label: '#tiptap_charmap',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.TextIndent',
+		name: 'Text Indent Tiptap Extension',
+		api: () => import('./toolbar/text-indent.tiptap-toolbar-api.js'),
+		forExtensions: ['Umb.Tiptap.TextIndent'],
+		meta: {
+			alias: 'indent',
+			icon: 'icon-indent',
+			label: 'Indent',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.TextOutdent',
+		name: 'Text Outdent Tiptap Extension',
+		api: () => import('./toolbar/text-outdent.tiptap-toolbar-api.js'),
+		forExtensions: ['Umb.Tiptap.TextIndent'],
+		meta: {
+			alias: 'outdent',
+			icon: 'icon-outdent',
+			label: 'Outdent',
 		},
 	},
 ];
 
-const extensions = [...coreExtensions, ...toolbarExtensions];
-
-export const manifests = [...kinds, ...extensions];
+export const manifests = [
+	...kinds,
+	...coreExtensions,
+	...statusbarExtensions,
+	...toolbarExtensions,
+	...blockExtensions,
+	...styleSelectExtensions,
+	...tableExtensions,
+];

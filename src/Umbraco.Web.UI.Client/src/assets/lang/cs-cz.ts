@@ -1734,9 +1734,6 @@ export default {
 		notificationEmailsCheckSuccessMessage: 'E-mail s upozorněním byl nastaven na <strong>%0%</strong>.',
 		notificationEmailsCheckErrorMessage:
 			'E-mail s oznámením je stále nastaven na výchozí hodnotu <strong>%0%</strong>.',
-		scheduledHealthCheckEmailBody:
-			'<html><body><p>Výsledky plánovaných kontrol Umbraco Health Checks provedených na %0% v %1% jsou následující:</p>%2%</body></html>',
-		scheduledHealthCheckEmailSubject: 'Stav Umbraco Health Check: %0%',
 		checkGroup: 'Zkontrolovat skupinu',
 		helpText:
 			'\n        <p>Kontrola vyhodnocuje různé oblasti vašeho webu z hlediska nastavení osvědčených postupů, konfigurace, potenciálních problémů atd. Problémy lze snadno vyřešit stisknutím tlačítka. Můžete přidat své vlastní kontroly, podívejte se na <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">dokumentaci pro více informací</a> o vlastních kontrolách.</p>\n        ',

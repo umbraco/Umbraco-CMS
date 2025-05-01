@@ -1,12 +1,12 @@
 import type { UmbBlockGridTypeColumnSpanOption } from '../../types.js';
 import { html, customElement, property, css, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import {
-	type UmbPropertyEditorUiElement,
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
+import type {
+	UmbPropertyEditorUiElement,
+	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-property-editor-ui-block-grid-column-span')
 export class UmbPropertyEditorUIBlockGridColumnSpanElement extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -33,7 +33,7 @@ export class UmbPropertyEditorUIBlockGridColumnSpanElement extends UmbLitElement
 			this.value = [...value, { columnSpan: index }];
 		}
 
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

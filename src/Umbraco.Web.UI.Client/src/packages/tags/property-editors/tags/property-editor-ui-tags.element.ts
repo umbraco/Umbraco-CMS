@@ -1,14 +1,14 @@
 import type { UmbTagsInputElement } from '../../components/tags-input/tags-input.element.js';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import {
-	type UmbPropertyEditorUiElement,
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
+import type {
+	UmbPropertyEditorUiElement,
+	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import '../../components/tags-input/tags-input.element.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-tags
@@ -63,7 +63,7 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 
 	#onChange(event: CustomEvent) {
 		this.value = ((event.target as UmbTagsInputElement).value as string).split(',');
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
