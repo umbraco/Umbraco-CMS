@@ -74,10 +74,12 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 
 			#name {
 				width: 100%;
+				z-index: 1;
 			}
 
 			#description {
 				width: 100%;
+				margin-top: -1px;
 				--uui-input-height: var(--uui-size-8);
 				--uui-input-border-color: transparent;
 			}
