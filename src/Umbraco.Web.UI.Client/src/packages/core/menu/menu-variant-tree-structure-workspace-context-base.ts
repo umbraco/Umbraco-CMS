@@ -99,24 +99,22 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			this.#parent.setValue(parent);
 			this.#structure.setValue(structureItems);
 
-			this.#setAncestorData(data, isNew);
+			this.#setAncestorData(data);
 		}
 	}
 
 	// TODO: introduce variant tree item model
-	#setAncestorData(data: any, isNew: boolean) {
-		let ancestorEntities = data.map((treeItem: any) => {
-			return {
-				unique: treeItem.unique,
-				entityType: treeItem.entityType,
-			};
-		});
-
-		if (!isNew) {
-			/* If the item is not new, we need to remove the last item from the ancestor entities
-			 because it is the current item and we don't want to include it in the ancestors */
-			ancestorEntities = ancestorEntities.slice(0, -1);
-		}
+	#setAncestorData(data: any) {
+		const ancestorEntities = data
+			.map((treeItem: any) => {
+				return {
+					unique: treeItem.unique,
+					entityType: treeItem.entityType,
+				};
+			})
+			/* If the item is not new, the current item is the last item in the array. 
+			We filter out the current item unique to handle any case where it could show up */
+			.filter((item: any) => item.unique !== this.#workspaceContext?.getUnique());
 
 		this.#ancestorContext.setAncestors(ancestorEntities);
 	}
