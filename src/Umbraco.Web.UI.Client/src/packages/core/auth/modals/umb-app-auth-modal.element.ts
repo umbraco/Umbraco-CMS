@@ -79,6 +79,24 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 						id="logo-on-image"
 						src="${this._serverUrl}/umbraco/management/api/v1/security/back-office/graphics/login-logo"
 						alt="Logo" />
+					<svg
+						id="curve-top"
+						width="1746"
+						height="1374"
+						viewBox="0 0 1746 1374"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg">
+						<path d="M8 1C61.5 722.5 206.5 1366.5 1745.5 1366.5" stroke="currentColor" stroke-width="15"></path>
+					</svg>
+					<svg
+						id="curve-bottom"
+						width="1364"
+						height="552"
+						viewBox="0 0 1364 552"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg">
+						<path d="M1 8C387 24 1109 11 1357 548" stroke="currentColor" stroke-width="15"></path>
+					</svg>
 				</div>
 				<div id="content-container">
 					<div id="content">
