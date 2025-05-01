@@ -28,7 +28,7 @@ public class UserPasswordChangedWebhookEvent : WebhookEventBase<UserPasswordChan
                  Guid.TryParse(notification.AffectedUserId, out Guid affectedUserGuid)
                 ? affectedUserGuid
                 : Guid.Empty,
-            PerormingId = Guid.TryParse(notification.PerformingUserId, out Guid performingUserGuid)
+            PerformingId = Guid.TryParse(notification.PerformingUserId, out Guid performingUserGuid)
                 ? performingUserGuid
                 : Guid.Empty,
         };

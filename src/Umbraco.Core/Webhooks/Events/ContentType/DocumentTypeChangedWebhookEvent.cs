@@ -24,6 +24,6 @@ public class DocumentTypeChangedWebhookEvent : WebhookEventBase<ContentTypeChang
         => notification.Changes.Select(contentTypeChange => new
         {
             Id = contentTypeChange.Item.Key,
-            contentTypeChange = contentTypeChange.ChangeTypes,
+            ContentTypeChange = contentTypeChange.ChangeTypes,
         });
 }
