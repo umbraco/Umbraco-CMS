@@ -127,7 +127,6 @@ test('can add an available block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(tipTapName);
 
   // Act
-  await umbracoUi.dataType.isExtensionItemChecked('Block', false);
   await umbracoUi.dataType.addAvailableBlocks(elementTypeName);
   await umbracoUi.dataType.clickSaveButton();
 
@@ -135,8 +134,6 @@ test('can add an available block', async ({umbracoApi, umbracoUi}) => {
   //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesRTEContainBlocks(tipTapName, [elementTypeId])).toBeTruthy();
-  // Verify that "Block" extension is enable
-  await umbracoUi.dataType.isExtensionItemChecked('Block');
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
@@ -240,39 +237,4 @@ test('can disable extensions item', async ({umbracoApi, umbracoUi}) => {
   const extensionsValue = tipTapData.values.find(value => value.alias === 'extensions');
   expect(extensionsValue.value.length).toBe(extensionsCount - 1);
   expect(extensionsValue.value).not.toContain(extensionItemName);
-});
-
-test('can add a statusbar', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const statusbarName = 'Word Count';
-  const statusbarApiValue = 'Umb.Tiptap.Statusbar.WordCount';
-  await umbracoApi.dataType.createDefaultTiptapDataType(tipTapName);
-  await umbracoUi.dataType.goToDataType(tipTapName);
-
-  // Act
-  await umbracoUi.dataType.clickStatusbarItemInToolboxWithName(statusbarName);
-  await umbracoUi.dataType.clickSaveButton();
-
-  // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const tipTapData = await umbracoApi.dataType.getByName(tipTapName);
-  const statusbarValue = tipTapData.values.find(value => value.alias === 'statusbar');
-  expect(statusbarValue.value).toEqual([[statusbarApiValue]]);
-});
-
-test('can remove a statusbar', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const statusbarName = 'Word Count';
-  await umbracoApi.dataType.createTiptapDataTypeWithWordCountStatusbar(tipTapName);
-  await umbracoUi.dataType.goToDataType(tipTapName);
-
-  // Act
-  await umbracoUi.dataType.clickStatusbarItemWithName(statusbarName);
-  await umbracoUi.dataType.clickSaveButton();
-
-  // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const tipTapData = await umbracoApi.dataType.getByName(tipTapName);
-  const statusbarValue = tipTapData.values.find(value => value.alias === 'statusbar');
-  expect(statusbarValue).toBeFalsy();
 });

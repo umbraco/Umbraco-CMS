@@ -44,10 +44,10 @@ test('can disable URL tracker', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.enterContentName(updatedContentName);
   await umbracoUi.content.clickSaveAndPublishButton();
   // verify that there is no redirects have been made
-  const contentUrl = await umbracoApi.document.getDocumentUrl(contentId);
+  const contentData = await umbracoApi.document.get(contentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.redirectManagement.clickRedirectManagementTab();
-  await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentUrl, false);
+  await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentData.urls[0].url, false);
   // Verify that the status is Disable
   const statusData = await umbracoApi.redirectManagement.getStatus();
   expect(statusData.status).toBe(disableStatus);
@@ -71,10 +71,10 @@ test.skip('can re-enable URL tracker', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.enterContentName(updatedContentName);
   await umbracoUi.content.clickSaveAndPublishButton();
   // verify that there is one redirects have been made
-  const contentUrl = await umbracoApi.document.getDocumentUrl(contentId);
+  const contentData = await umbracoApi.document.get(contentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.redirectManagement.clickRedirectManagementTab();
-  await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentUrl);
+  await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentData.urls[0].url);
   // Verify that the status is Enable
   const statusData = await umbracoApi.redirectManagement.getStatus();
   expect(statusData.status).toBe(enableStatus);
@@ -111,6 +111,6 @@ test.skip('can delete a redirect', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.redirectManagement.deleteFirstRedirectURL();
 
   // Assert
-  const contentUrl = await umbracoApi.document.getDocumentUrl(contentId);
-  await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentUrl, false);
+  const contentData = await umbracoApi.document.get(contentId);
+  await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentData.urls[0].url, false);
 });

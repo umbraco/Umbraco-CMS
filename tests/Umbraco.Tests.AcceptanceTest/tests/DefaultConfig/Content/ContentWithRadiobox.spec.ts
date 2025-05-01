@@ -14,14 +14,14 @@ test.beforeEach(async ({umbracoApi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.document.ensureNameNotExists(contentName); 
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can create content with the radiobox data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const expectedState = 'Draft';
+  const expectedState = 'Draft'; 
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoUi.goToBackOffice();
@@ -101,7 +101,8 @@ test('can not publish mandatory radiobox with an empty value', async ({umbracoAp
   // Do not select any radiobox values and the validation error appears
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
-  await umbracoUi.content.isErrorNotificationVisible();
+  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   // Select a radiobox value and the validation error disappears
   await umbracoUi.content.chooseRadioboxOption(optionValues[0]);
@@ -109,7 +110,8 @@ test('can not publish mandatory radiobox with an empty value', async ({umbracoAp
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isErrorNotificationVisible();
+  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));

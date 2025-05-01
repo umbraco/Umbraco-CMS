@@ -6,7 +6,7 @@ const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Textstring';
 const contentText = 'This is test content text';
-const referenceHeadline = ConstantHelper.trashDeleteDialogMessage.referenceHeadline;
+const referenceHeadline = 'The following items depend on this';
 const documentPickerName = ['TestPicker', 'DocumentTypeForPicker'];
 
 test.beforeEach(async ({umbracoApi}) => {

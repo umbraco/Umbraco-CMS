@@ -48,8 +48,8 @@ test('can create content with names that vary by culture', async ({umbracoApi, u
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickSelectVariantButton();
-  await umbracoUi.content.clickVariantAddModeButtonForLanguageName(secondLanguageName);
+  await umbracoUi.content.clickVariantSelectorButton();
+  await umbracoUi.content.clickVariantAddModeButton();
   await umbracoUi.content.enterContentName(danishContentName);
   await umbracoUi.content.clickSaveButtonForContent();
   await umbracoUi.content.clickSaveAndCloseButton();
@@ -78,8 +78,8 @@ test('can create content with names that vary by culture and content that is inv
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickSelectVariantButton();
-  await umbracoUi.content.clickVariantAddModeButtonForLanguageName(secondLanguageName);
+  await umbracoUi.content.clickVariantSelectorButton();
+  await umbracoUi.content.clickVariantAddModeButton();
   await umbracoUi.content.enterContentName(danishContentName);
   await umbracoUi.content.enterTextstring(danishTextContent);
   await umbracoUi.content.clickSaveButtonForContent();
@@ -111,8 +111,8 @@ test('can create content with names and content that vary by culture', async ({u
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickSelectVariantButton();
-  await umbracoUi.content.clickVariantAddModeButtonForLanguageName(secondLanguageName);
+  await umbracoUi.content.clickVariantSelectorButton();
+  await umbracoUi.content.clickVariantAddModeButton();
   await umbracoUi.content.enterContentName(danishContentName);
   await umbracoUi.content.enterTextstring(danishTextContent);
   await umbracoUi.content.clickSaveButtonForContent();
