@@ -204,13 +204,13 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 			}
 
 			#curve-top {
-				top: 0px;
-				right: 0px;
+				top: -9%;
+				right: -9%;
 			}
 
 			#curve-bottom {
-				bottom: 0px;
-				left: 0px;
+				bottom: -1px;
+				left: -1px;
 			}
 
 			#content-container {
