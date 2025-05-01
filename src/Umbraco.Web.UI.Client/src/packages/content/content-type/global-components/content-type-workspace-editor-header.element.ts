@@ -126,16 +126,18 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 				display: flex;
 				flex: 1 1 auto;
 				flex-direction: column;
-				gap: var(--uui-size-space-1);
 			}
 
 			#name {
 				width: 100%;
+				z-index: 1;
 			}
 
 			#description {
 				width: 100%;
+				margin-top: 1px;
 				--uui-input-height: var(--uui-size-8);
+				--uui-input-border-color: transparent;
 			}
 
 			#description:hover {
@@ -146,6 +148,8 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 				font-size: var(--uui-size-8);
 				height: 60px;
 				width: 60px;
+				--uui-button-border-color: transparent;
+				--uui-button-border-color-hover: var(--uui-color-border);
 			}
 		`,
 	];

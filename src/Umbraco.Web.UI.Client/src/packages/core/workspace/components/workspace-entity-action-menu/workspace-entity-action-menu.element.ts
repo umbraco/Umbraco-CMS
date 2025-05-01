@@ -58,8 +58,7 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 						id="action-button"
 						data-mark="workspace:action-menu-button"
 						popovertarget="workspace-entity-action-menu-popover"
-						label=${this.localize.term('general_actions')}
-						compact>
+						label=${this.localize.term('general_actions')}>
 						<uui-symbol-more></uui-symbol-more>
 					</uui-button>
 					<uui-popover-container
@@ -80,7 +79,18 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static override styles = [UmbTextStyles, css``];
+	static override styles = [
+		UmbTextStyles,
+		css`
+			:host {
+				height: 100%;
+				margin-left: calc(var(--uui-size-layout-1) * -1);
+			}
+			:host > uui-button {
+				height: 100%;
+			}
+		`,
+	];
 }
 
 declare global {

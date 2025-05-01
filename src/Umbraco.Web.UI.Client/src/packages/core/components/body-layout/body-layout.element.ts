@@ -204,12 +204,6 @@ export class UmbBodyLayoutElement extends LitElement {
 				box-sizing: border-box;
 				min-width: 0;
 			}
-
-			#action-menu-slot {
-				margin-left: calc(var(--uui-size-space-5) * -1);
-				margin-right: var(--uui-size-layout-1);
-			}
-
 			#navigation-slot {
 				margin-left: auto;
 			}
