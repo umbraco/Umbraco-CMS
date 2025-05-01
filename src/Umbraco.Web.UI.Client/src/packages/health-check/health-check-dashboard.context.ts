@@ -5,10 +5,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbHealthCheckDashboardContext extends UmbContextBase<
-	UmbHealthCheckDashboardContext,
-	typeof UMB_HEALTHCHECK_DASHBOARD_CONTEXT
-> {
+export class UmbHealthCheckDashboardContext extends UmbContextBase {
 	#manifests: ManifestHealthCheck[] = [];
 	set manifests(value: ManifestHealthCheck[]) {
 		this.#manifests = value;

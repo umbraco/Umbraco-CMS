@@ -4,6 +4,7 @@ import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+const ObserveSymbol = Symbol();
 export class UmbBlockEntryShowContentEditCondition
 	extends UmbConditionBase<BlockEntryShowContentEditConditionConfig>
 	implements UmbExtensionCondition
@@ -16,11 +17,11 @@ export class UmbBlockEntryShowContentEditCondition
 
 		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
 			this.observe(
-				context.showContentEdit,
+				context?.showContentEdit,
 				(showContentEdit) => {
 					this.permitted = !!showContentEdit;
 				},
-				'observeEntryShowContentEdit',
+				ObserveSymbol,
 			);
 		});
 	}

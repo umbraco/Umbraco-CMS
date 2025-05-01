@@ -17,9 +17,9 @@ export class UmbMultipleAppLanguageCondition
 
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (context) => {
 			this.observe(
-				context.moreThanOneLanguage,
+				context?.moreThanOneLanguage,
 				(moreThanOneLanguage) => {
-					this.permitted = moreThanOneLanguage;
+					this.permitted = moreThanOneLanguage ?? false;
 				},
 				'observeLanguages',
 			);

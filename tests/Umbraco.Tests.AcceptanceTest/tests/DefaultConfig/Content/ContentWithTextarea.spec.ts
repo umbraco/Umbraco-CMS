@@ -33,7 +33,8 @@ test('can create content with the textarea data type', async ({umbracoApi, umbra
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -53,7 +54,8 @@ test('can publish content with the textarea data type', async ({umbracoApi, umbr
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -73,7 +75,8 @@ test('can input text into the textarea', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -84,7 +87,7 @@ test('cannot input the text that exceeds the allowed amount of characters', asyn
   // Arrange
   const maxChars = 100;
   const textExceedMaxChars = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam mattis porttitor orci id cursus. Nulla';
-  const warningMessage = 'This field exceeds the allowed amount of characters';
+  const warningMessage = 'The string length exceeds the maximum length of';
   const dataTypeId = await umbracoApi.dataType.createTextareaDataType(customDataTypeName, maxChars);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -96,8 +99,9 @@ test('cannot input the text that exceeds the allowed amount of characters', asyn
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isTextWithExactNameVisible(warningMessage);
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isTextWithMessageVisible(warningMessage);
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);

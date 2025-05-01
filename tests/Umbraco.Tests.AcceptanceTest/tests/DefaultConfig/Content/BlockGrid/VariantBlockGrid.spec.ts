@@ -56,7 +56,6 @@ test('invariant document type with invariant block grid with invariant block wit
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   await umbracoUi.reloadPage();
@@ -78,7 +77,7 @@ test('can not create unsupported invariant document type with invariant block gr
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 
@@ -97,7 +96,7 @@ test('can not create unsupported invariant document type with invariant block gr
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 
@@ -120,7 +119,6 @@ test('variant document type with variant block grid with variant block with an v
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   await umbracoUi.reloadPage();
@@ -147,7 +145,6 @@ test('variant document type with invariant block grid with variant block with an
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   await umbracoUi.reloadPage();
@@ -174,7 +171,6 @@ test('variant document type with invariant block grid with variant block with an
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   await umbracoUi.reloadPage();

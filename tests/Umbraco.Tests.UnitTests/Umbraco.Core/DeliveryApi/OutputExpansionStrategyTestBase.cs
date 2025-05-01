@@ -43,7 +43,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     public void OutputExpansionStrategy_ExpandsNothingByDefault()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false);
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
         var content = new Mock<IPublishedContent>();
         var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None, VariationContext, CacheManager);
@@ -69,7 +69,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     public void OutputExpansionStrategy_CanExpandSpecificContent()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { "contentPickerTwo" });
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
         var content = new Mock<IPublishedContent>();
 
@@ -142,7 +142,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     public void OutputExpansionStrategy_CanExpandAllContent()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(true);
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
         var content = new Mock<IPublishedContent>();
 
@@ -177,7 +177,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     public void OutputExpansionStrategy_DoesNotExpandNestedContentPicker(string rootPropertyTypeAlias, string nestedPropertyTypeAlias)
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { rootPropertyTypeAlias, nestedPropertyTypeAlias });
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
         var content = new Mock<IPublishedContent>();
 
@@ -207,7 +207,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     public void OutputExpansionStrategy_DoesNotExpandElementsByDefault()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false);
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
         var apiElementBuilder = new ApiElementBuilder(accessor);
 
         var contentPickerValue = CreateSimplePickedContent(111, 222);
@@ -283,7 +283,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     public void OutputExpansionStrategy_ForwardsExpansionStateToPropertyValueConverter(bool expanding)
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { expanding ? "theAlias" : "noSuchAlias" });
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
         var content = new Mock<IPublishedContent>();
 

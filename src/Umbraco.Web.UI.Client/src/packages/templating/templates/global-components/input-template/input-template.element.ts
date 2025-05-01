@@ -91,10 +91,10 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 
 	async #observePickedTemplates() {
 		this.observe(
-			(await this._templateItemRepository.requestItems(this._selection)).asObservable(),
+			(await this._templateItemRepository?.requestItems(this._selection))?.asObservable?.(),
 			(data) => {
 				const oldValue = this._pickedTemplates;
-				this._pickedTemplates = data;
+				this._pickedTemplates = data ?? [];
 				this.requestUpdate('_pickedTemplates', oldValue);
 			},
 			'_observeTemplates',

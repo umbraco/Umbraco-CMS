@@ -16,9 +16,9 @@ export class UmbContentHasPropertiesWorkspaceCondition
 
 		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
-				context.structure.contentTypeHasProperties,
+				context?.structure.contentTypeHasProperties,
 				(hasProperties) => {
-					this.permitted = hasProperties;
+					this.permitted = hasProperties ?? false;
 				},
 				'hasPropertiesObserver',
 			);

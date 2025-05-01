@@ -5,7 +5,7 @@ import type {
 	UmbDocumentUnpublishModalData,
 	UmbDocumentUnpublishModalValue,
 } from './document-unpublish-modal.token.js';
-import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
@@ -65,7 +65,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		this.#configureReferences();
 
 		// If invariant, don't display the variant selection component.
-		if (this.data?.options.length === 1 && this.data.options[0].unique === 'invariant') {
+		if (this.data?.options.length === 1 && this.data.options[0].culture === null) {
 			this._isInvariant = true;
 			this._hasInvalidSelection = false;
 			return;
@@ -150,20 +150,21 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`<uui-dialog-layout headline=${this.localize.term('content_unpublish')}>
-			${!this._isInvariant
-				? html`
-						<p id="subtitle">
-							<umb-localize key="content_languagesToUnpublish">
-								Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.
-							</umb-localize>
-						</p>
-						<umb-document-variant-language-picker
-							.selectionManager=${this._selectionManager}
-							.variantLanguageOptions=${this._options}
-							.requiredFilter=${this._hasInvalidSelection ? this._requiredFilter : undefined}
-							.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>
-					`
-				: nothing}
+			${when(
+				!this._isInvariant,
+				() => html`
+					<p id="subtitle">
+						<umb-localize key="content_languagesToUnpublish">
+							Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.
+						</umb-localize>
+					</p>
+					<umb-document-variant-language-picker
+						.selectionManager=${this._selectionManager}
+						.variantLanguageOptions=${this._options}
+						.requiredFilter=${this._hasInvalidSelection ? this._requiredFilter : undefined}
+						.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>
+				`,
+			)}
 
 			<p>
 				<umb-localize key="prompt_confirmUnpublish">

@@ -12,6 +12,7 @@ import {
 	type UmbContextCallback,
 	UmbContextConsumerController,
 	UmbContextProviderController,
+	type UmbContextMinimal,
 } from '@umbraco-cms/backoffice/context-api';
 import { type ObserverCallback, UmbObserverController, simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 
@@ -33,7 +34,7 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 		}
 
 		getHostElement(): Element {
-			return this._host.getHostElement();
+			return this._host?.getHostElement();
 		}
 
 		get controllerAlias(): UmbControllerAlias {
@@ -80,7 +81,7 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 		}
 
 		provideContext<
-			BaseType = unknown,
+			BaseType extends UmbContextMinimal = UmbContextMinimal,
 			ResultType extends BaseType = BaseType,
 			InstanceType extends ResultType = ResultType,
 		>(
@@ -90,14 +91,14 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 			return new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, contextAlias, instance);
 		}
 
-		consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+		consumeContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
 			callback: UmbContextCallback<ResultType>,
 		): UmbContextConsumerController<BaseType, ResultType> {
 			return new UmbContextConsumerController(this, contextAlias, callback);
 		}
 
-		async getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+		async getContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
 			options?: UmbClassGetContextOptions,
 		): Promise<ResultType | undefined> {
@@ -116,9 +117,11 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 		public override destroy(): void {
 			if (this._host) {
 				this._host.removeUmbController(this);
-				this._host = undefined as never;
 			}
 			super.destroy();
+			if (this._host) {
+				this._host = undefined as never;
+			}
 		}
 	}
 

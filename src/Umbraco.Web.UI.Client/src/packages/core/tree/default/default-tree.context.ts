@@ -24,7 +24,7 @@ export class UmbDefaultTreeContext<
 		TreeRootType extends UmbTreeRootModel,
 		RequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
 	>
-	extends UmbContextBase<UmbDefaultTreeContext<TreeItemType, TreeRootType, RequestArgsType>>
+	extends UmbContextBase
 	implements UmbTreeContext
 {
 	#additionalRequestArgs = new UmbObjectState<Partial<RequestArgsType> | object>({});
@@ -38,9 +38,9 @@ export class UmbDefaultTreeContext<
 
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 	public filter?: (item: TreeItemType) => boolean = () => true;
-	public readonly selection = new UmbSelectionManager(this._host);
+	public readonly selection = new UmbSelectionManager(this);
 	public readonly pagination = new UmbPaginationManager();
-	public readonly expansion = new UmbTreeExpansionManager(this._host);
+	public readonly expansion = new UmbTreeExpansionManager(this);
 
 	#hideTreeRoot = new UmbBooleanState(false);
 	hideTreeRoot = this.#hideTreeRoot.asObservable();
@@ -78,6 +78,7 @@ export class UmbDefaultTreeContext<
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		super(host, UMB_TREE_CONTEXT);
+
 		this.pagination.setPageSize(this.#paging.take);
 		this.#consumeContexts();
 
@@ -373,7 +374,7 @@ export class UmbDefaultTreeContext<
 			this,
 			umbExtensionsRegistry,
 			repositoryAlias,
-			[this._host],
+			[this],
 			(permitted, ctrl) => {
 				this.#repository = permitted ? ctrl.api : undefined;
 				this.#checkIfInitialized();

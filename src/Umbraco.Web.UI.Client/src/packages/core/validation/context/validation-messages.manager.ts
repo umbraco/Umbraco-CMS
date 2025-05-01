@@ -80,6 +80,10 @@ export class UmbValidationMessagesManager {
 		return this.getMessages().filter((x) => MatchPathOrDescendantPath(x.path, path));
 	}
 
+	getHasMessageOfPathAndBody(path: string, body: string): boolean {
+		return this.getMessages().some((x) => x.path === path && x.body === body);
+	}
+
 	messagesOfPathAndDescendant(path: string): Observable<Array<UmbValidationMessage>> {
 		//path = path.toLowerCase();
 		return createObservablePart(this.filteredMessages, (msgs) =>

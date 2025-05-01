@@ -128,9 +128,8 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
 
         var mediaUpdateModel = new MediaUpdateModel
         {
-            InvariantName = newName,
-            InvariantProperties = SubImage.InvariantProperties,
-            Variants = SubImage.Variants,
+            Properties = SubImage.Properties,
+            Variants = [new VariantModel { Name = newName }]
         };
 
         // Act
@@ -152,9 +151,8 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
 
         var mediaUpdateModel = new MediaUpdateModel
         {
-            InvariantName = newName,
-            InvariantProperties = SubImage.InvariantProperties,
-            Variants = SubImage.Variants,
+            Properties = SubImage.Properties,
+            Variants = [new VariantModel { Name = newName }]
         };
 
         // Act

@@ -31,10 +31,12 @@ export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<never
 
 		if (isCurrentUser) {
 			const repository = new UmbCurrentUserRepository(this);
-			await repository.changePassword(data.newPassword, data.oldPassword);
+			const { error } = await repository.changePassword(data.newPassword, data.oldPassword);
+			if (error) throw error;
 		} else {
 			const repository = new UmbChangeUserPasswordRepository(this);
-			await repository.changePassword(this.args.unique, data.newPassword);
+			const { error } = await repository.changePassword(this.args.unique, data.newPassword);
+			if (error) throw error;
 		}
 	}
 }

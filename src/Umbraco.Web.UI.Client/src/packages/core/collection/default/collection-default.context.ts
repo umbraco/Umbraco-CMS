@@ -35,7 +35,7 @@ export class UmbDefaultCollectionContext<
 		CollectionItemType extends { entityType: string; unique: string } = any,
 		FilterModelType extends UmbCollectionFilterModel = UmbCollectionFilterModel,
 	>
-	extends UmbContextBase<UmbDefaultCollectionContext>
+	extends UmbContextBase
 	implements UmbCollectionContext, UmbApi
 {
 	#config?: UmbCollectionConfiguration = { pageSize: 50 };

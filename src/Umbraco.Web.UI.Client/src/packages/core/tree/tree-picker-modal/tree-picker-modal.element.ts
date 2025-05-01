@@ -58,13 +58,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					...this.data.search,
 					searchFrom: this.data.startNode,
 				});
-
-				const searchQueryParams = this.data.search.queryParams;
-				if (searchQueryParams) {
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					//@ts-ignore - TODO wire up types
-					this.#pickerContext.search.setQuery(searchQueryParams);
-				}
 			}
 
 			const multiple = this.data?.multiple ?? false;

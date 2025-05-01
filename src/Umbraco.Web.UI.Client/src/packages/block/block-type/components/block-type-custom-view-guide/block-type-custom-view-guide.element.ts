@@ -34,7 +34,7 @@ export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.observe(
-				await context.propertyValueByAlias<string | undefined>('contentElementTypeKey'),
+				await context?.propertyValueByAlias<string | undefined>('contentElementTypeKey'),
 				async (value) => {
 					if (!value) return;
 					const { asObservable } = await this.#repository.requestByUnique(value);

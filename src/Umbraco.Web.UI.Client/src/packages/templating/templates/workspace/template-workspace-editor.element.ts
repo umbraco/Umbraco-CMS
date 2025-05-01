@@ -48,24 +48,24 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_TEMPLATE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#templateWorkspaceContext = workspaceContext;
-			this.observe(this.#templateWorkspaceContext.name, (name) => {
+			this.observe(this.#templateWorkspaceContext?.name, (name) => {
 				this._name = name;
 			});
 
-			this.observe(this.#templateWorkspaceContext.alias, (alias) => {
+			this.observe(this.#templateWorkspaceContext?.alias, (alias) => {
 				this._alias = alias;
 			});
 
-			this.observe(this.#templateWorkspaceContext.content, (content) => {
+			this.observe(this.#templateWorkspaceContext?.content, (content) => {
 				this._content = content;
 			});
 
-			this.observe(this.#templateWorkspaceContext.masterTemplate, (masterTemplate) => {
+			this.observe(this.#templateWorkspaceContext?.masterTemplate, (masterTemplate) => {
 				this.#masterTemplateUnique = masterTemplate?.unique ?? null;
 				this._masterTemplateName = masterTemplate?.name ?? null;
 			});
 
-			this.observe(this.#templateWorkspaceContext.isNew, (isNew) => {
+			this.observe(this.#templateWorkspaceContext?.isNew, (isNew) => {
 				this.#isNew = !!isNew;
 			});
 		});

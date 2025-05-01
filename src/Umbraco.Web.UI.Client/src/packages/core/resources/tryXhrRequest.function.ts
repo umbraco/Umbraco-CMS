@@ -1,6 +1,7 @@
 import { UmbTryExecuteController } from './try-execute.controller.js';
 import { UmbCancelablePromise } from './cancelable-promise.js';
 import { UmbApiError } from './umb-error.js';
+import { isProblemDetailsLike } from './apiTypeValidators.function.js';
 import type { UmbApiResponse, XhrRequestOptions } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
@@ -82,12 +83,7 @@ function createXhrRequest<T>(options: XhrRequestOptions): UmbCancelablePromise<T
 						resolve(JSON.parse(xhr.responseText));
 					}
 				} else {
-					const error = new UmbApiError(xhr.statusText, xhr.status, xhr, {
-						title: xhr.statusText,
-						type: 'ApiError',
-						status: xhr.status,
-					});
-					reject(error);
+					reject(createErrorResponse(xhr));
 				}
 			} catch {
 				// This most likely happens when the response is not JSON
@@ -102,12 +98,7 @@ function createXhrRequest<T>(options: XhrRequestOptions): UmbCancelablePromise<T
 		};
 
 		xhr.onerror = () => {
-			const error = new UmbApiError(xhr.statusText, xhr.status, xhr, {
-				title: xhr.statusText,
-				type: 'ApiError',
-				status: xhr.status,
-			});
-			reject(error);
+			reject(createErrorResponse(xhr));
 		};
 
 		if (!onCancel.isCancelled) {
@@ -123,4 +114,34 @@ function createXhrRequest<T>(options: XhrRequestOptions): UmbCancelablePromise<T
 			xhr.abort();
 		});
 	});
+}
+
+/**
+ * Create an error response from an XMLHttpRequest.
+ * This function is used to create a consistent error response format for failed requests.
+ * It extracts the status, statusText, and responseText from the XMLHttpRequest object and creates an UmbApiError object.
+ * It tries to parse the responseText as JSON and, if successful, adds it to the UmbApiError object as UmbProblemDetails.
+ * @param {XMLHttpRequest} xhr The XMLHttpRequest object
+ * @returns {UmbApiError} An UmbApiError object containing the error details.
+ * @internal
+ */
+function createErrorResponse(xhr: XMLHttpRequest): UmbApiError {
+	const error = new UmbApiError(xhr.statusText, xhr.status, xhr, {
+		title: xhr.statusText,
+		type: 'ApiError',
+		status: xhr.status,
+	});
+	try {
+		const errorBody = xhr.responseText;
+		if (errorBody) {
+			const parsedError = JSON.parse(errorBody);
+			if (parsedError && isProblemDetailsLike(parsedError)) {
+				error.problemDetails = parsedError;
+			}
+		}
+	} catch {
+		// Ignore JSON parsing errors
+	}
+
+	return error;
 }

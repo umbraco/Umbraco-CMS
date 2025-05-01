@@ -702,6 +702,9 @@ export type DocumentResponseModel = {
     variants: Array<DocumentVariantResponseModel>;
     id: string;
     documentType: DocumentTypeReferenceResponseModel;
+    /**
+     * @deprecated
+     */
     urls: Array<DocumentUrlInfoModel>;
     template?: ReferenceByIdModel | null;
     isTrashed: boolean;
@@ -1235,6 +1238,9 @@ export type MediaResponseModel = {
     values: Array<MediaValueResponseModel>;
     variants: Array<MediaVariantResponseModel>;
     id: string;
+    /**
+     * @deprecated
+     */
     urls: Array<MediaUrlInfoModel>;
     isTrashed: boolean;
     mediaType: MediaTypeReferenceResponseModel;
@@ -2124,6 +2130,9 @@ export type PublishedDocumentResponseModel = {
     variants: Array<DocumentVariantResponseModel>;
     id: string;
     documentType: DocumentTypeReferenceResponseModel;
+    /**
+     * @deprecated
+     */
     urls: Array<DocumentUrlInfoModel>;
     template?: ReferenceByIdModel | null;
     isTrashed: boolean;

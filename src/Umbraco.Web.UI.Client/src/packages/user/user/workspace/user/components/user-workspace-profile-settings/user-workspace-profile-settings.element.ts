@@ -23,10 +23,10 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
 			this.#userWorkspaceContext = instance;
-			this.observe(this.#userWorkspaceContext.data, (user) => (this._user = user), 'umbUserObserver');
+			this.observe(this.#userWorkspaceContext?.data, (user) => (this._user = user), 'umbUserObserver');
 			this.observe(
-				this.#userWorkspaceContext.configRepository.part('usernameIsEmail'),
-				(usernameIsEmail) => (this._usernameIsEmail = usernameIsEmail),
+				this.#userWorkspaceContext?.configRepository.part('usernameIsEmail'),
+				(usernameIsEmail) => (this._usernameIsEmail = usernameIsEmail === undefined ? true : usernameIsEmail),
 				'umbUsernameIsEmailObserver',
 			);
 		});

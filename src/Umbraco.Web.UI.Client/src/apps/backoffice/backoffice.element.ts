@@ -77,7 +77,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 
 		// TODO: We need to ensure this request is called every time the user logs in, but this should be done somewhere across the app and not here [JOV]
 		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-			this.observe(authContext.isAuthorized, (isAuthorized) => {
+			this.observe(authContext?.isAuthorized, (isAuthorized) => {
 				if (!isAuthorized) return;
 				serverExtensions.registerPrivateExtensions();
 			});

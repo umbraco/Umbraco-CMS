@@ -1,3 +1,4 @@
+import { isProblemDetailsLike } from './apiTypeValidators.function.js';
 import { UmbResourceController } from './resource.controller.js';
 import type { UmbApiResponse, UmbTryExecuteOptions } from './types.js';
 import { UmbApiError, UmbCancelError } from './umb-error.js';
@@ -44,11 +45,17 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 		let message = 'An error occurred while trying to execute the request.';
 		let details: Record<string, string[]> | undefined = undefined;
 
-		if (UmbApiError.isUmbApiError(error)) {
-			// UmbApiError, show notification
-			headline = error.problemDetails.title ?? error.name;
-			message = error.problemDetails.detail ?? error.message;
-			details = error.problemDetails.errors ?? undefined;
+		// Check if we can extract problem details from the error
+		const problemDetails = UmbApiError.isUmbApiError(error)
+			? error.problemDetails
+			: isProblemDetailsLike(error)
+				? error
+				: undefined;
+
+		if (problemDetails) {
+			// UmbProblemDetails, show notification
+			message = problemDetails.title;
+			details = problemDetails.errors ?? undefined;
 		} else {
 			// Unknown error, show notification
 			headline = '';

@@ -13,7 +13,11 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDetailRepository,
+	UmbRepositoryResponse,
+	UmbRepositoryResponseWithAsObservable,
+} from '@umbraco-cms/backoffice/repository';
 import { UmbDeprecation, UmbStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -44,7 +48,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public readonly persistedData = this._data.persisted;
 	public readonly loading = new UmbStateManager(this);
 
-	protected _getDataPromise?: Promise<any>;
+	protected _getDataPromise?: Promise<
+		UmbRepositoryResponse<DetailModelType> | UmbRepositoryResponseWithAsObservable<DetailModelType>
+	>;
 	protected _detailRepository?: DetailRepositoryType;
 
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
@@ -93,11 +99,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
 			this.#eventContext = context;
 
-			this.#eventContext.removeEventListener(
+			this.#eventContext?.removeEventListener(
 				UmbEntityUpdatedEvent.TYPE,
 				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);
-			this.#eventContext.addEventListener(
+			this.#eventContext?.addEventListener(
 				UmbEntityUpdatedEvent.TYPE,
 				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);
@@ -166,9 +172,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return this.#parent.getValue()?.entityType;
 	}
 
-	async load(unique: string) {
+	async load(
+		unique: string,
+	): Promise<UmbRepositoryResponse<DetailModelType> | UmbRepositoryResponseWithAsObservable<DetailModelType>> {
 		if (unique === this.getUnique() && this._getDataPromise) {
-			return (await this._getDataPromise) as GetDataType;
+			return await this._getDataPromise;
 		}
 		this.resetState();
 		this.setIsNew(false);
@@ -176,8 +184,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
 		await this.#init;
 		this._getDataPromise = this._detailRepository!.requestByUnique(unique);
-		type GetDataType = Awaited<ReturnType<UmbDetailRepository<DetailModelType>['requestByUnique']>>;
-		const response = (await this._getDataPromise) as GetDataType;
+		const response = await this._getDataPromise;
 		const data = response.data;
 
 		if (data) {
@@ -185,7 +192,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			this._data.setCurrent(data);
 
 			this.observe(
-				response.asObservable(),
+				(response as UmbRepositoryResponseWithAsObservable<DetailModelType>).asObservable?.(),
 				(entity) => this.#onDetailStoreChange(entity),
 				'umbEntityDetailTypeStoreObserver',
 			);

@@ -19,7 +19,9 @@ export class UmbRelationTypeDetailRepository
 		super(host);
 
 		this.#init = this.consumeContext(UMB_RELATION_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
-			this.#detailStore = instance;
+			if (instance) {
+				this.#detailStore = instance;
+			}
 		}).asPromise({ preventTimeout: true });
 	}
 
@@ -36,7 +38,7 @@ export class UmbRelationTypeDetailRepository
 		const { data, error } = await this.#detailSource.read(unique);
 
 		if (data) {
-			this.#detailStore!.append(data);
+			this.#detailStore?.append(data);
 		}
 
 		return { data, error, asObservable: () => this.#detailStore!.byUnique(unique) };

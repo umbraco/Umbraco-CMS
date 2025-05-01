@@ -25,9 +25,9 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 
 	#observeCurrentPage() {
 		this.observe(
-			this._collectionContext!.pagination.currentPage,
+			this._collectionContext?.pagination.currentPage,
 			(currentPage) => {
-				this._currentPage = currentPage;
+				this._currentPage = currentPage ?? 1;
 			},
 			'umbCurrentPageObserver',
 		);
@@ -35,9 +35,9 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 
 	#observerTotalPages() {
 		this.observe(
-			this._collectionContext!.pagination.totalPages,
+			this._collectionContext?.pagination.totalPages,
 			(totalPages) => {
-				this._totalPages = totalPages;
+				this._totalPages = totalPages ?? 1;
 			},
 			'umbTotalPagesObserver',
 		);

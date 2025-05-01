@@ -17,7 +17,7 @@ export class UmbEditCurrentUserAction<ArgsMetaType = never>
 		this.#init = new Promise<void>((res) => {
 			this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
 				this.observe(
-					context.unique,
+					context?.unique,
 					(unique) => {
 						this.#unique = unique;
 						res();

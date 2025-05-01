@@ -1,5 +1,9 @@
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
-import type { UmbContentTypeModel, UmbPropertyTypeContainerModel } from '../../../types.js';
+import type {
+	UmbContentTypeCompositionModel,
+	UmbContentTypeModel,
+	UmbPropertyTypeContainerModel,
+} from '../../../types.js';
 import {
 	UmbContentTypeContainerStructureHelper,
 	UmbContentTypeMoveRootGroupsIntoFirstTabHelper,
@@ -127,10 +131,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					this.#sorter.disable();
 				}
 			},
-			'_observeIsSorting',
+			null,
 		);
-
-		//TODO: We need to differentiate between local and composition tabs (and hybrids)
 
 		this.#tabsStructureHelper.setContainerChildType('Tab');
 		this.#tabsStructureHelper.setIsRoot(true);
@@ -144,7 +146,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
-			this.#tabsStructureHelper.setStructureManager(workspaceContext.structure);
+			this.#tabsStructureHelper.setStructureManager(workspaceContext?.structure);
 
 			this.#observeRootGroups();
 		});
@@ -373,17 +375,29 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (!unique) {
 			throw new Error('Content Type unique is undefined');
 		}
-		const contentTypes = this.#workspaceContext.structure.getContentTypes();
 		const ownerContentType = this.#workspaceContext.structure.getOwnerContentType();
 		if (!ownerContentType) {
 			throw new Error('Owner Content Type not found');
 		}
 
+		const currentCompositions = await this.#workspaceContext.structure.getContentTypeCompositions();
+		const currentInheritanceCompositions = currentCompositions.filter(
+			(composition) => composition.compositionType === CompositionTypeModel.INHERITANCE,
+		);
+
+		const currentOwnerCompositions = await this.#workspaceContext.structure.getOwnerContentTypeCompositions();
+		const currentOwnerCompositionCompositions = currentOwnerCompositions.filter(
+			(composition) => composition.compositionType === CompositionTypeModel.COMPOSITION,
+		);
+		const currentOwnerInheritanceCompositions = currentOwnerCompositions.filter(
+			(composition) => composition.compositionType === CompositionTypeModel.INHERITANCE,
+		);
+
 		const compositionConfiguration = {
 			compositionRepositoryAlias: this._compositionRepositoryAlias,
 			unique: unique,
-			// Here we use the loaded content types to declare what we already inherit. That puts a pressure on cleaning up, but thats a good thing. [NL]
-			selection: contentTypes.map((contentType) => contentType.unique).filter((id) => id !== unique),
+			selection: currentOwnerCompositionCompositions.map((composition) => composition.contentType.unique),
+			usedForInheritance: currentInheritanceCompositions.map((composition) => composition.contentType.unique),
 			isElement: ownerContentType.isElement,
 			currentPropertyAliases: [],
 			isNew: this.#workspaceContext.getIsNew()!,
@@ -397,9 +411,16 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		const compositionIds = value.selection;
 
-		this.#workspaceContext?.setCompositions(
-			compositionIds.map((unique) => ({ contentType: { unique }, compositionType: CompositionTypeModel.COMPOSITION })),
-		);
+		this.#workspaceContext.setCompositions([
+			...currentOwnerInheritanceCompositions,
+			...compositionIds.map((unique) => {
+				const model: UmbContentTypeCompositionModel = {
+					contentType: { unique },
+					compositionType: CompositionTypeModel.COMPOSITION,
+				};
+				return model;
+			}),
+		]);
 	}
 
 	override render() {

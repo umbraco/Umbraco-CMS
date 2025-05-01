@@ -7,7 +7,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbTiptapStatusbarConfigurationContext extends UmbContextBase<UmbTiptapStatusbarConfigurationContext> {
+export class UmbTiptapStatusbarConfigurationContext extends UmbContextBase {
 	#extensions = new UmbArrayState<UmbTiptapStatusbarExtension>([], (x) => x.alias);
 	public readonly extensions = this.#extensions.asObservable();
 
@@ -43,7 +43,7 @@ export class UmbTiptapStatusbarConfigurationContext extends UmbContextBase<UmbTi
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (dataset) => {
 			this.observe(
-				await dataset.propertyValueByAlias<Array<string>>('extensions'),
+				await dataset?.propertyValueByAlias<Array<string>>('extensions'),
 				(extensions) => {
 					if (extensions) {
 						this.#extensionsEnabled.clear();

@@ -29,7 +29,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 
 		this.consumeContext(UMB_WEBHOOK_WORKSPACE_CONTEXT, (instance) => {
 			this.#webhookWorkspaceContext = instance;
-			this.observe(this.#webhookWorkspaceContext.data, (webhook) => {
+			this.observe(this.#webhookWorkspaceContext?.data, (webhook) => {
 				this._webhook = webhook;
 				this._contentType = this._webhook?.events[0]?.eventType ?? undefined;
 			});

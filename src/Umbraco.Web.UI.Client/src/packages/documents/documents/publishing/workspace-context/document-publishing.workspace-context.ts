@@ -27,7 +27,7 @@ import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/back
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
-export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDocumentPublishingWorkspaceContext> {
+export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase {
 	/**
 	 * Manages the pending changes for the published document.
 	 * @memberof UmbDocumentPublishingWorkspaceContext
@@ -226,13 +226,34 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 		if (!variantIds.length) return;
 
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		const localize = new UmbLocalizationController(this);
+
+		const primaryVariantName = await this.observe(this.#documentWorkspaceContext.name(variantIds[0])).asPromise();
+
+		const waitNotice = notificationContext?.peek('warning', {
+			data: {
+				headline: localize.term('publish_publishAll', primaryVariantName),
+				message: localize.term('publish_inProgress'),
+			},
+		});
+
 		const { error } = await this.#publishingRepository.publishWithDescendants(
 			unique,
 			variantIds,
 			result.includeUnpublishedDescendants ?? false,
 		);
 
+		waitNotice?.close();
+
 		if (!error) {
+			notificationContext?.peek('positive', {
+				data: {
+					headline: localize.term('publish_publishAll', primaryVariantName),
+					message: localize.term('publish_nodePublishAll', primaryVariantName),
+				},
+			});
+
 			// reload the document so all states are updated after the publish operation
 			await this.#documentWorkspaceContext.reload();
 			this.#loadAndProcessLastPublished();
@@ -349,7 +370,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 					headline: this.#localize.term('speechBubbles_editContentPublishedHeader'),
 					message: this.#localize.term(
 						'speechBubbles_editVariantPublishedText',
-						this.#localize.list(variants.map((v) => v.culture ?? v.name)),
+						// TODO: use correct variant names instead of variant strings [MR]
+						this.#localize.list(variants.map((v) => UmbVariantId.Create(v).toString() ?? v.name)),
 					),
 				},
 			});
@@ -379,11 +401,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		await this.#init;
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
-		const options = await firstValueFrom(this.#documentWorkspaceContext.variantOptions);
+		const allOptions = await firstValueFrom(this.#documentWorkspaceContext.variantOptions);
+		const options = allOptions.filter((option) => option.segment === null);
 
 		// TODO: this is a temporary copy of the content-detail workspace context method.
 		// we need to implement custom selection that makes sense for each the publishing modal.
-		let selected = this.#getChangedVariantsSelection();
+		let selected = this.#getPublishVariantsSelection();
 
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
 		selected = selected.filter((x) => options.some((o) => o.unique === x));
@@ -401,18 +424,32 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		};
 	}
 
-	#getChangedVariantsSelection() {
+	#getPublishVariantsSelection() {
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
-		const activeVariants = this.#documentWorkspaceContext.splitView
-			.getActiveVariants()
-			.map((activeVariant) => UmbVariantId.Create(activeVariant).toString());
-		const changedVariants = this.#documentWorkspaceContext.getChangedVariants().map((x) => x.toString());
-		const selection = [...activeVariants, ...changedVariants];
-		return [...new Set(selection)];
+		const activeVariants = this.#documentWorkspaceContext.splitView.getActiveVariants();
+		const activeVariantIds = activeVariants.map((x) => UmbVariantId.Create(x));
+		const changedVariantIds = this.#documentWorkspaceContext.getChangedVariants();
+		const activeAndChangedVariantIds = [...activeVariantIds, ...changedVariantIds];
+
+		// if a segment has been changed, we select the "parent" culture variant as it is currently only possible to select between cultures in the dialogs
+		const changedParentCultureVariantIds = activeAndChangedVariantIds
+			.filter((x) => x.segment !== null)
+			.map((x) => x.toSegmentInvariant());
+
+		const selected = [...activeAndChangedVariantIds, ...changedParentCultureVariantIds].map((variantId) =>
+			variantId.toString(),
+		);
+
+		const uniqueSelected = [...new Set(selected)];
+
+		return uniqueSelected;
 	}
 
 	async #initPendingChanges() {
-		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+		if (!this.#documentWorkspaceContext) {
+			// Do not complain in this case.
+			return;
+		}
 		this.observe(
 			observeMultiple([this.#documentWorkspaceContext.unique, this.#documentWorkspaceContext.isNew]),
 			([unique, isNew]) => {

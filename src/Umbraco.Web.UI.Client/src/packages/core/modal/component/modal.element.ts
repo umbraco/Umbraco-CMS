@@ -17,12 +17,8 @@ import {
 } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_ROUTE_CONTEXT, type UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement, loadManifestElement } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
-import {
-	UMB_CONTEXT_REQUEST_EVENT_TYPE,
-	UmbContextBoundary,
-	UmbContextProvider,
-} from '@umbraco-cms/backoffice/context-api';
+import { UmbContextBoundary, UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextProxyController } from '@umbraco-cms/backoffice/context-proxy';
 
 @customElement('umb-modal')
 export class UmbModalElement extends UmbLitElement {
@@ -64,18 +60,9 @@ export class UmbModalElement extends UmbLitElement {
 		// Makes sure that the modal triggers the reject of the context promise when it is closed by pressing escape.
 		this.element.addEventListener(UUIModalCloseEvent, this.#onClose);
 
-		// The following code is the context api proxy.
-		// It re-dispatches the context api request event to the origin target of this modal, in other words the element that initiated the modal. [NL]
-		this.element.addEventListener(UMB_CONTEXT_REQUEST_EVENT_TYPE, ((event: UmbContextRequestEvent) => {
-			if (!this.#modalContext) return;
-			// Note for this hack (The if-sentence):  [NL]
-			// We do not currently have a good enough control to ensure that the proxy is last, meaning if another context is provided at this element, it might respond after the proxy event has been dispatched.
-			// To avoid such this hack just prevents proxying the event if its a request for the Modal Context. [NL]
-			if (event.contextAlias !== UMB_MODAL_CONTEXT.contextAlias) {
-				event.stopImmediatePropagation();
-				this.#modalContext.getHostElement().dispatchEvent(event.clone());
-			}
-		}) as EventListener);
+		new UmbContextProxyController(this, this.element, () =>
+			this.#modalContext?.getHostElement(),
+		).setIgnoreContextAliases([UMB_MODAL_CONTEXT.contextAlias]);
 
 		this.#modalContext.onSubmit().then(
 			() => {

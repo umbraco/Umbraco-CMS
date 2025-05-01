@@ -30,7 +30,10 @@ export class UmbDisableUserEntityAction extends UmbEntityActionBase<never> {
 		});
 
 		const disableUserRepository = new UmbDisableUserRepository(this);
-		await disableUserRepository.disable([this.args.unique]);
+		const { error } = await disableUserRepository.disable([this.args.unique]);
+		if (error) {
+			throw error;
+		}
 	}
 }
 

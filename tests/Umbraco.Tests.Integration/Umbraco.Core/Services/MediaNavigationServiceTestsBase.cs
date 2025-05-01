@@ -49,7 +49,7 @@ internal abstract class MediaNavigationServiceTestsBase : UmbracoIntegrationTest
         {
             ContentTypeKey = mediaTypeKey,
             ParentKey = parentKey ?? Constants.System.RootKey,
-            InvariantName = name,
+            Variants = [new () { Name = name }],
             Key = key,
         };
 

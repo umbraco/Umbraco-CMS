@@ -7,7 +7,7 @@ import { loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbIconRegistryContext extends UmbContextBase<UmbIconRegistryContext> {
+export class UmbIconRegistryContext extends UmbContextBase {
 	#registry: UmbIconRegistry;
 	#manifestMap = new Map();
 	#icons = new UmbArrayState<UmbIconDefinition>([], (x) => x.name);

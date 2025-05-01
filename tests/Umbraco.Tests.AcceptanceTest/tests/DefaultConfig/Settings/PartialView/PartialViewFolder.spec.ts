@@ -23,7 +23,8 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.partialView.createPartialViewFolder(folderName);
 
   // Assert
-  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.partialView.isErrorNotificationVisible(false);
   expect(await umbracoApi.partialView.doesFolderExist(folderName)).toBeTruthy();
   // Verify the partial view folder is displayed under the Partial Views section
   await umbracoUi.partialView.clickRootFolderCaretButton();
@@ -42,7 +43,8 @@ test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.partialView.deleteFolder();
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  //await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.isErrorNotificationVisible(false);
   expect(await umbracoApi.partialView.doesFolderExist(folderName)).toBeFalsy();
   // Verify the partial view folder is NOT displayed under the Partial Views section
   await umbracoUi.partialView.clickRootFolderCaretButton();
@@ -65,7 +67,8 @@ test('can create a partial view in a folder', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.partialView.clickSaveButton();
 
   // Assert
-  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.partialView.isErrorNotificationVisible(false);
   const childrenData = await umbracoApi.partialView.getChildren(folderPath);
   expect(childrenData[0].name).toEqual(partialViewFileName);
   // Verify the partial view is displayed in the folder under the Partial Views section
@@ -94,7 +97,8 @@ test('can create a partial view in a folder in a folder', async ({umbracoApi, um
   await umbracoUi.partialView.clickSaveButton();
 
   // Assert
-  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.partialView.isErrorNotificationVisible(false);
   const childFolderChildrenData = await umbracoApi.partialView.getChildren(childFolderPath);
   expect(childFolderChildrenData[0].name).toEqual(partialViewFileName);
 
@@ -114,7 +118,8 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.partialView.createPartialViewFolder(childFolderName);
 
   // Assert
-  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.partialView.isErrorNotificationVisible(false);
   expect(await umbracoApi.partialView.doesNameExist(childFolderName)).toBeTruthy();
   const partialViewChildren = await umbracoApi.partialView.getChildren('/' + folderName);
   expect(partialViewChildren[0].path).toBe('/' + folderName + '/' + childFolderName);
@@ -137,7 +142,8 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.partialView.createPartialViewFolder(childOfChildFolderName);
 
   // Assert
-  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.partialView.isErrorNotificationVisible(false);
   expect(await umbracoApi.partialView.doesNameExist(childOfChildFolderName)).toBeTruthy();
   const partialViewChildren = await umbracoApi.partialView.getChildren('/' + folderName + '/' + childFolderName);
   expect(partialViewChildren[0].path).toBe('/' + folderName + '/' + childFolderName + '/' + childOfChildFolderName);

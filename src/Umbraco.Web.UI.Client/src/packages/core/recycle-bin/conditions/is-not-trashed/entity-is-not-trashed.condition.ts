@@ -19,7 +19,7 @@ export class UmbEntityIsNotTrashedCondition
 		this.permitted = true;
 
 		this.consumeContext(UMB_IS_TRASHED_ENTITY_CONTEXT, (context) => {
-			this.observe(context.isTrashed, (isTrashed) => {
+			this.observe(context?.isTrashed, (isTrashed) => {
 				this.permitted = isTrashed === false;
 			});
 		});

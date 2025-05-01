@@ -22,12 +22,20 @@ export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElem
 		super();
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.#dataset = context;
-			this.observe(await this.#dataset.propertyValueByAlias<number>('minAllowed'), (min) => {
-				this._minValue = min ?? 0;
-			});
-			this.observe(await this.#dataset.propertyValueByAlias<number>('maxAllowed'), (max) => {
-				this._maxValue = max ?? Infinity;
-			});
+			this.observe(
+				await this.#dataset?.propertyValueByAlias<number>('minAllowed'),
+				(min) => {
+					this._minValue = min ?? 0;
+				},
+				'observeMinAllowed',
+			);
+			this.observe(
+				await this.#dataset?.propertyValueByAlias<number>('maxAllowed'),
+				(max) => {
+					this._maxValue = max ?? Infinity;
+				},
+				'observeMaxAllowed',
+			);
 		});
 	}
 	#onAllowedRangeChange = (e: UmbChangeEvent) => {

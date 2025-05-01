@@ -61,7 +61,9 @@ export abstract class UmbTreeRepositoryBase<
 		this._treeSource = new treeSourceConstructor(this);
 
 		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
-			this._treeStore = instance;
+			if (instance) {
+				this._treeStore = instance;
+			}
 		}).asPromise({ preventTimeout: true });
 	}
 
@@ -81,13 +83,17 @@ export abstract class UmbTreeRepositoryBase<
 	async requestTreeRootItems(args: TreeRootItemsRequestArgsType) {
 		await this._init;
 
-		const { data, error: _error } = await this._treeSource.getRootItems(args);
-		const error: any = _error;
+		const { data, error } = await this._treeSource.getRootItems(args);
+		if (!this._treeStore) {
+			// If the tree store is not available, then we most likely are in a destructed setting.
+			return {};
+		}
 		if (data) {
-			this._treeStore!.appendItems(data.items);
+			this._treeStore?.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this._treeStore!.rootItems };
+		// TODO: Notice we are casting the error here, is that right?
+		return { data, error: error as unknown as UmbProblemDetails, asObservable: () => this._treeStore!.rootItems };
 	}
 
 	/**
@@ -106,7 +112,7 @@ export abstract class UmbTreeRepositoryBase<
 		const { data, error: _error } = await this._treeSource.getChildrenOf(args);
 		const error: any = _error;
 		if (data) {
-			this._treeStore!.appendItems(data.items);
+			this._treeStore?.appendItems(data.items);
 		}
 
 		return { data, error, asObservable: () => this._treeStore!.childrenOf(args.parent.unique) };

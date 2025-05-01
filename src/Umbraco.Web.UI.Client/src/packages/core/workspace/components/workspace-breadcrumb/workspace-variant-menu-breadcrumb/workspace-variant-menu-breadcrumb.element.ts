@@ -66,7 +66,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	}
 
 	#observeDefaultCulture() {
-		this.observe(this.#appLanguageContext!.appDefaultLanguage, (value) => {
+		this.observe(this.#appLanguageContext?.appDefaultLanguage, (value) => {
 			this._appDefaultCulture = value?.unique;
 		});
 	}

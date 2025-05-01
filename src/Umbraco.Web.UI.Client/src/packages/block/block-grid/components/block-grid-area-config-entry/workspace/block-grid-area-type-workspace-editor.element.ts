@@ -15,7 +15,7 @@ export class UmbBlockGridAreaTypeWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.observe(this.#workspaceContext.name, (name) => {
+			this.observe(this.#workspaceContext?.name, (name) => {
 				this._name = name;
 			});
 			this.#workspaceContext?.createPropertyDatasetContext(this);

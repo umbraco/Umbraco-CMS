@@ -10,7 +10,7 @@ import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 /**
  * A repository for Packages which mimics a tree store.
- 
+
  */
 export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 	#init!: Promise<void>;
@@ -23,10 +23,12 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 		this.#init = new Promise((resolve) => {
 			this.consumeContext(UMB_PACKAGE_STORE_TOKEN, (instance) => {
 				this.#packageStore = instance;
-				this.requestConfiguration(instance);
-				this.requestRootItems(instance);
-				this.requestPackageMigrations(instance);
-				resolve();
+				if (instance) {
+					this.requestConfiguration(instance);
+					this.requestRootItems(instance);
+					this.requestPackageMigrations(instance);
+					resolve();
+				}
 			});
 		});
 	}
