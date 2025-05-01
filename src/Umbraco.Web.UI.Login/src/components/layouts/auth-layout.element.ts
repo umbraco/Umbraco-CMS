@@ -183,8 +183,8 @@ export class UmbAuthLayoutElement extends UmbLitElement {
 			}
 
 			#curve-bottom {
-				bottom: -0.1%;
-				left: -0.5%;
+				bottom: -0.5%;
+				left: -0.1%;
 			}
 
 			#logo-on-image,
