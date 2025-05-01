@@ -1,10 +1,12 @@
 import { UMB_PICKER_CONTEXT } from '../picker.context.token.js';
 import type { UmbPickerContext } from '../picker.context.js';
 import type { ManifestPickerSearchResultItem } from './result-item/picker-search-result-item.extension.js';
-import { customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+
+type PickableFilterMethodType<T extends UmbEntityModel = UmbEntityModel> = (item: T) => boolean;
 
 @customElement('umb-picker-search-result')
 export class UmbPickerSearchResultElement extends UmbLitElement {
@@ -20,6 +22,9 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 	@state()
 	_isSearchable: boolean = false;
 
+	@property({ attribute: false })
+	pickableFilter: PickableFilterMethodType = () => true;
+
 	#pickerContext?: UmbPickerContext;
 
 	constructor() {
@@ -30,10 +35,15 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 			this.observe(
 				this.#pickerContext?.search.searchable,
 				(isSearchable) => (this._isSearchable = isSearchable ?? false),
+				'obsSearchable',
 			);
-			this.observe(this.#pickerContext?.search.query, (query) => (this._query = query));
-			this.observe(this.#pickerContext?.search.searching, (query) => (this._searching = query ?? false));
-			this.observe(this.#pickerContext?.search.resultItems, (items) => (this._items = items ?? []));
+			this.observe(this.#pickerContext?.search.query, (query) => (this._query = query), 'obsQuery');
+			this.observe(
+				this.#pickerContext?.search.searching,
+				(query) => (this._searching = query ?? false),
+				'obsSearching',
+			);
+			this.observe(this.#pickerContext?.search.resultItems, (items) => (this._items = items ?? []), 'obsResultItems');
 		});
 	}
 
@@ -62,7 +72,10 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 			<umb-extension-with-api-slot
 				type="pickerSearchResultItem"
 				.filter=${(manifest: ManifestPickerSearchResultItem) => manifest.forEntityTypes.includes(item.entityType)}
-				.elementProps=${{ item }}></umb-extension-with-api-slot>
+				.elementProps=${{
+					item,
+					disabled: true,
+				}}></umb-extension-with-api-slot>
 		`;
 	}
 }
