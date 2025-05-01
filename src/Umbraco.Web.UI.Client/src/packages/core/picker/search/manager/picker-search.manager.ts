@@ -183,8 +183,10 @@ export class UmbPickerSearchManager<
 		}
 
 		const args = {
-			searchFrom: this.#config?.searchFrom,
 			...query,
+			// ensure that config params are always included
+			...this.#config?.queryParams,
+			searchFrom: this.#config?.searchFrom,
 		};
 
 		const { data } = await this.#searchProvider.search(args);
