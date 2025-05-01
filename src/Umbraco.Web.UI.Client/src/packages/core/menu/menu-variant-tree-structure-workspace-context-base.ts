@@ -1,11 +1,11 @@
 import type { UmbVariantStructureItemModel } from './types.js';
-import type { UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbAncestorsEntityContext } from '@umbraco-cms/backoffice/entity';
+import { UmbAncestorsEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -103,18 +103,19 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		}
 	}
 
-	// TODO: introduce variant tree item model
-	#setAncestorData(data: any) {
+	#setAncestorData(data: Array<UmbTreeItemModel>) {
 		const ancestorEntities = data
-			.map((treeItem: any) => {
-				return {
+			.map((treeItem) => {
+				const entity: UmbEntityModel = {
 					unique: treeItem.unique,
 					entityType: treeItem.entityType,
 				};
+
+				return entity;
 			})
 			/* If the item is not new, the current item is the last item in the array. 
 			We filter out the current item unique to handle any case where it could show up */
-			.filter((item: any) => item.unique !== this.#workspaceContext?.getUnique());
+			.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
 
 		this.#ancestorContext.setAncestors(ancestorEntities);
 	}
