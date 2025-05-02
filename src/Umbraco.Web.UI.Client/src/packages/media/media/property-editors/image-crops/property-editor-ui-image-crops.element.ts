@@ -116,29 +116,56 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 							id="label"
 							name="label"
 							type="text"
+							required
 							.value=${initial?.label ?? ''}></uui-input>
 					</div>
 					<div class="input">
 						<uui-label for="alias">Alias</uui-label>
-						<uui-input label="Alias" id="alias" name="alias" type="text" autocomplete="false" .value=${initial?.alias ?? ''}></uui-input>
+						<uui-input
+							label="Alias"
+							id="alias"
+							name="alias"
+							type="text"
+							autocomplete="false"
+							required
+							.value=${initial?.alias ?? ''}></uui-input>
 					</div>
 					<div class="input">
 						<uui-label for="width">Width</uui-label>
-						<uui-input label="Width" id="width" name="width" type="number" autocomplete="false" .value=${initial?.width ?? ''} min="0">
+						<uui-input
+							label="Width"
+							id="width"
+							name="width"
+							type="number"
+							autocomplete="false"
+							required
+							.value=${initial?.width ?? ''}
+							min="0">
 							<span class="append" slot="append">px</span>
 						</uui-input>
 					</div>
 					<div class="input">
 						<uui-label for="height">Height</uui-label>
-						<uui-input label="Height" id="height" name="height" type="number" autocomplete="false" .value=${initial?.height ?? ''} min="0">
+						<uui-input
+							label="Height"
+							id="height"
+							name="height"
+							type="number"
+							autocomplete="false"
+							required
+							.value=${initial?.height ?? ''}
+							min="0">
 							<span class="append" slot="append">px</span>
 						</uui-input>
 					</div>
 					<div class="action-wrapper">
 						${this.editCropAlias
-				? html`<uui-button @click=${this.#onEditCancel}>Cancel</uui-button>
-								   <uui-button look="secondary" type="submit" label="Save"></uui-button>`
-				: html`<uui-button look="secondary" type="submit" label="Add"></uui-button>`}
+							? html`<uui-button @click=${this.#onEditCancel}>Cancel</uui-button>
+									<uui-button look="secondary" type="submit" label=${this.localize.term('general_edit')}></uui-button>`
+							: html`<uui-button
+									look="secondary"
+									type="submit"
+									label=${this.localize.term('general_create')}></uui-button>`}
 					</div>
 				</form>
 			</uui-form>
@@ -162,36 +189,41 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 	override render() {
 		return html`
 			<uui-ref-list class="crops">
-	${repeat(
-			this.value,
-			(item) => item.alias,
-			(item) => html`
-			${this.editCropAlias === item.alias
-					? html`<div class="crop-form">${this.#renderForm(item)}</div>`
-					: html`
-					<uui-ref-node
-						class="crop"
-						data-alias="${item.alias}"
-						detail="${item.width} x ${item.height}px"
-						name="${item.label} (${item.alias})">
-						<uui-icon slot="icon" name="icon-crop"></uui-icon>
-						<uui-action-bar slot="actions">
-							<uui-button
-								label=${this.localize.term('general_edit')}
-								color="default"
-								@click=${() => this.#onEdit(item)}></uui-button>
-							<uui-button
-								label=${this.localize.term('general_remove')}
-								color="danger"
-								@click=${() => this.#onRemove(item.alias)}></uui-button>
-						</uui-action-bar>
-					</uui-ref-node>
-				`}
-		`
-		)}
-</uui-ref-list>
-	${!this._isCreating && !this.editCropAlias
-				? html`<uui-button look="outline" @click=${() => (this._isCreating = true)}>Create crop</uui-button>`
+				${repeat(
+					this.value,
+					(item) => item.alias,
+					(item) => html`
+						${this.editCropAlias === item.alias
+							? html`<div class="crop-form">${this.#renderForm(item)}</div>`
+							: html`
+									<uui-ref-node
+										class="crop"
+										data-alias="${item.alias}"
+										detail="${item.width} x ${item.height}px"
+										name="${item.label} (${item.alias})">
+										<uui-icon slot="icon" name="icon-crop"></uui-icon>
+										<uui-action-bar slot="actions">
+											<uui-button
+												label=${this.localize.term('general_edit')}
+												data-mark="action:crop-edit"
+												@click=${() => this.#onEdit(item)}></uui-button>
+											<uui-button
+												label=${this.localize.term('general_remove')}
+												data-mark="action:crop-remove"
+												@click=${() => this.#onRemove(item.alias)}></uui-button>
+										</uui-action-bar>
+									</uui-ref-node>
+								`}
+					`,
+				)}
+			</uui-ref-list>
+			${!this._isCreating && !this.editCropAlias
+				? html`<uui-button
+						id="create"
+						data-mark="action:crop-create"
+						look="placeholder"
+						@click=${() => (this._isCreating = true)}
+						label=${this.localize.term('general_create')}></uui-button>`
 				: ''}
 			${this._isCreating ? this.#renderForm() : ''}
 		`;
@@ -237,6 +269,9 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 			.action-wrapper {
 				display: flex;
 				align-items: flex-end;
+			}
+			#create {
+				width: 100%;
 			}
 		`,
 	];
