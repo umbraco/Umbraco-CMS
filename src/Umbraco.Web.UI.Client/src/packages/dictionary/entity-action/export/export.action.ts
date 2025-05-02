@@ -12,9 +12,11 @@ export class UmbExportDictionaryEntityAction extends UmbEntityActionBase<object>
 
 		// Export the file
 		const repository = new UmbDictionaryExportRepository(this);
-		const { data } = await repository.requestExport(this.args.unique, value.includeChildren);
+		const { data, error } = await repository.requestExport(this.args.unique, value.includeChildren);
 
-		if (!data) return;
+		if (error) {
+			throw error;
+		}
 
 		blobDownload(data, `${this.args.unique}.udt`, 'text/xml');
 	}

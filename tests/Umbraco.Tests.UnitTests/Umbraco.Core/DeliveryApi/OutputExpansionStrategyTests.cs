@@ -20,7 +20,7 @@ public class OutputExpansionStrategyTests : OutputExpansionStrategyTestBase
     public void OutputExpansionStrategy_CanExpandSpecifiedElement()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { "element" });
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
         var apiElementBuilder = new ApiElementBuilder(accessor);
 
         var contentPickerValue = CreateSimplePickedContent(111, 222);
@@ -63,7 +63,7 @@ public class OutputExpansionStrategyTests : OutputExpansionStrategyTestBase
     public void OutputExpansionStrategy_CanExpandAllElements()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(true );
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
         var apiElementBuilder = new ApiElementBuilder(accessor);
 
         var contentPickerValue = CreateSimplePickedContent(111, 222);
@@ -120,7 +120,7 @@ public class OutputExpansionStrategyTests : OutputExpansionStrategyTestBase
     public void OutputExpansionStrategy_DoesNotExpandElementNestedContentPicker()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { "element" });
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
         var apiElementBuilder = new ApiElementBuilder(accessor);
 
         var nestedContentPickerValue = CreateSimplePickedContent(111, 222);

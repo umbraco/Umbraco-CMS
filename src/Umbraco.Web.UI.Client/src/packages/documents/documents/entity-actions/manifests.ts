@@ -34,30 +34,6 @@ const entityActions: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
-	/* TODO: Implement Permissions Entity Action
-	{
-		type: 'entityAction',
-		kind: 'default',
-		alias: 'Umb.EntityAction.Document.Permissions',
-		name: 'Permissions Document Entity Action',
-		weight: 300,
-		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
-		api: () => import('./permissions.action.js'),
-		meta: {
-			icon: 'icon-name-badge',
-			label: '#actions_setPermissions',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.UserPermission.Document',
-				allOf: [UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS],
-			},
-			{
-				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
-			},
-		],
-	},
-	*/
 ];
 
 export const manifests: Array<UmbExtensionManifest> = [
