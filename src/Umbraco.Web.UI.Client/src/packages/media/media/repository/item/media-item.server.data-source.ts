@@ -48,7 +48,35 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => MediaService.getItemMedia({ query: { id: uniques } });
+const getItems = async (uniques: Array<string>) => {
+	const batchSize = 1;
+	if (uniques.length > batchSize) {
+		const chunks = batchArray<string>(uniques, batchSize);
+		const promiseResults = await batchPromises<
+			string,
+			{
+				data: MediaItemResponseModel[];
+				request: Request;
+				response: Response;
+			}
+		>(chunks, (chunk) => MediaService.getItemMedia({ query: { id: chunk } }));
+
+		const errors = promiseResults.filter((result) => result.status === 'rejected');
+		if (errors.length > 0) {
+			// TODO: figure out if its enough to throw the first error
+			const error = errors[0].reason;
+			throw new Error(`Failed to batch fetch media items: ${error}`);
+		}
+
+		const data = promiseResults
+			.filter((promiseResult) => promiseResult.status === 'fulfilled')
+			.flatMap((promiseResult) => promiseResult.value.data);
+
+		return { data };
+	}
+
+	return MediaService.getItemMedia({ query: { id: uniques } });
+};
 
 const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 	return {
@@ -71,3 +99,30 @@ const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 		}),
 	};
 };
+
+/**
+ * Splits an array into chunks of a specified size
+ * @param { Array<BatchEntryType> } array - The array to split
+ * @param {number }batchSize - The size of each chunk
+ * @returns {Array<Array<T>>} - An array of chunks
+ */
+function batchArray<BatchEntryType>(array: Array<BatchEntryType>, batchSize: number): Array<Array<BatchEntryType>> {
+	const chunks: Array<Array<BatchEntryType>> = [];
+	for (let i = 0; i < array.length; i += batchSize) {
+		chunks.push(array.slice(i, i + batchSize));
+	}
+	return chunks;
+}
+
+/**
+ * Batches promises and returns a promise that resolves to an array of results
+ * @param {Array<Array<BatchEntryType>>} chunks - The array of chunks to process
+ * @param {(chunk: Array<BatchEntryType>) => Promise<PromiseResult>} callback - The function to call for each chunk
+ * @returns {Promise<PromiseSettledResult<PromiseResult>[]>} - A promise that resolves to an array of results
+ */
+function batchPromises<BatchEntryType, PromiseResult>(
+	chunks: Array<Array<BatchEntryType>>,
+	callback: (chunk: Array<BatchEntryType>) => Promise<PromiseResult>,
+): Promise<PromiseSettledResult<PromiseResult>[]> {
+	return Promise.allSettled(chunks.map((chunk) => callback(chunk)));
+}

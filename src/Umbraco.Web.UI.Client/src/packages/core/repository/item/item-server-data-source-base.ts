@@ -41,19 +41,6 @@ export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType
 	async getItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
 
-		const batchSize = 40;
-		if (uniques.length > batchSize) {
-			const chunks = batchArray<string>(uniques, batchSize);
-			const results = await Promise.allSettled(chunks.map((chunk) => tryExecute(this.#host, this.#getItems(chunk))));
-			const data = results.find((result) => result.status === 'fulfilled')?.value.data;
-			const error = results.find((result) => result.status === 'rejected')?.reason;
-			if (data) {
-				const items = data.map((item) => this.#mapper(item));
-				return { data: items };
-			}
-			return { error };
-		}
-
 		const { data, error } = await tryExecute(this.#host, this.#getItems(uniques));
 
 		if (data) {
@@ -63,18 +50,4 @@ export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType
 
 		return { error };
 	}
-}
-
-/**
- * Splits an array into chunks of a specified size
- * @param { Array<T> } array - The array to split
- * @param {number }batchSize - The size of each chunk
- * @returns {Array<Array<T>>} - An array of chunks
- */
-function batchArray<T>(array: Array<T>, batchSize: number): Array<Array<T>> {
-	const chunks: Array<Array<T>> = [];
-	for (let i = 0; i < array.length; i += batchSize) {
-		chunks.push(array.slice(i, i + batchSize));
-	}
-	return chunks;
 }
