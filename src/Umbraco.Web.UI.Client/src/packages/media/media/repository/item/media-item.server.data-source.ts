@@ -5,6 +5,7 @@ import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { batchArray } from '@umbraco-cms/backoffice/utils';
 
 /**
  * A data source for Media items that fetches data from the server
@@ -97,20 +98,6 @@ const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 		}),
 	};
 };
-
-/**
- * Splits an array into chunks of a specified size
- * @param { Array<BatchEntryType> } array - The array to split
- * @param {number }batchSize - The size of each chunk
- * @returns {Array<Array<T>>} - An array of chunks
- */
-function batchArray<BatchEntryType>(array: Array<BatchEntryType>, batchSize: number): Array<Array<BatchEntryType>> {
-	const chunks: Array<Array<BatchEntryType>> = [];
-	for (let i = 0; i < array.length; i += batchSize) {
-		chunks.push(array.slice(i, i + batchSize));
-	}
-	return chunks;
-}
 
 /**
  * Batches promises and returns a promise that resolves to an array of results
