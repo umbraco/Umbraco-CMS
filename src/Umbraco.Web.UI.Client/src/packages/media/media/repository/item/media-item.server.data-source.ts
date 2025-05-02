@@ -4,7 +4,7 @@ import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/external/ba
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { tryExecute, UmbApiError, UmbCancelError, UmbError } from '@umbraco-cms/backoffice/resources';
 import { batchArray } from '@umbraco-cms/backoffice/utils';
 
 /**
@@ -50,14 +50,22 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 		if (!uniques) throw new Error('Uniques are missing');
 
 		let data: Array<MediaItemResponseModel> | undefined;
-		let error: unknown;
+		let error: UmbError | UmbApiError | UmbCancelError | Error | undefined;
 
 		const batchSize = 40;
 		if (uniques.length > batchSize) {
 			const chunks = batchArray<string>(uniques, batchSize);
 			const results = await batchTryExecute(this.#host, chunks, (chunk) =>
+				// eslint-disable-next-line local-rules/no-direct-api-import
 				MediaService.getItemMedia({ query: { id: chunk } }),
 			);
+
+			const errors = results.filter((promiseResult) => promiseResult.status === 'rejected');
+
+			if (errors.length > 0) {
+				// TODO: investigate if its ok to only return the first error
+				error = errors[0].reason;
+			}
 
 			data = results
 				.filter((promiseResult) => promiseResult.status === 'fulfilled')
