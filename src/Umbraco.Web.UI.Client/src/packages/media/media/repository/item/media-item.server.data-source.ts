@@ -23,7 +23,6 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
-			getItems,
 			mapper,
 		});
 		this.#host = host;
@@ -45,38 +44,37 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 		const mapped = data?.items.map((item) => mapper(item));
 		return { data: mapped, error };
 	}
-}
 
-/* eslint-disable local-rules/no-direct-api-import */
-const getItems = async (uniques: Array<string>) => {
-	const batchSize = 1;
-	if (uniques.length > batchSize) {
-		const chunks = batchArray<string>(uniques, batchSize);
-		const promiseResults = await batchPromises<
-			string,
-			{
-				data: MediaItemResponseModel[];
-				request: Request;
-				response: Response;
-			}
-		>(chunks, (chunk) => MediaService.getItemMedia({ query: { id: chunk } }));
+	override async getItems(uniques: Array<string>) {
+		if (!uniques) throw new Error('Uniques are missing');
 
-		const errors = promiseResults.filter((result) => result.status === 'rejected');
-		if (errors.length > 0) {
-			// TODO: figure out if its enough to throw the first error
-			const error = errors[0].reason;
-			throw new Error(`Failed to batch fetch media items: ${error}`);
+		let data: Array<MediaItemResponseModel> | undefined;
+		let error: unknown;
+
+		const batchSize = 40;
+		if (uniques.length > batchSize) {
+			const chunks = batchArray<string>(uniques, batchSize);
+			const results = await batchTryExecute(this.#host, chunks, (chunk) =>
+				MediaService.getItemMedia({ query: { id: chunk } }),
+			);
+
+			data = results
+				.filter((promiseResult) => promiseResult.status === 'fulfilled')
+				.flatMap((promiseResult) => promiseResult.value.data);
+		} else {
+			const result = await tryExecute(this.#host, MediaService.getItemMedia({ query: { id: uniques } }));
+			data = result.data;
+			error = result.error;
 		}
 
-		const data = promiseResults
-			.filter((promiseResult) => promiseResult.status === 'fulfilled')
-			.flatMap((promiseResult) => promiseResult.value.data);
+		if (data) {
+			const items = data.map((item) => mapper(item));
+			return { data: items };
+		}
 
-		return { data };
+		return { error };
 	}
-
-	return MediaService.getItemMedia({ query: { id: uniques } });
-};
+}
 
 const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 	return {
@@ -116,13 +114,15 @@ function batchArray<BatchEntryType>(array: Array<BatchEntryType>, batchSize: num
 
 /**
  * Batches promises and returns a promise that resolves to an array of results
+ * @param {UmbControllerHost} host - The host to use for the request and where notifications will be shown
  * @param {Array<Array<BatchEntryType>>} chunks - The array of chunks to process
  * @param {(chunk: Array<BatchEntryType>) => Promise<PromiseResult>} callback - The function to call for each chunk
  * @returns {Promise<PromiseSettledResult<PromiseResult>[]>} - A promise that resolves to an array of results
  */
-function batchPromises<BatchEntryType, PromiseResult>(
+function batchTryExecute<BatchEntryType, PromiseResult>(
+	host: UmbControllerHost,
 	chunks: Array<Array<BatchEntryType>>,
 	callback: (chunk: Array<BatchEntryType>) => Promise<PromiseResult>,
 ): Promise<PromiseSettledResult<PromiseResult>[]> {
-	return Promise.allSettled(chunks.map((chunk) => callback(chunk)));
+	return Promise.allSettled(chunks.map((chunk) => tryExecute(host, callback(chunk))));
 }
