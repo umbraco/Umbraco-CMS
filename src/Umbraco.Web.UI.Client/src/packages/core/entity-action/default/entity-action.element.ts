@@ -70,6 +70,7 @@ export class UmbEntityActionDefaultElement<
 
 		return html`
 			<uui-menu-item
+				data-mark=${'entity-action:' + this.manifest?.alias}
 				label=${ifDefined(this.manifest?.meta.additionalOptions ? label + '…' : label)}
 				href=${ifDefined(this._href)}
 				@click-label=${this.#onClickLabel}
