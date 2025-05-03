@@ -15,6 +15,7 @@ public class ApiContentPathResolver : IApiContentPathResolver
         _apiPublishedContentCache = apiPublishedContentCache;
     }
 
+    [Obsolete("No longer used in V15. Scheduled for removal in V15.")]
     public virtual bool IsResolvablePath(string path)
     {
         // File requests will blow up with an downstream exception in GetRequiredPublishedSnapshot, which fails due to an UmbracoContext
@@ -30,7 +31,10 @@ public class ApiContentPathResolver : IApiContentPathResolver
         return true;
     }
 
-    private static bool IsFileRequest(string path) => path.Split('/', StringSplitOptions.RemoveEmptyEntries).Last().Contains('.');
+    private static bool IsFileRequest(string path) => path
+        .Split('/', StringSplitOptions.RemoveEmptyEntries)
+        .LastOrDefault()?
+        .Contains('.') is true;
 
     public virtual IPublishedContent? ResolveContentPath(string path)
     {
