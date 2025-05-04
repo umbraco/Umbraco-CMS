@@ -422,6 +422,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			? (this.#containerElement.shadowRoot ?? this.#containerElement)
 			: this.#containerElement;
 		containerElement.addEventListener('dragover', this.#itemDraggedOver as unknown as EventListener);
+		containerElement.addEventListener('drop', this.#itemDropped as unknown as EventListener);
 
 		this.#observer.disconnect();
 
@@ -461,6 +462,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				: this.#containerElement;
 
 			containerElement.removeEventListener('dragover', this.#itemDraggedOver as unknown as EventListener);
+			containerElement.removeEventListener('drop', this.#itemDropped as unknown as EventListener);
 			(this.#containerElement as unknown) = undefined;
 		}
 
@@ -468,7 +470,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	#itemDraggedOver = async (e: DragEvent) => {
-		const dropSorter = UmbSorterController.dropSorter as unknown as UmbSorterController<T, ElementType>;
+		let dropSorter = UmbSorterController.dropSorter as unknown as UmbSorterController<T, ElementType>;
+		let newDrop = false;
 
 		if (!dropSorter && e.dataTransfer?.types.includes('text/umb-sorter-identifier#' + this.identifier.toString())) {
 			// If we have no drop-sorter, and we share the same identifier, then we like to accept this drag.
@@ -476,14 +479,20 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				x.startsWith('text/umb-sorter-item-unique#'),
 			);
 			if (activeType) {
-				const activeId = activeType.split('#')?.[1];
+				const activeUnique = activeType.split('#')?.[1];
 
 				// Find the active item:
-				const activeItem = await this.#config.onRequestDrop?.({ unique: activeId });
+				const activeItem = await this.#config.onRequestDrop?.({ unique: activeUnique });
 				if (!activeItem) {
 					// Then we assume this item was not part of this sorters scope. This is the spot where inserting a new item from dataTransfer could be implemented.
 					return;
 				}
+
+				if (this.hasItem(activeUnique)) {
+					return;
+				}
+
+				e.dataTransfer.setData('text/umb-sorter-item-accepted', 'true');
 
 				// Set states:
 				UmbSorterController.activeItem = activeItem;
@@ -491,12 +500,22 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				UmbSorterController.activeDragElement = undefined;
 				UmbSorterController.activeSorter = undefined; // Important as we use this to know if we can remove the item via these Sorter references or if it is a Native Drop.
 				UmbSorterController.dropSorter = this as unknown as UmbSorterController<unknown>;
+				dropSorter = this as unknown as UmbSorterController<T, ElementType>;
 				UmbSorterController.originalIndex = undefined;
 				UmbSorterController.originalSorter = undefined;
+
+				//UmbSorterController.activeSorter = this as unknown as UmbSorterController<unknown>;
+				//UmbSorterController.originalSorter = this as unknown as UmbSorterController<unknown>;
+				window.addEventListener('mouseup', this.#handleMouseUp);
+				window.addEventListener('mouseout', this.#handleMouseUp);
+				window.addEventListener('mouseleave', this.#handleMouseUp);
+				window.addEventListener('mousemove', this.#handleMouseMove);
 
 				if (!this.#scrollElement) {
 					this.#scrollElement = getParentScrollElement(this.#containerElement, true);
 				}
+
+				newDrop = true;
 			}
 
 			// Then we need to set UmbSorterController.activeItem:
@@ -513,7 +532,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			}
 
 			// Do nothing as we are the active sorter.
-			this.#handleDragMove(e);
+			this.#handleDragMove(e, newDrop);
 
 			// Maybe we need to stop the event in this case.
 
@@ -533,6 +552,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			// Do not bubble up to parent sorters:
 			e.stopPropagation();
 		}
+	};
+
+	#itemDropped = async (e: DragEvent) => {
+		this.#handleMoveEnd();
 	};
 
 	#getDraggableElement(element: HTMLElement) {
@@ -597,14 +620,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			if (elUnique === modelUnique && elUnique !== undefined) {
 				if (UmbSorterController.activeElement !== element) {
 					this.#setCurrentElement(element);
-					if (!UmbSorterController.activeSorter) {
-						UmbSorterController.activeSorter = this as unknown as UmbSorterController<unknown>;
-						UmbSorterController.originalSorter = this as unknown as UmbSorterController<unknown>;
-						window.addEventListener('mouseup', this.#handleMouseUp);
-						window.addEventListener('mouseout', this.#handleMouseUp);
-						window.addEventListener('mouseleave', this.#handleMouseUp);
-						window.addEventListener('mousemove', this.#handleMouseMove);
-					}
 				}
 			}
 		}
@@ -660,6 +675,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			);
 		}
 
+		UmbSorterController.activeDragElement?.addEventListener('dragend', this.#handleDragEnd);
 		this.#setupPlaceholderStyle();
 	}
 
@@ -748,7 +764,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		UmbSorterController.originalSorter = this as unknown as UmbSorterController<unknown>;
 		// Notice, it is acceptable here to get index via object reference, but only cause there has been no change at this stage, otherwise we cannot trust the object instance is represented in the model — it could have mutated or been cloned [NL]
-		UmbSorterController.originalIndex = this.#model.indexOf(UmbSorterController.activeItem);
+		UmbSorterController.originalIndex = this.#model.findIndex((x) => this.#config.getUniqueOfModel(x) === activeUnique);
 
 		// Get the current index of the item:
 		UmbSorterController.activeIndex = UmbSorterController.originalIndex;
@@ -790,6 +806,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				UmbSorterController.originalIndex ?? 0,
 				UmbSorterController.activeSorter,
 			);
+		} else if (UmbSorterController.originalSorter === undefined) {
+			// The external dropped item, should be reverted back to where it came from.
+			// TODO: Revert back to original position.
 		}
 
 		this.#handleMoveEnd();
@@ -856,7 +875,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		this.#dragY = 0;
 	}
 
-	#handleDragMove(event: DragEvent) {
+	#handleDragMove(event: DragEvent, instant?: boolean) {
 		if (!UmbSorterController.activeItem) {
 			return;
 		}
@@ -875,6 +894,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			this.#dragY = clientY;
 
 			this.handleAutoScroll(this.#dragX, this.#dragY);
+
+			if (instant) {
+				this.#updateDragMove();
+				return;
+			}
 
 			const activeDragRect = UmbSorterController.activeDragElement?.getBoundingClientRect();
 			const insideCurrentRect = activeDragRect ? isWithinRect(this.#dragX, this.#dragY, activeDragRect) : false;
@@ -950,7 +974,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			}
 		});
 
-		let activeIndex: number | null = this.#model.indexOf(UmbSorterController.activeItem);
+		const activeUnique = this.#config.getUniqueOfModel(UmbSorterController.activeItem);
+		let activeIndex: number | null = this.#model.findIndex((x) => this.#config.getUniqueOfModel(x) === activeUnique);
 		if (activeIndex === -1) {
 			activeIndex = null;
 		}
@@ -1180,10 +1205,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		if (this.#config.performItemRemove) {
 			return (await this.#config.performItemRemove({ item })) ?? false;
 		} else {
-			const oldIndex = this.#model.indexOf(item);
-			if (oldIndex !== -1) {
-				const newModel = [...this.#model];
-				newModel.splice(oldIndex, 1);
+			const itemUnique = this.#config.getUniqueOfModel(item);
+			const newModel = this.#model.filter((x) => this.#config.getUniqueOfModel(x) !== itemUnique);
+			if (this.#model.length !== newModel.length) {
 				this.#model = newModel;
 				this.#config.onChange?.({ model: newModel, item });
 				return true;
@@ -1206,7 +1230,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			console.error('Failed to retrieve active item unique');
 			return false;
 		}
-		let item = UmbSorterController.activeItem as T;
+		let item: T | undefined;
 		if (fromCtrl) {
 			// If we got a fromCtrl, we should use it to get the item, to verify that it holds the model.
 			// We use the getItem method to find the current item/object of this entry, as we cannot trust the object instance(activeItem) to be the same as in the model. [NL]
@@ -1216,8 +1240,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				console.error('Could not find item of model to move', itemUnique, this.#model);
 				return false;
 			}
-			// Update item with latest find:
 			item = foundTheItem;
+		} else {
+			item = UmbSorterController.activeItem; //this.#model.find((x) => this.#config.getUniqueOfModel(x) === itemUnique) as T | undefined;
+			if (!item) {
+				return false;
+			}
 		}
 		// If we do not have a formCtrl, then it means that we dont know where it comes from, like via native drag across the Sorters awareness.
 
@@ -1225,7 +1253,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			return false;
 		}
 
-		const localMove = fromCtrl === (this as any);
+		let localMove = fromCtrl === (this as any);
 
 		if (!localMove) {
 			// Not a local move, so we have to switch container to continue:
@@ -1237,6 +1265,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 					return false;
 				}
 			} else if (!fromCtrl) {
+				// Before we react to the external factor, lets see if we already got it in our model.
 				// Remove from the external model.
 				if (!this.#config.requestExternalRemove) {
 					console.error(
@@ -1244,6 +1273,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 					);
 					return false;
 				}
+
+				UmbSorterController.activeSorter = this as unknown as UmbSorterController<unknown>;
+				fromCtrl = this as unknown as UmbSorterController<T, ElementType>;
+
 				if ((await this.#config.requestExternalRemove({ item })) !== true) {
 					console.error('Sorter could not remove the item before moving to a new container');
 					return false;
@@ -1252,8 +1285,13 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 					console.error('Sorter could not insert the item into the new container');
 					return false;
 				}
+				// This requestExternalInsert ^^ could have updated the model already. if so we should skip ahead to just move the item as a local move.
+				if (this.#model.find((x) => this.#config.getUniqueOfModel(x) === itemUnique)) {
+					localMove = true;
+				}
 			}
-
+		}
+		if (!localMove) {
 			if (this.#config.performItemInsert) {
 				const result = await this.#config.performItemInsert({ item, newIndex });
 				if (result === false) {
@@ -1264,7 +1302,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				// If everything went well, we can set the new activeSorter (and dropSorter) to this, as we are switching container. [NL]
 				UmbSorterController.activeSorter = this as unknown as UmbSorterController<unknown>;
 				UmbSorterController.dropSorter = this as unknown as UmbSorterController<unknown>;
-				UmbSorterController.activeIndex = this.#model.indexOf(item) ?? 0;
+				UmbSorterController.activeIndex =
+					this.#model.findIndex((x) => this.#config.getUniqueOfModel(x) === itemUnique) ?? 0;
 			} else {
 				const newModel = [...this.#model];
 				newModel.splice(newIndex, 0, item);
@@ -1288,7 +1327,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		if (localMove) {
 			// Local move:
 
-			const oldIndex = this.#model.indexOf(item);
+			const oldIndex = this.#model.findIndex((x) => this.#config.getUniqueOfModel(x) === itemUnique);
 			if (oldIndex === -1) {
 				console.error('Could not find item in model when performing internal move', this.getHostElement(), this.#model);
 				return false;
