@@ -98,5 +98,5 @@ public class RequestHandlerSettings
     /// <summary>
     ///     Add additional character replacements, or override defaults
     /// </summary>
-    public IEnumerable<CharItem> UserDefinedCharCollection { get; set; } = new HashSet<CharItem>();
+    public IEnumerable<CharItem> UserDefinedCharCollection { get; set; } = [];
 }
