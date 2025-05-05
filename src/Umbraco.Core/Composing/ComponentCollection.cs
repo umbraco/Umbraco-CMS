@@ -59,6 +59,7 @@ public class ComponentCollection : BuilderCollectionBase<IAsyncComponent>
                     try
                     {
                         await component.TerminateAsync(isRestarting, cancellationToken);
+                        (component as IDisposable)?.Dispose();
                     }
                     catch (Exception ex)
                     {

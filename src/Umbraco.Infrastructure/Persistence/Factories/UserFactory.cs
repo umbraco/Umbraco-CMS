@@ -123,7 +123,7 @@ internal static class UserFactory
 
         if (entity.HasIdentity)
         {
-            dto.Id = entity.Id.SafeCast<int>();
+            dto.Id = entity.Id;
         }
 
         return dto;

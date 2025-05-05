@@ -912,7 +912,8 @@ public static class StringExtensions
         return text;
     }
 
-    public static string OrIfNullOrWhiteSpace(this string input, string alternative) =>
+    [return: NotNullIfNotNull(nameof(alternative))]
+    public static string? OrIfNullOrWhiteSpace(this string? input, string? alternative) =>
         !string.IsNullOrWhiteSpace(input)
             ? input
             : alternative;

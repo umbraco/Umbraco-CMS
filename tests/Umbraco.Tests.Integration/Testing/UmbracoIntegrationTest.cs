@@ -88,7 +88,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     public void TearDownAsync()
     {
         _host.StopAsync();
-        Services.DisposeIfDisposable();
+        (Services as IDisposable)?.Dispose();
     }
 
     /// <summary>

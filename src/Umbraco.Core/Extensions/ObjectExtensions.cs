@@ -4,7 +4,6 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.ComponentModel;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml;
@@ -15,81 +14,148 @@ using Umbraco.Cms.Core.Collections;
 namespace Umbraco.Extensions;
 
 /// <summary>
-///     Provides object extension methods.
+/// Provides object extension methods.
 /// </summary>
 public static class ObjectExtensions
 {
-    private static readonly ConcurrentDictionary<Type, Type?> NullableGenericCache = new();
-    private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter?> InputTypeConverterCache = new();
-
-    private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter?> DestinationTypeConverterCache =
-        new();
-
-    private static readonly ConcurrentDictionary<CompositeTypeTypeKey, bool> AssignableTypeCache = new();
-    private static readonly ConcurrentDictionary<Type, bool> BoolConvertCache = new();
-
-    private static readonly char[] NumberDecimalSeparatorsToNormalize = { '.', ',' };
-    private static readonly CustomBooleanTypeConverter CustomBooleanTypeConverter = new();
-
-    // private static readonly ConcurrentDictionary<Type, Func<object>> ObjectFactoryCache = new ConcurrentDictionary<Type, Func<object>>();
+    private static readonly ConcurrentDictionary<Type, Type?> _nullableGenericCache = new();
+    private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter?> _inputTypeConverterCache = new();
+    private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter?> _destinationTypeConverterCache = new();
+    private static readonly ConcurrentDictionary<CompositeTypeTypeKey, bool> _assignableTypeCache = new();
+    private static readonly ConcurrentDictionary<Type, bool> _boolConvertCache = new();
+    private static readonly char[] _numberDecimalSeparatorsToNormalize = ['.', ','];
+    private static readonly CustomBooleanTypeConverter _customBooleanTypeConverter = new();
 
     /// <summary>
+    /// Returns an XML serialized safe string representation for the value and type.
     /// </summary>
-    /// <param name="input"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    public static IEnumerable<T> AsEnumerableOfOne<T>(this T input) => Enumerable.Repeat(input, 1);
+    /// <typeparam name="T">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>
+    /// The XML serialized safe string representation.
+    /// </returns>
+    public static string ToXmlString<T>(this object value) => value.ToXmlString(typeof(T));
 
     /// <summary>
-    /// Disposes the object if it implements <see cref="IDisposable" />.
+    /// Returns an XML serialized safe string representation for the value and type.
     /// </summary>
-    /// <param name="input">The object.</param>
-    [Obsolete("Please replace uses of this extension method with (input as IDisposable)?.Dispose(). This extension method will be removed in Umbraco 17.")]
-    public static void DisposeIfDisposable(this object input)
+    /// <param name="value">The value.</param>
+    /// <param name="type">The type of the value. This can only be a primitive type or <see cref="Guid" /> and <see cref="T:byte[]" />, otherwise an exception is thrown.</param>
+    /// <returns>
+    /// The XML serialized safe string representation.
+    /// </returns>
+    public static string ToXmlString(this object value, Type type)
     {
-        if (input is IDisposable disposable)
+        if (value == null)
         {
-            try
-            {
-                disposable.Dispose();
-            }
-            catch (ObjectDisposedException)
-            {
-                // ignore if it is already disposed
-            }
+            return string.Empty;
+
         }
+
+        if (type == typeof(string))
+        {
+            return value.ToString().OrIfNullOrWhiteSpace(string.Empty);
+        }
+
+        if (type == typeof(bool))
+        {
+            return XmlConvert.ToString((bool)value);
+        }
+
+        if (type == typeof(byte))
+        {
+            return XmlConvert.ToString((byte)value);
+        }
+
+        if (type == typeof(char))
+        {
+            return XmlConvert.ToString((char)value);
+        }
+
+        if (type == typeof(DateTime))
+        {
+            return XmlConvert.ToString((DateTime)value, XmlDateTimeSerializationMode.Unspecified);
+        }
+
+        if (type == typeof(DateTimeOffset))
+        {
+            return XmlConvert.ToString((DateTimeOffset)value);
+        }
+
+        if (type == typeof(decimal))
+        {
+            return XmlConvert.ToString((decimal)value);
+        }
+
+        if (type == typeof(double))
+        {
+            return XmlConvert.ToString((double)value);
+        }
+
+        if (type == typeof(float))
+        {
+            return XmlConvert.ToString((float)value);
+        }
+
+        if (type == typeof(Guid))
+        {
+            return XmlConvert.ToString((Guid)value);
+        }
+
+        if (type == typeof(int))
+        {
+            return XmlConvert.ToString((int)value);
+        }
+
+        if (type == typeof(long))
+        {
+            return XmlConvert.ToString((long)value);
+        }
+
+        if (type == typeof(sbyte))
+        {
+            return XmlConvert.ToString((sbyte)value);
+        }
+
+        if (type == typeof(short))
+        {
+            return XmlConvert.ToString((short)value);
+        }
+
+        if (type == typeof(TimeSpan))
+        {
+            return XmlConvert.ToString((TimeSpan)value);
+        }
+
+        if (type == typeof(uint))
+        {
+            return XmlConvert.ToString((uint)value);
+        }
+
+        if (type == typeof(ulong))
+        {
+            return XmlConvert.ToString((ulong)value);
+        }
+
+        if (type == typeof(ushort))
+        {
+            return XmlConvert.ToString((ushort)value);
+        }
+
+        throw new NotSupportedException($"Cannot convert type {type.FullName} to a string using ToXmlString, as it is not supported by XmlConvert.");
     }
 
     /// <summary>
-    ///     Provides a shortcut way of safely casting an input when you cannot guarantee the <typeparamref name="T" /> is
-    ///     an instance type (i.e., when the C# AS keyword is not applicable).
+    /// Attempts to convert the input object to the output type.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The type to convert to.</typeparam>
     /// <param name="input">The input.</param>
-    /// <returns></returns>
-    [Obsolete("This extension method is not longer used and will be removed in Umbraco 17.")]
-    public static T? SafeCast<T>(this object input)
-    {
-        if (ReferenceEquals(null, input) || ReferenceEquals(default(T), input))
-        {
-            return default;
-        }
-
-        if (input is T variable)
-        {
-            return variable;
-        }
-
-        return default;
-    }
-
-    /// <summary>
-    ///     Attempts to convert the input object to the output type.
-    /// </summary>
-    /// <remarks>This code is an optimized version of the original Umbraco method</remarks>
-    /// <typeparam name="T">The type to convert to</typeparam>
-    /// <param name="input">The input.</param>
-    /// <returns>The <see cref="Attempt{T}" /></returns>
+    /// <returns>
+    /// The <see cref="Attempt{T}" />.
+    /// </returns>
+    /// <remarks>
+    /// This code is an optimized version of the original Umbraco method.
+    /// </remarks>
     public static Attempt<T> TryConvertTo<T>(this object? input)
     {
         Attempt<object?> result = TryConvertTo(input, typeof(T));
@@ -116,19 +182,23 @@ public static class ObjectExtensions
         {
             return Attempt<T>.Succeed((T)input);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            return Attempt<T>.Fail(e);
+            return Attempt<T>.Fail(ex);
         }
     }
 
     /// <summary>
-    ///     Attempts to convert the input object to the output type.
+    /// Attempts to convert the input object to the output type.
     /// </summary>
-    /// <remarks>This code is an optimized version of the original Umbraco method</remarks>
     /// <param name="input">The input.</param>
-    /// <param name="target">The type to convert to</param>
-    /// <returns>The <see cref="Attempt{Object}" /></returns>
+    /// <param name="target">The type to convert to.</param>
+    /// <returns>
+    /// The <see cref="T:Attempt{object?}" />.
+    /// </returns>
+    /// <remarks>
+    /// This code is an optimized version of the original Umbraco method.
+    /// </remarks>
     public static Attempt<object?> TryConvertTo(this object? input, Type target)
     {
         if (target == null)
@@ -158,7 +228,7 @@ public static class ObjectExtensions
                 return Attempt.Succeed(input);
             }
 
-            // Check for string so that overloaders of ToString() can take advantage of the conversion.
+            // Check for string so that overloads of ToString() can take advantage of the conversion.
             if (target == typeof(string))
             {
                 return Attempt<object?>.Succeed(input.ToString());
@@ -225,13 +295,13 @@ public static class ObjectExtensions
             {
                 if (GetCachedCanConvertToBoolean(inputType))
                 {
-                    return Attempt.Succeed(CustomBooleanTypeConverter.ConvertFrom(input!));
+                    return Attempt.Succeed(_customBooleanTypeConverter.ConvertFrom(input!));
                 }
             }
 
             if (target == typeof(DateTime) && input is DateTimeOffset dateTimeOffset)
             {
-                // IMPORTANT: for compatability with various editors, we must discard any Offset information and assume UTC time here
+                // IMPORTANT: for compatibility with various editors, we must discard any Offset information and assume UTC time here
                 return Attempt.Succeed((object?)new DateTime(
                     new DateOnly(dateTimeOffset.Year, dateTimeOffset.Month, dateTimeOffset.Day),
                     new TimeOnly(dateTimeOffset.Hour, dateTimeOffset.Minute, dateTimeOffset.Second, dateTimeOffset.Millisecond, dateTimeOffset.Microsecond),
@@ -240,7 +310,7 @@ public static class ObjectExtensions
 
             if (target == typeof(DateTimeOffset) && input is DateTime dateTime)
             {
-                // IMPORTANT: for compatability with various editors, we must discard any DateTimeKind information and assume UTC time here
+                // IMPORTANT: for compatibility with various editors, we must discard any DateTimeKind information and assume UTC time here
                 return Attempt.Succeed((object?)new DateTimeOffset(
                     new DateOnly(dateTime.Year, dateTime.Month, dateTime.Day),
                     new TimeOnly(dateTime.Hour, dateTime.Minute, dateTime.Second, dateTime.Millisecond, dateTime.Microsecond),
@@ -281,102 +351,18 @@ public static class ObjectExtensions
         return Attempt<object?>.Fail();
     }
 
-    // public enum PropertyNamesCaseType
-    // {
-    //    CamelCase,
-    //    CaseInsensitive
-    // }
-
-    ///// <summary>
-    ///// Convert an object to a JSON string with camelCase formatting
-    ///// </summary>
-    ///// <param name="obj"></param>
-    ///// <returns></returns>
-    // public static string ToJsonString(this object obj)
-    // {
-    //    return obj.ToJsonString(PropertyNamesCaseType.CamelCase);
-    // }
-
-    ///// <summary>
-    ///// Convert an object to a JSON string with the specified formatting
-    ///// </summary>
-    ///// <param name="obj">The obj.</param>
-    ///// <param name="propertyNamesCaseType">Type of the property names case.</param>
-    ///// <returns></returns>
-    // public static string ToJsonString(this object obj, PropertyNamesCaseType propertyNamesCaseType)
-    // {
-    //    var type = obj.GetType();
-    //    var dateTimeStyle = "yyyy-MM-dd HH:mm:ss";
-
-    // if (type.IsPrimitive || typeof(string).IsAssignableFrom(type))
-    //    {
-    //        return obj.ToString();
-    //    }
-
-    // if (typeof(DateTime).IsAssignableFrom(type) || typeof(DateTimeOffset).IsAssignableFrom(type))
-    //    {
-    //        return Convert.ToDateTime(obj).ToString(dateTimeStyle);
-    //    }
-
-    // var serializer = new JsonSerializer();
-
-    // switch (propertyNamesCaseType)
-    //    {
-    //        case PropertyNamesCaseType.CamelCase:
-    //            serializer.ContractResolver = new CamelCasePropertyNamesContractResolver();
-    //            break;
-    //    }
-
-    // var dateTimeConverter = new IsoDateTimeConverter
-    //        {
-    //            DateTimeStyles = System.Globalization.DateTimeStyles.None,
-    //            DateTimeFormat = dateTimeStyle
-    //        };
-
-    // if (typeof(IDictionary).IsAssignableFrom(type))
-    //    {
-    //        return JObject.FromObject(obj, serializer).ToString(Formatting.None, dateTimeConverter);
-    //    }
-
-    // if (type.IsArray || (typeof(IEnumerable).IsAssignableFrom(type)))
-    //    {
-    //        return JArray.FromObject(obj, serializer).ToString(Formatting.None, dateTimeConverter);
-    //    }
-
-    // return JObject.FromObject(obj, serializer).ToString(Formatting.None, dateTimeConverter);
-    // }
-
-    /// <summary>
-    ///     Converts an object into a dictionary
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <typeparam name="TProperty"></typeparam>
-    /// <typeparam name="TVal"> </typeparam>
-    /// <param name="o"></param>
-    /// <param name="ignoreProperties"></param>
-    /// <returns></returns>
     [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 17.")]
-    public static IDictionary<string, TVal>? ToDictionary<T, TProperty, TVal>(
-        this T o,
-        params Expression<Func<T, TProperty>>[] ignoreProperties) => o?.ToDictionary<TVal>(ignoreProperties
-        .Select(e => o.GetPropertyInfo(e)).Select(propInfo => propInfo.Name).ToArray());
-
-    internal static void CheckThrowObjectDisposed(this IDisposable disposable, bool isDisposed, string objectname)
-    {
-        // TODO: Localize this exception
-        if (isDisposed)
-        {
-            throw new ObjectDisposedException(objectname);
-        }
-    }
-
     /// <summary>
-    ///     Attempts to convert the input string to the output type.
+    /// Attempts to convert the input string to the output type.
     /// </summary>
-    /// <remarks>This code is an optimized version of the original Umbraco method</remarks>
     /// <param name="input">The input.</param>
     /// <param name="target">The type to convert to</param>
-    /// <returns>The <see cref="Nullable{Attempt}" /></returns>
+    /// <returns>
+    /// The <see cref="T:Attempt{object?}" />
+    /// </returns>
+    /// <remarks>
+    /// This code is an optimized version of the original Umbraco method.
+    /// </remarks>
     private static Attempt<object?>? TryConvertToFromString(this string input, Type target)
     {
         // Easy
@@ -529,143 +515,7 @@ public static class ObjectExtensions
         return null; // we can't decide...
     }
 
-    /// <summary>
-    ///     Turns object into dictionary
-    /// </summary>
-    /// <param name="o"></param>
-    /// <param name="ignoreProperties">Properties to ignore</param>
-    /// <returns></returns>
-    [Obsolete("Use of this can be replaced with RouteValueDictionary or HtmlHelper.AnonymousObjectToHtmlAttributes(). The method will be removed in Umbraco 17.")]
-    public static IDictionary<string, TVal> ToDictionary<TVal>(this object o, params string[] ignoreProperties)
-    {
-        if (o != null)
-        {
-            PropertyDescriptorCollection props = TypeDescriptor.GetProperties(o);
-            var d = new Dictionary<string, TVal>();
-            foreach (PropertyDescriptor prop in props.Cast<PropertyDescriptor>()
-                         .Where(x => ignoreProperties.Contains(x.Name) == false))
-            {
-                var val = prop.GetValue(o);
-                if (val != null)
-                {
-                    d.Add(prop.Name, (TVal)val);
-                }
-            }
-
-            return d;
-        }
-
-        return new Dictionary<string, TVal>();
-    }
-
-    /// <summary>
-    ///     Returns an XmlSerialized safe string representation for the value
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="type">The Type can only be a primitive type or Guid and byte[] otherwise an exception is thrown</param>
-    /// <returns></returns>
-    public static string ToXmlString(this object value, Type type)
-    {
-        if (value == null)
-        {
-            return string.Empty;
-        }
-
-        if (type == typeof(string))
-        {
-            return value.ToString().IsNullOrWhiteSpace() ? string.Empty : value.ToString()!;
-        }
-
-        if (type == typeof(bool))
-        {
-            return XmlConvert.ToString((bool)value);
-        }
-
-        if (type == typeof(byte))
-        {
-            return XmlConvert.ToString((byte)value);
-        }
-
-        if (type == typeof(char))
-        {
-            return XmlConvert.ToString((char)value);
-        }
-
-        if (type == typeof(DateTime))
-        {
-            return XmlConvert.ToString((DateTime)value, XmlDateTimeSerializationMode.Unspecified);
-        }
-
-        if (type == typeof(DateTimeOffset))
-        {
-            return XmlConvert.ToString((DateTimeOffset)value);
-        }
-
-        if (type == typeof(decimal))
-        {
-            return XmlConvert.ToString((decimal)value);
-        }
-
-        if (type == typeof(double))
-        {
-            return XmlConvert.ToString((double)value);
-        }
-
-        if (type == typeof(float))
-        {
-            return XmlConvert.ToString((float)value);
-        }
-
-        if (type == typeof(Guid))
-        {
-            return XmlConvert.ToString((Guid)value);
-        }
-
-        if (type == typeof(int))
-        {
-            return XmlConvert.ToString((int)value);
-        }
-
-        if (type == typeof(long))
-        {
-            return XmlConvert.ToString((long)value);
-        }
-
-        if (type == typeof(sbyte))
-        {
-            return XmlConvert.ToString((sbyte)value);
-        }
-
-        if (type == typeof(short))
-        {
-            return XmlConvert.ToString((short)value);
-        }
-
-        if (type == typeof(TimeSpan))
-        {
-            return XmlConvert.ToString((TimeSpan)value);
-        }
-
-        if (type == typeof(uint))
-        {
-            return XmlConvert.ToString((uint)value);
-        }
-
-        if (type == typeof(ulong))
-        {
-            return XmlConvert.ToString((ulong)value);
-        }
-
-        if (type == typeof(ushort))
-        {
-            return XmlConvert.ToString((ushort)value);
-        }
-
-        throw new NotSupportedException("Cannot convert type " + type.FullName +
-                                        " to a string using ToXmlString as it is not supported by XmlConvert");
-    }
-
-    internal static string? ToDebugString(this object? obj, int levels = 0)
+    private static string? ToDebugString(this object? obj, int levels = 0)
     {
         if (obj == null)
         {
@@ -738,35 +588,6 @@ public static class ObjectExtensions
         return null;
     }
 
-    /// <summary>
-    ///     Attempts to serialize the value to an XmlString using ToXmlString
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="type"></param>
-    /// <returns></returns>
-    internal static Attempt<string?> TryConvertToXmlString(this object value, Type type)
-    {
-        try
-        {
-            var output = value.ToXmlString(type);
-            return Attempt.Succeed(output);
-        }
-        catch (NotSupportedException ex)
-        {
-            return Attempt<string?>.Fail(ex);
-        }
-    }
-
-    /// <summary>
-    ///     Returns an XmlSerialized safe string representation for the value and type
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    public static string ToXmlString<T>(this object value) => value.ToXmlString(typeof(T));
-
-    public static Guid AsGuid(this object value) => value is Guid guid ? guid : Guid.Empty;
-
     private static string? GetEnumPropertyDebugString(object enumItem, int levels)
     {
         try
@@ -795,7 +616,7 @@ public static class ObjectExtensions
     private static string NormalizeNumberDecimalSeparator(string s)
     {
         var normalized = Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
-        return s.ReplaceMany(NumberDecimalSeparatorsToNormalize, normalized);
+        return s.ReplaceMany(_numberDecimalSeparatorsToNormalize, normalized);
     }
 
     // gets a converter for source, that can convert to target, or null if none exists
@@ -804,7 +625,7 @@ public static class ObjectExtensions
     {
         var key = new CompositeTypeTypeKey(source, target);
 
-        if (InputTypeConverterCache.TryGetValue(key, out TypeConverter? typeConverter))
+        if (_inputTypeConverterCache.TryGetValue(key, out TypeConverter? typeConverter))
         {
             return typeConverter;
         }
@@ -812,10 +633,10 @@ public static class ObjectExtensions
         TypeConverter converter = TypeDescriptor.GetConverter(source);
         if (converter.CanConvertTo(target))
         {
-            return InputTypeConverterCache[key] = converter;
+            return _inputTypeConverterCache[key] = converter;
         }
 
-        InputTypeConverterCache[key] = null;
+        _inputTypeConverterCache[key] = null;
         return null;
     }
 
@@ -825,7 +646,7 @@ public static class ObjectExtensions
     {
         var key = new CompositeTypeTypeKey(source, target);
 
-        if (DestinationTypeConverterCache.TryGetValue(key, out TypeConverter? typeConverter))
+        if (_destinationTypeConverterCache.TryGetValue(key, out TypeConverter? typeConverter))
         {
             return typeConverter;
         }
@@ -833,10 +654,10 @@ public static class ObjectExtensions
         TypeConverter converter = TypeDescriptor.GetConverter(target);
         if (converter.CanConvertFrom(source))
         {
-            return DestinationTypeConverterCache[key] = converter;
+            return _destinationTypeConverterCache[key] = converter;
         }
 
-        DestinationTypeConverterCache[key] = null;
+        _destinationTypeConverterCache[key] = null;
         return null;
     }
 
@@ -844,7 +665,7 @@ public static class ObjectExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static Type? GetCachedGenericNullableType(Type type)
     {
-        if (NullableGenericCache.TryGetValue(type, out Type? underlyingType))
+        if (_nullableGenericCache.TryGetValue(type, out Type? underlyingType))
         {
             return underlyingType;
         }
@@ -852,10 +673,10 @@ public static class ObjectExtensions
         if (type.GetGenericTypeDefinition() == typeof(Nullable<>))
         {
             Type? underlying = Nullable.GetUnderlyingType(type);
-            return NullableGenericCache[type] = underlying;
+            return _nullableGenericCache[type] = underlying;
         }
 
-        NullableGenericCache[type] = null;
+        _nullableGenericCache[type] = null;
         return null;
     }
 
@@ -864,7 +685,7 @@ public static class ObjectExtensions
     private static bool GetCachedCanAssign(object input, Type source, Type target)
     {
         var key = new CompositeTypeTypeKey(source, target);
-        if (AssignableTypeCache.TryGetValue(key, out var canConvert))
+        if (_assignableTypeCache.TryGetValue(key, out var canConvert))
         {
             return canConvert;
         }
@@ -873,26 +694,26 @@ public static class ObjectExtensions
         // We can use it to very quickly determine whether true/false
         if (input is IConvertible && target.IsAssignableFrom(source))
         {
-            return AssignableTypeCache[key] = true;
+            return _assignableTypeCache[key] = true;
         }
 
-        return AssignableTypeCache[key] = false;
+        return _assignableTypeCache[key] = false;
     }
 
     // determines whether a type can be converted to boolean
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool GetCachedCanConvertToBoolean(Type type)
     {
-        if (BoolConvertCache.TryGetValue(type, out var result))
+        if (_boolConvertCache.TryGetValue(type, out var result))
         {
             return result;
         }
 
-        if (CustomBooleanTypeConverter.CanConvertFrom(type))
+        if (_customBooleanTypeConverter.CanConvertFrom(type))
         {
-            return BoolConvertCache[type] = true;
+            return _boolConvertCache[type] = true;
         }
 
-        return BoolConvertCache[type] = false;
+        return _boolConvertCache[type] = false;
     }
 }

@@ -41,24 +41,6 @@ public class ObjectExtensionsTests
     }
 
     [Test]
-    public void ObjectExtensions_Object_To_Dictionary()
-    {
-        // Arrange
-        var obj = new { Key1 = "value1", Key2 = "value2", Key3 = "value3" };
-
-        // Act
-        var d = obj.ToDictionary<string>();
-
-        // Assert
-        Assert.IsTrue(d.Keys.Contains("Key1"));
-        Assert.IsTrue(d.Keys.Contains("Key2"));
-        Assert.IsTrue(d.Keys.Contains("Key3"));
-        Assert.AreEqual(d["Key1"], "value1");
-        Assert.AreEqual(d["Key2"], "value2");
-        Assert.AreEqual(d["Key3"], "value3");
-    }
-
-    [Test]
     public void CanConvertIntToNullableInt()
     {
         var i = 1;
