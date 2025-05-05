@@ -17,7 +17,7 @@ export class UmbItemDataApiGetRequestController<
 > extends UmbControllerBase {
 	#apiCallback: (args: { uniques: Array<string> }) => Promise<ResponseModelType>;
 	#uniques: Array<string>;
-	#batchSize: number = 1;
+	#batchSize: number = 40;
 
 	constructor(host: UmbControllerHost, args: UmbItemDataApiGetRequestControllerArgs<ResponseModelType>) {
 		super(host);
