@@ -1,9 +1,9 @@
 # Umbraco Acceptance Tests
 
-You can watch a video following these instructions [here](https://www.youtube.com/watch?v=N4hBKB0U-d8) and a longer UmbraCollab recording [here](https://www.youtube.com/watch?v=hvoI28s_fDI). Make sure to use the latest recommended contribution branch rather than v10 that's mentioned in the video.  Alternatively, follow along the instructions below.
+You can watch a video following these instructions [here](https://www.youtube.com/watch?v=N4hBKB0U-d8) and a longer UmbraCollab recording [here](https://www.youtube.com/watch?v=hvoI28s_fDI). Make sure to use the latest recommended `main` branch rather than v10 that's mentioned in the video.  Alternatively, follow along the instructions below.
 
 ### Prerequisites
-- NodeJS 16+
+- NodeJS 22+
 - A running installed Umbraco on url: [https://localhost:44339](https://localhost:44339) (Default development port)
    - Install using a `SqlServer`/`LocalDb` as the tests execute too fast for `Sqlite` to handle.
 
