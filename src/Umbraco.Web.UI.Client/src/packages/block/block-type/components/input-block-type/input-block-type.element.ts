@@ -106,6 +106,12 @@ export class UmbInputBlockTypeElement<
 								presetAlias: 'element',
 							},
 						},
+						// TODO: hide the queryParams and filter config under a "elementTypesOnly" field. [MR]
+						search: {
+							queryParams: {
+								isElementType: true,
+							},
+						},
 						pickableFilter: (docType) =>
 							// Only pick elements:
 							docType.isElement &&
