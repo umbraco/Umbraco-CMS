@@ -51,7 +51,7 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 	override async getItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
 
-		const itemRequestManager = new UmbManagementApiItemGetRequestManager(this.#host, {
+		const itemRequestManager = new UmbManagementApiItemGetRequestController(this.#host, {
 			// eslint-disable-next-line local-rules/no-direct-api-import
 			api: (args) => MediaService.getItemMedia({ query: { id: args.uniques } }),
 			uniques,
@@ -90,16 +90,16 @@ const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 	};
 };
 
-interface UmbManagementApiItemGetRequestManagerArgs<ResponseModelType extends { data: unknown }> {
+interface UmbManagementApiItemGetRequestControllerArgs<ResponseModelType extends { data: unknown }> {
 	api: (args: { uniques: Array<string> }) => Promise<ResponseModelType>;
 	uniques: Array<string>;
 }
-class UmbManagementApiItemGetRequestManager<ResponseModelType extends { data: unknown }> extends UmbControllerBase {
+class UmbManagementApiItemGetRequestController<ResponseModelType extends { data: unknown }> extends UmbControllerBase {
 	#apiCallback: (args: { uniques: Array<string> }) => Promise<ResponseModelType>;
 	#uniques: Array<string>;
 	#batchSize: number = 1;
 
-	constructor(host: UmbControllerHost, args: UmbManagementApiItemGetRequestManagerArgs<ResponseModelType>) {
+	constructor(host: UmbControllerHost, args: UmbManagementApiItemGetRequestControllerArgs<ResponseModelType>) {
 		super(host);
 		this.#apiCallback = args.api;
 		this.#uniques = args.uniques;
