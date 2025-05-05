@@ -217,7 +217,7 @@ test('can delete member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.member.clickMemberLinkByName(memberName);
-  await umbracoUi.memberGroup.clickActionsButton();
+  await umbracoUi.memberGroup.clickActionButton();
   await umbracoUi.memberGroup.clickDeleteButton();
   await umbracoUi.memberGroup.clickConfirmToDeleteButton();
 
