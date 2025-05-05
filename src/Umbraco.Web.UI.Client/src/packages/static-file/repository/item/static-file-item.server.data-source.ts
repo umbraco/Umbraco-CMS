@@ -4,6 +4,7 @@ import type { StaticFileItemResponseModel } from '@umbraco-cms/backoffice/extern
 import { StaticFileService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import { UmbDataApiItemGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 /**
  * A server data source for Static File items
@@ -21,19 +22,27 @@ export class UmbStaticFileItemServerDataSource extends UmbItemServerDataSourceBa
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
-			getItems,
 			mapper,
 		});
 	}
+
+	override async getItems(uniques: Array<string>) {
+		if (!uniques) throw new Error('Uniques are missing');
+
+		const serializer = new UmbServerFilePathUniqueSerializer();
+		const paths = uniques.map((unique) => serializer.toServerPath(unique)!);
+
+		const itemRequestManager = new UmbDataApiItemGetRequestController(this, {
+			// eslint-disable-next-line local-rules/no-direct-api-import
+			api: (args) => StaticFileService.getItemStaticFile({ query: { path: args.uniques } }),
+			uniques: paths,
+		});
+
+		const { data, error } = await itemRequestManager.request();
+
+		return { data: this._getMappedItems(data), error };
+	}
 }
-
-const getItems = (uniques: Array<string>) => {
-	const serializer = new UmbServerFilePathUniqueSerializer();
-	const path = uniques.map((unique) => serializer.toServerPath(unique)!);
-
-	/* eslint-disable local-rules/no-direct-api-import */
-	return StaticFileService.getItemStaticFile({ query: { path } });
-};
 
 const mapper = (item: StaticFileItemResponseModel): UmbStaticFileItemModel => {
 	const serializer = new UmbServerFilePathUniqueSerializer();

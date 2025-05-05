@@ -4,6 +4,7 @@ import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository'
 import type { LanguageItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { LanguageService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbDataApiItemGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 /**
  * A server data source for Language items
@@ -21,14 +22,24 @@ export class UmbLanguageItemServerDataSource extends UmbItemServerDataSourceBase
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
-			getItems,
 			mapper,
 		});
 	}
-}
 
-/* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => LanguageService.getItemLanguage({ query: { isoCode: uniques } });
+	override async getItems(uniques: Array<string>) {
+		if (!uniques) throw new Error('Uniques are missing');
+
+		const itemRequestManager = new UmbDataApiItemGetRequestController(this, {
+			// eslint-disable-next-line local-rules/no-direct-api-import
+			api: (args) => LanguageService.getItemLanguage({ query: { isoCode: args.uniques } }),
+			uniques,
+		});
+
+		const { data, error } = await itemRequestManager.request();
+
+		return { data: this._getMappedItems(data), error };
+	}
+}
 
 const mapper = (item: LanguageItemResponseModel): UmbLanguageItemModel => {
 	return {

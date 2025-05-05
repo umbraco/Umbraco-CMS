@@ -4,6 +4,7 @@ import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository'
 import type { MediaTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbDataApiItemGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 /**
  * A data source for Media Type items that fetches data from the server
@@ -21,14 +22,24 @@ export class UmbMediaTypeItemServerDataSource extends UmbItemServerDataSourceBas
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
-			getItems,
 			mapper,
 		});
 	}
-}
 
-/* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => MediaTypeService.getItemMediaType({ query: { id: uniques } });
+	override async getItems(uniques: Array<string>) {
+		if (!uniques) throw new Error('Uniques are missing');
+
+		const itemRequestManager = new UmbDataApiItemGetRequestController(this, {
+			// eslint-disable-next-line local-rules/no-direct-api-import
+			api: (args) => MediaTypeService.getItemMediaType({ query: { id: args.uniques } }),
+			uniques,
+		});
+
+		const { data, error } = await itemRequestManager.request();
+
+		return { data: this._getMappedItems(data), error };
+	}
+}
 
 const mapper = (item: MediaTypeItemResponseModel): UmbMediaTypeItemModel => {
 	return {
