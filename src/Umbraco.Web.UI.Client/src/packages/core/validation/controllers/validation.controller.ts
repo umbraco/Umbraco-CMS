@@ -27,7 +27,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	>;
 	#inUnprovidingState: boolean = false;
 
-	// @reprecated - Will be removed in v.17
+	// @deprecated - Will be removed in v.17
 	// Local version of the data send to the server, only use-case is for translation.
 	#translationData = new UmbObjectState<any>(undefined);
 	/**
@@ -111,7 +111,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 * @param translator
 	 */
 	async addTranslator(translator: UmbValidationMessageTranslator) {
-		this.messages.addTranslator(translator);
+		this.messages?.addTranslator(translator);
 	}
 
 	/**
@@ -210,36 +210,38 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			'observeTranslationData',
 		);
 
-		this.observe(
-			parent.messages.messagesOfPathAndDescendant(dataPath),
-			(msgs) => {
-				this.messages.initiateChange();
-				if (this.#parentMessages) {
-					// Remove the local messages that does not exist in the parent anymore:
-					const toRemove = this.#parentMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
-					this.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
-				}
-				this.#parentMessages = msgs;
-				if (this.#baseDataPath === '$') {
-					this.messages.addMessageObjects(msgs);
-				} else {
-					msgs.forEach((msg) => {
-						const path = ReplaceStartOfPath(msg.path, this.#baseDataPath!, '$');
-						if (path === undefined) {
-							throw new Error(
-								'Path was not transformed correctly and can therefor not be transfered to the local validation context messages.',
-							);
-						}
-						// Notice, the local message uses the same key. [NL]
-						this.messages.addMessage(msg.type, path, msg.body, msg.key);
-					});
-				}
+		if (parent.messages) {
+			this.observe(
+				parent.messages.messagesOfPathAndDescendant(dataPath),
+				(msgs) => {
+					this.messages.initiateChange();
+					if (this.#parentMessages) {
+						// Remove the local messages that does not exist in the parent anymore:
+						const toRemove = this.#parentMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
+						this.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
+					}
+					this.#parentMessages = msgs;
+					if (this.#baseDataPath === '$') {
+						this.messages.addMessageObjects(msgs);
+					} else {
+						msgs.forEach((msg) => {
+							const path = ReplaceStartOfPath(msg.path, this.#baseDataPath!, '$');
+							if (path === undefined) {
+								throw new Error(
+									'Path was not transformed correctly and can therefor not be transferred to the local validation context messages.',
+								);
+							}
+							// Notice, the local message uses the same key. [NL]
+							this.messages.addMessage(msg.type, path, msg.body, msg.key);
+						});
+					}
 
-				this.#localMessages = this.messages.getNotFilteredMessages();
-				this.messages.finishChange();
-			},
-			'observeParentMessages',
-		);
+					this.#localMessages = this.messages.getNotFilteredMessages();
+					this.messages.finishChange();
+				},
+				'observeParentMessages',
+			);
+		}
 	}
 
 	#stopInheritance(): void {
