@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -20,7 +20,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('page header', async ({umbracoApi, umbracoUi}) => {
+test('can apply page header format', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.typeIntoRTETipTapEditor(inputText);
@@ -38,7 +38,7 @@ test('page header', async ({umbracoApi, umbracoUi}) => {
   expect(contentData.values[0].value.markup).toEqual('<h2>' + inputText + '</h2><p></p>');
 });
 
-test('section header', async ({umbracoApi, umbracoUi}) => {
+test('can apply section header format', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.typeIntoRTETipTapEditor(inputText);
@@ -56,7 +56,7 @@ test('section header', async ({umbracoApi, umbracoUi}) => {
   expect(contentData.values[0].value.markup).toEqual('<h3>' + inputText + '</h3><p></p>');
 });
 
-test('Paragraph header', async ({umbracoApi, umbracoUi}) => {
+test('can apply paragraph header format', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.typeIntoRTETipTapEditor(inputText);
@@ -74,7 +74,7 @@ test('Paragraph header', async ({umbracoApi, umbracoUi}) => {
   expect(contentData.values[0].value.markup).toEqual('<h4>' + inputText + '</h4><p></p>');
 });
 
-test('Paragraph blocks', async ({umbracoApi, umbracoUi}) => {
+test('can apply paragraph blocks format', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.typeIntoRTETipTapEditor(inputText);
@@ -89,5 +89,41 @@ test('Paragraph blocks', async ({umbracoApi, umbracoUi}) => {
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.markup).toEqual('<h4>' + inputText + '</h4><p></p>');
+  expect(contentData.values[0].value.markup).toEqual('<p>' + inputText + '</p>');
+});
+
+test('can apply block quote format', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.typeIntoRTETipTapEditor(inputText);
+  await umbracoUi.content.selectAllRTETipTapEditorText();
+
+  // Act
+  await umbracoUi.content.clickStyleSelectButton();
+  await umbracoUi.content.hoverCascadingMenuItemWithName('Containers');
+  await umbracoUi.content.clickCascadingMenuItemWithName('Block quote');
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isErrorNotificationVisible(false);
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value.markup).toEqual('<blockquote><p>' + inputText + '</p></blockquote><p></p>');
+});
+
+test('can apply code block format', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.typeIntoRTETipTapEditor(inputText);
+  await umbracoUi.content.selectAllRTETipTapEditorText();
+
+  // Act
+  await umbracoUi.content.clickStyleSelectButton();
+  await umbracoUi.content.hoverCascadingMenuItemWithName('Containers');
+  await umbracoUi.content.clickCascadingMenuItemWithName('Code block');
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isErrorNotificationVisible(false);
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value.markup).toEqual('<pre><code>' + inputText + '</pre></code><p></p>');
 });
