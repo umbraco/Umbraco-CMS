@@ -12,6 +12,9 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterRTETipTapEditor(inputText);
+  await umbracoUi.content.selectAllRTETipTapEditorText();
 })
 
 test.afterEach(async ({umbracoApi}) => {
@@ -22,15 +25,12 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can apply page header format', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.typeIntoRTETipTapEditor(inputText);
-  await umbracoUi.content.selectAllRTETipTapEditorText();
+  await umbracoUi.content.clickStyleSelectButton();
 
   // Act
-  await umbracoUi.content.clickStyleSelectButton();
   await umbracoUi.content.hoverCascadingMenuItemWithName('Headers');
   await umbracoUi.content.clickCascadingMenuItemWithName('Page header');
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveButton();
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);
@@ -40,15 +40,12 @@ test('can apply page header format', async ({umbracoApi, umbracoUi}) => {
 
 test('can apply section header format', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.typeIntoRTETipTapEditor(inputText);
-  await umbracoUi.content.selectAllRTETipTapEditorText();
+  await umbracoUi.content.clickStyleSelectButton();
 
   // Act
-  await umbracoUi.content.clickStyleSelectButton();
   await umbracoUi.content.hoverCascadingMenuItemWithName('Headers');
   await umbracoUi.content.clickCascadingMenuItemWithName('Section header');
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveButton();
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);
@@ -58,15 +55,12 @@ test('can apply section header format', async ({umbracoApi, umbracoUi}) => {
 
 test('can apply paragraph header format', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.typeIntoRTETipTapEditor(inputText);
-  await umbracoUi.content.selectAllRTETipTapEditorText();
+  await umbracoUi.content.clickStyleSelectButton();
 
   // Act
-  await umbracoUi.content.clickStyleSelectButton();
   await umbracoUi.content.hoverCascadingMenuItemWithName('Headers');
   await umbracoUi.content.clickCascadingMenuItemWithName('Paragraph header');
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveButton();
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);
@@ -76,15 +70,12 @@ test('can apply paragraph header format', async ({umbracoApi, umbracoUi}) => {
 
 test('can apply paragraph blocks format', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.typeIntoRTETipTapEditor(inputText);
-  await umbracoUi.content.selectAllRTETipTapEditorText();
+  await umbracoUi.content.clickStyleSelectButton();
 
   // Act
-  await umbracoUi.content.clickStyleSelectButton();
   await umbracoUi.content.hoverCascadingMenuItemWithName('Blocks');
   await umbracoUi.content.clickCascadingMenuItemWithName('Paragraph');
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveButton();
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);
@@ -94,15 +85,12 @@ test('can apply paragraph blocks format', async ({umbracoApi, umbracoUi}) => {
 
 test('can apply block quote format', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.typeIntoRTETipTapEditor(inputText);
-  await umbracoUi.content.selectAllRTETipTapEditorText();
+  await umbracoUi.content.clickStyleSelectButton();
 
   // Act
-  await umbracoUi.content.clickStyleSelectButton();
   await umbracoUi.content.hoverCascadingMenuItemWithName('Containers');
   await umbracoUi.content.clickCascadingMenuItemWithName('Block quote');
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveButton();
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);
@@ -112,15 +100,12 @@ test('can apply block quote format', async ({umbracoApi, umbracoUi}) => {
 
 test('can apply code block format', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.typeIntoRTETipTapEditor(inputText);
-  await umbracoUi.content.selectAllRTETipTapEditorText();
+  await umbracoUi.content.clickStyleSelectButton();
 
   // Act
-  await umbracoUi.content.clickStyleSelectButton();
   await umbracoUi.content.hoverCascadingMenuItemWithName('Containers');
   await umbracoUi.content.clickCascadingMenuItemWithName('Code block');
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveButton();
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);
