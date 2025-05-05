@@ -125,5 +125,5 @@ test('can apply code block format', async ({umbracoApi, umbracoUi}) => {
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.markup).toEqual('<pre><code>' + inputText + '</pre></code><p></p>');
+  expect(contentData.values[0].value.markup).toEqual('<pre><code>' + inputText + '</code></pre><p></p>');
 });
