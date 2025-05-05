@@ -8,7 +8,7 @@ import {
 	UmbError,
 	type UmbApiError,
 	type UmbCancelError,
-	type UmbApiDataResponse,
+	type UmbDataApiResponse,
 } from '@umbraco-cms/backoffice/resources';
 import { batchTryExecute, tryExecute } from '@umbraco-cms/backoffice/resources';
 import { batchArray } from '@umbraco-cms/backoffice/utils';
@@ -96,11 +96,11 @@ const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 	};
 };
 
-interface UmbDataApiItemGetRequestControllerArgs<ResponseModelType extends UmbApiDataResponse> {
+interface UmbDataApiItemGetRequestControllerArgs<ResponseModelType extends UmbDataApiResponse> {
 	api: (args: { uniques: Array<string> }) => Promise<ResponseModelType>;
 	uniques: Array<string>;
 }
-class UmbDataApiItemGetRequestController<ResponseModelType extends UmbApiDataResponse> extends UmbControllerBase {
+class UmbDataApiItemGetRequestController<ResponseModelType extends UmbDataApiResponse> extends UmbControllerBase {
 	#apiCallback: (args: { uniques: Array<string> }) => Promise<ResponseModelType>;
 	#uniques: Array<string>;
 	#batchSize: number = 1;

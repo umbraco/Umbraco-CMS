@@ -49,6 +49,6 @@ export type UmbApiWithErrorResponse = {
  */
 export type UmbApiResponse<T = unknown> = T & UmbApiWithErrorResponse;
 
-export interface UmbApiDataResponse<ResponseType extends { data: unknown } = { data: unknown }> {
+export interface UmbDataApiResponse<ResponseType extends { data: unknown } = { data: unknown }> {
 	data: ResponseType['data'];
 }
