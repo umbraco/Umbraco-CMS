@@ -16,7 +16,6 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 	MediaItemResponseModel,
 	UmbMediaItemModel
 > {
-	#host: UmbControllerHost;
 	/**
 	 * Creates an instance of UmbMediaItemServerDataSource.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
@@ -26,7 +25,6 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 		super(host, {
 			mapper,
 		});
-		this.#host = host;
 	}
 
 	/**
@@ -38,10 +36,7 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 	 * ```
 	 */
 	async search({ query, skip, take }: { query: string; skip: number; take: number }) {
-		const { data, error } = await tryExecute(
-			this.#host,
-			MediaService.getItemMediaSearch({ query: { query, skip, take } }),
-		);
+		const { data, error } = await tryExecute(this, MediaService.getItemMediaSearch({ query: { query, skip, take } }));
 		const mapped = data?.items.map((item) => mapper(item));
 		return { data: mapped, error };
 	}
@@ -49,7 +44,7 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 	override async getItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
 
-		const itemRequestManager = new UmbDataApiItemGetRequestController(this.#host, {
+		const itemRequestManager = new UmbDataApiItemGetRequestController(this, {
 			// eslint-disable-next-line local-rules/no-direct-api-import
 			api: (args) => MediaService.getItemMedia({ query: { id: args.uniques } }),
 			uniques,
@@ -57,12 +52,7 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 
 		const { data, error } = await itemRequestManager.request();
 
-		if (data) {
-			const items = data.map((item) => mapper(item));
-			return { data: items };
-		}
-
-		return { error };
+		return { data: this._getMappedItems(data), error };
 	}
 }
 
