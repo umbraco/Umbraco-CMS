@@ -4,11 +4,16 @@ import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/external/ba
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
-import { UmbError, type UmbApiError, type UmbCancelError } from '@umbraco-cms/backoffice/resources';
+import {
+	UmbError,
+	type UmbApiError,
+	type UmbCancelError,
+	type UmbApiDataResponse,
+} from '@umbraco-cms/backoffice/resources';
 import { batchTryExecute, tryExecute } from '@umbraco-cms/backoffice/resources';
 import { batchArray } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_NOTIFICATION_CONTEXT, umbPeekError } from '@umbraco-cms/backoffice/notification';
+import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 
 /**
  * A data source for Media items that fetches data from the server
@@ -91,11 +96,11 @@ const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 	};
 };
 
-interface UmbManagementApiItemGetRequestControllerArgs<ResponseModelType extends { data: unknown }> {
+interface UmbManagementApiItemGetRequestControllerArgs<ResponseModelType extends UmbApiDataResponse> {
 	api: (args: { uniques: Array<string> }) => Promise<ResponseModelType>;
 	uniques: Array<string>;
 }
-class UmbManagementApiItemGetRequestController<ResponseModelType extends { data: unknown }> extends UmbControllerBase {
+class UmbManagementApiItemGetRequestController<ResponseModelType extends UmbApiDataResponse> extends UmbControllerBase {
 	#apiCallback: (args: { uniques: Array<string> }) => Promise<ResponseModelType>;
 	#uniques: Array<string>;
 	#batchSize: number = 1;

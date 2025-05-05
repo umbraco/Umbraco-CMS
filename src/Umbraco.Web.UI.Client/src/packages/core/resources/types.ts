@@ -48,3 +48,7 @@ export type UmbApiWithErrorResponse = {
  * @property {UmbError | UmbApiError | UmbCancelError | Error} error The error returned from the API.
  */
 export type UmbApiResponse<T = unknown> = T & UmbApiWithErrorResponse;
+
+export interface UmbApiDataResponse<ResponseType extends { data: unknown } = { data: unknown }> {
+	data: ResponseType['data'];
+}
