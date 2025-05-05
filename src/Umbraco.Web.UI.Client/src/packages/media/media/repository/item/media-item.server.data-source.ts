@@ -90,11 +90,11 @@ const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 	};
 };
 
-interface UmbManagementApiItemGetRequestManagerArgs<ResponseModelType> {
+interface UmbManagementApiItemGetRequestManagerArgs<ResponseModelType extends { data: unknown }> {
 	api: (args: { uniques: Array<string> }) => Promise<ResponseModelType>;
 	uniques: Array<string>;
 }
-class UmbManagementApiItemGetRequestManager<ResponseModelType> extends UmbControllerBase {
+class UmbManagementApiItemGetRequestManager<ResponseModelType extends { data: unknown }> extends UmbControllerBase {
 	#apiCallback: (args: { uniques: Array<string> }) => Promise<ResponseModelType>;
 	#uniques: Array<string>;
 	#batchSize: number = 1;
@@ -108,7 +108,7 @@ class UmbManagementApiItemGetRequestManager<ResponseModelType> extends UmbContro
 	async request() {
 		if (!this.#uniques) throw new Error('Uniques are missing');
 
-		let data: Array<ResponseModelType> | undefined;
+		let data: ResponseModelType['data'] | undefined;
 		let error: UmbError | UmbApiError | UmbCancelError | Error | undefined;
 
 		if (this.#uniques.length > this.#batchSize) {
