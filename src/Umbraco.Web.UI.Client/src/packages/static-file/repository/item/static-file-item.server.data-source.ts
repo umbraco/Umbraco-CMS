@@ -4,7 +4,7 @@ import type { StaticFileItemResponseModel } from '@umbraco-cms/backoffice/extern
 import { StaticFileService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-import { UmbDataApiItemGetRequestController } from '@umbraco-cms/backoffice/entity-item';
+import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 /**
  * A server data source for Static File items
@@ -32,7 +32,7 @@ export class UmbStaticFileItemServerDataSource extends UmbItemServerDataSourceBa
 		const serializer = new UmbServerFilePathUniqueSerializer();
 		const paths = uniques.map((unique) => serializer.toServerPath(unique)!);
 
-		const itemRequestManager = new UmbDataApiItemGetRequestController(this, {
+		const itemRequestManager = new UmbItemDataApiGetRequestController(this, {
 			// eslint-disable-next-line local-rules/no-direct-api-import
 			api: (args) => StaticFileService.getItemStaticFile({ query: { path: args.uniques } }),
 			uniques: paths,

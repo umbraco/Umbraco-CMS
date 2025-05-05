@@ -1,6 +1,6 @@
 import type { UmbMediaUrlModel } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDataApiItemGetRequestController } from '@umbraco-cms/backoffice/entity-item';
+import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 import { MediaService, type MediaUrlInfoResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 
@@ -27,7 +27,7 @@ export class UmbMediaUrlServerDataSource extends UmbItemServerDataSourceBase<
 	override async getItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
 
-		const itemRequestManager = new UmbDataApiItemGetRequestController(this, {
+		const itemRequestManager = new UmbItemDataApiGetRequestController(this, {
 			// eslint-disable-next-line local-rules/no-direct-api-import
 			api: (args) => MediaService.getMediaUrls({ query: { id: args.uniques } }),
 			uniques,

@@ -6,7 +6,7 @@ import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
-import { UmbDataApiItemGetRequestController } from '@umbraco-cms/backoffice/entity-item';
+import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 let manifestPropertyEditorUis: Array<ManifestPropertyEditorUi> = [];
 
@@ -41,7 +41,7 @@ export class UmbDataTypeItemServerDataSource extends UmbItemServerDataSourceBase
 	override async getItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
 
-		const itemRequestManager = new UmbDataApiItemGetRequestController(this, {
+		const itemRequestManager = new UmbItemDataApiGetRequestController(this, {
 			// eslint-disable-next-line local-rules/no-direct-api-import
 			api: (args) => DataTypeService.getItemDataType({ query: { id: args.uniques } }),
 			uniques,

@@ -5,7 +5,7 @@ import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import { UmbDataApiItemGetRequestController } from '@umbraco-cms/backoffice/entity-item';
+import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 /**
  * A data source for Media items that fetches data from the server
@@ -44,7 +44,7 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 	override async getItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
 
-		const itemRequestManager = new UmbDataApiItemGetRequestController(this, {
+		const itemRequestManager = new UmbItemDataApiGetRequestController(this, {
 			// eslint-disable-next-line local-rules/no-direct-api-import
 			api: (args) => MediaService.getItemMedia({ query: { id: args.uniques } }),
 			uniques,

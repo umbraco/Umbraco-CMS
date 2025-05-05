@@ -1,4 +1,4 @@
-import type { UmbDataApiItemGetRequestControllerArgs } from './types.js';
+import type { UmbItemDataApiGetRequestControllerArgs } from './types.js';
 import {
 	batchTryExecute,
 	tryExecute,
@@ -12,14 +12,14 @@ import { batchArray } from '@umbraco-cms/backoffice/utils';
 import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbDataApiItemGetRequestController<
+export class UmbItemDataApiGetRequestController<
 	ResponseModelType extends UmbDataApiResponse,
 > extends UmbControllerBase {
 	#apiCallback: (args: { uniques: Array<string> }) => Promise<ResponseModelType>;
 	#uniques: Array<string>;
 	#batchSize: number = 1;
 
-	constructor(host: UmbControllerHost, args: UmbDataApiItemGetRequestControllerArgs<ResponseModelType>) {
+	constructor(host: UmbControllerHost, args: UmbItemDataApiGetRequestControllerArgs<ResponseModelType>) {
 		super(host);
 		this.#apiCallback = args.api;
 		this.#uniques = args.uniques;
