@@ -1,4 +1,5 @@
 import type { UmbApiError, UmbCancelError, UmbError } from './umb-error.js';
+export type * from './data-api/types.js';
 
 export interface XhrRequestOptions extends UmbTryExecuteOptions {
 	baseUrl?: string;
@@ -48,7 +49,3 @@ export type UmbApiWithErrorResponse = {
  * @property {UmbError | UmbApiError | UmbCancelError | Error} error The error returned from the API.
  */
 export type UmbApiResponse<T = unknown> = T & UmbApiWithErrorResponse;
-
-export interface UmbDataApiResponse<ResponseType extends { data: unknown } = { data: unknown }> {
-	data: ResponseType['data'];
-}

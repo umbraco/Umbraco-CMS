@@ -44,11 +44,12 @@ export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType
 
 		const { data, error } = await tryExecute(this.#host, this.#getItems(uniques));
 
-		if (data) {
-			const items = data.map((item) => this.#mapper(item));
-			return { data: items };
-		}
+		return { data: this._getMappedItems(data), error };
+	}
 
-		return { error };
+	protected _getMappedItems(items: Array<ServerItemType> | undefined): Array<ClientItemType> | undefined {
+		if (!items) return undefined;
+		if (!this.#mapper) throw new Error('Mapper is not implemented');
+		return items.map((item) => this.#mapper(item));
 	}
 }
