@@ -13,5 +13,5 @@ export function batchTryExecute<BatchEntryType, PromiseResult>(
 	chunks: Array<Array<BatchEntryType>>,
 	callback: (chunk: Array<BatchEntryType>) => Promise<PromiseResult>,
 ): Promise<PromiseSettledResult<PromiseResult>[]> {
-	return Promise.allSettled(chunks.map((chunk) => tryExecute(host, callback(chunk))));
+	return Promise.allSettled(chunks.map((chunk) => tryExecute(host, callback(chunk), { disableNotifications: true })));
 }
