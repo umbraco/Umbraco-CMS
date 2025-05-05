@@ -4,10 +4,11 @@ import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/external/ba
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
-import type { UmbApiError, UmbCancelError, UmbError } from '@umbraco-cms/backoffice/resources';
+import { UmbError, type UmbApiError, type UmbCancelError } from '@umbraco-cms/backoffice/resources';
 import { batchTryExecute, tryExecute } from '@umbraco-cms/backoffice/resources';
 import { batchArray } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_NOTIFICATION_CONTEXT, umbPeekError } from '@umbraco-cms/backoffice/notification';
 
 /**
  * A data source for Media items that fetches data from the server
@@ -118,8 +119,7 @@ class UmbManagementApiItemGetRequestController<ResponseModelType extends { data:
 			const errors = results.filter((promiseResult) => promiseResult.status === 'rejected');
 
 			if (errors.length > 0) {
-				// TODO: investigate if its ok to only return the first error
-				error = errors[0].reason;
+				error = await this.#getAndHandleErrorResult(errors);
 			}
 
 			data = results
@@ -132,5 +132,16 @@ class UmbManagementApiItemGetRequestController<ResponseModelType extends { data:
 		}
 
 		return { data, error };
+	}
+
+	async #getAndHandleErrorResult(errors: Array<PromiseRejectedResult>) {
+		// TODO: We currently expect all the errors to be the same, but we should handle this better in the future.
+		const error = errors[0];
+		await umbPeekError(this, {
+			headline: 'Error fetching items',
+			message: 'An error occurred while fetching items.',
+		});
+
+		return new UmbError(error.reason);
 	}
 }
