@@ -26,7 +26,14 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		const moveRepository = await createExtensionApiByAlias<UmbMoveRepository>(this, this.args.meta.moveRepositoryAlias);
 		if (!moveRepository) throw new Error('Move Repository is not available');
 
-		await moveRepository.requestMoveTo({ unique: this.args.unique, destination: { unique: destinationUnique } });
+		const { error } = await moveRepository.requestMoveTo({
+			unique: this.args.unique,
+			destination: { unique: destinationUnique },
+		});
+
+		if (error) {
+			throw error;
+		}
 
 		this.#reloadMenu();
 	}

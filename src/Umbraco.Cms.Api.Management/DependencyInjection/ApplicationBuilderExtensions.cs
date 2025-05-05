@@ -35,11 +35,17 @@ internal static class ApplicationBuilderExtensions
                         return;
                     }
 
+                    var statusCode = (exception as BadHttpRequestException)?.StatusCode;
+                    if (statusCode.HasValue)
+                    {
+                        context.Response.StatusCode = statusCode.Value;
+                    }
+
                     var response = new ProblemDetails
                     {
                         Title = exception.Message,
                         Detail = isDebug ? exception.StackTrace : null,
-                        Status = StatusCodes.Status500InternalServerError,
+                        Status = statusCode ?? StatusCodes.Status500InternalServerError,
                         Instance = isDebug ? exception.GetType().Name : null,
                         Type = "Error"
                     };

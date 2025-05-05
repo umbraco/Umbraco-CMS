@@ -34,7 +34,6 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 		const data: UmbMediaDetailModel = {
 			entityType: UMB_MEDIA_ENTITY_TYPE,
 			unique: UmbId.new(),
-			urls: [],
 			mediaType: {
 				unique: '',
 				collection: null,
@@ -87,7 +86,6 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 					updateDate: variant.updateDate,
 				};
 			}),
-			urls: data.urls as UmbMediaDetailModel['urls'],
 			mediaType: {
 				unique: data.mediaType.id,
 				collection: data.mediaType.collection ? { unique: data.mediaType.collection.id } : null,

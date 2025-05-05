@@ -17,6 +17,8 @@ import { UMB_PROPERTY_CONTEXT, UmbPropertyValueCloneController } from '@umbraco-
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 /**
  * Clipboard context for managing clipboard entries for property values
@@ -26,6 +28,7 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
  */
 export class UmbClipboardPropertyContext extends UmbContextBase {
 	#init?: Promise<unknown>;
+	#localize = new UmbLocalizationController(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CLIPBOARD_PROPERTY_CONTEXT);
@@ -104,7 +107,25 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 			icon: args.icon,
 		};
 
-		return await clipboardContext.write(entryPreset);
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		if (!notificationContext) {
+			throw new Error('Notification context is required');
+		}
+
+		try {
+			const clipboardEntry = await clipboardContext.write(entryPreset);
+
+			notificationContext.peek('positive', {
+				data: { message: this.#localize.term('clipboard_copySuccessHeadline') },
+			});
+
+			return clipboardEntry;
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : String(error);
+			notificationContext.peek('danger', { data: { message: errorMessage } });
+		}
+
+		return undefined;
 	}
 
 	/**

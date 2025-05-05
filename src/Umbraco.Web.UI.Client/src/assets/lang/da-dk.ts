@@ -442,10 +442,10 @@ export default {
 		stay: 'Bliv',
 		discardChanges: 'Kassér ændringer',
 		unsavedChanges: 'Kassér ugemte ændringer',
-		unsavedChangesWarning:
-			'Er du sikker på du vil navigere væk fra denne side? - du har ikke-gemte\n      ændringer\n    ',
+		unsavedChangesWarning: 'Er du sikker på du vil navigere væk fra denne side? - du har ikke-gemte ændringer',
 		confirmListViewPublish: 'Udgivelse vil gøre de valgte sider synlige på sitet.',
 		confirmListViewUnpublish: 'Afpublicering vil fjerne de valgte sider og deres undersider fra sitet.',
+		confirmPublish: 'Udgivelse vil gøre denne side og alle dets publicerede undersider synlige på websitet.',
 		confirmUnpublish: 'Afpublicering vil fjerne denne side og alle dets undersider fra websitet.',
 		doctypeChangeWarning: 'Du har ikke-gemte ændringer. Hvis du ændrer dokumenttype, kasseres ændringerne.\n    ',
 	},

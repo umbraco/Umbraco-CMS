@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
     <IsPackable>false</IsPackable>
@@ -24,6 +24,11 @@
   <ItemGroup>
     <!-- Add design/build time support for EF Core migrations -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
+    <!-- Explicit transitive references to avoid warnings on build - see https://github.com/dotnet/efcore/issues/35143-->
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
   </ItemGroup>
 
   <ItemGroup>

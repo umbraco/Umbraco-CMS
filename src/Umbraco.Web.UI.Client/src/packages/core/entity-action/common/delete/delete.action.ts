@@ -25,7 +25,10 @@ export class UmbDeleteEntityAction<
 			this.args.meta.detailRepositoryAlias,
 		);
 
-		await detailRepository.delete(this.args.unique);
+		const { error } = await detailRepository.delete(this.args.unique);
+		if (error) {
+			throw error;
+		}
 
 		await this.#notify();
 	}
@@ -35,7 +38,7 @@ export class UmbDeleteEntityAction<
 		const message = this.args.meta.confirm?.message ?? '#defaultdialogs_confirmdelete';
 
 		// TODO: handle items with variants
-		await umbConfirmModal(this._host, {
+		await umbConfirmModal(this, {
 			headline,
 			content: this.#localize.string(message, item.name),
 			color: 'danger',

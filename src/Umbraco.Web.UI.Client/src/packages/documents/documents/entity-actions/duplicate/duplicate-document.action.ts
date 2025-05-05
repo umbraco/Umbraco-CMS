@@ -29,9 +29,11 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 			includeDescendants: value.includeDescendants,
 		});
 
-		if (!error) {
-			this.#reloadMenu(destinationUnique);
+		if (error) {
+			throw error;
 		}
+
+		this.#reloadMenu(destinationUnique);
 	}
 
 	async #reloadMenu(destinationUnique: string | null) {

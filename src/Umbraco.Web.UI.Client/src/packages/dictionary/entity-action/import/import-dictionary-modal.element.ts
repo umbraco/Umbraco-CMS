@@ -4,8 +4,9 @@ import { css, html, customElement, query, state, when } from '@umbraco-cms/backo
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbTreeElement, UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
-import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
+import type { UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
+import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
 interface UmbDictionaryItemPreview {
 	id: string;
@@ -31,16 +32,20 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	@state()
 	private _temporaryFileId = '';
 
+	@state()
+	private _importButtonState?: UUIButtonState;
+
+	@state()
+	private _importAllowed = false;
+
 	@query('#form')
 	private _form!: HTMLFormElement;
-
-	@query('umb-tree')
-	private _treeElement?: UmbTreeElement;
 
 	#fileReader;
 	#fileContent: Array<UmbDictionaryItemPreview> = [];
 	#dictionaryImportRepository = new UmbDictionaryImportRepository(this);
-	#temporaryFileRepository = new UmbTemporaryFileRepository(this);
+	#temporaryFileManager = new UmbTemporaryFileManager(this);
+	#abortController?: AbortController;
 
 	constructor() {
 		super();
@@ -99,14 +104,28 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 
 	async #onUpload(e: Event) {
 		e.preventDefault();
+
+		this.#onClear();
+
 		const formData = new FormData(this._form);
 		const file = formData.get('file') as File;
 		if (!file) throw new Error('File is missing');
 
 		this.#fileReader.readAsText(file);
-		this._temporaryFileId = UmbId.new();
+		const temporaryUnique = UmbId.new();
 
-		this.#temporaryFileRepository.upload(this._temporaryFileId, file);
+		this.#abortController = new AbortController();
+
+		const { status } = await this.#temporaryFileManager.uploadOne({
+			file,
+			temporaryUnique,
+			abortController: this.#abortController,
+		});
+
+		if (status === TemporaryFileStatus.SUCCESS) {
+			this._importAllowed = true;
+			this._temporaryFileId = temporaryUnique;
+		}
 	}
 
 	async #onFileInput() {
@@ -117,6 +136,9 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 
 	#onClear() {
 		this._temporaryFileId = '';
+		this._importAllowed = false;
+		this.#abortController?.abort();
+		this.#abortController = undefined;
 	}
 
 	override render() {
@@ -163,6 +185,8 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 				${this.localize.term('general_back')}
 			</uui-button>
 			<uui-button
+				.state=${this._importButtonState}
+				?disabled=${!this._importAllowed}
 				type="button"
 				label=${this.localize.term('general_import')}
 				look="primary"

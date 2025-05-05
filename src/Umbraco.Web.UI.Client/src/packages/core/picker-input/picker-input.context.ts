@@ -99,7 +99,8 @@ export class UmbPickerInputContext<
 			value: {
 				selection: this.getSelection(),
 			} as PickerModalValueType,
-		});
+		}).catch(() => undefined);
+		if (!modalValue) return;
 
 		this.setSelection(modalValue.selection);
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());

@@ -49,9 +49,14 @@ export class UmbEntityActionDefaultElement<
 	async #onClickLabel(event: UUIMenuItemEvent) {
 		if (!this._href) {
 			event.stopPropagation();
-			await this.#api?.execute().catch(() => {});
+
+			try {
+				await this.#api?.execute();
+				this.dispatchEvent(new UmbActionExecutedEvent());
+			} catch (error) {
+				console.error('Error executing action:', error);
+			}
 		}
-		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
 	// TODO: we need to stop the regular click event from bubbling up to the table so it doesn't select the row.
