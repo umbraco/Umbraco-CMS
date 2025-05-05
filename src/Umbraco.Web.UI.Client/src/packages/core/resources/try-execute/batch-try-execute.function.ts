@@ -1,4 +1,4 @@
-import { tryExecute } from '../tryExecute.function.js';
+import { tryExecute } from './tryExecute.function.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
