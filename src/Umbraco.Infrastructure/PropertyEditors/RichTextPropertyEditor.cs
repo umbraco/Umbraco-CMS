@@ -219,8 +219,50 @@ public class RichTextPropertyEditor : DataEditor
                 StaticServiceProvider.Instance.GetRequiredService<IRichTextRequiredValidator>(),
                 StaticServiceProvider.Instance.GetRequiredService<IRichTextRegexValidator>())
         {
-
         }
+
+        public RichTextPropertyValueEditor(
+            DataEditorAttribute attribute,
+            PropertyEditorCollection propertyEditors,
+            IDataTypeConfigurationCache dataTypeReadCache,
+            ILogger<RichTextPropertyValueEditor> logger,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            HtmlImageSourceParser imageSourceParser,
+            HtmlLocalLinkParser localLinkParser,
+            RichTextEditorPastedImages pastedImages,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            IHtmlSanitizer htmlSanitizer,
+            IHtmlMacroParameterParser macroParameterParser,
+            IBlockEditorElementTypeCache elementTypeCache,
+            IPropertyValidationService propertyValidationService,
+            DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
+            IRichTextRequiredValidator richTextRequiredValidator)
+            : this(
+                attribute,
+                propertyEditors,
+                dataTypeReadCache,
+                logger,
+                backOfficeSecurityAccessor,
+                localizedTextService,
+                shortStringHelper,
+                imageSourceParser,
+                localLinkParser,
+                pastedImages,
+                jsonSerializer,
+                ioHelper,
+                htmlSanitizer,
+                macroParameterParser,
+                elementTypeCache,
+                propertyValidationService,
+                dataValueReferenceFactoryCollection,
+                richTextRequiredValidator,
+                StaticServiceProvider.Instance.GetRequiredService<IRichTextRegexValidator>())
+            {
+            }
+
         public RichTextPropertyValueEditor(
             DataEditorAttribute attribute,
             PropertyEditorCollection propertyEditors,
