@@ -1,1 +1,1 @@
-export * from './data-api-item-get-request.controller.js';
+export * from './item-data-api-get-request.controller.js';
