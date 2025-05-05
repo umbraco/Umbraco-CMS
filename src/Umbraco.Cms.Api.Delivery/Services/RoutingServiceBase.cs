@@ -1,3 +1,4 @@
+using System.Web;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -36,7 +37,11 @@ internal abstract class RoutingServiceBase
     }
 
     protected static string GetContentRoute(DomainAndUri domainAndUri, Uri contentRoute)
-        => $"{domainAndUri.ContentId}{DomainUtilities.PathRelativeToDomain(domainAndUri.Uri, contentRoute.AbsolutePath)}";
+    {
+        // Decoding the absolute path of contentRoute as PathRelativeToDomain needs to work with a decoded path value
+        var decodedAbsolutePath = HttpUtility.UrlDecode(contentRoute.AbsolutePath);
+        return $"{domainAndUri.ContentId}{DomainUtilities.PathRelativeToDomain(domainAndUri.Uri, decodedAbsolutePath)}";
+    }
 
     protected DomainAndUri? GetDomainAndUriForRoute(Uri contentUrl)
     {
