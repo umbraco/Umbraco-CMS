@@ -12,12 +12,10 @@ using Umbraco.Cms.Core.Sync;
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
 [WebhookEvent("Content Published", Constants.WebhookEvents.Types.Content)]
-public class ExtendedContentPublishedWebhookEvent : WebhookEventContentBase<ContentPublishedNotification, IContent>
+public class ExtendedContentPublishedWebhookEvent : ExtendedContentWebhookEventBase<ContentPublishedNotification>
 {
     private readonly IApiContentResponseBuilder _apiContentBuilder;
     private readonly IPublishedContentCache _publishedContentCache;
-    private readonly IOutputExpansionStrategyAccessor _outputExpansionStrategyAccessor;
-    private readonly IVariationContextAccessor _variationContextAccessor;
 
     public ExtendedContentPublishedWebhookEvent(
         IWebhookFiringService webhookFiringService,
@@ -32,12 +30,12 @@ public class ExtendedContentPublishedWebhookEvent : WebhookEventContentBase<Cont
             webhookFiringService,
             webhookService,
             webhookSettings,
-            serverRoleAccessor)
+            serverRoleAccessor,
+            outputExpansionStrategyAccessor,
+            variationContextAccessor)
     {
         _apiContentBuilder = apiContentBuilder;
         _publishedContentCache = publishedContentCache;
-        _outputExpansionStrategyAccessor = outputExpansionStrategyAccessor;
-        _variationContextAccessor = variationContextAccessor;
     }
 
     public override string Alias => Constants.WebhookEvents.Aliases.ContentPublish;
@@ -56,29 +54,7 @@ public class ExtendedContentPublishedWebhookEvent : WebhookEventContentBase<Cont
             return null;
         }
 
-        var cultures = new Dictionary<string, object>();
-
-        // just to be safe that messing with the variationContext doesn't screw things up
-        VariationContext? originalVariationContext = _variationContextAccessor.VariationContext;
-
-        foreach (KeyValuePair<string, IApiContentRoute> culture in deliveryContent.Cultures)
-        {
-            _variationContextAccessor.VariationContext = new VariationContext(culture.Key);
-
-            IDictionary<string, object?> properties =
-                _outputExpansionStrategyAccessor.TryGetValue(out IOutputExpansionStrategy? outputExpansionStrategy)
-                    ? outputExpansionStrategy.MapContentProperties(publishedContent!)
-                    : new Dictionary<string, object?>();
-
-            cultures.Add(culture.Key, new
-            {
-                culture.Value.Path,
-                culture.Value.StartItem,
-                properties,
-            });
-        }
-
-        _variationContextAccessor.VariationContext = originalVariationContext;
+        Dictionary<string, object> cultures = BuildCultureProperties(publishedContent!, deliveryContent);
 
         return new
         {

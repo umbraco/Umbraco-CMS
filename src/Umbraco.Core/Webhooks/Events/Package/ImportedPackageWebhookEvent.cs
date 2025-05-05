@@ -26,23 +26,23 @@ public class ImportedPackageWebhookEvent : WebhookEventBase<ImportedPackageNotif
             PackageName = notification.InstallationSummary.PackageName,
             InstalledEntities = new
             {
-                Content = notification.InstallationSummary.ContentInstalled.Select(x => x.Key),
-                Languages = notification.InstallationSummary.LanguagesInstalled.Select(x => x.Key),
-                Media = notification.InstallationSummary.MediaInstalled.Select(x => x.Key),
-                Scripts = notification.InstallationSummary.ScriptsInstalled.Select(x => x.Key),
-                StyleSheets = notification.InstallationSummary.StylesheetsInstalled.Select(x => x.Key),
-                Templates = notification.InstallationSummary.TemplatesInstalled.Select(x => x.Key),
-                DataTypes = notification.InstallationSummary.DataTypesInstalled.Select(x => x.Key),
-                DictionaryItems = notification.InstallationSummary.DictionaryItemsInstalled.Select(x => x.Key),
-                DocumentTypes = notification.InstallationSummary.DocumentTypesInstalled.Select(x => x.Key),
-                EntityContainers = notification.InstallationSummary.EntityContainersInstalled.Select(x => x.Key),
-                MediaTypes = notification.InstallationSummary.MediaTypesInstalled.Select(x => x.Key),
-                PartialViews = notification.InstallationSummary.PartialViewsInstalled.Select(x => x.Key),
+                ContentIds = notification.InstallationSummary.ContentInstalled.Select(x => x.Key),
+                LanguagesIds = notification.InstallationSummary.LanguagesInstalled.Select(x => x.Key),
+                MediaIds = notification.InstallationSummary.MediaInstalled.Select(x => x.Key),
+                ScriptsIds = notification.InstallationSummary.ScriptsInstalled.Select(x => x.Key),
+                StyleSheetsIds = notification.InstallationSummary.StylesheetsInstalled.Select(x => x.Key),
+                TemplatesIds = notification.InstallationSummary.TemplatesInstalled.Select(x => x.Key),
+                DataTypesIds = notification.InstallationSummary.DataTypesInstalled.Select(x => x.Key),
+                DictionaryItemsIds = notification.InstallationSummary.DictionaryItemsInstalled.Select(x => x.Key),
+                DocumentTypesIds = notification.InstallationSummary.DocumentTypesInstalled.Select(x => x.Key),
+                EntityContainersIds = notification.InstallationSummary.EntityContainersInstalled.Select(x => x.Key),
+                MediaTypesIds = notification.InstallationSummary.MediaTypesInstalled.Select(x => x.Key),
+                PartialViewsIds = notification.InstallationSummary.PartialViewsInstalled.Select(x => x.Key),
             },
             Warnings = new
             {
-                ConflictingStylesheets = notification.InstallationSummary.Warnings.ConflictingStylesheets?.Select(x => x?.Key).Where(x => x is not null) ?? [],
-                ConflictingTemplates = notification.InstallationSummary.Warnings.ConflictingTemplates?.Select(x => x.Key) ?? [],
+                ConflictingStylesheetsIds = notification.InstallationSummary.Warnings.ConflictingStylesheets?.Select(x => x?.Key).Where(x => x is not null) ?? [],
+                ConflictingTemplatesIds = notification.InstallationSummary.Warnings.ConflictingTemplates?.Select(x => x.Key) ?? [],
             },
         };
 }
