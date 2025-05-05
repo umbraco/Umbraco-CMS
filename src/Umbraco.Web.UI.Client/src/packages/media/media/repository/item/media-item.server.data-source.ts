@@ -5,7 +5,7 @@ import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbApiError, UmbCancelError, UmbError } from '@umbraco-cms/backoffice/resources';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { batchTryExecute, tryExecute } from '@umbraco-cms/backoffice/resources';
 import { batchArray } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
@@ -133,32 +133,4 @@ class UmbManagementApiItemGetRequestManager<ResponseModelType> extends UmbContro
 
 		return { data, error };
 	}
-}
-
-/**
- * Batches promises and returns a promise that resolves to an array of results
- * @param {Array<Array<BatchEntryType>>} chunks - The array of chunks to process
- * @param {(chunk: Array<BatchEntryType>) => Promise<PromiseResult>} callback - The function to call for each chunk
- * @returns {Promise<PromiseSettledResult<PromiseResult>[]>} - A promise that resolves to an array of results
- */
-function batchPromises<BatchEntryType, PromiseResult>(
-	chunks: Array<Array<BatchEntryType>>,
-	callback: (chunk: Array<BatchEntryType>) => Promise<PromiseResult>,
-): Promise<PromiseSettledResult<PromiseResult>[]> {
-	return Promise.allSettled(chunks.map((chunk) => callback(chunk)));
-}
-
-/**
- * Batches promises and returns a promise that resolves to an array of results
- * @param {UmbControllerHost} host - The host to use for the request and where notifications will be shown
- * @param {Array<Array<BatchEntryType>>} chunks - The array of chunks to process
- * @param {(chunk: Array<BatchEntryType>) => Promise<PromiseResult>} callback - The function to call for each chunk
- * @returns {Promise<PromiseSettledResult<PromiseResult>[]>} - A promise that resolves to an array of results
- */
-function batchTryExecute<BatchEntryType, PromiseResult>(
-	host: UmbControllerHost,
-	chunks: Array<Array<BatchEntryType>>,
-	callback: (chunk: Array<BatchEntryType>) => Promise<PromiseResult>,
-): Promise<PromiseSettledResult<PromiseResult>[]> {
-	return batchPromises(chunks, (chunk) => tryExecute(host, callback(chunk)));
 }
