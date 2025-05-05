@@ -1,3 +1,4 @@
+using System.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -35,6 +36,7 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
         await DocumentUrlService.InitAsync(true, CancellationToken.None);
 
         await GetRequiredService<ILanguageService>().CreateAsync(new Language("da-DK", "Danish"), Constants.Security.SuperUserKey);
+        await GetRequiredService<ILanguageService>().CreateAsync(new Language("ja-JP", "Japanese"), Constants.Security.SuperUserKey);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("theContentType")
@@ -50,6 +52,7 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
                 .WithContentType(contentType)
                 .WithCultureName("en-US", $"Root {rootNumber} en-US")
                 .WithCultureName("da-DK", $"Root {rootNumber} da-DK")
+                .WithCultureName("ja-JP", $"ル-ト {rootNumber} ja-JP")
                 .Build();
             ContentService.Save(root);
             ContentService.Publish(root, ["*"]);
@@ -62,6 +65,7 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
                     .WithParent(root)
                     .WithCultureName("en-US", $"Child {childNumber} en-US")
                     .WithCultureName("da-DK", $"Child {childNumber} da-DK")
+                    .WithCultureName("ja-JP", $"子供 {childNumber} ja-JP")
                     .Build();
                 ContentService.Save(child);
                 ContentService.Publish(child, ["*"]);
@@ -74,6 +78,7 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
                         .WithParent(child)
                         .WithCultureName("en-US", $"Grandchild {grandchildNumber} en-US")
                         .WithCultureName("da-DK", $"Grandchild {grandchildNumber} da-DK")
+                        .WithCultureName("ja-JP", $"孫 {grandchildNumber} ja-JP")
                         .Build();
                     ContentService.Save(grandchild);
                     ContentService.Publish(grandchild, ["*"]);
@@ -85,6 +90,7 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
 
     [TestCase("en-US")]
     [TestCase("da-DK")]
+    [TestCase("ja-JP")]
     public void First_Root_Without_StartItem(string culture)
     {
         Assert.IsEmpty(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString());
@@ -97,6 +103,7 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
 
     [TestCase("en-US")]
     [TestCase("da-DK")]
+    [TestCase("ja-JP")]
     [ConfigureBuilder(ActionName = nameof(ConfigureIncludeTopLevelNodeInPath))]
     public void First_Root_Without_StartItem_With_Top_Level_Node_Included(string culture)
     {
@@ -268,11 +275,29 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
     [TestCase("/", 1, "da-DK")]
     [TestCase("/root-2-da-dk", 2, "da-DK")]
     [TestCase("/root-3-da-dk", 3, "da-DK")]
+    [TestCase("/ル-ト-3-ja-jp", 3, "ja-JP")]
     public void Root_By_Path_Without_StartItem(string path, int root, string culture)
     {
         SetVariationContext(culture);
 
         var content = ApiContentPathResolver.ResolveContentPath(path);
+        Assert.IsNotNull(content);
+        Assert.AreEqual(_contentByName[$"Root {root}"].Key, content.Key);
+    }
+
+    [TestCase("/", 1, "en-US")]
+    [TestCase("/root-2-en-us", 2, "en-US")]
+    [TestCase("/root-3-en-us", 3, "en-US")]
+    [TestCase("/", 1, "da-DK")]
+    [TestCase("/root-2-da-dk", 2, "da-DK")]
+    [TestCase("/root-3-da-dk", 3, "da-DK")]
+    [TestCase("/ル-ト-3-ja-jp", 3, "ja-JP")]
+    public void Root_By_Path_Without_StartItem_Url_Encoded(string path, int root, string culture)
+    {
+        SetVariationContext(culture);
+
+        var encodedPath = HttpUtility.UrlEncode(path);
+        var content = ApiContentPathResolver.ResolveContentPath(encodedPath);
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentByName[$"Root {root}"].Key, content.Key);
     }
