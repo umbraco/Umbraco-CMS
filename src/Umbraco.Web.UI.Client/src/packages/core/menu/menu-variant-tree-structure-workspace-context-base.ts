@@ -1,5 +1,5 @@
 import type { UmbVariantStructureItemModel } from './types.js';
-import { UMB_VARIANT_MENU_STRUCTURE_WORKSPACE_CONTEXT } from './variant-menu-structure-workspace-context.context-token.js';
+import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from './menu-variant-structure-workspace-context.context-token.js';
 import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -26,10 +26,10 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	#parentContext = new UmbParentEntityContext(this);
 	#ancestorContext = new UmbAncestorsEntityContext(this);
 
-	public readonly IS_VARIANT_MENU_STRUCTURE_WORKSPACE_CONTEXT = true;
+	public readonly IS_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT = true;
 
 	constructor(host: UmbControllerHost, args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs) {
-		super(host, UMB_VARIANT_MENU_STRUCTURE_WORKSPACE_CONTEXT);
+		super(host, UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT);
 		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
 		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 		this.#args = args;

@@ -7,7 +7,7 @@ import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import {
-	UMB_VARIANT_MENU_STRUCTURE_WORKSPACE_CONTEXT,
+	UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT,
 	type UmbVariantStructureItemModel,
 } from '@umbraco-cms/backoffice/menu';
 
@@ -28,7 +28,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 	#workspaceContext?: UmbVariantDatasetWorkspaceContext;
 	#appLanguageContext?: UmbAppLanguageContext;
-	#structureContext?: typeof UMB_VARIANT_MENU_STRUCTURE_WORKSPACE_CONTEXT.TYPE;
+	#structureContext?: typeof UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -49,7 +49,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 			this.#observeStructure();
 		});
 
-		this.consumeContext(UMB_VARIANT_MENU_STRUCTURE_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT, (instance) => {
 			if (!instance) return;
 			this.#structureContext = instance;
 			this.#observeStructure();

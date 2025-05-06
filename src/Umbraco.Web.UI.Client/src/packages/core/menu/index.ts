@@ -1,8 +1,8 @@
 export * from './components/index.js';
 export * from './menu-tree-structure-workspace-context-base.js';
 export * from './menu-structure-workspace-context.context-token.js';
-export * from './variant-menu-structure-workspace-context.context-token.js';
-export * from './variant-menu-structure-workspace-context-base.js';
+export * from './menu-variant-structure-workspace-context.context-token.js';
+export * from './menu-variant-tree-structure-workspace-context-base.js';
 
 export type * from './types.js';
 
