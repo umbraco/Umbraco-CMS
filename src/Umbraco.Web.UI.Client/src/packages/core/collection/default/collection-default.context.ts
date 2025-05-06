@@ -25,7 +25,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { UMB_ENTITY_CONTEXT, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController, type UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
@@ -83,6 +83,7 @@ export class UmbDefaultCollectionContext<
 	});
 
 	#actionEventContext: UmbActionEventContext | undefined;
+	#parentEntityContext = new UmbParentEntityContext(this);
 
 	constructor(host: UmbControllerHost, defaultViewAlias: string, defaultFilter: Partial<FilterModelType> = {}) {
 		super(host, UMB_COLLECTION_CONTEXT);
@@ -92,6 +93,23 @@ export class UmbDefaultCollectionContext<
 
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 		this.#listenToEntityEvents();
+
+		// The parent entity context is used to get the parent entity for the collection items
+		// All items in the collection are children of the current entity context
+		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
+			const currentEntityUnique = context?.getUnique();
+			const currentEntityType = context?.getEntityType();
+
+			const parent: UmbEntityModel | undefined =
+				currentEntityUnique && currentEntityType
+					? {
+							unique: currentEntityUnique,
+							entityType: currentEntityType,
+						}
+					: undefined;
+
+			this.#parentEntityContext?.setParent(parent);
+		});
 	}
 
 	setupView(viewElement: UmbControllerHost) {
