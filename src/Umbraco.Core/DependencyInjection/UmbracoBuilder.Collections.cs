@@ -93,7 +93,15 @@ public static partial class UmbracoBuilderExtensions
         builder.FilterHandlers().Add(() => builder.TypeLoader.GetTypes<IFilterHandler>());
         builder.SortHandlers().Add(() => builder.TypeLoader.GetTypes<ISortHandler>());
         builder.ContentIndexHandlers().Add(() => builder.TypeLoader.GetTypes<IContentIndexHandler>());
-        builder.WebhookEvents().AddCms(true, builder.Config.GetValue<WebhookPayloadType>(Constants.Configuration.ConfigWebhookPayloadType));
+
+        WebhookPayloadType webhookPayloadType = Constants.Webhooks.DefaultPayloadType;
+        if (builder.Config.GetSection(Constants.Configuration.ConfigWebhookPayloadType) is not null)
+        {
+            webhookPayloadType = builder.Config.GetValue<WebhookPayloadType>(Constants.Configuration.ConfigWebhookPayloadType);
+        }
+
+        builder.WebhookEvents().AddCms(true, webhookPayloadType);
+
         builder.ContentTypeFilters();
     }
 
