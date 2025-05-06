@@ -9,6 +9,9 @@ export class ExampleHintWorkspaceView extends UmbElementMixin(LitElement) {
 
 	async onClick() {
 		const context = await this.getContext(UMB_WORKSPACE_VIEW_NAVIGATION_CONTEXT);
+		if (!context) {
+			throw new Error('Could not find the context');
+		}
 		const view = await context.getViewContext('example.workspaceView.hint');
 		if (!view) {
 			throw new Error('Could not find the view');
