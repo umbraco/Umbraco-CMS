@@ -19,7 +19,7 @@ import {
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbDeprecation, UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { UmbParentEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 export abstract class UmbTreeItemContextBase<
 		TreeItemType extends UmbTreeItemModel,
@@ -81,6 +81,7 @@ export abstract class UmbTreeItemContextBase<
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	#hasChildrenContext = new UmbHasChildrenEntityContext(this);
+	#parentContext = new UmbParentEntityContext(this);
 
 	// TODO: get this from the tree context
 	#paging = {
@@ -144,6 +145,13 @@ export abstract class UmbTreeItemContextBase<
 		this.#hasChildren.setValue(hasChildren);
 		this.#hasChildrenContext.setHasChildren(hasChildren);
 
+		const parentEntity: UmbEntityModel | undefined = treeItem.parent
+			? {
+					entityType: treeItem.parent.entityType,
+					unique: treeItem.parent.unique,
+				}
+			: undefined;
+		this.#parentContext.setParent(parentEntity);
 		this._treeItem.setValue(treeItem);
 
 		// Update observers:
