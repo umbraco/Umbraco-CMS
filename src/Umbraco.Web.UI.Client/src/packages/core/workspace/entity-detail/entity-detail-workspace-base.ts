@@ -70,15 +70,16 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		parent ? parent.entityType : undefined,
 	);
 
-	#parent = new UmbObjectState<{ entityType: string; unique: UmbEntityUnique } | undefined>(undefined);
 	/**
 	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead to get the parent both when creating and editing.
 	 */
-	public readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+	public readonly parentUnique = this.#createUnderParent.asObservablePart((parent) =>
+		parent ? parent.unique : undefined,
+	);
 	/**
 	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead to get the parent both when creating and editing.
 	 */
-	public readonly parentEntityType = this.#parent.asObservablePart((parent) =>
+	public readonly parentEntityType = this.#createUnderParent.asObservablePart((parent) =>
 		parent ? parent.entityType : undefined,
 	);
 
@@ -191,7 +192,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns { UmbEntityModel | undefined } The parent entity
 	 */
 	getParent(): UmbEntityModel | undefined {
-		return this.#parent.getValue();
+		return this.#createUnderParent.getValue();
 	}
 
 	/**
@@ -200,7 +201,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @param { UmbEntityModel } parent The parent entity
 	 */
 	setParent(parent: UmbEntityModel) {
-		this.#parent.setValue(parent);
+		this.#createUnderParent.setValue(parent);
 	}
 
 	/**
@@ -209,7 +210,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns { string | undefined } The parent unique identifier
 	 */
 	getParentUnique(): UmbEntityUnique | undefined {
-		return this.#parent.getValue()?.unique;
+		return this.#createUnderParent.getValue()?.unique;
 	}
 
 	/**
@@ -218,7 +219,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns { string | undefined } The parent entity type
 	 */
 	getParentEntityType() {
-		return this.#parent.getValue()?.entityType;
+		return this.#createUnderParent.getValue()?.entityType;
 	}
 
 	async load(
@@ -288,6 +289,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.resetState();
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Creating ${this.getEntityType()} scaffold` });
 		await this.#init;
+		// keeping setParent for backwards compatibility. Remove in v18.
+		this.setParent(args.parent);
 		this.setCreateUnderParent(args.parent);
 
 		const request = this._detailRepository!.createScaffold(args.preset);
@@ -330,7 +333,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 
 		if (this.getIsNew()) {
-			const parent = this.#parent.getValue();
+			const parent = this.#createUnderParent.getValue();
 			if (parent?.unique === undefined) throw new Error('Parent unique is missing');
 			if (!parent.entityType) throw new Error('Parent entity type is missing');
 			await this._create(currentData, parent);
