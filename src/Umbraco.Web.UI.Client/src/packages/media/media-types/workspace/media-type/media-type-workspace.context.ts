@@ -1,6 +1,6 @@
-import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../entity.js';
-import type { UmbMediaTypeDetailModel } from '../types.js';
-import { UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../constants.js';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../../entity.js';
+import type { UmbMediaTypeDetailModel } from '../../types.js';
+import { UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../constants.js';
 import { UmbMediaTypeWorkspaceEditorElement } from './media-type-workspace-editor.element.js';
 import { UMB_MEDIA_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import {

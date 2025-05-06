@@ -40,16 +40,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Media Type Tree Item',
 		forEntityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE, UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE, UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE],
 	},
-	{
-		type: 'workspace',
-		kind: 'default',
-		alias: 'Umb.Workspace.MediaType.Root',
-		name: 'Media Type Root Workspace',
-		meta: {
-			entityType: UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE,
-			headline: '#treeHeaders_mediaTypes',
-		},
-	},
 	...folderManifests,
 	...treeItemChildrenManifest,
 ];

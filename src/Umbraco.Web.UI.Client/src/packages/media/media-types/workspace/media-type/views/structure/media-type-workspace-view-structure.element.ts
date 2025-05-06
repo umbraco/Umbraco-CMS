@@ -1,5 +1,5 @@
 import type { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
-import type { UmbInputMediaTypeElement } from '../../../components/input-media-type/input-media-type.element.js';
+import type { UmbInputMediaTypeElement } from '../../../../components/input-media-type/input-media-type.element.js';
 import { UMB_MEDIA_TYPE_WORKSPACE_CONTEXT } from '../../media-type-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

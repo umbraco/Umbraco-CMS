@@ -1,1 +1,1 @@
-export * from './media-type-workspace.context-token.js';
+export * from './media-type/index.js';
