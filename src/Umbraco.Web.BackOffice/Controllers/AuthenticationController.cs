@@ -419,7 +419,7 @@ public class AuthenticationController : UmbracoApiControllerBase
     public async Task<ActionResult<UserDetail?>> PostLogin(LoginModel loginModel)
     {
         // Start a timed scope to ensure failed responses return is a consistent time
-        await using var timedScope = new TimedScope(GetLoginDuration(), CancellationToken.None);
+        await using var timedScope = new TimedScope(GetLoginDuration(), HttpContext.RequestAborted);
 
         // Sign the user in with username/password, this also gives a chance for developers to
         // custom verify the credentials and auto-link user accounts with a custom IBackOfficePasswordChecker
