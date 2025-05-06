@@ -8,14 +8,14 @@ import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observabl
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
 
-interface UmbVariantMenuStructureWorkspaceContextBaseArgs {
+interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
 }
 
-export abstract class UmbVariantMenuStructureWorkspaceContextBase extends UmbContextBase {
+export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends UmbContextBase {
 	//
 	#workspaceContext?: typeof UMB_VARIANT_TREE_ENTITY_WORKSPACE_CONTEXT.TYPE;
-	#args: UmbVariantMenuStructureWorkspaceContextBaseArgs;
+	#args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs;
 
 	#structure = new UmbArrayState<UmbVariantStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
@@ -28,7 +28,7 @@ export abstract class UmbVariantMenuStructureWorkspaceContextBase extends UmbCon
 
 	public readonly IS_VARIANT_MENU_STRUCTURE_WORKSPACE_CONTEXT = true;
 
-	constructor(host: UmbControllerHost, args: UmbVariantMenuStructureWorkspaceContextBaseArgs) {
+	constructor(host: UmbControllerHost, args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_VARIANT_MENU_STRUCTURE_WORKSPACE_CONTEXT);
 		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
 		this.provideContext('UmbMenuStructureWorkspaceContext', this);
@@ -130,8 +130,3 @@ export abstract class UmbVariantMenuStructureWorkspaceContextBase extends UmbCon
 		this.#parentContext.setParent(parentEntity);
 	}
 }
-
-/*
- * @obsolete use UmbVariantMenuStructureWorkspaceContextBase instead. will be removed in v.18
- */
-export { UmbVariantMenuStructureWorkspaceContextBase as UmbMenuVariantTreeStructureWorkspaceContextBase };
