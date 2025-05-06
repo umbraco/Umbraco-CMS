@@ -122,11 +122,11 @@ export default {
 		domainUpdated: "Domain '%0%' has been updated",
 		orEdit: 'Edit Current Domains',
 		domainHelpWithVariants:
-			'Valid domain names are: "example.com", "www.example.com", "example.com:8080", or "https://www.example.com/".\n     Furthermore also one-level paths in domains are supported, eg. "example.com/en" or "/en".',
+			'Valid domain names are: "example.com", "www.example.com", "example.com:8080", or "https://www.example.com/". Furthermore also one-level paths in domains are supported, e.g. "example.com/en" or "/en".',
 		inherit: 'Inherit',
 		setLanguage: 'Culture',
 		setLanguageHelp:
-			'Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />\n      to the current node, unless a domain below applies too.',
+			'Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br /> to the current node, unless a domain below applies too.',
 		setDomains: 'Domains',
 	},
 	buttons: {
@@ -165,6 +165,7 @@ export default {
 		styleChoose: 'Choose style',
 		styleShow: 'Show styles',
 		tableInsert: 'Insert table',
+		generateModelsAndClose: 'Generate models and close',
 		saveAndGenerateModels: 'Save and generate models',
 		undo: 'Undo',
 		redo: 'Redo',
@@ -173,7 +174,6 @@ export default {
 		confirmActionConfirm: 'Confirm',
 		morePublishingOptions: 'More publishing options',
 		submitChanges: 'Submit',
-		generateModelsAndClose: 'Generate models and close',
 	},
 	auditTrailsMedia: {
 		delete: 'Media deleted',
@@ -186,6 +186,7 @@ export default {
 		atViewingFor: 'Viewing for',
 		delete: 'Content deleted',
 		unpublish: 'Content unpublished',
+		unpublishvariant: 'Content unpublished for languages: %0%',
 		publish: 'Content saved and Published',
 		publishvariant: 'Content saved and published for languages: %0%',
 		save: 'Content saved',
@@ -208,6 +209,7 @@ export default {
 		smallSaveVariant: 'Save',
 		smallDelete: 'Delete',
 		smallUnpublish: 'Unpublish',
+		smallUnpublishVariant: 'Unpublish',
 		smallRollBack: 'Rollback',
 		smallSendToPublish: 'Send To Publish',
 		smallSendToPublishVariant: 'Send To Publish',
@@ -216,8 +218,6 @@ export default {
 		smallContentVersionPreventCleanup: 'Save',
 		smallContentVersionEnableCleanup: 'Save',
 		historyIncludingVariants: 'History (all variants)',
-		unpublishvariant: 'Content unpublished for languages: %0%',
-		smallUnpublishVariant: 'Unpublish',
 	},
 	codefile: {
 		createFolderIllegalChars: 'The folder name cannot contain illegal characters.',
@@ -258,11 +258,10 @@ export default {
 		noDate: 'No date chosen',
 		nodeName: 'Page title',
 		noMediaLink: 'This media item has no link',
+		noProperties: 'No content can be added for this item',
 		otherElements: 'Properties',
-		parentNotPublished:
-			"This document is published but is not visible because the parent '%0%' is\n      unpublished\n    ",
-		parentCultureNotPublished:
-			"This culture is published but is not visible because it is unpublished on\n      parent '%0%'\n    ",
+		parentNotPublished: "This document is published but is not visible because the parent '%0%' is unpublished",
+		parentCultureNotPublished: "This culture is published but is not visible because it is unpublished on parent '%0%'",
 		parentNotPublishedAnomaly: 'This document is published but is not in the cache',
 		getUrlException: 'Could not get the URL',
 		routeError: 'This document is published but its URL would collide with content %0%',
@@ -282,7 +281,7 @@ export default {
 		setDate: 'Set date',
 		sortDone: 'Sort order is updated',
 		sortHelp:
-			'To sort the nodes, simply drag the nodes or click one of the column headers. You can select\n      multiple nodes by holding the "shift" or "control" key while selecting\n    ',
+			'To sort the nodes, simply drag the nodes or click one of the column headers. You can select multiple nodes by holding the "shift" or "control" key while selecting',
 		statistics: 'Statistics',
 		titleOptional: 'Title (optional)',
 		altTextOptional: 'Alternative text (optional)',
@@ -306,16 +305,14 @@ export default {
 		scheduledPublishDocumentation:
 			'<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">What does this mean?</a>',
 		nestedContentDeleteItem: 'Are you sure you want to delete this item?',
-		nestedContentEditorNotSupported:
-			'Property %0% uses editor %1% which is not supported by Nested\n      Content.\n    ',
 		nestedContentDeleteAllItems: 'Are you sure you want to delete all items?',
+		nestedContentEditorNotSupported: 'Property %0% uses editor %1% which is not supported by Nested Content.',
 		nestedContentNoContentTypes: 'No Content Types are configured for this property.',
 		nestedContentAddElementType: 'Add Element Type',
 		nestedContentSelectElementTypeModalTitle: 'Select Element Type',
 		nestedContentGroupHelpText:
-			'Select the group whose properties should be displayed. If left blank, the\n      first group on the Element Type will be used.\n    ',
-		nestedContentTemplateHelpTextPart1:
-			'Enter an angular expression to evaluate against each item for its\n      name. Use\n    ',
+			'Select the group whose properties should be displayed. If left blank, the first group on the Element Type will be used.',
+		nestedContentTemplateHelpTextPart1: 'Enter an angular expression to evaluate against each item for its name. Use',
 		nestedContentTemplateHelpTextPart2: 'to display the item index',
 		nestedContentNoGroups:
 			'The selected element type does not contain any supported groups (tabs are not supported by this editor, either change them to groups or use the Block List editor).',
@@ -324,13 +321,13 @@ export default {
 		contentRoot: 'Content root',
 		includeUnpublished: 'Include unpublished content items.',
 		isSensitiveValue:
-			'This value is hidden. If you need access to view this value please contact your\n      website administrator.\n    ',
+			'This value is hidden. If you need access to view this value please contact your website administrator.',
 		isSensitiveValue_short: 'This value is hidden.',
 		languagesToPublish: 'What languages would you like to publish?',
 		languagesToSendForApproval: 'What languages would you like to send for approval?',
 		languagesToSchedule: 'What languages would you like to schedule?',
 		languagesToUnpublish:
-			'Select the languages to unpublish. Unpublishing a mandatory language will\n      unpublish all languages.\n    ',
+			'Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.',
 		variantsWillBeSaved: 'All new variants will be saved.',
 		variantsToPublish: 'Which variants would you like to publish?',
 		variantsToSave: 'Choose which variants to be saved.',
@@ -344,7 +341,6 @@ export default {
 		createEmpty: 'Create new',
 		createFromClipboard: 'Paste from clipboard',
 		nodeIsInTrash: 'This item is in the Recycle Bin',
-		noProperties: 'No content can be added for this item',
 		variantSaveNotAllowed: 'Save is not allowed',
 		variantPublishNotAllowed: 'Publish is not allowed',
 		variantSendForApprovalNotAllowed: 'Send for approval is not allowed',
@@ -363,7 +359,7 @@ export default {
 		createdBlueprintMessage: "A Document Blueprint was created from '%0%'",
 		duplicateBlueprintMessage: 'Another Document Blueprint with the same name already exists',
 		blueprintDescription:
-			'A Document Blueprint is predefined content that an editor can select to use as the\n      basis for creating new content\n    ',
+			'A Document Blueprint is predefined content that an editor can select to use as the basis for creating new content',
 	},
 	entityDetail: {
 		notFoundTitle: (entityType: string) => {
@@ -429,7 +425,7 @@ export default {
 		noDocumentTypesAtRoot:
 			'There are no Document Types available for creating content here. You must create these in <strong>Document Types</strong> within the <strong>Settings</strong> section.',
 		noDocumentTypesWithNoSettingsAccess:
-			"The selected page in the content tree doesn't allow for any pages\n      to be created below it.\n    ",
+			"The selected page in the content tree doesn't allow for any pages to be created below it.",
 		noDocumentTypesEditPermissions: 'Edit permissions for this Document Type',
 		noDocumentTypesCreateNew: 'Create a new Document Type',
 		noDocumentTypesAllowedAtRoot:
@@ -437,21 +433,21 @@ export default {
 		noMediaTypes:
 			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.',
 		noMediaTypesWithNoSettingsAccess:
-			"The selected media in the tree doesn't allow for any other media to be\n      created below it.\n    ",
-		noMediaTypesEditPermissions: 'Edit permissions for this Media Types',
+			"The selected media in the tree doesn't allow for any other media to be created below it.",
+		noMediaTypesEditPermissions: 'Edit permissions for this Media Type',
 		documentTypeWithoutTemplate: 'Document Type without a template',
 		documentTypeWithTemplate: 'Document Type with Template',
 		documentTypeWithTemplateDescription:
-			'The data definition for a content page that can be created by\n      editors in the content tree and is directly accessible via a URL.\n    ',
+			'The data definition for a content page that can be created by editors in the content tree and is directly accessible via a URL.',
 		documentType: 'Document Type',
 		documentTypeDescription:
-			'The data definition for a content component that can be created by editors in\n      the content tree and be picked on other pages but has no direct URL.\n    ',
+			'The data definition for a content component that can be created by editors in the content tree and be picked on other pages but has no direct URL.',
 		elementType: 'Element Type',
 		elementTypeDescription:
-			"Defines the schema for a repeating set of properties, for example, in a 'Block\n      List' or 'Block Grid' property editor.\n    ",
+			"Defines the schema for a repeating set of properties, for example, in a 'Block List' or 'Block Grid' property editor.",
 		composition: 'Composition',
 		compositionDescription:
-			"Defines a re-usable set of properties that can be included in the definition of\n      multiple other Document Types. For example, a set of 'Common Page Settings'.\n    ",
+			"Defines a re-usable set of properties that can be included in the definition of multiple other Document Types. For example, a set of 'Common Page Settings'.",
 		folder: 'Folder',
 		folderDescription: 'Used to organise items and other folders. Keep items structured and easy to access.',
 		newFolder: 'New folder',
@@ -540,7 +536,7 @@ export default {
 		inserttable: 'Insert table',
 		languagedeletewarning: 'This will delete the language and all content related to the language',
 		languageChangeWarning:
-			'Changing the culture for a language may be an expensive operation and will result\n      in the content cache and indexes being rebuilt\n    ',
+			'Changing the culture for a language may be an expensive operation and will result in the content cache and indexes being rebuilt',
 		lastEdited: 'Last edited',
 		link: 'Link',
 		linkinternal: 'Internal link',
@@ -553,20 +549,20 @@ export default {
 		permissionsSetForGroup: 'Set permissions for %0% for user group %1%',
 		permissionsHelp: 'Select the users groups you want to set permissions for',
 		recycleBinDeleting:
-			'The items in the recycle bin are now being deleted. Please do not close this window\n      while this operation takes place\n    ',
+			'The items in the recycle bin are now being deleted. Please do not close this window while this operation takes place',
 		recycleBinIsEmpty: 'The recycle bin is now empty',
 		recycleBinWarning: 'When items are deleted from the recycle bin, they will be gone forever',
 		regexSearchError:
 			"<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.",
 		regexSearchHelp:
-			"Search for a regular expression to add validation to a form field. Example: 'email,\n      'zip-code', 'URL'.\n    ",
+			"Search for a regular expression to add validation to a form field. Example: 'email, 'zip-code', 'URL'.",
 		removeMacro: 'Remove Macro',
 		requiredField: 'Required Field',
 		sitereindexed: 'Site is reindexed',
 		siterepublished:
-			'The website cache has been refreshed. All publish content is now up to date. While all\n      unpublished content is still unpublished\n    ',
+			'The website cache has been refreshed. All publish content is now up to date. While all unpublished content is still unpublished',
 		siterepublishHelp:
-			'The website cache will be refreshed. All published content will be updated, while\n      unpublished content will stay unpublished.\n    ',
+			'The website cache will be refreshed. All published content will be updated, while unpublished content will stay unpublished.',
 		tableColumns: 'Number of columns',
 		tableRows: 'Number of rows',
 		thumbnailimageclickfororiginal: 'Click on the image to see full size',
@@ -618,16 +614,16 @@ export default {
 		unLinkYourConfirm: 'You are about to un-link your Umbraco and {0} accounts and you will be logged out.',
 		linkedToService: 'Your account is linked to this service',
 		selectEditor: 'Select editor',
+		selectEditorConfiguration: 'Select configuration',
 		selectSnippet: 'Select snippet',
 		variantdeletewarning:
-			'This will delete the node and all its languages. If you only want to delete one\n      language, you should unpublish the node in that language instead.\n    ',
+			'This will delete the node and all its languages. If you only want to delete one language, you should unpublish the node in that language instead.',
 		propertyuserpickerremovewarning: 'This will remove the user <strong>%0%</strong>.',
 		userremovewarning: 'This will remove the user <strong>%0%</strong> from the <strong>%1%</strong> group',
 		yesRemove: 'Yes, remove',
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
-		selectEditorConfiguration: 'Select configuration',
 		seeErrorAction: 'See error',
 		seeErrorDialogHeadline: 'Error details',
 	},
@@ -662,10 +658,10 @@ export default {
 		indexInfoDescription: 'Lists the properties of the index',
 		manageIndexes: "Manage Examine's indexes",
 		manageIndexesDescription:
-			'Allows you to view the details of each index and provides some tools for\n      managing the indexes\n    ',
+			'Allows you to view the details of each index and provides some tools for managing the indexes',
 		rebuildIndex: 'Rebuild index',
 		rebuildIndexWarning:
-			'\n      This will cause the index to be rebuilt.<br />\n      Depending on how much content there is in your site this could take a while.<br />\n      It is not recommended to rebuild an index during times of high website traffic or when editors are editing content.\n     ',
+			'This will cause the index to be rebuilt.<br /> Depending on how much content there is in your site this could take a while.<br /> It is not recommended to rebuild an index during times of high website traffic or when editors are editing content.',
 		searchers: 'Searchers',
 		searchDescription: 'Search the index and view the results',
 		tools: 'Tools',
@@ -673,7 +669,7 @@ export default {
 		fields: 'fields',
 		indexCannotRead: 'The index cannot be read and will need to be rebuilt',
 		processIsTakingLonger:
-			'The process is taking longer than expected, check the Umbraco log to see if there\n      have been any errors during this operation\n    ',
+			'The process is taking longer than expected, check the Umbraco log to see if there have been any errors during this operation',
 		indexCannotRebuild: 'This index cannot be rebuilt because it has no assigned',
 		iIndexPopulator: 'IIndexPopulator',
 		noResults: 'No results were found',
@@ -719,6 +715,8 @@ export default {
 		folderWasRenamed: '%0% was renamed to %1%',
 	},
 	editdatatype: {
+		canChangePropertyEditorHelp:
+			'Changing a property editor on a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		addPrevalue: 'Add prevalue',
 		dataBaseDatatype: 'Database datatype',
 		guid: 'Property editor GUID',
@@ -733,8 +731,6 @@ export default {
 		selectFolder: 'Select the folder to move',
 		inTheTree: 'to in the tree structure below',
 		wasMoved: 'was moved underneath',
-		canChangePropertyEditorHelp:
-			'Changing a property editor on a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		hasReferencesDeleteConsequence:
 			'Deleting <strong>%0%</strong> will delete the properties and their data from the following items',
 		acceptDeleteConsequence: 'I understand this action will delete the properties and data based on this Data Type',
@@ -742,14 +738,14 @@ export default {
 	},
 	errorHandling: {
 		errorButDataWasSaved:
-			'Your data has been saved, but before you can publish this page there are some\n      errors you need to fix first:\n    ',
+			'Your data has been saved, but before you can publish this page there are some errors you need to fix first:',
 		errorChangingProviderPassword:
-			'The current membership provider does not support changing password\n      (EnablePasswordRetrieval need to be true)\n    ',
+			'The current membership provider does not support changing password (EnablePasswordRetrieval need to be true)',
 		errorExistsWithoutTab: '%0% already exists',
 		errorHeader: 'There were errors:',
 		errorHeaderWithoutTab: 'There were errors:',
 		errorInPasswordFormat:
-			'The password should be a minimum of %0% characters long and contain at least %1%\n      non-alpha numeric character(s)\n    ',
+			'The password should be a minimum of %0% characters long and contain at least %1% non-alpha numeric character(s)',
 		errorIntegerWithoutTab: '%0% must be an integer',
 		errorMandatory: 'The %0% field in the %1% tab is mandatory',
 		errorMandatoryWithoutTab: '%0% is a mandatory field',
@@ -762,14 +758,14 @@ export default {
 		receivedErrorFromServer: 'Received an error from the server',
 		dissallowedMediaType: 'The specified file type has been disallowed by the administrator',
 		codemirroriewarning:
-			"NOTE! Even though CodeMirror is enabled by configuration, it is disabled in\n      Internet Explorer because it's not stable enough.\n    ",
+			"NOTE! Even though CodeMirror is enabled by configuration, it is disabled in Internet Explorer because it's not stable enough.",
 		contentTypeAliasAndNameNotNull: 'Please fill both alias and name on the new property type!',
 		filePermissionsError: 'There is a problem with read/write access to a specific file or folder',
 		macroErrorLoadingPartialView: 'Error loading Partial View script (file: %0%)',
 		missingTitle: 'Please enter a title',
 		missingType: 'Please choose a type',
 		pictureResizeBiggerThanOrg:
-			"You're about to make the picture larger than the original size. Are you sure\n      that you want to proceed?\n    ",
+			"You're about to make the picture larger than the original size. Are you sure that you want to proceed?",
 		startNodeDoesNotExists: 'Startnode deleted, please contact your administrator',
 		stylesMustMarkBeforeSelect: 'Please mark content before changing style',
 		stylesNoStylesOnPage: 'No active styles available',
@@ -1034,20 +1030,19 @@ export default {
 	},
 	installer: {
 		databaseErrorCannotConnect: 'The installer cannot connect to the database.',
-		databaseErrorWebConfig:
-			'Could not save the web.config file. Please modify the connection string\n      manually.\n    ',
+		databaseErrorWebConfig: 'Could not save the web.config file. Please modify the connection string manually.',
 		databaseFound: 'Your database has been found and is identified as',
 		databaseHeader: 'Database configuration',
-		databaseInstall: '\n      Press the <strong>install</strong> button to install the Umbraco %0% database\n    ',
+		databaseInstall: 'Press the <strong>install</strong> button to install the Umbraco %0% database',
 		databaseInstallDone: 'Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.',
 		databaseNotFound:
-			'<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p>\n              <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>\n              <p>\n              Click the <strong>retry</strong> button when\n              done.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">\n\t\t\t              More information on editing web.config here</a>.</p>',
+			'<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p><p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file.</p><p>Click the <strong>retry</strong> button when done.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">More information on editing web.config here</a>.</p>',
 		databaseText:
-			'To complete this step, you must know some information regarding your database server ("connection string").<br />\n        Please contact your ISP if necessary.\n        If you\'re installing on a local machine or server you might need information from your system administrator.',
+			'To complete this step, you must know some information regarding your database server ("connection string").<br />   Please contact your ISP if necessary.   If you\'re installing on a local machine or server you might need information from your system administrator.',
 		databaseUpgrade:
-			"\n      <p>\n      Press the <strong>upgrade</strong> button to upgrade your database to Umbraco %0%</p>\n      <p>\n      Don't worry - no content will be deleted and everything will continue working afterwards!\n      </p>\n      ",
+			" <p> Press the <strong>upgrade</strong> button to upgrade your database to Umbraco %0%</p> <p> Don't worry - no content will be deleted and everything will continue working afterwards! </p> ",
 		databaseUpgradeDone:
-			'Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to\n      proceed. ',
+			'Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to proceed.',
 		databaseUpToDate:
 			'Your current database is up-to-date!. Click <strong>next</strong> to continue the configuration wizard',
 		defaultUserChangePass: "<strong>The Default users' password needs to be changed!</strong>",
@@ -1058,41 +1053,40 @@ export default {
 		defaultUserPasswordChanged: 'The password is changed!',
 		greatStart: 'Get a great start, watch our introduction videos',
 		licenseText:
-			'By clicking the next button (or modifying the umbracoConfigurationStatus in web.config),\n      you accept the license for this software as specified in the box below. Notice that this Umbraco distribution\n      consists of two different licenses, the open source MIT license for the framework and the Umbraco freeware license\n      that covers the UI.\n    ',
+			'By clicking the next button (or modifying the umbracoConfigurationStatus in web.config), you accept the license for this software as specified in the box below. Notice that this Umbraco distribution consists of two different licenses, the open source MIT license for the framework and the Umbraco freeware license that covers the UI.',
 		None: 'Not installed yet.',
 		permissionsAffectedFolders: 'Affected files and folders',
 		permissionsAffectedFoldersMoreInfo: 'More information on setting up permissions for Umbraco here',
-		permissionsAffectedFoldersText:
-			'You need to grant ASP.NET modify permissions to the following\n      files/folders\n    ',
+		permissionsAffectedFoldersText: 'You need to grant ASP.NET modify permissions to the following files/folders',
 		permissionsAlmostPerfect:
-			'<strong>Your permission settings are almost perfect!</strong><br /><br />\n        You can run Umbraco without problems, but you will not be able to install packages which are recommended to take full advantage of Umbraco.',
+			'<strong>Your permission settings are almost perfect!</strong><br /><br />   You can run Umbraco without problems, but you will not be able to install packages which are recommended to take full advantage of Umbraco.',
 		permissionsHowtoResolve: 'How to Resolve',
 		permissionsHowtoResolveLink: 'Click here to read the text version',
 		permissionsHowtoResolveText:
 			'Watch our <strong>video tutorial</strong> on setting up folder permissions for Umbraco or read the text version.',
 		permissionsMaybeAnIssue:
-			'<strong>Your permission settings might be an issue!</strong>\n      <br/><br />\n      You can run Umbraco without problems, but you will not be able to create folders or install packages which are recommended to take full advantage of Umbraco.',
+			'<strong>Your permission settings might be an issue!</strong><br/><br />You can run Umbraco without problems, but you will not be able to create folders or install packages which are recommended to take full advantage of Umbraco.',
 		permissionsNotReady:
-			"<strong>Your permission settings are not ready for Umbraco!</strong>\n          <br /><br />\n          In order to run Umbraco, you'll need to update your permission settings.",
+			"<strong>Your permission settings are not ready for Umbraco!</strong><br /><br />In order to run Umbraco, you'll need to update your permission settings.",
 		permissionsPerfect:
-			'<strong>Your permission settings are perfect!</strong><br /><br />\n              You are ready to run Umbraco and install packages!',
+			'<strong>Your permission settings are perfect!</strong><br /><br />You are ready to run Umbraco and install packages!',
 		permissionsResolveFolderIssues: 'Resolving folder issue',
 		permissionsResolveFolderIssuesLink:
-			'Follow this link for more information on problems with ASP.NET and\n      creating folders\n    ',
+			'Follow this link for more information on problems with ASP.NET and creating folders',
 		permissionsSettingUpPermissions: 'Setting up folder permissions',
 		permissionsText:
-			"\n      Umbraco needs write/modify access to certain directories in order to store files like pictures and PDF's.\n      It also stores temporary data (aka: cache) for enhancing the performance of your website.\n    ",
+			" Umbraco needs write/modify access to certain directories in order to store files like pictures and PDF's. It also stores temporary data (aka: cache) for enhancing the performance of your website.",
 		runwayFromScratch: 'I want to start from scratch',
 		runwayFromScratchText:
-			'\n        Your website is completely empty at the moment, so that\'s perfect if you want to start from scratch and create your own Document Types and templates.\n        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)\n        You can still choose to install Runway later on. Please go to the Developer section and choose Packages.\n      ',
+			'Your website is completely empty at the moment, so that\'s perfect if you want to start from scratch and create your own Document Types and templates.   (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>) You can still choose to install Runway later on. Please go to the Developer section and choose Packages.',
 		runwayHeader: "You've just set up a clean Umbraco platform. What do you want to do next?",
 		runwayInstalled: 'Runway is installed',
 		runwayInstalledText:
-			'\n      You have the foundation in place. Select what modules you wish to install on top of it.<br />\n      This is our list of recommended modules, check off the ones you would like to install, or view the <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">full list of modules</a>\n      ',
+			'You have the foundation in place. Select what modules you wish to install on top of it.<br /> This is our list of recommended modules, check off the ones you would like to install, or view the <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">full list of modules</a> ',
 		runwayOnlyProUsers: 'Only recommended for experienced users',
 		runwaySimpleSite: 'I want to start with a simple website',
 		runwaySimpleSiteText:
-			'\n      <p>\n      "Runway" is a simple website providing some basic Document Types and templates. The installer can set up Runway for you automatically,\n        but you can easily edit, extend or remove it. It\'s not necessary and you can perfectly use Umbraco without it. However,\n        Runway offers an easy foundation based on best practices to get you started faster than ever.\n        If you choose to install Runway, you can optionally select basic building blocks called Runway Modules to enhance your Runway pages.\n        </p>\n        <small>\n        <em>Included with Runway:</em> Home page, Getting Started page, Installing Modules page.<br />\n        <em>Optional Modules:</em> Top Navigation, Sitemap, Contact, Gallery.\n        </small>\n      ',
+			'<p>"Runway" is a simple website providing some basic Document Types and templates. The installer can set up Runway for you automatically, but you can easily edit, extend or remove it. It\'s not necessary and you can perfectly use Umbraco without it. However, Runway offers an easy foundation based on best practices to get you started faster than ever. If you choose to install Runway, you can optionally select basic building blocks called Runway Modules to enhance your Runway pages.</p> <small><em>Included with Runway:</em> Home page, Getting Started page, Installing Modules page.<br /> <em>Optional Modules:</em> Top Navigation, Sitemap, Contact, Gallery.</small>',
 		runwayWhatIsRunway: 'What is Runway',
 		step1: 'Step 1/5 Accept license',
 		step2: 'Step 2/5: Database configuration',
@@ -1100,14 +1094,14 @@ export default {
 		step4: 'Step 4/5: Check Umbraco security',
 		step5: 'Step 5/5: Umbraco is ready to get you started',
 		thankYou: 'Thank you for choosing Umbraco',
-		theEndBrowseSite: '<h3>Browse your new site</h3>\nYou installed Runway, so why not see how your new website looks.',
+		theEndBrowseSite: '<h3>Browse your new site</h3> You installed Runway, so why not see how your new website looks.',
 		theEndFurtherHelp:
 			'<h3>Further help and information</h3>\nGet help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the Umbraco terminology',
 		theEndHeader: 'Umbraco %0% is installed and ready for use',
 		theEndInstallFailed:
-			"To finish the installation, you'll need to\n        manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>UmbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.",
+			"To finish the installation, you'll need to   manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>UmbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.",
 		theEndInstallSuccess:
-			'You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>,\nyou can find plenty of resources on our getting started pages.',
+			'You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below.<br />If you are <strong>new to Umbraco</strong>, you can find plenty of resources on our getting started pages.',
 		theEndOpenUmbraco:
 			'<h3>Launch Umbraco</h3>\nTo manage your website, simply open the Umbraco backoffice and start adding content, updating the templates and stylesheets or add new functionality',
 		Unavailable: 'Connection to database failed.',
@@ -1115,7 +1109,7 @@ export default {
 		Version4: 'Umbraco Version 4',
 		watch: 'Watch',
 		welcomeIntro:
-			'This wizard will guide you through the process of configuring <strong>Umbraco %0%</strong> for a fresh install or upgrading from version 3.0.\n                                <br /><br />\n                                Press <strong>"next"</strong> to start the wizard.',
+			'This wizard will guide you through the process of configuring <strong>Umbraco %0%</strong> for a fresh install or upgrading from version 3.0.<br /><br />Press <strong>"next"</strong> to start the wizard.',
 	},
 	language: {
 		cultureCode: 'Culture Code',
@@ -1155,8 +1149,7 @@ export default {
 		notAllowedByPath:
 			'The current node cannot be moved to one of its subpages neither can the parent and destination be the same',
 		notAllowedAtRoot: 'The current node cannot exist at the root',
-		notValid:
-			"The action isn't allowed since you have insufficient permissions on 1 or more child\n      documents.\n    ",
+		notValid: "The action isn't allowed since you have insufficient permissions on 1 or more child documents.",
 		relateToOriginal: 'Relate copied items to original',
 	},
 	notifications: {
@@ -1169,7 +1162,7 @@ export default {
 		created: 'Created',
 		createPackage: 'Create package',
 		chooseLocalPackageText:
-			'\n      Choose Package from your machine, by clicking the Browse<br />\n         button and locating the package. Umbraco packages usually have a ".umb" or ".zip" extension.\n      ',
+			'Choose Package from your machine, by clicking the Browse<br /> button and locating the package. Umbraco packages usually have a ".umb" or ".zip" extension. ',
 		deletewarning: 'This will delete the package',
 		includeAllChildNodes: 'Include all child nodes',
 		installed: 'Installed',
@@ -1185,7 +1178,7 @@ export default {
 		packageSearch: 'Search for packages',
 		packageSearchResults: 'Results for',
 		packageNoResults: 'We couldn’t find anything for',
-		packageNoResultsDescription: 'Please try searching for another package or browse through the categories\n    ',
+		packageNoResultsDescription: 'Please try searching for another package or browse through the categories',
 		packagesPopular: 'Popular',
 		packagesPromoted: 'Promoted',
 		packagesNew: 'New releases',
@@ -1201,7 +1194,7 @@ export default {
 		packageLikes: 'Likes',
 		packageCompatibility: 'Compatibility',
 		packageCompatibilityDescription:
-			'This package is compatible with the following versions of Umbraco, as\n      reported by community members. Full compatibility cannot be guaranteed for versions reported below 100%\n    ',
+			'This package is compatible with the following versions of Umbraco, as reported by community members. Full compatibility cannot be guaranteed for versions reported below 100%',
 		packageExternalSources: 'External sources',
 		packageAuthor: 'Author',
 		packageDocumentation: 'Documentation',
@@ -1209,10 +1202,12 @@ export default {
 		packageName: 'Package name',
 		packageNoItemsHeader: "Package doesn't contain any items",
 		packageNoItemsText:
-			'This package file doesn\'t contain any items to uninstall.<br/><br/>\n      You can safely remove this from the system by clicking "uninstall package" below.',
+			'This package file doesn\'t contain any items to uninstall.<br/><br/> You can safely remove this from the system by clicking "uninstall package" below.',
 		packageOptions: 'Package options',
 		packageMigrationsRun: 'Run pending package migrations',
 		packageMigrationsConfirmText: 'Do you want to run the pending package migrations?',
+		packageMigrationsComplete: 'Package migrations have successfully completed.',
+		packageMigrationsNonePending: 'All package migrations have successfully completed.',
 		packageReadme: 'Package readme',
 		packageRepository: 'Package repository',
 		packageUninstallConfirm: 'Confirm package uninstall',
@@ -1220,16 +1215,14 @@ export default {
 		packageUninstalledText: 'The package was successfully uninstalled',
 		packageUninstallHeader: 'Uninstall package',
 		packageUninstallText:
-			'You can unselect items you do not wish to remove, at this time, below. When you click "confirm uninstall" all checked-off items will be removed.<br />\n      <span style="color: Red; font-weight: bold;">Notice:</span> any documents, media etc depending on the items you remove, will stop working, and could lead to system instability,\n      so uninstall with caution. If in doubt, contact the package author.',
+			'You can unselect items you do not wish to remove, at this time, below. When you click "confirm uninstall" all checked-off items will be removed.<br /> <span style="color: Red; font-weight: bold;">Notice:</span> any documents, media etc depending on the items you remove, will stop working, and could lead to system instability, so uninstall with caution. If in doubt, contact the package author.',
 		packageVersion: 'Package version',
 		verifiedToWorkOnUmbracoCloud: 'Verified to work on Umbraco Cloud',
-		packageMigrationsComplete: 'Package migrations have successfully completed.',
-		packageMigrationsNonePending: 'All package migrations have successfully completed.',
 	},
 	paste: {
 		doNothing: 'Paste with full formatting (Not recommended)',
 		errorMessage:
-			"The text you're trying to paste contains special characters or formatting. This could be\n      caused by copying text from Microsoft Word. Umbraco can remove special characters or formatting automatically, so\n      the pasted content will be more suitable for the web.\n    ",
+			"The text you're trying to paste contains special characters or formatting. This could be caused by copying text from Microsoft Word. Umbraco can remove special characters or formatting automatically, so the pasted content will be more suitable for the web.",
 		removeAll: 'Paste as raw text without any formatting at all',
 		removeSpecialFormattering: 'Paste, but remove formatting (Recommended)',
 	},
@@ -1253,13 +1246,13 @@ export default {
 		paMembersHelp: 'If you wish to grant access to specific members',
 	},
 	publish: {
-		contentPublishedFailedAwaitingRelease:
-			'\n      %0% could not be published because the item is scheduled for release.\n    ',
-		contentPublishedFailedExpired: '\n      %0% could not be published because the item has expired.\n    ',
+		contentPublishedFailedIsTrashed: '%0% could not be published because the item is in the recycle bin.',
+		contentPublishedFailedAwaitingRelease: '%0% could not be published because the item is scheduled for release.',
+		contentPublishedFailedExpired: '%0% could not be published because the item has expired.',
 		contentPublishedFailedInvalid:
-			'\n      %0% could not be published because these properties:  %1%  did not pass validation rules.\n    ',
-		contentPublishedFailedByEvent: '\n      %0% could not be published, a 3rd party add-in cancelled the action.\n    ',
-		contentPublishedFailedByParent: '\n      %0% can not be published, because a parent page is not published.\n    ',
+			'%0% could not be published because these properties: %1% did not pass validation rules.',
+		contentPublishedFailedByEvent: '%0% could not be published, a 3rd party add-in cancelled the action.',
+		contentPublishedFailedByParent: '%0% can not be published, because a parent page is not published.',
 		contentPublishedFailedByMissingName: '%0% can not be published, because its missing a name.',
 		includeUnpublished: 'Include unpublished subpages',
 		inProgress: 'Publishing in progress - please wait...',
@@ -1268,9 +1261,8 @@ export default {
 		nodePublishAll: '%0% and subpages have been published',
 		publishAll: 'Publish %0% and all its subpages',
 		publishHelp:
-			'Click <em>Publish</em> to publish <strong>%0%</strong> and thereby making its content publicly available.<br/><br />\n      You can publish this page and all its subpages by checking <em>Include unpublished subpages</em> below.\n      ',
+			'Click <em>Publish</em> to publish <strong>%0%</strong> and thereby making its content publicly available.<br/><br /> You can publish this page and all its subpages by checking <em>Include unpublished subpages</em> below. ',
 		invalidPublishBranchPermissions: 'Insufficient user permissions to publish all descendant documents',
-		contentPublishedFailedIsTrashed: '%0% could not be published because the item is in the recycle bin.',
 		contentPublishedFailedReqCultureValidationError:
 			"Validation failed for required language '%0%'. This language was saved but not published.",
 	},
@@ -1344,8 +1336,7 @@ export default {
 		editMediaEntryLabel: 'Edit %0% on %1%',
 		confirmCancelMediaEntryCreationHeadline: 'Discard creation?',
 		confirmCancelMediaEntryCreationMessage: 'Are you sure you want to cancel the creation.',
-		confirmCancelMediaEntryHasChanges:
-			'You have made changes to this content. Are you sure you want to\n      discard them?\n    ',
+		confirmCancelMediaEntryHasChanges: 'You have made changes to this content. Are you sure you want to discard them?',
 		confirmRemoveAllMediaEntryMessage: 'Remove all medias?',
 		tabClipboard: 'Clipboard',
 		notAllowed: 'Not allowed',
@@ -1380,7 +1371,7 @@ export default {
 		documentRolledBack: 'Document has been rolled back',
 		headline: 'Select a version to compare with the current version',
 		htmlHelp:
-			'This displays the selected version as HTML, if you wish to see the difference between 2\n      versions at the same time, use the diff view\n    ',
+			'This displays the selected version as HTML, if you wish to see the difference between 2 versions at the same time, use the diff view',
 		rollbackTo: 'Rollback to',
 		selectVersion: 'Select version',
 		view: 'View',
@@ -1413,7 +1404,7 @@ export default {
 	settings: {
 		defaulttemplate: 'Default template',
 		importDocumentTypeHelp:
-			'To import a Document Type, find the ".udt" file on your computer by clicking the\n      "Import" button (you\'ll be asked for confirmation on the next screen)\n    ',
+			'To import a Document Type, find the ".udt" file on your computer by clicking the "Import" button (you\'ll be asked for confirmation on the next screen)',
 		newtabname: 'New Tab Title',
 		nodetype: 'Node type',
 		objecttype: 'Type',
@@ -1425,7 +1416,7 @@ export default {
 		contentTypeEnabled: 'Master Content Type enabled',
 		contentTypeUses: 'This Content Type uses',
 		noPropertiesDefinedOnTab:
-			'No properties defined on this tab. Click on the "add a new property" link at\n      the top to create a new property.\n    ',
+			'No properties defined on this tab. Click on the "add a new property" link at the top to create a new property.',
 		createMatchingTemplate: 'Create matching template',
 		addIcon: 'Add icon',
 	},
@@ -1434,7 +1425,7 @@ export default {
 		sortCreationDate: 'Creation date',
 		sortDone: 'Sorting complete.',
 		sortHelp:
-			'Drag the different items up or down below to set how they should be arranged. Or click the\n      column headers to sort the entire collection of items\n    ',
+			'Drag the different items up or down below to set how they should be arranged. Or click the column headers to sort the entire collection of items',
 		sortPleaseWait: 'Please wait. Items are being sorted, this can take a while.',
 		sortEmptyState: 'This node has no child nodes to sort',
 	},
@@ -1532,28 +1523,22 @@ export default {
 		dictionaryItemExportedError: 'An error occurred while exporting the dictionary item(s)',
 		dictionaryItemImported: 'The following dictionary item(s) has been imported!',
 		publishWithNoDomains:
-			'Domains are not configured for multilingual site, please contact an administrator,\n      see log for more information\n    ',
+			'Domains are not configured for multilingual site, please contact an administrator, see log for more information',
 		publishWithMissingDomain:
-			'There is no domain configured for %0%, please contact an administrator, see\n      log for more information\n    ',
+			'There is no domain configured for %0%, please contact an administrator, see log for more information',
 		copySuccessMessage: 'Your system information has successfully been copied to the clipboard',
 		cannotCopyInformation: 'Could not copy your system information to the clipboard',
 		webhookSaved: 'Webhook saved',
-		operationSavedHeaderReloadUser: 'Saved. To view the changes please reload your browser',
 		editMultiContentPublishedText: '%0% documents published and are visible on the website',
 		editMultiContentUnpublishedText: '%0% documents unpublished and are no longer visible on the website',
-		editVariantPublishedText: '%0% published and is visible on the website',
 		editVariantUnpublishedText: '%0% unpublished and is no longer visible on the website',
 		editMultiVariantPublishedText: '%0% documents published for languages %1% and are visible on the website',
 		editMultiVariantUnpublishedText:
 			'%0% documents unpublished for languages %1% and are no longer visible on the website',
 		editContentScheduledSavedText: 'A schedule for publishing has been updated',
 		editContentScheduledNotSavedText: 'The schedule for publishing could not be updated',
-		editVariantSavedText: '%0% saved',
 		editVariantSendToPublishText: '%0% changes have been sent for approval',
 		contentCultureUnpublished: 'Content variation %0% unpublished',
-		contentMandatoryCultureUnpublished:
-			"The mandatory language '%0%' was unpublished. All languages for this content item are now unpublished.",
-		contentReqCulturePublishError: "Cannot publish the document since the required '%0%' is not published",
 		contentCultureValidationError: "Validation failed for language '%0%'",
 		scheduleErrReleaseDate1: 'The release date cannot be in the past',
 		scheduleErrReleaseDate2: "Cannot schedule the document for publishing since the required '%0%' is not published",
@@ -1572,8 +1557,7 @@ export default {
 		addRule: 'Add style',
 		editRule: 'Edit style',
 		editorRules: 'Rich text editor styles',
-		editorRulesHelp:
-			'Define the styles that should be available in the rich text editor for this\n      stylesheet\n    ',
+		editorRulesHelp: 'Define the styles that should be available in the rich text editor for this stylesheet',
 		editstylesheet: 'Edit stylesheet',
 		editstylesheetproperty: 'Edit stylesheet property',
 		nameHelp: 'The name displayed in the editor style selector',
@@ -1597,32 +1581,31 @@ export default {
 		insertDesc: 'Choose what to insert into your template',
 		insertDictionaryItem: 'Dictionary item',
 		insertDictionaryItemDesc:
-			'A dictionary item is a placeholder for a translatable piece of text, which\n      makes it easy to create designs for multilingual websites.\n    ',
+			'A dictionary item is a placeholder for a translatable piece of text, which makes it easy to create designs for multilingual websites.',
 		insertMacro: 'Macro',
 		insertMacroDesc:
-			'\n      A Macro is a configurable component which is great for\n      reusable parts of your design, where you need the option to provide parameters,\n      such as galleries, forms and lists.\n    ',
+			'A Macro is a configurable component which is great for reusable parts of your design, where you need the option to provide parameters, such as galleries, forms and lists.',
 		insertPageField: 'Value',
 		insertPageFieldDesc:
-			'Displays the value of a named field from the current page, with options to modify\n      the value or fallback to alternative values.\n    ',
+			'Displays the value of a named field from the current page, with options to modify the value or fallback to alternative values.',
 		insertPartialView: 'Partial view',
 		insertPartialViewDesc:
-			"\n      A partial view is a separate template file which can be rendered inside another\n      template, it's great for reusing markup or for separating complex templates into separate files.\n    ",
+			"A partial view is a separate template file which can be rendered inside another template, it's great for reusing markup or for separating complex templates into separate files.",
 		mastertemplate: 'Master template',
 		quickGuide: 'Quick guide to template tags',
 		noMaster: 'No master',
 		renderBody: 'Render child template',
-		renderBodyDesc:
-			'\n     Renders the contents of a child template, by inserting a\n     <code>@RenderBody()</code> placeholder.\n      ',
+		renderBodyDesc: 'Renders the contents of a child template, by inserting a <code>@RenderBody()</code> placeholder.',
 		defineSection: 'Define a named section',
 		defineSectionDesc:
-			'\n         Defines a part of your template as a named section by wrapping it in\n          <code>@section { ... }</code>. This can be rendered in a\n          specific area of the parent of this template, by using <code>@RenderSection</code>.\n      ',
+			'Defines a part of your template as a named section by wrapping it in <code>@section { ... }</code>. This can be rendered in a specific area of the parent of this template, by using <code>@RenderSection</code>.',
 		renderSection: 'Render a named section',
 		renderSectionDesc:
-			'\n      Renders a named area of a child template, by inserting a <code>@RenderSection(name)</code> placeholder.\n      This renders an area of a child template which is wrapped in a corresponding <code>@section [name]{ ... }</code> definition.\n      ',
+			'Renders a named area of a child template, by inserting a <code>@RenderSection(name)</code> placeholder. This renders an area of a child template which is wrapped in a corresponding <code>@section [name]{ ... }</code> definition.',
 		sectionName: 'Section Name',
 		sectionMandatory: 'Section is mandatory',
 		sectionMandatoryDesc:
-			'\n            If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is shown.\n    ',
+			'If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is shown.',
 		queryBuilder: 'Query builder',
 		itemsReturned: 'items returned, in',
 		publishedItemsReturned: 'Currently %0% published items returned, in %1% ms',
@@ -1674,7 +1657,7 @@ export default {
 		placeholderWriteHere: 'Write here...',
 		gridLayouts: 'Grid Layouts',
 		gridLayoutsDetail:
-			'Layouts are the overall work area for the grid editor, usually you only need one or\n      two different layouts\n    ',
+			'Layouts are the overall work area for the grid editor, usually you only need one or two different layouts',
 		addGridLayout: 'Add Grid Layout',
 		editGridLayout: 'Edit Grid Layout',
 		addGridLayoutDetail: 'Adjust the layout by setting column widths and adding additional sections',
@@ -1703,16 +1686,16 @@ export default {
 			'<p>Modifying a row configuration name will result in loss of data for any existing content that is based on this configuration.</p> <p><strong>Modifying only the label will not result in data loss.</strong></p>',
 		youAreDeleting: 'You are deleting the row configuration',
 		deletingARow:
-			'\n      Deleting a row configuration name will result in loss of data for any existing content that is based on this\n      configuration.\n    ',
+			'Deleting a row configuration name will result in loss of data for any existing content that is based on this configuration.',
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
-			'Modifying a layout will result in loss of data for any existing content that is based\n      on this configuration.\n    ',
+			'Modifying a layout will result in loss of data for any existing content that is based on this configuration.',
 	},
 	contentTypeEditor: {
 		compositions: 'Compositions',
 		group: 'Group',
 		groupReorderSameAliasError:
-			'You can\'t move the group %0% to this tab because the group will get the same\n      alias as a tab: "%1%". Rename the group to continue.\n    ',
+			'You can\'t move the group %0% to this tab because the group will get the same alias as a tab: "%1%". Rename the group to continue.',
 		noGroups: 'You have not added any groups',
 		addGroup: 'Add group',
 		inheritedFrom: 'Inherited from',
@@ -1724,16 +1707,16 @@ export default {
 		allowedTemplatesHeading: 'Allowed Templates',
 		allowedTemplatesDescription: 'Choose which templates editors are allowed to use on content of this type',
 		allowAtRootHeading: 'Allow at root',
-		allowAtRootDescription: 'Allow editors to create content of this type in the root of the content tree.\n    ',
+		allowAtRootDescription: 'Allow editors to create content of this type in the root of the content tree.',
 		childNodesHeading: 'Allowed child node types',
 		childNodesDescription: 'Allow content of the specified types to be created underneath content of this type.',
 		chooseChildNode: 'Choose child node',
 		compositionsDescription:
-			'Inherit tabs and properties from an existing Document Type. New tabs will be\n      added to the current Document Type or merged if a tab with an identical name exists.\n    ',
-		compositionInUse: 'This Content Type is used in a composition, and therefore cannot be composed itself.\n    ',
+			'Inherit tabs and properties from an existing Document Type. New tabs will be added to the current Document Type or merged if a tab with an identical name exists.',
+		compositionInUse: 'This Content Type is used in a composition, and therefore cannot be composed itself.',
 		noAvailableCompositions: 'There are no Content Types available to use as a composition.',
 		compositionRemoveWarning:
-			"Removing a composition will delete all the associated property data. Once you\n      save the Document Type there's no way back.\n    ",
+			"Removing a composition will delete all the associated property data. Once you save the Document Type there's no way back.",
 		availableEditors: 'Create new',
 		reuse: 'Use existing',
 		editorSettings: 'Editor settings',
@@ -1750,11 +1733,11 @@ export default {
 		allDocuments: 'All Documents',
 		allMediaItems: 'All media items',
 		usingThisDocument:
-			'using this Document Type will be deleted permanently, please confirm you want to\n      delete these as well.\n    ',
+			'using this Document Type will be deleted permanently, please confirm you want to delete these as well.',
 		usingThisMedia:
-			'using this Media Type will be deleted permanently, please confirm you want to delete\n      these as well.\n    ',
+			'using this Media Type will be deleted permanently, please confirm you want to delete these as well.',
 		usingThisMember:
-			'using this Member Type will be deleted permanently, please confirm you want to delete\n      these as well\n    ',
+			'using this Member Type will be deleted permanently, please confirm you want to delete these as well',
 		andAllDocuments: 'and all documents using this type',
 		andAllMediaItems: 'and all media items using this type',
 		andAllMembers: 'and all members using this type',
@@ -1768,7 +1751,7 @@ export default {
 		tabHasNoSortOrder: 'tab has no sort order',
 		compositionUsageHeading: 'Where is this composition used?',
 		compositionUsageSpecification:
-			'This composition is currently used in the composition of the following\n      Content Types:\n    ',
+			'This composition is currently used in the composition of the following Content Types:',
 		variantsHeading: 'Variation',
 		cultureVariantHeading: 'Allow vary by culture',
 		segmentVariantHeading: 'Allow segmentation',
@@ -1784,10 +1767,9 @@ export default {
 		allowVaryBySegment: 'Allow segmentation',
 		elementType: 'Element Type',
 		elementHeading: 'Is an Element Type',
-		elementDescription:
-			'An Element Type is meant to be used within other Document Types, and not in the Content\n      tree.\n    ',
+		elementDescription: 'An Element Type is meant to be used within other Document Types, and not in the Content tree.',
 		elementCannotToggle:
-			'A Document Type cannot be changed to an Element Type once it has been used to\n      create one or more content items.\n    ',
+			'A Document Type cannot be changed to an Element Type once it has been used to create one or more content items.',
 		elementDoesNotSupport: 'This is not applicable for an Element Type',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
 		displaySettingsHeadline: 'Appearance',
@@ -1803,7 +1785,7 @@ export default {
 		tabDirectPropertiesDropZone: 'Drag properties here to place directly on the tab',
 		removeChildNode: 'You are removing the child node',
 		removeChildNodeWarning:
-			'Removing a child node will limit the editors options to create different content\n      types beneath a node.\n    ',
+			'Removing a child node will limit the editors options to create different content types beneath a node.',
 		usingEditor: 'using this editor will get updated with the new settings.',
 		historyCleanupHeading: 'History cleanup',
 		historyCleanupDescription: 'Allow overriding the global history cleanup settings.',
@@ -1855,15 +1837,14 @@ export default {
 		addLanguage: 'Add language',
 		culture: 'ISO code',
 		mandatoryLanguage: 'Mandatory language',
-		mandatoryLanguageHelp:
-			'Properties on this language have to be filled out before the node can be\n      published.\n    ',
+		mandatoryLanguageHelp: 'Properties on this language have to be filled out before the node can be published.',
 		defaultLanguage: 'Default language',
 		defaultLanguageHelp: 'An Umbraco site can only have one default language set.',
 		changingDefaultLanguageWarning: 'Switching default language may result in default content missing.',
 		fallsbackToLabel: 'Falls back to',
 		noFallbackLanguageOption: 'No fall back language',
 		fallbackLanguageDescription:
-			'To allow multi-lingual content to fall back to another language if not\n      present in the requested language, select it here.\n    ',
+			'To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.',
 		fallbackLanguage: 'Fall back language',
 		none: 'none',
 		invariantPropertyUnlockHelp: '<strong>%0%</strong> is shared across languages and segments.',
@@ -1927,14 +1908,14 @@ export default {
 		fields: 'Fields',
 		includeSubpages: 'Include subpages',
 		noTranslators:
-			'No translator users found. Please create a translator user before you start sending\n      content to translation\n    ',
+			'No translator users found. Please create a translator user before you start sending content to translation',
 		pageHasBeenSendToTranslation: "The page '%0%' has been send to translation",
 		sendToTranslate: "Send the page '%0%' to translation",
 		totalWords: 'Total words',
 		translateTo: 'Translate to',
 		translationDone: 'Translation completed.',
 		translationDoneHelp:
-			"You can preview the pages, you've just translated, by clicking below. If the\n      original page is found, you will get a comparison of the 2 pages.\n    ",
+			"You can preview the pages, you've just translated, by clicking below. If the original page is found, you will get a comparison of the 2 pages.",
 		translationFailed: 'Translation failed, the XML file might be corrupt',
 		translationOptions: 'Translation options',
 		translator: 'Translator',
@@ -1993,7 +1974,7 @@ export default {
 	},
 	user: {
 		access: 'Access',
-		accessHelp: 'Based on the assigned groups and start nodes, the user has access to the following nodes\n    ',
+		accessHelp: 'Based on the assigned groups and start nodes, the user has access to the following nodes',
 		assignAccess: 'Assign access',
 		administrators: 'Administrator',
 		categoryField: 'Category field',
@@ -2023,11 +2004,11 @@ export default {
 		noPasswordChange: "The password hasn't been changed",
 		confirmNewPassword: 'Confirm new password',
 		changePasswordDescription:
-			"You can change your password for accessing the Umbraco backoffice by filling\n      out the form below and click the 'Change Password' button\n    ",
+			"You can change your password for accessing the Umbraco backoffice by filling out the form below and click the 'Change Password' button",
 		contentChannel: 'Content Channel',
 		createAnotherUser: 'Create another user',
 		createUserHelp:
-			'Create new users to give them access to Umbraco. When a new user is created a password\n      will be generated that you can share with the user.\n    ',
+			'Create new users to give them access to Umbraco. When a new user is created a password will be generated that you can share with the user.',
 		descriptionField: 'Description field',
 		disabled: 'Disable User',
 		documentType: 'Document Type',
@@ -2040,7 +2021,7 @@ export default {
 		invite: 'Invite',
 		inviteAnotherUser: 'Invite another user',
 		inviteUserHelp:
-			'Invite new users to give them access to Umbraco. An invite email will be sent to the\n      user with information on how to log in to Umbraco. Invites last for 72 hours.\n    ',
+			'Invite new users to give them access to Umbraco. An invite email will be sent to the user with information on how to log in to Umbraco. Invites last for 72 hours.',
 		language: 'UI Culture',
 		languageHelp: 'Set the culture you will see in menus and dialogs',
 		lastLockoutDate: 'Last lockout date',
@@ -2113,8 +2094,7 @@ export default {
 		startnodeshelp: 'Limit the content tree to specific start nodes',
 		updateDate: 'User last updated',
 		userCreated: 'has been created',
-		userCreatedSuccessHelp:
-			'The new user has successfully been created. To log in to Umbraco use the\n      password below.\n    ',
+		userCreatedSuccessHelp: 'The new user has successfully been created. To log in to Umbraco use the password below.',
 		userHasPassword: 'The user already has a password set',
 		userHasGroup: "The user is already in group '%0%'",
 		userLockoutNotEnabled: 'Lockout is not enabled for this user',
@@ -2125,14 +2105,13 @@ export default {
 		usergroup: 'User group',
 		usergroups: 'User groups',
 		userInvited: 'has been invited',
-		userInvitedSuccessHelp:
-			'An invitation has been sent to the new user with details about how to log in to\n      Umbraco.\n    ',
+		userInvitedSuccessHelp: 'An invitation has been sent to the new user with details about how to log in to Umbraco.',
 		userinviteWelcomeMessage:
-			'Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we\n      just need you to setup a password and add a picture for your avatar.\n    ',
+			"Hello there and welcome to Umbraco! In just 1 minute you'll be good to go, we just need you to setup a password and add a picture for your avatar.",
 		userinviteExpiredMessage:
-			'Welcome to Umbraco! Unfortunately your invite has expired. Please contact your\n      administrator and ask them to resend it.\n    ',
+			'Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.',
 		userinviteAvatarMessage:
-			'Uploading a photo of yourself will make it easy for other users to recognize\n      you. Click the circle above to upload your photo.\n    ',
+			'Uploading a photo of yourself will make it easy for other users to recognise you. Click the circle above to upload your photo.',
 		writer: 'Writer',
 		configureTwoFactor: 'Configure Two-Factor',
 		change: 'Change',
@@ -2226,11 +2205,11 @@ export default {
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",
 		checkErrorMessageDifferentExpectedValue:
-			"Expected value '%1%' for '%2%' in configuration file '%3%', but\n      found '%0%'.\n    ",
-		checkErrorMessageUnexpectedValue: "Found unexpected value '%0%' for '%2%' in configuration file '%3%'.\n    ",
+			"Expected value '%1%' for '%2%' in configuration file '%3%', but found '%0%'.",
+		checkErrorMessageUnexpectedValue: "Found unexpected value '%0%' for '%2%' in configuration file '%3%'.",
 		macroErrorModeCheckSuccessMessage: "MacroErrors are set to '%0%'.",
 		macroErrorModeCheckErrorMessage:
-			"MacroErrors are set to '%0%' which will prevent some or all pages in\n      your site from loading completely if there are any errors in macros. Rectifying this will set the value to '%1%'.\n    ",
+			"MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely if there are any errors in macros. Rectifying this will set the value to '%1%'.",
 		httpsCheckValidCertificate: "Your website's certificate is valid.",
 		httpsCheckInvalidCertificate: "Certificate validation error: '%0%'",
 		httpsCheckExpiredCertificate: "Your website's SSL certificate has expired.",
@@ -2238,12 +2217,12 @@ export default {
 		healthCheckInvalidUrl: "Error pinging the URL %0% - '%1%'",
 		httpsCheckIsCurrentSchemeHttps: 'You are currently %0% viewing the site using the HTTPS scheme.',
 		httpsCheckConfigurationRectifyNotPossible:
-			"The appSetting 'Umbraco:CMS:Global:UseHttps' is set to 'false' in\n      your appSettings.json file. Once you access this site using the HTTPS scheme, that should be set to 'true'.\n    ",
+			"The appSetting 'Umbraco:CMS:Global:UseHttps' is set to 'false' in your appSettings.json file. Once you access this site using the HTTPS scheme, that should be set to 'true'.",
 		httpsCheckConfigurationCheckResult:
-			"The appSetting 'Umbraco:CMS:Global:UseHttps' is set to '%0%' in your\n      appSettings.json file, your cookies are %1% marked as secure.\n    ",
+			"The appSetting 'Umbraco:CMS:Global:UseHttps' is set to '%0%' in your appSettings.json file, your cookies are %1% marked as secure.",
 		compilationDebugCheckSuccessMessage: 'Debug compilation mode is disabled.',
 		compilationDebugCheckErrorMessage:
-			'Debug compilation mode is currently enabled. It is recommended to\n      disable this setting before go live.\n    ',
+			'Debug compilation mode is currently enabled. It is recommended to disable this setting before go live.',
 		umbracoApplicationUrlCheckResultTrue:
 			"The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is set to <strong>%0%</strong>.",
 		umbracoApplicationUrlCheckResultFalse: "The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is not set.",
@@ -2263,24 +2242,24 @@ export default {
 		hSTSCheckHeaderNotFoundOnLocalhost:
 			'The header <strong>Strict-Transport-Security</strong> was not found. This header should not be present on localhost.',
 		xssProtectionCheckHeaderFound:
-			'The header <strong>X-XSS-Protection</strong> was found. <strong>It is recommended not to add this header to your website</strong>.<br />\n    You can read about this on the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection" target="_blank" rel="noopener" class="btn-link -underline">Mozilla</a> website ',
+			'The header <strong>X-XSS-Protection</strong> was found. <strong>It is recommended not to add this header to your website</strong>.<br />You can read about this on the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection" target="_blank" rel="noopener" class="btn-link -underline">Mozilla</a> website ',
 		xssProtectionCheckHeaderNotFound: 'The header <strong>X-XSS-Protection</strong> was not found.',
 		excessiveHeadersFound:
 			'The following headers revealing information about the website technology were found: <strong>%0%</strong>.',
-		excessiveHeadersNotFound: 'No headers revealing information about the website technology were found.\n    ',
 		smtpMailSettingsNotFound: 'In the Web.config file, system.net/mailsettings could not be found.',
 		smtpMailSettingsHostNotConfigured:
 			'In the Web.config file system.net/mailsettings section, the host is\n      not configured.\n    ',
+		excessiveHeadersNotFound: 'No headers revealing information about the website technology were found.',
 		smtpMailSettingsConnectionSuccess:
-			'SMTP settings are configured correctly and the service is operating\n      as expected.\n    ',
+			'SMTP settings are configured correctly and the service is operating as expected.',
 		smtpMailSettingsConnectionFail:
-			"The SMTP server configured with host '%0%' and port '%1%' could not be\n      reached. Please check to ensure the SMTP settings in the Web.config file system.net/mailsettings are correct.\n    ",
+			"The SMTP server configured with host '%0%' and port '%1%' could not be reached. Please check to ensure the SMTP settings in the configuration 'Umbraco:CMS:Global:Smtp' are correct.",
 		notificationEmailsCheckSuccessMessage: 'Notification email has been set to <strong>%0%</strong>.',
 		notificationEmailsCheckErrorMessage:
 			'Notification email is still set to the default value of <strong>%0%</strong>.',
 		checkGroup: 'Check group',
 		helpText:
-			'\n        <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.\n        You can add your own health checks, have a look at <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>\n        ',
+			'<p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.   You can add your own health checks, have a look at <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>',
 	},
 	redirectUrls: {
 		disableUrlTracker: 'Disable URL tracker',
@@ -2291,7 +2270,7 @@ export default {
 		panelInformation: 'The following URLs redirect to this content item:',
 		noRedirects: 'No redirects have been made',
 		noRedirectsDescription:
-			'When a published page gets renamed or moved a redirect will automatically be\n      made to the new page.\n    ',
+			'When a published page gets renamed or moved a redirect will automatically be made to the new page.',
 		redirectRemoved: 'Redirect URL removed.',
 		redirectRemoveError: 'Error removing redirect URL.',
 		redirectRemoveWarning: 'This will remove the redirect',
@@ -2314,7 +2293,7 @@ export default {
 		mediaTrashed: 'Trashed media with Id: {0} related to original parent media item with Id: {1}',
 		itemCannotBeRestored: 'Cannot automatically restore this item',
 		itemCannotBeRestoredHelpText:
-			'There is no location where this item can be automatically restored. You\n      can move the item manually using the tree below.\n    ',
+			'There is no location where this item can be automatically restored. You can move the item manually using the tree below.',
 		wasRestored: 'was restored under',
 	},
 	relationType: {
@@ -2389,7 +2368,7 @@ export default {
 		searchOverlayTitle: 'Search the Umbraco backoffice',
 		searchOverlayDescription: 'Search for content nodes, media nodes etc. across the backoffice.',
 		searchInputDescription:
-			'When autocomplete results are available, press up and down arrows, or use the\n      tab key and use the enter key to select.\n    ',
+			'When autocomplete results are available, press up and down arrows, or use the tab key and use the enter key to select.',
 		path: 'Path:',
 		foundIn: 'Found in',
 		hasTranslation: 'Has translation',
@@ -2493,15 +2472,15 @@ export default {
 		refreshStatus: 'Refresh status',
 		memoryCache: 'Memory Cache',
 		memoryCacheDescription:
-			'\n            This button lets you reload the in-memory cache, by entirely reloading it from the database\n    cache (but it does not rebuild that database cache). This is relatively fast.\n    Use it when you think that the memory cache has not been properly refreshed, after some events\n    triggered&mdash;which would indicate a minor Umbraco issue.\n    (note: triggers the reload on all servers in an LB environment, and will clear the second level cache if you have it enabled).\n    ',
+			'This button lets you reload the in-memory cache, by entirely reloading it from the database cache (but it does not rebuild that database cache). This is relatively fast. Use it when you think that the memory cache has not been properly refreshed, after some events triggered &mdash; which would indicate a minor Umbraco issue. (note: triggers the reload on all servers in an LB environment, and will clear the second level cache if you have it enabled).',
 		reload: 'Reload',
 		databaseCache: 'Database Cache',
 		databaseCacheDescription:
-			'\n    This button lets you rebuild the database cache, ie the content of the cmsContentNu table.\n    <strong>Rebuilding can be expensive.</strong>\n    Use it when reloading is not enough, and you think that the database cache has not been\n    properly generated&mdash;which would indicate some critical Umbraco issue.\n    ',
+			'This button lets you rebuild the database cache, e.g. the content of the cmsContentNu table. <strong>Rebuilding can be expensive.</strong> Use it when reloading is not enough, and you think that the database cache has not been properly generated &mdash; which would indicate some critical Umbraco issue.',
 		rebuild: 'Rebuild',
 		internals: 'Internals',
 		internalsDescription:
-			'\n    This button lets you trigger a NuCache snapshots collection (after running a fullCLR GC).\n    Unless you know what that means, you probably do <em>not</em> need to use it.\n    ',
+			'This button lets you trigger a NuCache snapshots collection (after running a fullCLR GC). Unless you know what that means, you probably do <em>not</em> need to use it.',
 		collect: 'Collect',
 		publishedCacheStatus: 'Published Cache Status',
 		caches: 'Caches',
@@ -2509,20 +2488,20 @@ export default {
 	profiling: {
 		performanceProfiling: 'Performance profiling',
 		performanceProfilingDescription:
-			"\n            <p>\n                Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.\n            </p>\n            <p>\n                If you want to activate the profiler for a specific page rendering, simply add <strong>umbDebug=true</strong> to the querystring when requesting the page.\n            </p>\n            <p>\n                If you want the profiler to be activated by default for all page renderings, you can use the toggle below.\n                It will set a cookie in your browser, which then activates the profiler automatically.\n                In other words, the profiler will only be active by default in <em>your</em> browser - not everyone else's.\n            </p>\n    ",
+			"<p>Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.</p><p>If you want to activate the profiler for a specific page rendering, simply add <strong>umbDebug=true</strong> to the querystring when requesting the page.</p><p>If you want the profiler to be activated by default for all page renderings, you can use the toggle below. It will set a cookie in your browser, which then activates the profiler automatically. In other words, the profiler will only be active by default in <em>your</em> browser - not everyone else's.</p>",
 		activateByDefault: 'Activate the profiler by default',
 		reminder: 'Friendly reminder',
 		reminderDescription:
-			'\n        <p>\n            You should never let a production site run in debug mode. Debug mode is turned off by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>false</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.\n        </p>\n    ',
+			'<p>You should never let a production site run in debug mode. Debug mode is turned off by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>false</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.</p>',
 		profilerEnabledDescription:
-			"\n        <p>\n            Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.\n        </p>\n        <p>\n            Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.\n        </p>\n    ",
+			"<p>Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.</p><p>Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.</p>",
 	},
 	settingsDashboardVideos: {
 		trainingHeadline: 'Hours of Umbraco training videos are only a click away',
 		trainingDescription:
-			'\n            <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>\n        ',
+			'<p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>',
 		learningBaseDescription:
-			'\n        <p>Want to master Umbraco? Spend a few minutes learning some best practices by visiting <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">the Umbraco Learning Base Youtube channel</a>. Here you can find a bunch of video material covering many aspects of Umbraco.</p>\n      ',
+			'  <p>Want to master Umbraco? Spend a few minutes learning some best practices by visiting <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">the Umbraco Learning Base Youtube channel</a>. Here you can find a bunch of video material covering many aspects of Umbraco.</p> ',
 		getStarted: 'To get you started',
 	},
 	settingsDashboard: {
@@ -2546,7 +2525,7 @@ export default {
 	startupDashboard: {
 		fallbackHeadline: 'Welcome to The Friendly CMS',
 		fallbackDescription:
-			"Thank you for choosing Umbraco - we think this could be the beginning of something\n      beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast\n      as possible.\n    ",
+			"Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.",
 	},
 	welcomeDashboard: {
 		ourUmbracoHeadline: 'Our Umbraco - The Friendliest Community',
@@ -2581,7 +2560,7 @@ export default {
 		labelCustomView: 'Custom view',
 		labelCustomViewInfoTitle: 'Show custom view description',
 		labelCustomViewDescription:
-			'Overwrite how this block appears in the backoffice UI. Pick a .html file\n      containing your presentation.\n    ',
+			'Overwrite how this block appears in the backoffice UI. Pick a .html file containing your presentation.',
 		labelSettingsElementType: 'Settings model',
 		labelEditorSize: 'Overlay editor size',
 		addCustomView: 'Add custom view',
@@ -2590,11 +2569,12 @@ export default {
 		confirmDeleteBlockMessage: 'Are you sure you want to delete this %0%?',
 		confirmDeleteBlockTypeMessage: 'Are you sure you want to delete the block configuration <strong>%0%</strong>?',
 		confirmDeleteBlockTypeNotice:
-			'The content of this block will still be present, editing of this content\n      will no longer be available and will be shown as unsupported content.\n    ',
+			'The content of this block will still be present, editing of this content will no longer be available and will be shown as unsupported content.',
 		confirmDeleteBlockGroupTitle: 'Delete group?',
-		confirmDeleteBlockGroupMessage: 'Are you sure you want to delete group <strong>%0%</strong>?',
+		confirmDeleteBlockGroupMessage:
+			'Are you sure you want to delete group <strong>%0%</strong> and all the Block configurations of this?',
 		confirmDeleteBlockGroupNotice:
-			'The content of these Blocks will still be present, editing of this content\n      will no longer be available and will be shown as unsupported content.\n    ',
+			'The content of these Blocks will still be present, editing of this content will no longer be available and will be shown as unsupported content.',
 		blockConfigurationOverlayTitle: "Configuration of '%0%'",
 		elementTypeDoesNotExist: 'Cannot be edited cause ElementType does not exist.',
 		thumbnail: 'Thumbnail',
@@ -2701,13 +2681,13 @@ export default {
 	contentTemplatesDashboard: {
 		whatHeadline: 'What are Document Blueprints?',
 		whatDescription:
-			'Document Blueprints are pre-defined content that can be selected when creating a new\n      content node.\n    ',
+			'Document Blueprints are pre-defined content that can be selected when creating a new content node.',
 		createHeadline: 'How do I create a Document Blueprint?',
 		createDescription:
-			'\n            <p>There are two ways to create a Document Blueprint:</p>\n            <ul>\n                <li>Right-click a content node and select "Create Document Blueprint" to create a new Document Blueprint.</li>\n                <li>Right-click the Document Blueprints tree in the Settings section and select the Document Type you want to create a Document Blueprint for.</li>\n            </ul>\n            <p>Once given a name, editors can start using the Document Blueprint as a foundation for their new page.</p>\n        ',
+			'<p>There are two ways to create a Document Blueprint:</p><ul><li>Right-click a content node and select "Create Document Blueprint" to create a new Document Blueprint.</li><li>Right-click the Document Blueprints tree in the Settings section and select the Document Type you want to create a Document Blueprint for.</li></ul><p>Once given a name, editors can start using the Document Blueprint as a foundation for their new page.</p>',
 		manageHeadline: 'How do I manage Document Blueprints?',
 		manageDescription:
-			'You can edit and delete Document Blueprints from the "Document Blueprints" tree in the\n      Settings section. Expand the Document Type which the Document Blueprint is based on and click it to edit or delete\n      it.\n    ',
+			'You can edit and delete Document Blueprints from the "Document Blueprints" tree in the Settings section. Expand the Document Type which the Document Blueprint is based on and click it to edit or delete it.',
 	},
 	preview: {
 		endLabel: 'End',
@@ -2716,12 +2696,12 @@ export default {
 		openWebsiteTitle: 'Open website in preview mode',
 		returnToPreviewHeadline: 'Preview website?',
 		returnToPreviewDescription:
-			'You have ended preview mode, do you want to enable it again to view the\n      latest saved version of your website?\n    ',
+			'You have ended preview mode, do you want to enable it again to view the latest saved version of your website?',
 		returnToPreviewAcceptButton: 'Preview latest version',
 		returnToPreviewDeclineButton: 'View published version',
 		viewPublishedContentHeadline: 'View published version?',
 		viewPublishedContentDescription:
-			'You are in Preview Mode, do you want exit in order to view the\n      published version of your website?\n    ',
+			'You are in Preview Mode, do you want exit in order to view the published version of your website?',
 		viewPublishedContentAcceptButton: 'View published version',
 		viewPublishedContentDeclineButton: 'Stay in preview mode',
 	},
