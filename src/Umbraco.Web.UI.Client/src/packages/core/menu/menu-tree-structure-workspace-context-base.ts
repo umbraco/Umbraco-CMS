@@ -6,6 +6,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
 
 interface UmbMenuStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -20,6 +21,8 @@ export abstract class UmbMenuStructureWorkspaceContextBase extends UmbContextBas
 
 	#parent = new UmbObjectState<UmbStructureItemModel | undefined>(undefined);
 	public readonly parent = this.#parent.asObservable();
+
+	#parentContext = new UmbParentEntityContext(this);
 
 	constructor(host: UmbControllerHost, args: UmbMenuStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
@@ -85,9 +88,26 @@ export abstract class UmbMenuStructureWorkspaceContextBase extends UmbContextBas
 			}
 		}
 
-		const parent = structureItems[structureItems.length - 2];
-		this.#parent.setValue(parent);
 		this.#structure.setValue(structureItems);
+		this.#handleParent(structureItems);
+	}
+
+	#handleParent(structureItems: Array<UmbStructureItemModel>) {
+		/* If the item is not new, the current item is the last item in the array. 
+			We filter out the current item unique to handle any case where it could show up */
+		const parent = structureItems.filter((item) => item.unique !== this.#workspaceContext?.getUnique()).pop();
+
+		// TODO: remove this when the parent gets removed from the structure interface
+		this.#parent.setValue(parent);
+
+		const parentEntity = parent
+			? {
+					unique: parent.unique,
+					entityType: parent.entityType,
+				}
+			: undefined;
+
+		this.#parentContext.setParent(parentEntity);
 	}
 }
 /*
