@@ -56,10 +56,10 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 			? html`
 					<uui-button
 						id="action-button"
+						data-mark="workspace:action-menu-button"
 						popovertarget="workspace-entity-action-menu-popover"
 						label=${this.localize.term('general_actions')}>
-						${this.localize.term('general_actions')}
-						<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
+						<uui-symbol-more></uui-symbol-more>
 					</uui-button>
 					<uui-popover-container
 						id="workspace-entity-action-menu-popover"
@@ -84,8 +84,8 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 		css`
 			:host {
 				height: 100%;
+				margin-left: calc(var(--uui-size-layout-1) * -1);
 			}
-
 			:host > uui-button {
 				height: 100%;
 			}

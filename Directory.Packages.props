@@ -7,13 +7,17 @@
   <ItemGroup>
     <GlobalPackageReference Include="Nerdbank.GitVersioning" Version="3.7.115" />
     <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
-    <GlobalPackageReference Include="Umbraco.Code" Version="2.2.0" />
+    <GlobalPackageReference Include="Umbraco.Code" Version="2.3.0" />
     <GlobalPackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.2.0" />
   </ItemGroup>
   <!-- Microsoft packages -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.4" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" />  <!-- TODO: Update the hard-dependency that Umbraco.Code has on 4.10.0 to allow update of this to latest (4.13.0). -->
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.13.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.13.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.13.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.13.0" />
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.4" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.4" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
