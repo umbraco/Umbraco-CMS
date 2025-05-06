@@ -408,6 +408,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	#initialize = () => {
 		if (this.#isConnected === false) return;
+		if (this.#containerElement) {
+			console.error('Container element already initialized', this.#containerElement);
+			return;
+		}
 
 		const containerEl =
 			(this.#config.containerSelector
@@ -598,6 +602,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	setupItem(element: ElementType) {
+		if (this.#elements.includes(element)) {
+			console.error('Element already setup', element);
+			return;
+		}
 		if (this.#config.ignorerSelector) {
 			setupIgnorerElements(element, this.#config.ignorerSelector);
 		}
@@ -664,7 +672,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	#setCurrentElement(element: ElementType) {
 		UmbSorterController.activeElement = element;
-
 		UmbSorterController.activeDragElement = this.#getDraggableElement(element);
 
 		if (!UmbSorterController.activeDragElement) {
@@ -675,7 +682,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			);
 		}
 
-		UmbSorterController.activeDragElement?.addEventListener('dragend', this.#handleDragEnd);
+		//UmbSorterController.activeDragElement?.addEventListener('dragend', this.#handleDragEnd);
 		this.#setupPlaceholderStyle();
 	}
 
@@ -735,9 +742,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			this.#scrollElement = getParentScrollElement(this.#containerElement, true);
 		}
 
+		const containerRect = this.#containerElement.getBoundingClientRect();
+		this.#containerElement.style.height = containerRect.height + 'px';
+
 		this.#setCurrentElement(element as ElementType);
 
-		UmbSorterController.activeDragElement?.addEventListener('dragend', this.#handleDragEnd);
+		//UmbSorterController.activeDragElement?.addEventListener('dragend', this.#handleDragEnd);
 		window.addEventListener('mouseup', this.#handleMouseUp);
 		window.addEventListener('mouseout', this.#handleMouseUp);
 		window.addEventListener('mouseleave', this.#handleMouseUp);
@@ -831,11 +841,19 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	};
 
 	#handleMoveEnd() {
-		if (!UmbSorterController.activeElement || !UmbSorterController.activeItem) {
-			return;
-		}
+		this.#cleanupMove();
+		this.#stopAutoScroll();
+		this.removeAllowIndication();
 
-		const element = UmbSorterController.activeElement;
+		if (UmbSorterController.activeElement && UmbSorterController.activeItem) {
+			const element = UmbSorterController.activeElement;
+			if (this.#config.onEnd) {
+				this.#config.onEnd({
+					item: UmbSorterController.activeItem,
+					element: element as ElementType,
+				});
+			}
+		}
 
 		if (UmbSorterController.activeDragElement) {
 			UmbSorterController.activeDragElement.style.transform = '';
@@ -843,21 +861,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			UmbSorterController.activeDragElement.removeEventListener('dragend', this.#handleDragEnd);
 		}
 
-		window.removeEventListener('mouseup', this.#handleMouseUp);
-		window.removeEventListener('mouseout', this.#handleMouseUp);
-		window.removeEventListener('mouseleave', this.#handleMouseUp);
-		window.removeEventListener('mousemove', this.#handleMouseMove);
-
 		this.#removePlaceholderStyle();
-		this.#stopAutoScroll();
-		this.removeAllowIndication();
-
-		if (this.#config.onEnd) {
-			this.#config.onEnd({
-				item: UmbSorterController.activeItem,
-				element: element as ElementType,
-			});
-		}
 
 		if (UmbSorterController.rqaId) {
 			cancelAnimationFrame(UmbSorterController.rqaId);
@@ -873,6 +877,16 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		UmbSorterController.originalSorter = undefined;
 		this.#dragX = 0;
 		this.#dragY = 0;
+	}
+
+	#cleanupMove() {
+		if (this.#containerElement) {
+			this.#containerElement.style.height = '';
+		}
+		window.removeEventListener('mouseup', this.#handleMouseUp);
+		window.removeEventListener('mouseout', this.#handleMouseUp);
+		window.removeEventListener('mouseleave', this.#handleMouseUp);
+		window.removeEventListener('mousemove', this.#handleMouseMove);
 	}
 
 	#handleDragMove(event: DragEvent, instant?: boolean) {

@@ -334,6 +334,9 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: block;
+			}
 			#btn-add {
 				width: 100%;
 				--uui-button-height: var(--uui-size-14);

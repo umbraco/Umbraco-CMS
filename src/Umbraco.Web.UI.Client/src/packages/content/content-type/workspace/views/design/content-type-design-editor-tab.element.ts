@@ -260,6 +260,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 			.container-list {
 				display: grid;
 				gap: 10px;
+				align-content: start;
 			}
 
 			.container-list #convert-to-tab {
