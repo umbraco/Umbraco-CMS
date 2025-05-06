@@ -11,7 +11,7 @@ public class WebhookSettings
     internal const string StaticPeriod = "00:00:10";
     private const bool StaticEnableLoggingCleanup = true;
     private const int StaticKeepLogsForDays = 30;
-    private const WebhookPayloadType StaticPayloadType = WebhookPayloadType.Legacy;
+    private const WebhookPayloadType StaticPayloadType = Constants.Webhooks.DefaultPayloadType;
 
 
     /// <summary>
