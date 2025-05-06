@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -20,4 +21,6 @@ public class UserTwoFactorRequestedWebhookEvent : WebhookEventBase<UserTwoFactor
 
     public override string Alias => Constants.WebhookEvents.Aliases.UserTwoFactorRequested;
 
+    public override object? ConvertNotificationToRequestPayload(UserTwoFactorRequestedNotification notification)
+        => new DefaultPayloadModel { Id = notification.UserKey };
 }
