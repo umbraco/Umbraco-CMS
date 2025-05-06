@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Umbraco.Cms.Core.Webhooks;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
@@ -72,7 +72,7 @@ public class WebhookSettings
     /// <remarks>
     ///     <para>
     ///         By default, Legacy payloads are used see <see cref="WebhookPayloadType"/> for more info.
-    ///         This default will change to minimal starting from v17
+    ///         This default will change to minimal starting from v17.
     ///     </para>
     /// </remarks>
     [DefaultValue(StaticPayloadType)]
