@@ -1,5 +1,5 @@
 import type { UmbDocumentDetailModel, UmbDocumentVariantPublishModel } from '../../types.js';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
 import type {
 	CultureAndScheduleRequestModel,
 	PublishDocumentRequestModel,
@@ -8,7 +8,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
@@ -50,11 +50,11 @@ export class UmbDocumentPublishingServerDataSource {
 		);
 
 		// TODO: THIS DOES NOT TAKE SEGMENTS INTO ACCOUNT!!!!!!
-		const requestBody: PublishDocumentRequestModel = {
+		const body: PublishDocumentRequestModel = {
 			publishSchedules,
 		};
 
-		return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdPublish({ id: unique, requestBody }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdPublish({ path: { id: unique }, body: body }));
 	}
 
 	/**
@@ -73,18 +73,18 @@ export class UmbDocumentPublishingServerDataSource {
 		const hasInvariant = variantIds.some((variant) => variant.isCultureInvariant());
 
 		if (hasInvariant) {
-			const requestBody: UnpublishDocumentRequestModel = {
+			const body: UnpublishDocumentRequestModel = {
 				cultures: null,
 			};
 
-			return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdUnpublish({ id: unique, requestBody }));
+			return tryExecute(this.#host, DocumentService.putDocumentByIdUnpublish({ path: { id: unique }, body: body }));
 		}
 
-		const requestBody: UnpublishDocumentRequestModel = {
+		const body: UnpublishDocumentRequestModel = {
 			cultures: variantIds.map((variant) => variant.toCultureString()),
 		};
 
-		return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdUnpublish({ id: unique, requestBody }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdUnpublish({ path: { id: unique }, body: body }));
 	}
 
 	/**
@@ -101,15 +101,40 @@ export class UmbDocumentPublishingServerDataSource {
 	) {
 		if (!unique) throw new Error('Id is missing');
 
-		const requestBody: PublishDocumentWithDescendantsRequestModel = {
+		const body: PublishDocumentWithDescendantsRequestModel = {
 			cultures: variantIds.map((variant) => variant.toCultureString()),
 			includeUnpublishedDescendants,
 		};
 
-		return tryExecuteAndNotify(
+		// Initiate the publish descendants task and get back a task Id.
+		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentService.putDocumentByIdPublishWithDescendants({ id: unique, requestBody }),
+			DocumentService.putDocumentByIdPublishWithDescendants({ path: { id: unique }, body: body }),
 		);
+
+		if (error || !data) {
+			return { error };
+		}
+
+		const taskId = data.taskId;
+
+		// Poll until we know publishing is finished, then return the result.
+		let isFirstPoll = true;
+		while (true) {
+			await new Promise((resolve) => setTimeout(resolve, isFirstPoll ? 1000 : 5000));
+			isFirstPoll = false;
+			const { data, error } = await tryExecute(
+				this.#host,
+				DocumentService.getDocumentByIdPublishWithDescendantsResultByTaskId({ path: { id: unique, taskId } }),
+			);
+			if (error || !data) {
+				return { error };
+			}
+
+			if (data.isComplete) {
+				return { error: null };
+			}
+		}
 	}
 
 	/**
@@ -121,9 +146,9 @@ export class UmbDocumentPublishingServerDataSource {
 	async published(unique: string): Promise<UmbDataSourceResponse<UmbDocumentDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentService.getDocumentByIdPublished({ id: unique }),
+			DocumentService.getDocumentByIdPublished({ path: { id: unique } }),
 		);
 
 		if (error || !data) {
@@ -137,6 +162,7 @@ export class UmbDocumentPublishingServerDataSource {
 			values: data.values.map((value) => {
 				return {
 					editorAlias: value.editorAlias,
+					entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
 					culture: value.culture || null,
 					segment: value.segment || null,
 					alias: value.alias,
@@ -154,12 +180,6 @@ export class UmbDocumentPublishingServerDataSource {
 					updateDate: variant.updateDate,
 					scheduledPublishDate: variant.scheduledPublishDate || null,
 					scheduledUnpublishDate: variant.scheduledUnpublishDate || null,
-				};
-			}),
-			urls: data.urls.map((url) => {
-				return {
-					culture: url.culture || null,
-					url: url.url,
 				};
 			}),
 			template: data.template ? { unique: data.template.id } : null,

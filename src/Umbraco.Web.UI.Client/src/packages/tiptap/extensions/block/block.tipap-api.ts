@@ -1,6 +1,6 @@
+import { UmbTiptapExtensionApiBase } from '../base.js';
 import { distinctUntilChanged } from '@umbraco-cms/backoffice/external/rxjs';
 import { Node } from '@umbraco-cms/backoffice/external/tiptap';
-import { UmbTiptapExtensionApiBase } from '@umbraco-cms/backoffice/tiptap';
 import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
 import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
@@ -92,10 +92,13 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 
 		this.consumeContext(UMB_BLOCK_RTE_MANAGER_CONTEXT, (context) => {
 			this.observe(
-				context.contents.pipe(
+				context?.contents.pipe(
 					distinctUntilChanged((prev, curr) => prev.map((y) => y.key).join() === curr.map((y) => y.key).join()),
 				),
 				(contents) => {
+					if (!contents || !context) {
+						return;
+					}
 					this.#updateBlocks(contents, context.getLayouts());
 				},
 				'contents',

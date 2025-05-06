@@ -6,16 +6,16 @@ import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbFileDropzoneItemStatus, UmbInputDropzoneDashedStyles } from '@umbraco-cms/backoffice/dropzone';
+import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import type {
 	UmbDropzoneChangeEvent,
 	UmbInputDropzoneElement,
 	UmbUploadableFile,
 } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends UmbLitElement {
@@ -66,8 +66,8 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_APP_CONTEXT, (context) => {
-			this._serverUrl = context.getServerUrl();
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this._serverUrl = context?.getServerUrl() ?? '';
 		});
 	}
 
@@ -174,7 +174,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	#renderDropzone() {
 		return html`
 			<umb-input-dropzone
-				id="dropzone"
+				standalone
 				disable-folder-upload
 				accept=${ifDefined(this._extensions?.join(','))}
 				@change=${this.#onUpload}></umb-input-dropzone>
@@ -230,7 +230,6 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	static override readonly styles = [
 		UmbTextStyles,
-		UmbInputDropzoneDashedStyles,
 		css`
 			:host {
 				position: relative;
@@ -245,6 +244,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 				grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 				gap: var(--uui-size-space-4);
 				box-sizing: border-box;
+				margin-bottom: var(--uui-size-space-3);
 			}
 
 			#wrapper:has(umb-input-upload-field-file) {
@@ -256,8 +256,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 			#wrapperInner {
 				position: relative;
 				display: flex;
-				width: fit-content;
-				max-width: 100%;
+				width: 100%;
 			}
 		`,
 	];

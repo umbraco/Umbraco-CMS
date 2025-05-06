@@ -9,12 +9,12 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import type { UmbBlockDataModel, UmbBlockDataObjectModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 /**
  * A implementation of the Block Manager specifically for the Block Grid Editor.
@@ -33,7 +33,7 @@ export class UmbBlockGridManagerContext<
 		return this.#inlineEditingMode.getValue();
 	}
 
-	#initAppUrl: Promise<void>;
+	#initAppUrl: Promise<unknown>;
 
 	#serverUrl?: string;
 
@@ -87,9 +87,9 @@ export class UmbBlockGridManagerContext<
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.#initAppUrl = this.getContext(UMB_APP_CONTEXT).then((appContext) => {
-			this.#serverUrl = appContext.getServerUrl();
-		});
+		this.#initAppUrl = this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance?.getServerUrl();
+		}).asPromise({ preventTimeout: true });
 	}
 	/**
 	 * @param contentElementTypeKey
@@ -105,9 +105,8 @@ export class UmbBlockGridManagerContext<
 		// This property is used by some implementations, but not used in this. Do not remove. [NL]
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		_originData?: UmbBlockGridWorkspaceOriginData,
-	) {
+	): never {
 		throw new Error('Method deparecated use createWithPresets');
-		return {} as UmbBlockDataObjectModel<BlockLayoutType>;
 	}
 
 	async createWithPresets(

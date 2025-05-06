@@ -1,9 +1,10 @@
 import type { UmbContextToken } from '../token/index.js';
+import type { UmbContextMinimal } from '../types.js';
 import { UmbContextProvider } from './context-provider.js';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbContextProviderController<
-		BaseType = unknown,
+		BaseType extends UmbContextMinimal = UmbContextMinimal,
 		ResultType extends BaseType = BaseType,
 		InstanceType extends ResultType = ResultType,
 	>

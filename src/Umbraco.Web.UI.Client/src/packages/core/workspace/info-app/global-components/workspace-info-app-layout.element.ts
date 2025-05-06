@@ -24,7 +24,7 @@ export class UmbWorkspaceInfoAppLayoutElement extends UmbLitElement {
 			}
 
 			#container {
-				padding-left: var(--uui-size-space-4)
+				padding-left: var(--uui-size-space-4);
 			}
 		`,
 	];

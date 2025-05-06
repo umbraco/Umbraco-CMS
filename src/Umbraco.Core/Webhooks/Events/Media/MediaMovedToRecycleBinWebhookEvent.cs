@@ -25,7 +25,9 @@ public class MediaMovedToRecycleBinWebhookEvent : WebhookEventContentBase<MediaM
 
     public override string Alias => Constants.WebhookEvents.Aliases.MediaMovedToRecycleBin;
 
-    protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaMovedToRecycleBinNotification notification) => notification.MoveInfoCollection.Select(x => x.Entity);
+    protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaMovedToRecycleBinNotification notification)
+        => notification.MoveInfoCollection.Select(x => x.Entity);
 
-    protected override object ConvertEntityToRequestPayload(IMedia entity) => new DefaultPayloadModel { Id = entity.Key };
+    protected override object ConvertEntityToRequestPayload(IMedia entity)
+        => new DefaultPayloadModel { Id = entity.Key };
 }

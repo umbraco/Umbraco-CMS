@@ -1,14 +1,13 @@
 import { UmbIconRegistry } from './icon.registry.js';
-import type { UmbIconDefinition } from './types.js';
+import type { ManifestIcons, UmbIconDefinition } from './types.js';
 import { UMB_ICON_REGISTRY_CONTEXT } from './icon-registry.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { ManifestIcons } from '@umbraco-cms/backoffice/icon';
 
-export class UmbIconRegistryContext extends UmbContextBase<UmbIconRegistryContext> {
+export class UmbIconRegistryContext extends UmbContextBase {
 	#registry: UmbIconRegistry;
 	#manifestMap = new Map();
 	#icons = new UmbArrayState<UmbIconDefinition>([], (x) => x.name);

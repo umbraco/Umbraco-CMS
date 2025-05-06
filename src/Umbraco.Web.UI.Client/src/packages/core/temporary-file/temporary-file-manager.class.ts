@@ -11,7 +11,8 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { formatBytes } from '@umbraco-cms/backoffice/utils';
-import { isCancelError } from '@umbraco-cms/backoffice/resources';
+import { UmbApiError, UmbCancelError } from '@umbraco-cms/backoffice/resources';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbTemporaryFileManager<
 	UploadableItem extends UmbTemporaryFileModel = UmbTemporaryFileModel,
@@ -19,9 +20,18 @@ export class UmbTemporaryFileManager<
 	readonly #temporaryFileRepository = new UmbTemporaryFileRepository(this._host);
 	readonly #temporaryFileConfigRepository = new UmbTemporaryFileConfigRepository(this._host);
 	readonly #localization = new UmbLocalizationController(this._host);
+	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
 	readonly #queue = new UmbArrayState<UploadableItem>([], (item) => item.temporaryUnique);
 	public readonly queue = this.#queue.asObservable();
+
+	constructor(host: UmbControllerHost) {
+		super(host);
+
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
+			this.#notificationContext = instance;
+		});
+	}
 
 	/**
 	 * Gets the temporary file configuration.
@@ -44,7 +54,7 @@ export class UmbTemporaryFileManager<
 		return (await this.#handleQueue({ ...options, chunkSize: 1 }))[0];
 	}
 
-	async upload(
+	upload(
 		queueItems: Array<UploadableItem>,
 		options?: UmbUploadOptions<UploadableItem>,
 	): Promise<Array<UploadableItem>> {
@@ -91,6 +101,19 @@ export class UmbTemporaryFileManager<
 		return filesCompleted;
 	}
 
+	#notifyOnFileSizeLimitExceeded(maxFileSize: number, item: UploadableItem) {
+		this.#notificationContext?.peek('warning', {
+			data: {
+				headline: 'Upload',
+				message: `
+	${this.#localization.term('media_invalidFileSize')}: ${item.file.name} (${formatBytes(item.file.size)}).
+
+	${this.#localization.term('media_maxFileSize')} ${maxFileSize > 0 ? formatBytes(maxFileSize) : 'N/A'}.
+						`,
+			},
+		});
+	}
+
 	async #validateItem(item: UploadableItem): Promise<boolean> {
 		const config = await this.getConfiguration();
 		let maxFileSize = await this.observe(config.part('maxFileSize')).asPromise();
@@ -98,17 +121,7 @@ export class UmbTemporaryFileManager<
 			// Convert from kilobytes to bytes
 			maxFileSize *= 1024;
 			if (item.file.size > maxFileSize) {
-				const notification = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-				notification.peek('warning', {
-					data: {
-						headline: 'Upload',
-						message: `
-	${this.#localization.term('media_invalidFileSize')}: ${item.file.name} (${formatBytes(item.file.size)}).
-
-	${this.#localization.term('media_maxFileSize')} ${formatBytes(maxFileSize)}.
-						`,
-					},
-				});
+				this.#notifyOnFileSizeLimitExceeded(maxFileSize, item);
 				return false;
 			}
 		}
@@ -126,8 +139,7 @@ export class UmbTemporaryFileManager<
 			(allowedExtensions?.length && !allowedExtensions.includes(fileExtension)) ||
 			(disallowedExtensions?.length && disallowedExtensions.includes(fileExtension))
 		) {
-			const notification = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-			notification.peek('warning', {
+			this.#notificationContext?.peek('warning', {
 				data: {
 					message: `${this.#localization.term('media_disallowedFileType')}: ${fileExtension}`,
 				},
@@ -159,15 +171,36 @@ export class UmbTemporaryFileManager<
 			},
 			item.abortController?.signal ?? item.abortSignal,
 		);
+
 		let status = TemporaryFileStatus.SUCCESS;
+
 		if (error) {
-			status = TemporaryFileStatus.ERROR;
-			if (isCancelError(error)) {
-				status = TemporaryFileStatus.CANCELLED;
-			}
+			status = this.#handleError(error, item);
 		}
 
 		this.#queue.updateOne(item.temporaryUnique, { ...item, status });
 		return { ...item, status };
+	}
+
+	#handleError(error: Error, item: UploadableItem): TemporaryFileStatus {
+		if (error instanceof UmbCancelError) {
+			// Ignore the error if the upload was cancelled
+			return TemporaryFileStatus.CANCELLED;
+		}
+
+		if (error instanceof UmbApiError && error.status === 413) {
+			// Special handling for when the request body is too large
+			const maxFileSizeGuestimate = parseInt(/(\d+) bytes/.exec(error.problemDetails.title)?.[1] ?? '0', 10);
+			this.#notifyOnFileSizeLimitExceeded(maxFileSizeGuestimate, item);
+		} else {
+			this.#notificationContext?.peek('danger', {
+				data: {
+					headline: this.#localization.term('errors_receivedErrorFromServer'),
+					message: error.message,
+				},
+			});
+		}
+
+		return TemporaryFileStatus.ERROR;
 	}
 }

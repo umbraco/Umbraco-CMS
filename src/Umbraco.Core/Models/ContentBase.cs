@@ -301,7 +301,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
             }
 
             // set
-            else
+            else if (GetCultureName(culture) != name)
             {
                 this.SetCultureInfo(culture!, name, DateTime.Now);
             }
@@ -455,10 +455,12 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
                 $"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
         }
 
-        property?.SetValue(value, culture, segment);
-
-        // bump the culture to be flagged for updating
-        this.TouchCulture(culture);
+        var updated = property.SetValue(value, culture, segment);
+        if (updated)
+        {
+            // bump the culture to be flagged for updating
+            this.TouchCulture(culture);
+        }
     }
 
     /// <inheritdoc />

@@ -3,7 +3,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbArrayState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
-export type UmbValidationMessageType = 'client' | 'server';
+export type UmbValidationMessageType = 'client' | 'server' | 'config' | string;
 export interface UmbValidationMessage {
 	type: UmbValidationMessageType;
 	key: string;
@@ -80,6 +80,10 @@ export class UmbValidationMessagesManager {
 		return this.getMessages().filter((x) => MatchPathOrDescendantPath(x.path, path));
 	}
 
+	getHasMessageOfPathAndBody(path: string, body: string): boolean {
+		return this.getMessages().some((x) => x.path === path && x.body === body);
+	}
+
 	messagesOfPathAndDescendant(path: string): Observable<Array<UmbValidationMessage>> {
 		//path = path.toLowerCase();
 		return createObservablePart(this.filteredMessages, (msgs) =>
@@ -92,6 +96,14 @@ export class UmbValidationMessagesManager {
 		// Find messages that matches the given type and path.
 		return createObservablePart(this.filteredMessages, (msgs) =>
 			msgs.filter((x) => x.type === type && x.path === path),
+		);
+	}
+
+	messagesOfNotTypeAndPath(type: UmbValidationMessageType, path: string): Observable<Array<UmbValidationMessage>> {
+		//path = path.toLowerCase();
+		// Find messages that matches the given type and path.
+		return createObservablePart(this.filteredMessages, (msgs) =>
+			msgs.filter((x) => x.type !== type && x.path === path),
 		);
 	}
 

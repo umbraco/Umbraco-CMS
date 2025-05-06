@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-public class PackageInstallationTest : UmbracoIntegrationTest
+internal sealed class PackageInstallationTest : UmbracoIntegrationTest
 {
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 

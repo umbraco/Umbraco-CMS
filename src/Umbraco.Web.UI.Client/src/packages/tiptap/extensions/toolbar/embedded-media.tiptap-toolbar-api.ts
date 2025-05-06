@@ -1,7 +1,7 @@
 import { UmbTiptapToolbarElementApiBase } from '../base.js';
 import { umbEmbeddedMedia } from '@umbraco-cms/backoffice/external/tiptap';
 import { UMB_EMBEDDED_MEDIA_MODAL } from '@umbraco-cms/backoffice/embedded-media';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
 export default class UmbTiptapToolbarEmbeddedMediaExtensionApi extends UmbTiptapToolbarElementApiBase {
@@ -21,12 +21,8 @@ export default class UmbTiptapToolbarEmbeddedMediaExtensionApi extends UmbTiptap
 			data.url = attrs['data-embed-url'];
 		}
 
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalHandler = modalManager.open(this, UMB_EMBEDDED_MEDIA_MODAL, { data });
+		const result = await umbOpenModal(this, UMB_EMBEDDED_MEDIA_MODAL, { data }).catch(() => undefined);
 
-		if (!modalHandler) return;
-
-		const result = await modalHandler.onSubmit().catch(() => undefined);
 		if (!result) return;
 
 		editor?.commands.setEmbeddedMedia({

@@ -34,7 +34,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 		this.consumeContext(UMB_LANGUAGE_WORKSPACE_CONTEXT, (instance) => {
 			this.#languageWorkspaceContext = instance;
 
-			this.observe(this.#languageWorkspaceContext.data, (language) => {
+			this.observe(this.#languageWorkspaceContext?.data, (language) => {
 				this._language = language;
 
 				/* Store the initial value of the default language.
@@ -46,7 +46,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 				}
 			});
 
-			this.observe(this.#languageWorkspaceContext.isNew, (isNew) => {
+			this.observe(this.#languageWorkspaceContext?.isNew, (isNew) => {
 				this._isNew = isNew;
 			});
 		});

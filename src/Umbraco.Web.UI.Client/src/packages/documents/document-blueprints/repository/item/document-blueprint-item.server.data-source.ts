@@ -4,7 +4,7 @@ import { DocumentBlueprintService, DocumentTypeService } from '@umbraco-cms/back
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { DocumentBlueprintItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Document Blueprint items that fetches data from the server
@@ -31,9 +31,9 @@ export class UmbDocumentBlueprintItemServerDataSource extends UmbItemServerDataS
 
 	async getItemsByDocumentType(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentTypeService.getDocumentTypeByIdBlueprint({ id: unique }),
+			DocumentTypeService.getDocumentTypeByIdBlueprint({ path: { id: unique } }),
 		);
 
 		if (data) {
@@ -50,7 +50,8 @@ export class UmbDocumentBlueprintItemServerDataSource extends UmbItemServerDataS
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => DocumentBlueprintService.getItemDocumentBlueprint({ id: uniques });
+const getItems = (uniques: Array<string>) =>
+	DocumentBlueprintService.getItemDocumentBlueprint({ query: { id: uniques } });
 
 const mapper = (item: DocumentBlueprintItemResponseModel): UmbDocumentBlueprintItemModel => {
 	return {

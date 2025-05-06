@@ -155,7 +155,7 @@ public class NewDefaultUrlProvider : IUrlProvider
             }
 
             // need to strip off the leading ID for the route if it exists (occurs if the route is for a node with a domain assigned)
-            var pos = route.IndexOf('/');
+            var pos = route.IndexOf('/', StringComparison.Ordinal);
             var path = pos == 0 ? route : route.Substring(pos);
 
             var uri = new Uri(CombinePaths(d.Uri.GetLeftPart(UriPartial.Path), path));
@@ -237,7 +237,7 @@ public class NewDefaultUrlProvider : IUrlProvider
 
         // extract domainUri and path
         // route is /<path> or <domainRootId>/<path>
-        var pos = route.IndexOf('/');
+        var pos = route.IndexOf('/', StringComparison.Ordinal);
         var path = pos == 0 ? route : route[pos..];
         DomainAndUri? domainUri = pos == 0
             ? null
@@ -249,7 +249,8 @@ public class NewDefaultUrlProvider : IUrlProvider
                 culture);
 
         var defaultCulture = _localizationService.GetDefaultLanguageIsoCode();
-        if (domainUri is not null || string.IsNullOrEmpty(culture) ||
+        if (domainUri is not null ||
+            string.IsNullOrEmpty(culture) ||
             culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
         {
             var url = AssembleUrl(domainUri, path, current, mode).ToString();

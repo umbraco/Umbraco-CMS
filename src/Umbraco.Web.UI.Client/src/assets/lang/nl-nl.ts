@@ -378,7 +378,6 @@ export default {
 		newPartialViewMacroFromSnippet: 'Nieuwe partial view macro van fragment',
 		newPartialViewMacroNoMacro: 'Nieuwe partial view macro (zonder macro)',
 		newStyleSheetFile: 'Nieuw style sheet bestand',
-		newRteStyleSheetFile: 'Nieuw Rich Text Editor style sheet bestand',
 	},
 	dashboard: {
 		browser: 'Open je website',

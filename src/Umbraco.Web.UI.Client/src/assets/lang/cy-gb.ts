@@ -427,7 +427,6 @@ export default {
 		newPartialViewMacroFromSnippet: 'Macro rhan-wedd wag newydd o damaid',
 		newPartialViewMacroNoMacro: 'Macro rhan-wedd newydd (heb macro)',
 		newStyleSheetFile: 'Ffeil ddalen arddull newydd',
-		newRteStyleSheetFile: 'Ffeil ddalen arddull Golygydd Testun Cyfoethog newydd',
 	},
 	dashboard: {
 		browser: 'Pori eich gwefan',

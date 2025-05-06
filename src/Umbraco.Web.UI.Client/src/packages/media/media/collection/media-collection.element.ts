@@ -26,7 +26,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		});
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
-			this.observe(instance.unique, (unique) => {
+			this.observe(instance?.unique, (unique) => {
 				this._unique = unique ?? null;
 			});
 		});
@@ -64,6 +64,9 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		this.#collectionContext?.requestCollection();
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) {
+			throw new Error('Could not get event context');
+		}
 		const reloadEvent = new UmbRequestReloadChildrenOfEntityEvent({
 			entityType: this._unique ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
 			unique: this._unique,

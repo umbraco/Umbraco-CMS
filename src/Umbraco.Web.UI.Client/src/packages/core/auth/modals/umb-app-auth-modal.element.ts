@@ -5,7 +5,7 @@ import { UMB_AUTH_CONTEXT } from '../auth.context.token.js';
 import type { UmbAuthProviderDefaultProps } from '../types.js';
 import type { UmbModalAppAuthConfig, UmbModalAppAuthValue } from './umb-app-auth-modal.token.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 @customElement('umb-app-auth-modal')
 export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthConfig, UmbModalAppAuthValue> {
@@ -45,20 +45,20 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 	}
 
 	override firstUpdated(): void {
-		this.consumeContext(UMB_APP_CONTEXT, (context) => {
-			this._serverUrl = context.getServerUrl();
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this._serverUrl = context?.getServerUrl() ?? '';
 			this.style.setProperty(
 				'--image',
 				`url('${this._serverUrl}/umbraco/management/api/v1/security/back-office/graphics/login-background') no-repeat center center/cover`,
 			);
 
-			const serverConnection = context.getServerConnection();
+			const serverConnection = context?.getServerConnection();
 
-			this.observe(serverConnection.allowLocalLogin, (allowLocalLogin) => {
-				this._allowLocalLogin = allowLocalLogin;
+			this.observe(serverConnection?.allowLocalLogin, (allowLocalLogin) => {
+				this._allowLocalLogin = allowLocalLogin ?? false;
 			});
 
-			this.observe(serverConnection.isConnected, (isConnected) => {
+			this.observe(serverConnection?.isConnected, (isConnected) => {
 				this._loading = !isConnected;
 			});
 		});
@@ -170,7 +170,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		css`
 			:host {
 				display: block;
-				background: var(--uui-color-surface, #f4f4f4);
+				background: var(--uui-color-background, #f4f4f4);
 
 				--curves-color: var(--umb-login-curves-color, #f5c1bc);
 				--curves-display: var(--umb-login-curves-display, inline);
@@ -204,13 +204,13 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 			}
 
 			#curve-top {
-				top: 0px;
-				right: 0px;
+				top: -9%;
+				right: -9%;
 			}
 
 			#curve-bottom {
-				bottom: 0px;
-				left: 0px;
+				bottom: -0.5%;
+				left: -0.1%;
 			}
 
 			#content-container {

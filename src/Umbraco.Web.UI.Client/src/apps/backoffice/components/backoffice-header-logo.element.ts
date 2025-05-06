@@ -35,7 +35,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 
 		this.consumeContext(UMB_BACKOFFICE_CONTEXT, (context) => {
 			this.observe(
-				context.version,
+				context?.version,
 				(version) => {
 					if (!version) return;
 					this._version = version;
@@ -47,7 +47,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 		});
 	}
 
-	protected override async firstUpdated() {
+	protected override firstUpdated() {
 		this.#isAdmin();
 	}
 
@@ -88,6 +88,10 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 
 	async #openSystemInformation() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		if (!modalManager) {
+			throw new Error('Modal manager not found');
+		}
+
 		modalManager
 			.open(this, UMB_SYSINFO_MODAL)
 			.onSubmit()
@@ -97,6 +101,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 	async #openNewVersion() {
 		if (!this._serverUpgradeCheck) return;
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		if (!modalManager) return;
 		modalManager
 			.open(this, UMB_NEWVERSION_MODAL, {
 				data: {

@@ -11,11 +11,11 @@ import { UmbDeepState } from './deep-state.js';
  *
  * The ArrayState provides methods to append data when the data is an Object.
  */
-export class UmbArrayState<T> extends UmbDeepState<T[]> {
-	readonly getUniqueMethod: (entry: T) => unknown;
+export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
+	readonly getUniqueMethod: (entry: T) => U;
 	#sortMethod?: (a: T, b: T) => number;
 
-	constructor(initialData: T[], getUniqueOfEntryMethod: (entry: T) => unknown) {
+	constructor(initialData: T[], getUniqueOfEntryMethod: (entry: T) => U) {
 		super(initialData);
 		this.getUniqueMethod = getUniqueOfEntryMethod;
 	}
@@ -62,28 +62,24 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	}
 
 	/**
-	 * @function has
-	 * @param {unknown} unique - The unique value to remove.
-	 * @returns {boolean} true if an entry with the given unique exists.
-	 * @description - Test if a entry with the given unique exists in this Subject.
-	 * @example <caption>Example test for entry with id '2' and '3'</caption>
+	 * @function getHasOne
+	 * @param {U} unique - the unique value to compare with.
+	 * @returns {boolean} Wether it existed
+	 * @description - Check if a unique value exists in the current data of this Subject.
+	 * @example <caption>Example check for key to exist.</caption>
 	 * const data = [
-	 * 	{ id: 1, value: 'foo'},
-	 * 	{ id: 2, value: 'bar'}
+	 * 	{ key: 1, value: 'foo'},
+	 * 	{ key: 2, value: 'bar'}
 	 * ];
-	 * const myState = new UmbArrayState(data, (x) => x.id);
-	 * myState.has(2);// true
-	 * myState.has(3);// false
+	 * const myState = new UmbArrayState(data, (x) => x.key);
+	 * myState.hasOne(1);
 	 */
-	has(unique: unknown): boolean {
+	getHasOne(unique: U): boolean {
 		if (this.getUniqueMethod) {
-			const current = this.getValue();
-			if (!current) return false;
-			return current.some((x) => {
-				return this.getUniqueMethod(x) === unique;
-			});
+			return this.getValue().some((x) => this.getUniqueMethod(x) === unique);
+		} else {
+			throw new Error('Cannot use hasOne when no unique method provided to check for uniqueness');
 		}
-		return false;
 	}
 
 	/**

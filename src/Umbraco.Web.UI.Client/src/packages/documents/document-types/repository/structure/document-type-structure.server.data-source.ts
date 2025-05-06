@@ -24,8 +24,8 @@ const getAllowedChildrenOf = (unique: string | null, parentContentUnique: string
 	if (unique) {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DocumentTypeService.getDocumentTypeByIdAllowedChildren({
-			id: unique,
-			parentContentKey: parentContentUnique ?? undefined,
+			path: { id: unique },
+			query: { parentContentKey: parentContentUnique ?? undefined },
 		});
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import

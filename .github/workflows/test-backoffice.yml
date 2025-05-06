@@ -3,16 +3,18 @@ name: Test Backoffice
 on:
   push:
     branches:
-      - contrib
+      - main
       - release/*
       - v*/dev
+      - v*/main
     paths:
       - src/Umbraco.Web.UI.Client/**
   pull_request:
     branches:
-      - contrib
+      - main
       - release/*
       - v*/dev
+      - v*/main
     paths:
       - src/Umbraco.Web.UI.Client/**
 

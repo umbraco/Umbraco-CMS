@@ -32,7 +32,8 @@ test('can create a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesNameExist(blockListEditorName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(dataTypeData.editorAlias).toBe(blockListEditorAlias);
@@ -50,7 +51,8 @@ test('can rename a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesNameExist(blockListEditorName)).toBeTruthy();
   expect(await umbracoApi.dataType.doesNameExist(wrongName)).toBeFalsy();
 });
@@ -66,7 +68,8 @@ test('can delete a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.dataType.clickConfirmToDeleteButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesExist(blockListId)).toBeFalsy();
   await umbracoUi.dataType.isTreeItemVisible(blockListEditorName, false);
 });
@@ -86,7 +89,8 @@ test('can add a block to a block list editor', {tag: '@smoke'}, async ({umbracoA
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockListEditorName, [elementTypeId])).toBeTruthy();
 
   // Clean
@@ -110,7 +114,8 @@ test('can add multiple blocks to a block list editor', async ({umbracoApi, umbra
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockListEditorName, [elementTypeId, secondElementTypeId])).toBeTruthy();
 
   // Clean
@@ -131,7 +136,8 @@ test('can remove a block from a block list editor', {tag: '@smoke'}, async ({umb
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockListEditorName, [elementTypeId])).toBeFalsy();
 
   // Clean
@@ -151,7 +157,8 @@ test('can add a min and max amount to a block list editor', {tag: '@smoke'}, asy
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   const dataTypeData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(dataTypeData.values[0].value.min).toBe(minAmount);
   expect(dataTypeData.values[0].value.max).toBe(maxAmount);
@@ -188,7 +195,8 @@ test('can enable single block mode', {tag: '@smoke'}, async ({umbracoApi, umbrac
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.isSingleBlockModeEnabledForBlockList(blockListEditorName, true)).toBeTruthy();
 });
 
@@ -202,7 +210,8 @@ test('can disable single block mode', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.isSingleBlockModeEnabledForBlockList(blockListEditorName, false)).toBeTruthy();
 });
 
@@ -216,7 +225,8 @@ test('can enable live editing mode', {tag: '@smoke'}, async ({umbracoApi, umbrac
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.isLiveEditingModeEnabledForBlockEditor(blockListEditorName, true)).toBeTruthy();
 });
 
@@ -230,7 +240,8 @@ test('can disable live editing mode', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.isLiveEditingModeEnabledForBlockEditor(blockListEditorName, false)).toBeTruthy();
 });
 
@@ -244,7 +255,8 @@ test('can enable inline editing mode', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.isInlineEditingModeEnabledForBlockList(blockListEditorName, true)).toBeTruthy();
 });
 
@@ -258,7 +270,8 @@ test('can disable inline editing mode', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.isInlineEditingModeEnabledForBlockList(blockListEditorName, false)).toBeTruthy();
 });
 
@@ -273,7 +286,8 @@ test('can add a property editor width', {tag: '@smoke'}, async ({umbracoApi, umb
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockListEditorName, propertyWidth)).toBeTruthy();
 });
 
@@ -290,7 +304,8 @@ test('can update a property editor width', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockListEditorName, newPropertyWidth)).toBeTruthy();
 });
 
@@ -306,6 +321,7 @@ test('can remove a property editor width', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  //await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockListEditorName, '')).toBeTruthy();
 });

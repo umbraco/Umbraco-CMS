@@ -1,8 +1,7 @@
-import { UMB_COLLECTION_CONTEXT } from '../../default/index.js';
+import { UMB_COLLECTION_CONTEXT, type UmbDefaultCollectionContext } from '../../default/index.js';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, nothing, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-pagination')
@@ -26,9 +25,9 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 
 	#observeCurrentPage() {
 		this.observe(
-			this._collectionContext!.pagination.currentPage,
+			this._collectionContext?.pagination.currentPage,
 			(currentPage) => {
-				this._currentPage = currentPage;
+				this._currentPage = currentPage ?? 1;
 			},
 			'umbCurrentPageObserver',
 		);
@@ -36,9 +35,9 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 
 	#observerTotalPages() {
 		this.observe(
-			this._collectionContext!.pagination.totalPages,
+			this._collectionContext?.pagination.totalPages,
 			(totalPages) => {
-				this._totalPages = totalPages;
+				this._totalPages = totalPages ?? 1;
 			},
 			'umbTotalPagesObserver',
 		);

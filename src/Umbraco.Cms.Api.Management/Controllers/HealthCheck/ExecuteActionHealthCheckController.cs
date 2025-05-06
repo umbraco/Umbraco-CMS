@@ -63,6 +63,6 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
 
         HealthCheckStatus result = await healthCheck.ExecuteActionAsync(_umbracoMapper.Map<HealthCheckAction>(action)!);
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<HealthCheckResultResponseModel>(result)));
+        return Ok(_umbracoMapper.Map<HealthCheckResultResponseModel>(result));
     }
 }

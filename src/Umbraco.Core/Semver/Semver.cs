@@ -36,7 +36,6 @@ namespace Umbraco.Cms.Core.Semver
 #if NETSTANDARD
     public sealed class SemVersion : IComparable<SemVersion>, IComparable
 #else
-    [Serializable]
     public sealed class SemVersion : IComparable<SemVersion>, IComparable, ISerializable
 #endif
     {
@@ -51,29 +50,6 @@ namespace Umbraco.Cms.Core.Semver
                 RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
 #else
                 RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-#endif
-
-#if !NETSTANDARD
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="SemVersion" /> class.
-        /// </summary>
-        /// <param name="info"></param>
-        /// <param name="context"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        private SemVersion(SerializationInfo info, StreamingContext context)
-        {
-            if (info == null)
-            {
-                throw new ArgumentNullException("info");
-            }
-
-            SemVersion semVersion = Parse(info.GetString("SemVersion")!);
-            Major = semVersion.Major;
-            Minor = semVersion.Minor;
-            Patch = semVersion.Patch;
-            Prerelease = semVersion.Prerelease;
-            Build = semVersion.Build;
-        }
 #endif
 
         /// <summary>
@@ -525,7 +501,6 @@ namespace Umbraco.Cms.Core.Semver
         }
 
 #if !NETSTANDARD
-        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)

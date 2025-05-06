@@ -1,8 +1,8 @@
+import { UMB_WORKSPACE_CONTEXT } from '../../../workspace.context-token.js';
 import { css, customElement, html, ifDefined, map, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbMenuStructureWorkspaceContext, UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-workspace-breadcrumb')
@@ -32,9 +32,9 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 		});
 
 		// TODO: set up context token
-		this.consumeContext('UmbMenuStructureWorkspaceContext', (instance) => {
+		this.consumeContext<UmbMenuStructureWorkspaceContext>('UmbMenuStructureWorkspaceContext', (instance) => {
 			// TODO: get the correct interface from the context token
-			this.#structureContext = instance as UmbMenuStructureWorkspaceContext;
+			this.#structureContext = instance;
 			this.#observeStructure();
 		});
 	}

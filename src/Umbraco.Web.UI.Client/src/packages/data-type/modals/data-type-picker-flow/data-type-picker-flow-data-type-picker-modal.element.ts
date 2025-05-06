@@ -1,4 +1,5 @@
 import { UmbDataTypeCollectionRepository } from '../../collection/index.js';
+import type { UmbDataTypeItemModel } from '../../repository/item/types.js';
 import type {
 	UmbDataTypePickerFlowDataTypePickerModalData,
 	UmbDataTypePickerFlowDataTypePickerModalValue,
@@ -6,7 +7,6 @@ import type {
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-data-type-picker-flow-data-type-picker-modal')
 export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBaseElement<

@@ -8,6 +8,12 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 
 import '../cascading-menu-popover/cascading-menu-popover.element.js';
 
+/**
+* Provides a sticky toolbar for the {@link UmbInputTiptapElement}
+* @element umb-tiptap-toolbar
+* @cssprop --umb-tiptap-edge-border-color - Defines the edge border color
+* @cssprop --umb-tiptap-top - Defines the top value for the sticky toolbar
+*/
 @customElement('umb-tiptap-toolbar')
 export class UmbTiptapToolbarElement extends UmbLitElement {
 	#attached = false;
@@ -61,7 +67,7 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			},
 			undefined,
 			undefined,
-			() => import('../toolbar/default-tiptap-toolbar-element.api.js'),
+			() => import('../toolbar/default-tiptap-toolbar-api.js'),
 		);
 
 		this.#extensionsController.apiProperties = { configuration: this.configuration };
@@ -108,7 +114,7 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			flex-direction: column;
 
 			position: sticky;
-			top: -25px;
+			top: var(--umb-tiptap-top,-25px);
 			left: 0;
 			right: 0;
 			padding: var(--uui-size-3);

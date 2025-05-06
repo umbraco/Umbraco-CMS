@@ -9,17 +9,21 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
-			this.observe(
-				observeMultiple([
-					context.isNew,
-					context.content.structure.ownerContentTypeObservablePart((contentType) => contentType?.name),
-				]),
-				([isNew, name]) => {
-					this._headline =
-						this.localize.term(isNew ? 'general_add' : 'general_edit') + ' ' + this.localize.string(name);
-				},
-				'observeOwnerContentElementTypeName',
-			);
+			if (context) {
+				this.observe(
+					observeMultiple([
+						context.isNew,
+						context.content.structure.ownerContentTypeObservablePart((contentType) => contentType?.name),
+					]),
+					([isNew, name]) => {
+						this._headline =
+							this.localize.term(isNew ? 'general_add' : 'general_edit') + ' ' + this.localize.string(name);
+					},
+					'observeOwnerContentElementTypeName',
+				);
+			} else {
+				this.removeUmbControllerByAlias('observeOwnerContentElementTypeName');
+			}
 		});
 	}
 

@@ -109,7 +109,7 @@ namespace Umbraco.Extensions
                 .Enrich.FromLogContext(); // allows us to dynamically enrich
 
             logConfig.WriteTo.UmbracoFile(
-                path: umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory),
+                path: umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory, loggingConfiguration.LogFileNameFormat, loggingConfiguration.GetLogFileNameFormatArguments()),
                 fileSizeLimitBytes: umbracoFileConfiguration.FileSizeLimitBytes,
                 restrictedToMinimumLevel: umbracoFileConfiguration.RestrictedToMinimumLevel,
                 rollingInterval: umbracoFileConfiguration.RollingInterval,

@@ -82,7 +82,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		isFolder: false,
 		properties: [
 			{
-				id: '1',
+				id: '1_tipTap',
 				container: {
 					id: 'all-properties-group-key',
 				},
@@ -92,31 +92,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataType: {
 					id: 'dt-richTextEditorTiptap',
 				},
-				variesByCulture: false,
-				variesBySegment: false,
-				sortOrder: 0,
-				validation: {
-					mandatory: true,
-					mandatoryMessage: null,
-					regEx: null,
-					regExMessage: null,
-				},
-				appearance: {
-					labelOnTop: false,
-				},
-			},
-			{
-				id: '1',
-				container: {
-					id: 'all-properties-group-key',
-				},
-				alias: 'richTextEditorTinyMce',
-				name: 'Rich Text editor (TinyMce)',
-				description: 'Some description to test with a long description.',
-				dataType: {
-					id: 'dt-richTextEditorTinyMce',
-				},
-				variesByCulture: false,
+				variesByCulture: true,
 				variesBySegment: false,
 				sortOrder: 0,
 				validation: {
@@ -1774,7 +1750,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		description: null,
 		icon: 'icon-document',
 		allowedAsRoot: true,
-		variesByCulture: false,
+		variesByCulture: true,
 		variesBySegment: false,
 		isElement: false,
 		hasChildren: false,
@@ -1789,31 +1765,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				description:
 					'This is to test the default configuration for the Tiptap editor.\n\nSearch for **dt-richTextEditorTiptap** in the codebase to find the configuration and add configuration values.',
 				dataType: { id: 'dt-richTextEditorTiptap' },
-				variesByCulture: false,
-				variesBySegment: false,
-				sortOrder: 0,
-				validation: {
-					mandatory: false,
-					mandatoryMessage: null,
-					regEx: null,
-					regExMessage: null,
-				},
-				appearance: {
-					labelOnTop: false,
-				},
-			},
-			{
-				id: '2dd0d4d2-cda8-4ac2-affd-a69fc10382b1',
-				container: { id: 'the-simplest-document-type-id-container' },
-				alias: 'tinymce',
-				name: 'TinyMCE',
-				description: `
-This is to test the default configuration of the TinyMCE editor.
-
-Search for **dt-richTextEditorTinyMce** in the codebase to find the configuration and add configuration values.
-
-**NB!** If this throws an error in console, make sure that \`@umbraco-cms/backoffice/block-rte\` is available in the importmap.`,
-				dataType: { id: 'dt-richTextEditorTinyMce' },
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 0,

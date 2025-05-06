@@ -12,7 +12,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTiptapToolbarConfigurationContext> {
+export class UmbTiptapToolbarConfigurationContext extends UmbContextBase {
 	#extensions = new UmbArrayState<UmbTiptapToolbarExtension>([], (x) => x.alias);
 	public readonly extensions = this.#extensions.asObservable();
 
@@ -27,50 +27,6 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTipt
 
 	#toolbar = new UmbArrayState<UmbTiptapToolbarRowViewModel>([], (x) => x.unique);
 	public readonly toolbar = this.#toolbar.asObservable();
-
-	/** @deprecated This will be removed in Umbraco 16. */
-	#tinyMceToolbarMapping: Record<string, string | null> = {
-		undo: 'Umb.Tiptap.Toolbar.Undo',
-		redo: 'Umb.Tiptap.Toolbar.Redo',
-		cut: null,
-		copy: null,
-		paste: null,
-		styles: 'Umb.Tiptap.Toolbar.StyleSelect',
-		fontname: 'Umb.Tiptap.Toolbar.FontFamily',
-		fontfamily: 'Umb.Tiptap.Toolbar.FontFamily',
-		fontsize: 'Umb.Tiptap.Toolbar.FontSize',
-		forecolor: 'Umb.Tiptap.Toolbar.TextColorForeground',
-		backcolor: 'Umb.Tiptap.Toolbar.TextColorBackground',
-		blockquote: 'Umb.Tiptap.Toolbar.Blockquote',
-		formatblock: null,
-		removeformat: 'Umb.Tiptap.Toolbar.ClearFormatting',
-		bold: 'Umb.Tiptap.Toolbar.Bold',
-		italic: 'Umb.Tiptap.Toolbar.Italic',
-		underline: 'Umb.Tiptap.Toolbar.Underline',
-		strikethrough: 'Umb.Tiptap.Toolbar.Strike',
-		alignleft: 'Umb.Tiptap.Toolbar.TextAlignLeft',
-		aligncenter: 'Umb.Tiptap.Toolbar.TextAlignCenter',
-		alignright: 'Umb.Tiptap.Toolbar.TextAlignRight',
-		alignjustify: 'Umb.Tiptap.Toolbar.TextAlignJustify',
-		bullist: 'Umb.Tiptap.Toolbar.BulletList',
-		numlist: 'Umb.Tiptap.Toolbar.OrderedList',
-		outdent: 'Umb.Tiptap.Toolbar.TextOutdent',
-		indent: 'Umb.Tiptap.Toolbar.TextIndent',
-		anchor: 'Umb.Tiptap.Toolbar.Anchor',
-		table: 'Umb.Tiptap.Toolbar.Table',
-		hr: 'Umb.Tiptap.Toolbar.HorizontalRule',
-		subscript: 'Umb.Tiptap.Toolbar.Subscript',
-		superscript: 'Umb.Tiptap.Toolbar.Superscript',
-		charmap: 'Umb.Tiptap.Toolbar.CharacterMap',
-		rtl: 'Umb.Tiptap.Toolbar.TextDirectionRtl',
-		ltr: 'Umb.Tiptap.Toolbar.TextDirectionLtr',
-		link: 'Umb.Tiptap.Toolbar.Link',
-		unlink: 'Umb.Tiptap.Toolbar.Unlink',
-		sourcecode: 'Umb.Tiptap.Toolbar.SourceEditor',
-		umbmediapicker: 'Umb.Tiptap.Toolbar.MediaPicker',
-		umbembeddialog: 'Umb.Tiptap.Toolbar.EmbeddedMedia',
-		umbblockpicker: 'Umb.Tiptap.Toolbar.BlockPicker',
-	};
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TIPTAP_TOOLBAR_CONFIGURATION_CONTEXT);
@@ -93,7 +49,7 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTipt
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (dataset) => {
 			this.observe(
-				await dataset.propertyValueByAlias<Array<string>>('extensions'),
+				await dataset?.propertyValueByAlias<Array<string>>('extensions'),
 				(extensions) => {
 					if (extensions) {
 						this.#extensionsEnabled.clear();
@@ -182,28 +138,6 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTipt
 		const toolbar = [...this.#toolbar.getValue()];
 		toolbar.splice(rowIndex, 0, { unique: UmbId.new(), data: [{ unique: UmbId.new(), data: [] }] });
 		this.#toolbar.setValue(toolbar);
-	}
-
-	/**
-	 * @param {UmbTiptapToolbarValue | Array<string> | null} value - The value to migrate.
-	 * @returns {UmbTiptapToolbarValue} The migrated value.
-	 * @deprecated This will be removed in Umbraco 16.
-	 */
-	public migrateTinyMceToolbar(value?: UmbTiptapToolbarValue | Array<string> | null): UmbTiptapToolbarValue {
-		if (this.isValidToolbarValue(value)) return value;
-
-		const items: Array<string> = [];
-
-		if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'string') {
-			for (const alias of value) {
-				const mapping = this.#tinyMceToolbarMapping[alias];
-				if (mapping) {
-					items.push(mapping);
-				}
-			}
-		}
-
-		return [[items]];
 	}
 
 	public moveToolbarItem(from: [number, number, number], to: [number, number, number]) {

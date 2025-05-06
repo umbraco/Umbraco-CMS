@@ -15,9 +15,10 @@ import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/documen
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 import { UmbElementWorkspaceDataManager, type UmbElementPropertyDataOwner } from '@umbraco-cms/backoffice/content';
-import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
+import { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
 
 export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
 	extends UmbControllerBase
@@ -33,7 +34,8 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 	});
 	#getDataResolver!: () => void;
 
-	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	// TODO: who is controlling this? We need to be aware about seperation of concerns. [NL]
+	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	readonly variantId = this.#variantId.asObservable();
@@ -56,6 +58,9 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		new UmbDocumentTypeDetailRepository(this),
 	);
 
+	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
+	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
+
 	readonly validation = new UmbValidationController(this);
 
 	constructor(host: UmbBlockWorkspaceContext<LayoutDataType>, dataPathPropertyName: string) {
@@ -65,7 +70,14 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		this.name = host.name;
 		this.getName = host.getName;
 
-		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
+
+		this.observe(this.contentTypeId, (id) => {
+			if (id) {
+				this.structure.loadType(id);
+			}
+		});
 		this.observe(this.unique, (key) => {
 			if (key) {
 				this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.key == '${key}')]`);
@@ -99,6 +111,11 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 
 	resetState() {
 		this.#data.clear();
+		this.propertyViewGuard.clearRules();
+		this.propertyWriteGuard.clearRules();
+		// default:
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
 	}
 
 	setVariantId(variantId: UmbVariantId | undefined) {
@@ -117,6 +134,18 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 
 	getData() {
 		return this.#data.getCurrent();
+	}
+
+	setPersistedData(data: UmbBlockDataModel | undefined) {
+		this.#data.setPersisted(data);
+	}
+
+	/**
+	 * Check if there are unpersisted changes.
+	 * @returns { boolean } true if there are unpersisted changes.
+	 */
+	public getHasUnpersistedChanges(): boolean {
+		return this.#data.getHasUnpersistedChanges();
 	}
 
 	getUnique() {

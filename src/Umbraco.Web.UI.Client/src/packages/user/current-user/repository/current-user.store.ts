@@ -10,7 +10,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbCurrentUserStore extends UmbContextBase<UmbCurrentUserStore> {
+export class UmbCurrentUserStore extends UmbContextBase {
 	#data = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 
@@ -27,7 +27,7 @@ export class UmbCurrentUserStore extends UmbContextBase<UmbCurrentUserStore> {
 		super(host, UMB_CURRENT_USER_STORE_CONTEXT);
 
 		this.consumeContext(UMB_USER_DETAIL_STORE_CONTEXT, (instance) => {
-			this.observe(instance?.all(), (users) => this.#onUserDetailStoreUpdate(users));
+			this.observe(instance?.all(), (users) => this.#onUserDetailStoreUpdate(users ?? []));
 		});
 	}
 

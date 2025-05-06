@@ -36,30 +36,45 @@ describe('UmbSectionUserPermissionCondition', () => {
 	});
 
 	it('should return true if the user have access to the section', (done) => {
+		let callbackCount = 0;
 		condition = new UmbSectionUserPermissionCondition(hostElement, {
 			host: hostElement,
 			config: {
 				alias: UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS,
 				match: 'Umb.Section.Content',
 			},
-			onChange: (permitted) => {
-				expect(permitted).to.be.true;
-				done();
+			onChange: () => {
+				callbackCount++;
+				if (callbackCount === 1) {
+					expect(condition.permitted).to.be.true;
+					condition.hostDisconnected();
+					done();
+				}
 			},
 		});
 	});
 
-	it('should return false if the user does not have access to the section', (done) => {
+	it('should return false if the user does not have access to the section', async () => {
+		let callbackCount = 0;
 		condition = new UmbSectionUserPermissionCondition(hostElement, {
 			host: hostElement,
 			config: {
 				alias: UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS,
 				match: 'DOES_NOT_EXIST',
 			},
-			onChange: (permitted) => {
-				expect(permitted).to.be.false;
-				done();
+			onChange: () => {
+				callbackCount++;
 			},
 		});
+
+		await new Promise((resolve) => {
+			requestAnimationFrame(() => {
+				expect(condition.permitted).to.be.false;
+				resolve(true);
+			});
+		});
+
+		expect(callbackCount).to.equal(0);
+		condition.hostDisconnected();
 	});
 });

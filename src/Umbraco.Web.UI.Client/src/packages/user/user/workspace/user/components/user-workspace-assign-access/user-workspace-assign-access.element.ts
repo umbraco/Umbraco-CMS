@@ -3,8 +3,6 @@ import type { UmbUserDetailModel } from '../../../../types.js';
 import { html, customElement, state, nothing, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
-import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
@@ -36,32 +34,32 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 			this.#workspaceContext = instance;
 
 			this.observe(
-				this.#workspaceContext.userGroupUniques,
-				(value) => (this._userGroupUniques = value),
+				this.#workspaceContext?.userGroupUniques,
+				(value) => (this._userGroupUniques = value ?? []),
 				'_observeUserGroupAccess',
 			);
 
 			this.observe(
-				this.#workspaceContext.hasDocumentRootAccess,
-				(value) => (this._documentRootAccess = value),
+				this.#workspaceContext?.hasDocumentRootAccess,
+				(value) => (this._documentRootAccess = value ?? false),
 				'_observeDocumentRootAccess',
 			);
 
 			this.observe(
-				this.#workspaceContext.documentStartNodeUniques,
-				(value) => (this._documentStartNodeUniques = value),
+				this.#workspaceContext?.documentStartNodeUniques,
+				(value) => (this._documentStartNodeUniques = value ?? []),
 				'_observeDocumentStartNode',
 			);
 
 			this.observe(
-				this.#workspaceContext.hasMediaRootAccess,
-				(value) => (this._mediaRootAccess = value),
+				this.#workspaceContext?.hasMediaRootAccess,
+				(value) => (this._mediaRootAccess = value ?? false),
 				'_observeMediaRootAccess',
 			);
 
 			this.observe(
-				this.#workspaceContext.mediaStartNodeUniques,
-				(value) => (this._mediaStartNodeUniques = value),
+				this.#workspaceContext?.mediaStartNodeUniques,
+				(value) => (this._mediaStartNodeUniques = value ?? []),
 				'_observeMediaStartNode',
 			);
 		});
@@ -87,8 +85,10 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 
 	#onDocumentStartNodeChange(event: CustomEvent) {
 		event.stopPropagation();
-		const target = event.target as UmbInputDocumentElement;
-		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique) => {
+		// TODO: get back to this when media have been decoupled from users.
+		// The event target is deliberately set to any to avoid an import cycle with media.
+		const target = event.target as any;
+		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique: string) => {
 			return { unique };
 		});
 		// TODO make contexts method
@@ -105,8 +105,10 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 
 	#onMediaStartNodeChange(event: CustomEvent) {
 		event.stopPropagation();
-		const target = event.target as UmbInputMediaElement;
-		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique) => {
+		// TODO: get back to this when media have been decoupled from users.
+		// The event target is deliberately set to any to avoid an import cycle with media.
+		const target = event.target as any;
+		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique: string) => {
 			return { unique };
 		});
 		// TODO make contexts method

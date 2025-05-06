@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -29,10 +31,25 @@ internal sealed class ContentBlueprintEditingService
         : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, validationService, optionsMonitor, relationService)
         => _containerService = containerService;
 
-    public async Task<IContent?> GetAsync(Guid key)
+    public Task<IContent?> GetAsync(Guid key)
     {
         IContent? blueprint = ContentService.GetBlueprintById(key);
-        return await Task.FromResult(blueprint);
+        return Task.FromResult(blueprint);
+    }
+
+    public Task<IContent?> GetScaffoldedAsync(Guid key)
+    {
+        IContent? blueprint = ContentService.GetBlueprintById(key);
+        if (blueprint is null)
+        {
+            return Task.FromResult<IContent?>(null);
+        }
+
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        scope.Notifications.Publish(new ContentScaffoldedNotification(blueprint, blueprint, Constants.System.Root, new EventMessages()));
+        scope.Complete();
+
+        return Task.FromResult<IContent?>(blueprint);
     }
 
     public async Task<Attempt<PagedModel<IContent>?, ContentEditingOperationStatus>> GetPagedByContentTypeAsync(Guid contentTypeKey, int skip, int take)
@@ -69,7 +86,7 @@ internal sealed class ContentBlueprintEditingService
 
         IContent blueprint = result.Result.Content!;
 
-        if (ValidateUniqueName(createModel.InvariantName ?? string.Empty, blueprint) is false)
+        if (ValidateUniqueNames(createModel.Variants, blueprint) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.DuplicateName, new ContentCreateResult());
         }
@@ -116,7 +133,7 @@ internal sealed class ContentBlueprintEditingService
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentUpdateResult());
         }
 
-        if (ValidateUniqueName(updateModel.InvariantName ?? string.Empty, blueprint) is false)
+        if (ValidateUniqueNames(updateModel.Variants, blueprint) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.DuplicateName, new ContentUpdateResult());
         }
@@ -231,5 +248,19 @@ internal sealed class ContentBlueprintEditingService
     {
         IEnumerable<IContent> existing = ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
         return existing.Any(c => c.Name == name && c.Id != content.Id) is false;
+    }
+
+    private bool ValidateUniqueNames(IEnumerable<VariantModel> variants, IContent content)
+    {
+        IContent[] existing = ContentService.GetBlueprintsForContentTypes(content.ContentTypeId).ToArray();
+        foreach (VariantModel variant in variants)
+        {
+            if (existing.Any(c => c.GetCultureName(variant.Culture) == variant.Name && c.Id != content.Id))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

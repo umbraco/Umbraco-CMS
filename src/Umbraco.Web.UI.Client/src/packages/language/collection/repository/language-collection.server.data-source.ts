@@ -4,7 +4,7 @@ import { UMB_LANGUAGE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import { LanguageService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source that fetches the language collection data from the server.
@@ -30,7 +30,7 @@ export class UmbLanguageCollectionServerDataSource implements UmbCollectionDataS
 	 * @memberof UmbLanguageCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbLanguageCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, LanguageService.getLanguage(filter));
+		const { data, error } = await tryExecute(this.#host, LanguageService.getLanguage({ query: filter }));
 
 		if (data) {
 			const items = data.items.map((item) => {

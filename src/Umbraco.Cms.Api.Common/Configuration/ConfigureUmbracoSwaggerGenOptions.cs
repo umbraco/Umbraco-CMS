@@ -7,7 +7,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Common.OpenApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.Configuration;
@@ -17,13 +16,6 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
     private readonly IOperationIdSelector _operationIdSelector;
     private readonly ISchemaIdSelector _schemaIdSelector;
     private readonly ISubTypesSelector _subTypesSelector;
-
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 16.")]
-    public ConfigureUmbracoSwaggerGenOptions(
-        IOperationIdSelector operationIdSelector,
-        ISchemaIdSelector schemaIdSelector)
-        : this(operationIdSelector, schemaIdSelector, StaticServiceProvider.Instance.GetRequiredService<ISubTypesSelector>())
-    { }
 
     public ConfigureUmbracoSwaggerGenOptions(
         IOperationIdSelector operationIdSelector,

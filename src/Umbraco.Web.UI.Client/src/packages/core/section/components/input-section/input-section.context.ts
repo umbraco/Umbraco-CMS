@@ -9,6 +9,3 @@ export class UmbSectionPickerInputContext extends UmbPickerInputContext<UmbSecti
 		super(host, UMB_SECTION_ITEM_REPOSITORY_ALIAS, UMB_SECTION_PICKER_MODAL);
 	}
 }
-
-/** @deprecated Use `UmbSectionPickerInputContext` instead. This method will be removed in Umbraco 15. */
-export { UmbSectionPickerInputContext as UmbSectionPickerContext };

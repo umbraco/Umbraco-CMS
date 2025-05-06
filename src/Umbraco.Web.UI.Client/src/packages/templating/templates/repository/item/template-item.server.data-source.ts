@@ -28,7 +28,7 @@ export class UmbTemplateItemServerDataSource extends UmbItemServerDataSourceBase
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => TemplateService.getItemTemplate({ id: uniques });
+const getItems = (uniques: Array<string>) => TemplateService.getItemTemplate({ query: { id: uniques } });
 
 const mapper = (item: TemplateItemResponseModel): UmbTemplateItemModel => {
 	return {

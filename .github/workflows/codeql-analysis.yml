@@ -4,15 +4,15 @@ on:
   push:
     branches:
       - "*/dev"
-      - "*/contrib"
-      - "contrib"
+      - "*/main"
+      - "main"
       - "release/*"
   pull_request:
     # The branches below must be a subset of the branches above
     branches:
       - "*/dev"
-      - "*/contrib"
-      - "contrib"
+      - "*/main"
+      - "main"
       - "release/*"
   schedule:
     - cron: "33 2 * * 1"

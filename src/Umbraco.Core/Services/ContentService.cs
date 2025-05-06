@@ -160,72 +160,6 @@ public class ContentService : RepositoryService, IContentService
     {
     }
 
-    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V16.")]
-    public ContentService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IDocumentRepository documentRepository,
-        IEntityRepository entityRepository,
-        IAuditRepository auditRepository,
-        IContentTypeRepository contentTypeRepository,
-        IDocumentBlueprintRepository documentBlueprintRepository,
-        ILanguageRepository languageRepository,
-        Lazy<IPropertyValidationService> propertyValidationService,
-        IShortStringHelper shortStringHelper,
-        ICultureImpactFactory cultureImpactFactory,
-        IUserIdKeyResolver userIdKeyResolver)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            documentRepository,
-            entityRepository,
-            auditRepository,
-            contentTypeRepository,
-            documentBlueprintRepository,
-            languageRepository,
-            propertyValidationService,
-            shortStringHelper,
-            cultureImpactFactory,
-            userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>()
-            )
-    {
-    }
-
-    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V16.")]
-    public ContentService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IDocumentRepository documentRepository,
-        IEntityRepository entityRepository,
-        IAuditRepository auditRepository,
-        IContentTypeRepository contentTypeRepository,
-        IDocumentBlueprintRepository documentBlueprintRepository,
-        ILanguageRepository languageRepository,
-        Lazy<IPropertyValidationService> propertyValidationService,
-        IShortStringHelper shortStringHelper,
-        ICultureImpactFactory cultureImpactFactory)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            documentRepository,
-            entityRepository,
-            auditRepository,
-            contentTypeRepository,
-            documentBlueprintRepository,
-            languageRepository,
-            propertyValidationService,
-            shortStringHelper,
-            cultureImpactFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>(),
-            StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>())
-    {
-    }
-
     #endregion
 
     #region Static queries
@@ -1238,14 +1172,7 @@ public class ContentService : RepositoryService, IContentService
         return OperationResult.Succeed(eventMessages);
     }
 
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(Publish)} instead. Will be removed in V16")]
-    public PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId)
-        => Publish(content, new[] { culture }, userId);
-
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(Publish)} instead. Will be removed in V16")]
-    public PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId)
-        => Publish(content, cultures, userId);
-
+    /// <inheritdoc/>
     public PublishResult Publish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId)
     {
         if (content == null)
@@ -2083,65 +2010,8 @@ public class ContentService : RepositoryService, IContentService
         return cultures;
     }
 
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(PublishBranch)} instead. Will be removed in V16")]
-    public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = Constants.Security.SuperUserId)
-    {
-        // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
-        // and not to == them, else we would be comparing references, and that is a bad thing
-
-        // determines whether the document is edited, and thus needs to be published,
-        // for the specified culture (it may be edited for other cultures and that
-        // should not trigger a publish).
-
-        // determines cultures to be published
-        // can be: null (content is not impacted), an empty set (content is impacted but already published), or cultures
-        HashSet<string>? ShouldPublish(IContent c)
-        {
-            var isRoot = c.Id == content.Id;
-            HashSet<string>? culturesToPublish = null;
-
-            PublishBranchFilter publishBranchFilter = force ? PublishBranchFilter.IncludeUnpublished : PublishBranchFilter.Default;
-
-            // invariant content type
-            if (!c.ContentType.VariesByCulture())
-            {
-                return PublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, publishBranchFilter);
-            }
-
-            // variant content type, specific culture
-            if (culture != "*")
-            {
-                return PublishBranch_ShouldPublish(ref culturesToPublish, culture, c.IsCulturePublished(culture), c.IsCultureEdited(culture), isRoot, publishBranchFilter);
-            }
-
-            // variant content type, all cultures
-            if (c.Published)
-            {
-                // then some (and maybe all) cultures will be 'already published' (unless forcing),
-                // others will have to 'republish this culture'
-                foreach (var x in c.AvailableCultures)
-                {
-                    PublishBranch_ShouldPublish(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, publishBranchFilter);
-                }
-
-                return culturesToPublish;
-            }
-
-            // if not published, publish if force/root else do nothing
-            return force || isRoot
-                ? new HashSet<string> { "*" } // "*" means 'publish all'
-                : null; // null means 'nothing to do'
-        }
-
-        return PublishBranch(content, ShouldPublish, PublishBranch_PublishCultures, userId);
-    }
-
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(PublishBranch)} instead. Will be removed in V16")]
-    public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId)
-        => PublishBranch(content, force ? PublishBranchFilter.IncludeUnpublished : PublishBranchFilter.Default, cultures, userId);
-
     /// <inheritdoc />
-    [Obsolete("This method is not longer used as the 'force' parameter has been split into publishing unpublished and force re-published. Please use the overload containing parameters for those options instead. Will be removed in V16")]
+    [Obsolete("This method is not longer used as the 'force' parameter has been split into publishing unpublished and force re-published. Please use the overload containing parameters for those options instead. Scheduled for removal in V17")]
     public IEnumerable<PublishResult> PublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId)
         => PublishBranch(content, force ? PublishBranchFilter.IncludeUnpublished : PublishBranchFilter.Default, cultures, userId);
 
@@ -2767,7 +2637,7 @@ public class ContentService : RepositoryService, IContentService
             {
                 foreach (IContent content in contents)
                 {
-                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id))
+                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child))
                     {
                         continue;
                     }
@@ -3377,7 +3247,7 @@ public class ContentService : RepositoryService, IContentService
                             content.Name,
                             content.Id,
                             culture,
-                            "document is culture awaiting release");
+                            "document has culture awaiting release");
                     }
 
                     return new PublishResult(

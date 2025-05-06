@@ -9,6 +9,3 @@ export class UmbLanguagePickerInputContext extends UmbPickerInputContext<UmbLang
 		super(host, UMB_LANGUAGE_ITEM_REPOSITORY_ALIAS, UMB_LANGUAGE_PICKER_MODAL);
 	}
 }
-
-/** @deprecated Use `UmbLanguagePickerInputContext` instead. This method will be removed in Umbraco 15. */
-export { UmbLanguagePickerInputContext as UmbLanguagePickerContext };

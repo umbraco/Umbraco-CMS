@@ -3,6 +3,13 @@ import { manifests as integerSchemaManifests } from './Umbraco.Integer.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
+		type: 'propertyValuePreset',
+		forPropertyEditorSchemaAlias: 'Umbraco.Decimal',
+		alias: 'Umb.PropertyValuePreset.Decimal',
+		name: 'Property Editor Schema Decimal Preset for Initial Values',
+		api: () => import('./decimal-property-value-preset.js'),
+	},
+	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.Decimal',
 		name: 'Decimal Property Editor UI',
@@ -30,6 +37,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 				],
 			},
 		},
+	},
+	{
+		type: 'propertyValuePreset',
+		forPropertyEditorSchemaAlias: 'Umbraco.Integer',
+		alias: 'Umb.PropertyValuePreset.Integer',
+		name: 'Property Editor Schema Integer Preset for Initial Values',
+		api: () => import('./integer-property-value-preset.js'),
 	},
 	{
 		type: 'propertyEditorUi',

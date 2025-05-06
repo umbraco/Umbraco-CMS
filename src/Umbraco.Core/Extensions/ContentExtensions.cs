@@ -245,13 +245,13 @@ public static class ContentExtensions
         }
 
         IEnumerable<ContentSchedule> expires = contentSchedule.GetSchedule(culture, ContentScheduleAction.Expire);
-        if (expires != null && expires.Any(x => x.Date > DateTime.MinValue && DateTime.Now > x.Date))
+        if (expires != null && expires.Any(x => x.Date > DateTime.MinValue && DateTime.UtcNow > x.Date))
         {
             return ContentStatus.Expired;
         }
 
         IEnumerable<ContentSchedule> release = contentSchedule.GetSchedule(culture, ContentScheduleAction.Release);
-        if (release != null && release.Any(x => x.Date > DateTime.MinValue && x.Date > DateTime.Now))
+        if (release != null && release.Any(x => x.Date > DateTime.MinValue && x.Date > DateTime.UtcNow))
         {
             return ContentStatus.AwaitingRelease;
         }

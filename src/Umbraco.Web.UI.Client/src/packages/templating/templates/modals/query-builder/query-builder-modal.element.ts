@@ -8,7 +8,7 @@ import type {
 } from './query-builder-modal.token.js';
 import type { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, query, queryAll, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type {
 	TemplateQueryResultResponseModel,
 	TemplateQuerySettingsResponseModel,
@@ -90,24 +90,24 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 	};
 
 	async #openDocumentPicker() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		modalManager
-			.open(this, UMB_DOCUMENT_PICKER_MODAL, { data: { hideTreeRoot: true } })
-			.onSubmit()
-			.then((result) => {
-				const selection = result.selection[0];
-				this.#updateQueryRequest({ rootDocument: selection ? { unique: selection } : null });
+		const result = await umbOpenModal(this, UMB_DOCUMENT_PICKER_MODAL, { data: { hideTreeRoot: true } }).catch(
+			() => undefined,
+		);
 
-				if (result.selection.length > 0 && result.selection[0] === null) {
-					this._selectedRootContentName = 'all pages';
-					return;
-				}
+		if (!result) return;
 
-				if (result.selection.length > 0) {
-					this.#getDocumentItem(result.selection as string[]);
-					return;
-				}
-			});
+		const selection = result.selection[0];
+		this.#updateQueryRequest({ rootDocument: selection ? { unique: selection } : null });
+
+		if (result.selection.length > 0 && result.selection[0] === null) {
+			this._selectedRootContentName = 'all pages';
+			return;
+		}
+
+		if (result.selection.length > 0) {
+			this.#getDocumentItem(result.selection as string[]);
+			return;
+		}
 	}
 
 	async #getDocumentItem(ids: string[]) {
@@ -243,9 +243,11 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 						</div>
 						<div class="row query-results">
 							<span id="results-count">
-								${this._templateQuery?.resultCount ?? 0}
-								<umb-localize key="template_itemsReturned">items returned, in</umb-localize>
-								${this._templateQuery?.executionTime ?? 0} ms
+								<umb-localize
+									key="template_publishedItemsReturned"
+									.args=${[this._templateQuery?.resultCount ?? 0, this._templateQuery?.executionTime ?? 0]}
+									>items returned, in</umb-localize
+								>
 							</span>
 							${this._templateQuery?.sampleResults.map(
 								(sample) => html`<span><umb-icon name=${sample.icon}></umb-icon>${sample.name}</span>`,

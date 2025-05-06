@@ -16,6 +16,14 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
     [SetUp]
     public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
 
+    public void Relate(IContent parent, IContent child)
+    {
+        var relatedContentRelType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+
+        var relation = RelationService.Relate(parent.Id, child.Id, relatedContentRelType);
+        RelationService.Save(relation);
+    }
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
         => builder.AddNotificationHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>();
 
@@ -41,7 +49,7 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = rootName
+            Variants = [new () { Name = rootName }]
         };
 
         var root = (await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result.Content!;
@@ -53,7 +61,7 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
         ContentTypeService.Save(contentType);
 
         createModel.ParentKey = root.Key;
-        createModel.InvariantName = childName;
+        createModel.Variants = [new() { Name = childName }];
 
         var child = (await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result.Content!;
         Assert.AreEqual(root.Id, child.ParentId);

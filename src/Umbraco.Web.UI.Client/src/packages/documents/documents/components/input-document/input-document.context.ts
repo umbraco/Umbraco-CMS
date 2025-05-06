@@ -9,6 +9,7 @@ import type { UmbDocumentTypeEntityType } from '@umbraco-cms/backoffice/document
 
 interface UmbDocumentPickerInputContextOpenArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>;
+	includeTrashed?: boolean;
 }
 
 export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
@@ -43,6 +44,7 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 		// pass allowedContentTypes to the search request args
 		combinedPickerData.search!.queryParams = {
 			allowedContentTypes: args?.allowedContentTypes,
+			includeTrashed: args?.includeTrashed,
 			...pickerData?.search?.queryParams,
 		};
 
@@ -61,6 +63,3 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 		return true;
 	};
 }
-
-/** @deprecated Use `UmbDocumentPickerInputContext` instead. This method will be removed in Umbraco 15. */
-export { UmbDocumentPickerInputContext as UmbDocumentPickerContext };

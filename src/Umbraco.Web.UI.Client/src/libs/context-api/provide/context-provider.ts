@@ -1,12 +1,19 @@
+import type { UmbContextMinimal } from '../types.js';
 import type { UmbContextRequestEvent } from '../consume/context-request.event.js';
 import type { UmbContextToken } from '../token/index.js';
 import { UMB_CONTEXT_REQUEST_EVENT_TYPE, UMB_DEBUG_CONTEXT_EVENT_TYPE } from '../consume/context-request.event.js';
-import { UmbContextProvideEventImplementation } from './context-provide.event.js';
+import {
+	UmbContextProvideEventImplementation,
+	UmbContextUnprovidedEventImplementation,
+} from './context-provide.event.js';
 
 /**
  * @class UmbContextProvider
  */
-export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType = BaseType> {
+export class UmbContextProvider<
+	BaseType extends UmbContextMinimal = UmbContextMinimal,
+	ResultType extends BaseType = BaseType,
+> {
 	#eventTarget: EventTarget;
 
 	#contextAlias: string;
@@ -40,15 +47,15 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 		this.#contextAlias = idSplit[0];
 		this.#apiAlias = idSplit[1] ?? 'default';
 		this.#instance = instance;
-
-		this.#eventTarget.addEventListener(UMB_CONTEXT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
-		this.#eventTarget.addEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this.#handleDebugContextRequest);
 	}
 
 	/**
 	 * @memberof UmbContextProvider
 	 */
 	public hostConnected(): void {
+		this.#eventTarget.addEventListener(UMB_CONTEXT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
+		this.#eventTarget.addEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this.#handleDebugContextRequest);
+
 		this.#eventTarget.dispatchEvent(new UmbContextProvideEventImplementation(this.#contextAlias));
 	}
 
@@ -56,8 +63,10 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	 * @memberof UmbContextProvider
 	 */
 	public hostDisconnected(): void {
-		// Out-commented for now, but kept if we like to reintroduce this:
-		//window.dispatchEvent(new UmbContextUnprovidedEventImplementation(this._contextAlias, this.#instance));
+		this.#eventTarget.removeEventListener(UMB_CONTEXT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
+		this.#eventTarget.removeEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this.#handleDebugContextRequest);
+
+		this.#eventTarget.dispatchEvent(new UmbContextUnprovidedEventImplementation(this.#contextAlias, this.#instance));
 	}
 
 	/**

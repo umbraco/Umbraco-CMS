@@ -29,5 +29,6 @@ public class ContentSavedBlueprintWebhookEvent : WebhookEventContentBase<Content
         GetEntitiesFromNotification(ContentSavedBlueprintNotification notification)
             => new List<IContent> { notification.SavedBlueprint };
 
-    protected override object ConvertEntityToRequestPayload(IContent entity) => entity;
+    protected override object ConvertEntityToRequestPayload(IContent entity)
+        => new DefaultPayloadModel { Id = entity.Key };
 }

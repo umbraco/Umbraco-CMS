@@ -15,11 +15,11 @@ export class UmbDataTypeCollectionRepository extends UmbRepositoryBase implement
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.#init = Promise.all([
-			this.consumeContext(UMB_DATA_TYPE_ITEM_STORE_CONTEXT, (instance) => {
+		this.#init = this.consumeContext(UMB_DATA_TYPE_ITEM_STORE_CONTEXT, (instance) => {
+			if (instance) {
 				this.#itemStore = instance;
-			}).asPromise(),
-		]);
+			}
+		}).asPromise({ preventTimeout: true });
 
 		this.#collectionSource = new UmbDataTypeCollectionServerDataSource(host);
 	}

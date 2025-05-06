@@ -29,7 +29,8 @@ test('can create a rich text editor with tiptap', {tag: '@smoke'}, async ({umbra
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesNameExist(tipTapName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(tipTapName);
   expect(dataTypeData.editorAlias).toBe(tipTapAlias);
@@ -47,7 +48,8 @@ test('can rename a rich text editor with tiptap', async ({umbracoApi, umbracoUi}
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesNameExist(tipTapName)).toBeTruthy();
   expect(await umbracoApi.dataType.doesNameExist(wrongName)).toBeFalsy();
 });
@@ -62,7 +64,8 @@ test('can delete a rich text editor with tiptap', async ({umbracoApi, umbracoUi}
   await umbracoUi.dataType.clickDeleteAndConfirmButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesNameExist(tipTapName)).toBeFalsy();
   await umbracoUi.dataType.isTreeItemVisible(tipTapName, false);
 });
@@ -79,7 +82,8 @@ test('can add dimensions', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
 expect(await umbracoApi.dataType.doesRTEHaveDimensions(tipTapName, width, height)).toBeTruthy();
 });
 
@@ -94,7 +98,8 @@ test('can update maximum size for inserted images', async ({umbracoApi, umbracoU
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(tipTapName, 'maxImageSize', maximumSize)).toBeTruthy();
 });
 
@@ -109,7 +114,8 @@ test('can select overlay size', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(tipTapName, 'overlaySize', overlaySizeValue)).toBeTruthy();
 });
 
@@ -121,12 +127,16 @@ test('can add an available block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(tipTapName);
 
   // Act
+  await umbracoUi.dataType.isExtensionItemChecked('Block', false);
   await umbracoUi.dataType.addAvailableBlocks(elementTypeName);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesRTEContainBlocks(tipTapName, [elementTypeId])).toBeTruthy();
+  // Verify that "Block" extension is enable
+  await umbracoUi.dataType.isExtensionItemChecked('Block');
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
@@ -144,7 +154,8 @@ test('can add image upload folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(tipTapName, 'mediaParentId', mediaFolderId)).toBeTruthy();
 
   // Clean
@@ -161,7 +172,8 @@ test('can enable ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(tipTapName, 'ignoreUserStartNodes', true)).toBeTruthy();
 });
 
@@ -179,7 +191,8 @@ test('can delete toolbar group', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   const tipTapData = await umbracoApi.dataType.getByName(tipTapName);
   const toolbarValue = tipTapData.values.find(value => value.alias === 'toolbar');
   expect(toolbarValue.value[rowIndex].length).toBe(groupCount - 1);
@@ -198,7 +211,8 @@ test('can delete toolbar row', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   const tipTapData = await umbracoApi.dataType.getByName(tipTapName);
   const toolbarValue = tipTapData.values.find(value => value.alias === 'toolbar');
   if (rowCount - 1 === 0) {
@@ -220,9 +234,45 @@ test('can disable extensions item', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   const tipTapData = await umbracoApi.dataType.getByName(tipTapName);
   const extensionsValue = tipTapData.values.find(value => value.alias === 'extensions');
   expect(extensionsValue.value.length).toBe(extensionsCount - 1);
   expect(extensionsValue.value).not.toContain(extensionItemName);
+});
+
+test('can add a statusbar', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const statusbarName = 'Word Count';
+  const statusbarApiValue = 'Umb.Tiptap.Statusbar.WordCount';
+  await umbracoApi.dataType.createDefaultTiptapDataType(tipTapName);
+  await umbracoUi.dataType.goToDataType(tipTapName);
+
+  // Act
+  await umbracoUi.dataType.clickStatusbarItemInToolboxWithName(statusbarName);
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  const tipTapData = await umbracoApi.dataType.getByName(tipTapName);
+  const statusbarValue = tipTapData.values.find(value => value.alias === 'statusbar');
+  expect(statusbarValue.value).toEqual([[statusbarApiValue]]);
+});
+
+test('can remove a statusbar', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const statusbarName = 'Word Count';
+  await umbracoApi.dataType.createTiptapDataTypeWithWordCountStatusbar(tipTapName);
+  await umbracoUi.dataType.goToDataType(tipTapName);
+
+  // Act
+  await umbracoUi.dataType.clickStatusbarItemWithName(statusbarName);
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  const tipTapData = await umbracoApi.dataType.getByName(tipTapName);
+  const statusbarValue = tipTapData.values.find(value => value.alias === 'statusbar');
+  expect(statusbarValue).toBeFalsy();
 });

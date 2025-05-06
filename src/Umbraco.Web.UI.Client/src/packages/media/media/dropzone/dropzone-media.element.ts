@@ -1,3 +1,4 @@
+import { UmbMediaDropzoneManager } from './media-dropzone.manager.js';
 import {
 	UmbInputDropzoneElement,
 	UmbFileDropzoneItemStatus,
@@ -22,19 +23,6 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 	parentUnique: string | null = null;
 
 	/**
-	 * Determines if the dropzone should create temporary files or media items directly.
-	 * @deprecated Use the {@link UmbInputDropzoneElement} instead.
-	 */
-	@property({ type: Boolean, attribute: 'create-as-temporary' })
-	createAsTemporary: boolean = false;
-
-	/**
-	 * @deprecated Please use `getItems()` instead; this method will be removed in Umbraco 17.
-	 * @returns {Array<UmbUploadableItem>} An array of uploadable items.
-	 */
-	public getFiles = this.getItems;
-
-	/**
 	 * Gets the current value of the uploaded items.
 	 * @returns {Array<UmbUploadableItem>} An array of uploadable items.
 	 */
@@ -42,6 +30,7 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		return this._progressItems;
 	}
 
+	protected override _manager = new UmbMediaDropzoneManager(this);
 	public progressItems = () => this._manager.progressItems;
 	public progress = () => this._manager.progress;
 
@@ -52,6 +41,14 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		document.addEventListener('dragleave', this.#handleDragLeave.bind(this));
 		document.addEventListener('drop', this.#handleDrop.bind(this));
 
+		// TODO: Revisit this. I am not sure why it is needed to call these methods here when they are already called in the constructor of the parent class.
+		// If we do not call them here, the observer will use the wrong instance of the dropzone manager (UmbDropZoneManager instead of UmbMediaDropzoneManager).
+		this._observeProgress();
+		this._observeProgressItems();
+	}
+
+	protected override _observeProgressItems() {
+		super._observeProgressItems();
 		this.observe(
 			this._manager.progressItems,
 			(progressItems: Array<UmbUploadableItem>) => {
@@ -75,13 +72,8 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		if (this.disabled) return;
 		if (!event.detail.files.length && !event.detail.folders.length) return;
 
-		if (this.createAsTemporary) {
-			const uploadable = this._manager.createTemporaryFiles(event.detail.files);
-			this.dispatchEvent(new UmbDropzoneSubmittedEvent(await uploadable));
-		} else {
-			const uploadable = this._manager.createMediaItems(event.detail, this.parentUnique);
-			this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadable));
-		}
+		const uploadable = this._manager.createMediaItems(event.detail, this.parentUnique);
+		this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadable));
 	}
 
 	#handleDragEnter(e: DragEvent) {

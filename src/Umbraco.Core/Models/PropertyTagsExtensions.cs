@@ -22,7 +22,7 @@ public static class PropertyTagsExtensions
         }
 
         IDataEditor? editor = propertyEditors[property.PropertyType?.PropertyEditorAlias];
-        TagsPropertyEditorAttribute? tagAttribute = editor?.GetTagAttribute();
+        TagsPropertyEditorAttribute? tagAttribute = GetTagAttribute(editor);
 
         var configurationObject = property.PropertyType is null
             ? null
@@ -36,6 +36,9 @@ public static class PropertyTagsExtensions
 
         return configuration;
     }
+
+    private static TagsPropertyEditorAttribute? GetTagAttribute(IDataEditor? editor)
+        => editor?.GetType().GetCustomAttribute<TagsPropertyEditorAttribute>(false);
 
     /// <summary>
     ///     Assign tags.

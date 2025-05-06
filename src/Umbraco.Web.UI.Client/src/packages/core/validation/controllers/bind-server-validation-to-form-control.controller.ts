@@ -43,7 +43,7 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 			this.#context = context;
 
 			this.observe(
-				context.messages?.messagesOfTypeAndPath('server', dataPath),
+				context?.messages?.messagesOfNotTypeAndPath('client', dataPath),
 				(messages) => {
 					this.#messages = messages ?? [];
 					this.#isValid = this.#messages.length === 0;

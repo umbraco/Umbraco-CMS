@@ -9,6 +9,7 @@ import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui'
 
 import './member-workspace-view-member-info.element.js';
 import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 @customElement('umb-member-workspace-view-member')
 export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -20,8 +21,14 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;
 
-			this.observe(this._workspaceContext.isNew, (isNew) => {
+			this.observe(this._workspaceContext?.isNew, (isNew) => {
 				this._isNew = !!isNew;
+			});
+		});
+
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			this.observe(context?.hasAccessToSensitiveData, (hasAccessToSensitiveData) => {
+				this._hasAccessToSensitiveData = hasAccessToSensitiveData === true;
 			});
 		});
 	}
@@ -34,6 +41,9 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 
 	@state()
 	private _isNew = true;
+
+	@state()
+	private _hasAccessToSensitiveData = false;
 
 	#onChange(propertyName: keyof UmbMemberDetailModel, value: UmbMemberDetailModel[keyof UmbMemberDetailModel]) {
 		if (!this._workspaceContext) return;
@@ -172,23 +182,27 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 							.selection=${this._workspaceContext.memberGroups}></umb-input-member-group>
 					</umb-property-layout>
 
-					<umb-property-layout label=${this.localize.term('user_stateApproved')}>
-						<uui-toggle
-							slot="editor"
-							.checked=${this._workspaceContext.isApproved}
-							@change=${(e: UUIBooleanInputEvent) => this.#onChange('isApproved', e.target.checked)}>
-						</uui-toggle>
-					</umb-property-layout>
+					${when(
+						this._hasAccessToSensitiveData,
+						() => html`
+							<umb-property-layout label=${this.localize.term('user_stateApproved')}>
+								<uui-toggle
+									slot="editor"
+									.checked=${this._workspaceContext!.isApproved}
+									@change=${(e: UUIBooleanInputEvent) => this.#onChange('isApproved', e.target.checked)}>
+								</uui-toggle>
+							</umb-property-layout>
 
-					<umb-property-layout label=${this.localize.term('user_stateLockedOut')}>
-						<uui-toggle
-							slot="editor"
-							?disabled=${this._isNew || !this._workspaceContext.isLockedOut}
-							.checked=${this._workspaceContext.isLockedOut}
-							@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
-						</uui-toggle>
-					</umb-property-layout>
-
+							<umb-property-layout label=${this.localize.term('user_stateLockedOut')}>
+								<uui-toggle
+									slot="editor"
+									?disabled=${this._isNew || !this._workspaceContext!.isLockedOut}
+									.checked=${this._workspaceContext!.isLockedOut}
+									@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
+								</uui-toggle>
+							</umb-property-layout>
+						`,
+					)}
 					<umb-property-layout label=${this.localize.term('member_2fa')}>
 						<uui-toggle
 							slot="editor"

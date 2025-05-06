@@ -13,8 +13,7 @@
  * limitations under the License.
  */
 
-import { fromByteArray } from '@umbraco-cms/backoffice/external/base64-js';
-
+import { fromByteArray } from './base64-js/index.js';
 import { AppAuthError } from './errors.js';
 
 const HAS_CRYPTO = typeof window !== 'undefined' && !!(window.crypto as any);

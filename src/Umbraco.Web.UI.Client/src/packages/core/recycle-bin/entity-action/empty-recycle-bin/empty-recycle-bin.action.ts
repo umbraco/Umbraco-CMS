@@ -27,9 +27,14 @@ export class UmbEmptyRecycleBinEntityAction extends UmbEntityActionBase<MetaEnti
 			this,
 			this.args.meta.recycleBinRepositoryAlias,
 		);
-		await recycleBinRepository.requestEmpty();
+
+		const { error } = await recycleBinRepository.requestEmpty();
+		if (error) {
+			throw error;
+		}
 
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!actionEventContext) throw new Error('Action event context is not available');
 		const event = new UmbRequestReloadChildrenOfEntityEvent({
 			unique: this.args.unique,
 			entityType: this.args.entityType,

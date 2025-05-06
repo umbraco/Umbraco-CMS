@@ -12,7 +12,7 @@ public class ContentImagingSettings
 {
     internal const string StaticImageFileTypes = "jpeg,jpg,gif,bmp,png,tiff,tif,webp";
 
-    private static readonly ImagingAutoFillUploadField[] DefaultImagingAutoFillUploadField =
+    private static readonly ISet<ImagingAutoFillUploadField> DefaultImagingAutoFillUploadField = new HashSet<ImagingAutoFillUploadField>
     {
         new()
         {
@@ -28,10 +28,11 @@ public class ContentImagingSettings
     ///     Gets or sets a value for the collection of accepted image file extensions.
     /// </summary>
     [DefaultValue(StaticImageFileTypes)]
-    public string[] ImageFileTypes { get; set; } = StaticImageFileTypes.Split(',');
+    public ISet<string> ImageFileTypes { get; set; } = new HashSet<string>(StaticImageFileTypes.Split(Constants.CharArrays.Comma));
 
     /// <summary>
     ///     Gets or sets a value for the imaging autofill following media file upload fields.
     /// </summary>
-    public ImagingAutoFillUploadField[] AutoFillImageProperties { get; set; } = DefaultImagingAutoFillUploadField;
+    /// <value>
+    public ISet<ImagingAutoFillUploadField> AutoFillImageProperties { get; set; } = DefaultImagingAutoFillUploadField;
 }

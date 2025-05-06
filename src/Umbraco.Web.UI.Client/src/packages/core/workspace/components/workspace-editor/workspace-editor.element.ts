@@ -101,11 +101,11 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 							context.provideAt(component);
 						}
 					},
-				} as UmbRoute;
+				};
 			});
 
 			// Duplicate first workspace and use it for the empty path scenario. [NL]
-			newRoutes.push({ ...newRoutes[0], path: '' });
+			newRoutes.push({ ...newRoutes[0], unique: newRoutes[0].path, path: '' });
 
 			newRoutes.push({
 				path: `**`,
@@ -121,9 +121,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
 				${this.#renderBackButton()}
 				<slot name="header" slot="header"></slot>
-				${this.#renderViews()}
 				<slot name="action-menu" slot="action-menu"></slot>
-				${this.#renderRoutes()}
+				${this.#renderViews()} ${this.#renderRoutes()}
 				<slot></slot>
 				${when(
 					!this.enforceNoFooter,

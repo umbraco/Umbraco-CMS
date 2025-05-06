@@ -13,6 +13,3 @@ export class UmbPartialViewPickerInputContext extends UmbPickerInputContext<
 		super(host, UMB_PARTIAL_VIEW_ITEM_REPOSITORY_ALIAS, UMB_PARTIAL_VIEW_PICKER_MODAL);
 	}
 }
-
-/** @deprecated Use `UmbPartialViewPickerInputContext` instead. This method will be removed in Umbraco 15. */
-export { UmbPartialViewPickerInputContext as UmbPartialViewPickerContext };
