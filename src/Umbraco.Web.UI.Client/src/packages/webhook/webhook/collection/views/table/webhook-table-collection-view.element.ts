@@ -109,6 +109,7 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 							.value=${{
 								entityType: webhook.entityType,
 								unique: webhook.unique,
+								name: webhook.name,
 							}}></umb-entity-actions-table-column-view>`,
 					},
 				],
