@@ -27,7 +27,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Czech (Czech Republic) Backoffice UI Localization',
 		meta: {
-			culture: 'cs-cz',
+			culture: 'cs-CZ',
 		},
 		js: () => import('../../../assets/lang/cs-cz.js'),
 	},
@@ -37,7 +37,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Welsh (United Kingdom) Backoffice UI Localization',
 		meta: {
-			culture: 'cy-gb',
+			culture: 'cy-GB',
 		},
 		js: () => import('../../../assets/lang/cy-gb.js'),
 	},
@@ -47,7 +47,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Danish (Denmark) Backoffice UI Localization',
 		meta: {
-			culture: 'da-dk',
+			culture: 'da-DK',
 		},
 		js: () => import('../../../assets/lang/da-dk.js'),
 	},
@@ -57,7 +57,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'German (Germany) Backoffice UI Localization',
 		meta: {
-			culture: 'de-de',
+			culture: 'de-DE',
 		},
 		js: () => import('../../../assets/lang/de-de.js'),
 	},
@@ -67,7 +67,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'German (Switzerland) Backoffice UI Localization',
 		meta: {
-			culture: 'de-ch',
+			culture: 'de-CH',
 		},
 		js: () => import('../../../assets/lang/de-ch.js'),
 	},
@@ -87,7 +87,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'English (United States) Backoffice UI Localization',
 		meta: {
-			culture: 'en-us',
+			culture: 'en-US',
 		},
 		js: () => import('../../../assets/lang/en-us.js'),
 	},
@@ -97,7 +97,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Spanish (Spain) Backoffice UI Localization',
 		meta: {
-			culture: 'es-es',
+			culture: 'es-ES',
 		},
 		js: () => import('../../../assets/lang/es-es.js'),
 	},
@@ -107,7 +107,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'French (France) Backoffice UI Localization',
 		meta: {
-			culture: 'fr-fr',
+			culture: 'fr-FR',
 		},
 		js: () => import('../../../assets/lang/fr-fr.js'),
 	},
@@ -117,7 +117,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'French (Switzerland) Backoffice UI Localization',
 		meta: {
-			culture: 'fr-ch',
+			culture: 'fr-CH',
 		},
 		js: () => import('../../../assets/lang/fr-ch.js'),
 	},
@@ -127,7 +127,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Hebrew (Israel) Backoffice UI Localization',
 		meta: {
-			culture: 'he-il',
+			culture: 'he-IL',
 		},
 		js: () => import('../../../assets/lang/he-il.js'),
 	},
@@ -137,7 +137,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Croatian (Croatia) Backoffice UI Localization',
 		meta: {
-			culture: 'hr-hr',
+			culture: 'hr-HR',
 		},
 		js: () => import('../../../assets/lang/hr-hr.js'),
 	},
@@ -147,7 +147,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Italian (Italy) Backoffice UI Localization',
 		meta: {
-			culture: 'it-it',
+			culture: 'it-IT',
 		},
 		js: () => import('../../../assets/lang/it-it.js'),
 	},
@@ -157,7 +157,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Italian (Switzerland) Backoffice UI Localization',
 		meta: {
-			culture: 'it-ch',
+			culture: 'it-CH',
 		},
 		js: () => import('../../../assets/lang/it-ch.js'),
 	},
@@ -167,7 +167,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Japanese (Japan) Backoffice UI Localization',
 		meta: {
-			culture: 'ja-jp',
+			culture: 'ja-JP',
 		},
 		js: () => import('../../../assets/lang/ja-jp.js'),
 	},
@@ -177,7 +177,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Korean (Korea) Backoffice UI Localization',
 		meta: {
-			culture: 'ko-kr',
+			culture: 'ko-KR',
 		},
 		js: () => import('../../../assets/lang/ko-kr.js'),
 	},
@@ -187,7 +187,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Norwegian (Norway) Backoffice UI Localization',
 		meta: {
-			culture: 'nb-no',
+			culture: 'nb-NO',
 		},
 		js: () => import('../../../assets/lang/nb-no.js'),
 	},
@@ -197,7 +197,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Dutch (Netherlands) Backoffice UI Localization',
 		meta: {
-			culture: 'nl-nl',
+			culture: 'nl-NL',
 		},
 		js: () => import('../../../assets/lang/nl-nl.js'),
 	},
@@ -207,7 +207,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Polish (Poland) Backoffice UI Localization',
 		meta: {
-			culture: 'pl-pl',
+			culture: 'pl-PL',
 		},
 		js: () => import('../../../assets/lang/pl-pl.js'),
 	},
@@ -217,7 +217,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Portuguese (Brazil) Backoffice UI Localization',
 		meta: {
-			culture: 'pt-br',
+			culture: 'pt-BR',
 		},
 		js: () => import('../../../assets/lang/pt-br.js'),
 	},
@@ -227,7 +227,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Romanian (Romania) Backoffice UI Localization',
 		meta: {
-			culture: 'ro-ro',
+			culture: 'ro-RO',
 		},
 		js: () => import('../../../assets/lang/ro-ro.js'),
 	},
@@ -237,7 +237,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Russian (Russia) Backoffice UI Localization',
 		meta: {
-			culture: 'ru-ru',
+			culture: 'ru-RU',
 		},
 		js: () => import('../../../assets/lang/ru-ru.js'),
 	},
@@ -247,7 +247,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Swedish (Sweden) Backoffice UI Localization',
 		meta: {
-			culture: 'sv-se',
+			culture: 'sv-SE',
 		},
 		js: () => import('../../../assets/lang/sv-se.js'),
 	},
@@ -257,7 +257,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Turkish (Turkey) Backoffice UI Localization',
 		meta: {
-			culture: 'tr-tr',
+			culture: 'tr-TR',
 		},
 		js: () => import('../../../assets/lang/tr-tr.js'),
 	},
@@ -267,7 +267,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Ukrainian (Ukraine) Backoffice UI Localization',
 		meta: {
-			culture: 'uk-ua',
+			culture: 'uk-UA',
 		},
 		js: () => import('../../../assets/lang/uk-ua.js'),
 	},
@@ -277,7 +277,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Chinese (China) Backoffice UI Localization',
 		meta: {
-			culture: 'zh-cn',
+			culture: 'zh-CN',
 		},
 		js: () => import('../../../assets/lang/zh-cn.js'),
 	},
@@ -287,7 +287,7 @@ export const manifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'Chinese (Taiwan) Backoffice UI Localization',
 		meta: {
-			culture: 'zh-tw',
+			culture: 'zh-TW',
 		},
 		js: () => import('../../../assets/lang/zh-tw.js'),
 	},
