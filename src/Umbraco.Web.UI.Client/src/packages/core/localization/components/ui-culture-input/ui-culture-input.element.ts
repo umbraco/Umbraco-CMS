@@ -52,7 +52,7 @@ export class UmbUiCultureInputElement extends UUIFormControlMixin(UmbLitElement,
 			.map((manifest) => {
 				const culture = manifest.meta.culture.toLowerCase();
 				return {
-					name: manifest.name,
+					name: this.localize.term(`uiCulture_${culture}`),
 					value: culture,
 				};
 			});
