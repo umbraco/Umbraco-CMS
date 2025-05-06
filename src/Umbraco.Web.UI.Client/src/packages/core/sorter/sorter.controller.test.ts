@@ -46,7 +46,7 @@ describe('UmbSorterController', () => {
 
 	beforeEach(async () => {
 		element = await fixture(html`<test-my-sorter></test-my-sorter>`);
-		await aTimeout(10);
+		//await aTimeout(10);
 	});
 
 	it('is defined with its own instance', () => {
@@ -104,8 +104,8 @@ describe('UmbSorterController', () => {
 				expect(element.sorter).to.have.property('notifyDisallowed').that.is.a('function');
 			});
 
-			it('has a notifyRequestDrop method', () => {
-				expect(element.sorter).to.have.property('notifyRequestDrop').that.is.a('function');
+			it('has a notifyRequestMove method', () => {
+				expect(element.sorter).to.have.property('notifyRequestMove').that.is.a('function');
 			});
 
 			it('has a destroy method', () => {
