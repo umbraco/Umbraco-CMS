@@ -243,6 +243,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	};
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
+		ext.component?.setAttribute('part', 'component');
 		if (this._exposed) {
 			return ext.component;
 		} else {
@@ -345,6 +346,12 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 					outline: 3px solid var(--uui-color-focus);
 				}
 			}
+
+			umb-extension-slot::part(component) {
+				position: relative;
+				z-index: 0;
+			}
+
 			uui-action-bar {
 				position: absolute;
 				top: var(--uui-size-2);
