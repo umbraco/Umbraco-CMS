@@ -94,6 +94,7 @@ export class UmbDataTypeTreeItemTableCollectionViewElement extends UmbLitElement
 							.value=${{
 								entityType: item.entityType,
 								unique: item.unique,
+								name: item.name,
 							}}></umb-entity-actions-table-column-view>`,
 					},
 				],

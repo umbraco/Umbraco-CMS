@@ -26,7 +26,7 @@ export class UmbSectionSidebarMenuWithEntityActionsElement extends UmbSectionSid
 					slot="actions"
 					.unique=${null}
 					.entityType=${this.manifest?.meta.entityType}
-					.label=${this.manifest?.meta.label}>
+					.label=${this.localize.term('actions_viewActionsFor', [this.manifest?.meta.label])}>
 				</umb-entity-actions-bundle>
 			</div>
 		`;
