@@ -1,11 +1,11 @@
 import { UMB_WORKSPACE_VIEW_PATH_PATTERN } from '../../paths.js';
+import { UmbWorkspaceViewNavigationContext } from './workspace-view-navigation.context.js';
+import type { UmbWorkspaceViewNavigationState, UmbWorkspaceViewContext } from './workspace-view.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
-import { UmbWorkspaceViewNavigationContext } from './workspace-view-navigation.context.js';
-import type { UmbWorkspaceViewNavigationState, UmbWorkspaceViewContext } from './workspace-view.context.js';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 /**
@@ -29,7 +29,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	// This would mean that the Workspace would have a WorkspaceNavigationContext, and that would be able to host hints for each culture and segment. And then this one should not have a WorkspaceViewNavigationContext, the WorkspaceViewContext should also go away but a WorkspaceViewNavigationContext should exist and this should support begin provided at multiple elements cause we need to think about Split View.
 	// It then also means that this element should be able to get a Variant ID, I think via a property, and once that is set then we consume the WorkspaceViewNavigationContext and listens for hints for that variant.
 	#navigationContext = new UmbWorkspaceViewNavigationContext(this);
-	#workspaceViewStateObservers: Array<UmbObserverController> = [];
+	#workspaceViewHintObservers: Array<UmbObserverController> = [];
 
 	@property()
 	public headline = '';
@@ -67,10 +67,10 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		this.observe(
 			this.#navigationContext.views,
 			(views) => {
-				this.#workspaceViewStateObservers.forEach((observer) => observer.destroy());
+				this.#workspaceViewHintObservers.forEach((observer) => observer.destroy());
 				this._hintMap = new Map();
 				this._workspaceViews = views;
-				this.#workspaceViewStateObservers = views.map((view, index) =>
+				this.#workspaceViewHintObservers = views.map((view, index) =>
 					this.observe(
 						view.hint,
 						(state) => {

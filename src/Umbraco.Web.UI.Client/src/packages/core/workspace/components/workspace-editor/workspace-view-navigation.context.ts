@@ -9,6 +9,9 @@ import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 export class UmbWorkspaceViewNavigationContext extends UmbContextBase {
 	//
 	#init: Promise<void>;
+	/**
+	 * State holding the permitted Workspace Views as a Workspace View Context
+	 */
 	#views = new UmbBasicState(<Array<UmbWorkspaceViewContext>>[]);
 	public readonly views = this.#views.asObservable();
 
