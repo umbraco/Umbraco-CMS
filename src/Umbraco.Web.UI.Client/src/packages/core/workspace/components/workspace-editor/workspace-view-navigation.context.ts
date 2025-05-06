@@ -1,15 +1,12 @@
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbWorkspaceViewContext } from './workspace-view.context.js';
 import { UMB_WORKSPACE_VIEW_NAVIGATION_CONTEXT } from './workspace-view-navigation.context-token.js';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbWorkspaceViewContext } from './workspace-view.context.js';
 
-export class UmbWorkspaceViewNavigationContext extends UmbContextBase<
-	UmbWorkspaceViewNavigationContext,
-	typeof UMB_WORKSPACE_VIEW_NAVIGATION_CONTEXT
-> {
+export class UmbWorkspaceViewNavigationContext extends UmbContextBase {
 	//
 	#init: Promise<void>;
 	#views = new UmbBasicState(<Array<UmbWorkspaceViewContext>>[]);

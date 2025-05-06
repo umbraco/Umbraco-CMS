@@ -1,8 +1,8 @@
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
 import type { ManifestWorkspaceView } from '../../types.js';
 import { UMB_WORKSPACE_VIEW_CONTEXT } from './workspace-view.context-token.js';
-import type { UUIInterfaceColor } from '@umbraco-ui/uui';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
+import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 export type UmbWorkspaceViewNavigationState = {
@@ -47,11 +47,11 @@ export class UmbWorkspaceViewContext extends UmbControllerBase {
 	}
 
 	hasHint(unique: string | symbol): boolean {
-		return this.#hints.has(unique);
+		return this.#hints.getHasOne(unique);
 	}
 
 	addHint(state: Partial<UmbWorkspaceViewNavigationState>): string | symbol {
-		let newState = { ...state } as UmbWorkspaceViewNavigationState;
+		const newState = { ...state } as UmbWorkspaceViewNavigationState;
 		newState.unique ??= Symbol();
 		newState.weight ??= 0;
 		newState.text ??= '!';
