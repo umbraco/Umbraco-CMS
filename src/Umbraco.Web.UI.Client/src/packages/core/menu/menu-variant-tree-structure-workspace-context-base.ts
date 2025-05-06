@@ -12,6 +12,7 @@ interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
 }
 
+// TODO: introduce base class for all menu structure workspaces to handle ancestors and parent
 export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends UmbContextBase {
 	//
 	#workspaceContext?: typeof UMB_VARIANT_TREE_ENTITY_WORKSPACE_CONTEXT.TYPE;
