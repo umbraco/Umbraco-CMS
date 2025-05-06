@@ -10,18 +10,17 @@ let documentTypeId = null;
 const documentTypeGroupName = 'DocumentGroup';
 
 // Block Grid
-const blockGridDataTypeName = 'BlockGridName';
-let blockGridDataTypeId = null;
-
+const richTextDataTypeName = 'RichTextDataType';
+let richTextDataTypeId = null;
 // Element Types
-// Block Grid
-const blockGridElementTypeName = 'BlockGridElementName';
-let blockGridElementTypeId = null;
-const blockGridElementGroupName = 'GridElementGroup';
 // Block List
 const blockListElementTypeName = 'BlockListElementName';
 let blockListElementTypeId = null;
 const blockListElementGroupName = 'ListElementGroup';
+// Block Grid
+const blockGridElementTypeName = 'BlockGridElementName';
+let blockGridElementTypeId = null;
+const blockGridElementGroupName = 'GridElementGroup';
 // Rich Text Editor
 const richTextElementTypeName = 'RichTextElementName';
 let richTextElementTypeId = null;
@@ -38,7 +37,7 @@ test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(blockGridElementTypeName);
   await umbracoApi.documentType.ensureNameNotExists(blockListElementTypeName);
   await umbracoApi.documentType.ensureNameNotExists(richTextElementTypeName);
-  await umbracoApi.dataType.ensureNameNotExists(blockGridDataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(richTextDataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -47,28 +46,31 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(blockGridElementTypeName);
   await umbracoApi.documentType.ensureNameNotExists(blockListElementTypeName);
   await umbracoApi.documentType.ensureNameNotExists(richTextElementTypeName);
-  await umbracoApi.dataType.ensureNameNotExists(blockGridDataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(richTextDataTypeName);
 });
 
-test('can publish a block grid editor with a rich text editor', async ({umbracoApi, umbracoUi}) => {
+test('can publish a rich text editor with a rich text editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const richTextDataTypeName = 'RichTextName';
-  await umbracoApi.dataType.ensureNameNotExists(richTextDataTypeName);
-  const richTextEditorValue = 'Hello World';
-  const expectedRichTextEditorOutputValue = '<p>Hello World</p>';
-  const richTextEditorDataTypeId = await umbracoApi.dataType.createEmptyRichTextEditor(richTextDataTypeName);
-  richTextElementTypeId = await umbracoApi.documentType.createDefaultElementType(richTextElementTypeName, richTextElementGroupName, richTextDataTypeName, richTextEditorDataTypeId);
-  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridDataTypeName, richTextElementTypeId, true);
-  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId, documentTypeGroupName);
+  const secondRichTextDataTypeName = 'SecondRichTextName';
+  await umbracoApi.dataType.ensureNameNotExists(secondRichTextDataTypeName);
+  const richTextEditorValue = 'Hello First World';
+  const secondRichTextEditorValue = 'Hello Second World';
+  const expectedRichTextEditorOutputValue = '<p>' + richTextEditorValue + '</p>';
+  const secondExpectedRichTextEditorOutputValue = '<p>' + secondRichTextEditorValue + '</p>';
+  const secondRichTextEditorDataTypeId = await umbracoApi.dataType.createEmptyRichTextEditor(secondRichTextDataTypeName);
+  richTextElementTypeId = await umbracoApi.documentType.createDefaultElementType(richTextElementTypeName, richTextElementGroupName, secondRichTextDataTypeName, secondRichTextEditorDataTypeId);
+  richTextDataTypeId = await umbracoApi.dataType.createRichTextEditorWithABlock(richTextDataTypeName, richTextElementTypeId);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, richTextDataTypeName, richTextDataTypeId, documentTypeGroupName);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
-  await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickBlockElementWithName(richTextElementTypeName);
   await umbracoUi.content.enterRTETipTapEditor(richTextEditorValue);
+  await umbracoUi.content.clickInsertBlockButton();
+  await umbracoUi.content.clickBlockElementWithName(richTextElementTypeName);
+  await umbracoUi.content.enterRTETipTapEditorWithName(AliasHelper.toAlias(secondRichTextDataTypeName), secondRichTextEditorValue);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
 
@@ -77,62 +79,32 @@ test('can publish a block grid editor with a rich text editor', async ({umbracoA
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   // Asserts that the value in the RTE is as expected
   const documentData = await umbracoApi.document.getByName(contentName);
-  const documentValues = documentData.values.find(value => value.alias === AliasHelper.toAlias(blockGridDataTypeName));
-  expect(documentValues.value.contentData[0].values[0].value.markup).toContain(expectedRichTextEditorOutputValue);
+  const documentValues = documentData.values.find(value => value.alias === AliasHelper.toAlias(richTextDataTypeName));
+  // Value in the first RTE
+  expect(documentValues.value.markup).toContain(expectedRichTextEditorOutputValue);
+  // Value in the second RTE
+  const secondRTEInBlock = documentValues.value.blocks.contentData[0].values.find(value => value.alias === AliasHelper.toAlias(secondRichTextDataTypeName));
+  expect(secondRTEInBlock.value.markup).toContain(secondExpectedRichTextEditorOutputValue);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(richTextDataTypeName);
 });
 
-test('can publish a block grid editor with a block list editor', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const blockListDataTypeName = 'BlockListName';
-  await umbracoApi.dataType.ensureNameNotExists(blockListDataTypeName)
-  const textStringValue = 'Hello World';
-  const textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
-  textStringElementTypeId = await umbracoApi.documentType.createDefaultElementType(textStringElementTypeName, textStringGroupName, textStringDataTypeName, textStringDataType.id);
-  const blockListDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListDataTypeName, textStringElementTypeId);
-  blockListElementTypeId = await umbracoApi.documentType.createDefaultElementType(blockListElementTypeName, blockListElementGroupName, blockListDataTypeName, blockListDataTypeId);
-  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridDataTypeName, blockListElementTypeId, true);
-  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId, documentTypeGroupName);
-  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  await umbracoUi.content.goToContentWithName(contentName);
-
-  // Act
-  await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickBlockElementWithName(blockListElementTypeName);
-  await umbracoUi.content.clickAddBlockWithNameButton(textStringElementTypeName);
-  await umbracoUi.content.clickLinkWithName(textStringElementTypeName, true);
-  await umbracoUi.content.enterTextstring(textStringValue);
-  await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + textStringElementTypeName);
-  await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
-
-  // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
-  // Asserts that the value in the BlockList is as expected
-  const documentData = await umbracoApi.document.getByName(contentName);
-  const documentValues = documentData.values.find(value => value.alias === AliasHelper.toAlias(blockGridDataTypeName));
-  expect(documentValues.value.contentData[0].values[0].value.contentData[0].values[0].value).toContain(textStringValue);
-
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(blockListDataTypeName);
-});
-
-test('can publish a block grid editor with a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can publish a block list editor with a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringValue = 'Hello World';
-  const secondBlockGridDataTypeName = 'SecondBlockGridDataTypeName';
-  await umbracoApi.dataType.ensureNameNotExists(secondBlockGridDataTypeName);
+  const blockGridDataTypeName = 'BlockGridDataTypeName';
+  await umbracoApi.dataType.ensureNameNotExists(blockGridDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(blockGridElementTypeName);
+
   const textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
   textStringElementTypeId = await umbracoApi.documentType.createDefaultElementType(textStringElementTypeName, textStringGroupName, textStringDataTypeName, textStringDataType.id);
-  const secondBlockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(secondBlockGridDataTypeName, textStringElementTypeId);
-  blockGridElementTypeId = await umbracoApi.documentType.createDefaultElementType(blockGridElementTypeName, blockGridElementGroupName, secondBlockGridDataTypeName, secondBlockGridDataTypeId);
-  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridDataTypeName, blockGridElementTypeId, true);
-  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId, documentTypeGroupName);
+  const blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridDataTypeName, textStringElementTypeId);
+
+  blockGridElementTypeId = await umbracoApi.documentType.createDefaultElementType(blockGridElementTypeName, blockGridElementGroupName, blockGridDataTypeName, blockGridDataTypeId);
+
+  blockListDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListDataTypeName, blockGridElementTypeId);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListDataTypeName, blockListDataTypeId, documentTypeGroupName);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -153,10 +125,51 @@ test('can publish a block grid editor with a block grid editor', async ({umbraco
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   // Asserts that the value in the BlockGrid is as expected
   const documentData = await umbracoApi.document.getByName(contentName);
-  const documentValues = documentData.values.find(value => value.alias === AliasHelper.toAlias(blockGridDataTypeName));
+  const documentValues = documentData.values.find(value => value.alias === AliasHelper.toAlias(blockListDataTypeName));
   expect(documentValues.value.contentData[0].values[0].value.contentData[0].values[0].value).toContain(textStringValue);
 
   // Clean
-  await umbracoApi.dataType.ensureNameNotExists(secondBlockGridDataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(blockGridDataTypeName);
   await umbracoApi.documentType.ensureNameNotExists(blockGridElementTypeName);
+});
+
+test('can publish a block list editor with a block list editor', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const textStringValue = 'Hello World';
+  const secondBlockListDataTypeName = 'SecondBlockListName';
+  await umbracoApi.dataType.ensureNameNotExists(blockListDataTypeName)
+  await umbracoApi.documentType.ensureNameNotExists(textStringElementTypeName)
+  const textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
+  textStringElementTypeId = await umbracoApi.documentType.createDefaultElementType(textStringElementTypeName, textStringGroupName, textStringDataTypeName, textStringDataType.id);
+
+  const secondBlockListDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(secondBlockListDataTypeName, textStringElementTypeId);
+
+  blockListElementTypeId = await umbracoApi.documentType.createDefaultElementType(blockListElementTypeName, blockListElementGroupName, secondBlockListDataTypeName, secondBlockListDataTypeId);
+  blockListDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListDataTypeName, blockListElementTypeId);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListDataTypeName, blockListDataTypeId, documentTypeGroupName);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickBlockElementWithName(blockListElementTypeName);
+  await umbracoUi.content.clickAddBlockWithNameButton(textStringElementTypeName);
+  await umbracoUi.content.clickLinkWithName(textStringElementTypeName, true);
+  await umbracoUi.content.enterTextstring(textStringValue);
+  await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + textStringElementTypeName);
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  // Asserts that the value in the BlockList is as expected
+  const documentData = await umbracoApi.document.getByName(contentName);
+  const documentValues = documentData.values.find(value => value.alias === AliasHelper.toAlias(blockListDataTypeName));
+  expect(documentValues.value.contentData[0].values[0].value.contentData[0].values[0].value).toContain(textStringValue);
+
+  // Clean
+  await umbracoApi.dataType.ensureNameNotExists(secondBlockListDataTypeName);
 });
