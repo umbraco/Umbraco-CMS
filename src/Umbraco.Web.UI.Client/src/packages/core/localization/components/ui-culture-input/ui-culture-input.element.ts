@@ -47,12 +47,19 @@ export class UmbUiCultureInputElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	#mapToOptions(manifests: Array<ManifestLocalization>) {
-		this._options = manifests
-			.filter((isoCode) => isoCode !== undefined)
-			.map((manifest) => ({
-				name: manifest.name,
-				value: manifest.meta.culture.toLowerCase(),
-			}));
+		const options = manifests
+			.filter((manifest) => !!manifest.meta.culture)
+			.map((manifest) => {
+				const culture = manifest.meta.culture.toLowerCase();
+				return {
+					name: manifest.name,
+					value: culture,
+				};
+			});
+
+		const distinct = [...new Map(options.map((item) => [item.value, item])).values()];
+
+		this._options = distinct.sort((a, b) => a.value.localeCompare(b.value));
 	}
 
 	protected override getFormElement() {
