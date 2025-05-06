@@ -92,13 +92,13 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 				structureItems.push(...ancestorItems);
 
 				this.#structure.setValue(structureItems);
-				this.#handleParent(structureItems);
+				this.#setParentData(structureItems);
 				this.#setAncestorData(data);
 			}
 		}
 	}
 
-	#handleParent(structureItems: Array<UmbStructureItemModel>) {
+	#setParentData(structureItems: Array<UmbStructureItemModel>) {
 		/* If the item is not new, the current item is the last item in the array. 
 			We filter out the current item unique to handle any case where it could show up */
 		const parent = structureItems.filter((item) => item.unique !== this.#workspaceContext?.getUnique()).pop();
