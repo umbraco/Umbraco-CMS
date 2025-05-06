@@ -80,6 +80,7 @@ export default [
 			'@typescript-eslint/consistent-type-exports': 'error',
 			'@typescript-eslint/consistent-type-imports': 'error',
 			'@typescript-eslint/no-import-type-side-effects': 'warn',
+			//'@typescript-eslint/no-deprecated': 'error',
 		},
 	},
 

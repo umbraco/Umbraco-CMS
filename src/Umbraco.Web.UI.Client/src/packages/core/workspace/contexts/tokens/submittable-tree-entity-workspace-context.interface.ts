@@ -9,6 +9,6 @@ export interface UmbSubmittableTreeEntityWorkspaceContext extends UmbSubmittable
 	getCreateUnderParent(): UmbEntityModel | undefined;
 	setCreateUnderParent(parent: UmbEntityModel | undefined): void;
 
-	// TODO: This should be moved to the entity workspace context
+	// TODO: This should be moved to the entity workspace context. It is added here to avoid a breaking change.
 	entityType: Observable<string | undefined>;
 }
