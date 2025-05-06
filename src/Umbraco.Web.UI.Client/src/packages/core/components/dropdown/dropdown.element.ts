@@ -64,6 +64,7 @@ export class UmbDropdownElement extends UmbLitElement {
 			<uui-button
 				id="dropdown-button"
 				popovertarget="dropdown-popover"
+				data-mark="open-dropdown"
 				.look=${this.look}
 				.color=${this.color}
 				.label=${this.label ?? ''}

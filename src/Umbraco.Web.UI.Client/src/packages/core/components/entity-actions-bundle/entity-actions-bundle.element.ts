@@ -102,7 +102,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 				.label=${this.label}
 				compact
 				hide-expand>
-				<uui-symbol-more slot="label" label="Open actions menu"></uui-symbol-more>
+				<uui-symbol-more slot="label" .label=${this.label}></uui-symbol-more>
 				<uui-scroll-container>
 					<umb-entity-action-list
 						@action-executed=${this.#onActionExecuted}
@@ -115,12 +115,13 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	}
 
 	#renderFirstAction() {
-		if (!this._firstActionApi) return nothing;
+		if (!this._firstActionApi || !this._firstActionManifest) return nothing;
 		return html`<uui-button
-			label=${this.localize.string(this._firstActionManifest?.meta.label)}
+			label=${this.localize.string(this._firstActionManifest.meta.label)}
+			data-mark=${'entity-action:' + this._firstActionManifest.alias}
 			@click=${this.#onFirstActionClick}
 			href="${ifDefined(this._firstActionHref)}">
-			<uui-icon name=${ifDefined(this._firstActionManifest?.meta.icon)}></uui-icon>
+			<uui-icon name=${ifDefined(this._firstActionManifest.meta.icon)}></uui-icon>
 		</uui-button>`;
 	}
 
