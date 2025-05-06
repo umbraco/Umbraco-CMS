@@ -95,7 +95,7 @@ public static partial class UmbracoBuilderExtensions
         builder.ContentIndexHandlers().Add(() => builder.TypeLoader.GetTypes<IContentIndexHandler>());
 
         WebhookPayloadType webhookPayloadType = Constants.Webhooks.DefaultPayloadType;
-        if (builder.Config.GetSection(Constants.Configuration.ConfigWebhookPayloadType) is not null)
+        if (builder.Config.GetSection(Constants.Configuration.ConfigWebhookPayloadType).Value is not null)
         {
             webhookPayloadType = builder.Config.GetValue<WebhookPayloadType>(Constants.Configuration.ConfigWebhookPayloadType);
         }
