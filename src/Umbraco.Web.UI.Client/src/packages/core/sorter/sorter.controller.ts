@@ -743,7 +743,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 
 		const containerRect = this.#containerElement.getBoundingClientRect();
-		this.#containerElement.style.height = containerRect.height + 'px';
+		this.#containerElement.style.minHeight = containerRect.height + 'px';
 
 		this.#setCurrentElement(element as ElementType);
 
@@ -881,7 +881,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	#cleanupMove() {
 		if (this.#containerElement) {
-			this.#containerElement.style.height = '';
+			this.#containerElement.style.minHeight = '';
 		}
 		window.removeEventListener('mouseup', this.#handleMouseUp);
 		window.removeEventListener('mouseout', this.#handleMouseUp);
