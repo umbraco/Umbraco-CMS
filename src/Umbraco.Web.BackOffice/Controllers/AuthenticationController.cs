@@ -74,7 +74,6 @@ public class AuthenticationController : UmbracoApiControllerBase
     private readonly IUserService _userService;
     private readonly WebRoutingSettings _webRoutingSettings;
 
-    private const int FailedLoginDurationRandomOffsetInMilliseconds = 100;
     private static long? _loginDurationAverage;
 
     // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
@@ -419,13 +418,12 @@ public class AuthenticationController : UmbracoApiControllerBase
     public async Task<ActionResult<UserDetail?>> PostLogin(LoginModel loginModel)
     {
         // Start a timed scope to ensure failed responses return is a consistent time
-        await using var timedScope = new TimedScope(GetLoginDuration(), HttpContext.RequestAborted);
+        var loginDuration = Math.Max(_loginDurationAverage ?? _securitySettings.UserDefaultFailedLoginDurationInMilliseconds, _securitySettings.UserMinimumFailedLoginDurationInMilliseconds);
+        await using var timedScope = new TimedScope(loginDuration, HttpContext.RequestAborted);
 
         // Sign the user in with username/password, this also gives a chance for developers to
         // custom verify the credentials and auto-link user accounts with a custom IBackOfficePasswordChecker
-        SignInResult result = await _signInManager.PasswordSignInAsync(
-            loginModel.Username, loginModel.Password, true, true);
-
+        SignInResult result = await _signInManager.PasswordSignInAsync(loginModel.Username, loginModel.Password, true, true);
         if (result.Succeeded is false)
         {
             BackOfficeIdentityUser? user = await _userManager.FindByNameAsync(loginModel.Username.Trim());
@@ -474,22 +472,6 @@ public class AuthenticationController : UmbracoApiControllerBase
 
         // Return the user detail
         return GetUserDetail(_userService.GetByUsername(loginModel.Username));
-    }
-
-    private long GetLoginDuration()
-    {
-        var loginDuration = Math.Max(_loginDurationAverage ?? _securitySettings.UserDefaultFailedLoginDurationInMilliseconds, _securitySettings.UserMinimumFailedLoginDurationInMilliseconds);
-        var random = new Random();
-        var randomDelay = random.Next(-FailedLoginDurationRandomOffsetInMilliseconds, FailedLoginDurationRandomOffsetInMilliseconds);
-        loginDuration += randomDelay;
-
-        // Just be sure we don't get a negative number - possible if someone has configured a very low UserMinimumFailedLoginDurationInMilliseconds value.
-        if (loginDuration < 0)
-        {
-            loginDuration = 0;
-        }
-
-        return loginDuration;
     }
 
     /// <summary>
