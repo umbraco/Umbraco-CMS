@@ -3,7 +3,7 @@ import type { ManifestLocalization } from './extensions/localization.extension.j
 export const manifests: Array<ManifestLocalization> = [
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Ar',
+		alias: 'Umb.Localization.AR',
 		weight: -100,
 		name: 'Arabic Backoffice UI Localization',
 		meta: {
@@ -13,7 +13,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Bs',
+		alias: 'Umb.Localization.BS',
 		weight: -100,
 		name: 'Bosnian Backoffice UI Localization',
 		meta: {
@@ -23,7 +23,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Cs-CZ',
+		alias: 'Umb.Localization.CS_CZ',
 		weight: -100,
 		name: 'Czech (Czech Republic) Backoffice UI Localization',
 		meta: {
@@ -33,7 +33,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Cy-GB',
+		alias: 'Umb.Localization.CY_GB',
 		weight: -100,
 		name: 'Welsh (United Kingdom) Backoffice UI Localization',
 		meta: {
@@ -43,7 +43,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Da_DK',
+		alias: 'Umb.Localization.DA_DK',
 		weight: -100,
 		name: 'Danish (Denmark) Backoffice UI Localization',
 		meta: {
@@ -53,7 +53,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.De-DE',
+		alias: 'Umb.Localization.DE_DE',
 		weight: -100,
 		name: 'German (Germany) Backoffice UI Localization',
 		meta: {
@@ -63,7 +63,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.De-CH',
+		alias: 'Umb.Localization.DE_CH',
 		weight: -100,
 		name: 'German (Switzerland) Backoffice UI Localization',
 		meta: {
@@ -73,7 +73,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.En-GB',
+		alias: 'Umb.Localization.EN_GB',
 		weight: -100,
 		name: 'English (United Kingdom) Backoffice UI Localization',
 		meta: {
@@ -83,7 +83,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.En_US',
+		alias: 'Umb.Localization.EN_US',
 		weight: -100,
 		name: 'English (United States) Backoffice UI Localization',
 		meta: {
@@ -93,7 +93,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Es-ES',
+		alias: 'Umb.Localization.ES_ES',
 		weight: -100,
 		name: 'Spanish (Spain) Backoffice UI Localization',
 		meta: {
@@ -103,7 +103,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Fr-FR',
+		alias: 'Umb.Localization.FR_FR',
 		weight: -100,
 		name: 'French (France) Backoffice UI Localization',
 		meta: {
@@ -113,7 +113,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Fr-CH',
+		alias: 'Umb.Localization.FR_CH',
 		weight: -100,
 		name: 'French (Switzerland) Backoffice UI Localization',
 		meta: {
@@ -123,7 +123,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.He-IL',
+		alias: 'Umb.Localization.HE_IL',
 		weight: -100,
 		name: 'Hebrew (Israel) Backoffice UI Localization',
 		meta: {
@@ -133,7 +133,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Hr-HR',
+		alias: 'Umb.Localization.HR_HR',
 		weight: -100,
 		name: 'Croatian (Croatia) Backoffice UI Localization',
 		meta: {
@@ -143,7 +143,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.It-IT',
+		alias: 'Umb.Localization.IT_IT',
 		weight: -100,
 		name: 'Italian (Italy) Backoffice UI Localization',
 		meta: {
@@ -153,7 +153,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.It-CH',
+		alias: 'Umb.Localization.IT_CH',
 		weight: -100,
 		name: 'Italian (Switzerland) Backoffice UI Localization',
 		meta: {
@@ -163,7 +163,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Ja-JP',
+		alias: 'Umb.Localization.JA_JP',
 		weight: -100,
 		name: 'Japanese (Japan) Backoffice UI Localization',
 		meta: {
@@ -173,7 +173,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Ko-KR',
+		alias: 'Umb.Localization.KO_KR',
 		weight: -100,
 		name: 'Korean (Korea) Backoffice UI Localization',
 		meta: {
@@ -183,7 +183,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Nb-NO',
+		alias: 'Umb.Localization.NB_NO',
 		weight: -100,
 		name: 'Norwegian (Norway) Backoffice UI Localization',
 		meta: {
@@ -193,7 +193,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Nl-NL',
+		alias: 'Umb.Localization.NL_NL',
 		weight: -100,
 		name: 'Dutch (Netherlands) Backoffice UI Localization',
 		meta: {
@@ -203,7 +203,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Pl-PL',
+		alias: 'Umb.Localization.PL_PL',
 		weight: -100,
 		name: 'Polish (Poland) Backoffice UI Localization',
 		meta: {
@@ -213,7 +213,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Pt-BR',
+		alias: 'Umb.Localization.PT_BR',
 		weight: -100,
 		name: 'Portuguese (Brazil) Backoffice UI Localization',
 		meta: {
@@ -223,7 +223,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Ro-RO',
+		alias: 'Umb.Localization.RO_RO',
 		weight: -100,
 		name: 'Romanian (Romania) Backoffice UI Localization',
 		meta: {
@@ -233,7 +233,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Ru-RU',
+		alias: 'Umb.Localization.RU_RU',
 		weight: -100,
 		name: 'Russian (Russia) Backoffice UI Localization',
 		meta: {
@@ -243,7 +243,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Sv-SE',
+		alias: 'Umb.Localization.SV_SE',
 		weight: -100,
 		name: 'Swedish (Sweden) Backoffice UI Localization',
 		meta: {
@@ -253,7 +253,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Tr-TR',
+		alias: 'Umb.Localization.TR_TR',
 		weight: -100,
 		name: 'Turkish (Turkey) Backoffice UI Localization',
 		meta: {
@@ -263,7 +263,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Uk-UA',
+		alias: 'Umb.Localization.UK_UA',
 		weight: -100,
 		name: 'Ukrainian (Ukraine) Backoffice UI Localization',
 		meta: {
@@ -273,7 +273,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Zh-CN',
+		alias: 'Umb.Localization.ZH_CN',
 		weight: -100,
 		name: 'Chinese (China) Backoffice UI Localization',
 		meta: {
@@ -283,7 +283,7 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.Zh-TW',
+		alias: 'Umb.Localization.ZH_TW',
 		weight: -100,
 		name: 'Chinese (Taiwan) Backoffice UI Localization',
 		meta: {
