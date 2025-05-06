@@ -72,7 +72,6 @@ export default {
 		wasCopiedTo: 'was copied to',
 		wasDeleted: 'was deleted',
 		wasMovedTo: 'was moved to',
-		viewActionsFor: (name) => (name ? `View actions for '${name}'` : 'View actions'),
 	},
 	actionCategories: {
 		content: 'Content',

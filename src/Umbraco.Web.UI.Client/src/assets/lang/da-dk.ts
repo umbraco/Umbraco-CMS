@@ -62,9 +62,8 @@ export default {
 		unlock: 'Lås op',
 		createblueprint: 'Opret indholdsskabelon',
 		resendInvite: 'Gensend Invitation',
-		editContent: 'Rediger indhold',
-		chooseWhereToImport: 'Vælg hvor du vil importere',
-		viewActionsFor: (name) => (name ? `Se handlinger for '${name}'` : 'Se handlinger'),
+		editContent: 'Edit content',
+		chooseWhereToImport: 'Choose where to import',
 	},
 	actionCategories: {
 		content: 'Indhold',

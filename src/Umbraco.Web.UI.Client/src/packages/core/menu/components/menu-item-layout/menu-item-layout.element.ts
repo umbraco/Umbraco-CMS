@@ -80,7 +80,7 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 						slot="actions"
 						.entityType=${this.entityType}
 						.unique=${null}
-						.label=${this.localize.term('actions_viewActionsFor', [this.label])}>
+						.label=${this.label}>
 					</umb-entity-actions-bundle>`
 				: ''}
 			<slot></slot>

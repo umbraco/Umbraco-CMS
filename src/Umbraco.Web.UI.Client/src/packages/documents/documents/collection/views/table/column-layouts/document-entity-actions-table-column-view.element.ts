@@ -21,7 +21,6 @@ export class UmbDocumentEntityActionsTableColumnViewElement extends UmbLitElemen
 	override render() {
 		if (!this._value) return nothing;
 
-		// TODO: Missing name to parse on
 		return html`
 			<umb-entity-actions-table-column-view
 				.value=${{ unique: this._value.unique, entityType: this._value.entityType }}>

@@ -18,7 +18,7 @@ export class UmbDropdownElement extends UmbLitElement {
 	open = false;
 
 	@property()
-	label?: string;
+	label = '';
 
 	@property()
 	look: UUIInterfaceLook = 'default';
@@ -66,7 +66,7 @@ export class UmbDropdownElement extends UmbLitElement {
 				popovertarget="dropdown-popover"
 				.look=${this.look}
 				.color=${this.color}
-				.label=${this.label ?? ''}
+				.label=${this.label}
 				.compact=${this.compact}>
 				<slot name="label"></slot>
 				${when(
