@@ -98,7 +98,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			structureItems.push(...treeItemAncestors);
 
 			this.#structure.setValue(structureItems);
-
 			this.#handleParent(structureItems);
 			this.#setAncestorData(data);
 		}
@@ -122,8 +121,11 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		this.#parentContext.setParent(parentEntity);
 	}
 
-	#setAncestorData(data: Array<UmbTreeItemModel>) {
-		const ancestorEntities = data
+	/* Notice: ancestors are based on the server "data" ancestors and are not based on the full Menu (UI) structure.
+		This will mean that any item placed in the data root will not have any ancestors. But will have a parent based on the UI structure.
+	*/
+	#setAncestorData(ancestors: Array<UmbTreeItemModel>) {
+		const ancestorEntities = ancestors
 			.map((treeItem) => {
 				const entity: UmbEntityModel = {
 					unique: treeItem.unique,

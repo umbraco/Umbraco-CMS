@@ -6,7 +6,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
+import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 interface UmbMenuTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -23,6 +23,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	public readonly parent = this.#parent.asObservable();
 
 	#parentContext = new UmbParentEntityContext(this);
+	#ancestorContext = new UmbAncestorsEntityContext(this);
 
 	constructor(host: UmbControllerHost, args: UmbMenuTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
@@ -85,11 +86,12 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 				});
 
 				structureItems.push(...ancestorItems);
+
+				this.#structure.setValue(structureItems);
+				this.#handleParent(structureItems);
+				this.#setAncestorData(data);
 			}
 		}
-
-		this.#structure.setValue(structureItems);
-		this.#handleParent(structureItems);
 	}
 
 	#handleParent(structureItems: Array<UmbStructureItemModel>) {
@@ -108,5 +110,25 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 			: undefined;
 
 		this.#parentContext.setParent(parentEntity);
+	}
+
+	/* Notice: ancestors are based on the server "data" ancestors and are not based on the full Menu (UI) structure.
+		This will mean that any item placed in the data root will not have any ancestors. But will have a parent based on the UI structure.
+	*/
+	#setAncestorData(ancestors: Array<UmbTreeItemModel>) {
+		const ancestorEntities = ancestors
+			.map((treeItem) => {
+				const entity: UmbEntityModel = {
+					unique: treeItem.unique,
+					entityType: treeItem.entityType,
+				};
+
+				return entity;
+			})
+			/* If the item is not new, the current item is the last item in the array. 
+				We filter out the current item unique to handle any case where it could show up */
+			.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
+
+		this.#ancestorContext.setAncestors(ancestorEntities);
 	}
 }
