@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
@@ -27,6 +28,8 @@ public class SecuritySettings
 
     internal const int StaticMemberDefaultLockoutTimeInMinutes = 30 * 24 * 60;
     internal const int StaticUserDefaultLockoutTimeInMinutes = 30 * 24 * 60;
+    private const long StaticUserDefaultFailedLoginDurationInMilliseconds = 1000;
+    private const long StaticUserMinimumFailedLoginDurationInMilliseconds = 250;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to keep the user logged in.
@@ -125,4 +128,26 @@ public class SecuritySettings
     /// </summary>
     [DefaultValue(StaticAllowConcurrentLogins)]
     public bool AllowConcurrentLogins { get; set; } = StaticAllowConcurrentLogins;
+
+    /// <summary>
+    /// Gets or sets the default duration (in milliseconds) of failed login attempts.
+    /// </summary>
+    /// <value>
+    /// The default duration (in milliseconds) of failed login attempts.
+    /// </value>
+    /// <remarks>
+    /// The user login endpoint ensures that failed login attempts take at least as long as the average successful login.
+    /// However, if no successful logins have occurred, this value is used as the default duration.
+    /// </remarks>
+    [DefaultValue(StaticUserDefaultFailedLoginDurationInMilliseconds)]
+    public long UserDefaultFailedLoginDurationInMilliseconds { get; set; } = StaticUserDefaultFailedLoginDurationInMilliseconds;
+
+    /// <summary>
+    /// Gets or sets the minimum duration (in milliseconds) of failed login attempts.
+    /// </summary>
+    /// <value>
+    /// The minimum duration (in milliseconds) of failed login attempts.
+    /// </value>
+    [DefaultValue(StaticUserMinimumFailedLoginDurationInMilliseconds)]
+    public long UserMinimumFailedLoginDurationInMilliseconds { get; set; } = StaticUserMinimumFailedLoginDurationInMilliseconds;
 }

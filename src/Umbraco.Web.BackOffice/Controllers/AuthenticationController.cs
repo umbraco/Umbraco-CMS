@@ -74,6 +74,9 @@ public class AuthenticationController : UmbracoApiControllerBase
     private readonly IUserService _userService;
     private readonly WebRoutingSettings _webRoutingSettings;
 
+    private const int FailedLoginDurationRandomOffsetInMilliseconds = 100;
+    private static long? _loginDurationAverage;
+
     // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
     [ActivatorUtilitiesConstructor]
     public AuthenticationController(
@@ -415,42 +418,78 @@ public class AuthenticationController : UmbracoApiControllerBase
     [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
     public async Task<ActionResult<UserDetail?>> PostLogin(LoginModel loginModel)
     {
+        // Start a timed scope to ensure failed responses return is a consistent time
+        await using var timedScope = new TimedScope(GetLoginDuration(), CancellationToken.None);
+
         // Sign the user in with username/password, this also gives a chance for developers to
         // custom verify the credentials and auto-link user accounts with a custom IBackOfficePasswordChecker
         SignInResult result = await _signInManager.PasswordSignInAsync(
             loginModel.Username, loginModel.Password, true, true);
 
-        if (result.Succeeded)
+        if (result.Succeeded is false)
         {
-            // return the user detail
-            return GetUserDetail(_userService.GetByUsername(loginModel.Username));
-        }
+            BackOfficeIdentityUser? user = await _userManager.FindByNameAsync(loginModel.Username.Trim());
 
-        if (result.RequiresTwoFactor)
-        {
-            var twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(loginModel.Username);
+            if (user is not null &&
+                await _userManager.CheckPasswordAsync(user, loginModel.Password))
+            {
+                // The credentials were correct, so cancel timed scope and provide a more detailed failure response
+                await timedScope.CancelAsync();
 
-            IUser? attemptedUser = _userService.GetByUsername(loginModel.Username);
-
-            // create a with information to display a custom two factor send code view
-            var verifyResponse =
-                new ObjectResult(new { twoFactorView = twofactorView, userId = attemptedUser?.Id })
+                if (result.RequiresTwoFactor)
                 {
-                    StatusCode = StatusCodes.Status402PaymentRequired
-                };
+                    var twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(loginModel.Username);
 
-            return verifyResponse;
+                    IUser? attemptedUser = _userService.GetByUsername(loginModel.Username);
+
+                    // create a with information to display a custom two factor send code view
+                    var verifyResponse =
+                        new ObjectResult(new { twoFactorView = twofactorView, userId = attemptedUser?.Id })
+                        {
+                            StatusCode = StatusCodes.Status402PaymentRequired
+                        };
+
+                    return verifyResponse;
+                }
+
+                // TODO: We can check for these and respond differently if we think it's important
+                //  result.IsLockedOut
+                //  result.IsNotAllowed
+            }
+
+            // Return BadRequest (400), we don't want to return a 401 because that get's intercepted
+            // by our angular helper because it thinks that we need to re-perform the request once we are
+            // authorized and we don't want to return a 403 because angular will show a warning message indicating
+            // that the user doesn't have access to perform this function, we just want to return a normal invalid message.
+            return BadRequest();
         }
 
-        // TODO: We can check for these and respond differently if we think it's important
-        //  result.IsLockedOut
-        //  result.IsNotAllowed
+        // Set initial or update average (successful) login duration
+        _loginDurationAverage = _loginDurationAverage is long average
+            ? (average + (long)timedScope.Elapsed.TotalMilliseconds) / 2
+            : (long)timedScope.Elapsed.TotalMilliseconds;
 
-        // return BadRequest (400), we don't want to return a 401 because that get's intercepted
-        // by our angular helper because it thinks that we need to re-perform the request once we are
-        // authorized and we don't want to return a 403 because angular will show a warning message indicating
-        // that the user doesn't have access to perform this function, we just want to return a normal invalid message.
-        return BadRequest();
+        // Cancel the timed scope (we don't want to unnecessarily wait on a successful response)
+        await timedScope.CancelAsync();
+
+        // Return the user detail
+        return GetUserDetail(_userService.GetByUsername(loginModel.Username));
+    }
+
+    private long GetLoginDuration()
+    {
+        var loginDuration = Math.Max(_loginDurationAverage ?? _securitySettings.UserDefaultFailedLoginDurationInMilliseconds, _securitySettings.UserMinimumFailedLoginDurationInMilliseconds);
+        var random = new Random();
+        var randomDelay = random.Next(-FailedLoginDurationRandomOffsetInMilliseconds, FailedLoginDurationRandomOffsetInMilliseconds);
+        loginDuration += randomDelay;
+
+        // Just be sure we don't get a negative number - possible if someone has configured a very low UserMinimumFailedLoginDurationInMilliseconds value.
+        if (loginDuration < 0)
+        {
+            loginDuration = 0;
+        }
+
+        return loginDuration;
     }
 
     /// <summary>

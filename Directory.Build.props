@@ -35,7 +35,7 @@
     <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
   </PropertyGroup>
 
-  <!-- Calculate version only once for the whole repository -->
+  <!-- Calculate version only once for the whole repository --> 
   <PropertyGroup>
     <GitVersionBaseDirectory>$(MSBuildThisFileDirectory)</GitVersionBaseDirectory>
   </PropertyGroup>
