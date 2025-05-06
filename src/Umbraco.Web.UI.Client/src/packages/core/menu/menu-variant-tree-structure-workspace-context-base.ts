@@ -22,6 +22,9 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	public readonly structure = this.#structure.asObservable();
 
 	#parent = new UmbObjectState<UmbVariantStructureItemModel | undefined>(undefined);
+	/**
+	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead.
+	 */
 	public readonly parent = this.#parent.asObservable();
 
 	#parentContext = new UmbParentEntityContext(this);
