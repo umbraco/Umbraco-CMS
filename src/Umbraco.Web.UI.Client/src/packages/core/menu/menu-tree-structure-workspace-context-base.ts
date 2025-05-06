@@ -67,13 +67,17 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 
 		const isNew = this.#workspaceContext?.getIsNew();
 
-		const entityTypeObservable = isNew ? this.#workspaceContext?.parentEntityType : this.#workspaceContext?.entityType;
+		const entityTypeObservable = isNew
+			? this.#workspaceContext?.createUnderParentEntityType
+			: this.#workspaceContext?.entityType;
 		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
 		if (!entityType) throw new Error('Entity type is not available');
 
 		// If the entity type is different from the root entity type, then we can request the ancestors.
 		if (entityType !== root?.entityType) {
-			const uniqueObservable = isNew ? this.#workspaceContext?.parentUnique : this.#workspaceContext?.unique;
+			const uniqueObservable = isNew
+				? this.#workspaceContext?.createUnderParentEntityUnique
+				: this.#workspaceContext?.unique;
 			const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
 			if (!unique) throw new Error('Unique is not available');
 

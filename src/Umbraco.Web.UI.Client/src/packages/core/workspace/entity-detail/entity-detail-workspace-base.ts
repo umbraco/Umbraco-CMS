@@ -1,12 +1,12 @@
 import { UmbSubmittableWorkspaceContextBase } from '../submittable/index.js';
 import { UmbEntityWorkspaceDataManager } from '../entity/entity-workspace-data-manager.js';
-import type { UmbTreeEntityWorkspaceContext } from '../contexts/tokens/tree-entity-workspace-context.interface.js';
+import type { UmbSubmittableTreeEntityWorkspaceContext } from '../contexts/tokens/index.js';
 import type { UmbEntityDetailWorkspaceContextArgs, UmbEntityDetailWorkspaceContextCreateArgs } from './types.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UMB_DISCARD_CHANGES_MODAL, umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -32,7 +32,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
 	>
 	extends UmbSubmittableWorkspaceContextBase<DetailModelType>
-	implements UmbTreeEntityWorkspaceContext
+	implements UmbSubmittableTreeEntityWorkspaceContext
 {
 	// Just for context token safety:
 	public readonly IS_ENTITY_DETAIL_WORKSPACE_CONTEXT = true;
@@ -59,8 +59,25 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
+	#createUnderParent = new UmbObjectState<UmbEntityModel | undefined>(undefined);
+	createUnderParent = this.#createUnderParent.asObservable();
+
+	public readonly createUnderParentEntityUnique = this.#createUnderParent.asObservablePart((parent) =>
+		parent ? parent.unique : undefined,
+	);
+
+	public readonly createUnderParentEntityType = this.#createUnderParent.asObservablePart((parent) =>
+		parent ? parent.entityType : undefined,
+	);
+
 	#parent = new UmbObjectState<{ entityType: string; unique: UmbEntityUnique } | undefined>(undefined);
+	/**
+	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead to get the parent both when creating and editing.
+	 */
 	public readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+	/**
+	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead to get the parent both when creating and editing.
+	 */
 	public readonly parentEntityType = this.#parent.asObservablePart((parent) =>
 		parent ? parent.entityType : undefined,
 	);
@@ -153,25 +170,53 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	/**
+	 * Gets the parent that a new entity will be created under.
+	 * @returns { UmbEntityModel | undefined } The parent entity
+	 */
+	getCreateUnderParent(): UmbEntityModel | undefined {
+		return this.#createUnderParent.getValue();
+	}
+
+	/**
+	 * Sets the parent that a new entity will be created under.
+	 * @param {UmbEntityModel} parent The parent entity
+	 */
+	setCreateUnderParent(parent: UmbEntityModel): void {
+		this.#createUnderParent.setValue(parent);
+	}
+
+	/**
 	 * Get the parent
+	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead to get the parent both when creating and editing.
 	 * @returns { UmbEntityModel | undefined } The parent entity
 	 */
 	getParent(): UmbEntityModel | undefined {
 		return this.#parent.getValue();
 	}
 
+	/**
+	 * Set the parent
+	 * @deprecated Will be removed in v.18.
+	 * @param { UmbEntityModel } parent The parent entity
+	 */
 	setParent(parent: UmbEntityModel) {
 		this.#parent.setValue(parent);
 	}
 
 	/**
 	 * Get the parent unique
+	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead to get the parent both when creating and editing.
 	 * @returns { string | undefined } The parent unique identifier
 	 */
 	getParentUnique(): UmbEntityUnique | undefined {
 		return this.#parent.getValue()?.unique;
 	}
 
+	/**
+	 * Get the parent entity type
+	 * @deprecated Will be removed in v.18
+	 * @returns { string | undefined } The parent entity type
+	 */
 	getParentEntityType() {
 		return this.#parent.getValue()?.entityType;
 	}
@@ -243,7 +288,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.resetState();
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Creating ${this.getEntityType()} scaffold` });
 		await this.#init;
-		this.setParent(args.parent);
+		this.setCreateUnderParent(args.parent);
 
 		const request = this._detailRepository!.createScaffold(args.preset);
 		this._getDataPromise = request;

@@ -3,10 +3,10 @@ import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from './menu-variant-str
 import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_VARIANT_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -15,7 +15,7 @@ interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 // TODO: introduce base class for all menu structure workspaces to handle ancestors and parent
 export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends UmbContextBase {
 	//
-	#workspaceContext?: typeof UMB_VARIANT_TREE_ENTITY_WORKSPACE_CONTEXT.TYPE;
+	#workspaceContext?: typeof UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT.TYPE;
 	#args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs;
 
 	#structure = new UmbArrayState<UmbVariantStructureItemModel>([], (x) => x.unique);
@@ -38,7 +38,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 		this.#args = args;
 
-		this.consumeContext(UMB_VARIANT_TREE_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.observe(
 				this.#workspaceContext?.unique,
@@ -53,8 +53,12 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 	async #requestStructure() {
 		const isNew = this.#workspaceContext?.getIsNew();
-		const uniqueObservable = isNew ? this.#workspaceContext?.parentUnique : this.#workspaceContext?.unique;
-		const entityTypeObservable = isNew ? this.#workspaceContext?.parentEntityType : this.#workspaceContext?.entityType;
+		const uniqueObservable = isNew
+			? this.#workspaceContext?.createUnderParentEntityType
+			: this.#workspaceContext?.unique;
+		const entityTypeObservable = isNew
+			? this.#workspaceContext?.createUnderParentEntityUnique
+			: this.#workspaceContext?.entityType;
 
 		let structureItems: Array<UmbVariantStructureItemModel> = [];
 

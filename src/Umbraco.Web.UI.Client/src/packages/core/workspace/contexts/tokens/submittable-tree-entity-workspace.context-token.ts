@@ -9,5 +9,5 @@ export const UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT = new UmbContextToken
 	'UmbWorkspaceContext',
 	undefined,
 	(context): context is UmbSubmittableTreeEntityWorkspaceContext =>
-		'requestSubmit' in context && 'parentEntityType' in context,
+		'requestSubmit' in context && 'createUnderParent' in context,
 );
