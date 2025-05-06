@@ -48,7 +48,7 @@ describe('ArrayState', () => {
 		expect(subject.getHasOne('2')).to.be.true;
 	});
 	it('getHasOne method, return false when key does not exists', () => {
-		expect(subject.getHasOne('1337')).to.be.true;
+		expect(subject.getHasOne('1337')).to.be.false;
 	});
 
 	it('filter method, removes anything that is not true of the given predicate method', (done) => {
