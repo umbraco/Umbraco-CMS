@@ -75,7 +75,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 						view.hint,
 						(state) => {
 							this._hintMap.set(view.manifest.alias, state);
-							this.requestUpdate('_states');
+							this.requestUpdate('_hintMap');
 						},
 						'umbObserveState_' + index,
 					),
