@@ -223,6 +223,10 @@ export default {
 		createFolderIllegalChars: 'The folder name cannot contain illegal characters.',
 		deleteItemFailed: 'Failed to delete item: %0%',
 	},
+	collection: {
+		noItemsTitle: 'No items',
+		addCollectionConfiguration: 'Add collection',
+	},
 	content: {
 		isPublished: 'Is Published',
 		about: 'About this page',
@@ -360,6 +364,16 @@ export default {
 		duplicateBlueprintMessage: 'Another Document Blueprint with the same name already exists',
 		blueprintDescription:
 			'A Document Blueprint is predefined content that an editor can select to use as the\n      basis for creating new content\n    ',
+	},
+	entityDetail: {
+		notFoundTitle: (entityType: string) => {
+			const entityName = entityType ?? 'Item';
+			return `${entityName} not found`;
+		},
+		notFoundDescription: (entityType: string) => {
+			const entityName = entityType ?? 'item';
+			return `The requested ${entityName} could not be found. Please check the URL and try again.`;
+		},
 	},
 	media: {
 		clickToUpload: 'Click to upload',
@@ -664,6 +678,8 @@ export default {
 		iIndexPopulator: 'IIndexPopulator',
 		noResults: 'No results were found',
 		searchResultsFound: 'Showing %0% - %1% of %2% result(s) - Page %3% of %4%',
+		corruptStatus: 'Possible corrupt index detected',
+		corruptErrorDescription: 'Error received when evaluating the index:',
 	},
 	placeholders: {
 		username: 'Enter your username',
@@ -1335,6 +1351,10 @@ export default {
 		notAllowed: 'Not allowed',
 		openMediaPicker: 'Open media picker',
 	},
+	propertyEditorPicker: {
+		title: 'Select a property editor',
+		openPropertyEditorPicker: 'Select a property editor UI',
+	},
 	relatedlinks: {
 		enterExternal: 'enter external link',
 		chooseInternal: 'choose internal page',
@@ -1423,6 +1443,7 @@ export default {
 		validationFailedMessage: 'Validation errors must be fixed before the item can be saved',
 		operationFailedHeader: 'Failed',
 		operationSavedHeader: 'Saved',
+		operationSavedHeaderReloadUser: 'Saved. To view the changes please reload your browser',
 		invalidUserPermissionsText: 'Insufficient user permissions, could not complete the operation',
 		operationCancelledHeader: 'Cancelled',
 		operationCancelledText: 'Operation was cancelled by a 3rd party add-in',
@@ -1449,6 +1470,8 @@ export default {
 		editContentPublishedText: 'and is visible on the website',
 		editContentUnpublishedHeader: 'Document unpublished',
 		editContentUnpublishedText: 'and is no longer visible on the website',
+		editVariantPublishedText: '%0% published and is visible on the website',
+		editVariantSavedText: '%0% saved',
 		editBlueprintSavedHeader: 'Document Blueprint saved',
 		editBlueprintSavedText: 'Changes have been successfully saved',
 		editContentSavedHeader: 'Document saved',
@@ -1481,6 +1504,8 @@ export default {
 		templateSavedHeader: 'Template saved',
 		templateSavedText: 'Template saved without any errors!',
 		contentUnpublished: 'Content unpublished',
+		contentMandatoryCultureUnpublished:
+			"The mandatory language '%0%' was unpublished. All languages for this content item are now unpublished.",
 		partialViewSavedHeader: 'Partial view saved',
 		partialViewSavedText: 'Partial view saved without any errors!',
 		partialViewErrorHeader: 'Partial view not saved',
@@ -1500,6 +1525,7 @@ export default {
 		deleteUserSuccess: 'User %0% was deleted',
 		resendInviteHeader: 'Invite user',
 		resendInviteSuccess: 'Invitation has been re-sent to %0%',
+		contentReqCulturePublishError: "Cannot publish the document since the required '%0%' is not published",
 		documentTypeExportedSuccess: 'Document Type was exported to file',
 		documentTypeExportedError: 'An error occurred while exporting the Document Type',
 		dictionaryItemExportedSuccess: 'Dictionary item(s) was exported to file',
@@ -2709,10 +2735,6 @@ export default {
 		searchResult: 'item returned',
 		searchResults: 'items returned',
 	},
-	propertyEditorPicker: {
-		title: 'Select a property editor',
-		openPropertyEditorPicker: 'Select a property editor UI',
-	},
 	analytics: {
 		consentForAnalytics: 'Consent for telemetry data',
 		analyticsLevelSavedSuccess: 'Telemetry level saved!',
@@ -2794,10 +2816,6 @@ export default {
 		resetUrlHeadline: 'Reset URL?',
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',
-	},
-	collection: {
-		noItemsTitle: 'No items',
-		addCollectionConfiguration: 'Add collection',
 	},
 	uiCulture: {
 		ar: 'العربية',
