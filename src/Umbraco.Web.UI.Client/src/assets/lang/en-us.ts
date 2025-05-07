@@ -134,7 +134,7 @@ export default {
 		saveAndPublish: 'Save and publish',
 		saveToPublish: 'Send for approval',
 		saveListView: 'Save list view',
-		schedulePublish: 'Schedule',
+		schedulePublish: 'Schedule publish',
 		saveAndPreview: 'Save and preview',
 		showPageDisabled: "Preview is disabled because there's no template assigned",
 		styleChoose: 'Choose style',
