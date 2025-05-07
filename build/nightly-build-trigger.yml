@@ -10,9 +10,7 @@ schedules:
     include:
     - v10/dev
     - v13/dev
-    - v14/dev
-    - v15/dev
-    - v16/dev
+    - main
 
 steps:
 - checkout: none
