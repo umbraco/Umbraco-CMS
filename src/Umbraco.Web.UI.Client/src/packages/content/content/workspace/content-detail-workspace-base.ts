@@ -13,6 +13,7 @@ import {
 	UmbWorkspaceSplitViewManager,
 	type UmbEntityDetailWorkspaceContextArgs,
 	type UmbEntityDetailWorkspaceContextCreateArgs,
+	type UmbSaveableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbContentTypeStructureManager,
@@ -97,7 +98,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
 	>
 	extends UmbEntityDetailWorkspaceContextBase<DetailModelType, DetailRepositoryType, CreateArgsType>
-	implements UmbContentWorkspaceContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>
+	implements
+		UmbContentWorkspaceContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>,
+		UmbSaveableWorkspaceContext
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
@@ -779,6 +782,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	/**
+	 * Request a save of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be saved.
+	 * @returns {Promise<void>} a promise which resolves once it has been completed.
+	 */
+	public requestSave() {
+		return this._handleSave();
+	}
+
+	/**
 	 * Get the data to save
 	 * @param {Array<UmbVariantId>} variantIds - The variant ids to save
 	 * @returns {Promise<DetailModelType>}  {Promise<DetailModelType>}
@@ -789,6 +800,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected async _handleSubmit() {
+		await this._handleSave();
+		this._closeModal();
+	}
+	protected async _handleSave() {
 		const data = this.getData();
 		if (!data) {
 			throw new Error('Data is missing');
@@ -818,8 +833,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		} else {
-			/* If there are multiple variants but no modal token is set 
-			we will save the variants that would have been preselected in the modal. 
+			/* If there are multiple variants but no modal token is set
+			we will save the variants that would have been preselected in the modal.
 			These are based on the variants that have been edited */
 			variantIds = selected.map((x) => UmbVariantId.FromString(x));
 		}
@@ -829,18 +844,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		await this.runMandatoryValidationForSaveData(saveData, variantIds);
 		if (this.#validateOnSubmit) {
 			await this.askServerToValidate(saveData, variantIds);
-			return this.validateAndSubmit(
-				async () => {
-					return this.performCreateOrUpdate(variantIds, saveData);
-				},
-				async (reason?: any) => {
-					if (this.#ignoreValidationResultOnSubmit) {
-						return this.performCreateOrUpdate(variantIds, saveData);
-					} else {
-						return this.invalidSubmit(reason);
-					}
-				},
+			const valid = await this._validateAndLog().then(
+				() => true,
+				() => false,
 			);
+			if (valid || this.#ignoreValidationResultOnSubmit) {
+				return this.performCreateOrUpdate(variantIds, saveData);
+			}
 		} else {
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
@@ -915,8 +925,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		});
 		eventContext.dispatchEvent(event);
 		this.setIsNew(false);
-
-		this._closeModal();
 	}
 
 	async #update(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
@@ -966,8 +974,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		});
 
 		eventContext.dispatchEvent(updatedEvent);
-
-		this._closeModal();
 	}
 
 	override resetState() {

@@ -3,17 +3,20 @@ import type UmbDocumentWorkspaceContext from '../document-workspace.context.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
-	UmbSubmitWorkspaceAction,
+	UmbSaveWorkspaceAction,
 	type MetaWorkspaceAction,
-	type UmbSubmitWorkspaceActionArgs,
+	type UmbSaveWorkspaceActionArgs,
 	type UmbWorkspaceActionDefaultKind,
 } from '@umbraco-cms/backoffice/workspace';
 
 export class UmbDocumentSaveWorkspaceAction
-	extends UmbSubmitWorkspaceAction<MetaWorkspaceAction, UmbDocumentWorkspaceContext>
+	extends UmbSaveWorkspaceAction<MetaWorkspaceAction, UmbDocumentWorkspaceContext>
 	implements UmbWorkspaceActionDefaultKind<MetaWorkspaceAction>
 {
-	constructor(host: UmbControllerHost, args: UmbSubmitWorkspaceActionArgs<MetaWorkspaceAction>) {
+	constructor(
+		host: UmbControllerHost,
+		args: UmbSaveWorkspaceActionArgs<MetaWorkspaceAction, UmbDocumentWorkspaceContext>,
+	) {
 		super(host, { workspaceContextToken: UMB_DOCUMENT_WORKSPACE_CONTEXT, ...args });
 	}
 

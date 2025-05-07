@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -21,5 +22,5 @@ public class DomainSavedWebhookEvent : WebhookEventBase<DomainSavedNotification>
     public override string Alias => Constants.WebhookEvents.Aliases.DomainSaved;
 
     public override object? ConvertNotificationToRequestPayload(DomainSavedNotification notification)
-        => notification.SavedEntities;
+        => notification.SavedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }
