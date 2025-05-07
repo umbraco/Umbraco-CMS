@@ -59,8 +59,6 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     private IRelationService RelationService => GetRequiredService<IRelationService>();
 
-    private ILocalizedTextService TextService => GetRequiredService<ILocalizedTextService>();
-
     private ITagService TagService => GetRequiredService<ITagService>();
 
     private IPublicAccessService PublicAccessService => GetRequiredService<IPublicAccessService>();
@@ -738,8 +736,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     [Test]
     public void Can_Unpublish_Content_Variation()
     {
-        var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr,
-            out var contentType);
+        var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr, out var contentType);
 
         var saved = ContentService.Save(content);
         var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
@@ -1032,7 +1029,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         // audit log will only show that french was published
         var lastLog = AuditService.GetLogs(content.Id).Last();
-        Assert.AreEqual("Published languages: French (France)", lastLog.Comment);
+        Assert.AreEqual("Published languages: fr-FR", lastLog.Comment);
 
         // re-get
         content = ContentService.GetById(content.Id);
@@ -1042,7 +1039,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         // audit log will only show that english was published
         lastLog = AuditService.GetLogs(content.Id).Last();
-        Assert.AreEqual("Published languages: English (United Kingdom)", lastLog.Comment);
+        Assert.AreEqual("Published languages: en-GB", lastLog.Comment);
     }
 
     [Test]
@@ -1079,7 +1076,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         // audit log will only show that french was unpublished
         var lastLog = AuditService.GetLogs(content.Id).Last();
-        Assert.AreEqual("Unpublished languages: French (France)", lastLog.Comment);
+        Assert.AreEqual("Unpublished languages: fr-FR", lastLog.Comment);
 
         // re-get
         content = ContentService.GetById(content.Id);
@@ -1088,7 +1085,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         // audit log will only show that english was published
         var logs = AuditService.GetLogs(content.Id).ToList();
-        Assert.AreEqual("Unpublished languages: English (United Kingdom)", logs[^2].Comment);
+        Assert.AreEqual("Unpublished languages: en-GB", logs[^2].Comment);
         Assert.AreEqual("Unpublished (mandatory language unpublished)", logs[^1].Comment);
     }
 
