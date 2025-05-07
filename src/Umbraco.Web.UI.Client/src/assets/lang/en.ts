@@ -268,7 +268,7 @@ export default {
 		publishedPendingChanges: 'Published (pending changes)',
 		publishStatus: 'Publication Status',
 		publishDescendantsHelp:
-			'Publish <strong>%0%</strong> and all content items underneath and thereby making their content publicly available.',
+			'Publish <strong>%0%</strong> and all items underneath and thereby making their content publicly available.',
 		publishDescendantsWithVariantsHelp:
 			'Publish variants and variants of same type underneath and thereby making their content publicly available.',
 		noVariantsToProcess: 'There are no available variants',
@@ -468,9 +468,10 @@ export default {
 		unsavedChanges: 'Discard unsaved changes',
 		unsavedChangesWarning: 'Are you sure you want to navigate away from this page? You have unsaved changes',
 		confirmListViewPublish: 'Publishing will make the selected items publicly available.',
-		confirmListViewUnpublish: 'Unpublishing will remove the selected items and all their descendants from the site.',
-		confirmPublish: 'Publishing will make this document and all its published descendants publicly available.',
-		confirmUnpublish: 'Unpublishing will remove this page and all its descendants from the site.',
+		confirmListViewUnpublish:
+			'Unpublishing will make the selected items and all their descendants publicly unavailable.',
+		confirmPublish: 'Publishing will make this content and all its published descendants publicly available.',
+		confirmUnpublish: 'Unpublishing will make this content publicly unavailable.',
 		doctypeChangeWarning: 'You have unsaved changes. Making changes to the Document Type will discard the changes.',
 	},
 	bulk: {

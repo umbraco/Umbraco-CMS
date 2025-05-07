@@ -154,9 +154,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 				!this._isInvariant,
 				() => html`
 					<p id="subtitle">
-						<umb-localize key="content_languagesToUnpublish">
-							Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.
-						</umb-localize>
+						<umb-localize key="content_languagesToUnpublish"></umb-localize>
 					</p>
 					<umb-document-variant-language-picker
 						.selectionManager=${this._selectionManager}
@@ -167,9 +165,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 			)}
 
 			<p>
-				<umb-localize key="prompt_confirmUnpublish">
-					Unpublishing will remove this page and all its descendants from the site.
-				</umb-localize>
+				<umb-localize key="prompt_confirmUnpublish"></umb-localize>
 			</p>
 
 			${this._referencesConfig
