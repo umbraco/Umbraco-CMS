@@ -249,7 +249,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase {
 		if (!error) {
 			notificationContext?.peek('positive', {
 				data: {
-					headline: localize.term('publish_publishAll', primaryVariantName),
 					message: localize.term('publish_nodePublishAll', primaryVariantName),
 				},
 			});
@@ -365,15 +364,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase {
 		);
 
 		if (!error) {
-			const variants = saveData.variants.filter((v) => variantIds.some((id) => id.culture === v.culture));
 			this.#notificationContext?.peek('positive', {
 				data: {
-					headline: this.#localize.term('speechBubbles_editContentPublishedHeader'),
-					message: this.#localize.term(
-						'speechBubbles_editVariantPublishedText',
-						// TODO: use correct variant names instead of variant strings [MR]
-						this.#localize.list(variants.map((v) => UmbVariantId.Create(v).toString() ?? v.name)),
-					),
+					message: this.#localize.term('speechBubbles_editContentPublishedHeader'),
 				},
 			});
 
