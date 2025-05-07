@@ -209,7 +209,16 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			</div>
 			${this.#renderTemplateInput()}
 			<div class="general-item">
-				<strong><umb-localize key="template_id">Id</umb-localize></strong>
+				<div class="general-info">
+					<strong>
+						<umb-localize key="template_id">Id</umb-localize>
+					</strong>
+					<uui-button-copy-text
+						.text=${this._documentUnique}
+						color="default"
+						look="outline"
+						compact>Copy</uui-button-copy-text>
+				</div>
 				<span>${this._documentUnique}</span>
 			</div>
 		`;
@@ -351,6 +360,14 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			uui-ref-node-document-type[readonly] {
 				padding-top: 7px;
 				padding-bottom: 7px;
+			}
+
+			.general-info {
+				display: flex;
+			}
+
+			.general-info uui-button-copy-text {
+				margin-left: auto;
 			}
 		`,
 	];
