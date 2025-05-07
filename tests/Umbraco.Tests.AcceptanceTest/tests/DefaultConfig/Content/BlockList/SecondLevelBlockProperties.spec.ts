@@ -78,7 +78,7 @@ test('can publish a block list editor with a block grid editor', async ({umbraco
   const blockGridElementGroupName = 'GridElementGroup';
   await umbracoApi.dataType.ensureNameNotExists(blockGridDataTypeName);
   await umbracoApi.documentType.ensureNameNotExists(blockGridElementTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(textStringElementTypeId);
+  await umbracoApi.documentType.ensureNameNotExists(textStringElementTypeName);
 
   const textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
   textStringElementTypeId = await umbracoApi.documentType.createDefaultElementType(textStringElementTypeName, textStringGroupName, textStringDataTypeName, textStringDataType.id);
