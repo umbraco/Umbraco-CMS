@@ -3,6 +3,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_DEFAULT_LOCALIZATION_CULTURE } from '@umbraco-cms/backoffice/localization-api';
 import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -51,7 +52,7 @@ export class UmbUiCultureInputElement extends UmbFormControlMixin<string, typeof
 
 				const distinct = [...new Map(options.map((item) => [item.value, item])).values()];
 
-				this._options = distinct.sort((a, b) => a.value.localeCompare(b.value));
+				this._options = distinct.sort((a, b) => a.name.localeCompare(b.name));
 			},
 			'umbObserveLocalizationManifests',
 		);
@@ -72,25 +73,27 @@ export class UmbUiCultureInputElement extends UmbFormControlMixin<string, typeof
 	protected override firstUpdated(_changedProperties: PropertyValues): void {
 		super.firstUpdated(_changedProperties);
 
-		// Check if the culture can be found.
-		const found = this._options.find((option) => option.value === this.value);
-		if (!found) {
-			this.#invalidCulture = this.value;
+		if (this.value) {
+			// Check if the culture can be found.
+			const found = this._options.find((option) => option.value === this.value);
+			if (!found) {
+				this.#invalidCulture = this.value;
 
-			// if not found, check for the base culture
-			if (this.value?.includes('-')) {
-				const baseCulture = this.value.split('-')[0];
-				const foundBase = this._options.find((option) => option.value === baseCulture);
-				if (foundBase) {
-					this.value = foundBase.value;
+				// if not found, check for the base culture
+				const locale = new Intl.Locale(this.value);
+				if (locale.language) {
+					const foundBase = this._options.find((option) => option.value === locale.language);
+					if (foundBase) {
+						this.value = locale.language;
+					} else {
+						// if the base culture is not found, set the value to "en"
+						this.#invalidBaseCulture = locale.language;
+						this.value = UMB_DEFAULT_LOCALIZATION_CULTURE;
+					}
 				} else {
 					// if the base culture is not found, set the value to "en"
-					this.#invalidBaseCulture = baseCulture;
-					this.value = 'en';
+					this.value = UMB_DEFAULT_LOCALIZATION_CULTURE;
 				}
-			} else {
-				// if the base culture is not found, set the value to "en"
-				this.value = 'en';
 			}
 		}
 
