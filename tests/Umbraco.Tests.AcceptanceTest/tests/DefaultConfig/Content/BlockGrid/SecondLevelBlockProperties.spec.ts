@@ -13,19 +13,6 @@ const documentTypeGroupName = 'DocumentGroup';
 const blockGridDataTypeName = 'BlockGridName';
 let blockGridDataTypeId = null;
 
-// Element Types
-// Block Grid
-const blockGridElementTypeName = 'BlockGridElementName';
-let blockGridElementTypeId = null;
-const blockGridElementGroupName = 'GridElementGroup';
-// Block List
-const blockListElementTypeName = 'BlockListElementName';
-let blockListElementTypeId = null;
-const blockListElementGroupName = 'ListElementGroup';
-// Rich Text Editor
-const richTextElementTypeName = 'RichTextElementName';
-let richTextElementTypeId = null;
-const richTextElementGroupName = 'RTEElementGroup';
 // Text String
 const textStringElementTypeName = 'TextStringElementName';
 let textStringElementTypeId = null;
@@ -35,29 +22,27 @@ const textStringDataTypeName = 'Textstring';
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(blockGridElementTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(blockListElementTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(richTextElementTypeName);
   await umbracoApi.dataType.ensureNameNotExists(blockGridDataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(blockGridElementTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(blockListElementTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(richTextElementTypeName);
   await umbracoApi.dataType.ensureNameNotExists(blockGridDataTypeName);
 });
 
 test('can publish a block grid editor with a rich text editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const richTextDataTypeName = 'RichTextName';
-  await umbracoApi.dataType.ensureNameNotExists(richTextDataTypeName);
   const richTextEditorValue = 'Hello World';
   const expectedRichTextEditorOutputValue = '<p>Hello World</p>';
-  const richTextEditorDataTypeId = await umbracoApi.dataType.createEmptyRichTextEditor(richTextDataTypeName);
-  richTextElementTypeId = await umbracoApi.documentType.createDefaultElementType(richTextElementTypeName, richTextElementGroupName, richTextDataTypeName, richTextEditorDataTypeId);
+  const richTextDataTypeName = 'RichTextDataTypeName';
+  const richTextElementTypeName = 'RichTextElementName';
+  const richTextElementGroupName = 'RichTextElementGroupName';
+  await umbracoApi.dataType.ensureNameNotExists(richTextDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(richTextElementTypeName);
+
+  const richTextEditorDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(richTextDataTypeName);
+  const richTextElementTypeId = await umbracoApi.documentType.createDefaultElementType(richTextElementTypeName, richTextElementGroupName, richTextDataTypeName, richTextEditorDataTypeId);
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridDataTypeName, richTextElementTypeId, true);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId, documentTypeGroupName);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -82,17 +67,23 @@ test('can publish a block grid editor with a rich text editor', async ({umbracoA
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(richTextDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(richTextElementTypeName);
 });
 
 test('can publish a block grid editor with a block list editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const blockListDataTypeName = 'BlockListName';
-  await umbracoApi.dataType.ensureNameNotExists(blockListDataTypeName)
   const textStringValue = 'Hello World';
+  const blockListDataTypeName = 'BlockListName';
+  const blockListElementTypeName = 'BlockListElementName';
+  const blockListElementGroupName = 'BlockListElementGroupName';
+  await umbracoApi.dataType.ensureNameNotExists(blockListDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(textStringElementTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(blockListElementTypeName);
+
   const textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
   textStringElementTypeId = await umbracoApi.documentType.createDefaultElementType(textStringElementTypeName, textStringGroupName, textStringDataTypeName, textStringDataType.id);
   const blockListDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListDataTypeName, textStringElementTypeId);
-  blockListElementTypeId = await umbracoApi.documentType.createDefaultElementType(blockListElementTypeName, blockListElementGroupName, blockListDataTypeName, blockListDataTypeId);
+  const blockListElementTypeId = await umbracoApi.documentType.createDefaultElementType(blockListElementTypeName, blockListElementGroupName, blockListDataTypeName, blockListDataTypeId);
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridDataTypeName, blockListElementTypeId, true);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId, documentTypeGroupName);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -120,17 +111,24 @@ test('can publish a block grid editor with a block list editor', async ({umbraco
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(blockListDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(textStringElementTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(blockListElementTypeName);
 });
 
 test('can publish a block grid editor with a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringValue = 'Hello World';
   const secondBlockGridDataTypeName = 'SecondBlockGridDataTypeName';
+  const blockGridElementTypeName = 'BlockGridElementTypeName';
+  const blockGridElementGroupName = 'BlockGridElementGroupName';
   await umbracoApi.dataType.ensureNameNotExists(secondBlockGridDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(textStringElementTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(blockGridElementTypeName);
+
   const textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
   textStringElementTypeId = await umbracoApi.documentType.createDefaultElementType(textStringElementTypeName, textStringGroupName, textStringDataTypeName, textStringDataType.id);
   const secondBlockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(secondBlockGridDataTypeName, textStringElementTypeId);
-  blockGridElementTypeId = await umbracoApi.documentType.createDefaultElementType(blockGridElementTypeName, blockGridElementGroupName, secondBlockGridDataTypeName, secondBlockGridDataTypeId);
+  const blockGridElementTypeId = await umbracoApi.documentType.createDefaultElementType(blockGridElementTypeName, blockGridElementGroupName, secondBlockGridDataTypeName, secondBlockGridDataTypeId);
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridDataTypeName, blockGridElementTypeId, true);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId, documentTypeGroupName);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -158,5 +156,6 @@ test('can publish a block grid editor with a block grid editor', async ({umbraco
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(secondBlockGridDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(textStringElementTypeName);
   await umbracoApi.documentType.ensureNameNotExists(blockGridElementTypeName);
 });
