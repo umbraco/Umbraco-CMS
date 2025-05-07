@@ -1,4 +1,4 @@
-import { UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
