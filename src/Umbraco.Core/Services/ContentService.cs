@@ -1108,14 +1108,8 @@ public class ContentService : RepositoryService, IContentService
 
             if (culturesChanging != null)
             {
-                IEnumerable<string>? languages = _languageRepository.GetMany()?
-                    .Where(x => culturesChanging.InvariantContains(x.IsoCode))
-                    .Select(x => x.CultureName);
-                if (languages is not null)
-                {
-                    var langs = string.Join(", ", languages);
-                    Audit(AuditType.SaveVariant, userId.Value, content.Id, $"Saved languages: {langs}", langs);
-                }
+                var langs = GetLanguageDetailsForAuditEntry(culturesChanging);
+                Audit(AuditType.SaveVariant, userId.Value, content.Id, $"Saved languages: {langs}", langs);
             }
             else
             {
@@ -1625,9 +1619,7 @@ public class ContentService : RepositoryService, IContentService
                 if (culturesUnpublishing != null)
                 {
                     // This will mean that that we unpublished a mandatory culture or we unpublished the last culture.
-                    var langs = string.Join(", ", allLangs
-                        .Where(x => culturesUnpublishing.InvariantContains(x.IsoCode))
-                        .Select(x => x.CultureName));
+                    var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesUnpublishing);
                     Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
 
                     if (publishResult == null)
@@ -1707,9 +1699,7 @@ public class ContentService : RepositoryService, IContentService
                     case PublishResultType.SuccessPublishCulture:
                         if (culturesPublishing != null)
                         {
-                            var langs = string.Join(", ", allLangs
-                                .Where(x => culturesPublishing.InvariantContains(x.IsoCode))
-                                .Select(x => x.CultureName));
+                            var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesPublishing);
                             Audit(AuditType.PublishVariant, userId, content.Id, $"Published languages: {langs}", langs);
                         }
 
@@ -1717,9 +1707,7 @@ public class ContentService : RepositoryService, IContentService
                     case PublishResultType.SuccessUnpublishCulture:
                         if (culturesUnpublishing != null)
                         {
-                            var langs = string.Join(", ", allLangs
-                                .Where(x => culturesUnpublishing.InvariantContains(x.IsoCode))
-                                .Select(x => x.CultureName));
+                            var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesUnpublishing);
                             Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
                         }
 
@@ -1741,9 +1729,7 @@ public class ContentService : RepositoryService, IContentService
         {
             if (culturesChanging != null)
             {
-                var langs = string.Join(", ", allLangs
-                    .Where(x => culturesChanging.InvariantContains(x.IsoCode))
-                    .Select(x => x.CultureName));
+                var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesChanging);
                 Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
             }
             else
@@ -3097,6 +3083,17 @@ public class ContentService : RepositoryService, IContentService
 
     private void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null) =>
         _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.Document.GetName(), message, parameters));
+
+    private string GetLanguageDetailsForAuditEntry(IEnumerable<string> affectedCultures)
+        => GetLanguageDetailsForAuditEntry(_languageRepository.GetMany(), affectedCultures);
+
+    private static string GetLanguageDetailsForAuditEntry(IEnumerable<ILanguage> languages, IEnumerable<string> affectedCultures)
+    {
+        IEnumerable<string> languageIsoCodes = languages
+            .Where(x => affectedCultures.InvariantContains(x.IsoCode))
+            .Select(x => x.IsoCode);
+        return string.Join(", ", languageIsoCodes);
+    }
 
     private static bool IsDefaultCulture(IReadOnlyCollection<ILanguage>? langs, string culture) =>
         langs?.Any(x => x.IsDefault && x.IsoCode.InvariantEquals(culture)) ?? false;
