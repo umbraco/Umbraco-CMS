@@ -25,7 +25,7 @@ public static class RichTextPropertyEditorHelper
     /// </remarks>
     public static bool TryParseRichTextEditorValue(object? value, IJsonSerializer jsonSerializer, ILogger logger, [NotNullWhen(true)] out RichTextEditorValue? richTextEditorValue)
     {
-        if (value is not null && value is RichTextEditorValue existingRichTextEditorValue)
+        if (value is RichTextEditorValue existingRichTextEditorValue)
         {
             // already a RichTextEditorValue instance
             richTextEditorValue = existingRichTextEditorValue;
