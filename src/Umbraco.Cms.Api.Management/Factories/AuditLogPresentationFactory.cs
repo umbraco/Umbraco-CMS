@@ -27,19 +27,10 @@ public class AuditLogPresentationFactory : IAuditLogPresentationFactory
             LogType = auditItem.AuditType,
             Parameters = auditItem.Parameters,
             Timestamp = auditItem.CreateDate,
-            User = CreateUserReference(auditItem.UserId).GetAwaiter().GetResult(),
+            User = auditItem.UserId switch
+            {
+                Constants.Security.UnknownUserId => new ReferenceByIdModel(),
+                _ => new ReferenceByIdModel(_userIdKeyResolver.GetAsync(auditItem.UserId).GetAwaiter().GetResult()),
+            },
         };
-
-    private async Task<ReferenceByIdModel> CreateUserReference(int userId)
-    {
-        if (userId == Constants.Security.UnknownUserId)
-        {
-            return new ReferenceByIdModel();
-        }
-
-        Guid userKey = await _userIdKeyResolver.GetAsync(userId);
-        IUser user = await _userService.GetAsync(userKey)
-                     ?? throw new ArgumentException($"Could not find user with id {userId}");
-        return new ReferenceByIdModel(user.Key);
-    }
 }
