@@ -1,6 +1,8 @@
+using Microsoft.Extensions.Configuration;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DynamicRoot.Origin;
 using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
@@ -91,7 +93,15 @@ public static partial class UmbracoBuilderExtensions
         builder.FilterHandlers().Add(() => builder.TypeLoader.GetTypes<IFilterHandler>());
         builder.SortHandlers().Add(() => builder.TypeLoader.GetTypes<ISortHandler>());
         builder.ContentIndexHandlers().Add(() => builder.TypeLoader.GetTypes<IContentIndexHandler>());
-        builder.WebhookEvents().AddCms(true);
+
+        WebhookPayloadType webhookPayloadType = Constants.Webhooks.DefaultPayloadType;
+        if (builder.Config.GetSection(Constants.Configuration.ConfigWebhookPayloadType).Value is not null)
+        {
+            webhookPayloadType = builder.Config.GetValue<WebhookPayloadType>(Constants.Configuration.ConfigWebhookPayloadType);
+        }
+
+        builder.WebhookEvents().AddCms(true, webhookPayloadType);
+
         builder.ContentTypeFilters();
     }
 
