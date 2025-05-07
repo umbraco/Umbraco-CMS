@@ -1,25 +1,24 @@
 import type { MetaWorkspaceAction } from '../../../../types.js';
-import { UMB_SUBMITTABLE_WORKSPACE_CONTEXT } from '../../../../contexts/tokens/index.js';
-import type { UmbSubmittableWorkspaceContext } from '../../../../contexts/tokens/index.js';
+import { UMB_SAVEABLE_WORKSPACE_CONTEXT } from '../../../../contexts/tokens/index.js';
+import type { UmbSaveableWorkspaceContext } from '../../../../contexts/tokens/index.js';
 import { UmbWorkspaceActionBase } from '../../workspace-action-base.controller.js';
-import type { UmbSubmitWorkspaceActionArgs } from './types.js';
+import type { UmbSaveWorkspaceActionArgs } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbSubmitWorkspaceAction<
+export class UmbSaveWorkspaceAction<
 	ArgsMetaType extends MetaWorkspaceAction = MetaWorkspaceAction,
-	WorkspaceContextType extends UmbSubmittableWorkspaceContext = UmbSubmittableWorkspaceContext,
+	WorkspaceContextType extends UmbSaveableWorkspaceContext = UmbSaveableWorkspaceContext,
 > extends UmbWorkspaceActionBase<ArgsMetaType> {
 	protected _retrieveWorkspaceContext: Promise<unknown>;
 	protected _workspaceContext?: WorkspaceContextType;
 
-	constructor(host: UmbControllerHost, args: UmbSubmitWorkspaceActionArgs<ArgsMetaType>) {
+	constructor(host: UmbControllerHost, args: UmbSaveWorkspaceActionArgs<ArgsMetaType, WorkspaceContextType>) {
 		super(host, args);
 
-		// TODO: Could we make change label depending on the state? [NL]
 		this._retrieveWorkspaceContext = this.consumeContext(
-			args.workspaceContextToken ?? UMB_SUBMITTABLE_WORKSPACE_CONTEXT,
+			args.workspaceContextToken ?? UMB_SAVEABLE_WORKSPACE_CONTEXT,
 			(context) => {
-				this._workspaceContext = context as WorkspaceContextType;
+				this._workspaceContext = context as WorkspaceContextType | undefined;
 				this.#observeUnique();
 				this._gotWorkspaceContext();
 			},
@@ -48,6 +47,6 @@ export class UmbSubmitWorkspaceAction<
 
 	override async execute() {
 		await this._retrieveWorkspaceContext;
-		return await this._workspaceContext!.requestSubmit();
+		return await this._workspaceContext?.requestSave();
 	}
 }
