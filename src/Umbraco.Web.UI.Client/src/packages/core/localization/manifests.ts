@@ -33,13 +33,13 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.CY_GB',
+		alias: 'Umb.Localization.CY',
 		weight: -100,
-		name: 'Welsh (United Kingdom) Backoffice UI Localization',
+		name: 'Welsh Backoffice UI Localization',
 		meta: {
-			culture: 'cy-GB',
+			culture: 'cy',
 		},
-		js: () => import('../../../assets/lang/cy-gb.js'),
+		js: () => import('../../../assets/lang/cy.js'),
 	},
 	{
 		type: 'localization',
@@ -153,13 +153,13 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.NB_NO',
+		alias: 'Umb.Localization.NB',
 		weight: -100,
-		name: 'Norwegian (Norway) Backoffice UI Localization',
+		name: 'Norwegian Backoffice UI Localization',
 		meta: {
-			culture: 'nb-NO',
+			culture: 'nb',
 		},
-		js: () => import('../../../assets/lang/nb-no.js'),
+		js: () => import('../../../assets/lang/nb.js'),
 	},
 	{
 		type: 'localization',
@@ -183,13 +183,13 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.PT_BR',
+		alias: 'Umb.Localization.PT',
 		weight: -100,
-		name: 'Portuguese (Brazil) Backoffice UI Localization',
+		name: 'Portuguese Backoffice UI Localization',
 		meta: {
-			culture: 'pt-BR',
+			culture: 'pt',
 		},
-		js: () => import('../../../assets/lang/pt-br.js'),
+		js: () => import('../../../assets/lang/pt.js'),
 	},
 	{
 		type: 'localization',
@@ -243,13 +243,13 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.ZH_CN',
+		alias: 'Umb.Localization.ZH',
 		weight: -100,
-		name: 'Chinese (China) Backoffice UI Localization',
+		name: 'Chinese Backoffice UI Localization',
 		meta: {
-			culture: 'zh-CN',
+			culture: 'zh',
 		},
-		js: () => import('../../../assets/lang/zh-cn.js'),
+		js: () => import('../../../assets/lang/zh.js'),
 	},
 	{
 		type: 'localization',

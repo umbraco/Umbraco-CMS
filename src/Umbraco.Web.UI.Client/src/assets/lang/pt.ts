@@ -3,8 +3,8 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: pt
- * Language Int Name: Portuguese (BR)
- * Language Local Name: português (BR)
+ * Language Int Name: Portuguese
+ * Language Local Name: Português
  * Language LCID:
  * Language Culture: pt-BR
  */
