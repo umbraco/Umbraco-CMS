@@ -80,4 +80,14 @@ public class ExternalLoginService : RepositoryService, IExternalLoginWithKeyServ
             scope.Complete();
         }
     }
+
+    /// <inheritdoc />
+    public void DeleteUserLoginsForRemovedProviders(IEnumerable<string> currentProviderKeys)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            _externalLoginRepository.DeleteUserLoginsForRemovedProviders(currentProviderKeys);
+            scope.Complete();
+        }
+    }
 }
