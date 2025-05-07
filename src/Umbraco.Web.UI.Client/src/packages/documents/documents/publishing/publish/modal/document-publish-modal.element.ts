@@ -102,24 +102,19 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`<uui-dialog-layout headline=${this.localize.term('content_readyToPublish')}>
+			<p>
+				<umb-localize key="prompt_confirmPublish"></umb-localize>
+			</p>
+
 			${when(
 				!this._isInvariant,
 				() =>
-					html` <p id="subtitle">
-							<umb-localize key="content_variantsToPublish">Which variants would you like to publish?</umb-localize>
-						</p>
-						<umb-document-variant-language-picker
-							.selectionManager=${this.#selectionManager}
-							.variantLanguageOptions=${this._options}
-							.requiredFilter=${isNotPublishedMandatory}
-							.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>`,
+					html` <umb-document-variant-language-picker
+						.selectionManager=${this.#selectionManager}
+						.variantLanguageOptions=${this._options}
+						.requiredFilter=${isNotPublishedMandatory}
+						.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>`,
 			)}
-
-			<p>
-				<umb-localize key="prompt_confirmPublish">
-					Publishing will make this page and all its published descendants visible on the site.
-				</umb-localize>
-			</p>
 
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
