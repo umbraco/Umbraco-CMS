@@ -15,6 +15,7 @@ export class UmbDocumentPropertyDatasetContext extends UmbContentPropertyDataset
 > {
 	#dataSetVariantId?: UmbVariantId;
 	#documentConfiguration?: DocumentConfigurationResponseModel;
+	#allowEditInvariantFromNonDefault: boolean | undefined = undefined;
 
 	constructor(host: UmbControllerHost, dataOwner: UmbDocumentWorkspaceContext, variantId?: UmbVariantId) {
 		super(host, dataOwner, variantId);
@@ -23,14 +24,12 @@ export class UmbDocumentPropertyDatasetContext extends UmbContentPropertyDataset
 
 		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
 			this.#documentConfiguration = (await context?.getDocumentConfiguration()) ?? undefined;
-
-			if (this.#documentConfiguration?.allowEditInvariantFromNonDefault !== true) {
-				this.#preventEditInvariantFromNonDefault();
-			}
+			this.#allowEditInvariantFromNonDefault = this.#documentConfiguration?.allowEditInvariantFromNonDefault;
+			this.#enforceAllowEditInvariantFromNonDefault();
 		});
 	}
 
-	#preventEditInvariantFromNonDefault() {
+	#enforceAllowEditInvariantFromNonDefault() {
 		this.observe(
 			observeMultiple([this._dataOwner.structure.contentTypeProperties, this._dataOwner.variantOptions]),
 			([properties, variantOptions]) => {
@@ -46,9 +45,11 @@ export class UmbDocumentPropertyDatasetContext extends UmbContentPropertyDataset
 				properties.forEach((property) => {
 					const unique = 'UMB_PREVENT_EDIT_INVARIANT_FROM_NON_DEFAULT_' + property.unique;
 
+					// Clean up the rule if it exists before adding a new one
 					this._dataOwner.propertyWriteGuard.removeRule(unique);
 
-					if (!property.variesByCulture && !isDefaultLanguage) {
+					// If the property is invariant and not in the default language, we need to add a rule
+					if (!this.#allowEditInvariantFromNonDefault && !property.variesByCulture && !isDefaultLanguage) {
 						const rule: UmbVariantPropertyGuardRule = {
 							unique,
 							message: 'Shared properties can only be edited in the default language',
