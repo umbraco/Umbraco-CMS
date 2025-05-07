@@ -57,10 +57,6 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`<uui-dialog-layout headline=${this.localize.term('content_saveModalTitle')}>
-			<p id="subtitle">
-				<umb-localize key="content_variantsToSave">Choose which variants to be saved.</umb-localize>
-			</p>
-
 			<umb-document-variant-language-picker
 				.selectionManager=${this.#selectionManager}
 				.variantLanguageOptions=${this._options}
@@ -69,7 +65,7 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
-					label="${this.localize.term('buttons_saveAndClose')}"
+					label="${this.localize.term('buttons_save')}"
 					look="primary"
 					color="positive"
 					@click=${this.#submit}></uui-button>
