@@ -160,20 +160,6 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`<uui-dialog-layout headline=${this.localize.term('general_scheduledPublishing')}>
-			<p id="subtitle">
-				${when(
-					this._options.length > 1,
-					() => html`
-						<umb-localize key="content_languagesToSchedule">Which languages would you like to schedule?</umb-localize>
-					`,
-					() => html`
-						<umb-localize key="content_schedulePublishHelp">
-							Select the date and time to publish and/or unpublish the content item.
-						</umb-localize>
-					`,
-				)}
-			</p>
-
 			${this.#renderOptions()}
 
 			<div slot="actions">
