@@ -3,7 +3,7 @@ import type { UmbDocumentSearchItemModel, UmbDocumentSearchRequestArgs } from '.
 import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Rollback that fetches data from the server
@@ -31,12 +31,15 @@ export class UmbDocumentSearchServerDataSource
 	 * @memberof UmbDocumentSearchServerDataSource
 	 */
 	async search(args: UmbDocumentSearchRequestArgs) {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentService.getItemDocumentSearch({
-				query: args.query,
-				parentId: args.searchFrom?.unique ?? undefined,
-				allowedDocumentTypes: args.allowedContentTypes?.map((contentType) => contentType.unique),
+				query: {
+					query: args.query,
+					parentId: args.searchFrom?.unique ?? undefined,
+					allowedDocumentTypes: args.allowedContentTypes?.map((contentType) => contentType.unique),
+					trashed: args.includeTrashed,
+				},
 			}),
 		);
 

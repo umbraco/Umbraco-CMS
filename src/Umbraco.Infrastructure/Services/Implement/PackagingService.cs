@@ -2,10 +2,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Xml.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Manifest;
@@ -37,30 +35,6 @@ public class PackagingService : IPackagingService
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IHostEnvironment _hostEnvironment;
     private readonly IUserService _userService;
-
-    [Obsolete("Use the constructor with IPackageManifestReader instead.")]
-    public PackagingService(
-        IAuditService auditService,
-        ICreatedPackagesRepository createdPackages,
-        IPackageInstallation packageInstallation,
-        IEventAggregator eventAggregator,
-        IKeyValueService keyValueService,
-        ICoreScopeProvider coreScopeProvider,
-        PackageMigrationPlanCollection packageMigrationPlans,
-        IHostEnvironment hostEnvironment,
-        IUserService userService)
-        : this(
-            auditService,
-            createdPackages,
-            packageInstallation,
-            eventAggregator,
-            keyValueService,
-            coreScopeProvider,
-            packageMigrationPlans,
-            StaticServiceProvider.Instance.GetRequiredService<IPackageManifestReader>(),
-            hostEnvironment,
-            userService)
-    { }
 
     public PackagingService(
         IAuditService auditService,
@@ -131,21 +105,6 @@ public class PackagingService : IPackagingService
 
     #region Created/Installed Package Repositories
 
-    [Obsolete("Use DeleteCreatedPackageAsync instead. Scheduled for removal in Umbraco 15.")]
-    public void DeleteCreatedPackage(int id, int userId = Constants.Security.SuperUserId)
-    {
-        Guid key, currentUserKey;
-
-        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            PackageDefinition? package = GetCreatedPackageById(id);
-            key = package?.PackageId ?? Guid.Empty;
-            currentUserKey = _userService.GetUserById(id)?.Key ?? Constants.Security.SuperUserKey;
-        }
-
-        DeleteCreatedPackageAsync(key, currentUserKey).GetAwaiter().GetResult();
-    }
-
     /// <inheritdoc/>
     public async Task<Attempt<PackageDefinition?, PackageOperationStatus>> DeleteCreatedPackageAsync(Guid key, Guid userKey)
     {
@@ -165,14 +124,6 @@ public class PackagingService : IPackagingService
         return Attempt.SucceedWithStatus<PackageDefinition?, PackageOperationStatus>(PackageOperationStatus.Success, package);
     }
 
-    public IEnumerable<PackageDefinition?> GetAllCreatedPackages()
-    {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
-
-        return _createdPackages.GetAll();
-    }
-
-    [Obsolete("Use GetCreatedPackagesAsync instead. Scheduled for removal in Umbraco 15.")]
     public PackageDefinition? GetCreatedPackageById(int id)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
@@ -181,13 +132,13 @@ public class PackagingService : IPackagingService
     }
 
     /// <inheritdoc/>
-    public async Task<PagedModel<PackageDefinition>> GetCreatedPackagesAsync(int skip, int take)
+    public Task<PagedModel<PackageDefinition>> GetCreatedPackagesAsync(int skip, int take)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
         PackageDefinition[] packages = _createdPackages.GetAll().WhereNotNull().ToArray();
         var pagedModel = new PagedModel<PackageDefinition>(packages.Length, packages.Skip(skip).Take(take));
 
-        return pagedModel;
+        return Task.FromResult(pagedModel);
     }
 
     /// <inheritdoc/>
@@ -196,17 +147,6 @@ public class PackagingService : IPackagingService
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
 
         return Task.FromResult(_createdPackages.GetByKey(key));
-    }
-
-    [Obsolete("Use CreateCreatedPackageAsync or UpdateCreatedPackageAsync instead. Scheduled for removal in Umbraco 15.")]
-    public bool SaveCreatedPackage(PackageDefinition definition)
-    {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-
-        var success = _createdPackages.SavePackage(definition);
-        scope.Complete();
-
-        return success;
     }
 
     /// <inheritdoc/>
@@ -256,11 +196,7 @@ public class PackagingService : IPackagingService
     }
 
     public InstalledPackage? GetInstalledPackageByName(string packageName)
-        => GetAllInstalledPackages().Where(x => x.PackageName?.InvariantEquals(packageName) ?? false).FirstOrDefault();
-
-    [Obsolete("Use GetAllInstalledPackagesAsync instead. Scheduled for removal in Umbraco 15.")]
-    public IEnumerable<InstalledPackage> GetAllInstalledPackages()
-        => GetAllInstalledPackagesAsync().GetAwaiter().GetResult();
+        => GetAllInstalledPackagesAsync().GetAwaiter().GetResult().Where(x => x.PackageName?.InvariantEquals(packageName) ?? false).FirstOrDefault();
 
     public async Task<IEnumerable<InstalledPackage>> GetAllInstalledPackagesAsync()
     {
@@ -353,7 +289,7 @@ public class PackagingService : IPackagingService
             }
 
             // Set additional values
-            installedPackage.AllowPackageTelemetry = packageManifest.AllowTelemetry;
+            installedPackage.AllowPackageTelemetry = packageManifest is { AllowTelemetry: true, AllowPackageTelemetry: true };
 
             if (!string.IsNullOrEmpty(packageManifest.Version))
             {

@@ -1,12 +1,12 @@
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-property-editor-ui-number')
 export class UmbPropertyEditorUINumberElement
@@ -49,7 +49,7 @@ export class UmbPropertyEditorUINumberElement
 		super();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this._label = context.getLabel();
+			this._label = context?.getLabel();
 		});
 
 		this.addValidator(
@@ -89,7 +89,7 @@ export class UmbPropertyEditorUINumberElement
 		const newValue = event.target.value === '' ? undefined : this.#parseNumber(event.target.value);
 		if (newValue === this.value) return;
 		this.value = newValue;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

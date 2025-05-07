@@ -1,4 +1,5 @@
 import type { UmbClassMixinInterface } from './class-mixin.interface.js';
+import type { UmbClassGetContextOptions } from './class.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import {
@@ -11,6 +12,7 @@ import {
 	type UmbContextCallback,
 	UmbContextConsumerController,
 	UmbContextProviderController,
+	type UmbContextMinimal,
 } from '@umbraco-cms/backoffice/context-api';
 import { type ObserverCallback, UmbObserverController, simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 
@@ -32,7 +34,7 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 		}
 
 		getHostElement(): Element {
-			return this._host.getHostElement();
+			return this._host?.getHostElement();
 		}
 
 		get controllerAlias(): UmbControllerAlias {
@@ -79,7 +81,7 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 		}
 
 		provideContext<
-			BaseType = unknown,
+			BaseType extends UmbContextMinimal = UmbContextMinimal,
 			ResultType extends BaseType = BaseType,
 			InstanceType extends ResultType = ResultType,
 		>(
@@ -89,30 +91,37 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 			return new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, contextAlias, instance);
 		}
 
-		consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+		consumeContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
 			callback: UmbContextCallback<ResultType>,
 		): UmbContextConsumerController<BaseType, ResultType> {
 			return new UmbContextConsumerController(this, contextAlias, callback);
 		}
 
-		async getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+		async getContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
-		): Promise<ResultType> {
+			options?: UmbClassGetContextOptions,
+		): Promise<ResultType | undefined> {
 			const controller = new UmbContextConsumerController(this, contextAlias);
-			const promise = controller.asPromise().then((result) => {
-				controller.destroy();
-				return result;
-			});
-			return promise;
+			if (options) {
+				if (options.passContextAliasMatches) {
+					controller.passContextAliasMatches();
+				}
+				if (options.skipHost) {
+					controller.skipHost();
+				}
+			}
+			return controller.asPromise(options);
 		}
 
 		public override destroy(): void {
 			if (this._host) {
 				this._host.removeUmbController(this);
-				this._host = undefined as never;
 			}
 			super.destroy();
+			if (this._host) {
+				this._host = undefined as never;
+			}
 		}
 	}
 

@@ -1,10 +1,10 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-icon-picker
@@ -36,10 +36,7 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 	private _color = '';
 
 	private async _openModal() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_ICON_PICKER_MODAL);
-
-		const data = await modalContext?.onSubmit();
+		const data = await umbOpenModal(this, UMB_ICON_PICKER_MODAL).catch(() => undefined);
 		if (!data) return;
 
 		if (data.color) {
@@ -48,7 +45,7 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 			this.value = data.icon as string;
 		}
 
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
@@ -56,9 +53,8 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 			<uui-button
 				compact
 				label=${this.localize.term('defaultdialogs_selectIcon')}
-				look="secondary"
-				@click=${this._openModal}
-				style="margin-right: var(--uui-size-space-3)">
+				look="outline"
+				@click=${this._openModal}>
 				${this._color
 					? html` <uui-icon name="${this._icon}" style="color:var(${extractUmbColorVariable(this._color)})"></uui-icon>`
 					: html` <uui-icon name="${this._icon}"></uui-icon>`}

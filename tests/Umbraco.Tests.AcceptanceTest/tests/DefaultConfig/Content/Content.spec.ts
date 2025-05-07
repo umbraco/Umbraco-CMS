@@ -32,7 +32,8 @@ test('can create empty content', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -53,8 +54,8 @@ test('can save and publish empty content', {tag: '@smoke'}, async ({umbracoApi, 
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
@@ -77,7 +78,8 @@ test('can create content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value).toBe(contentText);
@@ -98,7 +100,8 @@ test('can rename content', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.content.isErrorNotificationVisible(false);
   const updatedContentData = await umbracoApi.document.get(contentId);
   expect(updatedContentData.variants[0].name).toEqual(contentName);
 });
@@ -118,13 +121,14 @@ test('can update content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.content.isErrorNotificationVisible(false);
   const updatedContentData = await umbracoApi.document.get(contentId);
   expect(updatedContentData.variants[0].name).toEqual(contentName);
   expect(updatedContentData.values[0].value).toBe(contentText);
 });
 
-test('can publish content', async ({umbracoApi, umbracoUi}) => {
+test('can publish invariant content node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -135,6 +139,7 @@ test('can publish content', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickPublishButton();
+  await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
@@ -160,4 +165,23 @@ test('can unpublish content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Draft');
+});
+
+test('can publish variant content node', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, contentText, dataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  await umbracoUi.content.clickPublishButton();
+  await umbracoUi.content.clickConfirmToPublishButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
 });

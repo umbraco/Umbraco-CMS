@@ -3,7 +3,6 @@ import type { UmbCropModel, UmbMediaPickerValueModel } from '../types.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type {
@@ -14,6 +13,7 @@ import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 import '../../components/input-rich-media/input-rich-media.element.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 const elementName = 'umb-property-editor-ui-media-picker';
 
@@ -91,8 +91,8 @@ export class UmbPropertyEditorUIMediaPickerElement
 		super();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this.observe(context.alias, (alias) => (this._alias = alias));
-			this.observe(context.variantId, (variantId) => (this._variantId = variantId?.toString() || 'invariant'));
+			this.observe(context?.alias, (alias) => (this._alias = alias));
+			this.observe(context?.variantId, (variantId) => (this._variantId = variantId?.toString() || 'invariant'));
 		});
 	}
 
@@ -107,7 +107,7 @@ export class UmbPropertyEditorUIMediaPickerElement
 	#onChange(event: CustomEvent & { target: UmbInputRichMediaElement }) {
 		const isEmpty = event.target.value?.length === 0;
 		this.value = isEmpty ? undefined : event.target.value;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

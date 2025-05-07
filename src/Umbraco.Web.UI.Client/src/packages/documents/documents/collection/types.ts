@@ -1,5 +1,6 @@
 import type { UmbDocumentEntityType } from '../entity.js';
 import type { UmbDocumentItemVariantModel } from '../item/repository/types.js';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 
 export interface UmbDocumentCollectionFilterModel extends UmbCollectionFilterModel {
@@ -12,6 +13,7 @@ export interface UmbDocumentCollectionFilterModel extends UmbCollectionFilterMod
 }
 
 export interface UmbDocumentCollectionItemModel {
+	ancestors: Array<UmbEntityModel>;
 	unique: string;
 	entityType: UmbDocumentEntityType;
 	creator?: string | null;

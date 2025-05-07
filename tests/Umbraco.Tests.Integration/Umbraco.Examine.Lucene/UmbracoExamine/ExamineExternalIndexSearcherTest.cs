@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Globalization;
@@ -21,7 +21,7 @@ using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
-public class ExamineExternalIndexSearcherTest : IExamineExternalIndexSearcherTest
+internal sealed class ExamineExternalIndexSearcherTest : IExamineExternalIndexSearcherTest
 {
     private readonly AppCaches _appCaches;
     private readonly ILanguageService _languageService;

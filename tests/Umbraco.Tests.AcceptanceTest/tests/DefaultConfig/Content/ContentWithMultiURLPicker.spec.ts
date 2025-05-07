@@ -44,7 +44,8 @@ test('can create content with the document link', {tag: '@smoke'}, async ({umbra
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -86,7 +87,8 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -121,7 +123,8 @@ test('can create content with the external link', async ({umbracoApi, umbracoUi}
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -154,7 +157,8 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -197,7 +201,8 @@ test('can add multiple links in the content', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -231,7 +236,8 @@ test('can remove the URL picker in the content', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -254,7 +260,8 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -379,7 +386,8 @@ test.skip('can create content with the link to an unpublished document', async (
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);

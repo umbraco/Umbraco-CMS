@@ -4,7 +4,7 @@ import type { UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
 
 export interface UmbElement extends UmbClassInterface, UmbControllerHostElement {
 	/**
-	 * Use the UmbLocalizeController to localize your element.
+	 * Use the UmbLocalizationController to localize your element.
 	 * @see UmbLocalizationController
 	 */
 	localize: UmbLocalizationController;

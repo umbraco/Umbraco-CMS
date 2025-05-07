@@ -3,7 +3,7 @@ import { UmbRollbackRepository } from '../repository/rollback.repository.js';
 import { UmbDocumentDetailRepository } from '../../repository/index.js';
 import type { UmbDocumentDetailModel } from '../../types.js';
 import type { UmbRollbackModalData, UmbRollbackModalValue } from './types.js';
-import { diffWords, type Change } from '@umbraco-cms/backoffice/external/diff';
+import { diffWords, type UmbDiffChange } from '@umbraco-cms/backoffice/utils';
 import { css, customElement, html, nothing, repeat, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -53,7 +53,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	_availableVariants: Option[] = [];
 
 	@state()
-	_diffs: Array<{ alias: string; diff: Change[] }> = [];
+	_diffs: Array<{ alias: string; diff: UmbDiffChange[] }> = [];
 
 	#rollbackRepository = new UmbRollbackRepository(this);
 	#userItemRepository = new UmbUserItemRepository(this);
@@ -73,21 +73,22 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		super();
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (instance) => {
-			this.#currentDatasetCulture = instance.getVariantId().culture ?? undefined;
+			this.#currentDatasetCulture = instance?.getVariantId().culture ?? undefined;
 			this.#selectCulture();
 		});
 
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
-			this.#currentAppCulture = instance.getAppCulture();
+			this.#currentAppCulture = instance?.getAppCulture();
 			this.#selectCulture();
 		});
 
 		this.consumeContext(UMB_ENTITY_CONTEXT, async (instance) => {
+			if (!instance) return;
 			if (instance.getEntityType() !== UMB_DOCUMENT_ENTITY_TYPE) {
 				throw new Error(`Entity type is not ${UMB_DOCUMENT_ENTITY_TYPE}`);
 			}
 
-			const unique = instance?.getUnique();
+			const unique = instance.getUnique();
 
 			if (!unique) {
 				throw new Error('Document unique is not set');
@@ -216,12 +217,17 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		}
 
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!actionEventContext) {
+			throw new Error('Action event context not found');
+		}
 
 		const reloadStructureEvent = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 		actionEventContext.dispatchEvent(reloadStructureEvent);
 
 		const entityUpdatedEvent = new UmbEntityUpdatedEvent({ unique, entityType });
 		actionEventContext.dispatchEvent(entityUpdatedEvent);
+
+		this.value = {};
 
 		this.modalContext?.submit();
 	}
@@ -243,7 +249,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		if (!version) return;
 
 		version.preventCleanup = preventCleanup;
-		this.requestUpdate('versions');
+		this.requestUpdate('_versions');
 	}
 
 	#onChangeCulture(event: UUISelectEvent) {
@@ -318,7 +324,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			throw new Error('Current name is not set');
 		}
 
-		const diffs: Array<{ alias: string; diff: Change[] }> = [];
+		const diffs: Array<{ alias: string; diff: UmbDiffChange[] }> = [];
 
 		const nameDiff = diffWords(currentName, this._selectedVersion.name);
 		diffs.push({ alias: 'name', diff: nameDiff });

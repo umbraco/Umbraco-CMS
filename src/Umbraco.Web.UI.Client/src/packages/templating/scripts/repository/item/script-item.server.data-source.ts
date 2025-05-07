@@ -3,7 +3,7 @@ import type { UmbScriptItemModel } from '../../types.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ScriptService } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
@@ -40,10 +40,10 @@ export class UmbScriptItemServerDataSource implements UmbItemDataSource<UmbScrip
 			})
 			.filter((x) => x !== null) as string[];
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			ScriptService.getItemScript({
-				path: paths,
+				query: { path: paths },
 			}),
 		);
 

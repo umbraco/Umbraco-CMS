@@ -1,5 +1,5 @@
+import type { UmbBlockWorkspaceData } from '../../workspace/index.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import type { UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup, UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { UmbClipboardEntryDetailModel } from '@umbraco-cms/backoffice/clipboard';
 

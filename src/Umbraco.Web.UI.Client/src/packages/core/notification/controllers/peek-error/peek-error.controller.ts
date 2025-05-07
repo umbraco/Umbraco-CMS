@@ -1,15 +1,18 @@
 import { UMB_NOTIFICATION_CONTEXT } from '../../notification.context.js';
+import type { UmbPeekErrorArgs } from '../../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbPeekErrorArgs } from '../../types.js';
 
 import './peek-error-notification.element.js';
 
 export class UmbPeekErrorController extends UmbControllerBase {
 	async open(args: UmbPeekErrorArgs): Promise<void> {
 		const context = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		if (!context) {
+			throw new Error('Could not get notification context');
+		}
 
-		context.peek('danger', {
+		context.peek(args.color ?? 'danger', {
 			elementName: 'umb-peek-error-notification',
 			data: args,
 		});

@@ -1,5 +1,3 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
@@ -31,22 +29,6 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         _dataTypeService = dataTypeService;
         _imageUrlGenerator = imageUrlGenerator;
         _reservedFieldNamesService = reservedFieldNamesService;
-    }
-
-    [Obsolete("Use the non obsolete constructor instead. Scheduled for removal in v16")]
-    public MediaTypeEditingService(
-        IContentTypeService contentTypeService,
-        IMediaTypeService mediaTypeService,
-        IDataTypeService dataTypeService,
-        IEntityService entityService,
-        IShortStringHelper shortStringHelper,
-        IImageUrlGenerator imageUrlGenerator)
-        : base(contentTypeService, mediaTypeService, dataTypeService, entityService, shortStringHelper)
-    {
-        _mediaTypeService = mediaTypeService;
-        _dataTypeService = dataTypeService;
-        _imageUrlGenerator = imageUrlGenerator;
-        _reservedFieldNamesService = StaticServiceProvider.Instance.GetRequiredService<IReservedFieldNamesService>();
     }
 
     public async Task<Attempt<IMediaType?, ContentTypeOperationStatus>> CreateAsync(MediaTypeCreateModel model, Guid userKey)

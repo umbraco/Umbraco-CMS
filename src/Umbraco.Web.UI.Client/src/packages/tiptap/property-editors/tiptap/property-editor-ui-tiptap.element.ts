@@ -1,6 +1,6 @@
 import type { UmbInputTiptapElement } from '../../components/input-tiptap/input-tiptap.element.js';
 import { UmbPropertyEditorUiRteElementBase } from '@umbraco-cms/backoffice/rte';
-import { customElement, html, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 import '../../components/input-tiptap/input-tiptap.element.js';
 
@@ -12,7 +12,7 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 
-		this.addFormControlElement(this.shadowRoot?.querySelector('umb-input-tiptap') as UmbInputTiptapElement);
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-tiptap') as UmbInputTiptapElement);
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputTiptapElement }) {
@@ -67,13 +67,19 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 		return html`
 			<umb-input-tiptap
 				.configuration=${this._config}
+				.requiredMessage=${this.mandatoryMessage}
 				.value=${this._markup}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}
-				?required-message=${this.mandatoryMessage}
 				@change=${this.#onChange}></umb-input-tiptap>
 		`;
 	}
+
+	static override styles = css`
+		:host(:invalid:not([pristine])) umb-input-tiptap {
+			--umb-tiptap-edge-border-color: var(--uui-color-invalid);
+		}
+	`;
 }
 
 export { UmbPropertyEditorUiTiptapElement as element };

@@ -15,7 +15,7 @@ import { UmbArrayState, UmbBasicState, UmbNumberState, UmbObjectState } from '@u
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectionManager, UmbPaginationManager, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -35,7 +35,7 @@ export class UmbDefaultCollectionContext<
 		CollectionItemType extends { entityType: string; unique: string } = any,
 		FilterModelType extends UmbCollectionFilterModel = UmbCollectionFilterModel,
 	>
-	extends UmbContextBase<UmbDefaultCollectionContext>
+	extends UmbContextBase
 	implements UmbCollectionContext, UmbApi
 {
 	#config?: UmbCollectionConfiguration = { pageSize: 50 };
@@ -292,6 +292,7 @@ export class UmbDefaultCollectionContext<
 	#onReloadChildrenRequest = async (event: UmbRequestReloadChildrenOfEntityEvent) => {
 		// check if the collection is in the same context as the entity from the event
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
+		if (!entityContext) return;
 		const unique = entityContext.getUnique();
 		const entityType = entityContext.getEntityType();
 
@@ -332,9 +333,14 @@ export class UmbDefaultCollectionContext<
 	 * Returns the manifest for the collection.
 	 * @returns {ManifestCollection}
 	 * @memberof UmbCollectionContext
-	 * @deprecated Use get the `.manifest` property instead.
+	 * @deprecated Use the `.manifest` property instead.
 	 */
 	public getManifest() {
+		new UmbDeprecation({
+			removeInVersion: '18.0.0',
+			deprecated: 'getManifest',
+			solution: 'Use .manifest property instead',
+		}).warn();
 		return this._manifest;
 	}
 

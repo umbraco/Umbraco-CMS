@@ -8,6 +8,12 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 
 import '../cascading-menu-popover/cascading-menu-popover.element.js';
 
+/**
+* Provides a sticky toolbar for the {@link UmbInputTiptapElement}
+* @element umb-tiptap-toolbar
+* @cssprop --umb-tiptap-edge-border-color - Defines the edge border color
+* @cssprop --umb-tiptap-top - Defines the top value for the sticky toolbar
+*/
 @customElement('umb-tiptap-toolbar')
 export class UmbTiptapToolbarElement extends UmbLitElement {
 	#attached = false;
@@ -33,6 +39,7 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 		this.#attached = true;
 		this.#observeExtensions();
 	}
+
 	override disconnectedCallback(): void {
 		this.#attached = false;
 		this.#extensionsController?.destroy();
@@ -51,11 +58,16 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			[],
 			(manifest) => this.toolbar.flat(2).includes(manifest.alias),
 			(extensionControllers) => {
-				this._lookup = new Map(extensionControllers.map((ext) => [ext.alias, ext.component]));
+				this._lookup = new Map(
+					extensionControllers.map((ext) => {
+						(ext.component as HTMLElement)?.setAttribute('data-mark', `action:tiptap-toolbar:${ext.alias}`);
+						return [ext.alias, ext.component];
+					}),
+				);
 			},
 			undefined,
 			undefined,
-			() => import('../toolbar/default-tiptap-toolbar-element.api.js'),
+			() => import('../toolbar/default-tiptap-toolbar-api.js'),
 		);
 
 		this.#extensionsController.apiProperties = { configuration: this.configuration };
@@ -63,19 +75,19 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`
-			${map(
-				this.toolbar,
-				(row) => html`
-					<div class="row">
-						${map(
-							row,
-							(group) => html`<div class="group">${map(group, (alias) => this._lookup?.get(alias) ?? nothing)}</div>`,
-						)}
-					</div>
-				`,
-			)}
-		`;
+		if (!this.toolbar.flat(2).length) return nothing;
+
+		return map(
+			this.toolbar,
+			(row) => html`
+				<div class="row">
+					${map(
+						row,
+						(group) => html`<div class="group">${map(group, (alias) => this._lookup?.get(alias) ?? nothing)}</div>`,
+					)}
+				</div>
+			`,
+		);
 	}
 
 	static override readonly styles = css`
@@ -102,7 +114,7 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			flex-direction: column;
 
 			position: sticky;
-			top: -25px;
+			top: var(--umb-tiptap-top,-25px);
 			left: 0;
 			right: 0;
 			padding: var(--uui-size-3);

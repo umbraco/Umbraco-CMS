@@ -5,7 +5,7 @@ import { UmbTemplateItemRepository } from '../../repository/item/index.js';
 import { UMB_TEMPLATE_PICKER_MODAL } from '../../modals/index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -91,10 +91,10 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 
 	async #observePickedTemplates() {
 		this.observe(
-			(await this._templateItemRepository.requestItems(this._selection)).asObservable(),
+			(await this._templateItemRepository?.requestItems(this._selection))?.asObservable?.(),
 			(data) => {
 				const oldValue = this._pickedTemplates;
-				this._pickedTemplates = data;
+				this._pickedTemplates = data ?? [];
 				this.requestUpdate('_pickedTemplates', oldValue);
 			},
 			'_observeTemplates',
@@ -124,15 +124,12 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	async #openPicker() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_TEMPLATE_PICKER_MODAL, {
+		const value = await umbOpenModal(this, UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				multiple: true,
 				pickableFilter: (template) => template.unique !== null && !this._selection.includes(template.unique),
 			},
-		});
-
-		const value = await modalContext?.onSubmit().catch(() => undefined);
+		}).catch(() => undefined);
 
 		if (!value?.selection) return;
 
@@ -201,8 +198,8 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 			:host {
 				display: grid;
 				gap: var(--uui-size-space-3);
-				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-				grid-template-rows: repeat(auto-fill, minmax(160px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
+				grid-template-rows: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 			}
 
 			#btn-add {

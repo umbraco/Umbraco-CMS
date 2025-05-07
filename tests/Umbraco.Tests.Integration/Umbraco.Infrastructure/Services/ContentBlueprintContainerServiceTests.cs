@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
+internal sealed class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
 {
     private IContentBlueprintContainerService ContentBlueprintContainerService => GetRequiredService<IContentBlueprintContainerService>();
 

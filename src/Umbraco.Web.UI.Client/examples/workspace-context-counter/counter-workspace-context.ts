@@ -1,17 +1,16 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 
 // The Example Workspace Context Controller:
-export class WorkspaceContextCounter extends UmbControllerBase {
+export class WorkspaceContextCounterElement extends UmbContextBase {
 	// We always keep our states private, and expose the values as observables:
 	#counter = new UmbNumberState(0);
 	readonly counter = this.#counter.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, EXAMPLE_COUNTER_CONTEXT.toString());
-		this.provideContext(EXAMPLE_COUNTER_CONTEXT, this);
+		super(host, EXAMPLE_COUNTER_CONTEXT);
 	}
 
 	// Lets expose methods to update the state:
@@ -21,10 +20,10 @@ export class WorkspaceContextCounter extends UmbControllerBase {
 }
 
 // Declare a api export, so Extension Registry can initialize this class:
-export const api = WorkspaceContextCounter;
+export const api = WorkspaceContextCounterElement;
 
 // Declare a Context Token that other elements can use to request the WorkspaceContextCounter:
-export const EXAMPLE_COUNTER_CONTEXT = new UmbContextToken<WorkspaceContextCounter>(
+export const EXAMPLE_COUNTER_CONTEXT = new UmbContextToken<WorkspaceContextCounterElement>(
 	'UmbWorkspaceContext',
 	'example.workspaceContext.counter',
 );

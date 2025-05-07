@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
-public class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
+internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {

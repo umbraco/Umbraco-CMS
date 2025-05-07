@@ -149,7 +149,7 @@ public class RuntimeState : IRuntimeState
                         _logger.LogDebug("Could not connect to database.");
                     }
 
-                    if (_globalSettings.Value.InstallMissingDatabase || _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory))
+                    if (_databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory))
                     {
                         // ok to install on a configured but missing database
                         Level = RuntimeLevel.BootFailed;
@@ -311,7 +311,7 @@ public class RuntimeState : IRuntimeState
         // anything other than install wants a database - see if we can connect
         // (since this is an already existing database, assume localdb is ready)
         bool canConnect;
-        var tries = _globalSettings.Value.InstallMissingDatabase ? 2 : 5;
+        var tries = 5;
         for (var i = 0; ;)
         {
             canConnect = databaseFactory.CanConnect;

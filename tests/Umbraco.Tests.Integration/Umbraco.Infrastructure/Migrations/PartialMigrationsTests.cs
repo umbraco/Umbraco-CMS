@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using NUnit.Framework;
@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations;
 // These tests depend on the key-value table, so we need a schema to run these tests.
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 [TestFixture]
-public class PartialMigrationsTests : UmbracoIntegrationTest
+internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 {
     public const string TableName = "testTable";
     public const string ColumnName = "testColumn";
@@ -42,7 +42,7 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
         => services.AddNotificationHandler<UmbracoPlanExecutedNotification, UmbracoPlanExecutedTestNotificationHandler>();
 
     [Test]
-    public void CanRerunPartiallyCompletedMigration()
+    public async Task CanRerunPartiallyCompletedMigration()
     {
         var plan = new MigrationPlan("test")
             .From(string.Empty)
@@ -52,7 +52,7 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
 
         var upgrader = new Upgrader(plan);
 
-        var result = upgrader.Execute(MigrationPlanExecutor, ScopeProvider, KeyValueService);
+        var result = await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
 
         Assert.Multiple(() =>
         {
@@ -74,7 +74,7 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
         // Now let's simulate that someone came along and fixed the broken migration and we'll now try and rerun
         ErrorMigration.ShouldExplode = false;
         upgrader = new Upgrader(plan);
-        result = upgrader.Execute(MigrationPlanExecutor, ScopeProvider, KeyValueService);
+        result = await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
 
         Assert.Multiple(() =>
         {
@@ -93,12 +93,12 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void CanRunMigrationTwice()
+    public async Task CanRunMigrationTwice()
     {
         Upgrader? upgrader = new(new SimpleMigrationPlan());
         Upgrader? upgrader2 = new(new SimpleMigrationPlan());
-        var result = upgrader.Execute(MigrationPlanExecutor, ScopeProvider, KeyValueService);
-        var result2 = upgrader2.Execute(MigrationPlanExecutor, ScopeProvider, KeyValueService);
+        var result = await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
+        var result2 = await upgrader2.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
 
         Assert.Multiple(() =>
         {
@@ -113,7 +113,7 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void StateIsOnlySavedIfAMigrationSucceeds()
+    public async Task StateIsOnlySavedIfAMigrationSucceeds()
     {
         var plan = new MigrationPlan("test")
             .From(string.Empty)
@@ -121,7 +121,7 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
             .To<CreateTableMigration>("b");
 
         var upgrader = new Upgrader(plan);
-        var result = upgrader.Execute(MigrationPlanExecutor, ScopeProvider, KeyValueService);
+        var result = await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
 
         Assert.Multiple(() =>
         {
@@ -138,16 +138,16 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void ScopesAreCreatedIfNecessary()
+    public async Task ScopesAreCreatedIfNecessary()
     {
-        // The migrations have assert to esnure scopes
+        // The migrations have assert to ensure scopes
         var plan = new MigrationPlan("test")
             .From(string.Empty)
             .To<AsserScopeScopedTestMigration>("a")
             .To<AssertScopeUnscopedTestMigration>("b");
 
         var upgrader = new Upgrader(plan);
-        var result = upgrader.Execute(MigrationPlanExecutor, ScopeProvider, KeyValueService);
+        var result = await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
 
         Assert.IsTrue(result.Successful);
         Assert.AreEqual(2, result.CompletedTransitions.Count);
@@ -157,7 +157,7 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
     [Test]
     [TestCase(true)]
     [TestCase(false)]
-    public void UmbracoPlanExecutedNotificationIsAlwaysPublished(bool shouldSucceed)
+    public async Task UmbracoPlanExecutedNotificationIsAlwaysPublished(bool shouldSucceed)
     {
         var notificationPublished = false;
         ErrorMigration.ShouldExplode = shouldSucceed is false;
@@ -190,7 +190,7 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
         // We have to use the DatabaseBuilder otherwise the notification isn't published
         var databaseBuilder = GetRequiredService<DatabaseBuilder>();
         var plan = new TestUmbracoPlan(null!);
-        databaseBuilder.UpgradeSchemaAndData(plan);
+        await databaseBuilder.UpgradeSchemaAndDataAsync(plan).ConfigureAwait(false);
 
         Assert.IsTrue(notificationPublished);
     }
@@ -242,7 +242,7 @@ internal class AddColumnMigration : MigrationBase
         .Do();
 }
 
-internal class AssertScopeUnscopedTestMigration : UnscopedMigrationBase
+internal class AssertScopeUnscopedTestMigration : UnscopedAsyncMigrationBase
 {
     private readonly IScopeProvider _scopeProvider;
     private readonly IScopeAccessor _scopeAccessor;
@@ -256,7 +256,7 @@ internal class AssertScopeUnscopedTestMigration : UnscopedMigrationBase
         _scopeAccessor = scopeAccessor;
     }
 
-    protected override void Migrate()
+    protected override Task MigrateAsync()
     {
         // Since this is a scopeless migration both ambient scope and the parent scope should be null
         Assert.IsNull(_scopeAccessor.AmbientScope);
@@ -265,6 +265,8 @@ internal class AssertScopeUnscopedTestMigration : UnscopedMigrationBase
         Assert.IsNull(((Scope)scope).ParentScope);
 
         Context.Complete();
+
+        return Task.CompletedTask;
     }
 }
 

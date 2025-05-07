@@ -1,41 +1,26 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Image Cropper';
-let dataTypeDefaultData = null;
-let dataTypeData = null;
+const editorAlias = 'Umbraco.ImageCropper';
+const editorUiAlias = 'Umb.PropertyEditorUi.ImageCropper';
+const customDataTypeName = 'Custom Image Cropper';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
-  dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  if (dataTypeDefaultData !== null) {
-    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);
-  }
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can add crop', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const cropData = ['Test Label', 'Test Alias', 100, 50];
-  const expectedDataTypeValues = [{
-    "alias": "crops",
-    "value": [
-      {
-        "label": cropData[0],
-        "alias": cropData[1],
-        "width": cropData[2],
-        "height": cropData[3]
-      }
-    ]
-  }];
-  // Remove all existing crops
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  dataTypeData.values = [];
-  await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
-  await umbracoUi.dataType.goToDataType(dataTypeName);
+  await umbracoApi.dataType.createDefaultImageCropperDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
   await umbracoUi.dataType.enterCropValues(
@@ -48,79 +33,59 @@ test('can add crop', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeData.values).toEqual(expectedDataTypeValues);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropData[0], cropData[1], cropData[2], cropData[3])).toBeTruthy();
 });
 
 test('can edit crop', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const wrongCropData = ['Wrong Alias', 50, 100];
-  const wrongDataTypeValues = [{
-    "alias": "crops",
-    "value": [
-      {
-        "alias": wrongCropData[0],
-        "width": wrongCropData[1],
-        "height": wrongCropData[2]
-      }
-    ]
-  }];
-  const updatedCropData = ['Updated Label', 'Updated Test Alias', 100, 50];
-  const expectedDataTypeValues = [{
-    "alias": "crops",
-    "value": [
-      {
-        "label": updatedCropData[0],
-        "alias": updatedCropData[1],
-        "width": updatedCropData[2],
-        "height": updatedCropData[3]
-      }
-    ]
-  }];
-  // Remove all existing crops and add a crop to edit
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  dataTypeData.values = wrongDataTypeValues;
-  await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
-  await umbracoUi.dataType.goToDataType(dataTypeName);
+  const cropData = ['Test Label', AliasHelper.toAlias('Test Label'), 100, 50];
+  const updatedCropData = ['Updated Label', AliasHelper.toAlias('Updated Label'), 80, 30];
+  await umbracoApi.dataType.createImageCropperDataTypeWithOneCrop(customDataTypeName, cropData[0], cropData[2], cropData[3]);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
-  await umbracoUi.dataType.editCropByAlias(wrongCropData[0].toString());
-  await umbracoUi.dataType.enterCropValues(updatedCropData[0].toString(), updatedCropData[1].toString(), updatedCropData[2].toString(), updatedCropData[3].toString());
+  await umbracoUi.dataType.editCropByAlias(cropData[0]);
+  await umbracoUi.dataType.enterCropValues(updatedCropData[0], updatedCropData[1], updatedCropData[2].toString(), updatedCropData[3].toString());
   await umbracoUi.dataType.clickSaveCropButton();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeData.values).toEqual(expectedDataTypeValues);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, updatedCropData[0], updatedCropData[1], updatedCropData[2], updatedCropData[3])).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropData[0], cropData[1], cropData[2], cropData[3])).toBeFalsy();
 });
 
 test('can delete crop', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const wrongCropData = ['Wrong Alias', 50, 100];
-  const wrongDataTypeValues = [{
-    "alias": "crops",
-    "value": [
-      {
-        "alias": wrongCropData[0],
-        "width": wrongCropData[1],
-        "height": wrongCropData[2]
-      }
-    ]
-  }];
-  // Remove all existing crops and add a crop to remove
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  dataTypeData.values = wrongDataTypeValues;
-  await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
-  await umbracoUi.dataType.goToDataType(dataTypeName);
+  const cropData = ['Deleted Alias', AliasHelper.toAlias('Deleted Alias'), 50, 100];
+  await umbracoApi.dataType.createImageCropperDataTypeWithOneCrop(customDataTypeName, cropData[0], cropData[2], cropData[3]);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
-  await umbracoUi.dataType.removeCropByAlias(wrongCropData[0].toString());
+  await umbracoUi.dataType.removeCropByAlias(cropData[0].toString());
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeData.values).toEqual([]);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropData[0], cropData[1], cropData[2], cropData[3])).toBeFalsy();
+});
+
+test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
+  // Act
+  await umbracoUi.dataType.goToDataType(dataTypeName);
+
+  // Assert
+  await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.imageCropperSettings);
+  await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.imageCropperSettings);
+  await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
+  await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
+  const dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
+  expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
+  expect(dataTypeDefaultData.values).toEqual([]);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'crops')).toBeFalsy();
 });

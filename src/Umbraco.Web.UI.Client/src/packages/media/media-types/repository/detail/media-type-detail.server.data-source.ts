@@ -8,7 +8,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbPropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 
 /**
@@ -66,7 +66,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, MediaTypeService.getMediaTypeById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, MediaTypeService.getMediaTypeById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -87,6 +87,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			properties: data.properties.map((property) => {
 				return {
 					id: property.id,
+					unique: property.id,
 					container: property.container,
 					sortOrder: property.sortOrder,
 					alias: property.alias,
@@ -138,7 +139,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 		if (!model.unique) throw new Error('Media Type unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateMediaTypeRequestModel = {
+		const body: CreateMediaTypeRequestModel = {
 			alias: model.alias,
 			name: model.name,
 			description: model.description,
@@ -180,14 +181,14 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			MediaTypeService.postMediaType({
-				requestBody,
+				body,
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			return this.read(data);
 		}
 
@@ -205,7 +206,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateMediaTypeRequestModel = {
+		const body: UpdateMediaTypeRequestModel = {
 			alias: model.alias,
 			name: model.name,
 			description: model.description,
@@ -245,11 +246,11 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			MediaTypeService.putMediaTypeById({
-				id: model.unique,
-				requestBody,
+				path: { id: model.unique },
+				body,
 			}),
 		);
 
@@ -269,10 +270,10 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			MediaTypeService.deleteMediaTypeById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

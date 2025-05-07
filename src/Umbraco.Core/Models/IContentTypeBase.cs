@@ -179,4 +179,12 @@ public interface IContentTypeBase : IUmbracoEntity, IRememberBeingDirty
     ///     Gets an <see cref="ISimpleContentType" /> corresponding to this content type.
     /// </summary>
     ISimpleContentType ToSimple();
+
+
+    /// <summary>
+    /// Deep clones itself while resetting identities so it is treated as a new entity
+    /// </summary>
+    /// <param name="alias">The new alias of the <see cref="IContentTypeBase"/>.</param>
+    /// <returns>The copied, reset instance.</returns>
+    IContentTypeBase DeepCloneWithResetIdentities(string alias);
 }

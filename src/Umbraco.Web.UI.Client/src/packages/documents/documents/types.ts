@@ -29,7 +29,6 @@ export interface UmbDocumentDetailModel extends UmbContentDetailModel {
 	entityType: UmbDocumentEntityType;
 	isTrashed: boolean;
 	template: { unique: string } | null;
-	urls: Array<UmbDocumentUrlInfoModel>;
 	values: Array<UmbDocumentValueModel>;
 	variants: Array<UmbDocumentVariantModel>;
 }

@@ -2,11 +2,11 @@ import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbMediaCollectionItemModel } from '../../types.js';
 import type { UmbMediaCollectionContext } from '../../media-collection.context.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from '../../media-collection.context-token.js';
-import { UmbFileDropzoneItemStatus } from '../../../dropzone/types.js';
 import { UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE } from '../../../entity.js';
 import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 
 import '@umbraco-cms/backoffice/imaging';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
@@ -28,9 +28,9 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		super();
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
-			collectionContext.setupView(this);
+			collectionContext?.setupView(this);
 			this.observe(
-				collectionContext.workspacePathBuilder,
+				collectionContext?.workspacePathBuilder,
 				(builder) => {
 					this._workspacePathBuilder = builder;
 				},
@@ -134,11 +134,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				display: flex;
 				justify-content: center;
 				align-items: center;
-			}
-
-			/** TODO: Remove this fix when UUI gets upgrade to 1.3 */
-			umb-imaging-thumbnail {
-				pointer-events: none;
 			}
 
 			#media-grid {

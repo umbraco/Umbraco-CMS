@@ -1,14 +1,13 @@
 import { UmbModalToken } from '../token/modal-token.js';
 import type { UmbModalConfig, UmbModalType } from '../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { type UmbDeepPartialObject, umbDeepMerge } from '@umbraco-cms/backoffice/utils';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
-import { UMB_ROUTE_CONTEXT } from '@umbraco-cms/backoffice/router';
+import { UMB_ROUTE_CONTEXT, type IRouterSlot } from '@umbraco-cms/backoffice/router';
 
 export interface UmbModalRejectReason {
 	type: string;
@@ -116,7 +115,7 @@ export class UmbModalContext<
 
 	async _internal_removeCurrentModal() {
 		const routeContext = await this.getContext(UMB_ROUTE_CONTEXT);
-		routeContext._internal_removeModalPath(this.#activeModalPath);
+		routeContext?._internal_removeModalPath(this.#activeModalPath);
 	}
 
 	forceResolve() {
@@ -151,8 +150,9 @@ export class UmbModalContext<
 			this._internal_removeCurrentModal();
 			return;
 		}
-		this.#submitResolver?.(this.getValue());
+		const resolver = this.#submitResolver;
 		this.#markAsResolved();
+		resolver?.(this.getValue());
 		// TODO: Could we clean up this class here? (Example destroy the value state, and other things?)
 	}
 
@@ -171,8 +171,9 @@ export class UmbModalContext<
 			this._internal_removeCurrentModal();
 			return;
 		}
-		this.#submitRejecter?.(reason);
+		const resolver = this.#submitRejecter;
 		this.#markAsResolved();
+		resolver?.(reason);
 		// TODO: Could we clean up this class here? (Example destroy the value state, and other things?)
 	}
 
@@ -182,8 +183,8 @@ export class UmbModalContext<
 	 * @public
 	 * @memberof UmbModalContext
 	 */
-	public onSubmit() {
-		return this.#submitPromise;
+	public async onSubmit() {
+		return await this.#submitPromise;
 	}
 
 	/**

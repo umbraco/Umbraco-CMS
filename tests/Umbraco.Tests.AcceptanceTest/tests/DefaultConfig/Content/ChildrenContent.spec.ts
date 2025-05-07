@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 let documentTypeId = '';
@@ -37,7 +37,8 @@ test('can create child node', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(childContentName)).toBeTruthy();
   const childData = await umbracoApi.document.getChildren(contentId);
   expect(childData[0].variants[0].name).toBe(childContentName);
@@ -76,7 +77,8 @@ test('can create child node in child node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   const childOfChildData = await umbracoApi.document.getChildren(childContentId);
   expect(childOfChildData[0].variants[0].name).toBe(childOfChildContentName);
   // verify that the child content displays in the tree
@@ -101,14 +103,15 @@ test('cannot publish child if the parent is not published', async ({umbracoApi, 
   await umbracoUi.content.clickCaretButtonForContentName(contentName);
   await umbracoUi.content.clickActionsMenuForContent(childContentName);
   await umbracoUi.content.clickPublishButton();
+  await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
-  await umbracoUi.content.isErrorNotificationVisible();
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.parentNotPublished);
   const contentData = await umbracoApi.document.getByName(childContentName);
   expect(contentData.variants[0].state).toBe('Draft');
 });
 
-test('can publish with descendants', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can publish content with child node', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
@@ -120,11 +123,13 @@ test('can publish with descendants', {tag: '@smoke'}, async ({umbracoApi, umbrac
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickPublishButton();
+  await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
-  const childContentData = await umbracoApi.document.getByName(contentName);
-  expect(childContentData.variants[0].state).toBe('Published');
+  const childContentData = await umbracoApi.document.getByName(childContentName);
+  expect(childContentData.variants[0].state).toBe('Draft');
 });

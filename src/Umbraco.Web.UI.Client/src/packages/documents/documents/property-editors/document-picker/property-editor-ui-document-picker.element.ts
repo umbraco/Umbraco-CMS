@@ -1,8 +1,8 @@
 import type { UmbInputDocumentElement } from '../../components/input-document/input-document.element.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -25,7 +25,6 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 		}
 
 		this._startNodeId = config.getValueByAlias('startNodeId');
-		this._showOpenButton = config.getValueByAlias('showOpenButton') ?? false;
 	}
 
 	/**
@@ -48,12 +47,9 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	@state()
 	private _startNodeId?: string;
 
-	@state()
-	private _showOpenButton?: boolean;
-
 	#onChange(event: CustomEvent & { target: UmbInputDocumentElement }) {
 		this.value = event.target.value;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
@@ -67,7 +63,6 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 				.max=${this._max}
 				.startNode=${startNode}
 				.value=${this.value}
-				?showOpenButton=${this._showOpenButton}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}>
 			</umb-input-document>

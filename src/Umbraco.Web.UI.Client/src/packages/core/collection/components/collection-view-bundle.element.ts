@@ -36,7 +36,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_ROUTE_CONTEXT, (context) => {
-			this.observe(context.activePath, (activePath) => {
+			this.observe(context?.activePath, (activePath) => {
 				this._collectionRootPathName = activePath;
 			});
 		});
@@ -47,7 +47,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
-			this._entityUnique = context.getUnique() ?? '';
+			this._entityUnique = context?.getUnique() ?? '';
 		});
 	}
 

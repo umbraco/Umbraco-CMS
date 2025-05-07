@@ -1,7 +1,7 @@
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UpgradeService, ApiError } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UpgradeSettingsResponseModelReadable } from '@umbraco-cms/backoffice/external/backend-api';
+import { UpgradeService } from '@umbraco-cms/backoffice/external/backend-api';
+import { tryExecute, UmbApiError } from '@umbraco-cms/backoffice/resources';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import '../installer/shared/layout/installer-layout.element.js';
@@ -13,7 +13,7 @@ import './upgrader-view.element.js';
 @customElement('umb-upgrader')
 export class UmbUpgraderElement extends UmbLitElement {
 	@state()
-	private upgradeSettings?: UpgradeSettingsResponseModel;
+	private upgradeSettings?: UpgradeSettingsResponseModelReadable;
 
 	@state()
 	private fetching = true;
@@ -43,12 +43,14 @@ export class UmbUpgraderElement extends UmbLitElement {
 	private async _setup() {
 		this.fetching = true;
 
-		const { data, error } = await tryExecute(UpgradeService.getUpgradeSettings());
+		const { data, error } = await tryExecute(this, UpgradeService.getUpgradeSettings(), { disableNotifications: true });
 
 		if (data) {
 			this.upgradeSettings = data;
 		} else if (error) {
-			this.errorMessage = error instanceof ApiError ? (error.body as any).detail : error.message;
+			this.errorMessage = UmbApiError.isUmbApiError(error)
+				? (error.problemDetails.detail ?? 'Unknown error, please try again')
+				: error.message;
 		}
 
 		this.fetching = false;
@@ -59,11 +61,12 @@ export class UmbUpgraderElement extends UmbLitElement {
 		this.errorMessage = '';
 		this.upgrading = true;
 
-		const { error } = await tryExecute(UpgradeService.postUpgradeAuthorize());
+		const { error } = await tryExecute(this, UpgradeService.postUpgradeAuthorize());
 
 		if (error) {
-			this.errorMessage =
-				error instanceof ApiError ? (error.body as any).detail : (error.message ?? 'Unknown error, please try again');
+			this.errorMessage = UmbApiError.isUmbApiError(error)
+				? (error.problemDetails.detail ?? 'Unknown error, please try again')
+				: (error.message ?? 'Unknown error, please try again');
 		} else {
 			history.pushState(null, '', 'section/content');
 		}

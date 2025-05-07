@@ -10,7 +10,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 			properties: [
 				{
 					alias: 'crops',
-					label: 'Define Crops',
+					label: 'Crop options',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ImageCropsConfiguration',
 				},
 			],

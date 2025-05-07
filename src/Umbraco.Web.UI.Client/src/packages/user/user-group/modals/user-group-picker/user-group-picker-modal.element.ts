@@ -1,11 +1,11 @@
 import { UmbUserGroupCollectionRepository } from '../../collection/repository/index.js';
 import type { UmbUserGroupDetailModel } from '../../types.js';
+import type { UMB_USER_GROUP_PICKER_MODAL } from './user-group-picker-modal.token.js';
 import { css, customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { debounce, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UMB_USER_GROUP_PICKER_MODAL } from '@umbraco-cms/backoffice/user-group';
 import type { UUIInputEvent, UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import '../../components/user-group-ref/user-group-ref.element.js';

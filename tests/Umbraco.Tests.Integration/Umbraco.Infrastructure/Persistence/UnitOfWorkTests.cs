@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class UnitOfWorkTests : UmbracoIntegrationTest
+internal sealed class UnitOfWorkTests : UmbracoIntegrationTest
 {
     [Test]
     public void ReadLockNonExisting()

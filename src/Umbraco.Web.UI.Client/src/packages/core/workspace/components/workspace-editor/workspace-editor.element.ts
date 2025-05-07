@@ -1,9 +1,10 @@
+import type { ManifestWorkspaceView } from '../../extensions/types.js';
+import { UMB_WORKSPACE_VIEW_PATH_PATTERN } from '../../paths.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement, UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_VIEW_PATH_PATTERN, type ManifestWorkspaceView } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 
 /**
@@ -69,11 +70,11 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 							(component as any).manifest = manifest;
 						}
 					},
-				} as UmbRoute;
+				};
 			});
 
 			// Duplicate first workspace and use it for the empty path scenario. [NL]
-			newRoutes.push({ ...newRoutes[0], path: '' });
+			newRoutes.push({ ...newRoutes[0], unique: newRoutes[0].path, path: '' });
 
 			newRoutes.push({
 				path: `**`,
@@ -89,9 +90,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
 				${this.#renderBackButton()}
 				<slot name="header" slot="header"></slot>
-				${this.#renderViews()}
 				<slot name="action-menu" slot="action-menu"></slot>
-				${this.#renderRoutes()}
+				${this.#renderViews()} ${this.#renderRoutes()}
 				<slot></slot>
 				${when(
 					!this.enforceNoFooter,

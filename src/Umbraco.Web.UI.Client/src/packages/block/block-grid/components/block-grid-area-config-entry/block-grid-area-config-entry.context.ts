@@ -3,17 +3,14 @@ import {
 	UmbBlockGridScaleManager,
 	type UmbBlockGridScalableContext,
 } from '../../context/block-grid-scale-manager/block-grid-scale-manager.controller.js';
+import type { UmbBlockGridTypeAreaType } from '../../types.js';
 import { UMB_BLOCK_GRID_AREA_CONFIG_ENTRY_CONTEXT } from './block-grid-area-config-entry.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import type { UmbBlockGridTypeAreaType } from '@umbraco-cms/backoffice/block-grid';
-export class UmbBlockGridAreaConfigEntryContext
-	extends UmbContextBase<UmbBlockGridAreaConfigEntryContext>
-	implements UmbBlockGridScalableContext
-{
+export class UmbBlockGridAreaConfigEntryContext extends UmbContextBase implements UmbBlockGridScalableContext {
 	//
 	#entriesContext?: typeof UMB_BLOCK_GRID_AREA_TYPE_ENTRIES_CONTEXT.TYPE;
 	//

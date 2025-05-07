@@ -80,17 +80,22 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 
 	async load(unique: string) {
 		this.resetState();
-		const context = await this.getContext(UMB_PROPERTY_CONTEXT);
-		this.observe(context.value, (value) => {
-			if (value) {
-				const blockTypeData = value.find((x: UmbBlockGridTypeAreaType) => x.key === unique);
-				if (blockTypeData) {
-					this.#data.setValue(blockTypeData);
-					return;
-				}
-			}
-			// Fallback to undefined:
-			this.#data.setValue(undefined);
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this.observe(
+				context?.value,
+				(value) => {
+					if (value) {
+						const blockTypeData = value.find((x: UmbBlockGridTypeAreaType) => x.key === unique);
+						if (blockTypeData) {
+							this.#data.setValue(blockTypeData);
+							return;
+						}
+					}
+					// Fallback to undefined:
+					this.#data.setValue(undefined);
+				},
+				'observePropertyValue',
+			);
 		});
 	}
 
@@ -171,6 +176,9 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		}
 
 		const context = await this.getContext(UMB_PROPERTY_CONTEXT);
+		if (!context) {
+			throw new Error('Property context not found.');
+		}
 
 		// TODO: We should most likely consume already, in this way I avoid having the reset this consumption.
 		context.setValue(appendToFrozenArray(context.getValue() ?? [], this.#data.getValue(), (x) => x?.key));

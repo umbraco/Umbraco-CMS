@@ -11,6 +11,9 @@ export class UmbMoveDictionaryRepository extends UmbRepositoryBase implements Um
 
 		if (!error) {
 			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+			if (!notificationContext) {
+				throw new Error('Notification context not found');
+			}
 			const notification = { data: { message: `Moved` } };
 			notificationContext.peek('positive', notification);
 		}

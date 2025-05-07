@@ -4,7 +4,6 @@ import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBlockRteEntriesContext, UmbBlockRteManagerContext } from '@umbraco-cms/backoffice/block-rte';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
 import type {
@@ -16,7 +15,8 @@ import {
 	UmbFormControlMixin,
 	UmbValidationContext,
 } from '@umbraco-cms/backoffice/validation';
-import { UmbBlockElementDataValidationPathTranslator } from '@umbraco-cms/backoffice/block';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 export abstract class UmbPropertyEditorUiRteElementBase
 	extends UmbFormControlMixin<UmbPropertyEditorRteValueType | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
@@ -53,7 +53,11 @@ export abstract class UmbPropertyEditorUiRteElementBase
 
 		const buildUpValue: Partial<UmbPropertyEditorRteValueType> = value ? { ...value } : {};
 		buildUpValue.markup ??= '';
-		buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [], expose: [] };
+		if (buildUpValue.blocks) {
+			buildUpValue.blocks = { ...buildUpValue.blocks };
+		} else {
+			buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [], expose: [] };
+		}
 		buildUpValue.blocks.layout ??= {};
 		buildUpValue.blocks.contentData ??= [];
 		buildUpValue.blocks.settingsData ??= [];
@@ -111,18 +115,57 @@ export abstract class UmbPropertyEditorUiRteElementBase
 	readonly #entriesContext = new UmbBlockRteEntriesContext(this);
 
 	readonly #validationContext = new UmbValidationContext(this);
-	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
-	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (context) => {
+			if (context) {
+				this.observe(
+					observeMultiple([
+						this.#managerContext.blockTypes,
+						context.structure.variesByCulture,
+						context.structure.variesBySegment,
+					]),
+					async ([blockTypes, variesByCulture, variesBySegment]) => {
+						if (blockTypes.length > 0 && (variesByCulture === false || variesBySegment === false)) {
+							// check if any of the Blocks varyByCulture or Segment and then display a warning.
+							const promises = await Promise.all(
+								blockTypes.map(async (blockType) => {
+									const elementType = blockType.contentElementTypeKey;
+									await this.#managerContext.contentTypesLoaded;
+									const structure = await this.#managerContext.getStructure(elementType);
+									if (variesByCulture === false && structure?.getVariesByCulture() === true) {
+										// If block varies by culture but document does not.
+										return true;
+									} else if (variesBySegment === false && structure?.getVariesBySegment() === true) {
+										// If block varies by segment but document does not.
+										return true;
+									}
+									return false;
+								}),
+							);
+							const notSupportedVariantSetting = promises.filter((x) => x === true).length > 0;
+
+							if (notSupportedVariantSetting) {
+								this.setCustomValidity('#blockEditor_blockVariantConfigurationNotSupported');
+								this.checkValidity();
+							}
+						}
+					},
+					'blockTypeConfigurationCheck',
+				);
+			} else {
+				this.removeUmbControllerByAlias('blockTypeConfigurationCheck');
+			}
+		}).passContextAliasMatches();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.#gotPropertyContext(context);
 		});
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-			this.#managerContext.setVariantId(context.getVariantId());
+			this.#managerContext.setVariantId(context?.getVariantId());
 		});
 
 		this.observe(
@@ -141,19 +184,14 @@ export abstract class UmbPropertyEditorUiRteElementBase
 		);
 	}
 
-	#gotPropertyContext(context: typeof UMB_PROPERTY_CONTEXT.TYPE) {
+	#gotPropertyContext(context: typeof UMB_PROPERTY_CONTEXT.TYPE | undefined) {
 		this.observe(
-			context.dataPath,
+			context?.dataPath,
 			(dataPath) => {
-				// Translate paths for content/settings:
-				this.#contentDataPathTranslator?.destroy();
-				this.#settingsDataPathTranslator?.destroy();
 				if (dataPath) {
 					// Set the data path for the local validation context:
 					this.#validationContext.setDataPath(dataPath + '.blocks');
-
-					this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
-					this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
+					this.#validationContext.autoReport();
 				}
 			},
 			'observeDataPath',
@@ -207,9 +245,9 @@ export abstract class UmbPropertyEditorUiRteElementBase
 					return;
 				}
 
-				context.setValue(super.value);
+				context?.setValue(super.value);
 			},
-			'motherObserver',
+			'blockManagerObserver',
 		);
 	}
 
@@ -228,6 +266,6 @@ export abstract class UmbPropertyEditorUiRteElementBase
 	}
 
 	protected _fireChangeEvent() {
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 }

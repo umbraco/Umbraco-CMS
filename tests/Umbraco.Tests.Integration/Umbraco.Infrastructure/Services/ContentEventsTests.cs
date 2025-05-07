@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class ContentEventsTests : UmbracoIntegrationTestWithContent
+    internal sealed class ContentEventsTests : UmbracoIntegrationTestWithContent
     {
         private CacheRefresherCollection CacheRefresherCollection => GetRequiredService<CacheRefresherCollection>();
 
@@ -2086,7 +2086,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         // all content type events
         #endregion
 
-        public class LocalServerMessenger : ServerMessengerBase
+        internal sealed class LocalServerMessenger : ServerMessengerBase
         {
             public LocalServerMessenger()
                 : base(false, new SystemTextJsonSerializer())

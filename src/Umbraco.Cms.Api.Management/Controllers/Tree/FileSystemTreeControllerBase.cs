@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.FileSystem;
@@ -12,28 +12,28 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 {
     protected abstract IFileSystem FileSystem { get; }
 
-    protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> GetRoot(int skip, int take)
+    protected Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> GetRoot(int skip, int take)
     {
         FileSystemTreeItemPresentationModel[] viewModels = GetPathViewModels(string.Empty, skip, take, out var totalItems);
 
         PagedViewModel<FileSystemTreeItemPresentationModel> result = PagedViewModel(viewModels, totalItems);
-        return await Task.FromResult(Ok(result));
+        return Task.FromResult<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>>(Ok(result));
     }
 
-    protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> GetChildren(string path, int skip, int take)
+    protected Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> GetChildren(string path, int skip, int take)
     {
         FileSystemTreeItemPresentationModel[] viewModels = GetPathViewModels(path, skip, take, out var totalItems);
 
         PagedViewModel<FileSystemTreeItemPresentationModel> result = PagedViewModel(viewModels, totalItems);
-        return await Task.FromResult(Ok(result));
+        return Task.FromResult<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>>(Ok(result));
     }
 
-    protected virtual async Task<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>> GetAncestors(string path, bool includeSelf = true)
+    protected virtual Task<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>> GetAncestors(string path, bool includeSelf = true)
     {
         path = path.VirtualPathToSystemPath();
         FileSystemTreeItemPresentationModel[] models = GetAncestorModels(path, includeSelf);
 
-        return await Task.FromResult(Ok(models));
+        return Task.FromResult<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>>(Ok(models));
     }
 
     protected virtual FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)

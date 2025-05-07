@@ -17,10 +17,11 @@ public static class DocumentUpdateHelper
             {
                 Segment = null,
                 Culture = null,
-                Name = createModel.InvariantName!,
+                Name = createModel.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name
+                        ?? throw new ArgumentException("Could not find an invariant variant for the model name", nameof(createModel)),
             }
         ];
-        updateRequestModel.Values = createModel.InvariantProperties.Select(x => new DocumentValueModel
+        updateRequestModel.Values = createModel.Properties.Select(x => new DocumentValueModel
         {
             Alias = x.Alias,
             Value = x.Value,
@@ -44,10 +45,11 @@ public static class DocumentUpdateHelper
             {
                 Segment = null,
                 Culture = null,
-                Name = createModel.InvariantName!,
+                Name = createModel.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name
+                       ?? throw new ArgumentException("Could not find an invariant variant for the model name", nameof(createModel)),
             }
         ];
-        createDocumentRequestModel.Values = createModel.InvariantProperties.Select(x => new DocumentValueModel
+        createDocumentRequestModel.Values = createModel.Properties.Select(x => new DocumentValueModel
         {
             Alias = x.Alias,
             Value = x.Value,

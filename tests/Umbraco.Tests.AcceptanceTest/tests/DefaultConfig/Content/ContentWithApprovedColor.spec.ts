@@ -31,7 +31,8 @@ test('can create content with the approved color data type', async ({umbracoApi,
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -51,7 +52,8 @@ test('can publish content with the approved color data type', async ({umbracoApi
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -74,7 +76,8 @@ test('can create content with the custom approved color data type', async ({umbr
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));

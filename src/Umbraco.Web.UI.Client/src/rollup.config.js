@@ -39,19 +39,13 @@ console.log('--- Copying UUI Fonts ---');
 cpSync('./node_modules/@umbraco-ui/uui-css/assets/fonts', `${DIST_DIRECTORY}/assets/fonts`, { recursive: true });
 console.log('--- Copying src UUI Fonts done ---');
 
-// Copy TinyMCE
-console.log('--- Copying TinyMCE ---');
-cpSync('./node_modules/tinymce', `${DIST_DIRECTORY}/tinymce`, { recursive: true });
-console.log('--- Copying TinyMCE done ---');
-
-// Copy TinyMCE i18n
-console.log('--- Copying TinyMCE i18n ---');
-cpSync('./node_modules/tinymce-i18n/langs6', `${DIST_DIRECTORY}/tinymce/langs`, { recursive: true });
-console.log('--- Copying TinyMCE i18n done ---');
-
 // Copy monaco-editor
 console.log('--- Copying monaco-editor ---');
 cpSync('./node_modules/monaco-editor/esm/vs/editor/editor.worker.js', `${DIST_DIRECTORY}/monaco-editor/vs/editor/editor.worker.js`);
+cpSync('./node_modules/monaco-editor/esm/vs/base', `${DIST_DIRECTORY}/monaco-editor/vs/base`, { recursive: true });
+cpSync('./node_modules/monaco-editor/esm/vs/nls.js', `${DIST_DIRECTORY}/monaco-editor/vs/nls.js`, { recursive: true });
+cpSync('./node_modules/monaco-editor/esm/vs/nls.messages.js', `${DIST_DIRECTORY}/monaco-editor/vs/nls.messages.js`, { recursive: true });
+cpSync('./node_modules/monaco-editor/esm/vs/editor/common', `${DIST_DIRECTORY}/monaco-editor/vs/editor/common`, { recursive: true });
 cpSync('./node_modules/monaco-editor/esm/vs/language', `${DIST_DIRECTORY}/monaco-editor/vs/language`, { recursive: true });
 cpSync('./node_modules/monaco-editor/min/vs/base/browser/ui/codicons', `${DIST_DIRECTORY}/assets/fonts`, { recursive: true });
 console.log('--- Copying monaco-editor done ---');

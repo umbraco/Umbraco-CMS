@@ -72,7 +72,6 @@ function destroyIgnorerElements(element: HTMLElement, ignorerSelectors: string) 
  * @param element
  */
 function setupPreventEvent(element: Element) {
-	console.log('prevent on', element);
 	(element as HTMLElement).draggable = false;
 	//(element as HTMLElement).setAttribute('draggable', 'false');
 }

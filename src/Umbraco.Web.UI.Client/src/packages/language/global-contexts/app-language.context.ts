@@ -11,7 +11,7 @@ import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 
 // TODO: Make a store for the App Languages.
 // TODO: Implement default language end-point, in progress at backend team, so we can avoid getting all languages.
-export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext> implements UmbApi {
+export class UmbAppLanguageContext extends UmbContextBase implements UmbApi {
 	#languagesResolve!: () => void;
 	#languagesPromise = new Promise<void>((resolve) => {
 		this.#languagesResolve = resolve;
@@ -33,6 +33,7 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 	public readonly appLanguage = this.#appLanguage.asObservable();
 	public readonly appLanguageCulture = this.#appLanguage.asObservablePart((x) => x?.unique);
 
+	// TODO: I think we should move all read only states to this context and then make a observable regarding the read only state of the app language. [NL]
 	public readonly appLanguageReadOnlyState = new UmbReadOnlyStateManager(this);
 
 	public readonly appMandatoryLanguages = this.#languages.asObservablePart((languages) =>
@@ -55,19 +56,19 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 
 		// TODO: We need to ensure this request is called every time the user logs in, but this should be done somewhere across the app and not here [JOV]
 		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-			this.observe(authContext.isAuthorized, (isAuthorized) => {
+			this.observe(authContext?.isAuthorized, (isAuthorized) => {
 				if (!isAuthorized) return;
 				this.#requestLanguages();
 			});
 		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(context.languages, (languages) => {
+			this.observe(context?.languages, (languages) => {
 				this.#currentUserAllowedLanguages = languages || [];
 				this.#setIsReadOnly();
 			});
 
-			this.observe(context.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
+			this.observe(context?.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
 				this.#currentUserHasAccessToAllLanguages = hasAccessToAllLanguages || false;
 				this.#setIsReadOnly();
 			});

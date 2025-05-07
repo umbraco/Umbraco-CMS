@@ -1,11 +1,12 @@
 # [Umbraco CMS](https://umbraco.com)
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE.md) 
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) 
-![Mastodon Follow](https://img.shields.io/mastodon/follow/110661369750014952?domain=https%3A%2F%2Fumbracocommunity.social)
-[![Chat about Umbraco on Discord](https://img.shields.io/discord/869656431308189746?logo=discord&logoColor=fff)](https://discord.gg/umbraco) 
-[![Read what's going on in the Umbraco Discord chat now](https://img.shields.io/badge/read-discord-blue)](https://discord-chats.umbraco.com) 
+[![NuGet Version](https://img.shields.io/nuget/v/Umbraco.Cms)](https://www.nuget.org/packages/Umbraco.Cms)
 [![Build status](https://img.shields.io/azure-devops/build/umbraco/Umbraco%2520Cms/301?logo=azurepipelines&label=Azure%20Pipelines)](https://umbraco.visualstudio.com/Umbraco%20Cms/_build?definitionId=301) 
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) 
+[![Forum](https://img.shields.io/badge/help-forum-blue)](https://forum.umbraco.com) 
+[![Chat about Umbraco on Discord](https://img.shields.io/discord/869656431308189746?logo=discord&logoColor=fff)](https://discord.gg/umbraco) 
+![Mastodon Follow](https://img.shields.io/mastodon/follow/110661369750014952?domain=https%3A%2F%2Fumbracocommunity.social)
 
 
 ### Umbraco is a free and open source .NET content management system. Our mission is to help you deliver delightful digital experiences by making Umbraco friendly, simpler and social. 

@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models;
@@ -17,14 +19,24 @@ public class PropertyValidationService : IPropertyValidationService
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IValueEditorCache _valueEditorCache;
     private readonly ICultureDictionary _cultureDictionary;
+    private readonly ILanguageService _languageService;
+    private readonly ContentSettings _contentSettings;
 
-    [Obsolete("Use the constructor that accepts ICultureDictionary. Will be removed in V15.")]
+    [Obsolete("Use the constructor that accepts ILanguageService and ContentSettings options. Will be removed in V17.")]
     public PropertyValidationService(
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,
         ILocalizedTextService textService,
-        IValueEditorCache valueEditorCache)
-        : this(propertyEditors, dataTypeService, textService, valueEditorCache, StaticServiceProvider.Instance.GetRequiredService<ICultureDictionary>())
+        IValueEditorCache valueEditorCache,
+        ICultureDictionary cultureDictionary)
+        : this(
+            propertyEditors,
+            dataTypeService,
+            textService,
+            valueEditorCache,
+            cultureDictionary,
+            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>())
     {
     }
 
@@ -33,13 +45,17 @@ public class PropertyValidationService : IPropertyValidationService
         IDataTypeService dataTypeService,
         ILocalizedTextService textService,
         IValueEditorCache valueEditorCache,
-        ICultureDictionary cultureDictionary)
+        ICultureDictionary cultureDictionary,
+        ILanguageService languageService,
+        IOptions<ContentSettings> contentSettings)
     {
         _propertyEditors = propertyEditors;
         _dataTypeService = dataTypeService;
         _textService = textService;
         _valueEditorCache = valueEditorCache;
         _cultureDictionary = cultureDictionary;
+        _languageService = languageService;
+        _contentSettings = contentSettings.Value;
     }
 
     /// <inheritdoc />
@@ -66,14 +82,21 @@ public class PropertyValidationService : IPropertyValidationService
                                                 propertyType.PropertyEditorAlias);
         }
 
+        // only validate culture invariant properties if
+        // - AllowEditInvariantFromNonDefault is true, or
+        // - the default language is being validated, or
+        // - the underlying data editor supports partial property value merging (e.g. block level variance)
+        var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        if (propertyType.VariesByCulture() is false
+            && _contentSettings.AllowEditInvariantFromNonDefault is false
+            && validationContext.CulturesBeingValidated.InvariantContains(defaultCulture) is false
+            && dataEditor.CanMergePartialPropertyValues(propertyType) is false)
+        {
+            return [];
+        }
+
         return ValidatePropertyValue(dataEditor, dataType, postedValue, propertyType.Mandatory, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage, validationContext);
     }
-
-    [Obsolete("Please use the overload that accepts a PropertyValidationContext. Will be removed in V16.")]
-    public IEnumerable<ValidationResult> ValidatePropertyValue(
-        IPropertyType propertyType,
-        object? postedValue)
-        => ValidatePropertyValue(propertyType, postedValue, PropertyValidationContext.Empty());
 
     /// <inheritdoc />
     public IEnumerable<ValidationResult> ValidatePropertyValue(
@@ -110,17 +133,6 @@ public class PropertyValidationService : IPropertyValidationService
             yield return validationResult;
         }
     }
-
-    [Obsolete("Please use the overload that accepts a PropertyValidationContext. Will be removed in V16.")]
-    public IEnumerable<ValidationResult> ValidatePropertyValue(
-        IDataEditor editor,
-        IDataType dataType,
-        object? postedValue,
-        bool isRequired,
-        string? validationRegExp,
-        string? isRequiredMessage,
-        string? validationRegExpMessage)
-        => ValidatePropertyValue(editor, dataType, postedValue, isRequired, validationRegExp, isRequiredMessage, validationRegExpMessage, PropertyValidationContext.Empty());
 
     /// <inheritdoc />
     public bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact? impact)
@@ -174,10 +186,6 @@ public class PropertyValidationService : IPropertyValidationService
 
         return invalidProperties.Length == 0;
     }
-
-    [Obsolete("Please use the overload that accepts a PropertyValidationContext. Will be removed in V16.")]
-    public bool IsPropertyValid(IProperty property, string culture = "*", string segment = "*")
-        => IsPropertyValid(property, PropertyValidationContext.CultureAndSegment(culture, segment));
 
     /// <inheritdoc />
     public bool IsPropertyValid(IProperty property, PropertyValidationContext validationContext)

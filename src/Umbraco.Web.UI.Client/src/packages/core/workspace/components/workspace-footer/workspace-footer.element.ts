@@ -1,15 +1,11 @@
-import { UMB_SUBMITTABLE_WORKSPACE_CONTEXT } from '../../contexts/tokens/submittable-workspace.context-token.js';
+import { UMB_SUBMITTABLE_WORKSPACE_CONTEXT } from '../../contexts/index.js';
+import type { ManifestWorkspaceAction, MetaWorkspaceAction } from '../../extensions/types.js';
+import type { UmbWorkspaceActionArgs } from '../workspace-action/types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type {
-	ManifestWorkspaceAction,
-	MetaWorkspaceAction,
-	UmbWorkspaceActionArgs,
-} from '@umbraco-cms/backoffice/workspace';
 
 /**
  *
@@ -44,7 +40,7 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.consumeContext(UMB_SUBMITTABLE_WORKSPACE_CONTEXT, (context) => {
-			this._isNew = context.getIsNew();
+			this._isNew = context?.getIsNew();
 		});
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			this._modalContext = context;

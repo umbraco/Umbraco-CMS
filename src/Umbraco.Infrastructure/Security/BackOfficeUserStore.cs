@@ -138,8 +138,8 @@ public class BackOfficeUserStore :
         var userEntity = new User(_globalSettings, user.Name, user.Email, user.UserName, emptyPasswordValue)
         {
             Language = user.Culture ?? _globalSettings.DefaultUILanguage,
-            StartContentIds = user.StartContentIds ?? new int[] { },
-            StartMediaIds = user.StartMediaIds ?? new int[] { },
+            StartContentIds = user.StartContentIds ?? [],
+            StartMediaIds = user.StartMediaIds ?? [],
             IsLockedOut = user.IsLockedOut,
             Key = user.Key,
             Kind = user.Kind

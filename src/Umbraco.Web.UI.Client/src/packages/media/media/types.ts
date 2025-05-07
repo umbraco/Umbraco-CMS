@@ -5,7 +5,6 @@ import type { UmbContentDetailModel, UmbElementValueModel } from '@umbraco-cms/b
 
 export type * from './audit-log/types.js';
 export type * from './collection/types.js';
-export type * from './dropzone/types.js';
 export type * from './modals/types.js';
 export type * from './recycle-bin/types.js';
 export type * from './repository/types.js';
@@ -22,7 +21,6 @@ export interface UmbMediaDetailModel extends UmbContentDetailModel {
 	entityType: UmbMediaEntityType;
 	isTrashed: boolean;
 	unique: string;
-	urls: Array<UmbMediaUrlInfoModel>;
 	values: Array<UmbMediaValueModel>;
 	variants: Array<UmbEntityVariantModel>;
 }

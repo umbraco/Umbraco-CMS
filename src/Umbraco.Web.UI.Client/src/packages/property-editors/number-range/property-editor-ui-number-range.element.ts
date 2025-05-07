@@ -1,8 +1,8 @@
 import type { UmbInputNumberRangeElement } from '@umbraco-cms/backoffice/components';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -28,14 +28,13 @@ export class UmbPropertyEditorUINumberRangeElement
 
 	@property({ type: Object })
 	public override set value(value: UmbNumberRangeValueType | undefined) {
-		this.#value = value || { min: undefined, max: undefined };
+		super.value = value || { min: undefined, max: undefined };
 		this._minValue = value?.min;
 		this._maxValue = value?.max;
 	}
 	public override get value() {
-		return this.#value;
+		return super.value;
 	}
-	#value: UmbNumberRangeValueType = { min: undefined, max: undefined };
 
 	public set config(config: UmbPropertyEditorConfigCollection) {
 		if (!config) return;
@@ -44,7 +43,7 @@ export class UmbPropertyEditorUINumberRangeElement
 
 	#onChange(event: CustomEvent & { target: UmbInputNumberRangeElement }) {
 		this.value = { min: event.target.minValue, max: event.target.maxValue };
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override firstUpdated() {

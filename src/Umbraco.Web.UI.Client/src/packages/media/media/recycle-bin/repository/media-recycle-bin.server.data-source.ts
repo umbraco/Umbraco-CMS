@@ -6,7 +6,7 @@ import type {
 } from '@umbraco-cms/backoffice/recycle-bin';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 export class UmbMediaRecycleBinServerDataSource implements UmbRecycleBinDataSource {
 	#host: UmbControllerHost;
@@ -16,15 +16,15 @@ export class UmbMediaRecycleBinServerDataSource implements UmbRecycleBinDataSour
 	}
 
 	trash(args: UmbRecycleBinTrashRequestArgs) {
-		return tryExecuteAndNotify(this.#host, MediaService.putMediaByIdMoveToRecycleBin({ id: args.unique }));
+		return tryExecute(this.#host, MediaService.putMediaByIdMoveToRecycleBin({ path: { id: args.unique } }));
 	}
 
 	restore(args: UmbRecycleBinRestoreRequestArgs) {
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			MediaService.putRecycleBinMediaByIdRestore({
-				id: args.unique,
-				requestBody: {
+				path: { id: args.unique },
+				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},
 			}),
@@ -32,13 +32,13 @@ export class UmbMediaRecycleBinServerDataSource implements UmbRecycleBinDataSour
 	}
 
 	empty() {
-		return tryExecuteAndNotify(this.#host, MediaService.deleteRecycleBinMedia());
+		return tryExecute(this.#host, MediaService.deleteRecycleBinMedia());
 	}
 
 	async getOriginalParent(args: UmbRecycleBinOriginalParentRequestArgs) {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
-			MediaService.getRecycleBinMediaByIdOriginalParent({ id: args.unique }),
+			MediaService.getRecycleBinMediaByIdOriginalParent({ path: { id: args.unique } }),
 		);
 
 		// only check for undefined because data can be null if the parent is the root

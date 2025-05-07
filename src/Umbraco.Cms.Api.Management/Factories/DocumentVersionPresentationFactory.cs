@@ -26,11 +26,19 @@ internal sealed class DocumentVersionPresentationFactory : IDocumentVersionPrese
             new ReferenceByIdModel(_entityService.GetKey(contentVersion.ContentTypeId, UmbracoObjectTypes.DocumentType)
                 .Result),
             new ReferenceByIdModel(await _userIdKeyResolver.GetAsync(contentVersion.UserId)),
-            new DateTimeOffset(contentVersion.VersionDate, TimeSpan.Zero), // todo align with datetime offset rework
+            new DateTimeOffset(contentVersion.VersionDate),
             contentVersion.CurrentPublishedVersion,
             contentVersion.CurrentDraftVersion,
             contentVersion.PreventCleanup);
 
-    public async Task<IEnumerable<DocumentVersionItemResponseModel>> CreateMultipleAsync(IEnumerable<ContentVersionMeta> contentVersions) =>
-        await Task.WhenAll(contentVersions.Select(CreateAsync));
+    public async Task<IEnumerable<DocumentVersionItemResponseModel>> CreateMultipleAsync(IEnumerable<ContentVersionMeta> contentVersions)
+        => await CreateMultipleImplAsync(contentVersions).ToArrayAsync();
+
+    private async IAsyncEnumerable<DocumentVersionItemResponseModel> CreateMultipleImplAsync(IEnumerable<ContentVersionMeta> contentVersions)
+    {
+        foreach (ContentVersionMeta contentVersion in contentVersions)
+        {
+            yield return await CreateAsync(contentVersion);
+        }
+    }
 }

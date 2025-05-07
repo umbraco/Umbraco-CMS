@@ -11,7 +11,7 @@ export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implemen
 	/**
 	 * Promise that resolves when the repository has been initialized, i.e. when the configuration has been fetched from the server.
 	 */
-	initialized: Promise<void>;
+	initialized;
 
 	#dataStore?: typeof UMB_TEMPORARY_FILE_CONFIG_STORE_CONTEXT.TYPE;
 	#dataSource = new UmbTemporaryFileConfigServerDataSource(this);
@@ -20,9 +20,11 @@ export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implemen
 		super(host, UMB_TEMPORARY_FILE_REPOSITORY_ALIAS.toString());
 		this.initialized = new Promise<void>((resolve) => {
 			this.consumeContext(UMB_TEMPORARY_FILE_CONFIG_STORE_CONTEXT, async (store) => {
-				this.#dataStore = store;
-				await this.#init();
-				resolve();
+				if (store) {
+					this.#dataStore = store;
+					await this.#init();
+					resolve();
+				}
 			});
 		});
 	}

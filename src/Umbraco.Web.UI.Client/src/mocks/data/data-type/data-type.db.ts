@@ -3,6 +3,7 @@ import { UmbMockEntityFolderManager } from '../utils/entity/entity-folder.manage
 import { UmbMockEntityTreeManager } from '../utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
+import { queryFilter } from '../utils.js';
 import type { UmbMockDataTypeModel } from './data-type.data.js';
 import { data } from './data-type.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -12,7 +13,23 @@ import type {
 	DataTypeItemResponseModel,
 	DataTypeResponseModel,
 	DataTypeTreeItemResponseModel,
+	PagedDataTypeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
+
+export interface DataTypeFilterOptions {
+	skip: number;
+	take: number;
+	orderBy: string;
+	orderDirection: string;
+	editorUiAlias?: string;
+	filter?: string;
+}
+
+const editorUiAliasFilter = (filterOptions: DataTypeFilterOptions, item: UmbMockDataTypeModel) =>
+	item.editorUiAlias === filterOptions.editorUiAlias;
+
+const dataQueryFilter = (filterOptions: DataTypeFilterOptions, item: UmbMockDataTypeModel) =>
+	queryFilter(filterOptions.filter ?? '', item.name);
 
 class UmbDataTypeMockDB extends UmbEntityMockDbBase<UmbMockDataTypeModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockDataTypeModel>(this, treeItemMapper);
@@ -22,6 +39,28 @@ class UmbDataTypeMockDB extends UmbEntityMockDbBase<UmbMockDataTypeModel> {
 
 	constructor(data: Array<UmbMockDataTypeModel>) {
 		super(data);
+	}
+
+	filter(options: DataTypeFilterOptions): PagedDataTypeItemResponseModel {
+		const allItems = this.getAll();
+
+		const filterOptions: DataTypeFilterOptions = {
+			skip: options.skip || 0,
+			take: options.take || 25,
+			orderBy: options.orderBy || 'name',
+			orderDirection: options.orderDirection || 'asc',
+			editorUiAlias: options.editorUiAlias,
+			filter: options.filter,
+		};
+
+		const filteredItems = allItems.filter(
+			(item) => editorUiAliasFilter(filterOptions, item) && dataQueryFilter(filterOptions, item),
+		);
+		const totalItems = filteredItems.length;
+
+		const paginatedItems = filteredItems.slice(filterOptions.skip, filterOptions.skip + filterOptions.take);
+
+		return { total: totalItems, items: paginatedItems };
 	}
 }
 

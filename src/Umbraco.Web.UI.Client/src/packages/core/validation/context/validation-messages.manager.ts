@@ -1,9 +1,9 @@
 import type { UmbValidationMessageTranslator } from '../translators/validation-message-path-translator.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
-export type UmbValidationMessageType = 'client' | 'server';
+export type UmbValidationMessageType = 'client' | 'server' | 'config' | string;
 export interface UmbValidationMessage {
 	type: UmbValidationMessageType;
 	key: string;
@@ -26,46 +26,100 @@ function MatchPathOrDescendantPath(source: string, match: string): boolean {
 }
 
 export class UmbValidationMessagesManager {
+	#filter?: (msg: UmbValidationMessage) => boolean;
+
 	#messages = new UmbArrayState<UmbValidationMessage>([], (x) => x.key);
 	messages = this.#messages.asObservable();
+	filteredMessages = this.#messages.asObservablePart((msgs) => (this.#filter ? msgs.filter(this.#filter) : msgs));
+
+	getNotFilteredMessages(): Array<UmbValidationMessage> {
+		return this.#messages.getValue();
+	}
+
+	getMessages(): Array<UmbValidationMessage> {
+		const msgs = this.#messages.getValue();
+		return this.#filter ? msgs.filter(this.#filter) : msgs;
+	}
 
 	debug(logName: string) {
 		this.messages.subscribe((x) => console.log(logName, x));
 	}
 
+	debugFiltered(logName: string) {
+		this.filteredMessages.subscribe((x) => console.log(logName, x));
+	}
+
+	filter(method: (msg: UmbValidationMessage) => boolean): void {
+		this.#filter = method;
+		// This should maybe trigger a re-filter of the messages, but I'm not sure how we should do that properly of now. [NL]
+		// The reason is that maybe the filter changes while we have validation messages.
+	}
+
+	#updateLock = 0;
+	initiateChange() {
+		this.#updateLock++;
+		this.#messages.mute();
+		// TODO: When ready enable this code will enable handling a finish automatically by this implementation 'using myState.initiatePropertyValueChange()' (Relies on TS support of Using) [NL]
+		/*return {
+			[Symbol.dispose]: this.finishPropertyValueChange,
+		};*/
+	}
+	finishChange() {
+		this.#updateLock--;
+		if (this.#updateLock === 0) {
+			this.#messages.unmute();
+		}
+	}
+
 	getHasAnyMessages(): boolean {
-		return this.#messages.getValue().length !== 0;
+		return this.getMessages().length !== 0;
 	}
 
 	getMessagesOfPathAndDescendant(path: string): Array<UmbValidationMessage> {
 		//path = path.toLowerCase();
-		return this.#messages.getValue().filter((x) => MatchPathOrDescendantPath(x.path, path));
+		return this.getMessages().filter((x) => MatchPathOrDescendantPath(x.path, path));
+	}
+
+	getHasMessageOfPathAndBody(path: string, body: string): boolean {
+		return this.getMessages().some((x) => x.path === path && x.body === body);
 	}
 
 	messagesOfPathAndDescendant(path: string): Observable<Array<UmbValidationMessage>> {
 		//path = path.toLowerCase();
-		return this.#messages.asObservablePart((msgs) => msgs.filter((x) => MatchPathOrDescendantPath(x.path, path)));
+		return createObservablePart(this.filteredMessages, (msgs) =>
+			msgs.filter((x) => MatchPathOrDescendantPath(x.path, path)),
+		);
 	}
 
 	messagesOfTypeAndPath(type: UmbValidationMessageType, path: string): Observable<Array<UmbValidationMessage>> {
 		//path = path.toLowerCase();
 		// Find messages that matches the given type and path.
-		return this.#messages.asObservablePart((msgs) => msgs.filter((x) => x.type === type && x.path === path));
+		return createObservablePart(this.filteredMessages, (msgs) =>
+			msgs.filter((x) => x.type === type && x.path === path),
+		);
+	}
+
+	messagesOfNotTypeAndPath(type: UmbValidationMessageType, path: string): Observable<Array<UmbValidationMessage>> {
+		//path = path.toLowerCase();
+		// Find messages that matches the given type and path.
+		return createObservablePart(this.filteredMessages, (msgs) =>
+			msgs.filter((x) => x.type !== type && x.path === path),
+		);
 	}
 
 	hasMessagesOfPathAndDescendant(path: string): Observable<boolean> {
 		//path = path.toLowerCase();
-		return this.#messages.asObservablePart((msgs) => msgs.some((x) => MatchPathOrDescendantPath(x.path, path)));
+		return createObservablePart(this.filteredMessages, (msgs) =>
+			msgs.some((x) => MatchPathOrDescendantPath(x.path, path)),
+		);
 	}
 	getHasMessagesOfPathAndDescendant(path: string): boolean {
 		//path = path.toLowerCase();
-		return this.#messages
-			.getValue()
-			.some(
-				(x) =>
-					x.path.indexOf(path) === 0 &&
-					(x.path.length === path.length || x.path[path.length] === '.' || x.path[path.length] === '['),
-			);
+		return this.getMessages().some(
+			(x) =>
+				x.path.indexOf(path) === 0 &&
+				(x.path.length === path.length || x.path[path.length] === '.' || x.path[path.length] === '['),
+		);
 	}
 
 	addMessage(type: UmbValidationMessageType, path: string, body: string, key: string = UmbId.new()): void {
@@ -75,7 +129,9 @@ export class UmbValidationMessagesManager {
 		if (this.#messages.getValue().find((x) => x.type === type && x.path === path && x.body === body)) {
 			return;
 		}
+		this.initiateChange();
 		this.#messages.appendOne({ type, key, path, body: body });
+		this.finishChange();
 	}
 
 	addMessages(type: UmbValidationMessageType, path: string, bodies: Array<string>): void {
@@ -86,27 +142,48 @@ export class UmbValidationMessagesManager {
 		const newBodies = bodies.filter(
 			(message) => existingMessages.find((x) => x.type === type && x.path === path && x.body === message) === undefined,
 		);
+		this.initiateChange();
 		this.#messages.append(newBodies.map((body) => ({ type, key: UmbId.new(), path, body })));
+		this.finishChange();
+	}
+
+	addMessageObjects(messages: Array<UmbValidationMessage>): void {
+		this.initiateChange();
+		this.#messages.append(messages);
+		this.finishChange();
 	}
 
 	removeMessageByKey(key: string): void {
+		this.initiateChange();
 		this.#messages.removeOne(key);
+		this.finishChange();
 	}
 	removeMessageByKeys(keys: Array<string>): void {
+		if (keys.length === 0) return;
+		this.initiateChange();
 		this.#messages.filter((x) => keys.indexOf(x.key) === -1);
+		this.finishChange();
 	}
 	removeMessagesByType(type: UmbValidationMessageType): void {
+		this.initiateChange();
 		this.#messages.filter((x) => x.type !== type);
+		this.finishChange();
 	}
 	removeMessagesByPath(path: string): void {
+		this.initiateChange();
 		this.#messages.filter((x) => x.path !== path);
+		this.finishChange();
 	}
 	removeMessagesAndDescendantsByPath(path: string): void {
+		this.initiateChange();
 		this.#messages.filter((x) => MatchPathOrDescendantPath(x.path, path));
+		this.finishChange();
 	}
 	removeMessagesByTypeAndPath(type: UmbValidationMessageType, path: string): void {
 		//path = path.toLowerCase();
+		this.initiateChange();
 		this.#messages.filter((x) => !(x.type === type && x.path === path));
+		this.finishChange();
 	}
 
 	#translatePath(path: string): string | undefined {
@@ -124,6 +201,7 @@ export class UmbValidationMessagesManager {
 
 	#translators: Array<UmbValidationMessageTranslator> = [];
 	addTranslator(translator: UmbValidationMessageTranslator): void {
+		this.initiateChange();
 		if (this.#translators.indexOf(translator) === -1) {
 			this.#translators.push(translator);
 		}
@@ -137,6 +215,7 @@ export class UmbValidationMessagesManager {
 				this.#messages.updateOne(msg.key, { path: newPath });
 			}
 		}
+		this.finishChange();
 	}
 
 	removeTranslator(translator: UmbValidationMessageTranslator): void {

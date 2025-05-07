@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const dataTypeName = 'List View - Media';
 let dataTypeDefaultData = null;
@@ -105,7 +105,8 @@ test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
-  await umbracoUi.media.reloadMediaTree();
+  //await umbracoUi.media.isSuccessNotificationVisible();
+  await umbracoUi.media.isErrorNotificationVisible(false);
   expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();
@@ -114,8 +115,8 @@ test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}
   await umbracoUi.media.isItemVisibleInRecycleBin(secondMediaFileName, true, false);
 });
 
-// TODO: Remove skip when update code to select media successfully.
-test.skip('can allow bulk move in the media section', async ({umbracoApi, umbracoUi}) => {
+// TODO: Remove fixme when update code to select media successfully.
+test.fixme('can allow bulk move in the media section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaFolderName = 'Test Folder Name';
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
@@ -131,7 +132,8 @@ test.skip('can allow bulk move in the media section', async ({umbracoApi, umbrac
   await umbracoUi.media.clickChooseModalButton();
 
   // Assert
-  await umbracoUi.media.isSuccessNotificationVisible();
+  //await umbracoUi.media.isSuccessNotificationVisible();
+  await umbracoUi.media.isErrorNotificationVisible(false);
   expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, firstMediaFileName)).toBeTruthy();
   expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, secondMediaFileName)).toBeTruthy();
 

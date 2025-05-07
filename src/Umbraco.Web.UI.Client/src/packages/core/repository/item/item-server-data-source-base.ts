@@ -1,9 +1,10 @@
-import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse } from '../data-source-response.interface.js';
+import type { UmbItemDataSource } from './item-data-source.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 export interface UmbItemServerDataSourceBaseArgs<ServerItemType, ClientItemType extends { unique: string }> {
-	getItems: (uniques: Array<string>) => Promise<Array<ServerItemType>>;
+	getItems: (uniques: Array<string>) => Promise<UmbDataSourceResponse<Array<ServerItemType>>>;
 	mapper: (item: ServerItemType) => ClientItemType;
 }
 
@@ -16,7 +17,7 @@ export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType
 	implements UmbItemDataSource<ClientItemType>
 {
 	#host: UmbControllerHost;
-	#getItems: (uniques: Array<string>) => Promise<Array<ServerItemType>>;
+	#getItems: (uniques: Array<string>) => Promise<UmbDataSourceResponse<Array<ServerItemType>>>;
 	#mapper: (item: ServerItemType) => ClientItemType;
 
 	/**
@@ -39,7 +40,7 @@ export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType
 	 */
 	async getItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
-		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getItems(uniques));
+		const { data, error } = await tryExecute(this.#host, this.#getItems(uniques));
 
 		if (data) {
 			const items = data.map((item) => this.#mapper(item));

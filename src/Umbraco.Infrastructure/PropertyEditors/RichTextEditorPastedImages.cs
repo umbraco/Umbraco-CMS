@@ -38,56 +38,6 @@ public sealed class RichTextEditorPastedImages
     private readonly AppCaches _appCaches;
     private readonly IUserService _userService;
 
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
-    public RichTextEditorPastedImages(
-        IUmbracoContextAccessor umbracoContextAccessor,
-        ILogger<RichTextEditorPastedImages> logger,
-        IHostingEnvironment hostingEnvironment,
-        IMediaService mediaService,
-        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-        MediaFileManager mediaFileManager,
-        MediaUrlGeneratorCollection mediaUrlGenerators,
-        IShortStringHelper shortStringHelper,
-        IPublishedUrlProvider publishedUrlProvider)
-        : this(
-            umbracoContextAccessor,
-            logger,
-            hostingEnvironment,
-            mediaService,
-            contentTypeBaseServiceProvider,
-            mediaFileManager,
-            mediaUrlGenerators,
-            shortStringHelper,
-            publishedUrlProvider,
-            StaticServiceProvider.Instance.GetRequiredService<ITemporaryFileService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IScopeProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IMediaImportService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IImageUrlGenerator>(),
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>())
-    {
-    }
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
-    public RichTextEditorPastedImages(
-        IUmbracoContextAccessor umbracoContextAccessor,
-        ILogger<RichTextEditorPastedImages> logger,
-        IHostingEnvironment hostingEnvironment,
-        IMediaService mediaService,
-        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-        MediaFileManager mediaFileManager,
-        MediaUrlGeneratorCollection mediaUrlGenerators,
-        IShortStringHelper shortStringHelper,
-        IPublishedUrlProvider publishedUrlProvider,
-        ITemporaryFileService temporaryFileService,
-        IScopeProvider scopeProvider,
-        IMediaImportService mediaImportService,
-        IImageUrlGenerator imageUrlGenerator,
-        IOptions<ContentSettings> contentSettings)
-        : this(umbracoContextAccessor, publishedUrlProvider, temporaryFileService, scopeProvider, mediaImportService, imageUrlGenerator)
-    {
-    }
-
-    // highest overload to be picked by DI, pointing to newest ctor
     [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
     public RichTextEditorPastedImages(
         IUmbracoContextAccessor umbracoContextAccessor,
@@ -153,18 +103,6 @@ public sealed class RichTextEditorPastedImages
         // this obviously is not correct. however, we only use IUserService in an obsolete method,
         // so this is better than having even more obsolete constructors for V16
         _userService = StaticServiceProvider.Instance.GetRequiredService<IUserService>();
-    }
-
-    [Obsolete($"Please use {nameof(FindAndPersistPastedTempImagesAsync)}. Will be removed in V16.")]
-    public string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IImageUrlGenerator imageUrlGenerator)
-        => FindAndPersistPastedTempImages(html, mediaParentFolder, userId);
-
-    [Obsolete($"Please use {nameof(FindAndPersistPastedTempImagesAsync)}. Will be removed in V16.")]
-    public string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId)
-    {
-        IUser user = _userService.GetUserById(userId)
-                     ?? throw new ArgumentException($"Could not find a user with the specified user key ({userId})", nameof(userId));
-        return FindAndPersistPastedTempImagesAsync(html, mediaParentFolder, user.Key).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -252,7 +190,7 @@ public sealed class RichTextEditorPastedImages
                 });
             }
 
-            img.SetAttributeValue("src", location);
+            img.SetAttributeValue("src", location ?? string.Empty);
 
             // Remove the data attribute (so we do not re-process this)
             img.Attributes.Remove(TemporaryImageDataAttribute);

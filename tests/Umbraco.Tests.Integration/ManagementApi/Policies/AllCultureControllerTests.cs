@@ -9,13 +9,13 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Policies;
 ///
 /// </summary>
 [TestFixture]
-public class AllCultureControllerTests : ManagementApiTest<AllCultureController>
+internal sealed class AllCultureControllerTests : ManagementApiTest<AllCultureController>
 {
     protected override Expression<Func<AllCultureController, object>> MethodSelector =>
         x => x.GetAll(CancellationToken.None, 0, 100);
 
     [Test]
-    public virtual async Task As_Admin_I_Have_Access()
+    public async Task As_Admin_I_Have_Access()
     {
         await AuthenticateClientAsync(Client, "admin@umbraco.com", "1234567890", true);
 
@@ -25,7 +25,7 @@ public class AllCultureControllerTests : ManagementApiTest<AllCultureController>
     }
 
     [Test]
-    public virtual async Task As_Editor_I_Have_Access()
+    public async Task As_Editor_I_Have_Access()
     {
         await AuthenticateClientAsync(Client, "editor@umbraco.com", "1234567890", false);
 
@@ -35,7 +35,7 @@ public class AllCultureControllerTests : ManagementApiTest<AllCultureController>
     }
 
     [Test]
-    public virtual async Task Unauthourized_when_no_token_is_provided()
+    public async Task Unauthourized_when_no_token_is_provided()
     {
         var response = await Client.GetAsync(Url);
 

@@ -28,15 +28,13 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 				this.#context.removeValidator(this);
 			}
 			this.#context = context;
-			context.addValidator(this);
+			context?.addValidator(this);
 			// If we have a message already, then un-pristine the control:
-			if (dataPath && context.messages.getHasMessagesOfPathAndDescendant(dataPath)) {
+			if (dataPath && context?.messages.getHasMessagesOfPathAndDescendant(dataPath)) {
 				formControl.pristine = false;
 			}
 		});
 		this.#control = formControl;
-		this.#control.addEventListener(UmbValidationInvalidEvent.TYPE, this.#setInvalid);
-		this.#control.addEventListener(UmbValidationValidEvent.TYPE, this.#setValid);
 	}
 
 	get isValid(): boolean {
@@ -50,7 +48,10 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 			if (newVal) {
 				this.#context?.messages.removeMessagesByTypeAndPath('client', this.#dataPath);
 			} else {
-				this.#context?.messages.addMessages('client', this.#dataPath, [this.#control.validationMessage]);
+				// We only want to add the message if it is not already there. (this could be a custom or server message that got binded to the control, we do not want that double.)
+				if (!this.#context?.messages.getHasMessageOfPathAndBody(this.#dataPath, this.#control.validationMessage)) {
+					this.#context?.messages.addMessage('client', this.#dataPath, this.#control.validationMessage);
+				}
 			}
 		}
 		//this.dispatchEvent(new CustomEvent('change')); // To let the ValidationContext know that the validation state has changed.
@@ -82,12 +83,18 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 
 	override hostConnected(): void {
 		super.hostConnected();
+		this.#control.addEventListener(UmbValidationInvalidEvent.TYPE, this.#setInvalid);
+		this.#control.addEventListener(UmbValidationValidEvent.TYPE, this.#setValid);
 		if (this.#context) {
 			this.#context.addValidator(this);
 		}
 	}
 	override hostDisconnected(): void {
 		super.hostDisconnected();
+		if (this.#control) {
+			this.#control.removeEventListener(UmbValidationInvalidEvent.TYPE, this.#setInvalid);
+			this.#control.removeEventListener(UmbValidationValidEvent.TYPE, this.#setValid);
+		}
 		if (this.#context) {
 			this.#context.removeValidator(this);
 			// Remove any messages that this validator has added:
@@ -99,11 +106,9 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 	}
 
 	override destroy(): void {
+		super.destroy();
 		if (this.#control) {
-			this.#control.removeEventListener(UmbValidationInvalidEvent.TYPE, this.#setInvalid);
-			this.#control.removeEventListener(UmbValidationValidEvent.TYPE, this.#setValid);
 			this.#control = undefined as any;
 		}
-		super.destroy();
 	}
 }

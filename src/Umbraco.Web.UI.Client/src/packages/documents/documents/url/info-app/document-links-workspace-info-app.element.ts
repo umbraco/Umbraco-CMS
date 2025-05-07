@@ -51,12 +51,12 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
 			this.#eventContext = context;
 
-			this.#eventContext.removeEventListener(
+			this.#eventContext?.removeEventListener(
 				UmbRequestReloadStructureForEntityEvent.TYPE,
 				this.#onReloadRequest as unknown as EventListener,
 			);
 
-			this.#eventContext.addEventListener(
+			this.#eventContext?.addEventListener(
 				UmbRequestReloadStructureForEntityEvent.TYPE,
 				this.#onReloadRequest as unknown as EventListener,
 			);
@@ -64,24 +64,32 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
 			this.#documentWorkspaceContext = context;
-			this.observe(observeMultiple([context.isNew, context.unique]), ([isNew, unique]) => {
-				if (!unique) return;
-				this._isNew = isNew === true;
+			if (context) {
+				this.observe(
+					observeMultiple([context.isNew, context.unique]),
+					([isNew, unique]) => {
+						if (!unique) return;
+						this._isNew = isNew === true;
 
-				if (unique !== this._unique) {
-					this._unique = unique;
-					this.#requestUrls();
-				}
-			});
+						if (unique !== this._unique) {
+							this._unique = unique;
+							this.#requestUrls();
+						}
+					},
+					'observeWorkspaceState',
+				);
+			} else {
+				this.removeUmbControllerByAlias('observeWorkspaceState');
+			}
 
-			this.observe(context.variantOptions, (variantOptions) => {
+			this.observe(context?.variantOptions, (variantOptions) => {
 				this._variantOptions = variantOptions;
 				this.#setLinks();
 			});
 		});
 
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
-			this.observe(instance.appDefaultLanguage, (value) => {
+			this.observe(instance?.appDefaultLanguage, (value) => {
 				this._defaultCulture = value?.unique;
 				this.#setLinks();
 			});

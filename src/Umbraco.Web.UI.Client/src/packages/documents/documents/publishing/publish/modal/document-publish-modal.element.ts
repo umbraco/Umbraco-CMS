@@ -1,7 +1,7 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
 import { isNotPublishedMandatory } from '../../utils.js';
 import type { UmbDocumentPublishModalData, UmbDocumentPublishModalValue } from './document-publish-modal.token.js';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
@@ -21,6 +21,12 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 	@state()
 	_hasNotSelectedMandatory?: boolean;
 
+	@state()
+	_hasInvalidSelection = true;
+
+	@state()
+	_isInvariant = false;
+
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
 		if (!option.variant || option.variant.state === UmbDocumentVariantState.NOT_CREATED) {
 			return false;
@@ -29,6 +35,13 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 	};
 
 	override firstUpdated() {
+		// If invariant, don't display the variant selection component.
+		if (this.data?.options.length === 1 && this.data.options[0].culture === null) {
+			this._isInvariant = true;
+			this._hasInvalidSelection = false;
+			return;
+		}
+
 		this.#configureSelectionManager();
 	}
 
@@ -79,7 +92,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 	}
 
 	#submit() {
-		this.value = { selection: this.#selectionManager.getSelection() };
+		this.value = { selection: this._isInvariant ? ['invariant'] : this.#selectionManager.getSelection() };
 		this.modalContext?.submit();
 	}
 
@@ -88,26 +101,38 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<umb-body-layout headline=${this.localize.term('content_readyToPublish')}>
-			<p id="subtitle">
-				<umb-localize key="content_variantsToPublish">Which variants would you like to publish?</umb-localize>
+		return html`<uui-dialog-layout headline=${this.localize.term('content_readyToPublish')}>
+			${when(
+				!this._isInvariant,
+				() =>
+					html` <p id="subtitle">
+							<umb-localize key="content_variantsToPublish">Which variants would you like to publish?</umb-localize>
+						</p>
+						<umb-document-variant-language-picker
+							.selectionManager=${this.#selectionManager}
+							.variantLanguageOptions=${this._options}
+							.requiredFilter=${isNotPublishedMandatory}
+							.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>`,
+			)}
+
+			<p>
+				<umb-localize key="prompt_confirmPublish">
+					Publishing will make this page and all its published descendants visible on the site.
+				</umb-localize>
 			</p>
-			<umb-document-variant-language-picker
-				.selectionManager=${this.#selectionManager}
-				.variantLanguageOptions=${this._options}
-				.requiredFilter=${isNotPublishedMandatory}
-				.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>
 
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
-					label="${this.localize.term('buttons_saveAndPublish')}"
+					label="${this.data?.confirmLabel
+						? this.localize.string(this.data.confirmLabel)
+						: this.localize.term('buttons_saveAndPublish')}"
 					look="primary"
 					color="positive"
 					?disabled=${this._hasNotSelectedMandatory}
 					@click=${this.#submit}></uui-button>
 			</div>
-		</umb-body-layout>`;
+		</uui-dialog-layout>`;
 	}
 
 	static override styles = [

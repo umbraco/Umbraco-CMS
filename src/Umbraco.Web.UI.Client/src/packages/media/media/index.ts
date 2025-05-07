@@ -5,7 +5,6 @@ export * from './reference/index.js';
 export * from './repository/index.js';
 export * from './search/index.js';
 export * from './url/index.js';
-export * from './utils/index.js';
 
 export { UmbMediaAuditLogRepository } from './audit-log/index.js';
 

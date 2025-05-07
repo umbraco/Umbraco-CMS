@@ -40,10 +40,10 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
     public async Task Validate_OpenApi_Contract_is_implemented()
     {
         string[] keysToIgnore = { "servers", "x-generator" };
-        var officePath = GlobalSettings.GetBackOfficePath(HostingEnvironment);
+        var backOfficePath = HostingEnvironment.GetBackOfficePath();
 
-        var urlToContract = $"{officePath}/management/api/openapi.json";
-        var swaggerPath = $"{officePath}/swagger/management/swagger.json";
+        var urlToContract = $"{backOfficePath}/management/api/openapi.json";
+        var swaggerPath = $"{backOfficePath}/swagger/management/swagger.json";
         var apiContract = JsonNode.Parse(await Client.GetStringAsync(urlToContract)).AsObject();
 
         var generatedJsonString = await Client.GetStringAsync(swaggerPath);

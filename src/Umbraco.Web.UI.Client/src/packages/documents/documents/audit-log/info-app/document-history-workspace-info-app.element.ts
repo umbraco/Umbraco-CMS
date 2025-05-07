@@ -45,7 +45,7 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number));
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
-			context.addEventListener(UmbRequestReloadStructureForEntityEvent.TYPE, () => {
+			context?.addEventListener(UmbRequestReloadStructureForEntityEvent.TYPE, () => {
 				this.#requestAuditLogs();
 			});
 		});
@@ -62,7 +62,8 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	async #requestAuditLogs() {
-		const unique = this.#workspaceContext?.getUnique();
+		if (!this.#workspaceContext) return;
+		const unique = this.#workspaceContext.getUnique();
 		if (!unique) throw new Error('Document unique is required');
 
 		const { data } = await this.#auditLogRepository.requestAuditLog({
@@ -183,6 +184,7 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 			}
 
 			.log-type uui-tag {
+				justify-self: center;
 				height: fit-content;
 				margin-top: auto;
 				margin-bottom: auto;

@@ -1,7 +1,7 @@
 import type { UmbInputDocumentTypeElement } from '../../components/input-document-type/input-document-type.element.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -17,38 +17,37 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 		if (!config) return;
 
 		const minMax = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
-		this.min = minMax?.min ?? 0;
-		this.max = minMax?.max ?? Infinity;
+		this._min = minMax?.min ?? 0;
+		this._max = minMax?.max ?? Infinity;
 
-		this.onlyElementTypes = config.getValueByAlias('onlyPickElementTypes') ?? false;
-		this.showOpenButton = config?.getValueByAlias('showOpenButton') ?? false;
+		this._elementTypesOnly = config.getValueByAlias('onlyPickElementTypes') ?? false;
 	}
 
-	@state()
-	min = 0;
+	@property({ type: Boolean, attribute: 'readonly' })
+	readonly = false;
 
 	@state()
-	max = Infinity;
+	private _min = 0;
 
 	@state()
-	showOpenButton?: boolean;
+	private _max = Infinity;
 
 	@state()
-	onlyElementTypes?: boolean;
+	private _elementTypesOnly?: boolean;
 
 	#onChange(event: CustomEvent & { target: UmbInputDocumentTypeElement }) {
 		this.value = event.target.value;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
 		return html`
 			<umb-input-document-type
-				.min=${this.min}
-				.max=${this.max}
+				.min=${this._min}
+				.max=${this._max}
 				.value=${this.value}
-				.elementTypesOnly=${this.onlyElementTypes ?? false}
-				?showOpenButton=${this.showOpenButton}
+				.readonly=${this.readonly}
+				.elementTypesOnly=${this._elementTypesOnly ?? false}
 				@change=${this.#onChange}>
 			</umb-input-document-type>
 		`;

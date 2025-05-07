@@ -1,12 +1,12 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-color-picker
@@ -17,8 +17,7 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 
 	@property({ type: Object })
 	public set value(value: UmbSwatchDetails | undefined) {
-		if (!value) return;
-		this.#value = this.#ensureHashPrefix(value);
+		this.#value = value ? this.#ensureHashPrefix(value) : undefined;
 	}
 	public get value(): UmbSwatchDetails | undefined {
 		return this.#value;
@@ -60,7 +59,7 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 	#onChange(event: UUIColorSwatchesEvent) {
 		const value = event.target.value;
 		this.value = this._swatches.find((swatch) => swatch.value === value);
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

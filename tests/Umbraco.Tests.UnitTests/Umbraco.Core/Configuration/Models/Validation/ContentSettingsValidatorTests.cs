@@ -41,16 +41,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
         private static ContentSettings BuildContentSettings(string culture = "en-US", string autoFillImagePropertyAlias = "testAlias") =>
             new ContentSettings
             {
-                Error404Collection = new ContentErrorPage[]
-                    {
-                        new() { Culture = culture, ContentId = 1 },
-                    },
-                Imaging = new ContentImagingSettings
+                Error404Collection =
                 {
-                    AutoFillImageProperties = new ImagingAutoFillUploadField[]
-                        {
-                            new() { Alias = autoFillImagePropertyAlias, WidthFieldAlias = "w", HeightFieldAlias = "h", LengthFieldAlias = "l", ExtensionFieldAlias = "e" },
-                        },
+                    new() { Culture = culture, ContentId = 1 },
+                },
+                Imaging =
+                {
+                    AutoFillImageProperties =
+                    {
+                        new() { Alias = autoFillImagePropertyAlias, WidthFieldAlias = "w", HeightFieldAlias = "h", LengthFieldAlias = "l", ExtensionFieldAlias = "e" },
+                    },
                 },
             };
     }

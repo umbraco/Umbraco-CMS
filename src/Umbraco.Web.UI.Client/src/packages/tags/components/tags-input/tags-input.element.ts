@@ -278,6 +278,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 				align-items: center;
 				padding: var(--uui-size-space-2);
 				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
 				background-color: var(--uui-input-background-color, var(--uui-color-surface));
 				flex: 1;
 				min-height: 40px;

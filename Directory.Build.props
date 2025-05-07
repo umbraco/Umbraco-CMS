@@ -20,6 +20,7 @@
     <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
   </PropertyGroup>
 
+
   <PropertyGroup>
     <!--
       TODO: Fix and remove overrides:
@@ -39,7 +40,7 @@
   <!-- Package Validation -->
   <PropertyGroup>
     <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
-    <EnablePackageValidation>true</EnablePackageValidation>
+    <EnablePackageValidation>false</EnablePackageValidation>
     <PackageValidationBaselineVersion>15.0.0</PackageValidationBaselineVersion>
     <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
     <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>

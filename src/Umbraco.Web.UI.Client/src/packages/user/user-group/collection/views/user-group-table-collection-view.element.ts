@@ -12,13 +12,12 @@ import type {
 	UmbTableItem,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
-import { UmbMediaItemRepository } from '@umbraco-cms/backoffice/media';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
 
 import '../components/user-group-table-name-column-layout.element.js';
 import '../components/user-group-table-sections-column-layout.element.js';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-user-group-collection-table-view')
 export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
@@ -63,8 +62,8 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	#collectionContext?: UmbUserGroupCollectionContext;
 
 	// TODO: hardcoded dependencies on document and media modules. We should figure out how these dependencies can be added through extensions.
-	#documentItemRepository = new UmbDocumentItemRepository(this);
-	#mediaItemRepository = new UmbMediaItemRepository(this);
+	#documentItemRepository?: UmbItemRepository<UmbUniqueItemModel>;
+	#mediaItemRepository?: UmbItemRepository<UmbUniqueItemModel>;
 
 	#documentStartNodeMap = new Map<string, string>();
 	#mediaStartNodeMap = new Map<string, string>();
@@ -75,21 +74,44 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 		this.consumeContext(UMB_USER_GROUP_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
 			this.observe(
-				this.#collectionContext.selection.selection,
-				(selection) => (this._selection = selection),
+				this.#collectionContext?.selection.selection,
+				(selection) => (this._selection = selection ?? []),
 				'umbCollectionSelectionObserver',
 			);
 			this.observe(
-				this.#collectionContext.items,
-				(items) => {
-					this._createTableItems(items);
+				this.#collectionContext?.items,
+				async (items) => {
+					await this.#initRepositories();
+					this._createTableItems(items ?? []);
 				},
 				'umbCollectionItemsObserver',
 			);
 		});
 	}
 
+	async #initRepositories() {
+		if (this.#documentItemRepository && this.#mediaItemRepository) return;
+
+		// TODO: get back to this when documents have been decoupled from users.
+		// The repository alias is hardcoded on purpose to avoid a document import in the user module.
+		this.#documentItemRepository = await createExtensionApiByAlias<UmbItemRepository<UmbUniqueItemModel>>(
+			this,
+			'Umb.Repository.DocumentItem',
+		);
+
+		// TODO: get back to this when media have been decoupled from users.
+		// The repository alias is hardcoded on purpose to avoid a media import in the user module.
+		this.#mediaItemRepository = await createExtensionApiByAlias<UmbItemRepository<UmbUniqueItemModel>>(
+			this,
+			'Umb.Repository.MediaItem',
+		);
+	}
+
 	private async _createTableItems(userGroups: Array<UmbUserGroupDetailModel>) {
+		if (!this.#documentItemRepository || !this.#mediaItemRepository) {
+			throw new Error('Document and media item repositories are not initialized.');
+		}
+
 		await Promise.all([
 			this.#requestAndCacheStartNodes(
 				userGroups,

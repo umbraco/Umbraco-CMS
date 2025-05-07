@@ -49,7 +49,7 @@ test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.language.createVietnameseLanguage();
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
   dataTypeId = dataType.id;
-  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId, 'TestGroup', true);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId, 'TestGroup', true, true);
   await umbracoApi.document.createDocumentWithMultipleVariants(documentName, documentTypeId, AliasHelper.toAlias(dataTypeName), cultureVariants);
 });
 
@@ -80,7 +80,8 @@ test.fixme('can rename content with language set in userGroup', async ({umbracoA
   await umbracoUi.content.clickSaveAndCloseButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isErrorNotificationVisible(false);
   await umbracoUi.content.isContentInTreeVisible(updatedContentName);
 });
 

@@ -593,8 +593,8 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Install Playwright and dependencies
-          - pwsh: npx playwright install --with-deps
-            displayName: Install Playwright
+          - pwsh: npx playwright install chromium
+            displayName: Install Playwright only with Chromium browser
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
@@ -639,7 +639,7 @@ stages:
               testResultsFormat: 'JUnit'
               testResultsFiles: '*.xml'
               searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
-              testRunTitle: "$(Agent.JobName)"   
+              testRunTitle: "$(Agent.JobName)"
 
       - job:
         displayName: E2E Tests (SQL Server)
@@ -760,8 +760,8 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Install Playwright and dependencies
-          - pwsh: npx playwright install --with-deps
-            displayName: Install Playwright
+          - pwsh: npx playwright install chromium
+            displayName: Install Playwright only with Chromium browser
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
@@ -806,7 +806,7 @@ stages:
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
-          
+
           # Publish test results
           - task: PublishTestResults@2
             displayName: "Publish test results"
@@ -829,6 +829,8 @@ stages:
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     jobs:
       - job:
+        pool:
+          vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
         displayName: Push to pre-release feed
         steps:
           - checkout: none
@@ -890,6 +892,8 @@ stages:
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
     jobs:
       - job:
+        pool:
+          vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
         displayName: Push to NuGet
         steps:
           - checkout: none

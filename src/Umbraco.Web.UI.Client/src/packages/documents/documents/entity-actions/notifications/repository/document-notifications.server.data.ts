@@ -1,7 +1,7 @@
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UpdateDocumentNotificationsRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document Culture and Hostnames that fetches data from the server
@@ -26,7 +26,7 @@ export class UmbDocumentNotificationsServerDataSource {
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentService.getDocumentByIdNotifications({ id: unique }));
+		return tryExecute(this.#host, DocumentService.getDocumentByIdNotifications({ path: { id: unique } }));
 	}
 
 	/**
@@ -37,9 +37,6 @@ export class UmbDocumentNotificationsServerDataSource {
 	 */
 	async update(unique: string, data: UpdateDocumentNotificationsRequestModel) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecuteAndNotify(
-			this.#host,
-			DocumentService.putDocumentByIdNotifications({ id: unique, requestBody: data }),
-		);
+		return tryExecute(this.#host, DocumentService.putDocumentByIdNotifications({ path: { id: unique }, body: data }));
 	}
 }

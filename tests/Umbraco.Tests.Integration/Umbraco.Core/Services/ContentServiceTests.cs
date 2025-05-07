@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
     Database = UmbracoTestOptions.Database.NewSchemaPerTest,
     PublishedRepositoryEvents = true,
     WithApplication = true)]
-public class ContentServiceTests : UmbracoIntegrationTestWithContent
+internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 {
     [SetUp]
     public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
@@ -214,7 +214,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         ctVariant.Variations = ContentVariation.Culture;
         ContentTypeService.Save(ctVariant);
 
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
 
         // 10x invariant content, half is scheduled to be published in 5 seconds, the other half is scheduled to be unpublished in 5 seconds
         var invariant = new List<IContent>();
@@ -321,7 +321,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         // Act
         var content = ContentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage");
 
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.Now.AddHours(2));
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddHours(2));
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
         Assert.AreEqual(1, contentSchedule.FullSchedule.Count);
 
@@ -676,7 +676,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         var root = ContentService.GetById(Textpage.Id);
         ContentService.Publish(root!, root!.AvailableCultures.ToArray());
         var content = ContentService.GetById(Subpage.Id);
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.Now.AddSeconds(1));
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddSeconds(1));
         ContentService.PersistContentSchedule(content!, contentSchedule);
         ContentService.Publish(content, content.AvailableCultures.ToArray());
 
@@ -1386,7 +1386,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var content = ContentService.GetById(Subpage.Id); // This Content expired 5min ago
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.Now.AddMinutes(-5));
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddMinutes(-5));
         ContentService.Save(content, contentSchedule: contentSchedule);
 
         var parent = ContentService.GetById(Textpage.Id);
@@ -1416,7 +1416,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var content = ContentBuilder.CreateBasicContent(contentType);
         content.SetCultureName("Hello", "en-US");
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", null, DateTime.Now.AddMinutes(-5));
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", null, DateTime.UtcNow.AddMinutes(-5));
         ContentService.Save(content, contentSchedule: contentSchedule);
 
         var published = ContentService.Publish(content, new[] { "en-US" });
@@ -1431,7 +1431,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var content = ContentService.GetById(Subpage.Id);
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddHours(2), null);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null);
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
 
         var parent = ContentService.GetById(Textpage.Id);
@@ -1488,7 +1488,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         content.Properties[0].SetValue("Foo", string.Empty);
         contentService.Save(content);
         contentService.PersistContentSchedule(content,
-            ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddHours(2), null));
+            ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null));
 
         // Act
         var result = contentService.Publish(content, Array.Empty<string>(), userId: Constants.Security.SuperUserId);
@@ -1540,7 +1540,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         contentService.Publish(content, Array.Empty<string>());
 
         contentService.PersistContentSchedule(content,
-            ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddHours(2), null));
+            ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null));
         contentService.Save(content);
 
         // Act
@@ -1568,7 +1568,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var content = ContentBuilder.CreateBasicContent(contentType);
         content.SetCultureName("Hello", "en-US");
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", DateTime.Now.AddHours(2), null);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", DateTime.UtcNow.AddHours(2), null);
         ContentService.Save(content, contentSchedule: contentSchedule);
 
         var published = ContentService.Publish(content, new[] { "en-US" });
@@ -1913,11 +1913,11 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Ensures_Permissions_Are_Retained_For_Copied_Descendants_With_Explicit_Permissions()
+    public async Task Ensures_Permissions_Are_Retained_For_Copied_Descendants_With_Explicit_Permissions()
     {
         // Arrange
         var userGroup = UserGroupBuilder.CreateUserGroup("1");
-        UserService.Save(userGroup);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -1954,11 +1954,11 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Ensures_Permissions_Are_Inherited_For_Copied_Descendants()
+    public async Task Ensures_Permissions_Are_Inherited_For_Copied_Descendants()
     {
         // Arrange
         var userGroup = UserGroupBuilder.CreateUserGroup("1");
-        UserService.Save(userGroup);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -1969,7 +1969,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         {
             new(contentType.Key, 0, contentType.Alias)
         };
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parentPage = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(parentPage);
@@ -2060,7 +2060,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
         editorGroup.StartContentId = content1.Id;
-        UserService.Save(editorGroup);
+        await UserGroupService.UpdateAsync(editorGroup, Constants.Security.SuperUserKey);
 
         var admin = await UserService.GetAsync(Constants.Security.SuperUserKey);
         admin.StartContentIds = new[] { content1.Id };
@@ -2075,7 +2075,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsTrue(PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
         var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
-        var userGroup = UserService.GetUserGroupByAlias(user.Groups.First().Alias);
+        var userGroup = await UserGroupService.GetAsync(user.Groups.First().Alias);
         Assert.IsNotNull(NotificationService.CreateNotification(user, content1, "X"));
 
         ContentService.SetPermission(content1, "A", new[] { userGroup.Id });

@@ -18,11 +18,11 @@ export class UmbRelationTypeDetailRepository
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.#init = Promise.all([
-			this.consumeContext(UMB_RELATION_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
+		this.#init = this.consumeContext(UMB_RELATION_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
+			if (instance) {
 				this.#detailStore = instance;
-			}).asPromise(),
-		]);
+			}
+		}).asPromise({ preventTimeout: true });
 	}
 
 	/**
@@ -38,7 +38,7 @@ export class UmbRelationTypeDetailRepository
 		const { data, error } = await this.#detailSource.read(unique);
 
 		if (data) {
-			this.#detailStore!.append(data);
+			this.#detailStore?.append(data);
 		}
 
 		return { data, error, asObservable: () => this.#detailStore!.byUnique(unique) };

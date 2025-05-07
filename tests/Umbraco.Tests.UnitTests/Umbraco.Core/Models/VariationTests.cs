@@ -1,13 +1,16 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -565,13 +568,13 @@ public class VariationTests
         Assert.IsNull(prop.GetValue(published: true));
         var propertyValidationService = GetPropertyValidationService();
 
-        Assert.IsTrue(propertyValidationService.IsPropertyValid(prop));
+        Assert.IsTrue(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.Empty()));
 
         propertyType.Mandatory = true;
-        Assert.IsTrue(propertyValidationService.IsPropertyValid(prop));
+        Assert.IsTrue(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.Empty()));
 
         prop.SetValue(null);
-        Assert.IsFalse(propertyValidationService.IsPropertyValid(prop));
+        Assert.IsFalse(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.Empty()));
 
         // can publish, even though invalid
         prop.PublishValues();
@@ -604,12 +607,12 @@ public class VariationTests
         var propertyValidationService = GetPropertyValidationService();
 
         // "no value" is valid for non-mandatory properties
-        Assert.IsTrue(propertyValidationService.IsPropertyValid(prop, culture, segment));
+        Assert.IsTrue(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.CultureAndSegment(culture, segment)));
 
         propertyType.Mandatory = true;
 
         // "no value" is NOT valid for mandatory properties
-        Assert.IsFalse(propertyValidationService.IsPropertyValid(prop, culture, segment));
+        Assert.IsFalse(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.CultureAndSegment(culture, segment)));
 
         // can publish, even though invalid
         prop.PublishValues();
@@ -654,6 +657,8 @@ public class VariationTests
             dataTypeService,
             Mock.Of<ILocalizedTextService>(),
             new ValueEditorCache(),
-            Mock.Of<ICultureDictionary>());
+            Mock.Of<ICultureDictionary>(),
+            Mock.Of<ILanguageService>(),
+            Mock.Of<IOptions<ContentSettings>>());
     }
 }

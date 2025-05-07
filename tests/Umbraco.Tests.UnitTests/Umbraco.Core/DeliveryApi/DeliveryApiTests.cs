@@ -9,7 +9,9 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
@@ -64,6 +66,9 @@ public class DeliveryApiTests
         publishStatusQueryService
             .Setup(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns(true);
+        publishStatusQueryService
+            .Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>()))
+            .Returns(true);
 
         PublishStatusQueryService = publishStatusQueryService.Object;
     }
@@ -72,7 +77,7 @@ public class DeliveryApiTests
     {
         var mockPublishedContentTypeFactory = new Mock<IPublishedContentTypeFactory>();
         mockPublishedContentTypeFactory.Setup(x => x.GetDataType(It.IsAny<int>()))
-            .Returns(new PublishedDataType(123, editorAlias, new Lazy<object>(() => dataTypeConfiguration)));
+            .Returns(new PublishedDataType(123, editorAlias, editorAlias, new Lazy<object>(() => dataTypeConfiguration)));
 
         var publishedPropType = new PublishedPropertyType(
             propertyTypeAlias,
@@ -87,6 +92,8 @@ public class DeliveryApiTests
     }
 
     protected IOutputExpansionStrategyAccessor CreateOutputExpansionStrategyAccessor() => new NoopOutputExpansionStrategyAccessor();
+
+    protected IVariationContextAccessor CreateVariationContextAccessor() => new TestVariationContextAccessor();
 
     protected IOptions<GlobalSettings> CreateGlobalSettings(bool hideTopLevelNodeFromPath = true)
     {
@@ -128,7 +135,8 @@ public class DeliveryApiTests
         IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null,
         IPublishedContentCache? contentCache = null,
         IDocumentNavigationQueryService? navigationQueryService = null,
-        IPublishStatusQueryService? publishStatusQueryService = null)
+        IPublishStatusQueryService? publishStatusQueryService = null,
+        IDocumentUrlService? documentUrlService = null)
     {
         if (requestHandlerSettingsMonitor == null)
         {
@@ -145,6 +153,7 @@ public class DeliveryApiTests
             requestHandlerSettingsMonitor,
             contentCache ?? Mock.Of<IPublishedContentCache>(),
             navigationQueryService ?? Mock.Of<IDocumentNavigationQueryService>(),
-            publishStatusQueryService ?? PublishStatusQueryService);
+            publishStatusQueryService ?? PublishStatusQueryService,
+            documentUrlService ?? Mock.Of<IDocumentUrlService>());
     }
 }

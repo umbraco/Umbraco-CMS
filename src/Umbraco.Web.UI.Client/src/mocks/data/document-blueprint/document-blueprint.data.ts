@@ -1,29 +1,24 @@
-import type { UmbMockDocumentModel } from '../document/document.data.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import {
+	DocumentVariantStateModel,
+	type DocumentBlueprintItemResponseModel,
+	type DocumentBlueprintResponseModel,
+	type DocumentBlueprintTreeItemResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbMockDocumentBlueprintModel extends UmbMockDocumentModel {}
+export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
+	DocumentBlueprintItemResponseModel &
+	DocumentBlueprintTreeItemResponseModel;
 
 export const data: Array<UmbMockDocumentBlueprintModel> = [
 	{
-		urls: [
-			{
-				culture: 'en-US',
-				url: '/',
-			},
-		],
-		template: null,
 		id: 'the-simplest-document-id',
-		createDate: '2023-02-06T15:32:05.350038',
-		parent: null,
 		documentType: {
 			id: 'the-simplest-document-type-id',
 			icon: 'icon-document',
 		},
 		hasChildren: false,
-		noAccess: false,
-		isProtected: false,
-		isTrashed: false,
+		isFolder: false,
+		name: 'The Simplest Document Blueprint',
 		variants: [
 			{
 				state: DocumentVariantStateModel.DRAFT,

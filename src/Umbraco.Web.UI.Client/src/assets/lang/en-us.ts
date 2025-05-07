@@ -77,28 +77,6 @@ export default {
 		structure: 'Structure',
 		other: 'Other',
 	},
-	actionDescriptions: {
-		assignDomain: 'Allow access to assign culture and hostnames',
-		auditTrail: "Allow access to view a node's history log",
-		browse: 'Allow access to view a node',
-		changeDocType: 'Allow access to change Document Type for a node',
-		copy: 'Allow access to copy a node',
-		create: 'Allow access to create nodes',
-		delete: 'Allow access to delete nodes',
-		move: 'Allow access to move a node',
-		protect: 'Allow access to set and change access restrictions for a node',
-		publish: 'Allow access to publish a node',
-		unpublish: 'Allow access to unpublish a node',
-		rights: 'Allow access to change permissions for a node',
-		rollback: 'Allow access to roll back a node to a previous state',
-		sendtopublish: 'Allow access to send a node for approval before publishing',
-		sendToTranslate: 'Allow access to send a node for translation',
-		sort: 'Allow access to change the sort order for nodes',
-		translate: 'Allow access to translate a node',
-		update: 'Allow access to save a node',
-		createblueprint: 'Allow access to create a Document Blueprint',
-		notify: 'Allow access to setup notifications for content nodes',
-	},
 	apps: {
 		umbContent: 'Content',
 		umbInfo: 'Info',
@@ -320,9 +298,6 @@ export default {
 		removeTextBox: 'Remove this text box',
 		contentRoot: 'Content root',
 		includeUnpublished: 'Include unpublished content items.',
-		forceRepublish: 'Publish unchanged items.',
-		forceRepublishWarning: 'WARNING: Publishing all pages below this one in the content tree, whether or not they have changed, can be an expensive and long-running operation.',
-		forceRepublishAdvisory: 'This should not be necessary in normal circumstances so please only proceed with this option selected if you are certain it is required.',
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your\n      website administrator.\n    ',
 		isSensitiveValue_short: 'This value is hidden.',
@@ -452,7 +427,6 @@ export default {
 			"Defines a re-usable set of properties that can be included in the definition of\n      multiple other Document Types. For example, a set of 'Common Page Settings'.\n    ",
 		folder: 'Folder',
 		folderDescription: 'Used to organize items and other folders. Keep items structured and easy to access.',
-		newFolder: 'Folder',
 		newDataType: 'Data Type',
 		newJavascriptFile: 'New JavaScript file',
 		newEmptyPartialView: 'New empty partial view',
@@ -460,8 +434,6 @@ export default {
 		newPartialViewFromSnippet: 'New partial view from snippet',
 		newPartialViewMacroFromSnippet: 'New partial view macro from snippet',
 		newPartialViewMacroNoMacro: 'New partial view macro (without macro)',
-		newStyleSheetFile: 'New style sheet file',
-		newRteStyleSheetFile: 'New Rich Text Editor style sheet file',
 	},
 	dashboard: {
 		browser: 'Browse your website',
@@ -471,18 +443,6 @@ export default {
 		restart: 'Restart',
 		visit: 'Visit',
 		welcome: 'Welcome',
-	},
-	prompt: {
-		stay: 'Stay',
-		discardChanges: 'Discard changes',
-		unsavedChanges: 'You have unsaved changes',
-		unsavedChangesWarning: 'Are you sure you want to navigate away from this page? You have unsaved changes',
-		confirmListViewPublish: 'Publishing will make the selected items visible on the site.',
-		confirmListViewUnpublish:
-			'Unpublishing will remove the selected items and all their descendants from the\n      site.\n    ',
-		confirmUnpublish: 'Unpublishing will remove this page and all its descendants from the site.',
-		doctypeChangeWarning:
-			'You have unsaved changes. Making changes to the Document Type will discard the\n      changes.\n    ',
 	},
 	bulk: {
 		done: 'Done',
@@ -1250,7 +1210,8 @@ export default {
 		colorsTitle: 'Colors',
 		colorsDescription: 'Add, remove or sort colors',
 		showLabelTitle: 'Include labels?',
-		showLabelDescription: 'Stores colors as a JSON object containing both the color hex string and label, rather than just the hex string.',
+		showLabelDescription:
+			'Stores colors as a JSON object containing both the color hex string and label, rather than just the hex string.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
@@ -1707,16 +1668,6 @@ export default {
 		compositionUsageHeading: 'Where is this composition used?',
 		compositionUsageSpecification:
 			'This composition is currently used in the composition of the following\n      Content Types:\n    ',
-		variantsHeading: 'Allow variations',
-		cultureVariantHeading: 'Allow vary by culture',
-		segmentVariantHeading: 'Allow segmentation',
-		cultureVariantLabel: 'Vary by culture',
-		segmentVariantLabel: 'Vary by segments',
-		variantsDescription: 'Allow editors to create content of this type in different languages.',
-		cultureVariantDescription: 'Allow editors to create content of different languages.',
-		segmentVariantDescription: 'Allow editors to create segments of this content.',
-		allowVaryByCulture: 'Allow varying by culture',
-		allowVaryBySegment: 'Allow segmentation',
 		elementType: 'Element Type',
 		elementHeading: 'Is an Element Type',
 		elementDescription:
@@ -1985,9 +1936,6 @@ export default {
 		permissionsGranularHelp: 'Set permissions for specific nodes',
 		granularRightsLabel: 'Documents',
 		granularRightsDescription: 'Assign permissions to specific documents',
-		permissionsEntityGroup_document: 'Content',
-		permissionsEntityGroup_media: 'Media',
-		permissionsEntityGroup_member: 'Member',
 		profile: 'Profile',
 		searchAllChildren: 'Search all children',
 		languagesHelp: 'Limit the languages users have access to edit',
@@ -2109,7 +2057,7 @@ export default {
 		duplicateUsername: "Username '%0%' is already taken",
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
-		entriesExceed: 'Maximum %0% entries, <strong>%1%</strong> too many.',
+		entriesExceed: 'Maximum %0% entries, you have entered <strong>%1%</strong> too many.',
 		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
 	},
 	healthcheck: {
@@ -2375,7 +2323,7 @@ export default {
 		refreshStatus: 'Refresh status',
 		memoryCache: 'Memory Cache',
 		memoryCacheDescription:
-			'\n            This button lets you reload the in-memory cache, by entirely reloading it from the database\n    cache (but it does not rebuild that database cache). This is relatively fast.\n    Use it when you think that the memory cache has not been properly refreshed, after some events\n    triggered&mdash;which would indicate a minor Umbraco issue.\n    (note: triggers the reload on all servers in an LB environment).\n    ',
+			'\n            This button lets you reload the in-memory cache, by entirely reloading it from the database\n    cache (but it does not rebuild that database cache). This is relatively fast.\n    Use it when you think that the memory cache has not been properly refreshed, after some events\n    triggered&mdash;which would indicate a minor Umbraco issue.\n    (note: triggers the reload on all servers in an LB environment, and will clear the second level cache if you have it enabled).\n    ',
 		reload: 'Reload',
 		databaseCache: 'Database Cache',
 		databaseCacheDescription:
@@ -2615,7 +2563,7 @@ export default {
 		consentForAnalytics: 'Consent for telemetry data',
 		analyticsLevelSavedSuccess: 'Telemetry level saved!',
 		analyticsDescription:
-			'\n      In order to improve Umbraco and add new functionality based on as relevant information as possible,\n          <br>we would like to collect system- and usage information from your installation.\n          <br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n          <br>Hopefully, you will help us collect some valuable data.\n          <br>\n          <br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.\n       ',
+			'In order to improve Umbraco and add new functionality based on as relevant information as possible, we would like to collect system- and usage information from your installation.\n<br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n<br>Hopefully, you will help us collect some valuable data.\n<br>\n<br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.',
 		minimalLevelDescription: 'We will only send an anonymized site ID to let us know that the site exists.',
 		basicLevelDescription: 'We will send an anonymized site ID, Umbraco version, and packages installed',
 		detailedLevelDescription:

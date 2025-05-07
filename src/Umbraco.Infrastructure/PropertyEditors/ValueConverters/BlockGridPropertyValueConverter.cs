@@ -1,9 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
@@ -24,19 +22,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         private readonly BlockGridPropertyValueConstructorCache _constructorCache;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
-
-        [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V16")]
-        public BlockGridPropertyValueConverter(
-            IProfilingLogger proflog,
-            BlockEditorConverter blockConverter,
-            IJsonSerializer jsonSerializer,
-            IApiElementBuilder apiElementBuilder,
-            BlockGridPropertyValueConstructorCache constructorCache)
-            : this(proflog, blockConverter, jsonSerializer, apiElementBuilder, constructorCache,
-                StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(),
-                StaticServiceProvider.Instance.GetRequiredService<BlockEditorVarianceHandler>())
-        {
-        }
 
         public BlockGridPropertyValueConverter(
             IProfilingLogger proflog,

@@ -29,7 +29,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
 			this.#appLanguage = instance;
-			this.observe(this.#appLanguage.appLanguageCulture, (appCulture) => {
+			this.observe(this.#appLanguage?.appLanguageCulture, (appCulture) => {
 				this.#appCulture = appCulture;
 				this.#generateRoutes();
 			});
@@ -38,7 +38,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.observe(
-				this.#workspaceContext.variantOptions,
+				this.#workspaceContext?.variantOptions,
 				(variants) => {
 					this.#variants = variants;
 					this.#generateRoutes();
@@ -101,8 +101,17 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 					const route = routes.find((route) => route.path === this.#appCulture);
 
 					if (!route) {
+						const firstVariantPath = routes.find((route) => route.path === this.#variants?.[0].unique)?.path;
+
+						if (firstVariantPath) {
+							history.replaceState({}, '', `${this.#workspaceRoute}/${firstVariantPath}`);
+							return;
+						}
+
 						// TODO: Notice: here is a specific index used for fallback, this could be made more solid [NL]
-						history.replaceState({}, '', `${this.#workspaceRoute}/${routes[routes.length - 3].path}`);
+						const path = `${this.#workspaceRoute}/${routes[routes.length - 3].path}`;
+
+						history.replaceState({}, '', path);
 						return;
 					}
 

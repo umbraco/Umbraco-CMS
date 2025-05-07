@@ -18,16 +18,20 @@ export const plugins: PluginOption[] = [
 				dest: 'umbraco/backoffice/css',
 			},
 			{
+				src: 'node_modules/@umbraco-ui/uui-css/dist/uui-css.css',
+				dest: 'umbraco/backoffice/css',
+			},
+			{
+				src: 'node_modules/@umbraco-ui/uui-css/assets/fonts/*',
+				dest: 'umbraco/backoffice/assets/fonts',
+			},
+			{
 				src: 'src/assets/*',
 				dest: 'umbraco/backoffice/assets',
 			},
 			{
-				src: 'node_modules/tinymce/**/*',
-				dest: 'umbraco/backoffice/tinymce',
-			},
-			{
-				src: 'node_modules/tinymce-i18n/langs6/**/*',
-				dest: 'umbraco/backoffice/tinymce/langs',
+				src: 'src/mocks/handlers/backoffice/assets/*',
+				dest: 'umbraco/backoffice/assets',
 			},
 			{
 				src: 'node_modules/msw/lib/iife/**/*',
@@ -35,7 +39,7 @@ export const plugins: PluginOption[] = [
 			},
 			{
 				src: 'node_modules/monaco-editor/esm/**/*',
-				dest: 'umbraco/backoffice/monaco-editor/esm',
+				dest: 'umbraco/backoffice/monaco-editor/vs',
 			},
 		],
 	}),

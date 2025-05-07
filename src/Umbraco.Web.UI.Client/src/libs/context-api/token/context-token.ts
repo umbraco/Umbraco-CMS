@@ -1,3 +1,5 @@
+import type { UmbContextMinimal } from '../types.js';
+
 export type UmbContextDiscriminator<BaseType, DiscriminatorResult extends BaseType> = (
 	instance: BaseType,
 ) => instance is DiscriminatorResult;
@@ -7,7 +9,10 @@ export type UmbContextDiscriminator<BaseType, DiscriminatorResult extends BaseTy
  * @template BaseType - A generic type of the API before decimated.
  * @template ResultType - A concrete type of the API after decimation, use this when you apply a discriminator method. Note this is optional and defaults to the BaseType.
  */
-export class UmbContextToken<BaseType = unknown, ResultType extends BaseType = BaseType> {
+export class UmbContextToken<
+	BaseType extends UmbContextMinimal = UmbContextMinimal,
+	ResultType extends BaseType = BaseType,
+> {
 	#discriminator: UmbContextDiscriminator<BaseType, ResultType> | undefined;
 	/**
 	 * Get the type of the token

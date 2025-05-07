@@ -11,13 +11,13 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 type UmbTiptapExtension = {
 	alias: string;
@@ -62,7 +62,7 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 		super();
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (dataset) => {
 			this.observe(
-				await dataset.propertyValueByAlias<Array<unknown>>('blocks'),
+				await dataset?.propertyValueByAlias<Array<unknown>>('blocks'),
 				(blocks) => {
 					const tmpValue = this.value ? [...this.value] : [];
 
@@ -134,7 +134,7 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 
 	#setValue(value: Array<string>) {
 		this.value = value;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#syncViewModel() {

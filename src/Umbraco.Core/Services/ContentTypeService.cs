@@ -1,9 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
@@ -41,56 +40,6 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             userIdKeyResolver,
             contentTypeFilters) =>
         ContentService = contentService;
-
-    [Obsolete("Use the ctor specifying all dependencies instead")]
-    public ContentTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IContentService contentService,
-        IContentTypeRepository repository,
-        IAuditRepository auditRepository,
-        IDocumentTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            contentService,
-            repository,
-            auditRepository,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    { }
-
-    [Obsolete("Use the ctor specifying all dependencies instead")]
-    public ContentTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IContentService contentService,
-        IContentTypeRepository repository,
-        IAuditRepository auditRepository,
-        IDocumentTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            contentService,
-            repository,
-            auditRepository,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<ContentTypeFilterCollection>())
-    { }
 
     protected override int[] ReadLockIds => ContentTypeLocks.ReadLockIds;
 
@@ -145,6 +94,16 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
             return Repository.GetAllContentTypeIds(aliases);
         }
+    }
+
+    public async Task<IEnumerable<IContentType>> GetByQueryAsync(IQuery<IContentType> query, CancellationToken cancellationToken)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        // that one is special because it works across content, media and member types
+        scope.ReadLock(Constants.Locks.ContentTypes);
+        IEnumerable<IContentType> contentTypes = Repository.Get(query);
+        scope.Complete();
+        return contentTypes;
     }
 
     protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)

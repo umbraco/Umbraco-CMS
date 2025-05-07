@@ -110,8 +110,8 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	@property({ type: Array })
 	allowedContentTypeIds?: Array<string> | undefined;
 
-	@property({ type: Boolean })
-	showOpenButton?: boolean;
+	@property({ type: Boolean, attribute: 'include-trashed' })
+	includeTrashed = false;
 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
@@ -197,6 +197,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 					unique: id,
 					entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 				})),
+				includeTrashed: this.includeTrashed,
 			},
 		);
 	}
@@ -284,9 +285,9 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 			}
 			.container {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-				grid-auto-rows: 150px;
-				gap: var(--uui-size-space-5);
+				gap: var(--uui-size-space-3);
+				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
+				grid-auto-rows: var(--umb-card-medium-min-width);
 			}
 
 			#btn-add {

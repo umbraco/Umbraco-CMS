@@ -12,31 +12,26 @@ import {
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from './clipboard.property-context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_PROPERTY_CONTEXT, UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/property';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 /**
  * Clipboard context for managing clipboard entries for property values
  * @export
  * @class UmbClipboardPropertyContext
- * @augments {UmbContextBase<UmbClipboardPropertyContext>}
+ * @augments {UmbContextBase}
  */
-export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardPropertyContext> {
+export class UmbClipboardPropertyContext extends UmbContextBase {
 	#init?: Promise<unknown>;
-
-	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
+	#localize = new UmbLocalizationController(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CLIPBOARD_PROPERTY_CONTEXT);
-
-		this.#init = Promise.all([
-			this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
-				this.#modalManagerContext = context;
-			}).asPromise(),
-		]);
 	}
 
 	/**
@@ -99,6 +94,9 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 		propertyEditorUiAlias: string;
 	}): Promise<UmbClipboardEntryDetailModel | undefined> {
 		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
+		if (!clipboardContext) {
+			throw new Error('Clipboard context is required');
+		}
 
 		const copyValueResolver = new UmbClipboardCopyPropertyValueTranslatorValueResolver(this);
 		const values = await copyValueResolver.resolve(args.propertyValue, args.propertyEditorUiAlias);
@@ -109,7 +107,25 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 			icon: args.icon,
 		};
 
-		return await clipboardContext.write(entryPreset);
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		if (!notificationContext) {
+			throw new Error('Notification context is required');
+		}
+
+		try {
+			const clipboardEntry = await clipboardContext.write(entryPreset);
+
+			notificationContext.peek('positive', {
+				data: { message: this.#localize.term('clipboard_copySuccessHeadline') },
+			});
+
+			return clipboardEntry;
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : String(error);
+			notificationContext.peek('danger', { data: { message: errorMessage } });
+		}
+
+		return undefined;
 	}
 
 	/**
@@ -129,11 +145,15 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 
 		const pasteTranslatorManifests = this.getPasteTranslatorManifests(args.propertyEditorUiAlias);
 		const propertyEditorUiManifest = await this.#findPropertyEditorUiManifest(args.propertyEditorUiAlias);
-		const config = (await this.getContext(UMB_PROPERTY_CONTEXT)).getConfig();
+		const config = (await this.getContext(UMB_PROPERTY_CONTEXT))?.getConfig();
+
+		if (!config) {
+			throw new Error('Property context is required');
+		}
 
 		const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
-		const modal = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL, {
+		const result = await umbOpenModal(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL, {
 			data: {
 				asyncFilter: async (clipboardEntryDetail) => {
 					const hasSupportedPasteTranslator = this.hasSupportedPasteTranslator(
@@ -164,7 +184,6 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 			},
 		});
 
-		const result = await modal?.onSubmit();
 		const selection = result?.selection || [];
 
 		if (!selection.length) {
@@ -223,6 +242,9 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 		}
 
 		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
+		if (!clipboardContext) {
+			throw new Error('Clipboard context is required');
+		}
 		const entry = await clipboardContext.read(clipboardEntryUnique);
 
 		if (!entry) {

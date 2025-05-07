@@ -1,7 +1,7 @@
+import { EXAMPLE_COUNTER_CONTEXT } from './counter-workspace-context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import { EXAMPLE_COUNTER_CONTEXT } from './counter-workspace-context';
 
 @customElement('example-counter-workspace-view')
 export class ExampleCounterWorkspaceView extends UmbElementMixin(LitElement) {

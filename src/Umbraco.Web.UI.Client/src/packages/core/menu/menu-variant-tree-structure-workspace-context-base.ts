@@ -5,14 +5,15 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbAncestorsEntityContext } from '@umbraco-cms/backoffice/entity';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
 }
 
-export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends UmbContextBase<unknown> {
+export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends UmbContextBase {
 	// TODO: add correct interface
-	#workspaceContext?: any;
+	#workspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
 	#args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs;
 
 	#structure = new UmbArrayState<UmbVariantStructureItemModel>([], (x) => x.unique);
@@ -21,26 +22,33 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	#parent = new UmbObjectState<UmbVariantStructureItemModel | undefined>(undefined);
 	public readonly parent = this.#parent.asObservable();
 
+	#ancestorContext = new UmbAncestorsEntityContext(this);
+
 	constructor(host: UmbControllerHost, args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs) {
 		// TODO: set up context token
 		super(host, 'UmbMenuStructureWorkspaceContext');
 		this.#args = args;
 
+		// TODO: Implement a Context Token that supports parentUnique, parentEntityType, entityType
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			this.#workspaceContext.observe(this.#workspaceContext.unique, (value) => {
-				if (!value) return;
-				this.#requestStructure();
-			});
+			this.observe(
+				this.#workspaceContext?.unique,
+				(value) => {
+					if (!value) return;
+					this.#requestStructure();
+				},
+				'observeUnique',
+			);
 		});
 	}
 
 	async #requestStructure() {
 		const isNew = this.#workspaceContext?.getIsNew();
-		const uniqueObservable = isNew ? this.#workspaceContext?.parentUnique : this.#workspaceContext?.unique;
-		const entityTypeObservable = isNew ? this.#workspaceContext?.parentEntityType : this.#workspaceContext?.entityType;
+		const uniqueObservable = isNew ? (this.#workspaceContext as any)?.parentUnique : this.#workspaceContext?.unique;
+		const entityTypeObservable = isNew
+			? (this.#workspaceContext as any)?.parentEntityType
+			: (this.#workspaceContext as any)?.entityType;
 
 		let structureItems: Array<UmbVariantStructureItemModel> = [];
 
@@ -84,6 +92,15 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 					}),
 				};
 			});
+
+			const ancestorEntities = data.map((treeItem) => {
+				return {
+					unique: treeItem.unique,
+					entityType: treeItem.entityType,
+				};
+			});
+
+			this.#ancestorContext.setAncestors(ancestorEntities);
 
 			structureItems.push(...ancestorItems);
 

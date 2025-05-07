@@ -1,6 +1,6 @@
+import type { ManifestWorkspaceActionMenuItem } from '../../extensions/types.js';
 import { css, html, customElement, property, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { ManifestWorkspaceActionMenuItem } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -43,7 +43,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				margin="6"
 				placement="top-end"
 				@toggle=${this.#onPopoverToggle}>
-				<umb-popover-layout>
+				<umb-popover-layout id="workspace-action-popover-layout">
 					<uui-scroll-container>
 						${repeat(
 							this.items,
@@ -73,12 +73,17 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 
 			#workspace-action-popover {
 				min-width: 200px;
+				
 			}
 
 			#popover-trigger {
 				--uui-button-padding-top-factor: 0;
 				--uui-button-padding-bottom-factor: 0.125;
 			}
+
+			#workspace-action-popover-layout {
+      			overflow: visible;
+    		}
 		`,
 	];
 }
