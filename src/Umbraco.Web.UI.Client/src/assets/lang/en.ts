@@ -348,6 +348,8 @@ export default {
 		variantUnpublishNotAllowed: 'Unpublish is not allowed',
 		selectAllVariants: 'Select all variants',
 		saveModalTitle: 'Save',
+		saveAndPublishModalTitle: 'Save and publish',
+		publishModalTitle: 'Publish',
 	},
 	blueprints: {
 		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
