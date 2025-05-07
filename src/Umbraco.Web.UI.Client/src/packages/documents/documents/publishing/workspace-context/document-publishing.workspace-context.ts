@@ -308,6 +308,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase {
 			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
 			const result = await umbOpenModal(this, UMB_DOCUMENT_PUBLISH_MODAL, {
 				data: {
+					headline: this.#localize.term('content_saveAndPublishModalTitle'),
 					options,
 					pickableFilter: this.#publishableVariantsFilter,
 				},
