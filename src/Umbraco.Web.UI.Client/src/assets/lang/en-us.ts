@@ -861,7 +861,7 @@ export default {
 		retrieve: 'Retrieve',
 		retry: 'Retry',
 		rights: 'Permissions',
-		scheduledPublishing: 'Scheduled Publishing',
+		scheduledPublishing: 'Schedule publish',
 		umbracoInfo: 'Umbraco info',
 		search: 'Search',
 		searchNoResult: 'Sorry, we can not find what you are looking for.',
