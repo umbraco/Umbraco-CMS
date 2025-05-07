@@ -2820,6 +2820,7 @@ export default {
 		nl: 'Nederlands',
 		pl: 'Polski',
 		pt: 'Português',
+		'pt-br': 'Português (Brasil)',
 		ro: 'Romana',
 		ru: 'Русский',
 		sv: 'Svenska',

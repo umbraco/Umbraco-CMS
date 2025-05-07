@@ -193,6 +193,16 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
+		alias: 'Umb.Localization.PT_BR',
+		weight: -100,
+		name: 'Portuguese (Brazil) Backoffice UI Localization',
+		meta: {
+			culture: 'pt-BR',
+		},
+		js: () => import('../../../assets/lang/pt-br.js'),
+	},
+	{
+		type: 'localization',
 		alias: 'Umb.Localization.RO',
 		weight: -100,
 		name: 'Romanian Backoffice UI Localization',
