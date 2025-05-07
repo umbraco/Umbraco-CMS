@@ -101,7 +101,9 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<uui-dialog-layout headline=${this.localize.term('content_readyToPublish')}>
+		const headline = this.data?.headline ?? this.localize.term('content_publishModalTitle');
+
+		return html`<uui-dialog-layout headline=${headline}>
 			<p>
 				<umb-localize key="prompt_confirmPublish"></umb-localize>
 			</p>
