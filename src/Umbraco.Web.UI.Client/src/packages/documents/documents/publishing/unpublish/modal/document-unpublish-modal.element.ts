@@ -150,12 +150,12 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`<uui-dialog-layout headline=${this.localize.term('content_unpublish')}>
+			<p>
+				<umb-localize key="prompt_confirmUnpublish"></umb-localize>
+			</p>
 			${when(
 				!this._isInvariant,
 				() => html`
-					<p id="subtitle">
-						<umb-localize key="content_languagesToUnpublish"></umb-localize>
-					</p>
 					<umb-document-variant-language-picker
 						.selectionManager=${this._selectionManager}
 						.variantLanguageOptions=${this._options}
@@ -163,11 +163,6 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 						.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>
 				`,
 			)}
-
-			<p>
-				<umb-localize key="prompt_confirmUnpublish"></umb-localize>
-			</p>
-
 			${this._referencesConfig
 				? html`<umb-confirm-action-modal-entity-references
 						.config=${this._referencesConfig}
