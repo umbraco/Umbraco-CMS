@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.AuditLog;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
@@ -19,19 +20,26 @@ public class AuditLogPresentationFactory : IAuditLogPresentationFactory
 
     public IEnumerable<AuditLogResponseModel> CreateAuditLogViewModel(IEnumerable<IAuditItem> auditItems) => auditItems.Select(CreateAuditLogViewModel);
 
-    private AuditLogResponseModel CreateAuditLogViewModel(IAuditItem auditItem)
-    {
-        Guid userKey = _userIdKeyResolver.GetAsync(auditItem.UserId).GetAwaiter().GetResult();
-        IUser user = _userService.GetAsync(userKey).GetAwaiter().GetResult()
-                     ?? throw new ArgumentException($"Could not find user with id {auditItem.UserId}");
-
-        return new AuditLogResponseModel
+    private AuditLogResponseModel CreateAuditLogViewModel(IAuditItem auditItem) =>
+        new()
         {
             Comment = auditItem.Comment,
             LogType = auditItem.AuditType,
             Parameters = auditItem.Parameters,
             Timestamp = auditItem.CreateDate,
-            User = new ReferenceByIdModel(user.Key)
+            User = CreateUserReference(auditItem.UserId).GetAwaiter().GetResult(),
         };
+
+    private async Task<ReferenceByIdModel> CreateUserReference(int userId)
+    {
+        if (userId == Constants.Security.UnknownUserId)
+        {
+            return new ReferenceByIdModel();
+        }
+
+        Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+        IUser user = await _userService.GetAsync(userKey)
+                     ?? throw new ArgumentException($"Could not find user with id {userId}");
+        return new ReferenceByIdModel(user.Key);
     }
 }
