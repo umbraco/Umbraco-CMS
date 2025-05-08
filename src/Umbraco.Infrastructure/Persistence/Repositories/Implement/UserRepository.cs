@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -1068,6 +1069,46 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return ids.Length == 0
             ? Enumerable.Empty<IUser>()
             : GetMany(ids).OrderBy(x => x.Id) ?? Enumerable.Empty<IUser>();
+    }
+
+    /// <inheritdoc />
+    public void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentProviderKeys)
+    {
+        // Get all the user or member keys associated with the removed providers.
+        Sql<ISqlContext> idsQuery = SqlContext.Sql()
+            .Select<ExternalLoginDto>(x => x.UserOrMemberKey)
+            .From<ExternalLoginDto>()
+            .WhereNotIn<ExternalLoginDto>(x => x.ProviderKey, currentProviderKeys);
+        List<Guid> userAndMemberKeysAssoicatedWithRemovedProviders = Database.Fetch<Guid>(idsQuery);
+
+        // Filter for actual users and convert to integer IDs.
+        var userIdsAssoicatedWithRemovedProviders = userAndMemberKeysAssoicatedWithRemovedProviders
+            .Select(ConvertUserKeyToUserId)
+            .Where(x => x.HasValue)
+            .Select(x => x!.Value)
+            .ToArray();
+
+        // Invalidate the security stamps on the users associated with the removed providers.
+        Sql<ISqlContext> updateQuery = Sql()
+            .Update<UserDto>(u => u.Set(x => x.SecurityStampToken, "0".PadLeft(32, '0')))
+            .WhereIn<UserDto>(x => x.Id, userIdsAssoicatedWithRemovedProviders);
+        Database.Execute(updateQuery);
+    }
+
+    // Marked as internal to expose for unit testing.
+    internal static int? ConvertUserKeyToUserId(Guid userOrMemberKey)
+    {
+        // User Ids are stored as userIds in the umbracoUser table, but as a GUID representation
+        // of that integer in umbracoExternalLogin (converted via IntExtensions.ToGuid()).
+        // We need to parse that to get the user Ids to invalidate.
+        // Note also that umbracoExternalLogin contains members too, as proper GUIDs, so we need to ignore them.
+        if (userOrMemberKey.ToString().EndsWith("-0000-0000-0000-000000000000") is false)
+        {
+            // We have a proper GUID, not an integer conversion, hence a member, not a user.
+            return null;
+        }
+
+        return BitConverter.ToInt32(userOrMemberKey.ToByteArray());
     }
 
     #endregion

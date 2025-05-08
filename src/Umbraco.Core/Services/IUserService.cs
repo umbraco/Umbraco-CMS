@@ -233,6 +233,12 @@ public interface IUserService : IMembershipUserService
 
     IEnumerable<IUser> GetNextUsers(int id, int count);
 
+    /// <summary>
+    ///     Invalidates sessions for users that aren't associated with the current collection of providers.
+    /// </summary>
+    /// <param name="currentProviderKeys">The keys for the currently configured providers.</param>
+    void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentProviderKeys) { }
+
     #region User groups
 
     /// <summary>

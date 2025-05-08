@@ -28,8 +28,11 @@ public class SecuritySettings
 
     internal const int StaticMemberDefaultLockoutTimeInMinutes = 30 * 24 * 60;
     internal const int StaticUserDefaultLockoutTimeInMinutes = 30 * 24 * 60;
-    private const long StaticUserDefaultFailedLoginDurationInMilliseconds = 1000;
-    private const long StaticUserMinimumFailedLoginDurationInMilliseconds = 250;
+    internal const long StaticUserDefaultFailedLoginDurationInMilliseconds = 1000;
+    internal const long StaticUserMinimumFailedLoginDurationInMilliseconds = 250;
+    internal const string StaticSecurityStampValidationInterval = "0.00:30:00"; // TimeSpan.FromMinutes(30);
+
+    public static TimeSpan DefaultSecurityStampValidationInterval => TimeSpan.Parse(StaticSecurityStampValidationInterval);
 
     /// <summary>
     ///     Gets or sets a value indicating whether to keep the user logged in.
@@ -150,4 +153,17 @@ public class SecuritySettings
     /// </value>
     [DefaultValue(StaticUserMinimumFailedLoginDurationInMilliseconds)]
     public long UserMinimumFailedLoginDurationInMilliseconds { get; set; } = StaticUserMinimumFailedLoginDurationInMilliseconds;
+
+    /// <summary>
+    /// Gets or sets the <see cref="TimeSpan"/> after which security stamps are re-validated. Defaults to 30 minutes.
+    /// </summary>
+    /// <value>
+    /// The <see cref="TimeSpan"/> after which security stamps are re-validated.
+    /// </value>
+    /// <remarks>
+    /// The default value aligns with the Microsoft.AspNetCore.Identity default:
+    /// https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.securitystampvalidatoroptions.validationinterval
+    /// </remarks>
+    [DefaultValue(StaticSecurityStampValidationInterval)]
+    public TimeSpan SecurityStampValidationInterval { get; set; } = TimeSpan.Parse(StaticSecurityStampValidationInterval);
 }

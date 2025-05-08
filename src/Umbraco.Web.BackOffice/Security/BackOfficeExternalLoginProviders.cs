@@ -13,6 +13,7 @@ public class BackOfficeExternalLoginProviders : IBackOfficeExternalLoginProvider
     private readonly Dictionary<string, BackOfficeExternalLoginProvider> _externalLogins;
     private readonly IKeyValueService _keyValueService;
     private readonly IExternalLoginWithKeyService _externalLoginWithKeyService;
+    private readonly IUserService _userService;
     private readonly ILogger<BackOfficeExternalLoginProviders> _logger;
 
     private const string ExternalLoginProvidersKey = "Umbraco.Cms.Web.BackOffice.Security.BackOfficeExternalLoginProviders";
@@ -26,6 +27,7 @@ public class BackOfficeExternalLoginProviders : IBackOfficeExternalLoginProvider
               authenticationSchemeProvider,
               StaticServiceProvider.Instance.GetRequiredService<IKeyValueService>(),
               StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
+              StaticServiceProvider.Instance.GetRequiredService<IUserService>(),
               StaticServiceProvider.Instance.GetRequiredService<ILogger<BackOfficeExternalLoginProviders>>())
     {
     }
@@ -35,12 +37,14 @@ public class BackOfficeExternalLoginProviders : IBackOfficeExternalLoginProvider
         IAuthenticationSchemeProvider authenticationSchemeProvider,
         IKeyValueService keyValueService,
         IExternalLoginWithKeyService externalLoginWithKeyService,
+        IUserService userService,
         ILogger<BackOfficeExternalLoginProviders> logger)
     {
         _externalLogins = externalLogins.ToDictionary(x => x.AuthenticationType);
         _authenticationSchemeProvider = authenticationSchemeProvider;
         _keyValueService = keyValueService;
         _externalLoginWithKeyService = externalLoginWithKeyService;
+        _userService = userService;
         _logger = logger;
     }
 
@@ -106,6 +110,7 @@ public class BackOfficeExternalLoginProviders : IBackOfficeExternalLoginProvider
             _logger.LogWarning(
                 "The configured external login providers have changed. All existing backoffice tokens will be invalidated");
 
+            _userService.InvalidateSessionsForRemovedProviders(_externalLogins.Keys);
             _externalLoginWithKeyService.DeleteUserLoginsForRemovedProviders(_externalLogins.Keys);
 
             _keyValueService.SetValue(ExternalLoginProvidersKey, currentExternalLoginProvidersValue);

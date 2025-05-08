@@ -720,6 +720,16 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
+    /// <inheritdoc />
+    public void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentProviderKeys)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            _userRepository.InvalidateSessionsForRemovedProviders(currentProviderKeys);
+            scope.Complete();
+        }
+    }
+
     /// <summary>
     ///     Gets a list of <see cref="IUser" /> objects associated with a given group
     /// </summary>
