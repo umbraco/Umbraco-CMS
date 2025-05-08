@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
@@ -18,12 +18,20 @@ public static class RichTextPropertyEditorHelper
     /// <returns>True if the parsing succeeds, false otherwise</returns>
     /// <remarks>
     /// The passed value can be:
+    /// - a <see cref="RichTextEditorValue"/> instance (which will be the case if the rich text property is hidden from the editor).
     /// - a JSON string.
     /// - a JSON object.
     /// - a raw markup string (for backwards compatability).
     /// </remarks>
     public static bool TryParseRichTextEditorValue(object? value, IJsonSerializer jsonSerializer, ILogger logger, [NotNullWhen(true)] out RichTextEditorValue? richTextEditorValue)
     {
+        if (value is RichTextEditorValue existingRichTextEditorValue)
+        {
+            // already a RichTextEditorValue instance
+            richTextEditorValue = existingRichTextEditorValue;
+            return true;
+        }
+
         var stringValue = value as string ?? value?.ToString();
         if (stringValue is null)
         {
