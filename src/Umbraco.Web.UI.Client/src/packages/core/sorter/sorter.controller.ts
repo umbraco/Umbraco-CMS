@@ -486,7 +486,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	#itemDraggedOver = async (e: DragEvent) => {
-		console.log('item dragged over', e);
 		let dropSorter = UmbSorterController.dropSorter as unknown as UmbSorterController<T, ElementType>;
 		let newDrop = false;
 
@@ -616,7 +615,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	setupItem(element: ElementType) {
-		console.log('setupItem', element);
 		if (this.#elements.includes(element)) {
 			console.error('Element already setup', element);
 			return;
@@ -673,6 +671,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			UmbSorterController.activeElement?.classList.add(this.#config.placeholderClass);
 		}
 		if (this.#config.placeholderAttr) {
+			console.log('set attribute', UmbSorterController.activeElement);
 			UmbSorterController.activeElement?.setAttribute(this.#config.placeholderAttr, '');
 		}
 	}
@@ -702,7 +701,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	#handleHandleMouseDown = (event: MouseEvent) => {
-		console.log('handle mouse down', event);
 		const target = event.target as HTMLElement;
 		const composedPath = event.composedPath();
 
@@ -745,7 +743,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	};
 
 	#handleDragStart = (event: DragEvent) => {
-		console.log('drag start', event);
 		const element = (event.target as HTMLElement).closest(this.#config.itemSelector) as HTMLElement | null;
 		if (!element) return;
 
@@ -907,7 +904,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	#handleDragMove(event: DragEvent, instant?: boolean) {
-		console.log('Drag move', event);
 		if (!UmbSorterController.activeItem) {
 			return;
 		}
