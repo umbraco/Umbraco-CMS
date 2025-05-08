@@ -1078,10 +1078,10 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .Select<ExternalLoginDto>(x => x.UserOrMemberKey)
             .From<ExternalLoginDto>()
             .WhereNotIn<ExternalLoginDto>(x => x.ProviderKey, currentProviderKeys);
-        List<Guid> userAndMemberKeysAssoicatedWithRemovedProviders = Database.Fetch<Guid>(idsQuery);
+        List<Guid> userAndMemberKeysAssociatedWithRemovedProviders = Database.Fetch<Guid>(idsQuery);
 
         // Filter for actual users and convert to integer IDs.
-        var userIdsAssoicatedWithRemovedProviders = userAndMemberKeysAssoicatedWithRemovedProviders
+        var userIdsAssociatedWithRemovedProviders = userAndMemberKeysAssociatedWithRemovedProviders
             .Select(ConvertUserKeyToUserId)
             .Where(x => x.HasValue)
             .Select(x => x!.Value)
@@ -1090,7 +1090,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         // Invalidate the security stamps on the users associated with the removed providers.
         Sql<ISqlContext> updateQuery = Sql()
             .Update<UserDto>(u => u.Set(x => x.SecurityStampToken, "0".PadLeft(32, '0')))
-            .WhereIn<UserDto>(x => x.Id, userIdsAssoicatedWithRemovedProviders);
+            .WhereIn<UserDto>(x => x.Id, userIdsAssociatedWithRemovedProviders);
         Database.Execute(updateQuery);
     }
 
