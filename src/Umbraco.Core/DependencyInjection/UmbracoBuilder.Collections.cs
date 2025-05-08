@@ -95,7 +95,12 @@ public static partial class UmbracoBuilderExtensions
         builder.ContentIndexHandlers().Add(() => builder.TypeLoader.GetTypes<IContentIndexHandler>());
 
         WebhookPayloadType webhookPayloadType = Constants.Webhooks.DefaultPayloadType;
-        if (builder.Config.GetSection(Constants.Configuration.ConfigWebhookPayloadType).Value is not null)
+
+        // IntelliSense indicates that GetSection cannot return null. However, in certain unit test setups,
+        // the configuration may not be fully initialized, leading to GetSection returning null. This null
+        // check ensures that the code behaves correctly in such scenarios and prevents potential null
+        // reference exceptions during testing.
+        if (builder.Config.GetSection(Constants.Configuration.ConfigWebhookPayloadType)?.Value is not null)
         {
             webhookPayloadType = builder.Config.GetValue<WebhookPayloadType>(Constants.Configuration.ConfigWebhookPayloadType);
         }
