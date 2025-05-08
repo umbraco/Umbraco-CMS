@@ -181,7 +181,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.#sorter.disable();
+		//this.#sorter.disable();
 
 		this.consumeContext(UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT, (context) => {
 			this.observe(
@@ -189,9 +189,9 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 				(isSorting) => {
 					this._sortModeActive = isSorting;
 					if (isSorting) {
-						this.#sorter.enable();
+						//this.#sorter.enable();
 					} else {
-						this.#sorter.disable();
+						//this.#sorter.disable();
 					}
 				},
 				'_observeIsSorting',
@@ -337,6 +337,13 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			:host {
 				display: block;
 			}
+
+			#property-list {
+				/* enables dropping things into this despite it begin empty. */
+				margin-top: -20px;
+				padding-top: 20px;
+			}
+
 			#btn-add {
 				width: 100%;
 				--uui-button-height: var(--uui-size-14);
