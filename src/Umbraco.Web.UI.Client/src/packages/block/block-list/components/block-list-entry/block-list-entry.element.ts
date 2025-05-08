@@ -346,6 +346,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
+		ext.component?.setAttribute('part', 'component');
 		if (this._exposed) {
 			return ext.component;
 		} else {
@@ -509,6 +510,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			:host([settings-invalid])::after,
 			:host([content-invalid])::after {
 				border-color: var(--uui-color-invalid);
+			}
+
+			umb-extension-slot::part(component) {
+				position: relative;
+				z-index: 0;
 			}
 
 			uui-action-bar {
