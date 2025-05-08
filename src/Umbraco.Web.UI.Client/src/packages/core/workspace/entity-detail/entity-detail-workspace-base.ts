@@ -60,13 +60,13 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	#createUnderParent = new UmbObjectState<UmbEntityModel | undefined>(undefined);
-	createUnderParent = this.#createUnderParent.asObservable();
+	_internal_createUnderParent = this.#createUnderParent.asObservable();
 
-	public readonly createUnderParentEntityUnique = this.#createUnderParent.asObservablePart((parent) =>
+	public readonly _internal_createUnderParentEntityUnique = this.#createUnderParent.asObservablePart((parent) =>
 		parent ? parent.unique : undefined,
 	);
 
-	public readonly createUnderParentEntityType = this.#createUnderParent.asObservablePart((parent) =>
+	public readonly _internal_createUnderParentEntityType = this.#createUnderParent.asObservablePart((parent) =>
 		parent ? parent.entityType : undefined,
 	);
 
@@ -174,7 +174,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * Gets the parent that a new entity will be created under.
 	 * @returns { UmbEntityModel | undefined } The parent entity
 	 */
-	getCreateUnderParent(): UmbEntityModel | undefined {
+	_internal_getCreateUnderParent(): UmbEntityModel | undefined {
 		return this.#createUnderParent.getValue();
 	}
 
@@ -182,7 +182,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * Sets the parent that a new entity will be created under.
 	 * @param {UmbEntityModel} parent The parent entity
 	 */
-	setCreateUnderParent(parent: UmbEntityModel): void {
+	_internal_setCreateUnderParent(parent: UmbEntityModel): void {
 		this.#createUnderParent.setValue(parent);
 	}
 
@@ -291,7 +291,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		await this.#init;
 		// keeping setParent for backwards compatibility. Remove in v18.
 		this.setParent(args.parent);
-		this.setCreateUnderParent(args.parent);
+		this._internal_setCreateUnderParent(args.parent);
 
 		const request = this._detailRepository!.createScaffold(args.preset);
 		this._getDataPromise = request;

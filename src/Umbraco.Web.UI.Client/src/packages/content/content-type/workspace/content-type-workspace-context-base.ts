@@ -82,7 +82,7 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	): Promise<DetailModelType | undefined> {
 		this.resetState();
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Creating ${this.getEntityType()} scaffold` });
-		this.setCreateUnderParent(args.parent);
+		this._internal_setCreateUnderParent(args.parent);
 
 		const request = this.structure.createScaffold(args.preset);
 		this._getDataPromise = request;

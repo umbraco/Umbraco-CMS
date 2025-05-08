@@ -54,10 +54,10 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	async #requestStructure() {
 		const isNew = this.#workspaceContext?.getIsNew();
 		const uniqueObservable = isNew
-			? this.#workspaceContext?.createUnderParentEntityType
+			? this.#workspaceContext?._internal_createUnderParentEntityType
 			: this.#workspaceContext?.unique;
 		const entityTypeObservable = isNew
-			? this.#workspaceContext?.createUnderParentEntityUnique
+			? this.#workspaceContext?._internal_createUnderParentEntityUnique
 			: this.#workspaceContext?.entityType;
 
 		let structureItems: Array<UmbVariantStructureItemModel> = [];
