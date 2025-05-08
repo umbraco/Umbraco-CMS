@@ -219,7 +219,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 					<uui-menu-item
 						label=${this.localize.string(compositions.name)}
 						?selectable=${!usedForInheritance}
-						?disabled=${usedForInheritance}
+						?disabled=${usedForInheritance || compositions.isCompatible === false}
 						@selected=${() => this.#onSelectionAdd(compositions.unique)}
 						@deselected=${() => this.#onSelectionRemove(compositions.unique)}
 						?selected=${this._selection.find((unique) => unique === compositions.unique)}>
