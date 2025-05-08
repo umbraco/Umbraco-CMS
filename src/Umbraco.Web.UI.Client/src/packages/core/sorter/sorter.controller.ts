@@ -455,8 +455,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	#uninitialize() {
 		// Do something when host element is disconnected.
-		if (UmbSorterController.activeElement) {
-			this.#handleDragEnd();
+		if (UmbSorterController.activeSorter === (this as unknown as UmbSorterController<unknown>)) {
+			if (UmbSorterController.activeElement) {
+				this.#handleDragEnd();
+			}
 		}
 
 		if (UmbSorterController.dropSorter === (this as unknown as UmbSorterController<unknown>)) {
@@ -464,7 +466,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			UmbSorterController.dropSorter = undefined;
 		}
 
-		UmbSorterController.lastIndicationSorter = undefined;
+		if (UmbSorterController.lastIndicationSorter === (this as unknown as UmbSorterController<unknown>)) {
+			// If we are the lastIndicationSorter, we can now remove out self to get into pure Native Drag n' drop.
+			UmbSorterController.lastIndicationSorter = undefined;
+		}
 
 		this.#observer.disconnect();
 
@@ -671,7 +676,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			UmbSorterController.activeElement?.classList.add(this.#config.placeholderClass);
 		}
 		if (this.#config.placeholderAttr) {
-			console.log('set attribute', UmbSorterController.activeElement);
 			UmbSorterController.activeElement?.setAttribute(this.#config.placeholderAttr, '');
 		}
 	}
