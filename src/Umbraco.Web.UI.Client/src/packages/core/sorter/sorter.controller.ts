@@ -415,10 +415,20 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			return;
 		}
 
-		const containerEl =
-			(this.#config.containerSelector
-				? this.#host.shadowRoot!.querySelector(this.#config.containerSelector)
-				: this.#host) ?? this.#host;
+		const containerEl = this.#config.containerSelector
+			? this.#host.shadowRoot!.querySelector(this.#config.containerSelector)
+			: this.#host;
+
+		if (!containerEl) {
+			if (this.#config.containerSelector) {
+				throw new Error(
+					`Sorter could not find the container element, using this query selector '${this.#config.containerSelector}'.`,
+				);
+			} else {
+				throw new Error('Sorter could not get its host element.');
+			}
+			return;
+		}
 
 		this.#containerElement = containerEl as HTMLElement;
 		this.#useContainerShadowRoot = this.#containerElement === this.#host;
