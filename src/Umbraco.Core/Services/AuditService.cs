@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.Implement;
 
@@ -33,36 +34,32 @@ public sealed class AuditService : RepositoryService, IAuditService
         _isAvailable = new Lazy<bool>(DetermineIsAvailable);
     }
 
-    public void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null)
+    /// <inheritdoc />
+    [Obsolete("Use AddAsync() instead. Scheduled for removal in Umbraco 18.")]
+    public void Add(
+        AuditType type,
+        int userId,
+        int objectId,
+        string? entityType,
+        string comment,
+        string? parameters = null) =>
+        AddAsync(type, userId, objectId, entityType, comment, parameters).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public Task<Attempt<AuditLogOperationStatus>> AddAsync(
+        AuditType type,
+        int userId,
+        int objectId,
+        string? entityType,
+        string comment,
+        string? parameters = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, comment, parameters));
             scope.Complete();
-        }
-    }
 
-    public IEnumerable<IAuditItem> GetLogs(int objectId)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            IEnumerable<IAuditItem> result = _auditRepository.Get(Query<IAuditItem>().Where(x => x.Id == objectId));
-            scope.Complete();
-            return result;
-        }
-    }
-
-    public IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            IEnumerable<IAuditItem> result = sinceDate.HasValue == false
-                ? _auditRepository.Get(type, Query<IAuditItem>().Where(x => x.UserId == userId))
-                : _auditRepository.Get(
-                    type,
-                    Query<IAuditItem>().Where(x => x.UserId == userId && x.CreateDate >= sinceDate.Value));
-            scope.Complete();
-            return result;
+            return Task.FromResult(Attempt.Succeed(AuditLogOperationStatus.Success));
         }
     }
 
@@ -78,34 +75,125 @@ public sealed class AuditService : RepositoryService, IAuditService
         }
     }
 
-    public void CleanLogs(int maximumAgeOfLogsInMinutes)
+    /// <inheritdoc />
+    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<IAuditItem> GetLogs(int objectId)
     {
+        // TODO: Call GetItemsByEntityAsync() - check whether it causes a behavioral change
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            _auditRepository.CleanLogs(maximumAgeOfLogsInMinutes);
+            IEnumerable<IAuditItem> result = _auditRepository.Get(Query<IAuditItem>().Where(x => x.Id == objectId));
             scope.Complete();
+            return result;
         }
     }
 
-    /// <summary>
-    ///     Returns paged items in the audit trail for a given entity
-    /// </summary>
-    /// <param name="entityId"></param>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalRecords"></param>
-    /// <param name="orderDirection">
-    ///     By default this will always be ordered descending (newest first)
-    /// </param>
-    /// <param name="auditTypeFilter">
-    ///     Since we currently do not have enum support with our expression parser, we cannot query on AuditType in the query
-    ///     or the custom filter
-    ///     so we need to do that here
-    /// </param>
-    /// <param name="customFilter">
-    ///     Optional filter to be applied
-    /// </param>
-    /// <returns></returns>
+    /// <inheritdoc />
+    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null)
+    {
+        // TODO: Call GetPagedItemsByUserAsync() - check whether it causes a behavioral change
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            IEnumerable<IAuditItem> result = sinceDate.HasValue == false
+                ? _auditRepository.Get(type, Query<IAuditItem>().Where(x => x.UserId == userId))
+                : _auditRepository.Get(
+                    type,
+                    Query<IAuditItem>().Where(x => x.UserId == userId && x.CreateDate >= sinceDate.Value));
+            scope.Complete();
+            return result;
+        }
+    }
+
+    /// <inheritdoc />
+    public Task<PagedModel<IAuditItem>> GetItemsAsync(
+        int skip,
+        int take,
+        Direction orderDirection = Direction.Descending,
+        DateTimeOffset? sinceDate = null,
+        AuditType[]? auditTypeFilter = null)
+    {
+        if (skip < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(skip));
+        }
+
+        if (take <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(take));
+        }
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+        IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
+
+        return GetItemsAsyncInner(Query<IAuditItem>(), pageNumber, pageSize, orderDirection, auditTypeFilter, customFilter);
+    }
+
+    /// <inheritdoc />
+    public Task<PagedModel<IAuditItem>> GetItemsByKeyAsync(
+        Guid entityKey,
+        UmbracoObjectTypes entityType,
+        int skip,
+        int take,
+        Direction orderDirection = Direction.Descending,
+        DateTimeOffset? sinceDate = null,
+        AuditType[]? auditTypeFilter = null)
+    {
+        if (skip < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(skip));
+        }
+
+        if (take <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(take));
+        }
+
+        Attempt<int> keyToIdAttempt = _entityService.GetId(entityKey, entityType);
+        if (keyToIdAttempt.Success is false)
+        {
+            return Task.FromResult(new PagedModel<IAuditItem> { Items = [], Total = 0 });
+        }
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+        IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == keyToIdAttempt.Result);
+        IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
+
+        return GetItemsAsyncInner(query, pageNumber, pageSize, orderDirection, auditTypeFilter, customFilter);
+    }
+
+    /// <inheritdoc />
+    public Task<PagedModel<IAuditItem>> GetItemsByEntityAsync(
+        int entityId,
+        int skip,
+        int take,
+        Direction orderDirection = Direction.Descending,
+        AuditType[]? auditTypeFilter = null,
+        IQuery<IAuditItem>? customFilter = null)
+    {
+        if (skip < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(skip));
+        }
+
+        if (take <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(take));
+        }
+
+        if (entityId is Constants.System.Root or <= 0)
+        {
+            return Task.FromResult(new PagedModel<IAuditItem> { Items = [], Total = 0 });
+        }
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+        IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == entityId);
+
+        return GetItemsAsyncInner(query, pageNumber, pageSize, orderDirection, auditTypeFilter, customFilter);
+    }
+
+    /// <inheritdoc />
+    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IAuditItem> GetPagedItemsByEntity(
         int entityId,
         long pageIndex,
@@ -125,39 +213,22 @@ public sealed class AuditService : RepositoryService, IAuditService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        if (entityId == Constants.System.Root || entityId <= 0)
+        if (entityId is Constants.System.Root or <= 0)
         {
-            totalRecords = 0;
-            return Enumerable.Empty<IAuditItem>();
+            totalRecords = 0L;
+            return [];
         }
 
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == entityId);
+        IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == entityId);
 
-            return _auditRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderDirection, auditTypeFilter, customFilter);
-        }
+        PagedModel<IAuditItem> items = GetItemsAsyncInner(query, pageIndex, pageSize, orderDirection, auditTypeFilter, customFilter).GetAwaiter().GetResult();
+        totalRecords = items.Total;
+
+        return items.Items;
     }
 
-    /// <summary>
-    ///     Returns paged items in the audit trail for a given user
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalRecords"></param>
-    /// <param name="orderDirection">
-    ///     By default this will always be ordered descending (newest first)
-    /// </param>
-    /// <param name="auditTypeFilter">
-    ///     Since we currently do not have enum support with our expression parser, we cannot query on AuditType in the query
-    ///     or the custom filter
-    ///     so we need to do that here
-    /// </param>
-    /// <param name="customFilter">
-    ///     Optional filter to be applied
-    /// </param>
-    /// <returns></returns>
+    /// <inheritdoc />
+    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IAuditItem> GetPagedItemsByUser(
         int userId,
         long pageIndex,
@@ -177,56 +248,21 @@ public sealed class AuditService : RepositoryService, IAuditService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        if (userId < Constants.Security.SuperUserId)
+        if (userId is Constants.System.Root or <= 0)
         {
-            totalRecords = 0;
-            return Enumerable.Empty<IAuditItem>();
+            totalRecords = 0L;
+            return [];
         }
 
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == userId);
+        IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == userId);
 
-            return _auditRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderDirection, auditTypeFilter, customFilter);
-        }
+        PagedModel<IAuditItem> items = GetItemsAsyncInner(query, pageIndex, pageSize, orderDirection, auditTypeFilter, customFilter).GetAwaiter().GetResult();
+        totalRecords = items.Total;
+
+        return items.Items;
     }
 
-    public Task<PagedModel<IAuditItem>> GetItemsByKeyAsync(
-        Guid entityKey,
-        UmbracoObjectTypes entityType,
-        int skip,
-        int take,
-        Direction orderDirection = Direction.Descending,
-        DateTimeOffset? sinceDate = null,
-        AuditType[]? auditTypeFilter = null)
-        {
-            if (skip < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(skip));
-            }
-
-            if (take <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(take));
-            }
-
-            Attempt<int> keyToIdAttempt = _entityService.GetId(entityKey, entityType);
-            if (keyToIdAttempt.Success is false)
-            {
-                return Task.FromResult(new PagedModel<IAuditItem> { Items = Enumerable.Empty<IAuditItem>(), Total = 0 });
-            }
-
-            using (ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == keyToIdAttempt.Result);
-                IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate.Value.LocalDateTime) : null;
-                PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
-
-                IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out var totalRecords, orderDirection, auditTypeFilter, customFilter);
-                return Task.FromResult(new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords });
-            }
-        }
-
+    /// <inheritdoc />
     public async Task<PagedModel<IAuditItem>> GetPagedItemsByUserAsync(
         Guid userKey,
         int skip,
@@ -246,25 +282,41 @@ public sealed class AuditService : RepositoryService, IAuditService
         }
 
         IUser? user = await _userService.GetAsync(userKey);
-
         if (user is null)
         {
             return new PagedModel<IAuditItem>();
         }
 
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == user.Id);
-            IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
-            PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+        IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == user.Id);
+        IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
-            IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out var totalRecords, orderDirection, auditTypeFilter, customFilter);
-            return new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords };
-        }
+        return await GetItemsAsyncInner(query, pageNumber, pageSize, orderDirection, auditTypeFilter, customFilter);
     }
 
     /// <inheritdoc />
-    public IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string? affectedDetails, string eventType, string eventDetails)
+    [Obsolete("Use WriteAsync() instead. Scheduled for removal in Umbraco 18.")]
+    public IAuditEntry Write(
+        int performingUserId,
+        string perfomingDetails,
+        string performingIp,
+        DateTime eventDateUtc,
+        int affectedUserId,
+        string? affectedDetails,
+        string eventType,
+        string eventDetails) =>
+            WriteAsync(
+                performingUserId,
+                perfomingDetails,
+                performingIp,
+                eventDateUtc,
+                affectedUserId,
+                affectedDetails,
+                eventType,
+                eventDetails).GetAwaiter().GetResult().Result;
+
+    /// <inheritdoc />
+    public Task<Attempt<IAuditEntry, AuditLogOperationStatus>> WriteAsync(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string? affectedDetails, string eventType, string eventDetails)
     {
         if (performingUserId < 0 && performingUserId != Constants.Security.SuperUserId)
         {
@@ -305,7 +357,7 @@ public sealed class AuditService : RepositoryService, IAuditService
             throw new ArgumentException($"Must be max {Constants.Audit.EventTypeLength} chars.", nameof(eventType));
         }
 
-        if (performingIp != null && performingIp.Length > Constants.Audit.IpLength)
+        if (performingIp is { Length: > Constants.Audit.IpLength })
         {
             throw new ArgumentException($"Must be max {Constants.Audit.EventTypeLength} chars.", nameof(performingIp));
         }
@@ -324,7 +376,7 @@ public sealed class AuditService : RepositoryService, IAuditService
 
         if (_isAvailable.Value == false)
         {
-            return entry;
+            return Task.FromResult(Attempt.SucceedWithStatus(AuditLogOperationStatus.Success, (IAuditEntry)entry));
         }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -333,7 +385,24 @@ public sealed class AuditService : RepositoryService, IAuditService
             scope.Complete();
         }
 
-        return entry;
+        return Task.FromResult(Attempt.SucceedWithStatus(AuditLogOperationStatus.Success, (IAuditEntry)entry));
+    }
+
+    /// <inheritdoc />
+    [Obsolete("Use CleanLogsAsync() instead. Scheduled for removal in Umbraco 18.")]
+    public void CleanLogs(int maximumAgeOfLogsInMinutes)
+        => CleanLogsAsync(maximumAgeOfLogsInMinutes).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public Task CleanLogsAsync(int maximumAgeOfLogsInMinutes)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            _auditRepository.CleanLogs(maximumAgeOfLogsInMinutes);
+            scope.Complete();
+        }
+
+        return Task.CompletedTask;
     }
 
     // TODO: Currently used in testing only, not part of the interface, need to add queryable methods to the interface instead
@@ -356,12 +425,27 @@ public sealed class AuditService : RepositoryService, IAuditService
         if (_isAvailable.Value == false)
         {
             records = 0;
-            return Enumerable.Empty<IAuditEntry>();
+            return [];
         }
 
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _auditEntryRepository.GetPage(pageIndex, pageCount, out records);
+        }
+    }
+
+    private Task<PagedModel<IAuditItem>> GetItemsAsyncInner(
+        IQuery<IAuditItem> query,
+        long pageNumber,
+        int pageSize,
+        Direction orderDirection = Direction.Descending,
+        AuditType[]? auditTypeFilter = null,
+        IQuery<IAuditItem>? customFilter = null)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out var totalRecords, orderDirection, auditTypeFilter, customFilter);
+            return Task.FromResult(new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords });
         }
     }
 
