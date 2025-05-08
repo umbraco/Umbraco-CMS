@@ -1,4 +1,5 @@
 import type { UmbApiError, UmbCancelError, UmbError } from './umb-error.js';
+export type * from './data-api/types.js';
 
 export interface XhrRequestOptions extends UmbTryExecuteOptions {
 	baseUrl?: string;
