@@ -424,6 +424,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	#onDragOver(event: DragEvent, path: string) {
+		if (this._activePath === path) return;
 		event.preventDefault();
 		window.history.replaceState(null, '', path);
 	}
