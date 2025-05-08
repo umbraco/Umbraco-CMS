@@ -69,6 +69,15 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		);
 	}
 
+	#generateEmptyStateLabel() {
+		const labelKey =
+			this.#collectionContext?.manifest?.meta.noItemsLabel ??
+			this.#collectionContext?.getConfig()?.noItemsLabel ??
+			'#collection_noItemsTitle';
+
+		return this.localize.string(labelKey);
+	}
+
 	override render() {
 		return this._routes
 			? html`
@@ -98,9 +107,10 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 
 	#renderEmptyState() {
 		if (!this._isDoneLoading) return nothing;
+
 		return html`
 			<div id="empty-state" class="uui-text">
-				<h4><umb-localize key="collection_noItemsTitle"></umb-localize></h4>
+				<h4>${this.#generateEmptyStateLabel()}</h4>
 			</div>
 		`;
 	}
