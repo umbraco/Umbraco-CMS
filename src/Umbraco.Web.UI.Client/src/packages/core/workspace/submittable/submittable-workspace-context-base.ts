@@ -84,6 +84,17 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		);
 	}
 
+	protected async _validateAndLog(): Promise<void> {
+		await this.validate().catch(async () => {
+			// TODO: Implement developer-mode logging here. [NL]
+			console.warn(
+				'Validation failed because of these validation messages still begin present: ',
+				this.#validationContexts.flatMap((x) => x.messages.getMessages()),
+			);
+			return Promise.reject();
+		});
+	}
+
 	public async validateAndSubmit(
 		onValid: () => Promise<void>,
 		onInvalid: (reason?: any) => Promise<void>,
@@ -95,16 +106,11 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 			this.#submitResolve = resolve;
 			this.#submitReject = reject;
 		});
-		this.validate().then(
+		this._validateAndLog().then(
 			async () => {
 				onValid().then(this.#completeSubmit, this.#rejectSubmit);
 			},
 			async (error) => {
-				// TODO: Implement developer-mode logging here. [NL]
-				console.warn(
-					'Validation failed because of these validation messages still begin present: ',
-					this.#validationContexts.flatMap((x) => x.messages.getMessages()),
-				);
 				onInvalid(error).then(this.#resolveSubmit, this.#rejectSubmit);
 			},
 		);
