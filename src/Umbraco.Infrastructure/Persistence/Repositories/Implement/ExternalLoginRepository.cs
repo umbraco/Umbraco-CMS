@@ -57,10 +57,10 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
         Database.Delete<ExternalLoginDto>("WHERE userOrMemberKey=@userOrMemberKey", new { userOrMemberKey });
 
     /// <inheritdoc />
-    public void DeleteUserLoginsForRemovedProviders(IEnumerable<string> currentProviderKeys) =>
+    public void DeleteUserLoginsForRemovedProviders(IEnumerable<string> currentLoginProviders) =>
         Database.Execute(Sql()
             .Delete<ExternalLoginDto>()
-            .WhereNotIn<ExternalLoginDto>(x => x.ProviderKey, currentProviderKeys));
+            .WhereNotIn<ExternalLoginDto>(x => x.LoginProvider, currentLoginProviders));
 
     /// <inheritdoc />
     public void Save(Guid userOrMemberKey, IEnumerable<IExternalLogin> logins)

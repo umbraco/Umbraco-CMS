@@ -82,11 +82,11 @@ public class ExternalLoginService : RepositoryService, IExternalLoginWithKeyServ
     }
 
     /// <inheritdoc />
-    public void DeleteUserLoginsForRemovedProviders(IEnumerable<string> currentProviderKeys)
+    public void DeleteUserLoginsForRemovedProviders(IEnumerable<string> currentLoginProviders)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            _externalLoginRepository.DeleteUserLoginsForRemovedProviders(currentProviderKeys);
+            _externalLoginRepository.DeleteUserLoginsForRemovedProviders(currentLoginProviders);
             scope.Complete();
         }
     }
