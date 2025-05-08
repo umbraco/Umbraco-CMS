@@ -1,15 +1,14 @@
-import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
+import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 type ManifestType = ManifestEntityCreateOptionAction;
 
-const elementName = 'umb-collection-create-action-button';
-@customElement(elementName)
+@customElement('umb-collection-create-action-button')
 export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 	@state()
 	private _popoverOpen = false;
@@ -58,7 +57,7 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 		if (!this.#entityContext) return;
 
 		const entityType = this.#entityContext.getEntityType();
-		if (!entityType) throw new Error('No entityType found');
+		if (!entityType) throw new Error('No entity type found');
 
 		const unique = this.#entityContext.getUnique();
 		if (unique === undefined) throw new Error('No unique found');
@@ -93,11 +92,16 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 	}
 
 	#renderSingleOptionAction() {
-		return html` <uui-button
-			label=${this.#createLabel}
-			color="default"
-			look="outline"
-			@click=${(event: Event) => this.#onClick(event, this._apiControllers[0])}></uui-button>`;
+		const href = this._hrefList[0];
+		return html`
+			<uui-button
+				label=${this.#createLabel}
+				color="default"
+				look="outline"
+				href=${ifDefined(href)}
+				target=${this.#getTarget(href)}
+				@click=${(event: Event) => this.#onClick(event, this._apiControllers[0], href)}></uui-button>
+		`;
 	}
 
 	#renderMultiOptionAction() {
@@ -139,9 +143,9 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 		return html`
 			<uui-menu-item
 				label=${label}
-				@click=${(event: Event) => this.#onClick(event, controller, href)}
 				href=${ifDefined(href)}
-				target=${this.#getTarget(href)}>
+				target=${this.#getTarget(href)}
+				@click=${(event: Event) => this.#onClick(event, controller, href)}>
 				<umb-icon slot="icon" .name=${manifest.meta.icon}></umb-icon>
 			</uui-menu-item>
 		`;
@@ -152,6 +156,6 @@ export { UmbCollectionCreateActionButtonElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbCollectionCreateActionButtonElement;
+		'umb-collection-create-action-button': UmbCollectionCreateActionButtonElement;
 	}
 }
