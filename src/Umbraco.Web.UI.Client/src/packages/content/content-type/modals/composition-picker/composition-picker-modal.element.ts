@@ -131,7 +131,9 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('contentTypeEditor_compositions')}">
-				${this._references.length ? this.#renderHasReference() : this.#renderAvailableCompositions()}
+				<uui-box>
+					${this._references.length ? this.#renderHasReference() : this.#renderAvailableCompositions()}
+				</uui-box>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					${!this._references.length
@@ -250,6 +252,10 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 				display: flex;
 				align-items: center;
 				gap: var(--uui-size-3);
+			}
+
+			.compositions-list {
+				margin-block: var(--uui-size-3);
 			}
 		`,
 	];
