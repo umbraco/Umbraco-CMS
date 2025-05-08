@@ -131,7 +131,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 										.state=${this._migrationButtonState}
 										color="warning"
 										look="primary"
-										label=${this.localize.term('packageMigrationsRun')}></uui-button>`
+										label=${this.localize.term('packager_packageMigrationsRun')}></uui-button>`
 								: nothing}
 						</div>
 					</uui-ref-node-package>
