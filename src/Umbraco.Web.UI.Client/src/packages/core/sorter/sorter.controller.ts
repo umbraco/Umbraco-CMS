@@ -393,6 +393,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	override hostConnected() {
+		if (this.#isConnected) return;
 		this.#isConnected = true;
 		if (this.#enabled) {
 			requestAnimationFrame(this.#initialize);
@@ -409,7 +410,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	#initialize = () => {
 		if (this.#isConnected === false) return;
 		if (this.#containerElement) {
-			console.error('Container element already initialized', this.#containerElement);
+			// This can happen, so no need to show an error as it seems to be happening in some cases. We will just reject. [NL]
+			//console.error('Container element already initialized', this.#containerElement);
 			return;
 		}
 
