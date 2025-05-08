@@ -33,8 +33,8 @@ public interface IBackOfficeExternalLoginProviders
 
     /// <summary>
     ///     Used during startup to see if the configured external login providers is different from the persisted information.
-    ///     If they are different, this will invalidates all backoffice sessions.
-    ///     In particular we want to ensure that any tokens issued from a now removed login provider are invalidated.
+    ///     If they are different, this will invalidate backoffice sessions and clear external logins for removed providers
+    ///     if the external login provider setup has changed.
     /// </summary>
     void InvalidateSessionsIfExternalLoginProvidersChanged() { }
 }

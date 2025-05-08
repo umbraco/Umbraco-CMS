@@ -108,7 +108,7 @@ public class BackOfficeExternalLoginProviders : IBackOfficeExternalLoginProvider
         if ((previousExternalLoginProvidersValue ?? string.Empty) != currentExternalLoginProvidersValue)
         {
             _logger.LogWarning(
-                "The configured external login providers have changed. All existing backoffice tokens will be invalidated");
+                "The configured external login providers have changed. Existing backoffice sessions using the removed providers will be invalidated and external login data removed.");
 
             _userService.InvalidateSessionsForRemovedProviders(_externalLogins.Keys);
             _externalLoginWithKeyService.DeleteUserLoginsForRemovedProviders(_externalLogins.Keys);

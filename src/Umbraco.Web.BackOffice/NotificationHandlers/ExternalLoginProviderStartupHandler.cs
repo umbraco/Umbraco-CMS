@@ -7,7 +7,8 @@ using Umbraco.Cms.Web.BackOffice.Security;
 namespace Umbraco.Cms.Web.BackOffice.NotificationHandlers;
 
 /// <summary>
-/// Invalidates all backoffice sessions if the external login provider setup has changed.
+/// Invalidates backoffice sessions and clears external logins for removed providers if the external login
+/// provider setup has changed.
 /// </summary>
 public class ExternalLoginProviderStartupHandler : INotificationHandler<UmbracoApplicationStartingNotification>
 {

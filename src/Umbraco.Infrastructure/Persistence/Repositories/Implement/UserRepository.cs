@@ -11,7 +11,6 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -1098,7 +1097,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
     // Marked as internal to expose for unit testing.
     internal static int? ConvertUserKeyToUserId(Guid userOrMemberKey)
     {
-        // User Ids are stored as userIds in the umbracoUser table, but as a GUID representation
+        // User Ids are stored as integers in the umbracoUser table, but as a GUID representation
         // of that integer in umbracoExternalLogin (converted via IntExtensions.ToGuid()).
         // We need to parse that to get the user Ids to invalidate.
         // Note also that umbracoExternalLogin contains members too, as proper GUIDs, so we need to ignore them.
