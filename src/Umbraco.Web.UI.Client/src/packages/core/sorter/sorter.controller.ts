@@ -456,6 +456,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	#uninitialize() {
 		// Do something when host element is disconnected.
 		if (UmbSorterController.activeSorter === (this as unknown as UmbSorterController<unknown>)) {
+			UmbSorterController.activeSorter = undefined;
 			if (UmbSorterController.activeElement) {
 				this.#handleDragEnd();
 			}
@@ -490,11 +491,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		this.#elements.forEach((item) => this.destroyItem(item));
 	}
 
-	#itemDraggedOver = async (e: DragEvent) => {
-		let dropSorter = UmbSorterController.dropSorter as unknown as UmbSorterController<T, ElementType>;
-		let newDrop = false;
-
-		if (!dropSorter && e.dataTransfer?.types.includes('text/umb-sorter-identifier#' + this.identifier.toString())) {
+	async #obtainIncomingItem(e: DragEvent) {
+		if (
+			!UmbSorterController.dropSorter &&
+			e.dataTransfer?.types.includes('text/umb-sorter-identifier#' + this.identifier.toString())
+		) {
 			// If we have no drop-sorter, and we share the same identifier, then we like to accept this drag.
 			const activeType: string | undefined = e.dataTransfer?.types.find((x) =>
 				x.startsWith('text/umb-sorter-item-unique#'),
@@ -502,15 +503,23 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			if (activeType) {
 				const activeUnique = activeType.split('#')?.[1];
 
-				// Find the active item:
-				const activeItem = await this.#config.onRequestDrop?.({ unique: activeUnique });
+				let activeItem = this.#model.find((x) => this.#config.getUniqueOfModel(x) === activeUnique);
+				if (activeItem) {
+					UmbSorterController.activeSorter = this as unknown as UmbSorterController<unknown>;
+				}
+				// test if unique is already in the model:
 				if (!activeItem) {
-					// Then we assume this item was not part of this sorters scope. This is the spot where inserting a new item from dataTransfer could be implemented.
-					return;
+					// Find the active item:
+					activeItem = await this.#config.onRequestDrop?.({ unique: activeUnique });
+					UmbSorterController.activeSorter = undefined; // Important as we use this to know if we can remove the item via these Sorter references or if it is a Native Drop.
+					if (!activeItem) {
+						// Then we assume this item was not part of this sorters scope. This is the spot where inserting a new item from dataTransfer could be implemented.
+						return false;
+					}
 				}
 
 				if (this.hasItem(activeUnique)) {
-					return;
+					return false;
 				}
 
 				e.dataTransfer.setData('text/umb-sorter-item-accepted', 'true');
@@ -519,9 +528,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				UmbSorterController.activeItem = activeItem;
 				UmbSorterController.activeElement = undefined;
 				UmbSorterController.activeDragElement = undefined;
-				UmbSorterController.activeSorter = undefined; // Important as we use this to know if we can remove the item via these Sorter references or if it is a Native Drop.
 				UmbSorterController.dropSorter = this as unknown as UmbSorterController<unknown>;
-				dropSorter = this as unknown as UmbSorterController<T, ElementType>;
 				UmbSorterController.originalIndex = undefined;
 				UmbSorterController.originalSorter = undefined;
 
@@ -535,14 +542,16 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				if (!this.#scrollElement) {
 					this.#scrollElement = getParentScrollElement(this.#containerElement, true);
 				}
-
-				newDrop = true;
+				return true;
 			}
-
-			// Then we need to set UmbSorterController.activeItem:
 		}
 
-		//if(UmbSorterController.activeSorter === this) return;
+		return false;
+	}
+
+	#itemDraggedOver = async (e: DragEvent) => {
+		const newDrop = await this.#obtainIncomingItem(e);
+		const dropSorter = UmbSorterController.dropSorter as unknown as UmbSorterController<T, ElementType>;
 
 		if (!dropSorter || dropSorter.identifier !== this.identifier) return;
 
