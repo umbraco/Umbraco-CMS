@@ -32,13 +32,10 @@ public class ConfigureSecurityStampOptions : IConfigureOptions<SecurityStampVali
     /// <param name="securitySettings">The <see cref="SecuritySettings" /> options.</param>
     public static void ConfigureOptions(SecurityStampValidatorOptions options, SecuritySettings securitySettings)
     {
-        // Default to the configured value (which, by default is 30 minutes, matching the Microsoft.AspNetCore.Identity default).
-        options.ValidationInterval = securitySettings.SecurityStampValidationInterval;
-
         // Adjust the security stamp validation interval to a shorter duration
-        // when concurrent logins are not allowed and the duration has the default interval value,
-        // ensuring quicker re-validation.
-        if (securitySettings.AllowConcurrentLogins is false && options.ValidationInterval == SecuritySettings.DefaultSecurityStampValidationInterval)
+        // when concurrent logins are not allowed and the duration has the default interval value
+        // (currently defaults to 30 minutes), ensuring quicker re-validation.
+        if (securitySettings.AllowConcurrentLogins is false && options.ValidationInterval == new SecurityStampValidatorOptions().ValidationInterval)
         {
             options.ValidationInterval = TimeSpan.FromSeconds(30);
         }
