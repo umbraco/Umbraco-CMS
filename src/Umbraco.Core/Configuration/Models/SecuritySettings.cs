@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
@@ -138,6 +139,7 @@ public class SecuritySettings
     /// The user login endpoint ensures that failed login attempts take at least as long as the average successful login.
     /// However, if no successful logins have occurred, this value is used as the default duration.
     /// </remarks>
+    [Range(0, int.MaxValue)] // TODO (V17): Change property type to short and update maximum range to short.MaxValue
     [DefaultValue(StaticUserDefaultFailedLoginDurationInMilliseconds)]
     public long UserDefaultFailedLoginDurationInMilliseconds { get; set; } = StaticUserDefaultFailedLoginDurationInMilliseconds;
 
@@ -147,6 +149,7 @@ public class SecuritySettings
     /// <value>
     /// The minimum duration (in milliseconds) of failed login attempts.
     /// </value>
+    [Range(0, int.MaxValue)] // TODO (V17): Change property type to short and update maximum range to short.MaxValue
     [DefaultValue(StaticUserMinimumFailedLoginDurationInMilliseconds)]
     public long UserMinimumFailedLoginDurationInMilliseconds { get; set; } = StaticUserMinimumFailedLoginDurationInMilliseconds;
 }
