@@ -4,6 +4,7 @@ import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository'
 import type { MemberGroupItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MemberGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 /**
  * A server data source for Member Group items
@@ -21,14 +22,24 @@ export class UmbMemberGroupItemServerDataSource extends UmbItemServerDataSourceB
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
-			getItems,
 			mapper,
 		});
 	}
-}
 
-/* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => MemberGroupService.getItemMemberGroup({ query: { id: uniques } });
+	override async getItems(uniques: Array<string>) {
+		if (!uniques) throw new Error('Uniques are missing');
+
+		const itemRequestManager = new UmbItemDataApiGetRequestController(this, {
+			// eslint-disable-next-line local-rules/no-direct-api-import
+			api: (args) => MemberGroupService.getItemMemberGroup({ query: { id: args.uniques } }),
+			uniques,
+		});
+
+		const { data, error } = await itemRequestManager.request();
+
+		return { data: this._getMappedItems(data), error };
+	}
+}
 
 const mapper = (item: MemberGroupItemResponseModel): UmbMemberGroupItemModel => {
 	return {
