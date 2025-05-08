@@ -75,7 +75,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 			this.#collectionContext?.getConfig()?.noItemsLabel ??
 			'#collection_noItemsTitle';
 
-		return this.localize.string(labelKey);
+		return labelKey.startsWith('#') ? this.localize.string(labelKey) : labelKey;
 	}
 
 	override render() {
