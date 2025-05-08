@@ -795,6 +795,17 @@ export class UmbContentTypeStructureManager<
 		);
 	}
 
+	/**
+	 * Get all property aliases for the content type including inherited and composed content types.
+	 * @returns {Promise<Array<string>>} - A promise that will be resolved with the list of all content type property aliases.
+	 */
+	async getContentTypePropertyAliases() {
+		return this.#contentTypes
+			.getValue()
+			.flatMap((x) => x.properties?.map((y) => y.alias) ?? [])
+			.filter(UmbFilterDuplicateStrings);
+	}
+
 	#clear() {
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];
