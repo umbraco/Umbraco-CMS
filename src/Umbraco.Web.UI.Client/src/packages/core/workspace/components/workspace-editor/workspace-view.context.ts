@@ -1,33 +1,29 @@
 import type { ManifestWorkspaceView } from '../../types.js';
+import type { UmbWorkspaceHint } from '../../controllers/workspace-view-hint-manager.controller.js';
 import { UMB_WORKSPACE_VIEW_CONTEXT } from './workspace-view.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
-import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbHintManager } from '@umbraco-cms/backoffice/utils';
 
-export type UmbWorkspaceViewNavigationState = {
-	unique: string | symbol;
-	text: string;
-	weight: number;
-	color?: UUIInterfaceColor;
-};
+export interface UmbWorkspaceViewHint extends UmbWorkspaceHint {
+	viewAlias: string;
+}
 
 export class UmbWorkspaceViewContext extends UmbControllerBase {
 	//
 	#providerCtrl: any;
 	#currentProvideHost?: UmbClassInterface;
 
-	manifest: ManifestWorkspaceView;
+	public manifest: ManifestWorkspaceView;
 
-	#hints = new UmbArrayState<UmbWorkspaceViewNavigationState>([], (x) => x.unique);
-	readonly hints = this.#hints.asObservable();
-	readonly hint = this.#hints.asObservablePart((x) => x[0]);
+	public hints;
 
 	constructor(host: UmbControllerHost, manifest: ManifestWorkspaceView) {
 		super(host);
 		this.manifest = manifest;
-
-		this.#hints.sortBy((a, b) => (b.weight || 0) - (a.weight || 0));
+		this.hints = new UmbHintManager<UmbWorkspaceViewHint>(this, { scaffold: { viewAlias: manifest.alias } });
 	}
 
 	provideAt(controllerHost: UmbClassInterface): void {
@@ -46,20 +42,18 @@ export class UmbWorkspaceViewContext extends UmbControllerBase {
 		}
 	}
 
-	hasHint(unique: string | symbol): boolean {
-		return this.#hints.getHasOne(unique);
-	}
-
-	addHint(state: Partial<UmbWorkspaceViewNavigationState>): string | symbol {
-		const newState = { ...state } as UmbWorkspaceViewNavigationState;
-		newState.unique ??= Symbol();
-		newState.weight ??= 0;
-		newState.text ??= '!';
-		this.#hints.appendOne(newState);
-		return newState.unique;
-	}
-
-	removeHint(unique: string | symbol): void {
-		this.#hints.removeOne(unique);
+	/**
+	 * observe hint of an optional variant, the variant is optional, in that case all variantIds are accepted.
+	 * @param {UmbVariantId} variantId - the variantId to match against the hint.
+	 * @returns {Observable<UmbWorkspaceHint | undefined>} the first hint that matches the variantId or undefined if no hint is found.
+	 */
+	hintOfVariant(variantId?: UmbVariantId): Observable<UmbWorkspaceHint | undefined> {
+		const viewAlias = this.manifest.alias;
+		if (variantId) {
+			return this.hints.asObservablePart((x) =>
+				x.find((hint) => hint.viewAlias === viewAlias && (hint.variantId ? hint.variantId.compare(variantId) : true)),
+			);
+		}
+		return this.hints.asObservablePart((x) => x.find((hint) => hint.viewAlias === viewAlias));
 	}
 }

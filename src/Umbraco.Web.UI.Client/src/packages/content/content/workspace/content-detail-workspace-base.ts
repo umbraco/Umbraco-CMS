@@ -11,6 +11,7 @@ import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbra
 import {
 	UmbEntityDetailWorkspaceContextBase,
 	UmbWorkspaceSplitViewManager,
+	UmbWorkspaceViewHintManager,
 	type UmbEntityDetailWorkspaceContextArgs,
 	type UmbEntityDetailWorkspaceContextCreateArgs,
 } from '@umbraco-cms/backoffice/workspace';
@@ -134,6 +135,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/* Split View */
 	readonly splitView = new UmbWorkspaceSplitViewManager();
+
+	/* Hints */
+	readonly hints = new UmbWorkspaceViewHintManager(this);
 
 	/* Variant Options */
 	// TODO: Optimize this so it uses either a App Language Context? [NL]
@@ -818,8 +822,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		} else {
-			/* If there are multiple variants but no modal token is set 
-			we will save the variants that would have been preselected in the modal. 
+			/* If there are multiple variants but no modal token is set
+			we will save the variants that would have been preselected in the modal.
 			These are based on the variants that have been edited */
 			variantIds = selected.map((x) => UmbVariantId.FromString(x));
 		}

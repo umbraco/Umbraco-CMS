@@ -2,6 +2,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UMB_WORKSPACE_VIEW_NAVIGATION_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 @customElement('example-hint-workspace-view')
 export class ExampleHintWorkspaceView extends UmbElementMixin(LitElement) {
@@ -17,14 +18,15 @@ export class ExampleHintWorkspaceView extends UmbElementMixin(LitElement) {
 			throw new Error('Could not find the view');
 		}
 
-		if (view.hasHint('exampleHintFromToggleAction')) {
-			view.removeHint('exampleHintFromToggleAction');
+		if (view.hints.has('exampleHintFromToggleAction')) {
+			view.hints.removeOne('exampleHintFromToggleAction');
 		} else {
-			view.addHint({
+			view.hints.addOne({
 				unique: 'exampleHintFromToggleAction',
 				text: 'Hi',
 				color: 'invalid',
 				weight: 100,
+				variantId: new UmbVariantId('en-US'),
 			});
 		}
 	}

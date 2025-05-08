@@ -1,12 +1,14 @@
 import { UMB_WORKSPACE_VIEW_PATH_PATTERN } from '../../paths.js';
+import type { UmbWorkspaceHint } from '../../controllers/workspace-view-hint-manager.controller.js';
 import { UmbWorkspaceViewNavigationContext } from './workspace-view-navigation.context.js';
-import type { UmbWorkspaceViewNavigationState, UmbWorkspaceViewContext } from './workspace-view.context.js';
+import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * @element umb-workspace-editor
@@ -28,6 +30,12 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	// Then these should been observe here in the workspace-editor(here), for the current culture and segment? and also for the invariant culture. (not invariant/default segment)
 	// This would mean that the Workspace would have a WorkspaceNavigationContext, and that would be able to host hints for each culture and segment. And then this one should not have a WorkspaceViewNavigationContext, the WorkspaceViewContext should also go away but a WorkspaceViewNavigationContext should exist and this should support begin provided at multiple elements cause we need to think about Split View.
 	// It then also means that this element should be able to get a Variant ID, I think via a property, and once that is set then we consume the WorkspaceViewNavigationContext and listens for hints for that variant.
+	/*
+	--- UPDATE 06/05/2025 ---
+	Well, because we use <umb-workspace-editor> individually, we should make sure this works independently of the workspace context.
+	So the question goes how can we sync this upward and downward for just specific variant ids. Or sync all, but only show by a filter..
+	I think all hints should support the concept of variant id, but it should be optional if we like to filter by it.
+	*/
 	#navigationContext = new UmbWorkspaceViewNavigationContext(this);
 	#workspaceViewHintObservers: Array<UmbObserverController> = [];
 
@@ -46,11 +54,21 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@property({ type: Boolean })
 	public loading = false;
 
+	@property({ attribute: false })
+	public get variantId(): UmbVariantId | undefined {
+		return this._variantId;
+	}
+	public set variantId(value: UmbVariantId | undefined) {
+		this._variantId = value;
+		this.#observeWorkspaceViewHints();
+	}
+	private _variantId?: UmbVariantId | undefined;
+
 	@state()
 	private _workspaceViews: Array<UmbWorkspaceViewContext> = [];
 
 	@state()
-	private _hintMap: Map<string, UmbWorkspaceViewNavigationState> = new Map();
+	private _hintMap: Map<string, UmbWorkspaceHint> = new Map();
 
 	@state()
 	private _routes?: UmbRoute[];
@@ -63,30 +81,37 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	constructor() {
 		super();
-
 		this.observe(
 			this.#navigationContext.views,
 			(views) => {
-				this.#workspaceViewHintObservers.forEach((observer) => observer.destroy());
-				this._hintMap = new Map();
 				this._workspaceViews = views;
-				this.#workspaceViewHintObservers = views.map((view, index) =>
-					this.observe(
-						view.hint,
-						(state) => {
-							this._hintMap.set(view.manifest.alias, state);
-							this.requestUpdate('_hintMap');
-						},
-						'umbObserveState_' + index,
-					),
-				);
-				this._createRoutes();
+				this.#observeWorkspaceViewHints();
+				this.#createRoutes();
 			},
-			'observeWorkspaceViews',
+			null,
 		);
 	}
 
-	private _createRoutes() {
+	#observeWorkspaceViewHints() {
+		this.#workspaceViewHintObservers.forEach((observer) => observer.destroy());
+		this._hintMap = new Map();
+		this.#workspaceViewHintObservers = this._workspaceViews.map((view, index) =>
+			this.observe(
+				view.hintOfVariant(this._variantId),
+				(hint) => {
+					if (hint) {
+						this._hintMap.set(view.manifest.alias, hint);
+					} else {
+						this._hintMap.delete(view.manifest.alias);
+					}
+					this.requestUpdate('_hintMap');
+				},
+				'umbObserveState_' + index,
+			),
+		);
+	}
+
+	#createRoutes() {
 		let newRoutes: UmbRoute[] = [];
 
 		if (this._workspaceViews.length > 0) {
@@ -117,24 +142,26 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`
-			<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
-				${this.#renderBackButton()}
-				<slot name="header" slot="header"></slot>
-				<slot name="action-menu" slot="action-menu"></slot>
-				${this.#renderViews()} ${this.#renderRoutes()}
-				<slot></slot>
-				${when(
-					!this.enforceNoFooter,
-					() => html`
-						<umb-workspace-footer slot="footer" data-mark="workspace:footer">
-							<slot name="footer-info"></slot>
-							<slot name="actions" slot="actions" data-mark="workspace:footer-actions"></slot>
-						</umb-workspace-footer>
-					`,
-				)}
-			</umb-body-layout>
-		`;
+		return this._routes
+			? html`
+					<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
+						${this.#renderBackButton()}
+						<slot name="header" slot="header"></slot>
+						<slot name="action-menu" slot="action-menu"></slot>
+						${this.#renderViews()} ${this.#renderRoutes()}
+						<slot></slot>
+						${when(
+							!this.enforceNoFooter,
+							() => html`
+								<umb-workspace-footer slot="footer" data-mark="workspace:footer">
+									<slot name="footer-info"></slot>
+									<slot name="actions" slot="actions" data-mark="workspace:footer-actions"></slot>
+								</umb-workspace-footer>
+							`,
+						)}
+					</umb-body-layout>
+				`
+			: nothing;
 	}
 
 	#renderViews() {
