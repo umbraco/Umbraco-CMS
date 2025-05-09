@@ -114,7 +114,7 @@ test('can trash a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.media.clickActionsMenuForName(folderName);
-  await umbracoUi.media.clickTrashButton();
+  await umbracoUi.media.clickTrashActionMenuOption();
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
@@ -132,7 +132,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.media.clickActionsMenuForName(parentFolderName);
-  await umbracoUi.media.clickCreateModalButton();
+  await umbracoUi.media.clickCreateActionMenuOption();
   await umbracoUi.media.clickMediaTypeName('Folder');
   await umbracoUi.media.enterMediaItemName(folderName);
   await umbracoUi.media.clickSaveButton();
@@ -177,7 +177,7 @@ test('can trash a media item', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.media.clickActionsMenuForName(mediaFileName);
-  await umbracoUi.media.clickTrashButton();
+  await umbracoUi.media.clickTrashActionMenuOption();
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert

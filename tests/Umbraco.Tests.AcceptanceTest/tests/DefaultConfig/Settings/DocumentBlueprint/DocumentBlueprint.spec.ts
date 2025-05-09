@@ -23,7 +23,7 @@ test('can create a document blueprint from the settings menu', {tag: '@smoke'}, 
 
   // Act
   await umbracoUi.documentBlueprint.clickActionsMenuAtRoot();
-  await umbracoUi.documentBlueprint.clickCreateDocumentBlueprintButton();
+  await umbracoUi.documentBlueprint.clickCreateActionMenuOption();
   await umbracoUi.documentBlueprint.clickTextButtonWithName(documentTypeName);
   await umbracoUi.documentBlueprint.enterDocumentBlueprintName(documentBlueprintName);
   await umbracoUi.documentBlueprint.clickSaveButton();
@@ -66,7 +66,7 @@ test('can delete a document blueprint', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.documentBlueprint.reloadDocumentBlueprintsTree();
   await umbracoUi.documentBlueprint.clickActionsMenuForDocumentBlueprints(documentBlueprintName);
-  await umbracoUi.documentBlueprint.clickDeleteMenuButton();
+  await umbracoUi.documentBlueprint.clickDeleteActionMenuOption();
   await umbracoUi.documentBlueprint.clickConfirmToDeleteButton();
 
   // Assert
@@ -85,7 +85,7 @@ test('can create a document blueprint from the content menu', async ({umbracoApi
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(documentBlueprintName);
-  await umbracoUi.content.clickCreateDocumentBlueprintButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
