@@ -351,7 +351,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public async saveAndPreview(): Promise<void> {
-		await this.#handleSaveAndPreview();
+		return await this.#handleSaveAndPreview();
 	}
 
 	async #handleSaveAndPreview() {
