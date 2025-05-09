@@ -144,7 +144,7 @@ public class DeliveryApiSettings
         /// <value>
         /// The URLs allowed as redirect targets.
         /// </value>
-        public ISet<Uri> LoginRedirectUrls { get; set; } = new HashSet<Uri>();
+        public IEnumerable<Uri> LoginRedirectUrls { get; set; } = [];
 
         /// <summary>
         ///     Gets or sets the URLs allowed to use as redirect targets after a successful logout (session termination).
@@ -155,7 +155,7 @@ public class DeliveryApiSettings
         /// <remarks>
         /// These are only required if logout is to be used.
         /// </remarks>
-        public ISet<Uri> LogoutRedirectUrls { get; set; } = new HashSet<Uri>();
+        public IEnumerable<Uri> LogoutRedirectUrls { get; set; } = [];
     }
 
     /// <summary>
