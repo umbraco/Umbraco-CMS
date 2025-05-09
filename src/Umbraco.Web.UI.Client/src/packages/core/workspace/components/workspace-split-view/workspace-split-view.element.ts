@@ -67,6 +67,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 				back-path=${ifDefined(this.backPath)}
 				.hideNavigation=${!this.displayNavigation}
 				.enforceNoFooter=${true}>
+				<slot id="icon" name="icon" slot="header"></slot>
 				<slot id="header" name="variant-selector" slot="header" @slotchange=${this.#onVariantSelectorSlotChanged}>
 					${when(
 						!this._variantSelectorSlotHasContent,
@@ -105,6 +106,14 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 			#header {
 				flex: 1 1 auto;
 				display: block;
+			}
+
+			#icon {
+				display: inline-block;
+				font-size: var(--uui-size-6);
+				margin-right: var(--uui-size-space-4);
+				--uui-button-border-color: transparent;
+				--uui-button-border-color-hover: var(--uui-color-border);
 			}
 		`,
 	];
