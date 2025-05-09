@@ -301,7 +301,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public async saveAndPreview(): Promise<void> {
-		return this.#handleSaveAndPreview();
+		return await this.#handleSaveAndPreview();
 	}
 
 	async #handleSaveAndPreview() {
@@ -351,7 +351,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the Publish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.publish();
+		await this.#publishingContext.publish();
 	}
 
 	/**
@@ -365,7 +365,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the SaveAndPublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.saveAndPublish();
+		await this.#publishingContext.saveAndPublish();
 	}
 
 	/**
@@ -379,7 +379,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the Schedule method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.schedule();
+		await this.#publishingContext.schedule();
 	}
 
 	/**
@@ -393,7 +393,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the Unpublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.unpublish();
+		await this.#publishingContext.unpublish();
 	}
 
 	/**
@@ -407,7 +407,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the PublishWithDescendants method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.publishWithDescendants();
+		await this.#publishingContext.publishWithDescendants();
 	}
 
 	public createPropertyDatasetContext(
