@@ -159,7 +159,7 @@ export default {
 		saveAndPublish: 'Save and publish',
 		saveToPublish: 'Save and send for approval',
 		saveListView: 'Save list view',
-		schedulePublish: 'Schedule',
+		schedulePublish: 'Schedule publish',
 		saveAndPreview: 'Save and preview',
 		showPageDisabled: "Preview is disabled because there's no template assigned",
 		styleChoose: 'Choose style',
@@ -271,7 +271,7 @@ export default {
 		publishedPendingChanges: 'Published (pending changes)',
 		publishStatus: 'Publication Status',
 		publishDescendantsHelp:
-			'Publish <strong>%0%</strong> and all content items underneath and thereby making their content publicly available.',
+			'Publish <strong>%0%</strong> and all items underneath and thereby making their content publicly available.',
 		publishDescendantsWithVariantsHelp:
 			'Publish variants and variants of same type underneath and thereby making their content publicly available.',
 		noVariantsToProcess: 'There are no available variants',
@@ -319,7 +319,7 @@ export default {
 		addTextBox: 'Add another text box',
 		removeTextBox: 'Remove this text box',
 		contentRoot: 'Content root',
-		includeUnpublished: 'Include unpublished content items.',
+		includeUnpublished: 'Include unpublished items.',
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your website administrator.',
 		isSensitiveValue_short: 'This value is hidden.',
@@ -348,6 +348,8 @@ export default {
 		variantUnpublishNotAllowed: 'Unpublish is not allowed',
 		selectAllVariants: 'Select all variants',
 		saveModalTitle: 'Save',
+		saveAndPublishModalTitle: 'Save and publish',
+		publishModalTitle: 'Publish',
 	},
 	blueprints: {
 		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
@@ -475,10 +477,11 @@ export default {
 		discardChanges: 'Discard changes',
 		unsavedChanges: 'Discard unsaved changes',
 		unsavedChangesWarning: 'Are you sure you want to navigate away from this page? You have unsaved changes',
-		confirmListViewPublish: 'Publishing will make the selected items visible on the site.',
-		confirmListViewUnpublish: 'Unpublishing will remove the selected items and all their descendants from the site.',
-		confirmPublish: 'Publishing will make this page and all its published descendants visible on the site.',
-		confirmUnpublish: 'Unpublishing will remove this page and all its descendants from the site.',
+		confirmListViewPublish: 'Publishing will make the selected items publicly available.',
+		confirmListViewUnpublish:
+			'Unpublishing will make the selected items and all their descendants publicly unavailable.',
+		confirmPublish: 'Publishing will make this content and all its published descendants publicly available.',
+		confirmUnpublish: 'Unpublishing will make this content publicly unavailable.',
 		doctypeChangeWarning: 'You have unsaved changes. Making changes to the Document Type will discard the changes.',
 	},
 	bulk: {
@@ -911,7 +914,7 @@ export default {
 		retrieve: 'Retrieve',
 		retry: 'Retry',
 		rights: 'Permissions',
-		scheduledPublishing: 'Scheduled Publishing',
+		scheduledPublishing: 'Schedule publish',
 		umbracoInfo: 'Umbraco info',
 		search: 'Search',
 		searchNoResult: 'Sorry, we can not find what you are looking for.',
