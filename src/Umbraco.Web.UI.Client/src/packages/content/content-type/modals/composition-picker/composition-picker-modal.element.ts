@@ -220,6 +220,9 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 			(compositions) => {
 				const usedForInheritance = this._usedForInheritance.includes(compositions.unique);
 				const usedForComposition = this._usedForComposition.includes(compositions.unique);
+				/* The server will return isCompatible as false if the Doc Type is currently being used in a composition. 
+				Therefore, we need to account for this in the "isDisabled" check to ensure it remains enabled. 
+				Otherwise, it would become disabled and couldn't be deselected by the user. */
 				const isDisabled = usedForInheritance || (compositions.isCompatible === false && !usedForComposition);
 				return html`
 					<uui-menu-item
