@@ -248,8 +248,6 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IRichTextRequiredValidator, RichTextRequiredValidator>();
 
-        // same as newing one up and required for the RichTextRegexValidator
-        builder.Services.AddTransient<RegexValidator>();
         builder.Services.AddSingleton<IRichTextRegexValidator, RichTextRegexValidator>();
 
         return builder;

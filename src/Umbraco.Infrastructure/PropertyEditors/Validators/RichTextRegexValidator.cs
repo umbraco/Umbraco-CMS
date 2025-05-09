@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 
@@ -13,12 +12,11 @@ internal class RichTextRegexValidator : IRichTextRegexValidator
 
     public RichTextRegexValidator(
         IJsonSerializer jsonSerializer,
-        ILogger<RichTextRegexValidator> logger,
-        RegexValidator regexValidator)
+        ILogger<RichTextRegexValidator> logger)
     {
         _jsonSerializer = jsonSerializer;
         _logger = logger;
-        _regexValidator = regexValidator;
+        _regexValidator = new RegexValidator();
     }
 
     public IEnumerable<ValidationResult> ValidateFormat(object? value, string? valueType, string format) => _regexValidator.ValidateFormat(GetValue(value), valueType, format);
