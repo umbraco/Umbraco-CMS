@@ -57,7 +57,7 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 * @memberof UmbDocumentPublishingRepository
 	 */
 	async published(unique: string): Promise<UmbRepositoryResponse<UmbDocumentDetailModel>> {
-		return await this.#publishingDataSource.published(unique);
+		return this.#publishingDataSource.published(unique);
 	}
 }
 
