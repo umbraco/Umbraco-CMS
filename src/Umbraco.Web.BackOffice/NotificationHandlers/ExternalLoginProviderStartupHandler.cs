@@ -29,20 +29,10 @@ internal sealed class ExternalLoginProviderStartupHandler : INotificationHandler
 
     public void Handle(UmbracoApplicationStartingNotification notification)
     {
-        if (_runtimeState.Level != RuntimeLevel.Run)
+        if (_runtimeState.Level != RuntimeLevel.Run ||
+            _serverRoleAccessor.CurrentServerRole == ServerRole.Subscriber)
         {
             return;
-        }
-
-        switch (_serverRoleAccessor.CurrentServerRole)
-        {
-            case ServerRole.Subscriber:
-            case ServerRole.Unknown:
-                return;
-            case ServerRole.Single:
-            case ServerRole.SchedulingPublisher:
-            default:
-                break;
         }
 
         _backOfficeExternalLoginProviders.InvalidateSessionsIfExternalLoginProvidersChanged();
