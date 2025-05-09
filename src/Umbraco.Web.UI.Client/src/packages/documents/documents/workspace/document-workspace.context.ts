@@ -68,6 +68,7 @@ export class UmbDocumentWorkspaceContext
 		(data) => !!data?.documentType.collection,
 	);
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
+	readonly documentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.documentType.icon || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#publishingContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
