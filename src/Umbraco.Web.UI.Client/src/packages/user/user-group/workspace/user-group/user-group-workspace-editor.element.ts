@@ -12,8 +12,10 @@ import type { UmbInputLanguageElement } from '@umbraco-cms/backoffice/language';
 import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 
+// import of local components
 import './components/user-group-entity-user-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
+import './components/user-group-ui-user-permission-list.element.js';
 
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
@@ -244,6 +246,10 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 					<uui-box>
 						<div slot="headline"><umb-localize key="user_permissionsDefault"></umb-localize></div>
+
+						<umb-property-layout label="Permissions">
+							<umb-user-group-ui-user-permission-list slot="editor"></umb-user-group-ui-user-permission-list>
+						</umb-property-layout>
 
 						<umb-property-layout
 							label=${this.localize.term('user_entityPermissionsLabel')}
