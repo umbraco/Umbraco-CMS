@@ -1070,5 +1070,45 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             : GetMany(ids).OrderBy(x => x.Id) ?? Enumerable.Empty<IUser>();
     }
 
+    /// <inheritdoc />
+    public void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentProviderKeys)
+    {
+        // Get all the user or member keys associated with the removed providers.
+        Sql<ISqlContext> idsQuery = SqlContext.Sql()
+            .Select<ExternalLoginDto>(x => x.UserOrMemberKey)
+            .From<ExternalLoginDto>()
+            .WhereNotIn<ExternalLoginDto>(x => x.ProviderKey, currentProviderKeys);
+        List<Guid> userAndMemberKeysAssociatedWithRemovedProviders = Database.Fetch<Guid>(idsQuery);
+        if (userAndMemberKeysAssociatedWithRemovedProviders.Count == 0)
+        {
+            return;
+        }
+
+        // Filter for actual users and convert to integer IDs.
+        var userIdsAssociatedWithRemovedProviders = userAndMemberKeysAssociatedWithRemovedProviders
+            .Select(ConvertUserKeyToUserId)
+            .Where(x => x.HasValue)
+            .Select(x => x!.Value)
+            .ToList();
+        if (userIdsAssociatedWithRemovedProviders.Count == 0)
+        {
+            return;
+        }
+
+        // Invalidate the security stamps on the users associated with the removed providers.
+        Sql<ISqlContext> updateQuery = Sql()
+            .Update<UserDto>(u => u.Set(x => x.SecurityStampToken, "0".PadLeft(32, '0')))
+            .WhereIn<UserDto>(x => x.Id, userIdsAssociatedWithRemovedProviders);
+        Database.Execute(updateQuery);
+    }
+
+    private static int? ConvertUserKeyToUserId(Guid userOrMemberKey) =>
+
+        // User Ids are stored as integers in the umbracoUser table, but as a GUID representation
+        // of that integer in umbracoExternalLogin (converted via IntExtensions.ToGuid()).
+        // We need to parse that to get the user Ids to invalidate.
+        // Note also that umbracoExternalLogin contains members too, as proper GUIDs, so we need to ignore them.
+        IntExtensions.TryParseFromGuid(userOrMemberKey, out int? userId) ? userId : null;
+
     #endregion
 }
