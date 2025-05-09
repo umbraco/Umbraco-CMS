@@ -1,6 +1,6 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -14,17 +14,21 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	@state()
 	_variants?: Array<ActiveVariant>;
 
+	@state()
+	_icon?: string;
+
 	constructor() {
 		super();
 
 		// TODO: Refactor: use a split view workspace context token: [NL]
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;
-			this._observeActiveVariantInfo();
+			this.#observeActiveVariantInfo();
+			this.#observeIcon();
 		});
 	}
 
-	private _observeActiveVariantInfo() {
+	#observeActiveVariantInfo() {
 		if (!this._workspaceContext) return;
 		this.observe(
 			this._workspaceContext.splitView.activeVariantsInfo,
@@ -33,6 +37,14 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 			},
 			'_observeActiveVariantsInfo',
 		);
+	}
+
+	#observeIcon() {
+		if (!this._workspaceContext) return;
+		this.observe(this._workspaceContext.documentTypeIcon, (icon) => {
+			this._icon = icon ?? undefined;
+			console.log('Icon:', icon);
+		});
 	}
 
 	override render() {
@@ -46,6 +58,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 								<umb-workspace-split-view
 									.splitViewIndex=${view.index}
 									.displayNavigation=${view.index === this._variants!.length - 1}>
+									<umb-icon slot="icon" name=${ifDefined(this._icon)}></umb-icon>
 									<umb-document-workspace-split-view-variant-selector
 										slot="variant-selector"></umb-document-workspace-split-view-variant-selector>
 								</umb-workspace-split-view>
