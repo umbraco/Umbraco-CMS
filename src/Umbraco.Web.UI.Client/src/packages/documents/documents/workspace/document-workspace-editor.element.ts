@@ -34,9 +34,10 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				this.#appCulture = appCulture;
 				this.#generateRoutes();
 				// If the global app language changes, we update the first split view editor to the new app language.
-				const activeSegment = this.#workspaceContext?.splitView.getActiveVariants()[0].segment;
+				const splitViewIndex = 0;
+				const activeSegment = this.#workspaceContext?.splitView.getActiveVariants()[splitViewIndex]?.segment;
 				const variantId = new UmbVariantId(appCulture, activeSegment);
-				this.#workspaceContext?.splitView.switchVariant(0, variantId);
+				this.#workspaceContext?.splitView.switchVariant(splitViewIndex, variantId);
 			});
 		});
 
