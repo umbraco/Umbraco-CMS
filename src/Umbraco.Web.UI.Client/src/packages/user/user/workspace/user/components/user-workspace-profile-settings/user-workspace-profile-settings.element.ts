@@ -1,12 +1,11 @@
+import { UmbUserKind } from '../../../../utils/index.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import type { UmbUserDetailModel } from '../../../../types.js';
-import { UmbUserKind } from '../../../../utils/index.js';
 import { html, customElement, state, ifDefined, css, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbUiCultureInputElement } from '@umbraco-cms/backoffice/localization';
-import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-user-workspace-profile-settings')
 export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
@@ -61,27 +60,30 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<uui-box>
-			<div slot="headline"><umb-localize key="user_profile">Profile</umb-localize></div>
-			${this.#renderEmailProperty()} ${this.#renderUsernameProperty()} ${this.#renderUILanguageProperty()}
-		</uui-box>`;
+		return html`
+			<uui-box>
+				<div slot="headline"><umb-localize key="user_profile">Profile</umb-localize></div>
+				${this.#renderEmailProperty()} ${this.#renderUsernameProperty()} ${this.#renderUILanguageProperty()}
+			</uui-box>
+		`;
 	}
 
 	#renderEmailProperty() {
 		return html`
 			<umb-property-layout
 				mandatory
-				label="${this.localize.term('general_email')}"
-				.description=${this.localize.term('user_emailDescription', this._usernameIsEmail)}>
+				label=${this.localize.term('general_email')}
+				description=${this.localize.term('user_emailDescription', this._usernameIsEmail)}>
 				<uui-input
 					slot="editor"
 					name="email"
-					label="${this.localize.term('general_email')}"
-					@change="${this.#onEmailChange}"
+					label=${this.localize.term('general_email')}
 					required
 					required-message=${this.localize.term('user_emailRequired')}
-					${umbBindToValidation(this)}
-					value=${ifDefined(this._user?.email)}></uui-input>
+					value=${ifDefined(this._user?.email)}
+					@change=${this.#onEmailChange}
+					${umbBindToValidation(this)}>
+				</uui-input>
 			</umb-property-layout>
 		`;
 	}
@@ -92,17 +94,18 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 		return html`
 			<umb-property-layout
 				mandatory
-				label="${this.localize.term('user_loginname')}"
+				label=${this.localize.term('user_loginname')}
 				description=${this.localize.term('user_loginnameDescription')}>
 				<uui-input
 					slot="editor"
 					name="username"
 					autocomplete="off"
-					label="${this.localize.term('user_loginname')}"
-					@change="${this.#onUsernameChange}"
+					label=${this.localize.term('user_loginname')}
 					required
 					required-message=${this.localize.term('user_loginnameRequired')}
-					value=${ifDefined(this._user?.userName)}></uui-input>
+					value=${ifDefined(this._user?.userName)}
+					@change=${this.#onUsernameChange}>
+				</uui-input>
 			</umb-property-layout>
 		`;
 	}
@@ -111,20 +114,20 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 		if (this._user?.kind === UmbUserKind.API) return nothing;
 		return html`
 			<umb-property-layout
-				label="${this.localize.term('user_language')}"
+				label=${this.localize.term('user_language')}
 				description=${this.localize.term('user_languageHelp')}>
 				<umb-ui-culture-input
 					slot="editor"
-					value=${ifDefined(this._user?.languageIsoCode ?? undefined)}
-					@change="${this.#onLanguageChange}"
 					name="language"
-					label="${this.localize.term('user_language')}"></umb-ui-culture-input>
+					label=${this.localize.term('user_language')}
+					value=${ifDefined(this._user?.languageIsoCode ?? undefined)}
+					@change=${this.#onLanguageChange}>
+				</umb-ui-culture-input>
 			</umb-property-layout>
 		`;
 	}
 
 	static override styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				display: block;

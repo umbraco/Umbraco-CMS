@@ -58,7 +58,7 @@ test('can delete a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
 
   // Act
   await umbracoUi.memberGroup.clickMemberGroupLinkByName(memberGroupName);
-  await umbracoUi.memberGroup.clickActionsButton();
+  await umbracoUi.memberGroup.clickActionButton();
   await umbracoUi.memberGroup.clickDeleteButton();
   await umbracoUi.memberGroup.clickConfirmToDeleteButton();
 

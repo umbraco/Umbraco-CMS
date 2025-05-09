@@ -38,7 +38,7 @@ test('can rename a data type folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(wrongDataTypeFolderName);
-  await umbracoUi.dataType.clickRenameFolderButton();
+  await umbracoUi.dataType.clickRenameActionMenuOption();
   await umbracoUi.dataType.enterFolderName(dataTypeFolderName);
   await umbracoUi.dataType.clickConfirmRenameButton();
 
@@ -73,7 +73,7 @@ test('can create a data type in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
-  await umbracoUi.dataType.clickActionsMenuCreateButton();
+  await umbracoUi.dataType.clickCreateActionMenuOption();
   await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();

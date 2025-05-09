@@ -29,7 +29,8 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 	@state()
 	private _value: Array<UmbBlockGridTypeAreaTypePermission> = [];
 
-	_blockTypes: Array<UmbBlockTypeWithGroupKey> = [];
+	@state()
+	private _blockTypes?: Array<UmbBlockTypeWithGroupKey>;
 
 	@state()
 	private _blockTypesWithElementName: Array<{ type: UmbBlockTypeWithGroupKey; name: string }> = [];
@@ -48,7 +49,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 		this.observe(this.#itemsManager.items, (items) => {
 			this._blockTypesWithElementName = items
 				.map((item) => {
-					const blockType = this._blockTypes.find((block) => block.contentElementTypeKey === item.unique);
+					const blockType = this._blockTypes?.find((block) => block.contentElementTypeKey === item.unique);
 					if (blockType) {
 						return { type: blockType, name: item.name };
 					}
@@ -123,8 +124,11 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 	}
 
 	override render() {
-		if (this._blockTypesWithElementName.length === 0) {
+		if (this._blockTypes === undefined) {
 			return nothing;
+		}
+		if (this._blockTypesWithElementName.length === 0) {
+			return 'There must be one Block Type created before permissions can be configured.';
 		}
 		return html`<div id="permissions">
 				${repeat(

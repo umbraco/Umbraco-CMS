@@ -19,7 +19,7 @@ test('can create a template', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
 
   // Act
   await umbracoUi.template.clickActionsMenuAtRoot();
-  await umbracoUi.template.clickCreateButton();
+  await umbracoUi.template.clickCreateActionMenuOption();
   await umbracoUi.template.enterTemplateName(templateName);
   await umbracoUi.template.clickSaveButton();
 
@@ -378,7 +378,7 @@ test('cannot create a template with an empty name', {tag: '@smoke'}, async ({umb
 
   // Act
   await umbracoUi.template.clickActionsMenuAtRoot();
-  await umbracoUi.template.clickCreateButton();
+  await umbracoUi.template.clickCreateActionMenuOption();
   await umbracoUi.template.clickSaveButton();
 
   // Assert

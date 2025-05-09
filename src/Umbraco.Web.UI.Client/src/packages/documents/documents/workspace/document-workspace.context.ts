@@ -20,7 +20,7 @@ import { UmbDocumentValidationRepository } from '../repository/validation/index.
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	type UmbPublishableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
@@ -37,8 +37,6 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/language';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 type ContentModel = UmbDocumentDetailModel;
@@ -102,14 +100,6 @@ export class UmbDocumentWorkspaceContext
 
 				return true;
 			};
-		});
-
-		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
-			const documentConfiguration = (await context?.getDocumentConfiguration()) ?? undefined;
-
-			if (documentConfiguration?.allowEditInvariantFromNonDefault !== true) {
-				this.#preventEditInvariantFromNonDefault();
-			}
 		});
 
 		this.observe(
@@ -226,46 +216,6 @@ export class UmbDocumentWorkspaceContext
 		]);
 	}
 
-	#preventEditInvariantFromNonDefault() {
-		this.observe(
-			observeMultiple([this.structure.contentTypeProperties, this.languages]),
-			([properties, languages]) => {
-				if (properties.length === 0) return;
-				if (languages.length === 0) return;
-
-				const defaultLanguageUnique = languages.find((x) => x.isDefault)?.unique;
-				const ruleUnique = 'UMB_preventEditInvariantFromNonDefault';
-
-				const rule = {
-					unique: ruleUnique,
-					permitted: false,
-					message: 'Shared properties can only be edited in the default language',
-					variantId: UmbVariantId.CreateInvariant(),
-				};
-
-				/* The permission is false by default, and the onChange callback will not be triggered if the permission hasn't changed.
-			Therefore, we add the rule to the readOnlyGuard here. */
-				this.propertyWriteGuard.addRule(rule);
-
-				createExtensionApiByAlias(this, UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS, [
-					{
-						config: {
-							allOf: [defaultLanguageUnique],
-						},
-						onChange: (permitted: boolean) => {
-							if (permitted) {
-								this.propertyWriteGuard.removeRule(ruleUnique);
-							} else {
-								this.propertyWriteGuard.addRule(rule);
-							}
-						},
-					},
-				]);
-			},
-			'observePreventEditInvariantFromNonDefault',
-		);
-	}
-
 	override resetState(): void {
 		super.resetState();
 		this.#isTrashedContext.setIsTrashed(false);
@@ -341,34 +291,30 @@ export class UmbDocumentWorkspaceContext
 		this._data.updateCurrent({ template: { unique: templateUnique } });
 	}
 
-	/**
-	 * Request a submit of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be submitted.
-	 * @returns {Promise<void>} a promise which resolves once it has been completed.
-	 */
-	public override requestSubmit() {
+	protected override async _handleSave() {
 		const elementStyle = (this.getHostElement() as HTMLElement).style;
 		elementStyle.setProperty('--uui-color-invalid', 'var(--uui-color-warning)');
 		elementStyle.setProperty('--uui-color-invalid-emphasis', 'var(--uui-color-warning-emphasis)');
 		elementStyle.setProperty('--uui-color-invalid-standalone', 'var(--uui-color-warning-standalone)');
 		elementStyle.setProperty('--uui-color-invalid-contrast', 'var(--uui-color-warning-contrast)');
-		return this._handleSubmit();
+		await super._handleSave();
 	}
 
 	public async saveAndPreview(): Promise<void> {
-		return this.#handleSaveAndPreview();
+		return await this.#handleSaveAndPreview();
 	}
 
 	async #handleSaveAndPreview() {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
-		let culture = UMB_INVARIANT_CULTURE;
+		let firstVariantId = UmbVariantId.CreateInvariant();
 
 		// Save document (the active variant) before previewing.
 		const { selected } = await this._determineVariantOptions();
 		if (selected.length > 0) {
-			culture = selected[0];
-			const variantIds = [UmbVariantId.FromString(culture)];
+			firstVariantId = UmbVariantId.FromString(selected[0]);
+			const variantIds = [firstVariantId];
 			const saveData = await this._data.constructData(variantIds);
 			await this.runMandatoryValidationForSaveData(saveData);
 			await this.performCreateOrUpdate(variantIds, saveData);
@@ -383,11 +329,15 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		const backofficePath = serverContext.getBackofficePath();
-		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', serverContext.getServerUrl());
+		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', window.location.origin);
 		previewUrl.searchParams.set('id', unique);
 
-		if (culture && culture !== UMB_INVARIANT_CULTURE) {
-			previewUrl.searchParams.set('culture', culture);
+		if (firstVariantId.culture) {
+			previewUrl.searchParams.set('culture', firstVariantId.culture);
+		}
+
+		if (firstVariantId.segment) {
+			previewUrl.searchParams.set('segment', firstVariantId.segment);
 		}
 
 		const previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
@@ -401,7 +351,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the Publish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.publish();
+		await this.#publishingContext.publish();
 	}
 
 	/**
@@ -415,7 +365,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the SaveAndPublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.saveAndPublish();
+		await this.#publishingContext.saveAndPublish();
 	}
 
 	/**
@@ -429,7 +379,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the Schedule method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.schedule();
+		await this.#publishingContext.schedule();
 	}
 
 	/**
@@ -443,7 +393,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the Unpublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.unpublish();
+		await this.#publishingContext.unpublish();
 	}
 
 	/**
@@ -457,7 +407,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the PublishWithDescendants method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.publishWithDescendants();
+		await this.#publishingContext.publishWithDescendants();
 	}
 
 	public createPropertyDatasetContext(

@@ -115,7 +115,7 @@ test('can delete a user group', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
 
   // Act
-  await umbracoUi.userGroup.clickActionsButton();
+  await umbracoUi.userGroup.clickActionButton();
   await umbracoUi.userGroup.clickDeleteButton();
   await umbracoUi.userGroup.clickConfirmToDeleteButton();
 

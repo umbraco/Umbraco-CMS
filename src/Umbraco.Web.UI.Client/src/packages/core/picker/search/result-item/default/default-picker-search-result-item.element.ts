@@ -13,8 +13,9 @@ export class UmbDefaultPickerSearchResultItemElement extends UmbPickerSearchResu
 				id=${item.unique}
 				icon=${item.icon ?? 'icon-document'}
 				select-only
-				selectable
+				?selectable=${!this.disabled}
 				?selected=${this._isSelected}
+				?disabled=${this.disabled}
 				@deselected=${() => this.pickerContext?.selection.deselect(item.unique)}
 				@selected=${() => this.pickerContext?.selection.select(item.unique)}>
 			</umb-ref-item>

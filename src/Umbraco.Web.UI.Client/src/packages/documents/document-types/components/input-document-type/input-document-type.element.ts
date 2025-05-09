@@ -151,7 +151,10 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 
 	#getPickableFilter() {
 		if (this.documentTypesOnly) {
-			return (x: UmbDocumentTypeTreeItemModel) => x.isFolder === false && x.isElement === false;
+			/* TODO: We do not have the same model in the tree and during the search, so theoretically, we cannot use the same filter. 
+			The search item model does not include "isFolder," so it checks for falsy intentionally. 
+			We need to investigate getting this typed correctly. [MR] */
+			return (x: UmbDocumentTypeTreeItemModel) => !x.isFolder && x.isElement === false;
 		}
 		if (this.elementTypesOnly) {
 			return (x: UmbDocumentTypeTreeItemModel) => x.isElement;

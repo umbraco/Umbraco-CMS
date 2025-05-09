@@ -34,7 +34,7 @@ test.fixme('can create content with the list view data type', async ({umbracoApi
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
@@ -168,7 +168,7 @@ test('child is removed from list after child content is deleted', async ({umbrac
   // Act
   await umbracoUi.content.clickCaretButtonForContentName(contentName);
   await umbracoUi.content.clickActionsMenuForContent(childContentName);
-  await umbracoUi.content.clickTrashButton();
+  await umbracoUi.content.clickTrashActionMenuOption();
   await umbracoUi.content.clickConfirmTrashButton();
 
   // Assert

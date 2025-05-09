@@ -21,7 +21,7 @@ test.afterEach(async ({umbracoApi}) => {
 test.skip('can create a relation type', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.relationType.clickActionsMenuAtRoot();
-  await umbracoUi.relationType.clickCreateButton();
+  await umbracoUi.relationType.clickCreateActionMenuOption();
   await umbracoUi.relationType.enterRelationTypeName(relationTypeName);
   await umbracoUi.relationType.selectParentOption(objectTypeName);
   await umbracoUi.relationType.selectChildOption(objectTypeName);
@@ -93,7 +93,7 @@ test.skip('can delete a relation type', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.relationType.clickRootFolderCaretButton();
   await umbracoUi.relationType.clickActionsMenuForRelationType(relationTypeName);
-  await umbracoUi.relationType.clickDeleteButton();
+  await umbracoUi.relationType.clickDeleteActionMenuOption();
   await umbracoUi.relationType.clickConfirmToDeleteButton();
 
   // Assert
