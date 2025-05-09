@@ -66,17 +66,18 @@ export class UmbEntityActionDefaultElement<
 	}
 
 	override render() {
-		const label = this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest?.name;
+		if (!this.manifest) return nothing;
+
+		const label = this.manifest.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest.name;
 
 		return html`
 			<uui-menu-item
-				label=${ifDefined(this.manifest?.meta.additionalOptions ? label + '…' : label)}
+				label=${ifDefined(this.manifest.meta.additionalOptions ? label + '…' : label)}
+				data-mark=${'entity-action:' + this.manifest.alias}
 				href=${ifDefined(this._href)}
 				@click-label=${this.#onClickLabel}
 				@click=${this.#onClick}>
-				${this.manifest?.meta.icon
-					? html`<umb-icon slot="icon" name="${this.manifest?.meta.icon}"></umb-icon>`
-					: nothing}
+				${this.manifest.meta.icon ? html`<umb-icon slot="icon" name="${this.manifest.meta.icon}"></umb-icon>` : nothing}
 			</uui-menu-item>
 		`;
 	}
