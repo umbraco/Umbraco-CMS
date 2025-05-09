@@ -19,7 +19,7 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 		if (!unique) throw new Error('id is missing');
 		if (!variants.length) throw new Error('variant IDs are missing');
 
-		return await this.#publishingDataSource.publish(unique, variants);
+		return this.#publishingDataSource.publish(unique, variants);
 	}
 
 	/**
