@@ -35,11 +35,9 @@ public class MediaSavedWebhookEvent : WebhookEventContentBase<MediaSavedNotifica
 
     public override string Alias => Constants.WebhookEvents.Aliases.MediaSave;
 
-    protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaSavedNotification notification) => notification.SavedEntities;
+    protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaSavedNotification notification)
+        => notification.SavedEntities;
 
     protected override object? ConvertEntityToRequestPayload(IMedia entity)
-    {
-        IPublishedContent? publishedContent = _mediaCache.GetById(entity.Key);
-        return publishedContent is null ? null : _apiMediaBuilder.Build(publishedContent);
-    }
+        => new DefaultPayloadModel { Id = entity.Key };
 }

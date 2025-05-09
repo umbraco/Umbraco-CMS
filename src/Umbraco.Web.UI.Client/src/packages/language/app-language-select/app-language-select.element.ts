@@ -138,7 +138,8 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			id="dropdown-popover"
 			data-mark="app-language-menu"
 			@beforetoggle=${this.#onPopoverToggle}>
-			<umb-popover-layout>
+						<umb-popover-layout>
+			<uui-scroll-container style="max-height:calc(100vh - (var(--umb-header-layout-height) + 60px));">
 				${repeat(
 					this._languages,
 					(language) => language.unique,
@@ -152,7 +153,9 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 						</uui-menu-item>
 					`,
 				)}
-			</umb-popover-layout>
+				</uui-scroll-container>
+							</umb-popover-layout>
+
 		</uui-popover-container>`;
 	}
 
@@ -197,6 +200,8 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 			uui-menu-item {
 				color: var(--uui-color-text);
+				
+				width: auto;
 			}
 		`,
 	];

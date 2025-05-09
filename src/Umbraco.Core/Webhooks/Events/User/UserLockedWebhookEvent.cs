@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -19,4 +20,13 @@ public class UserLockedWebhookEvent : WebhookEventBase<UserLockedNotification>
     }
 
     public override string Alias => Constants.WebhookEvents.Aliases.UserLocked;
+
+    public override object? ConvertNotificationToRequestPayload(UserLockedNotification notification)
+        => new DefaultPayloadModel
+        {
+            Id = notification.AffectedUserId is not null &&
+                 Guid.TryParse(notification.AffectedUserId, out Guid affectedUserGuid)
+                ? affectedUserGuid
+                : Guid.Empty,
+        };
 }

@@ -35,7 +35,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 
 		const collection = await dataTypeCollectionRepository.requestCollection({
 			skip: 0,
-			take: 100,
+			take: 1000,
 			editorUiAlias: propertyEditorUiAlias,
 		});
 
