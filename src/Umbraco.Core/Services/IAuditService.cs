@@ -9,9 +9,6 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IAuditService : IService
 {
-    [Obsolete("Use AddAsync() instead. Scheduled for removal in Umbraco 18.")]
-    void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null);
-
     /// <summary>
     ///    Adds an audit entry.
     /// </summary>
@@ -22,17 +19,16 @@ public interface IAuditService : IService
     /// <param name="comment">The comment associated with the audit entry.</param>
     /// <param name="parameters">The parameters associated with the audit entry.</param>
     /// <returns>Result of the add audit log operation.</returns>
-    public Task<Attempt<AuditLogOperationStatus>> AddAsync(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null) =>
-        throw new NotImplementedException();
+    public Task<Attempt<AuditLogOperationStatus>> AddAsync(
+        AuditType type,
+        int userId,
+        int objectId,
+        string? entityType,
+        string comment,
+        string? parameters = null) => throw new NotImplementedException();
 
-    [Obsolete("Use GetItemsAsync() instead. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<IAuditItem> GetLogs(AuditType type, DateTime? sinceDate = null);
-
-    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<IAuditItem> GetLogs(int objectId);
-
-    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null);
+    [Obsolete("Use AddAsync() instead. Scheduled for removal in Umbraco 18.")]
+    void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null);
 
     /// <summary>
     ///    Returns paged items in the audit trail.
@@ -55,7 +51,10 @@ public interface IAuditService : IService
         int take,
         Direction orderDirection = Direction.Descending,
         DateTimeOffset? sinceDate = null,
-        AuditType[]? auditTypeFilter = null);
+        AuditType[]? auditTypeFilter = null) => throw new NotImplementedException();
+
+    [Obsolete("Use GetItemsAsync() instead. Scheduled for removal in Umbraco 18.")]
+    IEnumerable<IAuditItem> GetLogs(AuditType type, DateTime? sinceDate = null);
 
     /// <summary>
     ///     Returns paged items in the audit trail for a given entity.
@@ -88,6 +87,31 @@ public interface IAuditService : IService
     ///     Returns paged items in the audit trail for a given entity.
     /// </summary>
     /// <param name="entityId">The identifier of the entity.</param>
+    /// <param name="skip">The number of audit trail entries to skip.</param>
+    /// <param name="take">The number of audit trail entries to take.</param>
+    /// <param name="orderDirection">
+    ///     By default, this will always be ordered descending (newest first).
+    /// </param>
+    /// <param name="auditTypeFilter">
+    ///     Since we currently do not have enum support with our expression parser, we cannot query on AuditType in the query
+    ///     or the custom filter, so we need to do that here.
+    /// </param>
+    /// <param name="customFilter">
+    ///     Optional filter to be applied.
+    /// </param>
+    /// <returns>The paged items in the audit trail for the specified entity.</returns>
+    Task<PagedModel<IAuditItem>> GetItemsByEntityAsync(
+        int entityId,
+        int skip,
+        int take,
+        Direction orderDirection = Direction.Descending,
+        AuditType[]? auditTypeFilter = null,
+        IQuery<IAuditItem>? customFilter = null) => throw new NotImplementedException();
+
+    /// <summary>
+    ///     Returns paged items in the audit trail for a given entity.
+    /// </summary>
+    /// <param name="entityId">The identifier of the entity.</param>
     /// <param name="pageIndex">The index of tha page (pagination).</param>
     /// <param name="pageSize">The number of results to return.</param>
     /// <param name="totalRecords">The total number of records.</param>
@@ -112,10 +136,13 @@ public interface IAuditService : IService
         AuditType[]? auditTypeFilter = null,
         IQuery<IAuditItem>? customFilter = null);
 
+    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 18.")]
+    IEnumerable<IAuditItem> GetLogs(int objectId);
+
     /// <summary>
-    ///     Returns paged items in the audit trail for a given entity.
+    ///     Returns paged items in the audit trail for a given user.
     /// </summary>
-    /// <param name="entityId">The identifier of the entity.</param>
+    /// <param name="userKey">The key of the user.</param>
     /// <param name="skip">The number of audit trail entries to skip.</param>
     /// <param name="take">The number of audit trail entries to take.</param>
     /// <param name="orderDirection">
@@ -125,17 +152,15 @@ public interface IAuditService : IService
     ///     Since we currently do not have enum support with our expression parser, we cannot query on AuditType in the query
     ///     or the custom filter, so we need to do that here.
     /// </param>
-    /// <param name="customFilter">
-    ///     Optional filter to be applied.
-    /// </param>
-    /// <returns>The paged items in the audit trail for the specified entity.</returns>
-    Task<PagedModel<IAuditItem>> GetItemsByEntityAsync(
-        int entityId,
+    /// <param name="sinceDate">The date to filter the audit entries.</param>
+    /// <returns>The paged items in the audit trail for the specified user.</returns>
+    Task<PagedModel<IAuditItem>> GetPagedItemsByUserAsync(
+        Guid userKey,
         int skip,
         int take,
         Direction orderDirection = Direction.Descending,
         AuditType[]? auditTypeFilter = null,
-        IQuery<IAuditItem>? customFilter = null);
+        DateTime? sinceDate = null) => throw new NotImplementedException();
 
     /// <summary>
     ///     Returns paged items in the audit trail for a given user.
@@ -166,28 +191,37 @@ public interface IAuditService : IService
         AuditType[]? auditTypeFilter = null,
         IQuery<IAuditItem>? customFilter = null);
 
+    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 18.")]
+    IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null);
+
     /// <summary>
-    ///     Returns paged items in the audit trail for a given user.
+    ///     Writes an audit entry for an audited event.
     /// </summary>
-    /// <param name="userKey">The key of the user.</param>
-    /// <param name="skip">The number of audit trail entries to skip.</param>
-    /// <param name="take">The number of audit trail entries to take.</param>
-    /// <param name="orderDirection">
-    ///     By default, this will always be ordered descending (newest first).
+    /// <param name="performingUserId">The identifier of the user triggering the audited event.</param>
+    /// <param name="performingDetails">Free-form details about the user triggering the audited event.</param>
+    /// <param name="performingIp">The IP address or the request triggering the audited event.</param>
+    /// <param name="eventDateUtc">The date and time of the audited event.</param>
+    /// <param name="affectedUserId">The identifier of the user affected by the audited event.</param>
+    /// <param name="affectedDetails">Free-form details about the entity affected by the audited event.</param>
+    /// <param name="eventType">
+    ///     The type of the audited event - must contain only alphanumeric chars and hyphens with forward slashes separating
+    ///     categories.
+    ///     <example>
+    ///         The eventType will generally be formatted like: {application}/{entity-type}/{category}/{sub-category}
+    ///         Example: umbraco/user/sign-in/failed
+    ///     </example>
     /// </param>
-    /// <param name="auditTypeFilter">
-    ///     Since we currently do not have enum support with our expression parser, we cannot query on AuditType in the query
-    ///     or the custom filter, so we need to do that here.
-    /// </param>
-    /// <param name="sinceDate">The date to filter the audit entries.</param>
-    /// <returns>The paged items in the audit trail for the specified user.</returns>
-    Task<PagedModel<IAuditItem>> GetPagedItemsByUserAsync(
-        Guid userKey,
-        int skip,
-        int take,
-        Direction orderDirection = Direction.Descending,
-        AuditType[]? auditTypeFilter = null,
-        DateTime? sinceDate = null) => throw new NotImplementedException();
+    /// <param name="eventDetails">Free-form details about the audited event.</param>
+    /// <returns>The created audit entry.</returns>
+    Task<Attempt<IAuditEntry, AuditLogOperationStatus>> WriteAsync(
+        int performingUserId,
+        string performingDetails,
+        string performingIp,
+        DateTime eventDateUtc,
+        int affectedUserId,
+        string affectedDetails,
+        string eventType,
+        string eventDetails) => throw new NotImplementedException();
 
     /// <summary>
     ///     Writes an audit entry for an audited event.
@@ -220,41 +254,12 @@ public interface IAuditService : IService
         string eventDetails);
 
     /// <summary>
-    ///     Writes an audit entry for an audited event.
-    /// </summary>
-    /// <param name="performingUserId">The identifier of the user triggering the audited event.</param>
-    /// <param name="performingDetails">Free-form details about the user triggering the audited event.</param>
-    /// <param name="performingIp">The IP address or the request triggering the audited event.</param>
-    /// <param name="eventDateUtc">The date and time of the audited event.</param>
-    /// <param name="affectedUserId">The identifier of the user affected by the audited event.</param>
-    /// <param name="affectedDetails">Free-form details about the entity affected by the audited event.</param>
-    /// <param name="eventType">
-    ///     The type of the audited event - must contain only alphanumeric chars and hyphens with forward slashes separating
-    ///     categories.
-    ///     <example>
-    ///         The eventType will generally be formatted like: {application}/{entity-type}/{category}/{sub-category}
-    ///         Example: umbraco/user/sign-in/failed
-    ///     </example>
-    /// </param>
-    /// <param name="eventDetails">Free-form details about the audited event.</param>
-    /// <returns>The created audit entry.</returns>
-    Task<Attempt<IAuditEntry, AuditLogOperationStatus>> WriteAsync(
-        int performingUserId,
-        string performingDetails,
-        string performingIp,
-        DateTime eventDateUtc,
-        int affectedUserId,
-        string affectedDetails,
-        string eventType,
-        string eventDetails);
-
-    [Obsolete("Use CleanLogsAsync() instead. Scheduled for removal in Umbraco 18.")]
-    void CleanLogs(int maximumAgeOfLogsInMinutes);
-
-    /// <summary>
     ///    Cleans the audit logs older than the specified maximum age.
     /// </summary>
     /// <param name="maximumAgeOfLogsInMinutes">The maximum age of logs in minutes.</param>
     /// <returns>Task representing the asynchronous operation.</returns>
-    public Task CleanLogsAsync(int maximumAgeOfLogsInMinutes);
+    public Task CleanLogsAsync(int maximumAgeOfLogsInMinutes) => throw new NotImplementedException();
+
+    [Obsolete("Use CleanLogsAsync() instead. Scheduled for removal in Umbraco 18.")]
+    void CleanLogs(int maximumAgeOfLogsInMinutes);
 }

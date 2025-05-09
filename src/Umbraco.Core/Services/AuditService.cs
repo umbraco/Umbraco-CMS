@@ -9,6 +9,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.Implement;
 
+/// <summary>
+/// Audit service for logging and retrieving audit entries.
+/// </summary>
 public sealed class AuditService : RepositoryService, IAuditService
 {
     private readonly IAuditEntryRepository _auditEntryRepository;
@@ -17,6 +20,9 @@ public sealed class AuditService : RepositoryService, IAuditService
     private readonly IEntityService _entityService;
     private readonly Lazy<bool> _isAvailable;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AuditService"/> class.
+    /// </summary>
     public AuditService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -35,6 +41,16 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     /// <inheritdoc />
+    public Task<Attempt<AuditLogOperationStatus>> AddAsync(
+        AuditType type,
+        int userId,
+        int objectId,
+        string? entityType,
+        string comment,
+        string? parameters = null) =>
+        Task.FromResult(AddInner(type, userId, objectId, entityType, comment, parameters));
+
+    /// <inheritdoc />
     [Obsolete("Use AddAsync() instead. Scheduled for removal in Umbraco 18.")]
     public void Add(
         AuditType type,
@@ -43,67 +59,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         string? entityType,
         string comment,
         string? parameters = null) =>
-        AddAsync(type, userId, objectId, entityType, comment, parameters).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public Task<Attempt<AuditLogOperationStatus>> AddAsync(
-        AuditType type,
-        int userId,
-        int objectId,
-        string? entityType,
-        string comment,
-        string? parameters = null)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, comment, parameters));
-            scope.Complete();
-
-            return Task.FromResult(Attempt.Succeed(AuditLogOperationStatus.Success));
-        }
-    }
-
-    public IEnumerable<IAuditItem> GetLogs(AuditType type, DateTime? sinceDate = null)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            IEnumerable<IAuditItem> result = sinceDate.HasValue == false
-                ? _auditRepository.Get(type, Query<IAuditItem>())
-                : _auditRepository.Get(type, Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate.Value));
-            scope.Complete();
-            return result;
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IAuditItem> GetLogs(int objectId)
-    {
-        // TODO: Call GetItemsByEntityAsync() - check whether it causes a behavioral change
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            IEnumerable<IAuditItem> result = _auditRepository.Get(Query<IAuditItem>().Where(x => x.Id == objectId));
-            scope.Complete();
-            return result;
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null)
-    {
-        // TODO: Call GetPagedItemsByUserAsync() - check whether it causes a behavioral change
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            IEnumerable<IAuditItem> result = sinceDate.HasValue == false
-                ? _auditRepository.Get(type, Query<IAuditItem>().Where(x => x.UserId == userId))
-                : _auditRepository.Get(
-                    type,
-                    Query<IAuditItem>().Where(x => x.UserId == userId && x.CreateDate >= sinceDate.Value));
-            scope.Complete();
-            return result;
-        }
-    }
+        AddInner(type, userId, objectId, entityType, comment, parameters);
 
     /// <inheritdoc />
     public Task<PagedModel<IAuditItem>> GetItemsAsync(
@@ -124,9 +80,22 @@ public sealed class AuditService : RepositoryService, IAuditService
         }
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+        IQuery<IAuditItem> query = Query<IAuditItem>();
         IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
 
-        return GetItemsAsyncInner(Query<IAuditItem>(), pageNumber, pageSize, orderDirection, auditTypeFilter, customFilter);
+        PagedModel<IAuditItem> result = GetItemsInner(query, pageNumber, pageSize, orderDirection, auditTypeFilter, customFilter);
+        return Task.FromResult(result);
+    }
+
+    /// <inheritdoc />
+    [Obsolete("Use GetItemsAsync() instead. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<IAuditItem> GetLogs(AuditType type, DateTime? sinceDate = null)
+    {
+        IQuery<IAuditItem> query = Query<IAuditItem>();
+        IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
+
+        PagedModel<IAuditItem> result = GetItemsInner(query, 1, int.MaxValue, customFilter: customFilter);
+        return result.Items;
     }
 
     /// <inheritdoc />
@@ -156,10 +125,10 @@ public sealed class AuditService : RepositoryService, IAuditService
         }
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
-        IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == keyToIdAttempt.Result);
         IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
 
-        return GetItemsAsyncInner(query, pageNumber, pageSize, orderDirection, auditTypeFilter, customFilter);
+        PagedModel<IAuditItem> result = GetItemsByEntityInner(keyToIdAttempt.Result, pageNumber, pageSize, orderDirection, auditTypeFilter, customFilter);
+        return Task.FromResult(result);
     }
 
     /// <inheritdoc />
@@ -187,9 +156,9 @@ public sealed class AuditService : RepositoryService, IAuditService
         }
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
-        IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == entityId);
+        PagedModel<IAuditItem> result = GetItemsByEntityInner(entityId, pageNumber, pageSize, orderDirection, auditTypeFilter, customFilter);
 
-        return GetItemsAsyncInner(query, pageNumber, pageSize, orderDirection, auditTypeFilter, customFilter);
+        return Task.FromResult(result);
     }
 
     /// <inheritdoc />
@@ -219,12 +188,50 @@ public sealed class AuditService : RepositoryService, IAuditService
             return [];
         }
 
-        IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == entityId);
+        PagedModel<IAuditItem> result = GetItemsByEntityInner(entityId, pageIndex, pageSize, orderDirection, auditTypeFilter, customFilter);
+        totalRecords = result.Total;
 
-        PagedModel<IAuditItem> items = GetItemsAsyncInner(query, pageIndex, pageSize, orderDirection, auditTypeFilter, customFilter).GetAwaiter().GetResult();
-        totalRecords = items.Total;
+        return result.Items;
+    }
 
-        return items.Items;
+    /// <inheritdoc />
+    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<IAuditItem> GetLogs(int objectId)
+    {
+        PagedModel<IAuditItem> result = GetItemsByEntityInner(objectId, 1, int.MaxValue);
+        return result.Items;
+    }
+
+    /// <inheritdoc />
+    public async Task<PagedModel<IAuditItem>> GetPagedItemsByUserAsync(
+        Guid userKey,
+        int skip,
+        int take,
+        Direction orderDirection = Direction.Descending,
+        AuditType[]? auditTypeFilter = null,
+        DateTime? sinceDate = null)
+    {
+        if (skip < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(skip));
+        }
+
+        if (take <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(take));
+        }
+
+        IUser? user = await _userService.GetAsync(userKey);
+        if (user is null)
+        {
+            return new PagedModel<IAuditItem>();
+        }
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+        IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
+
+        PagedModel<IAuditItem> result = GetItemsByUserInner(user.Id, pageNumber, pageSize, orderDirection, auditTypeFilter, customFilter);
+        return result;
     }
 
     /// <inheritdoc />
@@ -254,44 +261,19 @@ public sealed class AuditService : RepositoryService, IAuditService
             return [];
         }
 
-        IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == userId);
-
-        PagedModel<IAuditItem> items = GetItemsAsyncInner(query, pageIndex, pageSize, orderDirection, auditTypeFilter, customFilter).GetAwaiter().GetResult();
+        PagedModel<IAuditItem> items = GetItemsByUserInner(userId, pageIndex, pageSize, orderDirection, auditTypeFilter, customFilter);
         totalRecords = items.Total;
 
         return items.Items;
     }
 
     /// <inheritdoc />
-    public async Task<PagedModel<IAuditItem>> GetPagedItemsByUserAsync(
-        Guid userKey,
-        int skip,
-        int take,
-        Direction orderDirection = Direction.Descending,
-        AuditType[]? auditTypeFilter = null,
-        DateTime? sinceDate = null)
+    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null)
     {
-        if (skip < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(skip));
-        }
-
-        if (take <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(take));
-        }
-
-        IUser? user = await _userService.GetAsync(userKey);
-        if (user is null)
-        {
-            return new PagedModel<IAuditItem>();
-        }
-
-        IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == user.Id);
         IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
-        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
-
-        return await GetItemsAsyncInner(query, pageNumber, pageSize, orderDirection, auditTypeFilter, customFilter);
+        PagedModel<IAuditItem> result = GetItemsByUserInner(userId, 1, int.MaxValue, customFilter: customFilter);
+        return result.Items;
     }
 
     /// <inheritdoc />
@@ -305,7 +287,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         string? affectedDetails,
         string eventType,
         string eventDetails) =>
-            WriteAsync(
+            WriteInner(
                 performingUserId,
                 perfomingDetails,
                 performingIp,
@@ -313,104 +295,47 @@ public sealed class AuditService : RepositoryService, IAuditService
                 affectedUserId,
                 affectedDetails,
                 eventType,
-                eventDetails).GetAwaiter().GetResult().Result;
+                eventDetails).Result;
 
     /// <inheritdoc />
-    public Task<Attempt<IAuditEntry, AuditLogOperationStatus>> WriteAsync(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string? affectedDetails, string eventType, string eventDetails)
+    public Task<Attempt<IAuditEntry, AuditLogOperationStatus>> WriteAsync(
+        int performingUserId,
+        string performingDetails,
+        string performingIp,
+        DateTime eventDateUtc,
+        int affectedUserId,
+        string? affectedDetails,
+        string eventType,
+        string eventDetails) =>
+        Task.FromResult(
+            WriteInner(
+            performingUserId,
+            performingDetails,
+            performingIp,
+            eventDateUtc,
+            affectedUserId,
+            affectedDetails,
+            eventType,
+            eventDetails));
+
+    /// <inheritdoc />
+    public Task CleanLogsAsync(int maximumAgeOfLogsInMinutes)
     {
-        if (performingUserId < 0 && performingUserId != Constants.Security.SuperUserId)
-        {
-            throw new ArgumentOutOfRangeException(nameof(performingUserId));
-        }
-
-        if (string.IsNullOrWhiteSpace(perfomingDetails))
-        {
-            throw new ArgumentException("Value cannot be null or whitespace.", nameof(perfomingDetails));
-        }
-
-        if (string.IsNullOrWhiteSpace(eventType))
-        {
-            throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventType));
-        }
-
-        if (string.IsNullOrWhiteSpace(eventDetails))
-        {
-            throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventDetails));
-        }
-
-        // we need to truncate the data else we'll get SQL errors
-        affectedDetails =
-            affectedDetails?[..Math.Min(affectedDetails.Length, Constants.Audit.DetailsLength)];
-        eventDetails = eventDetails[..Math.Min(eventDetails.Length, Constants.Audit.DetailsLength)];
-
-        // validate the eventType - must contain a forward slash, no spaces, no special chars
-        var eventTypeParts = eventType.ToCharArray();
-        if (eventTypeParts.Contains('/') == false ||
-            eventTypeParts.All(c => char.IsLetterOrDigit(c) || c == '/' || c == '-') == false)
-        {
-            throw new ArgumentException(nameof(eventType) +
-                                        " must contain only alphanumeric characters, hyphens and at least one '/' defining a category");
-        }
-
-        if (eventType.Length > Constants.Audit.EventTypeLength)
-        {
-            throw new ArgumentException($"Must be max {Constants.Audit.EventTypeLength} chars.", nameof(eventType));
-        }
-
-        if (performingIp is { Length: > Constants.Audit.IpLength })
-        {
-            throw new ArgumentException($"Must be max {Constants.Audit.EventTypeLength} chars.", nameof(performingIp));
-        }
-
-        var entry = new AuditEntry
-        {
-            PerformingUserId = performingUserId,
-            PerformingDetails = perfomingDetails,
-            PerformingIp = performingIp,
-            EventDateUtc = eventDateUtc,
-            AffectedUserId = affectedUserId,
-            AffectedDetails = affectedDetails,
-            EventType = eventType,
-            EventDetails = eventDetails,
-        };
-
-        if (_isAvailable.Value == false)
-        {
-            return Task.FromResult(Attempt.SucceedWithStatus(AuditLogOperationStatus.Success, (IAuditEntry)entry));
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _auditEntryRepository.Save(entry);
-            scope.Complete();
-        }
-
-        return Task.FromResult(Attempt.SucceedWithStatus(AuditLogOperationStatus.Success, (IAuditEntry)entry));
+        CleanLogsInner(maximumAgeOfLogsInMinutes);
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc />
     [Obsolete("Use CleanLogsAsync() instead. Scheduled for removal in Umbraco 18.")]
     public void CleanLogs(int maximumAgeOfLogsInMinutes)
-        => CleanLogsAsync(maximumAgeOfLogsInMinutes).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public Task CleanLogsAsync(int maximumAgeOfLogsInMinutes)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _auditRepository.CleanLogs(maximumAgeOfLogsInMinutes);
-            scope.Complete();
-        }
-
-        return Task.CompletedTask;
-    }
+        => CleanLogsInner(maximumAgeOfLogsInMinutes);
 
     // TODO: Currently used in testing only, not part of the interface, need to add queryable methods to the interface instead
-    internal IEnumerable<IAuditEntry>? GetAll()
+    internal IEnumerable<IAuditEntry> GetAll()
     {
         if (_isAvailable.Value == false)
         {
-            return Enumerable.Empty<IAuditEntry>();
+            return [];
         }
 
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -434,7 +359,22 @@ public sealed class AuditService : RepositoryService, IAuditService
         }
     }
 
-    private Task<PagedModel<IAuditItem>> GetItemsAsyncInner(
+    private Attempt<AuditLogOperationStatus> AddInner(
+        AuditType type,
+        int userId,
+        int objectId,
+        string? entityType,
+        string comment,
+        string? parameters = null)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, comment, parameters));
+        scope.Complete();
+
+        return Attempt.Succeed(AuditLogOperationStatus.Success);
+    }
+
+    private PagedModel<IAuditItem> GetItemsInner(
         IQuery<IAuditItem> query,
         long pageNumber,
         int pageSize,
@@ -445,8 +385,126 @@ public sealed class AuditService : RepositoryService, IAuditService
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out var totalRecords, orderDirection, auditTypeFilter, customFilter);
-            return Task.FromResult(new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords });
+            return new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords };
         }
+    }
+
+    private PagedModel<IAuditItem> GetItemsByEntityInner(
+        int entityId,
+        long pageNumber,
+        int pageSize,
+        Direction orderDirection = Direction.Descending,
+        AuditType[]? auditTypeFilter = null,
+        IQuery<IAuditItem>? customFilter = null)
+    {
+        IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == entityId);
+
+        PagedModel<IAuditItem> result = GetItemsInner(query, pageNumber, pageSize, orderDirection, auditTypeFilter, customFilter);
+        return result;
+    }
+
+    private PagedModel<IAuditItem> GetItemsByUserInner(
+        int userId,
+        long pageNumber,
+        int pageSize,
+        Direction orderDirection = Direction.Descending,
+        AuditType[]? auditTypeFilter = null,
+        IQuery<IAuditItem>? customFilter = null)
+    {
+        if (userId is <= 0)
+        {
+            return new PagedModel<IAuditItem> { Items = [], Total = 0 };
+        }
+
+        IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == userId);
+        return GetItemsInner(query, pageNumber, pageSize, orderDirection, auditTypeFilter, customFilter);
+    }
+
+    private Attempt<IAuditEntry, AuditLogOperationStatus> WriteInner(
+        int performingUserId,
+        string performingDetails,
+        string performingIp,
+        DateTime eventDateUtc,
+        int affectedUserId,
+        string? affectedDetails,
+        string eventType,
+        string eventDetails)
+    {
+        if (performingUserId < 0 && performingUserId != Constants.Security.SuperUserId)
+        {
+            throw new ArgumentOutOfRangeException(nameof(performingUserId));
+        }
+
+        if (string.IsNullOrWhiteSpace(performingDetails))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(performingDetails));
+        }
+
+        if (string.IsNullOrWhiteSpace(eventType))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventType));
+        }
+
+        if (string.IsNullOrWhiteSpace(eventDetails))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventDetails));
+        }
+
+        // we need to truncate the data else we'll get SQL errors
+        affectedDetails =
+            affectedDetails?[..Math.Min(affectedDetails.Length, Constants.Audit.DetailsLength)];
+        eventDetails = eventDetails[..Math.Min(eventDetails.Length, Constants.Audit.DetailsLength)];
+
+        // validate the eventType - must contain a forward slash, no spaces, no special chars
+        var eventTypeParts = eventType.ToCharArray();
+        if (eventTypeParts.Contains('/') == false ||
+            eventTypeParts.All(c => char.IsLetterOrDigit(c) || c == '/' || c == '-') == false)
+        {
+            throw new ArgumentException(
+                nameof(eventType) + " must contain only alphanumeric characters, hyphens and at least one '/' defining a category");
+        }
+
+        if (eventType.Length > Constants.Audit.EventTypeLength)
+        {
+            throw new ArgumentException($"Must be max {Constants.Audit.EventTypeLength} chars.", nameof(eventType));
+        }
+
+        if (performingIp is { Length: > Constants.Audit.IpLength })
+        {
+            throw new ArgumentException($"Must be max {Constants.Audit.EventTypeLength} chars.", nameof(performingIp));
+        }
+
+        var entry = new AuditEntry
+        {
+            PerformingUserId = performingUserId,
+            PerformingDetails = performingDetails,
+            PerformingIp = performingIp,
+            EventDateUtc = eventDateUtc,
+            AffectedUserId = affectedUserId,
+            AffectedDetails = affectedDetails,
+            EventType = eventType,
+            EventDetails = eventDetails,
+        };
+
+        if (_isAvailable.Value == false)
+        {
+            return Attempt.SucceedWithStatus(AuditLogOperationStatus.Success, (IAuditEntry)entry);
+        }
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            _auditEntryRepository.Save(entry);
+            scope.Complete();
+        }
+
+        return Attempt.SucceedWithStatus(AuditLogOperationStatus.Success, (IAuditEntry)entry);
+    }
+
+    private void CleanLogsInner(int maximumAgeOfLogsInMinutes)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        _auditRepository.CleanLogs(maximumAgeOfLogsInMinutes);
+        scope.Complete();
     }
 
     /// <summary>
