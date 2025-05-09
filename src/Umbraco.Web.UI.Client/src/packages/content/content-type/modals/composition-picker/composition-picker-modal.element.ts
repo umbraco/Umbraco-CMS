@@ -39,6 +39,9 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _usedForInheritance: Array<string> = [];
 
+	@state()
+	private _usedForComposition: Array<string> = [];
+
 	override connectedCallback() {
 		super.connectedCallback();
 
@@ -53,6 +56,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 		this._selection = this.data?.selection ?? [];
 		this._usedForInheritance = this.data?.usedForInheritance ?? [];
+		this._usedForComposition = this.data?.usedForComposition ?? [];
 		this.modalContext?.setValue({ selection: this._selection });
 
 		const isNew = this.data!.isNew;
@@ -215,11 +219,13 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 			(compositions) => compositions.unique,
 			(compositions) => {
 				const usedForInheritance = this._usedForInheritance.includes(compositions.unique);
+				const usedForComposition = this._usedForComposition.includes(compositions.unique);
+				const isDisabled = usedForInheritance || (compositions.isCompatible === false && !usedForComposition);
 				return html`
 					<uui-menu-item
 						label=${this.localize.string(compositions.name)}
 						?selectable=${!usedForInheritance}
-						?disabled=${usedForInheritance || compositions.isCompatible === false}
+						?disabled=${isDisabled}
 						@selected=${() => this.#onSelectionAdd(compositions.unique)}
 						@deselected=${() => this.#onSelectionRemove(compositions.unique)}
 						?selected=${this._selection.find((unique) => unique === compositions.unique)}>
