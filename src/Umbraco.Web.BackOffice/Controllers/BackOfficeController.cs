@@ -230,10 +230,12 @@ public class BackOfficeController : UmbracoController
 
         // sign the user in
         DateTime? previousLastLoginDate = identityUser.LastLoginDateUtc;
+        var securityStamp = identityUser.SecurityStamp;
         await _signInManager.SignInAsync(identityUser, false);
 
-        // reset the lastlogindate back to previous as the user hasn't actually logged in, to add a flag or similar to BackOfficeSignInManager would be a breaking change
+        // reset the lastlogindate and securitystamp back to previous as the user hasn't actually logged in, to add a flag or similar to BackOfficeSignInManager would be a breaking change
         identityUser.LastLoginDateUtc = previousLastLoginDate;
+        identityUser.SecurityStamp = securityStamp;
         await _userManager.UpdateAsync(identityUser);
 
         return RedirectToLogin(new { flow = "invite-user", invite = "1" });
