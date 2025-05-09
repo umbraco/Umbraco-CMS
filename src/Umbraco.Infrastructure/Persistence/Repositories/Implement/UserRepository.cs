@@ -1071,13 +1071,13 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
     }
 
     /// <inheritdoc />
-    public void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentProviderKeys)
+    public void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentLoginProviders)
     {
         // Get all the user or member keys associated with the removed providers.
         Sql<ISqlContext> idsQuery = SqlContext.Sql()
             .Select<ExternalLoginDto>(x => x.UserOrMemberKey)
             .From<ExternalLoginDto>()
-            .WhereNotIn<ExternalLoginDto>(x => x.ProviderKey, currentProviderKeys);
+            .WhereNotIn<ExternalLoginDto>(x => x.LoginProvider, currentLoginProviders);
         List<Guid> userAndMemberKeysAssociatedWithRemovedProviders = Database.Fetch<Guid>(idsQuery);
         if (userAndMemberKeysAssociatedWithRemovedProviders.Count == 0)
         {

@@ -721,11 +721,11 @@ internal class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc />
-    public void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentProviderKeys)
+    public void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentLoginProviders)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            _userRepository.InvalidateSessionsForRemovedProviders(currentProviderKeys);
+            _userRepository.InvalidateSessionsForRemovedProviders(currentLoginProviders);
             scope.Complete();
         }
     }
