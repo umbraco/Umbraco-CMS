@@ -28,7 +28,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     /// <summary>
-    /// Provides an happy path test case where culture codes are provided exactly matching the language ISO codes.
+    /// Provides a happy path test case where culture codes are provided exactly matching the language ISO codes.
     /// </summary>
     [Test]
     public async Task Can_Publish_With_Consistent_Provision_Of_Culture_Codes()
@@ -47,7 +47,8 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
     }
 
     /// <summary>
-    /// Provides an originally failing test case for https://github.com/umbraco/Umbraco-CMS/issues/19287.
+    /// Provides an originally failing test case for https://github.com/umbraco/Umbraco-CMS/issues/19287, where the culture
+    /// codes are provided with inconsistent casing.
     /// </summary>
     [Test]
     public async Task Can_Publish_With_Inconsistent_Provision_Of_Culture_Codes()
