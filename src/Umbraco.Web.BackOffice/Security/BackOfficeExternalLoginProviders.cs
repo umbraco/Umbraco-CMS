@@ -103,7 +103,7 @@ public class BackOfficeExternalLoginProviders : IBackOfficeExternalLoginProvider
     public void InvalidateSessionsIfExternalLoginProvidersChanged()
     {
         var previousExternalLoginProvidersValue = _keyValueService.GetValue(ExternalLoginProvidersKey);
-        var currentExternalLoginProvidersValue = string.Join("|", _externalLogins.Keys);
+        var currentExternalLoginProvidersValue = string.Join("|", _externalLogins.Keys.OrderBy(key => key));
 
         if ((previousExternalLoginProvidersValue ?? string.Empty) != currentExternalLoginProvidersValue)
         {

@@ -1079,13 +1079,21 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .From<ExternalLoginDto>()
             .WhereNotIn<ExternalLoginDto>(x => x.ProviderKey, currentProviderKeys);
         List<Guid> userAndMemberKeysAssociatedWithRemovedProviders = Database.Fetch<Guid>(idsQuery);
+        if (userAndMemberKeysAssociatedWithRemovedProviders.Count == 0)
+        {
+            return;
+        }
 
         // Filter for actual users and convert to integer IDs.
         var userIdsAssociatedWithRemovedProviders = userAndMemberKeysAssociatedWithRemovedProviders
             .Select(ConvertUserKeyToUserId)
             .Where(x => x.HasValue)
             .Select(x => x!.Value)
-            .ToArray();
+            .ToList();
+        if (userIdsAssociatedWithRemovedProviders.Count == 0)
+        {
+            return;
+        }
 
         // Invalidate the security stamps on the users associated with the removed providers.
         Sql<ISqlContext> updateQuery = Sql()
@@ -1094,21 +1102,13 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         Database.Execute(updateQuery);
     }
 
-    // Marked as internal to expose for unit testing.
-    internal static int? ConvertUserKeyToUserId(Guid userOrMemberKey)
-    {
+    private static int? ConvertUserKeyToUserId(Guid userOrMemberKey) =>
+
         // User Ids are stored as integers in the umbracoUser table, but as a GUID representation
         // of that integer in umbracoExternalLogin (converted via IntExtensions.ToGuid()).
         // We need to parse that to get the user Ids to invalidate.
         // Note also that umbracoExternalLogin contains members too, as proper GUIDs, so we need to ignore them.
-        if (userOrMemberKey.ToString().EndsWith("-0000-0000-0000-000000000000") is false)
-        {
-            // We have a proper GUID, not an integer conversion, hence a member, not a user.
-            return null;
-        }
-
-        return BitConverter.ToInt32(userOrMemberKey.ToByteArray());
-    }
+        IntExtensions.TryParseFromGuid(userOrMemberKey, out int? userId) ? userId : null;
 
     #endregion
 }
