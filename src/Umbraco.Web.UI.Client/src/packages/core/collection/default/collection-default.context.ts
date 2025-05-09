@@ -243,6 +243,10 @@ export class UmbDefaultCollectionContext<
 		return this._manifest;
 	}
 
+	public getEmptyLabel(): string {
+		return this.manifest?.meta.noItemsLabel ?? this.#config?.noItemsLabel ?? '#collection_noItemsTitle';
+	}
+
 	/**
 	 * Requests the collection from the repository.
 	 * @returns {*}
