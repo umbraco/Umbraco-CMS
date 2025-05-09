@@ -41,7 +41,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 
 	#observeIcon() {
 		if (!this._workspaceContext) return;
-		this.observe(this._workspaceContext.documentTypeIcon, (icon) => {
+		this.observe(this._workspaceContext.contentTypeIcon, (icon) => {
 			this._icon = icon ?? undefined;
 			console.log('Icon:', icon);
 		});

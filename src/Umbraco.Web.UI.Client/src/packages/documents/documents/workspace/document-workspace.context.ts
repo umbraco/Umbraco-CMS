@@ -68,8 +68,9 @@ export class UmbDocumentWorkspaceContext
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent(
 		(data) => !!data?.documentType.collection,
 	);
+	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.documentType.icon || null);
+
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
-	readonly documentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.documentType.icon || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#publishingContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
@@ -304,8 +305,7 @@ export class UmbDocumentWorkspaceContext
 		let icon: string | null = null;
 
 		// TODO: Look into optimizing this so we don't have to fetch the document type multiple times. [MR]
-		const documentTypeItemRepository = new UmbDocumentTypeDetailRepository(this);
-		const { data } = await documentTypeItemRepository.requestByUnique(documentTypeUnique);
+		const { data } = await new UmbDocumentTypeDetailRepository(this).requestByUnique(documentTypeUnique);
 
 		if (data) {
 			collection = data.collection;
