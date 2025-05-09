@@ -346,21 +346,6 @@ public sealed class AuditService : RepositoryService, IAuditService
         }
     }
 
-    // TODO: Currently used in testing only, not part of the interface, need to add queryable methods to the interface instead
-    internal IEnumerable<IAuditEntry> GetPage(long pageIndex, int pageCount, out long records)
-    {
-        if (_isAvailable.Value == false)
-        {
-            records = 0;
-            return [];
-        }
-
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _auditEntryRepository.GetPage(pageIndex, pageCount, out records);
-        }
-    }
-
     private Attempt<AuditLogOperationStatus> AddInner(
         AuditType type,
         int userId,

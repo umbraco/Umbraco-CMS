@@ -150,7 +150,7 @@ public class AuditEntryBuilder<TParent>
             PerformingDetails = performingDetails,
             PerformingIp = performingIp,
             EventDateUtc = eventDateUtc,
-            PerformingUserId = performingUserId
+            PerformingUserId = performingUserId,
         };
     }
 }
