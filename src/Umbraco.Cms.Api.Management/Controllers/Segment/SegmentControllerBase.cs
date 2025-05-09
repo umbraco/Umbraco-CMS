@@ -1,12 +1,15 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Segment;
 
 [VersionedApiBackOfficeRoute("segment")]
 [ApiExplorerSettings(GroupName = "Segment")]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public abstract class SegmentControllerBase : ManagementApiControllerBase
 {
     protected IActionResult MapFailure(SegmentOperationStatus status)
