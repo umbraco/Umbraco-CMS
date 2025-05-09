@@ -31,7 +31,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can publish invariant content with descendants', async ({umbracoApi, umbracoUi}) => {
+test('can publish invariant content with descendants without unpublished content items', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   childDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(childDocumentTypeName, dataTypeName, dataTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndDataType(documentTypeName, childDocumentTypeId, dataTypeName, dataTypeId);
@@ -44,7 +44,7 @@ test('can publish invariant content with descendants', async ({umbracoApi, umbra
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickPublishWithDescendantsButton();
-  // verify variant language
+  // Verify variant language
   await umbracoUi.content.doesDocumentVariantLanguageItemHaveCount(1);
   await umbracoUi.content.doesDocumentVariantLanguageItemHaveName(defaultLanguage);
   await umbracoUi.content.clickPublishWithDescendantsModalButton();
@@ -59,7 +59,7 @@ test('can publish invariant content with descendants', async ({umbracoApi, umbra
   expect(childContentData.variants[0].state).toBe('Draft');
 });
 
-test('can publish invariant content with descendants and include unpublished content items.', async ({umbracoApi, umbracoUi}) => {
+test('can publish invariant content with descendants and include unpublished content items', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   childDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(childDocumentTypeName, dataTypeName, dataTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndDataType(documentTypeName, childDocumentTypeId, dataTypeName, dataTypeId);
@@ -72,7 +72,7 @@ test('can publish invariant content with descendants and include unpublished con
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickPublishWithDescendantsButton();
-  // verify variant language
+  // Verify variant language
   await umbracoUi.content.doesDocumentVariantLanguageItemHaveCount(1);
   await umbracoUi.content.doesDocumentVariantLanguageItemHaveName(defaultLanguage);
   await umbracoUi.content.clickIncludeUnpublishedDescendantsToggle();
@@ -101,7 +101,7 @@ test('can cancel to publish invariant content with descendants', async ({umbraco
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickPublishWithDescendantsButton();
-  // verify variant language
+  // Verify variant language
   await umbracoUi.content.doesDocumentVariantLanguageItemHaveCount(1);
   await umbracoUi.content.doesDocumentVariantLanguageItemHaveName(defaultLanguage);
   await umbracoUi.content.clickCloseButton();
@@ -115,7 +115,7 @@ test('can cancel to publish invariant content with descendants', async ({umbraco
   expect(childContentData.variants[0].state).toBe('Draft');
 });
 
-test('can publish variant content with descendants', async ({umbracoApi, umbracoUi}) => {
+test('can publish variant content with descendants without unpublished content items', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   childDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(childDocumentTypeName, dataTypeName, dataTypeId);
   documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithAllowedChildNodeAndInvariantPropertyEditor(documentTypeName, childDocumentTypeId, dataTypeName, dataTypeId);
@@ -128,7 +128,7 @@ test('can publish variant content with descendants', async ({umbracoApi, umbraco
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickPublishWithDescendantsButton();
-  // verify variant language
+  // Verify variant language
   await umbracoUi.content.doesDocumentVariantLanguageItemHaveCount(2);
   await umbracoUi.content.doesDocumentVariantLanguageItemHaveName(defaultLanguage);
   await umbracoUi.content.doesDocumentVariantLanguageItemHaveName(danishLanguage);
@@ -144,7 +144,7 @@ test('can publish variant content with descendants', async ({umbracoApi, umbraco
   expect(childContentData.variants[0].state).toBe('Draft');
 });
 
-test('can publish variant content with descendants and include unpublished content items.', async ({umbracoApi, umbracoUi}) => {
+test('can publish variant content with descendants and include unpublished content items', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   childDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(childDocumentTypeName, dataTypeName, dataTypeId);
   documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithAllowedChildNodeAndInvariantPropertyEditor(documentTypeName, childDocumentTypeId, dataTypeName, dataTypeId);
@@ -157,7 +157,7 @@ test('can publish variant content with descendants and include unpublished conte
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickPublishWithDescendantsButton();
-  // verify variant language
+  // Verify variant language
   await umbracoUi.content.doesDocumentVariantLanguageItemHaveCount(2);
   await umbracoUi.content.doesDocumentVariantLanguageItemHaveName(defaultLanguage);
   await umbracoUi.content.doesDocumentVariantLanguageItemHaveName(danishLanguage);
@@ -187,7 +187,7 @@ test('can cancel to publish variant content with descendants', async ({umbracoAp
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickPublishWithDescendantsButton();
-  // verify variant language
+  // Verify variant language
   await umbracoUi.content.doesDocumentVariantLanguageItemHaveCount(2);
   await umbracoUi.content.doesDocumentVariantLanguageItemHaveName(defaultLanguage);
   await umbracoUi.content.doesDocumentVariantLanguageItemHaveName(danishLanguage);
