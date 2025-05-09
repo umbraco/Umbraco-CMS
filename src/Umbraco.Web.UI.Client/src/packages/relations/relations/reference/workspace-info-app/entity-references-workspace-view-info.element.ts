@@ -132,7 +132,13 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 
 		return html`
 			<div class="pagination-container">
-				<uui-pagination .total=${totalPages} @change="${this.#onPageChange}"></uui-pagination>
+				<uui-pagination 
+				.total=${totalPages} 
+				firstlabel=${this.localize.term('general_first')}
+                previouslabel=${this.localize.term('general_previous')}
+                nextlabel=${this.localize.term('general_next')}
+                lastlabel=${this.localize.term('general_last')}
+				@change="${this.#onPageChange}"></uui-pagination>
 			</div>
 		`;
 	}
