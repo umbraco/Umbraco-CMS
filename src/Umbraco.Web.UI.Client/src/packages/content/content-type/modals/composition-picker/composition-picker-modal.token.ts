@@ -5,6 +5,7 @@ export interface UmbCompositionPickerModalData {
 	compositionRepositoryAlias: string;
 	selection: Array<string>;
 	usedForInheritance: Array<string>;
+	usedForComposition: Array<string>;
 	unique: string | null;
 	isElement: boolean;
 	currentPropertyAliases: Array<string>;
