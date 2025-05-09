@@ -103,30 +103,35 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
     /// <returns></returns>
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
+        if (editorValue.Value is null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
         {
             return null;
         }
 
-        BlockEditorData<TValue, TLayout>? blockEditorData;
+        BlockEditorData<TValue, TLayout>? currentBlockEditorData = GetBlockEditorData(currentValue);
+        BlockEditorData<TValue, TLayout>? blockEditorData = GetBlockEditorData(editorValue.Value);
+
+        if (blockEditorData is null || blockEditorData.BlockValue.ContentData.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        MapBlockValueFromEditor(blockEditorData.BlockValue, currentBlockEditorData?.BlockValue, editorValue.ContentKey);
+
+        // return json
+        return JsonSerializer.Serialize(blockEditorData.BlockValue);
+    }
+
+    private BlockEditorData<TValue, TLayout>? GetBlockEditorData(object? value)
+    {
         try
         {
-            blockEditorData = BlockEditorValues.DeserializeAndClean(editorValue.Value);
+            return BlockEditorValues.DeserializeAndClean(value);
         }
         catch
         {
             // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
-            return string.Empty;
+            return null;
         }
-
-        if (blockEditorData == null || blockEditorData.BlockValue.ContentData.Count == 0)
-        {
-            return string.Empty;
-        }
-
-        MapBlockValueFromEditor(blockEditorData.BlockValue);
-
-        // return json
-        return JsonSerializer.Serialize(blockEditorData.BlockValue);
     }
 }
