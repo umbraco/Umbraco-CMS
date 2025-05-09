@@ -1,5 +1,7 @@
-﻿using System.Collections.Specialized;
+using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Globalization;
+using System.Runtime.ConstrainedExecution;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Extensions;
@@ -288,6 +290,8 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         // set on variant content type
         if (ContentType.VariesByCulture())
         {
+            culture = EnsureConsistentCultureCode(culture);
+
             // invariant is ok
             if (culture.IsNullOrWhiteSpace())
             {
@@ -297,7 +301,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
             // clear
             else if (name.IsNullOrWhiteSpace())
             {
-                ClearCultureInfo(culture!);
+                ClearCultureInfo(culture);
             }
 
             // set
@@ -322,11 +326,6 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
 
     private void ClearCultureInfo(string culture)
     {
-        if (culture == null)
-        {
-            throw new ArgumentNullException(nameof(culture));
-        }
-
         if (string.IsNullOrWhiteSpace(culture))
         {
             throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(culture));
@@ -342,6 +341,18 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         {
             _cultureInfos = null;
         }
+    }
+
+    private static string? EnsureConsistentCultureCode(string? culture)
+    {
+        if (culture.IsNullOrWhiteSpace())
+        {
+            return null;
+        }
+
+        // Create as CultureInfo instance from provided name so we can ensure consistent casing of culture code when persisting.
+        // This will accept mixed case but once created have a `Name` property that is consistently and correctly cased.
+        return new CultureInfo(culture).Name;
     }
 
     /// <summary>
@@ -455,6 +466,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
                 $"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
         }
 
+        culture = EnsureConsistentCultureCode(culture);
         var updated = property.SetValue(value, culture, segment);
         if (updated)
         {
