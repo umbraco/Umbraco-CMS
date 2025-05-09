@@ -1289,8 +1289,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         // Delete the OpenIddict tokens for the users associated with the removed providers.
         // The following is safe from SQL injection as we are dealing with GUIDs, not strings.
-        // Upper-case is necessary for SQLite, and also works for SQL Server.
-        var userKeysForInClause = string.Join("','", userAndMemberKeysAssociatedWithRemovedProviders.Select(x => x.ToString().ToUpperInvariant()));
+        var userKeysForInClause = string.Join("','", userAndMemberKeysAssociatedWithRemovedProviders.Select(x => x.ToString()));
         Database.Execute("DELETE FROM umbracoOpenIddictTokens WHERE Subject IN ('" + userKeysForInClause + "')");
     }
 
