@@ -105,28 +105,11 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 		}
 
 		if (!error) {
-			// If the content is invariant, we need to show a different notification
-			const isInvariant = options.length === 1 && options[0].culture === null;
-
-			if (isInvariant) {
-				notificationContext?.peek('positive', {
-					data: {
-						headline: localize.term('speechBubbles_editContentUnpublishedHeader'),
-						message: localize.term('speechBubbles_editContentUnpublishedText'),
-					},
-				});
-			} else {
-				const documentVariants = documentData.variants.filter((variant) => result.selection.includes(variant.culture!));
-				notificationContext?.peek('positive', {
-					data: {
-						headline: localize.term('speechBubbles_editContentUnpublishedHeader'),
-						message: localize.term(
-							'speechBubbles_editVariantUnpublishedText',
-							localize.list(documentVariants.map((v) => v.culture ?? v.name)),
-						),
-					},
-				});
-			}
+			notificationContext?.peek('positive', {
+				data: {
+					message: localize.term('speechBubbles_editContentUnpublishedHeader'),
+				},
+			});
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({

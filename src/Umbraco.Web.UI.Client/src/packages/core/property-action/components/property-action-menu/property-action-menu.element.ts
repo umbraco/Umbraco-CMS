@@ -44,7 +44,12 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	override render() {
 		if (!this._actions?.length) return nothing;
 		return html`
-			<uui-button id="popover-trigger" popovertarget="property-action-popover" label="Open actions menu" compact>
+			<uui-button
+				id="popover-trigger"
+				popovertarget="property-action-popover"
+				data-mark="open-property-actions"
+				label=${this.localize.term('actions_viewActionsFor')}
+				compact>
 				<uui-symbol-more id="more-symbol"></uui-symbol-more>
 			</uui-button>
 			<uui-popover-container id="property-action-popover">

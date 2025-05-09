@@ -431,6 +431,12 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		]);
 	}
 
+	#onDragOver(event: DragEvent, path: string) {
+		if (this._activePath === path) return;
+		event.preventDefault();
+		window.history.replaceState(null, '', path);
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout header-fit-height>
@@ -507,8 +513,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	renderRootTab() {
-		const rootTabPath = this._routerPath + '/root';
-		const rootTabActive = rootTabPath === this._activePath;
+		const path = this._routerPath + '/root';
+		const rootTabActive = path === this._activePath;
 		if (!this._hasRootGroups && !this._sortModeActive) {
 			// If we don't have any root groups and we are not in sort mode, then we don't want to render the root tab.
 			return nothing;
@@ -520,7 +526,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
 				label=${this.localize.term('general_generic')}
 				.active=${rootTabActive}
-				href=${rootTabPath}>
+				href=${path}
+				@dragover=${(event: DragEvent) => this.#onDragOver(event, path)}>
 				${this.localize.term('general_generic')}
 			</uui-tab>
 		`;
@@ -537,7 +544,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			href=${path}
 			data-umb-tab-id=${ifDefined(tab.id)}
 			data-mark="tab:${tab.name}"
-			?sortable=${ownedTab}>
+			?sortable=${ownedTab}
+			@dragover=${(event: DragEvent) => this.#onDragOver(event, path)}>
 			${this.renderTabInner(tab, tabActive, ownedTab)}
 		</uui-tab>`;
 	}
