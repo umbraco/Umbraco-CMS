@@ -6,6 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 // TODO: This seem fully identical with Media Workspace Editor, so we can refactor this to a generic component. [NL]
 @customElement('umb-document-workspace-editor')
@@ -32,6 +33,10 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			this.observe(this.#appLanguage?.appLanguageCulture, (appCulture) => {
 				this.#appCulture = appCulture;
 				this.#generateRoutes();
+				// If the global app language changes, we update the first split view editor to the new app language.
+				const activeSegment = this.#workspaceContext?.splitView.getActiveVariants()[0].segment;
+				const variantId = new UmbVariantId(appCulture, activeSegment);
+				this.#workspaceContext?.splitView.switchVariant(0, variantId);
 			});
 		});
 
