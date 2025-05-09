@@ -323,12 +323,6 @@ public interface IUserService : IMembershipUserService
     IEnumerable<IUser> GetAllNotInGroup(int groupId);
 
     /// <summary>
-    ///     Invalidates sessions for users that aren't associated with the current collection of providers.
-    /// </summary>
-    /// <param name="currentProviderKeys">The keys for the currently configured providers.</param>
-    void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentProviderKeys) { }
-
-    /// <summary>
     ///     Verifies the reset code sent from the reset password mail for a given user.
     /// </summary>
     /// <param name="userKey">The unique key of the user.</param>

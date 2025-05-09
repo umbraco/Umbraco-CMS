@@ -164,6 +164,6 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
     /// <summary>
     ///     Invalidates sessions for users that aren't associated with the current collection of providers.
     /// </summary>
-    /// <param name="currentProviderKeys">The keys for the currently configured providers.</param>
-    void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentProviderKeys) { }
+    /// <param name="currentLoginProviders">The names of the currently configured providers.</param>
+    void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentLoginProviders) { }
 }

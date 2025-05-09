@@ -50,8 +50,8 @@ public interface IExternalLoginWithKeyService : IService
     void DeleteUserLogins(Guid userOrMemberKey);
 
     /// <summary>
-    ///     Deletes external logins that aren't associated with the current collection of providers.
+    ///     Deletes external logins and invalidates sessions for users that aren't associated with the current collection of providers.
     /// </summary>
     /// <param name="currentLoginProviders">The names of the currently configured providers.</param>
-    void DeleteUserLoginsForRemovedProviders(IEnumerable<string> currentLoginProviders) { }
+    void PurgeLoginsForRemovedProviders(IEnumerable<string> currentLoginProviders) { }
 }
