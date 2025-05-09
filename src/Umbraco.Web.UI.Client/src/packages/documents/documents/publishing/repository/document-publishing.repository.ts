@@ -19,7 +19,7 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 		if (!unique) throw new Error('id is missing');
 		if (!variants.length) throw new Error('variant IDs are missing');
 
-		return this.#publishingDataSource.publish(unique, variants);
+		return await this.#publishingDataSource.publish(unique, variants);
 	}
 
 	/**
@@ -33,7 +33,7 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 		if (!id) throw new Error('id is missing');
 		if (!variantIds) throw new Error('variant IDs are missing');
 
-		return this.#publishingDataSource.unpublish(id, variantIds);
+		return await this.#publishingDataSource.unpublish(id, variantIds);
 	}
 
 	/**
@@ -47,7 +47,7 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 		if (!id) throw new Error('id is missing');
 		if (!variantIds) throw new Error('variant IDs are missing');
 
-		return this.#publishingDataSource.publishWithDescendants(id, variantIds, includeUnpublishedDescendants);
+		return await this.#publishingDataSource.publishWithDescendants(id, variantIds, includeUnpublishedDescendants);
 	}
 
 	/**
@@ -57,7 +57,7 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 * @memberof UmbDocumentPublishingRepository
 	 */
 	async published(unique: string): Promise<UmbRepositoryResponse<UmbDocumentDetailModel>> {
-		return this.#publishingDataSource.published(unique);
+		return await this.#publishingDataSource.published(unique);
 	}
 }
 

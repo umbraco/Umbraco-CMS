@@ -7,7 +7,7 @@ export class UmbDocumentUnpublishWorkspaceAction extends UmbWorkspaceActionBase 
 		if (!workspaceContext) {
 			throw new Error('Publishing workspace context not found');
 		}
-		return workspaceContext.unpublish();
+		return await workspaceContext.unpublish();
 	}
 }
 
