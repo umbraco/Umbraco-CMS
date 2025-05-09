@@ -19,7 +19,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   // Publish the content
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickPublishButton();
+  await umbracoUi.content.clickPublishActionMenuOption();
   await umbracoUi.content.clickConfirmToPublishButton();
 });
 

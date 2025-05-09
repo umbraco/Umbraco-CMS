@@ -26,7 +26,7 @@ test('can create empty content', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
@@ -48,7 +48,7 @@ test('can save and publish empty content', {tag: '@smoke'}, async ({umbracoApi, 
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveAndPublishButton();
@@ -71,7 +71,7 @@ test('can create content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.enterTextstring(contentText);
@@ -138,7 +138,7 @@ test('can publish invariant content node', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickPublishButton();
+  await umbracoUi.content.clickPublishActionMenuOption();
   await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
@@ -158,7 +158,7 @@ test('can unpublish content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickUnpublishButton();
+  await umbracoUi.content.clickUnpublishActionMenuOption();
   await umbracoUi.content.clickConfirmToUnpublishButton();
 
   // Assert
@@ -177,7 +177,7 @@ test('can publish variant content node', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickPublishButton();
+  await umbracoUi.content.clickPublishActionMenuOption();
   await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert

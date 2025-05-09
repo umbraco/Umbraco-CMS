@@ -95,25 +95,33 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		if (this._numberOfActions === 1) return nothing;
 
 		return html`
-			<umb-dropdown id="action-modal" .open=${this._dropdownIsOpen} @click=${this.#onDropdownClick} compact hide-expand>
-				<uui-symbol-more slot="label" label="Open actions menu"></uui-symbol-more>
+			<umb-dropdown
+				id="action-modal"
+				.open=${this._dropdownIsOpen}
+				@click=${this.#onDropdownClick}
+				.label=${this.label}
+				compact
+				hide-expand>
+				<uui-symbol-more slot="label" .label=${this.label}></uui-symbol-more>
 				<uui-scroll-container>
 					<umb-entity-action-list
 						@action-executed=${this.#onActionExecuted}
 						.entityType=${this.entityType}
-						.unique=${this.unique}></umb-entity-action-list>
+						.unique=${this.unique}
+						.label=${this.label}></umb-entity-action-list>
 				</uui-scroll-container>
 			</umb-dropdown>
 		`;
 	}
 
 	#renderFirstAction() {
-		if (!this._firstActionApi) return nothing;
+		if (!this._firstActionApi || !this._firstActionManifest) return nothing;
 		return html`<uui-button
-			label=${ifDefined(this._firstActionManifest?.meta.label)}
+			label=${this.localize.string(this._firstActionManifest.meta.label)}
+			data-mark=${'entity-action:' + this._firstActionManifest.alias}
 			@click=${this.#onFirstActionClick}
 			href="${ifDefined(this._firstActionHref)}">
-			<uui-icon name=${ifDefined(this._firstActionManifest?.meta.icon)}></uui-icon>
+			<uui-icon name=${ifDefined(this._firstActionManifest.meta.icon)}></uui-icon>
 		</uui-button>`;
 	}
 
