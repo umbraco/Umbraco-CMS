@@ -326,8 +326,9 @@ public class PackagingService : IPackagingService
                     PackageName = group.Key.PackageName,
                 };
 
+                var packageKey = Constants.Conventions.Migrations.KeyValuePrefix + (group.Key.PackageId ?? group.Key.PackageName);
                 var currentState = keyValues?
-                    .GetValueOrDefault(Constants.Conventions.Migrations.KeyValuePrefix + group.Key.PackageId);
+                    .GetValueOrDefault(packageKey);
 
                 package.PackageMigrationPlans = group
                     .Select(plan => new InstalledPackageMigrationPlans
