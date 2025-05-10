@@ -112,8 +112,6 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 				display: inline-block;
 				font-size: var(--uui-size-6);
 				margin-right: var(--uui-size-space-4);
-				--uui-button-border-color: transparent;
-				--uui-button-border-color-hover: var(--uui-color-border);
 			}
 		`,
 	];
