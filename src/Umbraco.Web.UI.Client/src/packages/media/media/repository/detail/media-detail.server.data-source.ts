@@ -4,40 +4,45 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbMediaTypeServerDataSource } from '@umbraco-cms/backoffice/media-type';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import { umbDeepMerge, type UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 
 /**
  * A data source for the Media that fetches data from the server
  * @class UmbMediaServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDetailModel> {
-	#host: UmbControllerHost;
-
-	/**
-	 * Creates an instance of UmbMediaServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbMediaServerDataSource
-	 */
-	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
+export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDetailDataSource<UmbMediaDetailModel> {
 	/**
 	 * Creates a new Media scaffold
-	 * @param {Partial<UmbMediaDetailModel>} [preset]
+	 * @param {UmbDeepPartialObject<UmbMediaDetailModel>} [preset]
 	 * @returns { UmbMediaDetailModel }
 	 * @memberof UmbMediaServerDataSource
 	 */
-	async createScaffold(preset: Partial<UmbMediaDetailModel> = {}) {
-		const data: UmbMediaDetailModel = {
+	async createScaffold(preset: UmbDeepPartialObject<UmbMediaDetailModel> = {}) {
+		let mediaTypeIcon: string | null = null;
+		let mediaTypeCollection: UmbReferenceByUnique | null = null;
+
+		const mediaTypeUnique = preset.mediaType?.unique;
+
+		if (!mediaTypeUnique) {
+			throw new Error('Media type unique is missing');
+		}
+
+		const { data } = await new UmbMediaTypeServerDataSource(this).read(mediaTypeUnique);
+		mediaTypeIcon = data?.icon ?? null;
+		mediaTypeCollection = data?.collection ?? null;
+
+		const defaultData: UmbMediaDetailModel = {
 			entityType: UMB_MEDIA_ENTITY_TYPE,
 			unique: UmbId.new(),
 			mediaType: {
-				unique: '',
-				collection: null,
-				icon: null,
+				unique: mediaTypeUnique,
+				collection: mediaTypeCollection,
+				icon: mediaTypeIcon,
 			},
 			isTrashed: false,
 			values: [],
@@ -50,10 +55,11 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 					updateDate: null,
 				},
 			],
-			...preset,
 		};
 
-		return { data };
+		const scaffold = umbDeepMerge(defaultData, preset) as UmbMediaDetailModel;
+
+		return { data: scaffold };
 	}
 
 	/**
@@ -65,7 +71,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, MediaService.getMediaById({ path: { id: unique } }));
+		const { data, error } = await tryExecute(this, MediaService.getMediaById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -122,7 +128,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 		};
 
 		const { data, error } = await tryExecute(
-			this.#host,
+			this,
 			MediaService.postMedia({
 				body,
 			}),
@@ -152,7 +158,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 		};
 
 		const { error } = await tryExecute(
-			this.#host,
+			this,
 			MediaService.putMediaById({
 				path: { id: model.unique },
 				body,
@@ -175,6 +181,6 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecute(this.#host, MediaService.deleteMediaById({ path: { id: unique } }));
+		return tryExecute(this, MediaService.deleteMediaById({ path: { id: unique } }));
 	}
 }

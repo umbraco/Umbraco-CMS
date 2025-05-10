@@ -118,11 +118,10 @@ export class UmbMediaWorkspaceContext
 	 * @deprecated Use `createScaffold` instead.
 	 */
 	public async create(parent: { entityType: string; unique: string | null }, mediaTypeUnique: string) {
-		const args = {
+		return this.createScaffold({
 			parent,
-			preset: { mediaType: { unique: mediaTypeUnique, collection: null } },
-		};
-		return this.createScaffold(args);
+			preset: { mediaType: { unique: mediaTypeUnique } },
+		});
 	}
 
 	public getCollectionAlias() {
