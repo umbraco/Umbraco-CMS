@@ -13,16 +13,16 @@ import type { UmbPropertyContainerTypes } from '@umbraco-cms/backoffice/content-
 
 /**
  * A data source for the Media Type that fetches data from the server
- * @class UmbMediaTypeServerDataSource
+ * @class UmbMediaTypeDetailServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMediaTypeDetailModel> {
+export class UmbMediaTypeDetailServerDataSource implements UmbDetailDataSource<UmbMediaTypeDetailModel> {
 	#host: UmbControllerHost;
 
 	/**
-	 * Creates an instance of UmbMediaTypeServerDataSource.
+	 * Creates an instance of UmbMediaTypeDetailServerDataSource.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbMediaTypeServerDataSource
+	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
@@ -32,7 +32,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	 * Creates a new Media Type scaffold
 	 * @param {Partial<UmbMediaTypeDetailModel>} [preset]
 	 * @returns { CreateMediaTypeRequestModel }
-	 * @memberof UmbMediaTypeServerDataSource
+	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbMediaTypeDetailModel> = {}) {
 		const data: UmbMediaTypeDetailModel = {
@@ -61,7 +61,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	 * Fetches a Media Type with the given id from the server
 	 * @param {string} unique
 	 * @returns {*}
-	 * @memberof UmbMediaTypeServerDataSource
+	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
@@ -132,7 +132,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	 * @param {UmbMediaTypeDetailModel} model
 	 * @param parentUnique
 	 * @returns {*}
-	 * @memberof UmbMediaTypeServerDataSource
+	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	async create(model: UmbMediaTypeDetailModel, parentUnique: string | null = null) {
 		if (!model) throw new Error('Media Type is missing');
@@ -200,7 +200,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	 * @param {UmbMediaTypeDetailModel} MediaType
 	 * @param model
 	 * @returns {*}
-	 * @memberof UmbMediaTypeServerDataSource
+	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	async update(model: UmbMediaTypeDetailModel) {
 		if (!model.unique) throw new Error('Unique is missing');
@@ -265,7 +265,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	 * Deletes a Media Type on the server
 	 * @param {string} unique
 	 * @returns {*}
-	 * @memberof UmbMediaTypeServerDataSource
+	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');

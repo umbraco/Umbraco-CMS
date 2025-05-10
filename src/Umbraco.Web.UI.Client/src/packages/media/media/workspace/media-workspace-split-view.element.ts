@@ -1,6 +1,6 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from './media-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -12,17 +12,21 @@ export class UmbMediaWorkspaceSplitViewElement extends UmbLitElement {
 	@state()
 	_variants?: Array<ActiveVariant>;
 
+	@state()
+	_icon?: string;
+
 	constructor() {
 		super();
 
 		// TODO: Refactor: use a split view workspace context token:
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;
-			this._observeActiveVariantInfo();
+			this.#observeActiveVariantInfo();
+			this.#observeIcon();
 		});
 	}
 
-	private _observeActiveVariantInfo() {
+	#observeActiveVariantInfo() {
 		if (!this._workspaceContext) return;
 		this.observe(
 			this._workspaceContext.splitView.activeVariantsInfo,
@@ -31,6 +35,13 @@ export class UmbMediaWorkspaceSplitViewElement extends UmbLitElement {
 			},
 			'_observeActiveVariantsInfo',
 		);
+	}
+
+	#observeIcon() {
+		if (!this._workspaceContext) return;
+		this.observe(this._workspaceContext.contentTypeIcon, (icon) => {
+			this._icon = icon ?? undefined;
+		});
 	}
 
 	override render() {
@@ -43,7 +54,9 @@ export class UmbMediaWorkspaceSplitViewElement extends UmbLitElement {
 							(view) => html`
 								<umb-workspace-split-view
 									.splitViewIndex=${view.index}
-									.displayNavigation=${view.index === this._variants!.length - 1}></umb-workspace-split-view>
+									.displayNavigation=${view.index === this._variants!.length - 1}>
+									<umb-icon slot="icon" name=${ifDefined(this._icon)}></umb-icon>
+								</umb-workspace-split-view>
 							`,
 						)}
 					</div>
