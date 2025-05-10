@@ -62,25 +62,6 @@ export class UmbDocumentServerDataSource
 	}
 
 	/**
-	 * Creates a new variant scaffold.
-	 * @returns A new variant scaffold.
-	 */
-	/*
-	// TDOD: remove if not used
-	createVariantScaffold(): UmbDocumentVariantModel {
-		return {
-			state: null,
-			culture: null,
-			segment: null,
-			name: '',
-			publishDate: null,
-			createDate: null,
-			updateDate: null,
-		};
-	}
-	*/
-
-	/**
 	 * Fetches a Document with the given id from the server
 	 * @param {string} unique
 	 * @returns {*}
