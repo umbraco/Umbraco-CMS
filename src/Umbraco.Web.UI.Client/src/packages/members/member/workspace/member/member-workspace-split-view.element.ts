@@ -1,7 +1,7 @@
 import { UMB_MEMBER_ROOT_WORKSPACE_PATH } from '../../paths.js';
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from './member-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -13,17 +13,21 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 	@state()
 	_variants?: Array<ActiveVariant>;
 
+	@state()
+	_icon?: string;
+
 	constructor() {
 		super();
 
 		// TODO: Refactor: use a split view workspace context token:
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;
-			this._observeActiveVariantInfo();
+			this.#observeActiveVariantInfo();
+			this.#observeIcon();
 		});
 	}
 
-	private _observeActiveVariantInfo() {
+	#observeActiveVariantInfo() {
 		if (!this._workspaceContext) return;
 		this.observe(
 			this._workspaceContext.splitView.activeVariantsInfo,
@@ -32,6 +36,14 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 			},
 			'_observeActiveVariantsInfo',
 		);
+	}
+
+	#observeIcon() {
+		if (!this._workspaceContext) return;
+		this.observe(this._workspaceContext.contentTypeIcon, (icon) => {
+			this._icon = icon ?? undefined;
+			console.log('Icon:', icon);
+		});
 	}
 
 	override render() {
@@ -46,6 +58,7 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 									back-path=${UMB_MEMBER_ROOT_WORKSPACE_PATH}
 									.splitViewIndex=${view.index}
 									.displayNavigation=${view.index === this._variants!.length - 1}>
+									<umb-icon slot="icon" name=${ifDefined(this._icon)}></umb-icon>
 								</umb-workspace-split-view>
 							`,
 						)}
