@@ -6,7 +6,7 @@ import type { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbMediaTypeServerDataSource } from '@umbraco-cms/backoffice/media-type';
+import { UmbMediaTypeDetailServerDataSource } from '@umbraco-cms/backoffice/media-type';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { umbDeepMerge, type UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 
@@ -32,7 +32,7 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 			throw new Error('Media type unique is missing');
 		}
 
-		const { data } = await new UmbMediaTypeServerDataSource(this).read(mediaTypeUnique);
+		const { data } = await new UmbMediaTypeDetailServerDataSource(this).read(mediaTypeUnique);
 		mediaTypeIcon = data?.icon ?? null;
 		mediaTypeCollection = data?.collection ?? null;
 
