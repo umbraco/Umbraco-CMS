@@ -42,7 +42,6 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 		if (!this._workspaceContext) return;
 		this.observe(this._workspaceContext.contentTypeIcon, (icon) => {
 			this._icon = icon ?? undefined;
-			console.log('Icon:', icon);
 		});
 	}
 
