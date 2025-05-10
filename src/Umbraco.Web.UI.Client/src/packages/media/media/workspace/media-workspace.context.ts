@@ -38,6 +38,7 @@ export class UmbMediaWorkspaceContext
 {
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.mediaType.unique);
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent((data) => !!data?.mediaType.collection);
+	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.mediaType.icon);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 
