@@ -7,7 +7,7 @@ import type { CreateMemberRequestModel, UpdateMemberRequestModel } from '@umbrac
 import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { umbDeepMerge } from '@umbraco-cms/backoffice/utils';
-import { UmbMemberTypeServerDataSource } from '@umbraco-cms/backoffice/member-type';
+import { UmbMemberTypeDetailServerDataSource } from '@umbraco-cms/backoffice/member-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
@@ -31,7 +31,7 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 			throw new Error('Document type unique is missing');
 		}
 
-		const { data } = await new UmbMemberTypeServerDataSource(this).read(memberTypeUnique);
+		const { data } = await new UmbMemberTypeDetailServerDataSource(this).read(memberTypeUnique);
 		memberTypeIcon = data?.icon ?? '';
 
 		const defaultData: UmbMemberDetailModel = {
