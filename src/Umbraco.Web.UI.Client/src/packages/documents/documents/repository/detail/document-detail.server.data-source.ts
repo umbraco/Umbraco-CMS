@@ -7,49 +7,58 @@ import type {
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { umbDeepMerge, type UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import { UmbDocumentTypeDetailServerDataSource } from '@umbraco-cms/backoffice/document-type';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
  * A data source for the Document that fetches data from the server
  * @class UmbDocumentServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocumentDetailModel> {
-	#host: UmbControllerHost;
-
-	/**
-	 * Creates an instance of UmbDocumentServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbDocumentServerDataSource
-	 */
-	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
+export class UmbDocumentServerDataSource
+	extends UmbControllerBase
+	implements UmbDetailDataSource<UmbDocumentDetailModel>
+{
 	/**
 	 * Creates a new Document scaffold
 	 * @param preset
 	 * @returns { UmbDocumentDetailModel }
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async createScaffold(preset: Partial<UmbDocumentDetailModel> = {}) {
-		const data: UmbDocumentDetailModel = {
+	async createScaffold(preset: UmbDeepPartialObject<UmbDocumentDetailModel> = {}) {
+		let documentTypeIcon: string | null = null;
+		let documentTypeCollection: UmbReferenceByUnique | null = null;
+
+		const documentTypeUnique = preset.documentType?.unique;
+
+		if (!documentTypeUnique) {
+			throw new Error('Document type unique is missing');
+		}
+
+		const { data } = await new UmbDocumentTypeDetailServerDataSource(this).read(documentTypeUnique);
+		documentTypeIcon = data?.icon ?? null;
+		documentTypeCollection = data?.collection ?? null;
+
+		const defaultData: UmbDocumentDetailModel = {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			unique: UmbId.new(),
 			template: null,
 			documentType: {
-				unique: '',
-				collection: null,
-				icon: null,
+				unique: documentTypeUnique,
+				collection: documentTypeCollection,
+				icon: documentTypeIcon,
 			},
 			isTrashed: false,
 			values: [],
 			variants: [],
-			...preset,
 		};
 
-		return { data };
+		const scaffold = umbDeepMerge(defaultData, preset) as UmbDocumentDetailModel;
+
+		return { data: scaffold };
 	}
 
 	/**
@@ -80,7 +89,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, DocumentService.getDocumentById({ path: { id: unique } }));
+		const { data, error } = await tryExecute(this, DocumentService.getDocumentById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -147,7 +156,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		};
 
 		const { data, error } = await tryExecute(
-			this.#host,
+			this,
 			DocumentService.postDocument({
 				body: body,
 			}),
@@ -177,7 +186,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		};
 
 		const { error } = await tryExecute(
-			this.#host,
+			this,
 			DocumentService.putDocumentById({
 				path: { id: model.unique },
 				body: body,
@@ -199,6 +208,6 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecute(this.#host, DocumentService.deleteDocumentById({ path: { id: unique } }));
+		return tryExecute(this, DocumentService.deleteDocumentById({ path: { id: unique } }));
 	}
 }

@@ -33,14 +33,13 @@ import {
 	type UmbContentCollectionWorkspaceContext,
 	type UmbContentWorkspaceContext,
 } from '@umbraco-cms/backoffice/content';
-import { UmbDocumentTypeItemRepository, type UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
+import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/language';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
-import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -301,24 +300,11 @@ export class UmbDocumentWorkspaceContext
 			});
 		}
 
-		let collection: UmbReferenceByUnique | null = null;
-		let icon: string | null = null;
-
-		// TODO: Look into optimizing this so we don't have to fetch the document type multiple times. [MR]
-		const { data } = await new UmbDocumentTypeDetailRepository(this).requestByUnique(documentTypeUnique);
-
-		if (data) {
-			collection = data.collection;
-			icon = data.icon;
-		}
-
 		return this.createScaffold({
 			parent,
 			preset: {
 				documentType: {
 					unique: documentTypeUnique,
-					collection,
-					icon,
 				},
 			},
 		});
