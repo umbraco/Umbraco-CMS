@@ -3,8 +3,7 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-const elementName = 'umb-script-folder-workspace-editor';
-@customElement(elementName)
+@customElement('umb-script-folder-workspace-editor')
 export class UmbScriptFolderWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _name = '';
@@ -44,6 +43,6 @@ export { UmbScriptFolderWorkspaceEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbScriptFolderWorkspaceEditorElement;
+		['umb-script-folder-workspace-editor']: UmbScriptFolderWorkspaceEditorElement;
 	}
 }
