@@ -25,8 +25,7 @@ test('can add language', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.language.clickSaveButton();
 
   // Assert
-  //await umbracoUi.language.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.language.isErrorNotificationVisible(false);
+  await umbracoUi.language.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.language.doesExist(isoCode)).toBeTruthy();
   // Verify the created language displays in the list
   await umbracoUi.language.clickLanguagesMenu();
@@ -45,8 +44,7 @@ test('can update default language option', {tag: '@smoke'}, async ({umbracoApi, 
   await umbracoUi.language.clickSaveButton();
 
   // Assert
-  //await umbracoUi.language.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.language.isErrorNotificationVisible(false);
+  await umbracoUi.language.isSuccessStateVisibleForSaveButton();
   const languageData = await umbracoApi.language.get(isoCode);
   expect(languageData.isDefault).toBe(true);
 
@@ -69,8 +67,7 @@ test('can update mandatory language option', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.language.clickSaveButton();
 
   // Assert
-  //await umbracoUi.language.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.language.isErrorNotificationVisible(false);
+  await umbracoUi.language.isSuccessStateVisibleForSaveButton();
   const languageData = await umbracoApi.language.get(isoCode);
   expect(languageData.isMandatory).toBe(true);
 });
@@ -103,8 +100,7 @@ test('can remove fallback language', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.language.clickSaveButton();
 
   // Act
-  //await umbracoUi.language.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.language.isErrorNotificationVisible(false);
+  await umbracoUi.language.isSuccessStateVisibleForSaveButton();
   const languageData = await umbracoApi.language.get(isoCode);
   expect(languageData.fallbackIsoCode).toBeFalsy();
 });
@@ -122,8 +118,7 @@ test('can add fallback language', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.language.clickSaveButton();
 
   // Act
-  //await umbracoUi.language.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.language.isErrorNotificationVisible(false);
+  await umbracoUi.language.isSuccessStateVisibleForSaveButton();
   const languageData = await umbracoApi.language.get(isoCode);
   expect(languageData.fallbackIsoCode).toBe(defaultLanguageIsoCode);
 });

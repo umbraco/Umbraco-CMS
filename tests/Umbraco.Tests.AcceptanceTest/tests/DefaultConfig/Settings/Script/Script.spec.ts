@@ -45,8 +45,7 @@ test('can create a script with content', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.script.clickSaveButton();
 
   // Assert
-  //await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.script.isErrorNotificationVisible(false);
+  await umbracoUi.script.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
   const scriptData = await umbracoApi.script.getByName(scriptName);
   expect(scriptData.content).toBe(scriptContent);
@@ -65,8 +64,7 @@ test('can update a script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.script.clickSaveButton();
 
   // Assert
-  //await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.script.isErrorNotificationVisible(false);
+  await umbracoUi.script.isSuccessStateVisibleForSaveButton();
   const updatedScript = await umbracoApi.script.get(scriptPath);
   expect(updatedScript.content).toBe(updatedScriptContent);
 });

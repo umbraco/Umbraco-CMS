@@ -24,8 +24,7 @@ test('can create a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.documentType.isErrorNotificationVisible(false);
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   await umbracoUi.documentType.reloadTree('Document Types');
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName);
@@ -69,8 +68,7 @@ test('can create a element type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.documentType.isErrorNotificationVisible(false);
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   // Checks if the isElement is true
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
@@ -92,8 +90,7 @@ test('can rename a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.documentType.isErrorNotificationVisible(false);
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   await umbracoUi.documentType.isDocumentTreeItemVisible(wrongName, false);
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName);
@@ -114,8 +111,7 @@ test('can update the alias for a document type', async ({umbracoApi, umbracoUi})
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.documentType.isErrorNotificationVisible(false);
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName, true);
   const documentTypeDataNew = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeDataNew.alias).toBe(newAlias);
@@ -134,8 +130,7 @@ test('can add an icon for a document type', {tag: '@smoke'}, async ({umbracoApi,
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.documentType.isErrorNotificationVisible(false);
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.icon).toBe(bugIcon);
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName, true);

@@ -100,8 +100,7 @@ test('can rename content', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const updatedContentData = await umbracoApi.document.get(contentId);
   expect(updatedContentData.variants[0].name).toEqual(contentName);
 });
@@ -121,8 +120,7 @@ test('can update content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const updatedContentData = await umbracoApi.document.get(contentId);
   expect(updatedContentData.variants[0].name).toEqual(contentName);
   expect(updatedContentData.values[0].value).toBe(contentText);

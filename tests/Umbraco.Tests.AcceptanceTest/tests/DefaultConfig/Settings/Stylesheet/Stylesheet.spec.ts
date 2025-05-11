@@ -47,8 +47,7 @@ test('can create a stylesheet with content', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.stylesheet.clickSaveButton();
 
   // Assert
-  //await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.stylesheet.isErrorNotificationVisible(false);
+  await umbracoUi.stylesheet.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
   const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
   expect(stylesheetData.content).toEqual(stylesheetContent);
@@ -67,8 +66,7 @@ test.skip('can update a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbrac
   await umbracoUi.stylesheet.clickSaveButton();
 
   // Assert
-  //await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.stylesheet.isErrorNotificationVisible(false);
+  await umbracoUi.stylesheet.isSuccessStateVisibleForSaveButton();
   const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
   expect(stylesheetData.content).toEqual(stylesheetContent);
 });

@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -63,8 +63,7 @@ test('can publish content with the list view data type', async ({umbracoApi, umb
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -108,6 +107,7 @@ test('can publish content with a child in the list', async ({umbracoApi, umbraco
   // Currently necessary
   await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   await umbracoUi.content.goToContentInListViewWithName(childContentName);
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
@@ -264,7 +264,7 @@ test('can unpublish child content from list', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.clickConfirmToUnpublishButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
   await umbracoUi.content.isErrorNotificationVisible(false);
   const childContentData = await umbracoApi.document.getByName(childContentName);
   expect(childContentData.variants[0].state).toBe(expectedState);
@@ -290,7 +290,7 @@ test('can duplicate child content in list', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.selectDocumentWithNameAtRoot(secondDocumentName);
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesFirstItemInListViewHaveName(childContentName);
   await umbracoUi.content.goToContentWithName(secondDocumentName);
@@ -321,7 +321,7 @@ test('can move child content in list', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.selectDocumentWithNameAtRoot(secondDocumentName);
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesListViewContainCount(0);
   await umbracoUi.content.goToContentWithName(secondDocumentName);
@@ -349,7 +349,6 @@ test('can trash child content in list', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickConfirmTrashButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesListViewContainCount(0);
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(0);

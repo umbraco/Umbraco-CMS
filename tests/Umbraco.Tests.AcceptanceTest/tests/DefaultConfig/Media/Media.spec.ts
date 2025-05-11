@@ -44,8 +44,7 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickSaveButton();
 
   // Assert
-  //await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.media.isErrorNotificationVisible(false);
+  await umbracoUi.media.isSuccessStateVisibleForSaveButton();
   await umbracoUi.media.isMediaTreeItemVisible(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeTruthy();
 });
@@ -72,8 +71,7 @@ for (const mediaFileType of mediaFileTypes) {
     await umbracoUi.media.clickSaveButton();
 
     // Assert
-    //await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.media.isErrorNotificationVisible(false);
+    await umbracoUi.media.isSuccessStateVisibleForSaveButton();
     const mediaData = await umbracoApi.media.getByName(mediaFileType.fileName);
     const mediaUrl = await umbracoApi.media.getMediaUrl(mediaData.id);
     await umbracoUi.media.doesMediaHaveThumbnail(mediaData.id, mediaFileType.thumbnail, mediaUrl);
