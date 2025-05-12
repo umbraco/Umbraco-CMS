@@ -186,7 +186,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	#openPicker() {
 		this.#pickerContext.openPicker(
 			{
-				multiple: this.max > 1,
+				hideTreeRoot: true,
 				startNode: this.startNode,
 			},
 			{

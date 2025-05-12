@@ -1,5 +1,4 @@
-import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../constants.js';
-import { UMB_MEDIA_PICKER_MODAL } from '../../modals/index.js';
+import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_TREE_PICKER_MODAL } from '../../constants.js';
 import type { UmbMediaItemModel } from '../../repository/item/types.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from '../../modals/index.js';
 import { UMB_MEDIA_SEARCH_PROVIDER_ALIAS } from '../../search/constants.js';
@@ -19,7 +18,7 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 	UmbMediaPickerModalValue
 > {
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_MEDIA_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_PICKER_MODAL);
+		super(host, UMB_MEDIA_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_TREE_PICKER_MODAL);
 	}
 
 	override async openPicker(pickerData?: Partial<UmbMediaPickerModalData>, args?: UmbMediaPickerInputContextOpenArgs) {
