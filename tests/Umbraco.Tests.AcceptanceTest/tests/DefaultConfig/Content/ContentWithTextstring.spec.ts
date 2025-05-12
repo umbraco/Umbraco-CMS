@@ -87,8 +87,9 @@ test('cannot input the text that exceeds the allowed amount of characters', asyn
   // Arrange
   const maxChars = 20;
   const textExceedMaxChars = 'Lorem ipsum dolor sit';
-  const warningMessage = 'This field exceeds the allowed amount of characters';
+  const warningMessage = 'The string length exceeds the maximum length of';
   const dataTypeId = await umbracoApi.dataType.createTextstringDataType(customDataTypeName, maxChars);
+  console.log(dataTypeId);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -99,7 +100,7 @@ test('cannot input the text that exceeds the allowed amount of characters', asyn
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isTextWithExactNameVisible(warningMessage);
+  await umbracoUi.content.isTextWithMessageVisible(warningMessage);
   //await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
 
