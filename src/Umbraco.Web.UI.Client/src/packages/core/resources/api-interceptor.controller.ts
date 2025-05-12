@@ -47,8 +47,8 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	addForbiddenResponseInterceptor(client: typeof umbHttpClient) {
 			client.interceptors.response.use(async (response: Response) => {
 				if (response.status === 403) {
-					let headline = 'Permission Denied';
-					let message = 'You do not have the necessary permissions to complete the requested action. If you believe this is in error, please reach out to your administrator.';
+					const headline = 'Permission Denied';
+					const message = 'You do not have the necessary permissions to complete the requested action. If you believe this is in error, please reach out to your administrator.';
 
 					this.#peekError(headline, message, null);
 				}
