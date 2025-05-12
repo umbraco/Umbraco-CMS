@@ -30,7 +30,7 @@ test('can create content with allow vary by culture enabled', async ({umbracoApi
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveAndCloseButton();
+  await umbracoUi.content.clickSaveButton();
 
   // Assert
   //await umbracoUi.content.isSuccessNotificationVisible();

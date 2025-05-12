@@ -86,7 +86,7 @@ test('can delete a template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.isErrorNotificationVisible(false);
   await umbracoUi.template.reloadTemplateTree();
   expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
-  await umbracoUi.template.isTemplateRootTreeItemVisible(templateName, false);
+  await umbracoUi.template.isTemplateRootTreeItemVisible(templateName, false, false);
 });
 
 test('can set a template as master template', async ({umbracoApi, umbracoUi}) => {
