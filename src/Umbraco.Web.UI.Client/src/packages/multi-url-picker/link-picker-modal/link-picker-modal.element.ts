@@ -196,7 +196,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	async #getUrlForDocument(unique: string) {
 		const documentUrlRepository = new UmbDocumentUrlRepository(this);
 		const { data: documentUrlData } = await documentUrlRepository.requestItems([unique]);
-		return documentUrlData?.[0].urls[0].url ?? '';
+		return documentUrlData && documentUrlData[0].urls.length > 0 ? (documentUrlData?.[0].urls[0].url ?? '') : '';
 	}
 
 	async #getUrlForMedia(unique: string) {
