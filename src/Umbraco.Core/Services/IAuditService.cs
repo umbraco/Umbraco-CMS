@@ -100,7 +100,7 @@ public interface IAuditService : IService
     ///     Optional filter to be applied.
     /// </param>
     /// <returns>The paged items in the audit trail for the specified entity.</returns>
-    Task<PagedModel<IAuditItem>> GetItemsByEntityAsync(
+    public Task<PagedModel<IAuditItem>> GetItemsByEntityAsync(
         int entityId,
         int skip,
         int take,
@@ -213,7 +213,7 @@ public interface IAuditService : IService
     /// </param>
     /// <param name="eventDetails">Free-form details about the audited event.</param>
     /// <returns>The created audit entry.</returns>
-    Task<Attempt<IAuditEntry, AuditLogOperationStatus>> WriteAsync(
+    public Task<Attempt<IAuditEntry, AuditLogOperationStatus>> WriteAsync(
         int performingUserId,
         string performingDetails,
         string performingIp,

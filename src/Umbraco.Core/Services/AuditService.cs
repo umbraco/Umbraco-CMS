@@ -69,15 +69,8 @@ public sealed class AuditService : RepositoryService, IAuditService
         DateTimeOffset? sinceDate = null,
         AuditType[]? auditTypeFilter = null)
     {
-        if (skip < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(skip));
-        }
-
-        if (take <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(take));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(skip);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(take);
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageIndex, out var pageSize);
         IQuery<IAuditItem>? customFilter = sinceDate.HasValue
@@ -110,15 +103,8 @@ public sealed class AuditService : RepositoryService, IAuditService
         DateTimeOffset? sinceDate = null,
         AuditType[]? auditTypeFilter = null)
     {
-        if (skip < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(skip));
-        }
-
-        if (take <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(take));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(skip);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(take);
 
         Attempt<int> keyToIdAttempt = _entityService.GetId(entityKey, entityType);
         if (keyToIdAttempt.Success is false)
@@ -142,15 +128,8 @@ public sealed class AuditService : RepositoryService, IAuditService
         AuditType[]? auditTypeFilter = null,
         IQuery<IAuditItem>? customFilter = null)
     {
-        if (skip < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(skip));
-        }
-
-        if (take <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(take));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(skip);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(take);
 
         if (entityId is Constants.System.Root or <= 0)
         {
@@ -174,15 +153,8 @@ public sealed class AuditService : RepositoryService, IAuditService
         AuditType[]? auditTypeFilter = null,
         IQuery<IAuditItem>? customFilter = null)
     {
-        if (pageIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageIndex));
-        }
-
-        if (pageSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(pageIndex);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(pageSize);
 
         if (entityId is Constants.System.Root or <= 0)
         {
@@ -213,15 +185,8 @@ public sealed class AuditService : RepositoryService, IAuditService
         AuditType[]? auditTypeFilter = null,
         DateTime? sinceDate = null)
     {
-        if (skip < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(skip));
-        }
-
-        if (take <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(take));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(skip);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(take);
 
         IUser? user = await _userService.GetAsync(userKey);
         if (user is null)
@@ -247,15 +212,8 @@ public sealed class AuditService : RepositoryService, IAuditService
         AuditType[]? auditTypeFilter = null,
         IQuery<IAuditItem>? customFilter = null)
     {
-        if (pageIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageIndex));
-        }
-
-        if (pageSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(pageIndex);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(pageSize);
 
         if (userId is Constants.System.Root or <= 0)
         {
@@ -430,10 +388,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         string eventType,
         string eventDetails)
     {
-        if (performingUserId < Constants.Security.SuperUserId)
-        {
-            throw new ArgumentOutOfRangeException(nameof(performingUserId));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(performingUserId, Constants.Security.SuperUserId);
 
         if (string.IsNullOrWhiteSpace(performingDetails))
         {
