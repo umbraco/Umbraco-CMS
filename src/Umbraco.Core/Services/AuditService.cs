@@ -264,6 +264,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     /// <inheritdoc />
+    [Obsolete("Will be moved to a new service and removed from this one in a future version.")]
     public IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string? affectedDetails, string eventType, string eventDetails)
     {
         if (performingUserId < 0 && performingUserId != Constants.Security.SuperUserId)
