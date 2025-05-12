@@ -56,13 +56,14 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		}
 
 		this.#getMediaTypes();
+		this.populateLinkUrl();
 	}
 
 	protected override firstUpdated() {
 		this._linkAnchorInput?.addValidator(
 			'valueMissing',
 			() => this.localize.term('linkPicker_modalAnchorValidationMessage'),
-			() => !this.value.link.url && !this.value.link.queryString,
+			() => !this.value.link.name && !this.value.link.queryString,
 		);
 	}
 
@@ -72,6 +73,30 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		const { data: mediaTypes } = await mediaTypeStructureRepository.requestAllowedChildrenOf(null, null);
 		this._allowedMediaTypeUniques =
 			(mediaTypes?.items.map((x) => x.unique).filter((x) => x && !isUmbracoFolder(x)) as Array<string>) ?? [];
+	}
+
+	async populateLinkUrl() {
+		// Documents and media have URLs saved in the local link format. Display the actual URL to align with what
+		// the user sees when they selected it initially.
+		if (!this.value.link?.unique || this.value.link?.url?.indexOf('localLink') === -1) return;
+
+		let url: string | undefined = undefined;
+		switch (this.value.link.type) {
+			case 'document': {
+				url = await this.#getUrlForDocument(this.value.link.unique);
+				break;
+			}
+			case 'media': {
+				url = await this.#getUrlForMedia(this.value.link.unique);
+				break;
+			}
+			default:
+				break;
+		}
+
+		if (url) {
+			this.#partialUpdateLink({ url });
+		}
 	}
 
 	#partialUpdateLink(linkObject: Partial<UmbLinkPickerLink>) {
@@ -136,10 +161,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					if (documentData) {
 						icon = documentData.documentType.icon;
 						name = documentData.variants[0].name;
-
-						const documentUrlRepository = new UmbDocumentUrlRepository(this);
-						const { data: documentUrlData } = await documentUrlRepository.requestItems([unique]);
-						url = documentUrlData?.[0].urls[0].url ?? '';
+						url = await this.#getUrlForDocument(unique);
 					}
 					break;
 				}
@@ -149,10 +171,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					if (mediaData) {
 						icon = mediaData.mediaType.icon;
 						name = mediaData.variants[0].name;
-
-						const mediaUrlRepository = new UmbMediaUrlRepository(this);
-						const { data: mediaUrlData } = await mediaUrlRepository.requestItems([unique]);
-						url = mediaUrlData?.[0].url ?? '';
+						url = await this.#getUrlForMedia(unique);
 					}
 					break;
 				}
@@ -163,7 +182,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 		const link = {
 			icon,
-			name: this.value.link.name || name,
+			name: name || this.value.link.name,
 			type: unique ? type : undefined,
 			unique,
 			url: url ?? this.value.link.url,
@@ -172,6 +191,18 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		this.#partialUpdateLink(link);
 
 		await this.#validationContext.validate();
+	}
+
+	async #getUrlForDocument(unique: string) {
+		const documentUrlRepository = new UmbDocumentUrlRepository(this);
+		const { data: documentUrlData } = await documentUrlRepository.requestItems([unique]);
+		return documentUrlData && documentUrlData[0].urls.length > 0 ? (documentUrlData?.[0].urls[0].url ?? '') : '';
+	}
+
+	async #getUrlForMedia(unique: string) {
+		const mediaUrlRepository = new UmbMediaUrlRepository(this);
+		const { data: mediaUrlData } = await mediaUrlRepository.requestItems([unique]);
+		return mediaUrlData?.[0].url ?? '';
 	}
 
 	async #onResetUrl() {
