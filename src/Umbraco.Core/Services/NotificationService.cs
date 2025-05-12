@@ -96,7 +96,7 @@ public class NotificationService : INotificationService
 
         // see notes above
         var id = Constants.Security.SuperUserId;
-        const int pagesz = 400; // load batches of 400 users
+        const int UserBatchSize = 400; // load batches of 400 users
         do
         {
             var notifications = GetUsersNotifications(new List<int>(), action, Enumerable.Empty<int>(), Constants.ObjectTypes.Document)?.ToList();
@@ -106,8 +106,7 @@ public class NotificationService : INotificationService
             }
 
             // users are returned ordered by id, notifications are returned ordered by user id
-            var users = _userService.GetNextUsers(id, pagesz).ToList();
-            var approvedUsers = users.Where(x => x.IsApproved).ToList();
+            var approvedUsers = _userService.GetNextApprovedUsers(id, UserBatchSize).ToList();
             foreach (IUser approvedUser in approvedUsers)
             {
                 Notification[] userNotifications = notifications.Where(n => n.UserId == approvedUser.Id).ToArray();
@@ -138,7 +137,7 @@ public class NotificationService : INotificationService
             }
 
             // load more users if any
-            id = users.Count == pagesz ? users.Last().Id + 1 : -1;
+            id = approvedUsers.Count == UserBatchSize ? approvedUsers.Last().Id + 1 : -1;
         }
         while (id > 0);
     }
