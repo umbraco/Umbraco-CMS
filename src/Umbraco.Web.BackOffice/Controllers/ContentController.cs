@@ -256,6 +256,7 @@ public class ContentController : ContentControllerBase
     ///     Permission check is done for letter 'R' which is for <see cref="ActionRights" /> which the user must have access to
     ///     update
     /// </remarks>
+    [HttpPost]
     public async Task<ActionResult<IEnumerable<AssignedUserGroupPermissions?>?>> PostSaveUserGroupPermissions(
         UserGroupPermissionsSave saveModel)
     {
@@ -902,6 +903,7 @@ public class ContentController : ContentControllerBase
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     [FileUploadCleanupFilter]
     [ContentSaveValidation(skipUserAccessValidation:true)] // skip user access validation because we "only" require Settings access to create new blueprints from scratch
+    [HttpPost]
     public async Task<ActionResult<ContentItemDisplay<ContentVariantDisplay>?>?> PostSaveBlueprint(
         [ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
     {
@@ -939,6 +941,7 @@ public class ContentController : ContentControllerBase
     [FileUploadCleanupFilter]
     [ContentSaveValidation]
     [OutgoingEditorModelEvent]
+    [HttpPost]
     public async Task<ActionResult<ContentItemDisplay<ContentVariantScheduleDisplay>?>> PostSave(
         [ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
     {
@@ -999,6 +1002,7 @@ public class ContentController : ContentControllerBase
             // if there's only one variant and the model state is not valid we cannot publish so change it to save
             if (variantCount == 1)
             {
+
                 switch (contentItem.Action)
                 {
                     case ContentSaveAction.Publish:
@@ -1144,25 +1148,6 @@ public class ContentController : ContentControllerBase
                 break;
             case ContentSaveAction.PublishWithDescendants:
             case ContentSaveAction.PublishWithDescendantsNew:
-            {
-                if (!await ValidatePublishBranchPermissionsAsync(contentItem))
-                {
-                    globalNotifications.AddErrorNotification(
-                        _localizedTextService.Localize(null, "publish"),
-                        _localizedTextService.Localize("publish", "invalidPublishBranchPermissions"));
-                    wasCancelled = false;
-                    break;
-                }
-
-                var publishStatus = PublishBranchInternal(contentItem, false, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
-                var addedDomainWarnings = AddDomainWarnings(publishStatus, successfulCultures, globalNotifications, defaultCulture);
-                AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
-                if (addedDomainWarnings is false)
-                {
-                    AddPublishRoutableErrorNotifications(publishStatus, globalNotifications, successfulCultures);
-                }
-            }
-                break;
             case ContentSaveAction.PublishWithDescendantsForce:
             case ContentSaveAction.PublishWithDescendantsForceNew:
             {
@@ -1175,8 +1160,13 @@ public class ContentController : ContentControllerBase
                     break;
                 }
 
-                var publishStatus = PublishBranchInternal(contentItem, true, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
+                var publishStatus = PublishBranchInternal(contentItem, BuildPublishBranchFilter(contentItem.Action), cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
+                var addedDomainWarnings = AddDomainWarnings(publishStatus, successfulCultures, globalNotifications, defaultCulture);
                 AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
+                if (addedDomainWarnings is false)
+                {
+                    AddPublishRoutableErrorNotifications(publishStatus, globalNotifications, successfulCultures);
+                }
             }
                 break;
             default:
@@ -1228,6 +1218,20 @@ public class ContentController : ContentControllerBase
         return display;
     }
 
+    private static PublishBranchFilter BuildPublishBranchFilter(ContentSaveAction contentSaveAction)
+    {
+        var includeUnpublished = contentSaveAction == ContentSaveAction.PublishWithDescendantsForce
+                               || contentSaveAction == ContentSaveAction.PublishWithDescendantsForceNew;
+
+        PublishBranchFilter publishBranchFilter = PublishBranchFilter.Default;
+        if (includeUnpublished)
+        {
+            publishBranchFilter |= PublishBranchFilter.IncludeUnpublished;
+        }
+
+        return publishBranchFilter;
+    }
+
     private void AddPublishStatusNotifications(
         IReadOnlyCollection<PublishResult> publishStatus,
         SimpleNotificationModel globalNotifications,
@@ -1248,6 +1252,11 @@ public class ContentController : ContentControllerBase
         SimpleNotificationModel globalNotifications,
         string[]? successfulCultures)
     {
+        if (_contentSettings.ShowUnroutableContentWarnings is false)
+        {
+            return;
+        }
+
         IContent? content = publishStatus.FirstOrDefault()?.Content;
         if (content is null)
         {
@@ -1668,12 +1677,12 @@ public class ContentController : ContentControllerBase
         return authorizationResult.Succeeded;
     }
 
-    private IEnumerable<PublishResult> PublishBranchInternal(ContentItemSave contentItem, bool force, string? cultureForInvariantErrors, out bool wasCancelled, out string[]? successfulCultures)
+    private IEnumerable<PublishResult> PublishBranchInternal(ContentItemSave contentItem, PublishBranchFilter publishBranchFilter, string? cultureForInvariantErrors, out bool wasCancelled, out string[]? successfulCultures)
     {
         if (!contentItem.PersistedContent?.ContentType.VariesByCulture() ?? false)
         {
             //its invariant, proceed normally
-            IEnumerable<PublishResult> publishStatus = _contentService.SaveAndPublishBranch(contentItem.PersistedContent!, force, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+            IEnumerable<PublishResult> publishStatus = _contentService.SaveAndPublishBranch(contentItem.PersistedContent!, publishBranchFilter, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             // TODO: Deal with multiple cancellations
             wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
             successfulCultures = null; //must be null! this implies invariant
@@ -1709,7 +1718,7 @@ public class ContentController : ContentControllerBase
         {
             //proceed to publish if all validation still succeeds
             IEnumerable<PublishResult> publishStatus = _contentService.SaveAndPublishBranch(
-                contentItem.PersistedContent!, force, culturesToPublish.WhereNotNull().ToArray(), _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+                contentItem.PersistedContent!, publishBranchFilter, culturesToPublish.WhereNotNull().ToArray(), _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             // TODO: Deal with multiple cancellations
             wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
             successfulCultures = contentItem.Variants.Where(x => x.Publish).Select(x => x.Culture).WhereNotNull()
@@ -2089,6 +2098,7 @@ public class ContentController : ContentControllerBase
     ///     does not have Publish access to this node.
     /// </remarks>
     [Authorize(Policy = AuthorizationPolicies.ContentPermissionPublishById)]
+    [HttpPost]
     public IActionResult PostPublishById(int id)
     {
         IContent? foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
@@ -2120,6 +2130,7 @@ public class ContentController : ContentControllerBase
     ///     does not have Publish access to this node.
     /// </remarks>
     [Authorize(Policy = AuthorizationPolicies.ContentPermissionPublishById)]
+    [HttpPost]
     public IActionResult PostPublishByIdAndCulture(PublishContent model)
     {
         var languageCount = _allLangs.Value.Count();
@@ -2243,6 +2254,7 @@ public class ContentController : ContentControllerBase
     /// </summary>
     /// <param name="sorted"></param>
     /// <returns></returns>
+    [HttpPost]
     public async Task<IActionResult> PostSort(ContentSortOrder sorted)
     {
         if (sorted == null)
@@ -2294,6 +2306,7 @@ public class ContentController : ContentControllerBase
     /// </summary>
     /// <param name="move"></param>
     /// <returns></returns>
+    [HttpPost]
     public async Task<IActionResult?> PostMove(MoveOrCopy move)
     {
         // Authorize...
@@ -2333,6 +2346,7 @@ public class ContentController : ContentControllerBase
     /// </summary>
     /// <param name="copy"></param>
     /// <returns></returns>
+    [HttpPost]
     public async Task<ActionResult<IContent>?> PostCopy(MoveOrCopy copy)
     {
         // Authorize...
@@ -2372,6 +2386,7 @@ public class ContentController : ContentControllerBase
     /// <param name="model">The content and variants to unpublish</param>
     /// <returns></returns>
     [OutgoingEditorModelEvent]
+    [HttpPost]
     public async Task<ActionResult<ContentItemDisplayWithSchedule?>> PostUnpublish(UnpublishContent model)
     {
         IContent? foundContent = _contentService.GetById(model.Id);
@@ -3096,6 +3111,7 @@ public class ContentController : ContentControllerBase
         return notifications;
     }
 
+    [HttpPost]
     public IActionResult PostNotificationOptions(
         int contentId,
         [FromQuery(Name = "notifyOptions[]")] string[] notifyOptions)

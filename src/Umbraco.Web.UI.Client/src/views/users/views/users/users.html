@@ -196,7 +196,7 @@
                             <umb-avatar size="l" color="secondary" name="{{user.name}}" img-src="{{user.avatars[2]}}" img-srcset="{{user.avatars[3]}} 2x, {{user.avatars[4]}} 3x">
                             </umb-avatar>
                         </div>
-                        <div class="umb-user-card__name">{{user.name}}</div>
+                        <div title="{{user.name}}" class="umb-user-card__name">{{user.name}}</div>
                     </a>
                     <div class="umb-user-card__group">
                         <span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span>
@@ -209,9 +209,10 @@
                             {{ user.formattedLastLogin }}
                         </div>
                         <div ng-if="!user.formattedLastLogin">
-                            <div>{{ user.name | umbWordLimit:1 }}
-                                <localize key="user_noLogin">has not logged in yet</localize>
-                            </div>
+                          <div class="umb-user-name__last-login" title="{{ user.name | umbWordLimit:1 }}">
+                            {{ user.name | umbWordLimit:1 }}
+                          </div>
+                          <localize key="user_noLogin">has not logged in yet</localize>
                         </div>
                     </div>
                 </div>

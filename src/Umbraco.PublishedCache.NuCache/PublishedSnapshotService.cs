@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Extensions;
@@ -31,6 +32,9 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
     // means faster execution, but uses memory - not sure if we want it
     // so making it configurable.
     public static readonly bool FullCacheWhenPreviewing = true;
+
+    private const string IsRebuildingDatabaseCacheRuntimeCacheKey = "temp_database_cache_rebuild_op";
+
     private readonly NuCacheSettings _config;
     private readonly ContentDataSerializer _contentDataSerializer;
     private readonly IDefaultCultureAccessor _defaultCultureAccessor;
@@ -51,6 +55,8 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
     private readonly object _storesLock = new();
     private readonly ISyncBootStateAccessor _syncBootStateAccessor;
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+    private readonly IAppPolicyCache _runtimeCache;
 
     private long _contentGen;
 
@@ -91,7 +97,9 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
         IPublishedModelFactory publishedModelFactory,
         IHostingEnvironment hostingEnvironment,
         IOptions<NuCacheSettings> config,
-        ContentDataSerializer contentDataSerializer)
+        ContentDataSerializer contentDataSerializer,
+        IBackgroundTaskQueue backgroundTaskQueue,
+        AppCaches appCaches)
     {
         _options = options;
         _syncBootStateAccessor = syncBootStateAccessor;
@@ -111,6 +119,8 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
         _contentDataSerializer = contentDataSerializer;
         _config = config.Value;
         _publishedModelFactory = publishedModelFactory;
+        _backgroundTaskQueue = backgroundTaskQueue;
+        _runtimeCache = appCaches.RuntimeCache;
     }
 
     protected PublishedSnapshot? CurrentPublishedSnapshot
@@ -350,11 +360,65 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
     }
 
     /// <inheritdoc />
+    public bool IsRebuilding() => _runtimeCache.Get(IsRebuildingDatabaseCacheRuntimeCacheKey) is not null;
+
+    /// <inheritdoc />
     public void Rebuild(
         IReadOnlyCollection<int>? contentTypeIds = null,
         IReadOnlyCollection<int>? mediaTypeIds = null,
         IReadOnlyCollection<int>? memberTypeIds = null)
-        => _publishedContentService.Rebuild(contentTypeIds, mediaTypeIds, memberTypeIds);
+        => Rebuild(false, contentTypeIds, mediaTypeIds, memberTypeIds);
+
+    /// <inheritdoc />
+    public void Rebuild(
+        bool useBackgroundThread,
+        IReadOnlyCollection<int>? contentTypeIds = null,
+        IReadOnlyCollection<int>? mediaTypeIds = null,
+        IReadOnlyCollection<int>? memberTypeIds = null)
+    {
+        if (useBackgroundThread)
+        {
+            _logger.LogInformation("Starting async background thread for rebuilding database cache.");
+
+            _backgroundTaskQueue.QueueBackgroundWorkItem(
+                cancellationToken =>
+                {
+                    // Do not flow AsyncLocal to the child thread
+                    using (ExecutionContext.SuppressFlow())
+                    {
+                        Task.Run(() => PerformRebuild(contentTypeIds, mediaTypeIds, memberTypeIds));
+
+                        // immediately return so the request isn't waiting.
+                        return Task.CompletedTask;
+                    }
+                });
+        }
+        else
+        {
+            PerformRebuild(contentTypeIds, mediaTypeIds, memberTypeIds);
+        }
+    }
+
+    private void PerformRebuild(
+        IReadOnlyCollection<int>? contentTypeIds = null,
+        IReadOnlyCollection<int>? mediaTypeIds = null,
+        IReadOnlyCollection<int>? memberTypeIds = null)
+    {
+        try
+        {
+            SetIsRebuilding();
+
+            _publishedContentService.Rebuild(contentTypeIds, mediaTypeIds, memberTypeIds);
+        }
+        finally
+        {
+            ClearIsRebuilding();
+        }
+    }
+
+    private void SetIsRebuilding() => _runtimeCache.Insert(IsRebuildingDatabaseCacheRuntimeCacheKey, () => "tempValue", TimeSpan.FromMinutes(10));
+
+    private void ClearIsRebuilding() => _runtimeCache.Clear(IsRebuildingDatabaseCacheRuntimeCacheKey);
 
     public async Task CollectAsync()
     {

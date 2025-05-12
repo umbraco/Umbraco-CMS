@@ -247,6 +247,7 @@
         function save() {
 
             if (!formHelper.submitForm({ scope: $scope })) {
+              vm.saveButtonState = 'error';
               return;
             }
 

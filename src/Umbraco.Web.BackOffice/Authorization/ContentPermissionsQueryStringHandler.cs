@@ -20,6 +20,8 @@ public class
 {
     private readonly ContentPermissions _contentPermissions;
 
+    protected override UmbracoObjectTypes KeyParsingFilterType => UmbracoObjectTypes.Document;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentPermissionsQueryStringHandler" /> class.
     /// </summary>
@@ -48,7 +50,11 @@ public class
                 return Task.FromResult(true);
             }
 
-            var argument = routeVal.ToString();
+            // Handle case where the incoming querystring could contain more than one value (e.g. ?id=1000&id=1001).
+            // It's the first one that'll be processed by the protected method so we should verify that.
+            var argument = routeVal.Count == 1
+                ? routeVal.ToString()
+                : routeVal.FirstOrDefault()?.ToString() ?? string.Empty;
 
             if (!TryParseNodeId(argument, out nodeId))
             {

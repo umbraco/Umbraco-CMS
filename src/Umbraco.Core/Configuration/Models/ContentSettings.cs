@@ -160,6 +160,7 @@ public class ContentSettings
     internal const bool StaticDisableUnpublishWhenReferenced = false;
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
     internal const bool StaticShowDomainWarnings = true;
+    internal const bool StaticShowUnroutableContentWarnings = true;
 
     /// <summary>
     ///     Gets or sets a value for the content notification settings.
@@ -285,4 +286,10 @@ public class ContentSettings
     /// </summary>
     [DefaultValue(StaticShowDomainWarnings)]
     public bool ShowDomainWarnings { get; set; } = StaticShowDomainWarnings;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to show unroutable content warnings.
+    /// </summary>
+    [DefaultValue(StaticShowUnroutableContentWarnings)]
+    public bool ShowUnroutableContentWarnings { get; set; } = StaticShowUnroutableContentWarnings;
 }

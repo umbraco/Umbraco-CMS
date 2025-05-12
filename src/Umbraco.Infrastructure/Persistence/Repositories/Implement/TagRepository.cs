@@ -387,7 +387,9 @@ WHERE r.tagId IS NULL";
         }).ToList();
 
     /// <inheritdoc />
-    public IEnumerable<ITag> GetTagsForEntityType(TaggableObjectTypes objectType, string? group = null,
+    public IEnumerable<ITag> GetTagsForEntityType(
+        TaggableObjectTypes objectType,
+        string? group = null,
         string? culture = null)
     {
         Sql<ISqlContext> sql = GetTagsSql(culture, true);
@@ -400,6 +402,9 @@ WHERE r.tagId IS NULL";
             sql = sql
                 .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
         }
+
+        sql = sql
+            .Where<NodeDto>(dto => !dto.Trashed);
 
         if (group.IsNullOrWhiteSpace() == false)
         {
