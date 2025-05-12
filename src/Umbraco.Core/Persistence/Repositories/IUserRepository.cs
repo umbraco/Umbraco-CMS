@@ -125,4 +125,10 @@ public interface IUserRepository : IReadWriteQueryRepository<int, IUser>
     /// <param name="count">The number of users to return.</param>
     /// <returns>A page of <see cref="IUser"/> instances.</returns>
     IEnumerable<IUser> GetNextApprovedUsers(int id, int count) => Enumerable.Empty<IUser>();
+
+    /// <summary>
+    ///     Invalidates sessions for users that aren't associated with the current collection of providers.
+    /// </summary>
+    /// <param name="currentProviderKeys">The keys for the currently configured providers.</param>
+    void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentProviderKeys) { }
 }

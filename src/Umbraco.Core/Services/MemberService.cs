@@ -743,7 +743,9 @@ namespace Umbraco.Cms.Core.Services
         public void SetLastLogin(string username, DateTime date) => throw new NotImplementedException();
 
         /// <inheritdoc />
-        public void Save(IMember member)
+        public void Save(IMember member) => Save(member, PublishNotificationSaveOptions.All);
+
+        public void Save(IMember member, PublishNotificationSaveOptions publishNotificationSaveOptions)
         {
             // trimming username and email to make sure we have no trailing space
             member.Username = member.Username.Trim();
@@ -752,11 +754,15 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
-            var savingNotification = new MemberSavingNotification(member, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotification))
+            MemberSavingNotification? savingNotification = null;
+            if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saving))
             {
-                scope.Complete();
-                return;
+                savingNotification = new MemberSavingNotification(member, evtMsgs);
+                if (scope.Notifications.PublishCancelable(savingNotification))
+                {
+                    scope.Complete();
+                    return;
+                }
             }
 
             if (string.IsNullOrWhiteSpace(member.Name))
@@ -768,7 +774,13 @@ namespace Umbraco.Cms.Core.Services
 
             _memberRepository.Save(member);
 
-            scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+            if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saved))
+            {
+                scope.Notifications.Publish(
+                    savingNotification is null
+                    ? new MemberSavedNotification(member, evtMsgs)
+                    : new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+            }
 
             Audit(AuditType.Save, 0, member.Id);
 

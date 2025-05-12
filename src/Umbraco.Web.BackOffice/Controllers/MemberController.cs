@@ -723,6 +723,17 @@ public class MemberController : ContentControllerBase
             return false;
         }
 
+        // User names can only contain the configured allowed characters. This is validated by ASP.NET Identity on create
+        // as the setting is applied to the IdentityOptions, but we need to check ourselves for updates.
+        var allowedUserNameCharacters = _securitySettings.AllowedUserNameCharacters;
+        if (contentItem.Username.Any(c => allowedUserNameCharacters.Contains(c) == false))
+        {
+            ModelState.AddPropertyError(
+                new ValidationResult("Username contains invalid characters"),
+                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
+            return false;
+        }
+
         if (contentItem.Password != null && !contentItem.Password.NewPassword.IsNullOrWhiteSpace())
         {
             IdentityResult validPassword = await _memberManager.ValidatePasswordAsync(contentItem.Password.NewPassword);

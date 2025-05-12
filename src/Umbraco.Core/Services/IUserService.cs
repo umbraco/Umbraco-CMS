@@ -248,6 +248,12 @@ public interface IUserService : IMembershipUserService
     /// <returns>A page of <see cref="IUser"/> instances.</returns>
     IEnumerable<IUser> GetNextApprovedUsers(int id, int count) => Enumerable.Empty<IUser>();
 
+    /// <summary>
+    ///     Invalidates sessions for users that aren't associated with the current collection of providers.
+    /// </summary>
+    /// <param name="currentLoginProviders">The keys for the currently configured providers.</param>
+    void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentLoginProviders) { }
+
     #region User groups
 
     /// <summary>

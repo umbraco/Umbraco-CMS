@@ -217,10 +217,8 @@ public partial class PreviewController : Controller
 
         // are we attempting a redirect to the default route (by ID with optional culture)?
         Match match = DefaultPreviewRedirectRegex().Match(redir ?? string.Empty);
-        if (match.Success)
+        if (match.Success && int.TryParse(match.Groups["id"].Value, out int id))
         {
-            var id = int.Parse(match.Groups["id"].Value);
-
             // first try to resolve the published URL
             if (_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext) &&
                 umbracoContext.Content is not null)

@@ -386,6 +386,7 @@ public class MediaController : ContentControllerBase
     /// </summary>
     /// <param name="move"></param>
     /// <returns></returns>
+    [HttpPost]
     public async Task<IActionResult> PostMove(MoveOrCopy move)
     {
         // Authorize...
@@ -436,6 +437,7 @@ public class MediaController : ContentControllerBase
     [FileUploadCleanupFilter]
     [MediaItemSaveValidation]
     [OutgoingEditorModelEvent]
+    [HttpPost]
     public ActionResult<MediaItemDisplay?>? PostSave(
         [ModelBinder(typeof(MediaItemBinder))] MediaItemSave contentItem)
     {
@@ -551,6 +553,7 @@ public class MediaController : ContentControllerBase
     /// </summary>
     /// <param name="sorted"></param>
     /// <returns></returns>
+    [HttpPost]
     public async Task<IActionResult> PostSort(ContentSortOrder sorted)
     {
         if (sorted == null)
@@ -595,6 +598,7 @@ public class MediaController : ContentControllerBase
         }
     }
 
+    [HttpPost]
     public async Task<ActionResult<MediaItemDisplay?>> PostAddFolder(PostedFolder folder)
     {
         ActionResult<int?>? parentIdResult = await GetParentIdAsIntAsync(folder.ParentId, true);
@@ -628,6 +632,7 @@ public class MediaController : ContentControllerBase
     /// <remarks>
     ///     We cannot validate this request with attributes (nicely) due to the nature of the multi-part for data.
     /// </remarks>
+    [HttpPost]
     public async Task<IActionResult> PostAddFile([FromForm] string path, [FromForm] string currentFolder,
         [FromForm] string contentTypeAlias, List<IFormFile> file)
     {

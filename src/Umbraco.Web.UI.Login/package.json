@@ -1,29 +1,29 @@
 {
-	"name": "login",
-	"private": true,
+  "name": "login",
+  "private": true,
   "type": "module",
-	"scripts": {
-		"dev": "vite",
-		"build": "tsc && vite build",
-		"watch": "tsc && vite build --watch",
-		"preview": "vite preview"
-	},
-    "engines": {
-      "node": ">=20.8",
-      "npm": ">=10.1"
-    },
-	"dependencies": {
-		"lit": "^3.1.2",
-		"msw": "^2.2.0",
-		"rxjs": "^7.8.1"
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "watch": "tsc && vite build --watch",
+    "preview": "vite preview"
   },
-	"devDependencies": {
-    "@umbraco-ui/uui": "1.12.2",
-    "@umbraco-ui/uui-css": "1.12.1",
-		"typescript": "^5.3.3",
-		"vite": "^5.1.7"
-	},
-	"msw": {
-		"workerDirectory": "public"
-	}
+  "engines": {
+    "node": ">=20.8",
+    "npm": ">=10.1"
+  },
+  "dependencies": {
+    "lit": "^3.1.2",
+    "msw": "^2.2.0",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@umbraco-ui/uui": "1.13.0",
+    "@umbraco-ui/uui-css": "1.13.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.1.7"
+  },
+  "msw": {
+    "workerDirectory": "public"
+  }
 }

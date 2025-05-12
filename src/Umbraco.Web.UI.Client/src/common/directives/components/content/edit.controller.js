@@ -1033,9 +1033,12 @@
                 $scope.content.variants.forEach(variant => variant.save = false);
                 //ensure the save flag is set for the active variant
                 selectedVariant.save = true;
+                $scope.page.previewButtonState = "busy";
                 performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function (data) {
+                    $scope.page.previewButtonState = "success";
                     openPreviewWindow(url, urlTarget);
                 }, function (err) {
+                    $scope.page.previewButtonState = "error";
                     //validation issues ....
                 });
             }
