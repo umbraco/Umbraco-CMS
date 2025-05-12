@@ -52,7 +52,7 @@ test('can publish a block grid editor with a rich text editor', async ({umbracoA
 
   // Act
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickBlockElementWithName(richTextElementTypeName);
+  await umbracoUi.content.clickBlockCardWithName(richTextElementTypeName, true);
   await umbracoUi.content.enterRTETipTapEditor(richTextEditorValue);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
@@ -93,9 +93,9 @@ test('can publish a block grid editor with a block list editor', async ({umbraco
 
   // Act
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickBlockElementWithName(blockListElementTypeName);
+  await umbracoUi.content.clickBlockCardWithName(blockListElementTypeName, true);
   await umbracoUi.content.clickAddBlockWithNameButton(textStringElementTypeName);
-  await umbracoUi.content.clickLinkWithName(textStringElementTypeName, true);
+  await umbracoUi.content.clickBlockCardWithName(textStringElementTypeName, true);
   await umbracoUi.content.enterTextstring(textStringValue);
   await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + textStringElementTypeName);
   await umbracoUi.content.clickCreateModalButton();
@@ -138,9 +138,9 @@ test('can publish a block grid editor with a block grid editor', async ({umbraco
 
   // Act
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickLinkWithName(blockGridElementTypeName, true);
+  await umbracoUi.content.clickBlockCardWithName(blockGridElementTypeName, true);
   await umbracoUi.content.clickAddBlockWithNameButton(textStringElementTypeName);
-  await umbracoUi.content.clickLinkWithName(textStringElementTypeName, true);
+  await umbracoUi.content.clickBlockCardWithName(textStringElementTypeName, true);
   await umbracoUi.content.enterTextstring(textStringValue);
   await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + textStringElementTypeName);
   await umbracoUi.content.clickCreateModalButton();

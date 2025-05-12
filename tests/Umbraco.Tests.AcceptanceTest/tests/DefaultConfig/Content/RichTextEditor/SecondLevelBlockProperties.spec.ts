@@ -55,7 +55,7 @@ test('can publish a rich text editor with a rich text editor', async ({umbracoAp
   // Act
   await umbracoUi.content.enterRTETipTapEditor(richTextEditorValue);
   await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickBlockElementWithName(richTextElementTypeName);
+  await umbracoUi.content.clickBlockCardWithName(richTextElementTypeName, true);
   await umbracoUi.content.enterRTETipTapEditorWithName(AliasHelper.toAlias(secondRichTextDataTypeName), secondRichTextEditorValue);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
@@ -73,7 +73,6 @@ test('can publish a rich text editor with a rich text editor', async ({umbracoAp
   expect(secondRTEInBlock.value.markup).toContain(secondExpectedRichTextEditorOutputValue);
 
   // Clean
-  await umbracoApi.dataType.ensureNameNotExists(richTextDataTypeName);
   await umbracoApi.documentType.ensureNameNotExists(richTextElementGroupName);
 });
 
@@ -89,7 +88,7 @@ test('can publish a rich text editor with a block grid editor', async ({umbracoA
 
   const textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
   textStringElementTypeId = await umbracoApi.documentType.createDefaultElementType(textStringElementTypeName, textStringGroupName, textStringDataTypeName, textStringDataType.id);
-  const blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridDataTypeName, textStringElementTypeId);
+  const blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockWithInlineEditingMode(blockGridDataTypeName, textStringElementTypeId, true);
   const blockGridElementTypeId = await umbracoApi.documentType.createDefaultElementType(blockGridElementTypeName, blockGridElementGroupName, blockGridDataTypeName, blockGridDataTypeId);
   richTextDataTypeId = await umbracoApi.dataType.createRichTextEditorWithABlock(richTextDataTypeName, blockGridElementTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, richTextDataTypeName, richTextDataTypeId, documentTypeGroupName);
@@ -100,9 +99,9 @@ test('can publish a rich text editor with a block grid editor', async ({umbracoA
 
   // Act
   await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickLinkWithName(blockGridElementTypeName, true);
+  await umbracoUi.content.clickBlockCardWithName(blockGridElementTypeName, true);
   await umbracoUi.content.clickAddBlockWithNameButton(textStringElementTypeName);
-  await umbracoUi.content.clickLinkWithName(textStringElementTypeName, true);
+  await umbracoUi.content.clickBlockCardWithName(textStringElementTypeName, true);
   await umbracoUi.content.enterTextstring(textStringValue);
   await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + textStringElementTypeName);
   await umbracoUi.content.clickCreateModalButton();
@@ -144,9 +143,9 @@ test('can publish a rich text editor with a block list editor', async ({umbracoA
 
   // Act
   await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickLinkWithName(blockListElementTypeName, true);
+  await umbracoUi.content.clickBlockCardWithName(blockListElementTypeName, true);
   await umbracoUi.content.clickAddBlockWithNameButton(textStringElementTypeName);
-  await umbracoUi.content.clickLinkWithName(textStringElementTypeName, true);
+  await umbracoUi.content.clickBlockCardWithName(textStringElementTypeName, true);
   await umbracoUi.content.enterTextstring(textStringValue);
   await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + textStringElementTypeName);
   await umbracoUi.content.clickCreateModalButton();
