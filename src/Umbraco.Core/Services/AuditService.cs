@@ -12,16 +12,16 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 namespace Umbraco.Cms.Core.Services.Implement;
 
 /// <summary>
-/// Audit service for logging and retrieving audit entries.
+///     Audit service for logging and retrieving audit entries.
 /// </summary>
 public sealed class AuditService : RepositoryService, IAuditService
 {
-    private readonly IUserService _userService;
     private readonly IAuditRepository _auditRepository;
     private readonly IEntityService _entityService;
+    private readonly IUserService _userService;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AuditService"/> class.
+    ///     Initializes a new instance of the <see cref="AuditService" /> class.
     /// </summary>
     [ActivatorUtilitiesConstructor]
     public AuditService(
@@ -39,7 +39,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AuditService"/> class.
+    ///     Initializes a new instance of the <see cref="AuditService" /> class.
     /// </summary>
     [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
     public AuditService(
@@ -91,7 +91,13 @@ public sealed class AuditService : RepositoryService, IAuditService
             ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate)
             : null;
 
-        PagedModel<IAuditItem> result = GetItemsInner(query: null, pageIndex, pageSize, orderDirection, auditTypeFilter, customFilter);
+        PagedModel<IAuditItem> result = GetItemsInner(
+            null,
+            pageIndex,
+            pageSize,
+            orderDirection,
+            auditTypeFilter,
+            customFilter);
         return Task.FromResult(result);
     }
 
@@ -103,7 +109,12 @@ public sealed class AuditService : RepositoryService, IAuditService
             ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate)
             : null;
 
-        PagedModel<IAuditItem> result = GetItemsInner(query: null, 0, int.MaxValue, Direction.Ascending, customFilter: customFilter);
+        PagedModel<IAuditItem> result = GetItemsInner(
+            null,
+            0,
+            int.MaxValue,
+            Direction.Ascending,
+            customFilter: customFilter);
         return result.Items;
     }
 
@@ -127,9 +138,16 @@ public sealed class AuditService : RepositoryService, IAuditService
         }
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageIndex, out var pageSize);
-        IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
+        IQuery<IAuditItem>? customFilter =
+            sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
 
-        PagedModel<IAuditItem> result = GetItemsByEntityInner(keyToIdAttempt.Result, pageIndex, pageSize, orderDirection, auditTypeFilter, customFilter);
+        PagedModel<IAuditItem> result = GetItemsByEntityInner(
+            keyToIdAttempt.Result,
+            pageIndex,
+            pageSize,
+            orderDirection,
+            auditTypeFilter,
+            customFilter);
         return Task.FromResult(result);
     }
 
@@ -151,7 +169,13 @@ public sealed class AuditService : RepositoryService, IAuditService
         }
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageIndex, out var pageSize);
-        PagedModel<IAuditItem> result = GetItemsByEntityInner(entityId, pageIndex, pageSize, orderDirection, auditTypeFilter, customFilter);
+        PagedModel<IAuditItem> result = GetItemsByEntityInner(
+            entityId,
+            pageIndex,
+            pageSize,
+            orderDirection,
+            auditTypeFilter,
+            customFilter);
 
         return Task.FromResult(result);
     }
@@ -176,7 +200,13 @@ public sealed class AuditService : RepositoryService, IAuditService
             return [];
         }
 
-        PagedModel<IAuditItem> result = GetItemsByEntityInner(entityId, pageIndex, pageSize, orderDirection, auditTypeFilter, customFilter);
+        PagedModel<IAuditItem> result = GetItemsByEntityInner(
+            entityId,
+            pageIndex,
+            pageSize,
+            orderDirection,
+            auditTypeFilter,
+            customFilter);
         totalRecords = result.Total;
 
         return result.Items;
@@ -209,9 +239,16 @@ public sealed class AuditService : RepositoryService, IAuditService
         }
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageIndex, out var pageSize);
-        IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
+        IQuery<IAuditItem>? customFilter =
+            sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
 
-        PagedModel<IAuditItem> result = GetItemsByUserInner(user.Id, pageIndex, pageSize, orderDirection, auditTypeFilter, customFilter);
+        PagedModel<IAuditItem> result = GetItemsByUserInner(
+            user.Id,
+            pageIndex,
+            pageSize,
+            orderDirection,
+            auditTypeFilter,
+            customFilter);
         return result;
     }
 
@@ -235,7 +272,13 @@ public sealed class AuditService : RepositoryService, IAuditService
             return [];
         }
 
-        PagedModel<IAuditItem> items = GetItemsByUserInner(userId, pageIndex, pageSize, orderDirection, auditTypeFilter, customFilter);
+        PagedModel<IAuditItem> items = GetItemsByUserInner(
+            userId,
+            pageIndex,
+            pageSize,
+            orderDirection,
+            auditTypeFilter,
+            customFilter);
         totalRecords = items.Total;
 
         return items.Items;
@@ -245,8 +288,16 @@ public sealed class AuditService : RepositoryService, IAuditService
     [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null)
     {
-        IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.AuditType == type && x.CreateDate >= sinceDate) : null;
-        PagedModel<IAuditItem> result = GetItemsByUserInner(userId, 0, int.MaxValue, Direction.Ascending, auditTypeFilter: [type], customFilter: customFilter);
+        IQuery<IAuditItem>? customFilter = sinceDate.HasValue
+            ? Query<IAuditItem>().Where(x => x.AuditType == type && x.CreateDate >= sinceDate)
+            : null;
+        PagedModel<IAuditItem> result = GetItemsByUserInner(
+            userId,
+            0,
+            int.MaxValue,
+            Direction.Ascending,
+            [type],
+            customFilter);
         return result.Items;
     }
 
@@ -263,7 +314,8 @@ public sealed class AuditService : RepositoryService, IAuditService
         string eventDetails)
     {
         // Use the static service provider to resolve the audit entry service, as this is only needed for this obsolete method.
-        var auditEntryService = (AuditEntryService)StaticServiceProvider.Instance.GetRequiredService<IAuditEntryService>();
+        var auditEntryService =
+            (AuditEntryService)StaticServiceProvider.Instance.GetRequiredService<IAuditEntryService>();
 
         return auditEntryService.WriteInner(
             performingUserId,
