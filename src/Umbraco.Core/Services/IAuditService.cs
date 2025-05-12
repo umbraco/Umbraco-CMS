@@ -24,7 +24,7 @@ public interface IAuditService : IService
         int userId,
         int objectId,
         string? entityType,
-        string comment,
+        string? comment = null,
         string? parameters = null) => throw new NotImplementedException();
 
     [Obsolete("Use AddAsync() instead. Scheduled for removal in Umbraco 18.")]

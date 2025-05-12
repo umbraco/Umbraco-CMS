@@ -46,7 +46,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         int userId,
         int objectId,
         string? entityType,
-        string comment,
+        string? comment = null,
         string? parameters = null) =>
         Task.FromResult(AddInner(type, userId, objectId, entityType, comment, parameters));
 
@@ -351,7 +351,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         int userId,
         int objectId,
         string? entityType,
-        string comment,
+        string? comment = null,
         string? parameters = null)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
