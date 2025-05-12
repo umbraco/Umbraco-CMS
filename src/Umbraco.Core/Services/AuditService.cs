@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -14,15 +16,32 @@ namespace Umbraco.Cms.Core.Services.Implement;
 /// </summary>
 public sealed class AuditService : RepositoryService, IAuditService
 {
-    private readonly IAuditEntryRepository _auditEntryRepository;
     private readonly IUserService _userService;
     private readonly IAuditRepository _auditRepository;
     private readonly IEntityService _entityService;
-    private readonly Lazy<bool> _isAvailable;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AuditService"/> class.
     /// </summary>
+    [ActivatorUtilitiesConstructor]
+    public AuditService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IAuditRepository auditRepository,
+        IUserService userService,
+        IEntityService entityService)
+        : base(provider, loggerFactory, eventMessagesFactory)
+    {
+        _auditRepository = auditRepository;
+        _userService = userService;
+        _entityService = entityService;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AuditService"/> class.
+    /// </summary>
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
     public AuditService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -31,13 +50,8 @@ public sealed class AuditService : RepositoryService, IAuditService
         IAuditEntryRepository auditEntryRepository,
         IUserService userService,
         IEntityService entityService)
-        : base(provider, loggerFactory, eventMessagesFactory)
+        : this(provider, loggerFactory, eventMessagesFactory, auditRepository, userService, entityService)
     {
-        _auditRepository = auditRepository;
-        _auditEntryRepository = auditEntryRepository;
-        _userService = userService;
-        _entityService = entityService;
-        _isAvailable = new Lazy<bool>(DetermineIsAvailable);
     }
 
     /// <inheritdoc />
@@ -237,7 +251,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use WriteAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use AuditEntryService.WriteAsync() instead. Scheduled for removal in Umbraco 18.")]
     public IAuditEntry Write(
         int performingUserId,
         string perfomingDetails,
@@ -246,37 +260,21 @@ public sealed class AuditService : RepositoryService, IAuditService
         int affectedUserId,
         string? affectedDetails,
         string eventType,
-        string eventDetails) =>
-            WriteInner(
-                performingUserId,
-                perfomingDetails,
-                performingIp,
-                eventDateUtc,
-                affectedUserId,
-                affectedDetails,
-                eventType,
-                eventDetails).Result;
+        string eventDetails)
+    {
+        // Use the static service provider to resolve the audit entry service, as this is only needed for this obsolete method.
+        var auditEntryService = (AuditEntryService)StaticServiceProvider.Instance.GetRequiredService<IAuditEntryService>();
 
-    /// <inheritdoc />
-    public Task<Attempt<IAuditEntry, AuditLogOperationStatus>> WriteAsync(
-        int performingUserId,
-        string performingDetails,
-        string performingIp,
-        DateTime eventDateUtc,
-        int affectedUserId,
-        string? affectedDetails,
-        string eventType,
-        string eventDetails) =>
-        Task.FromResult(
-            WriteInner(
+        return auditEntryService.WriteInner(
             performingUserId,
-            performingDetails,
+            perfomingDetails,
             performingIp,
             eventDateUtc,
             affectedUserId,
             affectedDetails,
             eventType,
-            eventDetails));
+            eventDetails).Result;
+    }
 
     /// <inheritdoc />
     public Task CleanLogsAsync(int maximumAgeOfLogsInMinutes)
@@ -289,20 +287,6 @@ public sealed class AuditService : RepositoryService, IAuditService
     [Obsolete("Use CleanLogsAsync() instead. Scheduled for removal in Umbraco 18.")]
     public void CleanLogs(int maximumAgeOfLogsInMinutes)
         => CleanLogsInner(maximumAgeOfLogsInMinutes);
-
-    // TODO: Currently used in testing only, not part of the interface, need to add queryable methods to the interface instead
-    internal IEnumerable<IAuditEntry> GetAll()
-    {
-        if (_isAvailable.Value == false)
-        {
-            return [];
-        }
-
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _auditEntryRepository.GetMany();
-        }
-    }
 
     private Attempt<AuditLogOperationStatus> AddInner(
         AuditType type,
@@ -378,98 +362,10 @@ public sealed class AuditService : RepositoryService, IAuditService
         return GetItemsInner(query, pageIndex, pageSize, orderDirection, auditTypeFilter, customFilter);
     }
 
-    private Attempt<IAuditEntry, AuditLogOperationStatus> WriteInner(
-        int performingUserId,
-        string performingDetails,
-        string performingIp,
-        DateTime eventDateUtc,
-        int affectedUserId,
-        string? affectedDetails,
-        string eventType,
-        string eventDetails)
-    {
-        ArgumentOutOfRangeException.ThrowIfLessThan(performingUserId, Constants.Security.SuperUserId);
-
-        if (string.IsNullOrWhiteSpace(performingDetails))
-        {
-            throw new ArgumentException("Value cannot be null or whitespace.", nameof(performingDetails));
-        }
-
-        if (string.IsNullOrWhiteSpace(eventType))
-        {
-            throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventType));
-        }
-
-        if (string.IsNullOrWhiteSpace(eventDetails))
-        {
-            throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventDetails));
-        }
-
-        // we need to truncate the data else we'll get SQL errors
-        affectedDetails =
-            affectedDetails?[..Math.Min(affectedDetails.Length, Constants.Audit.DetailsLength)];
-        eventDetails = eventDetails[..Math.Min(eventDetails.Length, Constants.Audit.DetailsLength)];
-
-        // validate the eventType - must contain a forward slash, no spaces, no special chars
-        var eventTypeParts = eventType.ToCharArray();
-        if (eventTypeParts.Contains('/') == false ||
-            eventTypeParts.All(c => char.IsLetterOrDigit(c) || c == '/' || c == '-') == false)
-        {
-            throw new ArgumentException(
-                nameof(eventType) + " must contain only alphanumeric characters, hyphens and at least one '/' defining a category");
-        }
-
-        if (eventType.Length > Constants.Audit.EventTypeLength)
-        {
-            throw new ArgumentException($"Must be max {Constants.Audit.EventTypeLength} chars.", nameof(eventType));
-        }
-
-        if (performingIp is { Length: > Constants.Audit.IpLength })
-        {
-            throw new ArgumentException($"Must be max {Constants.Audit.EventTypeLength} chars.", nameof(performingIp));
-        }
-
-        var entry = new AuditEntry
-        {
-            PerformingUserId = performingUserId,
-            PerformingDetails = performingDetails,
-            PerformingIp = performingIp,
-            EventDateUtc = eventDateUtc,
-            AffectedUserId = affectedUserId,
-            AffectedDetails = affectedDetails,
-            EventType = eventType,
-            EventDetails = eventDetails,
-        };
-
-        if (_isAvailable.Value == false)
-        {
-            return Attempt.SucceedWithStatus(AuditLogOperationStatus.Success, (IAuditEntry)entry);
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _auditEntryRepository.Save(entry);
-            scope.Complete();
-        }
-
-        return Attempt.SucceedWithStatus(AuditLogOperationStatus.Success, (IAuditEntry)entry);
-    }
-
     private void CleanLogsInner(int maximumAgeOfLogsInMinutes)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         _auditRepository.CleanLogs(maximumAgeOfLogsInMinutes);
         scope.Complete();
-    }
-
-    /// <summary>
-    ///     Determines whether the repository is available.
-    /// </summary>
-    private bool DetermineIsAvailable()
-    {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _auditEntryRepository.IsAvailable();
-        }
     }
 }

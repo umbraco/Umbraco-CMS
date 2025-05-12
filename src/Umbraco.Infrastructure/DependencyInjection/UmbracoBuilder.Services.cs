@@ -44,6 +44,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IUserIdKeyResolver, UserIdKeyResolver>();
 
         builder.Services.AddUnique<IAuditService, AuditService>();
+        builder.Services.AddUnique<IAuditEntryService, AuditEntryService>();
         builder.Services.AddUnique<ICacheInstructionService, CacheInstructionService>();
         builder.Services.AddUnique<IBasicAuthService, BasicAuthService>();
         builder.Services.AddUnique<IDataTypeService, DataTypeService>();

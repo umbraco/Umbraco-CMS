@@ -198,35 +198,6 @@ public interface IAuditService : IService
     ///     Writes an audit entry for an audited event.
     /// </summary>
     /// <param name="performingUserId">The identifier of the user triggering the audited event.</param>
-    /// <param name="performingDetails">Free-form details about the user triggering the audited event.</param>
-    /// <param name="performingIp">The IP address or the request triggering the audited event.</param>
-    /// <param name="eventDateUtc">The date and time of the audited event.</param>
-    /// <param name="affectedUserId">The identifier of the user affected by the audited event.</param>
-    /// <param name="affectedDetails">Free-form details about the entity affected by the audited event.</param>
-    /// <param name="eventType">
-    ///     The type of the audited event - must contain only alphanumeric chars and hyphens with forward slashes separating
-    ///     categories.
-    ///     <example>
-    ///         The eventType will generally be formatted like: {application}/{entity-type}/{category}/{sub-category}
-    ///         Example: umbraco/user/sign-in/failed
-    ///     </example>
-    /// </param>
-    /// <param name="eventDetails">Free-form details about the audited event.</param>
-    /// <returns>The created audit entry.</returns>
-    public Task<Attempt<IAuditEntry, AuditLogOperationStatus>> WriteAsync(
-        int performingUserId,
-        string performingDetails,
-        string performingIp,
-        DateTime eventDateUtc,
-        int affectedUserId,
-        string affectedDetails,
-        string eventType,
-        string eventDetails) => throw new NotImplementedException();
-
-    /// <summary>
-    ///     Writes an audit entry for an audited event.
-    /// </summary>
-    /// <param name="performingUserId">The identifier of the user triggering the audited event.</param>
     /// <param name="perfomingDetails">Free-form details about the user triggering the audited event.</param>
     /// <param name="performingIp">The IP address or the request triggering the audited event.</param>
     /// <param name="eventDateUtc">The date and time of the audited event.</param>
@@ -242,7 +213,7 @@ public interface IAuditService : IService
     /// </param>
     /// <param name="eventDetails">Free-form details about the audited event.</param>
     /// <returns>The created audit entry.</returns>
-    [Obsolete("Use WriteAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use IAuditEntryService.WriteAsync() instead. Scheduled for removal in Umbraco 18.")]
     IAuditEntry Write(
         int performingUserId,
         string perfomingDetails,
