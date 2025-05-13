@@ -2,6 +2,7 @@ import { UmbDocumentUrlRepository } from '../repository/index.js';
 import type { UmbDocumentVariantOptionModel } from '../../types.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import type { UmbDocumentUrlModel } from '../repository/types.js';
+import { UmbDocumentUrlsDataResolver } from '../document-urls-data-resolver.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -44,6 +45,8 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+
+	#documentUrlsDataResolver? = new UmbDocumentUrlsDataResolver(this);
 
 	constructor() {
 		super();
@@ -94,6 +97,11 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 				this.#setLinks();
 			});
 		});
+
+		this.observe(this.#documentUrlsDataResolver?.urls, (urls) => {
+			this.#urls = urls ?? [];
+			this.#setLinks();
+		});
 	}
 
 	#setLinks() {
@@ -124,14 +132,12 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 		if (!this._unique) return;
 
 		this._loading = true;
-		this.#urls = [];
+		this.#documentUrlsDataResolver?.setData([]);
 
 		const { data } = await this.#documentUrlRepository.requestItems([this._unique]);
 
 		if (data?.length) {
-			const item = data[0];
-			this.#urls = item.urls;
-			this.#setLinks();
+			this.#documentUrlsDataResolver?.setData(data[0].urls);
 		}
 
 		this._loading = false;
