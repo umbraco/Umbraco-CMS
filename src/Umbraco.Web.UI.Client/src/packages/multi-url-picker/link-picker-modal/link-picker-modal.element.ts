@@ -8,7 +8,13 @@ import { css, customElement, html, nothing, query, state, when } from '@umbraco-
 import { isUmbracoFolder, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { umbBindToValidation, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { umbConfirmModal, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbDocumentDetailRepository, UmbDocumentUrlRepository } from '@umbraco-cms/backoffice/document';
+import {
+	UmbDocumentDetailRepository,
+	UmbDocumentItemDataResolver,
+	UmbDocumentItemRepository,
+	UmbDocumentUrlRepository,
+	UmbDocumentUrlsDataResolver,
+} from '@umbraco-cms/backoffice/document';
 import { UmbMediaDetailRepository, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
@@ -156,11 +162,14 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		if (unique) {
 			switch (type) {
 				case 'document': {
-					const documentRepository = new UmbDocumentDetailRepository(this);
-					const { data: documentData } = await documentRepository.requestByUnique(unique);
-					if (documentData) {
-						icon = documentData.documentType.icon;
-						name = documentData.variants[0].name;
+					const documentRepository = new UmbDocumentItemRepository(this);
+					const { data: documentItems } = await documentRepository.requestItems([unique]);
+					const documentItem = documentItems?.[0];
+					if (documentItem) {
+						const itemDataResolver = new UmbDocumentItemDataResolver(this);
+						itemDataResolver.setData(documentItem);
+						icon = await itemDataResolver.getIcon();
+						name = await itemDataResolver.getName();
 						url = await this.#getUrlForDocument(unique);
 					}
 					break;
@@ -196,7 +205,11 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	async #getUrlForDocument(unique: string) {
 		const documentUrlRepository = new UmbDocumentUrlRepository(this);
 		const { data: documentUrlData } = await documentUrlRepository.requestItems([unique]);
-		return documentUrlData && documentUrlData[0].urls.length > 0 ? (documentUrlData?.[0].urls[0].url ?? '') : '';
+		const urlsItem = documentUrlData?.[0];
+		const dataResolver = new UmbDocumentUrlsDataResolver(this);
+		dataResolver.setData(urlsItem?.urls);
+		const resolvedUrls = await dataResolver.getUrls();
+		return resolvedUrls?.[0]?.url ?? '';
 	}
 
 	async #getUrlForMedia(unique: string) {
