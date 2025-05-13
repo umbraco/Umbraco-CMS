@@ -24,6 +24,7 @@ import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 type UmbPropertyTypeUnique = UmbPropertyTypeModel['unique'];
 
@@ -114,12 +115,8 @@ export class UmbContentTypeStructureManager<
 	readonly variesByCulture = createObservablePart(this.ownerContentType, (x) => x?.variesByCulture);
 	readonly variesBySegment = createObservablePart(this.ownerContentType, (x) => x?.variesBySegment);
 
-	#containers: UmbArrayState<UmbPropertyTypeContainerModel> = new UmbArrayState<UmbPropertyTypeContainerModel>(
-		[],
-		(x) => x.id,
-	);
 	containerById(id: string) {
-		return this.#containers.asObservablePart((x) => x.find((y) => y.id === id));
+		return createObservablePart(this.#contentTypeContainers, (x) => x.find((y) => y.id === id));
 	}
 
 	constructor(host: UmbControllerHost, typeRepository: UmbDetailRepository<T> | string) {
@@ -158,13 +155,6 @@ export class UmbContentTypeStructureManager<
 			this.contentTypeCompositions,
 			(contentTypeCompositions) => {
 				this.#loadContentTypeCompositions(contentTypeCompositions);
-			},
-			null,
-		);
-		this.observe(
-			this.#contentTypeContainers,
-			(contentTypeContainers) => {
-				this.#containers.setValue(contentTypeContainers);
 			},
 			null,
 		);
@@ -359,7 +349,7 @@ export class UmbContentTypeStructureManager<
 		this.#editedTypes.appendOne(toContentTypeUnique);
 
 		// Find container.
-		const container = this.#containers.getValue().find((x) => x.id === containerId);
+		const container = (await firstValueFrom(this.#contentTypeContainers)).find((x) => x.id === containerId);
 		if (!container) throw new Error('Container to clone was not found');
 
 		const clonedContainer: UmbPropertyTypeContainerModel = {
@@ -706,17 +696,19 @@ export class UmbContentTypeStructureManager<
 	}
 
 	rootContainers(containerType: UmbPropertyContainerTypes) {
-		return this.#containers.asObservablePart((data) => {
+		return createObservablePart(this.#contentTypeContainers, (data) => {
 			return data.filter((x) => x.parent === null && x.type === containerType);
 		});
 	}
 
-	getRootContainers(containerType: UmbPropertyContainerTypes) {
-		return this.#containers.getValue().filter((x) => x.parent === null && x.type === containerType);
+	async getRootContainers(containerType: UmbPropertyContainerTypes) {
+		return (await firstValueFrom(this.#contentTypeContainers)).filter(
+			(x) => x.parent === null && x.type === containerType,
+		);
 	}
 
 	async hasRootContainers(containerType: UmbPropertyContainerTypes) {
-		return this.#containers.asObservablePart((data) => {
+		return createObservablePart(this.#contentTypeContainers, (data) => {
 			return data.filter((x) => x.parent === null && x.type === containerType).length > 0;
 		});
 	}
@@ -748,14 +740,14 @@ export class UmbContentTypeStructureManager<
 	}
 
 	containersOfParentId(parentId: string, containerType: UmbPropertyContainerTypes) {
-		return this.#containers.asObservablePart((data) => {
+		return createObservablePart(this.#contentTypeContainers, (data) => {
 			return data.filter((x) => x.parent?.id === parentId && x.type === containerType);
 		});
 	}
 
 	// In future this might need to take parentName(parentId lookup) into account as well? otherwise containers that share same name and type will always be merged, but their position might be different and they should not be merged. [NL]
 	containersByNameAndType(name: string, containerType: UmbPropertyContainerTypes) {
-		return this.#containers.asObservablePart((data) => {
+		return createObservablePart(this.#contentTypeContainers, (data) => {
 			return data.filter((x) => x.name === name && x.type === containerType);
 		});
 	}
@@ -766,7 +758,7 @@ export class UmbContentTypeStructureManager<
 		parentName: string | null,
 		parentType?: UmbPropertyContainerTypes,
 	) {
-		return this.#containers.asObservablePart((data) => {
+		return createObservablePart(this.#contentTypeContainers, (data) => {
 			return data.filter(
 				(x) =>
 					// Match name and type:
@@ -816,14 +808,12 @@ export class UmbContentTypeStructureManager<
 	#clear() {
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];
-		this.#containers.setValue([]);
 		this.#repoManager?.clear();
 		this.#contentTypes.setValue([]);
 	}
 
 	public override destroy() {
 		this.#contentTypes.destroy();
-		this.#containers.destroy();
 		super.destroy();
 	}
 }
