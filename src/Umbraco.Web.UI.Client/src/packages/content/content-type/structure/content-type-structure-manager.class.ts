@@ -140,11 +140,20 @@ export class UmbContentTypeStructureManager<
 				this.#repoManager.entries,
 				(entries) => {
 					// Prevent updating once that are have edited here.
-					entries = entries.filter(
+					const entriesToBeUpdated = entries.filter(
 						(x) => !(this.#editedTypes.getHasOne(x.unique) && this.#contentTypes.getHasOne(x.unique)),
 					);
 
-					this.#contentTypes.append(entries);
+					// Remove entries based on no-longer existing uniques:
+					const entriesToBeRemoved = this.#contentTypes
+						.getValue()
+						.filter((entry) => !entries.some((x) => x.unique === entry.unique))
+						.map((x) => x.unique);
+
+					this.#contentTypes.mute();
+					this.#contentTypes.remove(entriesToBeRemoved);
+					this.#contentTypes.append(entriesToBeUpdated);
+					this.#contentTypes.unmute();
 				},
 				null,
 			);
@@ -256,6 +265,8 @@ export class UmbContentTypeStructureManager<
 	}
 
 	async #loadContentTypeCompositions(contentTypeCompositions: T['compositions'] | undefined) {
+		// Important to wait a JS-cycle, cause this is called by an observation of a state and this results in setting the value for the state(potentially in the same JS-cycle) then we need to make sure we don't trigger a new update before the old subscription chain is completed. [NL]
+		await Promise.resolve();
 		const ownerUnique = this.getOwnerContentTypeUnique();
 		if (!ownerUnique) return;
 		const compositionUniques = contentTypeCompositions?.map((x) => x.contentType.unique) ?? [];

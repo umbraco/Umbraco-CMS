@@ -81,9 +81,9 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 					.getValue()
 					.filter((entry) => !uniques.includes(entry.unique))
 					.map((x) => x.unique);
-				console.log('removedEntries', removedEntries);
-				this.#entries.remove(removedEntries);
+
 				this.#statuses.remove(removedEntries);
+				this.#entries.remove(removedEntries);
 				removedEntries.forEach((entry) => {
 					this.removeUmbControllerByAlias('observeEntry_' + entry);
 				});
