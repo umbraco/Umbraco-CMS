@@ -967,6 +967,73 @@ public class UserServiceTests : UmbracoIntegrationTest
         }
     }
 
+    [Test]
+    public void Can_Get_Next_Users_In_Batches()
+    {
+        var users = UserBuilder.CreateMulipleUsers(10).ToArray();
+        UserService.Save(users);
+
+        var userBatch1 = UserService.GetNextUsers(Constants.Security.SuperUserId, 3);
+        var userBatch2 = UserService.GetNextUsers(1, 6);
+        var userBatch3 = UserService.GetNextUsers(4, 5);
+        var userBatch4 = UserService.GetNextUsers(9, 5);
+        var allUsers = UserService.GetNextUsers(Constants.Security.SuperUserId, int.MaxValue);
+
+        Assert.AreEqual(3, userBatch1.Count());
+        Assert.AreEqual(Constants.Security.SuperUserId, userBatch1.First().Id);
+        Assert.AreEqual(2, userBatch1.Last().Id);
+
+        Assert.AreEqual(6, userBatch2.Count());
+        Assert.AreEqual(1, userBatch2.First().Id);
+        Assert.AreEqual(6, userBatch2.Last().Id);
+
+        Assert.AreEqual(5, userBatch3.Count());
+        Assert.AreEqual(4, userBatch3.First().Id);
+        Assert.AreEqual(8, userBatch3.Last().Id);
+
+        Assert.AreEqual(2, userBatch4.Count());
+        Assert.AreEqual(9, userBatch4.First().Id);
+        Assert.AreEqual(10, userBatch4.Last().Id);
+
+        Assert.AreEqual(11, allUsers.Count());
+    }
+
+    [Test]
+    public void Can_Get_Next_Approved_Users_In_Batches()
+    {
+        var users = UserBuilder.CreateMulipleUsers(10).ToArray();
+        for (int i = 0; i < users.Length; i++)
+        {
+            users[i].IsApproved = !(i == 0 || i == 6);  // Setup all users as approved except for a couple.
+        }
+
+        UserService.Save(users);
+
+        var userBatch1 = UserService.GetNextApprovedUsers(Constants.Security.SuperUserId, 3);
+        var userBatch2 = UserService.GetNextApprovedUsers(1, 6);
+        var userBatch3 = UserService.GetNextApprovedUsers(4, 5);
+        var userBatch4 = UserService.GetNextApprovedUsers(9, 5);
+        var allApprovedUsers = UserService.GetNextApprovedUsers(Constants.Security.SuperUserId, int.MaxValue);
+
+        Assert.AreEqual(3, userBatch1.Count());
+        Assert.AreEqual(Constants.Security.SuperUserId, userBatch1.First().Id);
+        Assert.AreEqual(3, userBatch1.Last().Id);
+
+        Assert.AreEqual(6, userBatch2.Count());
+        Assert.AreEqual(2, userBatch2.First().Id);
+        Assert.AreEqual(8, userBatch2.Last().Id);
+
+        Assert.AreEqual(5, userBatch3.Count());
+        Assert.AreEqual(4, userBatch3.First().Id);
+        Assert.AreEqual(9, userBatch3.Last().Id);
+
+        Assert.AreEqual(2, userBatch4.Count());
+        Assert.AreEqual(9, userBatch4.First().Id);
+        Assert.AreEqual(10, userBatch4.Last().Id);
+
+        Assert.AreEqual(9, allApprovedUsers.Count());
+    }
+
     private Content[] BuildContentItems(int numberToCreate)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
