@@ -7,7 +7,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Events;
 
-public class RelateOnCopyNotificationHandler : INotificationHandler<ContentCopiedNotification>
+public class RelateOnCopyNotificationHandler :
+    INotificationHandler<ContentCopiedNotification>,
+    INotificationAsyncHandler<ContentCopiedNotification>
 {
     private readonly IAuditService _auditService;
     private readonly IRelationService _relationService;
@@ -18,14 +20,16 @@ public class RelateOnCopyNotificationHandler : INotificationHandler<ContentCopie
         _auditService = auditService;
     }
 
-    public void Handle(ContentCopiedNotification notification)
+    /// <inheritdoc />
+    public async Task HandleAsync(ContentCopiedNotification notification, CancellationToken cancellationToken)
     {
         if (notification.RelateToOriginal == false)
         {
             return;
         }
 
-        IRelationType? relationType = _relationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias);
+        IRelationType? relationType =
+            _relationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias);
 
         if (relationType == null)
         {
@@ -43,11 +47,15 @@ public class RelateOnCopyNotificationHandler : INotificationHandler<ContentCopie
         var relation = new Relation(notification.Original.Id, notification.Copy.Id, relationType);
         _relationService.Save(relation);
 
-        _auditService.Add(
+        await _auditService.AddAsync(
             AuditType.Copy,
             notification.Copy.WriterId,
             notification.Copy.Id,
             UmbracoObjectTypes.Document.GetName() ?? string.Empty,
             $"Copied content with Id: '{notification.Copy.Id}' related to original content with Id: '{notification.Original.Id}'");
     }
+
+    [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in V19.")]
+    public void Handle(ContentCopiedNotification notification) =>
+        HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 }

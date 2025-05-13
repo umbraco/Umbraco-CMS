@@ -82,7 +82,7 @@ public class PackagingService : IPackagingService
 
         InstallationSummary summary = _packageInstallation.InstallPackageData(compiledPackage, userId, out _);
 
-        _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package data installed for package '{compiledPackage.Name}'.");
+        _auditService.AddAsync(AuditType.PackagerInstall, userId, -1, "Package", $"Package data installed for package '{compiledPackage.Name}'.").GetAwaiter().GetResult();
 
         // trigger the ImportedPackage event
         _eventAggregator.Publish(new ImportedPackageNotification(summary).WithStateFrom(importingPackageNotification));
@@ -116,7 +116,7 @@ public class PackagingService : IPackagingService
         }
 
         int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
-        _auditService.Add(AuditType.Delete, currentUserId, -1, "Package", $"Created package '{package.Name}' deleted. Package key: {key}");
+        await _auditService.AddAsync(AuditType.Delete, currentUserId, -1, "Package", $"Created package '{package.Name}' deleted. Package key: {key}");
         _createdPackages.Delete(package.Id);
 
         scope.Complete();
@@ -164,7 +164,7 @@ public class PackagingService : IPackagingService
         }
 
         int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
-        _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' created. Package key: {package.PackageId}");
+        await _auditService.AddAsync(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' created. Package key: {package.PackageId}");
 
         scope.Complete();
 
@@ -181,7 +181,7 @@ public class PackagingService : IPackagingService
         }
 
         int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
-        _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' updated. Package key: {package.PackageId}");
+        await _auditService.AddAsync(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' updated. Package key: {package.PackageId}");
 
         scope.Complete();
 

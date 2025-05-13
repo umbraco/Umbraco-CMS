@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
@@ -16,22 +17,26 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 internal sealed class AuditServiceTests : UmbracoIntegrationTest
 {
     [Test]
-    public void GetUserLogs()
+    public async Task GetUserLogs()
     {
         var sut = (AuditService)Services.GetRequiredService<IAuditService>();
 
         var eventDateUtc = DateTime.UtcNow.AddDays(-1);
 
-        var numberOfEntries = 10;
+        const int numberOfEntries = 10;
         for (var i = 0; i < numberOfEntries; i++)
         {
             eventDateUtc = eventDateUtc.AddMinutes(1);
-            sut.Add(AuditType.Unpublish, -1, 33, string.Empty, "blah");
+            await sut.AddAsync(AuditType.Unpublish, -1, 33, string.Empty, "blah");
         }
 
-        sut.Add(AuditType.Publish, -1, 33, string.Empty, "blah");
+        await sut.AddAsync(AuditType.Publish, -1, 33, string.Empty, "blah");
 
-        var logs = sut.GetUserLogs(-1, AuditType.Unpublish).ToArray();
+        var logs = (await sut.GetPagedItemsByUserAsync(
+            Constants.Security.SuperUserKey,
+            0,
+            int.MaxValue,
+            auditTypeFilter: [AuditType.Unpublish])).Items.ToArray();
 
         Assert.Multiple(() =>
         {
