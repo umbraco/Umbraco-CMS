@@ -3,6 +3,7 @@ import type { UmbDocumentVariantOptionModel } from '../../types.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import type { UmbDocumentUrlModel } from '../repository/types.js';
 import { UmbDocumentUrlsDataResolver } from '../document-urls-data-resolver.js';
+import { UmbDocumentItemDataResolver } from '../../item/document-item-data-resolver.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -11,11 +12,10 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
-import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 
 interface UmbDocumentInfoViewLink {
-	culture: string;
-	url: string | undefined;
+	culture: string | null;
+	url: string | null | undefined;
 	state: DocumentVariantStateModel | null | undefined;
 }
 
@@ -37,9 +37,6 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 
 	@state()
 	private _links: Array<UmbDocumentInfoViewLink> = [];
-
-	@state()
-	private _defaultCulture?: string;
 
 	#urls: Array<UmbDocumentUrlModel> = [];
 
@@ -91,13 +88,6 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 			});
 		});
 
-		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
-			this.observe(instance?.appDefaultLanguage, (value) => {
-				this._defaultCulture = value?.unique;
-				this.#setLinks();
-			});
-		});
-
 		this.observe(this.#documentUrlsDataResolver?.urls, (urls) => {
 			this.#urls = urls ?? [];
 			this.#setLinks();
@@ -105,11 +95,14 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	#setLinks() {
-		const links: Array<UmbDocumentInfoViewLink> = this.#urls.map((u) => {
-			const culture = u.culture ?? this._defaultCulture ?? '';
-			const url = u.url;
+		const links: Array<UmbDocumentInfoViewLink> = this.#urls.map((url) => {
+			const culture = url.culture;
 			const state = this._variantOptions?.find((variantOption) => variantOption.culture === culture)?.variant?.state;
-			return { culture, url, state };
+			return {
+				culture,
+				url: url.url,
+				state,
+			};
 		});
 
 		this._links = links;
@@ -202,12 +195,12 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 			${repeat(
 				this._links,
 				(link) => link.url,
-				(link) => this.#renderLink(link),
+				(link) => this.#renderLink(link, this._links),
 			)}
 		`;
 	}
 
-	#renderLink(link: UmbDocumentInfoViewLink) {
+	#renderLink(link: UmbDocumentInfoViewLink, links: Array<UmbDocumentInfoViewLink>) {
 		if (!link.url) {
 			return this.#renderEmptyLink(link.culture, link.state);
 		}
@@ -215,7 +208,7 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 		return html`
 			<a class="link-item" href=${this.#getTargetUrl(link.url)} target="_blank">
 				<span>
-					${this.#renderLinkCulture(link.culture)}
+					${this.#renderLinkCulture(link.culture, links)}
 					<span>${link.url}</span>
 				</span>
 				<uui-icon name="icon-out"></uui-icon>
@@ -238,9 +231,11 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 		</div>`;
 	}
 
-	#renderLinkCulture(culture: string | null) {
+	#renderLinkCulture(culture: string | null, links?: Array<UmbDocumentInfoViewLink>) {
 		if (!culture) return nothing;
 		if (this._links.length === 1) return nothing;
+		const allLinksHaveSameCulture = links?.every((link) => link.culture === culture);
+		if (allLinksHaveSameCulture) return nothing;
 		return html`<span class="culture">${culture}</span>`;
 	}
 
