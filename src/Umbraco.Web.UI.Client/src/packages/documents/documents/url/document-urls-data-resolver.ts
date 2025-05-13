@@ -1,10 +1,9 @@
 import type { UmbDocumentUrlModel } from './repository/types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A controller for resolving data for document urls
