@@ -1,6 +1,8 @@
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -15,16 +17,25 @@ namespace Umbraco.Cms.Core.Handlers;
 
 public sealed class AuditNotificationsHandler :
     INotificationHandler<MemberSavedNotification>,
+    INotificationAsyncHandler<MemberSavedNotification>,
     INotificationHandler<MemberDeletedNotification>,
+    INotificationAsyncHandler<MemberDeletedNotification>,
     INotificationHandler<AssignedMemberRolesNotification>,
+    INotificationAsyncHandler<AssignedMemberRolesNotification>,
     INotificationHandler<RemovedMemberRolesNotification>,
+    INotificationAsyncHandler<RemovedMemberRolesNotification>,
     INotificationHandler<ExportedMemberNotification>,
+    INotificationAsyncHandler<ExportedMemberNotification>,
     INotificationHandler<UserSavedNotification>,
+    INotificationAsyncHandler<UserSavedNotification>,
     INotificationHandler<UserDeletedNotification>,
+    INotificationAsyncHandler<UserDeletedNotification>,
     INotificationHandler<UserGroupWithUsersSavedNotification>,
-    INotificationHandler<AssignedUserGroupPermissionsNotification>
+    INotificationAsyncHandler<UserGroupWithUsersSavedNotification>,
+    INotificationHandler<AssignedUserGroupPermissionsNotification>,
+    INotificationAsyncHandler<AssignedUserGroupPermissionsNotification>
 {
-    private readonly IAuditService _auditService;
+    private readonly IAuditEntryService _auditEntryService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IEntityService _entityService;
     private readonly GlobalSettings _globalSettings;
@@ -33,6 +44,27 @@ public sealed class AuditNotificationsHandler :
     private readonly IUserGroupService _userGroupService;
     private readonly IUserService _userService;
 
+    public AuditNotificationsHandler(
+        IAuditEntryService auditEntryService,
+        IUserService userService,
+        IEntityService entityService,
+        IIpResolver ipResolver,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IMemberService memberService,
+        IUserGroupService userGroupService)
+    {
+        _auditEntryService = auditEntryService;
+        _userService = userService;
+        _entityService = entityService;
+        _ipResolver = ipResolver;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _memberService = memberService;
+        _userGroupService = userGroupService;
+        _globalSettings = globalSettings.CurrentValue;
+    }
+
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public AuditNotificationsHandler(
         IAuditService auditService,
         IUserService userService,
@@ -43,7 +75,7 @@ public sealed class AuditNotificationsHandler :
         IMemberService memberService,
         IUserGroupService userGroupService)
     {
-        _auditService = auditService;
+        _auditEntryService = StaticServiceProvider.Instance.GetRequiredService<IAuditEntryService>();
         _userService = userService;
         _entityService = entityService;
         _ipResolver = ipResolver;
@@ -72,7 +104,8 @@ public sealed class AuditNotificationsHandler :
         Email = string.Empty,
     };
 
-    public void Handle(AssignedMemberRolesNotification notification)
+    /// <inheritdoc />
+    public async Task HandleAsync(AssignedMemberRolesNotification notification, CancellationToken cancellationToken)
     {
         IUser performingUser = CurrentPerformingUser;
         var roles = string.Join(", ", notification.Roles);
@@ -80,7 +113,7 @@ public sealed class AuditNotificationsHandler :
         foreach (var id in notification.MemberIds)
         {
             members.TryGetValue(id, out IMember? member);
-            _auditService.Write(
+            await _auditEntryService.WriteAsync(
                 performingUser.Id,
                 $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
@@ -92,7 +125,12 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
-    public void Handle(AssignedUserGroupPermissionsNotification notification)
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    public void Handle(AssignedMemberRolesNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task HandleAsync(AssignedUserGroupPermissionsNotification notification, CancellationToken cancellationToken)
     {
         IUser performingUser = CurrentPerformingUser;
         IEnumerable<EntityPermission> perms = notification.EntityPermissions;
@@ -102,7 +140,7 @@ public sealed class AuditNotificationsHandler :
             var assigned = string.Join(", ", perm.AssignedPermissions);
             IEntitySlim? entity = _entityService.Get(perm.EntityId);
 
-            _auditService.Write(
+            await _auditEntryService.WriteAsync(
                 performingUser.Id,
                 $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
@@ -114,12 +152,17 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
-    public void Handle(ExportedMemberNotification notification)
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    public void Handle(AssignedUserGroupPermissionsNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task HandleAsync(ExportedMemberNotification notification, CancellationToken cancellationToken)
     {
         IUser performingUser = CurrentPerformingUser;
         IMember member = notification.Member;
 
-        _auditService.Write(
+        await _auditEntryService.WriteAsync(
             performingUser.Id,
             $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
             PerformingIp,
@@ -130,13 +173,17 @@ public sealed class AuditNotificationsHandler :
             "exported member data");
     }
 
-    public void Handle(MemberDeletedNotification notification)
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    public void Handle(ExportedMemberNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    public async Task HandleAsync(MemberDeletedNotification notification, CancellationToken cancellationToken)
     {
         IUser performingUser = CurrentPerformingUser;
         IEnumerable<IMember> members = notification.DeletedEntities;
         foreach (IMember member in members)
         {
-            _auditService.Write(
+            await _auditEntryService.WriteAsync(
                 performingUser.Id,
                 $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
@@ -148,7 +195,12 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
-    public void Handle(MemberSavedNotification notification)
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    public void Handle(MemberDeletedNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task HandleAsync(MemberSavedNotification notification, CancellationToken cancellationToken)
     {
         IUser performingUser = CurrentPerformingUser;
         IEnumerable<IMember> members = notification.SavedEntities;
@@ -156,7 +208,7 @@ public sealed class AuditNotificationsHandler :
         {
             var dp = string.Join(", ", ((Member)member).GetWereDirtyProperties());
 
-            _auditService.Write(
+            await _auditEntryService.WriteAsync(
                 performingUser.Id,
                 $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
@@ -168,7 +220,12 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
-    public void Handle(RemovedMemberRolesNotification notification)
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    public void Handle(MemberSavedNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task HandleAsync(RemovedMemberRolesNotification notification, CancellationToken cancellationToken)
     {
         IUser performingUser = CurrentPerformingUser;
         var roles = string.Join(", ", notification.Roles);
@@ -176,7 +233,7 @@ public sealed class AuditNotificationsHandler :
         foreach (var id in notification.MemberIds)
         {
             members.TryGetValue(id, out IMember? member);
-            _auditService.Write(
+            await _auditEntryService.WriteAsync(
                 performingUser.Id,
                 $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
@@ -188,13 +245,18 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
-    public void Handle(UserDeletedNotification notification)
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    public void Handle(RemovedMemberRolesNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task HandleAsync(UserDeletedNotification notification, CancellationToken cancellationToken)
     {
         IUser performingUser = CurrentPerformingUser;
         IEnumerable<IUser> affectedUsers = notification.DeletedEntities;
         foreach (IUser affectedUser in affectedUsers)
         {
-            _auditService.Write(
+            await _auditEntryService.WriteAsync(
                 performingUser.Id,
                 $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
@@ -206,7 +268,11 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
-    public void Handle(UserGroupWithUsersSavedNotification notification)
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    public void Handle(UserDeletedNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    public async Task HandleAsync(UserGroupWithUsersSavedNotification notification, CancellationToken cancellationToken)
     {
         IUser performingUser = CurrentPerformingUser;
         foreach (UserGroupWithUsers groupWithUser in notification.SavedEntities)
@@ -238,7 +304,7 @@ public sealed class AuditNotificationsHandler :
                 sb.Append($"default perms: {perms}");
             }
 
-            _auditService.Write(
+            await _auditEntryService.WriteAsync(
                 performingUser.Id,
                 $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
@@ -251,7 +317,7 @@ public sealed class AuditNotificationsHandler :
             // now audit the users that have changed
             foreach (IUser user in groupWithUser.RemovedUsers)
             {
-                _auditService.Write(
+                await _auditEntryService.WriteAsync(
                     performingUser.Id,
                     $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                     PerformingIp,
@@ -264,7 +330,7 @@ public sealed class AuditNotificationsHandler :
 
             foreach (IUser user in groupWithUser.AddedUsers)
             {
-                _auditService.Write(
+                await _auditEntryService.WriteAsync(
                     performingUser.Id,
                     $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                     PerformingIp,
@@ -277,7 +343,12 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
-    public void Handle(UserSavedNotification notification)
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    public void Handle(UserGroupWithUsersSavedNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task HandleAsync(UserSavedNotification notification, CancellationToken cancellationToken)
     {
         IUser performingUser = CurrentPerformingUser;
         IEnumerable<IUser> affectedUsers = notification.SavedEntities;
@@ -289,7 +360,7 @@ public sealed class AuditNotificationsHandler :
 
             var dp = string.Join(", ", ((User)affectedUser).GetWereDirtyProperties());
 
-            _auditService.Write(
+            await _auditEntryService.WriteAsync(
                 performingUser.Id,
                 $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
@@ -300,6 +371,9 @@ public sealed class AuditNotificationsHandler :
                 $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}{(groups == null ? string.Empty : "; groups assigned: " + groups)}");
         }
     }
+
+    public void Handle(UserSavedNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
     private string FormatEmail(IMember? member) =>
         member == null ? string.Empty : member.Email.IsNullOrWhiteSpace() ? string.Empty : $"<{member.Email}>";
