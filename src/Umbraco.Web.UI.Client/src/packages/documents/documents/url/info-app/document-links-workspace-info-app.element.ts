@@ -3,8 +3,16 @@ import type { UmbDocumentVariantOptionModel } from '../../types.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import type { UmbDocumentUrlModel } from '../repository/types.js';
 import { UmbDocumentUrlsDataResolver } from '../document-urls-data-resolver.js';
-import { UmbDocumentItemDataResolver } from '../../item/document-item-data-resolver.js';
-import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	repeat,
+	state,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -206,7 +214,7 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 		}
 
 		return html`
-			<a class="link-item" href=${this.#getTargetUrl(link.url)} target="_blank">
+			<a class="link-item" href=${ifDefined(this.#getTargetUrl(link.url))} target="_blank">
 				<span>
 					${this.#renderLinkCulture(link.culture, links)}
 					<span>${link.url}</span>
