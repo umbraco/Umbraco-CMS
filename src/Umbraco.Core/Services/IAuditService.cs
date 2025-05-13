@@ -144,7 +144,7 @@ public interface IAuditService : IService
     ///     </example>
     /// </param>
     /// <param name="eventDetails">Free-form details about the audited event.</param>
-    [Obsolete("Will be moved to a new service and removed from this one in a future version.")]
+    [Obsolete("Will be moved to a new service. Scheduled for removal in V18.")]
     IAuditEntry Write(
         int performingUserId,
         string perfomingDetails,
