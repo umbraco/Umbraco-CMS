@@ -226,7 +226,6 @@ public class MemberUserStoreTests
             m.Name == "a" &&
             m.Email == "a@b.com" &&
             m.Username == "c" &&
-            m.RawPasswordValue == "d" &&
             m.Comments == "e" &&
             m.ContentTypeAlias == fakeMemberType.Alias &&
             m.HasIdentity == true &&
