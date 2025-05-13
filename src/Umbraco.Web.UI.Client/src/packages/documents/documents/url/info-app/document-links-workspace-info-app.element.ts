@@ -20,6 +20,8 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 interface UmbDocumentInfoViewLink {
 	culture: string | null;
@@ -50,6 +52,7 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+	#propertyDataSetVariantId?: UmbVariantId;
 
 	#documentUrlsDataResolver? = new UmbDocumentUrlsDataResolver(this);
 
@@ -94,6 +97,11 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 				this._variantOptions = variantOptions;
 				this.#setLinks();
 			});
+		});
+
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
+			this.#propertyDataSetVariantId = context?.getVariantId();
+			this.#setLinks();
 		});
 
 		this.observe(this.#documentUrlsDataResolver?.urls, (urls) => {
@@ -203,12 +211,12 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 			${repeat(
 				this._links,
 				(link) => link.url,
-				(link) => this.#renderLink(link, this._links),
+				(link) => this.#renderLink(link),
 			)}
 		`;
 	}
 
-	#renderLink(link: UmbDocumentInfoViewLink, links: Array<UmbDocumentInfoViewLink>) {
+	#renderLink(link: UmbDocumentInfoViewLink) {
 		if (!link.url) {
 			return this.#renderEmptyLink(link.culture, link.state);
 		}
@@ -216,7 +224,7 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 		return html`
 			<a class="link-item" href=${ifDefined(this.#getTargetUrl(link.url))} target="_blank">
 				<span>
-					${this.#renderLinkCulture(link.culture, links)}
+					${this.#renderLinkCulture(link.culture)}
 					<span>${link.url}</span>
 				</span>
 				<uui-icon name="icon-out"></uui-icon>
@@ -225,9 +233,9 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	#renderNoLinks() {
-		return html` ${this._variantOptions?.map((variantOption) =>
-			this.#renderEmptyLink(variantOption.culture, variantOption.variant?.state),
-		)}`;
+		return html` ${this._variantOptions
+			?.filter((variantOption) => variantOption.culture === this.#propertyDataSetVariantId?.culture)
+			.map((variantOption) => this.#renderEmptyLink(variantOption.culture, variantOption.variant?.state))}`;
 	}
 
 	#renderEmptyLink(culture: string | null, state: DocumentVariantStateModel | null | undefined) {
@@ -239,10 +247,10 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 		</div>`;
 	}
 
-	#renderLinkCulture(culture: string | null, links?: Array<UmbDocumentInfoViewLink>) {
+	#renderLinkCulture(culture: string | null) {
 		if (!culture) return nothing;
 		if (this._links.length === 1) return nothing;
-		const allLinksHaveSameCulture = links?.every((link) => link.culture === culture);
+		const allLinksHaveSameCulture = this._links?.every((link) => link.culture === culture);
 		if (allLinksHaveSameCulture) return nothing;
 		return html`<span class="culture">${culture}</span>`;
 	}
