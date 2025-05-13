@@ -820,6 +820,34 @@ namespace Umbraco.Cms.Core.Services
             scope.Complete();
         }
 
+        /// <inheritdoc/>
+        public async Task UpdateLoginPropertiesAsync(IMember member)
+        {
+            EventMessages evtMsgs = EventMessagesFactory.Get();
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            var savingNotification = new MemberSavingNotification(member, evtMsgs);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                scope.Complete();
+                return;
+            }
+
+            await _memberRepository.UpdateLoginPropertiesAsync(member);
+
+            scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+
+            // Note that we aren't calling "Audit" here (deliberately, because this is not a full save operation on the member
+            // that we'd want to audit who made the changes via the backoffice or management API; rather it's just the member
+            // logging in as themselves).
+            // We are though publishing notifications, to maintain backwards compatibility for any solutions using these for
+            // processing following a member login.
+            // These notification handlers will ensure that the records to umbracoLog are also added in the same way as they
+            // are for a full save operation.
+
+            scope.Complete();
+        }
+
         #endregion
 
         #region Delete
