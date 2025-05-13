@@ -290,7 +290,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         // set on variant content type
         if (ContentType.VariesByCulture())
         {
-            culture = EnsureConsistentCultureCode(culture);
+            culture = culture.EnsureCultureCode();
 
             // invariant is ok
             if (culture.IsNullOrWhiteSpace())
@@ -341,18 +341,6 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         {
             _cultureInfos = null;
         }
-    }
-
-    private static string? EnsureConsistentCultureCode(string? culture)
-    {
-        if (culture.IsNullOrWhiteSpace())
-        {
-            return null;
-        }
-
-        // Create as CultureInfo instance from provided name so we can ensure consistent casing of culture code when persisting.
-        // This will accept mixed case but once created have a `Name` property that is consistently and correctly cased.
-        return new CultureInfo(culture).Name;
     }
 
     /// <summary>
@@ -466,7 +454,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
                 $"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
         }
 
-        culture = EnsureConsistentCultureCode(culture);
+        culture = culture.EnsureCultureCode();
         var updated = property.SetValue(value, culture, segment);
         if (updated)
         {
