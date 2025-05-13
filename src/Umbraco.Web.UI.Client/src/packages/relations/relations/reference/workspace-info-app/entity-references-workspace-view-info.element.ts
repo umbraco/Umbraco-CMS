@@ -106,7 +106,7 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 		if (!this._items?.length) return nothing;
 		return html`
 			<umb-workspace-info-app-layout headline="#references_labelUsedByItems">
-				${this.#renderItems()} ${this.#renderReferencePagination()}
+				<div id="content">${this.#renderItems()} ${this.#renderReferencePagination()}</div>
 			</umb-workspace-info-app-layout>
 		`;
 	}
@@ -142,6 +142,11 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 		css`
 			:host {
 				display: contents;
+			}
+
+			#content {
+				display: block;
+				padding: var(--uui-size-space-3) var(--uui-size-space-4);
 			}
 
 			.pagination-container {

@@ -266,10 +266,6 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 
 	static override styles = [
 		css`
-			uui-box {
-				--uui-box-default-padding: 0;
-			}
-
 			#loader-container {
 				display: flex;
 				justify-content: center;
