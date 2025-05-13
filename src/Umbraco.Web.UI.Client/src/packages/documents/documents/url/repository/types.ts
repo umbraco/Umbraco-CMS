@@ -5,5 +5,5 @@ export interface UmbDocumentUrlsModel {
 
 export interface UmbDocumentUrlModel {
 	culture: string | null;
-	url: string;
+	url?: string;
 }
