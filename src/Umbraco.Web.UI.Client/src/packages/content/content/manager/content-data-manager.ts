@@ -140,7 +140,7 @@ export class UmbContentWorkspaceDataManager<
 			};
 		});
 
-		const changedProperties = current?.values.map((value) => {
+		const changedProperties = current?.values.filter(v => v.culture || v.segment).map((value) => {
 			const persistedValues = persisted?.values.find((x) => UmbVariantId.Create(value).compare(x));
 			return {
 				culture: value.culture,
