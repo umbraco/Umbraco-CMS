@@ -467,13 +467,13 @@ stages:
 
           # Wait for application to start responding to requests
           - pwsh: npx wait-on -v --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)
-            condition: and(succeeded(), ne($(testFolder), 'UnattendedInstallConfig'))
+            condition: and(succeeded(), ne(variables['testFolder'], 'UnattendedInstallConfig'))
             displayName: Wait for application
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Wait till the port is open
           - pwsh: npx wait-on -v --interval 1000 --timeout 120000 $(port)
-            condition: and(succeeded(), eq($(testFolder), 'UnattendedInstallConfig'))
+            condition: and(succeeded(), eq(variables['testFolder'], 'UnattendedInstallConfig'))
             displayName: Wait for application port, only used when UnattendedInstallConfig is the testFolder
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
