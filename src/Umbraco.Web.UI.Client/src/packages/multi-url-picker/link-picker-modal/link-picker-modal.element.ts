@@ -9,7 +9,6 @@ import { isUmbracoFolder, UmbMediaTypeStructureRepository } from '@umbraco-cms/b
 import { umbBindToValidation, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { umbConfirmModal, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import {
-	UmbDocumentDetailRepository,
 	UmbDocumentItemDataResolver,
 	UmbDocumentItemRepository,
 	UmbDocumentUrlRepository,
