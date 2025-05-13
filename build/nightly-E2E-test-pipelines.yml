@@ -472,7 +472,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Wait till the port is open
-          - pwsh: npx wait-on -v --interval 1000 --timeout 120000 $(port)
+          - pwsh: npx wait-on -v --interval 1000 --timeout 120000 tcp:$(port)
             condition: and(succeeded(), eq(variables['testFolder'], 'UnattendedInstallConfig'))
             displayName: Wait for application port, only used when UnattendedInstallConfig is the testFolder
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
