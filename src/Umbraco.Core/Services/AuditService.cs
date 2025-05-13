@@ -264,7 +264,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     /// <inheritdoc />
-    [Obsolete("Will be moved to a new service. Scheduled for removal in V18.")]
+    [Obsolete("Will be moved to a new service in V17. Scheduled for removal in V18.")]
     public IAuditEntry Write(
         int performingUserId,
         string perfomingDetails,
