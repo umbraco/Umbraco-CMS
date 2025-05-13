@@ -104,7 +104,7 @@ public static class HtmlHelperRenderExtensions
         ViewDataDictionary? viewData = null,
         Func<object, ViewDataDictionary?, string>? contextualKeyBuilder = null)
     {
-        var cacheKey = new StringBuilder(partialViewName);
+        var cacheKey = new StringBuilder(partialViewName + "-");
 
         // let's always cache by the current culture to allow variants to have different cache results
         var cultureName = Thread.CurrentThread.CurrentUICulture.Name;
