@@ -83,7 +83,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	async populateLinkUrl() {
 		// Documents and media have URLs saved in the local link format. Display the actual URL to align with what
 		// the user sees when they selected it initially.
-		if (!this.value.link?.unique || this.value.link?.url?.indexOf('localLink') === -1) return;
+		if (!this.value.link?.unique) return;
 
 		let url: string | undefined = undefined;
 		switch (this.value.link.type) {
