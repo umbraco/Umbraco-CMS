@@ -9,7 +9,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Segment;
 
 [VersionedApiBackOfficeRoute("segment")]
 [ApiExplorerSettings(GroupName = "Segment")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public abstract class SegmentControllerBase : ManagementApiControllerBase
 {
     protected IActionResult MapFailure(SegmentOperationStatus status)
