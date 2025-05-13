@@ -14,7 +14,7 @@ import {
 	UmbDocumentUrlRepository,
 	UmbDocumentUrlsDataResolver,
 } from '@umbraco-cms/backoffice/document';
-import { UmbMediaDetailRepository, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
+import { UmbMediaItemRepository, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -174,11 +174,12 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					break;
 				}
 				case 'media': {
-					const mediaRepository = new UmbMediaDetailRepository(this);
-					const { data: mediaData } = await mediaRepository.requestByUnique(unique);
-					if (mediaData) {
-						icon = mediaData.mediaType.icon;
-						name = mediaData.variants[0].name;
+					const mediaRepository = new UmbMediaItemRepository(this);
+					const { data: mediaData } = await mediaRepository.requestItems([unique]);
+					const mediaItem = mediaData?.[0];
+					if (mediaItem) {
+						icon = mediaItem.mediaType.icon;
+						name = mediaItem.variants[0].name;
 						url = await this.#getUrlForMedia(unique);
 					}
 					break;
