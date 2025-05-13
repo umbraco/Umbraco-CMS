@@ -115,8 +115,7 @@ test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}
   await umbracoUi.media.isItemVisibleInRecycleBin(secondMediaFileName, true, false);
 });
 
-// TODO: Remove fixme when update code to select media successfully.
-test.fixme('can allow bulk move in the media section', async ({umbracoApi, umbracoUi}) => {
+test('can allow bulk move in the media section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaFolderName = 'Test Folder Name';
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
@@ -132,7 +131,7 @@ test.fixme('can allow bulk move in the media section', async ({umbracoApi, umbra
   await umbracoUi.media.clickChooseModalButton();
 
   // Assert
-  //await umbracoUi.media.isSuccessNotificationVisible();
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.media.isErrorNotificationVisible(false);
   expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, firstMediaFileName)).toBeTruthy();
   expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, secondMediaFileName)).toBeTruthy();

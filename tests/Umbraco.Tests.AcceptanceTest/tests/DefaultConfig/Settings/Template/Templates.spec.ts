@@ -142,8 +142,7 @@ test('can remove a master template', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.template.ensureNameNotExists(childTemplateName);
 });
 
-// Remove skip when the front-end is ready. Currently this function is not stable, sometimes the shown code is not updated after choosing Order By
-test.skip('can use query builder with Order By statement for a template', async ({umbracoApi, umbracoUi}) => {
+test('can use query builder with Order By statement for a template', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const propertyAliasValue = 'UpdateDate';
   const isAscending = true;
@@ -176,14 +175,13 @@ test.skip('can use query builder with Order By statement for a template', async 
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  //await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.template.isErrorNotificationVisible(false);
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(expectedTemplateContent);
 });
 
-// Remove .fixme when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18536
-test.fixme('can use query builder with Where statement for a template', async ({umbracoApi, umbracoUi}) => {
+test('can use query builder with Where statement for a template', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const propertyAliasValue = 'Name';
   const operatorValue = 'is';

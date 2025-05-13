@@ -114,8 +114,7 @@ test('can update a partial view content', {tag: '@smoke'}, async ({umbracoApi, u
   expect(updatedPartialView.content).toBe(updatedPartialViewContent);
 });
 
-// Remove .fixme when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18536
-test.fixme('can use query builder with Order By statement for a partial view', async ({umbracoApi, umbracoUi}) => {
+test('can use query builder with Order By statement for a partial view', async ({umbracoApi, umbracoUi}) => {
   //Arrange
   const propertyAliasValue = 'UpdateDate';
   const isAscending = true;
@@ -149,14 +148,13 @@ test.fixme('can use query builder with Order By statement for a partial view', a
   await umbracoUi.partialView.clickSaveButton();
 
   // Assert
-  //await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.partialView.isErrorNotificationVisible(false);
   const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
   expect(updatedPartialView.content).toBe(expectedTemplateContent);
 });
 
-// Remove .fixme when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18536
-test.fixme('can use query builder with Where statement for a partial view', async ({umbracoApi, umbracoUi}) => {
+test('can use query builder with Where statement for a partial view', async ({umbracoApi, umbracoUi}) => {
   //Arrange
   const propertyAliasValue = 'Name';
   const operatorValue = 'is';
