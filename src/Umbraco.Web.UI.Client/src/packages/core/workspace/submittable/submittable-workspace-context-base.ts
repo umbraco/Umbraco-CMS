@@ -30,7 +30,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 
 	#submitPromise: Promise<void> | undefined;
 	#submitResolve: (() => void) | undefined;
-	#submitReject: (() => void) | undefined;
+	#submitReject: ((reason?: any) => void) | undefined;
 
 	abstract readonly unique: Observable<string | null | undefined>;
 
@@ -57,7 +57,6 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	}
 
 	protected resetState() {
-		//this.validation.reset();
 		this.#validationContexts.forEach((context) => context.reset());
 		this.#isNew.setValue(undefined);
 	}
@@ -75,18 +74,20 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	 * @returns Promise that resolves to void when the validation is complete.
 	 */
 	public async validate(): Promise<Array<void>> {
-		//return this.validation.validate();
-		return Promise.all(this.#validationContexts.map((context) => context.validate()));
+		return await Promise.all(this.#validationContexts.map((context) => context.validate()));
 	}
 
 	public async requestSubmit(): Promise<void> {
 		return this.validateAndSubmit(
 			() => this.submit(),
-			() => this.invalidSubmit(),
+			(reason?: any) => this.invalidSubmit(reason),
 		);
 	}
 
-	public async validateAndSubmit(onValid: () => Promise<void>, onInvalid: () => Promise<void>): Promise<void> {
+	public async validateAndSubmit(
+		onValid: () => Promise<void>,
+		onInvalid: (reason?: any) => Promise<void>,
+	): Promise<void> {
 		if (this.#submitPromise) {
 			return this.#submitPromise;
 		}
@@ -98,19 +99,24 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 			async () => {
 				onValid().then(this.#completeSubmit, this.#rejectSubmit);
 			},
-			async () => {
-				onInvalid().then(this.#resolveSubmit, this.#rejectSubmit);
+			async (error) => {
+				// TODO: Implement developer-mode logging here. [NL]
+				console.warn(
+					'Validation failed because of these validation messages still begin present: ',
+					this.#validationContexts.flatMap((x) => x.messages.getMessages()),
+				);
+				onInvalid(error).then(this.#resolveSubmit, this.#rejectSubmit);
 			},
 		);
 
-		return this.#submitPromise;
+		return await this.#submitPromise;
 	}
 
-	#rejectSubmit = () => {
+	#rejectSubmit = (error: any) => {
 		if (this.#submitPromise) {
 			// TODO: Capture the validation contexts messages on open, and then reset to them in this case. [NL]
 
-			this.#submitReject?.();
+			this.#submitReject?.(error);
 			this.#submitPromise = undefined;
 			this.#submitResolve = undefined;
 			this.#submitReject = undefined;
@@ -147,8 +153,8 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	abstract getEntityType(): string;
 	abstract getData(): WorkspaceDataModelType | undefined;
 	protected abstract submit(): Promise<void>;
-	protected invalidSubmit(): Promise<void> {
-		return Promise.reject();
+	protected invalidSubmit(reason?: any): Promise<void> {
+		return Promise.reject(reason);
 	}
 }
 

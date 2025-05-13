@@ -97,7 +97,7 @@ export default class UmbStylesheetRuleSettingsModalElement extends UmbModalBaseE
 										<br />
 										1 2 3 4 5 6 7 8 9 0 € £ $ % &amp; (.,;:'"!?)
 										<br />
-										Just keep examining every bid quoted for zinc etchings.
+										Amazingly few discotheques provide jukeboxes.
 									</div>
 								</uui-form-layout-item>
 							</form>

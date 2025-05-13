@@ -150,10 +150,13 @@ test('can import a dictionary item with descendants', {tag: '@smoke'}, async ({u
   await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
   await umbracoUi.dictionary.clickImportButton();
   await umbracoUi.dictionary.importDictionary(udtFilePath);
+  // These timeouts are necessary as this test can fail
+  await umbracoUi.waitForTimeout(500);
 
   // Assert
   // Verify the imported dictionary items display in the list
   await umbracoUi.reloadPage();
+  await umbracoUi.waitForTimeout(500);
   expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importParentDictionaryName)).toBeTruthy();
   expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importChildDictionaryName)).toBeTruthy();
   // Verify the imported dictionary items display in the tree

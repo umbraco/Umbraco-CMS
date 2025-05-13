@@ -4,10 +4,11 @@
 
 These contribution guidelines are mostly just that - guidelines, not rules. This is what we've found to work best over the years, but if you choose to ignore them, we still love you! 💖 Use your best judgement, and feel free to propose changes to this document in a pull request.
 
-## Getting Started
 We have a guide on [what to consider before you start](contributing-before-you-start.md) and more detailed guides at the end of this article.
 
-The following steps are a quick-start guide:
+## Contribution guide
+
+This guide describes each step to make your first contribution:
 
 1. **Fork**
 
@@ -25,17 +26,21 @@ The following steps are a quick-start guide:
 
     Switch to the `contrib` branch
 
-4. **Build**
+4. **Branch out**
 
-    Build your fork of Umbraco locally [as described in the build documentation](BUILD.md), you can build with any IDE that supports dotnet or the command line.
+    Create a new branch based on `contrib` and name it after the issue you're fixing, For example: `v15/bugfix/18132-rte-tinymce-onchange-value-check`.
 
-5. **Branch**
+    Please follow this format for branches: `v{major}/{feature|bugfix|task}/{issue}-{description}`. 
 
-    Create a new branch now and name it after the issue you're fixing, we usually follow the format: `v{major}/{feature|bugfix|task}/{issue}-{description}`. For example: `v15/bugfix/18132-rte-tinymce-onchange-value-check`.
-
-    This means it's a temporary branch for the particular issue you're working on, in this case a bug fix for issue number `18132` that affects Umbraco 15.
+    This is a development branch for the particular issue you're working on, in this case a bug-fix for issue number `18132` that affects Umbraco v.15.
 
     Don't commit to `contrib`, create a new branch first.
+
+5. **Build or run a Development Server**
+
+    You can build or run a Development Server with any IDE that supports DotNet or the command line.
+
+    Read [Build or run a Development Server](BUILD.md) for the right approach to your needs.
 
 6. **Change**
 
@@ -45,7 +50,7 @@ The following steps are a quick-start guide:
 
     Done? Yay! 🎉
 
-    Remember to commit to your new `temp` branch, and don't commit to `contrib`. Then you can push the changes up to your fork on GitHub.
+    Remember to commit to your branch. When it's ready push the changes to your fork on GitHub.
 
 8. **Create pull request**
 
@@ -56,7 +61,7 @@ The following steps are a quick-start guide:
 ## Further contribution guides
 
 - [Before you start](contributing-before-you-start.md)
-- [Finding your first issue: Up for grabs](contributing-before-you-start.md)
+- [Finding your first issue: Up for grabs](contributing-first-issue.md)
 - [Contributing to the new backoffice](https://docs.umbraco.com/umbraco-backoffice/)
 - [Unwanted changes](contributing-unwanted-changes.md)
 - [Other ways to contribute](contributing-other-ways-to-contribute.md)

@@ -74,7 +74,10 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 			<div id="headerColumn">
 				<uui-label id="label" title=${this.alias} ?required=${this.mandatory}>
 					${this.localize.string(this.label)}
-					${when(this.invalid, () => html`<uui-badge color="danger" attention>!</uui-badge>`)}
+					${when(
+						this.invalid,
+						() => html`<div id="invalid-badge"><uui-badge color="invalid" attention>!</uui-badge></div>`,
+					)}
 				</uui-label>
 				<slot name="action-menu"></slot>
 				${this.#renderDescription()}
@@ -129,15 +132,28 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 			}
 			/*}*/
 
+			:host {
+				/* TODO: Temp solution to not get a yellow asterisk when invalid. */
+				--umb-temp-uui-color-invalid: var(--uui-color-invalid);
+			}
+
 			#label {
 				position: relative;
 				word-break: break-word;
+				/* TODO: Temp solution to not get a yellow asterisk when invalid. */
+				--uui-color-invalid: var(--uui-color-danger);
 			}
-			:host([invalid]) #label {
-				color: var(--uui-color-danger);
+			#invalid-badge {
+				display: inline-block;
+				position: relative;
+				width: 18px;
+				height: 1em;
+				margin-right: 6px;
 			}
 			uui-badge {
-				right: -30px;
+				//height: var(--uui-color-invalid);
+				background-color: var(--umb-temp-uui-color-invalid);
+				color: var(--uui-color-invalid-contrast);
 			}
 
 			#description {

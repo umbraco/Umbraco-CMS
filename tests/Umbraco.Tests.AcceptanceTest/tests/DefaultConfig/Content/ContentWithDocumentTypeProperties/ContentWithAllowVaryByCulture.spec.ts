@@ -69,7 +69,7 @@ test('can create content with names that vary by culture and content that is inv
   const danishTextContent = 'Dette er testtekst';
   const dataTypeName = 'Textstring';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', false);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', true, false);
   await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, textContent, dataTypeName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -101,7 +101,7 @@ test('can create content with names and content that vary by culture', async ({u
   const danishTextContent = 'Dette er testtekst';
   const dataTypeName = 'Textstring';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', true);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', true, true);
   await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, textContent, dataTypeName, true);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);

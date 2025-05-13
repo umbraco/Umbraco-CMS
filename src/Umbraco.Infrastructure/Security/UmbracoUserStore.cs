@@ -35,29 +35,18 @@ public abstract class UmbracoUserStore<TUser, TRole>
     [Obsolete("Use TryConvertIdentityIdToInt instead. Scheduled for removal in V15.")]
     protected static int UserIdToInt(string? userId)
     {
-        if (TryUserIdToInt(userId, out int result))
+        if (int.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
         {
             return result;
-        }
-
-        throw new InvalidOperationException($"Unable to convert user ID ({userId})to int using InvariantCulture");
-    }
-
-    protected static bool TryUserIdToInt(string? userId, out int result)
-    {
-        if (int.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out result))
-        {
-            return true;
         }
 
         if (Guid.TryParse(userId, out Guid key))
         {
             // Reverse the IntExtensions.ToGuid
-            result = BitConverter.ToInt32(key.ToByteArray(), 0);
-            return true;
+            return BitConverter.ToInt32(key.ToByteArray(), 0);
         }
 
-        return false;
+        throw new InvalidOperationException($"Unable to convert user ID ({userId})to int using InvariantCulture");
     }
 
     protected abstract Task<int> ResolveEntityIdFromIdentityId(string? identityId);

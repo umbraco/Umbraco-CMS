@@ -175,14 +175,15 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 
 	#renderInside() {
 		if (this._exposed === false) {
-			return html`<uui-button id="exposeButton" @click=${this.#expose}
+			return html`<uui-button id="exposeButton" draggable="false" @click=${this.#expose}
 				><uui-icon name="icon-add"></uui-icon>
 				<umb-localize
 					key="blockEditor_createThisFor"
 					.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize
 			></uui-button>`;
 		} else {
-			return html`<umb-block-workspace-view-edit-content-no-router></umb-block-workspace-view-edit-content-no-router>`;
+			return html`<umb-block-workspace-view-edit-content-no-router
+				draggable="false"></umb-block-workspace-view-edit-content-no-router>`;
 		}
 	}
 

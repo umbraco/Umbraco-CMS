@@ -95,7 +95,7 @@ test('can remove fallback language', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.language.clickLanguageByName(languageName);
-  await umbracoUi.language.removeFallbackLanguageByName(defaultLanguageName);
+  await umbracoUi.language.removeFallbackLanguageByIsoCode(defaultLanguageIsoCode);
   await umbracoUi.language.clickSaveButton();
 
   // Act

@@ -71,24 +71,21 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 * @param id
 	 * @param variantIds
 	 * @param includeUnpublishedDescendants
-	 * @param forceRepublish
 	 * @memberof UmbDocumentPublishingRepository
 	 */
-	async publishWithDescendants(
-		id: string,
-		variantIds: Array<UmbVariantId>,
-		includeUnpublishedDescendants: boolean,
-		forceRepublish: boolean,
-	) {
+	async publishWithDescendants(id: string, variantIds: Array<UmbVariantId>, includeUnpublishedDescendants: boolean) {
 		if (!id) throw new Error('id is missing');
 		if (!variantIds) throw new Error('variant IDs are missing');
 		await this.#init;
+
+		const notification = { data: { message: `Document and descendants submitted for publishing...` } };
+		// TODO: Move this to the calling workspace context [JOV]
+		this.#notificationContext?.peek('positive', notification);
 
 		const { error } = await this.#publishingDataSource.publishWithDescendants(
 			id,
 			variantIds,
 			includeUnpublishedDescendants,
-			forceRepublish,
 		);
 
 		if (!error) {

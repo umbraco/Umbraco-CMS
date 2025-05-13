@@ -1,7 +1,7 @@
+import type { UmbFormControlMixinInterface } from '../mixins/index.js';
+import { UmbBindServerValidationToFormControl, UmbFormControlValidator } from '../controllers/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { AsyncDirective, directive, nothing, type ElementPart } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbFormControlMixinInterface } from '@umbraco-cms/backoffice/validation';
-import { UmbBindServerValidationToFormControl, UmbFormControlValidator } from '@umbraco-cms/backoffice/validation';
 
 /**
  * The `bind to validation` directive connects the Form Control Element to closets Validation Context.

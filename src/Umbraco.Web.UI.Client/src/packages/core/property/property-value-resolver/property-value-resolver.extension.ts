@@ -9,7 +9,7 @@ export interface ManifestPropertyValueResolver extends ManifestApi<UmbPropertyVa
 
 export interface MetaPropertyValueResolver {
 	/**
-	 * @deprecated use `forEditorAlias` instead
+	 * @deprecated use `forEditorAlias` instead, will be removed in v.17
 	 */
 	editorAlias?: string;
 }

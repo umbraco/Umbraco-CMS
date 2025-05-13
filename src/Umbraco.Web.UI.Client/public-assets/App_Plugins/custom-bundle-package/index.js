@@ -1,9 +1,9 @@
-export const manifests: Array<UmbExtensionManifest> = [
+export const manifests = [
 	{
 		type: 'section',
 		alias: 'MyBundle.Section.Custom',
 		name: 'Custom Section',
-		js: '/App_Plugins/section.js',
+		element: () => import('./section.js'),
 		weight: 1,
 		meta: {
 			label: 'My Bundle Section',

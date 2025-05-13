@@ -56,12 +56,12 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 
 	override async firstUpdated() {
 		if (this._documentTypeUnique) {
-			this.#retrieveAllowedDocumentTypesOf(this._documentTypeUnique);
+			this.#retrieveAllowedDocumentTypesOf(this._documentTypeUnique, this._documentUnique || null);
 		}
 	}
 
-	async #retrieveAllowedDocumentTypesOf(unique: string | null) {
-		const { data } = await this.#documentTypeStructureRepository.requestAllowedChildrenOf(unique);
+	async #retrieveAllowedDocumentTypesOf(unique: string | null, parentContentUnique: string | null) {
+		const { data } = await this.#documentTypeStructureRepository.requestAllowedChildrenOf(unique, parentContentUnique);
 
 		if (data && data.items) {
 			this._allowedDocumentTypes = data.items;
@@ -69,7 +69,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	}
 
 	#onPopoverToggle(event: ToggleEvent) {
-		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this._popoverOpen = event.newState === 'open';

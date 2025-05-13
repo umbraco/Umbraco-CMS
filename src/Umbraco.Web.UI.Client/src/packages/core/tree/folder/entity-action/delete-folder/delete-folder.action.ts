@@ -40,7 +40,7 @@ export class UmbDeleteFolderEntityAction extends UmbEntityActionBase<MetaEntityA
 		if (folder) {
 			// TODO: maybe we can show something about how many items are part of the folder?
 			await umbConfirmModal(this._host, {
-				headline: `Delete folder ${folder.name}`,
+				headline: `Delete ${folder.name}`,
 				content: 'Are you sure you want to delete this folder?',
 				color: 'danger',
 				confirmLabel: 'Delete',

@@ -16,7 +16,7 @@ public class DocumentUrlDto
     [PrimaryKeyColumn(Clustered = false, AutoIncrement = true)]
     public int NodeId { get; set; }
 
-    [Index(IndexTypes.UniqueClustered, ForColumns = "uniqueId, languageId, isDraft", Name = "IX_" + TableName)]
+    [Index(IndexTypes.UniqueClustered, ForColumns = "uniqueId, languageId, isDraft, urlSegment", Name = "IX_" + TableName)]
     [Column("uniqueId")]
     [ForeignKey(typeof(NodeDto), Column = "uniqueId")]
     public Guid UniqueId { get; set; }
@@ -28,14 +28,11 @@ public class DocumentUrlDto
     [ForeignKey(typeof(LanguageDto))]
     public int LanguageId { get; set; }
 
-    //
-    // [Column("segment")]
-    // [NullSetting(NullSetting = NullSettings.Null)]
-    // [Length(PropertyDataDto.SegmentLength)]
-    // public string Segment { get; set; } = string.Empty;
-
     [Column("urlSegment")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string UrlSegment { get; set; } = string.Empty;
 
+    [Column("isPrimary")]
+    [Constraint(Default = 1)]
+    public bool IsPrimary { get; set; }
 }

@@ -79,11 +79,12 @@ export class UmbStylesheetRuleInputElement extends UUIFormControlMixin(UmbLitEle
 					this.rules,
 					(rule, index) => rule.name + index,
 					(rule, index) => html`
-						<umb-stylesheet-rule-ref name=${rule.name} id=${rule.name} detail=${rule.selector}>
+						<umb-stylesheet-rule-ref
+							name=${rule.name}
+							id=${rule.name}
+							detail=${rule.selector}
+							@open=${() => this.#editRule(rule, index)}>
 							<uui-action-bar slot="actions">
-								<uui-button
-									label=${this.localize.term('general_edit')}
-									@click=${() => this.#editRule(rule, index)}></uui-button>
 								<uui-button
 									label=${this.localize.term('general_remove')}
 									@click=${() => this.#removeRule(rule)}></uui-button>

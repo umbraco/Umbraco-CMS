@@ -4,7 +4,7 @@ export * from './context/index.js';
 export * from './controllers/index.js';
 export * from './directives/bind-to-validation.lit-directive.js';
 export * from './events/index.js';
-export type * from './interfaces/index.js';
 export * from './mixins/index.js';
 export * from './translators/index.js';
 export * from './utils/index.js';
+export type * from './types.js';

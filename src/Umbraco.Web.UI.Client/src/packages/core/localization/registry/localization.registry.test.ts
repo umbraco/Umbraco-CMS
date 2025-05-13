@@ -4,15 +4,30 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import type { ManifestLocalization } from '../extensions/localization.extension.js';
 
 //#region Localizations
-const english: ManifestLocalization = {
+const englishUk: ManifestLocalization = {
 	type: 'localization',
 	alias: 'test.en',
-	name: 'Test English',
+	name: 'Test English (UK)',
+	meta: {
+		culture: 'en',
+		localizations: {
+			general: {
+				color: 'Colour',
+			},
+		},
+	},
+};
+
+const english: ManifestLocalization = {
+	type: 'localization',
+	alias: 'test.en-us',
+	name: 'Test English (US)',
 	meta: {
 		culture: 'en-us',
 		direction: 'ltr',
 		localizations: {
 			general: {
+				color: 'Color',
 				close: 'Close',
 				logout: 'Log out',
 				withInlineToken: '{0} {1}',
@@ -72,6 +87,7 @@ const danishRegional: ManifestLocalization = {
 //#endregion
 
 describe('UmbLocalizeController', () => {
+	umbExtensionsRegistry.register(englishUk);
 	umbExtensionsRegistry.register(english);
 	umbExtensionsRegistry.register(danish);
 	umbExtensionsRegistry.register(danishRegional);
@@ -109,6 +125,32 @@ describe('UmbLocalizeController', () => {
 		const current = registry.localizations.get(english.meta.culture);
 		expect(current).to.have.property('general_close', 'Close 2');
 		expect(current).to.have.property('general_logout', 'Log out');
+	});
+
+	it('should be able to switch to the fallback language', async () => {
+		// Verify that the document language and direction is set correctly to the default language
+		expect(document.documentElement.lang).to.equal(english.meta.culture);
+		expect(document.documentElement.dir).to.equal(english.meta.direction);
+
+		// Switch to the fallback language, which is the UK version of English
+		registry.loadLanguage('en');
+		await aTimeout(0);
+
+		expect(document.documentElement.lang).to.equal('en');
+		expect(document.documentElement.dir).to.equal('ltr');
+
+		const current = registry.localizations.get(englishUk.meta.culture);
+		expect(current).to.have.property('general_color', 'Colour');
+
+		// And switch back again
+		registry.loadLanguage('en-us');
+		await aTimeout(0);
+
+		expect(document.documentElement.lang).to.equal('en-us');
+		expect(document.documentElement.dir).to.equal('ltr');
+
+		const newCurrent = registry.localizations.get(english.meta.culture);
+		expect(newCurrent).to.have.property('general_color', 'Color');
 	});
 
 	it('should load a new language', async () => {

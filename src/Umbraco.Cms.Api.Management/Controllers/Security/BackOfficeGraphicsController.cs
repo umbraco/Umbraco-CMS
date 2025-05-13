@@ -19,6 +19,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Security;
 public class BackOfficeGraphicsController : Controller
 {
     public const string LogoRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(Logo);
+    public const string LogoAlternativeRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LogoAlternative);
     public const string LoginBackGroundRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginBackground);
     public const string LoginLogoRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginLogo);
     public const string LoginLogoAlternativeRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginLogoAlternative);
@@ -43,6 +44,11 @@ public class BackOfficeGraphicsController : Controller
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
     public IActionResult Logo() => HandleFileRequest(_contentSettings.Value.BackOfficeLogo);
+
+    [HttpGet("logo-alternative", Name = LogoAlternativeRouteName)]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
+    public IActionResult LogoAlternative() => HandleFileRequest(_contentSettings.Value.BackOfficeLogoAlternative);
 
     [HttpGet("login-logo", Name = LoginLogoRouteName)]
     [AllowAnonymous]

@@ -1,4 +1,5 @@
 import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../types.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { DirectionModel, DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { DocumentCollectionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -32,16 +33,24 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 
 		if (data) {
 			const items = data.items.map((item: DocumentCollectionResponseModel) => {
-				// TODO: [LK] Temp solution, review how to get the name from the corresponding variant.
+				// TODO: remove in v17.0.0
 				const variant = item.variants[0];
 
 				const model: UmbDocumentCollectionItemModel = {
+					ancestors: item.ancestors.map((ancestor) => {
+						return {
+							unique: ancestor.id,
+							entityType: UMB_DOCUMENT_ENTITY_TYPE,
+						};
+					}),
 					unique: item.id,
-					entityType: 'document',
+					entityType: UMB_DOCUMENT_ENTITY_TYPE,
 					contentTypeAlias: item.documentType.alias,
 					createDate: new Date(variant.createDate),
 					creator: item.creator,
 					icon: item.documentType.icon,
+					isProtected: item.isProtected,
+					isTrashed: item.isTrashed,
 					name: variant.name,
 					sortOrder: item.sortOrder,
 					state: variant.state,
@@ -49,6 +58,18 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					updater: item.updater,
 					values: item.values.map((item) => {
 						return { alias: item.alias, value: item.value as string };
+					}),
+					documentType: {
+						unique: item.documentType.id,
+						icon: item.documentType.icon,
+						alias: item.documentType.alias,
+					},
+					variants: item.variants.map((item) => {
+						return {
+							name: item.name,
+							culture: item.culture ?? null,
+							state: item.state,
+						};
 					}),
 				};
 				return model;

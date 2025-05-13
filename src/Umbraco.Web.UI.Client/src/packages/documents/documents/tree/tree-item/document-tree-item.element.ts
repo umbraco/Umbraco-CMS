@@ -1,86 +1,46 @@
-import type { UmbDocumentTreeItemModel, UmbDocumentTreeItemVariantModel } from '../types.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { css, html, nothing, customElement, state, classMap } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
-import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import type { UmbDocumentTreeItemModel } from '../types.js';
+import type { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
+import { css, html, nothing, customElement, classMap, state, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-document-tree-item')
-export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocumentTreeItemModel> {
-	#appLanguageContext?: UmbAppLanguageContext;
-
-	@state()
-	_currentCulture?: string;
-
-	@state()
-	_defaultCulture?: string;
-
-	@state()
-	_variant?: UmbDocumentTreeItemVariantModel;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
-			this.#appLanguageContext = instance;
-			this.#observeAppCulture();
-			this.#observeDefaultCulture();
-		});
+export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
+	UmbDocumentTreeItemModel,
+	UmbDocumentTreeItemContext
+> {
+	#api: UmbDocumentTreeItemContext | undefined;
+	@property({ type: Object, attribute: false })
+	public override get api(): UmbDocumentTreeItemContext | undefined {
+		return this.#api;
 	}
+	public override set api(value: UmbDocumentTreeItemContext | undefined) {
+		this.#api = value;
 
-	#observeAppCulture() {
-		this.observe(this.#appLanguageContext!.appLanguageCulture, (value) => {
-			this._currentCulture = value;
-			this._variant = this.#findVariant(value);
-		});
-	}
-
-	#observeDefaultCulture() {
-		this.observe(this.#appLanguageContext!.appDefaultLanguage, (value) => {
-			this._defaultCulture = value?.unique;
-		});
-	}
-
-	#findVariant(culture: string | undefined) {
-		return this.item?.variants.find((x) => x.culture === culture);
-	}
-
-	#isInvariant() {
-		const firstVariant = this.item?.variants[0];
-		return firstVariant?.culture === null && firstVariant?.segment === null;
-	}
-
-	// TODO: we should move the fallback name logic to a helper class. It will be used in multiple places
-	#getLabel() {
-		if (this.#isInvariant()) {
-			return this._item?.variants[0].name;
+		if (this.#api) {
+			this.observe(this.#api.name, (name) => (this._name = name || ''));
+			this.observe(this.#api.isDraft, (isDraft) => (this._isDraft = isDraft || false));
+			this.observe(this.#api.icon, (icon) => (this._icon = icon || ''));
 		}
 
-		// ensure we always have the correct variant data
-		this._variant = this.#findVariant(this._currentCulture);
-
-		const fallbackName = this.#findVariant(this._defaultCulture)?.name ?? this._item?.variants[0].name ?? 'Unknown';
-		return this._variant?.name ?? `(${fallbackName})`;
+		super.api = value;
 	}
 
-	#isDraft() {
-		if (this.#isInvariant()) {
-			return this._item?.variants[0].state === DocumentVariantStateModel.DRAFT;
-		}
+	@state()
+	private _name = '';
 
-		// ensure we always have the correct variant data
-		this._variant = this.#findVariant(this._currentCulture);
+	@state()
+	private _isDraft = false;
 
-		return this._variant?.state === DocumentVariantStateModel.DRAFT;
-	}
+	@state()
+	private _icon = '';
 
 	override renderIconContainer() {
-		const icon = this.item?.documentType.icon;
+		const icon = this._icon;
 		const iconWithoutColor = icon?.split(' ')[0];
 
 		return html`
-			<span id="icon-container" slot="icon" class=${classMap({ draft: this.#isDraft() })}>
+			<span id="icon-container" slot="icon" class=${classMap({ draft: this._isDraft })}>
 				${icon && iconWithoutColor
 					? html`
 							<umb-icon id="icon" slot="icon" name="${this._isActive ? iconWithoutColor : icon}"></umb-icon>
@@ -92,9 +52,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 	}
 
 	override renderLabel() {
-		return html`<span id="label" slot="label" class=${classMap({ draft: this.#isDraft() })}
-			>${this.#getLabel()}</span
-		> `;
+		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>${this._name}</span> `;
 	}
 
 	#renderStateIcon() {

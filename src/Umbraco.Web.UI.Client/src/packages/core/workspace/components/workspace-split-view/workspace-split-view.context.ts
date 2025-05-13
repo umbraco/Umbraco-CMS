@@ -6,8 +6,11 @@ import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
+import type { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 
 export class UmbWorkspaceSplitViewContext extends UmbContextBase<UmbWorkspaceSplitViewContext> {
+	//
+	#variantVariantValidationContext?: UmbValidationController;
 	#workspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
 	public getWorkspaceContext() {
 		return this.#workspaceContext;
@@ -43,10 +46,20 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase<UmbWorkspaceSpl
 		this.observe(
 			this.#workspaceContext.splitView.activeVariantByIndex(index),
 			async (activeVariantInfo) => {
+				if (this.#variantVariantValidationContext) {
+					this.#variantVariantValidationContext.unprovide();
+				}
 				if (!activeVariantInfo) return;
 
 				this.#datasetContext?.destroy();
 				const variantId = UmbVariantId.Create(activeVariantInfo);
+
+				const validationContext = this.#workspaceContext?.getVariantValidationContext(variantId);
+				if (validationContext) {
+					validationContext.provideAt(this);
+					this.#variantVariantValidationContext = validationContext;
+				}
+
 				this.#datasetContext = this.#workspaceContext?.createPropertyDatasetContext(this, variantId);
 				this.getHostElement().setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'workspace-split-view:' + variantId.toString());
 			},

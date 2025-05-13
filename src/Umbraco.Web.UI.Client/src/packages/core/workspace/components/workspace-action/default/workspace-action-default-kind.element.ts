@@ -13,6 +13,7 @@ import {
 	type UmbExtensionElementAndApiInitializer,
 	UmbExtensionsElementAndApiInitializer,
 } from '@umbraco-cms/backoffice/extension-api';
+import { stringOrStringArrayIntersects } from '@umbraco-cms/backoffice/utils';
 
 import '../../workspace-action-menu/index.js';
 
@@ -38,7 +39,6 @@ export class UmbWorkspaceActionElement<
 			this._href = value?.meta.href;
 			this._additionalOptions = value?.meta.additionalOptions;
 			this.#createAliases();
-			this.requestUpdate('manifest', oldValue);
 		}
 	}
 	public get manifest() {
@@ -90,7 +90,10 @@ export class UmbWorkspaceActionElement<
 			// TODO: This works on one level for now, which will be enough for the current use case. However, you can overwrite the overwrites, so we need to make this recursive. Perhaps we could move this to the extensions initializer.
 			// Add overwrites so that we can show any previously registered actions on the original workspace action
 			if (this.#manifest.overwrites) {
-				for (const alias of this.#manifest.overwrites) {
+				const overwrites = Array.isArray(this.#manifest.overwrites)
+					? this.#manifest.overwrites
+					: [this.#manifest.overwrites];
+				for (const alias of overwrites) {
 					aliases.add(alias);
 				}
 			}
@@ -115,7 +118,10 @@ export class UmbWorkspaceActionElement<
 				if (!this._additionalOptions) {
 					this._buttonState = 'success';
 				}
-			} catch {
+			} catch (reason) {
+				if (reason) {
+					console.warn(reason);
+				}
 				if (!this._additionalOptions) {
 					this._buttonState = 'failed';
 				}
@@ -145,11 +151,7 @@ export class UmbWorkspaceActionElement<
 			umbExtensionsRegistry,
 			'workspaceActionMenuItem',
 			ExtensionApiArgsMethod,
-			(action) => {
-				return Array.isArray(action.forWorkspaceActions)
-					? action.forWorkspaceActions.some((alias) => aliases.includes(alias))
-					: aliases.includes(action.forWorkspaceActions);
-			},
+			(action) => stringOrStringArrayIntersects(action.forWorkspaceActions, aliases),
 			(extensionControllers) => {
 				this._items = extensionControllers;
 			},

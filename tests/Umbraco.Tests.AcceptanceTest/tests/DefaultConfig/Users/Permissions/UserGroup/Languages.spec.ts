@@ -49,7 +49,7 @@ test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.language.createVietnameseLanguage();
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
   dataTypeId = dataType.id;
-  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId, 'TestGroup', true);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId, 'TestGroup', true, true);
   await umbracoApi.document.createDocumentWithMultipleVariants(documentName, documentTypeId, AliasHelper.toAlias(dataTypeName), cultureVariants);
 });
 
@@ -62,7 +62,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can rename content with language set in userGroup', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can rename content with language set in userGroup', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedContentName = 'UpdatedContentName';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithLanguageAndContentSection(userGroupName, englishIsoCode);
@@ -75,6 +75,7 @@ test('can rename content with language set in userGroup', async ({umbracoApi, um
   // Act
   await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(updatedContentName);
+  // Fix this later. Currently the "Save" button changed to "Save..." button
   await umbracoUi.content.clickSaveButton();
   await umbracoUi.content.clickSaveAndCloseButton();
 

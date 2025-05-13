@@ -10,11 +10,6 @@ export class UmbMenuElement extends UmbLitElement {
 	@property({ attribute: false })
 	manifest?: ManifestMenu;
 
-	constructor() {
-		super();
-		//this.provideContext(UMB_MENU_CONTEXT, new UmbMenuContext());
-	}
-
 	override render() {
 		return html`
 			<umb-extension-slot

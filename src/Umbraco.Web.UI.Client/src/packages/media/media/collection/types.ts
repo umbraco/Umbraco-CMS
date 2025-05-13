@@ -1,4 +1,4 @@
-import type { UmbFileDropzoneItemStatus } from '../dropzone/types.js';
+import type { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 
 export interface UmbMediaCollectionFilterModel extends UmbCollectionFilterModel {

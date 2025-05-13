@@ -8,7 +8,3 @@ export interface UmbEntityModel {
 export interface UmbNamedEntityModel extends UmbEntityModel {
 	name: string;
 }
-
-export interface UmbDefaultItemModel extends UmbNamedEntityModel {
-	icon?: string;
-}

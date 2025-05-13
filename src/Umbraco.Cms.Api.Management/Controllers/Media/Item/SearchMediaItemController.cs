@@ -32,12 +32,17 @@ public class SearchMediaItemController : MediaItemControllerBase
     public async Task<IActionResult> SearchFromParent(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, Guid? parentId = null)
         => await SearchFromParentWithAllowedTypes(cancellationToken, query, skip, take, parentId);
 
+    [NonAction]
+    [Obsolete("Scheduled to be removed in v16, use the non obsoleted method instead")]
+    public async Task<IActionResult> SearchFromParentWithAllowedTypes(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, Guid? parentId = null, [FromQuery]IEnumerable<Guid>? allowedMediaTypes = null)
+        => await SearchFromParentWithAllowedTypes(cancellationToken, query, null, skip, take, parentId);
+
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<MediaItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchFromParentWithAllowedTypes(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, Guid? parentId = null, [FromQuery]IEnumerable<Guid>? allowedMediaTypes = null)
+    public async Task<IActionResult> SearchFromParentWithAllowedTypes(CancellationToken cancellationToken, string query, bool? trashed = null, int skip = 0, int take = 100, Guid? parentId = null, [FromQuery]IEnumerable<Guid>? allowedMediaTypes = null)
     {
-        PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Media, query, parentId, allowedMediaTypes, skip, take);
+        PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Media, query, parentId, allowedMediaTypes, trashed, skip, take);
         var result = new PagedModel<MediaItemResponseModel>
         {
             Items = searchResult.Items.OfType<IMediaEntitySlim>().Select(_mediaPresentationFactory.CreateItemResponseModel),

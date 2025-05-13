@@ -62,6 +62,9 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	@property({ attribute: false })
 	public editContentTypePath?: string;
 
+	@property({ attribute: false })
+	public ownerVariesByCulture?: boolean;
+
 	@property({ type: Boolean, reflect: true, attribute: '_inherited' })
 	public _inherited?: boolean;
 
@@ -241,7 +244,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				</div>
 				<uui-button
 					id="editor"
-					look="secondary"
+					look="outline"
 					label=${this.localize.term('contentTypeEditor_editorSettings')}
 					href=${this.editPropertyTypePath +
 					UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this.property.id })}>
@@ -260,7 +263,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		if (!this.property) return;
 		return html`
 			<div class="sortable">
-				<uui-icon name="icon-navigation"></uui-icon>
+				<uui-icon name="icon-grip"></uui-icon>
 				<span>${this.property.name}</span>
 				<span style="color: var(--uui-color-disabled-contrast)">(${this.property.alias})</span>
 			</div>
@@ -294,9 +297,22 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		return this.property
 			? html`<div class="types">
 					${this.property.dataType?.unique ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
-					${this.property.variesByCulture
+					${this.ownerVariesByCulture
+						? this.property.variesByCulture
+							? html`<uui-tag look="default">
+									<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term(
+										'contentTypeEditor_cultureVariantLabel',
+									)}
+								</uui-tag>`
+							: html`<uui-tag look="default">
+									<uui-icon name="icon-shared-value"></uui-icon> ${this.localize.term(
+										'contentTypeEditor_cultureInvariantLabel',
+									)}
+								</uui-tag>`
+						: nothing}
+					${this.property.variesBySegment
 						? html`<uui-tag look="default">
-								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureVariantLabel')}
+								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_segmentVariantLabel')}
 							</uui-tag>`
 						: nothing}
 					${this.property.appearance?.labelOnTop == true
@@ -415,6 +431,12 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 			#editor {
 				position: relative;
+				--uui-button-background-color: var(--uui-color-background);
+				--uui-button-background-color-hover: var(--uui-color-background);
+			}
+			#editor uui-action-bar {
+				--uui-button-background-color: var(--uui-color-surface);
+				--uui-button-background-color-hover: var(--uui-color-surface);
 			}
 			#alias-input,
 			#label-input,

@@ -16,6 +16,14 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
     [SetUp]
     public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
 
+    public void Relate(IContent parent, IContent child)
+    {
+        var relatedContentRelType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+
+        var relation = RelationService.Relate(parent.Id, child.Id, relatedContentRelType);
+        RelationService.Save(relation);
+    }
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
         => builder.AddNotificationHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>();
 

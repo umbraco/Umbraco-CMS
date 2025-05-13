@@ -7,6 +7,10 @@ export default class UmbTiptapToolbarTextAlignRightExtensionApi extends UmbTipta
 	}
 
 	override execute(editor?: Editor) {
-		editor?.chain().focus().setTextAlign('right').run();
+		if (!this.isActive(editor)) {
+			editor?.chain().focus().setTextAlign('right').run();
+		} else {
+			editor?.chain().focus().unsetTextAlign().run();
+		}
 	}
 }

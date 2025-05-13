@@ -6,18 +6,18 @@ import styles from 'monaco-editor/min/vs/editor/editor.main.css?inline';
 const initializeWorkers = () => {
 	self.MonacoEnvironment = {
 		getWorker(workerId: string, label: string): Promise<Worker> | Worker {
-			let url = '/umbraco/backoffice/monaco-editor/esm/vs/editor/editor.worker.js';
+			let url = '/umbraco/backoffice/monaco-editor/vs/editor/editor.worker.js';
 			if (label === 'json') {
-				url = '/umbraco/backoffice/monaco-editor/esm/vs/language/json/json.worker.js';
+				url = '/umbraco/backoffice/monaco-editor/vs/language/json/json.worker.js';
 			}
 			if (label === 'css' || label === 'scss' || label === 'less') {
-				url = '/umbraco/backoffice/monaco-editor/esm/vs/language/css/css.worker.js';
+				url = '/umbraco/backoffice/monaco-editor/vs/language/css/css.worker.js';
 			}
 			if (label === 'html' || label === 'handlebars' || label === 'razor') {
-				url = '/umbraco/backoffice/monaco-editor/esm/vs/language/html/html.worker.js';
+				url = '/umbraco/backoffice/monaco-editor/vs/language/html/html.worker.js';
 			}
 			if (label === 'typescript' || label === 'javascript') {
-				url = '/umbraco/backoffice/monaco-editor/esm/vs/language/typescript/ts.worker.js';
+				url = '/umbraco/backoffice/monaco-editor/vs/language/typescript/ts.worker.js';
 			}
 			return new Worker(url, { name: workerId, type: 'module' });
 		},

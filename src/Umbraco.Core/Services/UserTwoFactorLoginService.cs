@@ -32,7 +32,7 @@ internal class UserTwoFactorLoginService : TwoFactorLoginServiceBase, IUserTwoFa
         return await base.DisableAsync(userKey, providerName);
     }
 
-    /// <inheritdoc cref="IUserTwoFactorLoginService.DisableAsync" />
+    /// <inheritdoc cref="IUserTwoFactorLoginService.GetProviderNamesAsync" />
     public override async Task<Attempt<IEnumerable<UserTwoFactorProviderModel>, TwoFactorOperationStatus>> GetProviderNamesAsync(Guid userKey)
     {
         IUser? user = await _userService.GetAsync(userKey);
@@ -45,7 +45,7 @@ internal class UserTwoFactorLoginService : TwoFactorLoginServiceBase, IUserTwoFa
         return await base.GetProviderNamesAsync(userKey);
     }
 
-    /// <inheritdoc cref="IUserTwoFactorLoginService.DisableAsync" />
+    /// <inheritdoc cref="IUserTwoFactorLoginService.GetSetupInfoAsync" />
     public override async Task<Attempt<ISetupTwoFactorModel, TwoFactorOperationStatus>> GetSetupInfoAsync(Guid userKey, string providerName)
     {
         IUser? user = await _userService.GetAsync(userKey);
@@ -58,7 +58,7 @@ internal class UserTwoFactorLoginService : TwoFactorLoginServiceBase, IUserTwoFa
         return await base.GetSetupInfoAsync(userKey, providerName);
     }
 
-    /// <inheritdoc cref="IUserTwoFactorLoginService.DisableAsync" />
+    /// <inheritdoc cref="IUserTwoFactorLoginService.ValidateAndSaveAsync" />
     public override async Task<Attempt<TwoFactorOperationStatus>> ValidateAndSaveAsync(string providerName, Guid userKey, string secret, string code)
     {
         IUser? user = await _userService.GetAsync(userKey);

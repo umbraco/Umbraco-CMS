@@ -2,7 +2,7 @@ import type { UmbContentDetailModel } from '../types.js';
 import { UmbElementWorkspaceDataManager } from './element-data-manager.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { appendToFrozenArray, jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
-import { UmbVariantId, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbVariantObjectCompare, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
 export class UmbContentWorkspaceDataManager<
 	ModelType extends UmbContentDetailModel,
@@ -17,6 +17,27 @@ export class UmbContentWorkspaceDataManager<
 	constructor(host: UmbControllerHost, variantScaffold?: ModelVariantType) {
 		super(host);
 		this.#variantScaffold = variantScaffold;
+	}
+
+	protected override _sortCurrentData<GivenType extends Partial<ModelType> = Partial<ModelType>>(
+		persistedData: Partial<ModelType>,
+		currentData: GivenType,
+	): GivenType {
+		currentData = super._sortCurrentData(persistedData, currentData);
+		// Sort the variants in the same order as the persisted data:
+		const persistedVariants = persistedData.variants;
+		if (persistedVariants && currentData.variants) {
+			return {
+				...currentData,
+				variants: [...currentData.variants].sort(function (a, b) {
+					return (
+						persistedVariants.findIndex((x) => umbVariantObjectCompare(x, a)) -
+						persistedVariants.findIndex((x) => umbVariantObjectCompare(x, b))
+					);
+				}),
+			};
+		}
+		return currentData;
 	}
 
 	/**
@@ -50,8 +71,7 @@ export class UmbContentWorkspaceDataManager<
 				} as ModelVariantType,
 				(x) => variantId.compare(x),
 			) as Array<ModelVariantType>;
-			// TODO: I have some trouble with TypeScript here, I does not look like me, but i had to give up. [NL]
-			this._current.update({ variants: newVariants } as any);
+			this.updateCurrent({ variants: newVariants } as unknown as ModelType);
 		} else if (this._varies === false) {
 			// TODO: Beware about segments, in this case we need to also consider segments, if its allowed to vary by segments.
 			const invariantVariantId = UmbVariantId.CreateInvariant();
@@ -65,8 +85,7 @@ export class UmbContentWorkspaceDataManager<
 					...update,
 				} as ModelVariantType,
 			];
-			// TODO: I have some trouble with TypeScript here, I does not look like me, but i had to give up. [NL]
-			this._current.update({ variants: newVariants } as any);
+			this.updateCurrent({ variants: newVariants } as unknown as ModelType);
 		} else {
 			throw new Error('Varies by culture is missing');
 		}

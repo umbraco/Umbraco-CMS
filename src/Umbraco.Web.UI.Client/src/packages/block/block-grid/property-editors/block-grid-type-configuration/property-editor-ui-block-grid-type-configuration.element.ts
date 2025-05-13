@@ -47,7 +47,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		getUniqueOfElement: (element) => element.getAttribute('data-umb-group-key'),
 		getUniqueOfModel: (modelEntry) => modelEntry.key!,
 		itemSelector: '.group',
-		draggableSelector: '.group-handle',
+		handleSelector: '.group-handle',
 		containerSelector: '#groups',
 		onChange: ({ model }) => {
 			this._groupsWithBlockTypes = model;

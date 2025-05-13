@@ -8,6 +8,7 @@ import type {
 	UmbRecycleBinRestoreRequestArgs,
 	UmbRecycleBinTrashRequestArgs,
 } from './types.js';
+import type { UmbNotificationHandler } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
@@ -21,6 +22,9 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
  */
 export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase implements UmbRecycleBinRepository {
 	#recycleBinSource: UmbRecycleBinDataSource;
+	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+	#requestTrashSuccessNotification?: UmbNotificationHandler;
+	#requestRestoreSuccessNotification?: UmbNotificationHandler;
 
 	/**
 	 * Creates an instance of UmbRecycleBinRepositoryBase.
@@ -31,6 +35,10 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 	constructor(host: UmbControllerHost, recycleBinSource: UmbRecycleBinDataSourceConstructor) {
 		super(host);
 		this.#recycleBinSource = new recycleBinSource(this);
+
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
+			this.#notificationContext = context;
+		});
 	}
 
 	/**
@@ -43,9 +51,9 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 		const { error } = await this.#recycleBinSource.trash(args);
 
 		if (!error) {
-			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+			this.#requestTrashSuccessNotification?.close();
 			const notification = { data: { message: `Trashed` } };
-			notificationContext.peek('positive', notification);
+			this.#requestTrashSuccessNotification = this.#notificationContext?.peek('positive', notification);
 		}
 
 		return { error };
@@ -61,9 +69,9 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 		const { error } = await this.#recycleBinSource.restore(args);
 
 		if (!error) {
-			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+			this.#requestRestoreSuccessNotification?.close();
 			const notification = { data: { message: `Restored` } };
-			notificationContext.peek('positive', notification);
+			this.#requestRestoreSuccessNotification = this.#notificationContext?.peek('positive', notification);
 		}
 
 		return { error };
@@ -78,9 +86,8 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 		const { error } = await this.#recycleBinSource.empty();
 
 		if (!error) {
-			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 			const notification = { data: { message: `Recycle Bin Emptied` } };
-			notificationContext.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		return this.#recycleBinSource.empty();

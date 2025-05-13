@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 
+[Obsolete("This is no longer used and has been migrated to an internal class within RadioButtonsPropertyEditor. Scheduled for removal in Umbraco 17.")]
 public class RadioValueValidator : IValueValidator
 {
     public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration,

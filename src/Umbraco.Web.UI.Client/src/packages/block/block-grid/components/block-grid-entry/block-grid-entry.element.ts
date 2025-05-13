@@ -1,16 +1,11 @@
-import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
 import type { UmbBlockGridLayoutModel } from '../../types.js';
 import { UMB_BLOCK_GRID } from '../../constants.js';
+import { UmbBlockGridEntryContext } from './block-grid-entry.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
-
-import '../block-grid-block-inline/index.js';
-import '../block-grid-block-unsupported/index.js';
-import '../block-grid-block/index.js';
-import '../block-scale-handler/index.js';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import type {
@@ -93,6 +88,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	_exposed?: boolean;
 
+	// Unuspported is triggerede if the Block Type is not reconized, it can also be triggerede by the Content Element Type not existing any longer. [NL]
 	@state()
 	_unsupported?: boolean;
 
@@ -107,13 +103,16 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_canScale?: boolean;
-
 	@state()
 	_showInlineCreateBefore?: boolean;
 	@state()
 	_showInlineCreateAfter?: boolean;
 	@state()
 	_inlineCreateAboveWidth?: string;
+
+	// If the Block Type is disallowed in this location then it become a invalid Block Type. Notice not supported blocks are determined via the unsupported property. [NL]
+	@property({ type: Boolean, attribute: 'location-invalid', reflect: true })
+	_invalidLocation?: boolean;
 
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
@@ -163,6 +162,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.canScale,
 			(canScale) => {
 				this._canScale = canScale;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.isAllowed,
+			(isAllowed) => {
+				this._invalidLocation = !isAllowed;
 			},
 			null,
 		);
@@ -435,7 +441,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	override render() {
-		return this.contentKey
+		return this.contentKey && (this._contentTypeAlias || this._unsupported)
 			? html`
 					${this.#renderCreateBeforeInlineButton()}
 					<div class="umb-block-grid__block" part="umb-block-grid__block">
@@ -450,7 +456,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						>
 						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
-							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
+							: nothing}
+						${this._invalidLocation
+							? html`<uui-tag id="invalidLocation" color="danger"
+									><umb-localize key="blockEditor_invalidDropPosition" .args=${[this._label]}></umb-localize
+								></uui-tag>`
 							: nothing}
 						${this._canScale
 							? html` <umb-block-scale-handler
@@ -551,7 +562,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 					href=${this._workspaceEditContentPath}>
 					<uui-icon name=${this._exposed === false ? 'icon-add' : 'icon-edit'}></uui-icon>
 					${this._contentInvalid
-						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+						? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
 						: nothing}
 				</uui-button>`
 			: this._showContentEdit === false && this._exposed === false
@@ -570,11 +581,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				? html`<uui-button
 						label="Edit settings"
 						look="secondary"
-						color=${this._settingsInvalid ? 'danger' : ''}
+						color=${this._settingsInvalid ? 'invalid' : ''}
 						href=${this._workspaceEditSettingsPath}>
 						<uui-icon name="icon-settings"></uui-icon>
 						${this._settingsInvalid
-							? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
+							? html`<uui-badge attention color="invalid" label="Invalid settings">!</uui-badge>`
 							: nothing}
 					</uui-button>`
 				: nothing}
@@ -624,9 +635,17 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				transition: border-color 240ms ease-in;
 			}
 
+			:host([location-invalid])::after,
 			:host([settings-invalid])::after,
 			:host([content-invalid])::after {
-				border-color: var(--uui-color-danger);
+				border-color: var(--uui-color-invalid);
+			}
+
+			#invalidLocation {
+				position: absolute;
+				top: -1em;
+				left: var(--uui-size-space-2);
+				z-index: 2;
 			}
 
 			uui-action-bar {

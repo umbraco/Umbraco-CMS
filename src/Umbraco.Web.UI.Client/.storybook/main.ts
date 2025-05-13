@@ -35,7 +35,9 @@ const config: StorybookConfig = {
 	typescript: {
 		check: true,
 	},
-	docs: {},
+	docs: {
+        autodocs: true
+    },
 	managerHead(head, { configType }) {
 		const base = process.env.VITE_BASE_PATH || '/';
 		const injections = [

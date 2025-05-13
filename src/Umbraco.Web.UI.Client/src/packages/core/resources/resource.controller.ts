@@ -50,8 +50,9 @@ export class UmbResourceController extends UmbControllerBase {
 	 * Wrap the {tryExecute} function in a try/catch block and return the result.
 	 * If the executor function throws an error, then show the details in a notification.
 	 * @param _options
+	 * @param options
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions): Promise<UmbDataSourceResponse<T>> {
 		const { data, error } = await UmbResourceController.tryExecute<T>(this.#promise);
 
@@ -71,7 +72,7 @@ export class UmbResourceController extends UmbControllerBase {
 			 */
 			if (isCancelError(error)) {
 				// Cancelled - do nothing
-				return {};
+				return { error };
 			} else {
 				console.groupCollapsed('ApiError caught in UmbResourceController');
 				console.error('Request failed', error.request);

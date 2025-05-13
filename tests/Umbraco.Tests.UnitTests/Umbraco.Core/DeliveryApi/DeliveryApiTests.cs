@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
@@ -113,13 +114,14 @@ public class DeliveryApiTests
         content.SetupGet(c => c.ContentType).Returns(contentType);
         content.SetupGet(c => c.Properties).Returns(properties);
         content.SetupGet(c => c.ItemType).Returns(contentType.ItemType);
+        content.SetupGet(c => c.Level).Returns(1);
         content.Setup(c => c.IsPublished(It.IsAny<string?>())).Returns(true);
     }
 
     protected string DefaultUrlSegment(string name, string? culture = null)
         => $"{name.ToLowerInvariant().Replace(" ", "-")}{(culture.IsNullOrWhiteSpace() ? string.Empty : $"-{culture}")}";
 
-    protected ApiContentRouteBuilder CreateContentRouteBuilder(
+    protected virtual ApiContentRouteBuilder CreateContentRouteBuilder(
         IApiContentPathProvider contentPathProvider,
         IOptions<GlobalSettings> globalSettings,
         IVariationContextAccessor? variationContextAccessor = null,
@@ -127,7 +129,8 @@ public class DeliveryApiTests
         IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null,
         IPublishedContentCache? contentCache = null,
         IDocumentNavigationQueryService? navigationQueryService = null,
-        IPublishStatusQueryService? publishStatusQueryService = null)
+        IPublishStatusQueryService? publishStatusQueryService = null,
+        IDocumentUrlService? documentUrlService = null)
     {
         if (requestHandlerSettingsMonitor == null)
         {
@@ -144,6 +147,7 @@ public class DeliveryApiTests
             requestHandlerSettingsMonitor,
             contentCache ?? Mock.Of<IPublishedContentCache>(),
             navigationQueryService ?? Mock.Of<IDocumentNavigationQueryService>(),
-            publishStatusQueryService ?? PublishStatusQueryService);
+            publishStatusQueryService ?? PublishStatusQueryService,
+            documentUrlService ?? Mock.Of<IDocumentUrlService>());
     }
 }

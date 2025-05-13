@@ -1,1 +1,1 @@
-export type { UmbDocumentItemModel } from './repository/types.js';
+export type * from './repository/types.js';

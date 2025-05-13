@@ -1,6 +1,6 @@
 import type { UmbUserDetailModel, UmbUserStartNodesModel } from '../../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
-import { UmbUserKind } from '../../utils/index.js';
+import { UmbUserKind } from '../../utils/user-kind.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {

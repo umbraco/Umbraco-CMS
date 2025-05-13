@@ -1183,8 +1183,13 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return pagedModel;
     }
 
+
     /// <inheritdoc />
     public async Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take)
+        => await GetAllowedChildrenAsync(key, null, skip, take);
+
+    /// <inheritdoc />
+    public async Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, Guid? parentContentKey, int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         TItem? parent = Get(key);
@@ -1197,7 +1202,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         IEnumerable<ContentTypeSort> allowedContentTypes = parent.AllowedContentTypes;
         foreach (IContentTypeFilter filter in _contentTypeFilters)
         {
-            allowedContentTypes = await filter.FilterAllowedChildrenAsync(allowedContentTypes, key);
+            allowedContentTypes = await filter.FilterAllowedChildrenAsync(allowedContentTypes, key, parentContentKey);
         }
 
         PagedModel<TItem> result;

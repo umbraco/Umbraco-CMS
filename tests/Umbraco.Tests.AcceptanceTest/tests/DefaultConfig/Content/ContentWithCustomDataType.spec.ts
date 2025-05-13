@@ -244,8 +244,8 @@ test('can add string to the multiple text string in the content section', async 
 
 test('can create content with the custom data type with slider property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  customDataTypeName = 'Slider';
-  const customDataTypeId = await umbracoApi.dataType.createSliderDataTyper(customDataTypeName);
+  customDataTypeName = 'Custom Slider';
+  const customDataTypeId = await umbracoApi.dataType.createSliderDataType(customDataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
@@ -273,7 +273,7 @@ test('can change slider value in the content section', async ({umbracoApi, umbra
     "from": sliderValue,
     "to": sliderValue
   }
-  const customDataTypeId = await umbracoApi.dataType.createSliderDataTyper(customDataTypeName);
+  const customDataTypeId = await umbracoApi.dataType.createSliderDataType(customDataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();

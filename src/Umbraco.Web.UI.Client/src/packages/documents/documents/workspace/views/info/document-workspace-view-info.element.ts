@@ -60,7 +60,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		super();
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath(':entityType')
+			.addAdditionalPath('general/:entityType')
 			.onSetup((params) => {
 				return { data: { entityType: params.entityType, preset: {} } };
 			})

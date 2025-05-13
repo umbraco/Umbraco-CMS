@@ -46,7 +46,7 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 			...pickerData?.search?.queryParams,
 		};
 
-		super.openPicker(combinedPickerData);
+		await super.openPicker(combinedPickerData);
 	}
 
 	#pickableFilter = (

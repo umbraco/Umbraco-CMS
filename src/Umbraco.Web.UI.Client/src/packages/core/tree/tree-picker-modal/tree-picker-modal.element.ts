@@ -182,6 +182,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				.props=${{
 					hideTreeItemActions: true,
 					hideTreeRoot: this.data?.hideTreeRoot,
+					expandTreeRoot: this.data?.expandTreeRoot,
 					selectionConfiguration: this._selectionConfiguration,
 					filter: this.data?.filter,
 					selectableFilter: this.data?.pickableFilter,

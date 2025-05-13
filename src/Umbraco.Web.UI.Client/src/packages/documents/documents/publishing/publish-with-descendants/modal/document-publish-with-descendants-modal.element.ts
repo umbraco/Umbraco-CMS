@@ -18,7 +18,6 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 > {
 	#selectionManager = new UmbSelectionManager<string>(this);
 	#includeUnpublishedDescendants = false;
-	#forceRepublish = false;
 
 	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
@@ -80,11 +79,14 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 		);
 	}
 
-	#submit() {
+	#onIncludeUnpublishedDescendantsChange() {
+		this.#includeUnpublishedDescendants = !this.#includeUnpublishedDescendants;
+	}
+
+	async #submit() {
 		this.value = {
 			selection: this.#selectionManager.getSelection(),
 			includeUnpublishedDescendants: this.#includeUnpublishedDescendants,
-			forceRepublish: this.#forceRepublish,
 		};
 		this.modalContext?.submit();
 	}
@@ -94,7 +96,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	}
 
 	override render() {
-		return html`<umb-body-layout headline=${this.localize.term('buttons_publishDescendants')}>
+		return html`<uui-dialog-layout headline=${this.localize.term('buttons_publishDescendants')}>
 			<p id="subtitle">
 				${this._options.length === 1
 					? html`<umb-localize
@@ -122,15 +124,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 					id="includeUnpublishedDescendants"
 					label=${this.localize.term('content_includeUnpublished')}
 					?checked=${this.value?.includeUnpublishedDescendants}
-					@change=${() => (this.#includeUnpublishedDescendants = !this.#includeUnpublishedDescendants)}></uui-toggle>
-			</uui-form-layout-item>
-
-			<uui-form-layout-item>
-				<uui-toggle
-					id="forceRepublish"
-					label=${this.localize.term('content_forceRepublish')}
-					?checked=${this.value?.forceRepublish}
-					@change=${() => (this.#forceRepublish = !this.#forceRepublish)}></uui-toggle>
+					@change=${this.#onIncludeUnpublishedDescendantsChange}></uui-toggle>
 			</uui-form-layout-item>
 
 			<div slot="actions">
@@ -142,7 +136,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 					?disabled=${this._hasNotSelectedMandatory}
 					@click=${this.#submit}></uui-button>
 			</div>
-		</umb-body-layout> `;
+		</uui-dialog-layout> `;
 	}
 
 	static override styles = [

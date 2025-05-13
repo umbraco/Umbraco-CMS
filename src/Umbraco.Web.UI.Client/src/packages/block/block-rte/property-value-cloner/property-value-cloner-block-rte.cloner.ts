@@ -1,15 +1,15 @@
 import {
 	UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS,
-	type UmbPropertyEditorUiValueType,
+	type UmbPropertyEditorRteValueType,
 } from '@umbraco-cms/backoffice/rte';
 import type { UmbPropertyValueCloner } from '@umbraco-cms/backoffice/property';
 import { UmbFlatLayoutBlockPropertyValueCloner } from '@umbraco-cms/backoffice/block';
 
-export class UmbBlockRTEPropertyValueCloner implements UmbPropertyValueCloner<UmbPropertyEditorUiValueType> {
+export class UmbBlockRTEPropertyValueCloner implements UmbPropertyValueCloner<UmbPropertyEditorRteValueType> {
 	#markup?: string;
 	#markupDoc?: Document;
 
-	async cloneValue(value: UmbPropertyEditorUiValueType) {
+	async cloneValue(value: UmbPropertyEditorRteValueType) {
 		if (value) {
 			this.#markup = value.markup;
 
@@ -19,7 +19,7 @@ export class UmbBlockRTEPropertyValueCloner implements UmbPropertyValueCloner<Um
 			const cloner = new UmbFlatLayoutBlockPropertyValueCloner(UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS, {
 				contentIdUpdatedCallback: this.#replaceContentKeyInMarkup,
 			});
-			const result = {} as UmbPropertyEditorUiValueType;
+			const result = {} as UmbPropertyEditorRteValueType;
 			result.blocks = await cloner.cloneValue(value.blocks);
 			result.markup = this.#markup;
 			return result;

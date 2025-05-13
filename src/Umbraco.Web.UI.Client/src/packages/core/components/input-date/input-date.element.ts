@@ -1,4 +1,4 @@
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 export type InputDateType = 'date' | 'time' | 'datetime-local';
@@ -28,6 +28,16 @@ export class UmbInputDateElement extends UUIInputElement {
 		super();
 		this.type = 'date'; // Default to 'date'
 	}
+
+	// Adding styles override to add a darkmode version.
+	static override styles = [
+		...UUIInputElement.styles,
+		css`
+			input {
+				color-scheme: var(--uui-color-scheme, normal);
+			}
+		`,
+	];
 }
 
 export default UmbInputDateElement;

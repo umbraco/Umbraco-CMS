@@ -62,7 +62,7 @@ test('can create child content in a collection', async ({umbracoApi, umbracoUi})
   expect(childData[0].variants[0].name).toBe(firstChildContentName);
   // verify that the child content displays in collection list after reloading tree
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickReloadButton();
+  await umbracoUi.content.clickReloadChildrenButton();
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.doesDocumentTableColumnNameValuesMatch(expectedNames);
 
@@ -95,7 +95,7 @@ test('can create multiple child nodes in a collection', async ({umbracoApi, umbr
   expect(childData[1].variants[0].name).toBe(secondChildContentName);
   // verify that the child content displays in collection list after reloading tree
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickReloadButton();
+  await umbracoUi.content.clickReloadChildrenButton();
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.doesDocumentTableColumnNameValuesMatch(expectedNames);
 

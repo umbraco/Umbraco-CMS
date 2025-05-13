@@ -291,8 +291,8 @@ internal class MediaCacheService : IMediaCacheService
 
     private HybridCacheEntryOptions GetSeedEntryOptions() => new()
     {
-        Expiration = _cacheSettings.SeedCacheDuration,
-        LocalCacheExpiration = _cacheSettings.SeedCacheDuration,
+        Expiration = _cacheSettings.Entry.Media.SeedCacheDuration,
+        LocalCacheExpiration = _cacheSettings.Entry.Media.SeedCacheDuration,
     };
 
     private string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";

@@ -1,8 +1,10 @@
-/* This Source Code has been derived from Lee Kelleher's Contentment.
+/*
+ * This Source Code has been derived from Contentment.
  * https://github.com/leekelleher/umbraco-contentment/blob/develop/src/Umbraco.Community.Contentment/DataEditors/Bytes/bytes.js
- * SPDX-License-Identifier: MPL-2.0
- * Copyright © 2019 Lee Kelleher.
- * Modifications are licensed under the MIT License.
+ * Copyright © 2016-2023 Lee Kelleher
+ * Copyright © 2024 Umbraco A/S
+ * Originally licensed under the Mozilla Public License, v. 2.0
+ * Relicensed under the MIT License with permission from the copyright holder.
  */
 
 export interface IFormatBytesOptions {

@@ -1,18 +1,48 @@
 import type { UmbTreeItemContext } from '../index.js';
 import type { UmbTreeItemModel } from '../../types.js';
-import { UMB_TREE_ITEM_CONTEXT } from './tree-item-context-base.js';
 import { html, nothing, state, ifDefined, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
-export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeItemModel> extends UmbLitElement {
-	_item?: TreeItemModelType;
+export abstract class UmbTreeItemElementBase<
+	TreeItemModelType extends UmbTreeItemModel,
+	TreeItemContextType extends UmbTreeItemContext<TreeItemModelType> = UmbTreeItemContext<TreeItemModelType>,
+> extends UmbLitElement {
+	protected _item?: TreeItemModelType;
 	@property({ type: Object, attribute: false })
 	get item(): TreeItemModelType | undefined {
 		return this._item;
 	}
 	set item(newVal: TreeItemModelType) {
 		this._item = newVal;
-		this.#initTreeItem();
+
+		if (this._item) {
+			this.#initTreeItem();
+		}
+	}
+
+	#api: TreeItemContextType | undefined;
+	@property({ type: Object, attribute: false })
+	public get api(): TreeItemContextType | undefined {
+		return this.#api;
+	}
+	public set api(value: TreeItemContextType | undefined) {
+		this.#api = value;
+
+		if (this.#api) {
+			this.observe(this.#api.childItems, (value) => (this._childItems = value));
+			this.observe(this.#api.hasChildren, (value) => (this._hasChildren = value));
+			this.observe(this.#api.isActive, (value) => (this._isActive = value));
+			this.observe(this.#api.isOpen, (value) => (this._isOpen = value));
+			this.observe(this.#api.isLoading, (value) => (this._isLoading = value));
+			this.observe(this.#api.isSelectableContext, (value) => (this._isSelectableContext = value));
+			this.observe(this.#api.isSelectable, (value) => (this._isSelectable = value));
+			this.observe(this.#api.isSelected, (value) => (this._isSelected = value));
+			this.observe(this.#api.path, (value) => (this._href = value));
+			this.observe(this.#api.pagination.currentPage, (value) => (this._currentPage = value));
+			this.observe(this.#api.pagination.totalPages, (value) => (this._totalPages = value));
+			this.#initTreeItem();
+		}
 	}
 
 	@property({ type: Boolean, attribute: false })
@@ -43,6 +73,9 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	private _hasChildren = false;
 
 	@state()
+	private _isOpen = false;
+
+	@state()
 	private _iconSlotHasChildren = false;
 
 	@state()
@@ -51,58 +84,36 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	@state()
 	private _currentPage = 1;
 
-	#treeItemContext?: UmbTreeItemContext<TreeItemModelType>;
-
-	constructor() {
-		super();
-
-		// TODO: Notice this can be retrieve via a api property. [NL]
-		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (instance) => {
-			this.#treeItemContext = instance;
-			if (!this.#treeItemContext) return;
-
-			this.#initTreeItem();
-
-			// TODO: investigate if we can make an observe decorator
-			this.observe(this.#treeItemContext.treeItem, (value) => (this._item = value));
-			this.observe(this.#treeItemContext.childItems, (value) => (this._childItems = value));
-			this.observe(this.#treeItemContext.hasChildren, (value) => (this._hasChildren = value));
-			this.observe(this.#treeItemContext.isActive, (value) => (this._isActive = value));
-			this.observe(this.#treeItemContext.isLoading, (value) => (this._isLoading = value));
-			this.observe(this.#treeItemContext.isSelectableContext, (value) => (this._isSelectableContext = value));
-			this.observe(this.#treeItemContext.isSelectable, (value) => (this._isSelectable = value));
-			this.observe(this.#treeItemContext.isSelected, (value) => (this._isSelected = value));
-			this.observe(this.#treeItemContext.path, (value) => (this._href = value));
-			this.observe(this.#treeItemContext.pagination.currentPage, (value) => (this._currentPage = value));
-			this.observe(this.#treeItemContext.pagination.totalPages, (value) => (this._totalPages = value));
-		});
-	}
-
 	#initTreeItem() {
-		if (!this.#treeItemContext) return;
+		if (!this.#api) return;
 		if (!this._item) return;
-		this.#treeItemContext.setTreeItem(this._item);
+		this.#api.setTreeItem(this._item);
 	}
 
 	private _handleSelectedItem(event: Event) {
 		event.stopPropagation();
-		this.#treeItemContext?.select();
+		this.#api?.select();
 	}
 
 	private _handleDeselectedItem(event: Event) {
 		event.stopPropagation();
-		this.#treeItemContext?.deselect();
+		this.#api?.deselect();
 	}
 
-	// TODO: do we want to catch and emit a backoffice event here?
-	private _onShowChildren() {
-		this.#treeItemContext?.loadChildren();
+	private _onShowChildren(event: UUIMenuItemEvent) {
+		event.stopPropagation();
+		this.#api?.showChildren();
+	}
+
+	private _onHideChildren(event: UUIMenuItemEvent) {
+		event.stopPropagation();
+		this.#api?.hideChildren();
 	}
 
 	#onLoadMoreClick = (event: any) => {
 		event.stopPropagation();
 		const next = (this._currentPage = this._currentPage + 1);
-		this.#treeItemContext?.pagination.setCurrentPageNumber(next);
+		this.#api?.pagination.setCurrentPageNumber(next);
 	};
 
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
@@ -112,6 +123,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 		return html`
 			<uui-menu-item
 				@show-children=${this._onShowChildren}
+				@hide-children=${this._onHideChildren}
 				@selected=${this._handleSelectedItem}
 				@deselected=${this._handleDeselectedItem}
 				?active=${this._isActive}
@@ -120,6 +132,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}
 				.hasChildren=${this._hasChildren}
+				.showChildren=${this._isOpen}
 				.caretLabel=${this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + label}
 				label=${label}
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
@@ -168,11 +181,11 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 
 	#renderActions() {
 		if (this.hideActions) return;
-		return this.#treeItemContext && this._item
+		return this.#api && this._item
 			? html`<umb-entity-actions-bundle
 					slot="actions"
-					.entityType=${this.#treeItemContext.entityType}
-					.unique=${this.#treeItemContext.unique}
+					.entityType=${this.#api.entityType}
+					.unique=${this.#api.unique}
 					.label=${this._item.name}>
 				</umb-entity-actions-bundle>`
 			: '';

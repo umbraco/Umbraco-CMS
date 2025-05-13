@@ -177,6 +177,7 @@ export abstract class UmbBaseExtensionsInitializer<
 
 		this.#exposedPermittedExts = approvedExtensions;
 
+		// TODO: Option to first resolve once all have responded are completed. [NL]
 		if (this.#exposedPermittedExts.length > 0) {
 			this.#promiseResolvers.forEach((x) => x());
 			this.#promiseResolvers = [];

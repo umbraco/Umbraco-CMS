@@ -1,41 +1,22 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import type { UmbDocumentItemModel } from './types.js';
-import {
-	classMap,
-	css,
-	customElement,
-	html,
-	ifDefined,
-	nothing,
-	property,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import { UmbDocumentItemDataResolver } from './document-item-data-resolver.js';
+import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-document-item-ref')
 export class UmbDocumentItemRefElement extends UmbLitElement {
-	#item?: UmbDocumentItemModel | undefined;
+	#item = new UmbDocumentItemDataResolver<UmbDocumentItemModel>(this);
 
 	@property({ type: Object })
 	public get item(): UmbDocumentItemModel | undefined {
-		return this.#item;
+		return this.#item.getData();
 	}
 	public set item(value: UmbDocumentItemModel | undefined) {
-		const oldValue = this.#item;
-		this.#item = value;
-
-		if (!this.#item) {
-			this.#modalRoute?.destroy();
-			return;
-		}
-
-		if (oldValue?.unique === this.#item.unique) {
-			return;
-		}
-
-		this.#modalRoute?.setUniquePathValue('unique', this.#item.unique);
+		this.#item.setData(value);
 	}
 
 	@property({ type: Boolean })
@@ -45,15 +26,27 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	standalone = false;
 
 	@state()
-	_editPath = '';
+	_unique = '';
 
-	#modalRoute?: any;
+	@state()
+	_name = '';
+
+	@state()
+	_icon = '';
+
+	@state()
+	_isTrashed = false;
+
+	@state()
+	_isDraft = false;
+
+	@state()
+	_editPath = '';
 
 	constructor() {
 		super();
 
-		this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath(UMB_DOCUMENT_ENTITY_TYPE)
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addUniquePaths(['unique'])
 			.onSetup(() => {
 				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
@@ -61,14 +54,18 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 			.observeRouteBuilder((routeBuilder) => {
 				this._editPath = routeBuilder({});
 			});
+
+		this.#item.observe(this.#item.unique, (unique) => (this._unique = unique ?? ''));
+		this.#item.observe(this.#item.name, (name) => (this._name = name ?? ''));
+		this.#item.observe(this.#item.icon, (icon) => (this._icon = icon ?? ''));
+		this.#item.observe(this.#item.isTrashed, (isTrashed) => (this._isTrashed = isTrashed ?? false));
+		this.#item.observe(this.#item.isDraft, (isDraft) => (this._isDraft = isDraft ?? false));
 	}
 
-	#isDraft(item: UmbDocumentItemModel) {
-		return item.variants[0]?.state === 'Draft';
-	}
-
-	#getHref(item: UmbDocumentItemModel) {
-		return `${this._editPath}/edit/${item.unique}`;
+	#getHref() {
+		if (!this._unique) return;
+		const path = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this._unique });
+		return `${this._editPath}/${path}`;
 	}
 
 	override render() {
@@ -76,34 +73,30 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 
 		return html`
 			<uui-ref-node
-				class=${classMap({ draft: this.#isDraft(this.item) })}
-				name=${this.item.name}
-				href=${ifDefined(this.#getHref(this.item))}
+				name=${this._name}
+				href=${ifDefined(this.#getHref())}
 				?readonly=${this.readonly}
 				?standalone=${this.standalone}>
 				<slot name="actions" slot="actions"></slot>
-				${this.#renderIcon(this.item)} ${this.#renderIsTrashed(this.item)}
+				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
 			</uui-ref-node>
 		`;
 	}
 
-	#renderIcon(item: UmbDocumentItemModel) {
-		if (!item.documentType.icon) return;
-		return html`<umb-icon slot="icon" name=${item.documentType.icon}></umb-icon>`;
+	#renderIcon() {
+		if (!this._icon) return nothing;
+		return html`<umb-icon slot="icon" name=${this._icon}></umb-icon>`;
 	}
 
-	#renderIsTrashed(item: UmbDocumentItemModel) {
-		if (!item.isTrashed) return;
+	#renderIsTrashed() {
+		if (!this._isTrashed) return nothing;
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
-	static override styles = [
-		css`
-			.draft {
-				opacity: 0.6;
-			}
-		`,
-	];
+	#renderIsDraft() {
+		if (!this._isDraft) return nothing;
+		return html`<uui-tag size="s" slot="tag" look="secondary" color="default">Draft</uui-tag>`;
+	}
 }
 
 export { UmbDocumentItemRefElement as element };

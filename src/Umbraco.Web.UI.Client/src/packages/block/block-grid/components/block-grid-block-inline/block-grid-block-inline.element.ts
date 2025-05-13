@@ -1,11 +1,9 @@
-import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../context/block-grid-entry.context-token.js';
+import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../block-grid-entry/constants.js';
 import type { UmbBlockGridWorkspaceOriginData } from '../../workspace/block-grid-workspace.modal-token.js';
-import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../../context/block-grid-entries.context-token.js';
+import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../block-grid-entries/constants.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
-import '../block-grid-areas-container/index.js';
-import '../ref-grid-block/index.js';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 import {
 	type UMB_BLOCK_WORKSPACE_CONTEXT,
@@ -204,12 +202,12 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 					.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize
 			></uui-button>`;
 		} else {
-			return html`<div id="inside">
+			return html`<div id="inside" draggable="false">
 				<umb-property-type-based-property
 					.property=${this._inlineProperty}
 					.dataPath=${this._inlinePropertyDataPath ?? ''}
 					slot="areas"></umb-property-type-based-property>
-				<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
+				<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
 			</div>`;
 		}
 	}

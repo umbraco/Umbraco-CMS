@@ -83,9 +83,6 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 		return this.#pickerContext.getSelection();
 	}
 
-	@property({ type: Boolean })
-	showOpenButton?: boolean;
-
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
 

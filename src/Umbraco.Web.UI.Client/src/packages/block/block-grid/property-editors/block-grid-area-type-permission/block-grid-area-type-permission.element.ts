@@ -3,7 +3,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, css, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/data-type';
 import type { UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
 import type { UUIComboboxElement, UUIComboboxEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -12,6 +11,7 @@ import {
 	UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 	type UmbDocumentTypeItemModel,
 } from '@umbraco-cms/backoffice/document-type';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-property-editor-ui-block-grid-area-type-permission')
 export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
@@ -78,7 +78,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 
 	#addNewPermission() {
 		this.value = [...this.value, { minAllowed: 0, maxAllowed: undefined }];
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#setPermissionKey(e: UUIComboboxEvent, index: number) {
@@ -95,7 +95,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 			: { elementTypeKey: undefined, groupKey: undefined };
 
 		this.value = value.map((permission, i) => (i === index ? { ...permission, ...setting } : permission));
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#setPermissionMinimumRange(e: UUIInputEvent, index: number) {
@@ -105,7 +105,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 		this.value = value.map((permission, i) =>
 			i === index ? { ...permission, minAllowed: parseInt(input) ?? 0 } : permission,
 		);
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 	#setPermissionMaximumRange(e: UUIInputEvent, index: number) {
 		const value = [...this.value];
@@ -114,12 +114,12 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 		this.value = value.map((permission, i) =>
 			i === index ? { ...permission, maxAllowed: parseInt(input) ?? undefined } : permission,
 		);
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#remove(index: number) {
 		this.value = [...this.value].filter((_, i) => i !== index);
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

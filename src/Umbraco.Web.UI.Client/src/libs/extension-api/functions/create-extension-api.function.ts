@@ -5,10 +5,10 @@ import type { UmbApiConstructorArgumentsMethodType } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
- *
- * @param host
- * @param manifest
- * @param constructorArgs
+ * @param {UmbControllerHost} host - The controller host for this controller to be appended to
+ * @param {ManifestApi} manifest - The manifest of the extension
+ * @param {Array | UmbApiConstructorArgumentsMethodType} constructorArgs - The constructor arguments to pass to the API class
+ * @returns {Promise<UmbApi | undefined>} - The API class instance
  */
 export async function createExtensionApi<ApiType extends UmbApi = UmbApi>(
 	host: UmbControllerHost,

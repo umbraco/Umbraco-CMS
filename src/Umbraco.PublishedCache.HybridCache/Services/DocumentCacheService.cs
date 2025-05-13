@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -115,18 +115,16 @@ internal sealed class DocumentCacheService : IDocumentCacheService
                 // When unpublishing a node, a payload with RefreshBranch is published, so we don't have to worry about this.
                 // Similarly, when a branch is published, next time the content is requested, the parent will be published,
                 // this works because we don't cache null values.
-                if (preview is false && contentCacheNode is not null)
+                if (preview is false && contentCacheNode is not null && HasPublishedAncestorPath(contentCacheNode.Key) is false)
                 {
-                    if (HasPublishedAncestorPath(contentCacheNode.Key) is false)
-                    {
-                        return null;
-                    }
+                    // Careful not to early return here. We need to complete the scope even if returning null.
+                    contentCacheNode = null;
                 }
 
                 scope.Complete();
                 return contentCacheNode;
             },
-            GetEntryOptions(key));
+            GetEntryOptions(key, preview));
 
         // We don't want to cache removed items, this may cause issues if the L2 serializer changes.
         if (contentCacheNode is null)
@@ -209,13 +207,13 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         ContentCacheNode? draftNode = await _databaseCacheRepository.GetContentSourceAsync(key, true);
         if (draftNode is not null)
         {
-            await _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key));
+            await _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true));
         }
 
         ContentCacheNode? publishedNode = await _databaseCacheRepository.GetContentSourceAsync(key, false);
         if (publishedNode is not null && HasPublishedAncestorPath(publishedNode.Key))
         {
-            await _hybridCache.SetAsync(GetCacheKey(publishedNode.Key, false), publishedNode, GetEntryOptions(publishedNode.Key));
+            await _hybridCache.SetAsync(GetCacheKey(publishedNode.Key, false), publishedNode, GetEntryOptions(publishedNode.Key, false));
         }
 
         scope.Complete();
@@ -276,9 +274,9 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         LocalCacheExpiration = _cacheSettings.Entry.Document.SeedCacheDuration
     };
 
-    private HybridCacheEntryOptions GetEntryOptions(Guid key)
+    private HybridCacheEntryOptions GetEntryOptions(Guid key, bool preview)
     {
-        if (SeedKeys.Contains(key))
+        if (SeedKeys.Contains(key) && preview is false)
         {
             return GetSeedEntryOptions();
         }

@@ -110,7 +110,7 @@ export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement
 			<uui-button
 				id="btn-add"
 				look="placeholder"
-				@click=${() => this.#pickerContext.openPicker()}
+				@click=${() => this.#pickerContext.openPicker({ pickableFilter: (item) => !item.isFolder })}
 				label="Add stylesheet"></uui-button>
 		`;
 	}
@@ -118,13 +118,14 @@ export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement
 	#renderItem(item: UmbStylesheetItemModel) {
 		if (!item.unique) return;
 		return html`
-			<uui-ref-node-data-type name=${item.name}>
+			<uui-ref-node name=${item.name}>
+				<uui-icon slot="icon" name="icon-palette"></uui-icon>
 				<uui-action-bar slot="actions">
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.unique!)}
 						label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
-			</uui-ref-node-data-type>
+			</uui-ref-node>
 		`;
 	}
 

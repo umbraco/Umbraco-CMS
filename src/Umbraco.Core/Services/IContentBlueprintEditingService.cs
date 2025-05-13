@@ -8,6 +8,8 @@ public interface IContentBlueprintEditingService
 {
     Task<IContent?> GetAsync(Guid key);
 
+    Task<IContent?> GetScaffoldedAsync(Guid key) => Task.FromResult<IContent?>(null);
+
     Task<Attempt<PagedModel<IContent>?, ContentEditingOperationStatus>> GetPagedByContentTypeAsync(
         Guid contentTypeKey,
         int skip,

@@ -1,6 +1,7 @@
 import { readFileSync, writeFile, mkdir, rmSync } from 'fs';
 import * as globModule from 'tiny-glob';
 import * as pathModule from 'path';
+import { optimize } from 'svgo';
 
 const path = pathModule.default;
 const getDirName = path.dirname;
@@ -13,6 +14,10 @@ const iconMapJson = `${moduleDirectory}/icon-dictionary.json`;
 
 const lucideSvgDirectory = 'node_modules/lucide-static/icons';
 const simpleIconsSvgDirectory = 'node_modules/simple-icons/icons';
+
+const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
+
+const errors = [];
 
 const run = async () => {
 	// Empty output directory:
@@ -55,6 +60,7 @@ const collectDictionaryIcons = async () => {
 
 				icons.push(icon);
 			} catch (e) {
+				errors.push(`[Lucide] Could not load file: '${path}'`);
 				console.log(`[Lucide] Could not load file: '${path}'`);
 			}
 		}
@@ -86,6 +92,7 @@ const collectDictionaryIcons = async () => {
 
 				icons.push(icon);
 			} catch (e) {
+				errors.push(`[SimpleIcons] Could not load file: '${path}'`);
 				console.log(`[SimpleIcons] Could not load file: '${path}'`);
 			}
 		}
@@ -111,6 +118,7 @@ const collectDictionaryIcons = async () => {
 
 				icons.push(icon);
 			} catch (e) {
+				errors.push(`[Umbraco] Could not load file: '${path}'`);
 				console.log(`[Umbraco] Could not load file: '${path}'`);
 			}
 		}
@@ -157,7 +165,9 @@ const collectDiskIcons = async (icons) => {
 
 const writeIconsToDisk = (icons) => {
 	icons.forEach((icon) => {
-		const content = 'export default `' + icon.svg + '`;';
+		const optimizedResult = optimize(icon.svg);
+
+		const content = 'export default `' + optimizedResult.data + '`;';
 
 		writeFileWithDir(icon.output, content, (err) => {
 			if (err) {
@@ -176,10 +186,11 @@ const generateJS = (icons) => {
 
 	const iconDescriptors = icons.map((icon) => {
 		// remove legacy for v.17 (Deprecated)
+		// Notice how legacy also makes an icon hidden. Legacy will be removed in v.17, but still used in the dictionary for legacy icons. But outward they are both hidden. [NL]
 		return `{
 			name: "${icon.name}",
 			${icon.legacy ? 'legacy: true,' : ''}
-			${icon.hidden ? 'hidden: true,' : ''}
+			${icon.hidden || icon.legacy ? 'hidden: true,' : ''}
 			path: () => import("./icons/${icon.fileName}.js"),
 		}`.replace(/\t/g, '').replace(/^\s*[\r\n]/gm, ''); // Regex removes white space [NL] // + regex that removes empty lines. [NL]
 	});
@@ -199,10 +210,23 @@ const generateJS = (icons) => {
 
 const writeFileWithDir = (path, contents, cb) => {
 	mkdir(getDirName(path), { recursive: true }, function (err) {
-		if (err) return cb(err);
+		if (err) {
+			errors.push(err);
+			return cb(err);
+		}
 
 		writeFile(path, contents, cb);
 	});
 };
 
-run();
+await run();
+
+if (errors.length > 0) {
+	if (IS_GITHUB_ACTIONS) {
+		const msg = errors.join('\n');
+		console.log(`::error title=Failed to generate all icons::${msg}`);
+		process.exit(1);
+	} else {
+		console.error('Failed to generate all icons, please see the error log');
+	}
+}
