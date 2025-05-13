@@ -27,7 +27,7 @@ public interface IAuditService : IService
         string? comment = null,
         string? parameters = null) => throw new NotImplementedException();
 
-    [Obsolete("Use AddAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use AddAsync() instead. Scheduled for removal in Umbraco 19.")]
     void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null);
 
     /// <summary>
@@ -53,7 +53,7 @@ public interface IAuditService : IService
         DateTimeOffset? sinceDate = null,
         AuditType[]? auditTypeFilter = null) => throw new NotImplementedException();
 
-    [Obsolete("Use GetItemsAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use GetItemsAsync() instead. Scheduled for removal in Umbraco 19.")]
     IEnumerable<IAuditItem> GetLogs(AuditType type, DateTime? sinceDate = null);
 
     /// <summary>
@@ -126,7 +126,7 @@ public interface IAuditService : IService
     ///     Optional filter to be applied.
     /// </param>
     /// <returns>The paged items in the audit trail for the specified entity.</returns>
-    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 19.")]
     IEnumerable<IAuditItem> GetPagedItemsByEntity(
         int entityId,
         long pageIndex,
@@ -136,7 +136,7 @@ public interface IAuditService : IService
         AuditType[]? auditTypeFilter = null,
         IQuery<IAuditItem>? customFilter = null);
 
-    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 19.")]
     IEnumerable<IAuditItem> GetLogs(int objectId);
 
     /// <summary>
@@ -181,7 +181,7 @@ public interface IAuditService : IService
     ///     Optional filter to be applied.
     /// </param>
     /// <returns></returns>
-    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 19.")]
     IEnumerable<IAuditItem> GetPagedItemsByUser(
         int userId,
         long pageIndex,
@@ -191,7 +191,7 @@ public interface IAuditService : IService
         AuditType[]? auditTypeFilter = null,
         IQuery<IAuditItem>? customFilter = null);
 
-    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 19.")]
     IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null);
 
     /// <summary>
@@ -213,7 +213,7 @@ public interface IAuditService : IService
     /// </param>
     /// <param name="eventDetails">Free-form details about the audited event.</param>
     /// <returns>The created audit entry.</returns>
-    [Obsolete("Use IAuditEntryService.WriteAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use IAuditEntryService.WriteAsync() instead. Scheduled for removal in Umbraco 19.")]
     IAuditEntry Write(
         int performingUserId,
         string perfomingDetails,
@@ -231,6 +231,6 @@ public interface IAuditService : IService
     /// <returns>Task representing the asynchronous operation.</returns>
     public Task CleanLogsAsync(int maximumAgeOfLogsInMinutes) => throw new NotImplementedException();
 
-    [Obsolete("Use CleanLogsAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use CleanLogsAsync() instead. Scheduled for removal in Umbraco 19.")]
     void CleanLogs(int maximumAgeOfLogsInMinutes);
 }

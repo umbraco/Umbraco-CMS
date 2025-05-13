@@ -41,7 +41,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     /// <summary>
     ///     Initializes a new instance of the <see cref="AuditService" /> class.
     /// </summary>
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public AuditService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -65,7 +65,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         Task.FromResult(AddInner(type, userId, objectId, entityType, comment, parameters));
 
     /// <inheritdoc />
-    [Obsolete("Use AddAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use AddAsync() instead. Scheduled for removal in Umbraco 19.")]
     public void Add(
         AuditType type,
         int userId,
@@ -102,7 +102,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use GetItemsAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use GetItemsAsync() instead. Scheduled for removal in Umbraco 19.")]
     public IEnumerable<IAuditItem> GetLogs(AuditType type, DateTime? sinceDate = null)
     {
         IQuery<IAuditItem>? customFilter = sinceDate.HasValue
@@ -181,7 +181,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 19.")]
     public IEnumerable<IAuditItem> GetPagedItemsByEntity(
         int entityId,
         long pageIndex,
@@ -213,7 +213,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 19.")]
     public IEnumerable<IAuditItem> GetLogs(int objectId)
     {
         PagedModel<IAuditItem> result = GetItemsByEntityInner(objectId, 0, int.MaxValue, Direction.Ascending);
@@ -253,7 +253,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 19.")]
     public IEnumerable<IAuditItem> GetPagedItemsByUser(
         int userId,
         long pageIndex,
@@ -285,7 +285,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 19.")]
     public IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null)
     {
         IQuery<IAuditItem>? customFilter = sinceDate.HasValue
@@ -302,7 +302,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use AuditEntryService.WriteAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use AuditEntryService.WriteAsync() instead. Scheduled for removal in Umbraco 19.")]
     public IAuditEntry Write(
         int performingUserId,
         string perfomingDetails,
@@ -336,7 +336,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use CleanLogsAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use CleanLogsAsync() instead. Scheduled for removal in Umbraco 19.")]
     public void CleanLogs(int maximumAgeOfLogsInMinutes)
         => CleanLogsInner(maximumAgeOfLogsInMinutes);
 
