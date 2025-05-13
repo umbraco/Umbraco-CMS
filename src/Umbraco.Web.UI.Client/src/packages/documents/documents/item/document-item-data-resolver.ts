@@ -45,6 +45,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	constructor(host: UmbControllerHost) {
 		super(host);
 
+		// TODO: listen for UMB_VARIANT_CONTEXT when available
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#propertyDataSetCulture = context?.getVariantId();
 			this.#setVariantAwareValues();

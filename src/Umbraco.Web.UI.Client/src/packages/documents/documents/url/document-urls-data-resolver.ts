@@ -4,7 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A controller for resolving data for document urls
@@ -13,7 +13,6 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
  * @augments {UmbControllerBase}
  */
 export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
-	#defaultCulture?: string;
 	#appCulture?: string;
 	#propertyDataSetCulture?: UmbVariantId;
 	#data?: Array<UmbDocumentUrlModel> | undefined;
@@ -31,23 +30,13 @@ export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-			this.#propertyDataSetCulture = context?.getVariantId();
-			this.#setCultureAwareValues();
-		});
-
-		// We do not depend on this context because we know is it only available in some cases
-		this.#init = this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (context) => {
-			this.observe(context?.appLanguageCulture, (culture) => {
-				this.#appCulture = culture;
+		// TODO: listen for UMB_VARIANT_CONTEXT when available
+		this.#init = Promise.all([
+			this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
+				this.#propertyDataSetCulture = context?.getVariantId();
 				this.#setCultureAwareValues();
-			});
-
-			this.observe(context?.appDefaultLanguage, (value) => {
-				this.#defaultCulture = value?.unique;
-				this.#setCultureAwareValues();
-			});
-		}).asPromise();
+			}).asPromise(),
+		]);
 	}
 
 	/**
@@ -95,11 +84,12 @@ export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
 	}
 
 	#getCurrentCulture(): string | undefined {
-		return this.#propertyDataSetCulture?.culture || this.#appCulture || this.#defaultCulture;
+		return this.#propertyDataSetCulture?.culture || this.#appCulture;
 	}
 
 	#getDataForCurrentCulture(): Array<UmbDocumentUrlModel> | undefined {
 		const culture = this.#getCurrentCulture();
-		return this.#data?.filter((x) => x.culture === culture);
+		// If there is no culture context (invariant data) we return all urls
+		return culture ? this.#data?.filter((x) => x.culture === culture) : this.#data;
 	}
 }
