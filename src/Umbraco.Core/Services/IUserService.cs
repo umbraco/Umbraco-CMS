@@ -231,7 +231,22 @@ public interface IUserService : IMembershipUserService
     /// </returns>
     IEnumerable<IUser> GetAllNotInGroup(int groupId);
 
+    /// <summary>
+    ///    Gets a page of users, ordered by Id and starting from the provided Id.
+    /// </summary>
+    /// <param name="id">The user Id to start retrieving users from.</param>
+    /// <param name="count">The number of users to return.</param>
+    /// <returns>A page of <see cref="IUser"/> instances.</returns>
+    [Obsolete("No longer used in Umbraco. Scheduled for removal in Umbraco 18.")]
     IEnumerable<IUser> GetNextUsers(int id, int count);
+
+    /// <summary>
+    ///    Gets a page of approved users, ordered by Id and starting from the provided Id.
+    /// </summary>
+    /// <param name="id">The user Id to start retrieving users from.</param>
+    /// <param name="count">The number of users to return.</param>
+    /// <returns>A page of <see cref="IUser"/> instances.</returns>
+    IEnumerable<IUser> GetNextApprovedUsers(int id, int count) => Enumerable.Empty<IUser>();
 
     /// <summary>
     ///     Invalidates sessions for users that aren't associated with the current collection of providers.

@@ -1053,13 +1053,25 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return sql;
     }
 
-    public IEnumerable<IUser> GetNextUsers(int id, int count)
+    /// <inheritdoc/>
+    public IEnumerable<IUser> GetNextUsers(int id, int count) => PerformGetNextUsers(id, false, count);
+
+    /// <inheritdoc/>
+    public IEnumerable<IUser> GetNextApprovedUsers(int id, int count) => PerformGetNextUsers(id, true, count);
+
+    private IEnumerable<IUser> PerformGetNextUsers(int id, bool approvedOnly, int count)
     {
         Sql<ISqlContext> idsQuery = SqlContext.Sql()
             .Select<UserDto>(x => x.Id)
             .From<UserDto>()
-            .Where<UserDto>(x => x.Id >= id)
-            .OrderBy<UserDto>(x => x.Id);
+            .Where<UserDto>(x => x.Id >= id);
+
+        if (approvedOnly)
+        {
+            idsQuery = idsQuery.Where<UserDto>(x => x.Disabled == false);
+        }
+
+        idsQuery = idsQuery.OrderBy<UserDto>(x => x.Id);
 
         // first page is index 1, not zero
         var ids = Database.Page<int>(1, count, idsQuery).Items.ToArray();
