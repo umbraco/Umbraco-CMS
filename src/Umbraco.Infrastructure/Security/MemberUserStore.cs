@@ -195,7 +195,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 {
                     // As part of logging in members we update the last login date, and, if concurrent logins are disabled, the security stamp.
                     // If and only if we are updating these properties, we can avoid the overhead of a full save of the member with the associated
-                    // locking, property updates, tag handline etc., and make a more efficient update.
+                    // locking, property updates, tag handling etc., and make a more efficient update.
                     if (UpdatingOnlyLoginProperties(propertiesUpdated))
                     {
                         await _memberService.UpdateLoginPropertiesAsync(found);
