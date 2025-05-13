@@ -40,10 +40,8 @@ export class UmbDropdownElement extends UmbLitElement {
 		super.updated(_changedProperties);
 		if (_changedProperties.has('open') && this.popoverContainerElement) {
 			if (this.open) {
-				console.warn('open is currently not working, use .openDropdown() instead');
 				this.openDropdown();
 			} else {
-				console.warn('open is currently not working, use .closeDropdown() instead');
 				this.closeDropdown();
 			}
 		}
