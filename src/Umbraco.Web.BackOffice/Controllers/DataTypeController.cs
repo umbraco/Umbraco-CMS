@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
@@ -48,6 +49,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IConfigurationEditorJsonSerializer _serializer;
         private readonly IDataTypeUsageService _dataTypeUsageService;
+        private readonly IEntityService _entityService;
 
         [Obsolete("Use constructor that takes IDataTypeUsageService, scheduled for removal in V12")]
         public DataTypeController(
@@ -74,9 +76,41 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             localizedTextService,
             backOfficeSecurityAccessor,
             serializer,
-            StaticServiceProvider.Instance.GetRequiredService<IDataTypeUsageService>())
+            StaticServiceProvider.Instance.GetRequiredService<IDataTypeUsageService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IEntityService>())
          {
          }
+
+        [Obsolete("Use constructor that takes IDataTypeUsageService, scheduled for removal in V17")]
+        public DataTypeController(
+            PropertyEditorCollection propertyEditors,
+            IDataTypeService dataTypeService,
+            IOptionsSnapshot<ContentSettings> contentSettings,
+            IUmbracoMapper umbracoMapper,
+            PropertyEditorCollection propertyEditorCollection,
+            IContentTypeService contentTypeService,
+            IMediaTypeService mediaTypeService,
+            IMemberTypeService memberTypeService,
+            ILocalizedTextService localizedTextService,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IConfigurationEditorJsonSerializer serializer,
+            IDataTypeUsageService dataTypeUsageService)
+            : this(
+                propertyEditors,
+                dataTypeService,
+                contentSettings,
+                umbracoMapper,
+                propertyEditorCollection,
+                contentTypeService,
+                mediaTypeService,
+                memberTypeService,
+                localizedTextService,
+                backOfficeSecurityAccessor,
+                serializer,
+                dataTypeUsageService,
+                StaticServiceProvider.Instance.GetRequiredService<IEntityService>())
+        {
+        }
 
         [ActivatorUtilitiesConstructor]
         public DataTypeController(
@@ -91,7 +125,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ILocalizedTextService localizedTextService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IConfigurationEditorJsonSerializer serializer,
-            IDataTypeUsageService dataTypeUsageService)
+            IDataTypeUsageService dataTypeUsageService,
+            IEntityService entityService)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
@@ -105,6 +140,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backOfficeSecurityAccessor));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             _dataTypeUsageService = dataTypeUsageService ?? throw new ArgumentNullException(nameof(dataTypeUsageService));
+            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
         /// <summary>
@@ -466,13 +502,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpGet]
         public DataTypeReferences GetReferences(Guid id)
         {
-            IDataType? dataType = _dataTypeService.GetDataType(id);
-            if (dataType is null)
-            {
-                return new DataTypeReferences();
-            }
-
-            return GetReferences(dataType.Id);
+            IEntitySlim? dataType = _entityService.Get(id, UmbracoObjectTypes.DataType);
+            return dataType is null
+                ? new DataTypeReferences()
+                : GetReferences(dataType.Id);
         }
 
         [HttpGet]
