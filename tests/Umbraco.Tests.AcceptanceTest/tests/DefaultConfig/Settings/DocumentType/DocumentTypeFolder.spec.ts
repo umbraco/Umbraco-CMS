@@ -61,6 +61,7 @@ test('can rename a document type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.documentType.clickRenameActionMenuOption();
   await umbracoUi.documentType.enterFolderName(documentFolderName);
   await umbracoUi.documentType.clickConfirmRenameButton();
+  await umbracoUi.waitForTimeout(500);
 
   // Assert
   //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);

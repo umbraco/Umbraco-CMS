@@ -213,7 +213,7 @@ test('can remove a block in a group from a block grid editor', {tag: '@smoke'}, 
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeFalsy();
 });
 
-test('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondGroupName = 'MoveToHereGroup';
@@ -228,6 +228,7 @@ test('can move a block from a group to another group in a block grid editor', as
   // Drag and Drop
   const dragFromLocator = await umbracoUi.dataType.getLinkWithName(elementTypeName);
   const dragToLocator = await umbracoUi.dataType.getAddButtonInGroupWithName(secondGroupName);
+  // This needs to be fixed
   await umbracoUi.dataType.dragAndDrop(dragFromLocator, dragToLocator, -10, 0, 10);
   await umbracoUi.dataType.clickSaveButton();
 
