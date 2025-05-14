@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -22,6 +23,7 @@ public class AuditServiceTests
     private Mock<ICoreScopeProvider> _scopeProviderMock;
     private Mock<IAuditRepository> _auditRepositoryMock;
     private Mock<IEntityService> _entityServiceMock;
+    private Mock<IUserService> _userServiceMock;
 
     [SetUp]
     public void Setup()
@@ -29,19 +31,20 @@ public class AuditServiceTests
         _scopeProviderMock = new Mock<ICoreScopeProvider>(MockBehavior.Strict);
         _auditRepositoryMock = new Mock<IAuditRepository>(MockBehavior.Strict);
         _entityServiceMock = new Mock<IEntityService>(MockBehavior.Strict);
+        _userServiceMock = new Mock<IUserService>(MockBehavior.Strict);
 
         _auditService = new AuditService(
             _scopeProviderMock.Object,
             Mock.Of<ILoggerFactory>(MockBehavior.Strict),
             Mock.Of<IEventMessagesFactory>(MockBehavior.Strict),
             _auditRepositoryMock.Object,
-            Mock.Of<IUserService>(MockBehavior.Strict),
+            _userServiceMock.Object,
             _entityServiceMock.Object);
     }
 
-    [TestCase(AuditType.Publish, -1, 33, null, null, null)]
-    [TestCase(AuditType.Copy, -1, 1, "entityType", "comment", "parameters")]
-    public async Task AddAsync_Calls_Repository_With_Correct_Values(AuditType type, int userId, int objectId, string? entityType, string? comment, string? parameters = null)
+    [TestCase(AuditType.Publish, 33, null, null, null)]
+    [TestCase(AuditType.Copy, 1, "entityType", "comment", "parameters")]
+    public async Task AddAsync_Calls_Repository_With_Correct_Values(AuditType type, int objectId, string? entityType, string? comment, string? parameters = null)
     {
         SetupScopeProviderMock();
 
@@ -49,24 +52,49 @@ public class AuditServiceTests
             .Callback<IAuditItem>(item =>
             {
                 Assert.AreEqual(type, item.AuditType);
-                Assert.AreEqual(userId, item.UserId);
+                Assert.AreEqual(Constants.Security.SuperUserId, item.UserId);
                 Assert.AreEqual(objectId, item.Id);
                 Assert.AreEqual(entityType, item.EntityType);
                 Assert.AreEqual(comment, item.Comment);
                 Assert.AreEqual(parameters, item.Parameters);
             });
 
-        var result = await _auditService.AddAsync(type, userId, objectId, entityType, comment, parameters);
+        Mock<IUser> mockUser = new Mock<IUser>();
+        mockUser.Setup(x => x.Id).Returns(Constants.Security.SuperUserId);
+
+        _userServiceMock.Setup(x => x.GetAsync(Constants.Security.SuperUserKey)).ReturnsAsync(mockUser.Object);
+
+        var result = await _auditService.AddAsync(
+            type,
+            Constants.Security.SuperUserKey,
+            objectId,
+            entityType,
+            comment,
+            parameters);
         _auditRepositoryMock.Verify(x => x.Save(It.IsAny<IAuditItem>()), Times.Once);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(AuditLogOperationStatus.Success, result.Result);
     }
 
     [Test]
+    public async Task AddAsync_Does_Not_Succeed_When_Non_Existing_User_Is_Provided()
+    {
+        _userServiceMock.Setup(x => x.GetAsync(It.IsAny<Guid>())).ReturnsAsync((IUser?)null);
+
+        var result = await _auditService.AddAsync(
+            AuditType.Publish,
+            Guid.Parse("00000000-0000-0000-0000-000000000001"),
+            1,
+            "entityType",
+            "comment",
+            "parameters");
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(AuditLogOperationStatus.UserNotFound, result.Result);
+    }
+
+    [Test]
     public void GetItemsAsync_Throws_When_Invalid_Pagination_Arguments_Are_Provided()
     {
-        SetupScopeProviderMock();
-
         Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _auditService.GetItemsAsync(-1, 10), "Skip must be greater than or equal to 0.");
         Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _auditService.GetItemsAsync(0, -1), "Take must be greater than 0.");
         Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _auditService.GetItemsAsync(0, 0), "Take must be greater than 0.");
@@ -99,8 +127,6 @@ public class AuditServiceTests
     [Test]
     public void GetItemsByKeyAsync_Throws_When_Invalid_Pagination_Arguments_Are_Provided()
     {
-        SetupScopeProviderMock();
-
         Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _auditService.GetItemsByKeyAsync(Guid.Empty, UmbracoObjectTypes.Document, -1, 10), "Skip must be greater than or equal to 0.");
         Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _auditService.GetItemsByKeyAsync(Guid.Empty, UmbracoObjectTypes.Document, 0, -1), "Take must be greater than 0.");
         Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _auditService.GetItemsByKeyAsync(Guid.Empty, UmbracoObjectTypes.Document, 0, 0), "Take must be greater than 0.");

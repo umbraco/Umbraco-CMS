@@ -2,6 +2,8 @@
 // See LICENSE for more details.
 
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
@@ -25,6 +27,7 @@ public sealed class RelateOnTrashNotificationHandler :
     private readonly IRelationService _relationService;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly ILocalizedTextService _textService;
 
     public RelateOnTrashNotificationHandler(
@@ -33,7 +36,8 @@ public sealed class RelateOnTrashNotificationHandler :
         ILocalizedTextService textService,
         IAuditService auditService,
         IScopeProvider scopeProvider,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IUserIdKeyResolver userIdKeyResolver)
     {
         _relationService = relationService;
         _entityService = entityService;
@@ -41,6 +45,26 @@ public sealed class RelateOnTrashNotificationHandler :
         _auditService = auditService;
         _scopeProvider = scopeProvider;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _userIdKeyResolver = userIdKeyResolver;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
+    public RelateOnTrashNotificationHandler(
+        IRelationService relationService,
+        IEntityService entityService,
+        ILocalizedTextService textService,
+        IAuditService auditService,
+        IScopeProvider scopeProvider,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        : this(
+            relationService,
+            entityService,
+            textService,
+            auditService,
+            scopeProvider,
+            backOfficeSecurityAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+    {
     }
 
     public void Handle(ContentMovedNotification notification)
@@ -96,7 +120,7 @@ public sealed class RelateOnTrashNotificationHandler :
 
                     await _auditService.AddAsync(
                         AuditType.Delete,
-                        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? item.Entity.WriterId,
+                        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? await _userIdKeyResolver.GetAsync(item.Entity.WriterId),
                         item.Entity.Id,
                         UmbracoObjectTypes.Document.GetName(),
                         string.Format(_textService.Localize("recycleBin", "contentTrashed"), item.Entity.Id, originalParentId));
@@ -161,7 +185,7 @@ public sealed class RelateOnTrashNotificationHandler :
                     _relationService.Save(relation);
                     await _auditService.AddAsync(
                         AuditType.Delete,
-                        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? item.Entity.WriterId,
+                        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? await _userIdKeyResolver.GetAsync(item.Entity.WriterId),
                         item.Entity.Id,
                         UmbracoObjectTypes.Media.GetName(),
                         string.Format(_textService.Localize("recycleBin", "mediaTrashed"), item.Entity.Id, originalParentId));

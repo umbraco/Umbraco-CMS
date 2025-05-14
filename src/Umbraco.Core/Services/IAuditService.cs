@@ -13,7 +13,7 @@ public interface IAuditService : IService
     ///    Adds an audit entry.
     /// </summary>
     /// <param name="type">The type of the audit.</param>
-    /// <param name="userId">The identifier of the user triggering the event.</param>
+    /// <param name="userKey">The key of the user triggering the event.</param>
     /// <param name="objectId">The identifier of the affected object.</param>
     /// <param name="entityType">The entity type of the affected object.</param>
     /// <param name="comment">The comment associated with the audit entry.</param>
@@ -21,7 +21,7 @@ public interface IAuditService : IService
     /// <returns>Result of the add audit log operation.</returns>
     public Task<Attempt<AuditLogOperationStatus>> AddAsync(
         AuditType type,
-        int userId,
+        Guid userKey,
         int objectId,
         string? entityType,
         string? comment = null,

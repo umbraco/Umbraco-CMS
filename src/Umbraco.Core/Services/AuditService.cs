@@ -55,14 +55,27 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     /// <inheritdoc />
-    public Task<Attempt<AuditLogOperationStatus>> AddAsync(
+    public async Task<Attempt<AuditLogOperationStatus>> AddAsync(
         AuditType type,
-        int userId,
+        Guid userKey,
         int objectId,
         string? entityType,
         string? comment = null,
-        string? parameters = null) =>
-        Task.FromResult(AddInner(type, userId, objectId, entityType, comment, parameters));
+        string? parameters = null)
+    {
+        var userId = userKey switch
+        {
+            { } when userKey == Constants.Security.UnknownUserKey => Constants.Security.UnknownUserId,
+            _ => (await _userService.GetAsync(userKey))?.Id,
+        };
+
+        if (userId is null)
+        {
+            return Attempt.Fail(AuditLogOperationStatus.UserNotFound);
+        }
+
+        return AddInner(type, userId.Value, objectId, entityType, comment, parameters);
+    }
 
     /// <inheritdoc />
     [Obsolete("Use AddAsync() instead. Scheduled for removal in Umbraco 19.")]

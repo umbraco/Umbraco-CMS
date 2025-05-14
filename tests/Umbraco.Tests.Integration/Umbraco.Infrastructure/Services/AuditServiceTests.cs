@@ -27,10 +27,10 @@ internal sealed class AuditServiceTests : UmbracoIntegrationTest
         for (var i = 0; i < numberOfEntries; i++)
         {
             eventDateUtc = eventDateUtc.AddMinutes(1);
-            await sut.AddAsync(AuditType.Unpublish, -1, 33, string.Empty, "blah");
+            await sut.AddAsync(AuditType.Unpublish, Constants.Security.SuperUserKey, 33, string.Empty, "blah");
         }
 
-        await sut.AddAsync(AuditType.Publish, -1, 33, string.Empty, "blah");
+        await sut.AddAsync(AuditType.Publish, Constants.Security.SuperUserKey, 33, string.Empty, "blah");
 
         var logs = (await sut.GetPagedItemsByUserAsync(
             Constants.Security.SuperUserKey,
