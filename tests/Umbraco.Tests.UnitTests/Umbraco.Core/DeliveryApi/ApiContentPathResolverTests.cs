@@ -11,6 +11,7 @@ public class ApiContentPathResolverTests
     private const string TestPath = "/test/page";
 
     [TestCase(TestPath, true)]
+    [TestCase("/", true)]
     [TestCase("file.txt", false)]
     [TestCase("test/file.txt", false)]
     [TestCase("test/test2/file.txt", false)]
@@ -24,11 +25,12 @@ public class ApiContentPathResolverTests
         Assert.AreEqual(expected, result);
     }
 
-    [Test]
-    public void Resolves_Content_For_Path()
+    [TestCase(TestPath)]
+    [TestCase("/")]
+    public void Resolves_Content_For_Path(string path)
     {
         var resolver = CreateResolver();
-        var result = resolver.ResolveContentPath(TestPath);
+        var result = resolver.ResolveContentPath(path);
         Assert.IsNotNull(result);
     }
 
@@ -40,7 +42,10 @@ public class ApiContentPathResolverTests
             .Returns((string path) => path);
         var mockApiPublishedContentCache = new Mock<IApiPublishedContentCache>();
         mockApiPublishedContentCache
-            .Setup(x => x.GetByRoute(It.Is<string>(y => y == TestPath)))
+            .Setup(x => x.GetByRoute(TestPath))
+            .Returns(new Mock<IPublishedContent>().Object);
+        mockApiPublishedContentCache
+            .Setup(x => x.GetByRoute("/"))
             .Returns(new Mock<IPublishedContent>().Object);
         return new ApiContentPathResolver(mockRequestRoutingService.Object, mockApiPublishedContentCache.Object);
     }

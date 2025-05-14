@@ -1053,13 +1053,25 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return sql;
     }
 
-    public IEnumerable<IUser> GetNextUsers(int id, int count)
+    /// <inheritdoc/>
+    public IEnumerable<IUser> GetNextUsers(int id, int count) => PerformGetNextUsers(id, false, count);
+
+    /// <inheritdoc/>
+    public IEnumerable<IUser> GetNextApprovedUsers(int id, int count) => PerformGetNextUsers(id, true, count);
+
+    private IEnumerable<IUser> PerformGetNextUsers(int id, bool approvedOnly, int count)
     {
         Sql<ISqlContext> idsQuery = SqlContext.Sql()
             .Select<UserDto>(x => x.Id)
             .From<UserDto>()
-            .Where<UserDto>(x => x.Id >= id)
-            .OrderBy<UserDto>(x => x.Id);
+            .Where<UserDto>(x => x.Id >= id);
+
+        if (approvedOnly)
+        {
+            idsQuery = idsQuery.Where<UserDto>(x => x.Disabled == false);
+        }
+
+        idsQuery = idsQuery.OrderBy<UserDto>(x => x.Id);
 
         // first page is index 1, not zero
         var ids = Database.Page<int>(1, count, idsQuery).Items.ToArray();
@@ -1069,6 +1081,46 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             ? Enumerable.Empty<IUser>()
             : GetMany(ids).OrderBy(x => x.Id) ?? Enumerable.Empty<IUser>();
     }
+
+    /// <inheritdoc />
+    public void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentLoginProviders)
+    {
+        // Get all the user or member keys associated with the removed providers.
+        Sql<ISqlContext> idsQuery = SqlContext.Sql()
+            .Select<ExternalLoginDto>(x => x.UserOrMemberKey)
+            .From<ExternalLoginDto>()
+            .WhereNotIn<ExternalLoginDto>(x => x.LoginProvider, currentLoginProviders);
+        List<Guid> userAndMemberKeysAssociatedWithRemovedProviders = Database.Fetch<Guid>(idsQuery);
+        if (userAndMemberKeysAssociatedWithRemovedProviders.Count == 0)
+        {
+            return;
+        }
+
+        // Filter for actual users and convert to integer IDs.
+        var userIdsAssociatedWithRemovedProviders = userAndMemberKeysAssociatedWithRemovedProviders
+            .Select(ConvertUserKeyToUserId)
+            .Where(x => x.HasValue)
+            .Select(x => x!.Value)
+            .ToList();
+        if (userIdsAssociatedWithRemovedProviders.Count == 0)
+        {
+            return;
+        }
+
+        // Invalidate the security stamps on the users associated with the removed providers.
+        Sql<ISqlContext> updateQuery = Sql()
+            .Update<UserDto>(u => u.Set(x => x.SecurityStampToken, "0".PadLeft(32, '0')))
+            .WhereIn<UserDto>(x => x.Id, userIdsAssociatedWithRemovedProviders);
+        Database.Execute(updateQuery);
+    }
+
+    private static int? ConvertUserKeyToUserId(Guid userOrMemberKey) =>
+
+        // User Ids are stored as integers in the umbracoUser table, but as a GUID representation
+        // of that integer in umbracoExternalLogin (converted via IntExtensions.ToGuid()).
+        // We need to parse that to get the user Ids to invalidate.
+        // Note also that umbracoExternalLogin contains members too, as proper GUIDs, so we need to ignore them.
+        IntExtensions.TryParseFromGuid(userOrMemberKey, out int? userId) ? userId : null;
 
     #endregion
 }
