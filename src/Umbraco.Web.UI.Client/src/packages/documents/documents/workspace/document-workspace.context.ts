@@ -449,7 +449,7 @@ export class UmbDocumentWorkspaceContext
 
 					const datasetVariantId = UmbVariantId.CreateFromPartial(variantOption);
 					const invariantVariantId = UmbVariantId.CreateInvariant();
-					const unique = `UMB_PREVENT_EDIT_INVARIANT_FROM_NON_DEFAULT_${datasetVariantId.toString()}`;
+					const unique = `UMB_PREVENT_EDIT_INVARIANT_FROM_NON_DEFAULT_DATASET=${datasetVariantId.toString()}_PROPERTY_${invariantVariantId.toString()}`;
 
 					const rule: UmbVariantPropertyGuardRule = {
 						unique,
