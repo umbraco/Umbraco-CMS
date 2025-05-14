@@ -9,7 +9,7 @@ const password = process.env.UMBRACO_USER_PASSWORD;
 test('Install Umbraco', async ({page, umbracoUi}) => {
   test.slow();
   // Arrange
-  await page.goto(process.env.url + '/umbraco/install');
+  await page.goto(process.env.URL + '/umbraco/install');
 
   // Act
   await page.getByLabel('name').fill(name);
