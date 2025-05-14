@@ -57,6 +57,7 @@ public class AuditServiceTests
             });
 
         var result = await _auditService.AddAsync(type, userId, objectId, entityType, comment, parameters);
+        _auditRepositoryMock.Verify(x => x.Save(It.IsAny<IAuditItem>()), Times.Once);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(AuditLogOperationStatus.Success, result.Result);
     }
@@ -206,10 +207,10 @@ public class AuditServiceTests
         SetupScopeProviderMock();
         _auditRepositoryMock.Setup(x => x.CleanLogs(100));
         await _auditService.CleanLogsAsync(100);
+        _auditRepositoryMock.Verify(x => x.CleanLogs(It.IsAny<int>()), Times.Once);
     }
 
-    private void SetupScopeProviderMock()
-    {
+    private void SetupScopeProviderMock() =>
         _scopeProviderMock
             .Setup(x => x.CreateCoreScope(
                 It.IsAny<IsolationLevel>(),
@@ -220,5 +221,4 @@ public class AuditServiceTests
                 It.IsAny<bool>(),
                 It.IsAny<bool>()))
             .Returns(Mock.Of<IScope>());
-    }
 }
