@@ -389,17 +389,25 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		const currentOwnerCompositionCompositions = currentOwnerCompositions.filter(
 			(composition) => composition.compositionType === CompositionTypeModel.COMPOSITION,
 		);
+
+		const currentOwnerCompositionCompositionUniques = currentOwnerCompositionCompositions.map(
+			(composition) => composition.contentType.unique,
+		);
+
 		const currentOwnerInheritanceCompositions = currentOwnerCompositions.filter(
 			(composition) => composition.compositionType === CompositionTypeModel.INHERITANCE,
 		);
 
+		const currentPropertyAliases = await this.#workspaceContext.structure.getContentTypePropertyAliases();
+
 		const compositionConfiguration = {
 			compositionRepositoryAlias: this._compositionRepositoryAlias,
 			unique: unique,
-			selection: currentOwnerCompositionCompositions.map((composition) => composition.contentType.unique),
+			selection: currentOwnerCompositionCompositionUniques,
 			usedForInheritance: currentInheritanceCompositions.map((composition) => composition.contentType.unique),
+			usedForComposition: currentOwnerCompositionCompositionUniques,
 			isElement: ownerContentType.isElement,
-			currentPropertyAliases: [],
+			currentPropertyAliases,
 			isNew: this.#workspaceContext.getIsNew()!,
 		};
 
