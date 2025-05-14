@@ -1,7 +1,17 @@
 import { UmbEntityContext } from '../../entity/entity.context.js';
+import type { UmbDropdownElement } from '../dropdown/index.js';
 import type { UmbEntityAction, ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, nothing, customElement, property, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
+import {
+	html,
+	nothing,
+	customElement,
+	property,
+	state,
+	ifDefined,
+	css,
+	query,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
@@ -29,8 +39,8 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	@state()
 	private _firstActionHref?: string;
 
-	@state()
-	_dropdownIsOpen = false;
+	@query('#action-modal')
+	private _dropdownElement?: UmbDropdownElement;
 
 	// TODO: provide the entity context on a higher level, like the root element of this entity, tree-item/workspace/... [NL]
 	#entityContext = new UmbEntityContext(this);
@@ -79,7 +89,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	}
 
 	#onActionExecuted() {
-		this._dropdownIsOpen = false;
+		this._dropdownElement?.closeDropdown();
 	}
 
 	#onDropdownClick(event: Event) {
@@ -95,13 +105,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		if (this._numberOfActions === 1) return nothing;
 
 		return html`
-			<umb-dropdown
-				id="action-modal"
-				.open=${this._dropdownIsOpen}
-				@click=${this.#onDropdownClick}
-				.label=${this.label}
-				compact
-				hide-expand>
+			<umb-dropdown id="action-modal" @click=${this.#onDropdownClick} .label=${this.label} compact hide-expand>
 				<uui-symbol-more slot="label" .label=${this.label}></uui-symbol-more>
 				<uui-scroll-container>
 					<umb-entity-action-list
