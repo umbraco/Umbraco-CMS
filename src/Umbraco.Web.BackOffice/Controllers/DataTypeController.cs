@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IConfigurationEditorJsonSerializer _serializer;
         private readonly IDataTypeUsageService _dataTypeUsageService;
-        private readonly IEntityService _entityService;
+        private readonly IIdKeyMap _idKeyMap;
 
         [Obsolete("Use constructor that takes IDataTypeUsageService, scheduled for removal in V12")]
         public DataTypeController(
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             backOfficeSecurityAccessor,
             serializer,
             StaticServiceProvider.Instance.GetRequiredService<IDataTypeUsageService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IEntityService>())
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
          {
          }
 
@@ -108,7 +108,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 backOfficeSecurityAccessor,
                 serializer,
                 dataTypeUsageService,
-                StaticServiceProvider.Instance.GetRequiredService<IEntityService>())
+                StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
         {
         }
 
@@ -126,7 +126,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IConfigurationEditorJsonSerializer serializer,
             IDataTypeUsageService dataTypeUsageService,
-            IEntityService entityService)
+            IIdKeyMap entityService)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
@@ -140,7 +140,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backOfficeSecurityAccessor));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             _dataTypeUsageService = dataTypeUsageService ?? throw new ArgumentNullException(nameof(dataTypeUsageService));
-            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+            _idKeyMap = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
         /// <summary>
@@ -502,10 +502,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpGet]
         public DataTypeReferences GetReferences(Guid id)
         {
-            IEntitySlim? dataType = _entityService.Get(id, UmbracoObjectTypes.DataType);
-            return dataType is null
-                ? new DataTypeReferences()
-                : GetReferences(dataType.Id);
+            Attempt<int> dataType = _idKeyMap.GetIdForKey(id, UmbracoObjectTypes.DataType);
+            return dataType.Success
+                ? GetReferences(dataType.Result)
+                : new DataTypeReferences();
         }
 
         [HttpGet]
