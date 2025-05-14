@@ -407,5 +407,6 @@ public class StringExtensionsTests
     public void EnsureCultureCode_ReturnsExpectedResult(string? culture, string? expected) => Assert.AreEqual(expected, culture.EnsureCultureCode());
 
     [Test]
+    [Platform(Include = "Win")]
     public void EnsureCultureCode_ThrowsOnUnrecognisedCode() => Assert.Throws<CultureNotFoundException>(() => "xxx-xxx".EnsureCultureCode());
 }
