@@ -56,6 +56,7 @@ public interface IAuditEntryService : IService
     /// </param>
     /// <param name="eventDetails">Free-form details about the audited event.</param>
     /// <returns>The created audit entry.</returns>
+    [Obsolete("Use the overload that takes user keys. Scheduled for removal in Umbraco 19.")]
     public Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
         int performingUserId,
         string performingDetails,

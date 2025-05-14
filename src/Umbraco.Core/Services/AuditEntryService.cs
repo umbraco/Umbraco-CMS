@@ -68,6 +68,7 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
     }
 
     /// <inheritdoc />
+    [Obsolete("Use the overload that takes user keys. Scheduled for removal in Umbraco 19.")]
     public Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
         int performingUserId,
         string perfomingDetails,
