@@ -90,7 +90,10 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 		const propertyViewGuard = this._dataOwner.propertyViewGuard;
 
 		this.#properties.forEach((property) => {
-			const propertyVariantId = new UmbVariantId(this._variantId?.culture, this._variantId?.segment);
+			const propertyVariantId = new UmbVariantId(
+				property.variesByCulture ? this._variantId?.culture : null,
+				property.variesBySegment ? this._variantId?.segment : null,
+			);
 			this.observe(
 				propertyViewGuard.isPermittedForVariantAndProperty(propertyVariantId, property),
 				(permitted) => {
