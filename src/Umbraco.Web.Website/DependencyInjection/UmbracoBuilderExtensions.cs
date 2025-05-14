@@ -76,7 +76,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IPublicAccessRequestHandler, PublicAccessRequestHandler>();
         builder.Services.AddSingleton<BasicAuthenticationMiddleware>();
 
-        // Partial cache invalidators
+        // Partial view cache invalidators
         builder.Services.AddUnique<IMemberPartialViewCacheInvalidator, MemberPartialViewCacheInvalidator>();
 
         builder

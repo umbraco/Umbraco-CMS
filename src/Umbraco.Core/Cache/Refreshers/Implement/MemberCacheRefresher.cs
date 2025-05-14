@@ -97,7 +97,9 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
 
     private void ClearCache(params JsonPayload[] payloads)
     {
+        // Clear the partial views cache for all partials that are cached by member, for the updates members.
         _memberPartialViewCacheInvalidator.ClearPartialViewCacheItems(payloads.Select(p => p.Id));
+
         Attempt<IAppPolicyCache?> memberCache = AppCaches.IsolatedCaches.Get<IMember>();
 
         foreach (JsonPayload p in payloads)
