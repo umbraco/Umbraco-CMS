@@ -349,7 +349,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		if (this._exposed) {
 			return ext.component;
 		} else {
-			return html`<div>
+			return html`<div style="min-height: var(--uui-size-16);">
 				${ext.component}
 				<umb-block-overlay-expose-button
 					.contentTypeName=${this._contentTypeName}
