@@ -15,35 +15,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 internal sealed class AuditEntryServiceTests : UmbracoIntegrationTest
 {
     [Test]
-    public async Task GetPage()
-    {
-        var sut = (AuditEntryService)GetRequiredService<IAuditEntryService>();
-        var expected = new AuditEntryBuilder().Build();
-
-        for (var i = 0; i < 10; i++)
-        {
-            await sut.WriteAsync(
-                expected.PerformingUserId + i,
-                expected.PerformingDetails,
-                expected.PerformingIp,
-                expected.EventDateUtc.AddMinutes(i),
-                expected.AffectedUserId + i,
-                expected.AffectedDetails,
-                expected.EventType,
-                expected.EventDetails);
-        }
-
-        var entries = sut.GetPage(2, 2, out var count).ToArray();
-
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual(2, entries.Length);
-            Assert.AreEqual(expected.PerformingUserId + 5, entries[0].PerformingUserId);
-            Assert.AreEqual(expected.PerformingUserId + 4, entries[1].PerformingUserId);
-        });
-    }
-
-    [Test]
     public async Task Write_and_GetAll()
     {
         var sut = (AuditEntryService)Services.GetRequiredService<IAuditEntryService>();

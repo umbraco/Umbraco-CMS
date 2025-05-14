@@ -43,14 +43,14 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
         string eventDetails) =>
         Task.FromResult(
             WriteInner(
-            performingUserId,
-            perfomingDetails,
-            performingIp,
-            eventDateUtc,
-            affectedUserId,
-            affectedDetails,
-            eventType,
-            eventDetails));
+                performingUserId,
+                perfomingDetails,
+                performingIp,
+                eventDateUtc,
+                affectedUserId,
+                affectedDetails,
+                eventType,
+                eventDetails));
 
     // This method is used by the AuditService while the AuditService.Write() method is not removed.
     internal Attempt<IAuditEntry, AuditEntryOperationStatus> WriteInner(
@@ -132,31 +132,16 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
 
 
     // TODO: Currently used in testing only, not part of the interface, need to add queryable methods to the interface instead
-    internal IEnumerable<IAuditEntry>? GetAll()
+    internal IEnumerable<IAuditEntry> GetAll()
     {
         if (_isAvailable.Value == false)
         {
-            return Enumerable.Empty<IAuditEntry>();
+            return [];
         }
 
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _auditEntryRepository.GetMany();
-        }
-    }
-
-    // TODO: Currently used in testing only, not part of the interface, need to add queryable methods to the interface instead
-    internal IEnumerable<IAuditEntry> GetPage(long pageIndex, int pageCount, out long records)
-    {
-        if (_isAvailable.Value == false)
-        {
-            records = 0;
-            return Enumerable.Empty<IAuditEntry>();
-        }
-
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _auditEntryRepository.GetPage(pageIndex, pageCount, out records);
         }
     }
 
