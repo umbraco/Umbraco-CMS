@@ -338,16 +338,16 @@ stages:
             # UnattendedInstallConfig
             WindowsUnattendedInstallConfig:
               vmImage: "windows-latest"
-              testFolder: "unattendedInstallConfig"
-              testCommand: "npx playwright test --project=$testFolder"
+              testFolder: "UnattendedInstallConfig"
+              testCommand: "npx playwright test --project=unattendedInstallConfig"
               # NOT THE BEST SOLUTION
               port: 44331
             #              CONNECTIONSTRINGS__UMBRACODBDSN: ""
             #              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: ""
             LinuxUnattendedInstallConfig:
               vmImage: "ubuntu-latest"
-              testFolder: "unattendedInstallConfig"
-              testCommand: "npx playwright test --project=$testFolder"
+              testFolder: "UnattendedInstallConfig"
+              testCommand: "npx playwright test --project=unattendedInstallConfig"
               port: 44331
         #              CONNECTIONSTRINGS__UMBRACODBDSN: ""
         #              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: ""
