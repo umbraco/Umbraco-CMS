@@ -12,8 +12,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 // TODO: maybe move this to UI Library.
 @customElement('umb-dropdown')
 export class UmbDropdownElement extends UmbLitElement {
-	@query('#dropdown-popover')
-	popoverContainerElement?: UUIPopoverContainerElement;
 	@property({ type: Boolean, reflect: true })
 	open = false;
 
@@ -35,19 +33,16 @@ export class UmbDropdownElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: 'hide-expand' })
 	hideExpand = false;
 
+	@query('#dropdown-popover')
+	popoverContainerElement?: UUIPopoverContainerElement;
+
 	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 		if (_changedProperties.has('open') && this.popoverContainerElement) {
 			if (this.open) {
-				// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				this.popoverContainerElement.showPopover();
+				this.openDropdown();
 			} else {
-				// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				this.popoverContainerElement.hidePopover();
+				this.closeDropdown();
 			}
 		}
 	}
@@ -57,6 +52,20 @@ export class UmbDropdownElement extends UmbLitElement {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this.open = event.newState === 'open';
+	}
+
+	openDropdown() {
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this.popoverContainerElement?.showPopover();
+	}
+
+	closeDropdown() {
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this.popoverContainerElement?.hidePopover();
 	}
 
 	override render() {
