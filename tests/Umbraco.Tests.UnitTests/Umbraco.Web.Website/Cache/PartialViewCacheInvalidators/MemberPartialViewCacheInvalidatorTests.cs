@@ -59,9 +59,15 @@ public class MemberPartialViewCacheInvalidatorTests
             new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()),
             null);
         cacheKey = CoreCacheHelperExtensions.PartialViewCacheKey + cacheKey;
-        var regex = $"Umbraco.Web.PartialViewCacheKey.*-m{MemberId}-*";
-        var regexMatch = Regex.IsMatch(cacheKey, regex);
+        Assert.AreEqual("Umbraco.Web.PartialViewCacheKeyTestPartial.cshtml-en-US-0-m1234-", cacheKey);
+
+        var regexForMember = $"Umbraco.Web.PartialViewCacheKey.*-m{MemberId}-*";
+        var regexMatch = Regex.IsMatch(cacheKey, regexForMember);
         Assert.IsTrue(regexMatch);
+
+        var regexForAnotherMember = $"Umbraco.Web.PartialViewCacheKey.*-m{4321}-*";
+        regexMatch = Regex.IsMatch(cacheKey, regexForAnotherMember);
+        Assert.IsFalse(regexMatch);
     }
 
     private class TestViewModel
