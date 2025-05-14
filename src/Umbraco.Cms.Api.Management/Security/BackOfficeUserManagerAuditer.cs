@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
@@ -28,7 +29,9 @@ internal sealed class BackOfficeUserManagerAuditer :
     /// </summary>
     /// <param name="auditEntryService">The audit entry service.</param>
     /// <param name="userService">The user service.</param>
-    public BackOfficeUserManagerAuditer(IAuditEntryService auditEntryService, IUserService userService)
+    public BackOfficeUserManagerAuditer(
+        IAuditEntryService auditEntryService,
+        IUserService userService)
     {
         _auditEntryService = auditEntryService;
         _userService = userService;
@@ -123,30 +126,34 @@ internal sealed class BackOfficeUserManagerAuditer :
         string eventType,
         string eventDetails)
     {
+        Guid? performingKey = null;
         var performingDetails = "User UNKNOWN:0";
         if (performingId.HasValue)
         {
             IUser? performingUser = _userService.GetUserById(performingId.Value);
+            performingKey = performingUser?.Key;
             performingDetails = performingUser is null
                 ? $"User UNKNOWN:{performingId.Value}"
                 : $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}";
         }
 
+        Guid? affectedKey = null;
         var affectedDetails = "User UNKNOWN:0";
         if (affectedId.HasValue)
         {
             IUser? affectedUser = _userService.GetUserById(affectedId.Value);
+            affectedKey = affectedUser?.Key;
             affectedDetails = affectedUser is null
                 ? $"User UNKNOWN:{affectedId.Value}"
                 : $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}";
         }
 
         await _auditEntryService.WriteAsync(
-            performingId ?? 0,
+            performingKey ?? Constants.Security.UnknownUserKey,
             performingDetails,
             ipAddress,
             DateTime.UtcNow,
-            affectedId ?? 0,
+            affectedKey ?? Constants.Security.UnknownUserKey,
             affectedDetails,
             eventType,
             eventDetails);

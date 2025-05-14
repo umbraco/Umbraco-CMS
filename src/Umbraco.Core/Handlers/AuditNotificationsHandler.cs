@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -38,7 +39,6 @@ public sealed class AuditNotificationsHandler :
     private readonly IAuditEntryService _auditEntryService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IEntityService _entityService;
-    private readonly GlobalSettings _globalSettings;
     private readonly IIpResolver _ipResolver;
     private readonly IMemberService _memberService;
     private readonly IUserGroupService _userGroupService;
@@ -49,7 +49,6 @@ public sealed class AuditNotificationsHandler :
         IUserService userService,
         IEntityService entityService,
         IIpResolver ipResolver,
-        IOptionsMonitor<GlobalSettings> globalSettings,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IMemberService memberService,
         IUserGroupService userGroupService)
@@ -61,64 +60,33 @@ public sealed class AuditNotificationsHandler :
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _memberService = memberService;
         _userGroupService = userGroupService;
-        _globalSettings = globalSettings.CurrentValue;
     }
 
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
-    public AuditNotificationsHandler(
-        IAuditService auditService,
-        IUserService userService,
-        IEntityService entityService,
-        IIpResolver ipResolver,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IMemberService memberService,
-        IUserGroupService userGroupService)
-    {
-        _auditEntryService = StaticServiceProvider.Instance.GetRequiredService<IAuditEntryService>();
-        _userService = userService;
-        _entityService = entityService;
-        _ipResolver = ipResolver;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _memberService = memberService;
-        _userGroupService = userGroupService;
-        _globalSettings = globalSettings.CurrentValue;
-    }
-
-    private IUser CurrentPerformingUser
+    private IUser? CurrentPerformingUser
     {
         get
         {
             IUser? identity = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
             IUser? user = identity == null ? null : _userService.GetAsync(identity.Key).GetAwaiter().GetResult();
-            return user ?? UnknownUser(_globalSettings);
+            return user;
         }
     }
 
     private string PerformingIp => _ipResolver.GetCurrentRequestIpAddress();
 
-    public static IUser UnknownUser(GlobalSettings globalSettings) => new User(globalSettings)
-    {
-        Id = Constants.Security.UnknownUserId,
-        Name = Constants.Security.UnknownUserName,
-        Email = string.Empty,
-    };
-
     /// <inheritdoc />
     public async Task HandleAsync(AssignedMemberRolesNotification notification, CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = CurrentPerformingUser;
         var roles = string.Join(", ", notification.Roles);
         var members = _memberService.GetAllMembers(notification.MemberIds).ToDictionary(x => x.Id, x => x);
         foreach (var id in notification.MemberIds)
         {
             members.TryGetValue(id, out IMember? member);
-            await _auditEntryService.WriteAsync(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                -1,
+
+            await Audit(
+                performingUser,
+                null,
                 $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
                 "umbraco/member/roles/assigned",
                 $"roles modified, assigned {roles}");
@@ -130,9 +98,11 @@ public sealed class AuditNotificationsHandler :
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
     /// <inheritdoc />
-    public async Task HandleAsync(AssignedUserGroupPermissionsNotification notification, CancellationToken cancellationToken)
+    public async Task HandleAsync(
+        AssignedUserGroupPermissionsNotification notification,
+        CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = CurrentPerformingUser;
         IEnumerable<EntityPermission> perms = notification.EntityPermissions;
         foreach (EntityPermission perm in perms)
         {
@@ -140,12 +110,9 @@ public sealed class AuditNotificationsHandler :
             var assigned = string.Join(", ", perm.AssignedPermissions);
             IEntitySlim? entity = _entityService.Get(perm.EntityId);
 
-            await _auditEntryService.WriteAsync(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                -1,
+            await Audit(
+                performingUser,
+                null,
                 $"User Group {group?.Id} \"{group?.Name}\" ({group?.Alias})",
                 "umbraco/user-group/permissions-change",
                 $"assigning {(string.IsNullOrWhiteSpace(assigned) ? "(nothing)" : assigned)} on id:{perm.EntityId} \"{entity?.Name}\"");
@@ -159,15 +126,12 @@ public sealed class AuditNotificationsHandler :
     /// <inheritdoc />
     public async Task HandleAsync(ExportedMemberNotification notification, CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = CurrentPerformingUser;
         IMember member = notification.Member;
 
-        await _auditEntryService.WriteAsync(
-            performingUser.Id,
-            $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-            PerformingIp,
-            DateTime.UtcNow,
-            -1,
+        await Audit(
+            performingUser,
+            null,
             $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
             "umbraco/member/exported",
             "exported member data");
@@ -179,16 +143,13 @@ public sealed class AuditNotificationsHandler :
 
     public async Task HandleAsync(MemberDeletedNotification notification, CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = CurrentPerformingUser;
         IEnumerable<IMember> members = notification.DeletedEntities;
         foreach (IMember member in members)
         {
-            await _auditEntryService.WriteAsync(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                -1,
+            await Audit(
+                performingUser,
+                null,
                 $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
                 "umbraco/member/delete",
                 $"delete member id:{member.Id} \"{member.Name}\" {FormatEmail(member)}");
@@ -202,18 +163,15 @@ public sealed class AuditNotificationsHandler :
     /// <inheritdoc />
     public async Task HandleAsync(MemberSavedNotification notification, CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = CurrentPerformingUser;
         IEnumerable<IMember> members = notification.SavedEntities;
         foreach (IMember member in members)
         {
             var dp = string.Join(", ", ((Member)member).GetWereDirtyProperties());
 
-            await _auditEntryService.WriteAsync(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                -1,
+            await Audit(
+                performingUser,
+                null,
                 $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
                 "umbraco/member/save",
                 $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}");
@@ -227,18 +185,16 @@ public sealed class AuditNotificationsHandler :
     /// <inheritdoc />
     public async Task HandleAsync(RemovedMemberRolesNotification notification, CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = CurrentPerformingUser;
         var roles = string.Join(", ", notification.Roles);
         var members = _memberService.GetAllMembers(notification.MemberIds).ToDictionary(x => x.Id, x => x);
         foreach (var id in notification.MemberIds)
         {
             members.TryGetValue(id, out IMember? member);
-            await _auditEntryService.WriteAsync(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                -1,
+
+            await Audit(
+                performingUser,
+                null,
                 $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
                 "umbraco/member/roles/removed",
                 $"roles modified, removed {roles}");
@@ -252,17 +208,14 @@ public sealed class AuditNotificationsHandler :
     /// <inheritdoc />
     public async Task HandleAsync(UserDeletedNotification notification, CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = CurrentPerformingUser;
         IEnumerable<IUser> affectedUsers = notification.DeletedEntities;
         foreach (IUser affectedUser in affectedUsers)
         {
-            await _auditEntryService.WriteAsync(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                affectedUser.Id,
-                $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
+            await Audit(
+                performingUser,
+                affectedUser,
+                null,
                 "umbraco/user/delete",
                 "delete user");
         }
@@ -274,7 +227,7 @@ public sealed class AuditNotificationsHandler :
 
     public async Task HandleAsync(UserGroupWithUsersSavedNotification notification, CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = CurrentPerformingUser;
         foreach (UserGroupWithUsers groupWithUser in notification.SavedEntities)
         {
             IUserGroup group = groupWithUser.UserGroup;
@@ -304,12 +257,9 @@ public sealed class AuditNotificationsHandler :
                 sb.Append($"default perms: {perms}");
             }
 
-            await _auditEntryService.WriteAsync(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                -1,
+            await Audit(
+                performingUser,
+                null,
                 $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
                 "umbraco/user-group/save",
                 $"{sb}");
@@ -317,26 +267,20 @@ public sealed class AuditNotificationsHandler :
             // now audit the users that have changed
             foreach (IUser user in groupWithUser.RemovedUsers)
             {
-                await _auditEntryService.WriteAsync(
-                    performingUser.Id,
-                    $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                    PerformingIp,
-                    DateTime.UtcNow,
-                    user.Id,
-                    $"User \"{user.Name}\" {FormatEmail(user)}",
+                await Audit(
+                    performingUser,
+                    user,
+                    null,
                     "umbraco/user-group/save",
                     $"Removed user \"{user.Name}\" {FormatEmail(user)} from group {group.Id} \"{group.Name}\" ({group.Alias})");
             }
 
             foreach (IUser user in groupWithUser.AddedUsers)
             {
-                await _auditEntryService.WriteAsync(
-                    performingUser.Id,
-                    $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                    PerformingIp,
-                    DateTime.UtcNow,
-                    user.Id,
-                    $"User \"{user.Name}\" {FormatEmail(user)}",
+                await Audit(
+                    performingUser,
+                    user,
+                    null,
                     "umbraco/user-group/save",
                     $"Added user \"{user.Name}\" {FormatEmail(user)} to group {group.Id} \"{group.Name}\" ({group.Alias})");
             }
@@ -350,7 +294,7 @@ public sealed class AuditNotificationsHandler :
     /// <inheritdoc />
     public async Task HandleAsync(UserSavedNotification notification, CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = CurrentPerformingUser;
         IEnumerable<IUser> affectedUsers = notification.SavedEntities;
         foreach (IUser affectedUser in affectedUsers)
         {
@@ -360,13 +304,10 @@ public sealed class AuditNotificationsHandler :
 
             var dp = string.Join(", ", ((User)affectedUser).GetWereDirtyProperties());
 
-            await _auditEntryService.WriteAsync(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                affectedUser.Id,
-                $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
+            await Audit(
+                performingUser,
+                affectedUser,
+                null,
                 "umbraco/user/save",
                 $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}{(groups == null ? string.Empty : "; groups assigned: " + groups)}");
         }
@@ -375,8 +316,29 @@ public sealed class AuditNotificationsHandler :
     public void Handle(UserSavedNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
+    private async Task Audit(
+        IUser? performingUser,
+        IUser? affectedUser,
+        string? affectedDetails,
+        string eventType,
+        string eventDetails)
+    {
+        affectedDetails ??= affectedUser is null ? string.Empty : $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}";
+        await _auditEntryService.WriteAsync(
+            performingUser?.Key ?? Constants.Security.UnknownUserKey,
+            $"User \"{performingUser?.Name ?? Constants.Security.UnknownUserName}\" {FormatEmail(performingUser)}",
+            PerformingIp,
+            DateTime.UtcNow,
+            affectedUser?.Key ?? Constants.Security.SuperUserKey,
+            affectedDetails,
+            eventType,
+            eventDetails);
+    }
+
     private string FormatEmail(IMember? member) =>
         member == null ? string.Empty : member.Email.IsNullOrWhiteSpace() ? string.Empty : $"<{member.Email}>";
 
-    private string FormatEmail(IUser user) => user == null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? string.Empty : $"<{user.Email}>";
+    private string FormatEmail(IUser? user) => user is not null && !user.Email.IsNullOrWhiteSpace()
+        ? $"<{user.Email}>"
+        : string.Empty;
 }

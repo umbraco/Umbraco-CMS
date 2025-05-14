@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -47,6 +48,42 @@ internal sealed class AuditEntryServiceTests : UmbracoIntegrationTest
             Assert.IsNotNull(entries);
             Assert.AreEqual(1, entries.Length);
             Assert.AreEqual(expected.PerformingUserId, entries[0].PerformingUserId);
+        });
+    }
+
+    [Test]
+    public async Task Write_and_GetAll_With_Keys()
+    {
+        var sut = (AuditEntryService)Services.GetRequiredService<IAuditEntryService>();
+        var eventDateUtc = DateTime.UtcNow;
+        var result = await sut.WriteAsync(
+            Constants.Security.SuperUserKey,
+            "performingDetails",
+            "performingIp",
+            eventDateUtc,
+            Constants.Security.UnknownUserKey,
+            "affectedDetails",
+            "umbraco/test",
+            "eventDetails");
+        Assert.IsTrue(result.Success);
+
+        var actual = result.Result;
+
+        var entries = sut.GetAll().ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(Constants.Security.SuperUserId, actual.PerformingUserId);
+            Assert.AreEqual("performingDetails", actual.PerformingDetails);
+            Assert.AreEqual("performingIp", actual.PerformingIp);
+            Assert.AreEqual(eventDateUtc, actual.EventDateUtc);
+            Assert.AreEqual(Constants.Security.UnknownUserId, actual.AffectedUserId);
+            Assert.AreEqual("affectedDetails", actual.AffectedDetails);
+            Assert.AreEqual("umbraco/test", actual.EventType);
+            Assert.AreEqual("eventDetails", actual.EventDetails);
+            Assert.IsNotNull(entries);
+            Assert.AreEqual(1, entries.Length);
+            Assert.AreEqual(Constants.Security.SuperUserId, entries[0].PerformingUserId);
         });
     }
 }

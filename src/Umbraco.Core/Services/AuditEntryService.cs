@@ -15,6 +15,7 @@ namespace Umbraco.Cms.Core.Services;
 public class AuditEntryService : RepositoryService, IAuditEntryService
 {
     private readonly IAuditEntryRepository _auditEntryRepository;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly Lazy<bool> _isAvailable;
 
     /// <summary>
@@ -22,13 +23,48 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
     /// </summary>
     public AuditEntryService(
         IAuditEntryRepository auditEntryRepository,
+        IUserIdKeyResolver userIdKeyResolver,
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _auditEntryRepository = auditEntryRepository;
+        _userIdKeyResolver = userIdKeyResolver;
         _isAvailable = new Lazy<bool>(DetermineIsAvailable);
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
+        Guid performingUserKey,
+        string performingDetails,
+        string performingIp,
+        DateTime eventDateUtc,
+        Guid affectedUserKey,
+        string? affectedDetails,
+        string eventType,
+        string eventDetails)
+    {
+        var performingUserId = await GetUserId(performingUserKey);
+        var affectedUserId = await GetUserId(affectedUserKey);
+        return WriteInner(
+            performingUserId,
+            performingDetails,
+            performingIp,
+            eventDateUtc,
+            affectedUserId,
+            affectedDetails,
+            eventType,
+            eventDetails);
+
+        async Task<int> GetUserId(Guid userKey)
+        {
+            return userKey switch
+            {
+                _ when userKey == Constants.Security.UnknownUserKey => Constants.Security.UnknownUserId,
+                _ => await _userIdKeyResolver.GetAsync(userKey),
+            };
+        }
     }
 
     /// <inheritdoc />
