@@ -15,109 +15,113 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
-[UmbracoTest(
-    Database = UmbracoTestOptions.Database.NewSchemaPerTest,
-    PublishedRepositoryEvents = true,
-    WithApplication = true)]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
 {
     private IContentService ContentService => GetRequiredService<IContentService>();
 
-    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
-
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     /// <summary>
-    /// Provides a happy path test case where culture codes are provided exactly matching the language ISO codes.
+    /// Provides both happy path with correctly cased cultures, and originally failing test cases for
+    /// https://github.com/umbraco/Umbraco-CMS/issues/19287, where the culture codes are provided with inconsistent casing.
     /// </summary>
-    [Test]
-    public async Task Can_Publish_With_Consistent_Provision_Of_Culture_Codes()
+    [TestCase("en-US", "en-US", "en-US")]
+    [TestCase("en-us", "en-us", "en-us")]
+    [TestCase("en-US", "en-US", "en-us")]
+    [TestCase("en-us", "en-US", "en-US")]
+    [TestCase("en-US", "en-us", "en-US")]
+    public async Task Can_Save_And_Publish_With_Inconsistent_Provision_Of_Culture_Codes(string cultureNameCultureCode, string valueCultureCode, string publishCultureCode)
     {
-        var (langEn, langDa, contentType) = await SetupVariantTest();
+        var contentType = await SetupVariantTest();
 
         IContent content = ContentService.Create("Test Item", Constants.System.Root, contentType);
-        content.SetCultureName("Test item", "en-US");
-        content.SetValue("title", "Title", "en-US");
-
-        Assert.AreEqual("en-US", content.AvailableCultures.FirstOrDefault());
-
+        content.SetCultureName("Test item", cultureNameCultureCode);
+        content.SetValue("title", "Title", valueCultureCode);
         ContentService.Save(content);
-        var publishResult = ContentService.Publish(content, ["en-US"]);
+
+        var publishResult = ContentService.Publish(content, [publishCultureCode]);
         Assert.IsTrue(publishResult.Success);
+
+        content = ContentService.GetById(content.Key)!;
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(content.Published);
+            Assert.AreEqual(1, content.PublishedCultures.Count());
+            Assert.AreEqual("en-US", content.PublishedCultures.FirstOrDefault());
+        });
     }
 
-    /// <summary>
-    /// Provides an originally failing test case for https://github.com/umbraco/Umbraco-CMS/issues/19287, where the culture
-    /// codes are provided with inconsistent casing.
-    /// </summary>
-    [Test]
-    public async Task Can_Publish_With_Inconsistent_Provision_Of_Culture_Codes_When_Setting_Properties()
+    [TestCase("en-US", "en-US", "en-US")]
+    [TestCase("en-us", "en-us", "en-us")]
+    [TestCase("en-US", "en-US", "en-us")]
+    [TestCase("en-us", "en-US", "en-US")]
+    [TestCase("en-US", "en-us", "en-US")]
+    public async Task Can_Unpublish_With_Inconsistent_Provision_Of_Culture_Codes(string cultureNameCultureCode, string valueCultureCode, string unpublishCultureCode)
     {
-        var (langEn, langDa, contentType) = await SetupVariantTest();
+        var contentType = await SetupVariantTest();
 
         IContent content = ContentService.Create("Test Item", Constants.System.Root, contentType);
-        content.SetCultureName("Test item", "en-us");
-        content.SetValue("title", "Title", "en-us");
-
-        Assert.AreEqual("en-US", content.AvailableCultures.FirstOrDefault());
-
+        content.SetCultureName("Test item", cultureNameCultureCode);
+        content.SetValue("title", "Title", valueCultureCode);
         ContentService.Save(content);
-        var publishResult = ContentService.Publish(content, ["en-US"]);
-        Assert.IsTrue(publishResult.Success);
-    }
+        // use correctly cased culture code to publish
+        ContentService.Publish(content, ["en-US"]);
 
-    [Test]
-    public async Task Can_Publish_With_Inconsistent_Provision_Of_Culture_Codes_When_Publishing()
-    {
-        var (langEn, langDa, contentType) = await SetupVariantTest();
-
-        IContent content = ContentService.Create("Test Item", Constants.System.Root, contentType);
-        content.SetCultureName("Test item", "en-US");
-        content.SetValue("title", "Title", "en-US");
-        ContentService.Save(content);
-
-        var publishResult = ContentService.Publish(content, ["en-us"]);
-        Assert.IsTrue(publishResult.Success);
-    }
-
-    [Test]
-    public async Task Can_Unpublish_With_Inconsistent_Provision_Of_Culture_Codes()
-    {
-        var (langEn, langDa, contentType) = await SetupVariantTest();
-
-        IContent content = ContentService.Create("Test Item", Constants.System.Root, contentType);
-        content.SetCultureName("Test item", "en-US");
-        content.SetValue("title", "Title", "en-US");
-        ContentService.Save(content);
-
-        var unpublishResult = ContentService.Unpublish(content, "en-us");
+        var unpublishResult = ContentService.Unpublish(content, unpublishCultureCode);
         Assert.IsTrue(unpublishResult.Success);
+
+        content = ContentService.GetById(content.Key)!;
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(content.Published);
+            Assert.AreEqual(0, content.PublishedCultures.Count());
+        });
     }
 
-    [Test]
-    public async Task Can_Publish_Branch_With_Inconsistent_Provision_Of_Culture_Codes()
+    [TestCase("en-US", "en-US", "en-US")]
+    [TestCase("en-us", "en-us", "en-us")]
+    [TestCase("en-US", "en-US", "en-us")]
+    [TestCase("en-us", "en-US", "en-US")]
+    [TestCase("en-US", "en-us", "en-US")]
+    public async Task Can_Publish_Branch_With_Inconsistent_Provision_Of_Culture_Codes(string cultureNameCultureCode, string valueCultureCode, string publishCultureCode)
     {
-        var (langEn, langDa, contentType) = await SetupVariantTest();
+        var contentType = await SetupVariantTest();
 
-        IContent content = ContentService.Create("Test Item", Constants.System.Root, contentType);
-        content.SetCultureName("Test item", "en-US");
-        content.SetValue("title", "Title", "en-US");
-        ContentService.Save(content);
+        IContent root = ContentService.Create("Root", Constants.System.Root, contentType);
+        root.SetCultureName("Root", cultureNameCultureCode);
+        root.SetValue("title", "Root Title", valueCultureCode);
+        ContentService.Save(root);
 
-        var publishResult = ContentService.PublishBranch(content, PublishBranchFilter.All, ["en-us"]);
-        Assert.AreEqual(1, publishResult.Count());
+        var child = ContentService.Create("Child", root.Id, contentType);
+        child.SetCultureName("Child", cultureNameCultureCode);
+        child.SetValue("title", "Child Title", valueCultureCode);
+        ContentService.Save(child);
+
+        var publishResult = ContentService.PublishBranch(root, PublishBranchFilter.All, [publishCultureCode]);
+        Assert.AreEqual(2, publishResult.Count());
         Assert.IsTrue(publishResult.First().Success);
+        Assert.IsTrue(publishResult.Last().Success);
+
+        root = ContentService.GetById(root.Key)!;
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(root.Published);
+            Assert.AreEqual(1, root.PublishedCultures.Count());
+            Assert.AreEqual("en-US", root.PublishedCultures.FirstOrDefault());
+        });
+
+        child = ContentService.GetById(child.Key)!;
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(child.Published);
+            Assert.AreEqual(1, child.PublishedCultures.Count());
+            Assert.AreEqual("en-US", child.PublishedCultures.FirstOrDefault());
+        });
     }
 
-    private async Task<(ILanguage LangEn, ILanguage LangDa, IContentType contentType)> SetupVariantTest()
+    private async Task<IContentType> SetupVariantTest()
     {
-        var langEn = await LanguageService.GetAsync("en-US");
-
-        var langDa = new LanguageBuilder()
-            .WithCultureInfo("da-DK")
-            .Build();
-        await LanguageService.CreateAsync(langDa, Constants.Security.SuperUserKey);
-
         var key = Guid.NewGuid();
         var contentType = new ContentTypeBuilder()
             .WithAlias("variantContent")
@@ -139,6 +143,9 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        return (langEn, langDa, contentType);
+        contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 0, contentType.Alias)];
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        return contentType;
     }
 }
