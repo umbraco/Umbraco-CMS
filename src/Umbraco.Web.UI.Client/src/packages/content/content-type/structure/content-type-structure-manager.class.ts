@@ -821,6 +821,7 @@ export class UmbContentTypeStructureManager<
 		this.#contentTypeObservers = [];
 		this.#repoManager?.clear();
 		this.#contentTypes.setValue([]);
+		this.#ownerContentTypeUnique = undefined;
 	}
 
 	public override destroy() {
