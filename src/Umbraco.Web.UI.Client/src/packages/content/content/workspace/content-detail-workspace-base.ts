@@ -136,7 +136,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	#variesBySegment?: boolean;
 
 	/* Split View */
-	readonly splitView = new UmbWorkspaceSplitViewManager();
+	readonly splitView = new UmbWorkspaceSplitViewManager(this);
 
 	/* Variant Options */
 	// TODO: Optimize this so it uses either a App Language Context? [NL]
