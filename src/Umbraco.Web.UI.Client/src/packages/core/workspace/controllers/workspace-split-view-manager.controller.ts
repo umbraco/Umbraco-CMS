@@ -1,5 +1,7 @@
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantContext, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export type ActiveVariant = {
 	index: number;
@@ -11,7 +13,11 @@ export type ActiveVariant = {
  * @class UmbWorkspaceSplitViewManager
  * @description - Class managing the split view state for a workspace context.
  */
-export class UmbWorkspaceSplitViewManager {
+export class UmbWorkspaceSplitViewManager extends UmbControllerBase {
+	constructor(host: UmbControllerHost) {
+		super(host);
+	}
+
 	#activeVariantsInfo = new UmbArrayState<ActiveVariant>([], (x) => x.index).sortBy(
 		(a, b) => (a.index || 0) - (b.index || 0),
 	);
@@ -25,8 +31,12 @@ export class UmbWorkspaceSplitViewManager {
 		this._routeBase = route;
 	}
 
+	#variantContext = new UmbVariantContext(this);
+
 	setActiveVariant(index: number, culture: string | null, segment: string | null) {
 		this.#activeVariantsInfo.appendOneAt({ index, culture: culture ?? null, segment: segment ?? null }, index);
+		const variantId = UmbVariantId.Create({ culture, segment });
+		this.#variantContext.setVariantId(variantId);
 	}
 
 	getActiveVariants() {
