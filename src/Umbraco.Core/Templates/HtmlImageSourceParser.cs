@@ -106,6 +106,16 @@ public sealed class HtmlImageSourceParser
     /// <returns></returns>
     public string RemoveImageSources(string text)
 
-        // see comment in ResolveMediaFromTextString for group reference
-        => ResolveImgPattern.Replace(text, "$1$3$4$5");
+        // find each ResolveImgPattern match in the text, then find each
+        // SrcAttributeRegex match in the match value, then replace the src
+        // attribute value with an empty string
+        // (see comment in ResolveMediaFromTextString for group reference)
+        => ResolveImgPattern.Replace(text, match =>
+        {
+            // Find the src attribute
+            Match src = SrcAttributeRegex.Match(match.Value);
+
+            return src.Success == false ?
+                match.Value : match.Value.Replace(src.Value, "src=\"\"");
+        });
 }
