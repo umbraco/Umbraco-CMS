@@ -252,12 +252,9 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 				<img id="image" @keydown=${() => nothing} src=${this.src} alt="" />
 				<span
 					id="focal-point"
-					class=${classMap({
-						'focal-point--dragging': this._isDraggingGridHandle,
-						hidden: this.hideFocalPoint,
-					})}
+					class=${classMap({ 'focal-point--dragging': this._isDraggingGridHandle, hidden: this.hideFocalPoint })}
 					tabindex=${ifDefined(this.disabled ? undefined : '0')}
-					aria-label="${this.localize.term('general_focalPoint')}"
+					aria-label=${this.localize.term('general_focalPoint')}
 					@keydown=${this.#handleGridKeyDown}>
 				</span>
 			</div>
