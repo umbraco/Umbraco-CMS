@@ -3,12 +3,7 @@ import type { UmbDocumentItemModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import {
-	observeMultiple,
-	UmbBooleanState,
-	UmbObjectState,
-	UmbStringState,
-} from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { type UmbVariantContext, UMB_VARIANT_CONTEXT, type UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'hasChildren'>;
@@ -35,10 +30,9 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	#isDraft = new UmbBooleanState(undefined);
 	public readonly isDraft = this.#isDraft.asObservable();
 
-	#variantId?: UmbVariantId;
-	#defaultCulture?: string | null;
-	#init: Promise<unknown>;
 	#variantContext?: UmbVariantContext;
+	#variantId?: UmbVariantId;
+	#fallbackCulture?: string | null;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -51,14 +45,23 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 
 	#observeVariantContext() {
 		this.observe(
-			observeMultiple([this.#variantContext?.variantId, this.#variantContext?.fallbackCulture]),
-			([variantId, defaultCulture]) => {
+			this.#variantContext?.variantId,
+			(variantId) => {
 				if (variantId === undefined) return;
-				if (defaultCulture === undefined) return;
 				this.#variantId = variantId;
-				this.#defaultCulture = defaultCulture;
 				this.#setVariantAwareValues();
 			},
+			'umbObserveVariantId',
+		);
+
+		this.observe(
+			this.#variantContext?.fallbackCulture,
+			(fallbackCulture) => {
+				if (fallbackCulture === undefined) return;
+				this.#fallbackCulture = fallbackCulture;
+				this.#setVariantAwareValues();
+			},
+			'umbObserveFallbackCulture',
 		);
 	}
 
@@ -96,7 +99,6 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getName(): Promise<string> {
-		await this.#init;
 		return this.#name.getValue() || '';
 	}
 
@@ -115,7 +117,6 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getState(): Promise<DocumentVariantStateModel | null | undefined> {
-		await this.#init;
 		const variant = await this.#getCurrentVariant();
 		return variant?.state;
 	}
@@ -126,7 +127,6 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getIsDraft(): Promise<boolean> {
-		await this.#init;
 		return this.#isDraft.getValue() ?? false;
 	}
 
@@ -136,38 +136,37 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getIsTrashed(): Promise<boolean> {
-		await this.#init;
 		return this.#data?.getValue()?.isTrashed ?? false;
 	}
 
 	#setVariantAwareValues() {
+		if (!this.#variantContext) return;
+		if (!this.#variantId) return;
+		if (!this.#fallbackCulture) return;
+		if (!this.#data) return;
 		this.#setName();
 		this.#setIsDraft();
 		this.#setState();
 	}
 
 	async #setName() {
-		await this.#init;
-
 		const variant = await this.#getCurrentVariant();
 		if (variant) {
 			this.#name.setValue(variant.name);
 			return;
 		}
 
-		const fallbackName = this.#findVariant(this.#defaultCulture!)?.name;
+		const fallbackName = this.#findVariant(this.#fallbackCulture!)?.name;
 		this.#name.setValue(`(${fallbackName})`);
 	}
 
 	async #setIsDraft() {
-		await this.#init;
 		const variant = await this.#getCurrentVariant();
 		const isDraft = variant?.state === UmbDocumentVariantState.DRAFT || false;
 		this.#isDraft.setValue(isDraft);
 	}
 
 	async #setState() {
-		await this.#init;
 		const variant = await this.#getCurrentVariant();
 		const state = variant?.state || UmbDocumentVariantState.NOT_CREATED;
 		this.#state.setValue(state);
@@ -178,7 +177,6 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	}
 
 	async #getCurrentVariant() {
-		await this.#init;
 		if (this.#isInvariant()) {
 			return this.getData()?.variants?.[0];
 		}
