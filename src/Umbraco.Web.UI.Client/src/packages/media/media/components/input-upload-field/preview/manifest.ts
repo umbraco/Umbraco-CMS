@@ -26,7 +26,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'fileUploadPreview',
 		alias: 'Umb.FileUploadPreview.Svg',
-		name: 'Svg File Upload Preview',
+		name: 'SVG File Upload Preview',
 		weight: 100,
 		element: () => import('./input-upload-field-svg.element.js'),
 		forMimeTypes: ['image/svg+xml'],
