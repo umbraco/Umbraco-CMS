@@ -22,10 +22,10 @@ export interface UmbVariantPropertyGuardRule extends UmbPropertyGuardRule {
 
 /**
  *
- * @param rule - The rule to check.
- * @param variantId - The property variant id to check.
- * @param propertyType - The property type to check.
- * @param datasetVariantId - The variant id of the dataset. This is used to determine if the rule applies to the current dataset.
+ * @param {UmbVariantPropertyGuardRule} rule - The rule to check.
+ * @param {UmbVariantId} variantId - The property variant id to check.
+ * @param {UmbReferenceByUnique} propertyType - The property type to check.
+ * @param {UmbVariantId} datasetVariantId - The variant id of the dataset. This is used to determine if the rule applies to the current dataset.
  * @returns {boolean} - Returns true if the rule applies to the given conditions.
  */
 function findRule(
@@ -35,13 +35,9 @@ function findRule(
 	datasetVariantId: UmbVariantId,
 ) {
 	return (
-		(rule.variantId?.compare(variantId) &&
-			rule.propertyType?.unique === propertyType.unique &&
-			rule.datasetVariantId?.compare(datasetVariantId)) ||
-		(rule.variantId?.compare(variantId) && rule.datasetVariantId?.compare(datasetVariantId)) ||
-		(rule.variantId === undefined && rule.propertyType?.unique === propertyType.unique) ||
-		(rule.variantId?.compare(variantId) && rule.propertyType === undefined && datasetVariantId === undefined) ||
-		(rule.variantId === undefined && rule.propertyType === undefined)
+		(rule.variantId === undefined || rule.variantId.culture === variantId.culture) &&
+		(rule.propertyType === undefined || rule.propertyType.unique === propertyType.unique) &&
+		(rule.datasetVariantId === undefined || rule.datasetVariantId.culture === datasetVariantId.culture)
 	);
 }
 
