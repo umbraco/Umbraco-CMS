@@ -31,7 +31,7 @@ export default defineConfig({
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
     // When working locally it can be a good idea to use trace: 'on-first-retry' instead of 'retain-on-failure', it can cut the local test times in half.
-    trace: 'on',
+    trace: 'retain-on-failure',
     ignoreHTTPSErrors: true,
   },
 
