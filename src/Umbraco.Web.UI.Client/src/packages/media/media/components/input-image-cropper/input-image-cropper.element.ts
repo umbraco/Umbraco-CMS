@@ -190,9 +190,16 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 				max-width: 500px;
 				min-width: 300px;
 			}
+
 			#loader {
 				display: flex;
 				justify-content: center;
+			}
+
+			[slot='actions'] {
+				uui-icon {
+					padding-right: var(--uui-size-1);
+				}
 			}
 		`,
 	];
