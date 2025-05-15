@@ -39,28 +39,34 @@ public class HtmlImageSourceParserTests
         Assert.AreEqual(UdiParser.Parse("umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"), result[1]);
     }
 
-    [Test]
-    public void Remove_Image_Sources()
-    {
-        var imageSourceParser = new HtmlImageSourceParser(Mock.Of<IPublishedUrlProvider>());
-
-        var result = imageSourceParser.RemoveImageSources(@"<p>
+    [TestCase(
+        @"<p>
 <div>
     <img src=""/media/12354/test.jpg"" />
 </div></p>
 <p>
     <div><img src=""/media/987645/test.jpg"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" /></div>
-</p>");
-
-        Assert.AreEqual(
-            @"<p>
+</p>",
+        ExpectedResult = @"<p>
 <div>
     <img src=""/media/12354/test.jpg"" />
 </div></p>
 <p>
     <div><img src="""" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" /></div>
 </p>",
-            result);
+        TestName = "Remove image source with data-udi set")]
+    [TestCase(
+        @"<img src=""/media/12354/test.jpg?width=400&height=400&hmac=test"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        ExpectedResult = @"<img src=""?width=400&height=400&hmac=test"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        TestName = "Remove image source but keep querystring")]
+    [Category("Remove image sources")]
+    public string Remove_Image_Sources(string sourceHtml)
+    {
+        var imageSourceParser = new HtmlImageSourceParser(Mock.Of<IPublishedUrlProvider>());
+
+        var actual = imageSourceParser.RemoveImageSources(sourceHtml);
+
+        return actual;
     }
 
     [Test]
