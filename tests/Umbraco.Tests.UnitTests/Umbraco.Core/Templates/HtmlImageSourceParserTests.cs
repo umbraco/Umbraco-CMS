@@ -147,6 +147,10 @@ public class HtmlImageSourceParserTests
         ExpectedResult = @"<div><img src=""/media/1001/image.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
         TestName = "Filled source is overwritten with data-udi set")]
     [TestCase(
+        @"<div><img alt title=""Test"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" src=""non empty src"" /></div>",
+        ExpectedResult = @"<div><img alt title=""Test"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" src=""/media/1001/image.jpg"" /></div>",
+        TestName = "Order of attributes does not matter")]
+    [TestCase(
         @"<div><img src=""some src"" some-attribute data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" another-attribute/></div>",
         ExpectedResult = @"<div><img src=""/media/1001/image.jpg"" some-attribute data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" another-attribute/></div>",
         TestName = "Attributes are persisted")]
@@ -158,6 +162,10 @@ public class HtmlImageSourceParserTests
         @"<div><img src=""?width=100&height=500"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
         ExpectedResult = @"<div><img src=""/media/1001/image.jpg?width=100&height=500"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
         TestName = "Parameters are prefixed")]
+    [TestCase(
+        @"<div><img data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" src=""?width=100&height=500"" /></div>",
+        ExpectedResult = @"<div><img data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" src=""/media/1001/image.jpg?width=100&height=500"" /></div>",
+        TestName = "Parameters are prefixed (order of attributes reversed)")]
     [TestCase(
         @"<div>
                 <img src="""" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/>
