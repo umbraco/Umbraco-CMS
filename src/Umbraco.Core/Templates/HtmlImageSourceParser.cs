@@ -115,7 +115,7 @@ public sealed class HtmlImageSourceParser
             // Find the src attribute
             Match src = SrcAttributeRegex.Match(match.Value);
 
-            return src.Success == false ?
+            return src.Success == false || string.IsNullOrWhiteSpace(src.Groups[1].Value) ?
                 match.Value : match.Value.Replace(src.Groups[1].Value, string.Empty);
         });
 }
