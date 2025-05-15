@@ -6,6 +6,9 @@ import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeEntityType } from '@umbraco-cms/backoffice/document-type';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 interface UmbDocumentPickerInputContextOpenArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>;
@@ -18,14 +21,38 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 	UmbDocumentPickerModalData,
 	UmbDocumentPickerModalValue
 > {
+	#init: Promise<unknown>;
+	#propertyDataSetCulture?: UmbVariantId;
+	#appCulture?: string;
+	#defaultCulture?: string;
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_PICKER_MODAL);
+
+		// TODO: replace this with a UMB_VARIANT_CONTEXT
+		// We do not depend on this context because we know is it only available in some cases
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
+			this.#propertyDataSetCulture = context?.getVariantId();
+		});
+
+		// TODO: replace this with a UMB_VARIANT_CONTEXT
+		this.#init = this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (context) => {
+			this.observe(context?.appLanguageCulture, (culture) => {
+				this.#appCulture = culture;
+			});
+
+			this.observe(context?.appDefaultLanguage, (value) => {
+				this.#defaultCulture = value?.unique;
+			});
+		}).asPromise();
 	}
 
 	override async openPicker(
 		pickerData?: Partial<UmbDocumentPickerModalData>,
 		args?: UmbDocumentPickerInputContextOpenArgs,
 	) {
+		await this.#init;
+
 		const combinedPickerData = {
 			...pickerData,
 		};
@@ -45,6 +72,7 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 		combinedPickerData.search!.queryParams = {
 			allowedContentTypes: args?.allowedContentTypes,
 			includeTrashed: args?.includeTrashed,
+			culture: this.#propertyDataSetCulture?.culture || this.#appCulture || this.#defaultCulture,
 			...pickerData?.search?.queryParams,
 		};
 
