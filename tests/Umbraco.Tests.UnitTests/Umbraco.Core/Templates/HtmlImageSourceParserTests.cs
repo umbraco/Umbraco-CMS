@@ -56,9 +56,17 @@ public class HtmlImageSourceParserTests
 </p>",
         TestName = "Remove image source with data-udi set")]
     [TestCase(
-        @"<img src=""/media/12354/test.jpg?width=400&height=400&hmac=test"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
-        ExpectedResult = @"<img src=""?width=400&height=400&hmac=test"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        @"<img alt title=""Title"" src=""/media/12354/test.jpg?width=400&height=400&hmac=test"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        ExpectedResult = @"<img alt title=""Title"" src=""?width=400&height=400&hmac=test"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
         TestName = "Remove image source but keep querystring")]
+    [TestCase(
+        @"<img alt title=""Title"" src="""" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        ExpectedResult = @"<img alt title=""Title"" src="""" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        TestName = "Remove image source with empty src")]
+    [TestCase(
+        @"<img src=""/media/12345/test.jpg"" />",
+        ExpectedResult = @"<img src=""/media/12345/test.jpg"" />",
+        TestName = "Do not remove image source without data-udi set")]
     [Category("Remove image sources")]
     public string Remove_Image_Sources(string sourceHtml)
     {
