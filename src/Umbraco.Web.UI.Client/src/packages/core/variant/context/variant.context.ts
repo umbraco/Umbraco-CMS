@@ -12,16 +12,26 @@ import { UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observabl
  */
 export class UmbVariantContext extends UmbContextBase {
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
-	variantId = this.#variantId.asObservable();
+	public variantId = this.#variantId.asObservable();
 
 	#culture = new UmbStringState<string | null | undefined>(undefined);
-	culture = this.#culture.asObservable();
+	public culture = this.#culture.asObservable();
 
 	#segment = new UmbStringState<string | null | undefined>(undefined);
-	segment = this.#segment.asObservable();
+	public segment = this.#segment.asObservable();
+
+	#defaultCulture = new UmbStringState<string | null | undefined>(undefined);
+	public defaultCulture = this.#defaultCulture.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_VARIANT_CONTEXT);
+
+		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
+			this.observe(context?.defaultCulture, (defaultCulture) => {
+				if (!defaultCulture) return;
+				this.setDefaultCulture(defaultCulture);
+			});
+		}).skipHost();
 	}
 
 	/**
@@ -82,5 +92,23 @@ export class UmbVariantContext extends UmbContextBase {
 		this.#segment.setValue(segment);
 		const variantId = new UmbVariantId(this.#culture.getValue(), segment);
 		this.#variantId.setValue(variantId);
+	}
+
+	/**
+	 * Gets the default culture state
+	 * @returns {(string | null | undefined)} - The default culture state
+	 * @memberof UmbVariantContext
+	 */
+	getDefaultCulture(): string | null | undefined {
+		return this.#defaultCulture.getValue();
+	}
+
+	/**
+	 * Sets the default culture state
+	 * @param {string | undefined} culture - The default culture to set
+	 * @memberof UmbVariantContext
+	 */
+	setDefaultCulture(culture: string | null): void {
+		this.#defaultCulture.setValue(culture);
 	}
 }
