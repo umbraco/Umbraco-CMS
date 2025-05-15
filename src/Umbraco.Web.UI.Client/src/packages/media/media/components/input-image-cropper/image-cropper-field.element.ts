@@ -175,14 +175,18 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	}
 
 	protected renderActions() {
-		return html`<slot name="actions"></slot>
+		return html`
+			<slot name="actions"></slot>
 			${when(
-				!this.hideFocalPoint,
-				() =>
-					html`<uui-button
-						label=${this.localize.term('content_resetFocalPoint')}
-						@click=${this.onResetFocalPoint}></uui-button>`,
-			)} `;
+				!this.hideFocalPoint && this.focalPoint.left !== 0.5 && this.focalPoint.top !== 0.5,
+				() => html`
+					<uui-button compact label=${this.localize.term('content_resetFocalPoint')} @click=${this.onResetFocalPoint}>
+						<uui-icon name="icon-axis-rotation"></uui-icon>
+						${this.localize.term('content_resetFocalPoint')}
+					</uui-button>
+				`,
+			)}
+		`;
 	}
 
 	protected renderSide() {
