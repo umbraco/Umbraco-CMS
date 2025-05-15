@@ -8,6 +8,7 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbReadOnlyStateManager } from '@umbraco-cms/backoffice/utils';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
 
 // TODO: Make a store for the App Languages.
 // TODO: Implement default language end-point, in progress at backend team, so we can avoid getting all languages.
@@ -50,6 +51,8 @@ export class UmbAppLanguageContext extends UmbContextBase implements UmbApi {
 
 	#readOnlyStateIdentifier = 'UMB_LANGUAGE_PERMISSION_';
 	#localStorageKey = 'umb:appLanguage';
+
+	#variantContext = new UmbVariantContext(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_APP_LANGUAGE_CONTEXT);
@@ -95,6 +98,9 @@ export class UmbAppLanguageContext extends UmbContextBase implements UmbApi {
 
 		// set the new language
 		this.#appLanguage.update(language);
+
+		// Update the variant context with the new language
+		this.#variantContext.setCulture(language.unique);
 
 		// store the new language in local storage
 		localStorage.setItem(this.#localStorageKey, language?.unique);
