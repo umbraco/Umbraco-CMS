@@ -30,7 +30,8 @@ test('can add allow vary by culture for a document type', {tag: '@smoke'}, async
   expect(documentTypeData.variesByCulture).toBeTruthy();
 });
 
-test('can add allow segmentation for a document type', async ({umbracoApi, umbracoUi}) => {
+// On V16 Segments will not be allowed through the UI, but the server.
+test.skip('can add allow segmentation for a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);

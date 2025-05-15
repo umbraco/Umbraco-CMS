@@ -86,7 +86,7 @@ test('can delete a template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.isErrorNotificationVisible(false);
   await umbracoUi.template.reloadTemplateTree();
   expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
-  await umbracoUi.template.isTemplateRootTreeItemVisible(templateName, false);
+  await umbracoUi.template.isTemplateRootTreeItemVisible(templateName, false, false);
 });
 
 test('can set a template as master template', async ({umbracoApi, umbracoUi}) => {
@@ -99,7 +99,7 @@ test('can set a template as master template', async ({umbracoApi, umbracoUi}) =>
   // Act
   await umbracoUi.template.goToTemplate(childTemplateName);
   await umbracoUi.template.clickChangeMasterTemplateButton();
-  await umbracoUi.template.clickButtonWithName(templateName);
+  await umbracoUi.template.clickModalMenuItemWithName(templateName);
   await umbracoUi.template.clickChooseButton();
   await umbracoUi.template.clickSaveButton();
 

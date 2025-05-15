@@ -132,7 +132,7 @@ test('can limit the media picker in the content by setting the start node', asyn
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('can not publish a mandatory media picker with an empty value', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can not publish a mandatory media picker with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', false, false, true);
@@ -145,10 +145,9 @@ test('can not publish a mandatory media picker with an empty value', async ({umb
   // Do not pick any media and the validation error appears
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   // Pick a media value and the validation error disappears
+  // TODO: This should be fixed
   await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaFileName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);

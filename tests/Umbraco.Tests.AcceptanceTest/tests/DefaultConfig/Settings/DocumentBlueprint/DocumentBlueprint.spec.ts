@@ -85,7 +85,7 @@ test('can create a document blueprint from the content menu', async ({umbracoApi
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(documentBlueprintName);
-  await umbracoUi.content.clickCreateActionMenuOption();
+  await umbracoUi.content.clickCreateBlueprintActionMenuOption();
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert

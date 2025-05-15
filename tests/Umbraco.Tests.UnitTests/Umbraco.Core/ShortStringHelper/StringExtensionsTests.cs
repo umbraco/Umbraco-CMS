@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -395,4 +396,17 @@ public class StringExtensionsTests
         var ids = input.GetIdsFromPathReversed();
         Assert.AreEqual(expected, string.Join(",", ids));
     }
+
+    [TestCase(null, null)]
+    [TestCase("", "")]
+    [TestCase("*", "*")]
+    [TestCase("en", "en")]
+    [TestCase("EN", "en")]
+    [TestCase("en-US", "en-US")]
+    [TestCase("en-gb", "en-GB")]
+    public void EnsureCultureCode_ReturnsExpectedResult(string? culture, string? expected) => Assert.AreEqual(expected, culture.EnsureCultureCode());
+
+    [Test]
+    [Platform(Include = "Win")]
+    public void EnsureCultureCode_ThrowsOnUnrecognisedCode() => Assert.Throws<CultureNotFoundException>(() => "xxx-xxx".EnsureCultureCode());
 }

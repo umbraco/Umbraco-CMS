@@ -56,18 +56,6 @@ export interface MetaCurrentUserActionDefaultKind extends MetaCurrentUserAction 
 	 * ]
 	 */
 	label: string;
-
-	/**
-	 * The look of the button
-	 * @default primary
-	 */
-	look?: UUIInterfaceLook;
-
-	/**
-	 * The color of the button
-	 * @default default
-	 */
-	color?: UUIInterfaceColor;
 }
 
 declare global {
