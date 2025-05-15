@@ -35,14 +35,16 @@ public class AddGuidsToAuditEntries : UnscopedMigrationBase
         AddColumnIfNotExists<AuditEntryDto>(columns, NewAffectedUserKeyColumnName);
 
         Database.Execute(
-            new Sql("UPDATE umbracoAudit " +
-                    "SET performingUserKey = (" +
-                    "SELECT umbracoUser.key FROM umbracoUser WHERE umbracoUser.id= umbracoAudit.performingUserId);"));
+            new Sql(
+                "UPDATE umbracoAudit " +
+                "SET performingUserKey = (" +
+                $"SELECT umbracoUser.{Database.SqlContext.SqlSyntax.GetQuotedColumnName("key")} FROM umbracoUser WHERE umbracoUser.id= umbracoAudit.performingUserId);"));
 
         Database.Execute(
-            new Sql("UPDATE umbracoAudit " +
-                    "SET affectedUserKey = (" +
-                    "SELECT umbracoUser.key FROM umbracoUser WHERE umbracoUser.id= umbracoAudit.affectedUserId);"));
+            new Sql(
+                "UPDATE umbracoAudit " +
+                "SET affectedUserKey = (" +
+                $"SELECT umbracoUser.{Database.SqlContext.SqlSyntax.GetQuotedColumnName("key")} FROM umbracoUser WHERE umbracoUser.id= umbracoAudit.affectedUserId);"));
 
         scope.Complete();
         Context.Complete();
