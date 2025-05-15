@@ -6,7 +6,7 @@ const name = 'TestName';
 const email = process.env.UMBRACO_USER_LOGIN;
 const password = process.env.UMBRACO_USER_PASSWORD;
 
-test('Install Umbraco', async ({page, umbracoUi}) => {
+test('Install Umbraco using SQLServer Express', async ({page, umbracoUi}) => {
   test.slow();
   // Arrange
   await page.goto(process.env.URL + '/umbraco/install');
@@ -17,6 +17,8 @@ test('Install Umbraco', async ({page, umbracoUi}) => {
   await page.getByLabel('password', {exact: true}).fill(password);
   await page.getByLabel('Next').click();
   await page.getByLabel('Next').click();
+  await page.locator('#database-type').locator('#native').selectOption('SQL Server Express LocalDB');
+  await expect(page.locator('#database-type').locator('option:checked')).toHaveText('SQL Server Express LocalDB')
   await page.getByLabel('Install').click();
 
   // Assert
