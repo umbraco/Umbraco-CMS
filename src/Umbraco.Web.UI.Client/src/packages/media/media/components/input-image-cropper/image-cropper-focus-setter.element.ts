@@ -107,18 +107,9 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		}
 	}
 
-	#coordsToFactor(x: number, y: number) {
-		const top = (y / 100 / y) * 50;
-		const left = (x / 100 / x) * 50;
-
-		return { top, left };
-	}
-
 	#setFocalPoint(x: number, y: number, width: number, height: number) {
 		const left = clamp(x / width, 0, 1);
 		const top = clamp(y / height, 0, 1);
-
-		this.#coordsToFactor(x, y);
 
 		const focalPoint = { left, top } as UmbFocalPointModel;
 
