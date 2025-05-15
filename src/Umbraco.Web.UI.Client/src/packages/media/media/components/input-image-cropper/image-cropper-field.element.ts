@@ -191,16 +191,18 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 
 	protected renderSide() {
 		if (!this.value || !this.crops) return;
-
 		return repeat(
 			this.crops,
 			(crop) => crop.alias + JSON.stringify(crop.coordinates),
-			(crop) =>
-				html` <umb-image-cropper-preview
-					@click=${() => this.onCropClick(crop)}
+			(crop) => html`
+				<umb-image-cropper-preview
 					.crop=${crop}
 					.focalPoint=${this.focalPoint}
-					.src=${this.source}></umb-image-cropper-preview>`,
+					.src=${this.source}
+					?active=${this.currentCrop?.alias === crop.alias}
+					@click=${() => this.onCropClick(crop)}>
+				</umb-image-cropper-preview>
+			`,
 		);
 	}
 	static override styles = css`
@@ -232,16 +234,20 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 			height: calc(100% - 33px - var(--uui-size-space-1)); /* Temp solution to make room for actions */
 		}
 
-		#side {
-			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-			gap: var(--uui-size-space-3);
-			flex-grow: 1;
-			overflow-y: auto;
-			height: fit-content;
-			max-height: 100%;
-		}
 	`;
+			#side {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+				gap: var(--uui-size-space-3);
+				flex-grow: 1;
+				overflow-y: auto;
+				height: fit-content;
+				max-height: 100%;
+
+				umb-image-cropper-preview[active] {
+					background-color: var(--uui-color-current);
+				}
+			}
 }
 
 declare global {
