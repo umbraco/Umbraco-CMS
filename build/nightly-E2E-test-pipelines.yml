@@ -302,9 +302,11 @@ stages:
               testCommand: "npm run test -- --shard=1/3"
             LinuxPart2Of3:
               vmImage: "ubuntu-latest"
+              testFolder: "DefaultConfig"
               testCommand: "npm run test -- --shard=2/3"
             LinuxPart3Of3:
               vmImage: "ubuntu-latest"
+              testFolder: "DefaultConfig"
               testCommand: "npm run test -- --shard=3/3"
             WindowsPart1Of3:
               vmImage: "windows-latest"
@@ -312,9 +314,11 @@ stages:
               testCommand: "npm run test -- --shard=1/3"
             WindowsPart2Of3:
               vmImage: "windows-latest"
+              testFolder: "DefaultConfig"
               testCommand: "npm run test -- --shard=2/3"
             WindowsPart3Of3:
               vmImage: "windows-latest"
+              testFolder: "DefaultConfig"
               testCommand: "npm run test -- --shard=3/3"
             # Additional test configurations can be added here
             # UnattendedInstallConfig
@@ -518,16 +522,19 @@ stages:
         strategy:
           matrix:
             LinuxPart1Of3:
+              testFolder: "DefaultConfig"
               testCommand: "npm run testSqlite -- --shard=1/3"
               vmImage: "ubuntu-latest"
               SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
             LinuxPart2Of3:
+              testFolder: "DefaultConfig"
               testCommand: "npm run testSqlite -- --shard=2/3"
               vmImage: "ubuntu-latest"
               SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
             LinuxPart3Of3:
+              testFolder: "DefaultConfig"
               testCommand: "npm run testSqlite -- --shard=3/3"
               vmImage: "ubuntu-latest"
               SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
@@ -535,12 +542,15 @@ stages:
             WindowsPart1Of3:
               vmImage: "windows-latest"
               testCommand: "npm run testSqlite -- --shard=1/3"
+              testFolder: "DefaultConfig"
             WindowsPart2Of3:
               vmImage: "windows-latest"
               testCommand: "npm run testSqlite -- --shard=2/3"
+              testFolder: "DefaultConfig"
             WindowsPart3Of3:
               vmImage: "windows-latest"
               testCommand: "npm run testSqlite -- --shard=3/3"
+              testFolder: "DefaultConfig"
             # Additional test configurations can be added here
             # UnattendedInstallConfig
             WindowsUnattendedInstallConfig:
@@ -578,8 +588,8 @@ stages:
               useGlobalJson: true
 
           - pwsh: |
-              "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
-              UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+              "UMBRACO_USER_LOGIN=$(PlaywrightUserEmail)
+              UMBRACO_USER_PASSWORD=$(PlaywrightPassword)
               URL=$(ASPNETCORE_URLS)
               STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
             displayName: Generate .env
