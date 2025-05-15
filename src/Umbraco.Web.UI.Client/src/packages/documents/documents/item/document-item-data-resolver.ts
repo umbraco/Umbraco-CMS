@@ -51,7 +51,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 
 	#observeVariantContext() {
 		this.observe(
-			observeMultiple([this.#variantContext?.variantId, this.#variantContext?.defaultCulture]),
+			observeMultiple([this.#variantContext?.variantId, this.#variantContext?.fallbackCulture]),
 			([variantId, defaultCulture]) => {
 				if (variantId === undefined) return;
 				if (defaultCulture === undefined) return;

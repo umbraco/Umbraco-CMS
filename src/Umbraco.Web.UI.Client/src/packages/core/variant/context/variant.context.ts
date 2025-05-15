@@ -20,16 +20,16 @@ export class UmbVariantContext extends UmbContextBase {
 	#segment = new UmbStringState<string | null | undefined>(undefined);
 	public segment = this.#segment.asObservable();
 
-	#defaultCulture = new UmbStringState<string | null | undefined>(undefined);
-	public defaultCulture = this.#defaultCulture.asObservable();
+	#fallbackCulture = new UmbStringState<string | null | undefined>(undefined);
+	public fallbackCulture = this.#fallbackCulture.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_VARIANT_CONTEXT);
 
 		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
-			this.observe(context?.defaultCulture, (defaultCulture) => {
-				if (!defaultCulture) return;
-				this.setDefaultCulture(defaultCulture);
+			this.observe(context?.fallbackCulture, (fallbackCulture) => {
+				if (!fallbackCulture) return;
+				this.setFallbackCulture(fallbackCulture);
 			});
 		}).skipHost();
 	}
@@ -95,20 +95,20 @@ export class UmbVariantContext extends UmbContextBase {
 	}
 
 	/**
-	 * Gets the default culture state
-	 * @returns {(string | null | undefined)} - The default culture state
+	 * Gets the fallback culture state
+	 * @returns {(string | null | undefined)} - The fallback culture state
 	 * @memberof UmbVariantContext
 	 */
-	getDefaultCulture(): string | null | undefined {
-		return this.#defaultCulture.getValue();
+	getFallbackCulture(): string | null | undefined {
+		return this.#fallbackCulture.getValue();
 	}
 
 	/**
-	 * Sets the default culture state
-	 * @param {string | undefined} culture - The default culture to set
+	 * Sets the fallback culture state
+	 * @param {string | undefined} culture - The fallback culture to set
 	 * @memberof UmbVariantContext
 	 */
-	setDefaultCulture(culture: string | null): void {
-		this.#defaultCulture.setValue(culture);
+	setFallbackCulture(culture: string | null): void {
+		this.#fallbackCulture.setValue(culture);
 	}
 }

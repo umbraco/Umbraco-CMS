@@ -131,7 +131,7 @@ export class UmbAppLanguageContext extends UmbContextBase implements UmbApi {
 		// in that case do we then need an endpoint to get the default language?
 		if (!defaultLanguageUnique) return;
 
-		this.#variantContext.setDefaultCulture(defaultLanguageUnique);
+		this.#variantContext.setFallbackCulture(defaultLanguageUnique);
 
 		// get the selected language from local storage
 		const uniqueFromLocalStorage = localStorage.getItem(this.#localStorageKey);
