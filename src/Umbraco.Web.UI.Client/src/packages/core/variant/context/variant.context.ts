@@ -39,7 +39,7 @@ export class UmbVariantContext extends UmbContextBase {
 	 * @param {UmbVariantId | undefined} variantId - The variant to set
 	 * @memberof UmbVariantContext
 	 */
-	setVariantId(variantId: UmbVariantId | undefined): void {
+	async setVariantId(variantId: UmbVariantId | undefined): Promise<void> {
 		this.#variantId.setValue(variantId);
 		this.#culture.setValue(variantId?.culture);
 		this.#segment.setValue(variantId?.segment);
@@ -47,19 +47,19 @@ export class UmbVariantContext extends UmbContextBase {
 
 	/**
 	 * Gets variant state
-	 * @returns {UmbVariantId | undefined} - The variant state
+	 * @returns {Promise<UmbVariantId | undefined>} - The variant state
 	 * @memberof UmbVariantContext
 	 */
-	getVariantId(): UmbVariantId | undefined {
+	async getVariantId(): Promise<UmbVariantId | undefined> {
 		return this.#variantId.getValue();
 	}
 
 	/**
 	 * Gets the culture state
-	 * @returns {(string | null | undefined)} - The culture state
+	 * @returns {(Promise<string | null | undefined>)} - The culture state
 	 * @memberof UmbVariantContext
 	 */
-	getCulture(): string | null | undefined {
+	async getCulture(): Promise<string | null | undefined> {
 		return this.#variantId.getValue()?.culture;
 	}
 
@@ -68,7 +68,7 @@ export class UmbVariantContext extends UmbContextBase {
 	 * @param {string | undefined} culture - The culture to set
 	 * @memberof UmbVariantContext
 	 */
-	setCulture(culture: string | null): void {
+	async setCulture(culture: string | null): Promise<void> {
 		this.#culture.setValue(culture);
 		const variantId = new UmbVariantId(culture, this.#segment.getValue());
 		this.#variantId.setValue(variantId);
@@ -76,10 +76,10 @@ export class UmbVariantContext extends UmbContextBase {
 
 	/**
 	 * Gets the variant segment state
-	 * @returns {(string | null | undefined)} - The segment state
+	 * @returns {(Promise<string | null | undefined>)} - The segment state
 	 * @memberof UmbVariantContext
 	 */
-	getSegment(): string | null | undefined {
+	async getSegment(): Promise<string | null | undefined> {
 		return this.#variantId.getValue()?.segment;
 	}
 
@@ -88,7 +88,7 @@ export class UmbVariantContext extends UmbContextBase {
 	 * @param {string | undefined} segment - The segment to set
 	 * @memberof UmbVariantContext
 	 */
-	setSegment(segment: string | null): void {
+	async setSegment(segment: string | null): Promise<void> {
 		this.#segment.setValue(segment);
 		const variantId = new UmbVariantId(this.#culture.getValue(), segment);
 		this.#variantId.setValue(variantId);
@@ -96,10 +96,10 @@ export class UmbVariantContext extends UmbContextBase {
 
 	/**
 	 * Gets the fallback culture state
-	 * @returns {(string | null | undefined)} - The fallback culture state
+	 * @returns {(Promise<string | null | undefined>)} - The fallback culture state
 	 * @memberof UmbVariantContext
 	 */
-	getFallbackCulture(): string | null | undefined {
+	async getFallbackCulture(): Promise<string | null | undefined> {
 		return this.#fallbackCulture.getValue();
 	}
 
@@ -108,7 +108,7 @@ export class UmbVariantContext extends UmbContextBase {
 	 * @param {string | undefined} culture - The fallback culture to set
 	 * @memberof UmbVariantContext
 	 */
-	setFallbackCulture(culture: string | null): void {
+	async setFallbackCulture(culture: string | null): Promise<void> {
 		this.#fallbackCulture.setValue(culture);
 	}
 }
