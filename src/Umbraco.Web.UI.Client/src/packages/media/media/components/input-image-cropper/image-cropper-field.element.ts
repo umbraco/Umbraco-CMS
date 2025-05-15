@@ -205,36 +205,46 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 			`,
 		);
 	}
-	static override styles = css`
-		:host {
-			display: flex;
-			width: 100%;
-			box-sizing: border-box;
-			gap: var(--uui-size-space-3);
-			height: 400px;
-		}
 
-		#main {
-			max-width: 500px;
-			min-width: 300px;
-			width: 100%;
-			height: 100%;
-			display: flex;
-			gap: var(--uui-size-space-1);
-			flex-direction: column;
-		}
+	static override styles = [
+		css`
+			:host {
+				display: flex;
+				width: 100%;
+				box-sizing: border-box;
+				gap: var(--uui-size-space-3);
+				height: 400px;
+			}
 
-		#actions {
-			display: flex;
-			justify-content: space-between;
-			margin-top: 0.5rem;
-		}
+			#main {
+				max-width: 500px;
+				min-width: 300px;
+				width: 100%;
+				height: 100%;
+				display: flex;
+				gap: var(--uui-size-space-1);
+				flex-direction: column;
+			}
 
-		umb-image-cropper-focus-setter {
-			height: calc(100% - 33px - var(--uui-size-space-1)); /* Temp solution to make room for actions */
-		}
+			#actions {
+				display: flex;
+				justify-content: space-between;
+				margin-top: 0.5rem;
 
-	`;
+				uui-icon {
+					padding-right: var(--uui-size-1);
+				}
+			}
+
+			slot[name='actions'] {
+				display: block;
+				flex: 1;
+			}
+
+			umb-image-cropper-focus-setter {
+				height: calc(100% - 33px - var(--uui-size-space-1)); /* Temp solution to make room for actions */
+			}
+
 			#side {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -248,6 +258,8 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 					background-color: var(--uui-color-current);
 				}
 			}
+		`,
+	];
 }
 
 declare global {
