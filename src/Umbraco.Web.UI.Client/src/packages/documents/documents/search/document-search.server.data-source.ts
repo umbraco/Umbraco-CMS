@@ -36,7 +36,7 @@ export class UmbDocumentSearchServerDataSource
 			DocumentService.getItemDocumentSearch({
 				query: {
 					allowedDocumentTypes: args.allowedContentTypes?.map((contentType) => contentType.unique),
-					culture: args.culture,
+					culture: args.culture || undefined,
 					parentId: args.searchFrom?.unique ?? undefined,
 					query: args.query,
 					trashed: args.includeTrashed,

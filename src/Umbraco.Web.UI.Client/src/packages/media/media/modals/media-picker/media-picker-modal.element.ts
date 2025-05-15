@@ -77,7 +77,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	private _dropzone!: UmbDropzoneMediaElement;
 
 	#pagingMap = new Map<string, UmbPaginationManager>();
-	#contextCulture?: string;
+	#contextCulture?: string | null;
 
 	constructor() {
 		super();
@@ -90,7 +90,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
 			this.observe(context?.culture, (culture) => {
-				this.#contextCulture = culture ?? undefined;
+				this.#contextCulture = culture;
 			});
 		});
 	}
