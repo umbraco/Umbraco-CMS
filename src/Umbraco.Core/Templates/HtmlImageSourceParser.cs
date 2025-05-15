@@ -11,7 +11,7 @@ public sealed class HtmlImageSourceParser
         RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
     private static readonly Regex SrcAttributeRegex = new(
-        @"src=""([^""\?]*)(\?[^""]*)?""[^>]",
+        @"src=""([^""\?]*)(\?[^""]*)?""",
         RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
     private static readonly Regex DataUdiAttributeRegex = new(
