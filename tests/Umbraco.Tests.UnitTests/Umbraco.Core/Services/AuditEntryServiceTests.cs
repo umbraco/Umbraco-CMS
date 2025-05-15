@@ -54,6 +54,8 @@ public class AuditEntryServiceTests
                 Assert.AreEqual("umbraco/test", item.EventType);
                 Assert.AreEqual("eventDetails", item.EventDetails);
             });
+        _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.SuperUserId))
+            .ReturnsAsync(Constants.Security.SuperUserKey);
 
         var result = await _auditEntryService.WriteAsync(
             Constants.Security.SuperUserId,
@@ -101,8 +103,8 @@ public class AuditEntryServiceTests
                 Assert.AreEqual("umbraco/test", item.EventType);
                 Assert.AreEqual("eventDetails", item.EventDetails);
             });
-        _userIdKeyResolverMock.Setup(x => x.GetAsync(Constants.Security.SuperUserKey))
-            .Returns(Task.FromResult(Constants.Security.SuperUserId));
+        _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.SuperUserKey))
+            .ReturnsAsync(Constants.Security.SuperUserId);
 
         var result = await _auditEntryService.WriteAsync(
             Constants.Security.SuperUserKey,

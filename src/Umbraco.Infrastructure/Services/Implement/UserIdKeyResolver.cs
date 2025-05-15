@@ -22,6 +22,10 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
 
     /// <inheritdoc/>
     public async Task<int> GetAsync(Guid key)
+        => await TryGetAsync(key) ?? throw new InvalidOperationException("No user found with the specified key");
+
+    /// <inheritdoc/>
+    public async Task<int?> TryGetAsync(Guid key)
     {
         if (_keyToId.TryGetValue(key, out int id))
         {
@@ -48,11 +52,14 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
                 .From<UserDto>()
                 .Where<UserDto>(x => x.Key == key);
 
-            int fetchedId = (await scope.Database.ExecuteScalarAsync<int?>(query))
-                            ?? throw new InvalidOperationException("No user found with the specified key");
+            int? fetchedId = await scope.Database.ExecuteScalarAsync<int?>(query);
+            if (fetchedId is null)
+            {
+                return null;
+            }
 
 
-            _keyToId[key] = fetchedId;
+            _keyToId[key] = fetchedId.Value;
             return fetchedId;
         }
         finally
@@ -63,6 +70,10 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
 
     /// <inheritdoc/>
     public async Task<Guid> GetAsync(int id)
+        => await TryGetAsync(id) ?? throw new InvalidOperationException("No user found with the specified id");
+
+    /// <inheritdoc/>
+    public async Task<Guid?> TryGetAsync(int id)
     {
         if (_idToKey.TryGetValue(id, out Guid key))
         {
@@ -85,10 +96,13 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
                 .From<UserDto>()
                 .Where<UserDto>(x => x.Id == id);
 
-            Guid fetchedKey = scope.Database.ExecuteScalar<Guid?>(query)
-                              ?? throw new InvalidOperationException("No user found with the specified id");
+            Guid? fetchedKey = scope.Database.ExecuteScalar<Guid?>(query);
+            if (fetchedKey is null)
+            {
+                return null;
+            }
 
-            _idToKey[id] = fetchedKey;
+            _idToKey[id] = fetchedKey.Value;
 
             return fetchedKey;
         }

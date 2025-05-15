@@ -338,7 +338,7 @@ public sealed class AuditService : RepositoryService, IAuditService
             affectedUserId,
             affectedDetails,
             eventType,
-            eventDetails).Result;
+            eventDetails).GetAwaiter().GetResult().Result;
     }
 
     /// <inheritdoc />

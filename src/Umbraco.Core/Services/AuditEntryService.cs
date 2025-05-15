@@ -16,7 +16,8 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
 {
     private readonly IAuditEntryRepository _auditEntryRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly Lazy<bool> _isAvailable;
+    private readonly Lock _isAvailableLock = new();
+    private bool _isAvailable;
 
     /// <summary>
     ///    Initializes a new instance of the <see cref="AuditEntryService" /> class.
@@ -31,7 +32,6 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
     {
         _auditEntryRepository = auditEntryRepository;
         _userIdKeyResolver = userIdKeyResolver;
-        _isAvailable = new Lazy<bool>(DetermineIsAvailable);
     }
 
     /// <inheritdoc />
@@ -49,10 +49,12 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
         var affectedUserId = await GetUserId(affectedUserKey);
         return WriteInner(
             performingUserId,
+            performingUserKey,
             performingDetails,
             performingIp,
             eventDateUtc,
             affectedUserId,
+            affectedUserKey,
             affectedDetails,
             eventType,
             eventDetails);
@@ -62,14 +64,14 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
             return userKey switch
             {
                 _ when userKey == Constants.Security.UnknownUserKey => Constants.Security.UnknownUserId,
-                _ => await _userIdKeyResolver.GetAsync(userKey),
+                _ => await _userIdKeyResolver.TryGetAsync(userKey) ?? Constants.Security.UnknownUserId,
             };
         }
     }
 
     /// <inheritdoc />
     [Obsolete("Use the overload that takes user keys. Scheduled for removal in Umbraco 19.")]
-    public Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
+    public async Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
         int performingUserId,
         string perfomingDetails,
         string performingIp,
@@ -78,24 +80,60 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
         string? affectedDetails,
         string eventType,
         string eventDetails) =>
-        Task.FromResult(
-            WriteInner(
-                performingUserId,
-                perfomingDetails,
-                performingIp,
-                eventDateUtc,
-                affectedUserId,
-                affectedDetails,
-                eventType,
-                eventDetails));
+        await WriteInner(
+            performingUserId,
+            perfomingDetails,
+            performingIp,
+            eventDateUtc,
+            affectedUserId,
+            affectedDetails,
+            eventType,
+            eventDetails);
 
     // This method is used by the AuditService while the AuditService.Write() method is not removed.
-    internal Attempt<IAuditEntry, AuditEntryOperationStatus> WriteInner(
+    internal async Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteInner(
         int performingUserId,
         string performingDetails,
         string performingIp,
         DateTime eventDateUtc,
         int affectedUserId,
+        string? affectedDetails,
+        string eventType,
+        string eventDetails)
+    {
+        Guid? performingUserKey = await GetUserKey(performingUserId);
+        Guid? affectedUserKey = await GetUserKey(affectedUserId);
+
+        return WriteInner(
+            performingUserId,
+            performingUserKey,
+            performingDetails,
+            performingIp,
+            eventDateUtc,
+            affectedUserId,
+            affectedUserKey,
+            affectedDetails,
+            eventType,
+            eventDetails);
+
+        async Task<Guid?> GetUserKey(int userId)
+        {
+            return userId switch
+            {
+                Constants.Security.UnknownUserId => Constants.Security.UnknownUserKey,
+                _ => await _userIdKeyResolver.TryGetAsync(userId),
+            };
+        }
+    }
+
+    private Attempt<IAuditEntry, AuditEntryOperationStatus> WriteInner(
+        int performingUserId,
+        Guid? performingUserKey,
+        string performingDetails,
+        string performingIp,
+        DateTime eventDateUtc,
+        int affectedUserId,
+        Guid? affectedUserKey,
         string? affectedDetails,
         string eventType,
         string eventDetails)
@@ -144,16 +182,18 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
         var entry = new AuditEntry
         {
             PerformingUserId = performingUserId,
+            PerformingUserKey = performingUserKey,
             PerformingDetails = performingDetails,
             PerformingIp = performingIp,
             EventDateUtc = eventDateUtc,
             AffectedUserId = affectedUserId,
+            AffectedUserKey = affectedUserKey,
             AffectedDetails = affectedDetails,
             EventType = eventType,
             EventDetails = eventDetails,
         };
 
-        if (_isAvailable.Value == false)
+        if (!IsAvailable())
         {
             return Attempt.FailWithStatus(AuditEntryOperationStatus.RepositoryNotAvailable, (IAuditEntry)entry);
         }
@@ -167,11 +207,10 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
         return Attempt.SucceedWithStatus(AuditEntryOperationStatus.Success, (IAuditEntry)entry);
     }
 
-
     // TODO: Currently used in testing only, not part of the interface, need to add queryable methods to the interface instead
     internal IEnumerable<IAuditEntry> GetAll()
     {
-        if (_isAvailable.Value == false)
+        if (!IsAvailable())
         {
             return [];
         }
@@ -182,14 +221,26 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
         }
     }
 
-    /// <summary>
-    ///     Determines whether the repository is available.
-    /// </summary>
-    private bool DetermineIsAvailable()
+    private bool IsAvailable()
     {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        if (_isAvailable)
         {
-            return _auditEntryRepository.IsAvailable();
+            return true;
         }
+
+        lock (_isAvailableLock)
+        {
+            if (_isAvailable)
+            {
+                return true;
+            }
+
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                _isAvailable = _auditEntryRepository.IsAvailable();
+            }
+        }
+
+        return _isAvailable;
     }
 }

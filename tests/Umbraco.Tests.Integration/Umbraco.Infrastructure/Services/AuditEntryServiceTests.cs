@@ -19,14 +19,15 @@ internal sealed class AuditEntryServiceTests : UmbracoIntegrationTest
     public async Task Write_and_GetAll()
     {
         var sut = (AuditEntryService)Services.GetRequiredService<IAuditEntryService>();
-        var expected = new AuditEntryBuilder().Build();
+        var expected = new AuditEntryBuilder()
+            .Build();
 
         var result = await sut.WriteAsync(
-            expected.PerformingUserId,
+            expected.PerformingUserKey.Value,
             expected.PerformingDetails,
             expected.PerformingIp,
             expected.EventDateUtc,
-            expected.AffectedUserId,
+            expected.AffectedUserKey.Value,
             expected.AffectedDetails,
             expected.EventType,
             expected.EventDetails);
@@ -39,15 +40,17 @@ internal sealed class AuditEntryServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(expected.PerformingUserId, actual.PerformingUserId);
+            Assert.AreEqual(expected.PerformingUserKey, actual.PerformingUserKey);
             Assert.AreEqual(expected.PerformingDetails, actual.PerformingDetails);
             Assert.AreEqual(expected.EventDateUtc, actual.EventDateUtc);
             Assert.AreEqual(expected.AffectedUserId, actual.AffectedUserId);
+            Assert.AreEqual(expected.AffectedUserKey, actual.AffectedUserKey);
             Assert.AreEqual(expected.AffectedDetails, actual.AffectedDetails);
             Assert.AreEqual(expected.EventType, actual.EventType);
             Assert.AreEqual(expected.EventDetails, actual.EventDetails);
             Assert.IsNotNull(entries);
             Assert.AreEqual(1, entries.Length);
-            Assert.AreEqual(expected.PerformingUserId, entries[0].PerformingUserId);
+            Assert.AreEqual(expected.PerformingUserKey, entries[0].PerformingUserKey);
         });
     }
 
@@ -74,10 +77,12 @@ internal sealed class AuditEntryServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(Constants.Security.SuperUserId, actual.PerformingUserId);
+            Assert.AreEqual(Constants.Security.SuperUserKey, actual.PerformingUserKey);
             Assert.AreEqual("performingDetails", actual.PerformingDetails);
             Assert.AreEqual("performingIp", actual.PerformingIp);
             Assert.AreEqual(eventDateUtc, actual.EventDateUtc);
             Assert.AreEqual(Constants.Security.UnknownUserId, actual.AffectedUserId);
+            Assert.AreEqual(Constants.Security.UnknownUserKey, actual.AffectedUserKey);
             Assert.AreEqual("affectedDetails", actual.AffectedDetails);
             Assert.AreEqual("umbraco/test", actual.EventType);
             Assert.AreEqual("eventDetails", actual.EventDetails);
