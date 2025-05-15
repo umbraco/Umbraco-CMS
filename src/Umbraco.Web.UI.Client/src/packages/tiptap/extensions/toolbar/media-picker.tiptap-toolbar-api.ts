@@ -1,6 +1,7 @@
 import { UmbTiptapToolbarElementApiBase } from '../base.js';
-import { getGuidFromUdi, getProcessedImageUrl, imageSize } from '@umbraco-cms/backoffice/utils';
+import { getGuidFromUdi, imageSize } from '@umbraco-cms/backoffice/utils';
 import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
@@ -8,6 +9,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbMediaCaptionAltTextModalValue } from '@umbraco-cms/backoffice/media';
 
 export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbTiptapToolbarElementApiBase {
+	#imagingRepository = new UmbImagingRepository(this);
+
 	#modalManager?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
 	/**
@@ -99,11 +102,15 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 		if (!media?.url) return;
 
 		const { width, height } = await imageSize(media.url, { maxWidth: this.maxWidth });
-		const src = await getProcessedImageUrl(media.url, { width, height, mode: ImageCropModeModel.MAX });
+		const { data } = await this.#imagingRepository.requestResizedItems([mediaUnique], {
+			width,
+			height,
+			mode: ImageCropModeModel.MAX,
+		});
 
 		const img = {
 			alt: media.altText,
-			src,
+			src: data[0]?.url ?? media.url,
 			'data-udi': `umb://media/${mediaUnique.replace(/-/g, '')}`,
 			width: width.toString(),
 			height: height.toString(),
