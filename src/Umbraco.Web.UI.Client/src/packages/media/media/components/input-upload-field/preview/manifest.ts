@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'fileUploadPreview',
 		alias: 'Umb.FileUploadPreview.File',
-		name: 'File File Upload Preview',
+		name: 'General File Upload Preview',
 		weight: 100,
 		element: () => import('./input-upload-field-file.element.js'),
 		forMimeTypes: ['*/*'],
