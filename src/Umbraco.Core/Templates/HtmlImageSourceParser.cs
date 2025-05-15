@@ -75,8 +75,8 @@ public sealed class HtmlImageSourceParser
 
             // Find the src attribute
             // src match groups:
-            // - 1 = the src attribute value
-            // - 2 = the src attribute query string
+            // - 1 = the src attribute value until the query string
+            // - 2 = the src attribute query string including the '?'
             Match src = SrcAttributeRegex.Match(match.Value);
 
             if (src.Success == false)
@@ -116,6 +116,6 @@ public sealed class HtmlImageSourceParser
             Match src = SrcAttributeRegex.Match(match.Value);
 
             return src.Success == false ?
-                match.Value : match.Value.Replace(src.Value, "src=\"\"");
+                match.Value : match.Value.Replace(src.Groups[1].Value, string.Empty);
         });
 }
