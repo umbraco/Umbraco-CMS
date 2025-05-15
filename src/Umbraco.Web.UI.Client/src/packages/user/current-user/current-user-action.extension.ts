@@ -1,7 +1,6 @@
 import type { UmbAction } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
-import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 
 export interface UmbCurrentUserActionArgs<MetaArgsType> {
 	meta: MetaArgsType;
