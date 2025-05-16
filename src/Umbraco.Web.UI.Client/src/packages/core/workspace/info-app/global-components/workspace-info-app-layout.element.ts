@@ -22,10 +22,6 @@ export class UmbWorkspaceInfoAppLayoutElement extends UmbLitElement {
 			uui-box {
 				--uui-box-default-padding: 0;
 			}
-
-			#container {
-				padding-left: var(--uui-size-space-4);
-			}
 		`,
 	];
 }

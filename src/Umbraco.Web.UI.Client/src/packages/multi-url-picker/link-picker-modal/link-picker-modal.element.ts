@@ -8,8 +8,13 @@ import { css, customElement, html, nothing, query, state, when } from '@umbraco-
 import { isUmbracoFolder, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { umbBindToValidation, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { umbConfirmModal, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbDocumentDetailRepository, UmbDocumentUrlRepository } from '@umbraco-cms/backoffice/document';
-import { UmbMediaDetailRepository, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
+import {
+	UmbDocumentItemDataResolver,
+	UmbDocumentItemRepository,
+	UmbDocumentUrlRepository,
+	UmbDocumentUrlsDataResolver,
+} from '@umbraco-cms/backoffice/document';
+import { UmbMediaItemRepository, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -78,7 +83,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	async populateLinkUrl() {
 		// Documents and media have URLs saved in the local link format. Display the actual URL to align with what
 		// the user sees when they selected it initially.
-		if (!this.value.link?.unique || this.value.link?.url?.indexOf('localLink') === -1) return;
+		if (!this.value.link?.unique) return;
 
 		let url: string | undefined = undefined;
 		switch (this.value.link.type) {
@@ -156,21 +161,25 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		if (unique) {
 			switch (type) {
 				case 'document': {
-					const documentRepository = new UmbDocumentDetailRepository(this);
-					const { data: documentData } = await documentRepository.requestByUnique(unique);
-					if (documentData) {
-						icon = documentData.documentType.icon;
-						name = documentData.variants[0].name;
+					const documentRepository = new UmbDocumentItemRepository(this);
+					const { data: documentItems } = await documentRepository.requestItems([unique]);
+					const documentItem = documentItems?.[0];
+					if (documentItem) {
+						const itemDataResolver = new UmbDocumentItemDataResolver(this);
+						itemDataResolver.setData(documentItem);
+						icon = await itemDataResolver.getIcon();
+						name = await itemDataResolver.getName();
 						url = await this.#getUrlForDocument(unique);
 					}
 					break;
 				}
 				case 'media': {
-					const mediaRepository = new UmbMediaDetailRepository(this);
-					const { data: mediaData } = await mediaRepository.requestByUnique(unique);
-					if (mediaData) {
-						icon = mediaData.mediaType.icon;
-						name = mediaData.variants[0].name;
+					const mediaRepository = new UmbMediaItemRepository(this);
+					const { data: mediaData } = await mediaRepository.requestItems([unique]);
+					const mediaItem = mediaData?.[0];
+					if (mediaItem) {
+						icon = mediaItem.mediaType.icon;
+						name = mediaItem.variants[0].name;
 						url = await this.#getUrlForMedia(unique);
 					}
 					break;
@@ -178,6 +187,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				default:
 					break;
 			}
+			// The selection was removed
+		} else {
+			this.#resetUrl();
 		}
 
 		const link = {
@@ -196,7 +208,11 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	async #getUrlForDocument(unique: string) {
 		const documentUrlRepository = new UmbDocumentUrlRepository(this);
 		const { data: documentUrlData } = await documentUrlRepository.requestItems([unique]);
-		return documentUrlData && documentUrlData[0].urls.length > 0 ? (documentUrlData?.[0].urls[0].url ?? '') : '';
+		const urlsItem = documentUrlData?.[0];
+		const dataResolver = new UmbDocumentUrlsDataResolver(this);
+		dataResolver.setData(urlsItem?.urls);
+		const resolvedUrls = await dataResolver.getUrls();
+		return resolvedUrls?.[0]?.url ?? '';
 	}
 
 	async #getUrlForMedia(unique: string) {
@@ -215,6 +231,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			});
 		}
 
+		this.#resetUrl();
+	}
+
+	#resetUrl() {
 		this.#partialUpdateLink({ type: null, url: null });
 	}
 

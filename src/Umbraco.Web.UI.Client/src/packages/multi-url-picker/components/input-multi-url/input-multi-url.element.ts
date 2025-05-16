@@ -21,6 +21,8 @@ import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import { UmbDocumentUrlRepository, UmbDocumentUrlsDataResolver } from '@umbraco-cms/backoffice/document';
+import { UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 
 /**
  * @element umb-input-multi-url
@@ -129,6 +131,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 		this.#urls = [...data]; // Unfreeze data coming from State, so we can manipulate it.
 		super.value = this.#urls.map((x) => x.url).join(',');
 		this.#sorter.setModel(this.#urls);
+		this.#populateLinksUrl();
 	}
 	get urls(): Array<UmbLinkPickerLink> {
 		return this.#urls;
@@ -159,6 +162,9 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 
 	@state()
 	private _modalRoute?: UmbModalRouteBuilder;
+
+	@state()
+	_resolvedLinkUrls: Array<{ unique: string; url: string }> = [];
 
 	#linkPickerModal;
 
@@ -227,6 +233,49 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRoute = routeBuilder;
 			});
+	}
+
+	#populateLinksUrl() {
+		// Documents and media have URLs saved in the local link format. Display the actual URL to align with what
+		// the user sees when they selected it initially.
+		this.#urls.forEach(async (link) => {
+			if (!link.unique) return;
+
+			let url: string | undefined = undefined;
+			switch (link.type) {
+				case 'document': {
+					url = await this.#getUrlForDocument(link.unique);
+					break;
+				}
+				case 'media': {
+					url = await this.#getUrlForMedia(link.unique);
+					break;
+				}
+				default:
+					break;
+			}
+
+			if (url) {
+				const resolvedUrl = { unique: link.unique, url };
+				this._resolvedLinkUrls = [...this._resolvedLinkUrls, resolvedUrl];
+			}
+		});
+	}
+
+	async #getUrlForDocument(unique: string) {
+		const documentUrlRepository = new UmbDocumentUrlRepository(this);
+		const { data: documentUrlData } = await documentUrlRepository.requestItems([unique]);
+		const urlsItem = documentUrlData?.[0];
+		const dataResolver = new UmbDocumentUrlsDataResolver(this);
+		dataResolver.setData(urlsItem?.urls);
+		const resolvedUrls = await dataResolver.getUrls();
+		return resolvedUrls?.[0]?.url ?? '';
+	}
+
+	async #getUrlForMedia(unique: string) {
+		const mediaUrlRepository = new UmbMediaUrlRepository(this);
+		const { data: mediaUrlData } = await mediaUrlRepository.requestItems([unique]);
+		return mediaUrlData?.[0].url ?? '';
 	}
 
 	async #requestRemoveItem(index: number) {
@@ -307,12 +356,13 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	#renderItem(link: UmbLinkPickerLink, index: number) {
 		const unique = this.#getUnique(link);
 		const href = this.readonly ? undefined : (this._modalRoute?.({ index }) ?? undefined);
+		const resolvedUrl = this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? '';
 		return html`
 			<uui-ref-node
 				id=${unique}
 				href=${ifDefined(href)}
 				name=${link.name || ''}
-				detail=${(link.url || '') + (link.queryString || '')}
+				detail=${resolvedUrl + (link.queryString || '')}
 				?readonly=${this.readonly}>
 				<umb-icon slot="icon" name=${link.icon || 'icon-link'}></umb-icon>
 				${when(
