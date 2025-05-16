@@ -276,7 +276,7 @@
 		"typescript": "^5.8.3",
 		"typescript-eslint": "^8.31.0",
 		"typescript-json-schema": "^0.65.1",
-		"vite": "^6.3.2",
+		"vite": "^6.3.5",
 		"vite-plugin-static-copy": "^2.3.1",
 		"vite-tsconfig-paths": "^5.1.4",
 		"web-component-analyzer": "^2.0.0"

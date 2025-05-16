@@ -250,7 +250,7 @@ export class UmbAuthContext extends UmbContextBase {
 		return {
 			base: config.baseUrl,
 			credentials: config.credentials,
-			token: this.getLatestToken,
+			token: () => this.getLatestToken(),
 		};
 	}
 

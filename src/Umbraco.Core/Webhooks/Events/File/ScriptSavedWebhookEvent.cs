@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -7,7 +8,7 @@ using Umbraco.Cms.Core.Sync;
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
 [WebhookEvent("Script Saved")]
-public class ScriptSavedWebhookEvent : WebhookEventBase<ScriptDeletedNotification>
+public class ScriptSavedWebhookEvent : WebhookEventBase<ScriptSavedNotification>
 {
     public ScriptSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
@@ -20,6 +21,6 @@ public class ScriptSavedWebhookEvent : WebhookEventBase<ScriptDeletedNotificatio
 
     public override string Alias => Constants.WebhookEvents.Aliases.ScriptSaved;
 
-    public override object? ConvertNotificationToRequestPayload(ScriptDeletedNotification notification)
-        => notification.DeletedEntities;
+    public override object? ConvertNotificationToRequestPayload(ScriptSavedNotification notification)
+        => notification.SavedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }
