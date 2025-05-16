@@ -25,6 +25,7 @@ import { UMB_CONTENT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UUIInputEvent, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 import '@umbraco-cms/backoffice/imaging';
 
@@ -76,6 +77,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	private _dropzone!: UmbDropzoneMediaElement;
 
 	#pagingMap = new Map<string, UmbPaginationManager>();
+	#contextCulture?: string | null;
 
 	constructor() {
 		super();
@@ -83,6 +85,12 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		this.consumeContext(UMB_CONTENT_PROPERTY_CONTEXT, (context) => {
 			this.observe(context?.dataType, (dataType) => {
 				this.#dataType = dataType;
+			});
+		});
+
+		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
+			this.observe(context?.culture, (culture) => {
+				this.#contextCulture = culture;
 			});
 		});
 	}
@@ -203,6 +211,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		const { data } = await this.#mediaSearchProvider.search({
 			query,
 			searchFrom: this._searchFrom,
+			culture: this.#contextCulture,
 			...this.data?.search?.queryParams,
 		});
 

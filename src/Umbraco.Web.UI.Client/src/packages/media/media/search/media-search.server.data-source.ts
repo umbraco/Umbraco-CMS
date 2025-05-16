@@ -35,9 +35,10 @@ export class UmbMediaSearchServerDataSource
 			this.#host,
 			MediaService.getItemMediaSearch({
 				query: {
-					query: args.query,
-					parentId: args.searchFrom?.unique || undefined,
 					allowedMediaTypes: args.allowedContentTypes?.map((mediaReference) => mediaReference.unique),
+					culture: args.culture || undefined,
+					parentId: args.searchFrom?.unique || undefined,
+					query: args.query,
 					trashed: args.includeTrashed,
 				},
 			}),

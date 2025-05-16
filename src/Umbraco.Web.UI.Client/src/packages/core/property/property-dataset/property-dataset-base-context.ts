@@ -33,7 +33,7 @@ export class UmbPropertyDatasetContextBase
 	public readOnly = this.#readOnly.asObservable();
 
 	#variantId: UmbVariantId = UmbVariantId.CreateInvariant();
-	#variantContext = new UmbVariantContext(this);
+	#variantContext = new UmbVariantContext(this).inherit();
 
 	getEntityType() {
 		return this._entityType;

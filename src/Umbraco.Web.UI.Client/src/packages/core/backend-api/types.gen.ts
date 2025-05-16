@@ -6700,6 +6700,7 @@ export type GetItemDocumentSearchData = {
     query?: {
         query?: string;
         trashed?: boolean;
+        culture?: string;
         skip?: number;
         take?: number;
         parentId?: string;
@@ -8991,6 +8992,7 @@ export type GetItemMediaSearchData = {
     query?: {
         query?: string;
         trashed?: boolean;
+        culture?: string;
         skip?: number;
         take?: number;
         parentId?: string;

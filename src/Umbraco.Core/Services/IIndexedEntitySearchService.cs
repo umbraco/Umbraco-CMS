@@ -35,7 +35,7 @@ public interface IIndexedEntitySearchService
         int skip = 0,
         int take = 100,
         bool ignoreUserStartNodes = false)
-        => Search(objectType,query, skip, take, ignoreUserStartNodes);
+        => Search(objectType, query, skip, take, ignoreUserStartNodes);
 
     Task<PagedModel<IEntitySlim>> SearchAsync(
         UmbracoObjectTypes objectType,
@@ -43,6 +43,7 @@ public interface IIndexedEntitySearchService
         Guid? parentId,
         IEnumerable<Guid>? contentTypeIds,
         bool? trashed,
+        string? culture = null,
         int skip = 0,
         int take = 100,
         bool ignoreUserStartNodes = false);

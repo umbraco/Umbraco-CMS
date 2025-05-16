@@ -6,6 +6,7 @@ import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeEntityType } from '@umbraco-cms/backoffice/document-type';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 interface UmbDocumentPickerInputContextOpenArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>;
@@ -41,10 +42,14 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 			};
 		}
 
+		const variantContext = await this.getContext(UMB_VARIANT_CONTEXT);
+		const culture = await variantContext?.getDisplayCulture();
+
 		// pass allowedContentTypes to the search request args
 		combinedPickerData.search!.queryParams = {
 			allowedContentTypes: args?.allowedContentTypes,
 			includeTrashed: args?.includeTrashed,
+			culture,
 			...pickerData?.search?.queryParams,
 		};
 

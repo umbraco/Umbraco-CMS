@@ -68,7 +68,6 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 	}
 
 	#renderResultItem(item: UmbEntityModel) {
-		console.log('pickableFilter', this.pickableFilter(item));
 		return html`
 			<umb-extension-with-api-slot
 				type="pickerSearchResultItem"

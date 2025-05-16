@@ -28,12 +28,13 @@ public class SearchDocumentItemController : DocumentItemControllerBase
         CancellationToken cancellationToken,
         string query,
         bool? trashed = null,
+        string? culture = null,
         int skip = 0,
         int take = 100,
         Guid? parentId = null,
         [FromQuery] IEnumerable<Guid>? allowedDocumentTypes = null)
     {
-        PagedModel<IEntitySlim> searchResult = await _indexedEntitySearchService.SearchAsync(UmbracoObjectTypes.Document, query, parentId, allowedDocumentTypes, trashed, skip, take);
+        PagedModel<IEntitySlim> searchResult = await _indexedEntitySearchService.SearchAsync(UmbracoObjectTypes.Document, query, parentId, allowedDocumentTypes, trashed, culture, skip, take);
         var result = new PagedModel<DocumentItemResponseModel>
         {
             Items = searchResult.Items.OfType<IDocumentEntitySlim>().Select(_documentPresentationFactory.CreateItemResponseModel),

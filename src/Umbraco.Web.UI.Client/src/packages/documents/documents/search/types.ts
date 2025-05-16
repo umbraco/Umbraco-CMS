@@ -9,4 +9,5 @@ export interface UmbDocumentSearchItemModel extends UmbDocumentItemModel {
 export interface UmbDocumentSearchRequestArgs extends UmbSearchRequestArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>;
 	includeTrashed?: boolean;
+	culture?: string | null;
 }

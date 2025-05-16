@@ -35,9 +35,10 @@ export class UmbDocumentSearchServerDataSource
 			this.#host,
 			DocumentService.getItemDocumentSearch({
 				query: {
-					query: args.query,
-					parentId: args.searchFrom?.unique ?? undefined,
 					allowedDocumentTypes: args.allowedContentTypes?.map((contentType) => contentType.unique),
+					culture: args.culture || undefined,
+					parentId: args.searchFrom?.unique ?? undefined,
+					query: args.query,
 					trashed: args.includeTrashed,
 				},
 			}),

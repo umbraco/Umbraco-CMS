@@ -23,7 +23,7 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 	public readOnly = this.#readOnly.asObservable();
 
 	#workspace: WorkspaceType;
-	#variantContext = new UmbVariantContext(this);
+	#variantContext = new UmbVariantContext(this).inherit();
 
 	name;
 

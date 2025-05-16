@@ -73,7 +73,7 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
         int skip = 0,
         int take = 100,
         bool ignoreUserStartNodes = false)
-        => SearchAsync(objectType, query, parentId, contentTypeIds, trashed, skip, take, ignoreUserStartNodes).GetAwaiter().GetResult();
+        => SearchAsync(objectType, query, parentId, contentTypeIds, trashed, null, skip, take, ignoreUserStartNodes).GetAwaiter().GetResult();
 
     public Task<PagedModel<IEntitySlim>> SearchAsync(
         UmbracoObjectTypes objectType,
@@ -81,6 +81,7 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
         Guid? parentId,
         IEnumerable<Guid>? contentTypeIds,
         bool? trashed,
+        string? culture = null,
         int skip = 0,
         int take = 100,
         bool ignoreUserStartNodes = false)

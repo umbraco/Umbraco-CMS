@@ -47,7 +47,7 @@ export abstract class UmbElementPropertyDatasetContext<
 	protected _readOnly = new UmbBooleanState(false);
 	public readOnly = this._readOnly.asObservable();
 
-	#variantContext = new UmbVariantContext(this);
+	#variantContext = new UmbVariantContext(this).inherit();
 
 	getEntityType(): string {
 		return this._dataOwner.getEntityType();

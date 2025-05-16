@@ -1,3 +1,4 @@
+import type { UmbDocumentItemModel } from '../../item/types.js';
 import { UmbDocumentPickerInputContext } from './input-document.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
@@ -7,7 +8,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
-import type { UmbDocumentItemModel } from '../../item/types.js';
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
