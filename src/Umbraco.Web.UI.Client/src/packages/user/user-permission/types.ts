@@ -1,5 +1,7 @@
-export type * from './user-granular-permission.extension.js';
-export type * from './entity-user-permission.extension.js';
+export type * from './ui-user-permission/types.js';
+export type * from './entity-user-permission/types.js';
+export type * from './entity-user-permission/types.js';
+export type * from './granular-user-permission/types.js';
 export interface UmbUserPermissionModel {
 	$type: string;
 	userPermissionType?: string;
