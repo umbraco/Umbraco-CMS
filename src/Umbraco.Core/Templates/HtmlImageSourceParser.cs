@@ -7,7 +7,11 @@ namespace Umbraco.Cms.Core.Templates;
 public sealed class HtmlImageSourceParser
 {
     private static readonly Regex ResolveImgPattern = new(
-        @"(<img[^>]*src="")([^""\?]*)((?:\?[^""]*)?""[^>]*data-udi="")([^""]*)(""[^>]*>)",
+        @"<img[^>]*(data-udi=""([^""]*)"")[^>]*>",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
+    private static readonly Regex SrcAttributeRegex = new(
+        @"src=""([^""\?]*)(\?[^""]*)?""",
         RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
     private static readonly Regex DataUdiAttributeRegex = new(
@@ -61,14 +65,23 @@ public sealed class HtmlImageSourceParser
         return ResolveImgPattern.Replace(text, match =>
         {
             // match groups:
-            // - 1 = from the beginning of the image tag until src attribute value begins
-            // - 2 = the src attribute value excluding the querystring (if present)
-            // - 3 = anything after group 2 and before the data-udi attribute value begins
-            // - 4 = the data-udi attribute value
-            // - 5 = anything after group 4 until the image tag is closed
-            var udi = match.Groups[4].Value;
+            // - 1 = the data-udi attribute
+            // - 2 = the data-udi attribute value
+            var udi = match.Groups[2].Value;
             if (udi.IsNullOrWhiteSpace() || UdiParser.TryParse<GuidUdi>(udi, out GuidUdi? guidUdi) == false)
             {
+                return match.Value;
+            }
+
+            // Find the src attribute
+            // src match groups:
+            // - 1 = the src attribute value until the query string
+            // - 2 = the src attribute query string including the '?'
+            Match src = SrcAttributeRegex.Match(match.Value);
+
+            if (src.Success == false)
+            {
+                // the src attribute isn't found, return the original value
                 return match.Value;
             }
 
@@ -80,7 +93,9 @@ public sealed class HtmlImageSourceParser
                 return match.Value;
             }
 
-            return $"{match.Groups[1].Value}{mediaUrl}{match.Groups[3].Value}{udi}{match.Groups[5].Value}";
+            var newImgTag = match.Value.Replace(src.Value, $"src=\"{mediaUrl}{src.Groups[2].Value}\"");
+
+            return newImgTag;
         });
     }
 
@@ -91,6 +106,16 @@ public sealed class HtmlImageSourceParser
     /// <returns></returns>
     public string RemoveImageSources(string text)
 
-        // see comment in ResolveMediaFromTextString for group reference
-        => ResolveImgPattern.Replace(text, "$1$3$4$5");
+        // find each ResolveImgPattern match in the text, then find each
+        // SrcAttributeRegex match in the match value, then replace the src
+        // attribute value with an empty string
+        // (see comment in ResolveMediaFromTextString for group reference)
+        => ResolveImgPattern.Replace(text, match =>
+        {
+            // Find the src attribute
+            Match src = SrcAttributeRegex.Match(match.Value);
+
+            return src.Success == false || string.IsNullOrWhiteSpace(src.Groups[1].Value) ?
+                match.Value : match.Value.Replace(src.Groups[1].Value, string.Empty);
+        });
 }

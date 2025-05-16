@@ -39,28 +39,42 @@ public class HtmlImageSourceParserTests
         Assert.AreEqual(UdiParser.Parse("umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"), result[1]);
     }
 
-    [Test]
-    public void Remove_Image_Sources()
-    {
-        var imageSourceParser = new HtmlImageSourceParser(Mock.Of<IPublishedUrlProvider>());
-
-        var result = imageSourceParser.RemoveImageSources(@"<p>
+    [TestCase(
+        @"<p>
 <div>
     <img src=""/media/12354/test.jpg"" />
 </div></p>
 <p>
     <div><img src=""/media/987645/test.jpg"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" /></div>
-</p>");
-
-        Assert.AreEqual(
-            @"<p>
+</p>",
+        ExpectedResult = @"<p>
 <div>
     <img src=""/media/12354/test.jpg"" />
 </div></p>
 <p>
     <div><img src="""" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" /></div>
 </p>",
-            result);
+        TestName = "Remove image source with data-udi set")]
+    [TestCase(
+        @"<img alt title=""Title"" src=""/media/12354/test.jpg?width=400&height=400&hmac=test"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        ExpectedResult = @"<img alt title=""Title"" src=""?width=400&height=400&hmac=test"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        TestName = "Remove image source but keep querystring")]
+    [TestCase(
+        @"<img alt title=""Title"" src="""" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        ExpectedResult = @"<img alt title=""Title"" src="""" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        TestName = "Remove image source with empty src")]
+    [TestCase(
+        @"<img src=""/media/12345/test.jpg"" />",
+        ExpectedResult = @"<img src=""/media/12345/test.jpg"" />",
+        TestName = "Do not remove image source without data-udi set")]
+    [Category("Remove image sources")]
+    public string Remove_Image_Sources(string sourceHtml)
+    {
+        var imageSourceParser = new HtmlImageSourceParser(Mock.Of<IPublishedUrlProvider>());
+
+        var actual = imageSourceParser.RemoveImageSources(sourceHtml);
+
+        return actual;
     }
 
     [Test]
@@ -147,6 +161,10 @@ public class HtmlImageSourceParserTests
         ExpectedResult = @"<div><img src=""/media/1001/image.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
         TestName = "Filled source is overwritten with data-udi set")]
     [TestCase(
+        @"<div><img alt title=""Test"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" src=""non empty src"" /></div>",
+        ExpectedResult = @"<div><img alt title=""Test"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" src=""/media/1001/image.jpg"" /></div>",
+        TestName = "Order of attributes does not matter")]
+    [TestCase(
         @"<div><img src=""some src"" some-attribute data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" another-attribute/></div>",
         ExpectedResult = @"<div><img src=""/media/1001/image.jpg"" some-attribute data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" another-attribute/></div>",
         TestName = "Attributes are persisted")]
@@ -158,6 +176,10 @@ public class HtmlImageSourceParserTests
         @"<div><img src=""?width=100&height=500"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
         ExpectedResult = @"<div><img src=""/media/1001/image.jpg?width=100&height=500"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
         TestName = "Parameters are prefixed")]
+    [TestCase(
+        @"<div><img data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" src=""?width=100&height=500"" /></div>",
+        ExpectedResult = @"<div><img data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" src=""/media/1001/image.jpg?width=100&height=500"" /></div>",
+        TestName = "Parameters are prefixed (order of attributes reversed)")]
     [TestCase(
         @"<div>
                 <img src="""" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/>
