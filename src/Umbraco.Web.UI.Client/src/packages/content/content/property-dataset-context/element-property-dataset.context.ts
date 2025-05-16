@@ -12,7 +12,7 @@ import {
 	createObservablePart,
 	mergeObservables,
 } from '@umbraco-cms/backoffice/observable-api';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantContext, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
@@ -47,6 +47,8 @@ export abstract class UmbElementPropertyDatasetContext<
 	protected _readOnly = new UmbBooleanState(false);
 	public readOnly = this._readOnly.asObservable();
 
+	#variantContext = new UmbVariantContext(this);
+
 	getEntityType(): string {
 		return this._dataOwner.getEntityType();
 	}
@@ -64,6 +66,7 @@ export abstract class UmbElementPropertyDatasetContext<
 		super(host, UMB_PROPERTY_DATASET_CONTEXT);
 		this._dataOwner = dataOwner;
 		this.#variantId = variantId ?? UmbVariantId.CreateInvariant();
+		this.#variantContext.setVariantId(this.#variantId);
 
 		this.#propertyVariantIdPromise = new Promise((resolve) => {
 			this.#propertyVariantIdPromiseResolver = resolve as any;

@@ -7,7 +7,7 @@ import type {
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantContext, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbBooleanState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
 /**
@@ -23,6 +23,7 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 	public readOnly = this.#readOnly.asObservable();
 
 	#workspace: WorkspaceType;
+	#variantContext = new UmbVariantContext(this);
 
 	name;
 
@@ -49,6 +50,7 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 		this.#workspace = workspace;
 
 		this.name = this.#workspace.name;
+		this.#variantContext.setVariantId(this.getVariantId());
 	}
 
 	get properties(): Observable<Array<UmbPropertyValueData> | undefined> {
