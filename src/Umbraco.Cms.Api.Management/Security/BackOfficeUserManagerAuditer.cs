@@ -1,4 +1,7 @@
 ﻿using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
@@ -12,24 +15,32 @@ namespace Umbraco.Cms.Api.Management.Security;
 ///     Binds to notifications to write audit logs for the <see cref="BackOfficeUserManager" />
 /// </summary>
 internal sealed class BackOfficeUserManagerAuditer :
-    INotificationHandler<UserLoginSuccessNotification>,
-    INotificationHandler<UserLogoutSuccessNotification>,
-    INotificationHandler<UserLoginFailedNotification>,
-    INotificationHandler<UserForgotPasswordRequestedNotification>,
-    INotificationHandler<UserForgotPasswordChangedNotification>,
-    INotificationHandler<UserPasswordChangedNotification>,
-    INotificationHandler<UserPasswordResetNotification>
+    INotificationAsyncHandler<UserLoginSuccessNotification>,
+    INotificationAsyncHandler<UserLogoutSuccessNotification>,
+    INotificationAsyncHandler<UserLoginFailedNotification>,
+    INotificationAsyncHandler<UserForgotPasswordRequestedNotification>,
+    INotificationAsyncHandler<UserForgotPasswordChangedNotification>,
+    INotificationAsyncHandler<UserPasswordChangedNotification>,
+    INotificationAsyncHandler<UserPasswordResetNotification>
 {
-    private readonly IAuditService _auditService;
+    private readonly IAuditEntryService _auditEntryService;
     private readonly IUserService _userService;
 
-    public BackOfficeUserManagerAuditer(IAuditService auditService, IUserService userService)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeUserManagerAuditer"/> class.
+    /// </summary>
+    /// <param name="auditEntryService">The audit entry service.</param>
+    /// <param name="userService">The user service.</param>
+    public BackOfficeUserManagerAuditer(
+        IAuditEntryService auditEntryService,
+        IUserService userService)
     {
-        _auditService = auditService;
+        _auditEntryService = auditEntryService;
         _userService = userService;
     }
 
-    public void Handle(UserForgotPasswordChangedNotification notification) =>
+    /// <inheritdoc />
+    public Task HandleAsync(UserForgotPasswordChangedNotification notification, CancellationToken cancellationToken) =>
         WriteAudit(
             notification.PerformingUserId,
             notification.AffectedUserId,
@@ -37,7 +48,8 @@ internal sealed class BackOfficeUserManagerAuditer :
             "umbraco/user/password/forgot/change",
             "password forgot/change");
 
-    public void Handle(UserForgotPasswordRequestedNotification notification) =>
+    /// <inheritdoc />
+    public Task HandleAsync(UserForgotPasswordRequestedNotification notification, CancellationToken cancellationToken) =>
         WriteAudit(
             notification.PerformingUserId,
             notification.AffectedUserId,
@@ -45,7 +57,8 @@ internal sealed class BackOfficeUserManagerAuditer :
             "umbraco/user/password/forgot/request",
             "password forgot/request");
 
-    public void Handle(UserLoginFailedNotification notification) =>
+    /// <inheritdoc />
+    public Task HandleAsync(UserLoginFailedNotification notification, CancellationToken cancellationToken) =>
         WriteAudit(
             notification.PerformingUserId,
             null,
@@ -53,7 +66,8 @@ internal sealed class BackOfficeUserManagerAuditer :
             "umbraco/user/sign-in/failed",
             "login failed");
 
-    public void Handle(UserLoginSuccessNotification notification)
+    /// <inheritdoc />
+    public Task HandleAsync(UserLoginSuccessNotification notification, CancellationToken cancellationToken)
         => WriteAudit(
             notification.PerformingUserId,
             notification.AffectedUserId,
@@ -61,7 +75,8 @@ internal sealed class BackOfficeUserManagerAuditer :
             "umbraco/user/sign-in/login",
             "login success");
 
-    public void Handle(UserLogoutSuccessNotification notification)
+    /// <inheritdoc />
+    public Task HandleAsync(UserLogoutSuccessNotification notification, CancellationToken cancellationToken)
         => WriteAudit(
             notification.PerformingUserId,
             notification.AffectedUserId,
@@ -69,7 +84,8 @@ internal sealed class BackOfficeUserManagerAuditer :
             "umbraco/user/sign-in/logout",
             "logout success");
 
-    public void Handle(UserPasswordChangedNotification notification) =>
+    /// <inheritdoc />
+    public Task HandleAsync(UserPasswordChangedNotification notification, CancellationToken cancellationToken) =>
         WriteAudit(
             notification.PerformingUserId,
             notification.AffectedUserId,
@@ -77,7 +93,8 @@ internal sealed class BackOfficeUserManagerAuditer :
             "umbraco/user/password/change",
             "password change");
 
-    public void Handle(UserPasswordResetNotification notification) =>
+    /// <inheritdoc />
+    public Task HandleAsync(UserPasswordResetNotification notification, CancellationToken cancellationToken) =>
         WriteAudit(
             notification.PerformingUserId,
             notification.AffectedUserId,
@@ -88,7 +105,7 @@ internal sealed class BackOfficeUserManagerAuditer :
     private static string FormatEmail(IMembershipUser? user) =>
         user is null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? string.Empty : $"<{user.Email}>";
 
-    private void WriteAudit(
+    private async Task WriteAudit(
         string performingId,
         string? affectedId,
         string ipAddress,
@@ -98,43 +115,47 @@ internal sealed class BackOfficeUserManagerAuditer :
         int? performingIdAsInt = ParseUserId(performingId);
         int? affectedIdAsInt = ParseUserId(affectedId);
 
-        WriteAudit(performingIdAsInt, affectedIdAsInt, ipAddress, eventType, eventDetails);
+        await WriteAudit(performingIdAsInt, affectedIdAsInt, ipAddress, eventType, eventDetails);
     }
 
     private static int? ParseUserId(string? id)
         => int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var isAsInt) ? isAsInt : null;
 
-    private void WriteAudit(
+    private async Task WriteAudit(
         int? performingId,
         int? affectedId,
         string ipAddress,
         string eventType,
         string eventDetails)
     {
+        Guid? performingKey = null;
         var performingDetails = "User UNKNOWN:0";
         if (performingId.HasValue)
         {
             IUser? performingUser = _userService.GetUserById(performingId.Value);
+            performingKey = performingUser?.Key;
             performingDetails = performingUser is null
                 ? $"User UNKNOWN:{performingId.Value}"
                 : $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}";
         }
 
+        Guid? affectedKey = null;
         var affectedDetails = "User UNKNOWN:0";
         if (affectedId.HasValue)
         {
             IUser? affectedUser = _userService.GetUserById(affectedId.Value);
+            affectedKey = affectedUser?.Key;
             affectedDetails = affectedUser is null
                 ? $"User UNKNOWN:{affectedId.Value}"
                 : $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}";
         }
 
-        _auditService.Write(
-            performingId ?? 0,
+        await _auditEntryService.WriteAsync(
+            performingKey ?? Constants.Security.UnknownUserKey,
             performingDetails,
             ipAddress,
             DateTime.UtcNow,
-            affectedId ?? 0,
+            affectedKey ?? Constants.Security.UnknownUserKey,
             affectedDetails,
             eventType,
             eventDetails);

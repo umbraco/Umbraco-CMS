@@ -144,6 +144,7 @@ public interface IAuditService : IService
     ///     </example>
     /// </param>
     /// <param name="eventDetails">Free-form details about the audited event.</param>
+    [Obsolete("Use AuditEntryService.WriteAsync() instead. Scheduled for removal in Umbraco 18.")]
     IAuditEntry Write(
         int performingUserId,
         string perfomingDetails,

@@ -10,6 +10,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
+using ColumnInfo = Umbraco.Cms.Infrastructure.Persistence.SqlSyntax.ColumnInfo;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
@@ -43,7 +44,17 @@ internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IA
     public bool IsAvailable()
     {
         var tables = SqlSyntax.GetTablesInSchema(Database).ToArray();
-        return tables.InvariantContains(Constants.DatabaseSchema.Tables.AuditEntry);
+        if (!tables.InvariantContains(Constants.DatabaseSchema.Tables.AuditEntry))
+        {
+            return false;
+        }
+
+        // This check is needed to determine if the migration 'V_17_0_0.AddGuidsToAuditEntries' has run.
+        // Otherwise, an exception will be thrown when trying to write audits when in "maintenance" mode.
+        // This check can be removed once that migration is removed.
+        ColumnInfo[] columns = SqlSyntax.GetColumnsInSchema(Database).Distinct().ToArray();
+        return columns.Any(x => x.TableName.InvariantEquals(Constants.DatabaseSchema.Tables.AuditEntry)
+                                && x.ColumnName.InvariantEquals("performingUserKey"));
     }
 
     /// <inheritdoc />
