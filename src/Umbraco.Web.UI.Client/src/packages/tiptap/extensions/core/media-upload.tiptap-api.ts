@@ -15,12 +15,18 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 	#configuration?: UmbPropertyEditorConfigCollection;
 
 	/**
-	 * @returns {number} The maximum width of uploaded images
+	 * @returns {number} The configured maximum allowed image size
 	 */
-	get maxWidth(): number {
+	get maxImageSize(): number {
 		const maxImageSize = parseInt(this.#configuration?.getValueByAlias('maxImageSize') ?? '', 10);
 		return isNaN(maxImageSize) ? 500 : maxImageSize;
 	}
+
+	/**
+	 * @deprecated Use `maxImageSize` instead.
+	 * @returns {number} The maximum width of uploaded images
+	 */
+	maxWidth = this.maxImageSize;
 
 	/**
 	 * @returns {Array<string>} The allowed mime types for uploads
@@ -98,7 +104,7 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 		this.dispatchEvent(new CustomEvent('rte.file.uploading', { composed: true, bubbles: true, detail: fileModels }));
 
 		const uploads = await this.#manager.upload(fileModels);
-		const maxImageSize = this.maxWidth;
+		const maxImageSize = this.maxImageSize;
 
 		uploads.forEach(async (upload) => {
 			if (upload.status !== TemporaryFileStatus.SUCCESS) {
@@ -112,7 +118,7 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 			}
 
 			const blobUrl = URL.createObjectURL(upload.file);
-			const { width, height } = await imageSize(blobUrl, { maxWidth: maxImageSize });
+			const { width, height } = await imageSize(blobUrl, { maxWidth: maxImageSize, maxHeight: maxImageSize });
 
 			editor
 				.chain()
