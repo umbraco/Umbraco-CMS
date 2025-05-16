@@ -96,7 +96,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 				const globalSearchApi = await createExtensionApi<UmbGlobalSearchApi>(this, controller.manifest);
 				const searchProviderApi = await createExtensionApiByAlias<UmbSearchProvider<UmbSearchResultItemModel>>(
 					this,
-					controller.manifest.meta?.searchProvider,
+					controller.manifest.meta?.searchProviderAlias,
 				);
 
 				const searcher: GlobalSearchers = {

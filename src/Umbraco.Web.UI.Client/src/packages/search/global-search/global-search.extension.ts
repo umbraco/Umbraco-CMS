@@ -10,7 +10,7 @@ export interface ManifestGlobalSearch
 
 export interface MetaGlobalSearch {
 	label: string;
-	searchProvider: string;
+	searchProviderAlias: string;
 }
 
 declare global {

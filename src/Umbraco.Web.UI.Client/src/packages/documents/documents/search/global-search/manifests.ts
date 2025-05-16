@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 800,
 		meta: {
 			label: 'Documents',
-			searchProvider: UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS,
+			searchProviderAlias: UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS,
 		},
 	},
 ];

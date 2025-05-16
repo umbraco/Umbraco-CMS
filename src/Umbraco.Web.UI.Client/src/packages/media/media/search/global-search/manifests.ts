@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 700,
 		meta: {
 			label: 'Media',
-			searchProvider: UMB_MEDIA_SEARCH_PROVIDER_ALIAS,
+			searchProviderAlias: UMB_MEDIA_SEARCH_PROVIDER_ALIAS,
 		},
 	},
 ];
