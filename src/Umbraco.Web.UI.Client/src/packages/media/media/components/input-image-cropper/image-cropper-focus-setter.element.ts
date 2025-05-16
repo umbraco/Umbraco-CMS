@@ -107,18 +107,9 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		}
 	}
 
-	#coordsToFactor(x: number, y: number) {
-		const top = (y / 100 / y) * 50;
-		const left = (x / 100 / x) * 50;
-
-		return { top, left };
-	}
-
 	#setFocalPoint(x: number, y: number, width: number, height: number) {
 		const left = clamp(x / width, 0, 1);
 		const top = clamp(y / height, 0, 1);
-
-		this.#coordsToFactor(x, y);
 
 		const focalPoint = { left, top } as UmbFocalPointModel;
 
@@ -252,12 +243,9 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 				<img id="image" @keydown=${() => nothing} src=${this.src} alt="" />
 				<span
 					id="focal-point"
-					class=${classMap({
-						'focal-point--dragging': this._isDraggingGridHandle,
-						hidden: this.hideFocalPoint,
-					})}
+					class=${classMap({ 'focal-point--dragging': this._isDraggingGridHandle, hidden: this.hideFocalPoint })}
 					tabindex=${ifDefined(this.disabled ? undefined : '0')}
-					aria-label="${this.localize.term('general_focalPoint')}"
+					aria-label=${this.localize.term('general_focalPoint')}
 					@keydown=${this.#handleGridKeyDown}>
 				</span>
 			</div>
