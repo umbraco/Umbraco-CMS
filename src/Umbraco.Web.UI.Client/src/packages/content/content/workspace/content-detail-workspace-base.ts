@@ -714,6 +714,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 */
 	public async runMandatoryValidationForSaveData(saveData: DetailModelType, variantIds: Array<UmbVariantId> = []) {
 		// Check that the data is valid before we save it.
+		// If we vary by culture then we do not want to validate the invariant variant.
+		if (this.getVariesByCulture()) {
+			variantIds = variantIds.filter((variant) => !variant.isCultureInvariant());
+		}
 		const missingVariants = variantIds.filter((variant) => {
 			return !saveData.variants.some((y) => variant.compare(y));
 		});
