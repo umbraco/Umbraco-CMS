@@ -11,6 +11,7 @@ import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbra
 import {
 	UmbEntityDetailWorkspaceContextBase,
 	UmbWorkspaceSplitViewManager,
+	UmbWorkspaceViewHintManager,
 	type UmbEntityDetailWorkspaceContextArgs,
 	type UmbEntityDetailWorkspaceContextCreateArgs,
 	type UmbSaveableWorkspaceContext,
@@ -137,6 +138,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/* Split View */
 	readonly splitView = new UmbWorkspaceSplitViewManager();
+
+	/* Hints */
+	readonly hints = new UmbWorkspaceViewHintManager(this);
 
 	/* Variant Options */
 	// TODO: Optimize this so it uses either a App Language Context? [NL]

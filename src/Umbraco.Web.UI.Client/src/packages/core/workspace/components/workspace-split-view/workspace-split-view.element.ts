@@ -14,6 +14,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 // import local components
 import './workspace-split-view-variant-selector.element.js';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  *
@@ -43,6 +44,9 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	@state()
 	private _isNew = false;
 
+	@state()
+	private _variantId?: UmbVariantId;
+
 	splitViewContext = new UmbWorkspaceSplitViewContext(this);
 
 	#onVariantSelectorSlotChanged(e: Event) {
@@ -57,7 +61,15 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 			(isNew) => {
 				this._isNew = isNew ?? false;
 			},
-			'umbObserveIsNew',
+			null,
+		);
+
+		this.observe(
+			this.splitViewContext.variantId,
+			(variantId) => {
+				this._variantId = variantId;
+			},
+			null,
 		);
 	}
 
@@ -66,6 +78,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 			<umb-workspace-editor
 				back-path=${ifDefined(this.backPath)}
 				.hideNavigation=${!this.displayNavigation}
+				.variantId=${this._variantId}
 				.enforceNoFooter=${true}>
 				<slot id="header" name="variant-selector" slot="header" @slotchange=${this.#onVariantSelectorSlotChanged}>
 					${when(
