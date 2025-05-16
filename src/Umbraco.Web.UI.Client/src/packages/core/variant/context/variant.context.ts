@@ -41,7 +41,7 @@ export class UmbVariantContext extends UmbContextBase {
 				context?.fallbackCulture,
 				(fallbackCulture) => {
 					if (!fallbackCulture) return;
-					this.setFallbackCulture(fallbackCulture);
+					this.#fallbackCulture.setValue(fallbackCulture);
 				},
 				'observeFallbackCulture',
 			);
@@ -50,7 +50,7 @@ export class UmbVariantContext extends UmbContextBase {
 				context?.appCulture,
 				(appCulture) => {
 					if (!appCulture) return;
-					this.setAppCulture(appCulture);
+					this.#appCulture.setValue(appCulture);
 				},
 				'observeAppCulture',
 			);
@@ -130,6 +130,7 @@ export class UmbVariantContext extends UmbContextBase {
 	 * @memberof UmbVariantContext
 	 */
 	async setFallbackCulture(culture: string | null): Promise<void> {
+		this.removeUmbControllerByAlias('observeFallbackCulture');
 		this.#fallbackCulture.setValue(culture);
 	}
 
@@ -148,6 +149,7 @@ export class UmbVariantContext extends UmbContextBase {
 	 * @memberof UmbVariantContext
 	 */
 	async setAppCulture(culture: string | null): Promise<void> {
+		this.removeUmbControllerByAlias('observeAppCulture');
 		this.#appCulture.setValue(culture);
 	}
 
