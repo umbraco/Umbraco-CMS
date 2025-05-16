@@ -186,8 +186,9 @@ ${this._systemInformation}`;
 	static override readonly styles = [
 		UmbTextStyles,
 		css`
-			#code-block {
+			#codeblock {
 				max-height: 300px;
+				overflow: auto;
 			}
 		`,
 	];
