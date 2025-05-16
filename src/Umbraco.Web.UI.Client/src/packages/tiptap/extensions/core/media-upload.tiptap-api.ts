@@ -118,6 +118,10 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 			}
 
 			const blobUrl = URL.createObjectURL(upload.file);
+
+			// Get the image dimensions - this essentially simulates what the server would do
+			// when it resizes the image. The server will return the resized image URL.
+			// We need to use the blob URL here, as the server will not be able to access the local file.
 			const { width, height } = await imageSize(blobUrl, { maxWidth: maxImageSize, maxHeight: maxImageSize });
 
 			editor
