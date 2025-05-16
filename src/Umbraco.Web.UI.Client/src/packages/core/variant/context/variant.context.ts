@@ -28,7 +28,14 @@ export class UmbVariantContext extends UmbContextBase {
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_VARIANT_CONTEXT);
+	}
 
+	/**
+	 * Inherit values from the parent variant context
+	 * @returns {UmbVariantContext} - The current instance of the context
+	 * @memberof UmbVariantContext
+	 */
+	inherit(): UmbVariantContext {
 		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
 			this.observe(
 				context?.fallbackCulture,
@@ -48,6 +55,8 @@ export class UmbVariantContext extends UmbContextBase {
 				'observeFallbackCulture',
 			);
 		}).skipHost();
+
+		return this;
 	}
 
 	/**
