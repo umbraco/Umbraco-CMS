@@ -12,13 +12,9 @@ import { UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observabl
  */
 export class UmbVariantContext extends UmbContextBase {
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
-	public variantId = this.#variantId.asObservable();
-
-	#culture = new UmbStringState<string | null | undefined>(undefined);
-	public culture = this.#culture.asObservable();
-
-	#segment = new UmbStringState<string | null | undefined>(undefined);
-	public segment = this.#segment.asObservable();
+	public readonly variantId = this.#variantId.asObservable();
+	public readonly culture = this.#variantId.asObservablePart((x) => x?.culture);
+	public readonly segment = this.#variantId.asObservablePart((x) => x?.segment);
 
 	#fallbackCulture = new UmbStringState<string | null | undefined>(undefined);
 	public fallbackCulture = this.#fallbackCulture.asObservable();
@@ -27,10 +23,14 @@ export class UmbVariantContext extends UmbContextBase {
 		super(host, UMB_VARIANT_CONTEXT);
 
 		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
-			this.observe(context?.fallbackCulture, (fallbackCulture) => {
-				if (!fallbackCulture) return;
-				this.setFallbackCulture(fallbackCulture);
-			});
+			this.observe(
+				context?.fallbackCulture,
+				(fallbackCulture) => {
+					if (!fallbackCulture) return;
+					this.setFallbackCulture(fallbackCulture);
+				},
+				'observeFallbackCulture',
+			);
 		}).skipHost();
 	}
 
@@ -41,8 +41,6 @@ export class UmbVariantContext extends UmbContextBase {
 	 */
 	async setVariantId(variantId: UmbVariantId | undefined): Promise<void> {
 		this.#variantId.setValue(variantId);
-		this.#culture.setValue(variantId?.culture);
-		this.#segment.setValue(variantId?.segment);
 	}
 
 	/**
@@ -69,8 +67,7 @@ export class UmbVariantContext extends UmbContextBase {
 	 * @memberof UmbVariantContext
 	 */
 	async setCulture(culture: string | null): Promise<void> {
-		this.#culture.setValue(culture);
-		const variantId = new UmbVariantId(culture, this.#segment.getValue());
+		const variantId = new UmbVariantId(culture, this.#variantId.getValue()?.segment);
 		this.#variantId.setValue(variantId);
 	}
 
@@ -89,8 +86,7 @@ export class UmbVariantContext extends UmbContextBase {
 	 * @memberof UmbVariantContext
 	 */
 	async setSegment(segment: string | null): Promise<void> {
-		this.#segment.setValue(segment);
-		const variantId = new UmbVariantId(this.#culture.getValue(), segment);
+		const variantId = new UmbVariantId(this.#variantId.getValue()?.culture, segment);
 		this.#variantId.setValue(variantId);
 	}
 
