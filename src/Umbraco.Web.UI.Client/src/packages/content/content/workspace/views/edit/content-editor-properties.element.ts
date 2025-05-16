@@ -29,7 +29,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	}
 
 	@state()
-	_variantId?: UmbVariantId;
+	_datasetVariantId?: UmbVariantId;
 
 	@state()
 	_visibleProperties?: Array<UmbPropertyTypeModel>;
@@ -38,7 +38,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 		super();
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (datasetContext) => {
-			this._variantId = datasetContext?.getVariantId();
+			this._datasetVariantId = datasetContext?.getVariantId();
 			this.#processPropertyStructure();
 		});
 
@@ -61,16 +61,19 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	}
 
 	#processPropertyStructure() {
-		if (!this.#workspaceContext || !this.#properties || !this.#propertyStructureHelper) {
+		if (!this.#workspaceContext || !this.#properties || !this.#propertyStructureHelper || !this._datasetVariantId) {
 			return;
 		}
 
 		const propertyViewGuard = this.#workspaceContext.propertyViewGuard;
 
 		this.#properties.forEach((property) => {
-			const propertyVariantId = new UmbVariantId(this._variantId?.culture, this._variantId?.segment);
+			const propertyVariantId = new UmbVariantId(
+				property.variesByCulture ? this._datasetVariantId?.culture : null,
+				property.variesBySegment ? this._datasetVariantId?.segment : null,
+			);
 			this.observe(
-				propertyViewGuard.isPermittedForVariantAndProperty(propertyVariantId, property),
+				propertyViewGuard.isPermittedForVariantAndProperty(propertyVariantId, property, this._datasetVariantId!),
 				(permitted) => {
 					if (permitted) {
 						this.#visiblePropertiesUniques.push(property.unique);
@@ -95,14 +98,14 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	}
 
 	override render() {
-		return this._variantId && this._visibleProperties
+		return this._datasetVariantId && this._visibleProperties
 			? repeat(
 					this._visibleProperties,
 					(property) => property.alias,
 					(property) =>
 						html`<umb-content-workspace-view-edit-property
 							class="property"
-							.variantId=${this._variantId}
+							.variantId=${this._datasetVariantId}
 							.property=${property}></umb-content-workspace-view-edit-property>`,
 				)
 			: nothing;
