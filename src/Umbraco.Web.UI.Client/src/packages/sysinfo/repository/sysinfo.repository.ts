@@ -1,3 +1,4 @@
+import packageJson from '../../../../package.json';
 import type { UmbServerUpgradeCheck } from '../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
@@ -18,6 +19,14 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 	async requestServerInformation() {
 		const { data } = await tryExecute(this, ServerService.getServerInformation(), { disableNotifications: true });
 		return data;
+	}
+
+	async requestClientInformation() {
+		const { version } = packageJson;
+		const clientInformation = {
+			version,
+		};
+		return clientInformation;
 	}
 
 	/**
