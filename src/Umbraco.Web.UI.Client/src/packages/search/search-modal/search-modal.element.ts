@@ -1,5 +1,6 @@
 import type { UmbSearchProvider, UmbSearchResultItemModel } from '../types.js';
 import type { ManifestSearchResultItem } from '../extensions/types.js';
+import type { UmbGlobalSearchApi } from '../global-search/types.js';
 import {
 	css,
 	html,
@@ -12,17 +13,18 @@ import {
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApiByAlias, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
 import '../search-result/search-result-item.element.js';
 
-type SearchProvider = {
+type GlobalSearchers = {
 	name: string;
-	api: UmbSearchProvider<UmbSearchResultItemModel>;
+	api?: UmbGlobalSearchApi;
 	alias: string;
+	searchProviderApi: UmbSearchProvider<UmbSearchResultItemModel>;
 };
 
 @customElement('umb-search-modal')
@@ -42,10 +44,10 @@ export class UmbSearchModalElement extends UmbLitElement {
 	private _searchResults: Array<UmbSearchResultItemModel> = [];
 
 	@state()
-	private _searchProviders: Array<SearchProvider> = [];
+	private _globalSearchers: Array<GlobalSearchers> = [];
 
 	@state()
-	_currentProvider?: SearchProvider;
+	_currentGlobalSearcher?: GlobalSearchers;
 
 	@state()
 	_loading: boolean = false;
@@ -58,7 +60,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.#observeProviders();
+		this.#observeGlobalSearchers();
 	}
 
 	override connectedCallback() {
@@ -86,25 +88,33 @@ export class UmbSearchModalElement extends UmbLitElement {
 		this.modalContext?.reject();
 	};
 
-	#observeProviders() {
-		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'searchProvider', null, async (providers) => {
-			const searchProviders: Array<SearchProvider> = [];
+	#observeGlobalSearchers() {
+		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'globalSearch', null, async (controllers) => {
+			const globalSearch: Array<GlobalSearchers> = [];
 
-			for (const provider of providers) {
-				const api = await createExtensionApi<UmbSearchProvider<UmbSearchResultItemModel>>(this, provider.manifest);
-				if (api) {
-					searchProviders.push({
-						name: provider.manifest.meta?.label || provider.manifest.name,
-						api,
-						alias: provider.alias,
-					});
+			for (const controller of controllers) {
+				const globalSearchApi = await createExtensionApi<UmbGlobalSearchApi>(this, controller.manifest);
+				const searchProviderApi = await createExtensionApiByAlias<UmbSearchProvider<UmbSearchResultItemModel>>(
+					this,
+					controller.manifest.meta?.searchProvider,
+				);
+
+				const searcher: GlobalSearchers = {
+					name: controller.manifest.meta?.label || controller.manifest.name,
+					api: globalSearchApi,
+					searchProviderApi,
+					alias: controller.alias,
+				};
+
+				if (searchProviderApi) {
+					globalSearch.push(searcher);
 				}
 			}
 
-			this._searchProviders = searchProviders;
+			this._globalSearchers = globalSearch;
 
-			if (this._searchProviders.length > 0) {
-				this._currentProvider = this._searchProviders[0];
+			if (this._globalSearchers.length > 0) {
+				this._currentGlobalSearcher = this._globalSearchers[0];
 			}
 		});
 	}
@@ -141,10 +151,10 @@ export class UmbSearchModalElement extends UmbLitElement {
 		}
 	}
 
-	#setCurrentProvider(searchProvider: SearchProvider) {
-		if (this._currentProvider === searchProvider) return;
+	#setCurrentSearcher(searcher: GlobalSearchers) {
+		if (this._currentGlobalSearcher === searcher) return;
 
-		this._currentProvider = searchProvider;
+		this._currentGlobalSearcher = searcher;
 
 		this.#focusInput();
 		this._loading = true;
@@ -153,8 +163,8 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	async #updateSearchResults() {
-		if (this._search && this._currentProvider?.api) {
-			const { data } = await this._currentProvider.api.search({ query: this._search });
+		if (this._search && this._currentGlobalSearcher?.searchProviderApi) {
+			const { data } = await this._currentGlobalSearcher.searchProviderApi.search({ query: this._search });
 			if (!data) return;
 			this._searchResults = data.items;
 		} else {
@@ -325,15 +335,15 @@ export class UmbSearchModalElement extends UmbLitElement {
 		return html`
 			<div id="search-providers">
 				${repeat(
-					this._searchProviders,
-					(searchProvider) => searchProvider.alias,
-					(searchProvider) => html`
+					this._globalSearchers,
+					(searcher) => searcher.alias,
+					(searcher) => html`
 						<button
-							class="search-provider ${this._currentProvider?.alias === searchProvider.alias ? 'active' : ''}"
-							data-provider-alias=${searchProvider.alias}
-							@click=${() => this.#setCurrentProvider(searchProvider)}
+							class="search-provider ${this._currentGlobalSearcher?.alias === searcher.alias ? 'active' : ''}"
+							data-provider-alias=${searcher.alias}
+							@click=${() => this.#setCurrentSearcher(searcher)}
 							@keydown=${() => ''}>
-							${searchProvider.name}
+							${searcher.name}
 						</button>
 					`,
 				)}
