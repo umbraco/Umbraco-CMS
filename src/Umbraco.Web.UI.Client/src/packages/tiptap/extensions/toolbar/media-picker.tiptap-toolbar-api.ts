@@ -107,16 +107,29 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 	async #insertInEditor(editor: Editor, mediaUnique: string, media: UmbMediaCaptionAltTextModalValue) {
 		if (!media?.url) return;
 
-		const { width, height } = await imageSize(media.url, { maxWidth: this.maxWidth });
+		const maxImageSize = this.maxImageSize;
+
+		// Get the resized image URL
 		const { data } = await this.#imagingRepository.requestResizedItems([mediaUnique], {
-			width,
-			height,
+			width: maxImageSize,
+			height: maxImageSize,
 			mode: ImageCropModeModel.MAX,
 		});
 
+		if (!data?.length || !data[0]?.url) {
+			console.error('No data returned from imaging repository');
+			return;
+		}
+
+		// Set the media URL to the first item in the data array
+		const src = data[0].url;
+
+		// Fetch the actual image dimensions
+		const { width, height } = await imageSize(src);
+
 		const img = {
+			src,
 			alt: media.altText,
-			src: data?.[0]?.url ?? media.url,
 			'data-udi': `umb://media/${mediaUnique.replace(/-/g, '')}`,
 			width: width.toString(),
 			height: height.toString(),
