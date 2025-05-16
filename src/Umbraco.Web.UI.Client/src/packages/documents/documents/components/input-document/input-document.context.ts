@@ -43,7 +43,7 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 		}
 
 		const variantContext = await this.getContext(UMB_VARIANT_CONTEXT);
-		const culture = await variantContext?.getCulture();
+		const culture = await variantContext?.getDisplayCulture();
 
 		// pass allowedContentTypes to the search request args
 		combinedPickerData.search!.queryParams = {

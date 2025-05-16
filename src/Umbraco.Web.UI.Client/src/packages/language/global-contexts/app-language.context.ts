@@ -101,6 +101,7 @@ export class UmbAppLanguageContext extends UmbContextBase implements UmbApi {
 
 		// Update the variant context with the new language
 		this.#variantContext.setCulture(language.unique);
+		this.#variantContext.setAppCulture(language.unique);
 
 		// store the new language in local storage
 		localStorage.setItem(this.#localStorageKey, language?.unique);

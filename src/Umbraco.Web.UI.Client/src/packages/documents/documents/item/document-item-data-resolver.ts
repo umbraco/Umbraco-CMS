@@ -31,8 +31,8 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	public readonly isDraft = this.#isDraft.asObservable();
 
 	#variantContext?: UmbVariantContext;
-	#variantId?: UmbVariantId;
 	#fallbackCulture?: string | null;
+	#displayCulture?: string | null;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -45,10 +45,10 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 
 	#observeVariantContext() {
 		this.observe(
-			this.#variantContext?.variantId,
-			(variantId) => {
-				if (variantId === undefined) return;
-				this.#variantId = variantId;
+			this.#variantContext?.displayCulture,
+			(displayCulture) => {
+				if (displayCulture === undefined) return;
+				this.#displayCulture = displayCulture;
 				this.#setVariantAwareValues();
 			},
 			'umbObserveVariantId',
@@ -141,7 +141,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 
 	#setVariantAwareValues() {
 		if (!this.#variantContext) return;
-		if (!this.#variantId) return;
+		if (!this.#displayCulture) return;
 		if (!this.#fallbackCulture) return;
 		if (!this.#data) return;
 		this.#setName();
@@ -181,8 +181,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 			return this.getData()?.variants?.[0];
 		}
 
-		const culture = this.#variantId?.culture;
-		return this.#findVariant(culture!);
+		return this.#findVariant(this.#displayCulture!);
 	}
 
 	#isInvariant() {
