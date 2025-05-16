@@ -1,5 +1,7 @@
+import { UMB_MEDIA_SECTION_ALIAS } from '../../../media-section/constants.js';
 import { UMB_MEDIA_SEARCH_PROVIDER_ALIAS } from '../constants.js';
 import { UMB_MEDIA_GLOBAL_SEARCH_ALIAS } from './constants.js';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -11,5 +13,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Media',
 			searchProviderAlias: UMB_MEDIA_SEARCH_PROVIDER_ALIAS,
 		},
+		conditions: [
+			{
+				alias: UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS,
+				match: UMB_MEDIA_SECTION_ALIAS,
+			},
+		],
 	},
 ];
