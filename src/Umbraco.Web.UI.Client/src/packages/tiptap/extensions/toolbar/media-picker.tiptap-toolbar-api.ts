@@ -110,7 +110,7 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 
 		const img = {
 			alt: media.altText,
-			src: data[0]?.url ?? media.url,
+			src: data?.[0]?.url ?? media.url,
 			'data-udi': `umb://media/${mediaUnique.replace(/-/g, '')}`,
 			width: width.toString(),
 			height: height.toString(),
