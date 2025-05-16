@@ -22,38 +22,28 @@ public class ColorPickerValueConverter : PropertyValueConverterBase
         => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.ColorPicker);
 
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-        => UseLabel(propertyType) ? typeof(PickedColor) : typeof(string);
+        => typeof(PickedColor);
 
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
-        var useLabel = UseLabel(propertyType);
-
         if (source is null)
         {
-            return useLabel ? null : string.Empty;
+            return null;
         }
 
         var value = source.ToString()!;
         if (value.DetectIsJson())
         {
             PickedColor? convertedValue = _jsonSerializer.Deserialize<PickedColor>(value);
-            return useLabel ? convertedValue : convertedValue?.Color;
+            return convertedValue;
         }
 
         // This seems to be something old old where it may not be json at all.
-        if (useLabel)
-        {
-            return new PickedColor(value, value);
-        }
-
-        return value;
+        return new PickedColor(value, value);
     }
-
-    private bool UseLabel(IPublishedPropertyType propertyType) => ConfigurationEditor
-        .ConfigurationAs<ColorPickerConfiguration>(propertyType.DataType.ConfigurationObject)?.UseLabel ?? false;
 
     public class PickedColor
     {
