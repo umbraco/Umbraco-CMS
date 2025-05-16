@@ -187,6 +187,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				default:
 					break;
 			}
+			// The selection was removed
+		} else {
+			this.#resetUrl();
 		}
 
 		const link = {
@@ -228,6 +231,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			});
 		}
 
+		this.#resetUrl();
+	}
+
+	#resetUrl() {
 		this.#partialUpdateLink({ type: null, url: null });
 	}
 
