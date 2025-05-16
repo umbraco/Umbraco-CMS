@@ -14,12 +14,18 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 	#modalManager?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
 	/**
-	 * @returns {number} The maximum width of uploaded images
+	 * @returns {number} The configured maximum allowed image size
 	 */
-	get maxWidth(): number {
+	get maxImageSize(): number {
 		const maxImageSize = parseInt(this.configuration?.getValueByAlias('maxImageSize') ?? '', 10);
 		return isNaN(maxImageSize) ? 500 : maxImageSize;
 	}
+
+	/**
+	 * @deprecated Use `maxImageSize` instead.
+	 * @returns {number} The maximum width of uploaded images
+	 */
+	maxWidth = this.maxImageSize;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
