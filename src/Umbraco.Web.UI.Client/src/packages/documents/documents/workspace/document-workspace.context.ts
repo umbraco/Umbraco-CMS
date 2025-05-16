@@ -38,6 +38,8 @@ import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -89,6 +91,7 @@ export class UmbDocumentWorkspaceContext
 		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
 			const config = await context?.getDocumentConfiguration();
 			const allowSegmentCreation = config?.allowNonExistingSegmentsCreation ?? false;
+			const allowEditInvariantFromNonDefault = config?.allowEditInvariantFromNonDefault ?? true;
 
 			this._variantOptionsFilter = (variantOption) => {
 				const isNotCreatedSegmentVariant = variantOption.segment && !variantOption.variant;
@@ -100,6 +103,10 @@ export class UmbDocumentWorkspaceContext
 
 				return true;
 			};
+
+			if (allowEditInvariantFromNonDefault === false) {
+				this.#preventEditInvariantFromNonDefault();
+			}
 		});
 
 		this.observe(
@@ -427,6 +434,36 @@ export class UmbDocumentWorkspaceContext
 			unique: identifier,
 			message,
 		});
+	}
+
+	#preventEditInvariantFromNonDefault() {
+		this.observe(
+			observeMultiple([this.structure.contentTypeProperties, this.variantOptions]),
+			([properties, variantOptions]) => {
+				if (properties.length === 0) return;
+				if (variantOptions.length === 0) return;
+
+				variantOptions.forEach((variantOption) => {
+					// Do not add a rule for the default language. It is always permitted to edit.
+					if (variantOption.language.isDefault) return;
+
+					const datasetVariantId = UmbVariantId.CreateFromPartial(variantOption);
+					const invariantVariantId = UmbVariantId.CreateInvariant();
+					const unique = `UMB_PREVENT_EDIT_INVARIANT_FROM_NON_DEFAULT_DATASET=${datasetVariantId.toString()}_PROPERTY_${invariantVariantId.toString()}`;
+
+					const rule: UmbVariantPropertyGuardRule = {
+						unique,
+						message: 'Shared properties can only be edited in the default language',
+						variantId: invariantVariantId,
+						datasetVariantId,
+						permitted: false,
+					};
+
+					this.propertyWriteGuard.addRule(rule);
+					console.log('Adding rule', rule);
+				});
+			},
+		);
 	}
 }
 
