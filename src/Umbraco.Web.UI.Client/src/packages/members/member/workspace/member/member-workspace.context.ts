@@ -28,6 +28,7 @@ export class UmbMemberWorkspaceContext
 	implements UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbMemberVariantModel>
 {
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.memberType.unique);
+	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.memberType.icon);
 	readonly kind = this._data.createObservablePartOfCurrent((data) => data?.kind);
 	readonly createDate = this._data.createObservablePartOfCurrent((data) => data?.variants[0].createDate);
 	readonly updateDate = this._data.createObservablePartOfCurrent((data) => data?.variants[0].updateDate);
