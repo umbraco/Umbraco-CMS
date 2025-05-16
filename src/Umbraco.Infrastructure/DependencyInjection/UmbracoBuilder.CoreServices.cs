@@ -403,15 +403,15 @@ public static partial class UmbracoBuilderExtensions
 
         // add notification handlers for auditing
         builder
-            .AddNotificationHandler<MemberSavedNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<MemberDeletedNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<AssignedMemberRolesNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<RemovedMemberRolesNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<ExportedMemberNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<UserSavedNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<UserDeletedNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
+            .AddNotificationAsyncHandler<MemberSavedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<MemberDeletedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<AssignedMemberRolesNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<RemovedMemberRolesNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<ExportedMemberNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<UserSavedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<UserDeletedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
 
         // Handlers for publish warnings
         builder.AddNotificationHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
