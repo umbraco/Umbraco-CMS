@@ -5,8 +5,10 @@ export * from './modals/constants.js';
 export * from './paths.js';
 export * from './reference/constants.js';
 export * from './repository/constants.js';
+export * from './search/constants.js';
 export * from './tree/constants.js';
 export * from './workspace/constants.js';
+
 export {
 	UMB_DATA_TYPE_ENTITY_TYPE,
 	UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
