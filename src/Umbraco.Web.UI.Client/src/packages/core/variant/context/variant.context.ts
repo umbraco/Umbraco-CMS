@@ -52,7 +52,7 @@ export class UmbVariantContext extends UmbContextBase {
 					if (!appCulture) return;
 					this.setAppCulture(appCulture);
 				},
-				'observeFallbackCulture',
+				'observeAppCulture',
 			);
 		}).skipHost();
 
