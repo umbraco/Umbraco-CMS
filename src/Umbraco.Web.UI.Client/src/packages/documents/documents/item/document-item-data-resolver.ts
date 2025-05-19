@@ -90,7 +90,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getUnique(): Promise<string | undefined> {
-		return this.#data?.getValue()?.unique;
+		return await this.observe(this.unique).asPromise();
 	}
 
 	/**
@@ -99,7 +99,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getName(): Promise<string> {
-		return this.#name.getValue() || '';
+		return (await this.observe(this.name).asPromise()) || '';
 	}
 
 	/**
@@ -108,7 +108,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getIcon(): Promise<string | undefined> {
-		return this.#data?.getValue()?.documentType.icon;
+		return await this.observe(this.icon).asPromise();
 	}
 
 	/**
@@ -127,7 +127,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getIsDraft(): Promise<boolean> {
-		return this.#isDraft.getValue() ?? false;
+		return (await this.observe(this.isDraft).asPromise()) ?? false;
 	}
 
 	/**
@@ -136,7 +136,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getIsTrashed(): Promise<boolean> {
-		return this.#data?.getValue()?.isTrashed ?? false;
+		return (await this.observe(this.isTrashed).asPromise()) ?? false;
 	}
 
 	#setVariantAwareValues() {
