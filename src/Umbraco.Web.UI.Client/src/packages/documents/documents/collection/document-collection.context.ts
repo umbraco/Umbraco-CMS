@@ -36,7 +36,6 @@ export class UmbDocumentCollectionContext extends UmbDefaultCollectionContext<
 	}
 
 	public override async requestCollection() {
-		await this._init;
 		await this.observe(this.#displayCultureObservable)?.asPromise();
 		await super.requestCollection();
 	}
