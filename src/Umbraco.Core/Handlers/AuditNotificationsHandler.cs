@@ -356,6 +356,7 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
     public void Handle(UserSavedNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 

@@ -1,7 +1,3 @@
-// <copyright file="AuditEntryService.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
