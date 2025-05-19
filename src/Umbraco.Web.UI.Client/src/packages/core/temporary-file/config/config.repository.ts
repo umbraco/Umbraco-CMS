@@ -35,11 +35,16 @@ export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implemen
 			return;
 		}
 
-		const { data } = await this.#dataSource.getConfig();
+		const temporaryFileConfig = await this.requestTemporaryFileConfiguration();
 
-		if (data) {
-			this.#dataStore?.update(data);
+		if (temporaryFileConfig) {
+			this.#dataStore?.update(temporaryFileConfig);
 		}
+	}
+
+	async requestTemporaryFileConfiguration() {
+		const { data } = await this.#dataSource.getConfig();
+		return data;
 	}
 
 	/**
