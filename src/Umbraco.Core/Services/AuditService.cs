@@ -23,7 +23,6 @@ public sealed class AuditService : RepositoryService, IAuditService
     /// <summary>
     ///     Initializes a new instance of the <see cref="AuditService" /> class.
     /// </summary>
-    [ActivatorUtilitiesConstructor]
     public AuditService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
