@@ -1,5 +1,7 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -22,7 +24,7 @@ namespace Umbraco.Cms.Core.Services
     {
         private readonly IMediaRepository _mediaRepository;
         private readonly IMediaTypeRepository _mediaTypeRepository;
-        private readonly IAuditRepository _auditRepository;
+        private readonly IAuditService _auditService;
         private readonly IEntityRepository _entityRepository;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
@@ -37,7 +39,7 @@ namespace Umbraco.Cms.Core.Services
             ILoggerFactory loggerFactory,
             IEventMessagesFactory eventMessagesFactory,
             IMediaRepository mediaRepository,
-            IAuditRepository auditRepository,
+            IAuditService auditService,
             IMediaTypeRepository mediaTypeRepository,
             IEntityRepository entityRepository,
             IShortStringHelper shortStringHelper,
@@ -46,11 +48,64 @@ namespace Umbraco.Cms.Core.Services
         {
             _mediaFileManager = mediaFileManager;
             _mediaRepository = mediaRepository;
-            _auditRepository = auditRepository;
+            _auditService = auditService;
             _mediaTypeRepository = mediaTypeRepository;
             _entityRepository = entityRepository;
             _shortStringHelper = shortStringHelper;
             _userIdKeyResolver = userIdKeyResolver;
+        }
+
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+        public MediaService(
+            ICoreScopeProvider provider,
+            MediaFileManager mediaFileManager,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IMediaRepository mediaRepository,
+            IAuditRepository auditRepository,
+            IMediaTypeRepository mediaTypeRepository,
+            IEntityRepository entityRepository,
+            IShortStringHelper shortStringHelper,
+            IUserIdKeyResolver userIdKeyResolver)
+            : this(
+                provider,
+                mediaFileManager,
+                loggerFactory,
+                eventMessagesFactory,
+                mediaRepository,
+                StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+                mediaTypeRepository,
+                entityRepository,
+                shortStringHelper,
+                userIdKeyResolver)
+        {
+        }
+
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+        public MediaService(
+            ICoreScopeProvider provider,
+            MediaFileManager mediaFileManager,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IMediaRepository mediaRepository,
+            IAuditService auditService,
+            IAuditRepository auditRepository,
+            IMediaTypeRepository mediaTypeRepository,
+            IEntityRepository entityRepository,
+            IShortStringHelper shortStringHelper,
+            IUserIdKeyResolver userIdKeyResolver)
+            : this(
+                provider,
+                mediaFileManager,
+                loggerFactory,
+                eventMessagesFactory,
+                mediaRepository,
+                auditService,
+                mediaTypeRepository,
+                entityRepository,
+                shortStringHelper,
+                userIdKeyResolver)
+        {
         }
 
         #endregion
@@ -1235,9 +1290,22 @@ namespace Umbraco.Cms.Core.Services
 
         #region Private Methods
 
-        private void Audit(AuditType type, int userId, int objectId, string? message = null)
+        private void Audit(AuditType type, int userId, int objectId, string? message = null) =>
+            AuditAsync(type, userId, objectId, message).GetAwaiter().GetResult();
+
+        private async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
         {
-            _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Media), message));
+            Guid userKey = await _userIdKeyResolver.TryGetAsync(userId) is { Success: true } userKeyAttempt
+                ? userKeyAttempt.Result
+                : Constants.Security.UnknownUserKey;
+
+            await _auditService.AddAsync(
+                type,
+                userKey,
+                objectId,
+                UmbracoObjectTypes.Media.GetName(),
+                message,
+                parameters);
         }
 
         #endregion

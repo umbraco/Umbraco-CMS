@@ -23,7 +23,7 @@ public class AuditServiceTests
     private Mock<ICoreScopeProvider> _scopeProviderMock;
     private Mock<IAuditRepository> _auditRepositoryMock;
     private Mock<IEntityService> _entityServiceMock;
-    private Mock<IUserService> _userServiceMock;
+    private Mock<IUserIdKeyResolver> _userIdKeyResolverMock;
 
     [SetUp]
     public void Setup()
@@ -31,14 +31,14 @@ public class AuditServiceTests
         _scopeProviderMock = new Mock<ICoreScopeProvider>(MockBehavior.Strict);
         _auditRepositoryMock = new Mock<IAuditRepository>(MockBehavior.Strict);
         _entityServiceMock = new Mock<IEntityService>(MockBehavior.Strict);
-        _userServiceMock = new Mock<IUserService>(MockBehavior.Strict);
+        _userIdKeyResolverMock = new Mock<IUserIdKeyResolver>(MockBehavior.Strict);
 
         _auditService = new AuditService(
             _scopeProviderMock.Object,
             Mock.Of<ILoggerFactory>(MockBehavior.Strict),
             Mock.Of<IEventMessagesFactory>(MockBehavior.Strict),
             _auditRepositoryMock.Object,
-            _userServiceMock.Object,
+            _userIdKeyResolverMock.Object,
             _entityServiceMock.Object);
     }
 
@@ -59,10 +59,8 @@ public class AuditServiceTests
                 Assert.AreEqual(parameters, item.Parameters);
             });
 
-        Mock<IUser> mockUser = new Mock<IUser>();
-        mockUser.Setup(x => x.Id).Returns(Constants.Security.SuperUserId);
-
-        _userServiceMock.Setup(x => x.GetAsync(Constants.Security.SuperUserKey)).ReturnsAsync(mockUser.Object);
+        _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.SuperUserKey))
+            .ReturnsAsync(Attempt.Succeed(Constants.Security.SuperUserId));
 
         var result = await _auditService.AddAsync(
             type,
@@ -79,7 +77,7 @@ public class AuditServiceTests
     [Test]
     public async Task AddAsync_Does_Not_Succeed_When_Non_Existing_User_Is_Provided()
     {
-        _userServiceMock.Setup(x => x.GetAsync(It.IsAny<Guid>())).ReturnsAsync((IUser?)null);
+        _userIdKeyResolverMock.Setup(x => x.TryGetAsync(It.IsAny<Guid>())).ReturnsAsync(Attempt.Fail<int>());
 
         var result = await _auditService.AddAsync(
             AuditType.Publish,

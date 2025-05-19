@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Services;
 
 internal class ContentVersionService : IContentVersionService
 {
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly IContentVersionCleanupPolicy _contentVersionCleanupPolicy;
     private readonly IDocumentVersionRepository _documentVersionRepository;
     private readonly IEventMessagesFactory _eventMessagesFactory;
@@ -32,7 +32,7 @@ internal class ContentVersionService : IContentVersionService
         IContentVersionCleanupPolicy contentVersionCleanupPolicy,
         ICoreScopeProvider scopeProvider,
         IEventMessagesFactory eventMessagesFactory,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         ILanguageRepository languageRepository,
         IEntityService entityService,
         IContentService contentService,
@@ -43,7 +43,7 @@ internal class ContentVersionService : IContentVersionService
         _contentVersionCleanupPolicy = contentVersionCleanupPolicy;
         _scopeProvider = scopeProvider;
         _eventMessagesFactory = eventMessagesFactory;
-        _auditRepository = auditRepository;
+        _auditService = auditService;
         _languageRepository = languageRepository;
         _entityService = entityService;
         _contentService = contentService;
@@ -299,16 +299,21 @@ internal class ContentVersionService : IContentVersionService
         return versionsToDelete;
     }
 
-    private void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
+    private void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null) =>
+        AuditAsync(type, userId, objectId, message, parameters).GetAwaiter().GetResult();
+
+    private async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
     {
-        var entry = new AuditItem(
-            objectId,
+        Guid userKey = await _userIdKeyResolver.TryGetAsync(userId) is { Success: true } userKeyAttempt
+            ? userKeyAttempt.Result
+            : Constants.Security.UnknownUserKey;
+
+        await _auditService.AddAsync(
             type,
-            userId,
+            userKey,
+            objectId,
             UmbracoObjectTypes.Document.GetName(),
             message,
             parameters);
-
-        _auditRepository.Save(entry);
     }
 }

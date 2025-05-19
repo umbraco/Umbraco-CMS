@@ -16,9 +16,9 @@ namespace Umbraco.Cms.Core.Services.Implement;
 /// </summary>
 public sealed class AuditService : RepositoryService, IAuditService
 {
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IAuditRepository _auditRepository;
     private readonly IEntityService _entityService;
-    private readonly IUserService _userService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="AuditService" /> class.
@@ -28,29 +28,13 @@ public sealed class AuditService : RepositoryService, IAuditService
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IAuditRepository auditRepository,
-        IUserService userService,
+        IUserIdKeyResolver userIdKeyResolver,
         IEntityService entityService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _auditRepository = auditRepository;
-        _userService = userService;
+        _userIdKeyResolver = userIdKeyResolver;
         _entityService = entityService;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="AuditService" /> class.
-    /// </summary>
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
-    public AuditService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IAuditRepository auditRepository,
-        IAuditEntryRepository auditEntryRepository,
-        IUserService userService,
-        IEntityService entityService)
-        : this(provider, loggerFactory, eventMessagesFactory, auditRepository, userService, entityService)
-    {
     }
 
     /// <inheritdoc />
@@ -62,10 +46,12 @@ public sealed class AuditService : RepositoryService, IAuditService
         string? comment = null,
         string? parameters = null)
     {
-        var userId = userKey switch
+        int? userId = userKey switch
         {
             { } when userKey == Constants.Security.UnknownUserKey => Constants.Security.UnknownUserId,
-            _ => (await _userService.GetAsync(userKey))?.Id,
+            _ => await _userIdKeyResolver.TryGetAsync(userKey) is { Success: true } userIdAttempt
+                ? userIdAttempt.Result
+                : null,
         };
 
         if (userId is null)
@@ -244,8 +230,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         ArgumentOutOfRangeException.ThrowIfNegative(skip);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(take);
 
-        IUser? user = await _userService.GetAsync(userKey);
-        if (user is null)
+        if (await _userIdKeyResolver.TryGetAsync(userKey) is not { Success: true } userIdAttempt)
         {
             return new PagedModel<IAuditItem>();
         }
@@ -255,7 +240,7 @@ public sealed class AuditService : RepositoryService, IAuditService
             sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
 
         PagedModel<IAuditItem> result = GetItemsByUserInner(
-            user.Id,
+            userIdAttempt.Result,
             pageIndex,
             pageSize,
             orderDirection,
@@ -433,3 +418,4 @@ public sealed class AuditService : RepositoryService, IAuditService
         scope.Complete();
     }
 }
+

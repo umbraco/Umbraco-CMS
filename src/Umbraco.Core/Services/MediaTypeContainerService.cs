@@ -14,10 +14,10 @@ internal sealed class MediaTypeContainerService : EntityTypeContainerService<IMe
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IMediaTypeContainerRepository entityContainerRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IEntityRepository entityRepository,
         IUserIdKeyResolver userIdKeyResolver)
-        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditRepository, entityRepository, userIdKeyResolver)
+        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver)
     {
     }
 

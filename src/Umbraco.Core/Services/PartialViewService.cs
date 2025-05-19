@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -21,10 +23,55 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
         IPartialViewRepository repository,
         ILogger<StylesheetService> logger,
         IUserIdKeyResolver userIdKeyResolver,
+        IAuditService auditService,
+        PartialViewSnippetCollection snippetCollection)
+        : base(provider, loggerFactory, eventMessagesFactory, repository, logger, userIdKeyResolver, auditService)
+        => _snippetCollection = snippetCollection;
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public PartialViewService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IPartialViewRepository repository,
+        ILogger<StylesheetService> logger,
+        IUserIdKeyResolver userIdKeyResolver,
         IAuditRepository auditRepository,
         PartialViewSnippetCollection snippetCollection)
-        : base(provider, loggerFactory, eventMessagesFactory, repository, logger, userIdKeyResolver, auditRepository)
-        => _snippetCollection = snippetCollection;
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            logger,
+            userIdKeyResolver,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+            snippetCollection)
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public PartialViewService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IPartialViewRepository repository,
+        ILogger<StylesheetService> logger,
+        IUserIdKeyResolver userIdKeyResolver,
+        IAuditService auditService,
+        IAuditRepository auditRepository,
+        PartialViewSnippetCollection snippetCollection)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            logger,
+            userIdKeyResolver,
+            auditService,
+            snippetCollection)
+    {
+    }
 
     protected override string[] AllowedFileExtensions { get; } = { ".cshtml" };
 

@@ -13,10 +13,10 @@ internal sealed class DataTypeContainerService : EntityTypeContainerService<IDat
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IDataTypeContainerRepository entityContainerRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IEntityRepository entityRepository,
         IUserIdKeyResolver userIdKeyResolver)
-        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditRepository, entityRepository, userIdKeyResolver)
+        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver)
     {
     }
 
