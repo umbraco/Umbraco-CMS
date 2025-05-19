@@ -25,7 +25,7 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
     }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.AddNotificationHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>();
+        => builder.AddNotificationAsyncHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>();
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
