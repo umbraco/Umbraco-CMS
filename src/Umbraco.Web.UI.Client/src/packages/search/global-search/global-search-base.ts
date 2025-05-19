@@ -1,11 +1,11 @@
-import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type {
 	ManifestGlobalSearch,
 	ManifestSearchProvider,
 	UmbGlobalSearchApi,
 	UmbSearchProvider,
 	UmbSearchRequestArgs,
-} from '@umbraco-cms/backoffice/search';
+} from '../types.js';
+import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
