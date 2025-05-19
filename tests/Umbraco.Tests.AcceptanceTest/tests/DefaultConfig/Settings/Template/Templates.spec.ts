@@ -342,25 +342,26 @@ test('can insert value into a template', async ({umbracoApi, umbracoUi}) => {
   expect(templateData.content).toBe(templateContent);
 });
 
-// TODO: Remove skip when the front-end is ready. Currently the returned items count is not updated after choosing the root content.
-test.skip('can show returned items in query builder ', async ({umbracoApi, umbracoUi}) => {
+test('can show returned items in query builder ', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   // Create content at root with a child
   const documentTypeName = 'ParentDocumentType';
   const childDocumentTypeName = 'ChildDocumentType';
-  const contentName = 'ContentName';
-  const childContentName = 'ChildContentName';
+  const contentName = 'ContentNameTemplate';
+  const childContentName = 'ChildContentNameTemplate';
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(childDocumentTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
   const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
+  const childContentId = await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
+  await umbracoApi.document.publish(contentId);
+  await umbracoApi.document.publish(childContentId);
   // Create template
   await umbracoApi.template.createDefaultTemplate(templateName);
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
   await umbracoUi.template.clickQueryBuilderButton();
-  await umbracoUi.template.chooseRootContentInQueryBuilder('(' + contentName + ')');
+  await umbracoUi.template.chooseRootContentInQueryBuilder(contentName);
 
   // Assert
   await umbracoUi.template.doesReturnedItemsHaveCount(1);
@@ -368,6 +369,9 @@ test.skip('can show returned items in query builder ', async ({umbracoApi, umbra
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
+  await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.document.ensureNameNotExists(childContentName);
 });
 
 test('cannot create a template with an empty name', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

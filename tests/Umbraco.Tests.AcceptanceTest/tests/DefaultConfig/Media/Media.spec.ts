@@ -14,8 +14,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
 });
 
-//TODO: Remove skip when the frontend is ready. Currently it is possible to create an empty media file, should not be possible
-test.skip('can not create a empty media file', async ({umbracoApi, umbracoUi}) => {
+test('can not create a empty media file', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 

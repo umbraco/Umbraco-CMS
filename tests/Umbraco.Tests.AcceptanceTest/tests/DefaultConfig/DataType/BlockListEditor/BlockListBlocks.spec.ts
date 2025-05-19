@@ -113,7 +113,7 @@ test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isElementWorkspaceOpenInBlock(elementTypeName);
 });
 
-// TODO: Skip this test as it is impossible to remove a content model
+// Skip this test as it is impossible to remove a content model in front-end
 test.skip('can remove a content model from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);

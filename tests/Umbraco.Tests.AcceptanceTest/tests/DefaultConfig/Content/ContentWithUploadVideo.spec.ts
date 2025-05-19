@@ -91,8 +91,7 @@ for (const uploadVideo of uploadVideos) {
   });
 }
 
-// TODO: Remove skip when the front-end is ready. Currently the uploaded video still displays after removing.
-test.skip('can remove a mp4 file in the content', async ({umbracoApi, umbracoUi}) => {
+test('can remove a mp4 file in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const uploadFileName = 'Video.mp4';
   const mineType = 'video/mp4';

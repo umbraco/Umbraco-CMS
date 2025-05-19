@@ -315,7 +315,7 @@ test('cannot update the URL picker with an empty link', async ({umbracoApi, umbr
 
 // TODO: Remove skip when the front-end ready. Currently it still accept the empty link with an anchor or querystring
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
-test.skip('cannot submit an empty URL with an anchor or query', async ({umbracoApi, umbracoUi}) => {
+test('cannot submit an empty URL with an anchor or query', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -358,9 +358,7 @@ test.skip('cannot submit an empty link using spacebar', async ({umbracoApi, umbr
   await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
-// TODO: Remove skip when the front-end ready. Currently it is impossible to link to unpublished document
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17974
-test.skip('can create content with the link to an unpublished document', async ({umbracoApi, umbracoUi}) => {
+test('can create content with the link to an unpublished document', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

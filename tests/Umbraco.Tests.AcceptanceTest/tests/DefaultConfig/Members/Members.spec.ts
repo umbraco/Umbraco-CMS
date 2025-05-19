@@ -248,8 +248,7 @@ test('cannot create member with invalid email', async ({umbracoApi, umbracoUi}) 
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
 });
 
-// TODO: Remove skip when the front-end is ready. Currently it is possible to update member with invalid email.
-test.skip('cannot update email to an invalid email', async ({umbracoApi, umbracoUi}) => {
+test('cannot update email to an invalid email', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const invalidEmail = 'invalidemail';
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
@@ -262,7 +261,7 @@ test.skip('cannot update email to an invalid email', async ({umbracoApi, umbraco
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isErrorNotificationVisible();
+  await umbracoUi.member.doesErrorNotificationHaveText(NotificationConstantHelper.error.invalidEmail);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.email).toBe(email);
 });

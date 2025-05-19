@@ -256,8 +256,7 @@ test('can delete a partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoUi.partialView.isPartialViewRootTreeItemVisible(partialViewFileName, false, false);
 });
 
-// TODO: Remove skip when the front-end is ready. Currently the returned items count is not updated after choosing the root content.
-test.skip('can show returned items in query builder ', async ({umbracoApi, umbracoUi}) => {
+test('can show returned items in query builder ', async ({umbracoApi, umbracoUi}) => {
   //Arrange
   // Create content at root with a child
   const documentTypeName = 'ParentDocumentType';
@@ -267,12 +266,14 @@ test.skip('can show returned items in query builder ', async ({umbracoApi, umbra
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(childDocumentTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
   const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
+  const childContentId = await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
+  await umbracoApi.document.publish(contentId);
+  await umbracoApi.document.publish(childContentId);
   // Create partial view
   await umbracoApi.partialView.create(partialViewFileName, partialViewFileName, '/');
   expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
 
-  //Act
+  // Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
   await umbracoUi.partialView.clickQueryBuilderButton();
   await umbracoUi.partialView.chooseRootContentInQueryBuilder(contentName);
@@ -283,6 +284,9 @@ test.skip('can show returned items in query builder ', async ({umbracoApi, umbra
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
+  await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.document.ensureNameNotExists(childContentName);
 });
 
 test('cannot create a partial view with an empty name', async ({umbracoApi, umbracoUi}) => {
