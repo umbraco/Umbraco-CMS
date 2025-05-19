@@ -1,7 +1,9 @@
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
@@ -22,7 +24,7 @@ namespace Umbraco.Cms.Core.Services;
 public class FileService : RepositoryService, IFileService
 {
     private const string PartialViewHeader = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage";
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IPartialViewRepository _partialViewRepository;
     private readonly IScriptRepository _scriptRepository;
@@ -38,7 +40,7 @@ public class FileService : RepositoryService, IFileService
         IStylesheetRepository stylesheetRepository,
         IScriptRepository scriptRepository,
         IPartialViewRepository partialViewRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IHostingEnvironment hostingEnvironment,
         ITemplateService templateService,
         ITemplateRepository templateRepository,
@@ -50,11 +52,76 @@ public class FileService : RepositoryService, IFileService
         _stylesheetRepository = stylesheetRepository;
         _scriptRepository = scriptRepository;
         _partialViewRepository = partialViewRepository;
-        _auditRepository = auditRepository;
+        _auditService = auditService;
         _hostingEnvironment = hostingEnvironment;
         _templateService = templateService;
         _templateRepository = templateRepository;
         _userIdKeyResolver = userIdKeyResolver;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public FileService(
+        ICoreScopeProvider uowProvider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IStylesheetRepository stylesheetRepository,
+        IScriptRepository scriptRepository,
+        IPartialViewRepository partialViewRepository,
+        IAuditRepository auditRepository,
+        IHostingEnvironment hostingEnvironment,
+        ITemplateService templateService,
+        ITemplateRepository templateRepository,
+        IUserIdKeyResolver userIdKeyResolver,
+        IShortStringHelper shortStringHelper,
+        IOptions<GlobalSettings> globalSettings)
+        : this(
+            uowProvider,
+            loggerFactory,
+            eventMessagesFactory,
+            stylesheetRepository,
+            scriptRepository,
+            partialViewRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+            hostingEnvironment,
+            templateService,
+            templateRepository,
+            userIdKeyResolver,
+            shortStringHelper,
+            globalSettings)
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public FileService(
+        ICoreScopeProvider uowProvider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IStylesheetRepository stylesheetRepository,
+        IScriptRepository scriptRepository,
+        IPartialViewRepository partialViewRepository,
+        IAuditService auditService,
+        IAuditRepository auditRepository,
+        IHostingEnvironment hostingEnvironment,
+        ITemplateService templateService,
+        ITemplateRepository templateRepository,
+        IUserIdKeyResolver userIdKeyResolver,
+        IShortStringHelper shortStringHelper,
+        IOptions<GlobalSettings> globalSettings)
+        : this(
+            uowProvider,
+            loggerFactory,
+            eventMessagesFactory,
+            stylesheetRepository,
+            scriptRepository,
+            partialViewRepository,
+            auditService,
+            hostingEnvironment,
+            templateService,
+            templateRepository,
+            userIdKeyResolver,
+            shortStringHelper,
+            globalSettings)
+    {
     }
 
     #region Stylesheets
@@ -70,7 +137,20 @@ public class FileService : RepositoryService, IFileService
     }
 
     private void Audit(AuditType type, int userId, int objectId, string? entityType) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
+        AuditAsync(type, userId, objectId, entityType).GetAwaiter().GetResult();
+
+    private async Task AuditAsync(AuditType type, int userId, int objectId, string? entityType)
+    {
+        Guid userKey = await _userIdKeyResolver.TryGetAsync(userId) is { Success: true } userKeyAttempt
+            ? userKeyAttempt.Result
+            : Constants.Security.UnknownUserKey;
+
+        await _auditService.AddAsync(
+            type,
+            userKey,
+            objectId,
+            entityType);
+    }
 
     /// <inheritdoc />
     [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
