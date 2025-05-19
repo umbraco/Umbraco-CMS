@@ -105,22 +105,17 @@ public sealed class AuditNotificationsHandler :
     {
     }
 
-    private IUser? CurrentPerformingUser
-    {
-        get
-        {
-            IUser? identity = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-            IUser? user = identity == null ? null : _userService.GetAsync(identity.Key).GetAwaiter().GetResult();
-            return user;
-        }
-    }
+    private async Task<IUser?> GetCurrentPerformingUser() =>
+        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is { } identity
+            ? await _userService.GetAsync(identity.Key)
+            : null;
 
     private string PerformingIp => _ipResolver.GetCurrentRequestIpAddress();
 
     /// <inheritdoc />
     public async Task HandleAsync(AssignedMemberRolesNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         var roles = string.Join(", ", notification.Roles);
         var members = _memberService.GetAllMembers(notification.MemberIds).ToDictionary(x => x.Id, x => x);
         foreach (var id in notification.MemberIds)
@@ -145,7 +140,7 @@ public sealed class AuditNotificationsHandler :
         AssignedUserGroupPermissionsNotification notification,
         CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IEnumerable<EntityPermission> perms = notification.EntityPermissions;
         foreach (EntityPermission perm in perms)
         {
@@ -169,7 +164,7 @@ public sealed class AuditNotificationsHandler :
     /// <inheritdoc />
     public async Task HandleAsync(ExportedMemberNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IMember member = notification.Member;
 
         await Audit(
@@ -186,7 +181,7 @@ public sealed class AuditNotificationsHandler :
 
     public async Task HandleAsync(MemberDeletedNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IEnumerable<IMember> members = notification.DeletedEntities;
         foreach (IMember member in members)
         {
@@ -206,7 +201,7 @@ public sealed class AuditNotificationsHandler :
     /// <inheritdoc />
     public async Task HandleAsync(MemberSavedNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IEnumerable<IMember> members = notification.SavedEntities;
         foreach (IMember member in members)
         {
@@ -228,7 +223,7 @@ public sealed class AuditNotificationsHandler :
     /// <inheritdoc />
     public async Task HandleAsync(RemovedMemberRolesNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         var roles = string.Join(", ", notification.Roles);
         var members = _memberService.GetAllMembers(notification.MemberIds).ToDictionary(x => x.Id, x => x);
         foreach (var id in notification.MemberIds)
@@ -251,7 +246,7 @@ public sealed class AuditNotificationsHandler :
     /// <inheritdoc />
     public async Task HandleAsync(UserDeletedNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IEnumerable<IUser> affectedUsers = notification.DeletedEntities;
         foreach (IUser affectedUser in affectedUsers)
         {
@@ -270,7 +265,7 @@ public sealed class AuditNotificationsHandler :
 
     public async Task HandleAsync(UserGroupWithUsersSavedNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         foreach (UserGroupWithUsers groupWithUser in notification.SavedEntities)
         {
             IUserGroup group = groupWithUser.UserGroup;
@@ -337,7 +332,7 @@ public sealed class AuditNotificationsHandler :
     /// <inheritdoc />
     public async Task HandleAsync(UserSavedNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IEnumerable<IUser> affectedUsers = notification.SavedEntities;
         foreach (IUser affectedUser in affectedUsers)
         {
@@ -356,6 +351,7 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
     public void Handle(UserSavedNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
