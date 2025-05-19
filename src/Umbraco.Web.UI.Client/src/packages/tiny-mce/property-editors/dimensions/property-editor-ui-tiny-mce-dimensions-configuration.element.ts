@@ -2,7 +2,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-tiny-mce-dimensions-configuration
@@ -14,11 +14,11 @@ export class UmbPropertyEditorUITinyMceDimensionsConfigurationElement extends Um
 
 	#onChangeWidth(e: UUIInputEvent) {
 		this.value = { ...this.value, width: Number(e.target.value as string) };
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 	#onChangeHeight(e: UUIInputEvent) {
 		this.value = { ...this.value, height: Number(e.target.value as string) };
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

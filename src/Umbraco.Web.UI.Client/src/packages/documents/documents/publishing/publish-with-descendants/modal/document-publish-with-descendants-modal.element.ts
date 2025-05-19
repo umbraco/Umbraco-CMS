@@ -5,7 +5,7 @@ import type {
 	UmbDocumentPublishWithDescendantsModalValue,
 } from './document-publish-with-descendants-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
-import { umbConfirmModal, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
@@ -18,7 +18,6 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 > {
 	#selectionManager = new UmbSelectionManager<string>(this);
 	#includeUnpublishedDescendants = false;
-	#forceRepublish = false;
 
 	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
@@ -84,25 +83,10 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 		this.#includeUnpublishedDescendants = !this.#includeUnpublishedDescendants;
 	}
 
-	async #onForceRepublishChange() {
-		this.#forceRepublish = !this.#forceRepublish;
-	}
-
 	async #submit() {
-
-		if (this.#forceRepublish) {
-			await umbConfirmModal(this, {
-				headline: this.localize.term('content_forceRepublishWarning'),
-				content: this.localize.term('content_forceRepublishAdvisory'),
-				color: 'warning',
-				confirmLabel: this.localize.term('actions_publish'),
-			});
-		}
-
 		this.value = {
 			selection: this.#selectionManager.getSelection(),
 			includeUnpublishedDescendants: this.#includeUnpublishedDescendants,
-			forceRepublish: this.#forceRepublish,
 		};
 		this.modalContext?.submit();
 	}
@@ -112,7 +96,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	}
 
 	override render() {
-		return html`<umb-body-layout headline=${this.localize.term('buttons_publishDescendants')}>
+		return html`<uui-dialog-layout headline=${this.localize.term('buttons_publishDescendants')}>
 			<p id="subtitle">
 				${this._options.length === 1
 					? html`<umb-localize
@@ -143,14 +127,6 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 					@change=${this.#onIncludeUnpublishedDescendantsChange}></uui-toggle>
 			</uui-form-layout-item>
 
-			<uui-form-layout-item>
-				<uui-toggle
-					id="forceRepublish"
-					label=${this.localize.term('content_forceRepublish')}
-					?checked=${this.value?.forceRepublish}
-					@change=${this.#onForceRepublishChange}></uui-toggle>
-			</uui-form-layout-item>
-
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
@@ -160,7 +136,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 					?disabled=${this._hasNotSelectedMandatory}
 					@click=${this.#submit}></uui-button>
 			</div>
-		</umb-body-layout> `;
+		</uui-dialog-layout> `;
 	}
 
 	static override styles = [

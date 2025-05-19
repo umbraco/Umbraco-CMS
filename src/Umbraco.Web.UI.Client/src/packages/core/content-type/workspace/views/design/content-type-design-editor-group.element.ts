@@ -63,19 +63,12 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 						const hasAOwnerContainer = !!ownerContainer;
 						const pureOwnerContainer = hasAOwnerContainer && containers.length === 1;
 
-						// TODO: Check if requestUpdate is needed here, I do not think it is when i added it, but I just wanted to be safe when debugging [NL]
-						const oldHasOwnerContainer = this._hasOwnerContainer;
-						const oldInherited = this._inherited;
-						const oldInheritedFrom = this._inheritedFrom;
 						this._hasOwnerContainer = hasAOwnerContainer;
 						this._inherited = !pureOwnerContainer;
 						this._inheritedFrom = containers
 							.filter((con) => con.id !== ownerContainer?.id)
 							.map((con) => this.groupStructureHelper!.getContentTypeOfContainer(con.id))
 							.filter((contentType) => contentType !== undefined) as Array<UmbContentTypeModel>;
-						this.requestUpdate('_hasOwnerContainer', oldHasOwnerContainer);
-						this.requestUpdate('_inherited', oldInherited);
-						this.requestUpdate('_inheritedFrom', oldInheritedFrom);
 					},
 					'observeGroupContainers',
 				);
@@ -160,10 +153,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 		return html`
 			<div slot="header" class="drag-handle">
 				<div>
-					${when(
-						this.sortModeActive && this._hasOwnerContainer,
-						() => html`<uui-icon name="icon-navigation"></uui-icon>`,
-					)}
+					${when(this.sortModeActive && this._hasOwnerContainer, () => html`<uui-icon name="icon-grip"></uui-icon>`)}
 					<uui-input
 						id="group-name"
 						label=${this.localize.term('contentTypeEditor_group')}
@@ -178,7 +168,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 			</div>
 			<div slot="header-actions">
 				${when(
-					this._hasOwnerContainer === false && this._inheritedFrom,
+					this._hasOwnerContainer === false && this._inheritedFrom && this._inheritedFrom.length > 0,
 					() => html`
 						<uui-tag look="default" class="inherited">
 							<uui-icon name="icon-merge"></uui-icon>

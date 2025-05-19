@@ -13,6 +13,7 @@ export default defineConfig({
 		entry: {
 			'entry-point': 'entry-point.ts',
 			'imaging/index': 'imaging/index.ts',
+			'dropzone/index': 'dropzone/index.ts',
 			'media-types/index': 'media-types/index.ts',
 			'media/index': 'media/index.ts',
 			'umbraco-package': 'umbraco-package.ts',

@@ -19,6 +19,7 @@ import type {
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
 
+import './column-layouts/document-entity-actions-table-column-view.element.js';
 import './column-layouts/document-table-column-name.element.js';
 import './column-layouts/document-table-column-state.element.js';
 
@@ -143,11 +144,8 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 					if (column.alias === 'entityActions') {
 						return {
 							columnAlias: 'entityActions',
-							value: html`<umb-entity-actions-table-column-view
-								.value=${{
-									entityType: item.entityType,
-									unique: item.unique,
-								}}></umb-entity-actions-table-column-view>`,
+							value: html`<umb-document-entity-actions-table-column-view
+								.value=${item}></umb-document-entity-actions-table-column-view>`,
 						};
 					}
 

@@ -1,13 +1,17 @@
-import { css, html, nothing, repeat, customElement, property, classMap } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { classMap, css, customElement, html, nothing, property, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 export type UmbCheckboxListItem = { label: string; value: string; checked: boolean; invalid?: boolean };
 
 @customElement('umb-input-checkbox-list')
-export class UmbInputCheckboxListElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputCheckboxListElement extends UmbFormControlMixin<
+	string | undefined,
+	typeof UmbLitElement,
+	undefined
+>(UmbLitElement, undefined) {
 	@property({ attribute: false })
 	public list: Array<UmbCheckboxListItem> = [];
 
@@ -38,8 +42,24 @@ export class UmbInputCheckboxListElement extends UUIFormControlMixin(UmbLitEleme
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
-	protected override getFormElement() {
-		return undefined;
+	/**
+	 * Sets the input to required, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	required?: boolean;
+
+	@property({ type: String })
+	requiredMessage?: string;
+
+	constructor() {
+		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !this.readonly && !!this.required && (this.value === undefined || this.value === null || this.value === ''),
+		);
 	}
 
 	#onChange(event: UUIBooleanInputEvent) {
@@ -73,13 +93,15 @@ export class UmbInputCheckboxListElement extends UUIFormControlMixin(UmbLitEleme
 	}
 
 	#renderCheckbox(item: (typeof this.list)[0]) {
-		return html`<uui-checkbox
-			class=${classMap({ invalid: !!item.invalid })}
-			?checked=${item.checked}
-			label=${item.label + (item.invalid ? ` (${this.localize.term('validation_legacyOption')})` : '')}
-			title=${item.invalid ? this.localize.term('validation_legacyOptionDescription') : ''}
-			value=${item.value}
-			?readonly=${this.readonly}></uui-checkbox>`;
+		return html`
+			<uui-checkbox
+				class=${classMap({ invalid: !!item.invalid })}
+				label=${item.label + (item.invalid ? ` (${this.localize.term('validation_legacyOption')})` : '')}
+				title=${item.invalid ? this.localize.term('validation_legacyOptionDescription') : ''}
+				value=${item.value}
+				?checked=${item.checked}
+				?readonly=${this.readonly}></uui-checkbox>
+		`;
 	}
 
 	static override readonly styles = [

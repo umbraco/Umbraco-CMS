@@ -116,8 +116,8 @@ internal sealed class MemberEditingService : IMemberEditingService
             return IdentityMemberCreationFailed(createResult, status);
         }
 
-        IMember member = _memberService.GetByEmail(createModel.Email)
-                          ?? throw new InvalidOperationException("Member creation succeeded, but member could not be found by email.");
+        IMember member = _memberService.GetByUsername(createModel.Username)
+                          ?? throw new InvalidOperationException("Member creation succeeded, but member could not be found by username.");
 
         var updateRolesResult = await UpdateRoles(createModel.Roles, identityMember);
         if (updateRolesResult is false)
@@ -149,12 +149,11 @@ internal sealed class MemberEditingService : IMemberEditingService
 
         if (user.HasAccessToSensitiveData() is false)
         {
-            // handle sensitive data. certain member properties (IsApproved, IsLockedOut) are subject to "sensitive data" rules.
-            if (member.IsLockedOut != updateModel.IsLockedOut || member.IsApproved != updateModel.IsApproved)
-            {
-                status.ContentEditingOperationStatus = ContentEditingOperationStatus.NotAllowed;
-                return Attempt.FailWithStatus(status, new MemberUpdateResult());
-            }
+            // Handle sensitive data. Certain member properties (IsApproved, IsLockedOut) are subject to "sensitive data" rules.
+            // The client won't have received these, so will always be false.
+            // We should reset them back to their original values before proceeding with the update.
+            updateModel.IsApproved = member.IsApproved;
+            updateModel.IsLockedOut = member.IsLockedOut;
         }
 
         MemberIdentityUser? identityMember = await _memberManager.FindByIdAsync(member.Id.ToString());
@@ -283,10 +282,13 @@ internal sealed class MemberEditingService : IMemberEditingService
             return MemberEditingOperationStatus.DuplicateUsername;
         }
 
-        IMember? byEmail = _memberService.GetByEmail(model.Email);
-        if (byEmail is not null && byEmail.Key != memberKey)
+        if (_securitySettings.MemberRequireUniqueEmail)
         {
-            return MemberEditingOperationStatus.DuplicateEmail;
+            IMember? byEmail = _memberService.GetByEmail(model.Email);
+            if (byEmail is not null && byEmail.Key != memberKey)
+            {
+                return MemberEditingOperationStatus.DuplicateEmail;
+            }
         }
 
         return MemberEditingOperationStatus.Success;

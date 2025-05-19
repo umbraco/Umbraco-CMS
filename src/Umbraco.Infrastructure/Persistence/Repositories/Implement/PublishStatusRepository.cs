@@ -1,6 +1,4 @@
 using NPoco;
-using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.Media.EmbedProviders;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -67,7 +65,7 @@ public class PublishStatusRepository: IPublishStatusRepository
         List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(sql);
 
         IDictionary<Guid, ISet<string>> result = Map(databaseRecords);
-        return result.ContainsKey(documentKey) ? result[documentKey] : new HashSet<string>();
+        return result.TryGetValue(documentKey, out ISet<string>? value) ? value : new HashSet<string>();
     }
 
     public async Task<IDictionary<Guid, ISet<string>>> GetDescendantsOrSelfPublishStatusAsync(Guid rootDocumentKey, CancellationToken cancellationToken)
@@ -98,7 +96,7 @@ public class PublishStatusRepository: IPublishStatusRepository
                 x=> (ISet<string>) x.Where(x=> IsPublished(x)).Select(y=>y.IsoCode).ToHashSet());
     }
 
-    private bool IsPublished(PublishStatusDto publishStatusDto)
+    private static bool IsPublished(PublishStatusDto publishStatusDto)
     {
         switch ((ContentVariation)publishStatusDto.ContentTypeVariation)
         {
@@ -112,7 +110,7 @@ public class PublishStatusRepository: IPublishStatusRepository
         }
     }
 
-    private class PublishStatusDto
+    private sealed class PublishStatusDto
     {
 
         public const string DocumentVariantPublishStatusColumnName = "variantPublished";
@@ -133,5 +131,4 @@ public class PublishStatusRepository: IPublishStatusRepository
         [Column(DocumentVariantPublishStatusColumnName)]
         public bool DocumentVariantPublishStatus  { get; set; }
     }
-
 }

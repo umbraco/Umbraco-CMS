@@ -1,15 +1,20 @@
-import type { UmbBlockDataModel } from '../../block/index.js';
-import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel, UmbBlockRteValueModel } from '../types.js';
 import {
 	UMB_BLOCK_RTE_WORKSPACE_MODAL,
 	type UmbBlockRteWorkspaceOriginData,
 } from '../workspace/block-rte-workspace.modal-token.js';
 import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from './block-rte-manager.context-token.js';
+import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoffice/rte';
+
+/**
+ * Copied from the 'rte' package to avoid a circular dependency.
+ * @internal
+ */
+const UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS = 'Umbraco.RichText';
 
 export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT,

@@ -6,10 +6,14 @@ export default class UmbInputUploadFieldAudioElement extends UmbLitElement {
 	@property({ type: String })
 	path = '';
 
+	get #label() {
+		return this.path.split('/').pop() ?? '';
+	}
+
 	override render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
 
-		return html`<audio controls src=${this.path}></audio>`;
+		return html`<audio controls src=${this.path} title=${this.#label}></audio>`;
 	}
 
 	static override readonly styles = [

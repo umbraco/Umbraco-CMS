@@ -95,6 +95,7 @@ export class UmbModalElement extends UmbLitElement {
 			this.#modalRouterElement = document.createElement('umb-router-slot');
 			this.#modalRouterElement.routes = [
 				{
+					unique: '_umbEmptyRoute_',
 					path: '',
 					component: document.createElement('slot'),
 				},

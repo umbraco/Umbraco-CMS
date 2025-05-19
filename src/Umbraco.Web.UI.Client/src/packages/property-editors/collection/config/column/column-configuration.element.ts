@@ -2,7 +2,6 @@ import type { UmbInputCollectionContentTypePropertyElement } from './components/
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
@@ -13,6 +12,7 @@ import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 // import of local components
 import './components/index.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-collection-column-configuration
@@ -29,7 +29,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 		containerSelector: '#layout-wrapper',
 		onChange: ({ model }) => {
 			this.value = model;
-			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
 
@@ -72,7 +72,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 
 		this.value = [...(this.value ?? []), config];
 
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#onChangeLabel(e: UUIInputEvent, configuration: UmbCollectionColumnConfiguration) {
@@ -81,7 +81,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 				config.alias === configuration.alias ? { ...config, header: e.target.value as string } : config,
 		);
 
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#onChangeNameTemplate(e: UUIInputEvent, configuration: UmbCollectionColumnConfiguration) {
@@ -90,7 +90,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 				config.alias === configuration.alias ? { ...config, nameTemplate: e.target.value as string } : config,
 		);
 
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#onRemove(unique: string) {
@@ -101,7 +101,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 		});
 
 		this.value = newValue;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
@@ -132,7 +132,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 	#renderColumn(column: UmbCollectionColumnConfiguration) {
 		return html`
 			<div class="layout-item" id=${column.alias}>
-				<uui-icon name="icon-navigation"></uui-icon>
+				<uui-icon class="drag-handle" name="icon-grip"></uui-icon>
 
 				<uui-input
 					required
@@ -192,6 +192,14 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 				flex: 0 0 auto;
 				display: flex;
 				justify-content: flex-end;
+			}
+
+			.drag-handle {
+				cursor: grab;
+			}
+
+			.drag-handle:active {
+				cursor: grabbing;
 			}
 		`,
 	];

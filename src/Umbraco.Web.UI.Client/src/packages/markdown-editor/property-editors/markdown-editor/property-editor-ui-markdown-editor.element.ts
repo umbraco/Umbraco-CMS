@@ -1,7 +1,6 @@
 import type { UmbInputMarkdownElement } from '../../components/input-markdown-editor/index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -9,6 +8,7 @@ import type {
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 import '../../components/input-markdown-editor/index.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-markdown-editor
@@ -42,7 +42,7 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 
 	#onChange(event: Event & { target: UmbInputMarkdownElement }) {
 		this.value = event.target.value as string;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

@@ -23,10 +23,10 @@ export const Div = Node.create<DivOptions>({
 	},
 
 	parseHTML() {
-		return [{ tag: 'div' }];
+		return [{ tag: this.name }];
 	},
 
 	renderHTML({ HTMLAttributes }) {
-		return ['div', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+		return [this.name, mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
 	},
 });

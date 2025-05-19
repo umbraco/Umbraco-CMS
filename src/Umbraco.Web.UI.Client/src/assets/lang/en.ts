@@ -317,9 +317,6 @@ export default {
 		removeTextBox: 'Remove this text box',
 		contentRoot: 'Content root',
 		includeUnpublished: 'Include unpublished content items.',
-		forceRepublish: 'Publish unchanged items.',
-		forceRepublishWarning: 'WARNING: Publishing all pages below this one in the content tree, whether or not they have changed, can be an expensive and long-running operation.',
-		forceRepublishAdvisory: 'This should not be necessary in normal circumstances so please only proceed with this option selected if you are certain it is required.',
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your\n      website administrator.\n    ',
 		isSensitiveValue_short: 'This value is hidden.',
@@ -377,8 +374,6 @@ export default {
 		fileSecurityValidationFailure: 'One or more file security validations have failed',
 		moveToSameFolderFailed: 'Parent and destination folders cannot be the same',
 		uploadNotAllowed: 'Upload is not allowed in this location.',
-		noticeExtensionsServerOverride:
-			'Regardless of the allowed file types, the following limitations apply system-wide due to the server configuration:',
 	},
 	member: {
 		'2fa': 'Two-Factor Authentication',
@@ -625,13 +620,15 @@ export default {
 	},
 	dictionary: {
 		importDictionaryItemHelp:
-			'\n      To import a dictionary item, find the ".udt" file on your computer by clicking the\n      "Import" button (you\'ll be asked for confirmation on the next screen)\n    ',
+			'To import a dictionary item, find the ".udt" file on your computer by clicking the "Add" button (you\'ll be asked for confirmation on the next screen).',
 		itemDoesNotExists: 'Dictionary item does not exist.',
 		parentDoesNotExists: 'Parent item does not exist.',
 		noItems: 'There are no dictionary items.',
 		noItemsInFile: 'There are no dictionary items in this file.',
 		noItemsFound: 'There were no dictionary items found.',
 		createNew: 'Create dictionary item',
+		pickFile: 'Select file',
+		pickFileRequired: 'Please select a ".udt" file',
 	},
 	dictionaryItem: {
 		description: "Edit the different language versions for the dictionary item '%0%' below",
@@ -902,7 +899,6 @@ export default {
 		retrieve: 'Retrieve',
 		retry: 'Retry',
 		rights: 'Permissions',
-		serverConfiguration: 'Server Configuration',
 		scheduledPublishing: 'Scheduled Publishing',
 		umbracoInfo: 'Umbraco info',
 		search: 'Search',
@@ -1279,6 +1275,11 @@ export default {
 		defineRootNode: 'Pick root node',
 		defineXPathOrigin: 'Specify via XPath',
 		defineDynamicRoot: 'Specify a Dynamic Root',
+		unsupportedHeadline: (type?: string) =>
+			`<strong>Unsupported ${type ?? 'content'} items</strong><br>The following content is no longer supported in this Editor.`,
+		unsupportedMessage:
+			'If you still require this content, please contact your administrator. Otherwise you can remove it.',
+		unsupportedRemove: 'Remove unsupported items?',
 	},
 	dynamicRoot: {
 		configurationTitle: 'Dynamic Root Query',
@@ -1591,6 +1592,7 @@ export default {
 			'\n            If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is shown.\n    ',
 		queryBuilder: 'Query builder',
 		itemsReturned: 'items returned, in',
+		publishedItemsReturned: 'Currently %0% published items returned, in %1% ms',
 		iWant: 'I want',
 		allContent: 'all content',
 		contentOfType: 'content of type "%0%"',
@@ -1734,11 +1736,13 @@ export default {
 		compositionUsageHeading: 'Where is this composition used?',
 		compositionUsageSpecification:
 			'This composition is currently used in the composition of the following\n      Content Types:\n    ',
-		variantsHeading: 'Allow variations',
+		variantsHeading: 'Variation',
 		cultureVariantHeading: 'Allow vary by culture',
 		segmentVariantHeading: 'Allow segmentation',
+		cultureInvariantLabel: 'Shared across cultures',
+		segmentInvariantLabel: 'Shared across segments',
 		cultureVariantLabel: 'Vary by culture',
-		segmentVariantLabel: 'Vary by segments',
+		segmentVariantLabel: 'Vary by segment',
 		variantsDescription: 'Allow editors to create content of this type in different languages.',
 		cultureVariantDescription: 'Allow editors to create content of different languages.',
 		segmentVariantDescription: 'Allow editors to create segments of this content.',
@@ -2164,7 +2168,7 @@ export default {
 		invalidPattern: 'Value is invalid, it does not match the correct pattern',
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
-		entriesExceed: 'Maximum %0% entries, <strong>%1%</strong> too many.',
+		entriesExceed: 'Maximum %0% entries, you have entered <strong>%1%</strong> too many.',
 		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
 		invalidMemberGroupName: 'Invalid member group name',
 		invalidUserGroupName: 'Invalid user group name',
@@ -2654,6 +2658,8 @@ export default {
 		unsupportedBlockName: 'Unsupported',
 		unsupportedBlockDescription:
 			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',
+		blockVariantConfigurationNotSupported:
+			'One or more Block Types of this Block Editor is using a Element-Type that is configured to Vary By Culture or Vary By Segment. This is not supported on a Content item that does not vary by Culture or Segment.',
 	},
 	contentTemplatesDashboard: {
 		whatHeadline: 'What are Document Blueprints?',
@@ -2700,7 +2706,7 @@ export default {
 		consentForAnalytics: 'Consent for telemetry data',
 		analyticsLevelSavedSuccess: 'Telemetry level saved!',
 		analyticsDescription:
-			'In order to improve Umbraco and add new functionality based on as relevant information as possible,\n<br>we would like to collect system- and usage information from your installation.\n<br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n<br>Hopefully, you will help us collect some valuable data.\n<br>\n<br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.',
+			'In order to improve Umbraco and add new functionality based on as relevant information as possible, we would like to collect system- and usage information from your installation.\n<br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n<br>Hopefully, you will help us collect some valuable data.\n<br>\n<br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.',
 		minimalLevelDescription: 'We will only send an anonymized site ID to let us know that the site exists.',
 		basicLevelDescription: 'We will send an anonymized site ID, Umbraco version, and packages installed',
 		detailedLevelDescription:
@@ -2735,14 +2741,19 @@ export default {
 		config_overlaySize_description: 'Select the width of the overlay (link picker).',
 	},
 	tiptap: {
+		anchor: 'Anchor',
+		anchor_input: 'Enter an anchor ID',
 		config_dimensions_description: 'Set the maximum width and height of the editor. This excludes the toolbar height.',
 		config_extensions: 'Capabilities',
+		config_statusbar: 'Statusbar',
 		config_toolbar: 'Toolbar',
 		extGroup_formatting: 'Text formatting',
 		extGroup_interactive: 'Interactive elements',
 		extGroup_media: 'Embeds and media',
 		extGroup_structure: 'Content structure',
 		extGroup_unknown: 'Uncategorized',
+		statusbar_availableItems: 'Available statuses',
+		statusbar_availableItemsEmpty: 'There are no statusbar extensions to show',
 		toobar_availableItems: 'Available actions',
 		toobar_availableItemsEmpty: 'There are no toolbar extensions to show',
 		toolbar_designer: 'Toolbar designer',
@@ -2754,6 +2765,15 @@ export default {
 		toolbar_removeItem: 'Remove action',
 		toolbar_emptyGroup: 'Empty',
 		sourceCodeEdit: 'Edit source code',
+		charmap: 'Character map',
+		charmap_headline: 'Special character',
+		charmap_currency: 'Currency',
+		charmap_text: 'Text',
+		charmap_quotations: 'Quotations',
+		charmap_maths: 'Mathematical',
+		charmap_extlatin: 'Extended Latin',
+		charmap_symbols: 'Symbols',
+		charmap_arrows: 'Arrows',
 	},
 	linkPicker: {
 		modalSource: 'Source',

@@ -1,18 +1,40 @@
-import { CellSelection, TableMap } from '@tiptap/pm/tables';
-import { Decoration, DecorationSet } from '@tiptap/pm/view';
-import { EditorState } from '@tiptap/pm/state';
-import { EditorView } from '@tiptap/pm/view';
-import { findParentNode, mergeAttributes, Editor, Node } from '@tiptap/core';
-import { Node as PMNode, ResolvedPos } from '@tiptap/pm/model';
-import { Plugin } from '@tiptap/pm/state';
-import { Selection, Transaction } from '@tiptap/pm/state';
+import { UmbBubbleMenuPlugin } from './tiptap-umb-bubble-menu.extension.js';
+import { CellSelection, TableMap, TableView } from '@tiptap/pm/tables';
+import { Decoration, DecorationSet, EditorView } from '@tiptap/pm/view';
+import { EditorState, Plugin, Selection, Transaction } from '@tiptap/pm/state';
+import { findParentNode, Editor } from '@tiptap/core';
+import { Node as ProseMirrorNode, ResolvedPos } from '@tiptap/pm/model';
 import { Table } from '@tiptap/extension-table';
 import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
 import { TableRow } from '@tiptap/extension-table-row';
 import type { Rect } from '@tiptap/pm/tables';
 
-export const UmbTable = Table.configure({ resizable: true });
+// NOTE: Custom TableView, to allow for custom styles to be applied to the <table> element. [LK]
+// ref: https://github.com/ueberdosis/tiptap/blob/v2.11.5/packages/extension-table/src/TableView.ts
+export class UmbTableView extends TableView {
+	constructor(node: ProseMirrorNode, cellMinWidth: number) {
+		super(node, cellMinWidth);
+		this.#updateTableStyle(node);
+	}
+
+	override update(node: ProseMirrorNode): boolean {
+		if (!super.update(node)) return false;
+		this.#updateTableStyle(node);
+		return true;
+	}
+
+	#updateTableStyle(node: ProseMirrorNode) {
+		if (node.attrs.style) {
+			// NOTE: The `min-width` inline style is handled by the Tiptap TableView, so we need to preserve it. [LK]
+			const minWidth = this.table.style.minWidth;
+			const styles = node.attrs.style as string;
+			this.table.style.cssText = `${styles}; min-width: ${minWidth};`;
+		}
+	}
+}
+
+export const UmbTable = Table.configure({ resizable: true, View: UmbTableView });
 
 export const UmbTableRow = TableRow.extend({
 	allowGapCursor: false,
@@ -43,7 +65,16 @@ export const UmbTableHeader = TableHeader.extend({
 	},
 
 	addProseMirrorPlugins() {
+		const { editor } = this;
 		return [
+			UmbBubbleMenuPlugin(this.editor, {
+				unique: 'table-column-menu',
+				placement: 'top',
+				elementName: 'umb-tiptap-table-column-menu',
+				shouldShow(props) {
+					return isColumnGripSelected(props);
+				},
+			}),
 			new Plugin({
 				props: {
 					decorations: (state) => {
@@ -62,16 +93,16 @@ export const UmbTableHeader = TableHeader.extend({
 								decorations.push(
 									Decoration.widget(pos + 1, () => {
 										const colSelected = isColumnSelected(index)(selection);
-										const className = colSelected ? 'grip-column selected' : 'grip-column';
 
 										const grip = document.createElement('a');
 										grip.appendChild(document.createElement('uui-symbol-more'));
 
-										grip.className = className;
+										grip.className = colSelected ? 'grip-column selected' : 'grip-column';
+										grip.setAttribute('popovertarget', colSelected ? 'table-column-menu' : '');
+
 										grip.addEventListener('mousedown', (event) => {
 											event.preventDefault();
 											event.stopImmediatePropagation();
-
 											this.editor.view.dispatch(selectColumn(index)(this.editor.state.tr));
 										});
 
@@ -126,7 +157,16 @@ export const UmbTableCell = TableCell.extend({
 	},
 
 	addProseMirrorPlugins() {
+		const { editor } = this;
 		return [
+			UmbBubbleMenuPlugin(this.editor, {
+				unique: 'table-row-menu',
+				placement: 'left',
+				elementName: 'umb-tiptap-table-row-menu',
+				shouldShow(props) {
+					return isRowGripSelected(props);
+				},
+			}),
 			new Plugin({
 				props: {
 					decorations: (state) => {
@@ -145,12 +185,13 @@ export const UmbTableCell = TableCell.extend({
 								decorations.push(
 									Decoration.widget(pos + 1, () => {
 										const rowSelected = isRowSelected(index)(selection);
-										const className = rowSelected ? 'grip-row selected' : 'grip-row';
 
 										const grip = document.createElement('a');
 										grip.appendChild(document.createElement('uui-symbol-more'));
 
-										grip.className = className;
+										grip.className = rowSelected ? 'grip-row selected' : 'grip-row';
+										grip.setAttribute('popovertarget', rowSelected ? 'table-row-menu' : '');
+
 										grip.addEventListener('mousedown', (event) => {
 											event.preventDefault();
 											event.stopImmediatePropagation();
@@ -267,7 +308,7 @@ const getCellsInColumn = (columnIndex: number | number[]) => (selection: Selecti
 
 				return acc;
 			},
-			[] as { pos: number; start: number; node: PMNode | null | undefined }[],
+			[] as { pos: number; start: number; node: ProseMirrorNode | null | undefined }[],
 		);
 	}
 	return null;
@@ -301,7 +342,7 @@ const getCellsInRow = (rowIndex: number | number[]) => (selection: Selection) =>
 
 				return acc;
 			},
-			[] as { pos: number; start: number; node: PMNode | null | undefined }[],
+			[] as { pos: number; start: number; node: ProseMirrorNode | null | undefined }[],
 		);
 	}
 
@@ -331,7 +372,7 @@ const getCellsInTable = (selection: Selection) => {
 	return null;
 };
 
-const findParentNodeClosestToPos = ($pos: ResolvedPos, predicate: (node: PMNode) => boolean) => {
+const findParentNodeClosestToPos = ($pos: ResolvedPos, predicate: (node: ProseMirrorNode) => boolean) => {
 	for (let i = $pos.depth; i > 0; i -= 1) {
 		const node = $pos.node(i);
 
@@ -349,7 +390,7 @@ const findParentNodeClosestToPos = ($pos: ResolvedPos, predicate: (node: PMNode)
 };
 
 const findCellClosestToPos = ($pos: ResolvedPos) => {
-	const predicate = (node: PMNode) => node.type.spec.tableRole && /cell/i.test(node.type.spec.tableRole);
+	const predicate = (node: ProseMirrorNode) => node.type.spec.tableRole && /cell/i.test(node.type.spec.tableRole);
 
 	return findParentNodeClosestToPos($pos, predicate);
 };
@@ -449,7 +490,7 @@ const isColumnGripSelected = ({
 	return !!gripColumn;
 };
 
-export const isRowGripSelected = ({
+const isRowGripSelected = ({
 	editor,
 	view,
 	state,

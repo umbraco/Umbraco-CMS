@@ -26,6 +26,10 @@ public class RelationServiceTests : UmbracoIntegrationTest
 
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
+    private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
+
+    private IMemberService MemberService => GetRequiredService<IMemberService>();
+
     private IRelationService RelationService => GetRequiredService<IRelationService>();
 
     [Test]
@@ -109,6 +113,39 @@ public class RelationServiceTests : UmbracoIntegrationTest
 
         var relations = RelationService.GetByChildId(m1.Id, Constants.Conventions.RelationTypes.RelatedMediaAlias)
             .ToList();
+        Assert.AreEqual(6, relations.Count);
+
+        var entities = RelationService.GetParentEntitiesFromRelations(relations).ToList();
+        Assert.AreEqual(6, entities.Count);
+    }
+
+    [Test]
+    public void Return_List_Of_Content_Items_Where_Member_Item_Referenced()
+    {
+        var memberType = MemberTypeBuilder.CreateSimpleMemberType("testMemberType", "Test Member Type");
+        MemberTypeService.Save(memberType);
+        var member = MemberBuilder.CreateSimpleMember(memberType, "Test Member", "test@test.com", "xxxxxxxx", "testMember");
+        MemberService.Save(member);
+
+        var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest");
+        ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
+        ContentTypeService.Save(ct);
+
+        void CreateContentWithMemberRefs()
+        {
+            var content = ContentBuilder.CreateTextpageContent(ct, "my content 2", -1);
+
+            // 'bodyText' is a property with a RTE property editor which we knows automatically tracks relations
+            content.Properties["bodyText"].SetValue(@"<div data-udi='umb://member/" + member.Key.ToString("N") + @"'></div>");
+            ContentService.Save(content);
+        }
+
+        for (var i = 0; i < 6; i++)
+        {
+            CreateContentWithMemberRefs(); // create 6 content items referencing the same member
+        }
+
+        var relations = RelationService.GetByChildId(member.Id, Constants.Conventions.RelationTypes.RelatedMemberAlias).ToList();
         Assert.AreEqual(6, relations.Count);
 
         var entities = RelationService.GetParentEntitiesFromRelations(relations).ToList();

@@ -38,7 +38,7 @@ public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOpera
                                 Type = ReferenceType.SecurityScheme,
                                 Id = ManagementApiConfiguration.ApiSecurityName
                             }
-                        }, new string[] { }
+                        }, []
                     }
                 }
             };

@@ -49,8 +49,11 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 
 		oldModals.forEach((modal) => {
 			// TODO: I would not think this works as expected, the callback method has to be the exact same instance as the one added: [NL]
-			this._modalElementMap.get(modal.key)?.removeEventListener('close-end', this.#onCloseEnd.bind(this, modal.key));
+			const modalElement = this._modalElementMap.get(modal.key);
+			modalElement?.removeEventListener('close-end', this.#onCloseEnd.bind(this, modal.key));
+			modalElement?.destroy();
 			this._modalElementMap.delete(modal.key);
+			modal.destroy();
 		});
 
 		if (this._modals.length === 0) {

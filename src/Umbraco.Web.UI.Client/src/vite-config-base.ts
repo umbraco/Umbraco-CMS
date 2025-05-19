@@ -15,6 +15,7 @@ export const getDefaultConfig = (args: UmbViteDefaultConfigArgs): UserConfig => 
 				formats: ['es'],
 			},
 			outDir: args.dist,
+			emptyOutDir: true,
 			sourcemap: true,
 			rollupOptions: {
 				external: [/^@umbraco/],

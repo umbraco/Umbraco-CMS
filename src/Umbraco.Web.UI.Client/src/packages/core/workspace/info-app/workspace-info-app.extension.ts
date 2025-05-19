@@ -4,11 +4,11 @@ export interface UmbWorkspaceInfoAppElement extends HTMLElement {
 	manifest?: ManifestWorkspaceInfoApp;
 }
 
-export interface ManifestWorkspaceInfoApp
+export interface ManifestWorkspaceInfoApp<MetaType extends MetaWorkspaceInfoApp = MetaWorkspaceInfoApp>
 	extends ManifestElement<UmbWorkspaceInfoAppElement>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'workspaceInfoApp';
-	meta: MetaWorkspaceInfoApp;
+	meta: MetaType;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

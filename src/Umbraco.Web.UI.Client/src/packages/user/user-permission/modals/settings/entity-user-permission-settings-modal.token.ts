@@ -4,6 +4,7 @@ export interface UmbEntityUserPermissionSettingsModalData {
 	unique: string;
 	entityType: string;
 	headline?: string;
+	preset?: UmbEntityUserPermissionSettingsModalValue;
 }
 
 export type UmbEntityUserPermissionSettingsModalValue = {

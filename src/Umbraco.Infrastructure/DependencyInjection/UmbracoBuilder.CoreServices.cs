@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
@@ -43,7 +44,6 @@ using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HealthChecks;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Mail;
 using Umbraco.Cms.Infrastructure.Mail.Interfaces;
@@ -227,8 +227,13 @@ public static partial class UmbracoBuilderExtensions
 
         builder.AddInstaller();
 
-        // Services required to run background jobs (with out the handler)
-        builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+        // Services required to run background jobs
+        // We can simplify this registration once the obsolete IBackgroundTaskQueue is removed.
+        builder.Services.AddSingleton<HostedServices.BackgroundTaskQueue>();
+        builder.Services.AddSingleton<IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
+#pragma warning disable CS0618 // Type or member is obsolete
+        builder.Services.AddSingleton<HostedServices.IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
+#pragma warning restore CS0618 // Type or member is obsolete
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
 

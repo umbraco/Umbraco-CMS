@@ -173,7 +173,8 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 					? html`
 							<uui-box class="${this._hasProperties ? '' : 'opaque'}">
 								<umb-content-type-design-editor-properties
-									.containerId=${this.containerId}></umb-content-type-design-editor-properties>
+									.containerId=${this.containerId}
+									.editContentTypePath=${this._editContentTypePath}></umb-content-type-design-editor-properties>
 							</uui-box>
 						`
 					: nothing
@@ -188,7 +189,9 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 								?sort-mode-active=${this._sortModeActive}
 								.editContentTypePath=${this._editContentTypePath}
 								.group=${group}
-								.groupStructureHelper=${this.#groupStructureHelper as any}>
+								.groupStructureHelper=${this.#groupStructureHelper as any}
+								data-umb-group-id=${group.id}
+								data-mark="group:${group.name}">
 							</umb-content-type-design-editor-group>
 						`,
 					)}

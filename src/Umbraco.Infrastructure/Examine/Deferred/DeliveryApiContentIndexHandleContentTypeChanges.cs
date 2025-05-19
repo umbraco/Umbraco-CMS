@@ -1,13 +1,12 @@
-﻿using Examine;
+using Examine;
 using Examine.Search;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine.Deferred;

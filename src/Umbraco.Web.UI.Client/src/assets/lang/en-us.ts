@@ -320,9 +320,6 @@ export default {
 		removeTextBox: 'Remove this text box',
 		contentRoot: 'Content root',
 		includeUnpublished: 'Include unpublished content items.',
-		forceRepublish: 'Publish unchanged items.',
-		forceRepublishWarning: 'WARNING: Publishing all pages below this one in the content tree, whether or not they have changed, can be an expensive and long-running operation.',
-		forceRepublishAdvisory: 'This should not be necessary in normal circumstances so please only proceed with this option selected if you are certain it is required.',
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your\n      website administrator.\n    ',
 		isSensitiveValue_short: 'This value is hidden.',
@@ -623,13 +620,15 @@ export default {
 	},
 	dictionary: {
 		importDictionaryItemHelp:
-			'\n      To import a dictionary item, find the ".udt" file on your computer by clicking the\n      "Import" button (you\'ll be asked for confirmation on the next screen)\n    ',
+			'To import a dictionary item, find the ".udt" file on your computer by clicking the "Add" button (you\'ll be asked for confirmation on the next screen).',
 		itemDoesNotExists: 'Dictionary item does not exist.',
 		parentDoesNotExists: 'Parent item does not exist.',
 		noItems: 'There are no dictionary items.',
 		noItemsInFile: 'There are no dictionary items in this file.',
 		noItemsFound: 'There were no dictionary items found.',
 		createNew: 'Create dictionary item',
+		pickFile: 'Select file',
+		pickFileRequired: 'Please select a ".udt" file',
 	},
 	dictionaryItem: {
 		description: "Edit the different language versions for the dictionary item '%0%' below",
@@ -1248,7 +1247,8 @@ export default {
 		colorsTitle: 'Colors',
 		colorsDescription: 'Add, remove or sort colors',
 		showLabelTitle: 'Include labels?',
-		showLabelDescription: 'Stores colors as a JSON object containing both the color hex string and label, rather than just the hex string.',
+		showLabelDescription:
+			'Stores colors as a JSON object containing both the color hex string and label, rather than just the hex string.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
@@ -1705,16 +1705,6 @@ export default {
 		compositionUsageHeading: 'Where is this composition used?',
 		compositionUsageSpecification:
 			'This composition is currently used in the composition of the following\n      Content Types:\n    ',
-		variantsHeading: 'Allow variations',
-		cultureVariantHeading: 'Allow vary by culture',
-		segmentVariantHeading: 'Allow segmentation',
-		cultureVariantLabel: 'Vary by culture',
-		segmentVariantLabel: 'Vary by segments',
-		variantsDescription: 'Allow editors to create content of this type in different languages.',
-		cultureVariantDescription: 'Allow editors to create content of different languages.',
-		segmentVariantDescription: 'Allow editors to create segments of this content.',
-		allowVaryByCulture: 'Allow varying by culture',
-		allowVaryBySegment: 'Allow segmentation',
 		elementType: 'Element Type',
 		elementHeading: 'Is an Element Type',
 		elementDescription:
@@ -2107,7 +2097,7 @@ export default {
 		duplicateUsername: "Username '%0%' is already taken",
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
-		entriesExceed: 'Maximum %0% entries, <strong>%1%</strong> too many.',
+		entriesExceed: 'Maximum %0% entries, you have entered <strong>%1%</strong> too many.',
 		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
 	},
 	healthcheck: {
@@ -2613,7 +2603,7 @@ export default {
 		consentForAnalytics: 'Consent for telemetry data',
 		analyticsLevelSavedSuccess: 'Telemetry level saved!',
 		analyticsDescription:
-			'\n      In order to improve Umbraco and add new functionality based on as relevant information as possible,\n          <br>we would like to collect system- and usage information from your installation.\n          <br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n          <br>Hopefully, you will help us collect some valuable data.\n          <br>\n          <br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.\n       ',
+		'In order to improve Umbraco and add new functionality based on as relevant information as possible, we would like to collect system- and usage information from your installation.\n<br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n<br>Hopefully, you will help us collect some valuable data.\n<br>\n<br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.',
 		minimalLevelDescription: 'We will only send an anonymized site ID to let us know that the site exists.',
 		basicLevelDescription: 'We will send an anonymized site ID, Umbraco version, and packages installed',
 		detailedLevelDescription:

@@ -1,13 +1,13 @@
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
-import {
-	type UmbPropertyEditorUiElement,
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
+import type {
+	UmbPropertyEditorUiElement,
+	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbBlockGridTypeGroupType } from '@umbraco-cms/backoffice/block-grid';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-property-editor-ui-block-grid-group-configuration')
 export class UmbPropertyEditorUIBlockGridGroupConfigurationElement
@@ -28,7 +28,7 @@ export class UmbPropertyEditorUIBlockGridGroupConfigurationElement
 
 	#addGroup() {
 		this.value = [...this._value, { name: 'Unnamed group', key: UmbId.new() }];
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

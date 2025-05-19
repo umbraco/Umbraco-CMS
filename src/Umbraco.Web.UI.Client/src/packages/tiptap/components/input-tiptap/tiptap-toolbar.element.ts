@@ -33,6 +33,7 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 		this.#attached = true;
 		this.#observeExtensions();
 	}
+
 	override disconnectedCallback(): void {
 		this.#attached = false;
 		this.#extensionsController?.destroy();
@@ -51,11 +52,16 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			[],
 			(manifest) => this.toolbar.flat(2).includes(manifest.alias),
 			(extensionControllers) => {
-				this._lookup = new Map(extensionControllers.map((ext) => [ext.alias, ext.component]));
+				this._lookup = new Map(
+					extensionControllers.map((ext) => {
+						(ext.component as HTMLElement)?.setAttribute('data-mark', `action:tiptap-toolbar:${ext.alias}`);
+						return [ext.alias, ext.component];
+					}),
+				);
 			},
 			undefined,
 			undefined,
-			() => import('../toolbar/default-tiptap-toolbar-element.api.js'),
+			() => import('../toolbar/default-tiptap-toolbar-api.js'),
 		);
 
 		this.#extensionsController.apiProperties = { configuration: this.configuration };
@@ -63,19 +69,19 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`
-			${map(
-				this.toolbar,
-				(row) => html`
-					<div class="row">
-						${map(
-							row,
-							(group) => html`<div class="group">${map(group, (alias) => this._lookup?.get(alias) ?? nothing)}</div>`,
-						)}
-					</div>
-				`,
-			)}
-		`;
+		if (!this.toolbar.flat(2).length) return nothing;
+
+		return map(
+			this.toolbar,
+			(row) => html`
+				<div class="row">
+					${map(
+						row,
+						(group) => html`<div class="group">${map(group, (alias) => this._lookup?.get(alias) ?? nothing)}</div>`,
+					)}
+				</div>
+			`,
+		);
 	}
 
 	static override readonly styles = css`

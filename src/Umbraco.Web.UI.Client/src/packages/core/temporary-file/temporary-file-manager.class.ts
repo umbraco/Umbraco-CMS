@@ -11,6 +11,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { formatBytes } from '@umbraco-cms/backoffice/utils';
+import { isCancelError } from '@umbraco-cms/backoffice/resources';
 
 export class UmbTemporaryFileManager<
 	UploadableItem extends UmbTemporaryFileModel = UmbTemporaryFileModel,
@@ -21,6 +22,15 @@ export class UmbTemporaryFileManager<
 
 	readonly #queue = new UmbArrayState<UploadableItem>([], (item) => item.temporaryUnique);
 	public readonly queue = this.#queue.asObservable();
+
+	/**
+	 * Gets the temporary file configuration.
+	 * @returns {Promise<UmbTemporaryFileConfigRepository>} The temporary file configuration.
+	 */
+	async getConfiguration(): Promise<UmbTemporaryFileConfigRepository> {
+		await this.#temporaryFileConfigRepository.initialized;
+		return this.#temporaryFileConfigRepository;
+	}
 
 	async uploadOne(uploadableItem: UploadableItem, options?: UmbUploadOptions<UploadableItem>): Promise<UploadableItem> {
 		this.#queue.setValue([]);
@@ -53,6 +63,10 @@ export class UmbTemporaryFileManager<
 		this.#queue.remove(uniques);
 	}
 
+	removeAll() {
+		this.#queue.setValue([]);
+	}
+
 	async #handleQueue(options?: UmbUploadOptions<UploadableItem>): Promise<Array<UploadableItem>> {
 		const filesCompleted: Array<UploadableItem> = [];
 		const queue = this.#queue.getValue();
@@ -78,7 +92,8 @@ export class UmbTemporaryFileManager<
 	}
 
 	async #validateItem(item: UploadableItem): Promise<boolean> {
-		let maxFileSize = await this.observe(this.#temporaryFileConfigRepository.part('maxFileSize')).asPromise();
+		const config = await this.getConfiguration();
+		let maxFileSize = await this.observe(config.part('maxFileSize')).asPromise();
 		if (maxFileSize) {
 			// Convert from kilobytes to bytes
 			maxFileSize *= 1024;
@@ -142,9 +157,15 @@ export class UmbTemporaryFileManager<
 				// Update progress in percent if a callback is provided
 				if (item.onProgress) item.onProgress((evt.loaded / evt.total) * 100);
 			},
-			item.abortSignal,
+			item.abortController?.signal ?? item.abortSignal,
 		);
-		const status = error ? TemporaryFileStatus.ERROR : TemporaryFileStatus.SUCCESS;
+		let status = TemporaryFileStatus.SUCCESS;
+		if (error) {
+			status = TemporaryFileStatus.ERROR;
+			if (isCancelError(error)) {
+				status = TemporaryFileStatus.CANCELLED;
+			}
+		}
 
 		this.#queue.updateOne(item.temporaryUnique, { ...item, status });
 		return { ...item, status };

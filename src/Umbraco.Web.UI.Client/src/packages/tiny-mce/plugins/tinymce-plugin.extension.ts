@@ -28,9 +28,10 @@ export interface MetaTinyMcePlugin {
 	}>;
 
 	/**
-	 * Sets the default configuration for the TinyMCE editor. This configuration will be used when the editor is initialized.
-	 * @see [TinyMCE Configuration](https://www.tiny.cloud/docs/configure/) for more information.
+	 * @title Sets the default configuration for the TinyMCE editor.
+	 * @description This configuration will be used when the editor is initialized. See the [TinyMCE Configuration](https://www.tiny.cloud/docs/configure/) for more information.
 	 * @optional
+	 * @TJS-type object
 	 * @examples [
 	 * {
 	 *   "plugins": "wordcount",

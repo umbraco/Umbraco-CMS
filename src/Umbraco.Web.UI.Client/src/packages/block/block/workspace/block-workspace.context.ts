@@ -16,7 +16,7 @@ import {
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_DISCARD_CHANGES_MODAL, UMB_MODAL_CONTEXT, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { decodeFilePath, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import {
 	UMB_BLOCK_ENTRIES_CONTEXT,
@@ -80,6 +80,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		super(host, workspaceArgs.manifest.alias);
 		const manifest = workspaceArgs.manifest;
 		this.#entityType = manifest.meta?.entityType;
+
+		window.addEventListener('willchangestate', this.#onWillNavigate);
 
 		this.addValidationContext(this.content.validation);
 		this.addValidationContext(this.settings.validation);
@@ -223,6 +225,51 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		);
 	}
 
+	#allowNavigateAway = false;
+	#onWillNavigate = async (e: CustomEvent) => {
+		const newUrl = e.detail.url;
+
+		if (this.#allowNavigateAway) {
+			return true;
+		}
+
+		if (this._checkWillNavigateAway(newUrl) && this.getHasUnpersistedChanges()) {
+			/* Since ours modals are async while events are synchronous, we need to prevent the default behavior of the event, even if the modal hasn’t been resolved yet.
+			Once the modal is resolved (the user accepted to discard the changes and navigate away from the route), we will push a new history state.
+			This push will make the "willchangestate" event happen again and due to this somewhat "backward" behavior,
+			we set an "allowNavigateAway"-flag to prevent the "discard-changes" functionality from running in a loop.*/
+			e.preventDefault();
+			const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT).catch(() => undefined);
+			const modal = modalManager?.open(this, UMB_DISCARD_CHANGES_MODAL);
+			if (modal) {
+				try {
+					// navigate to the new url when discarding changes
+					await modal.onSubmit();
+					this.#allowNavigateAway = true;
+					history.pushState({}, '', e.detail.url);
+					return true;
+				} catch {
+					return false;
+				}
+			} else {
+				console.error('No modal manager found!');
+			}
+		}
+
+		return true;
+	};
+
+	/**
+	 * Check if the workspace is about to navigate away.
+	 * @protected
+	 * @param {string} newUrl The new url that the workspace is navigating to.
+	 * @returns { boolean} true if the workspace is navigating away.
+	 * @memberof UmbEntityWorkspaceContextBase
+	 */
+	protected _checkWillNavigateAway(newUrl: string): boolean {
+		return !newUrl.includes(this.routes.getActiveLocalPath());
+	}
+
 	setEditorSize(editorSize: UUIModalSidebarSize) {
 		this.#modalContext?.setModalSize(editorSize);
 	}
@@ -236,6 +283,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#initialSettings = undefined;
 		this.content.resetState();
 		this.settings.resetState();
+		this.#allowNavigateAway = false;
 		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 	}
 
@@ -425,6 +473,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	/**
+	 * Check if there are unpersisted changes.
+	 * @returns { boolean } true if there are unpersisted changes.
+	 */
+	public getHasUnpersistedChanges(): boolean {
+		return this.content.getHasUnpersistedChanges() || this.settings.getHasUnpersistedChanges();
+	}
+
+	/**
 	 * @function propertyValueByAlias
 	 * @param {string} propertyAlias - The alias of the property to get the value of.
 	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} - The value of the property.
@@ -463,6 +519,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 
 		const settingsData = this.settings.getData();
+		this.content.setPersistedData(contentData);
+		if (settingsData) {
+			this.settings.setPersistedData(settingsData);
+		}
 
 		if (!this.#liveEditingMode) {
 			if (this.getIsNew() === true) {
@@ -486,6 +546,13 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.#expose(layoutData.contentKey);
 		this.setIsNew(false);
+
+		this.#reportValidation();
+	}
+
+	#reportValidation() {
+		this.content.validation.report();
+		this.settings.validation.report();
 	}
 
 	expose() {
@@ -527,6 +594,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	public override destroy(): void {
 		super.destroy();
+		window.removeEventListener('willchangestate', this.#onWillNavigate);
 		this.#layout?.destroy();
 		this.#name?.destroy();
 		this.#layout = undefined as any;

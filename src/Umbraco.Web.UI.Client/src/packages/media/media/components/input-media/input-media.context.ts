@@ -44,7 +44,7 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 			...pickerData?.search?.queryParams,
 		};
 
-		super.openPicker(combinedPickerData);
+		await super.openPicker(combinedPickerData);
 	}
 
 	#pickableFilter = (

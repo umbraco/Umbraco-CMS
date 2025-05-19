@@ -17,7 +17,7 @@ export class UmbTiptapTableInsertElement extends UmbLitElement {
 		this._selectedColumn = column;
 		this._selectedRow = row;
 
-		this.editor?.chain().focus().insertTable({ rows: row, cols: column }).run();
+		this.editor?.chain().focus().insertTable({ rows: row, cols: column, withHeaderRow: false }).run();
 	}
 
 	#onMouseover(column: number, row: number) {

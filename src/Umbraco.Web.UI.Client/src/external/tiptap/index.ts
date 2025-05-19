@@ -8,6 +8,7 @@ export { TextStyle } from '@tiptap/extension-text-style';
 export { Blockquote } from '@tiptap/extension-blockquote';
 export { Bold } from '@tiptap/extension-bold';
 export { BulletList } from '@tiptap/extension-bullet-list';
+export { CharacterCount } from '@tiptap/extension-character-count';
 export { Code } from '@tiptap/extension-code';
 export { CodeBlock } from '@tiptap/extension-code-block';
 export { Heading } from '@tiptap/extension-heading';
@@ -28,13 +29,16 @@ export { TextAlign } from '@tiptap/extension-text-align';
 export { Underline } from '@tiptap/extension-underline';
 
 // CUSTOM EXTENSIONS
+export * from './extensions/tiptap-anchor.extension.js';
 export * from './extensions/tiptap-div.extension.js';
 export * from './extensions/tiptap-figcaption.extension.js';
 export * from './extensions/tiptap-figure.extension.js';
 export * from './extensions/tiptap-span.extension.js';
 export * from './extensions/tiptap-html-global-attributes.extension.js';
 export * from './extensions/tiptap-text-direction-extension.js';
+export * from './extensions/tiptap-text-indent-extension.js';
 export * from './extensions/tiptap-trailing-node.extension.js';
+export * from './extensions/tiptap-umb-bubble-menu.extension.js';
 export * from './extensions/tiptap-umb-embedded-media.extension.js';
 export * from './extensions/tiptap-umb-image.extension.js';
 export * from './extensions/tiptap-umb-link.extension.js';

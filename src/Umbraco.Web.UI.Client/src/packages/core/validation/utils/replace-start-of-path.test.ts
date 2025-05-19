@@ -19,4 +19,10 @@ describe('ReplaceStartOfPath', () => {
 
 		expect(result).to.eq('$');
 	});
+
+	it('replaces the root character with root character', () => {
+		const result = ReplaceStartOfPath('$.start.test', '$', '$');
+
+		expect(result).to.eq('$.start.test');
+	});
 });

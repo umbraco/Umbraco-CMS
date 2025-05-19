@@ -6,6 +6,7 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 export type * from './tiptap.extension.js';
+export type * from './tiptap-statusbar.extension.js';
 export type * from './tiptap-toolbar.extension.js';
 
 export interface UmbTiptapExtensionApi extends UmbApi {

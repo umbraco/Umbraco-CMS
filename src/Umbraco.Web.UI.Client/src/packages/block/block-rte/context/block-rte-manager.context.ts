@@ -1,7 +1,7 @@
 import type { UmbBlockRteWorkspaceOriginData } from '../workspace/block-rte-workspace.modal-token.js';
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
 import type { UmbBlockDataModel } from '../../block/types.js';
-import { UmbBlockManagerContext, type UmbBlockDataObjectModel } from '@umbraco-cms/backoffice/block';
+import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 
 import '../components/block-rte-entry/index.js';
 
@@ -19,6 +19,9 @@ export class UmbBlockRteManagerContext<
 	}
 
 	/**
+	 * @param contentElementTypeKey
+	 * @param partialLayoutEntry
+	 * @param _originData
 	 * @deprecated Use createWithPresets instead. Will be removed in v.17.
 	 */
 	create(
@@ -29,9 +32,8 @@ export class UmbBlockRteManagerContext<
 		// This property is used by some implementations, but not used in this. Do not remove. [NL]
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		_originData?: UmbBlockRteWorkspaceOriginData,
-	) {
+	): never {
 		throw new Error('Method deparecated use createWithPresets');
-		return {} as UmbBlockDataObjectModel<BlockLayoutType>;
 	}
 	async createWithPresets(
 		contentElementTypeKey: string,

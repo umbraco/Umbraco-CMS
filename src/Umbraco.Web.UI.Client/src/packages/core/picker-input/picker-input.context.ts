@@ -115,7 +115,7 @@ export class UmbPickerInputContext<
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',
-			confirmLabel: 'Remove',
+			confirmLabel: '#actions_remove',
 		});
 
 		this.#removeItem(unique);

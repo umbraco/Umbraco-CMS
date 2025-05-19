@@ -1,237 +1,203 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-const dataTypes = ['Media Picker', 'Multiple Media Picker', 'Image Media Picker', 'Multiple Image Media Picker'];
-for (const dataTypeName of dataTypes) {
-  test.describe(`${dataTypeName} tests`, () => {
-    let dataTypeDefaultData = null;
-    let dataTypeData = null;
+const mediaPickerTypes = [
+  {type: 'Media Picker', isMultiple: false},
+  {type: 'Multiple Media Picker', isMultiple: true},
+  {type: 'Image Media Picker', isMultiple: false},
+  {type: 'Multiple Image Media Picker', isMultiple: true},
+];
+const editorAlias = 'Umbraco.MediaPicker3';
+const editorUiAlias = 'Umb.PropertyEditorUi.MediaPicker';
+const customDataTypeName = 'Custom Media Picker';
 
-    test.beforeEach(async ({umbracoUi, umbracoApi}) => {
-      await umbracoUi.goToBackOffice();
-      await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
-      dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
-    });
+test.beforeEach(async ({umbracoUi, umbracoApi}) => {
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+});
 
-    test.afterEach(async ({umbracoApi}) => {
-      if (dataTypeDefaultData !== null) {
-        await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);
-      }
-    });
+test.afterEach(async ({umbracoApi}) => {
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+});
 
-    test('can update pick multiple items', async ({umbracoApi, umbracoUi}) => {
-      // Arrange
-      const expectedDataTypeValues = {
-        "alias": "multiple",
-        "value": dataTypeName === 'Media Picker' || dataTypeName === 'Image Media Picker' ? true : false,
-      };
+test('can update pick multiple items', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.dataType.createDefaultMediaPickerDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
-      // Act
-      await umbracoUi.dataType.goToDataType(dataTypeName);
-      await umbracoUi.dataType.clickPickMultipleItemsSlider();
-      await umbracoUi.dataType.clickSaveButton();
+  // Act
+  await umbracoUi.dataType.clickPickMultipleItemsToggle();
+  await umbracoUi.dataType.clickSaveButton();
 
-      // Assert
-      dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-      expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-    });
+  // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'multiple', true)).toBeTruthy();
+});
 
-    test('can update amount', async ({umbracoApi, umbracoUi}) => {
-      // Arrange
-      const lowValue = 5;
-      const highValue = 1000;
-      const expectedDataTypeValues = {
-        "alias": "validationLimit",
-        "value": {
-          "min": lowValue,
-          "max": highValue
-        }
-      };
+test('can update amount', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const minValue = 5;
+  const maxValue = 1000;
+  await umbracoApi.dataType.createDefaultMediaPickerDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
-      // Act
-      await umbracoUi.dataType.goToDataType(dataTypeName);
-      await umbracoUi.dataType.enterAmountValue(lowValue.toString(), highValue.toString());
-      await umbracoUi.dataType.clickSaveButton();
+  // Act
+  await umbracoUi.dataType.enterAmountValue(minValue.toString(), maxValue.toString());
+  await umbracoUi.dataType.clickSaveButton();
 
-      // Assert
-      dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-      expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-    });
+  // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.dataType.doesMediaPickerHaveMinAndMaxAmount(customDataTypeName, minValue, maxValue)).toBeTruthy();
+});
 
-    test('can update enable focal point', async ({umbracoApi, umbracoUi}) => {
-      // Arrange
-      const expectedDataTypeValues = {
-        "alias": "enableLocalFocalPoint",
-        "value": true
-      };
+test('can update enable focal point', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.dataType.createDefaultMediaPickerDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
-      // Act
-      await umbracoUi.dataType.goToDataType(dataTypeName);
-      await umbracoUi.dataType.clickEnableFocalPointSlider();
-      await umbracoUi.dataType.clickSaveButton();
+  // Act
+  await umbracoUi.dataType.clickEnableFocalPointToggle();
+  await umbracoUi.dataType.clickSaveButton();
 
-      // Assert
-      dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-      expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-    });
+  // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'enableLocalFocalPoint', true)).toBeTruthy();
+});
 
-    test('can add image crop', async ({umbracoApi, umbracoUi}) => {
-      // Arrange
-      const cropData = ['Test Label', 'Test Alias', 100, 50];
-      const expectedDataTypeValues = {
-        "alias": "crops",
-        "value": [
-          {
-            "label": cropData[0],
-            "alias": cropData[1],
-            "width": cropData[2],
-            "height": cropData[3]
-          }
-        ]
-      };
+test('can add image crop', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const cropData = ['Test Label', 'testAlias', 100, 50];
+  await umbracoApi.dataType.createDefaultMediaPickerDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
-      // Act
-      await umbracoUi.dataType.goToDataType(dataTypeName);
-      await umbracoUi.waitForTimeout(500);
-      await umbracoUi.dataType.enterCropValues(
-        cropData[0].toString(),
-        cropData[1].toString(),
-        cropData[2].toString(),
-        cropData[3].toString()
-      );
-      await umbracoUi.waitForTimeout(500);
-      await umbracoUi.dataType.clickAddCropButton();
-      await umbracoUi.dataType.clickSaveButton();
-      await umbracoUi.waitForTimeout(500);
+  // Act
+  await umbracoUi.dataType.enterCropValues(
+    cropData[0].toString(),
+    cropData[1].toString(),
+    cropData[2].toString(),
+    cropData[3].toString()
+  );
+  await umbracoUi.dataType.clickAddCropButton();
+  await umbracoUi.dataType.clickSaveButton();
 
-      // Assert
-      dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-      expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-    });
+  // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropData[0], cropData[1], cropData[2], cropData[3])).toBeTruthy();
+});
 
-    test('can update ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
-      // Arrange
-      const expectedDataTypeValues = {
-        "alias": "ignoreUserStartNodes",
-        "value": true
-      };
+test('can update ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.dataType.createDefaultMediaPickerDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
 
-      // Act
-      await umbracoUi.dataType.goToDataType(dataTypeName);
-      await umbracoUi.dataType.clickIgnoreUserStartNodesSlider();
-      await umbracoUi.dataType.clickSaveButton();
+  // Act
+  await umbracoUi.dataType.clickIgnoreUserStartNodesToggle();
+  await umbracoUi.dataType.clickSaveButton();
 
-      // Assert
-      dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-      expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-    });
+  // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'ignoreUserStartNodes', true)).toBeTruthy();
+});
 
-    test('can add accepted types', async ({umbracoApi, umbracoUi}) => {
-      // Arrange
-      const mediaTypeName = 'Audio';
-      const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+test('can add accepted types', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const mediaTypeName = 'Audio';
+  const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+  await umbracoApi.dataType.createDefaultMediaPickerDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.addAcceptedType(mediaTypeName);
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'filter', mediaTypeData.id)).toBeTruthy();
+});
+
+test('can remove accepted types', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const mediaTypeName = 'Image';
+  const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+  await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.removeAcceptedType(mediaTypeName);
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'filter', mediaTypeData.id)).toBeFalsy();
+});
+
+test('can add start node', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  // Create media
+  const mediaName = 'TestStartNode';
+  const mediaId = await umbracoApi.media.createDefaultMediaWithArticle(mediaName);
+  expect(await umbracoApi.media.doesNameExist(mediaName)).toBeTruthy();
+  await umbracoApi.dataType.createDefaultMediaPickerDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.clickChooseStartNodeButton();
+  await umbracoUi.dataType.addMediaStartNode(mediaName);
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'startNodeId', mediaId)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+});
+
+test('can remove start node', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  // Create media
+  const mediaName = 'TestStartNode';
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+  const mediaId = await umbracoApi.media.createDefaultMediaWithArticle(mediaName);
+  expect(await umbracoApi.media.doesNameExist(mediaName)).toBeTruthy();
+  await umbracoApi.dataType.createImageMediaPickerDataTypeWithStartNodeId(customDataTypeName, mediaId);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.removeMediaStartNode(mediaName);
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'startNodeId', mediaId)).toBeFalsy();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+});
+
+for (const mediaPicker of mediaPickerTypes) {
+  test(`the default configuration of ${mediaPicker.type} is correct`, async ({umbracoApi, umbracoUi}) => {
+    // Act
+    await umbracoUi.dataType.goToDataType(mediaPicker.type);
+
+    // Assert
+    await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.mediaPickerSettings);
+    await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.mediaPickerSettings);
+    await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
+    await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
+    expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'multiple', mediaPicker.isMultiple)).toBeTruthy();
+    if (mediaPicker.type.includes('Image')) {
       const imageTypeData = await umbracoApi.mediaType.getByName('Image');
-      const expectedFilterValue =
-        dataTypeName === "Image Media Picker" ||
-        dataTypeName === "Multiple Image Media Picker"
-          ? imageTypeData.id + "," + mediaTypeData.id
-          : mediaTypeData.id;
-      const expectedDataTypeValues = {
-        "alias": "filter",
-        "value": expectedFilterValue
-      };
-
-      // Act
-      await umbracoUi.dataType.goToDataType(dataTypeName);
-      await umbracoUi.dataType.addAcceptedType(mediaTypeName);
-      await umbracoUi.dataType.clickSaveButton();
-
-      // Assert
-      dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-      expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-    });
-
-    test('can remove accepted types', async ({umbracoApi, umbracoUi}) => {
-      // Arrange
-      const mediaTypeName = 'Audio';
-      const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-      const removedDataTypeValues = [{
-        "alias": "filter",
-        "value": mediaTypeData.id
-      }];
-      const expectedDataTypeValues = [];
-
-      // Remove all existing options and add an option to remove
-      dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-      dataTypeData.values = removedDataTypeValues;
-      await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
-
-      // Act
-      await umbracoUi.dataType.goToDataType(dataTypeName);
-      await umbracoUi.dataType.removeAcceptedType(mediaTypeName);
-      await umbracoUi.dataType.clickSaveButton();
-
-      // Assert
-      dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-      expect(dataTypeData.values).toEqual(expectedDataTypeValues);
-    });
-
-    test('can add start node', async ({umbracoApi, umbracoUi}) => {
-      // Arrange
-      // Create media
-      const mediaName = 'TestStartNode';
-      await umbracoApi.media.ensureNameNotExists(mediaName);
-      const mediaId = await umbracoApi.media.createDefaultMediaWithArticle(mediaName);
-      expect(await umbracoApi.media.doesNameExist(mediaName)).toBeTruthy();
-
-      const expectedDataTypeValues = {
-        "alias": "startNodeId",
-        "value": mediaId
-      };
-
-      // Act
-      await umbracoUi.dataType.goToDataType(dataTypeName);
-      await umbracoUi.dataType.clickChooseStartNodeButton();
-      await umbracoUi.dataType.addMediaStartNode(mediaName);
-      await umbracoUi.dataType.clickSaveButton();
-
-      // Assert
-      dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-      expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-
-      // Clean
-      await umbracoApi.media.ensureNameNotExists(mediaName);
-    });
-
-    test('can remove start node', async ({umbracoApi, umbracoUi}) => {
-      // Arrange
-      // Create media
-      const mediaName = 'TestStartNode';
-      await umbracoApi.media.ensureNameNotExists(mediaName);
-      const mediaId = await umbracoApi.media.createDefaultMediaWithArticle(mediaName);
-      expect(await umbracoApi.media.doesNameExist(mediaName)).toBeTruthy();
-
-      const removedDataTypeValues = [{
-        "alias": "startNodeId",
-        "value": mediaId
-      }];
-
-      // Remove all existing values and add a start node to remove
-      dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-      dataTypeData.values = removedDataTypeValues;
-      await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
-
-      // Act
-      await umbracoUi.dataType.goToDataType(dataTypeName);
-      await umbracoUi.dataType.removeMediaStartNode(mediaName);
-      await umbracoUi.dataType.clickSaveButton();
-
-      // Assert
-      dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-      expect(dataTypeData.values).toEqual([]);
-
-      // Clean
-      await umbracoApi.media.ensureNameNotExists(mediaName);
-    });
+      expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'filter', imageTypeData.id)).toBeTruthy();
+    }
+    if (!mediaPicker.type.includes('Multiple')) {
+      expect(await umbracoApi.dataType.doesMediaPickerHaveMinAndMaxAmount(mediaPicker.type, 0, 1)).toBeTruthy();
+    }
+    expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'startNodeId')).toBeFalsy();
+    expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'ignoreUserStartNodes')).toBeFalsy();
+    expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'crops')).toBeFalsy();
+    expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'enableLocalFocalPoint')).toBeFalsy();
   });
 }

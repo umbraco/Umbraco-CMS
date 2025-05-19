@@ -11,7 +11,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel, LogLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { query } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -27,7 +27,10 @@ export interface LogViewerDateRange {
 }
 
 // TODO: Revisit usage of workspace for this case...
-export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements UmbWorkspaceContext {
+export class UmbLogViewerWorkspaceContext
+	extends UmbContextBase<UmbLogViewerWorkspaceContext, typeof UMB_APP_LOG_VIEWER_CONTEXT>
+	implements UmbWorkspaceContext
+{
 	public readonly workspaceAlias: string = 'Umb.Workspace.LogViewer';
 	#repository: UmbLogViewerRepository;
 
@@ -104,10 +107,9 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 	currentPage = 1;
 
 	constructor(host: UmbControllerHost) {
-		super(host);
+		super(host, UMB_APP_LOG_VIEWER_CONTEXT);
+		// TODO: Revisit usage of workspace for this case... currently no other workspace context provides them self with their own token, we need to update UMB_APP_LOG_VIEWER_CONTEXT to become a workspace context. [NL]
 		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
-		// TODO: Revisit usage of workspace for this case... currently no other workspace context provides them self with their own token.
-		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT, this);
 		this.#repository = new UmbLogViewerRepository(host);
 	}
 

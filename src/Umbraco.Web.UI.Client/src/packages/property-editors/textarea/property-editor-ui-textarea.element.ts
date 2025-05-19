@@ -1,6 +1,5 @@
 import { css, customElement, html, ifDefined, property, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -9,6 +8,7 @@ import type {
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-property-editor-ui-textarea')
 export class UmbPropertyEditorUITextareaElement
@@ -47,35 +47,24 @@ export class UmbPropertyEditorUITextareaElement
 	private _rows?: number;
 
 	@state()
-	private _maxHeight?: number;
-
-	@state()
-	private _minHeight?: number;
-
-	@state()
 	private _css: StyleInfo = {};
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._maxChars = Number(config?.getValueByAlias('maxChars')) || undefined;
 		this._rows = Number(config?.getValueByAlias('rows')) || undefined;
-		this._minHeight = Number(config?.getValueByAlias('minHeight')) || undefined;
-		this._maxHeight = Number(config?.getValueByAlias('maxHeight')) || undefined;
+		// min/max height where for a short period present in the config, but we do not want this complexity of our configuration.
+		// @deprecated remove config option in v.18, leave good default.
+		const _minHeight = Number(config?.getValueByAlias('minHeight')) || undefined;
+		const _maxHeight = Number(config?.getValueByAlias('maxHeight')) || undefined;
 
 		this._css = {
-			'--uui-textarea-min-height': this._minHeight ? `${this._minHeight}px` : 'reset',
-			'--uui-textarea-max-height': this._maxHeight ? `${this._maxHeight}px` : 'reset',
+			'--uui-textarea-min-height': _minHeight ? `${_minHeight}px` : 'reset',
+			'--uui-textarea-max-height': _maxHeight ? `${_maxHeight}px` : '33vh',
 		};
 	}
 
 	protected override firstUpdated(): void {
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-textarea')!);
-
-		if (this._minHeight && this._maxHeight && this._minHeight > this._maxHeight) {
-			console.warn(
-				`Property '${this.name}' (Textarea) has been misconfigured, 'minHeight' is greater than 'maxHeight'. Please correct your data type configuration.`,
-				this,
-			);
-		}
 	}
 
 	override focus() {
@@ -86,7 +75,7 @@ export class UmbPropertyEditorUITextareaElement
 		const newValue = (event.target as HTMLTextAreaElement).value;
 		if (newValue === this.value) return;
 		this.value = newValue;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

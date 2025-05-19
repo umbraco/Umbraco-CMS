@@ -28,7 +28,7 @@ export const Span = Mark.create<SpanOptions>({
 		return {
 			setSpanStyle:
 				(styles) =>
-				({ commands, editor, chain }) => {
+				({ commands, editor }) => {
 					if (!styles) return false;
 
 					const existing = editor.getAttributes(this.name)?.style as string;

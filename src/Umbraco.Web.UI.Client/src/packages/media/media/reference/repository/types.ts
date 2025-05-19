@@ -1,6 +1,5 @@
 import type { UmbMediaItemVariantModel } from '../../repository/item/types.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { TrackedReferenceMediaTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export interface UmbMediaReferenceModel extends UmbEntityModel {
 	/**
@@ -23,6 +22,11 @@ export interface UmbMediaReferenceModel extends UmbEntityModel {
 	 * @memberof UmbMediaReferenceModel
 	 */
 	published?: boolean | null;
-	mediaType: TrackedReferenceMediaTypeModel;
+	mediaType: {
+		alias: string;
+		icon: string;
+		name: string;
+		unique: string;
+	};
 	variants: Array<UmbMediaItemVariantModel>;
 }

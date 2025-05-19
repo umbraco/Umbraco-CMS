@@ -3,6 +3,8 @@ import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { UmbTreeContext } from '../tree-context.interface.js';
 import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
 import type { ManifestTree } from '../extensions/types.js';
+import { UmbTreeExpansionManager } from '../expansion-manager/index.js';
+import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
 import { type UmbActionEventContext, UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -38,9 +40,13 @@ export class UmbDefaultTreeContext<
 	public filter?: (item: TreeItemType) => boolean = () => true;
 	public readonly selection = new UmbSelectionManager(this._host);
 	public readonly pagination = new UmbPaginationManager();
+	public readonly expansion = new UmbTreeExpansionManager(this._host);
 
 	#hideTreeRoot = new UmbBooleanState(false);
 	hideTreeRoot = this.#hideTreeRoot.asObservable();
+
+	#expandTreeRoot = new UmbBooleanState(undefined);
+	expandTreeRoot = this.#expandTreeRoot.asObservable();
 
 	#startNode = new UmbObjectState<UmbTreeStartNode | undefined>(undefined);
 	startNode = this.#startNode.asObservable();
@@ -156,6 +162,10 @@ export class UmbDefaultTreeContext<
 		if (data) {
 			this.#treeRoot.setValue(data);
 			this.pagination.setTotalItems(1);
+
+			if (this.getExpandTreeRoot()) {
+				this.#toggleTreeRootExpansion(true);
+			}
 		}
 	}
 
@@ -275,6 +285,56 @@ export class UmbDefaultTreeContext<
 
 	public getAdditionalRequestArgs() {
 		return this.#additionalRequestArgs.getValue();
+	}
+
+	/**
+	 * Sets the expansion state
+	 * @param {UmbTreeExpansionModel} data - The expansion state
+	 * @returns {void}
+	 * @memberof UmbDefaultTreeContext
+	 */
+	setExpansion(data: UmbTreeExpansionModel): void {
+		this.expansion.setExpansion(data);
+	}
+
+	/**
+	 * Gets the expansion state
+	 * @returns {UmbTreeExpansionModel} - The expansion state
+	 * @memberof UmbDefaultTreeContext
+	 */
+	getExpansion(): UmbTreeExpansionModel {
+		return this.expansion.getExpansion();
+	}
+
+	/**
+	 * Sets the expandTreeRoot config
+	 * @param {boolean} expandTreeRoot - Whether to expand the tree root
+	 * @memberof UmbDefaultTreeContext
+	 */
+	setExpandTreeRoot(expandTreeRoot: boolean) {
+		this.#expandTreeRoot.setValue(expandTreeRoot);
+		this.#toggleTreeRootExpansion(expandTreeRoot);
+	}
+
+	/**
+	 * Gets the expandTreeRoot config
+	 * @returns {boolean | undefined} - Whether to expand the tree root
+	 * @memberof UmbDefaultTreeContext
+	 */
+	getExpandTreeRoot(): boolean | undefined {
+		return this.#expandTreeRoot.getValue();
+	}
+
+	#toggleTreeRootExpansion(expand: boolean) {
+		const treeRoot = this.#treeRoot.getValue();
+		if (!treeRoot) return;
+		const treeRootEntity = { entityType: treeRoot.entityType, unique: treeRoot.unique };
+
+		if (expand) {
+			this.expansion.expandItem(treeRootEntity);
+		} else {
+			this.expansion.collapseItem(treeRootEntity);
+		}
 	}
 
 	#resetTree() {

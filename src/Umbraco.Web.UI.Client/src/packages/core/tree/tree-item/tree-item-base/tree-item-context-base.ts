@@ -19,6 +19,7 @@ import {
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 export abstract class UmbTreeItemContextBase<
 		TreeItemType extends UmbTreeItemModel,
@@ -28,7 +29,7 @@ export abstract class UmbTreeItemContextBase<
 	extends UmbContextBase<UmbTreeItemContext<TreeItemType>>
 	implements UmbTreeItemContext<TreeItemType>
 {
-	public unique?: string | null;
+	public unique?: UmbEntityUnique;
 	public entityType?: string;
 	public readonly pagination = new UmbPaginationManager();
 
@@ -65,6 +66,9 @@ export abstract class UmbTreeItemContextBase<
 
 	#path = new UmbStringState('');
 	readonly path = this.#path.asObservable();
+
+	#isOpen = new UmbBooleanState(false);
+	isOpen = this.#isOpen.asObservable();
 
 	#foldersOnly = new UmbBooleanState(false);
 	readonly foldersOnly = this.#foldersOnly.asObservable();
@@ -212,14 +216,55 @@ export abstract class UmbTreeItemContextBase<
 		});
 	}
 
+	/**
+	 * Selects the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {void}
+	 */
 	public select() {
 		if (this.unique === undefined) throw new Error('Could not select. Unique is missing');
 		this.treeContext?.selection.select(this.unique);
 	}
 
+	/**
+	 * Deselects the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {void}
+	 */
 	public deselect() {
 		if (this.unique === undefined) throw new Error('Could not deselect. Unique is missing');
 		this.treeContext?.selection.deselect(this.unique);
+	}
+
+	public showChildren() {
+		const entityType = this.entityType;
+		const unique = this.unique;
+
+		if (!entityType) {
+			throw new Error('Could not show children, entity type is missing');
+		}
+
+		if (unique === undefined) {
+			throw new Error('Could not show children, unique is missing');
+		}
+
+		// It is the tree that keeps track of the open children. We tell the tree to open this child
+		this.treeContext?.expansion.expandItem({ entityType, unique });
+	}
+
+	public hideChildren() {
+		const entityType = this.entityType;
+		const unique = this.unique;
+
+		if (!entityType) {
+			throw new Error('Could not show children, entity type is missing');
+		}
+
+		if (unique === undefined) {
+			throw new Error('Could not show children, unique is missing');
+		}
+
+		this.treeContext?.expansion.collapseItem({ entityType, unique });
 	}
 
 	async #consumeContexts() {
@@ -239,6 +284,7 @@ export abstract class UmbTreeItemContextBase<
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
 			this.#observeFoldersOnly();
+			this.#observeExpansion();
 		});
 
 		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (instance) => {
@@ -336,6 +382,25 @@ export abstract class UmbTreeItemContextBase<
 				this.#hasActions.setValue(actions.length > 0);
 			},
 			'observeActions',
+		);
+	}
+
+	#observeExpansion() {
+		if (this.unique === undefined) return;
+		if (!this.entityType) return;
+		if (!this.treeContext) return;
+
+		this.observe(
+			this.treeContext.expansion.isExpanded({ entityType: this.entityType, unique: this.unique }),
+			(isExpanded) => {
+				// If this item has children, load them
+				if (isExpanded && this.#hasChildren.getValue() && this.#isOpen.getValue() === false) {
+					this.loadChildren();
+				}
+
+				this.#isOpen.setValue(isExpanded);
+			},
+			'observeExpansion',
 		);
 	}
 

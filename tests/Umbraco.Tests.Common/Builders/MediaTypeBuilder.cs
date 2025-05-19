@@ -139,6 +139,7 @@ public class MediaTypeBuilder
         var mediaType = builder
             .WithAlias(alias)
             .WithName(name)
+            .WithIcon("icon-picture")
             .WithParentContentType(parent)
             .AddPropertyGroup()
             .WithAlias(propertyGroupAlias)

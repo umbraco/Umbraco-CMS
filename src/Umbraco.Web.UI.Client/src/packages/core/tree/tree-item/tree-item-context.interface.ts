@@ -14,6 +14,7 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> exten
 	isSelectable: Observable<boolean>;
 	isSelected: Observable<boolean>;
 	isActive: Observable<boolean>;
+	isOpen: Observable<boolean>;
 	hasActions: Observable<boolean>;
 	path: Observable<string>;
 	pagination: UmbPaginationManager;
@@ -24,4 +25,7 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> exten
 	select(): void;
 	deselect(): void;
 	constructPath(pathname: string, entityType: string, unique: string): string;
+	loadChildren(): void;
+	showChildren(): void;
+	hideChildren(): void;
 }

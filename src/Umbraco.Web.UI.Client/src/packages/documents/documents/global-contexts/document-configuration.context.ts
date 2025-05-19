@@ -1,4 +1,4 @@
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -10,15 +10,17 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * A context for fetching and caching the document configuration.
  * @deprecated Do not use this one, it will have ot change in near future.
  */
-export class UmbDocumentConfigurationContext extends UmbControllerBase implements UmbApi {
+export class UmbDocumentConfigurationContext
+	extends UmbContextBase<UmbDocumentConfigurationContext, typeof UMB_DOCUMENT_CONFIGURATION_CONTEXT>
+	implements UmbApi
+{
 	/**
 	 * The cached document configuration.
 	 */
 	static #DocumentConfiguration: Promise<DocumentConfigurationResponseModel | null>;
 
 	constructor(host: UmbControllerHost) {
-		super(host);
-		this.provideContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, this);
+		super(host, UMB_DOCUMENT_CONFIGURATION_CONTEXT);
 	}
 
 	/**

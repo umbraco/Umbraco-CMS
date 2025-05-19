@@ -1,10 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -632,6 +634,7 @@ public class VariationTests
         var dataValueEditorFactory = Mock.Of<IDataValueEditorFactory>(x
             => x.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()) == new TextOnlyValueEditor(
                 attribute,
+                Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IShortStringHelper>(),
                 new SystemTextJsonSerializer(),
                 Mock.Of<IIOHelper>()));
@@ -653,6 +656,8 @@ public class VariationTests
             dataTypeService,
             Mock.Of<ILocalizedTextService>(),
             new ValueEditorCache(),
-            Mock.Of<ICultureDictionary>());
+            Mock.Of<ICultureDictionary>(),
+            Mock.Of<ILanguageService>(),
+            Mock.Of<IOptions<ContentSettings>>());
     }
 }

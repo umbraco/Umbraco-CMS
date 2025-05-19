@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
@@ -145,6 +146,16 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
             return Repository.GetAllContentTypeIds(aliases);
         }
+    }
+
+    public async Task<IEnumerable<IContentType>> GetByQueryAsync(IQuery<IContentType> query, CancellationToken cancellationToken)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        // that one is special because it works across content, media and member types
+        scope.ReadLock(Constants.Locks.ContentTypes);
+        IEnumerable<IContentType> contentTypes = Repository.Get(query);
+        scope.Complete();
+        return contentTypes;
     }
 
     protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)

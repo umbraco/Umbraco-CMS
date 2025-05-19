@@ -82,4 +82,3 @@ test('can remove a tag in the content', async ({umbracoApi, umbracoUi}) => {
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
 });
-

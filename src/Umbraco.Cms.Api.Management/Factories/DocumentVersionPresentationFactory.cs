@@ -26,7 +26,7 @@ internal sealed class DocumentVersionPresentationFactory : IDocumentVersionPrese
             new ReferenceByIdModel(_entityService.GetKey(contentVersion.ContentTypeId, UmbracoObjectTypes.DocumentType)
                 .Result),
             new ReferenceByIdModel(await _userIdKeyResolver.GetAsync(contentVersion.UserId)),
-            new DateTimeOffset(contentVersion.VersionDate, TimeSpan.Zero), // todo align with datetime offset rework
+            new DateTimeOffset(contentVersion.VersionDate),
             contentVersion.CurrentPublishedVersion,
             contentVersion.CurrentDraftVersion,
             contentVersion.PreventCleanup);

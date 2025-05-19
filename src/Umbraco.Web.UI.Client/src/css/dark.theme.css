@@ -16,7 +16,7 @@
 	--uui-color-focus: #316dca;
 	--uui-color-surface: #2d333b;
 	--uui-color-surface-alt: #373e47;
-	--uui-color-surface-emphasis: #434c56;
+	--uui-color-surface-emphasis: #333a42;
 	--uui-color-background: #21262e;
 	--uui-color-text: #eeeeef;
 	--uui-color-text-alt: #eeeeef;
@@ -29,8 +29,8 @@
 	--uui-color-divider-standalone: #434c56;
 	--uui-color-divider-emphasis: #545d68;
 	--uui-color-default: #316dca;
-	--uui-color-default-emphasis: #316dca;
-	--uui-color-default-standalone: #316dca;
+	--uui-color-default-emphasis: #5387d5;
+	--uui-color-default-standalone: #eeeeef;
 	--uui-color-default-contrast: #eeeeef;
 	--uui-color-warning: #af7c12;
 	--uui-color-warning-emphasis: #af7c12;
