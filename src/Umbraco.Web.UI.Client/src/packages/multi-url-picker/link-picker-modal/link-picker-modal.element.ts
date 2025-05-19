@@ -11,7 +11,6 @@ import {
 	umbBindToValidation,
 	UmbObserveValidationStateController,
 	UmbValidationContext,
-	UmbValidationController,
 	type UmbValidator,
 } from '@umbraco-cms/backoffice/validation';
 import { umbConfirmModal, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -27,6 +26,7 @@ import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 class UmbLinkPickerValueValidator extends UmbControllerBase implements UmbValidator {
 	#context?: typeof UMB_VALIDATION_CONTEXT.TYPE;
@@ -38,7 +38,7 @@ class UmbLinkPickerValueValidator extends UmbControllerBase implements UmbValida
 
 	#value: unknown;
 
-	#unique = 'Hej';
+	#unique = 'UmbLinkPickerValueValidator';
 
 	setValue(value: unknown) {
 		this.#value = value;
@@ -113,7 +113,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	constructor() {
 		super();
 
-		new UmbObserveValidationStateController(this, '$.url', (invalid) => {
+		new UmbObserveValidationStateController(this, '$.type', (invalid) => {
 			this._missingLinkUrl = invalid;
 		});
 	}
@@ -136,10 +136,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		this.#getMediaTypes();
 		this.populateLinkUrl();
 
-		const validator = new UmbLinkPickerValueValidator(this, '$.url');
+		const validator = new UmbLinkPickerValueValidator(this, '$.type');
 
 		this.observe(this.modalContext?.value, (value) => {
-			validator.setValue(value?.link.url);
+			validator.setValue(value?.link.type);
 		});
 	}
 
@@ -417,9 +417,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				placeholder=${this.localize.term('placeholders_enterUrl')}
 				.value=${this.value.link.url ?? ''}
 				?disabled=${!!this.value.link.unique}
-				?required=${this._config.hideAnchor}
-				@input=${this.#onLinkUrlInput}>
-				${umbBindToValidation(this)}>
+				required
+				@input=${this.#onLinkUrlInput}
+				${umbBindToValidation(this)}
+				${umbFocus()}>
 				${when(
 					!this.value.link.unique,
 					() => html`
