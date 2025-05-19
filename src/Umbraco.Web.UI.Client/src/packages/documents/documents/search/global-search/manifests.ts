@@ -9,6 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: UMB_DOCUMENT_GLOBAL_SEARCH_ALIAS,
 		type: 'globalSearch',
 		weight: 800,
+		api: () => import('./document-global-search.js'),
 		meta: {
 			label: 'Documents',
 			searchProviderAlias: UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS,
