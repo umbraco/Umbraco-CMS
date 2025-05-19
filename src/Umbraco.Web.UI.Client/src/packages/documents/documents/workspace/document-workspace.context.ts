@@ -460,7 +460,6 @@ export class UmbDocumentWorkspaceContext
 					};
 
 					this.propertyWriteGuard.addRule(rule);
-					console.log('Adding rule', rule);
 				});
 			},
 		);

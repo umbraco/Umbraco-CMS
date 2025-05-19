@@ -1,4 +1,9 @@
-import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbSearchProvider, UmbSearchRequestArgs, UmbSearchResultItemModel } from '../types.js';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbGlobalSearchApi extends UmbApi {}
+export interface UmbGlobalSearchApi<
+	SearchResultItemType extends UmbSearchResultItemModel = UmbSearchResultItemModel,
+	SearchRequestArgsType extends UmbSearchRequestArgs = UmbSearchRequestArgs,
+> extends UmbSearchProvider<SearchResultItemType, SearchRequestArgsType> {}
+
+export type * from './global-search.extension.js';

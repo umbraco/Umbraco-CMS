@@ -283,6 +283,10 @@ export class UmbDefaultCollectionContext<
 		this.requestCollection();
 	}
 
+	public updateFilter(filter: Partial<FilterModelType>) {
+		this._filter.setValue({ ...this._filter.getValue(), ...filter });
+	}
+
 	public getLastSelectedView(unique: string | undefined): string | undefined {
 		if (!unique) return;
 

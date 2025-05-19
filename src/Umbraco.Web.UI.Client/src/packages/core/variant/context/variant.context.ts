@@ -2,7 +2,7 @@ import { UmbVariantId } from '../variant-id.class.js';
 import { UMB_VARIANT_CONTEXT } from './variant.context.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { mergeObservables, UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * A context for the current variant state.
@@ -19,19 +19,44 @@ export class UmbVariantContext extends UmbContextBase {
 	#fallbackCulture = new UmbStringState<string | null | undefined>(undefined);
 	public fallbackCulture = this.#fallbackCulture.asObservable();
 
+	#appCulture = new UmbStringState<string | null | undefined>(undefined);
+	public appCulture = this.#appCulture.asObservable();
+
+	public readonly displayCulture = mergeObservables([this.culture, this.appCulture], ([culture, appCulture]) => {
+		return culture ?? appCulture;
+	});
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_VARIANT_CONTEXT);
+	}
 
+	/**
+	 * Inherit values from the parent variant context
+	 * @returns {UmbVariantContext} - The current instance of the context
+	 * @memberof UmbVariantContext
+	 */
+	inherit(): UmbVariantContext {
 		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
 			this.observe(
 				context?.fallbackCulture,
 				(fallbackCulture) => {
 					if (!fallbackCulture) return;
-					this.setFallbackCulture(fallbackCulture);
+					this.#fallbackCulture.setValue(fallbackCulture);
 				},
 				'observeFallbackCulture',
 			);
+
+			this.observe(
+				context?.appCulture,
+				(appCulture) => {
+					if (!appCulture) return;
+					this.#appCulture.setValue(appCulture);
+				},
+				'observeAppCulture',
+			);
 		}).skipHost();
+
+		return this;
 	}
 
 	/**
@@ -105,6 +130,35 @@ export class UmbVariantContext extends UmbContextBase {
 	 * @memberof UmbVariantContext
 	 */
 	async setFallbackCulture(culture: string | null): Promise<void> {
+		this.removeUmbControllerByAlias('observeFallbackCulture');
 		this.#fallbackCulture.setValue(culture);
+	}
+
+	/**
+	 * Gets the app culture state
+	 * @returns {(Promise<string | null | undefined>)} - The app culture state
+	 * @memberof UmbVariantContext
+	 */
+	async getAppCulture(): Promise<string | null | undefined> {
+		return this.#appCulture.getValue();
+	}
+
+	/**
+	 * Sets the app culture state
+	 * @param {string | undefined} culture - The app culture to set
+	 * @memberof UmbVariantContext
+	 */
+	async setAppCulture(culture: string | null): Promise<void> {
+		this.removeUmbControllerByAlias('observeAppCulture');
+		this.#appCulture.setValue(culture);
+	}
+
+	/**
+	 * Gets the display culture state
+	 * @returns {(Promise<string | null | undefined>)} - The app culture state
+	 * @memberof UmbVariantContext
+	 */
+	async getDisplayCulture(): Promise<string | null | undefined> {
+		return this.observe(this.displayCulture).asPromise();
 	}
 }
