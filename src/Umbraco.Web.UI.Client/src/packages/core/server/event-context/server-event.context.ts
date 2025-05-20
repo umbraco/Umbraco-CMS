@@ -7,19 +7,21 @@ import type { HubConnection } from '@microsoft/signalr';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import { Subject } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
-import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
-export interface UmbServerEventModel<DataType = unknown> {
-	type: string;
-	user: UmbReferenceByUnique;
-	data: DataType;
+export interface UmbServerEventModel {
+	eventSource: string;
+	eventType: string;
+	key: string;
 }
 
 export class UmbServerEventContext extends UmbContextBase {
-	//public readonly hub = new Subject<UmbServerEventModel>();
+	public readonly hub = new Subject<UmbServerEventModel>();
 
 	#connection?: HubConnection;
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_SERVER_EVENT_CONTEXT);
@@ -27,6 +29,10 @@ export class UmbServerEventContext extends UmbContextBase {
 		this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
 			this.#authContext = context;
 			this.#observeIsAuthorized();
+		});
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
+			this.#actionEventContext = context;
 		});
 	}
 
@@ -53,9 +59,36 @@ export class UmbServerEventContext extends UmbContextBase {
 			})
 			.build();
 
-		this.#connection.on('notify', (payload: unknown) => {
+		this.#connection.on('notify', (payload: UmbServerEventModel) => {
 			console.log('payloadReceived', payload);
-			//this.hub.next(payload);
+
+			// TODO: Only for POC purposes, replace with a proper mapping
+			const eventSourceToEntity: Record<any, any> = {
+				'Umbraco:CMS:Document': 'document',
+				'Umbraco:CMS:DocumentType': 'document-type',
+				'Umbraco:CMS:Media': 'media',
+				'Umbraco:CMS:MediaType': 'media-type',
+				'Umbraco:CMS:Member': 'member',
+				'Umbraco:CMS:MemberType': 'member-type',
+				'Umbraco:CMS:MemberGroup': 'member-group',
+				'Umbraco:CMS:DataType': 'data-type',
+			};
+
+			// TODO: Only for POC purposes, replace with a proper mapping
+			const eventTypeToAction: Record<any, any> = {
+				Created: 'entity-created',
+				Updated: 'entity-updated',
+				Deleted: 'entity-deleted',
+				Trashed: 'entity-trashed',
+			};
+
+			const event = new UmbEntityEvent({
+				type: eventTypeToAction[payload.eventType],
+				entityType: eventSourceToEntity[payload.eventSource],
+				unique: payload.key,
+			});
+
+			this.#actionEventContext?.dispatchEvent(event);
 		});
 
 		this.#connection
