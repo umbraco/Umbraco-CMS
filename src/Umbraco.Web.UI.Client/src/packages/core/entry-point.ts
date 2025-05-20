@@ -2,6 +2,7 @@ import { UMB_AUTH_CONTEXT } from './auth/auth.context.token.js';
 import { UmbBackofficeNotificationContainerElement, UmbBackofficeModalContainerElement } from './components/index.js';
 import { UmbActionEventContext } from './action/action-event.context.js';
 import { manifests as coreManifests } from './manifests.js';
+import { UmbServerEventManager } from './server/index.js';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbExtensionsApiInitializer, type UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
@@ -10,7 +11,6 @@ import './property-action/components/index.js';
 import './menu/components/index.js';
 import './extension-registry/components/index.js';
 import './entity-item/global-components.js';
-import { UmbServerEventContext } from './server/index.js';
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'globalContext', [host]);
@@ -18,7 +18,7 @@ export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'treeStore', [host]);
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'itemStore', [host]);
 
-	new UmbServerEventContext(host);
+	new UmbServerEventManager(host);
 
 	extensionRegistry.registerMany(coreManifests);
 
