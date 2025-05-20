@@ -19,7 +19,7 @@ function MemberDeleteController($scope, memberResource, treeService, navigationS
             treeService.removeNode($scope.currentNode);
 
             //if the current edited item is the same one as we're deleting, we need to navigate elsewhere
-            if (editorState.current && editorState.current.key == $scope.currentNode.id) {
+            if (editorState.current && editorState.current.key.replace(/-/g, "") == $scope.currentNode.id) {
                 $location.path("/member/member/list/" + ($routeParams.listName ? $routeParams.listName : 'all-members'));
             }
 
