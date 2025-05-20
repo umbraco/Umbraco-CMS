@@ -111,7 +111,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 		if (!data) return;
 
-		const folders = Array.from(new Set(data.map((c) => '/' + c.folderPath.join('/'))));
+		const folders = Array.from(new Set(data.map((c) => '/' + c.folderPath.join('/')))).sort();
 		this._compatibleCompositions = folders.map((path) => ({
 			path,
 			compositions: data.filter((c) => '/' + c.folderPath.join('/') === path),
