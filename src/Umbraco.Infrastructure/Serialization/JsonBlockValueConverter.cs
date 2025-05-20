@@ -209,6 +209,10 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                         else if (reader.TokenType is JsonTokenType.EndArray)
                         {
                             openCount--;
+                            if (openCount < 0)
+                            {
+                                throw new JsonException($"Malformed JSON: Encountered more closing array tokens than opening ones while processing block editor alias: {blockEditorAlias}.");
+                            }
                         }
 
                         if (!reader.Read())
