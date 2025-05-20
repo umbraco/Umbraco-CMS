@@ -30,10 +30,13 @@ export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement impleme
 	}
 
 	override render() {
-		return html`<umb-input-upload-field
-			@change="${this.#onChange}"
-			.allowedFileExtensions="${this._fileExtensions}"
-			.value=${this.value}></umb-input-upload-field>`;
+		return html`
+			<umb-input-upload-field
+				.allowedFileExtensions=${this._fileExtensions}
+				.value=${this.value}
+				@change=${this.#onChange}>
+			</umb-input-upload-field>
+		`;
 	}
 }
 

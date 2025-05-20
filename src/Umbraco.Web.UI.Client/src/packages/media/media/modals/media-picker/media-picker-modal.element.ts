@@ -337,6 +337,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 							? html`<uui-pagination
 									.current=${this._currentPage}
 									.total=${this._currentTotalPages}
+									firstlabel=${this.localize.term('general_first')}
+                                    previouslabel=${this.localize.term('general_previous')}
+                                    nextlabel=${this.localize.term('general_next')}
+                                    lastlabel=${this.localize.term('general_last')}
 									@change=${this.#onPageChange}></uui-pagination>`
 							: nothing}`}
 		`;
@@ -453,11 +457,6 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 				grid-auto-rows: var(--umb-card-medium-min-width);
 				padding-bottom: 5px; /** The modal is a bit jumpy due to the img card focus/hover border. This fixes the issue. */
-			}
-
-			/** TODO: Remove this fix when UUI gets upgrade to 1.3 */
-			umb-imaging-thumbnail {
-				pointer-events: none;
 			}
 
 			umb-icon {
