@@ -10,12 +10,15 @@ import './property-action/components/index.js';
 import './menu/components/index.js';
 import './extension-registry/components/index.js';
 import './entity-item/global-components.js';
+import { UmbServerEventContext } from './server/index.js';
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'globalContext', [host]);
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'store', [host]);
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'treeStore', [host]);
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'itemStore', [host]);
+
+	new UmbServerEventContext(host);
 
 	extensionRegistry.registerMany(coreManifests);
 
