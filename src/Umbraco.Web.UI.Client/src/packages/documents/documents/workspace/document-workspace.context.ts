@@ -67,6 +67,8 @@ export class UmbDocumentWorkspaceContext
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent(
 		(data) => !!data?.documentType.collection,
 	);
+	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.documentType.icon || null);
+
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
@@ -303,7 +305,6 @@ export class UmbDocumentWorkspaceContext
 			preset: {
 				documentType: {
 					unique: documentTypeUnique,
-					collection: null,
 				},
 			},
 		});
