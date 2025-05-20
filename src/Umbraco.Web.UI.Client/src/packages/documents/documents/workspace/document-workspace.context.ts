@@ -37,9 +37,9 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/language';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -93,6 +93,7 @@ export class UmbDocumentWorkspaceContext
 		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
 			const config = await context?.getDocumentConfiguration();
 			const allowSegmentCreation = config?.allowNonExistingSegmentsCreation ?? false;
+			const allowEditInvariantFromNonDefault = config?.allowEditInvariantFromNonDefault ?? true;
 
 			this._variantOptionsFilter = (variantOption) => {
 				const isNotCreatedSegmentVariant = variantOption.segment && !variantOption.variant;
@@ -104,12 +105,8 @@ export class UmbDocumentWorkspaceContext
 
 				return true;
 			};
-		});
 
-		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
-			const documentConfiguration = (await context?.getDocumentConfiguration()) ?? undefined;
-
-			if (documentConfiguration?.allowEditInvariantFromNonDefault !== true) {
+			if (allowEditInvariantFromNonDefault === false) {
 				this.#preventEditInvariantFromNonDefault();
 			}
 		});
@@ -228,46 +225,6 @@ export class UmbDocumentWorkspaceContext
 		]);
 	}
 
-	#preventEditInvariantFromNonDefault() {
-		this.observe(
-			observeMultiple([this.structure.contentTypeProperties, this.languages]),
-			([properties, languages]) => {
-				if (properties.length === 0) return;
-				if (languages.length === 0) return;
-
-				const defaultLanguageUnique = languages.find((x) => x.isDefault)?.unique;
-				const ruleUnique = 'UMB_preventEditInvariantFromNonDefault';
-
-				const rule = {
-					unique: ruleUnique,
-					permitted: false,
-					message: 'Shared properties can only be edited in the default language',
-					variantId: UmbVariantId.CreateInvariant(),
-				};
-
-				/* The permission is false by default, and the onChange callback will not be triggered if the permission hasn't changed.
-			Therefore, we add the rule to the readOnlyGuard here. */
-				this.propertyWriteGuard.addRule(rule);
-
-				createExtensionApiByAlias(this, UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS, [
-					{
-						config: {
-							allOf: [defaultLanguageUnique],
-						},
-						onChange: (permitted: boolean) => {
-							if (permitted) {
-								this.propertyWriteGuard.removeRule(ruleUnique);
-							} else {
-								this.propertyWriteGuard.addRule(rule);
-							}
-						},
-					},
-				]);
-			},
-			'observePreventEditInvariantFromNonDefault',
-		);
-	}
-
 	override resetState(): void {
 		super.resetState();
 		this.#isTrashedContext.setIsTrashed(false);
@@ -352,7 +309,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public async saveAndPreview(): Promise<void> {
-		return this.#handleSaveAndPreview();
+		return await this.#handleSaveAndPreview();
 	}
 
 	async #handleSaveAndPreview() {
@@ -402,7 +359,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the Publish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.publish();
+		await this.#publishingContext.publish();
 	}
 
 	/**
@@ -416,7 +373,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the SaveAndPublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.saveAndPublish();
+		await this.#publishingContext.saveAndPublish();
 	}
 
 	/**
@@ -430,7 +387,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the Schedule method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.schedule();
+		await this.#publishingContext.schedule();
 	}
 
 	/**
@@ -444,7 +401,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the Unpublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.unpublish();
+		await this.#publishingContext.unpublish();
 	}
 
 	/**
@@ -458,7 +415,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the PublishWithDescendants method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.publishWithDescendants();
+		await this.#publishingContext.publishWithDescendants();
 	}
 
 	public createPropertyDatasetContext(
@@ -478,6 +435,35 @@ export class UmbDocumentWorkspaceContext
 			unique: identifier,
 			message,
 		});
+	}
+
+	#preventEditInvariantFromNonDefault() {
+		this.observe(
+			observeMultiple([this.structure.contentTypeProperties, this.variantOptions]),
+			([properties, variantOptions]) => {
+				if (properties.length === 0) return;
+				if (variantOptions.length === 0) return;
+
+				variantOptions.forEach((variantOption) => {
+					// Do not add a rule for the default language. It is always permitted to edit.
+					if (variantOption.language.isDefault) return;
+
+					const datasetVariantId = UmbVariantId.CreateFromPartial(variantOption);
+					const invariantVariantId = UmbVariantId.CreateInvariant();
+					const unique = `UMB_PREVENT_EDIT_INVARIANT_FROM_NON_DEFAULT_DATASET=${datasetVariantId.toString()}_PROPERTY_${invariantVariantId.toString()}`;
+
+					const rule: UmbVariantPropertyGuardRule = {
+						unique,
+						message: 'Shared properties can only be edited in the default language',
+						variantId: invariantVariantId,
+						datasetVariantId,
+						permitted: false,
+					};
+
+					this.propertyWriteGuard.addRule(rule);
+				});
+			},
+		);
 	}
 }
 

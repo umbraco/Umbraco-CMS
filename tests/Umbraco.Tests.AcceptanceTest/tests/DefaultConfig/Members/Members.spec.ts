@@ -27,7 +27,7 @@ test('can create a member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.member.goToMembers();
 
   // Act
-  await umbracoUi.member.clickCreateButton();
+  await umbracoUi.member.clickCreateMembersButton();
   await umbracoUi.member.enterMemberName(memberName);
   await umbracoUi.member.enterComments(comment);
   await umbracoUi.member.clickInfoTab();
@@ -233,7 +233,7 @@ test('cannot create member with invalid email', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.member.goToMembers();
 
   // Act
-  await umbracoUi.member.clickCreateButton();
+  await umbracoUi.member.clickCreateMembersButton();
   await umbracoUi.member.enterMemberName(memberName);
   await umbracoUi.member.enterComments(comment);
   await umbracoUi.member.clickInfoTab();

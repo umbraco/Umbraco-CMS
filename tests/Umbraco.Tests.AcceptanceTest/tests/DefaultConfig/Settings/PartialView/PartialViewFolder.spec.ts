@@ -40,7 +40,7 @@ test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   // Act
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
-  await umbracoUi.partialView.deleteFolder();
+  await umbracoUi.partialView.clickDeleteAndConfirmButton();
 
   // Assert
   //await umbracoUi.partialView.isSuccessNotificationVisible();
@@ -61,7 +61,7 @@ test('can create a partial view in a folder', async ({umbracoApi, umbracoUi}) =>
   // Act
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
-  await umbracoUi.partialView.clickCreateButton();
+  await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
   await umbracoUi.partialView.clickSaveButton();
@@ -91,7 +91,7 @@ test('can create a partial view in a folder in a folder', async ({umbracoApi, um
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.clickCaretButtonForName(folderName);
   await umbracoUi.partialView.clickActionsMenuForPartialView(childFolderName);
-  await umbracoUi.partialView.clickCreateButton();
+  await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
   await umbracoUi.partialView.clickSaveButton();
@@ -161,7 +161,7 @@ test('cannot delete non-empty folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.partialView.clickRootFolderCaretButton();
   await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
-  await umbracoUi.partialView.deleteFolder();
+  await umbracoUi.partialView.clickDeleteAndConfirmButton();
 
   // Assert
   await umbracoUi.partialView.doesErrorNotificationHaveText(NotificationConstantHelper.error.notEmpty);

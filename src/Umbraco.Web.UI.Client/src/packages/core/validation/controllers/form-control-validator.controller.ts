@@ -30,7 +30,7 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 			this.#context = context;
 			context?.addValidator(this);
 			// If we have a message already, then un-pristine the control:
-			if (dataPath && context?.messages.getHasMessagesOfPathAndDescendant(dataPath)) {
+			if (dataPath && context?.messages?.getHasMessagesOfPathAndDescendant(dataPath)) {
 				formControl.pristine = false;
 			}
 		});
@@ -46,11 +46,11 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 
 		if (this.#dataPath) {
 			if (newVal) {
-				this.#context?.messages.removeMessagesByTypeAndPath('client', this.#dataPath);
+				this.#context?.messages?.removeMessagesByTypeAndPath('client', this.#dataPath);
 			} else {
 				// We only want to add the message if it is not already there. (this could be a custom or server message that got binded to the control, we do not want that double.)
-				if (!this.#context?.messages.getHasMessageOfPathAndBody(this.#dataPath, this.#control.validationMessage)) {
-					this.#context?.messages.addMessage('client', this.#dataPath, this.#control.validationMessage);
+				if (!this.#context?.messages?.getHasMessageOfPathAndBody(this.#dataPath, this.#control.validationMessage)) {
+					this.#context?.messages?.addMessage('client', this.#dataPath, this.#control.validationMessage);
 				}
 			}
 		}

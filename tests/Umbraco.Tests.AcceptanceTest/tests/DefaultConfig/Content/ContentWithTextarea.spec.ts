@@ -27,7 +27,7 @@ test('can create content with the textarea data type', async ({umbracoApi, umbra
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
@@ -100,7 +100,7 @@ test('cannot input the text that exceeds the allowed amount of characters', asyn
 
   // Assert
   await umbracoUi.content.isTextWithMessageVisible(warningMessage);
-  //await umbracoUi.content.isSuccessNotificationVisible();
+  // await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
 
   // Clean

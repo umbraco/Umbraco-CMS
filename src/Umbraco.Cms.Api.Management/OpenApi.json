@@ -10160,6 +10160,13 @@
             }
           },
           {
+            "name": "culture",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "skip",
             "in": "query",
             "schema": {
@@ -15916,6 +15923,13 @@
             "in": "query",
             "schema": {
               "type": "boolean"
+            }
+          },
+          {
+            "name": "culture",
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           },
           {
