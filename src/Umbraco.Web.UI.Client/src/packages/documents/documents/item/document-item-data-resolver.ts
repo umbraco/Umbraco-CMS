@@ -42,6 +42,9 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	#isDraft = new UmbBooleanState(undefined);
 	public readonly isDraft = this.#isDraft.asObservable();
 
+	#isEdited = new UmbBooleanState(undefined);
+	public readonly isEdited = this.#isEdited.asObservable();
+
 	constructor(host: UmbControllerHost) {
 		super(host);
 
@@ -87,6 +90,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 			this.#icon.setValue(undefined);
 			this.#isTrashed.setValue(undefined);
 			this.#isDraft.setValue(undefined);
+			this.#isEdited.setValue(undefined);
 			return;
 		}
 
@@ -156,9 +160,20 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 		return this.#data?.isTrashed ?? false;
 	}
 
+	/**
+	 * Get the isEdited of the item
+	 * @returns {Promise<boolean>} The isEdited of the item
+	 * @memberof UmbDocumentItemDataResolver
+	 */
+	async getIsEdited(): Promise<boolean> {
+		await this.#init;
+		return this.#isEdited.getValue() ?? false;
+	}
+
 	#setVariantAwareValues() {
 		this.#setName();
 		this.#setIsDraft();
+		this.#setIsEdited();
 		this.#setState();
 	}
 
@@ -176,6 +191,12 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 		const variant = this.#getCurrentVariant();
 		const isDraft = variant?.state === UmbDocumentVariantState.DRAFT || false;
 		this.#isDraft.setValue(isDraft);
+	}
+
+	#setIsEdited() {
+		const variant = this.#getCurrentVariant();
+		const isEdited = variant?.state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES || false;
+		this.#isEdited.setValue(isEdited);
 	}
 
 	#setState() {
