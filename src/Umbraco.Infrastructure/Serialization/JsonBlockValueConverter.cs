@@ -189,9 +189,31 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                 else
                 {
                     // ignore this layout - forward the reader to the end of the array and look for the next one
-                    while (reader.TokenType is not JsonTokenType.EndArray)
+
+                    // Read past the current StartArray token before we start counting
+                    reader.Read();
+
+                    var openCount = 0;
+                    while (true)
                     {
-                        reader.Read();
+                        if (reader.TokenType is JsonTokenType.EndArray && openCount == 0)
+                        {
+                            break;
+                        }
+
+                        if (reader.TokenType is JsonTokenType.StartArray)
+                        {
+                            openCount++;
+                        }
+                        else if (reader.TokenType is JsonTokenType.EndArray)
+                        {
+                            openCount--;
+                        }
+
+                        if(!reader.Read())
+                        {
+                            throw new JsonException($"Unexpected end of JSON while looking for the end of the layout items array for block editor alias: {blockEditorAlias}.");
+                        }
                     }
                 }
             }
