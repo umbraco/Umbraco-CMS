@@ -1,5 +1,5 @@
-import type { UmbEntityActionEventArgs } from './event/entity-action.event.js';
-import { UmbEntityActionEvent } from './event/entity-action.event.js';
+import type { UmbEntityActionEventArgs } from './entity-action.event.js';
+import { UmbEntityActionEvent } from './entity-action.event.js';
 
 export class UmbRequestReloadStructureForEntityEvent extends UmbEntityActionEvent {
 	static readonly TYPE = 'request-reload-structure-for-entity';
