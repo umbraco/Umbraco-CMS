@@ -343,4 +343,11 @@ public interface IMemberService : IMembershipMemberService
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
     IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
+
+    /// <summary>
+    /// Saves only the properties related to login for the member, using an optimized, non-locking update.
+    /// </summary>
+    /// <param name="member">The member to update.</param>
+    /// <returns>Used to avoid the full save of the member object after a login operation.</returns>
+    Task UpdateLoginPropertiesAsync(IMember member) => Task.CompletedTask;
 }
