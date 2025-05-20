@@ -87,7 +87,6 @@ export class UmbInputBlockTypeElement<
 			this.observe(
 				await this.#datasetContext?.propertyValueByAlias('blocks'),
 				(value) => {
-					console.log('value', value);
 					this.#filter = value as Array<UmbBlockTypeBaseModel>;
 				},
 				'observeBlocks',
