@@ -36,7 +36,7 @@ test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   // Act
   await umbracoUi.stylesheet.reloadStylesheetTree();
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetFolderName);
-  await umbracoUi.stylesheet.deleteFolder();
+  await umbracoUi.stylesheet.clickDeleteAndConfirmButton();
 
   // Assert
   //await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
@@ -99,7 +99,7 @@ test('can create a stylesheet in a folder', async ({umbracoApi, umbracoUi}) => {
   //Act
   await umbracoUi.stylesheet.reloadStylesheetTree();
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetFolderName);
-  await umbracoUi.stylesheet.clickCreateButton();
+  await umbracoUi.stylesheet.clickCreateActionMenuOption();
   await umbracoUi.stylesheet.clickNewStylesheetButton();
   await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
   await umbracoUi.stylesheet.enterStylesheetContent(stylesheetContent);
@@ -129,7 +129,7 @@ test('can create a stylesheet in a folder in a folder', async ({umbracoApi, umbr
   await umbracoUi.stylesheet.reloadStylesheetTree();
   await umbracoUi.stylesheet.clickCaretButtonForName(stylesheetFolderName);
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(childFolderName);
-  await umbracoUi.stylesheet.clickCreateButton();
+  await umbracoUi.stylesheet.clickCreateActionMenuOption();
   await umbracoUi.stylesheet.clickNewStylesheetButton();
   await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
   await umbracoUi.stylesheet.enterStylesheetContent(stylesheetContent);
@@ -157,7 +157,7 @@ test('cannot delete non-empty folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.stylesheet.clickRootFolderCaretButton();
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetFolderName);
-  await umbracoUi.stylesheet.deleteFolder();
+  await umbracoUi.stylesheet.clickDeleteAndConfirmButton();
 
   //Assert
   await umbracoUi.stylesheet.doesErrorNotificationHaveText(NotificationConstantHelper.error.notEmpty);

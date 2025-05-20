@@ -36,7 +36,7 @@ test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   // Act
   await umbracoUi.script.reloadScriptTree();
   await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
-  await umbracoUi.script.deleteFolder();
+  await umbracoUi.script.clickDeleteAndConfirmButton();
 
   // Assert
   //await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
@@ -54,7 +54,7 @@ test('can create a script in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.script.reloadScriptTree();
   await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
-  await umbracoUi.script.clickCreateButton();
+  await umbracoUi.script.clickCreateOptionsActionMenuOption();
   await umbracoUi.script.clickNewJavascriptFileButton();
   await umbracoUi.script.enterScriptName(scriptName);
   await umbracoUi.script.enterScriptContent(scriptContent);
@@ -128,7 +128,7 @@ test('can create a script in a folder in a folder', async ({umbracoApi, umbracoU
   await umbracoUi.script.reloadScriptTree();
   await umbracoUi.script.clickCaretButtonForName(scriptFolderName);
   await umbracoUi.script.clickActionsMenuForScript(childFolderName);
-  await umbracoUi.script.clickCreateButton();
+  await umbracoUi.script.clickCreateOptionsActionMenuOption();
   await umbracoUi.script.clickNewJavascriptFileButton();
   await umbracoUi.script.enterScriptName(scriptName);
   await umbracoUi.script.clickSaveButton();

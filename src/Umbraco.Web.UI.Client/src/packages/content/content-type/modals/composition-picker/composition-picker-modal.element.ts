@@ -39,6 +39,9 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _usedForInheritance: Array<string> = [];
 
+	@state()
+	private _usedForComposition: Array<string> = [];
+
 	override connectedCallback() {
 		super.connectedCallback();
 
@@ -53,6 +56,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 		this._selection = this.data?.selection ?? [];
 		this._usedForInheritance = this.data?.usedForInheritance ?? [];
+		this._usedForComposition = this.data?.usedForComposition ?? [];
 		this.modalContext?.setValue({ selection: this._selection });
 
 		const isNew = this.data!.isNew;
@@ -131,7 +135,9 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('contentTypeEditor_compositions')}">
-				${this._references.length ? this.#renderHasReference() : this.#renderAvailableCompositions()}
+				<uui-box>
+					${this._references.length ? this.#renderHasReference() : this.#renderAvailableCompositions()}
+				</uui-box>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					${!this._references.length
@@ -213,11 +219,16 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 			(compositions) => compositions.unique,
 			(compositions) => {
 				const usedForInheritance = this._usedForInheritance.includes(compositions.unique);
+				const usedForComposition = this._usedForComposition.includes(compositions.unique);
+				/* The server will return isCompatible as false if the Doc Type is currently being used in a composition. 
+				Therefore, we need to account for this in the "isDisabled" check to ensure it remains enabled. 
+				Otherwise, it would become disabled and couldn't be deselected by the user. */
+				const isDisabled = usedForInheritance || (compositions.isCompatible === false && !usedForComposition);
 				return html`
 					<uui-menu-item
 						label=${this.localize.string(compositions.name)}
 						?selectable=${!usedForInheritance}
-						?disabled=${usedForInheritance}
+						?disabled=${isDisabled}
 						@selected=${() => this.#onSelectionAdd(compositions.unique)}
 						@deselected=${() => this.#onSelectionRemove(compositions.unique)}
 						?selected=${this._selection.find((unique) => unique === compositions.unique)}>
@@ -250,6 +261,10 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 				display: flex;
 				align-items: center;
 				gap: var(--uui-size-3);
+			}
+
+			.compositions-list {
+				margin-block: var(--uui-size-3);
 			}
 		`,
 	];

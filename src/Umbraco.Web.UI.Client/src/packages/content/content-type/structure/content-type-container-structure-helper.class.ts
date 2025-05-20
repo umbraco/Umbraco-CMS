@@ -194,6 +194,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 				// For that we get the owner containers first (We do not need to observe as this observation will be triggered if one of the owner containers change) [NL]
 				this.#ownerChildContainers = this.#structure!.getOwnerContainers(this.#childType!, this.#containerId!) ?? [];
+
 				this.#childContainers.setValue(rootContainers);
 			},
 			'_observeRootContainers',

@@ -29,9 +29,8 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	}
 
 	#observeActiveVariantInfo() {
-		if (!this._workspaceContext) return;
 		this.observe(
-			this._workspaceContext.splitView.activeVariantsInfo,
+			this._workspaceContext?.splitView.activeVariantsInfo,
 			(variants) => {
 				this._variants = variants;
 			},
@@ -40,8 +39,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	}
 
 	#observeIcon() {
-		if (!this._workspaceContext) return;
-		this.observe(this._workspaceContext.contentTypeIcon, (icon) => {
+		this.observe(this._workspaceContext?.contentTypeIcon, (icon) => {
 			this._icon = icon ?? undefined;
 		});
 	}

@@ -64,7 +64,7 @@ test('can create a dictionary item in a dictionary', {tag: '@smoke'}, async ({um
 
   // Act
   await umbracoUi.dictionary.clickActionsMenuForDictionary(parentDictionaryName);
-  await umbracoUi.dictionary.clickCreateButton();
+  await umbracoUi.dictionary.clickCreateActionMenuOption();
   await umbracoUi.dictionary.enterDictionaryName(dictionaryName);
   await umbracoUi.dictionary.clickSaveButton();
 
@@ -92,7 +92,7 @@ test('can export a dictionary item', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
-  await umbracoUi.dictionary.clickExportButton();
+  await umbracoUi.dictionary.clickExportActionMenuOption();
   const exportData = await umbracoUi.dictionary.exportDictionary(false);
 
   // Assert
@@ -108,7 +108,7 @@ test('can export a dictionary item with descendants', {tag: '@smoke'}, async ({u
 
   // Act
   await umbracoUi.dictionary.clickActionsMenuForDictionary(parentDictionaryName);
-  await umbracoUi.dictionary.clickExportButton();
+  await umbracoUi.dictionary.clickExportActionMenuOption();
   const exportData = await umbracoUi.dictionary.exportDictionary(true);
 
   // Assert
@@ -133,6 +133,7 @@ test('can import a dictionary item', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dictionary.importDictionary(udtFilePath);
 
   // Assert
+  await umbracoUi.waitForTimeout(500);
   // Verify the imported dictionary item displays in the list
   await umbracoUi.reloadPage();
   expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importDictionaryName)).toBeTruthy();
@@ -153,7 +154,7 @@ test('can import a dictionary item with descendants', {tag: '@smoke'}, async ({u
 
   // Act
   await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
-  await umbracoUi.dictionary.clickImportButton();
+  await umbracoUi.dictionary.clickImportActionMenuOption();
   await umbracoUi.dictionary.importDictionary(udtFilePath);
   // These timeouts are necessary as this test can fail
   await umbracoUi.waitForTimeout(500);

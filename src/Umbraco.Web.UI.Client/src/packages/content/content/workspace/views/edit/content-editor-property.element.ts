@@ -46,7 +46,11 @@ export class UmbContentWorkspaceViewEditPropertyElement extends UmbLitElement {
 				})}].value`;
 
 				this.observe(
-					this._context.propertyWriteGuard.isPermittedForVariantAndProperty(propertyVariantId, this.property),
+					this._context.propertyWriteGuard.isPermittedForVariantAndProperty(
+						propertyVariantId,
+						this.property,
+						this.variantId,
+					),
 					(write) => {
 						this._writeable = write;
 					},
