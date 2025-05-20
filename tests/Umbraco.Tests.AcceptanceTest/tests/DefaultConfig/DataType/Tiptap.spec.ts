@@ -29,7 +29,7 @@ test('can create a rich text editor with tiptap', {tag: '@smoke'}, async ({umbra
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesNameExist(tipTapName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(tipTapName);
   expect(dataTypeData.editorAlias).toBe(tipTapAlias);

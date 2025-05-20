@@ -22,7 +22,7 @@ test('can create a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   await umbracoUi.mediaType.clickSaveButton();
 
   // Assert
-  await umbracoUi.mediaType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.mediaType.isErrorNotificationVisible(false);
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
 });
 

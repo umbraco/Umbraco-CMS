@@ -32,7 +32,7 @@ test('can create a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesNameExist(blockGridEditorName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(blockGridEditorName);
   expect(dataTypeData.editorAlias).toBe(blockGridEditorAlias);

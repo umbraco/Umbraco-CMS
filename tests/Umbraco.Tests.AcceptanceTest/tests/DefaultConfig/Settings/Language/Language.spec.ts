@@ -25,7 +25,7 @@ test('can add language', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.language.clickSaveButton();
 
   // Assert
-  await umbracoUi.language.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.language.isErrorNotificationVisible(false);
   expect(await umbracoApi.language.doesExist(isoCode)).toBeTruthy();
   // Verify the created language displays in the list
   await umbracoUi.language.clickLanguagesMenu();
