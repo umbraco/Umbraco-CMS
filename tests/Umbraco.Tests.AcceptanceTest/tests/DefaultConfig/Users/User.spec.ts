@@ -22,8 +22,7 @@ test('can create a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.goToUsers();
 
   // Act
-  await umbracoUi.user.clickCreateButton();
-  await umbracoUi.user.clickUserButton();
+  await umbracoUi.user.clickCreateActionWithOptionName('User');
   await umbracoUi.user.enterNameOfTheUser(nameOfTheUser);
   await umbracoUi.user.enterUserEmail(userEmail);
   await umbracoUi.user.clickChooseButton();

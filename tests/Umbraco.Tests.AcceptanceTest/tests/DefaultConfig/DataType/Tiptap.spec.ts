@@ -21,7 +21,7 @@ test('can create a rich text editor with tiptap', {tag: '@smoke'}, async ({umbra
 
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
-  await umbracoUi.dataType.clickActionsMenuCreateButton();
+  await umbracoUi.dataType.clickCreateActionMenuOption();
   await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(tipTapName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();

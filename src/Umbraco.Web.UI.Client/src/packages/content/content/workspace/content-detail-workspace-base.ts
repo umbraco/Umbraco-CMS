@@ -714,6 +714,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 */
 	public async runMandatoryValidationForSaveData(saveData: DetailModelType, variantIds: Array<UmbVariantId> = []) {
 		// Check that the data is valid before we save it.
+		// If we vary by culture then we do not want to validate the invariant variant.
+		if (this.getVariesByCulture()) {
+			variantIds = variantIds.filter((variant) => !variant.isCultureInvariant());
+		}
 		const missingVariants = variantIds.filter((variant) => {
 			return !saveData.variants.some((y) => variant.compare(y));
 		});
@@ -754,7 +758,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 			// We ask the server first to get a concatenated set of validation messages. So we see both front-end and back-end validation messages [NL]
 			if (this.getIsNew()) {
-				const parent = this.getParent();
+				const parent = this._internal_getCreateUnderParent();
 				if (!parent) throw new Error('Parent is not set');
 				await this.#serverValidation.askServerForValidation(
 					saveData,
@@ -885,7 +889,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	async #create(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
 		if (!this._detailRepository) throw new Error('Detail repository is not set');
 
-		const parent = this.getParent();
+		const parent = this._internal_getCreateUnderParent();
 		if (!parent) throw new Error('Parent is not set');
 
 		const { data, error } = await this._detailRepository.create(saveData, parent.unique);

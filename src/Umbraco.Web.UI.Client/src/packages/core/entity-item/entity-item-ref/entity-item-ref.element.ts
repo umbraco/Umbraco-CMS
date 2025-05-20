@@ -8,6 +8,7 @@ import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 import './default-item-ref.element.js';
+import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-entity-item-ref')
 export class UmbEntityItemRefElement extends UmbLitElement {
@@ -41,7 +42,7 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 	}
 
 	#readonly = false;
-	@property({ type: Boolean, attribute: 'readonly' })
+	@property({ type: Boolean, reflect: true })
 	public get readonly() {
 		return this.#readonly;
 	}
@@ -54,7 +55,7 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 	}
 
 	#standalone = false;
-	@property({ type: Boolean, attribute: 'standalone' })
+	@property({ type: Boolean, reflect: true })
 	public get standalone() {
 		return this.#standalone;
 	}
@@ -66,7 +67,73 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 		}
 	}
 
+	#selectOnly = false;
+	@property({ type: Boolean, attribute: 'select-only', reflect: true })
+	public get selectOnly() {
+		return this.#selectOnly;
+	}
+	public set selectOnly(value) {
+		this.#selectOnly = value;
+
+		if (this._component) {
+			this._component.selectOnly = this.#selectOnly;
+		}
+	}
+
+	#selectable = false;
+	@property({ type: Boolean, reflect: true })
+	public get selectable() {
+		return this.#selectable;
+	}
+	public set selectable(value) {
+		this.#selectable = value;
+
+		if (this._component) {
+			this._component.selectable = this.#selectable;
+		}
+	}
+
+	#selected = false;
+	@property({ type: Boolean, reflect: true })
+	public get selected() {
+		return this.#selected;
+	}
+	public set selected(value) {
+		this.#selected = value;
+
+		if (this._component) {
+			this._component.selected = this.#selected;
+		}
+	}
+
+	#disabled = false;
+	@property({ type: Boolean, reflect: true })
+	public get disabled() {
+		return this.#disabled;
+	}
+	public set disabled(value) {
+		this.#disabled = value;
+
+		if (this._component) {
+			this._component.disabled = this.#disabled;
+		}
+	}
+
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
+
+	#onSelected(event: UmbSelectedEvent) {
+		event.stopPropagation();
+		const unique = this.#item?.unique;
+		if (!unique) throw new Error('No unique id found for item');
+		this.dispatchEvent(new UmbSelectedEvent(unique));
+	}
+
+	#onDeselected(event: UmbDeselectedEvent) {
+		event.stopPropagation();
+		const unique = this.#item?.unique;
+		if (!unique) throw new Error('No unique id found for item');
+		this.dispatchEvent(new UmbDeselectedEvent(unique));
+	}
 
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
@@ -91,6 +158,13 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 				component.item = this.#item;
 				component.readonly = this.readonly;
 				component.standalone = this.standalone;
+				component.selectOnly = this.selectOnly;
+				component.selectable = this.selectable;
+				component.selected = this.selected;
+				component.disabled = this.disabled;
+
+				component.addEventListener(UmbSelectedEvent.TYPE, this.#onSelected.bind(this));
+				component.addEventListener(UmbDeselectedEvent.TYPE, this.#onDeselected.bind(this));
 
 				// Proxy the actions slot to the component
 				const slotElement = document.createElement('slot');
@@ -108,6 +182,12 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 
 	override render() {
 		return html`${this._component}`;
+	}
+
+	override destroy(): void {
+		this._component?.removeEventListener(UmbSelectedEvent.TYPE, this.#onSelected.bind(this));
+		this._component?.removeEventListener(UmbDeselectedEvent.TYPE, this.#onDeselected.bind(this));
+		super.destroy();
 	}
 
 	static override styles = [

@@ -15,8 +15,8 @@ test.afterEach(async ({umbracoApi}) => {
 test('can create a empty document type folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
-  await umbracoUi.documentType.clickActionsMenuForName('Document Types');
-  await umbracoUi.documentType.clickCreateButton();
+  await umbracoUi.documentType.clickActionsMenuAtRoot();
+  await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentFolderButton();
   await umbracoUi.documentType.enterFolderName(documentFolderName);
   await umbracoUi.documentType.clickCreateFolderButton();
@@ -39,7 +39,7 @@ test('can delete a document type folder', {tag: '@smoke'}, async ({umbracoApi, u
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.documentType.clickRootFolderCaretButton();
   await umbracoUi.documentType.clickActionsMenuForName(documentFolderName);
-  await umbracoUi.documentType.deleteFolder();
+  await umbracoUi.documentType.clickDeleteAndConfirmButton();
 
   // Assert
   //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
@@ -58,9 +58,10 @@ test('can rename a document type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.documentType.clickRootFolderCaretButton();
   await umbracoUi.documentType.clickActionsMenuForName(oldFolderName);
-  await umbracoUi.documentType.clickRenameFolderButton();
+  await umbracoUi.documentType.clickRenameActionMenuOption();
   await umbracoUi.documentType.enterFolderName(documentFolderName);
   await umbracoUi.documentType.clickConfirmRenameButton();
+  await umbracoUi.waitForTimeout(500);
 
   // Assert
   //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
@@ -81,7 +82,7 @@ test('can create a document type folder in a folder', async ({umbracoApi, umbrac
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.documentType.clickRootFolderCaretButton();
   await umbracoUi.documentType.clickActionsMenuForName(documentFolderName);
-  await umbracoUi.documentType.clickCreateButton();
+  await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentFolderButton();
   await umbracoUi.documentType.enterFolderName(childFolderName);
   await umbracoUi.documentType.clickCreateFolderButton();
@@ -113,7 +114,7 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.documentType.clickRootFolderCaretButton();
   await umbracoUi.documentType.clickCaretButtonForName(grandParentFolderName);
   await umbracoUi.documentType.clickActionsMenuForName(parentFolderName);
-  await umbracoUi.documentType.clickCreateButton();
+  await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentFolderButton();
   await umbracoUi.documentType.enterFolderName(documentFolderName);
   await umbracoUi.documentType.clickCreateFolderButton();
