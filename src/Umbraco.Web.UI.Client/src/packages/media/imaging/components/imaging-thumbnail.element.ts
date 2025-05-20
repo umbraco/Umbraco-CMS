@@ -99,14 +99,8 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 
 		return when(
 			this._thumbnailUrl,
-			() =>
-				html`<img
-					id="figure"
-					src="${this._thumbnailUrl}"
-					alt="${this.alt}"
-					loading="${this.loading}"
-					draggable="false" />`,
-			() => html`<umb-icon id="icon" name="${this.icon}"></umb-icon>`,
+			(url) => html`<img id="figure" src=${url} alt=${this.alt} loading=${this.loading} draggable="false" />`,
+			() => html`<umb-icon id="icon" name=${this.icon}></umb-icon>`,
 		);
 	}
 

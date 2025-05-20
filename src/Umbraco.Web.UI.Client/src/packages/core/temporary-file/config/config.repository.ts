@@ -44,6 +44,7 @@ export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implemen
 
 	/**
 	 * Subscribe to the entire configuration.
+	 * @returns {Observable<UmbTemporaryFileConfigurationModel>}
 	 */
 	all() {
 		if (!this.#dataStore) {
@@ -56,6 +57,7 @@ export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implemen
 	/**
 	 * Subscribe to a part of the configuration.
 	 * @param part
+	 * @returns {Observable<UmbTemporaryFileConfigurationModel[Part]>}
 	 */
 	part<Part extends keyof UmbTemporaryFileConfigurationModel>(
 		part: Part,

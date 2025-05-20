@@ -173,14 +173,14 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	}
 
 	#renderImageCropper() {
-		return html`<umb-image-cropper-field
-			.value=${this.value}
-			.file=${this._file?.temporaryFile?.file}
-			@change=${this.#onChange}>
-			<uui-button slot="actions" @click=${this.#onRemove} label=${this.localize.term('content_uploadClear')}>
-				<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
-			</uui-button>
-		</umb-image-cropper-field> `;
+		return html`
+			<umb-image-cropper-field .value=${this.value} .file=${this._file?.temporaryFile?.file} @change=${this.#onChange}>
+				<uui-button slot="actions" compact label=${this.localize.term('content_uploadClear')} @click=${this.#onRemove}>
+					<uui-icon name="icon-trash"></uui-icon>
+					<umb-localize key="content_uploadClear">Remove file(s)</umb-localize>
+				</uui-button>
+			</umb-image-cropper-field>
+		`;
 	}
 
 	static override readonly styles = [
@@ -190,9 +190,16 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 				max-width: 500px;
 				min-width: 300px;
 			}
+
 			#loader {
 				display: flex;
 				justify-content: center;
+			}
+
+			[slot='actions'] {
+				uui-icon {
+					padding-right: var(--uui-size-1);
+				}
 			}
 		`,
 	];
