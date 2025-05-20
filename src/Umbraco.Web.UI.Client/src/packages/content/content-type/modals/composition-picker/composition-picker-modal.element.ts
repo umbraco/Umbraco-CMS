@@ -111,11 +111,12 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 		if (!data) return;
 
-		const folders = Array.from(new Set(data.map((c) => '/' + c.folderPath.join('/')))).sort();
-		this._compatibleCompositions = folders.map((path) => ({
-			path,
-			compositions: data.filter((c) => '/' + c.folderPath.join('/') === path),
-		}));
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-expect-error
+		const grouped = Object.groupBy(data, (item) => '/' + item.folderPath.join('/'));
+		this._compatibleCompositions = Object.keys(grouped)
+			.sort((a, b) => a.localeCompare(b))
+			.map((key) => ({ path: key, compositions: grouped[key] }));
 	}
 
 	#onSelectionAdd(unique: string) {
