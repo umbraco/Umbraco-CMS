@@ -87,6 +87,7 @@ export class UmbInputBlockTypeElement<
 			this.observe(
 				await this.#datasetContext?.propertyValueByAlias('blocks'),
 				(value) => {
+					console.log('value', value);
 					this.#filter = value as Array<UmbBlockTypeBaseModel>;
 				},
 				'observeBlocks',
@@ -116,8 +117,7 @@ export class UmbInputBlockTypeElement<
 							// Only pick elements:
 							docType.isElement &&
 							// Prevent picking the an already used element type:
-							this.#filter &&
-							this.#filter.find((x) => x.contentElementTypeKey === docType.unique) === undefined,
+							this.#filter?.find((x) => x.contentElementTypeKey === docType.unique) === undefined,
 					},
 					value: {
 						selection: [],
