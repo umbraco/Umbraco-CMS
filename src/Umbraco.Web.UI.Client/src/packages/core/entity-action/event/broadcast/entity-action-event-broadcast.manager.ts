@@ -24,7 +24,7 @@ export class UmbEntityActionEventBroadcastManager extends UmbControllerBase {
 
 		this.#broadcastChannel.onmessage = (event: MessageEvent) => {
 			/* We know when the event is from this channel the data will include
-			all the args for a UmbEntityActionEvent */
+			all the args for a UmbEntityEvent */
 			const entityEvent = new UmbEntityEvent(event.data);
 			this.#actionEventContext?.localDispatchEvent(entityEvent);
 		};
