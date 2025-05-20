@@ -61,8 +61,8 @@ test('tiptap is the default property editor in rich text editor', async ({umbrac
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
   // Assert 
-  //await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.tipTapSettings);
-  //await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.tipTapSettings);
+  await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.tipTapSettings);
+  await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.tipTapSettings);
   await umbracoUi.dataType.doesPropertyEditorHaveName(tipTapPropertyEditorName);
   await umbracoUi.dataType.doesPropertyEditorHaveAlias(tipTapAlias);
   await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(tipTapUiAlias);
