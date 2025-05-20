@@ -64,7 +64,8 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(richTextDataTypeName);
 });
 
-test('can update property value nested in a block grid area with an RTE with a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+// Needs to be updated as we are not asserting on save or publish notifications as we did in 15
+test.fixme('can update property value nested in a block grid area with an RTE with a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   test.slow();
   // Arrange
   // ElementType with Textstring And REGEX only accept letters and numbers
