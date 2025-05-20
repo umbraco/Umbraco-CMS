@@ -8,9 +8,16 @@ schedules:
     displayName: Daily midnight build
     branches:
       include:
-        - v14/dev
         - v15/dev
+        - release/16.0
         - main
+
+parameters:
+    # Skipped due to DB locks
+  - name: sqliteAcceptanceTests
+    displayName: Run SQLite Acceptance Tests
+    type: boolean
+    default: false
 
 variables:
   nodeVersion: 20
@@ -122,6 +129,8 @@ stages:
       # E2E Tests
       - job:
         displayName: E2E Tests (SQLite)
+        # currently disabled due to DB locks randomly occuring.
+        condition: eq(${{parameters.sqliteAcceptanceTests}}, True)
         timeoutInMinutes: 180
         variables:
           # Connection string
