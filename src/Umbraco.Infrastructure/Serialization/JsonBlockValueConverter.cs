@@ -191,8 +191,9 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                     // ignore this layout - forward the reader to the end of the array and look for the next one
 
                     // Read past the current StartArray token before we start counting
-                    reader.Read();
+                    _ = reader.Read();
 
+                    // Keep track of the number of open arrays to ensure we find the correct EndArray token
                     var openCount = 0;
                     while (true)
                     {
@@ -210,7 +211,7 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                             openCount--;
                         }
 
-                        if(!reader.Read())
+                        if (!reader.Read())
                         {
                             throw new JsonException($"Unexpected end of JSON while looking for the end of the layout items array for block editor alias: {blockEditorAlias}.");
                         }
