@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -49,7 +50,7 @@ public class DataValueReferenceFactoryCollectionTests
     [Test]
     public void GetAllReferences_All_Variants_With_IDataValueReferenceFactory()
     {
-        var collection = new DataValueReferenceFactoryCollection(() => new TestDataValueReferenceFactory().Yield());
+        var collection = new DataValueReferenceFactoryCollection(() => new TestDataValueReferenceFactory().Yield(), new NullLogger<DataValueReferenceFactoryCollection>());
 
         // label does not implement IDataValueReference
         var labelEditor = new LabelPropertyEditor(
@@ -93,7 +94,7 @@ public class DataValueReferenceFactoryCollectionTests
     [Test]
     public void GetAllReferences_All_Variants_With_IDataValueReference_Editor()
     {
-        var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>());
+        var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
 
         // mediaPicker does implement IDataValueReference
         var mediaPicker = new MediaPicker3PropertyEditor(
@@ -137,7 +138,7 @@ public class DataValueReferenceFactoryCollectionTests
     [Test]
     public void GetAllReferences_Invariant_With_IDataValueReference_Editor()
     {
-        var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>());
+        var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
 
         // mediaPicker does implement IDataValueReference
         var mediaPicker = new MediaPicker3PropertyEditor(
@@ -181,7 +182,7 @@ public class DataValueReferenceFactoryCollectionTests
     [Test]
     public void GetAutomaticRelationTypesAliases_ContainsDefault()
     {
-        var collection = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>);
+        var collection = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>, new NullLogger<DataValueReferenceFactoryCollection>());
         var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>));
 
         var result = collection.GetAllAutomaticRelationTypesAliases(propertyEditors).ToArray();
@@ -193,7 +194,7 @@ public class DataValueReferenceFactoryCollectionTests
     [Test]
     public void GetAutomaticRelationTypesAliases_ContainsCustom()
     {
-        var collection = new DataValueReferenceFactoryCollection(() => new TestDataValueReferenceFactory().Yield());
+        var collection = new DataValueReferenceFactoryCollection(() => new TestDataValueReferenceFactory().Yield(), new NullLogger<DataValueReferenceFactoryCollection>());
 
         var labelPropertyEditor = new LabelPropertyEditor(DataValueEditorFactory, IOHelper);
         var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => labelPropertyEditor.Yield()));

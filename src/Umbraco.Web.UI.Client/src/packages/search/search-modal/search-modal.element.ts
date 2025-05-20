@@ -22,9 +22,8 @@ import '../search-result/search-result-item.element.js';
 
 type GlobalSearchers = {
 	name: string;
-	api?: UmbGlobalSearchApi;
+	api?: UmbSearchProvider<UmbSearchResultItemModel>;
 	alias: string;
-	searchProviderApi: UmbSearchProvider<UmbSearchResultItemModel>;
 };
 
 @customElement('umb-search-modal')
@@ -93,20 +92,29 @@ export class UmbSearchModalElement extends UmbLitElement {
 			const globalSearch: Array<GlobalSearchers> = [];
 
 			for (const controller of controllers) {
-				const globalSearchApi = await createExtensionApi<UmbGlobalSearchApi>(this, controller.manifest);
-				const searchProviderApi = await createExtensionApiByAlias<UmbSearchProvider<UmbSearchResultItemModel>>(
-					this,
-					controller.manifest.meta?.searchProviderAlias,
-				);
+				let searchApi = undefined;
 
-				const searcher: GlobalSearchers = {
-					name: controller.manifest.meta?.label || controller.manifest.name,
-					api: globalSearchApi,
-					searchProviderApi,
-					alias: controller.alias,
-				};
+				if (controller.manifest.api) {
+					searchApi = await createExtensionApi<UmbGlobalSearchApi>(this, controller.manifest);
 
-				if (searchProviderApi) {
+					if (searchApi) {
+						// TODO: we need to investigate if it makes sense to have a function that does this when creating a new extension api? [MR]
+						(searchApi as any).manifest = controller.manifest;
+					}
+				} else {
+					searchApi = await createExtensionApiByAlias<UmbSearchProvider<UmbSearchResultItemModel>>(
+						this,
+						controller.manifest.meta?.searchProviderAlias,
+					);
+				}
+
+				if (searchApi) {
+					const searcher: GlobalSearchers = {
+						name: controller.manifest.meta?.label || controller.manifest.name,
+						api: searchApi,
+						alias: controller.alias,
+					};
+
 					globalSearch.push(searcher);
 				}
 			}
@@ -163,8 +171,8 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	async #updateSearchResults() {
-		if (this._search && this._currentGlobalSearcher?.searchProviderApi) {
-			const { data } = await this._currentGlobalSearcher.searchProviderApi.search({ query: this._search });
+		if (this._search && this._currentGlobalSearcher?.api) {
+			const { data } = await this._currentGlobalSearcher.api.search({ query: this._search });
 			if (!data) return;
 			this._searchResults = data.items;
 		} else {
