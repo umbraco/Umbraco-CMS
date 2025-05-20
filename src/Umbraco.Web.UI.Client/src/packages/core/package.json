@@ -7,6 +7,7 @@
 		"generate:server-api": "openapi-ts --file openapi-ts.config.js"
 	},
 	"dependencies": {
+		"@microsoft/signalr": "^8.0.7",
 		"@types/diff": "^7.0.2",
 		"diff": "^7.0.0",
 		"uuid": "^11.1.0"
