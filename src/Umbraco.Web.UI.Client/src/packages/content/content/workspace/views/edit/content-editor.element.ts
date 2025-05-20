@@ -130,9 +130,9 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 							${this._hasRootGroups && this._tabs.length > 0
 								? html`
 										<uui-tab
-											.label=${this.localize.term('general_generic')}
+											label=${this.localize.term('general_generic')}
 											.active=${this._routerPath + '/root' === this._activePath}
-											.href=${this._routerPath + '/root'}></uui-tab>
+											href=${this._routerPath + '/root'}></uui-tab>
 									`
 								: ''}
 							${repeat(
@@ -141,9 +141,9 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 								(tab) => {
 									const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
 									return html`<uui-tab
-										.label=${this.localize.string(tab.name ?? '#general_unnamed')}
+										label=${this.localize.string(tab.name ?? '#general_unnamed')}
 										.active=${path === this._activePath}
-										.href=${path}></uui-tab>`;
+										href=${path}></uui-tab>`;
 								},
 							)}
 						</uui-tab-group>`
