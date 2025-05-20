@@ -848,6 +848,7 @@ namespace Umbraco.Cms.Core.Services
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
             var savingNotification = new MemberSavingNotification(member, evtMsgs);
+            savingNotification.State.Add("LoginPropertiesOnly", true);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();
