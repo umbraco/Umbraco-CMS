@@ -83,6 +83,10 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 					extensionsWithElement.map(async (extensionController) => {
 						const api = await createExtensionApi(this, extensionController.manifest);
 
+						if (api) {
+							(api as any).manifest = extensionController.manifest;
+						}
+
 						return {
 							path:
 								api?.getPath?.() ||
