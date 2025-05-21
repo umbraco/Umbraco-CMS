@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -148,7 +149,7 @@ public class BlockListEditorPropertyValueEditorTests
             new DataEditorAttribute("alias"),
             new BlockListEditorDataConverter(jsonSerializer),
             new(new DataEditorCollection(() => [])),
-            new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>),
+            new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>, Mock.Of<ILogger<DataValueReferenceFactoryCollection>>()),
             Mock.Of<IDataTypeConfigurationCache>(),
             Mock.Of<IBlockEditorElementTypeCache>(),
             localizedTextServiceMock.Object,

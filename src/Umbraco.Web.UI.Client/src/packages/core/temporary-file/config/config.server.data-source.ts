@@ -13,6 +13,6 @@ export class UmbTemporaryFileConfigServerDataSource {
 	 * Get the temporary file configuration.
 	 */
 	getConfig() {
-		return tryExecute(this.#host, TemporaryFileService.getTemporaryFileConfiguration());
+		return tryExecute(this.#host, TemporaryFileService.getTemporaryFileConfiguration(), { disableNotifications: true });
 	}
 }

@@ -22,6 +22,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		super();
 
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (context) => {
+			// TODO: stop consuming the context both in the default element and here. Instead make the default able to inform when the context is consumed. Or come up with a better system for the controllers to talk together. [NL]
 			this.#collectionContext = context;
 		});
 

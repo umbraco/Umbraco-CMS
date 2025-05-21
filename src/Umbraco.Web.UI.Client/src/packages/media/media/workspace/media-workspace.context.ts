@@ -38,6 +38,7 @@ export class UmbMediaWorkspaceContext
 {
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.mediaType.unique);
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent((data) => !!data?.mediaType.collection);
+	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.mediaType.icon);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 
@@ -117,11 +118,10 @@ export class UmbMediaWorkspaceContext
 	 * @deprecated Use `createScaffold` instead.
 	 */
 	public async create(parent: { entityType: string; unique: string | null }, mediaTypeUnique: string) {
-		const args = {
+		return this.createScaffold({
 			parent,
-			preset: { mediaType: { unique: mediaTypeUnique, collection: null } },
-		};
-		return this.createScaffold(args);
+			preset: { mediaType: { unique: mediaTypeUnique } },
+		});
 	}
 
 	public getCollectionAlias() {

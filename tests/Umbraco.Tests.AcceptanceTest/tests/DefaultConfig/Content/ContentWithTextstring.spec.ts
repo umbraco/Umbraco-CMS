@@ -27,7 +27,7 @@ test('can create content with the textstring data type', async ({umbracoApi, umb
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
@@ -89,6 +89,7 @@ test('cannot input the text that exceeds the allowed amount of characters', asyn
   const textExceedMaxChars = 'Lorem ipsum dolor sit';
   const warningMessage = 'The string length exceeds the maximum length of';
   const dataTypeId = await umbracoApi.dataType.createTextstringDataType(customDataTypeName, maxChars);
+  console.log(dataTypeId);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);

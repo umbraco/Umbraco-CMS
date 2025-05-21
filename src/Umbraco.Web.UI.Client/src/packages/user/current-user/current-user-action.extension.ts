@@ -1,7 +1,6 @@
 import type { UmbAction } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
-import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 
 export interface UmbCurrentUserActionArgs<MetaArgsType> {
 	meta: MetaArgsType;
@@ -56,18 +55,6 @@ export interface MetaCurrentUserActionDefaultKind extends MetaCurrentUserAction 
 	 * ]
 	 */
 	label: string;
-
-	/**
-	 * The look of the button
-	 * @default primary
-	 */
-	look?: UUIInterfaceLook;
-
-	/**
-	 * The color of the button
-	 * @default default
-	 */
-	color?: UUIInterfaceColor;
 }
 
 declare global {
