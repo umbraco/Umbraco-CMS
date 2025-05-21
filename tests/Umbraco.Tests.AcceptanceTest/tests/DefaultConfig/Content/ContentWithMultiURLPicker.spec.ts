@@ -39,7 +39,7 @@ test('can create content with the document link', {tag: '@smoke'}, async ({umbra
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
-  await umbracoUi.content.clickButtonWithName('Choose');
+  await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveButton();
 
@@ -87,7 +87,7 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
+  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
