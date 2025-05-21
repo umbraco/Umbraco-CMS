@@ -1,6 +1,3 @@
-export { UMB_CONTENT_PROPERTY_CONTEXT } from './content-property.context-token.js';
-export { UmbContentPropertyContext } from './content-property.context.js';
-
 export * from './collection/index.js';
 export * from './components/index.js';
 export * from './constants.js';
