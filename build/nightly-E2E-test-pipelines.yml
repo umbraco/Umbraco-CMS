@@ -17,7 +17,7 @@ parameters:
   - name: sqliteAcceptanceTests
     displayName: Run SQLite Acceptance Tests
     type: boolean
-    default: false
+    default: true
 
 variables:
   nodeVersion: 20
@@ -129,7 +129,6 @@ stages:
       # E2E Tests
       - job:
         displayName: E2E Tests (SQLite)
-        # currently disabled due to DB locks randomly occuring.
         condition: eq(${{parameters.sqliteAcceptanceTests}}, True)
         timeoutInMinutes: 180
         variables:
