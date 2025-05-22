@@ -7,8 +7,6 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class AppCacheExtensions
 {
-    public const string NullRepresentationInCache = "*NULL*";
-
     public static T? GetCacheItem<T>(
         this IAppPolicyCache provider,
         string cacheKey,
@@ -43,7 +41,7 @@ public static class AppCacheExtensions
     public static T? GetCacheItem<T>(this IAppCache provider, string cacheKey)
     {
         var result = provider.Get(cacheKey);
-        if (result is null or (object)NullRepresentationInCache)
+        if (IsRetrievedItemNull(result))
         {
             return default;
         }
@@ -54,13 +52,15 @@ public static class AppCacheExtensions
     public static T? GetCacheItem<T>(this IAppCache provider, string cacheKey, Func<T> getCacheItem)
     {
         var result = provider.Get(cacheKey, () => getCacheItem());
-        if (result is null or (object)NullRepresentationInCache)
+        if (IsRetrievedItemNull(result))
         {
             return default;
         }
 
         return result.TryConvertTo<T>().Result;
     }
+
+    private static bool IsRetrievedItemNull(object? result) => result is null or (object)Cms.Core.Constants.Cache.NullRepresentationInCache;
 
     public static async Task<T?> GetCacheItemAsync<T>(
         this IAppPolicyCache provider,

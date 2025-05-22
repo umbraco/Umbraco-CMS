@@ -137,10 +137,8 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
             return fromCache;
         }
 
-        // Because TEntity can never be a string, we will never be in a position where the proxy value collides withs a real value.
-        // Therefore this point can only be reached if there is a proxy null value => becomes null when cast to TEntity above OR the item simply does not exist.
         // If we've cached a "null" value, return null.
-        if (_options.CacheNullValues && Cache.GetCacheItem<string>(cacheKey) == AppCacheExtensions.NullRepresentationInCache)
+        if (_options.CacheNullValues && Cache.GetCacheItem<string>(cacheKey) == Constants.Cache.NullRepresentationInCache)
         {
             return null;
         }
@@ -271,7 +269,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
         // a value that does exist but isn't yet cached, or a value that has been explicitly cached with a null value.
         // Both would return null when we retrieve from the cache and we couldn't distinguish between the two.
         // So we cache a special value that represents null, and then we can check for that value when we retrieve from the cache.
-        Cache.Insert(cacheKey, () => AppCacheExtensions.NullRepresentationInCache, TimeSpan.FromMinutes(5), true);
+        Cache.Insert(cacheKey, () => Constants.Cache.NullRepresentationInCache, TimeSpan.FromMinutes(5), true);
     }
 
     protected virtual void InsertEntities(TId[]? ids, TEntity[]? entities)
