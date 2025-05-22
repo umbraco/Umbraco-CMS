@@ -39,7 +39,7 @@ export class UmbExampleValidationContextDashboardElement extends UmbLitElement {
 
 		this.consumeContext(UMB_VALIDATION_CONTEXT, (validationContext) => {
 			this.observe(
-				validationContext.messages.messages,
+				validationContext?.messages.messages,
 				(messages) => {
 					this.messages = messages;
 				},

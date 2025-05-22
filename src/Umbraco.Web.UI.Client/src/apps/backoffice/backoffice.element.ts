@@ -42,13 +42,13 @@ const CORE_PACKAGES = [
 	import('../../packages/tags/umbraco-package.js'),
 	import('../../packages/telemetry/umbraco-package.js'),
 	import('../../packages/templating/umbraco-package.js'),
-	import('../../packages/tiny-mce/umbraco-package.js'),
 	import('../../packages/tiptap/umbraco-package.js'),
 	import('../../packages/translation/umbraco-package.js'),
 	import('../../packages/ufm/umbraco-package.js'),
 	import('../../packages/umbraco-news/umbraco-package.js'),
 	import('../../packages/user/umbraco-package.js'),
 	import('../../packages/webhook/umbraco-package.js'),
+	import('../../packages/content/umbraco-package.js'),
 ];
 
 @customElement('umb-backoffice')
@@ -77,7 +77,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 
 		// TODO: We need to ensure this request is called every time the user logs in, but this should be done somewhere across the app and not here [JOV]
 		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-			this.observe(authContext.isAuthorized, (isAuthorized) => {
+			this.observe(authContext?.isAuthorized, (isAuthorized) => {
 				if (!isAuthorized) return;
 				serverExtensions.registerPrivateExtensions();
 			});
@@ -92,7 +92,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: flex;

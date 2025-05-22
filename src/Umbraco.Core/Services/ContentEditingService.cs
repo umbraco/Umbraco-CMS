@@ -58,19 +58,10 @@ internal sealed class ContentEditingService
         _languageService = languageService;
     }
 
-    public async Task<IContent?> GetAsync(Guid key)
+    public Task<IContent?> GetAsync(Guid key)
     {
         IContent? content = ContentService.GetById(key);
-        return await Task.FromResult(content);
-    }
-
-    [Obsolete("Please use the validate update method that is not obsoleted. Scheduled for removal in V16.")]
-    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ContentUpdateModel updateModel)
-    {
-        IContent? content = ContentService.GetById(key);
-        return content is not null
-            ? await ValidateCulturesAndPropertiesAsync(updateModel, content.ContentType.Key)
-            : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+        return Task.FromResult(content);
     }
 
     [Obsolete("Please use the validate update method that is not obsoleted. Scheduled for removal in V17.")]

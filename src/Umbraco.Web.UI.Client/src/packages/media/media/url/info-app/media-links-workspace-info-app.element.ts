@@ -1,40 +1,107 @@
+import { UmbMediaUrlRepository } from '../repository/index.js';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
-import type { MediaUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbMediaUrlModel } from '../repository/types.js';
+import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import type { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { debounce } from '@umbraco-cms/backoffice/utils';
+
+interface UmbMediaInfoViewLink {
+	url: string | undefined;
+}
 
 @customElement('umb-media-links-workspace-info-app')
 export class UmbMediaLinksWorkspaceInfoAppElement extends UmbLitElement {
-	@state()
-	private _urls?: Array<MediaUrlInfoModel>;
+	#mediaUrlRepository = new UmbMediaUrlRepository(this);
 
-	#workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
+	@state()
+	private _isNew = false;
+
+	@state()
+	private _unique?: string;
+
+	@state()
+	private _loading = false;
+
+	@state()
+	private _links: Array<UmbMediaInfoViewLink> = [];
+
+	#urls: Array<UmbMediaUrlModel> = [];
+
+	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
-			this.#workspaceContext = context;
-			this.#observeUrls();
+			if (context) {
+				this.observe(
+					observeMultiple([context.isNew, context.unique]),
+					([isNew, unique]) => {
+						if (!unique) return;
+						this._isNew = isNew === true;
+
+						if (unique !== this._unique) {
+							this._unique = unique;
+							this.#requestUrls();
+						}
+					},
+					'observeWorkspaceState',
+				);
+			} else {
+				this.removeUmbControllerByAlias('observeWorkspaceState');
+			}
 		});
 	}
 
-	#observeUrls() {
-		if (!this.#workspaceContext) return;
+	#setLinks() {
+		const links: Array<UmbMediaInfoViewLink> = this.#urls.map((u) => {
+			const url = u.url;
+			return { url };
+		});
 
-		this.observe(
-			this.#workspaceContext.urls,
-			(urls) => {
-				this._urls = urls;
-			},
-			'__urls',
-		);
+		this._links = links;
 	}
 
-	protected override render() {
-		return html`<umb-workspace-info-app-layout headline="#general_links">
-			${this.#renderLinksSection()}
-		</umb-workspace-info-app-layout> `;
+	async #requestUrls() {
+		if (this._isNew) return;
+		if (!this._unique) return;
+
+		this._loading = true;
+		this.#urls = [];
+
+		const { data } = await this.#mediaUrlRepository.requestItems([this._unique]);
+
+		if (data?.length) {
+			this.#urls = data;
+			this.#setLinks();
+		}
+
+		this._loading = false;
+	}
+
+	#debounceRequestUrls = debounce(() => this.#requestUrls(), 50);
+
+	#onReloadRequest = () => {
+		this.#debounceRequestUrls();
+	};
+
+	override render() {
+		return html`
+			<umb-workspace-info-app-layout headline="#general_links">
+				${when(
+					this._loading,
+					() => this.#renderLoading(),
+					() => this.#renderContent(),
+				)}
+			</umb-workspace-info-app-layout>
+		`;
+	}
+
+	#renderLoading() {
+		return html`<div id="loader-container"><uui-loader></uui-loader></div>`;
 	}
 
 	#openSvg(imagePath: string) {
@@ -52,11 +119,11 @@ export class UmbMediaLinksWorkspaceInfoAppElement extends UmbLitElement {
 		popup.document.close();
 	}
 
-	#renderLinksSection() {
-		if (this._urls && this._urls.length) {
+	#renderContent() {
+		if (this._links.length) {
 			return html`
 				${repeat(
-					this._urls,
+					this._links,
 					(item) => item.url,
 					(item) => this.#renderLinkItem(item),
 				)}
@@ -70,11 +137,12 @@ export class UmbMediaLinksWorkspaceInfoAppElement extends UmbLitElement {
 		}
 	}
 
-	#renderLinkItem(item: MediaUrlInfoModel) {
+	#renderLinkItem(item: UmbMediaInfoViewLink) {
+		if (!item.url) return nothing;
 		const ext = item.url.split(/[#?]/)[0].split('.').pop()?.trim();
 		if (ext === 'svg') {
 			return html`
-				<a href="#" target="_blank" class="link-item with-href" @click=${() => this.#openSvg(item.url)}>
+				<a href="#" target="_blank" class="link-item with-href" @click=${() => this.#openSvg(item.url!)}>
 					<span class="link-content">${item.url}</span>
 					<uui-icon name="icon-out"></uui-icon>
 				</a>
@@ -87,6 +155,15 @@ export class UmbMediaLinksWorkspaceInfoAppElement extends UmbLitElement {
 				</a>
 			`;
 		}
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+
+		this.#eventContext?.removeEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadRequest as unknown as EventListener,
+		);
 	}
 
 	static override styles = [

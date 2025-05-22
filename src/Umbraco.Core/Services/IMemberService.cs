@@ -266,7 +266,8 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IMember" />
     /// </returns>
-    IMember? GetByKey(Guid id);
+    [Obsolete($"Use {nameof(GetById)}. Scheduled for removal in Umbraco 18.")]
+    IMember? GetByKey(Guid id) => GetById(id);
 
     /// <summary>
     ///     Gets a Member by its integer id
@@ -426,4 +427,11 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
     IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
+
+    /// <summary>
+    /// Saves only the properties related to login for the member, using an optimized, non-locking update.
+    /// </summary>
+    /// <param name="member">The member to update.</param>
+    /// <returns>Used to avoid the full save of the member object after a login operation.</returns>
+    Task UpdateLoginPropertiesAsync(IMember member) => Task.CompletedTask;
 }

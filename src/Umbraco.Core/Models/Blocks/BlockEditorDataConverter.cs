@@ -2,8 +2,6 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Blocks;
@@ -16,18 +14,6 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
     where TLayout : IBlockLayoutItem
 {
     private readonly IJsonSerializer _jsonSerializer;
-
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V15.")]
-    protected BlockEditorDataConverter(string propertyEditorAlias)
-        : this(propertyEditorAlias, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V15.")]
-    protected BlockEditorDataConverter(string propertyEditorAlias, IJsonSerializer jsonSerializer)
-        : this(jsonSerializer)
-    {
-    }
 
     protected BlockEditorDataConverter(IJsonSerializer jsonSerializer)
         => _jsonSerializer = jsonSerializer;

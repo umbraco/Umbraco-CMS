@@ -1,11 +1,11 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class ContentTypeEditingServiceTests
+internal sealed partial class ContentTypeEditingServiceTests
 {
     [TestCase(true)]
     [TestCase(false)]

@@ -19,6 +19,3 @@ export class UmbMediaTypePickerInputContext extends UmbPickerInputContext<
 		super(host, UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_TYPE_PICKER_MODAL);
 	}
 }
-
-/** @deprecated Use `UmbMediaTypePickerInputContext` instead. This method will be removed in Umbraco 15. */
-export { UmbMediaTypePickerInputContext as UmbMediaTypePickerContext };

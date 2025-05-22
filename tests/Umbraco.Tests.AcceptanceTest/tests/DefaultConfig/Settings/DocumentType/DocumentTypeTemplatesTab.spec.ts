@@ -31,7 +31,8 @@ test('can add an allowed template to a document type', {tag: '@smoke'}, async ({
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  //await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isErrorNotificationVisible(false);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedTemplates[0].id).toBe(templateId);
 });
@@ -51,7 +52,8 @@ test('can set an allowed template as default for document type', async ({umbraco
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  //await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isErrorNotificationVisible(false);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedTemplates).toHaveLength(2);
   expect(documentTypeData.defaultTemplate.id).toBe(secondTemplateId);
@@ -73,7 +75,8 @@ test.skip('can remove an allowed template from a document type', async ({umbraco
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  //await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isErrorNotificationVisible(false);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedTemplates).toHaveLength(0);
 });

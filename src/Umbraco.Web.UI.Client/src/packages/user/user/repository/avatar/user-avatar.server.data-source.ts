@@ -2,7 +2,7 @@ import type { SetAvatarRequestModel } from '@umbraco-cms/backoffice/external/bac
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 export class UmbUserAvatarServerDataSource {
 	#host: UmbControllerHost;
@@ -19,13 +19,13 @@ export class UmbUserAvatarServerDataSource {
 	 * @memberof UmbUserServerDataSource
 	 */
 	createAvatar(unique: string, fileUnique: string): Promise<UmbDataSourceErrorResponse> {
-		const requestBody: SetAvatarRequestModel = {
+		const body: SetAvatarRequestModel = {
 			file: {
 				id: fileUnique,
 			},
 		};
 
-		return tryExecuteAndNotify(this.#host, UserService.postUserAvatarById({ id: unique, requestBody }));
+		return tryExecute(this.#host, UserService.postUserAvatarById({ path: { id: unique }, body }));
 	}
 
 	/**
@@ -35,6 +35,6 @@ export class UmbUserAvatarServerDataSource {
 	 * @memberof UmbUserServerDataSource
 	 */
 	deleteAvatar(unique: string): Promise<UmbDataSourceErrorResponse> {
-		return tryExecuteAndNotify(this.#host, UserService.deleteUserAvatarById({ id: unique }));
+		return tryExecute(this.#host, UserService.deleteUserAvatarById({ path: { id: unique } }));
 	}
 }

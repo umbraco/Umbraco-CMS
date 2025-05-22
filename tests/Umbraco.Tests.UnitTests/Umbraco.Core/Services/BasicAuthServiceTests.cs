@@ -32,10 +32,12 @@ public class BasicAuthServiceTests
     [TestCase("125.125.124.1", "125.125.125.0/24", ExpectedResult = false)]
     public bool IsIpAllowListed(string clientIpAddress, string commaSeperatedAllowlist)
     {
-        var allowedIPs = commaSeperatedAllowlist.Split(",").Select(x => x.Trim()).ToArray();
         var sut = new BasicAuthService(
-            Mock.Of<IOptionsMonitor<BasicAuthSettings>>(_ =>
-                _.CurrentValue == new BasicAuthSettings { AllowedIPs = allowedIPs }),
+            Mock.Of<IOptionsMonitor<BasicAuthSettings>>(x =>
+                x.CurrentValue == new BasicAuthSettings
+                {
+                    AllowedIPs = new HashSet<string>(commaSeperatedAllowlist.Split(',', StringSplitOptions.TrimEntries))
+                }),
             new IpAddressUtilities());
 
         return sut.IsIpAllowListed(IPAddress.Parse(clientIpAddress));

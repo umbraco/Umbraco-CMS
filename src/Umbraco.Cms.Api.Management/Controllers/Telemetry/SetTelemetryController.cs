@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
@@ -34,6 +34,6 @@ public class SetTelemetryController : TelemetryControllerBase
         }
 
         await _metricsConsentService.SetConsentLevelAsync(telemetryRepresentationBase.TelemetryLevel);
-        return await Task.FromResult(Ok());
+        return Ok();
     }
 }

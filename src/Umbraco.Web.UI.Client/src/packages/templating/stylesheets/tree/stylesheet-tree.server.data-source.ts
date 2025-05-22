@@ -41,7 +41,7 @@ export class UmbStylesheetTreeServerDataSource extends UmbTreeServerDataSourceBa
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	StylesheetService.getTreeStylesheetRoot({ skip: args.skip, take: args.take });
+	StylesheetService.getTreeStylesheetRoot({ query: { skip: args.skip, take: args.take } });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parent.unique);
@@ -51,9 +51,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return StylesheetService.getTreeStylesheetChildren({
-			parentPath,
-			skip: args.skip,
-			take: args.take,
+			query: { parentPath, skip: args.skip, take: args.take },
 		});
 	}
 };
@@ -64,7 +62,7 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) => {
 
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	return StylesheetService.getTreeStylesheetAncestors({
-		descendantPath,
+		query: { descendantPath },
 	});
 };
 

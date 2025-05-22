@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
-public class MediaServiceTests : UmbracoIntegrationTest
+internal sealed class MediaServiceTests : UmbracoIntegrationTest
 {
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -7,7 +8,7 @@ using Umbraco.Cms.Core.Sync;
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
 [WebhookEvent("Data Type Deleted")]
-public class DataTypeDeletedWebhookEvent : WebhookEventBase<DataTypeSavedNotification>
+public class DataTypeDeletedWebhookEvent : WebhookEventBase<DataTypeDeletedNotification>
 {
     public DataTypeDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
@@ -20,6 +21,6 @@ public class DataTypeDeletedWebhookEvent : WebhookEventBase<DataTypeSavedNotific
 
     public override string Alias => Constants.WebhookEvents.Aliases.DataTypeDeleted;
 
-    public override object? ConvertNotificationToRequestPayload(DataTypeSavedNotification notification)
-        => notification.SavedEntities;
+    public override object? ConvertNotificationToRequestPayload(DataTypeDeletedNotification notification)
+        => notification.DeletedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

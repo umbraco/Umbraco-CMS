@@ -45,7 +45,7 @@ type UmbUfmFilterType = {
 	filter: ((...args: Array<unknown>) => string | undefined | null) | undefined;
 };
 
-export class UmbUfmContext extends UmbContextBase<UmbUfmContext> {
+export class UmbUfmContext extends UmbContextBase {
 	#filters = new UmbArrayState<UmbUfmFilterType>([], (x) => x.alias);
 	public readonly filters = this.#filters.asObservable();
 

@@ -1,7 +1,7 @@
 import type { UmbUnlockUserDataSource } from './types.js';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for unlocking users
@@ -28,10 +28,10 @@ export class UmbUnlockUserServerDataSource implements UmbUnlockUserDataSource {
 	async unlock(userIds: string[]) {
 		if (!userIds) throw new Error('User ids are missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			UserService.postUserUnlock({
-				requestBody: {
+				body: {
 					userIds: userIds.map((id) => ({ id })),
 				},
 			}),

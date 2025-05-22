@@ -49,6 +49,7 @@ public static class UmbracoBuilderExtensions
                 : provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
         });
         builder.Services.AddSingleton<IRequestCultureService, RequestCultureService>();
+        builder.Services.AddSingleton<IRequestSegmmentService, RequestSegmentService>();
         builder.Services.AddSingleton<IRequestRoutingService, RequestRoutingService>();
         builder.Services.AddSingleton<IRequestRedirectService, RequestRedirectService>();
         builder.Services.AddSingleton<IRequestPreviewService, RequestPreviewService>();
@@ -62,7 +63,6 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddTransient<IMemberApplicationManager, MemberApplicationManager>();
         builder.Services.AddTransient<IRequestMemberAccessService, RequestMemberAccessService>();
         builder.Services.AddTransient<ICurrentMemberClaimsProvider, CurrentMemberClaimsProvider>();
-        builder.Services.AddScoped<IMemberClientCredentialsManager, MemberClientCredentialsManager>();
 
         builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
         builder.AddUmbracoApiOpenApiUI();

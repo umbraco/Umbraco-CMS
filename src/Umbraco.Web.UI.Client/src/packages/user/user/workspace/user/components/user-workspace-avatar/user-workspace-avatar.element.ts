@@ -2,11 +2,15 @@ import type { UmbUserDetailModel } from '../../../../types.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import { css, html, customElement, query, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
 
 @customElement('umb-user-workspace-avatar')
 export class UmbUserAvatarElement extends UmbLitElement {
 	@state()
 	private _user?: UmbUserDetailModel;
+
+	@state()
+	private _allowedFileTypes = 'image/*';
 
 	@query('#AvatarFileField')
 	_avatarFileField?: HTMLInputElement;
@@ -16,6 +20,8 @@ export class UmbUserAvatarElement extends UmbLitElement {
 
 	#userWorkspaceContext?: typeof UMB_USER_WORKSPACE_CONTEXT.TYPE;
 
+	#temporaryFileConfigRepository = new UmbTemporaryFileConfigRepository(this);
+
 	constructor() {
 		super();
 
@@ -24,10 +30,27 @@ export class UmbUserAvatarElement extends UmbLitElement {
 			if (!this.#userWorkspaceContext) return;
 			this.#observeUser();
 		});
+
+		this.#observeAllowedFileTypes();
 	}
 
 	protected getFormElement() {
 		return this._selectElement;
+	}
+
+	async #observeAllowedFileTypes() {
+		await this.#temporaryFileConfigRepository.initialized;
+		this.observe(
+			this.#temporaryFileConfigRepository.part('imageFileTypes'),
+			(fileTypes) => {
+				if (fileTypes.length) {
+					this._allowedFileTypes = fileTypes.map((t) => `.${t}`).join(',');
+				} else {
+					this._allowedFileTypes = 'image/*';
+				}
+			},
+			'_imageFileTypes',
+		);
 	}
 
 	#observeUser = () => {
@@ -91,7 +114,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 						.name=${this._user.name}
 						.kind=${this._user.kind}
 						.imgUrls=${this._user.avatarUrls ?? []}></umb-user-avatar>
-					<input id="AvatarFileField" type="file" name="avatarFile" required hidden />
+					<input id="AvatarFileField" type="file" name="avatarFile" accept=${this._allowedFileTypes} required hidden />
 					<uui-button label="${this.localize.term('user_changePhoto')}" @click=${this.#uploadAvatar}></uui-button>
 					${this.#hasAvatar()
 						? html`

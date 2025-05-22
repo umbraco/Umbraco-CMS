@@ -7,13 +7,13 @@ export class UmbBackofficeHeaderElement extends UmbLitElement {
 		return html`
 			<div id="appHeader">
 				<umb-backoffice-header-logo></umb-backoffice-header-logo>
-				<umb-backoffice-header-sections id="sections"></umb-backoffice-header-sections>
+				<umb-backoffice-header-sections></umb-backoffice-header-sections>
 				<umb-backoffice-header-apps></umb-backoffice-header-apps>
 			</div>
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				width: 100%;
@@ -27,7 +27,7 @@ export class UmbBackofficeHeaderElement extends UmbLitElement {
 				padding: 0 var(--uui-size-space-5);
 			}
 
-			#sections {
+			umb-backoffice-header-sections {
 				flex: 1 1 auto;
 			}
 		`,

@@ -73,6 +73,18 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
         int skip = 0,
         int take = 100,
         bool ignoreUserStartNodes = false)
+        => SearchAsync(objectType, query, parentId, contentTypeIds, trashed, null, skip, take, ignoreUserStartNodes).GetAwaiter().GetResult();
+
+    public Task<PagedModel<IEntitySlim>> SearchAsync(
+        UmbracoObjectTypes objectType,
+        string query,
+        Guid? parentId,
+        IEnumerable<Guid>? contentTypeIds,
+        bool? trashed,
+        string? culture = null,
+        int skip = 0,
+        int take = 100,
+        bool ignoreUserStartNodes = false)
     {
         UmbracoEntityTypes entityType = objectType switch
         {
@@ -115,12 +127,12 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
             .Where(key => key != Guid.Empty)
             .ToArray();
 
-        return new PagedModel<IEntitySlim>
+        return Task.FromResult(new PagedModel<IEntitySlim>
         {
             Items = keys.Any()
                 ? _entityService.GetAll(objectType, keys)
                 : Enumerable.Empty<IEntitySlim>(),
             Total = totalFound
-        };
+        });
     }
 }

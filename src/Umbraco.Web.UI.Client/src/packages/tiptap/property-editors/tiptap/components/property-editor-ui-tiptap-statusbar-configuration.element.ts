@@ -55,7 +55,7 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 				if (!statusbar.length) return;
 				this._statusbar = statusbar;
 				this.#value = statusbar.map((area) => [...area.data]);
-				propertyContext.setValue(this.#value);
+				propertyContext?.setValue(this.#value);
 			});
 		});
 	}
@@ -199,7 +199,7 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 				<div class="items">
 					${when(
 						area?.data.length === 0,
-						() => html`<em><umb-localize key="toolbar_emptyGroup">Empty</umb-localize></em>`,
+						() => html`<em><umb-localize key="tiptap_toolbar_emptyGroup">Empty</umb-localize></em>`,
 						() => html`${area!.data.map((alias, idx) => this.#renderItem(alias, areaIndex, idx))}`,
 					)}
 				</div>

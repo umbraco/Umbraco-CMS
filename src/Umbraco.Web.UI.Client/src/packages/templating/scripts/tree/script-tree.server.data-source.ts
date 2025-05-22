@@ -37,7 +37,7 @@ export class UmbScriptTreeServerDataSource extends UmbTreeServerDataSourceBase<
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	ScriptService.getTreeScriptRoot({ skip: args.skip, take: args.take });
+	ScriptService.getTreeScriptRoot({ query: { skip: args.skip, take: args.take } });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parent.unique);
@@ -47,9 +47,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return ScriptService.getTreeScriptChildren({
-			parentPath,
-			skip: args.skip,
-			take: args.take,
+			query: { parentPath, skip: args.skip, take: args.take },
 		});
 	}
 };
@@ -60,7 +58,7 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) => {
 
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	return ScriptService.getTreeScriptAncestors({
-		descendantPath,
+		query: { descendantPath },
 	});
 };
 

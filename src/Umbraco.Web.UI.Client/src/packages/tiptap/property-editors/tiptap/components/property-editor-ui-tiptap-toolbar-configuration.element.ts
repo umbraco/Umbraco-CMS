@@ -34,7 +34,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	set value(value: UmbTiptapToolbarValue | undefined) {
 		if (!value) value = [[[]]];
 		if (value === this.#value) return;
-		this.#value = this.#context.migrateTinyMceToolbar(value);
+		this.#value = this.#context.isValidToolbarValue(value) ? value : [[[]]];
 	}
 	get value(): UmbTiptapToolbarValue | undefined {
 		return this.#context.cloneToolbarValue(this.#value);
@@ -59,7 +59,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				if (!toolbar.length) return;
 				this._toolbar = toolbar;
 				this.#value = toolbar.map((rows) => rows.data.map((groups) => [...groups.data]));
-				propertyContext.setValue(this.#value);
+				propertyContext?.setValue(this.#value);
 			});
 		});
 	}
@@ -246,7 +246,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				<div class="items">
 					${when(
 						group?.data.length === 0,
-						() => html`<em><umb-localize key="toolbar_emptyGroup">Empty</umb-localize></em>`,
+						() => html`<em><umb-localize key="tiptap_toolbar_emptyGroup">Empty</umb-localize></em>`,
 						() => html`${group!.data.map((alias, idx) => this.#renderItem(alias, rowIndex, groupIndex, idx))}`,
 					)}
 				</div>

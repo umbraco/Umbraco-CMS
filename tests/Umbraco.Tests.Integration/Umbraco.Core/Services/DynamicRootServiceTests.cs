@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 [SuppressMessage("ReSharper", "NotNullOrRequiredMemberIsNotInitialized")]
-public class DynamicRootServiceTests : UmbracoIntegrationTest
+internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
 {
     public enum DynamicRootOrigin
     {

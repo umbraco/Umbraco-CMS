@@ -20,9 +20,11 @@ export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implemen
 		super(host, UMB_TEMPORARY_FILE_REPOSITORY_ALIAS.toString());
 		this.initialized = new Promise<void>((resolve) => {
 			this.consumeContext(UMB_TEMPORARY_FILE_CONFIG_STORE_CONTEXT, async (store) => {
-				this.#dataStore = store;
-				await this.#init();
-				resolve();
+				if (store) {
+					this.#dataStore = store;
+					await this.#init();
+					resolve();
+				}
 			});
 		});
 	}
@@ -33,15 +35,21 @@ export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implemen
 			return;
 		}
 
-		const { data } = await this.#dataSource.getConfig();
+		const temporaryFileConfig = await this.requestTemporaryFileConfiguration();
 
-		if (data) {
-			this.#dataStore?.update(data);
+		if (temporaryFileConfig) {
+			this.#dataStore?.update(temporaryFileConfig);
 		}
+	}
+
+	async requestTemporaryFileConfiguration() {
+		const { data } = await this.#dataSource.getConfig();
+		return data;
 	}
 
 	/**
 	 * Subscribe to the entire configuration.
+	 * @returns {Observable<UmbTemporaryFileConfigurationModel>}
 	 */
 	all() {
 		if (!this.#dataStore) {
@@ -54,6 +62,7 @@ export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implemen
 	/**
 	 * Subscribe to a part of the configuration.
 	 * @param part
+	 * @returns {Observable<UmbTemporaryFileConfigurationModel[Part]>}
 	 */
 	part<Part extends keyof UmbTemporaryFileConfigurationModel>(
 		part: Part,

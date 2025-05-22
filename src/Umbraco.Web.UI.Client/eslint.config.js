@@ -28,6 +28,8 @@ export default [
 			'src/packages/core/icon-registry/icons',
 			'src/packages/core/icon-registry/icons.ts',
 			'src/**/*.test.ts',
+			'src/packages/core/backend-api',
+			'src/packages/core/openapi-ts.*.js',
 		],
 	},
 
@@ -63,13 +65,13 @@ export default [
 			'local-rules/enforce-umbraco-external-imports': [
 				'error',
 				{
-					exceptions: ['@umbraco-cms', '@open-wc/testing', '@storybook', 'msw', '.', 'vite'],
+					exceptions: ['@umbraco-cms', '@open-wc/testing', '@storybook', 'msw', '.', 'vite', 'uuid', 'diff'],
 				},
 			],
 			'local-rules/exported-string-constant-naming': [
 				'error',
 				{
-					excludedFileNames: ['umbraco-package', 'input-tiny-mce.defaults'], // TODO: what to do about the tiny mce defaults?
+					excludedFileNames: ['umbraco-package'],
 				},
 			],
 			'@typescript-eslint/no-non-null-assertion': 'off',
@@ -78,6 +80,14 @@ export default [
 			'@typescript-eslint/consistent-type-exports': 'error',
 			'@typescript-eslint/consistent-type-imports': 'error',
 			'@typescript-eslint/no-import-type-side-effects': 'warn',
+			'@typescript-eslint/no-deprecated': 'warn',
+			'jsdoc/check-tag-names': [
+				'warn',
+				{
+					// allow all tags from https://github.com/runem/web-component-analyzer
+					definedTags: ['element', 'attr', 'fires', 'prop', 'slot', 'cssprop', 'csspart'],
+				},
+			],
 		},
 	},
 

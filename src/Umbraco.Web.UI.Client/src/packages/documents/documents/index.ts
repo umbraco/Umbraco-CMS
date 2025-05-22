@@ -4,6 +4,7 @@ export * from './audit-log/index.js';
 export * from './components/index.js';
 export * from './constants.js';
 export * from './entity-actions/index.js';
+export * from './entity.js';
 export * from './global-contexts/index.js';
 export * from './item/index.js';
 export * from './modals/index.js';

@@ -6,7 +6,7 @@ using Umbraco.Cms.Infrastructure.ModelsBuilder.Options;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public class ContentTypeEditingServiceModelsBuilderEnabledTestsBase : ContentTypeEditingServiceTestsBase
+internal class ContentTypeEditingServiceModelsBuilderEnabledTestsBase : ContentTypeEditingServiceTestsBase
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {

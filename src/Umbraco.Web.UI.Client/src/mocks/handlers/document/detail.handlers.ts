@@ -4,6 +4,8 @@ import { items as referenceData } from '../../data/tracked-reference.data.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreateDocumentRequestModel,
+	DefaultReferenceResponseModel,
+	GetDocumentByIdReferencedDescendantsResponse,
 	PagedIReferenceResponseModel,
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
@@ -33,12 +35,34 @@ export const detailHandlers = [
 		const id = _req.params.id as string;
 		if (!id) return;
 
-		const PagedTrackedReference = {
-			total: referenceData.length,
-			items: referenceData,
+		const query = _req.url.searchParams;
+		const skip = query.get('skip') ? parseInt(query.get('skip') as string, 10) : 0;
+		const take = query.get('take') ? parseInt(query.get('take') as string, 10) : 100;
+
+		let data: Array<DefaultReferenceResponseModel> = [];
+
+		if (id === 'all-property-editors-document-id') {
+			data = referenceData;
+		}
+
+		const PagedTrackedReference: PagedIReferenceResponseModel = {
+			total: data.length,
+			items: data.slice(skip, skip + take),
 		};
 
-		return res(ctx.status(200), ctx.json<PagedIReferenceResponseModel>(PagedTrackedReference));
+		return res(ctx.status(200), ctx.json(PagedTrackedReference));
+	}),
+
+	rest.get(umbracoPath(`${UMB_SLUG}/:id/referenced-descendants`), (_req, res, ctx) => {
+		const id = _req.params.id as string;
+		if (!id) return;
+
+		const ReferencedDescendantsResponse: GetDocumentByIdReferencedDescendantsResponse = {
+			total: 0,
+			items: [],
+		};
+
+		return res(ctx.status(200), ctx.json(ReferencedDescendantsResponse));
 	}),
 
 	rest.put(umbracoPath(`${UMB_SLUG}/:id/validate`, 'v1.1'), (_req, res, ctx) => {

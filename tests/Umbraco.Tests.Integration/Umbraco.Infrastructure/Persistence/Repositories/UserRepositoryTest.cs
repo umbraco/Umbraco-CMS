@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
@@ -29,7 +30,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]
-public class UserRepositoryTest : UmbracoIntegrationTest
+internal sealed class UserRepositoryTest : UmbracoIntegrationTest
 {
     private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
 
@@ -326,7 +327,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
                     out var totalRecs,
                     user => user.Id,
                     Direction.Ascending,
-                    excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
+                    excludeUserGroups: new[] { DatabaseDataCreator.TranslatorGroupAlias },
                     filter: provider.CreateQuery<IUser>().Where(x => x.Id > -1));
 
                 // Assert
@@ -363,8 +364,8 @@ public class UserRepositoryTest : UmbracoIntegrationTest
                     out var totalRecs,
                     user => user.Id,
                     Direction.Ascending,
-                    new[] { Constants.Security.AdminGroupAlias, Constants.Security.SensitiveDataGroupAlias },
-                    new[] { Constants.Security.TranslatorGroupAlias },
+                    new[] { Constants.Security.AdminGroupAlias, DatabaseDataCreator.SensitiveDataGroupAlias },
+                    new[] { DatabaseDataCreator.TranslatorGroupAlias },
                     filter: provider.CreateQuery<IUser>().Where(x => x.Id == -1));
 
                 // Assert

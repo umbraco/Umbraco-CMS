@@ -18,16 +18,22 @@ export abstract class UmbMemberRepositoryBase extends UmbRepositoryBase {
 
 		this.init = Promise.all([
 			this.consumeContext(UMB_MEMBER_DETAIL_STORE_CONTEXT, (instance) => {
-				this.detailStore = instance;
-			}).asPromise(),
+				if (instance) {
+					this.detailStore = instance;
+				}
+			}).asPromise({ preventTimeout: true }),
 
 			this.consumeContext(UMB_MEMBER_ITEM_STORE_CONTEXT, (instance) => {
-				this.itemStore = instance;
-			}).asPromise(),
+				if (instance) {
+					this.itemStore = instance;
+				}
+			}).asPromise({ preventTimeout: true }),
 
 			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
-				this.notificationContext = instance;
-			}).asPromise(),
+				if (instance) {
+					this.notificationContext = instance;
+				}
+			}).asPromise({ preventTimeout: true }),
 		]);
 	}
 }

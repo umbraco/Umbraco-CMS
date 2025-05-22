@@ -94,6 +94,9 @@ export class UmbClipboardLocalStorageManager extends UmbControllerBase {
 		}
 
 		const context = await this.getContext(UMB_CURRENT_USER_CONTEXT);
+		if (!context) {
+			throw new Error('Could not get current user context');
+		}
 		this.#currentUserUnique = context.getUnique();
 		return this.#currentUserUnique;
 	}

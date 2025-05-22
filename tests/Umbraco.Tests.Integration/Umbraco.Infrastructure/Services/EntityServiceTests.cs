@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-public class EntityServiceTests : UmbracoIntegrationTest
+internal sealed class EntityServiceTests : UmbracoIntegrationTest
 {
     [SetUp]
     public async Task SetupTestData()

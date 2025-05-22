@@ -22,7 +22,11 @@ export class UmbWorkspaceAliasCondition
 
 		if (permissionCheck !== undefined) {
 			this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
-				this.permitted = permissionCheck!(context);
+				if (context) {
+					this.permitted = permissionCheck!(context);
+				} else {
+					this.permitted = false;
+				}
 			});
 		} else {
 			throw new Error(

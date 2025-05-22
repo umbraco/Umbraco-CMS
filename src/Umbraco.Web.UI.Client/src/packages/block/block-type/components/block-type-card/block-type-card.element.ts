@@ -5,14 +5,14 @@ import {
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UUICardEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 @customElement('umb-block-type-card')
 export class UmbBlockTypeCardElement extends UmbLitElement {
 	//
-	#init: Promise<void>;
+	#init: Promise<unknown>;
 	#serverUrl: string = '';
 
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
@@ -76,9 +76,9 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.#init = this.getContext(UMB_APP_CONTEXT).then((appContext) => {
-			this.#serverUrl = appContext.getServerUrl();
-		});
+		this.#init = this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance?.getServerUrl() ?? '';
+		}).asPromise({ preventTimeout: true });
 
 		this.observe(this.#itemManager.statuses, async (statuses) => {
 			const status = statuses[0];

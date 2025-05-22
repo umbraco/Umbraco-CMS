@@ -30,20 +30,6 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
         : base(dataValueEditorFactory, blockValuePropertyIndexValueFactory, jsonSerializer)
         => _ioHelper = ioHelper;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BlockListPropertyEditor"/> class.
-    /// </summary>
-    [Obsolete("Use constructor that doesn't take PropertyEditorCollection, scheduled for removal in V15")]
-    public BlockListPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        PropertyEditorCollection propertyEditors,
-        IIOHelper ioHelper,
-        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory,
-        IJsonSerializer jsonSerializer)
-        : this(dataValueEditorFactory, ioHelper, blockValuePropertyIndexValueFactory, jsonSerializer)
-    {
-    }
-
     /// <inheritdoc/>
     public override bool SupportsConfigurableElements => true;
 

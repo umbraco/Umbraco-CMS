@@ -4,7 +4,7 @@ import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { HealthStatusResponseModel, IndexResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthStatusModel, IndexerService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 import './section-view-examine-searchers.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -40,9 +40,9 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	}
 
 	async #getIndexData() {
-		const { data } = await tryExecuteAndNotify(
+		const { data } = await tryExecute(
 			this,
-			IndexerService.getIndexerByIndexName({ indexName: this.indexName }),
+			IndexerService.getIndexerByIndexName({ path: { indexName: this.indexName } }),
 		);
 		return data;
 	}
@@ -76,9 +76,9 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	}
 	private async _rebuild() {
 		this._buttonState = 'waiting';
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this,
-			IndexerService.postIndexerByIndexNameRebuild({ indexName: this.indexName }),
+			IndexerService.postIndexerByIndexNameRebuild({ path: { indexName: this.indexName } }),
 		);
 		if (error) {
 			this._buttonState = 'failed';

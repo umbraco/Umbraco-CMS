@@ -238,28 +238,33 @@ internal sealed class ContentPublishingService : IContentPublishingService
 
     private async Task<ContentValidationResult> ValidateCurrentContentAsync(IContent content, string[] cultures)
     {
+        IEnumerable<string?> effectiveCultures = content.ContentType.VariesByCulture()
+            ? cultures.Union([null])
+            : [null];
+
         // Would be better to be able to use a mapper/factory, but currently all that functionality is very much presentation logic.
         var model = new ContentUpdateModel()
         {
-            InvariantName = content.Name,
             // NOTE KJA: this needs redoing; we need to make an informed decision whether to include invariant properties, depending on if editing invariant properties is allowed on all variants, or if the default language is included in cultures
-            InvariantProperties = content.Properties.Where(x => x.PropertyType.VariesByCulture() is false).Select(x => new PropertyValueModel()
-            {
-                Alias = x.Alias,
-                Value = x.GetValue()
-            }),
+            Properties = effectiveCultures.SelectMany(culture =>
+                content.Properties.Select(property => property.PropertyType.VariesByCulture() == (culture is not null)
+                    ? new PropertyValueModel
+                    {
+                        Alias = property.Alias,
+                        Value = property.GetValue(culture: culture, segment: null, published: false),
+                        Culture = culture
+                    }
+                    : null)
+                .WhereNotNull())
+                .ToArray(),
             Variants = cultures.Select(culture => new VariantModel()
             {
                 Name = content.GetPublishName(culture) ?? string.Empty,
                 Culture = culture,
-                Segment = null,
-                Properties = content.Properties.Where(prop => prop.PropertyType.VariesByCulture()).Select(prop => new PropertyValueModel()
-                {
-                    Alias = prop.Alias,
-                    Value = prop.GetValue(culture: culture, segment: null, published: false)
-                })
-            })
+                Segment = null
+            }).ToArray()
         };
+
         IContentType? contentType = _contentTypeService.Get(content.ContentType.Key)!;
         ContentValidationResult validationResult = await _contentValidationService.ValidatePropertiesAsync(model, contentType, cultures);
         return validationResult;

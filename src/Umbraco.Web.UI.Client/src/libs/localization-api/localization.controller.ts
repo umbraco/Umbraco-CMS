@@ -23,15 +23,15 @@ import type { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/c
 
 const LocalizationControllerAlias = Symbol();
 /**
- * The UmbLocalizeController enables localization for your element.
+ * The UmbLocalizationController enables localization for your element.
  * @see UmbLocalizeElement
  * @example
  * ```ts
- * import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
+ * import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
  *
  * \@customElement('my-element')
  * export class MyElement extends LitElement {
- *   private localize = new UmbLocalizeController(this);
+ *   private localize = new UmbLocalizationController(this);
  *
  *   render() {
  *     return html`<p>${this.localize.term('general_close')}</p>`;

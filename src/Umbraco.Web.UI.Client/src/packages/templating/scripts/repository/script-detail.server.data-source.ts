@@ -8,7 +8,7 @@ import type { CreateScriptRequestModel, UpdateScriptRequestModel } from '@umbrac
 import { ScriptService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbScriptDetailModel> {
 	#host: UmbControllerHost;
@@ -37,20 +37,20 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(parentUnique);
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateScriptRequestModel = {
+		const body: CreateScriptRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
 			name: appendFileExtensionIfNeeded(model.name, '.js'),
 			content: model.content,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			ScriptService.postScript({
-				requestBody,
+				body,
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			const newPath = decodeURIComponent(data);
 			const newPathUnique = this.#serverFilePathUniqueSerializer.toUnique(newPath);
 			return this.read(newPathUnique);
@@ -65,9 +65,9 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
-			ScriptService.getScriptByPath({ path: encodeURIComponent(path) }),
+			ScriptService.getScriptByPath({ path: { path: encodeURIComponent(path) } }),
 		);
 
 		if (error || !data) {
@@ -90,15 +90,15 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(model.unique);
 		if (!path) throw new Error('Path is missing');
 
-		const requestBody: UpdateScriptRequestModel = {
+		const body: UpdateScriptRequestModel = {
 			content: model.content,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			ScriptService.putScriptByPath({
-				path: encodeURIComponent(path),
-				requestBody,
+				path: { path: encodeURIComponent(path) },
+				body,
 			}),
 		);
 
@@ -115,10 +115,10 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			ScriptService.deleteScriptByPath({
-				path: encodeURIComponent(path),
+				path: { path: encodeURIComponent(path) },
 			}),
 		);
 	}

@@ -78,7 +78,7 @@ const danishRegional: UmbLocalizationSet = {
 };
 //#endregion
 
-describe('UmbLocalizeController', () => {
+describe('UmbLocalizationController', () => {
 	let controller: UmbLocalizationController;
 
 	beforeEach(async () => {

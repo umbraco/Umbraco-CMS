@@ -5,7 +5,6 @@ import {
 	type DocumentBlueprintTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
 	DocumentBlueprintItemResponseModel &
 	DocumentBlueprintTreeItemResponseModel;

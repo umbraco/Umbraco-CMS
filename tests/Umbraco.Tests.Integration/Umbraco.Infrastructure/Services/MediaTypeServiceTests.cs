@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
-public class MediaTypeServiceTests : UmbracoIntegrationTest
+internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
 {
     private MediaService MediaService => (MediaService)GetRequiredService<IMediaService>();
 
@@ -252,7 +252,7 @@ public class MediaTypeServiceTests : UmbracoIntegrationTest
         Assert.Throws<InvalidOperationException>(() => mediaType.Alias += "_updated");
     }
 
-    public class ContentNotificationHandler :
+    internal sealed class ContentNotificationHandler :
         INotificationHandler<MediaMovedToRecycleBinNotification>
     {
         public static Action<MediaMovedToRecycleBinNotification> MovedMediaToRecycleBin { get; set; }

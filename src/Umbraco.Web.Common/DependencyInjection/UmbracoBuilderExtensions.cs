@@ -119,8 +119,7 @@ public static partial class UmbracoBuilderExtensions
 
         TypeLoader typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), loggerFactory, config);
 
-        IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
-        return new UmbracoBuilder(services, config, typeLoader, loggerFactory, profiler, appCaches, tempHostingEnvironment);
+        return new UmbracoBuilder(services, config, typeLoader, loggerFactory, profiler, appCaches);
     }
 
     /// <summary>
@@ -326,40 +325,6 @@ public static partial class UmbracoBuilderExtensions
 
         return builder;
     }
-
-    [Obsolete("This is not necessary any more. This will be removed in v16")]
-    public static IUmbracoBuilder AddWebServer(this IUmbracoBuilder builder)
-    {
-        builder.Services.Configure<KestrelServerOptions>(options =>
-        {
-            options.AllowSynchronousIO = true;
-        });
-
-        try
-        {
-            // See https://github.com/umbraco/Umbraco-CMS/pull/17886. This is a workaround for non-windows machines
-            // they won't have IIS available and trying to set this option will throw an exception.
-            //
-            // We're deferring this call to a method because if we just try to set the options here, we still get a
-            // TypeLoadException on non-windows machines.
-            // This workaround came from this comment: https://stackoverflow.com/a/3346975
-            AllowSynchronousIOForIIS(builder);
-        }
-        catch (TypeLoadException)
-        {
-            // Ignoring this exception because it's expected on non-windows machines
-        }
-        return builder;
-    }
-
-    // Prevents the compiler from inlining the method
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void AllowSynchronousIOForIIS(IUmbracoBuilder builder) =>
-        builder.Services.Configure<IISServerOptions>(
-            options =>
-            {
-                options.AllowSynchronousIO = true;
-            });
 
     private static IProfiler GetWebProfiler(IConfiguration config, IHttpContextAccessor httpContextAccessor)
     {

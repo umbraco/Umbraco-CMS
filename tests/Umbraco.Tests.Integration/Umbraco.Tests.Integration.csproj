@@ -274,6 +274,12 @@
     <Compile Update="Umbraco.Core\Services\PublishedUrlInfoProviderTests.cs">
       <DependentUpon>PublishedUrlInfoProviderTestsBase.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\PublishStatusServiceTests.Management.cs">
+      <DependentUpon>PublishStatusServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\PublishStatusServiceTests.Query.cs">
+      <DependentUpon>PublishStatusServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceTests.ChildUserAccessEntities.cs">
       <DependentUpon>UserStartNodeEntitiesServiceTests.cs</DependentUpon>
     </Compile>

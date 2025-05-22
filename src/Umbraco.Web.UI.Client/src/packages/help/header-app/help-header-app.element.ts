@@ -1,5 +1,5 @@
 import { UMB_HELP_MENU_ALIAS } from '../menu/index.js';
-import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbHeaderAppButtonElement } from '@umbraco-cms/backoffice/components';
@@ -54,7 +54,14 @@ export class UmbHelpHeaderAppElement extends UmbHeaderAppButtonElement {
 		`;
 	}
 
-	static override styles = UmbHeaderAppButtonElement.styles;
+	static override styles = [
+		...UmbHeaderAppButtonElement.styles,
+		css`
+			:host {
+				--uui-menu-item-flat-structure: 1;
+			}
+		`,
+	];
 }
 
 export { UmbHelpHeaderAppElement as element };

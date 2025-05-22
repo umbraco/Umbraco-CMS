@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
     Database = UmbracoTestOptions.Database.NewSchemaPerTest,
     PublishedRepositoryEvents = true,
     WithApplication = true)]
-public class ContentServiceTests : UmbracoIntegrationTestWithContent
+internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 {
     [SetUp]
     public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
@@ -58,8 +58,6 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
     private IRelationService RelationService => GetRequiredService<IRelationService>();
-
-    private ILocalizedTextService TextService => GetRequiredService<ILocalizedTextService>();
 
     private ITagService TagService => GetRequiredService<ITagService>();
 
@@ -738,8 +736,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     [Test]
     public void Can_Unpublish_Content_Variation()
     {
-        var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr,
-            out var contentType);
+        var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr, out var contentType);
 
         var saved = ContentService.Save(content);
         var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
@@ -1032,7 +1029,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         // audit log will only show that french was published
         var lastLog = AuditService.GetLogs(content.Id).Last();
-        Assert.AreEqual("Published languages: French (France)", lastLog.Comment);
+        Assert.AreEqual("Published languages: fr-FR", lastLog.Comment);
 
         // re-get
         content = ContentService.GetById(content.Id);
@@ -1042,7 +1039,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         // audit log will only show that english was published
         lastLog = AuditService.GetLogs(content.Id).Last();
-        Assert.AreEqual("Published languages: English (United Kingdom)", lastLog.Comment);
+        Assert.AreEqual("Published languages: en-GB", lastLog.Comment);
     }
 
     [Test]
@@ -1079,7 +1076,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         // audit log will only show that french was unpublished
         var lastLog = AuditService.GetLogs(content.Id).Last();
-        Assert.AreEqual("Unpublished languages: French (France)", lastLog.Comment);
+        Assert.AreEqual("Unpublished languages: fr-FR", lastLog.Comment);
 
         // re-get
         content = ContentService.GetById(content.Id);
@@ -1088,7 +1085,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         // audit log will only show that english was published
         var logs = AuditService.GetLogs(content.Id).ToList();
-        Assert.AreEqual("Unpublished languages: English (United Kingdom)", logs[^2].Comment);
+        Assert.AreEqual("Unpublished languages: en-GB", logs[^2].Comment);
         Assert.AreEqual("Unpublished (mandatory language unpublished)", logs[^1].Comment);
     }
 
@@ -1913,11 +1910,11 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Ensures_Permissions_Are_Retained_For_Copied_Descendants_With_Explicit_Permissions()
+    public async Task Ensures_Permissions_Are_Retained_For_Copied_Descendants_With_Explicit_Permissions()
     {
         // Arrange
         var userGroup = UserGroupBuilder.CreateUserGroup("1");
-        UserService.Save(userGroup);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -1954,11 +1951,11 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Ensures_Permissions_Are_Inherited_For_Copied_Descendants()
+    public async Task Ensures_Permissions_Are_Inherited_For_Copied_Descendants()
     {
         // Arrange
         var userGroup = UserGroupBuilder.CreateUserGroup("1");
-        UserService.Save(userGroup);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -1969,7 +1966,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         {
             new(contentType.Key, 0, contentType.Alias)
         };
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parentPage = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(parentPage);
@@ -2060,7 +2057,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
         editorGroup.StartContentId = content1.Id;
-        UserService.Save(editorGroup);
+        await UserGroupService.UpdateAsync(editorGroup, Constants.Security.SuperUserKey);
 
         var admin = await UserService.GetAsync(Constants.Security.SuperUserKey);
         admin.StartContentIds = new[] { content1.Id };
@@ -2075,7 +2072,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsTrue(PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
         var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
-        var userGroup = UserService.GetUserGroupByAlias(user.Groups.First().Alias);
+        var userGroup = await UserGroupService.GetAsync(user.Groups.First().Alias);
         Assert.IsNotNull(NotificationService.CreateNotification(user, content1, "X"));
 
         ContentService.SetPermission(content1, "A", new[] { userGroup.Id });

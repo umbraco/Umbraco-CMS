@@ -45,12 +45,16 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 			this.#collectionContext = instance;
 
 			this.observe(
-				this.#collectionContext.selection.selection,
-				(selection) => (this._selection = selection),
+				this.#collectionContext?.selection.selection,
+				(selection) => (this._selection = selection ?? []),
 				'umbCollectionSelectionObserver',
 			);
 
-			this.observe(this.#collectionContext.items, (items) => (this._users = items), 'umbCollectionItemsObserver');
+			this.observe(
+				this.#collectionContext?.items,
+				(items) => (this._users = items ?? []),
+				'umbCollectionItemsObserver',
+			);
 		});
 
 		this.#requestUserGroups();

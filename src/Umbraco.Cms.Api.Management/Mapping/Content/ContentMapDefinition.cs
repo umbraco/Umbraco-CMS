@@ -56,7 +56,8 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
     {
         IPropertyValue[] propertyValues = source.Properties.SelectMany(propertyCollection => propertyCollection.Values).ToArray();
         var cultures = source.AvailableCultures.DefaultIfEmpty(null).ToArray();
-        var segments = propertyValues.Select(property => property.Segment).Distinct().DefaultIfEmpty(null).ToArray();
+        // the default segment (null) must always be included in the view model - both for variant and invariant documents
+        var segments = propertyValues.Select(property => property.Segment).Union([null]).Distinct().ToArray();
 
         return cultures
             .SelectMany(culture => segments.Select(segment =>

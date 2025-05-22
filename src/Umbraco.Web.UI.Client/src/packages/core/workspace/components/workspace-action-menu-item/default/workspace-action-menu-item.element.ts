@@ -1,11 +1,11 @@
 import type { UmbWorkspaceActionMenuItem } from '../types.js';
-import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
 	ManifestWorkspaceActionMenuItemDefaultKind,
 	MetaWorkspaceActionMenuItemDefaultKind,
-} from '@umbraco-cms/backoffice/workspace';
+} from '../../../extensions/types.js';
+import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
+import { html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-workspace-action-menu-item')
@@ -34,7 +34,7 @@ export class UmbWorkspaceActionMenuItemElement<
 	async #onClickLabel(event: UUIMenuItemEvent) {
 		if (!this._href) {
 			event.stopPropagation();
-			await this.#api?.execute();
+			await this.#api?.execute().catch(() => {});
 		}
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}

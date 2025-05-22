@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MemberTypeRepositoryTest : UmbracoIntegrationTest
+internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
 {
     private MemberTypeRepository CreateRepository(IScopeProvider provider)
     {

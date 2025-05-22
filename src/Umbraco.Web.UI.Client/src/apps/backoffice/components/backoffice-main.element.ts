@@ -63,13 +63,13 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 
 		if (newRoutes.length > 0) {
 			newRoutes.push({
-				path: `**`,
-				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+				redirectTo: newRoutes[0].path,
+				path: ``,
 			});
 
 			newRoutes.push({
-				redirectTo: newRoutes[0].path,
-				path: ``,
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
 			});
 		}
 

@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
@@ -65,6 +66,9 @@ public class DeliveryApiTests
         publishStatusQueryService
             .Setup(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns(true);
+        publishStatusQueryService
+            .Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>()))
+            .Returns(true);
 
         PublishStatusQueryService = publishStatusQueryService.Object;
     }
@@ -73,7 +77,7 @@ public class DeliveryApiTests
     {
         var mockPublishedContentTypeFactory = new Mock<IPublishedContentTypeFactory>();
         mockPublishedContentTypeFactory.Setup(x => x.GetDataType(It.IsAny<int>()))
-            .Returns(new PublishedDataType(123, editorAlias, new Lazy<object>(() => dataTypeConfiguration)));
+            .Returns(new PublishedDataType(123, editorAlias, editorAlias, new Lazy<object>(() => dataTypeConfiguration)));
 
         var publishedPropType = new PublishedPropertyType(
             propertyTypeAlias,
@@ -88,6 +92,8 @@ public class DeliveryApiTests
     }
 
     protected IOutputExpansionStrategyAccessor CreateOutputExpansionStrategyAccessor() => new NoopOutputExpansionStrategyAccessor();
+
+    protected IVariationContextAccessor CreateVariationContextAccessor() => new TestVariationContextAccessor();
 
     protected IOptions<GlobalSettings> CreateGlobalSettings(bool hideTopLevelNodeFromPath = true)
     {

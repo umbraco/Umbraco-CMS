@@ -17,8 +17,7 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 
 	@property({ type: Object })
 	public set value(value: UmbSwatchDetails | undefined) {
-		if (!value) return;
-		this.#value = this.#ensureHashPrefix(value);
+		this.#value = value ? this.#ensureHashPrefix(value) : undefined;
 	}
 	public get value(): UmbSwatchDetails | undefined {
 		return this.#value;

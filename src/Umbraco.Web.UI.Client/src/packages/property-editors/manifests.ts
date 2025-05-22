@@ -1,5 +1,6 @@
 import { manifest as acceptedType } from './accepted-types/manifests.js';
 import { manifest as colorEditor } from './color-swatches-editor/manifests.js';
+import { manifest as dimensions } from './dimensions/manifest.js';
 import { manifest as numberRange } from './number-range/manifests.js';
 import { manifest as orderDirection } from './order-direction/manifests.js';
 import { manifest as overlaySize } from './overlay-size/manifests.js';
@@ -41,6 +42,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...contentPickerManifests,
 	acceptedType,
 	colorEditor,
+	dimensions,
 	numberRange,
 	orderDirection,
 	overlaySize,

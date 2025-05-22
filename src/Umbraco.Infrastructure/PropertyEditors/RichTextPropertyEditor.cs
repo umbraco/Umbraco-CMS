@@ -93,6 +93,7 @@ public class RichTextPropertyEditor : DataEditor
         private readonly RichTextEditorPastedImages _pastedImages;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IRichTextRequiredValidator _richTextRequiredValidator;
+        private readonly IRichTextRegexValidator _richTextRegexValidator;
         private readonly ILogger<RichTextPropertyValueEditor> _logger;
 
         public RichTextPropertyValueEditor(
@@ -111,6 +112,7 @@ public class RichTextPropertyEditor : DataEditor
             IPropertyValidationService propertyValidationService,
             DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
             IRichTextRequiredValidator richTextRequiredValidator,
+            IRichTextRegexValidator richTextRegexValidator,
             BlockEditorVarianceHandler blockEditorVarianceHandler,
             ILanguageService languageService,
             IIOHelper ioHelper)
@@ -122,6 +124,7 @@ public class RichTextPropertyEditor : DataEditor
             _pastedImages = pastedImages;
             _htmlSanitizer = htmlSanitizer;
             _richTextRequiredValidator = richTextRequiredValidator;
+            _richTextRegexValidator = richTextRegexValidator;
             _jsonSerializer = jsonSerializer;
             _logger = logger;
 
@@ -130,6 +133,8 @@ public class RichTextPropertyEditor : DataEditor
         }
 
         public override IValueRequiredValidator RequiredValidator => _richTextRequiredValidator;
+
+        public override IValueFormatValidator FormatValidator => _richTextRegexValidator;
 
         protected override RichTextBlockValue CreateWithLayout(IEnumerable<RichTextBlockLayoutItem> layout) => new(layout);
 

@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
@@ -108,9 +109,9 @@ public class UserEditorAuthorizationHelperTests
     [Test]
     [TestCase(Constants.Security.AdminGroupAlias, Constants.Security.AdminGroupAlias, ExpectedResult = true)]
     [TestCase(Constants.Security.AdminGroupAlias, "SomethingElse", ExpectedResult = true)]
-    [TestCase(Constants.Security.EditorGroupAlias, Constants.Security.AdminGroupAlias, ExpectedResult = false)]
-    [TestCase(Constants.Security.EditorGroupAlias, "SomethingElse", ExpectedResult = false)]
-    [TestCase(Constants.Security.EditorGroupAlias, Constants.Security.EditorGroupAlias, ExpectedResult = true)]
+    [TestCase(DatabaseDataCreator.EditorGroupAlias, Constants.Security.AdminGroupAlias, ExpectedResult = false)]
+    [TestCase(DatabaseDataCreator.EditorGroupAlias, "SomethingElse", ExpectedResult = false)]
+    [TestCase(DatabaseDataCreator.EditorGroupAlias, DatabaseDataCreator.EditorGroupAlias, ExpectedResult = true)]
     public bool Can_only_add_user_groups_you_are_part_of_yourself_unless_you_are_admin(
         string groupAlias,
         string groupToAdd)

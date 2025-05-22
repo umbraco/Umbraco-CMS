@@ -1,6 +1,6 @@
 import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Webhook that fetches data from the server
@@ -20,7 +20,7 @@ export class UmbWebhookEventServerDataSource {
 	}
 
 	async getAll() {
-		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookService.getWebhookEvents());
+		const { data, error } = await tryExecute(this.#host, WebhookService.getWebhookEvents());
 
 		if (error || !data) {
 			return { error };

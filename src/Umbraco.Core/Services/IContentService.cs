@@ -1,7 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Events;
-
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -320,21 +318,6 @@ public interface IContentService : IContentServiceBase<IContent>
     OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    /// Attempts to move the <see cref="IContent"/> <paramref name="content"/> to under the node with id <paramref name="parentId"/>.
-    /// </summary>
-    /// <param name="content">The <see cref="IContent"/> that shall be moved.</param>
-    /// <param name="parentId">The id of the new parent node.</param>
-    /// <param name="userId">Id of the user attempting to move <paramref name="content"/>.</param>
-    /// <returns>Success if moving succeeded, otherwise Failed.</returns>
-    [Obsolete("Adds return type to Move method. Will be removed in V14, as the original method will be adjusted.")]
-    OperationResult
-        AttemptMove(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
-    {
-        Move(content, parentId, userId);
-        return OperationResult.Succeed(new EventMessages());
-    }
-
-    /// <summary>
     ///     Copies a document.
     /// </summary>
     /// <remarks>
@@ -380,12 +363,6 @@ public interface IContentService : IContentServiceBase<IContent>
 
     #region Publish Document
 
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(Publish)} instead. Will be removed in V16")]
-    PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId);
-
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(Publish)} instead. Will be removed in V16")]
-    PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
-
     /// <summary>
     ///     Publishes a document.
     /// </summary>
@@ -398,12 +375,6 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="cultures">The cultures to publish.</param>
     /// <param name="userId">The identifier of the user performing the action.</param>
     PublishResult Publish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
-
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(PublishBranch)} instead. Will be removed in V16")]
-    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = Constants.Security.SuperUserId);
-
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(PublishBranch)} instead. Will be removed in V16")]
-    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Publishes a document branch.
@@ -434,10 +405,7 @@ public interface IContentService : IContentServiceBase<IContent>
     ///         The root of the branch is always published, regardless of <paramref name="publishBranchFilter" />.
     ///     </para>
     /// </remarks>
-    IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => SaveAndPublishBranch(content, publishBranchFilter.HasFlag(PublishBranchFilter.IncludeUnpublished), cultures, userId);
-#pragma warning restore CS0618 // Type or member is obsolete
+    IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Unpublishes a document.

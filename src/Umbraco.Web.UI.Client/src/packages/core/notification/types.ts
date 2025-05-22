@@ -26,5 +26,7 @@ export interface UmbNotificationOptions<UmbNotificationData = UmbNotificationDef
 export type UmbNotificationColor = '' | 'default' | 'positive' | 'warning' | 'danger';
 
 export interface UmbPeekErrorArgs extends UmbNotificationDefaultData {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	details?: any;
+	color?: UmbNotificationColor;
 }

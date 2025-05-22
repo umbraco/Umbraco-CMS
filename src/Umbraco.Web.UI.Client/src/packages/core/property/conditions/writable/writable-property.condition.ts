@@ -15,7 +15,7 @@ export class UmbWritablePropertyCondition
 		super(host, args);
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this.observe(context.isReadOnly, (value) => {
+			this.observe(context?.isReadOnly, (value) => {
 				this.permitted = value !== true;
 			});
 		});

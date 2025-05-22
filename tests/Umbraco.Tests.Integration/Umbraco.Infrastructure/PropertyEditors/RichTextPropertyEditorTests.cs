@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal class RichTextPropertyEditorTests : UmbracoIntegrationTest
+internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -98,7 +98,7 @@ internal class RichTextPropertyEditorTests : UmbracoIntegrationTest
                 Blocks = JsonSerializer.Deserialize<RichTextBlockValue>($$"""
                                                                   {
                                                                   	"layout": {
-                                                                  		"Umbraco.TinyMCE": [{
+                                                                  		"{{Constants.PropertyEditors.Aliases.RichText}}": [{
                                                                   				"contentKey": "{{elementId:D}}"
                                                                   			}
                                                                   		]
@@ -151,7 +151,7 @@ internal class RichTextPropertyEditorTests : UmbracoIntegrationTest
                 Blocks = JsonSerializer.Deserialize<RichTextBlockValue>($$"""
                                                                   {
                                                                   	"layout": {
-                                                                  		"Umbraco.TinyMCE": [{
+                                                                  		"{{Constants.PropertyEditors.Aliases.RichText}}": [{
                                                                   				"contentKey": "{{elementId:D}}"
                                                                   			}
                                                                   		]

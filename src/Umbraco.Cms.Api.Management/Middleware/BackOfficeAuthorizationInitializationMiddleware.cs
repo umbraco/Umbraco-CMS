@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
@@ -21,19 +20,6 @@ public class BackOfficeAuthorizationInitializationMiddleware : IMiddleware
     private readonly IServiceProvider _serviceProvider;
     private readonly IRuntimeState _runtimeState;
     private readonly WebRoutingSettings _webRoutingSettings;
-
-    [Obsolete("Use the non-obsolete constructor. This will be removed in Umbraco 16.")]
-    public BackOfficeAuthorizationInitializationMiddleware(
-        UmbracoRequestPaths umbracoRequestPaths,
-        IServiceProvider serviceProvider,
-        IRuntimeState runtimeState)
-    : this(
-        umbracoRequestPaths,
-        serviceProvider,
-        runtimeState,
-        StaticServiceProvider.Instance.GetRequiredService<IOptions<WebRoutingSettings>>())
-    {
-    }
 
     [Obsolete("Use the non-obsolete constructor. This will be removed in Umbraco 17.")]
     public BackOfficeAuthorizationInitializationMiddleware(

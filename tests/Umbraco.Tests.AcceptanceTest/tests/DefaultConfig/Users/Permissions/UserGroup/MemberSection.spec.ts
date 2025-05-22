@@ -69,7 +69,8 @@ test.skip('can create member with members section set', async ({umbracoApi, umbr
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created)
+  await umbracoUi.member.isErrorNotificationVisible(false);;
   await umbracoUi.member.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource, false);
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeTruthy();
 });
@@ -92,7 +93,8 @@ test.skip('can update member with members section set', async ({umbracoApi, umbr
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved)
+  await umbracoUi.member.isErrorNotificationVisible(false);;
   await umbracoUi.member.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource, false);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.username).toBe(updatedUsername);

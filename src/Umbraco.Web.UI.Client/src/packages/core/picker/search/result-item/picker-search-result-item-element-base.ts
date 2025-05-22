@@ -18,6 +18,9 @@ export abstract class UmbPickerSearchResultItemElementBase<ItemType extends UmbN
 		return this.#item;
 	}
 
+	@property({ type: Boolean })
+	disabled?: boolean;
+
 	@state()
 	_isSelected = false;
 
@@ -49,8 +52,9 @@ export abstract class UmbPickerSearchResultItemElementBase<ItemType extends UmbN
 			<umb-ref-item
 				name=${item.name}
 				select-only
-				selectable
+				?selectable=${!this.disabled}
 				?selected=${this._isSelected}
+				?disabled=${this.disabled}
 				@deselected=${() => this.pickerContext?.selection.deselect(item.unique)}
 				@selected=${() => this.pickerContext?.selection.select(item.unique)}>
 			</umb-ref-item>

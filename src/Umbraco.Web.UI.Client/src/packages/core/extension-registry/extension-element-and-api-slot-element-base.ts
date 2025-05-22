@@ -4,8 +4,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestElementAndApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
-// TODO: Eslint: allow abstract element class to end with "ElementBase" instead of "Element"
-
 export abstract class UmbExtensionElementAndApiSlotElementBase<
 	ManifestType extends ManifestElementAndApi,
 > extends UmbLitElement {

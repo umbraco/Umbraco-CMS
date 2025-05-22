@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class RelationTypeRepositoryTest : UmbracoIntegrationTest
+internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUp() => CreateTestData();

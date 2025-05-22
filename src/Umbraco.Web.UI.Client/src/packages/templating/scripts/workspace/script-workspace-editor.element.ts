@@ -20,8 +20,8 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_SCRIPT_WORKSPACE_CONTEXT, (context) => {
 			this.#context = context;
-			this.observe(this.#context.content, (content) => (this._content = content));
-			this.observe(this.#context.isNew, (isNew) => (this._isNew = isNew));
+			this.observe(this.#context?.content, (content) => (this._content = content));
+			this.observe(this.#context?.isNew, (isNew) => (this._isNew = isNew));
 		});
 	}
 

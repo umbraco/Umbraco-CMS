@@ -286,9 +286,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		);
 
 		this.observe(
-			this.#context.readOnlyState.isReadOnly,
+			this.#context.readOnlyGuard.permitted,
 			(isReadOnly) => (this._isReadOnly = isReadOnly),
-			'umbReadonlyObserver',
+			'umbReadOnlyObserver',
 		);
 	}
 
@@ -427,6 +427,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		if (ext.component) {
 			ext.component.classList.add('umb-block-grid__block--view');
+			ext.component.setAttribute('part', 'component');
 		}
 		if (this._exposed) {
 			return ext.component;
@@ -639,6 +640,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			:host([settings-invalid])::after,
 			:host([content-invalid])::after {
 				border-color: var(--uui-color-invalid);
+			}
+
+			umb-extension-slot::part(component) {
+				position: relative;
+				z-index: 0;
 			}
 
 			#invalidLocation {

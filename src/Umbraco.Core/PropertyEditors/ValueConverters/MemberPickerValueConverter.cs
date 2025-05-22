@@ -82,7 +82,7 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryA
                 return null;
             }
 
-            IMember? m = _memberService.GetByKey(sourceUdi.Guid);
+            IMember? m = _memberService.GetById(sourceUdi.Guid);
             if (m == null)
             {
                 return null;

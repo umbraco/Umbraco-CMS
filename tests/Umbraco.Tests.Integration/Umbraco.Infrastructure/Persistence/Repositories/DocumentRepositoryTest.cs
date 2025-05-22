@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -31,7 +32,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DocumentRepositoryTest : UmbracoIntegrationTest
+internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUpData()
@@ -129,7 +130,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
         var propertyEditors =
             new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
         var dataValueReferences =
-            new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>());
+            new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
         var repository = new DocumentRepository(
             scopeAccessor,
             appCaches,

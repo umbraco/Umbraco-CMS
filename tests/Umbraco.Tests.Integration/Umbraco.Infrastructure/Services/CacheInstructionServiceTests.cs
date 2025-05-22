@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class CacheInstructionServiceTests : UmbracoIntegrationTest
+internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 {
     private const string LocalIdentity = "localIdentity";
     private const string AlternateIdentity = "alternateIdentity";

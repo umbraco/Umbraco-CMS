@@ -8,14 +8,18 @@ export class UmbWebhookDeliveryCollectionWorkspaceViewElement extends UmbCollect
 		super();
 
 		this.consumeContext(UMB_WEBHOOK_WORKSPACE_CONTEXT, (instance) => {
-			this.observe(instance.unique, (unique) => this.#setWebhookFilter(unique));
+			this.observe(instance?.unique, (unique) => this.#setWebhookFilter(unique));
 		});
 	}
 
-	#setWebhookFilter(unique: string | null) {
-		this._filter = {
-			webhook: unique ? { unique } : null,
-		};
+	#setWebhookFilter(unique: string | null | undefined) {
+		if (unique === undefined) {
+			this._filter = undefined;
+		} else {
+			this._filter = {
+				webhook: unique ? { unique } : null,
+			};
+		}
 	}
 }
 

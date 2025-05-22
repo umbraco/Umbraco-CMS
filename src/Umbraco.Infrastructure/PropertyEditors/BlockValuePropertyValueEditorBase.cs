@@ -1,7 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -25,31 +22,6 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
     private BlockEditorValues<TValue, TLayout>? _blockEditorValues;
     private readonly ILanguageService _languageService;
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
-    protected BlockValuePropertyValueEditorBase(
-        DataEditorAttribute attribute,
-        PropertyEditorCollection propertyEditors,
-        IDataTypeConfigurationCache dataTypeConfigurationCache,
-        ILocalizedTextService textService,
-        ILogger logger,
-        IShortStringHelper shortStringHelper,
-        IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper,
-        DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
-        : this(
-            propertyEditors,
-            dataTypeConfigurationCache,
-            shortStringHelper,
-            jsonSerializer,
-            dataValueReferenceFactoryCollection,
-            StaticServiceProvider.Instance.GetRequiredService<BlockEditorVarianceHandler>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
-            ioHelper,
-            attribute
-            )
-    {
-    }
 
     protected BlockValuePropertyValueEditorBase(
         PropertyEditorCollection propertyEditors,

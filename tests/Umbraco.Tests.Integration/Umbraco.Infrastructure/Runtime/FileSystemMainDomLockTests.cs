@@ -15,7 +15,7 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Runtime;
 
 [TestFixture]
-internal class FileSystemMainDomLockTests : UmbracoIntegrationTest
+internal sealed class FileSystemMainDomLockTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUp()

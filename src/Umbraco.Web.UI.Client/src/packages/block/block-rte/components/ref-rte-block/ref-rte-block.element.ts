@@ -28,7 +28,7 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 
 		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
 			this.observe(
-				context.workspaceEditContentPath,
+				context?.workspaceEditContentPath,
 				(workspaceEditPath) => {
 					this._workspaceEditPath = workspaceEditPath;
 				},
@@ -38,10 +38,12 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<uui-ref-node standalone href=${this._workspaceEditPath ?? '#'}>
-			<umb-icon slot="icon" .name=${this.icon}></umb-icon>
-			<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
-		</uui-ref-node>`;
+		return html`
+			<uui-ref-node standalone href=${this._workspaceEditPath ?? '#'}>
+				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
+				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
+			</uui-ref-node>
+		`;
 	}
 
 	static override readonly styles = [

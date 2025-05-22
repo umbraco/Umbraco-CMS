@@ -12,7 +12,7 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
-internal partial class BlockListElementLevelVariationTests : BlockEditorElementVariationTestBase
+internal sealed partial class BlockListElementLevelVariationTests : BlockEditorElementVariationTestBase
 {
     public static new void ConfigureAllowEditInvariantFromNonDefaultTrue(IUmbracoBuilder builder)
     {

@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS } from '../../user-permissions/constants.js';
+import { UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS } from '../../user-permissions/document/constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as modalManifests } from './modal/manifests.js';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/entity-action';

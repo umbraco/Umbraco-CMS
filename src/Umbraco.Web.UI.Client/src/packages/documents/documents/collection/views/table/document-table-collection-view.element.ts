@@ -70,9 +70,9 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 
 		this.consumeContext(UMB_DOCUMENT_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
-			collectionContext.setupView(this);
+			collectionContext?.setupView(this);
 			this.observe(
-				collectionContext.workspacePathBuilder,
+				collectionContext?.workspacePathBuilder,
 				(builder) => {
 					this._workspacePathBuilder = builder;
 					if (this.#collectionContext) {

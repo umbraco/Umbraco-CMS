@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Expres
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
-    public class CreateTableExpressionTests : UmbracoIntegrationTest
+    internal sealed class CreateTableExpressionTests : UmbracoIntegrationTest
     {
         [Test]
         public void Do_ForSimpleTableDefinition_TableIsCreated()

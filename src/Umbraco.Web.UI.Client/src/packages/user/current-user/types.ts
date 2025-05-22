@@ -1,12 +1,9 @@
 import type {
-	ApiError,
-	CancelError,
-	DocumentPermissionPresentationModel,
-	UnknownTypePermissionPresentationModel,
 	UserExternalLoginProviderModel,
 	UserTwoFactorProviderModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import type { UmbApiError, UmbCancelError } from '@umbraco-cms/backoffice/resources';
 
 export type * from './user-profile-app.extension.js';
 export type * from './current-user-action.extension.js';
@@ -27,7 +24,7 @@ export interface UmbCurrentUserModel {
 	languages: Array<string>;
 	mediaStartNodeUniques: Array<UmbReferenceByUnique>;
 	name: string;
-	permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+	permissions: Array<unknown>;
 	unique: string;
 	userName: string;
 	userGroupUniques: string[];
@@ -37,7 +34,7 @@ export type UmbCurrentUserExternalLoginProviderModel = UserExternalLoginProvider
 
 export type UmbCurrentUserMfaProviderModel = UserTwoFactorProviderModel;
 
-export type UmbMfaProviderConfigurationCallback = Promise<{ error?: ApiError | CancelError }>;
+export type UmbMfaProviderConfigurationCallback = Promise<{ error?: UmbApiError | UmbCancelError }>;
 
 export interface UmbMfaProviderConfigurationElementProps {
 	/**

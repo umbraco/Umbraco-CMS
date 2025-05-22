@@ -1,7 +1,7 @@
+import type { UmbWorkspaceModalData } from './workspace-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbWorkspaceModalData } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-workspace-modal')

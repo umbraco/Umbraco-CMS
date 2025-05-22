@@ -15,7 +15,9 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 		this.#itemSource = new UmbImagingServerDataSource(host);
 
 		this.consumeContext(UMB_IMAGING_STORE_CONTEXT, (instance) => {
-			this.#dataStore = instance;
+			if (instance) {
+				this.#dataStore = instance;
+			}
 		});
 	}
 

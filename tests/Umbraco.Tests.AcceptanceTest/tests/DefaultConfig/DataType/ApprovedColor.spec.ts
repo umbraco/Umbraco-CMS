@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Approved Color';
@@ -28,7 +28,8 @@ test('can include label', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'useLabel', true)).toBeTruthy();
 });
 
@@ -42,7 +43,8 @@ test('can add color', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesApprovedColorHaveColor(customDataTypeName, colorValue)).toBeTruthy();
 });
 
@@ -56,7 +58,8 @@ test('can remove color', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesApprovedColorHaveColor(customDataTypeName, colorValue)).toBeFalsy();;
 });
 

@@ -131,7 +131,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
                                     UmbracoObjectTypes.Member,
                                     id =>
                                     {
-                                        IMember? m = _memberService.GetByKey(guidUdi.Guid);
+                                        IMember? m = _memberService.GetById(guidUdi.Guid);
                                         if (m == null)
                                         {
                                             return null;

@@ -32,7 +32,6 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     public FileUploadPropertyValueEditor(
         DataEditorAttribute attribute,
         MediaFileManager mediaFileManager,
-        ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IOptionsMonitor<ContentSettings> contentSettings,
         IJsonSerializer jsonSerializer,
@@ -40,7 +39,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         ITemporaryFileService temporaryFileService,
         IScopeProvider scopeProvider,
         IFileStreamSecurityValidator fileStreamSecurityValidator)
-        : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+        : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
         _jsonSerializer = jsonSerializer;

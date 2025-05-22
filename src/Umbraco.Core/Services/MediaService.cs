@@ -1,7 +1,5 @@
 using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -12,7 +10,6 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -54,30 +51,6 @@ namespace Umbraco.Cms.Core.Services
             _entityRepository = entityRepository;
             _shortStringHelper = shortStringHelper;
             _userIdKeyResolver = userIdKeyResolver;
-        }
-        [Obsolete("Use constructor that takes IUserIdKeyResolver as a parameter, scheduled for removal in V15")]
-        public MediaService(
-            ICoreScopeProvider provider,
-            MediaFileManager mediaFileManager,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IMediaRepository mediaRepository,
-            IAuditRepository auditRepository,
-            IMediaTypeRepository mediaTypeRepository,
-            IEntityRepository entityRepository,
-            IShortStringHelper shortStringHelper)
-            : this(
-                provider,
-                mediaFileManager,
-                loggerFactory,
-                eventMessagesFactory,
-                mediaRepository,
-                auditRepository,
-                mediaTypeRepository,
-                entityRepository,
-                shortStringHelper,
-                StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-        {
         }
 
         #endregion

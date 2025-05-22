@@ -1,9 +1,9 @@
 import { css, html, customElement, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import type { TelemetryResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { TelemetryLevelModel, TelemetryService, ApiError } from '@umbraco-cms/backoffice/external/backend-api';
+import { TelemetryLevelModel, TelemetryService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute, UmbApiError } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-dashboard-telemetry')
@@ -26,10 +26,10 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 	}
 
 	private async _setup() {
-		const telemetryLevels = await tryExecuteAndNotify(this, TelemetryService.getTelemetry({ skip: 0, take: 3 }));
+		const telemetryLevels = await tryExecute(this, TelemetryService.getTelemetry({ query: { skip: 0, take: 3 } }));
 		this._telemetryLevels = telemetryLevels.data?.items ?? [];
 
-		const telemetryLevel = await tryExecuteAndNotify(this, TelemetryService.getTelemetryLevel());
+		const telemetryLevel = await tryExecute(this, TelemetryService.getTelemetryLevel());
 		this._telemetryFormData = telemetryLevel.data?.telemetryLevel ?? TelemetryLevelModel.BASIC;
 	}
 
@@ -38,16 +38,17 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 
 		this._buttonState = 'waiting';
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this,
 			TelemetryService.postTelemetryLevel({
-				requestBody: { telemetryLevel: this._telemetryFormData },
+				body: { telemetryLevel: this._telemetryFormData },
 			}),
 		);
 
 		if (error) {
 			this._buttonState = 'failed';
-			this._errorMessage = error instanceof ApiError ? (error.body as any).detail : error.message;
+			this._errorMessage =
+				(UmbApiError.isUmbApiError(error) ? error.problemDetails.detail : error.message) ?? 'Unknown error';
 			return;
 		}
 

@@ -115,5 +115,9 @@ public class UmbracoPlan : MigrationPlan
         // To 15.4.0
         To<V_15_4_0.UpdateDocumentUrlToPersistMultipleSegmentsPerDocument>("{A9E72794-4036-4563-B543-1717C73B8879}");
         To<V_15_4_0.AddRelationTypeForMembers>("{33D62294-D0DE-4A86-A830-991EB36B96DA}");
+
+        // To 16.0.0
+        To<V_16_0_0.MigrateTinyMceToTiptap>("{C6681435-584F-4BC8-BB8D-BC853966AF0B}");
+        To<V_16_0_0.AddDocumentPropertyPermissions>("{D1568C33-A697-455F-8D16-48060CB954A1}");
     }
 }

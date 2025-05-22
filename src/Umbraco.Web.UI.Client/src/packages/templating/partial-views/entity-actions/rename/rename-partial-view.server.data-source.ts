@@ -6,7 +6,7 @@ import {
 import type { RenameStylesheetRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 export class UmbRenamePartialViewServerDataSource {
 	#host: UmbControllerHost;
@@ -32,19 +32,19 @@ export class UmbRenamePartialViewServerDataSource {
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
-		const requestBody: RenameStylesheetRequestModel = {
+		const body: RenameStylesheetRequestModel = {
 			name: appendFileExtensionIfNeeded(name, '.cshtml'),
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			PartialViewService.putPartialViewByPathRename({
-				path: encodeURIComponent(path),
-				requestBody,
+				path: { path: encodeURIComponent(path) },
+				body,
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			const newPath = decodeURIComponent(data);
 			const newPathUnique = this.#serverFilePathUniqueSerializer.toUnique(newPath);
 			return this.#detailDataSource.read(newPathUnique);

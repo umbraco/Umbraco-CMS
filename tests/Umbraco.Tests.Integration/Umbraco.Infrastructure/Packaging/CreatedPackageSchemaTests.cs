@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class CreatedPackageSchemaTests : UmbracoIntegrationTest
+internal sealed class CreatedPackageSchemaTests : UmbracoIntegrationTest
 {
     private ICreatedPackagesRepository CreatedPackageSchemaRepository =>
         GetRequiredService<ICreatedPackagesRepository>();

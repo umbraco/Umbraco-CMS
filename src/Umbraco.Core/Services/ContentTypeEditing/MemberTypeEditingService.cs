@@ -1,5 +1,3 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -27,21 +25,6 @@ internal sealed class MemberTypeEditingService : ContentTypeEditingServiceBase<I
         _memberTypeService = memberTypeService;
         _userService = userService;
         _reservedFieldNamesService = reservedFieldNamesService;
-    }
-
-    [Obsolete("Use the non obsolete constructor instead. Scheduled for removal in v16")]
-    public MemberTypeEditingService(
-        IContentTypeService contentTypeService,
-        IMemberTypeService memberTypeService,
-        IDataTypeService dataTypeService,
-        IEntityService entityService,
-        IShortStringHelper shortStringHelper,
-        IUserService userService)
-        : base(contentTypeService, memberTypeService, dataTypeService, entityService, shortStringHelper)
-    {
-        _memberTypeService = memberTypeService;
-        _userService = userService;
-        _reservedFieldNamesService = StaticServiceProvider.Instance.GetRequiredService<IReservedFieldNamesService>();
     }
 
     public async Task<Attempt<IMemberType?, ContentTypeOperationStatus>> CreateAsync(MemberTypeCreateModel model, Guid userKey)

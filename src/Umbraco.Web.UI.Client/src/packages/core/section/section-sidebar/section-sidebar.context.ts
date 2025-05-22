@@ -4,7 +4,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbStringState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbSectionSidebarContext extends UmbContextBase<UmbSectionSidebarContext> {
+export class UmbSectionSidebarContext extends UmbContextBase {
 	#contextMenuIsOpen = new UmbBooleanState(false);
 	contextMenuIsOpen = this.#contextMenuIsOpen.asObservable();
 

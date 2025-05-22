@@ -30,13 +30,13 @@ public sealed class HtmlStringUtilities
 
     public HtmlString StripHtmlTags(string html, params string[]? tags)
     {
-        HtmlDocument doc = new HtmlDocument();
+        var doc = new HtmlDocument();
         doc.LoadHtml(html);
 
-        List<HtmlNode> targets = new List<HtmlNode>();
-        HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes(".//*");
+        var targets = new List<HtmlNode>();
+        HtmlNodeCollection? nodes = doc.DocumentNode.SelectNodes(".//*");
 
-        if (nodes != null)
+        if (nodes is not null)
         {
             foreach (HtmlNode node in nodes)
             {

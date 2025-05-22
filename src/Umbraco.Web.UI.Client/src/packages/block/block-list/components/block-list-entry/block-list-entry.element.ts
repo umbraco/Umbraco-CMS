@@ -231,9 +231,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			null,
 		);
 		this.observe(
-			this.#context.readOnlyState.isReadOnly,
+			this.#context.readOnlyGuard.permitted,
 			(isReadOnly) => (this._isReadOnly = isReadOnly),
-			'umbReadonlyObserver',
+			'umbReadOnlyObserver',
 		);
 	}
 
@@ -293,6 +293,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
 		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
 		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+		if (!propertyDatasetContext || !propertyContext || !clipboardContext) {
+			throw new Error('Could not get required contexts to copy.');
+		}
 
 		const workspaceName = propertyDatasetContext?.getName();
 		const propertyLabel = propertyContext?.getLabel();
@@ -343,10 +346,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
+		ext.component?.setAttribute('part', 'component');
 		if (this._exposed) {
 			return ext.component;
 		} else {
-			return html`<div>
+			return html`<div style="min-height: var(--uui-size-16);">
 				${ext.component}
 				<umb-block-overlay-expose-button
 					.contentTypeName=${this._contentTypeName}
@@ -506,6 +510,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			:host([settings-invalid])::after,
 			:host([content-invalid])::after {
 				border-color: var(--uui-color-invalid);
+			}
+
+			umb-extension-slot::part(component) {
+				position: relative;
+				z-index: 0;
 			}
 
 			uui-action-bar {

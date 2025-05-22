@@ -38,9 +38,7 @@ export class UmbDocumentTypeTreeServerDataSource extends UmbTreeServerDataSource
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	DocumentTypeService.getTreeDocumentTypeRoot({
-		foldersOnly: args.foldersOnly,
-		skip: args.skip,
-		take: args.take,
+		query: { foldersOnly: args.foldersOnly, skip: args.skip, take: args.take },
 	});
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
@@ -53,10 +51,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DocumentTypeService.getTreeDocumentTypeChildren({
-			parentId: args.parent.unique,
-			foldersOnly: args.foldersOnly,
-			skip: args.skip,
-			take: args.take,
+			query: { parentId: args.parent.unique, foldersOnly: args.foldersOnly, skip: args.skip, take: args.take },
 		});
 	}
 };
@@ -64,7 +59,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	DocumentTypeService.getTreeDocumentTypeAncestors({
-		descendantId: args.treeItem.unique,
+		query: { descendantId: args.treeItem.unique },
 	});
 
 const mapper = (item: DocumentTypeTreeItemResponseModel): UmbDocumentTypeTreeItemModel => {

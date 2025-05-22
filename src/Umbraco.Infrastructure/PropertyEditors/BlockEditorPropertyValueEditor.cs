@@ -20,25 +20,6 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
-    protected BlockEditorPropertyValueEditor(
-        DataEditorAttribute attribute,
-        PropertyEditorCollection propertyEditors,
-        DataValueReferenceFactoryCollection dataValueReferenceFactories,
-        IDataTypeConfigurationCache dataTypeConfigurationCache,
-        ILocalizedTextService textService,
-        ILogger<BlockEditorPropertyValueEditor<TValue, TLayout>> logger,
-        IShortStringHelper shortStringHelper,
-        IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper)
-        : this(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer,
-            StaticServiceProvider.Instance.GetRequiredService<BlockEditorVarianceHandler>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
-            ioHelper,
-            attribute)
-    {
-    }
-
     protected BlockEditorPropertyValueEditor(
         PropertyEditorCollection propertyEditors,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,

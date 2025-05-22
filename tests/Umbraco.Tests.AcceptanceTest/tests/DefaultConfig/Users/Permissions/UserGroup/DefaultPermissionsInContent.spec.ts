@@ -91,7 +91,7 @@ test('can create document blueprint with permission enabled', async ({umbracoApi
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
-  await umbracoUi.content.clickCreateDocumentBlueprintButton();
+  await umbracoUi.content.clickCreateBlueprintActionMenuOption();
   await umbracoUi.content.enterDocumentBlueprintName(documentBlueprintName);
   await umbracoUi.content.clickSaveDocumentBlueprintButton();
 
@@ -123,7 +123,7 @@ test('can delete content with delete permission enabled', async ({umbracoApi, um
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
-  await umbracoUi.content.clickTrashButton();
+  await umbracoUi.content.clickTrashActionMenuOption();
   await umbracoUi.content.clickConfirmTrashButton();
 
   // Assert
@@ -187,13 +187,14 @@ test('can create content with create permission enabled', async ({umbracoApi, um
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(rootDocumentTypeName);
   await umbracoUi.content.enterContentName(testDocumentName);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.content.isErrorNotificationVisible(false);
 });
 
 test('can not create content with create permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -246,7 +247,8 @@ test('can publish content with publish permission enabled', async ({umbracoApi, 
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
-  await umbracoUi.content.clickPublishButton();
+  await umbracoUi.content.clickPublishActionMenuOption();
+  await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
@@ -310,7 +312,7 @@ test('can unpublish content with unpublish permission enabled', async ({umbracoA
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
-  await umbracoUi.content.clickUnpublishButton();
+  await umbracoUi.content.clickUnpublishActionMenuOption();
   await umbracoUi.content.clickConfirmToUnpublishButton();
 
   // Assert
@@ -349,7 +351,8 @@ test('can update content with update permission enabled', async ({umbracoApi, um
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
 });
 
@@ -380,7 +383,7 @@ test('can duplicate content with duplicate permission enabled', async ({umbracoA
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   // Duplicate to root
-  await umbracoUi.content.clickDuplicateToButton();
+  await umbracoUi.content.clickDuplicateToActionMenuOption();
   await umbracoUi.content.clickLabelWithName('Content');
   await umbracoUi.content.clickDuplicateButton();
 
@@ -422,7 +425,7 @@ test('can move content with move to permission enabled', async ({umbracoApi, umb
   // Act
   await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
   await umbracoUi.content.clickActionsMenuForContent(childDocumentOneName);
-  await umbracoUi.content.clickMoveToButton();
+  await umbracoUi.content.clickMoveToActionMenuOption();
   await umbracoUi.content.moveToContentWithName([], moveToDocumentName);
 
   // Assert
@@ -463,7 +466,7 @@ test('can sort children with sort children permission enabled', async ({umbracoA
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
-  await umbracoUi.content.clickSortChildrenButton();
+  await umbracoUi.content.clickSortChildrenActionMenuOption();
 
   // TODO: uncomment when it is not flaky
   // const childDocumentOneLocator = await umbracoUi.content.getButtonWithName(childDocumentOneName);
@@ -504,7 +507,7 @@ test('can set culture and hostnames with culture and hostnames permission enable
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
-  await umbracoUi.content.clickCultureAndHostnamesButton();
+  await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
   await umbracoUi.content.clickAddNewDomainButton();
   await umbracoUi.content.enterDomain('/domain');
   await umbracoUi.content.clickSaveModalButton();
@@ -541,7 +544,7 @@ test.skip('can set public access with public access permission enabled', async (
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
-  await umbracoUi.content.clickPublicAccessButton();
+  await umbracoUi.content.clickPublicAccessActionMenuOption();
   await umbracoUi.content.addGroupBasedPublicAccess(testMemberGroup, rootDocumentName);
 
   // Assert

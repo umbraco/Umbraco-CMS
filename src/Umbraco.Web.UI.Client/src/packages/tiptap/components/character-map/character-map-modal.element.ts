@@ -319,6 +319,8 @@ export class UmbCharacterMapModalElement extends UmbModalBaseElement<
 		],
 	};
 
+	#placeholderLabel = this.localize.term('placeholders_filter');
+
 	@state()
 	private _filterQuery = '';
 
@@ -357,6 +359,7 @@ export class UmbCharacterMapModalElement extends UmbModalBaseElement<
 			this._selectedGroup && this._selectedGroup !== '#general_all'
 				? this.#characterMap[this._selectedGroup].filter(this.#filterHandler)
 				: Object.values(this.#characterMap).flat().filter(this.#filterHandler);
+
 		return html`
 			<div id="container">
 				<div>
@@ -375,7 +378,8 @@ export class UmbCharacterMapModalElement extends UmbModalBaseElement<
 					<uui-input
 						type="search"
 						autocomplete="off"
-						placeholder=${this.localize.term('placeholders_filter')}
+						label=${this.#placeholderLabel}
+						placeholder=${this.#placeholderLabel}
 						@input=${this.#onFilterInput}
 						${umbFocus()}>
 						<div slot="prepend">

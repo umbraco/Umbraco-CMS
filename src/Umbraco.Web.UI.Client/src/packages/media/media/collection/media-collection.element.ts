@@ -22,11 +22,12 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		super();
 
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (context) => {
+			// TODO: stop consuming the context both in the default element and here. Instead make the default able to inform when the context is consumed. Or come up with a better system for the controllers to talk together. [NL]
 			this.#collectionContext = context;
 		});
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
-			this.observe(instance.unique, (unique) => {
+			this.observe(instance?.unique, (unique) => {
 				this._unique = unique ?? null;
 			});
 		});
@@ -64,6 +65,9 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		this.#collectionContext?.requestCollection();
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) {
+			throw new Error('Could not get event context');
+		}
 		const reloadEvent = new UmbRequestReloadChildrenOfEntityEvent({
 			entityType: this._unique ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
 			unique: this._unique,

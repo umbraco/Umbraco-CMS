@@ -1,13 +1,12 @@
 import { UMB_SEARCH_MODAL } from './search-modal/search-modal.token.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbHeaderAppButtonElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-search-header-app')
 export class UmbSearchHeaderAppElement extends UmbHeaderAppButtonElement {
 	async #onSearchClick() {
-		const context = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		context.open(this, UMB_SEARCH_MODAL);
+		await umbOpenModal(this, UMB_SEARCH_MODAL).catch(() => undefined);
 	}
 
 	override render() {

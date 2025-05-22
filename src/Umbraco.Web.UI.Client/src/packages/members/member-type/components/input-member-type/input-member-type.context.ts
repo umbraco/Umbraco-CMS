@@ -19,6 +19,3 @@ export class UmbMemberTypePickerInputContext extends UmbPickerInputContext<
 		super(host, UMB_MEMBER_TYPE_ITEM_REPOSITORY_ALIAS, UMB_MEMBER_TYPE_PICKER_MODAL);
 	}
 }
-
-/** @deprecated Use `UmbMemberTypePickerInputContext` instead. This method will be removed in Umbraco 15. */
-export { UmbMemberTypePickerInputContext as UmbMemberTypePickerContext };

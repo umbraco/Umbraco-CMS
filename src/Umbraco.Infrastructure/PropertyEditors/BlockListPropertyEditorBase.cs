@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
@@ -12,7 +11,6 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
-using StaticServiceProvider = Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -23,15 +21,6 @@ public abstract class BlockListPropertyEditorBase : DataEditor
 {
     private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
     private readonly IJsonSerializer _jsonSerializer;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BlockListPropertyEditorBase"/> class.
-    /// </summary>
-    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 15.")]
-    protected BlockListPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
-        : this(dataValueEditorFactory,blockValuePropertyIndexValueFactory, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
-    {
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BlockListPropertyEditorBase"/> class.

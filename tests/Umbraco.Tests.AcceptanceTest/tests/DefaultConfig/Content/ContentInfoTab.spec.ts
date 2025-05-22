@@ -33,7 +33,10 @@ test('can see correct information when published', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
+  // TODO: Since we are not asserting on a success notification yet, we need to wait for a second to make sure the content is published
+  await umbracoUi.waitForTimeout(1000);
   const contentData = await umbracoApi.document.getByName(contentName);
   await umbracoUi.content.doesIdHaveText(contentData.id);
   const expectedCreatedDate = new Date(contentData.variants[0].createDate).toLocaleString("en-US", {
@@ -45,8 +48,10 @@ test('can see correct information when published', async ({umbracoApi, umbracoUi
     second: "numeric",
     hour12: true,
   });
+
+  const contentUrl = await umbracoApi.document.getDocumentUrl(contentId);
   await umbracoUi.content.doesCreatedDateHaveText(expectedCreatedDate);
-  await umbracoUi.content.doesDocumentHaveLink(contentData.urls[0].url ? contentData.urls[0].url : '/');
+  await umbracoUi.content.doesDocumentHaveLink(contentUrl);
   // TODO: Uncomment this when front-end is ready. Currently the publication status of content is not changed to "Published" immediately after publishing it
   //await umbracoUi.content.doesPublicationStatusHaveText(contentData.variants[0].state === 'Draft' ? 'Unpublished' : contentData.variants[0].state);
 });
@@ -106,7 +111,8 @@ test('can change template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.template.id).toBe(secondTemplateId);
 

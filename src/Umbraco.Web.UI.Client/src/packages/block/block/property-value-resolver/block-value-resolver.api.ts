@@ -38,7 +38,7 @@ export abstract class UmbBlockValueResolver<ValueType>
 		value: ValueType,
 		variantsCallback: (values: Array<UmbBlockExposeModel>) => Promise<Array<UmbBlockExposeModel> | undefined>,
 	) {
-		const expose = (await variantsCallback(value.expose)) ?? [];
+		const expose = (await variantsCallback(value.expose ?? [])) ?? [];
 		return { ...value, expose };
 	}
 

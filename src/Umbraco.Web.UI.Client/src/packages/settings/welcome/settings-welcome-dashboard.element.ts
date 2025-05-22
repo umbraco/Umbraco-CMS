@@ -29,7 +29,7 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 					<div class="button-group">
 						<uui-button
 							look="outline"
-							href="https://our.umbraco.com/forum/"
+							href="https://forum.umbraco.com/"
 							label=${this.localize.term('settingsDashboard_goForum')}
 							target="_blank"></uui-button>
 						<uui-button

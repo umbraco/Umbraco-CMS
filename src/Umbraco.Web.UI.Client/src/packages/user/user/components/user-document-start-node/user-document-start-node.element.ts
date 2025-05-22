@@ -1,7 +1,7 @@
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
-import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
+import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 @customElement('umb-user-document-start-node')
 export class UmbUserDocumentStartNodeElement extends UmbLitElement {
@@ -22,14 +22,15 @@ export class UmbUserDocumentStartNodeElement extends UmbLitElement {
 	readonly = false;
 
 	@state()
-	_displayValue: Array<UmbDocumentItemModel> = [];
-
-	#itemRepository = new UmbDocumentItemRepository(this);
+	_displayValue: Array<any> = [];
 
 	async #observeItems() {
-		const { asObservable } = await this.#itemRepository.requestItems(this.#uniques);
+		// TODO: get back to this when documents have been decoupled from users.
+		// The repository alias is hardcoded on purpose to avoid a document import in the user module.
+		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(this, 'Umb.Repository.DocumentItem');
+		const { asObservable } = await itemRepository.requestItems(this.#uniques);
 
-		this.observe(asObservable(), (data) => {
+		this.observe(asObservable?.(), (data) => {
 			this._displayValue = data || [];
 		});
 	}

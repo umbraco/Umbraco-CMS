@@ -11,7 +11,7 @@ import type {
 import { StylesheetService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<UmbStylesheetDetailModel> {
 	#host: UmbControllerHost;
@@ -40,20 +40,20 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(parentUnique);
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateStylesheetRequestModel = {
+		const body: CreateStylesheetRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
 			name: appendFileExtensionIfNeeded(model.name, '.css'),
 			content: model.content,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			StylesheetService.postStylesheet({
-				requestBody,
+				body,
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			const newPath = decodeURIComponent(data);
 			const newPathUnique = this.#serverFilePathUniqueSerializer.toUnique(newPath);
 			return this.read(newPathUnique);
@@ -68,9 +68,9 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
-			StylesheetService.getStylesheetByPath({ path: encodeURIComponent(path) }),
+			StylesheetService.getStylesheetByPath({ path: { path: encodeURIComponent(path) } }),
 		);
 
 		if (error || !data) {
@@ -93,15 +93,15 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(model.unique);
 		if (!path) throw new Error('Path is missing');
 
-		const requestBody: UpdateStylesheetRequestModel = {
+		const body: UpdateStylesheetRequestModel = {
 			content: model.content,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			StylesheetService.putStylesheetByPath({
-				path: encodeURIComponent(path),
-				requestBody,
+				path: { path: encodeURIComponent(path) },
+				body,
 			}),
 		);
 
@@ -118,10 +118,10 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			StylesheetService.deleteStylesheetByPath({
-				path: encodeURIComponent(path),
+				path: { path: encodeURIComponent(path) },
 			}),
 		);
 	}

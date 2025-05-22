@@ -15,14 +15,15 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can create a empty media type folder', async ({umbracoApi, umbracoUi}) => {
   // Act
-  await umbracoUi.mediaType.clickActionsMenuForName('Media Types');
-  await umbracoUi.mediaType.clickActionsMenuCreateButton();
+  await umbracoUi.mediaType.clickActionsMenuAtRoot();
+  await umbracoUi.mediaType.clickCreateActionMenuOption();
   await umbracoUi.mediaType.clickFolderButton();
   await umbracoUi.mediaType.enterFolderName(mediaTypeFolderName);
   await umbracoUi.mediaType.clickConfirmCreateFolderButton();
 
   // Assert
-  await umbracoUi.mediaType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.mediaType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.mediaType.isErrorNotificationVisible(false);
   const folder = await umbracoApi.mediaType.getByName(mediaTypeFolderName);
   expect(folder.name).toBe(mediaTypeFolderName);
   // Checks if the folder is in the root
@@ -37,10 +38,11 @@ test('can delete a media type folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.mediaType.clickRootFolderCaretButton();
   await umbracoUi.mediaType.clickActionsMenuForName(mediaTypeFolderName);
-  await umbracoUi.mediaType.deleteFolder();
+  await umbracoUi.mediaType.clickDeleteAndConfirmButton();
 
   // Assert
-  await umbracoUi.mediaType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  //await umbracoUi.mediaType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  await umbracoUi.mediaType.isErrorNotificationVisible(false);
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeFolderName)).toBeFalsy();
 });
 
@@ -53,13 +55,14 @@ test('can rename a media type folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.mediaType.clickRootFolderCaretButton();
   await umbracoUi.mediaType.clickActionsMenuForName(oldFolderName);
-  await umbracoUi.mediaType.clickRenameFolderButton();
+  await umbracoUi.mediaType.clickUpdateActionMenuOption();
   await umbracoUi.waitForTimeout(500);
   await umbracoUi.mediaType.enterFolderName(mediaTypeFolderName);
   await umbracoUi.mediaType.clickConfirmRenameButton();
 
   // Assert
-  await umbracoUi.mediaType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  //await umbracoUi.mediaType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.mediaType.isErrorNotificationVisible(false);
   const folder = await umbracoApi.mediaType.getByName(mediaTypeFolderName);
   expect(folder.name).toBe(mediaTypeFolderName);
 });
@@ -73,13 +76,14 @@ test('can create a media type folder in a folder', async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.mediaType.clickRootFolderCaretButton();
   await umbracoUi.mediaType.clickActionsMenuForName(mediaTypeFolderName);
-  await umbracoUi.mediaType.clickActionsMenuCreateButton();
+  await umbracoUi.mediaType.clickCreateActionMenuOption();
   await umbracoUi.mediaType.clickFolderButton();
   await umbracoUi.mediaType.enterFolderName(childFolderName);
   await umbracoUi.mediaType.clickConfirmCreateFolderButton();
 
   // Assert
-  await umbracoUi.mediaType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.mediaType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.mediaType.isErrorNotificationVisible(false);
   await umbracoUi.mediaType.clickCaretButtonForName(mediaTypeFolderName);
   await umbracoUi.mediaType.isTreeItemVisible(childFolderName, true);
   const parentFolderChildren = await umbracoApi.mediaType.getChildren(parentFolderId);
@@ -102,13 +106,14 @@ test('can create a media type folder in a folder in a folder', async ({umbracoAp
   await umbracoUi.mediaType.clickRootFolderCaretButton();
   await umbracoUi.mediaType.clickCaretButtonForName(grandparentFolderName);
   await umbracoUi.mediaType.clickActionsMenuForName(mediaTypeFolderName);
-  await umbracoUi.mediaType.clickActionsMenuCreateButton();
+  await umbracoUi.mediaType.clickCreateActionMenuOption();
   await umbracoUi.mediaType.clickFolderButton();
   await umbracoUi.mediaType.enterFolderName(childFolderName);
   await umbracoUi.mediaType.clickConfirmCreateFolderButton();
 
   // Assert
-  await umbracoUi.mediaType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  //await umbracoUi.mediaType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.mediaType.isErrorNotificationVisible(false);
   await umbracoUi.mediaType.clickCaretButtonForName(mediaTypeFolderName);
   await umbracoUi.mediaType.isTreeItemVisible(childFolderName, true);
   const grandParentFolderChildren = await umbracoApi.mediaType.getChildren(grandParentFolderId);

@@ -1,8 +1,8 @@
 import { UmbConditionBase } from '../../extension-registry/conditions/condition-base.controller.js';
+import { UMB_SECTION_CONTEXT } from '../section.context.js';
 import type { SectionAliasConditionConfig } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
-import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 
 export class UmbSectionAliasCondition
 	extends UmbConditionBase<SectionAliasConditionConfig>
@@ -21,7 +21,7 @@ export class UmbSectionAliasCondition
 		if (permissionCheck !== undefined) {
 			this.consumeContext(UMB_SECTION_CONTEXT, (context) => {
 				this.observe(
-					context.alias,
+					context?.alias,
 					(sectionAlias) => {
 						this.permitted = sectionAlias ? permissionCheck!(sectionAlias) : false;
 					},

@@ -50,12 +50,12 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 	async #onCreateFolderClick(event: PointerEvent) {
 		event.stopPropagation();
 
-		try {
-			await this.#createFolderAction?.execute();
-			this._submitModal();
-		} catch (error) {
-			console.error(error);
-		}
+		this.#createFolderAction
+			?.execute()
+			.then(() => {
+				this._submitModal();
+			})
+			.catch(() => {});
 	}
 
 	#onSelected(event: UmbSelectedEvent) {

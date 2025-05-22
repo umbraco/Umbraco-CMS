@@ -1,4 +1,4 @@
-import type { PasswordConfigurationResponseModel } from "@umbraco-cms/backoffice/external/backend-api";
+import type { PasswordConfigurationResponseModel } from './api/index.js';
 
 export type LoginRequestModel = {
 	username: string;
@@ -8,16 +8,16 @@ export type LoginRequestModel = {
 
 export type LoginResponse = {
 	data?: {
-    username: string;
-  };
+		username: string;
+	};
 	error?: string;
 	status: number;
 	twoFactorView?: string;
-  twoFactorProviders?: string[];
+	twoFactorProviders?: string[];
 };
 
 export type MfaCodeResponse = {
-  error?: string;
+	error?: string;
 };
 
 export type ResetPasswordResponse = {
@@ -26,7 +26,7 @@ export type ResetPasswordResponse = {
 
 export type ValidatePasswordResetCodeResponse = {
 	error?: string;
-  passwordConfiguration?: PasswordConfigurationModel;
+	passwordConfiguration?: PasswordConfigurationModel;
 };
 
 export type NewPasswordResponse = {
@@ -34,8 +34,24 @@ export type NewPasswordResponse = {
 };
 
 export type ValidateInviteCodeResponse = {
-  error?: string;
-  passwordConfiguration?: PasswordConfigurationModel;
+	error?: string;
+	passwordConfiguration?: PasswordConfigurationModel;
 };
 
 export type PasswordConfigurationModel = PasswordConfigurationResponseModel;
+
+export type UmbProblemDetails = {
+	type?: string | null;
+	title?: string | null;
+	status?: number | null;
+	detail?: string | null;
+	instance?: string | null;
+	[key: string]:
+		| unknown
+		| (string | null)
+		| (string | null)
+		| (number | null)
+		| (string | null)
+		| (string | null)
+		| undefined;
+};

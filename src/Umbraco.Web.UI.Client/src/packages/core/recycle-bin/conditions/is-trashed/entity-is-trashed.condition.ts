@@ -12,7 +12,7 @@ export class UmbIsTrashedCondition extends UmbConditionBase<UmbConditionConfigBa
 		super(host, args);
 
 		this.consumeContext(UMB_IS_TRASHED_ENTITY_CONTEXT, (context) => {
-			this.observe(context.isTrashed, (isTrashed) => {
+			this.observe(context?.isTrashed, (isTrashed) => {
 				this.permitted = isTrashed === true;
 			});
 		});

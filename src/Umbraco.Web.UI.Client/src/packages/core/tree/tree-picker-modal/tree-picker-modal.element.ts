@@ -1,4 +1,4 @@
-import type { UmbTreeSelectionConfiguration } from '../types.js';
+import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '../types.js';
 import { UmbTreeItemPickerContext } from '../tree-item-picker/index.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-picker-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -7,7 +7,6 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbModalBaseElement<
@@ -59,13 +58,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					...this.data.search,
 					searchFrom: this.data.startNode,
 				});
-
-				const searchQueryParams = this.data.search.queryParams;
-				if (searchQueryParams) {
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					//@ts-ignore - TODO wire up types
-					this.#pickerContext.search.setQuery(searchQueryParams);
-				}
 			}
 
 			const multiple = this.data?.multiple ?? false;
@@ -167,7 +159,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	#renderSearch() {
 		return html`
 			<umb-picker-search-field></umb-picker-search-field>
-			<umb-picker-search-result></umb-picker-search-result>
+			<umb-picker-search-result .pickableFilter=${this.data?.pickableFilter}></umb-picker-search-result>
 		`;
 	}
 

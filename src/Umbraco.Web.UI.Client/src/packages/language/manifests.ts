@@ -1,4 +1,5 @@
-import { manifest as conditionsManifest } from './conditions/multiple-app-languages.condition.js';
+import { manifest as multiLanguageConditionManifest } from './conditions/multiple-app-languages/multiple-app-languages.condition.js';
+import { manifest as userPermissionConditionManifest } from './conditions/language-user-permission/manifests.js';
 import { manifests as appLanguageSelect } from './app-language-select/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as entityActions } from './entity-actions/manifests.js';
@@ -20,7 +21,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...modalManifests,
 	...repositoryManifests,
 	...workspaceManifests,
-	conditionsManifest,
+	multiLanguageConditionManifest,
+	userPermissionConditionManifest,
 	{
 		type: 'workspaceContext',
 		name: 'Document Language Access Workspace Context',

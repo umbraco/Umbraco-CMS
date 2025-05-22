@@ -1,7 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Member;
+namespace Umbraco.Cms.Api.Management.ViewModels.Member;
 
+[Obsolete("No longer used. Scheduled for removal in Umbraco 18.")]
 public class MemberConfigurationResponseModel
 {
-    [Obsolete("Use MemberTypeConfigurationResponseModel.ReservedFieldNames from the ConfigurationMemberTypeController endpoint instead.")]
-    public required ISet<string> ReservedFieldNames { get; set; }
 }

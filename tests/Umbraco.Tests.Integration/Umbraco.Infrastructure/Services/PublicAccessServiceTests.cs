@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class PublicAccessServiceTests : UmbracoIntegrationTest
+internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void CreateTestData()

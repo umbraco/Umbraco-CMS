@@ -1,10 +1,10 @@
 import type { UmbSectionSidebarContext } from '../section-sidebar/index.js';
 import { UMB_SECTION_SIDEBAR_CONTEXT } from '../section-sidebar/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state, ref } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextProxyController } from '@umbraco-cms/backoffice/context-proxy';
 
 @customElement('umb-section-sidebar-context-menu')
 export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
@@ -67,15 +67,10 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 		this.#closeContextMenu();
 	}
 
-	#proxyContextRequests(event: UmbContextRequestEvent) {
-		if (!this.#sectionSidebarContext) return;
-		// Note for this hack (The if-sentence):  [NL]
-		// We do not currently have a good enough control to ensure that the proxy is last, meaning if another context is provided at this element, it might respond after the proxy event has been dispatched.
-		// To avoid such this hack just prevents proxying the event if its a request for its own context.
-		if (event.contextAlias !== UMB_SECTION_SIDEBAR_CONTEXT.contextAlias) {
-			event.stopImmediatePropagation();
-			this.#sectionSidebarContext.getContextElement()?.dispatchEvent(event.clone());
-		}
+	#setupProxy(target: EventTarget | undefined) {
+		new UmbContextProxyController(this, target, () =>
+			this.#sectionSidebarContext?.getContextElement(),
+		).setIgnoreContextAliases([UMB_SECTION_SIDEBAR_CONTEXT.contextAlias]);
 	}
 
 	override render() {
@@ -96,7 +91,7 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 
 	#renderModal() {
 		return this._isOpen && this._unique !== undefined && this._entityType
-			? html`<uui-scroll-container id="action-modal" @umb:context-request=${this.#proxyContextRequests}>
+			? html`<uui-scroll-container id="action-modal" ${ref(this.#setupProxy)}>
 					${this._headline ? html`<h3>${this.localize.string(this._headline)}</h3>` : nothing}
 					<umb-entity-action-list
 						@action-executed=${this.#onActionExecuted}

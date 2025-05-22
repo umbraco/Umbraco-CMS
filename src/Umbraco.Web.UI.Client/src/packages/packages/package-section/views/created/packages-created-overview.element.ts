@@ -121,7 +121,13 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 		if (totalPages <= 1) return nothing;
 		return html`
 			<div class="container">
-				<uui-pagination .total=${totalPages} @change=${this.#onPageChange}></uui-pagination>
+				<uui-pagination 
+				.total=${totalPages} 
+				firstlabel=${this.localize.term('general_first')}
+                previouslabel=${this.localize.term('general_previous')}
+                nextlabel=${this.localize.term('general_next')}
+                lastlabel=${this.localize.term('general_last')}
+				@change=${this.#onPageChange}></uui-pagination>
 			</div>
 		`;
 	}

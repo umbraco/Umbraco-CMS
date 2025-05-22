@@ -115,12 +115,6 @@ public static partial class Constants
         public const string Package = "icon-box";
 
         /// <summary>
-        ///     System packages icon.
-        /// </summary>
-        [Obsolete("Use Package icon instead.")]
-        public const string Packages = "icon-box";
-
-        /// <summary>
         ///     System property editor icon
         /// </summary>
         public const string PartialView = "icon-article";

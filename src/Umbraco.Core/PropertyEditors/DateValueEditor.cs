@@ -15,12 +15,11 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal class DateValueEditor : DataValueEditor
 {
     public DateValueEditor(
-        ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
         DataEditorAttribute attribute)
-        : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute) =>
+        : base(shortStringHelper, jsonSerializer, ioHelper, attribute) =>
         Validators.Add(new DateTimeValidator());
 
     public override object ToEditor(IProperty property, string? culture = null, string? segment = null)

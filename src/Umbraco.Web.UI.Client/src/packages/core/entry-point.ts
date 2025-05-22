@@ -31,6 +31,6 @@ export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 
 	host.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
 		// Initialize the auth context to let the app context know that the core module is ready
-		authContext.setInitialized();
+		authContext?.setInitialized();
 	});
 };

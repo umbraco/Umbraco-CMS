@@ -1,21 +1,40 @@
 import type { UmbContextDiscriminator, UmbContextToken } from '../token/context-token.js';
-import { isUmbContextProvideEventType, UMB_CONTEXT_PROVIDE_EVENT_TYPE } from '../provide/context-provide.event.js';
+import {
+	isUmbContextProvideEventType,
+	isUmbContextUnprovidedEventType,
+	UMB_CONTEXT_PROVIDE_EVENT_TYPE,
+	UMB_CONTEXT_UNPROVIDED_EVENT_TYPE,
+} from '../provide/context-provide.event.js';
+import type { UmbContextMinimal } from '../types.js';
 import type { UmbContextCallback } from './context-request.event.js';
 import { UmbContextRequestEventImplementation } from './context-request.event.js';
 
-type HostElementMethod = () => Element | undefined;
+type HostElementMethod = () => Element;
+
+export type UmbContextConsumerAsPromiseOptionsType = {
+	preventTimeout?: boolean;
+};
 
 /**
  * @class UmbContextConsumer
+ * @description The context consumer class, used to consume a context from a host element.
+ * Notice it is not recommended to use this class directly, but rather use the `consumeContext` method from a `UmbElement` or `UmbElementMixin` or `UmbControllerBase` or `UmbClassMixin`.
+ * Alternatively, you can use the `UmbContextConsumerController` to consume a context from a host element. But this does require that you can implement one of the Class Mixins mentioned above.
  */
-export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType = BaseType> {
+export class UmbContextConsumer<
+	BaseType extends UmbContextMinimal = UmbContextMinimal,
+	ResultType extends BaseType = BaseType,
+> {
 	protected _retrieveHost: HostElementMethod;
 
+	#raf?: number;
 	#skipHost?: boolean;
 	#stopAtContextMatch = true;
 	#callback?: UmbContextCallback<ResultType>;
-	#promise?: Promise<ResultType>;
+	#promise?: Promise<ResultType | undefined>;
+	#promiseOptions?: UmbContextConsumerAsPromiseOptionsType;
 	#promiseResolver?: (instance: ResultType) => void;
+	#promiseRejecter?: (reason: string) => void;
 
 	#instance?: ResultType;
 	get instance() {
@@ -51,6 +70,10 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		this.#discriminator = (contextIdentifier as UmbContextToken<BaseType, ResultType>).getDiscriminator?.();
 	}
 
+	getHostElement(): Element {
+		return this._retrieveHost();
+	}
+
 	/**
 	 * @public
 	 * @memberof UmbContextConsumer
@@ -76,6 +99,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 
 	protected _onResponse = (instance: BaseType): boolean => {
 		if (this.#instance === instance) {
+			this.#resolvePromise();
 			return true;
 		}
 
@@ -83,7 +107,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 			throw new Error('Not allowed to set context api instance to undefined.');
 		}
 		if (this.#discriminator) {
-			// Notice if discriminator returns false, we do not want to setInstance.
+			// Notice if discriminator returns false, we do not want to setInstance. [NL]
 			if (this.#discriminator(instance)) {
 				this.setInstance(instance as unknown as ResultType);
 				return true;
@@ -95,30 +119,63 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		return false;
 	};
 
-	protected setInstance(instance: ResultType): void {
+	protected async setInstance(instance: ResultType): Promise<void> {
 		this.#instance = instance;
-		const promiseResolver = this.#promiseResolver; // Get the promise resolver, as it might be destroyed as a reaction of the callback [NL]
-		this.#callback?.(instance); // Resolve callback first as it might perform something you like completed before resolving the promise, as the promise might be used to determine when things are ready/initiated [NL]
-		if (promiseResolver && instance !== undefined) {
-			promiseResolver(instance);
+		this.#setCurrentTarget(instance.getHostElement());
+		await this.#callback?.(instance); // Resolve callback first as it might perform something you like completed before resolving the promise, as the promise might be used to determine when things are ready/initiated [NL]
+		this.#resolvePromise();
+	}
+
+	#resolvePromise() {
+		if (this.#promiseResolver && this.#instance !== undefined) {
+			this.#promiseResolver(this.#instance);
 			this.#promise = undefined;
+			this.#promiseOptions = undefined;
+			this.#promiseResolver = undefined;
+			this.#promiseRejecter = undefined;
+		}
+		if (!this.#callback) {
+			this.destroy();
+		}
+	}
+
+	#rejectPromise() {
+		if (this.#promiseRejecter) {
+			const hostElement = this._retrieveHost();
+			// If we still have the rejecter, it means that the context was not found immediately, so lets reject the promise. [NL]
+			this.#promiseRejecter?.(
+				`Context could not be found. (Context Alias: ${this.#contextAlias} with API Alias: ${this.#apiAlias}). Controller is hosted on ${hostElement?.parentNode?.nodeName ?? 'Not attached node'} > ${hostElement?.nodeName}`,
+			);
+			this.#promise = undefined;
+			this.#promiseOptions = undefined;
+			this.#promiseResolver = undefined;
+			this.#promiseRejecter = undefined;
+		}
+		if (!this.#callback) {
+			this.destroy();
 		}
 	}
 
 	/**
 	 * @public
 	 * @memberof UmbContextConsumer
+	 * @param {UmbContextConsumerAsPromiseOptionsType} options - Prevent the promise from timing out.
 	 * @description Get the context as a promise.
 	 * @returns {UmbContextConsumer} - A promise that resolves when the context is consumed.
 	 */
-	public asPromise(): Promise<ResultType> {
+	public asPromise(options?: UmbContextConsumerAsPromiseOptionsType): Promise<ResultType | undefined> {
 		return (
 			this.#promise ??
-			(this.#promise = new Promise<ResultType>((resolve) => {
+			(this.#promise = new Promise<ResultType | undefined>((resolve, reject) => {
 				if (this.#instance) {
+					this.#promiseOptions = undefined;
+					this.#promiseResolver = undefined;
+					this.#promiseRejecter = undefined;
 					resolve(this.#instance);
 				} else {
+					this.#promiseOptions = options;
 					this.#promiseResolver = resolve;
+					this.#promiseRejecter = reject;
 				}
 			}))
 		);
@@ -130,6 +187,10 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @description Request the context from the host element.
 	 */
 	public request(): void {
+		if (this.#raf !== undefined) {
+			cancelAnimationFrame(this.#raf);
+		}
+
 		const event = new UmbContextRequestEventImplementation(
 			this.#contextAlias,
 			this.#apiAlias,
@@ -137,22 +198,65 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 			this.#stopAtContextMatch,
 		);
 		(this.#skipHost ? this._retrieveHost()?.parentNode : this._retrieveHost())?.dispatchEvent(event);
+
+		if (this.#promiseResolver && this.#promiseOptions?.preventTimeout !== true) {
+			this.#raf = requestAnimationFrame(() => {
+				// For unproviding, then setInstance to undefined here. [NL]
+				this.#rejectPromise();
+				this.#raf = undefined;
+			});
+		}
 	}
 
 	public hostConnected(): void {
-		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
-		window.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#handleNewProvider);
-		//window.addEventListener(umbContextUnprovidedEventType, this.#handleRemovedProvider);
+		this.#setupCurrentTarget();
 		this.request();
 	}
 
 	public hostDisconnected(): void {
-		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
-		window.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#handleNewProvider);
-		//window.removeEventListener(umbContextUnprovidedEventType, this.#handleRemovedProvider);
+		if (this.#raf !== undefined) {
+			cancelAnimationFrame(this.#raf);
+			this.#raf = undefined;
+		}
+
+		this.#instance = undefined;
+		this.#callback?.(undefined);
+		if (this.#promiseRejecter) {
+			const hostElement = this._retrieveHost();
+			this.#promiseRejecter(
+				`Context request was cancelled, host was disconnected. (Context Alias: ${this.#contextAlias} with API Alias: ${this.#apiAlias}). Controller is hosted on ${hostElement?.parentNode?.nodeName ?? 'Not attached node'} > ${hostElement?.nodeName}`,
+			);
+		}
+		this.#promise = undefined;
+		this.#promiseOptions = undefined;
+		this.#promiseResolver = undefined;
+		this.#promiseRejecter = undefined;
+
+		this.#dismentalCurrentTarget();
+		this.#currentTarget = window;
 	}
 
-	#handleNewProvider = (event: Event): void => {
+	#currentTarget: EventTarget = window;
+	#setCurrentTarget(target: EventTarget | undefined) {
+		this.#dismentalCurrentTarget();
+		this.#currentTarget = target ?? window;
+		this.#setupCurrentTarget();
+	}
+
+	#setupCurrentTarget() {
+		this.#currentTarget.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
+		// TODO: consider not listening if it does not have a Context....
+		this.#currentTarget.addEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
+	}
+
+	#dismentalCurrentTarget() {
+		if (this.#currentTarget) {
+			this.#currentTarget.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
+			this.#currentTarget.removeEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
+		}
+	}
+
+	#onProvide = (event: Event): void => {
 		// Does seem a bit unnecessary, we could just assume the type via type casting...
 		if (!isUmbContextProvideEventType(event)) return;
 
@@ -161,31 +265,30 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		}
 	};
 
-	//Niels: I'm keeping this code around as it might be relevant, but I wanted to try to see if leaving this feature out for now could work for us.
-	/*
-	#handleRemovedProvider = (event: Event) => {
+	#onUnprovided = (event: Event) => {
 		// Does seem a bit unnecessary, we could just assume the type via type casting...
 		if (!isUmbContextUnprovidedEventType(event)) return;
 
 		if (this.#contextAlias === event.contextAlias && event.instance === this.#instance) {
-			this.#unProvide();
+			this.#unprovide();
 		}
 	};
 
-	#unProvide() {
+	#unprovide() {
 		if (this.#instance !== undefined) {
 			this.#instance = undefined;
 			this.#callback?.(undefined);
 		}
 	}
-	*/
 
 	public destroy(): void {
 		this.hostDisconnected();
 		this._retrieveHost = undefined as any;
 		this.#callback = undefined;
 		this.#promise = undefined;
+		this.#promiseOptions = undefined;
 		this.#promiseResolver = undefined;
+		this.#promiseRejecter = undefined;
 		this.#instance = undefined;
 		this.#discriminator = undefined;
 	}

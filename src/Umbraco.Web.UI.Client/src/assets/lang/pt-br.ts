@@ -3,8 +3,8 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: pt
- * Language Int Name: Portuguese (BR)
- * Language Local Name: português (BR)
+ * Language Int Name: Portuguese (Brazil)
+ * Language Local Name: Português ()
  * Language LCID:
  * Language Culture: pt-BR
  */
@@ -128,12 +128,6 @@ export default {
 		restart: 'Reiniciar',
 		visit: 'Visitar',
 		welcome: 'Bem Vindo(a)',
-	},
-	prompt: {
-		stay: 'Stay',
-		discardChanges: 'Discard changes',
-		unsavedChanges: 'You have unsaved changes',
-		unsavedChangesWarning: 'Are you sure you want to navigate away from this page? - you have unsaved changes',
 	},
 	bulk: {
 		done: 'Done',

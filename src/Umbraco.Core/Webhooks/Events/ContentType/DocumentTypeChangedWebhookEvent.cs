@@ -21,5 +21,9 @@ public class DocumentTypeChangedWebhookEvent : WebhookEventBase<ContentTypeChang
     public override string Alias => Constants.WebhookEvents.Aliases.DocumentTypeChanged;
 
     public override object? ConvertNotificationToRequestPayload(ContentTypeChangedNotification notification)
-        => notification.Changes;
+        => notification.Changes.Select(contentTypeChange => new
+        {
+            Id = contentTypeChange.Item.Key,
+            ContentTypeChange = contentTypeChange.ChangeTypes,
+        });
 }

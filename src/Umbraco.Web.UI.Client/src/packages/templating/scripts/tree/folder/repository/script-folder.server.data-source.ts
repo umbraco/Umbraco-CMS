@@ -4,14 +4,14 @@ import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 import type { CreateScriptFolderRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { ScriptService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for Script folders that fetches data from the server
  * @class UmbScriptFolderServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbFolderModel>}
  */
 export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbFolderModel> {
 	#host: UmbControllerHost;
@@ -55,10 +55,10 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Cannot read script folder without a path');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			ScriptService.getScriptFolderByPath({
-				path: encodeURIComponent(path),
+				path: { path: encodeURIComponent(path) },
 			}),
 		);
 
@@ -88,19 +88,19 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 
 		const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(parentUnique);
 
-		const requestBody: CreateScriptFolderRequestModel = {
+		const body: CreateScriptFolderRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
 			name: model.name,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			ScriptService.postScriptFolder({
-				requestBody,
+				body,
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			const newPath = decodeURIComponent(data);
 			const newPathUnique = this.#serverFilePathUniqueSerializer.toUnique(newPath);
 			return this.read(newPathUnique);
@@ -121,10 +121,10 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Cannot delete script folder without a path');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			ScriptService.deleteScriptFolderByPath({
-				path: encodeURIComponent(path),
+				path: { path: encodeURIComponent(path) },
 			}),
 		);
 	}

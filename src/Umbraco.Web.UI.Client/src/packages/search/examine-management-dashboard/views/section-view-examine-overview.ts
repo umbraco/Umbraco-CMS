@@ -4,7 +4,7 @@ import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffic
 import type { IndexResponseModel, SearcherResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthStatusModel, IndexerService, SearcherService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-examine-overview')
 export class UmbDashboardExamineOverviewElement extends UmbLitElement {
@@ -28,14 +28,14 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 
 	private async _getIndexers() {
 		this._loadingIndexers = true;
-		const { data } = await tryExecuteAndNotify(this, IndexerService.getIndexer({ take: 9999, skip: 0 }));
+		const { data } = await tryExecute(this, IndexerService.getIndexer({ query: { take: 9999, skip: 0 } }));
 		this._indexers = data?.items ?? [];
 		this._loadingIndexers = false;
 	}
 
 	private async _getSearchers() {
 		this._loadingSearchers = true;
-		const { data } = await tryExecuteAndNotify(this, SearcherService.getSearcher({ take: 9999, skip: 0 }));
+		const { data } = await tryExecute(this, SearcherService.getSearcher({ query: { take: 9999, skip: 0 } }));
 		this._searchers = data?.items ?? [];
 		this._loadingSearchers = false;
 	}

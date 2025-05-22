@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -24,29 +22,6 @@ internal sealed class MemberEditingService : IMemberEditingService
     private readonly ILogger<MemberEditingService> _logger;
     private readonly IMemberGroupService _memberGroupService;
     private readonly SecuritySettings _securitySettings;
-
-    [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V16.")]
-    public MemberEditingService(
-        IMemberService memberService,
-        IMemberTypeService memberTypeService,
-        IMemberContentEditingService memberContentEditingService,
-        IMemberManager memberManager,
-        ITwoFactorLoginService twoFactorLoginService,
-        IPasswordChanger<MemberIdentityUser> passwordChanger,
-        ILogger<MemberEditingService> logger,
-        IMemberGroupService memberGroupService)
-        : this(
-              memberService,
-              memberTypeService,
-              memberContentEditingService,
-              memberManager,
-              twoFactorLoginService,
-              passwordChanger,
-              logger,
-              memberGroupService,
-              StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
-    {
-    }
 
     public MemberEditingService(
         IMemberService memberService,
@@ -70,8 +45,8 @@ internal sealed class MemberEditingService : IMemberEditingService
         _securitySettings = securitySettings.Value;
     }
 
-    public async Task<IMember?> GetAsync(Guid key)
-        => await Task.FromResult(_memberService.GetByKey(key));
+    public Task<IMember?> GetAsync(Guid key)
+        => Task.FromResult(_memberService.GetById(key));
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MemberCreateModel createModel)
         => await _memberContentEditingService.ValidateAsync(createModel, createModel.ContentTypeKey);
@@ -102,12 +77,16 @@ internal sealed class MemberEditingService : IMemberEditingService
             return Attempt.FailWithStatus(status, new MemberCreateResult());
         }
 
+        // this should be validated already so it's OK to throw an exception here
+        var memberName = createModel.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name
+                         ?? throw new ArgumentException("Expected an invariant variant for the member name.", nameof(createModel));
+
         var identityMember = MemberIdentityUser.CreateNew(
             createModel.Username,
             createModel.Email,
             memberType.Alias,
             createModel.IsApproved,
-            createModel.InvariantName,
+            memberName,
             createModel.Key);
 
         IdentityResult createResult = await _memberManager.CreateAsync(identityMember, createModel.Password);
@@ -140,7 +119,7 @@ internal sealed class MemberEditingService : IMemberEditingService
     {
         var status = new MemberEditingStatus();
 
-        IMember? member = _memberService.GetByKey(key);
+        IMember? member = _memberService.GetById(key);
         if (member is null)
         {
             status.ContentEditingOperationStatus = ContentEditingOperationStatus.NotFound;
@@ -244,7 +223,7 @@ internal sealed class MemberEditingService : IMemberEditingService
 
     private async Task<MemberEditingOperationStatus> ValidateMemberDataAsync(MemberEditingModelBase model, Guid? memberKey, string? password)
     {
-        if (model.InvariantName.IsNullOrWhiteSpace())
+        if (model.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name.IsNullOrWhiteSpace() is not false)
         {
             return MemberEditingOperationStatus.InvalidName;
         }

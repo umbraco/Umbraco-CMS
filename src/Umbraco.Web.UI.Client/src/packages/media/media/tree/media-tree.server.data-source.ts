@@ -37,7 +37,7 @@ export class UmbMediaTreeServerDataSource extends UmbTreeServerDataSourceBase<
 
 const getRootItems = (args: UmbMediaTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	MediaService.getTreeMediaRoot({ dataTypeId: args.dataType?.unique, skip: args.skip, take: args.take });
+	MediaService.getTreeMediaRoot({ query: { dataTypeId: args.dataType?.unique, skip: args.skip, take: args.take } });
 
 const getChildrenOf = (args: UmbMediaTreeChildrenOfRequestArgs) => {
 	if (args.parent.unique === null) {
@@ -45,10 +45,7 @@ const getChildrenOf = (args: UmbMediaTreeChildrenOfRequestArgs) => {
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return MediaService.getTreeMediaChildren({
-			parentId: args.parent.unique,
-			dataTypeId: args.dataType?.unique,
-			skip: args.skip,
-			take: args.take,
+			query: { parentId: args.parent.unique, dataTypeId: args.dataType?.unique, skip: args.skip, take: args.take },
 		});
 	}
 };
@@ -56,7 +53,7 @@ const getChildrenOf = (args: UmbMediaTreeChildrenOfRequestArgs) => {
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	MediaService.getTreeMediaAncestors({
-		descendantId: args.treeItem.unique,
+		query: { descendantId: args.treeItem.unique },
 	});
 
 const mapper = (item: MediaTreeItemResponseModel): UmbMediaTreeItemModel => {

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Manifest;
@@ -29,17 +29,18 @@ internal sealed class PackageManifestService : IPackageManifestService
                $"{nameof(PackageManifestService)}-PackageManifests",
                async () =>
                {
-                   Task<IEnumerable<PackageManifest>>[] tasks = _packageManifestReaders
-                       .Select(x => x.ReadPackageManifestsAsync())
-                       .ToArray();
-                   await Task.WhenAll(tasks);
+                   var packageManifests = new List<PackageManifest>();
+                   foreach (IPackageManifestReader packageManifestReader in _packageManifestReaders)
+                   {
+                       packageManifests.AddRange(await packageManifestReader.ReadPackageManifestsAsync());
+                   }
 
-                   return tasks.SelectMany(x => x.Result);
+                   return packageManifests;
                },
                _runtimeSettings.Mode == RuntimeMode.Production
                    ? TimeSpan.FromDays(30)
                    : TimeSpan.FromSeconds(10))
-           ?? Array.Empty<PackageManifest>();
+           ?? Enumerable.Empty<PackageManifest>();
 
     public async Task<IEnumerable<PackageManifest>> GetPublicPackageManifestsAsync()
         => (await GetAllPackageManifestsAsync()).Where(manifest => manifest.AllowPublicAccess);

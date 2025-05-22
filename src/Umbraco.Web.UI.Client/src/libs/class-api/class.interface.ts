@@ -1,12 +1,19 @@
 import type {
 	UmbContextCallback,
+	UmbContextConsumerAsPromiseOptionsType,
 	UmbContextConsumerController,
+	UmbContextMinimal,
 	UmbContextProviderController,
 	UmbContextToken,
 } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ObserverCallback, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+
+export interface UmbClassGetContextOptions extends UmbContextConsumerAsPromiseOptionsType {
+	skipHost?: boolean;
+	passContextAliasMatches?: boolean;
+}
 
 export interface UmbClassInterface extends UmbControllerHost {
 	/**
@@ -42,7 +49,10 @@ export interface UmbClassInterface extends UmbControllerHost {
 	 * @returns {UmbContextProviderController} Reference to the created Context Provider Controller instance
 	 * @memberof UmbClassInterface
 	 */
-	provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R>;
+	provideContext<R extends UmbContextMinimal = UmbContextMinimal>(
+		alias: string | UmbContextToken<R>,
+		instance: R,
+	): UmbContextProviderController<R>;
 
 	/**
 	 * @description Setup a subscription for a context. The callback is called when the context is resolved.
@@ -51,7 +61,7 @@ export interface UmbClassInterface extends UmbControllerHost {
 	 * @returns {UmbContextConsumerController} Reference to the created Context Consumer Controller instance
 	 * @memberof UmbClassInterface
 	 */
-	consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+	consumeContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
 		alias: string | UmbContextToken<BaseType, ResultType>,
 		callback: UmbContextCallback<ResultType>,
 	): UmbContextConsumerController<BaseType, ResultType>;
@@ -59,10 +69,11 @@ export interface UmbClassInterface extends UmbControllerHost {
 	/**
 	 * @description Retrieve a context. Notice this is a one time retrieving of a context, meaning if you expect this to be up to date with reality you should instead use the consumeContext method.
 	 * @param {string} alias
-	 * @returns {Promise<ContextType>} A Promise with the reference to the Context Api Instance
+	 * @returns {Promise<unknown>} A Promise with the reference to the Context Api Instance
 	 * @memberof UmbClassInterface
 	 */
-	getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+	getContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
 		alias: string | UmbContextToken<BaseType, ResultType>,
-	): Promise<ResultType>;
+		options?: UmbClassGetContextOptions,
+	): Promise<ResultType | undefined>;
 }

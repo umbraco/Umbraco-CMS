@@ -48,7 +48,6 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 			allowNonExistingSegmentsCreation: true,
 			disableDeleteWhenReferenced: true,
 			disableUnpublishWhenReferenced: true,
-			reservedFieldNames: [],
 		};
 	}
 }

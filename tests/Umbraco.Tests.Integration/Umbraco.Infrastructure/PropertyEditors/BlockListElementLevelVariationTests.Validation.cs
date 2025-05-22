@@ -43,10 +43,10 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Properties = [], Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Properties = [], Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
                 ],
-                InvariantProperties =
+                Properties =
                 [
                     new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
                 ]
@@ -143,10 +143,10 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Properties = [], Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Properties = [], Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
                 ],
-                InvariantProperties =
+                Properties =
                 [
                     new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
                 ]
@@ -212,10 +212,10 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Properties = [], Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Properties = [], Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
                 ],
-                InvariantProperties =
+                Properties =
                 [
                     new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
                 ]
@@ -267,10 +267,10 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Properties = [], Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Properties = [], Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
                 ],
-                InvariantProperties =
+                Properties =
                 [
                     new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
                 ]
@@ -327,10 +327,10 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Properties = [], Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Properties = [], Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
                 ],
-                InvariantProperties =
+                Properties =
                 [
                     new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
                 ]
@@ -455,10 +455,10 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Properties = [], Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Properties = [], Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
                 ],
-                InvariantProperties =
+                Properties =
                 [
                     new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
                 ]
@@ -538,10 +538,10 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Properties = [], Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Properties = [], Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
                 ],
-                InvariantProperties =
+                Properties =
                 [
                     new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
                 ]
@@ -590,17 +590,12 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel
-                    {
-                        Name = "Name en-US",
-                        Culture = "en-US",
-                        Segment = null,
-                        Properties = [
-                            new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
-                        ]
-                    }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null }
                 ],
-                InvariantProperties = []
+                Properties =
+                [
+                    new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue), Culture = "en-US" }
+                ]
             },
             contentType);
 
@@ -650,17 +645,12 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel
-                    {
-                        Name = "Name en-US",
-                        Culture = "en-US",
-                        Segment = null,
-                        Properties = [
-                            new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
-                        ]
-                    }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null }
                 ],
-                InvariantProperties = []
+                Properties =
+                [
+                    new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue), Culture = "en-US" }
+                ]
             },
             contentType);
 

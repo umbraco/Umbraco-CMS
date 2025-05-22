@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
+using Umbraco.Cms.Core.Logging;
 
 namespace Umbraco.Cms.Infrastructure.Logging.Serilog;
 
@@ -43,5 +44,8 @@ public class UmbracoFileConfiguration
     public int RetainedFileCountLimit { get; set; } = 31;
 
     public string GetPath(string logDirectory) =>
-        Path.Combine(logDirectory, $"UmbracoTraceLog.{Environment.MachineName}..json");
+        GetPath(logDirectory, LoggingConfiguration.DefaultLogFileNameFormat, Environment.MachineName);
+
+    public string GetPath(string logDirectory, string fileNameFormat, params string[] fileNameArgs) =>
+        Path.Combine(logDirectory, string.Format(fileNameFormat, fileNameArgs));
 }

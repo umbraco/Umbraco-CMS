@@ -60,7 +60,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 		this.consumeContext(UMB_BLOCK_LIST_ENTRY_CONTEXT, (blockContext) => {
 			this.#blockContext = blockContext;
 			this.observe(
-				this.#blockContext.unique,
+				this.#blockContext?.unique,
 				(contentKey) => {
 					this.#contentKey = contentKey;
 					this.#load();

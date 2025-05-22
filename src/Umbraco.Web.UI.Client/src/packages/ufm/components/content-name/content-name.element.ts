@@ -22,7 +22,7 @@ export class UmbUfmContentNameElement extends UmbUfmElementBase {
 
 		this.consumeContext(UMB_UFM_RENDER_CONTEXT, (context) => {
 			this.observe(
-				context.value,
+				context?.value,
 				async (value) => {
 					const temp =
 						this.alias && typeof value === 'object'

@@ -7,10 +7,9 @@ import type {
 } from '../types.js';
 import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
-import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, nothing, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-default-tree')
 export class UmbDefaultTreeElement extends UmbLitElement {
@@ -19,6 +18,16 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		selectable: true,
 		selection: [],
 	};
+
+	private _api: UmbDefaultTreeContext<UmbTreeItemModel, UmbTreeRootModel> | undefined;
+	@property({ type: Object, attribute: false })
+	public get api(): UmbDefaultTreeContext<UmbTreeItemModel, UmbTreeRootModel> | undefined {
+		return this._api;
+	}
+	public set api(value: UmbDefaultTreeContext<UmbTreeItemModel, UmbTreeRootModel> | undefined) {
+		this._api = value;
+		this.#observeData();
+	}
 
 	@property({ type: Object, attribute: false })
 	selectionConfiguration: UmbTreeSelectionConfiguration = this._selectionConfiguration;
@@ -59,73 +68,62 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@state()
 	private _totalPages = 1;
 
-	#treeContext?: UmbDefaultTreeContext<UmbTreeItemModel, UmbTreeRootModel>;
-	#init: Promise<unknown>;
-
-	constructor() {
-		super();
-
-		this.#init = Promise.all([
-			// TODO: Notice this can be retrieve via a api property. [NL]
-			this.consumeContext(UMB_TREE_CONTEXT, (instance) => {
-				this.#treeContext = instance;
-				this.observe(this.#treeContext.treeRoot, (treeRoot) => (this._treeRoot = treeRoot));
-				this.observe(this.#treeContext.rootItems, (rootItems) => (this._rootItems = rootItems));
-				this.observe(this.#treeContext.pagination.currentPage, (value) => (this._currentPage = value));
-				this.observe(this.#treeContext.pagination.totalPages, (value) => (this._totalPages = value));
-			}).asPromise(),
-		]);
+	#observeData() {
+		this.observe(this._api?.treeRoot, (treeRoot) => (this._treeRoot = treeRoot));
+		this.observe(this._api?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []));
+		this.observe(this._api?.pagination.currentPage, (value) => (this._currentPage = value ?? 1));
+		this.observe(this._api?.pagination.totalPages, (value) => (this._totalPages = value ?? 1));
 	}
 
 	protected override async updated(
 		_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
 	): Promise<void> {
 		super.updated(_changedProperties);
-		await this.#init;
+		if (this._api === undefined) return;
 
 		if (_changedProperties.has('selectionConfiguration')) {
 			this._selectionConfiguration = this.selectionConfiguration;
 
-			this.#treeContext!.selection.setMultiple(this._selectionConfiguration.multiple ?? false);
-			this.#treeContext!.selection.setSelectable(this._selectionConfiguration.selectable ?? true);
-			this.#treeContext!.selection.setSelection(this._selectionConfiguration.selection ?? []);
+			this._api!.selection.setMultiple(this._selectionConfiguration.multiple ?? false);
+			this._api!.selection.setSelectable(this._selectionConfiguration.selectable ?? true);
+			this._api!.selection.setSelection(this._selectionConfiguration.selection ?? []);
 		}
 
 		if (_changedProperties.has('startNode')) {
-			this.#treeContext!.setStartNode(this.startNode);
+			this._api!.setStartNode(this.startNode);
 		}
 
 		if (_changedProperties.has('hideTreeRoot')) {
-			this.#treeContext!.setHideTreeRoot(this.hideTreeRoot);
+			this._api!.setHideTreeRoot(this.hideTreeRoot);
 		}
 
 		if (_changedProperties.has('expandTreeRoot')) {
-			this.#treeContext!.setExpandTreeRoot(this.expandTreeRoot);
+			this._api!.setExpandTreeRoot(this.expandTreeRoot);
 		}
 
 		if (_changedProperties.has('foldersOnly')) {
-			this.#treeContext!.setFoldersOnly(this.foldersOnly ?? false);
+			this._api!.setFoldersOnly(this.foldersOnly ?? false);
 		}
 
 		if (_changedProperties.has('selectableFilter')) {
-			this.#treeContext!.selectableFilter = this.selectableFilter;
+			this._api!.selectableFilter = this.selectableFilter;
 		}
 
 		if (_changedProperties.has('filter')) {
-			this.#treeContext!.filter = this.filter;
+			this._api!.filter = this.filter;
 		}
 
 		if (_changedProperties.has('expansion')) {
-			this.#treeContext!.setExpansion(this.expansion);
+			this._api!.setExpansion(this.expansion);
 		}
 	}
 
 	getSelection() {
-		return this.#treeContext?.selection.getSelection();
+		return this._api?.selection.getSelection();
 	}
 
 	getExpansion() {
-		return this.#treeContext?.expansion.getExpansion();
+		return this._api?.expansion.getExpansion();
 	}
 
 	override render() {
@@ -148,10 +146,11 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 				${repeat(
 					this._rootItems,
 					(item, index) => item.name + '___' + index,
-					(item) =>
-						html`<umb-tree-item
+					(item) => html`
+						<umb-tree-item
 							.entityType=${item.entityType}
-							.props=${{ hideActions: this.hideTreeItemActions, item }}></umb-tree-item>`,
+							.props=${{ hideActions: this.hideTreeItemActions, item }}></umb-tree-item>
+					`,
 				)}
 				${this.#renderPaging()}
 			`;
@@ -163,7 +162,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	#onLoadMoreClick = (event: any) => {
 		event.stopPropagation();
 		const next = (this._currentPage = this._currentPage + 1);
-		this.#treeContext?.pagination.setCurrentPageNumber(next);
+		this._api?.pagination.setCurrentPageNumber(next);
 	};
 
 	#renderPaging() {

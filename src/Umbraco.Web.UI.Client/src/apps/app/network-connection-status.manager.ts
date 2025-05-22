@@ -1,14 +1,11 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-import {
-	UMB_NOTIFICATION_CONTEXT,
-	type UmbNotificationContext,
-	type UmbNotificationHandler,
-} from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationHandler } from '@umbraco-cms/backoffice/notification';
 
 export class UmbNetworkConnectionStatusManager extends UmbControllerBase {
-	#notificationContext?: UmbNotificationContext;
+	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	#offlineNotification?: UmbNotificationHandler;
 
 	#localize = new UmbLocalizationController(this);

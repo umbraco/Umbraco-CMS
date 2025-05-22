@@ -1,16 +1,16 @@
+import type { UmbEntityModel } from '../../types.js';
 import { UMB_ANCESTORS_ENTITY_CONTEXT } from './ancestors.entity-context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 /**
  * A entity context for the ancestors
  * @class UmbAncestorsEntityContext
- * @augments {UmbContextBase<UmbAncestorsEntityContext>}
+ * @augments {UmbContextBase}
  * @implements {UmbAncestorsEntityContext}
  */
-export class UmbAncestorsEntityContext extends UmbContextBase<UmbAncestorsEntityContext> {
+export class UmbAncestorsEntityContext extends UmbContextBase {
 	#ancestors = new UmbArrayState<UmbEntityModel>([], (x) => x.unique);
 	ancestors = this.#ancestors.asObservable();
 

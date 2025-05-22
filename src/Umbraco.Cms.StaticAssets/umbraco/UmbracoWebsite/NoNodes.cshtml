@@ -1,14 +1,10 @@
-@using Microsoft.Extensions.Options
+@model Umbraco.Cms.Web.Website.Models.NoNodesViewModel
 @using Umbraco.Cms.Api.Management.Controllers.Security
-@using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Hosting
 @using Umbraco.Cms.Core.Routing
-@using Umbraco.Extensions
-@model Umbraco.Cms.Web.Website.Models.NoNodesViewModel
-@inject IHostingEnvironment hostingEnvironment
-@inject IOptions<GlobalSettings> globalSettings
+@inject IHostingEnvironment HostingEnvironment
 @{
-    var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+    var backOfficePath = HostingEnvironment.GetBackOfficePath();
     var logoImage = Url.RouteUrl(BackOfficeGraphicsController.LogoRouteName, new {Version= "1"});
 }
 <!doctype html>
@@ -20,7 +16,7 @@
 
     <title>Umbraco: No Published Content</title>
 
-    <link rel="stylesheet" href="@WebPath.Combine(backOfficePath.TrimStart("~") , "website", "/nonodes.css")" />
+    <link rel="stylesheet" href="@WebPath.Combine(backOfficePath , "website", "/nonodes.css")" />
 </head>
 <body>
 

@@ -25,7 +25,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         return new MultiNodeTreePickerValueConverter(
             Mock.Of<IUmbracoContextAccessor>(),
             Mock.Of<IMemberService>(),
-            new ApiContentBuilder(contentNameProvider, routeBuilder, expansionStrategyAccessor),
+            new ApiContentBuilder(contentNameProvider, routeBuilder, expansionStrategyAccessor, CreateVariationContextAccessor()),
             new ApiMediaBuilder(contentNameProvider, apiUrProvider, Mock.Of<IPublishedValueFallback>(), expansionStrategyAccessor),
             CacheManager.Content,
             CacheManager.Media,
@@ -33,7 +33,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
     }
 
     private PublishedDataType MultiNodePickerPublishedDataType(bool multiSelect, string entityType) =>
-        new PublishedDataType(123, "test", new Lazy<object>(() => new MultiNodePickerConfiguration
+        new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiNodePickerConfiguration
         {
             MaxNumber = multiSelect ? 10 : 1,
             TreeSource = new MultiNodePickerConfigurationTreeSource

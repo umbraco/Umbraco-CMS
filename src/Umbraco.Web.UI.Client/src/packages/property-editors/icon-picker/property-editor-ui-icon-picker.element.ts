@@ -1,6 +1,6 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
@@ -36,10 +36,7 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 	private _color = '';
 
 	private async _openModal() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_ICON_PICKER_MODAL);
-
-		const data = await modalContext?.onSubmit();
+		const data = await umbOpenModal(this, UMB_ICON_PICKER_MODAL).catch(() => undefined);
 		if (!data) return;
 
 		if (data.color) {

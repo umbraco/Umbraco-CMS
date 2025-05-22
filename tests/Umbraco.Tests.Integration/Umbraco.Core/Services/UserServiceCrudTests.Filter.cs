@@ -5,10 +5,11 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class UserServiceCrudTests
+internal sealed partial class UserServiceCrudTests
 {
     [TestCase(null, 1)]                     // Requesting no filter, will just get the admin user but not the created and disabled one.
                                             //  - verifies fix for https://github.com/umbraco/Umbraco-CMS/issues/18812
@@ -248,7 +249,7 @@ public partial class UserServiceCrudTests
         var userService = CreateUserService();
         await CreateTestUsers(userService);
 
-        var writerGroup = await UserGroupService.GetAsync(Constants.Security.WriterGroupAlias);
+        var writerGroup = await UserGroupService.GetAsync(DatabaseDataCreator.WriterGroupAlias);
         var filter = new UserFilter
         {
             IncludedUserGroups = new HashSet<Guid> { writerGroup!.Key }

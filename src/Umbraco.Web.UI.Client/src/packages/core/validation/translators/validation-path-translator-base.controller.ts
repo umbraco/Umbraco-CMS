@@ -16,7 +16,7 @@ export abstract class UmbValidationPathTranslatorBase
 		this.consumeContext(UMB_VALIDATION_CONTEXT, (context) => {
 			this._context?.removeTranslator(this);
 			this._context = context;
-			context.addTranslator(this);
+			context?.addTranslator(this);
 		});
 	}
 
