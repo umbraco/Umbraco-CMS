@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -357,16 +357,42 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsEmpty(blockLevelBlock.Elements);
     }
 
+    private const string TestParagraph = "What follows from <strong>here</strong> <em>is</em> <a href=\"#\">just</a> a bunch of text.";
+
     [Test]
     public void ParseElement_CanHandleWhitespaceAroundInlineElemements()
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse("<p>What follows from <strong>here</strong> <em>is</em> <a href=\"#\">just</a> a bunch of text.</p>") as RichTextRootElement;
+        var element = parser.Parse($"<p>{TestParagraph}</p>") as RichTextRootElement;
         Assert.IsNotNull(element);
         var paragraphElement = element.Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(paragraphElement);
 
+        AssertTestParagraph(paragraphElement);
+    }
+
+    [Test]
+    public void ParseElement_RemovesNewLinesAroundHtmlElements()
+    {
+        var parser = CreateRichTextElementParser();
+
+        var element = parser.Parse($"<table>\n<tr>\n<td>{TestParagraph}</td>\n</tr>\n</table>") as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var tableElement = element.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(tableElement);
+
+        var rowElement = tableElement.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(rowElement);
+
+        var cellElement = rowElement.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(cellElement);
+
+        AssertTestParagraph(cellElement);
+    }
+
+    private static void AssertTestParagraph(RichTextGenericElement paragraphElement)
+    {
         var childElements = paragraphElement.Elements.ToArray();
         Assert.AreEqual(7, childElements.Length);
 
