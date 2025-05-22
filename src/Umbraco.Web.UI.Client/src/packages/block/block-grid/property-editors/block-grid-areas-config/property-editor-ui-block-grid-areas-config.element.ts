@@ -2,7 +2,7 @@ import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET, type UmbBlockGridTypeAreaType
 import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL } from '../../components/block-grid-area-config-entry/constants.js';
 import { UmbBlockGridAreaTypeEntriesContext } from './block-grid-area-type-entries.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
@@ -10,7 +10,9 @@ import type {
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { incrementString } from '@umbraco-cms/backoffice/utils';
-
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
+import { type UmbBlockGridAreaConfigEntryElement } from '../../../block-grid/components/block-grid-area-config-entry/block-grid-area-config-entry.element.js';
 import '../../components/block-grid-area-config-entry/block-grid-area-config-entry.element.js';
 @customElement('umb-property-editor-ui-block-grid-areas-config')
 export class UmbPropertyEditorUIBlockGridAreasConfigElement
@@ -22,6 +24,29 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	// local vars:
 	#defaultAreaGridColumns: number = 12;
 	#valueOfAreaGridColumns?: number | null;
+
+	#sorter = new UmbSorterController<UmbBlockGridTypeAreaType, UmbBlockGridAreaConfigEntryElement>(this, {
+		itemSelector: 'umb-block-area-config-entry',
+		containerSelector: '.umb-block-grid__area-container',
+		resolvePlacement: UmbSorterResolvePlacementAsGrid,
+		getUniqueOfElement: (element) => {
+			return element.key;
+		},
+		getUniqueOfModel: (modelEntry) => {
+			return modelEntry.key;
+		},
+		onChange: ({ model }) => {
+			this._value = model;
+		}
+	});
+
+	override updated(changedProperties: Map<string | number | symbol, unknown>) {
+		super.updated(changedProperties); 
+
+		if (changedProperties.has('value')) {
+			this.#sorter.setModel(this.value ?? []);
+		}
+	}
 
 	@property({ type: Array })
 	public set value(value: Array<UmbBlockGridTypeAreaType>) {
@@ -133,6 +158,15 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 					<uui-button look="placeholder" label=${'Add area'} href=${this._workspacePath + 'create'}></uui-button>`
 			: '';
 	}
+
+	static override styles = [
+		UmbTextStyles,
+		css`
+			.umb-block-grid__area{
+				cursor: pointer;
+			}
+		`
+	]
 }
 
 export default UmbPropertyEditorUIBlockGridAreasConfigElement;
