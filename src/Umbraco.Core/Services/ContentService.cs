@@ -1184,6 +1184,8 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentException("Cultures cannot be null or whitespace", nameof(cultures));
         }
 
+        cultures = cultures.Select(x => x.EnsureCultureCode()!).ToArray();
+
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
         // we need to guard against unsaved changes before proceeding; the content will be saved, but we're not firing any saved notifications
@@ -1263,7 +1265,7 @@ public class ContentService : RepositoryService, IContentService
 
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        culture = culture?.NullOrWhiteSpaceAsNull();
+        culture = culture?.NullOrWhiteSpaceAsNull().EnsureCultureCode();
 
         PublishedState publishedState = content.PublishedState;
         if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
@@ -2063,7 +2065,7 @@ public class ContentService : RepositoryService, IContentService
             cultures = ["*"];
         }
 
-        return cultures;
+        return cultures.Select(x => x.EnsureCultureCode()!).ToArray();
     }
 
     private static bool ProvidedCulturesIndicatePublishAll(string[] cultures) => cultures.Length == 0 || (cultures.Length == 1 && cultures[0] == "invariant");

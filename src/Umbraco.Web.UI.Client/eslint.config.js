@@ -81,6 +81,13 @@ export default [
 			'@typescript-eslint/consistent-type-imports': 'error',
 			'@typescript-eslint/no-import-type-side-effects': 'warn',
 			'@typescript-eslint/no-deprecated': 'warn',
+			'jsdoc/check-tag-names': [
+				'warn',
+				{
+					// allow all tags from https://github.com/runem/web-component-analyzer
+					definedTags: ['element', 'attr', 'fires', 'prop', 'slot', 'cssprop', 'csspart'],
+				},
+			],
 		},
 	},
 

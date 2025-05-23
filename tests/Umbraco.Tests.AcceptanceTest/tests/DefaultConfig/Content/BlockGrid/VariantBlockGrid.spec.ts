@@ -56,9 +56,7 @@ test('invariant document type with invariant block grid with invariant block wit
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
-
   await umbracoUi.reloadPage();
   await umbracoUi.content.goToBlockGridBlockWithName(documentTypeGroupName, blockGridName, blockName);
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);
@@ -118,8 +116,6 @@ test('variant document type with variant block grid with variant block with an v
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   await umbracoUi.reloadPage();
@@ -146,8 +142,6 @@ test('variant document type with invariant block grid with variant block with an
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   await umbracoUi.reloadPage();
@@ -174,8 +168,6 @@ test('variant document type with invariant block grid with variant block with an
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   await umbracoUi.reloadPage();

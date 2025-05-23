@@ -24,6 +24,7 @@ import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 type UmbPropertyTypeUnique = UmbPropertyTypeModel['unique'];
 
@@ -114,12 +115,8 @@ export class UmbContentTypeStructureManager<
 	readonly variesByCulture = createObservablePart(this.ownerContentType, (x) => x?.variesByCulture);
 	readonly variesBySegment = createObservablePart(this.ownerContentType, (x) => x?.variesBySegment);
 
-	#containers: UmbArrayState<UmbPropertyTypeContainerModel> = new UmbArrayState<UmbPropertyTypeContainerModel>(
-		[],
-		(x) => x.id,
-	);
 	containerById(id: string) {
-		return this.#containers.asObservablePart((x) => x.find((y) => y.id === id));
+		return createObservablePart(this.#contentTypeContainers, (x) => x.find((y) => y.id === id));
 	}
 
 	constructor(host: UmbControllerHost, typeRepository: UmbDetailRepository<T> | string) {
@@ -143,11 +140,20 @@ export class UmbContentTypeStructureManager<
 				this.#repoManager.entries,
 				(entries) => {
 					// Prevent updating once that are have edited here.
-					entries = entries.filter(
+					const entriesToBeUpdated = entries.filter(
 						(x) => !(this.#editedTypes.getHasOne(x.unique) && this.#contentTypes.getHasOne(x.unique)),
 					);
 
-					this.#contentTypes.append(entries);
+					// Remove entries based on no-longer existing uniques:
+					const entriesToBeRemoved = this.#contentTypes
+						.getValue()
+						.filter((entry) => !entries.some((x) => x.unique === entry.unique))
+						.map((x) => x.unique);
+
+					this.#contentTypes.mute();
+					this.#contentTypes.remove(entriesToBeRemoved);
+					this.#contentTypes.append(entriesToBeUpdated);
+					this.#contentTypes.unmute();
 				},
 				null,
 			);
@@ -158,13 +164,6 @@ export class UmbContentTypeStructureManager<
 			this.contentTypeCompositions,
 			(contentTypeCompositions) => {
 				this.#loadContentTypeCompositions(contentTypeCompositions);
-			},
-			null,
-		);
-		this.observe(
-			this.#contentTypeContainers,
-			(contentTypeContainers) => {
-				this.#containers.setValue(contentTypeContainers);
 			},
 			null,
 		);
@@ -266,6 +265,8 @@ export class UmbContentTypeStructureManager<
 	}
 
 	async #loadContentTypeCompositions(contentTypeCompositions: T['compositions'] | undefined) {
+		// Important to wait a JS-cycle, cause this is called by an observation of a state and this results in setting the value for the state(potentially in the same JS-cycle) then we need to make sure we don't trigger a new update before the old subscription chain is completed. [NL]
+		await Promise.resolve();
 		const ownerUnique = this.getOwnerContentTypeUnique();
 		if (!ownerUnique) return;
 		const compositionUniques = contentTypeCompositions?.map((x) => x.contentType.unique) ?? [];
@@ -359,7 +360,7 @@ export class UmbContentTypeStructureManager<
 		this.#editedTypes.appendOne(toContentTypeUnique);
 
 		// Find container.
-		const container = this.#containers.getValue().find((x) => x.id === containerId);
+		const container = (await firstValueFrom(this.#contentTypeContainers)).find((x) => x.id === containerId);
 		if (!container) throw new Error('Container to clone was not found');
 
 		const clonedContainer: UmbPropertyTypeContainerModel = {
@@ -706,17 +707,19 @@ export class UmbContentTypeStructureManager<
 	}
 
 	rootContainers(containerType: UmbPropertyContainerTypes) {
-		return this.#containers.asObservablePart((data) => {
+		return createObservablePart(this.#contentTypeContainers, (data) => {
 			return data.filter((x) => x.parent === null && x.type === containerType);
 		});
 	}
 
-	getRootContainers(containerType: UmbPropertyContainerTypes) {
-		return this.#containers.getValue().filter((x) => x.parent === null && x.type === containerType);
+	async getRootContainers(containerType: UmbPropertyContainerTypes) {
+		return (await firstValueFrom(this.#contentTypeContainers)).filter(
+			(x) => x.parent === null && x.type === containerType,
+		);
 	}
 
 	async hasRootContainers(containerType: UmbPropertyContainerTypes) {
-		return this.#containers.asObservablePart((data) => {
+		return createObservablePart(this.#contentTypeContainers, (data) => {
 			return data.filter((x) => x.parent === null && x.type === containerType).length > 0;
 		});
 	}
@@ -748,14 +751,14 @@ export class UmbContentTypeStructureManager<
 	}
 
 	containersOfParentId(parentId: string, containerType: UmbPropertyContainerTypes) {
-		return this.#containers.asObservablePart((data) => {
+		return createObservablePart(this.#contentTypeContainers, (data) => {
 			return data.filter((x) => x.parent?.id === parentId && x.type === containerType);
 		});
 	}
 
 	// In future this might need to take parentName(parentId lookup) into account as well? otherwise containers that share same name and type will always be merged, but their position might be different and they should not be merged. [NL]
 	containersByNameAndType(name: string, containerType: UmbPropertyContainerTypes) {
-		return this.#containers.asObservablePart((data) => {
+		return createObservablePart(this.#contentTypeContainers, (data) => {
 			return data.filter((x) => x.name === name && x.type === containerType);
 		});
 	}
@@ -766,7 +769,7 @@ export class UmbContentTypeStructureManager<
 		parentName: string | null,
 		parentType?: UmbPropertyContainerTypes,
 	) {
-		return this.#containers.asObservablePart((data) => {
+		return createObservablePart(this.#contentTypeContainers, (data) => {
 			return data.filter(
 				(x) =>
 					// Match name and type:
@@ -813,17 +816,27 @@ export class UmbContentTypeStructureManager<
 		);
 	}
 
+	/**
+	 * Get all property aliases for the content type including inherited and composed content types.
+	 * @returns {Promise<Array<string>>} - A promise that will be resolved with the list of all content type property aliases.
+	 */
+	async getContentTypePropertyAliases() {
+		return this.#contentTypes
+			.getValue()
+			.flatMap((x) => x.properties?.map((y) => y.alias) ?? [])
+			.filter(UmbFilterDuplicateStrings);
+	}
+
 	#clear() {
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];
-		this.#containers.setValue([]);
 		this.#repoManager?.clear();
 		this.#contentTypes.setValue([]);
+		this.#ownerContentTypeUnique = undefined;
 	}
 
 	public override destroy() {
 		this.#contentTypes.destroy();
-		this.#containers.destroy();
 		super.destroy();
 	}
 }

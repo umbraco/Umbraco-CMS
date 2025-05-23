@@ -180,6 +180,10 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 							<uui-pagination
 								.current=${this._currentPageNumber}
 								.total=${this._totalPages}
+								firstlabel=${this.localize.term('general_first')}
+                                previouslabel=${this.localize.term('general_previous')}
+                                nextlabel=${this.localize.term('general_next')}
+                                lastlabel=${this.localize.term('general_last')}
 								@change=${this.#onPageChange}></uui-pagination>
 						`
 					: nothing}

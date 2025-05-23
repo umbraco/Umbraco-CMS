@@ -39,13 +39,13 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	 * <umb-extension-slot .type=${['my-extension-type','another-extension-type']}></umb-extension-slot>
 	 */
 	@property({ type: String })
-	public get type(): string | string[] | undefined {
-		return this.#type;
-	}
 	public set type(value: string | string[] | undefined) {
 		if (value === this.#type) return;
 		this.#type = value;
 		this.#observeExtensions();
+	}
+	public get type(): string | string[] | undefined {
+		return this.#type;
 	}
 	#type?: string | string[] | undefined;
 
@@ -58,13 +58,13 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	 * <umb-extension-slot type="my-extension-type" .filter=${(ext) => ext.meta.anyPropToFilter === 'foo'}></umb-extension-slot>
 	 */
 	@property({ type: Object, attribute: false })
-	public get filter(): (manifest: any) => boolean {
-		return this.#filter;
-	}
 	public set filter(value: (manifest: any) => boolean) {
 		if (value === this.#filter) return;
 		this.#filter = value;
 		this.#observeExtensions();
+	}
+	public get filter(): (manifest: any) => boolean {
+		return this.#filter;
 	}
 	#filter: (manifest: any) => boolean = () => true;
 
@@ -77,14 +77,14 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	 * <umb-extension-slot type="my-extension-type" .props=${{foo: 'bar'}}></umb-extension-slot>
 	 */
 	@property({ type: Object, attribute: false })
-	get props(): Record<string, unknown> | undefined {
-		return this.#props;
-	}
 	set props(newVal: Record<string, unknown> | undefined) {
 		this.#props = newVal;
 		if (this.#extensionsController) {
 			this.#extensionsController.properties = newVal;
 		}
+	}
+	get props(): Record<string, unknown> | undefined {
+		return this.#props;
 	}
 	#props?: Record<string, unknown> = {};
 

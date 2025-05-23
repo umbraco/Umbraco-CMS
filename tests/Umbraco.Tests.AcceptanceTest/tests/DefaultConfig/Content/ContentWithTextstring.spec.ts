@@ -14,7 +14,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
@@ -33,7 +33,7 @@ test('can create content with the textstring data type', async ({umbracoApi, umb
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
+  // await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
@@ -54,7 +54,7 @@ test('can publish content with the textstring data type', async ({umbracoApi, um
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
+  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
@@ -101,7 +101,7 @@ test('cannot input the text that exceeds the allowed amount of characters', asyn
 
   // Assert
   await umbracoUi.content.isTextWithMessageVisible(warningMessage);
-  //await umbracoUi.content.isSuccessNotificationVisible();
+  // await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
 
   // Clean

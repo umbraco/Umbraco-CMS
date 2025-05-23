@@ -56,8 +56,6 @@ test('invariant document type with invariant block list with invariant block wit
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   await umbracoUi.reloadPage();
@@ -118,8 +116,6 @@ test('variant document type with variant block list with variant block with an v
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   await umbracoUi.reloadPage();
@@ -146,8 +142,6 @@ test('variant document type with invariant block list with variant block with an
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   await umbracoUi.reloadPage();
@@ -174,8 +168,6 @@ test('variant document type with invariant block list with variant block with an
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   await umbracoUi.reloadPage();

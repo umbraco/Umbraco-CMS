@@ -55,6 +55,8 @@ export class UmbValidationPropertyPathTranslationController extends UmbControlle
 			return propertyPaths;
 		}
 
+		(api as any).manifest = manifest;
+
 		propertyPaths = (await api.translate(propertyPaths, propertyData)) ?? propertyPaths;
 
 		return propertyPaths;

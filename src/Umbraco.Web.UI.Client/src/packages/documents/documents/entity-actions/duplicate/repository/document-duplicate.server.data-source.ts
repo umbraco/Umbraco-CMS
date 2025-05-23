@@ -39,6 +39,7 @@ export class UmbDuplicateDocumentServerDataSource {
 					includeDescendants: args.includeDescendants,
 				},
 			}),
+			{ disableNotifications: true },
 		);
 	}
 }
