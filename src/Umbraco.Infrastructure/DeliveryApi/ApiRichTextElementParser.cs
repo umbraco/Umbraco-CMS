@@ -1,13 +1,10 @@
 using HtmlAgilityPack;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Infrastructure.Extensions;
 using Umbraco.Extensions;
 
@@ -103,7 +100,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         // - non-empty #text nodes
         // - empty #text between inline elements (see #17037) but not #text with only newlines (see #19388)
         HtmlNode[] childNodes = element.ChildNodes
-            .Where(c => c.Name != CommentNodeName && (c.Name != TextNodeName || (c.NextSibling is not null && c.PreviousSibling is not null) || IsNonEmptyElement(c)))
+            .Where(c => c.Name != CommentNodeName && (c.Name != TextNodeName || IsNonEmptyElement(c)))
             .ToArray();
 
         var tag = TagName(element);
