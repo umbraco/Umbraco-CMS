@@ -86,7 +86,7 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 
 	override render() {
 		if (!this._viewable) return nothing;
-		if (!this._datasetVariantId && !this._propertyType) return nothing;
+		if (!this._datasetVariantId || !this._propertyType) return nothing;
 
 		return html`<umb-content-workspace-view-edit-property
 			class="property"
