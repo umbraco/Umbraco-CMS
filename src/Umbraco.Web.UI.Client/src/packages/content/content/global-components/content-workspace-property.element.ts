@@ -1,0 +1,78 @@
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '../constants.js';
+import { html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+
+import '../workspace/views/edit/content-editor-property.element.js';
+
+@customElement('umb-content-workspace-property')
+export class UmbContentWorkspacePropertyElement extends UmbLitElement {
+	private _alias?: string | undefined;
+
+	@property()
+	public get alias(): string | undefined {
+		return this._alias;
+	}
+	public set alias(value: string | undefined) {
+		this._alias = value;
+		this.#observePropertyType();
+	}
+
+	@state()
+	_datasetVariantId?: UmbVariantId;
+
+	@state()
+	_dataPath?: string;
+
+	@state()
+	_writeable?: boolean;
+
+	@state()
+	_workspaceContext?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
+
+	@state()
+	_propertyType?: UmbPropertyTypeModel;
+
+	constructor() {
+		super();
+
+		// The Property Dataset is local to the active variant, we use this to retrieve the variant we like to gather the value from.
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (datasetContext) => {
+			this._datasetVariantId = datasetContext?.getVariantId();
+		});
+
+		// The Content Workspace Context is used to retrieve the property type we like to observe.
+		// This gives us the configuration from the property type as part of the data type.
+		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, async (workspaceContext) => {
+			this._workspaceContext = workspaceContext;
+			this.#observePropertyType();
+		});
+	}
+
+	async #observePropertyType() {
+		if (!this._alias || !this._workspaceContext) return;
+
+		this.observe(await this._workspaceContext?.structure.propertyStructureByAlias(this._alias), (propertyType) => {
+			this._propertyType = propertyType;
+		});
+	}
+
+	override render() {
+		if (!this._datasetVariantId && !this._propertyType) return nothing;
+
+		return html`<umb-content-workspace-view-edit-property
+			class="property"
+			.variantId=${this._datasetVariantId}
+			.property=${this._propertyType}></umb-content-workspace-view-edit-property>`;
+	}
+}
+
+export default UmbContentWorkspacePropertyElement;
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-content-workspace-property': UmbContentWorkspacePropertyElement;
+	}
+}

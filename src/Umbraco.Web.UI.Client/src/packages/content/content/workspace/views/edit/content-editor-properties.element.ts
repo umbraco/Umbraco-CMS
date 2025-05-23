@@ -11,8 +11,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
-import './content-editor-property.element.js';
-
 @customElement('umb-content-workspace-view-edit-properties')
 export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	#workspaceContext?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
@@ -103,10 +101,9 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 					this._visibleProperties,
 					(property) => property.alias,
 					(property) =>
-						html`<umb-content-workspace-view-edit-property
+						html`<umb-content-workspace-property
 							class="property"
-							.variantId=${this._datasetVariantId}
-							.property=${property}></umb-content-workspace-view-edit-property>`,
+							alias=${property.alias}></umb-content-workspace-property>`,
 				)
 			: nothing;
 	}
