@@ -71,7 +71,7 @@ export abstract class UmbTreeItemElementBase<
 	private _isSelectable = false;
 
 	@state()
-	private _isSelected = false;
+	protected _isSelected = false;
 
 	@state()
 	private _hasChildren = false;
@@ -168,7 +168,7 @@ export abstract class UmbTreeItemElementBase<
 		const iconWithoutColor = icon?.split(' ')[0];
 
 		if (icon && iconWithoutColor) {
-			return html`<umb-icon slot="icon" name="${this._isActive ? iconWithoutColor : icon}"></umb-icon>`;
+			return html`<umb-icon slot="icon" name="${this._isActive || this._isSelected ? iconWithoutColor : icon}"></umb-icon>`;
 		}
 
 		if (isFolder) {
